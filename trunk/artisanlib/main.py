@@ -314,10 +314,10 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 from const import UIconst
 
 # should not be needed anymore for minimalmodbus > v0.4
-if platf == 'Windows':
-    minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=True
-else:
-    minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=False
+#if platf == 'Windows':
+#    minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=True
+#else:
+#    minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=False
 
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
@@ -901,10 +901,11 @@ class tgraphcanvas(FigureCanvas):
 
         self.ax.set_xlim(self.startofx, self.endofx)
         self.ax.set_ylim(self.ylimit_min,self.ylimit)
-
-        self.delta_ax.set_xlim(self.startofx, self.endofx)
-        self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
-        self.delta_ax.set_autoscale_on(False)
+        
+        if self.delta_ax:
+            self.delta_ax.set_xlim(self.startofx, self.endofx)
+            self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+            self.delta_ax.set_autoscale_on(False)
 
         # disable figure autoscale
         self.ax.set_autoscale_on(False)
@@ -1069,7 +1070,6 @@ class tgraphcanvas(FigureCanvas):
         #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT
         self.dutycycle = 0.
         self.dutycycleTX = 0.
-        self.fujiETBT = 0.
         self.currentpidsv = 0.
 
         self.linecount = None # linecount cache for resetlines(); has to be reseted if visibility of ET/BT or extra lines or background ET/BT changes
@@ -3513,7 +3513,8 @@ class tgraphcanvas(FigureCanvas):
             aw.update_minieventline_visibility()
             aw.qmc.ax.set_xlabel("")
             aw.qmc.ax.set_ylabel("")
-            aw.qmc.delta_ax.set_ylabel("")
+            if aw.qmc.delta_ax:
+                aw.qmc.delta_ax.set_ylabel("")
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -5920,7 +5921,8 @@ class VMToolbar(NavigationToolbar):
             if aw.qmc.flagstart:
                 aw.qmc.ax.set_ylabel("")
                 aw.qmc.ax.set_xlabel("")
-                aw.qmc.delta_ax.set_ylabel("")
+                if aw.qmc.delta_ax:
+                    aw.qmc.delta_ax.set_ylabel("")
             item, ok = QInputDialog.getItem(self, 'Customize',
                                                   'Select axes:', titles,
                                                   0, False)
@@ -5964,12 +5966,14 @@ class SampleThread(QThread):
                 # calc previous RoR (pRoR) taking the last n samples into account
                 pdtemp = tempx[-1] - tempx[-n]
                 pdtime = timex[-1] - timex[-n]
-                pRoR = abs(pdtemp/pdtime)
-                dtemp = tempx[-1] - temp
-                dtime = timex[-1] - time
-                RoR = abs(dtemp/dtime)
-                if RoR > (pRoR + dRoR_limit):
-                    wrong_reading = 2
+                if pdtime > 0:
+                    pRoR = abs(pdtemp/pdtime)
+                    dtemp = tempx[-1] - temp
+                    dtime = timex[-1] - time
+                    if dtime > 0:
+                        RoR = abs(dtemp/dtime)
+                        if RoR > (pRoR + dRoR_limit):
+                            wrong_reading = 2
 #            #########################
 #            # c) handle outliers if it could be detected
             if wrong_reading:
@@ -19930,10 +19934,17 @@ class modbusport(object):
         self.littleEndianFloats = False
         self.xonoff=0
         self.master = None
+        self.COMsemaphore = QSemaphore(1)        
 
 #    def isConnected(self):
 #        return (self.master == None)
 
+    def address2register(self,addr,code=3):
+        if code == 3 or code == 6:
+            return addr - 40001
+        else:
+            return addr - 30001
+        
     def connect(self):
         if self.master and not self.master.serial.isOpen():
             self.master = None
@@ -19947,14 +19958,14 @@ class modbusport(object):
                 self.master.serial.setByteSize(self.bytesize)
                 self.master.serial.setParity(self.parity)
                 self.master.serial.setStopbits(self.stopbits)
-                # timeout seems to delay sequential requests in minimalmodbus so keep the default for now
-                self.master.serial.setTimeout(self.timeout) 
+                # timeout seems to delay sequential requests in minimalmodbus (used lib internal for Modbus timing requirements) so keep the default for now
+                #self.master.serial.setTimeout(self.timeout) 
                 # configure Instrument:
                 self.master.debug = False
                 # open port
                 if not self.master.close_port_after_each_call:
                     self.master.serial.open()
-                    libtime.sleep(.5) # avoid possible hickups on startup
+                    libtime.sleep(.3) # avoid possible hickups on startup
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -19975,7 +19986,7 @@ class modbusport(object):
     def writeSingleRegister(self,slave,register,value):
         try:
             #### lock shared resources #####
-            aw.qmc.samplingsemaphore.acquire(1)
+            self.COMsemaphore.acquire(1)
             self.connect()
             self.master.address = int(slave)
             self.master.write_register(int(register),int(value),0,6)
@@ -19983,15 +19994,15 @@ class modbusport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
 
     # value=int or float
     # writes a single precision 32bit float (2-registers)
     def writeWord(self,slave,register,value):
         try:
             #### lock shared resources #####
-            aw.qmc.samplingsemaphore.acquire(1)
+            self.COMsemaphore.acquire(1)
             self.connect()
             self.master.address = int(slave)
             self.master.write_float(int(register),float(value),2)
@@ -19999,11 +20010,13 @@ class modbusport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeWord() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
 
     def readFloat(self,slave,register,code=3):
         try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
             self.connect()
             self.master.address = int(slave)
             r = self.master.read_float(int(register),int(code),2)
@@ -20012,6 +20025,8 @@ class modbusport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " readFloat() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -20019,6 +20034,8 @@ class modbusport(object):
 
     def readSingleRegister(self,slave,register,code=3):
         try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
             self.connect()
             self.master.address = int(slave)
             r = self.master.read_register(int(register),0,int(code))
@@ -20027,6 +20044,8 @@ class modbusport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " readSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -20333,10 +20352,10 @@ class serialport(object):
     def fujitemperature(self):
         #update ET SV LCD 6
         aw.qmc.currentpidsv = aw.fujipid.readcurrentsv()
-        # get the temperature for ET. aw.fujipid.gettemperature(unitID)
-        t1 = aw.fujipid.gettemperature(self.controlETpid[1])/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
         #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
         tx = aw.qmc.timeclock.elapsed()/1000.
+        # get the temperature for ET. aw.fujipid.gettemperature(unitID)
+        t1 = aw.fujipid.gettemperature(self.controlETpid[1])/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
         #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
         if self.readBTpid[0] < 2:                    
             t2 = aw.fujipid.gettemperature(self.readBTpid[1])/10.
@@ -20350,14 +20369,14 @@ class serialport(object):
             command = aw.dtapid.message2send(unitID,function,address,ndata)
             t2 = self.sendDTAcommand(command)
         else:
-            t2 = 0.
+            t2 = -1
         #get current duty cycle and update LCD 7
-        aw.qmc.dutycycle = aw.fujipid.readdutycycle()
-        aw.qmc.dutycycleTX = aw.qmc.timeclock.elapsed()/1000.
-        if t2:
-            aw.qmc.fujiETBT = t1-t2
-        else:
-            aw.qmc.fujiETBT = 0.
+        try:
+            aw.qmc.dutycycle = aw.fujipid.readdutycycle()
+            aw.qmc.dutycycleTX = aw.qmc.timeclock.elapsed()/1000.
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","",None, QApplication.UnicodeUTF8) + " fujitemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
         return tx,t1,t2
 
     #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
@@ -20835,7 +20854,7 @@ class serialport(object):
             res1 = -1
         if aw.modbus.input2slave:
             if just_send:
-                libtime.sleep(0.03)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.01)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input2float:
                 res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             else:
@@ -20847,7 +20866,7 @@ class serialport(object):
             res2 = -1
         if aw.modbus.input3slave:
             if just_send:
-                libtime.sleep(0.03)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.01)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input3float:
                 res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             else:
@@ -20859,7 +20878,7 @@ class serialport(object):
             res3 = -1
         if aw.modbus.input4slave:
             if just_send:
-                libtime.sleep(0.03)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.01)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input4float:
                 res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             else:
@@ -26402,14 +26421,27 @@ class PXRpidDlgControl(ArtisanDialog):
     def setpoint(self,PID):
         command = ""
         try:
-            if PID == "ET":
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
-            elif PID == "BT":
-                if aw.ser.readBTpid[0] == 0:
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
-                elif aw.ser.readBTpid[0] == 1:
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                if PID == "ET":
+                    slaveID = aw.ser.controlETpid[1]
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
+                elif PID == "BT":
+                    slaveID = aw.ser.readBTpid[1]
+                    if aw.ser.readBTpid[0] == 0:
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                    elif aw.ser.readBTpid[0] == 1:
+                        reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
+                aw.modbus.writeSingleRegister(slaveID,reg,1)                
+                r = command
+            else:
+                if PID == "ET":
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
+                elif PID == "BT":
+                    if aw.ser.readBTpid[0] == 0:
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
+                    elif aw.ser.readBTpid[0] == 1:
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
+                r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
                 message = QApplication.translate("StatusBar","Decimal position successfully set to 1",None,QApplication.UnicodeUTF8)
@@ -26423,19 +26455,37 @@ class PXRpidDlgControl(ArtisanDialog):
     def setthermocoupletype(self,PID):
         command = ""
         try:
-            if PID == "ET":
-                index = self.ETthermocombobox.currentIndex()
-                value = self.PXRconversiontoindex[index]
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["pvinputtype"][1],value)
-            elif PID == "BT":
-                index = self.BTthermocombobox.currentIndex()
-                if aw.ser.readBTpid[0] == 0:
-                    value = self.PXGconversiontoindex[index]
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["pvinputtype"][1],value)
-                elif aw.ser.readBTpid[0] == 1:
+            if aw.ser.useModbusPort:
+                if PID == "ET":
+                    slaveID = aw.ser.controlETpid[1]
+                    index = self.ETthermocombobox.currentIndex()
                     value = self.PXRconversiontoindex[index]
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["pvinputtype"][1],value)
-            r = aw.ser.sendFUJIcommand(command,8)
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],6)
+                elif PID == "BT":
+                    slaveID = aw.ser.readBTpid[1]
+                    index = self.BTthermocombobox.currentIndex()
+                    if aw.ser.readBTpid[0] == 0:
+                        value = self.PXGconversiontoindex[index]
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["pvinputtype"][1],6)
+                    elif aw.ser.readBTpid[0] == 1:
+                        value = self.PXRconversiontoindex[index]
+                        reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],6)
+                aw.modbus.writeSingleRegister(slaveID,reg,value)
+                r == command
+            else:
+                if PID == "ET":
+                    index = self.ETthermocombobox.currentIndex()
+                    value = self.PXRconversiontoindex[index]
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["pvinputtype"][1],value)
+                elif PID == "BT":
+                    index = self.BTthermocombobox.currentIndex()
+                    if aw.ser.readBTpid[0] == 0:
+                        value = self.PXGconversiontoindex[index]
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["pvinputtype"][1],value)
+                    elif aw.ser.readBTpid[0] == 1:
+                        value = self.PXRconversiontoindex[index]
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["pvinputtype"][1],value)
+                r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
                 if PID == "ET":
@@ -26454,16 +26504,28 @@ class PXRpidDlgControl(ArtisanDialog):
         message = "empty"
         command = ""
         try:
-            if PID == "ET":
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["pvinputtype"][1],1)
-            elif PID == "BT":
-                if aw.ser.readBTpid[0] == 0:
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXG4["pvinputtype"][1],1)
-                elif aw.ser.readBTpid[0] == 1:
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXR["pvinputtype"][1],1)
-            if command:
-                Thtype = aw.fujipid.readoneword(command)
+            if aw.ser.useModbusPort:
+                if PID == "ET":
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],3)
+                elif PID == "BT":
+                    if aw.ser.readBTpid[0] == 0:
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["pvinputtype"][1],3)
+                    elif aw.ser.readBTpid[0] == 1:
+                        reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],3)
+                if command:
+                    Thtype = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+            else:
+                if PID == "ET":
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["pvinputtype"][1],1)
+                elif PID == "BT":
+                    if aw.ser.readBTpid[0] == 0:
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXG4["pvinputtype"][1],1)
+                    elif aw.ser.readBTpid[0] == 1:
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXR["pvinputtype"][1],1)
+                if command:
+                    Thtype = aw.fujipid.readoneword(command)
                 
+            if command:                
                 if PID == "ET":
                     if Thtype in self.PXRconversiontoindex:
                         self.ETthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(Thtype))
@@ -26540,9 +26602,14 @@ class PXRpidDlgControl(ArtisanDialog):
 
     def setONOFFautotune(self,flag):
         self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None, QApplication.UnicodeUTF8),500)
-        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["autotuning"][1],flag)
-        #TX and RX
-        r = aw.ser.sendFUJIcommand(command,8)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR["autotuning"][1],6)
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+            r = "00000000"
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["autotuning"][1],flag)
+            #TX and RX
+            r = aw.ser.sendFUJIcommand(command,8)
         if len(r) == 8:
             if flag == 0:
                 aw.fujipid.PXR["autotuning"][0] = 0
@@ -26559,9 +26626,14 @@ class PXRpidDlgControl(ArtisanDialog):
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
         self.status.showMessage(QApplication.translate("StatusBar","wait...",None, QApplication.UnicodeUTF8),500)
-        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["runstandby"][1],flag)
-        #TX and RX
-        r = aw.ser.sendFUJIcommand(command,8)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR["runstandby"][1],6)
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+            r = "00000000"
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["runstandby"][1],flag)
+            #TX and RX
+            r = aw.ser.sendFUJIcommand(command,8)
         if r == command:
             if flag == 1:
                 message = QApplication.translate("StatusBar","PID OFF",None, QApplication.UnicodeUTF8)     #put pid in standby 1 (pid on)
@@ -26578,19 +26650,29 @@ class PXRpidDlgControl(ArtisanDialog):
     def setsv(self):
         if self.svedit.text() != "":
             newSVvalue = int(float(self.svedit.text())*10) #multiply by 10 because of decimal point
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["sv0"][1],newSVvalue)
-            r = aw.ser.sendFUJIcommand(command,8)
-            if r == command:
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXR["sv0"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newSVvalue)
                 message = QApplication.translate("StatusBar","SV successfully set to %1",None, QApplication.UnicodeUTF8).arg(self.svedit.text())
                 aw.fujipid.PXR["sv0"][0] = float(str(self.svedit.text()))
                 self.status.showMessage(message,5000)
                 #record command as an Event 
                 strcommand = "SETSV::"+ str("%.1f"%(newSVvalue/10.))
                 aw.qmc.DeviceEventRecord(strcommand)
-            else:
-                mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setsv()"
-                self.status.showMessage(mssg,5000)
-                aw.qmc.adderror(mssg)
+            else:          
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["sv0"][1],newSVvalue)
+                r = aw.ser.sendFUJIcommand(command,8)
+                if r == command:
+                    message = QApplication.translate("StatusBar","SV successfully set to %1",None, QApplication.UnicodeUTF8).arg(self.svedit.text())
+                    aw.fujipid.PXR["sv0"][0] = float(str(self.svedit.text()))
+                    self.status.showMessage(message,5000)
+                    #record command as an Event 
+                    strcommand = "SETSV::"+ str("%.1f"%(newSVvalue/10.))
+                    aw.qmc.DeviceEventRecord(strcommand)
+                else:
+                    mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setsv()"
+                    self.status.showMessage(mssg,5000)
+                    aw.qmc.adderror(mssg)
         else:
             self.status.showMessage(QApplication.translate("StatusBar","Empty SV box",None, QApplication.UnicodeUTF8),5000)
 
@@ -26604,8 +26686,12 @@ class PXRpidDlgControl(ArtisanDialog):
             self.status.showMessage(QApplication.translate("StatusBar","Unable to read SV",None, QApplication.UnicodeUTF8),5000)
 
     def checkrampsoakmode(self):
-        msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["rampsoakmode"][1],1)
-        currentmode = aw.fujipid.readoneword(msg)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR["rampsoakmode"][1],3)
+            currentmode = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["rampsoakmode"][1],1)
+            currentmode = aw.fujipid.readoneword(msg)
         aw.fujipid.PXR["rampsoakstartend"][0] = currentmode
         if currentmode == 0:
             mode = ["0",
@@ -26736,15 +26822,24 @@ class PXRpidDlgControl(ArtisanDialog):
             #1 = 5-8
             #2 = 1-8
             selectedmode = self.patternComboBox.currentIndex()
-            msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["rampsoakpattern"][1],1)
-            currentmode = aw.fujipid.readoneword(msg)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXR["rampsoakpattern"][1],3)
+                currentmode = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+            else:            
+                msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["rampsoakpattern"][1],1)
+                currentmode = aw.fujipid.readoneword(msg)            
             if currentmode != -1:
                 aw.fujipid.PXR["rampsoakpattern"][0] = currentmode
                 if currentmode != selectedmode:
                     #set mode in pid to match the mode selected in the combobox
                     self.status.showMessage(QApplication.translate("StatusBar","Need to change pattern mode...",None, QApplication.UnicodeUTF8),1000)
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["rampsoakpattern"][1],selectedmode)
-                    r = aw.ser.sendFUJIcommand(command,8)
+                    if aw.ser.useModbusPort:
+                        reg = aw.modbus.address2register(aw.fujipid.PXR["rampsoakpattern"][1],6)
+                        aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,selectedmode)
+                        r = "00000000"
+                    else:
+                        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["rampsoakpattern"][1],selectedmode)
+                        r = aw.ser.sendFUJIcommand(command,8)
                     if len(r) == 8:
                         self.status.showMessage(QApplication.translate("StatusBar","Pattern has been changed. Wait 5 secs.",None, QApplication.UnicodeUTF8), 500)
                         aw.fujipid.PXR["rampsoakpattern"][0] = selectedmode
@@ -26753,8 +26848,13 @@ class PXRpidDlgControl(ArtisanDialog):
                         return
                 #combobox mode matches pid mode
                 #set ramp soak mode ON
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["rampsoak"][1],flag)
-                r = aw.ser.sendFUJIcommand(command,8)
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["rampsoak"][1],6)
+                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+                    r = command = ""
+                else:                
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["rampsoak"][1],flag)
+                    r = aw.ser.sendFUJIcommand(command,8)
                 if r == command:
                     #record command as an Event if flag = 1
                     self.status.showMessage(QApplication.translate("StatusBar","RS ON",None, QApplication.UnicodeUTF8), 5000)
@@ -26782,8 +26882,13 @@ class PXRpidDlgControl(ArtisanDialog):
         #set ramp soak OFF
         elif flag == 0:
             self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None, QApplication.UnicodeUTF8),500)
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["rampsoak"][1],flag)
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXR["rampsoak"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+                r = command = ""
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["rampsoak"][1],flag)
+                r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
                 self.status.showMessage(QApplication.translate("StatusBar","RS successfully turned OFF",None, QApplication.UnicodeUTF8), 5000)
                 aw.fujipid.PXR["rampsoak"][0] = flag
@@ -26794,8 +26899,12 @@ class PXRpidDlgControl(ArtisanDialog):
 
     def getsegment(self, idn):
         svkey = "segment" + str(idn) + "sv"
-        svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[svkey][1],1)
-        sv = aw.fujipid.readoneword(svcommand)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR[svkey][1],3)
+            sv = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[svkey][1],1)
+            sv = aw.fujipid.readoneword(svcommand)
         if sv == -1:
             mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " getsegment()"
             self.status.showMessage(mssg,5000)
@@ -26803,8 +26912,12 @@ class PXRpidDlgControl(ArtisanDialog):
             return -1
         aw.fujipid.PXR[svkey][0] = sv/10.              #divide by 10 because the decimal point is not sent by the PID
         rampkey = "segment" +str(idn) + "ramp"
-        rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[rampkey][1],1)
-        ramp = aw.fujipid.readoneword(rampcommand)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR[rampkey][1],3)
+            ramp = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[rampkey][1],1)
+            ramp = aw.fujipid.readoneword(rampcommand)
         if ramp == -1:
             mssg = QApplication.translate("StatusBar","getsegment(): problem reading ramp",None, QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
@@ -26812,8 +26925,12 @@ class PXRpidDlgControl(ArtisanDialog):
             return -1
         aw.fujipid.PXR[rampkey][0] = ramp/10.
         soakkey = "segment" + str(idn) + "soak"
-        soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[soakkey][1],1)
-        soak = aw.fujipid.readoneword(soakcommand)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR[soakkey][1],3)
+            soak = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[soakkey][1],1)
+            soak = aw.fujipid.readoneword(soakcommand)
         if soak == -1:
             mssg = QApplication.translate("StatusBar","getsegment(): problem reading soak",None, QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
@@ -26836,23 +26953,35 @@ class PXRpidDlgControl(ArtisanDialog):
         self.status.showMessage(QApplication.translate("StatusBar","Finished reading Ramp/Soak val.",None, QApplication.UnicodeUTF8),5000)
 
     def getpid(self):
-        pcommand= aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["p"][1],1)
-        p = aw.fujipid.readoneword(pcommand)/10.
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR["p"][1],3)
+            p = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+        else:    
+            pcommand= aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["p"][1],1)
+            p = aw.fujipid.readoneword(pcommand)/10.
         if p == -1 :
             return -1
         else:
             self.pedit.setText(str(p))
             aw.fujipid.PXR["p"][0] = p
         #i is int range 0-3200
-        icommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["i"][1],1)
-        i = aw.fujipid.readoneword(icommand)/10
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR["i"][1],3)
+            i = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+        else:
+            icommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["i"][1],1)
+            i = aw.fujipid.readoneword(icommand)/10.
         if i == -1:
             return -1
         else:
             self.iedit.setText(str(int(i)))
             aw.fujipid.PXR["i"][0] = i
-        dcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["d"][1],1)
-        d = aw.fujipid.readoneword(dcommand)/10.
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR["d"][1],3)
+            d = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+        else:
+            dcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["d"][1],1)
+            d = aw.fujipid.readoneword(dcommand)/10.
         if d == -1:
             return -1
         else:
@@ -26866,22 +26995,37 @@ class PXRpidDlgControl(ArtisanDialog):
         if var == "p":
             if str(self.pedit.text()).isdigit():
                 p = int(str(self.pedit.text()))*10
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["p"][1],p)
-                r = aw.ser.sendFUJIcommand(command,8)
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["p"][1],6)
+                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,p)
+                    r = "        "
+                else:
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["p"][1],p)
+                    r = aw.ser.sendFUJIcommand(command,8)
             else:
                 return -1
         elif var == "i":
             if str(self.iedit.text()).isdigit():
                 i = int(str(self.iedit.text()))*10
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["i"][1],i)
-                r = aw.ser.sendFUJIcommand(command,8)
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["i"][1],6)
+                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,i)
+                    r = "        "
+                else:
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["i"][1],i)
+                    r = aw.ser.sendFUJIcommand(command,8)
             else:
                 return -1
         elif var == "d":
             if str(self.dedit.text()).isdigit():
                 d = int(str(self.dedit.text()))*10
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["d"][1],d)
-                r = aw.ser.sendFUJIcommand(command,8)
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["d"][1],6)
+                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,d)
+                    r = "        "
+                else:
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["d"][1],d)
+                    r = aw.ser.sendFUJIcommand(command,8)
             else:
                 return -1
 
@@ -27726,8 +27870,13 @@ class PXG4pidDlgControl(ArtisanDialog):
 
     def settimeunits(self):
         try:
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["timeunits"][1],1)
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4["timeunits"][1],6)       
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,1)
+                r = command = ""
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["timeunits"][1],1)
+                r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
                 message = QApplication.translate("StatusBar","Time Units successfully set to MM:SS",None,QApplication.UnicodeUTF8)
@@ -27741,14 +27890,27 @@ class PXG4pidDlgControl(ArtisanDialog):
     def setpoint(self,PID):
         command = ""
         try:
-            if PID == "ET":
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
-            elif PID == "BT":
-                if aw.ser.readBTpid[0] == 0:
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
-                elif aw.ser.readBTpid[0] == 1:
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                if PID == "ET":
+                    slaveID = aw.ser.controlETpid[1]
+                    reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                elif PID == "BT":
+                    slaveID = aw.ser.readBTpid[1]
+                    if aw.ser.readBTpid[0] == 0:
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                    elif aw.ser.readBTpid[0] == 1:
+                        reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
+                aw.modbus.writeSingleRegister(slaveID,reg,1)
+                r = command
+            else:
+                if PID == "ET":
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
+                elif PID == "BT":
+                    if aw.ser.readBTpid[0] == 0:
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
+                    elif aw.ser.readBTpid[0] == 1:
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
+                r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
                 message = QApplication.translate("StatusBar","Decimal position successfully set to 1",None,QApplication.UnicodeUTF8)
@@ -27762,19 +27924,37 @@ class PXG4pidDlgControl(ArtisanDialog):
     def setthermocoupletype(self,PID):
         command = ""
         try:
-            if PID == "ET":
-                index = self.ETthermocombobox.currentIndex()
-                value = self.PXGconversiontoindex[index]
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["pvinputtype"][1],value)
-            elif PID == "BT":
-                index = self.BTthermocombobox.currentIndex()
-                if aw.ser.readBTpid[0] == 0:
+            if aw.ser.useModbusPort:
+                if PID == "ET":
+                    slaveID = aw.ser.controlETpid[1]
+                    index = self.ETthermocombobox.currentIndex()
                     value = self.PXGconversiontoindex[index]
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["pvinputtype"][1],value)
-                elif aw.ser.readBTpid[0] == 1:
-                    value = self.PXRconversiontoindex[index]
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["pvinputtype"][1],value)
-            r = aw.ser.sendFUJIcommand(command,8)
+                    reg = aw.modbus.address2register(aw.fujipid.PXG4["pvinputtype"][1],6)
+                elif PID == "BT":
+                    slaveID = aw.ser.readBTpid[1]
+                    index = self.BTthermocombobox.currentIndex()
+                    if aw.ser.readBTpid[0] == 0:
+                        value = self.PXGconversiontoindex[index]
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["pvinputtype"][1],6)
+                    elif aw.ser.readBTpid[0] == 1:
+                        value = self.PXRconversiontoindex[index]
+                        reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],6)
+                aw.modbus.writeSingleRegister(slaveID,reg,value)
+                r == command
+            else:
+                if PID == "ET":
+                    index = self.ETthermocombobox.currentIndex()
+                    value = self.PXGconversiontoindex[index]
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["pvinputtype"][1],value)
+                elif PID == "BT":
+                    index = self.BTthermocombobox.currentIndex()
+                    if aw.ser.readBTpid[0] == 0:
+                        value = self.PXGconversiontoindex[index]
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["pvinputtype"][1],value)
+                    elif aw.ser.readBTpid[0] == 1:
+                        value = self.PXRconversiontoindex[index]
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["pvinputtype"][1],value)
+                r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
                 if PID == "ET":
@@ -27793,15 +27973,27 @@ class PXG4pidDlgControl(ArtisanDialog):
         command = ""
         message = "empty"
         try:
-            if PID == "ET":
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["pvinputtype"][1],1)
-            elif PID == "BT":
-                if aw.ser.readBTpid[0] == 0:
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXG4["pvinputtype"][1],1)
-                elif aw.ser.readBTpid[0] == 1:
-                    command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXR["pvinputtype"][1],1)
+            if aw.ser.useModbusPort:
+                if PID == "ET":
+                    reg = aw.modbus.address2register(aw.fujipid.PXG4["pvinputtype"][1],3)
+                elif PID == "BT":
+                    if aw.ser.readBTpid[0] == 0:
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["pvinputtype"][1],3)
+                    elif aw.ser.readBTpid[0] == 1:
+                        reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],3)
+                if command:
+                    Thtype = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+            else:
+                if PID == "ET":
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["pvinputtype"][1],1)
+                elif PID == "BT":
+                    if aw.ser.readBTpid[0] == 0:
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXG4["pvinputtype"][1],1)
+                    elif aw.ser.readBTpid[0] == 1:
+                        command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXR["pvinputtype"][1],1)
+                if command:
+                    Thtype = aw.fujipid.readoneword(command)
             if command:
-                Thtype = aw.fujipid.readoneword(command)
                 if PID == "ET":
                     if Thtype in self.PXGconversiontoindex:
                         aw.fujipid.PXG4["pvinputtype"][0] = Thtype
@@ -27934,8 +28126,12 @@ class PXG4pidDlgControl(ArtisanDialog):
     #selects an sv
     def setNsv(self,svn):
         # read current sv N
-        command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectsv"][1],1)
-        N = aw.fujipid.readoneword(command)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4["selectsv"][1],3)
+            N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectsv"][1],1)
+            N = aw.fujipid.readoneword(command)
         # if current svN is different than requested svN
         if N != -1:
             if N != svn:
@@ -27944,8 +28140,13 @@ class PXG4pidDlgControl(ArtisanDialog):
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     #change variable svN
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["selectsv"][1],svn)
-                    r = aw.ser.sendFUJIcommand(command,8)
+                    if aw.ser.useModbusPort:
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["selectsv"][1],6)
+                        aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,svn)
+                        r = command = ""
+                    else:
+                        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["selectsv"][1],svn)
+                        r = aw.ser.sendFUJIcommand(command,8)
                     #check response from pid and update message on main window
                     if r == command:
                         aw.fujipid.PXG4["selectsv"][0] = svn
@@ -27984,8 +28185,12 @@ class PXG4pidDlgControl(ArtisanDialog):
     #selects an sv
     def setNpid(self,pidn):
         # read current sv N
-        command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
-        N = aw.fujipid.readoneword(command)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4["selectedpid"][1],3)
+            N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
+            N = aw.fujipid.readoneword(command)
         if N != -1:
             aw.fujipid.PXG4["selectedpid"][0] = N
             # if current svN is different than requested svN
@@ -27995,8 +28200,13 @@ class PXG4pidDlgControl(ArtisanDialog):
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     #change variable svN
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["selectedpid"][1],pidn)
-                    r = aw.ser.sendFUJIcommand(command,8)
+                    if aw.ser.useModbusPort:
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["selectedpid"][1],6)
+                        aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,pidn)
+                        r = command = ""
+                    else:
+                        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["selectedpid"][1],pidn)
+                        r = aw.ser.sendFUJIcommand(command,8)
                     #check response from pid and update message on main window
                     if r == command:
                         aw.fujipid.PXG4["selectedpid"][0] = pidn
@@ -28059,8 +28269,13 @@ class PXG4pidDlgControl(ArtisanDialog):
                 newSVvalue = int(float(str(self.sv7edit.text()))*10.)
         #send command to the right sv
         svkey = "sv"+ str(i)
-        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[svkey][1],newSVvalue)
-        r = aw.ser.sendFUJIcommand(command,8)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[svkey][1],6)
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newSVvalue)
+            r = "00000000"
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[svkey][1],newSVvalue)
+            r = aw.ser.sendFUJIcommand(command,8)
         #verify it went ok
         if len(r) == 8:
             if i == 1:
@@ -28155,15 +28370,24 @@ class PXG4pidDlgControl(ArtisanDialog):
         pkey = "p" + str(k)
         ikey = "i" + str(k)
         dkey = "d" + str(k)
-        commandp = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[pkey][1],newPvalue)
-        commandi = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[ikey][1],newIvalue)
-        commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[dkey][1],newDvalue)
-        p = aw.ser.sendFUJIcommand(commandp,8)
-        libtime.sleep(0.035) 
-        i = aw.ser.sendFUJIcommand(commandi,8)
-        libtime.sleep(0.035) 
-        d = aw.ser.sendFUJIcommand(commandd,8)
-        libtime.sleep(0.035) 
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[pkey][1],6)
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newPvalue)
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[ikey][1],6)
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newIvalue)
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[dkey][1],6)
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newDvalue)
+            p = i = d = "        "
+        else:
+            commandp = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[pkey][1],newPvalue)
+            commandi = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[ikey][1],newIvalue)
+            commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[dkey][1],newDvalue)
+            p = aw.ser.sendFUJIcommand(commandp,8)
+            libtime.sleep(0.035) 
+            i = aw.ser.sendFUJIcommand(commandi,8)
+            libtime.sleep(0.035) 
+            d = aw.ser.sendFUJIcommand(commandd,8)
+            libtime.sleep(0.035) 
         #verify it went ok
         if len(p) == 8 and len(i)==8 and len(d) == 8:
             if k == 1:               
@@ -28230,7 +28454,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                                                    QApplication.UnicodeUTF8).arg(str(k)).arg(str(lp)).arg(str(li)).arg(str(ld))
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
-
+            
     def getallpid(self):
         for k in range(1,8):
             pkey = "p" + str(k)
@@ -28239,12 +28463,24 @@ class PXG4pidDlgControl(ArtisanDialog):
             msg = QApplication.translate("StatusBar","sending commands for p%1 i%2 d%3",None,
                                                    QApplication.UnicodeUTF8).arg(str(k)).arg(str(k)).arg(str(k))
             self.status.showMessage(msg,1000)
-            commandp = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[pkey][1],1)
-            p = aw.fujipid.readoneword(commandp)/10.
-            commandi = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[ikey][1],1)
-            i = aw.fujipid.readoneword(commandi)/10.
-            commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[dkey][1],1)
-            dd = aw.fujipid.readoneword(commandd)/10.
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4[pkey][1],3)
+                p = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+            else:
+                commandp = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[pkey][1],1)
+                p = aw.fujipid.readoneword(commandp)/10.
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4[ikey][1],3)
+                i = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+            else:
+                commandi = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[ikey][1],1)
+                i = aw.fujipid.readoneword(commandi)/10.
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4[dkey][1],3)
+                dd = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+            else:
+                commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[dkey][1],1)
+            	dd = aw.fujipid.readoneword(commandd)/10.
             if p != -1 and i != -1 and dd != -1:
                 aw.fujipid.PXG4[pkey][0] = p
                 aw.fujipid.PXG4[ikey][0] = i
@@ -28297,8 +28533,12 @@ class PXG4pidDlgControl(ArtisanDialog):
                 aw.qmc.adderror(mssg)
                 return
         #read current pidN
-        command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
-        N = aw.fujipid.readoneword(command)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4["selectedpid"][1],3)
+            N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
+            N = aw.fujipid.readoneword(command)
         libtime.sleep(0.035) 
         if N != -1:
             aw.fujipid.PXG4["selectedpid"][0] = N
@@ -28326,8 +28566,12 @@ class PXG4pidDlgControl(ArtisanDialog):
     def getallsv(self):
         for i in reversed(list(range(1,8))):
             svkey = "sv" + str(i)
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[svkey][1],1)
-            sv = aw.fujipid.readoneword(command)/10.
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4[svkey][1],3)
+                sv = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[svkey][1],1)
+                sv = aw.fujipid.readoneword(command)/10.
             aw.fujipid.PXG4[svkey][0] = sv
             if i == 1:
                 self.sv1edit.setText(str(sv))
@@ -28358,8 +28602,12 @@ class PXG4pidDlgControl(ArtisanDialog):
                 self.status.showMessage(mssg,1000)
                 self.sv7edit.setText(str(sv))
         #read current svN
-        command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectsv"][1],1)
-        N = aw.fujipid.readoneword(command)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4["selectsv"][1],3)
+            N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectsv"][1],1)
+            N = aw.fujipid.readoneword(command)
         aw.fujipid.PXG4["selectsv"][0] = N
         if N == 1:
             self.radiosv1.setChecked(True)
@@ -28379,8 +28627,12 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.status.showMessage(mssg,5000)
 
     def checkrampsoakmode(self):
-        msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["rampsoakmode"][1],1)
-        currentmode = aw.fujipid.readoneword(msg)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4["rampsoakmode"][1],3)
+            currentmode = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["rampsoakmode"][1],1)
+            currentmode = aw.fujipid.readoneword(msg)
         aw.fujipid.PXG4["rampsoakmode"][0] = currentmode
         if currentmode == 0:
             mode = ["0",
@@ -28516,14 +28768,23 @@ class PXG4pidDlgControl(ArtisanDialog):
                 self.status.showMessage(QApplication.translate("StatusBar","No RX data",None,QApplication.UnicodeUTF8), 5000)
             self.status.showMessage(QApplication.translate("StatusBar","RS ON",None,QApplication.UnicodeUTF8),500)
             selectedmode = self.patternComboBox.currentIndex()
-            msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["rampsoakpattern"][1],1)
-            currentmode = aw.fujipid.readoneword(msg)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4["rampsoakpattern"][1],3)
+                currentmode = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+            else:                
+                msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["rampsoakpattern"][1],1)
+                currentmode = aw.fujipid.readoneword(msg)
             aw.fujipid.PXG4["rampsoakpattern"][0] = currentmode
             if currentmode != selectedmode:
                 #set mode in pid to match the mode selected in the combobox
                 self.status.showMessage(QApplication.translate("StatusBar","Need to change pattern mode...",None,QApplication.UnicodeUTF8),1000)
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoakpattern"][1],selectedmode)
-                r = aw.ser.sendFUJIcommand(command,8)
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(aw.fujipid.PXG4["rampsoakpattern"][1],6)
+                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,selectedmode)
+                    r = "        "
+                else:
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoakpattern"][1],selectedmode)
+                    r = aw.ser.sendFUJIcommand(command,8)
                 if len(r) == 8:
                     self.status.showMessage(QApplication.translate("StatusBar","Pattern has been changed. Wait 5 secs.",None,QApplication.UnicodeUTF8), 500)
                     aw.fujipid.PXG4["rampsoakpattern"][0] = selectedmode
@@ -28532,8 +28793,13 @@ class PXG4pidDlgControl(ArtisanDialog):
                     return
             #combobox mode matches pid mode
             #set ramp soak mode ON/OFF
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoak"][1],flag)
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4["rampsoak"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+                r = command = ""
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoak"][1],flag)
+                r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
                 #record command as an Event if flag = 1
                 self.status.showMessage(QApplication.translate("StatusBar","RS ON",None,QApplication.UnicodeUTF8), 5000)
@@ -28556,8 +28822,13 @@ class PXG4pidDlgControl(ArtisanDialog):
         #set ramp soak OFF
         elif flag == 0:
             self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None,QApplication.UnicodeUTF8),500)
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoak"][1],flag)
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4["rampsoak"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+                r = command = ""
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoak"][1],flag)
+                r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
                 self.status.showMessage(QApplication.translate("StatusBar","RS successfully turned OFF",None,QApplication.UnicodeUTF8), 5000)
                 aw.fujipid.PXG4["rampsoak"][0] = flag
@@ -28569,9 +28840,14 @@ class PXG4pidDlgControl(ArtisanDialog):
         onoff = self.getONOFFrampsoak()
         if onoff == 0:
             aw.fujipid.PXG4["rampsoakpattern"][0] = self.patternComboBox.currentIndex()
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoakpattern"][1],aw.fujipid.PXG4["rampsoakpattern"][0])
-            #TX and RX
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4["rampsoakpattern"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,aw.fujipid.PXG4["rampsoakpattern"][0])
+                r = command = ""
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoakpattern"][1],aw.fujipid.PXG4["rampsoakpattern"][0])
+                #TX and RX
+                r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
                 patterns = ["1-4","5-8","1-8","9-12","13-16","9-16","1-16"]
@@ -28588,9 +28864,14 @@ class PXG4pidDlgControl(ArtisanDialog):
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
         self.status.showMessage(QApplication.translate("StatusBar","wait...",None, QApplication.UnicodeUTF8),500)
-        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["runstandby"][1],flag)
-        #TX and RX
-        r = aw.ser.sendFUJIcommand(command,8)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4["runstandby"][1],6)
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+            r = "00000000"
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["runstandby"][1],flag)
+            #TX and RX
+            r = aw.ser.sendFUJIcommand(command,8)
         if r == command and flag == 1:
             message = QApplication.translate("StatusBar","PID set to OFF",None, QApplication.UnicodeUTF8)     #put pid in standby 1 (pid on)
             aw.fujipid.PXG4["runstandby"][0] = 1
@@ -28606,22 +28887,35 @@ class PXG4pidDlgControl(ArtisanDialog):
 
     def getsegment(self, idn):
         svkey = "segment" + str(idn) + "sv"
-        svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[svkey][1],1)
-        sv = aw.fujipid.readoneword(svcommand)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[svkey][1],3)
+            sv = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[svkey][1],1)
+            sv = aw.fujipid.readoneword(svcommand)
         if sv == -1:
             return -1
         aw.fujipid.PXG4[svkey][0] = sv/10.              #divide by 10 because the decimal point is not sent by the PID
         
         rampkey = "segment" + str(idn) + "ramp"
-        rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[rampkey][1],1)
-        ramp = aw.fujipid.readoneword(rampcommand)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[rampkey][1],3)
+            ramp = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[rampkey][1],1)
+            ramp = aw.fujipid.readoneword(rampcommand)
+        
         if ramp == -1:
             return -1
         aw.fujipid.PXG4[rampkey][0] = ramp
         
         soakkey = "segment" + str(idn) + "soak"
-        soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[soakkey][1],1)
-        soak = aw.fujipid.readoneword(soakcommand)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[soakkey][1],3)
+            soak = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[soakkey][1],1)
+            soak = aw.fujipid.readoneword(soakcommand)
         if soak == -1:
             return -1
         aw.fujipid.PXG4[soakkey][0] = soak
@@ -28643,8 +28937,12 @@ class PXG4pidDlgControl(ArtisanDialog):
     def setONOFFautotune(self,flag):
         self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None, QApplication.UnicodeUTF8),500)
         #read current pidN
-        command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
-        N = aw.fujipid.readoneword(command)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4["selectedpid"][1],3)
+            N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
+            N = aw.fujipid.readoneword(command)
         aw.fujipid.PXG4["selectedpid"][0] = N
         string = QApplication.translate("StatusBar","Current pid = %1. Proceed with autotune command?",None, QApplication.UnicodeUTF8).arg(str(N))
         reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None, QApplication.UnicodeUTF8),string,
@@ -28653,9 +28951,14 @@ class PXG4pidDlgControl(ArtisanDialog):
             self.status.showMessage(QApplication.translate("StatusBar","Autotune cancelled",None, QApplication.UnicodeUTF8),5000)
             return 0
         elif reply == QMessageBox.Yes:
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["autotuning"][1],flag)
-            #TX and RX
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4["autotuning"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+                r = "00000000"
+            else:        
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["autotuning"][1],flag)
+                #TX and RX
+                r = aw.ser.sendFUJIcommand(command,8)
             if len(r) == 8:
                 if flag == 0:
                     aw.fujipid.PXG4["autotuning"][0] = 0
@@ -28709,16 +29012,27 @@ class PXG4pidDlgControl(ArtisanDialog):
         ramp = aw.qmc.stringtoseconds(str(rampedit.text()))
         soak = aw.qmc.stringtoseconds(str(soakedit.text()))
         svkey = "segment" + str(idn) + "sv"
-        svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[svkey][1],int(sv*10))
-        r1 = aw.ser.sendFUJIcommand(svcommand,8)
-        libtime.sleep(0.1) #important time between writings
         rampkey = "segment" + str(idn) + "ramp"
-        rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[rampkey][1],ramp)
-        r2 = aw.ser.sendFUJIcommand(rampcommand,8)
-        libtime.sleep(0.1) #important time between writings
         soakkey = "segment" + str(idn) + "soak"
-        soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[soakkey][1],soak)
-        r3 = aw.ser.sendFUJIcommand(soakcommand,8)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[svkey][1],6)       
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(sv*10))
+            libtime.sleep(0.1) #important time between writings
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[rampkey][1],6)       
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,ramp)
+            libtime.sleep(0.1) #important time between writings
+            reg = aw.modbus.address2register(aw.fujipid.PXG4[soakkey][1],6)       
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,soak)
+            r1 = r2 = r3 = "        "
+        else:
+            svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[svkey][1],int(sv*10))
+            r1 = aw.ser.sendFUJIcommand(svcommand,8)
+            libtime.sleep(0.1) #important time between writings
+            rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[rampkey][1],ramp)
+            r2 = aw.ser.sendFUJIcommand(rampcommand,8)
+            libtime.sleep(0.1) #important time between writings
+            soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[soakkey][1],soak)
+            r3 = aw.ser.sendFUJIcommand(soakcommand,8)    
         #check if OK
         if len(r1) == 8 and len(r2) == 8 and len(r3) == 8:
             aw.fujipid.PXG4[svkey][0] = sv
@@ -28865,8 +29179,12 @@ class FujiPID(object):
     #This function reads read-only memory (with 3xxxx memory we need function=4)
     #both PXR3 and PXG4 use the same memory location 31001 (3xxxx = read only)
     def gettemperature(self, stationNo):
-        #we compose a message then we send it by using self.readoneword()
-        return self.readoneword(self.message2send(stationNo,4,31001,1))
+        if aw.ser.useModbusPort:
+            # we use the Minimalmodbus implementation
+            return aw.modbus.readSingleRegister(stationNo,aw.modbus.address2register(31001,4),4)
+        else:
+            #we compose a message then we send it by using self.readoneword()
+            return self.readoneword(self.message2send(stationNo,4,31001,1))
 
     #activates the PID SV buttons in the main window to adjust the SV value. Called from the PID control pannels/SV tab
     def activateONOFFeasySV(self,flag):
@@ -28895,28 +29213,54 @@ class FujiPID(object):
                 aw.button_17.setVisible(True)
 
     def readcurrentsv(self):
-        command = ""
-        #if control pid is fuji PXG4
-        if aw.ser.controlETpid[0] == 0:
-            command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["sv?"][1],1)
-        #or if control pid is fuji PXR
-        elif aw.ser.controlETpid[0] == 1:
-            command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
-        val = self.readoneword(command)/10.
+        if aw.ser.useModbusPort:
+            reg = None
+            #if control pid is fuji PXG4
+            if aw.ser.controlETpid[0] == 0:
+                reg = aw.modbus.address2register(self.PXG4["sv?"][1],4)
+            #or if control pid is fuji PXR
+            elif aw.ser.controlETpid[0] == 1:
+                reg = aw.modbus.address2register(self.PXR["sv?"][1],4)
+            if reg != None:
+                val = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,4)/10.
+            else:
+                val = -0.1
+        else:
+            command = ""
+            #if control pid is fuji PXG4
+            if aw.ser.controlETpid[0] == 0:
+                command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["sv?"][1],1)
+            #or if control pid is fuji PXR
+            elif aw.ser.controlETpid[0] == 1:
+                command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
+            val = self.readoneword(command)/10.
         if val != -0.1:
             return val
         else:
             return -1
 
     def readdutycycle(self):
-        command = ""
-        #if control pid is fuji PXG4
-        if aw.ser.controlETpid[0] == 0:
-            command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["mv1"][1],1)
-        #or if control pid is fuji PXR
-        elif aw.ser.controlETpid[0] == 1:
-            command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
-        val = self.readoneword(command)/100.
+        if aw.ser.useModbusPort:
+            reg = None
+            #if control pid is fuji PXG4
+            if aw.ser.controlETpid[0] == 0:
+                reg = aw.modbus.address2register(self.PXG4["mv1"][1],4)
+            #or if control pid is fuji PXR
+            elif aw.ser.controlETpid[0] == 1:
+                reg = aw.modbus.address2register(self.PXR["mv1"][1],4)
+            if reg != None:
+                val = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,4)/100.
+            else:
+                val = -0.01
+        else:
+            command = ""
+            #if control pid is fuji PXG4
+            if aw.ser.controlETpid[0] == 0:
+                command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["mv1"][1],1)
+            #or if control pid is fuji PXR
+            elif aw.ser.controlETpid[0] == 1:
+                command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
+            val = self.readoneword(command)/100.
         if val != -0.01:
             return val
         else:
@@ -28926,24 +29270,41 @@ class FujiPID(object):
     #flag =0 OFF, flag = 1 ON, flag = 2 hold
     #A ramp soak pattern defines a whole profile. They have a minimum of 4 segments.
     def setrampsoak(self,flag):
-        command = ""
-        #Fuji PXG 
-        if aw.ser.controlETpid[0] == 0:
-            command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4["rampsoak"][1],flag)
-        #Fuji PXR
-        elif aw.ser.controlETpid[0] == 1:
-            command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["rampsoak"][1],flag)
-        r = aw.ser.sendFUJIcommand(command,8)
-        #if OK
-        if r == command:
-            if flag == 1:
-                aw.sendmessage(QApplication.translate("Message","RS ON", None, QApplication.UnicodeUTF8))
-            elif flag == 0:
-                aw.sendmessage(QApplication.translate("Message","RS OFF", None, QApplication.UnicodeUTF8))
-            else:
-                aw.sendmessage(QApplication.translate("Message","RS on HOLD", None, QApplication.UnicodeUTF8))
+        if aw.ser.useModbusPort:
+            reg = None
+            #Fuji PXG 
+            if aw.ser.controlETpid[0] == 0:
+                reg = aw.modbus.address2register(self.PXG4["rampsoak"][1],6)
+            #Fuji PXR
+            elif aw.ser.controlETpid[0] == 1:
+                reg = aw.modbus.address2register(self.PXR["rampsoak"][1],6)
+            if reg != None:
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+                if flag == 1:
+                    aw.sendmessage(QApplication.translate("Message","RS ON", None, QApplication.UnicodeUTF8))
+                elif flag == 0:
+                    aw.sendmessage(QApplication.translate("Message","RS OFF", None, QApplication.UnicodeUTF8))
+                else:
+                    aw.sendmessage(QApplication.translate("Message","RS on HOLD", None, QApplication.UnicodeUTF8))            
         else:
-            aw.qmc.adderror(QApplication.translate("Error Message","RampSoak could not be changed",None, QApplication.UnicodeUTF8))
+            command = ""
+            #Fuji PXG 
+            if aw.ser.controlETpid[0] == 0:
+                command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4["rampsoak"][1],flag)
+            #Fuji PXR
+            elif aw.ser.controlETpid[0] == 1:
+                command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["rampsoak"][1],flag)
+            r = aw.ser.sendFUJIcommand(command,8)
+            #if OK
+            if r == command:
+                if flag == 1:
+                    aw.sendmessage(QApplication.translate("Message","RS ON", None, QApplication.UnicodeUTF8))
+                elif flag == 0:
+                    aw.sendmessage(QApplication.translate("Message","RS OFF", None, QApplication.UnicodeUTF8))
+                else:
+                    aw.sendmessage(QApplication.translate("Message","RS on HOLD", None, QApplication.UnicodeUTF8))
+            else:
+                aw.qmc.adderror(QApplication.translate("Error Message","RampSoak could not be changed",None, QApplication.UnicodeUTF8))
 
     #sets a new sv value
     def setsv(self,value):
@@ -28952,10 +29313,14 @@ class FujiPID(object):
         if aw.ser.controlETpid[0] == 0: 
             #send command to the current sv (1-7)
             svkey = "sv"+ str(aw.fujipid.PXG4["selectsv"][0]) #current sv
-            command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(value*10))
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(self.PXG4[svkey][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(value*10))
+            else:
+                command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(value*10))
+                r = aw.ser.sendFUJIcommand(command,8)
             #check response
-            if r == command:
+            if r == command or aw.ser.useModbusPort:
                 # [Not sure the following will translate or even format properly... Need testing!]
                 message = QApplication.translate("Message","PXG sv#%1 set to %2",None, QApplication.UnicodeUTF8).arg(self.PXG4["selectsv"][0]).arg("%.1f" % float(value))
                 aw.sendmessage(message)
@@ -28969,10 +29334,14 @@ class FujiPID(object):
                 return -1
         #Fuji PXR
         elif aw.ser.controlETpid[0] == 1:  
-            command = self.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["sv0"][1],int(value*10))
-            r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXR["sv0"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(value*10))
+            else:
+                command = self.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["sv0"][1],int(value*10))
+                r = aw.ser.sendFUJIcommand(command,8)
             #check response
-            if r == command:
+            if r == command or aw.ser.useModbusPort:
                 # [Not sure the following will translate or even format properly... Need testing!]
                 message = QApplication.translate("Message","PXR sv set to %1",None, QApplication.UnicodeUTF8).arg("%.1f" % float(value))
                 aw.fujipid.PXR["sv0"][0] = value
@@ -28993,14 +29362,22 @@ class FujiPID(object):
             #   if control pid is fuji PXG
             if aw.ser.controlETpid[0] == 0:
                 # read the current svN (1-7) being used
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,self.PXG4["selectsv"][1],1)
-                N = aw.fujipid.readoneword(command)
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["sv0"][1],3)
+                    N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+                else:
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,self.PXG4["selectsv"][1],1)
+                    N = aw.fujipid.readoneword(command)
                 if N != -1:
                     self.PXG4["selectsv"][0] = N
                     svkey = "sv" + str(N)
-                    command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],newsv)
-                    r = aw.ser.sendFUJIcommand(command,8)
-                    if len(r) == 8:
+                    if aw.ser.useModbusPort:
+                        reg = aw.modbus.address2register(self.PXG4[svkey][1],6)
+                        aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newsv)
+                    else:
+                        command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],newsv)
+                        r = aw.ser.sendFUJIcommand(command,8)
+                    if len(r) == 8 or aw.ser.useModbusPort:
                         message = QApplication.translate("Message","SV%1 changed from %2 to %3)",None, QApplication.UnicodeUTF8).arg(str(N)).arg(str(currentsv)).arg(str(newsv/10.))
                         aw.sendmessage(message)
                         self.PXG4[svkey][0] = newsv/10
@@ -29013,9 +29390,13 @@ class FujiPID(object):
                         aw.sendmessage(msg)
             #   or if control pid is fuji PXR
             elif aw.ser.controlETpid[0] == 1:
-                command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
-                r = aw.ser.sendFUJIcommand(command,8)
-                if len(r) == 8:
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(self.PXR["sv0"][1],6)
+                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newsv)
+                else:
+                    command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
+                    r = aw.ser.sendFUJIcommand(command,8)
+                if len(r) == 8 or aw.ser.useModbusPort:
                     message = QApplication.translate("Message","SV changed from %1 to %2",None, QApplication.UnicodeUTF8).arg(str(currentsv)).arg(str(newsv/10.))                           
                     aw.sendmessage(message)
                     self.PXR["sv0"][0] = newsv/10
@@ -29113,19 +29494,35 @@ class FujiPID(object):
         svkey = "segment" + str(idn) + "sv"
         rampkey = "segment" + str(idn) + "ramp"
         soakkey = "segment" + str(idn) + "soak"
-        if aw.ser.controlETpid[0] == 0:
-            svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(sv*10))
-            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[rampkey][1],ramp)
-            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[soakkey][1],soak)
-        elif  aw.ser.controlETpid[0] == 1:
-            svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[svkey][1],int(sv*10))
-            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[rampkey][1],ramp)
-            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[soakkey][1],soak)
-        r1 = aw.ser.sendFUJIcommand(svcommand,8)
-        libtime.sleep(0.11) #important time between writings
-        r2 = aw.ser.sendFUJIcommand(rampcommand,8)
-        libtime.sleep(0.11) #important time between writings
-        r3 = aw.ser.sendFUJIcommand(soakcommand,8)
+        if aw.ser.useModbusPort:
+            if aw.ser.controlETpid[0] == 0:
+                reg1 = aw.modbus.address2register(self.PXG4[svkey][1],6)
+                reg2 = aw.modbus.address2register(self.PXG4[rampkey][1],6)
+                reg3 = aw.modbus.address2register(self.PXG4[soakkey][1],6)
+            elif  aw.ser.controlETpid[0] == 1:
+                reg1 = aw.modbus.address2register(self.PXR[svkey][1],6)
+                reg2 = aw.modbus.address2register(self.PXR[rampkey][1],6)
+                reg3 = aw.modbus.address2register(self.PXR[soakkey][1],6)                
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg1,int(sv*10))
+            libtime.sleep(0.11) #important time between writings
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg2,ramp)
+            libtime.sleep(0.11) #important time between writings
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg3,soak)
+            r1 = r2 = r3 = "        "
+        else:
+            if aw.ser.controlETpid[0] == 0:
+                svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(sv*10))
+                rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[rampkey][1],ramp)
+                soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[soakkey][1],soak)
+            elif  aw.ser.controlETpid[0] == 1:
+                svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[svkey][1],int(sv*10))
+                rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[rampkey][1],ramp)
+                soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[soakkey][1],soak)
+            r1 = aw.ser.sendFUJIcommand(svcommand,8)
+            libtime.sleep(0.11) #important time between writings
+            r2 = aw.ser.sendFUJIcommand(rampcommand,8)
+            libtime.sleep(0.11) #important time between writings
+            r3 = aw.ser.sendFUJIcommand(soakcommand,8)
         #check if OK
         if len(r1)!=8 or len(r2)!=8 or len(r3)!=8:
             aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None, QApplication.UnicodeUTF8))

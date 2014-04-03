@@ -11,7 +11,7 @@ o pyparsing 2.0.1
 o dateutil 1.5
 o pytz 2013d
 o six 1.4.1
-o minimalmodbus 0.4
+o minimalmodbus 0.5
 o Phidgets Python 2.1.8
 
 o py2exe 0.6.9
@@ -20,6 +20,8 @@ o NSIS 2.46
 
 Upgrade History:
 
+- 2014-04-02
+ . minimalmodbus 0.4 => 0.5
 - 2014-03-17
  . scipy 0.13.1 => 0.13.3
 - 2014-01-11:
@@ -98,7 +100,7 @@ download and install from http://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 9) MinimalModbus
 
-download and install MinimalModbus-0.4.win32.exe
+download and install MinimalModbus-0.5.win32.exe
 
 10) py2exe
 
