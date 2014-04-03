@@ -10,7 +10,7 @@ o numpy 1.8.0
 o scipy 0.13.3
 o matplotlib 1.3.1
 o pyaudio 0.2.7
-o minimalmodbus 0.4
+o minimalmodbus 0.5
 o Phidgets Python 2.1.8
 o phyobjc 2.5.1
 
@@ -22,6 +22,8 @@ o py2app 0.8
 
 Upgrade History:
 
+- 2014-04-02
+ . minimalmodbus 0.4 => 0.5
 - 2014-03-17
  . Python 3.3.4 => 3.3.5
  . scipy 0.13.1 => 0.13.3
@@ -363,12 +365,12 @@ all: lib/$(PALIB) all-recursive examples selftests
 # sudo python3 setup.py install
 
 
-12) minimalmodbus (v0.4)
+12) minimalmodbus (v0.5)
 
 download from http://pypi.python.org/pypi/MinimalModbus/
 
-# tar -xzf MinimalModbus-0.4.tar.gz
-# cd MinimalModbus-0.4
+# tar -xzf MinimalModbus-0.5.tar.gz
+# cd MinimalModbus-0.5
 # python3 setup.py build
 # sudo python3 setup.py install
 
