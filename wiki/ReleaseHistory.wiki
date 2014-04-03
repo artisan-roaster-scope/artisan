@@ -13,7 +13,7 @@
   * adds Modbus/Fuji merger
  * Changes
   * increased resolution of temperatures in profiles to two digits
-  * updated Modbus lib
+  * updated Modbus lib (slightly faster)
  * Bug Fixes
   * improved serial communication
   * fixed extra event manual entry to allow digits
