@@ -1,5 +1,27 @@
 #summary Detailed Release History
 
+
+==v0.7.5 (3.04.2014)==
+
+ * New Features
+  * adds Phidgets 1048 probe type configuration
+  * adds event quantifiers
+  * adds CM correlation measure between fore- and background profile to statistics bar
+  * adds symbolic variables for background temperatures for symbolic assignments
+  * adds xy scale toggle via key d
+  * adds modbus temperature mode per channel
+  * adds Modbus/Fuji merger
+ * Changes
+  * increased resolution of temperatures in profiles to two digits
+  * updated Modbus lib
+ * Bug Fixes
+  * improved serial communication
+  * fixed extra event manual entry to allow digits
+  * adds security patch
+  * fixed background profile color selection
+  * font fix for OS X 10.9
+
+
 ==v0.7.4 (13.01.2014)==
 
  * Bug Fixes
