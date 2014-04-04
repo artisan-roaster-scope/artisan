@@ -60,6 +60,7 @@ o cascading alarms with programmable outputs
 o automatic CHARGE/DROP event detection
 o support for digital scales (only KERN with serial support for now)
 o event sliders supporting the Hottop Roaster Interface
+o event quantifiers
 o spike filter and curve smoothing
 o color input from color meters
 
@@ -158,6 +159,22 @@ Artisan uses the following libraries in unmodified forms:
 
 
 VERSION HISTORY
+
+v0.7.5 (3.04.2014)
+- improved serial communication
+- fixed extra event manual entry to allow digits
+- adds Phidgets 1048 probe type configuration
+- adds security patch
+- fixed background profile color selection
+- increased resolution of temperatures in profiles to two digits
+- adds event quantifiers
+- adds CM correlation measure between fore- and background profile to statistics bar
+- font fix for OS X 10.9
+- adds symbolic variables for background temperatures for symbolic assignments
+- adds xy scale toggle via key d
+- adds modbus temperature mode per channel
+- updated Modbus lib
+- adds Modbus/Fuji merger
 
 v0.7.4 (13.01.2014)
 - fixes ETBT swap functionality
