@@ -704,6 +704,9 @@ class tgraphcanvas(FigureCanvas):
         # this is to ensure, that only uneven window values are used and no wrong shift is happening through smoothing
         self.deltafilter = 5 # => corresponds to 2 on the user interface
         self.curvefilter = 3 # => corresponds to 1 on the user interface
+        
+        self.altsmoothing = False # toggle between standard and alternative smoothing approach
+        self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
 
         self.patheffects = 3
         self.graphstyle = 0
@@ -11079,6 +11082,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.filterDropOuts = settings.value("filterDropOuts",self.qmc.filterDropOuts).toBool()
             if settings.contains("dropSpikes"):
                 self.qmc.dropSpikes = settings.value("dropSpikes",self.qmc.dropSpikes).toBool()
+            if settings.contains("altSmoothing"):
+                self.qmc.altsmoothing = settings.value("altSmoothing",self.qmc.altsmoothing).toBool()
             if settings.contains("swapETBT"):
                 self.qmc.swapETBT = settings.value("swapETBT",self.qmc.swapETBT).toBool()
             if settings.contains("minmaxLimits"):
@@ -11097,6 +11102,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             if settings.contains("curvefilter"):
                 self.qmc.curvefilter = settings.value("curvefilter",self.qmc.curvefilter).toInt()[0]
+            if settings.contains("smoothingwindowsize"):
+                self.qmc.smoothingwindowsize = settings.value("smoothingwindowsize",self.qmc.smoothingwindowsize).toInt()[0]
             if settings.contains("ETcurve"):
                 self.qmc.ETcurve = settings.value("ETcurve",self.qmc.ETcurve).toBool()
             if settings.contains("BTcurve"):
@@ -11787,6 +11794,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("filterDropOuts",self.qmc.filterDropOuts)
             settings.setValue("dropSpikes",self.qmc.dropSpikes)
+            settings.setValue("altSmoothing",self.qmc.altsmoothing)
             settings.setValue("swapETBT",self.qmc.swapETBT)
             settings.setValue("minmaxLimits",self.qmc.minmaxLimits)
             settings.setValue("minLimit",self.qmc.filterDropOut_tmin)
@@ -11800,6 +11808,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("LCDdecimalplaces",self.qmc.LCDdecimalplaces)
             settings.endGroup()
             settings.setValue("curvefilter",self.qmc.curvefilter)
+            settings.setValue("smoothingwindowsize",self.qmc.smoothingwindowsize)
             settings.setValue("ETcurve",self.qmc.ETcurve)
             settings.setValue("BTcurve",self.qmc.BTcurve)
             settings.setValue("ETlcd",self.qmc.ETlcd)
@@ -12064,6 +12073,7 @@ class ApplicationWindow(QMainWindow):
         extras["DeltaBTlcd"]= str(self.qmc.DeltaBTlcdflag)
         extras["deltafilter"]= str(self.qmc.deltafilter)
         extras["curvefilter"]= str(self.qmc.curvefilter)
+        extras["smoothingwindowsize"]= str(self.qmc.smoothingwindowsize)
         extras["Projection"]= str(self.qmc.projectFlag)
         extras["ProjectionMode"]= str(self.qmc.projectionmode)
         extras["ETtarget"]= str(self.qmc.ETtarget)
@@ -14157,12 +14167,25 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setRange(0,40)
         self.Filter.setAlignment(Qt.AlignRight)
         self.Filter.setValue(aw.qmc.curvefilter/2)
-        self.connect(self.Filter,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))
+        self.connect(self.Filter,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))        
+        windowlabel = QLabel(QApplication.translate("Label", "Window",None, QApplication.UnicodeUTF8))
+        #Window holds the number of pads in filter
+        self.Window = QSpinBox()
+        self.Window.setSingleStep(1)
+        self.Window.setRange(0,40)
+        self.Window.setAlignment(Qt.AlignRight)
+        self.Window.setValue(aw.qmc.smoothingwindowsize)
+        self.connect(self.Window,SIGNAL("editingFinished()"),lambda x=0:self.changeWindow(0))        
         #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None, QApplication.UnicodeUTF8))
         self.FilterSpikes.setChecked(aw.qmc.filterDropOuts)
         self.connect(self.FilterSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDropFilter(i))
-        self.FilterSpikes.setFocusPolicy(Qt.NoFocus)
+        self.FilterSpikes.setFocusPolicy(Qt.NoFocus)    
+        #altsmoothing
+        self.AltSmoothing = QCheckBox(QApplication.translate("CheckBox", "Smooth2",None, QApplication.UnicodeUTF8))
+        self.AltSmoothing.setChecked(aw.qmc.altsmoothing)
+        self.connect(self.FilterSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeAltSmoothing(i))
+        self.AltSmoothing.setFocusPolicy(Qt.NoFocus)
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None, QApplication.UnicodeUTF8))
         self.DropSpikes.setChecked(aw.qmc.dropSpikes)
@@ -14296,8 +14319,11 @@ class HUDDlg(ArtisanDialog):
         sensitivityLayout.addStretch()
         spikesLayout = QHBoxLayout()
         spikesLayout.addWidget(self.FilterSpikes)
-        spikesLayout.addWidget(self.DropSpikes)
+        spikesLayout.addSpacing(30)
+        spikesLayout.addWidget(self.AltSmoothing)
         spikesLayout.addStretch()
+        spikesLayout.addWidget(windowlabel)
+        spikesLayout.addWidget(self.Window)
         curvesLayout = QVBoxLayout()
         curvesLayout.addLayout(rorBoxLayout)
         curvesLayout.addLayout(sensitivityLayout)
@@ -15104,6 +15130,10 @@ class HUDDlg(ArtisanDialog):
     def changeDropFilter(self,i):
         aw.qmc.filterDropOuts = not aw.qmc.filterDropOuts
         aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
+        
+    def changeAltSmoothing(self,i):
+        aw.qmc.altsmoothing = not aw.qmc.altsmoothing
+        aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
 
     def changeSpikeFilter(self,i):
         aw.qmc.dropSpikes = not aw.qmc.dropSpikes
@@ -15113,6 +15143,19 @@ class HUDDlg(ArtisanDialog):
         
     def changeSwapETBT(self,i):
         aw.qmc.swapETBT = not aw.qmc.swapETBT
+
+    def changeWindow(self,i):
+        try:
+            v = self.Window.value()
+            if v != aw.qmc.smoothingwindowsize:
+                self.Window.setDisabled(True)
+                aw.qmc.smoothingwindowsize = v
+                aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+                self.Window.setDisabled(False)
+                self.Window.setFocus()
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " changeWindow(): %1").arg(str(e)),exc_tb.tb_lineno)
         
     def changeFilter(self,i):
         try:
@@ -15163,6 +15206,7 @@ class HUDDlg(ArtisanDialog):
     #button OK
     def updatetargets(self):
         aw.qmc.filterDropOuts = self.FilterSpikes.isChecked()
+        aw.qmc.altsmoothing = self.AltSmoothing.isChecked()
         aw.qmc.dropSpikes = self.DropSpikes.isChecked()
         aw.qmc.minmaxLimits = self.MinMaxLimits.isChecked()
         aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
@@ -28480,7 +28524,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                 dd = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
             else:
                 commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[dkey][1],1)
-            	dd = aw.fujipid.readoneword(commandd)/10.
+                dd = aw.fujipid.readoneword(commandd)/10.
             if p != -1 and i != -1 and dd != -1:
                 aw.fujipid.PXG4[pkey][0] = p
                 aw.fujipid.PXG4[ikey][0] = i

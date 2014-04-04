@@ -73,7 +73,7 @@ RequestExecutionLevel admin
 ; HM NIS Edit Wizard helper defines
 !define py2exeOutputDir 'dist'
 !define PRODUCT_NAME "Artisan"
-!define PRODUCT_VERSION "0.7.4.0"
+!define PRODUCT_VERSION "0.7.5.0"
 !define PRODUCT_PUBLISHER "The Artisan Team"
 !define PRODUCT_WEB_SITE "http://code.google.com/p/artisan/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\artisan.exe"
