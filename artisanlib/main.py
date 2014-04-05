@@ -1147,8 +1147,8 @@ class tgraphcanvas(FigureCanvas):
 
     def updateAmbientTemp(self):
         res = aw.qmc.ambientTempSourceAvg()
-        if res:
-            aw.qmc.ambientTemp = res
+        if res and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
+            aw.qmc.ambientTemp = float(res)
 
     # eventsvalues maps the given number v to a string to be displayed to the user as special event value
     # v is expected to be float value of range [0.0-10.0]
@@ -10067,12 +10067,16 @@ class ApplicationWindow(QMainWindow):
 
     #Read object from file 
     def deserialize(self,filename):
-        obj = None
-        if os.path.exists(u(filename)):
-            f = codecs.open(u(filename), 'rb', encoding='utf-8')
-            obj=ast.literal_eval(f.read())
-            f.close()
-        return obj
+        try:
+            obj = None
+            if os.path.exists(u(filename)):
+                f = codecs.open(u(filename), 'rb', encoding='utf-8')
+                obj=ast.literal_eval(f.read())
+                f.close()
+            return obj
+        except Exception as ex:
+            import traceback
+            traceback.print_exc(file=sys.stdout)
 
     #used by fileLoad()
     def setProfile(self,profile):
@@ -10430,7 +10434,7 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setProfile()",str(ex),exc_tb.tb_lineno)
+            QMessageBox.information(self,QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
 
     # the int n specifies the number of digits
     def float2float(self,f,n=1):
@@ -10614,13 +10618,13 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)                
         ######### Humidity #########
         try:
-            if aw.qmc.bag_humidity[0] != 0.0:
+            if aw.qmc.bag_humidity[0] != 0.0 and not math.isnan(bag_humidity[0]):
                 computedProfile["bag_humidity"] = self.float2float(aw.qmc.bag_humidity[0])
-            if aw.qmc.bag_humidity[1] != 0.0:
+            if aw.qmc.bag_humidity[1] != 0.0 and not math.isnan(bag_humidity[1]):
                 computedProfile["bag_temperature"] = self.float2float(aw.qmc.bag_humidity[1])
-            if aw.qmc.ambient_humidity != 0.0:
+            if aw.qmc.ambient_humidity != 0.0 and not math.isnan(aw.qmc.ambient_humidity):
                 computedProfile["ambient_humidity"] = self.float2float(aw.qmc.ambient_humidity)
-            if aw.qmc.ambientTemp != 0.0:
+            if aw.qmc.ambientTemp != 0.0 and not math.isnan(aw.qmc.ambientTemp):
                 computedProfile["ambient_temperature"] = self.float2float(aw.qmc.ambientTemp)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -16196,7 +16200,7 @@ class editGraphDlg(ArtisanDialog):
             if self.eventtablecopy[i] !=  str(timez.text()):
                 aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(str(timez.text())))
             description = self.eventtable.cellWidget(i,2)
-            aw.qmc.specialeventsStrings[i] = str(description.text())
+            aw.qmc.specialeventsStrings[i] = u(description.text())
             etype = self.eventtable.cellWidget(i,3)
             aw.qmc.specialeventstype[i] = etype.currentIndex()
             evalue = self.eventtable.cellWidget(i,4).text()
@@ -16482,8 +16486,10 @@ class editGraphDlg(ArtisanDialog):
         #update ambient temperature
         try:
             aw.qmc.ambientTemp = float(str(self.ambientedit.text()))
+            if math.isnan(aw.qmc.ambientTemp):
+                aw.qmc.ambientTemp = 0.0
         except:
-            aw.qmc.ambientTemp = 0
+            aw.qmc.ambientTemp = 0.0
         #update ambient humidity
         try:
             aw.qmc.ambient_humidity = float(str(self.ambient_humidity_edit.text()))
