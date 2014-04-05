@@ -10439,9 +10439,16 @@ class ApplicationWindow(QMainWindow):
     # the int n specifies the number of digits
     def float2float(self,f,n=1):
         if n==0:
-            return int(round(f))
+            if math.isnan(f):
+                return 0
+            else:
+                return int(round(f))
         else:
-            return float(("%." + str(n) + "f")%f)
+            res = float(("%." + str(n) + "f")%f)
+            if math.isnan(res):
+                return 0.0
+            else:
+                return res
 
     # returns data that is computed by Artisan out of raw profile data using some formulas 
     # and displayed to users e.g. as part of the Report to users and stored along profiles to be used by external programs
