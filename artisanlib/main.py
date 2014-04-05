@@ -6034,6 +6034,33 @@ class SampleThread(QThread):
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1,-1
 
+    def compute_delta(self, times, temps, n):
+        """Compute a tempurature delta using numpy's polyfit with degree 1.
+
+        The latest n values from times and temps are used.  This returns a
+        least-squares linear fit of the series. The result's units are degrees
+        per minute.
+        """
+        n = min(n, len(times), len(temps))
+        if n <= 0: return 0
+        xs = times[-n:]
+        ys = temps[-n:]
+
+        # Remove NaNs from input
+        if sys.version < '3':
+            r = xrange(n - 1, -1, -1)
+        else:
+            r = range(n - 1, -1, -1)
+        for i in r:
+            if math.isnan(ys[i]):
+                ys[i:i+1] = []
+                xs[i:i+1] = []
+        if not ys:  # All NaNs
+            return 0
+
+        fit = numpy.polyfit(xs, ys, 1)
+        return fit[0] * 60
+
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
@@ -6219,9 +6246,15 @@ class SampleThread(QThread):
                         
                         # replaced above by taking the last and the butbutlast measurements to ensure a higher temperature resolution, reducing fluctuation
                         timed = aw.qmc.timex[-1] - aw.qmc.timex[-4]   #time difference between last two readings
-                        #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                        aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-4])/timed)*60.  #delta ET (degress/minute)
-                        aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-4])/timed)*60.  #delta  BT (degress/minute)
+                        if aw.qmc.altsmoothing:
+                            # Use numpy to compute a linear approximation for deltas:
+                            aw.qmc.rateofchange1 = self.compute_delta(aw.qmc.timex, aw.qmc.temp1, aw.qmc.smoothingwindowsize)
+                            aw.qmc.rateofchange2 = self.compute_delta(aw.qmc.timex, aw.qmc.temp2, aw.qmc.smoothingwindowsize)
+                        else:
+                            # Compute delta using the last two data points with:
+                            #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                            aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-4])/timed)*60.  #delta ET (degress/minute)
+                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-4])/timed)*60.  #delta  BT (degress/minute)
 
 
 
@@ -6230,7 +6263,7 @@ class SampleThread(QThread):
 
                         #######   filter deltaBT deltaET
                         # decay smoothing
-                        if aw.qmc.deltafilter:
+                        if aw.qmc.deltafilter and not aw.qmc.altsmoothing:
                             user_filter = int(round(aw.qmc.deltafilter/2))                            
                             if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
                                 if self.decay_weights == None or len(self.decay_weights) != user_filter: # recompute only on changes
