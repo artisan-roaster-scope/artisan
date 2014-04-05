@@ -8955,9 +8955,9 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<b>[a]</b> = Autosave",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + START",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[d]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[d]</b> = Toggle xy scale (T/Delta)",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[s]</b> = Toggle xy scale (T/Delta)",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8)) + "<br><br>"
@@ -13000,7 +13000,7 @@ $cupping_notes
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
         contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis, Miroslav Stankovic,")
-        contributors += u("<br>Barrie Fairley, Ziv Sade")
+        contributors += u("<br>Barrie Fairley, Ziv Sade, Nicholas Seckar")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -22749,7 +22749,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_input1registerEdit.setFixedWidth(50)
         self.modbus_input1registerEdit.setAlignment(Qt.AlignRight)
         modbus_function_codes = ["3","4"]
-        modbus_modes = ["C","F"]
+        modbus_modes = ["", "C","F"]
         modbus_input1floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
         modbus_input1codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
         self.modbus_input1float = QCheckBox()
@@ -26464,6 +26464,7 @@ class PXRpidDlgControl(ArtisanDialog):
 
     def setpoint(self,PID):
         command = ""
+        reg = None
         try:
             if aw.ser.useModbusPort:
                 if PID == "ET":
@@ -26475,7 +26476,8 @@ class PXRpidDlgControl(ArtisanDialog):
                         reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
                     elif aw.ser.readBTpid[0] == 1:
                         reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
-                aw.modbus.writeSingleRegister(slaveID,reg,1)                
+                if reg:
+                    aw.modbus.writeSingleRegister(slaveID,reg,1)
                 r = command
             else:
                 if PID == "ET":
@@ -26498,6 +26500,7 @@ class PXRpidDlgControl(ArtisanDialog):
 
     def setthermocoupletype(self,PID):
         command = ""
+        reg = None
         try:
             if aw.ser.useModbusPort:
                 if PID == "ET":
@@ -26514,7 +26517,8 @@ class PXRpidDlgControl(ArtisanDialog):
                     elif aw.ser.readBTpid[0] == 1:
                         value = self.PXRconversiontoindex[index]
                         reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],6)
-                aw.modbus.writeSingleRegister(slaveID,reg,value)
+                if reg:
+                    aw.modbus.writeSingleRegister(slaveID,reg,value)
                 r == command
             else:
                 if PID == "ET":
@@ -26547,6 +26551,7 @@ class PXRpidDlgControl(ArtisanDialog):
     def readthermocoupletype(self,PID):
         message = "empty"
         command = ""
+        reg = None
         try:
             if aw.ser.useModbusPort:
                 if PID == "ET":
@@ -26556,7 +26561,7 @@ class PXRpidDlgControl(ArtisanDialog):
                         reg = aw.modbus.address2register(aw.fujipid.PXG4["pvinputtype"][1],3)
                     elif aw.ser.readBTpid[0] == 1:
                         reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],3)
-                if command:
+                if reg:
                     Thtype = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
             else:
                 if PID == "ET":
@@ -27933,6 +27938,7 @@ class PXG4pidDlgControl(ArtisanDialog):
 
     def setpoint(self,PID):
         command = ""
+        reg = None
         try:
             if aw.ser.useModbusPort:
                 if PID == "ET":
@@ -27944,7 +27950,8 @@ class PXG4pidDlgControl(ArtisanDialog):
                         reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
                     elif aw.ser.readBTpid[0] == 1:
                         reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
-                aw.modbus.writeSingleRegister(slaveID,reg,1)
+                if reg:
+                    aw.modbus.writeSingleRegister(slaveID,reg,1)
                 r = command
             else:
                 if PID == "ET":
@@ -27967,6 +27974,7 @@ class PXG4pidDlgControl(ArtisanDialog):
 
     def setthermocoupletype(self,PID):
         command = ""
+        reg = None
         try:
             if aw.ser.useModbusPort:
                 if PID == "ET":
@@ -27983,7 +27991,8 @@ class PXG4pidDlgControl(ArtisanDialog):
                     elif aw.ser.readBTpid[0] == 1:
                         value = self.PXRconversiontoindex[index]
                         reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],6)
-                aw.modbus.writeSingleRegister(slaveID,reg,value)
+                if reg:
+                    aw.modbus.writeSingleRegister(slaveID,reg,value)
                 r == command
             else:
                 if PID == "ET":
@@ -28016,6 +28025,7 @@ class PXG4pidDlgControl(ArtisanDialog):
     def readthermocoupletype(self,PID):
         command = ""
         message = "empty"
+        reg = None
         try:
             if aw.ser.useModbusPort:
                 if PID == "ET":
@@ -28025,7 +28035,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                         reg = aw.modbus.address2register(aw.fujipid.PXG4["pvinputtype"][1],3)
                     elif aw.ser.readBTpid[0] == 1:
                         reg = aw.modbus.address2register(aw.fujipid.PXR["pvinputtype"][1],3)
-                if command:
+                if reg:
                     Thtype = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
             else:
                 if PID == "ET":
@@ -28235,7 +28245,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         else:
             command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
             N = aw.fujipid.readoneword(command)
-        if N != -1:
+        if N != None and N != -1:
             aw.fujipid.PXG4["selectedpid"][0] = N
             # if current svN is different than requested svN
             if N != pidn:
