@@ -9054,7 +9054,7 @@ class ApplicationWindow(QMainWindow):
         if lenevents:
             self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
             self.qmc.specialeventsvalue[lenevents-1] = aw.qmc.str2eventsvalue(str(self.valueEdit.text()))
-            self.qmc.specialeventsStrings[lenevents-1] = str(self.lineEvent.text())
+            self.qmc.specialeventsStrings[lenevents-1] = u(self.lineEvent.text())
             self.qmc.specialevents[lenevents-1] = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ self.qmc.stringtoseconds(str(self.etimeline.text())))
 
             self.lineEvent.clearFocus()
@@ -9138,13 +9138,14 @@ class ApplicationWindow(QMainWindow):
         profilepath_dir.setPath(self.profilepath)
         profilepath_elements = profilepath_dir.absolutePath().split("/")
         #compare profilepath with userprofilepath (modulo the last two segments which are month/year respectively)
-        if len(userprofilepath_elements) == len(profilepath_elements) and len(userprofilepath_elements) > 1 and freduce(lambda x,y: x and y, [x[0] == x[1] for x in zip(userprofilepath_elements[:-2],profilepath_elements[:-2])]):
-            if platf == 'Darwin':
-                return self.userprofilepath
-            else:
-                return self.profilepath
-        else:
-            return self.userprofilepath
+        return self.userprofilepath
+#        if len(userprofilepath_elements) == len(profilepath_elements) and len(userprofilepath_elements) > 1 and freduce(lambda x,y: x and y, [x[0] == x[1] for x in zip(userprofilepath_elements[:-2],profilepath_elements[:-2])]):
+#            if platf == 'Darwin':
+#                return self.userprofilepath
+#            else:
+#                return self.profilepath
+#        else:
+#            return self.userprofilepath
 
     def setDefaultPath(self,f):
         if f:
@@ -10075,8 +10076,9 @@ class ApplicationWindow(QMainWindow):
                 f.close()
             return obj
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+            pass
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
 
     #used by fileLoad()
     def setProfile(self,profile):
@@ -10174,6 +10176,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.mode = str(profile["mode"])
             #convert modes only if needed comparing the new uploaded mode to the old one.
             #otherwise it would incorrectly convert the uploaded phases
+            if "phases" in profile:
+                self.qmc.phases = profile["phases"]
             if self.qmc.mode == "F" and old_mode == "C":
                 self.qmc.fahrenheitMode()
             if self.qmc.mode == "C" and old_mode == "F":
@@ -10300,9 +10304,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.temp1 = profile["temp1"]
             if "temp2" in profile:
                 self.qmc.temp2 = profile["temp2"]
-# we do not load phases from the profile, but compute them automatically below
-#            if "phases" in profile:
-#                self.qmc.phases = profile["phases"]
     # don't let the users y/z min/max axis limits be overwritten by loading a profile
     #        if "zmax" in profile:
     #            self.qmc.zlimit = min(int(profile["zmax"]),500)
