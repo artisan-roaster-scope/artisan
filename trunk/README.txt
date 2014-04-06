@@ -160,7 +160,7 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
-v0.7.5 (3.04.2014)
+v0.7.5 (6.04.2014)
 - improved serial communication
 - fixed extra event manual entry to allow digits
 - adds Phidgets 1048 probe type configuration

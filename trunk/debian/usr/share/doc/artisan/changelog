@@ -15,7 +15,7 @@ artisan (0.7.5-1) precise; urgency=low
    - adds modbus temperature mode per channel
    - updated Modbus lib
    - adds Modbus/Fuji merger
- --  <marko.luther@gmx.net>  Thu, 3 Apr 2014 19:32:14 +0200
+ --  <marko.luther@gmx.net>  Sun, 6 Apr 2014 19:32:14 +0200
 
 artisan (0.7.4-1) precise; urgency=low
   * new upstream release
