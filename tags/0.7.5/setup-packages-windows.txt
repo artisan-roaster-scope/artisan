@@ -1,0 +1,118 @@
+Current Versions:
+
+o Python 2.7.6
+o pyserial 2.7
+o QT 4.8.5
+o PyQt 4.10.3
+o numpy 1.8.0
+o scipy 0.13.3
+o matplotlib 1.3.1
+o pyparsing 2.0.1
+o dateutil 1.5
+o pytz 2013d
+o six 1.4.1
+o minimalmodbus 0.5
+o Phidgets Python 2.1.8
+
+o py2exe 0.6.9
+o NSIS 2.46
+
+
+Upgrade History:
+
+- 2014-04-02
+ . minimalmodbus 0.4 => 0.5
+- 2014-03-17
+ . scipy 0.13.1 => 0.13.3
+- 2014-01-11:
+ . Phidgets Python 2.1.8 6/2013 => 2.1.8 7/2013
+- 2013-11-12:
+ . Python 2.7.5 => 2.7.6
+ . matplotlib 1.3.0 => 1.3.1
+ . scipy 0.12.0 => 0.13.1
+ . numpy 1.7.0 => 1.8.0
+- 2013-10-07:
+ . Python 2.7.4 => 2.7.5
+ . matplotlib 1.2.1 => 1.3.0
+ . PyQt4 4.10.1 => 4.10.3
+ . Qt 4.8.4 => 4.8.5
+ . Phidgets Python 2.1.8
+- 2013-05-02: Started
+
+
+Installation Instructions:
+
+0) Preparation
+
+Install Microsoft Visual C++ 2008 SP1 Redistributable Package (x86)
+http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
+
+vcredist_x86.exe
+
+1) Python 2.7
+
+install python-2.7.4.msi via "Python 3.3.1 Windows x86 MSI Installer" from http://www.python.org
+
+2) pyserial
+
+download pyserial-2.6.tar.gz from http://pyserial.sourceforge.net
+
+unpack and
+> c:\Python27\python setup.py build
+> c:\Python27\python setup.py install
+
+3) QT
+
+qt-win-opensource-4.8.5-vs2008.exe
+
+4) PyQT
+
+download and install PyQt4-4.10-gpl-Py2.7-Qt4.8.4-x32.exe
+
+5) numpy
+
+download numpy-1.7.1-win32-superpack-python2.7.exe from http://www.scipy.org/Download
+
+for noSSE version:
+install via DOS shell "numpy-1.7.1-superpack-win32.exe /arch nosse"
+
+6) scipy
+
+download scipy-0.13.3-win32-superpack-python2.7.exe from http://www.scipy.org/Download
+
+for noSSE version:
+install via DOS shell "scipy-0.13.3-superpack-win32.exe /arch nosse"
+
+7) matplotlib
+
+download matplotlib-1.2.1.win32-py2.7.exe from http://matplotlib.org/downloads.html
+
+for noSSE version:
+install via DOS shell "matplotlib-1.2.1-superpack-win32.exe /arch nosse"
+
+8) Install matplotlib utility libs
+
+download and install from http://www.lfd.uci.edu/~gohlke/pythonlibs/
+ - pyparsing-2.0.1.win32-py2.7.exe
+ - python-dateutil-1.5.win32-py2.7.exe
+ - pytz-2013d.win32-py2.7.exe
+ - six-1.4.1.win32-py2.7.exe
+
+9) MinimalModbus
+
+download and install MinimalModbus-0.5.win32.exe
+
+10) py2exe
+
+download and install py2exe-0.6.9.win32-py2.7.exe
+
+11) NSIS 2.46
+
+download and install from http://nsis.sourceforge.net/Download
+
+12) Install Phidgets Python
+
+# unzip PhidgetsPython_2.1.8.20130820.zip
+# cd PhidgetsPython
+# python setup.py build
+# python setup.py install
