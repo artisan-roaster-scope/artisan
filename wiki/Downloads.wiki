@@ -1,6 +1,6 @@
 #summary Artisan Downloads.
 
-= Introduction =
+= Downloads =
 
 As Google decided to disable the upload of new downloads on GoogleCode, Artisan releases are now hosted on the following GoogleDrive.
 
