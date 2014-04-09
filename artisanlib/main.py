@@ -515,7 +515,8 @@ class tgraphcanvas(FigureCanvas):
                        "+Phidget 1048_AT",      #36
                        "Phidget 1046 RTD",      #37
                        "+Phidget 1046_34 RTD",  #38
-                       "-Omega HH806W"          #39 NOT WORKING 
+                       "Mastech MS6514",        #39
+                       "-Omega HH806W"          #40 NOT WORKING 
                        ]
 
         #extra devices
@@ -20371,7 +20372,8 @@ class serialport(object):
                                    self.PHIDGET1048_AT,     #36
                                    self.PHIDGET1046,        #37
                                    self.PHIDGET1046_34,     #38
-                                   self.HH806W              #39
+                                   self.MastechMS6514,      #39
+                                   self.HH806W              #40
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -20600,6 +20602,11 @@ class serialport(object):
         t2,t1 = self.HH806AUtemperature()
         return tx,t2,t1 
 
+    def MastechMS6514(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.MS6514temperature()
+        return tx,t2,t1 
+
     def HH806W(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.HH806Wtemperature()
@@ -20815,6 +20822,48 @@ class serialport(object):
     def binary(self, n, digits=8):
         return "{0:0>{1}}".format(bin(n)[2:], digits)
 
+    #similar to Omega HH806
+    def MS6514temperature(self):
+        try:
+#            command = str2cmd("#0A0000NA2\r\n")  #"#0A0101NA4\r\n"
+            r = ""
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+                self.SP.flushInput()
+#                self.SP.flushOutput()
+#                self.SP.write(command)
+#                libtime.sleep(.1)
+                r = self.SP.read(16)
+                if len(r) == 16:
+                    #convert to binary to hex string
+                    s1 = hex2int(r[5],r[6])/10.
+                    s2 = hex2int(r[7],r[8])/10.
+                    #we convert the strings to integers. Divide by 10.0 (decimal position)
+                    return s1,s2
+                else:
+                    nbytes = len(r)
+                    aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): %1 bytes received but 16 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
+                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+            else:
+                return -1,-1
+        except serial.SerialException:
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806AUtemperature()"
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.MS6514temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("H806 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
+
+
     #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
         #init command = "#0A0000RA6\r\n"
@@ -20838,7 +20887,7 @@ class serialport(object):
                     return s1,s2
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","HH806AUtemperature(): %1 bytes received but 14 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
+                    aw.qmc.adderror(QApplication.translate("Error Message","HH806AUtemperature(): %1 bytes received but 16 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
                     return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
@@ -24417,8 +24466,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 38 is +Phidget 1046_34 RTD but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Omega HH806W":
+                elif meter == "Mastech MS6514":
                     aw.qmc.device = 39
+                    #aw.ser.comport = "COM11"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                elif meter == "Omega HH806W":
+                    aw.qmc.device = 40
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -24438,7 +24496,48 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #map device index to a setting mode (chose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
-            devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,1,1,1,1,1,8]  #0-41
+            devssettings = [
+                0, # 0
+                1, # 1
+                2, # 2
+                3, # 3
+                3, # 4
+                3, # 5
+                3, # 6
+                3, # 7
+                3, # 8
+                3, # 9
+                3, # 10
+                3, # 11
+                3, # 12
+                3, # 13
+                3, # 14
+                2, # 15
+                1, # 16
+                3, # 17
+                0, # 18
+                4, # 19
+                5, # 20
+                3, # 21
+                6, # 22
+                5, # 23
+                3, # 24
+                3, # 25
+                6, # 26
+                3, # 27
+                4, # 28
+                8, # 29
+                3, # 30
+                1, # 31
+                4, # 32
+                7, # 33
+                1, # 34
+                1, # 35
+                1, # 36
+                1, # 37
+                1, # 38
+                3, # 39
+                8] # 40
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
