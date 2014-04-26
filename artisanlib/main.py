@@ -14980,7 +14980,8 @@ class HUDDlg(ArtisanDialog):
             start = 0
         startindex = aw.qmc.time2index(starttime + start)
         endindex = min(l,aw.qmc.time2index(endtime + start))
-        z = aw.qmc.polyfit(self.curves[self.c1ComboBox.currentIndex()],self.curves[self.c2ComboBox.currentIndex()],self.polyfitdeg.value(),startindex,endindex,self.deltacurves[self.c2ComboBox.currentIndex()])
+        z = aw.qmc.polyfit(self.curves[self.c1ComboBox.currentIndex()],self.curves[self.c2ComboBox.currentIndex()],
+           self.polyfitdeg.value(),startindex,endindex,self.deltacurves[self.c2ComboBox.currentIndex()])
         if z != None:
             s = ""
             sign = "+"
@@ -15058,6 +15059,8 @@ class HUDDlg(ArtisanDialog):
         self.curvenames.append(QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8))
         self.curves.append(aw.qmc.temp1)
         self.curves.append(aw.qmc.temp2)
+        self.deltacurves.append(False)
+        self.deltacurves.append(False)
         for i in range(len(aw.qmc.extradevices)):
             self.curvenames.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
             self.curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
@@ -16118,12 +16121,14 @@ class editGraphDlg(ArtisanDialog):
             self.datatable.setItem(i,4,deltaBT)
             j = 5
             for k in range(len(aw.qmc.extratimex)):
-                extra_qtw1 = QTableWidgetItem("%.0f"%aw.qmc.extratemp1[k][i])
-                extra_qtw1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                extra_qtw2 = QTableWidgetItem("%.0f"%aw.qmc.extratemp2[k][i])
-                extra_qtw2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                self.datatable.setItem(i,j,extra_qtw1)
-                self.datatable.setItem(i,j+1,extra_qtw2)
+                if len(aw.qmc.extratemp1) > k and len(aw.qmc.extratemp1[k]) > i:
+                    extra_qtw1 = QTableWidgetItem("%.0f"%aw.qmc.extratemp1[k][i])
+                    extra_qtw1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                    self.datatable.setItem(i,j,extra_qtw1)
+                if len(aw.qmc.extratemp2) > k and len(aw.qmc.extratemp2[k]) > i:
+                    extra_qtw2 = QTableWidgetItem("%.0f"%aw.qmc.extratemp2[k][i])
+                    extra_qtw2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                    self.datatable.setItem(i,j+1,extra_qtw2)
                 j = j + 2
         header = self.datatable.horizontalHeader()
         header.setResizeMode(0, QHeaderView.Fixed)
@@ -24177,7 +24182,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.arduinoATChannel = str(self.arduinoATComboBox.currentText())
                 meter = "Arduino (TC4)"
                 aw.qmc.device = 19
-                aw.ser.baudrate = 19200
+                aw.ser.baudrate = 115200
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
