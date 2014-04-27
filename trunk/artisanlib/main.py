@@ -8472,8 +8472,9 @@ class ApplicationWindow(QMainWindow):
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " eventaction() %1").arg(str(e)),exc_tb.tb_lineno)
                 elif action == 3:
-                    for i in range(len(cmd_str)):
-                        buttonnumber = int(cmd_str[i])-1
+                    cmds = cmd_str.split(",")
+                    for i in range(len(cmds)):
+                        buttonnumber = int(cmds[i])-1
                         if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
                             self.recordextraevent(buttonnumber)
                 elif action == 4:
@@ -26031,7 +26032,8 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
                 beepWidget = self.alarmtable.cellWidget(i,9)
                 beep = beepWidget.layout().takeAt(1).widget()
-                aw.qmc.alarmbeep[i] = int(beep.isChecked())
+                if beep and beep != None:
+                    aw.qmc.alarmbeep[i] = int(beep.isChecked())
                 description = self.alarmtable.cellWidget(i,10)
                 aw.qmc.alarmstrings[i] = u(description.text())
         except Exception as ex:
