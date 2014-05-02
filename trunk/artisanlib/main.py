@@ -15468,7 +15468,7 @@ class editGraphDlg(ArtisanDialog):
         #DATA Table
         self.datatable = QTableWidget()
         self.datatable.setTabKeyNavigation(True)
-        self.createDataTable()        
+        #self.createDataTable()        
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None, QApplication.UnicodeUTF8)) + "</b>")
         self.titleedit = QLineEdit(aw.qmc.title)
@@ -15982,7 +15982,8 @@ class editGraphDlg(ArtisanDialog):
         self.TabWidget.addTab(C3Widget,QApplication.translate("Tab", "Events",None, QApplication.UnicodeUTF8))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None, QApplication.UnicodeUTF8))        
+        self.connect(self.TabWidget,SIGNAL("currentChanged(int)"),lambda i=0:self.tabSwitched(i))
         #incorporate layouts
         totallayout = QVBoxLayout()
         totallayout.addWidget(self.TabWidget)
@@ -15993,6 +15994,10 @@ class editGraphDlg(ArtisanDialog):
         #totallayout.addLayout(buttonsLayout)
         self.setLayout(totallayout)
 
+    def tabSwitched(self,i):
+        if i == 3:
+            self.createDataTable()
+            
     def roastflagChanged(self,flagname,x):
         if x == Qt.Checked:
             if flagname == "heavyFC":
@@ -16076,8 +16081,12 @@ class editGraphDlg(ArtisanDialog):
         for i in range(ndata):
             Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            ET = QTableWidgetItem("%.0f"%aw.qmc.temp1[i])
-            BT = QTableWidgetItem("%.0f"%aw.qmc.temp2[i])
+            if aw.qmc.LCDdecimalplaces:
+                fmtstr = "%.1f"
+            else:
+                fmtstr = "%.0f"
+            ET = QTableWidgetItem(fmtstr%aw.qmc.temp1[i])
+            BT = QTableWidgetItem(fmtstr%aw.qmc.temp2[i])
             ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             if i > 0 and (aw.qmc.timex[i]-aw.qmc.timex[i-1]):
@@ -16132,11 +16141,11 @@ class editGraphDlg(ArtisanDialog):
             j = 5
             for k in range(len(aw.qmc.extratimex)):
                 if len(aw.qmc.extratemp1) > k and len(aw.qmc.extratemp1[k]) > i:
-                    extra_qtw1 = QTableWidgetItem("%.0f"%aw.qmc.extratemp1[k][i])
+                    extra_qtw1 = QTableWidgetItem(fmtstr%aw.qmc.extratemp1[k][i])
                     extra_qtw1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                     self.datatable.setItem(i,j,extra_qtw1)
                 if len(aw.qmc.extratemp2) > k and len(aw.qmc.extratemp2[k]) > i:
-                    extra_qtw2 = QTableWidgetItem("%.0f"%aw.qmc.extratemp2[k][i])
+                    extra_qtw2 = QTableWidgetItem(fmtstr%aw.qmc.extratemp2[k][i])
                     extra_qtw2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                     self.datatable.setItem(i,j+1,extra_qtw2)
                 j = j + 2
