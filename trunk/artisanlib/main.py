@@ -10092,9 +10092,9 @@ class ApplicationWindow(QMainWindow):
     def setProfile(self,profile):
         try:
             #extra devices load and check
-            if "extratimex" in profile:
+            if "extratimex" in profile and len(profile["extratimex"]) > 0:
                 if "extradevices" in profile:
-                    if self.qmc.extradevices != profile["extradevices"]:
+                    if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
                         string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None, QApplication.UnicodeUTF8))
                         reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
                         if reply == QMessageBox.Yes:
@@ -10102,7 +10102,6 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.extradevices = profile["extradevices"]
                         else:
                             return False
-                        
                 # adjust extra serial device table
                 # a) remove superfluous extra serial settings
                 self.extraser = self.extraser[:len(self.qmc.extradevices)]
@@ -10117,64 +10116,64 @@ class ApplicationWindow(QMainWindow):
                     self.addSerialPort()
                 # c) set extra temp curves and prepare empty extra smoothed temp curves
                 if "extratimex" in profile:
-                    self.qmc.extratimex = profile["extratimex"]
+                    self.qmc.extratimex = profile["extratimex"] + [profile["extratimex"][0]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                 if "extratemp1" in profile:
-                    self.qmc.extratemp1 = profile["extratemp1"]
+                    self.qmc.extratemp1 = profile["extratemp1"] + [[-1]*len(self.qmc.extratimex[0])]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp1 = [[]]*len(self.qmc.extratemp1)
                 if "extratemp2" in profile:
-                    self.qmc.extratemp2 = profile["extratemp2"]
+                    self.qmc.extratemp2 = profile["extratemp2"] + [[-1]*len(self.qmc.extratimex[0])]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp2 = [[]]*len(self.qmc.extratemp2)
                 # d) set other extra curve attribute lists
                 if "extraname1" in profile:
-                    self.qmc.extraname1 = profile["extraname1"]
+                    self.qmc.extraname1 = [d(x) for x in profile["extraname1"] + self.qmc.extraname1[len(profile["extraname1"]):]]
                 if "extraname2" in profile:
-                    self.qmc.extraname2 = profile["extraname2"]
+                    self.qmc.extraname2 = [d(x) for x in profile["extraname2"] + self.qmc.extraname2[len(profile["extraname2"]):]]
                 if "extramathexpression1" in profile:
-                    self.qmc.extramathexpression1 = profile["extramathexpression1"]
+                    self.qmc.extramathexpression1 = profile["extramathexpression1"] + self.qmc.extramathexpression1[len(profile["extramathexpression1"]):]
                 if "extramathexpression2" in profile:
-                    self.qmc.extramathexpression2 = profile["extramathexpression2"]
+                    self.qmc.extramathexpression2 = profile["extramathexpression2"] + self.qmc.extramathexpression2[len(profile["extramathexpression2"]):]
                 if "extradevicecolor1" in profile:
-                    self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]]
+                    self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]] + self.qmc.extradevicecolor1[len(profile["extradevicecolor1"]):]
                 if "extradevicecolor2" in profile:
-                    self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]]
+                    self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]] + self.qmc.extradevicecolor2[len(profile["extradevicecolor2"]):]
                 if "extramarkersizes1" in profile:
-                    self.qmc.extramarkersizes1 = profile["extramarkersizes1"]
+                    self.qmc.extramarkersizes1 = profile["extramarkersizes1"] + self.qmc.extramarkersizes1[len(profile["extramarkersizes1"]):]
                 else:
                     self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*len(self.qmc.extratemp1)
                 if "extramarkersizes2" in profile:
-                    self.qmc.extramarkersizes2 = profile["extramarkersizes2"]
+                    self.qmc.extramarkersizes2 = profile["extramarkersizes2"] + self.qmc.extramarkersizes2[len(profile["extramarkersizes2"]):]
                 else:
                     self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*len(self.qmc.extratemp2)
                 if "extramarkers1" in profile:
-                    self.qmc.extramarkers1 = [d(x) for x in profile["extramarkers1"]]
+                    self.qmc.extramarkers1 = [d(x) for x in profile["extramarkers1"]] + self.qmc.extramarkers1[len(profile["extramarkers1"]):]
                 else:
                     self.qmc.extramarkers1 = [self.qmc.marker_default]*len(self.qmc.extratemp1)
                 if "extramarkers2" in profile:
-                    self.qmc.extramarkers2 = [d(x) for x in profile["extramarkers2"]]
+                    self.qmc.extramarkers2 = [d(x) for x in profile["extramarkers2"]] + self.qmc.extramarkers2[len(profile["extramarkers2"]):]
                 else:
                     self.qmc.extramarkers2 = [self.qmc.marker_default]*len(self.qmc.extratemp2)
                 if "extralinewidths1" in profile:
-                    self.qmc.extralinewidths1 = [int(w) for w in profile["extralinewidths1"]]
+                    self.qmc.extralinewidths1 = [int(w) for w in profile["extralinewidths1"]] + self.qmc.extralinewidths1[len(profile["extralinewidths1"]):]
                 else:
                     self.qmc.extralinewidths1 = [self.qmc.linewidth_default]*len(self.qmc.extratemp1)
                 if "extralinewidths2" in profile:
-                    self.qmc.extralinewidths2 = [int(w) for w in profile["extralinewidths2"]]
+                    self.qmc.extralinewidths2 = [int(w) for w in profile["extralinewidths2"]] + self.qmc.extralinewidths2[len(profile["extralinewidths2"]):]
                 else:
                     self.qmc.extralinewidths2 = [self.qmc.linewidth_default]*len(self.qmc.extratemp2)
                 if "extralinestyles1" in profile:
-                    self.qmc.extralinestyles1 = [d(x) for x in profile["extralinestyles1"]]
+                    self.qmc.extralinestyles1 = [d(x) for x in profile["extralinestyles1"]] + self.qmc.extralinestyles1[len(profile["extralinestyles1"]):]
                 else:
                     self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*len(self.qmc.extratemp1)
                 if "extralinestyles2" in profile:
-                    self.qmc.extralinestyles2 = [d(x) for x in profile["extralinestyles2"]]
+                    self.qmc.extralinestyles2 = [d(x) for x in profile["extralinestyles2"]] + self.qmc.extralinestyles2[len(profile["extralinestyles2"]):]
                 else:
                     self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*len(self.qmc.extratemp2)
                 if "extradrawstyles1" in profile:
-                    self.qmc.extradrawstyles1 = [d(x) for x in profile["extradrawstyles1"]]
+                    self.qmc.extradrawstyles1 = [d(x) for x in profile["extradrawstyles1"]] + self.qmc.extradrawstyles1[len(profile["extradrawstyles1"]):]
                 else:
                     self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp1)
                 if "extradrawstyles2" in profile:
-                    self.qmc.extradrawstyles2 = [d(x) for x in profile["extradrawstyles2"]]
+                    self.qmc.extradrawstyles2 = [d(x) for x in profile["extradrawstyles2"]] + self.qmc.extradrawstyles2[len(profile["extradrawstyles2"]):]
                 else:
                     self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp2)
                 self.updateExtraLCDvisibility()
@@ -10339,10 +10338,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.bag_humidity = [0.,0.]
             if "externalprogram" in profile:
                 self.ser.externalprogram = d(profile["externalprogram"])
-            if "extraname1" in profile:
-                self.qmc.extraname1 = [d(n) for n in profile["extraname1"]]
-            if "extraname2" in profile:
-                self.qmc.extraname2 = [d(n) for n in profile["extraname2"]]
             # alarms
             if self.qmc.loadalarmsfromprofile:
                 if "alarmflag" in profile:
