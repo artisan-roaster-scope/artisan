@@ -2400,6 +2400,9 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         e = 0
                     self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    #do water mark if SCs, but no SCe
+                    if timeindex[4] and not timeindex[5] and not timeindex2:
+                        self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
                 # add COOL mark
                 if timeindex[7] and not timeindex2:
                     tidx = timeindex[7]
@@ -3425,6 +3428,7 @@ class tgraphcanvas(FigureCanvas):
             aw.showSliders()
             aw.disableEditMenus()
             if aw.extraeventsbuttonsflag:
+                aw.update_extraeventbuttons_visibility()
                 aw.showExtraButtons()
             self.threadserver.createSampleThread()
         except Exception as ex:
@@ -8767,12 +8771,14 @@ class ApplicationWindow(QMainWindow):
         elif key == 66:                     #letter B hides/shows extra rows of event buttons
             if aw.qmc.flagon:
                 self.toggleextraeventrows()
+                aw.update_extraeventbuttons_visibility()
             else:
                 # allow to use 'b' key also if OFF
                 if aw.extrabuttondialogs.isVisible():
                     aw.hideExtraButtons()
                     aw.extraeventsbuttonsflag = False
                 else:
+                    aw.update_extraeventbuttons_visibility()
                     aw.showExtraButtons()
                     aw.extraeventsbuttonsflag = True
         #Extra event buttons palette. Numerical keys [0,1,2,3,4,5,6,7,8,9]
@@ -11446,8 +11452,8 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventbuttoncolor[i] = str(self.extraeventbuttoncolor[i])
                     self.extraeventbuttontextcolor[i] = str(self.extraeventbuttontextcolor[i])
                 #update individual visibility of each buttons
-                self.update_extraeventbuttons_visibility()
                 self.realignbuttons()
+                self.update_extraeventbuttons_visibility()
             settings.endGroup()
 
         except Exception:
@@ -26031,7 +26037,7 @@ class AlarmDlg(ArtisanDialog):
                 action = self.alarmtable.cellWidget(i,8)
                 aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
                 beepWidget = self.alarmtable.cellWidget(i,9)
-                beep = beepWidget.layout().takeAt(1).widget()
+                beep = beepWidget.layout().itemAt(1).widget()
                 if beep and beep != None:
                     aw.qmc.alarmbeep[i] = int(beep.isChecked())
                 description = self.alarmtable.cellWidget(i,10)
