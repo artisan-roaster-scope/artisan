@@ -9184,7 +9184,7 @@ class ApplicationWindow(QMainWindow):
     #reads and sets the actual directory
     def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None, QApplication.UnicodeUTF8),path=None):
         if path == None:
-            path = self.getDefaultPath() 
+            path = self.getDefaultPath()
         f = u(QFileDialog.getExistingDirectory(self,msg,path))
         self.setDefaultPath(f)
         return f
@@ -11223,6 +11223,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.beansize = settings.value("beansize",self.qmc.beansize).toDouble()[0]
             settings.endGroup()
             self.userprofilepath = u(settings.value("profilepath",self.userprofilepath).toString())
+            if settings.contains("autosavepath"):
+                self.qmc.autosavepath = u(settings.value("autosavepath",self.qmc.autosavepath).toString())
             if settings.contains("externalprogram"):
                 self.ser.externalprogram = u(settings.value("externalprogram",self.ser.externalprogram).toString())
             settings.beginGroup("ExtraDev")
@@ -11923,6 +11925,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
+            settings.setValue("autosavepath",self.qmc.autosavepath)
             settings.setValue("externalprogram",self.ser.externalprogram)
             #save extra devices
             settings.beginGroup("ExtraDev")
@@ -16762,12 +16765,12 @@ class autosaveDlg(ArtisanDialog):
         self.pathEdit.setText(filename)
 
     def autoChanged(self):
+        aw.qmc.autosavepath = str(self.pathEdit.text())
         if self.autocheckbox.isChecked():
             aw.qmc.autosaveflag = 1
             aw.qmc.autosaveprefix = self.prefixEdit.text()
             message = QApplication.translate("Message","Autosave ON. Prefix: %1").arg(self.prefixEdit.text())
             aw.sendmessage(message)
-            aw.qmc.autosavepath = str(self.pathEdit.text())
         else:
             aw.qmc.autosaveflag = 0
             message = QApplication.translate("Message","Autosave OFF", None, QApplication.UnicodeUTF8)
