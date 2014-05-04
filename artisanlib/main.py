@@ -1179,11 +1179,14 @@ class tgraphcanvas(FigureCanvas):
 
     # 100.0 to "10" and 10.1 to "1"
     def eventsvaluesShort(self,v):
-        value = self.eventsInternal2ExternalValue(v)
+        value = v*10. - 10.
         if value < 0:
             return ""
         else:
-            return u(int(round(value / 10)))
+            if aw.qmc.LCDdecimalplaces:
+                return u(int(round(value)))
+            else:
+                return u(int(round(value / 10)))
 
     # the inverse to eventsvalues above (string -> value)
     def str2eventsvalue(self,s):
@@ -2260,7 +2263,11 @@ class tgraphcanvas(FigureCanvas):
         else:
             rcParams['path.effects'] = []
         #annotate temp
-        self.ax.annotate("%.0f"%(temp), xy=(x,y),xytext=(x+e,y + yup),
+        if aw.qmc.LCDdecimalplaces:
+            fmtstr = "%.1f"
+        else:
+            fmtstr = "%.0f"        
+        self.ax.annotate(fmtstr%(temp), xy=(x,y),xytext=(x+e,y + yup),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
         #anotate time
         self.ax.annotate(time_str,xy=(x,y),xytext=(x+e,y - ydown),
@@ -9539,8 +9546,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extradevices.append(1)
             self.qmc.extradevicecolor1.append("black") #init color to black
             self.qmc.extradevicecolor2.append("black")
-            self.qmc.extraname1.append("Extra 1")
-            self.qmc.extraname2.append("Extra 2")
+            self.qmc.extraname1.append(u"Extra 1")
+            self.qmc.extraname2.append(u"Extra 2")
             self.qmc.extramathexpression1.append("")
             self.qmc.extramathexpression2.append("")
             

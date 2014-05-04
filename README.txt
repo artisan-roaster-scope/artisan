@@ -16,7 +16,7 @@ Developers: <https://lists.mokelbu.de/listinfo/artisan-devel>
 
 FEATURES
 
-o runs on Mac OS X 10.6/10.7/10.8 on Intel, Windows, and Linux
+o runs on Windows, Mac OS X 10.6/10.7/10.8 on Intel 64bit processor, and Linux
 (on OS X 10.8 Mountain Lion you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
