@@ -2036,11 +2036,14 @@ class tgraphcanvas(FigureCanvas):
                     self.roastingnotes = ""
                     self.cuppingnotes = ""
                     self.beans = ""
-                    self.weight = [0,0,"g"]
-                    self.volume = [0,0,"l"]
+                    self.weight = [0,0,self.weight[2]]
+                    self.volume = [0,0,self.volume[2]]
+                    self.density = [0,self.density[1],0,self.density[3]]
                     self.ambientTemp = 0.
                     self.ambient_humidity = 0.
                     self.beansize = 0.
+                    self.whole_color = 0
+                    self.ground_color = 0
 
                 self.roastdate = QDate.currentDate()
                 self.errorlog = []
@@ -11003,6 +11006,14 @@ class ApplicationWindow(QMainWindow):
             #restore roast color system
             if settings.contains("colorsystem"):
                 self.qmc.color_system_idx = settings.value("colorsystem",int(self.qmc.color_system_idx)).toInt()[0]
+            #restore units
+            settings.beginGroup("Units")
+            if settings.contains("weight"):
+                self.qmc.weight[2] = str(settings.value("weight",self.qmc.weight[2]).toString())
+                self.qmc.volume[2] = str(settings.value("volume",self.qmc.volume[2]).toString())
+                self.qmc.density[1] = str(settings.value("densityweight",self.qmc.density[1]).toString())
+                self.qmc.density[3] = str(settings.value("densityvolume",self.qmc.density[3]).toString())
+            settings.endGroup()
             #restore serial port
             settings.beginGroup("SerialPort")
             self.ser.comport = str(settings.value("comport",self.ser.comport).toString())
@@ -11906,7 +11917,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("xmax",self.qmc.endofx)
             settings.setValue("ymax",self.qmc.ylimit)
             settings.setValue("ymin",self.qmc.ylimit_min)
-            settings.setValue("zmax",self.qmc.zlimit)
+            settings.setValue("zmax",self.qmc.zlimit)2
             settings.setValue("zmin",self.qmc.zlimit_min)
             settings.setValue("resetmaxtime",self.qmc.resetmaxtime)
             settings.setValue("lockmax",self.qmc.fixmaxtime)
@@ -11918,6 +11929,12 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("beansize",self.qmc.beansize)
             settings.setValue("densitySampleVolume",self.qmc.density[2])
             settings.setValue("densitySampleVolumeUnit",self.qmc.density[3])
+            settings.endGroup()
+            settings.beginGroup("Units")
+            settings.setValue("weight",self.qmc.weight[2])
+            settings.setValue("volume",self.qmc.volume[2])
+            settings.setValue("densityweight",self.qmc.density[1])
+            settings.setValue("densityvolume",self.qmc.density[3])
             settings.endGroup()
             #save alarms
             settings.beginGroup("Alarms")
