@@ -2061,6 +2061,11 @@ class tgraphcanvas(FigureCanvas):
                 self.ystep_down = 0
                 self.ystep_up = 0
 
+                # reset keyboard mode
+                aw.keyboardmoveindex = 0
+                aw.keyboardmoveflag = 0
+                aw.resetKeyboardButtonMarks()
+                
                 self.startofx = 0
                 self.endofx = self.resetmaxtime 
                 if self.endofx < 1:
@@ -3684,7 +3689,6 @@ class tgraphcanvas(FigureCanvas):
                     self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
-                    st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
 
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -3706,6 +3710,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[1])
             except:
                 pass
+            st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
             message = QApplication.translate("Message","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st).arg(st2)
             #set message at bottom
             aw.sendmessage(message)
@@ -3741,8 +3747,6 @@ class tgraphcanvas(FigureCanvas):
                     self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
-                    st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
-                    st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3765,6 +3769,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[2])
             except:
                 pass
+            st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
             message = QApplication.translate("Message","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)
 
@@ -3793,8 +3799,6 @@ class tgraphcanvas(FigureCanvas):
                     self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
-                    st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
-                    st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3819,6 +3823,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[3])
             except:
                 pass
+            st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
             message = QApplication.translate("Message","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)
 
@@ -3849,8 +3855,6 @@ class tgraphcanvas(FigureCanvas):
                     self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
-                    st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
-                    st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3877,6 +3881,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[4])
             except:
                 pass
+            st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
             message = QApplication.translate("Message","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)
 
@@ -3904,8 +3910,6 @@ class tgraphcanvas(FigureCanvas):
                     self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
-                    st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
-                    st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3934,6 +3938,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[5])
             except:
                 pass
+            st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
             message = QApplication.translate("Message","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)
 
@@ -3973,8 +3979,6 @@ class tgraphcanvas(FigureCanvas):
                     self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
-                    st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
-                    st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -4011,6 +4015,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[6])
             except:
                 pass
+            st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
             message = QApplication.translate("Message","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)
 
@@ -4041,8 +4047,6 @@ class tgraphcanvas(FigureCanvas):
                     self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
-                    st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
-                    st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -4075,6 +4079,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[7])
             except:
                 pass
+            st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
             message = QApplication.translate("Message","[COOL END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             #set message at bottom
             aw.sendmessage(message)
@@ -8870,6 +8876,28 @@ class ApplicationWindow(QMainWindow):
             else:
                 return self.previousActiveButton(currentButtonIndex - 1)
 
+    def resetKeyboardButtonMarks(self):
+        if self.qmc.flagon:    
+            self.button_1.setStyleSheet(self.pushbuttonstyles["ON"])
+        else:
+            self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
+        self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
+        self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
+        self.button_20.setStyleSheet(self.pushbuttonstyles["COOL END"])
+        self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
+        self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
+        self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
+        self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
+        self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
+        self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
+        if self.qmc.flagstart:
+            if self.qmc.HUDflag:
+                self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_ON"])
+            else:
+                self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
+        else:
+            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+
     def moveKbutton(self,kcommand):
         #"Enter" toggles ON/OFF keyboard    
         if kcommand =="enter" and self.qmc.flagstart:
@@ -8889,27 +8917,7 @@ class ApplicationWindow(QMainWindow):
                 self.setSliderFocusPolicy(Qt.StrongFocus)
                 # clear all
                 self.sendmessage(QApplication.translate("Message","Keyboard moves turned OFF", None, QApplication.UnicodeUTF8))
-                if self.qmc.flagon:    
-                    self.button_1.setStyleSheet(self.pushbuttonstyles["ON"])
-                else:
-                    self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
-                self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
-                self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
-                self.button_20.setStyleSheet(self.pushbuttonstyles["COOL END"])
-                self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
-                self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
-                self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
-                self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
-                self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
-                self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
-                if self.qmc.flagstart:
-                    if self.qmc.HUDflag:
-                        self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_ON"])
-                    else:
-                        self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
-                else:
-                    aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
-
+                self.resetKeyboardButtonMarks()
         #if moves on
         if self.keyboardmoveflag:
             if kcommand == "space":
