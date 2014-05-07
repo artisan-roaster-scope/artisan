@@ -2464,6 +2464,8 @@ class tgraphcanvas(FigureCanvas):
                 self.endofx = 60
             self.ax.set_ylim(self.ylimit_min, self.ylimit)
             self.ax.set_autoscale_on(False)
+            fontprop_medium = aw.mpl_fontproperties.copy()
+            fontprop_medium.set_size("medium")
             fontprop_large = aw.mpl_fontproperties.copy()
             fontprop_large.set_size("large")
             fontprop_xlarge = aw.mpl_fontproperties.copy()
@@ -4481,41 +4483,25 @@ class tgraphcanvas(FigureCanvas):
 
                     #end temperature
                     if locale == "ar":
-                        strline = QString("[%11-%12] %9=" + aw.arabicReshape(QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8)) \
-                                    + "   " + aw.arabicReshape(QApplication.translate("Label", "d/m", None,QApplication.UnicodeUTF8)) \
-                                    + "%8=" + aw.arabicReshape(QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8)) \
-                                    + "   %7=" + aw.arabicReshape(QApplication.translate("Label", "T", None,QApplication.UnicodeUTF8)) \
-                                    + "   (%6) %4-%5=" + aw.arabicReshape(QApplication.translate("Label", "BT", None,QApplication.UnicodeUTF8)) \
-                                    + "   (%3) %1-%2= " + aw.arabicReshape(QApplication.translate("Label", "ET", None,QApplication.UnicodeUTF8))) \
-                                    .arg("%.0f"%BTmin) \
-                                    .arg("%.0f"%BTmax + self.mode) \
-                                    .arg("%.0f"%abs(BTmax - BTmin) + self.mode) \
-                                    .arg(u("%.0f"%ETmin)) \
-                                    .arg(u("%.0f"%ETmax + self.mode)) \
-                                    .arg(u("%.0f"%abs(ETmax - ETmin)  + self.mode)) \
+                        strline = QString("[%4-%5]%3=" + aw.arabicReshape(QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8)) \
+                                    + " " + aw.arabicReshape(QApplication.translate("Label", "d/m", None,QApplication.UnicodeUTF8)) \
+                                    + "%2=" + aw.arabicReshape(QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8)) \
+                                    + " %1=" + aw.arabicReshape(QApplication.translate("Label", "T", None,QApplication.UnicodeUTF8))) \
                                     .arg(u(timez)) \
                                     .arg(u(ror)) \
-                                    .arg(u("%d%sm"%(ts,self.mode))) \
+                                    .arg(u("%d"%ts)) \
                                     .arg(u(int(tse))) \
                                     .arg(u(int(tsb)))
                         if det != None:
-                            strline = QString(("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None,QApplication.UnicodeUTF8) + "   ") + strline
+                            strline = QString(("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None,QApplication.UnicodeUTF8) + " ") + strline
                     else:
-                        strline = QString(QApplication.translate("Label", "ET", None,QApplication.UnicodeUTF8) + "=%1-%2 (%3)   " \
-                                    + QApplication.translate("Label", "BT", None,QApplication.UnicodeUTF8) + "=%4-%5 (%6)   " \
-                                    + QApplication.translate("Label", "T", None,QApplication.UnicodeUTF8) + "=%7   " \
-                                    + QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8) + "=%8" \
+                        strline = QString(QApplication.translate("Label", "T", None,QApplication.UnicodeUTF8) + "=%1   " \
+                                    + QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8) + "=%2" \
                                     + QApplication.translate("Label", "d/m", None,QApplication.UnicodeUTF8) + "   " \
-                                    + QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8) + "=%9 [%11-%12]") \
-                                    .arg("%.0f"%BTmin) \
-                                    .arg("%.0f"%BTmax + self.mode) \
-                                    .arg("%.0f"%abs(BTmax - BTmin) + self.mode) \
-                                    .arg(u("%.0f"%ETmin)) \
-                                    .arg(u("%.0f"%ETmax + self.mode)) \
-                                    .arg(u("%.0f"%abs(ETmax - ETmin)  + self.mode)) \
+                                    + QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8) + "=%3[%4-%5]") \
                                     .arg(u(timez)) \
                                     .arg(u(ror)) \
-                                    .arg(u("%d%sm"%(ts,self.mode))) \
+                                    .arg(u("%d"%ts)) \
                                     .arg(u(int(tse))) \
                                     .arg(u(int(tsb)))
                         if det != None:
@@ -11917,7 +11903,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("xmax",self.qmc.endofx)
             settings.setValue("ymax",self.qmc.ylimit)
             settings.setValue("ymin",self.qmc.ylimit_min)
-            settings.setValue("zmax",self.qmc.zlimit)2
+            settings.setValue("zmax",self.qmc.zlimit)
             settings.setValue("zmin",self.qmc.zlimit_min)
             settings.setValue("resetmaxtime",self.qmc.resetmaxtime)
             settings.setValue("lockmax",self.qmc.fixmaxtime)
