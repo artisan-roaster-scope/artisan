@@ -463,11 +463,15 @@ class tgraphcanvas(FigureCanvas):
         #DEVICES
         self.device = 18                                    # default device selected to None (18). Calls appropiate function
         
+        # Phidget variables
         self.phidget1048_types = [
             ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
             ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
             ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
             ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE] # probe types (ThermocoupleType)
+        self.phidgetRemoteFlag = False
+        self.phidgetServerID = ""
+        self.phidgetPassword = ""
 
         #menu of thermocouple devices
         #device with first letter + only shows in extra device tab
@@ -10860,8 +10864,13 @@ class ApplicationWindow(QMainWindow):
             #restore device
             settings.beginGroup("Device")
             self.qmc.device = settings.value("id",self.qmc.device).toInt()[0]
+            # Phidget configurations
             if settings.contains("phidget1048_types"):
                 self.qmc.phidget1048_types = [x.toInt()[0] for x in settings.value("phidget1048_types").toList()]
+            if settings.contains("phidgetRemoteFlag"):
+                self.qmc.phidgetRemoteFlag = bool(settings.value("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag).toBool())
+                self.qmc.phidgetServerID = u(settings.value("phidgetServerID",self.qmc.phidgetServerID).toString())
+                self.qmc.phidgetPassword = u(settings.value("phidgetPassword",self.qmc.phidgetPassword).toString())
             # activate CONTROL BUTTON
             if self.qmc.device == 0:
                 self.button_10.setVisible(True) #CONTROL BUTTON
@@ -11720,6 +11729,9 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Device")
             settings.setValue("id",self.qmc.device)
             settings.setValue("phidget1048_types",self.qmc.phidget1048_types)
+            settings.setValue("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)
+            settings.setValue("phidgetServerID",self.qmc.phidgetServerID)
+            settings.setValue("phidgetPassword",self.qmc.phidgetPassword)
             settings.setValue("controlETpid",self.ser.controlETpid)
             settings.setValue("readBTpid",self.ser.readBTpid)
             settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)
@@ -21457,10 +21469,17 @@ class serialport(object):
                 aw.ser.PhidgetTemperatureSensor = Phidget1048TemperatureSensor()
                 libtime.sleep(.1)
                 if aw.ser.PhidgetTemperatureSensor.isAttached():
-                    aw.ser.PhidgetTemperatureSensor.openPhidget()
+                    if aw.qmc.phidgetRemoteFlag:
+                        aw.ser.PhidgetTemeratureSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                    else:
+                        aw.ser.PhidgetTemperatureSensor.openPhidget()
+                    libtime.sleep(0.00125)
                 else:
                     try: 
-                        aw.ser.PhidgetTemperatureSensor.openPhidget()
+                        if aw.qmc.phidgetRemoteFlag:
+                            res = aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        else:
+                            aw.ser.PhidgetTemperatureSensor.openPhidget()
                         libtime.sleep(.2)
                         aw.ser.PhidgetTemperatureSensor.waitForAttach(600) 
                         try:
@@ -21562,10 +21581,17 @@ class serialport(object):
                 aw.ser.PhidgetBridgeSensor = Phidget1046TemperatureSensor()
                 libtime.sleep(.1)
                 if aw.ser.PhidgetBridgeSensor.isAttached():
-                    aw.ser.PhidgetBridgeSensor.openPhidget()
+                    if aw.qmc.phidgetRemoteFlag:
+                        aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                    else:
+                        aw.ser.PhidgetBridgeSensor.openPhidget()
+                    libtime.sleep(0.00125)
                 else:
                     try: 
-                        aw.ser.PhidgetBridgeSensor.openPhidget()
+                        if aw.qmc.phidgetRemoteFlag:
+                            aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        else:
+                            aw.ser.PhidgetBridgeSensor.openPhidget()
                         libtime.sleep(.2)
                         aw.ser.PhidgetBridgeSensor.waitForAttach(600) 
                         aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))
@@ -23583,7 +23609,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.curveBox.addWidget(self.lcds)
         self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Meter", None, QApplication.UnicodeUTF8))
         self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None, QApplication.UnicodeUTF8))
-        self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","Arduino TC4", None, QApplication.UnicodeUTF8))
+        self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","TC4", None, QApplication.UnicodeUTF8))
         self.programButton = QRadioButton(QApplication.translate("Radio Button","Program", None, QApplication.UnicodeUTF8))
         #As a main device, don't show the devices that start with a "+"
         # devices with a first letter "+" are extra devices an depend on another device
@@ -23698,37 +23724,70 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.enableDisableAddDeleteButtons()
         ##########     LAYOUTS
         # create Phidget box
-        phidgetItems = ["K-Type", "J-Type", "E-Type", "T-Type"]
-        phidgetBox = QGridLayout()
+        phidgetItems = ["K", "J", "E", "T"]
+        phidgetBox1048 = QGridLayout()
         self.phidgetProbe1 = QComboBox()
         self.phidgetProbe1.addItems(phidgetItems)
         self.phidgetProbe1.setCurrentIndex(aw.qmc.phidget1048_types[0]-1)        
-        phidgetProbe1label = QLabel(QApplication.translate("Label", "Probe 1",None, QApplication.UnicodeUTF8))
+        phidgetProbe1label = QLabel(QApplication.translate("Label", "1:",None, QApplication.UnicodeUTF8))
         self.phidgetProbe2 = QComboBox()
         self.phidgetProbe2.addItems(phidgetItems)
         self.phidgetProbe2.setCurrentIndex(aw.qmc.phidget1048_types[1]-1)
-        phidgetProbe2label = QLabel(QApplication.translate("Label", "Probe 2",None, QApplication.UnicodeUTF8))
+        phidgetProbe2label = QLabel(QApplication.translate("Label", "2:",None, QApplication.UnicodeUTF8))
         self.phidgetProbe3 = QComboBox()
         self.phidgetProbe3.addItems(phidgetItems)
         self.phidgetProbe3.setCurrentIndex(aw.qmc.phidget1048_types[2]-1)
-        phidgetProbe3label = QLabel(QApplication.translate("Label", "Probe 3",None, QApplication.UnicodeUTF8))
+        phidgetProbe3label = QLabel(QApplication.translate("Label", "3:",None, QApplication.UnicodeUTF8))
         self.phidgetProbe4 = QComboBox()
         self.phidgetProbe4.addItems(phidgetItems)
         self.phidgetProbe4.setCurrentIndex(aw.qmc.phidget1048_types[3]-1)
-        phidgetProbe4label = QLabel(QApplication.translate("Label", "Probe 4",None, QApplication.UnicodeUTF8))
-        phidgetBox.addWidget(phidgetProbe1label,0,0,Qt.AlignCenter)
-        phidgetBox.addWidget(self.phidgetProbe1,1,0)
-        phidgetBox.addWidget(phidgetProbe2label,0,1)
-        phidgetBox.addWidget(self.phidgetProbe2,1,1)
-        phidgetBox.addWidget(phidgetProbe3label,0,2)
-        phidgetBox.addWidget(self.phidgetProbe3,1,2)
-        phidgetBox.addWidget(phidgetProbe4label,0,3)
-        phidgetBox.addWidget(self.phidgetProbe4,1,3)
-        phidgetHBox = QHBoxLayout()
-        phidgetHBox.addLayout(phidgetBox)
-        phidgetHBox.addStretch()
-        phidgetGroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048 Probe Types",None, QApplication.UnicodeUTF8))
-        phidgetGroupBox.setLayout(phidgetHBox)
+        phidgetProbe4label = QLabel(QApplication.translate("Label", "4:",None, QApplication.UnicodeUTF8))
+        phidgetBox1048.addWidget(phidgetProbe1label,0,0)
+        phidgetBox1048.addWidget(self.phidgetProbe1,0,1)
+        phidgetBox1048.addWidget(phidgetProbe2label,0,2)
+        phidgetBox1048.addWidget(self.phidgetProbe2,0,3)
+        phidgetBox1048.addWidget(phidgetProbe3label,0,4)
+        phidgetBox1048.addWidget(self.phidgetProbe3,0,5)
+        phidgetBox1048.addWidget(phidgetProbe4label,0,6)
+        phidgetBox1048.addWidget(self.phidgetProbe4,0,7)
+        phidget1048HBox = QHBoxLayout()
+        phidget1048HBox.addStretch()
+        phidget1048HBox.addLayout(phidgetBox1048)
+        phidget1048HBox.addStretch()
+        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","1048 Probe Types",None, QApplication.UnicodeUTF8))
+        phidget1048GroupBox.setLayout(phidget1048HBox)
+        phidget1048HBox.setContentsMargins(0,0,0,0)      
+        self.phidgetBoxRemoteFlag  = QCheckBox()
+        self.phidgetBoxRemoteFlag.setChecked(aw.qmc.phidgetRemoteFlag)
+        phidgetServerIdLabel = QLabel(QApplication.translate("CheckBox","ServerId:", None, QApplication.UnicodeUTF8))
+        self.phidgetServerId = QLineEdit(aw.qmc.phidgetServerID)
+        phidgetPasswordLabel = QLabel(QApplication.translate("CheckBox","Password:", None, QApplication.UnicodeUTF8))
+        self.phidgetPassword = QLineEdit(aw.qmc.phidgetPassword)
+        self.phidgetPassword.setEchoMode(3)
+        phidgetServerBox = QHBoxLayout()
+        phidgetServerBox.addWidget(phidgetServerIdLabel)
+        phidgetServerBox.addWidget(self.phidgetServerId)
+        phidgetServerBox.setContentsMargins(0,0,0,0)
+        phidgetServerBox.setSpacing(3)
+        phidgetPasswordBox = QHBoxLayout()
+        phidgetPasswordBox.addWidget(phidgetPasswordLabel)
+        phidgetPasswordBox.addWidget(self.phidgetPassword)
+        phidgetPasswordBox.setContentsMargins(0,0,0,0)
+        phidgetPasswordBox.setSpacing(3)
+        phidgetNetworkGrid = QGridLayout()
+        phidgetNetworkGrid.addWidget(self.phidgetBoxRemoteFlag,0,0)
+        phidgetNetworkGrid.addLayout(phidgetServerBox,0,1)
+        phidgetNetworkGrid.addLayout(phidgetPasswordBox,0,2)
+        phidgetNetworkGrid.setContentsMargins(0,0,0,0)
+        phidgetNetworkGrid.setSpacing(20)
+        phidgetNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None, QApplication.UnicodeUTF8))
+        phidgetNetworkGroupBox.setLayout(phidgetNetworkGrid)
+        phidgetVBox = QVBoxLayout()
+        phidgetVBox.addWidget(phidget1048GroupBox)
+        phidgetVBox.addWidget(phidgetNetworkGroupBox)
+        phidgetVBox.setContentsMargins(0,0,0,0)
+        phidgetGroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets",None, QApplication.UnicodeUTF8))
+        phidgetGroupBox.setLayout(phidgetVBox)
         # create pid box
         PIDgrid = QGridLayout()
         PIDgrid.addWidget(label1,0,1)
@@ -23743,6 +23802,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         PIDBox = QHBoxLayout()
         PIDBox.addLayout(PIDgrid)
         PIDBox.addStretch()
+        PIDBox.setContentsMargins(0,0,0,0)
         PIDGroupBox = QGroupBox(QApplication.translate("GroupBox","PID",None, QApplication.UnicodeUTF8))
         PIDGroupBox.setLayout(PIDBox)
         # create arduino box
@@ -23756,6 +23816,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         arduinoBox = QHBoxLayout()
         arduinoBox.addLayout(arduinogrid)
         arduinoBox.addStretch()
+        arduinoBox.setContentsMargins(0,0,0,0)
         arduinoGroupBox = QGroupBox(QApplication.translate("GroupBox","Arduino TC4",None, QApplication.UnicodeUTF8))
         arduinoGroupBox.setLayout(arduinoBox)
         #create program Box
@@ -23802,7 +23863,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.setSpacing(5)
-        tab1Layout.setContentsMargins(5,10,0,0)
+        tab1Layout.setContentsMargins(5,5,0,0)
         tab1Layout.addStretch()
         bLayout = QHBoxLayout()
         bLayout.addWidget(self.addButton)
@@ -24619,11 +24680,16 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.BTcurve = self.BTcurve.isChecked()
             aw.qmc.ETlcd = self.ETlcd.isChecked()
             aw.qmc.BTlcd = self.BTlcd.isChecked()
+            # Phidget configuraitons
             aw.qmc.phidget1048_types = [
                 self.phidgetProbe1.currentIndex()+1,
                 self.phidgetProbe2.currentIndex()+1,
                 self.phidgetProbe3.currentIndex()+1,
                 self.phidgetProbe4.currentIndex()+1]
+            aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
+            aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
+            aw.qmc.phidgetPassword = u(self.phidgetPassword.text())
+            # LCD visibility
             if aw.qmc.flagon:
                 aw.LCD2frame.setVisible(aw.qmc.ETlcd)
                 aw.LCD3frame.setVisible(aw.qmc.BTlcd)
@@ -27319,16 +27385,27 @@ class PXRpidDlgControl(ArtisanDialog):
         ramp = aw.qmc.stringtoseconds(str(rampedit.text()))
         soak = aw.qmc.stringtoseconds(str(soakedit.text()))
         svkey = "segment" + str(idn) + "sv"
-        svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR[svkey][1],int(sv*10))
-        r1 = aw.ser.sendFUJIcommand(svcommand,8)
-        libtime.sleep(0.1) #important time between writings
         rampkey = "segment" + str(idn) + "ramp"
-        rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR[rampkey][1],ramp)
-        r2 = aw.ser.sendFUJIcommand(rampcommand,8)
-        libtime.sleep(0.1) #important time between writings
         soakkey = "segment" + str(idn) + "soak"
-        soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR[soakkey][1],soak)
-        r3 = aw.ser.sendFUJIcommand(soakcommand,8)
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXR[svkey][1],6)       
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(sv*10))
+            libtime.sleep(0.1) #important time between writings
+            reg = aw.modbus.address2register(aw.fujipid.PXR[rampkey][1],6)       
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,ramp)
+            libtime.sleep(0.1) #important time between writings
+            reg = aw.modbus.address2register(aw.fujipid.PXR[soakkey][1],6)       
+            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,soak)        
+            r1 = r2 = r3 = "        "
+        else:
+            svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR[svkey][1],int(sv*10))
+            r1 = aw.ser.sendFUJIcommand(svcommand,8)
+            libtime.sleep(0.1) #important time between writings
+            rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR[rampkey][1],ramp)
+            r2 = aw.ser.sendFUJIcommand(rampcommand,8)
+            libtime.sleep(0.1) #important time between writings
+            soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR[soakkey][1],soak)
+            r3 = aw.ser.sendFUJIcommand(soakcommand,8)
         #check if OK
         if len(r1) == 8 and len(r2) == 8 and len(r3) == 8:
             aw.fujipid.PXR[svkey][0] = sv
