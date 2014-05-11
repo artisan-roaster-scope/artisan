@@ -520,7 +520,9 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget 1046 RTD",      #37
                        "+Phidget 1046_34 RTD",  #38
                        "Mastech MS6514",        #39
-                       "-Omega HH806W"          #40 NOT WORKING 
+                       "Phidget 1018 IO",       #40
+                       "+Phidget 1018_34 IO",   #41
+                       "-Omega HH806W"          #42 NOT WORKING 
                        ]
 
         #extra devices
@@ -9333,53 +9335,54 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEStrings = profile["specialeventsStrings"]
                 self.qmc.backgroundFlavors = profile["flavors"]
                 self.qmc.titleB = profile["title"]
-                # alarms
-                if self.qmc.loadalarmsfromprofile:
-                    if "alarmflag" in profile:
-                        self.qmc.alarmflag = profile["alarmflag"]
-                    else:
-                        self.qmc.alarmflag = []
-                    if "alarmguard" in profile:
-                        self.qmc.alarmguard = profile["alarmguard"]
-                    else:
-                        self.qmc.alarmguard = [-1]*len(self.qmc.alarmflag)
-                    if "alarmnegguard" in profile:
-                        self.qmc.alarmnegguard = profile["alarmnegguard"]
-                    else:
-                        self.qmc.alarmnegguard = [-1]*len(self.qmc.alarmflag)
-                    if "alarmtime" in profile:
-                        self.qmc.alarmtime = profile["alarmtime"]
-                    else:
-                        self.qmc.alarmtime = [-1]*len(self.qmc.alarmflag)
-                    if "alarmoffset" in profile:
-                        self.qmc.alarmoffset = profile["alarmoffset"]
-                    else:
-                        self.qmc.alarmoffset = [0]*len(self.qmc.alarmflag)
-                    if "alarmcond" in profile:
-                        self.qmc.alarmcond = profile["alarmcond"]
-                    else:
-                        self.qmc.alarmcond = [1]*len(self.qmc.alarmflag)
-                    if "alarmsource" in profile:
-                        self.qmc.alarmsource = profile["alarmsource"]
-                    else:
-                        self.qmc.alarmsource = [1]*len(self.qmc.alarmflag)
-                    if "alarmtemperature" in profile:
-                        self.qmc.alarmtemperature = profile["alarmtemperature"]
-                    else:
-                        self.qmc.alarmtemperature = [500]*len(self.qmc.alarmflag)
-                    if "alarmaction" in profile:
-                        self.qmc.alarmaction = profile["alarmaction"]
-                    else:
-                        self.qmc.alarmaction = [0]*len(self.qmc.alarmflag)
-                    if "alarmbeep" in profile:
-                        self.qmc.alarmbeep = profile["alarmbeep"]
-                    else:
-                        self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
-                    if "alarmstrings" in profile:
-                        self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
-                    else:
-                        self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
-                    self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered
+# we don't load alarms from backgrounds as this would overload the one of the foreground profile that automatically loads this background
+#                # alarms
+#                if self.qmc.loadalarmsfromprofile:
+#                    if "alarmflag" in profile:
+#                        self.qmc.alarmflag = profile["alarmflag"]
+#                    else:
+#                        self.qmc.alarmflag = []
+#                    if "alarmguard" in profile:
+#                        self.qmc.alarmguard = profile["alarmguard"]
+#                    else:
+#                        self.qmc.alarmguard = [-1]*len(self.qmc.alarmflag)
+#                    if "alarmnegguard" in profile:
+#                        self.qmc.alarmnegguard = profile["alarmnegguard"]
+#                    else:
+#                        self.qmc.alarmnegguard = [-1]*len(self.qmc.alarmflag)
+#                    if "alarmtime" in profile:
+#                        self.qmc.alarmtime = profile["alarmtime"]
+#                    else:
+#                        self.qmc.alarmtime = [-1]*len(self.qmc.alarmflag)
+#                    if "alarmoffset" in profile:
+#                        self.qmc.alarmoffset = profile["alarmoffset"]
+#                    else:
+#                        self.qmc.alarmoffset = [0]*len(self.qmc.alarmflag)
+#                    if "alarmcond" in profile:
+#                        self.qmc.alarmcond = profile["alarmcond"]
+#                    else:
+#                        self.qmc.alarmcond = [1]*len(self.qmc.alarmflag)
+#                    if "alarmsource" in profile:
+#                        self.qmc.alarmsource = profile["alarmsource"]
+#                    else:
+#                        self.qmc.alarmsource = [1]*len(self.qmc.alarmflag)
+#                    if "alarmtemperature" in profile:
+#                        self.qmc.alarmtemperature = profile["alarmtemperature"]
+#                    else:
+#                        self.qmc.alarmtemperature = [500]*len(self.qmc.alarmflag)
+#                    if "alarmaction" in profile:
+#                        self.qmc.alarmaction = profile["alarmaction"]
+#                    else:
+#                        self.qmc.alarmaction = [0]*len(self.qmc.alarmflag)
+#                    if "alarmbeep" in profile:
+#                        self.qmc.alarmbeep = profile["alarmbeep"]
+#                    else:
+#                        self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
+#                    if "alarmstrings" in profile:
+#                        self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
+#                    else:
+#                        self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
+#                    self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered
                 #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
                 if self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
                     l = len(self.qmc.backgroundFlavors)
@@ -20422,7 +20425,9 @@ class serialport(object):
                                    self.PHIDGET1046,        #37
                                    self.PHIDGET1046_34,     #38
                                    self.MastechMS6514,      #39
-                                   self.HH806W              #40
+                                   self.PHIDGET1018,        #40
+                                   self.PHIDGET1018_34,     #41
+                                   self.HH806W              #42
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -20686,6 +20691,16 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1046temperature(1)
         return tx,t1,t2
+        
+    def PHIDGET1018(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1046values(0)
+        return tx,v1,v2
+
+    def PHIDGET1018_34(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1046values(1)
+        return tx,v1,v2
 
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -21665,6 +21680,10 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
+            
+    # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
+    def PHIDGET1018values(self,mode=0):
+        return -1,-1            
 
     def ARDUINOTC4temperature(self):
         try:
@@ -23148,7 +23167,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
-        if not(devid in [29,33,34,37]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS and Phidget devices
+        if not(devid in [29,33,34,37,40,41]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS and Phidget devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -23345,7 +23364,7 @@ class comportDlg(ArtisanDialog):
                     devicename = aw.qmc.devices[devid-1]
                     device = QTableWidgetItem(devicename)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
-                    if not (devid in [29,33,34,37]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                    if not (devid in [29,33,34,37,40,41]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                         comportComboBox = PortComboBox(selection = aw.extracomport[i])
                         self.connect(comportComboBox, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                         comportComboBox.setFixedWidth(200)
@@ -24537,30 +24556,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 33 is +MODBUS_34 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Phidget 1048":
-                    aw.qmc.device = 34
-                    #aw.ser.comport = "COM11"
-                    aw.ser.baudrate = 19200
-                    aw.ser.bytesize = 8
-                    aw.ser.parity= 'E'
-                    aw.ser.stopbits = 1
-                    aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                ##########################
+                ####  DEVICE 34 is Phidget 1048 that does not use the serial port
+                ##########################
                 ##########################
                 ####  DEVICE 35 is +Phidget 1048_34 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 36 is +Phidget 1048_AT but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Phidget 1046 RTD":
-                    aw.qmc.device = 37
-                    #aw.ser.comport = "COM11"
-                    aw.ser.baudrate = 19200
-                    aw.ser.bytesize = 8
-                    aw.ser.parity= 'E'
-                    aw.ser.stopbits = 1
-                    aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                ##########################
+                ####  DEVICE 37 is Phidget 1046 RTD that does not use the serial port
+                ##########################
                 ##########################
                 ####  DEVICE 38 is +Phidget 1046_34 RTD but +DEVICE cannot be set as main device
                 ##########################
@@ -24573,8 +24580,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                ##########################
+                ####  DEVICE 40 is Phidget 1018 IO that does not use the serial port
+                ##########################
+                ##########################
+                ####  DEVICE 41 is +Phidget 1018_34 RTD but +DEVICE cannot be set as main device
+                ##########################
                 elif meter == "Omega HH806W":
-                    aw.qmc.device = 40
+                    aw.qmc.device = 42
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -24635,7 +24648,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 37
                 1, # 38
                 3, # 39
-                8] # 40
+                1, # 40
+                1, # 41
+                8] # 42
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -24697,7 +24712,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
-            if not(aw.qmc.device in [18,27,34,37]):
+            if not(aw.qmc.device in [18,27,34,37,40,41]):
                 aw.setcommport()
             self.close()
         except Exception as e:
