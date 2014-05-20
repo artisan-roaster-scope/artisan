@@ -22063,9 +22063,15 @@ class serialport(object):
                     aw.qmc.extraArduinoT3 = aw.qmc.extraArduinoT4 = -1                
                 if 44 in aw.qmc.extradevices: # +ArduinoTC4_78
                     # report SV as extraArduinoT5
-                    aw.qmc.extraArduinoT5 = float(res[7])
+                    try:
+                        aw.qmc.extraArduinoT5 = float(res[7])
+                    except:
+                        aw.qmc.extraArduinoT5 = -1
                     # report Ambient Temperature as extraArduinoT6
-                    aw.qmc.extraArduinoT6 = float(res[0])
+                    try:
+                        aw.qmc.extraArduinoT6 = float(res[0])
+                    except:
+                        aw.qmc.extraArduinoT6 = -1
                 # overwrite temps by AT internal Ambient Temperature
                 if aw.ser.arduinoATChannel != "None":
                     if aw.ser.arduinoATChannel == "T1":
