@@ -8319,8 +8319,11 @@ class ApplicationWindow(QMainWindow):
                 # TP phase LCD
                 if self.qmc.TPalarmtimeindex:
                     # after TP
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
-                    ts = tx - self.qmc.timex[self.qmc.TPalarmtimeindex]
+                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")                    
+                    if self.qmc.timeindex[2]:
+                        ts = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
+                    else:
+                        ts = tx - self.qmc.timex[self.qmc.TPalarmtimeindex]
                     tss = QString(self.qmc.stringfromseconds(int(ts)))
                     self.TPlcd.display(tss)
                 else:
@@ -8331,7 +8334,10 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.timeindex[1]:
                     # after DRY
                     self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
-                    ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
+                    if self.qmc.timeindex[2]:
+                        ts = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
+                    else:
+                        ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                     self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
                     # TP2DRY
                     if window_width > 950 and self.qmc.TPalarmtimeindex:
@@ -8362,7 +8368,10 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.timeindex[2]:
                     # after FCs
                     self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
-                    ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
+                    if self.qmc.timeindex[6]:
+                        ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[2]]
+                    else:
+                        ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
                     self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
                     # DRY2FCs
                     if  window_width > 950 and self.qmc.timeindex[1]:
@@ -8432,6 +8441,11 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCDSV.display(v)
 
     def sliderSVreleased(self):
+        if aw.qmc.LCDdecimalplaces:
+            s = "%.1f"%self.sliderSV.value()
+        else:
+            s = "%.0f"%self.sliderSV.value()
+        aw.sendmessage(QApplication.translate("Message","SV set to %s"%s, None, QApplication.UnicodeUTF8))
         aw.arduino.setSV(self.sliderSV.value(),False)
 
     def moveSVslider(self,v):
@@ -30351,7 +30365,7 @@ class ArduinoDlgControl(ArtisanDialog):
         
         self.pidSVLookahead = QSpinBox()
         self.pidSVLookahead.setAlignment(Qt.AlignRight)
-        self.pidSVLookahead.setRange(0,100)
+        self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
         self.pidSVLookahead.setValue(aw.arduino.svLookahead)  
         self.pidSVLookahead.setSuffix(" s")
@@ -30818,10 +30832,10 @@ class ArduinoTC4(object):
             return self.svRampSoak(tx)
         elif self.svMode == 2 and aw.qmc.background:
             # Follow Background mode
-            if aw.ser.arduinoETChannel == self.pidSource: # we observe the ET
+            if int(aw.ser.arduinoETChannel) == self.pidSource: # we observe the ET
                 j = aw.qmc.backgroundtime2index(tx + self.svLookahead)
                 return aw.qmc.temp1B[j]
-            elif aw.ser.arduinoBTChannel == self.pidSource: # we observe the BT
+            elif int(aw.ser.arduinoBTChannel) == self.pidSource: # we observe the BT
                 j = aw.qmc.backgroundtime2index(tx + self.svLookahead)
                 return aw.qmc.temp2B[j]
         else:
@@ -30839,7 +30853,6 @@ class ArduinoTC4(object):
                     aw.ser.SP.flushOutput()
                     aw.ser.SP.write(str2cmd("PID;SV;" + str(sv) +"\n"))
                     self.sv = sv
-                    aw.sendmessage(QApplication.translate("Message","SV set to %.1f"%sv, None, QApplication.UnicodeUTF8))
                     if move:
                         aw.moveSVslider(sv)
                     libtime.sleep(.1)
