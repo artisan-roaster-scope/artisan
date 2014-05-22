@@ -1,6 +1,27 @@
 #summary Detailed Release History
 
 
+==v0.8.0 ==
+
+ * New Features
+  * adds Mastech MS6514 support
+  * adds Phidget IO support (eg. 1018 or SBC)
+  * adds Phidget remote support (eg. via SBC)
+  * adds Arduino TC4 PID support
+ * Changes
+  * increased resolution of temperatures in profiles to two digits
+  * increased Arduino TC4 default serial baud rate from 19200 to 115200 to match the TC4 Firmware aArtisan v3.00
+  * saves autosave path and Volume/Weight/Density units to app settings
+  * roast profile data table and events value display respect decimal places settings
+  * improved extra device handling on profile loading
+  * simplified statistics line
+  * updates libraries (Qt, PyQt, numpy, scipy)
+  * alarms are not load from background profiles
+ * Bug Fixes
+  * fixes keyboard mode on reset
+  * fixes multiple event button action
+  * fixes mixup of alarm table introduced in 0.7.5
+
 ==v0.7.5 (06.04.2014)==
 
  * New Features
