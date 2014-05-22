@@ -9,7 +9,6 @@
   * adds Phidget remote support (eg. via SBC)
   * adds Arduino TC4 PID support
  * Changes
-  * increased resolution of temperatures in profiles to two digits
   * increased Arduino TC4 default serial baud rate from 19200 to 115200 to match the TC4 Firmware aArtisan v3.00
   * saves autosave path and Volume/Weight/Density units to app settings
   * roast profile data table and events value display respect decimal places settings
