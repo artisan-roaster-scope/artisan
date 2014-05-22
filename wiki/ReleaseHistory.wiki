@@ -1,7 +1,7 @@
 #summary Detailed Release History
 
 
-==v0.7.5 (xx.04.2014)==
+==v0.7.5 (06.04.2014)==
 
  * New Features
   * adds Phidgets 1048 probe type configuration
