@@ -1,7 +1,7 @@
 #summary Detailed Release History
 
 
-==v0.8.0 ==
+==v0.8.0 (25.05.2014)==
 
  * New Features
   * adds Mastech MS6514 support
