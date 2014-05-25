@@ -8344,8 +8344,8 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.timeindex[1]:
                     # after DRY
                     self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
-                    if self.qmc.timeindex[2]:
-                        ts = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
+                    if self.qmc.timeindex[6]:
+                        ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[1]]
                     else:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                     self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
