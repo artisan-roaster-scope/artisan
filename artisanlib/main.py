@@ -2154,6 +2154,10 @@ class tgraphcanvas(FigureCanvas):
                 aw.moveslider(1,0)
                 aw.moveslider(2,0)
                 aw.moveslider(3,0)
+                
+                # reset Arduino/TC4 PID SV
+                aw.moveSVslider(0)
+                aw.arduino.sv = 0
 
                 #autodetected CHARGE and DROP index
                 self.autoChargeIdx = 0
