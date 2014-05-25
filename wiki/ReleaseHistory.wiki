@@ -15,7 +15,7 @@
   * improved extra device handling on profile loading
   * simplified statistics line
   * updates libraries (Qt, PyQt, numpy, scipy)
-  * alarms are not load from background profiles
+  * do not load alarms from background profiles
  * Bug Fixes
   * fixes keyboard mode on reset
   * fixes multiple event button action
