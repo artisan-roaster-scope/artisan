@@ -1,4 +1,4 @@
-#summary Artisan running Mac OS, Windows, Ubuntu and CentOS.
+#summary Artisan running on Mac OS, Windows, Ubuntu and CentOS.
 
 ==Profiles==
 
