@@ -1160,8 +1160,18 @@ class tgraphcanvas(FigureCanvas):
 
     def updateAmbientTemp(self):
         res = aw.qmc.ambientTempSourceAvg()
-        if res and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
+        if res != None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
             aw.qmc.ambientTemp = float(res)
+        elif aw.qmc.device == 34: # Phidget 1048 (use internal temp)
+            try:
+                if aw.ser.PhidgetTemperatureSensor != None and aw.ser.PhidgetTemperatureSensor.isAttached():
+                    t = aw.ser.PhidgetTemperatureSensor.getAmbientTemperature()
+                    if mode == "F":
+                        aw.qmc.ambientTemp = aw.qmc.fromCtoF(t)
+                    else:
+                        aw.qmc.ambientTemp = t
+            except:
+                pass
 
     # eventsvalues maps the given number v to a string to be displayed to the user as special event value
     # v is expected to be float value of range [0.0-10.0]
@@ -13224,7 +13234,7 @@ $cupping_notes
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
         contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis, Miroslav Stankovic,")
-        contributors += u("<br>Barrie Fairley, Ziv Sade, Nicholas Seckar")
+        contributors += u("<br>Barrie Fairley, Ziv Sade, Nicholas Seckar, Morten M") + uchr(252) + u("nchow")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -16125,7 +16135,7 @@ class editGraphDlg(ArtisanDialog):
         tab1bLayout.addLayout(colorLayout)
         tab1bLayout.addLayout(humidityLayout)
         tab1bLayout.addLayout(ambientLayout)
-        tab1bLayout.addStretch()
+#        tab1bLayout.addStretch()
         roastpropertiesLayout = QHBoxLayout()
         roastpropertiesLayout.addWidget(self.roastproperties)
         roastpropertiesLayout.addStretch()
@@ -24262,10 +24272,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 limit = len(dev)
                 for _ in range(limit):
                     for i in range(len(dev)):
-                        if dev[i][0] == "-":
+                        if dev[i][0] == "-" or dev[i] == "NONE": # non manual device or deactivated device in extra device list
                             dev.pop(i)              #note: pop() makes the list smaller 
                             break 
-                #devices = sorted(dev)
                 devices = sorted(map(lambda x:(x[1:] if x.startswith("+") else x),dev), key=lambda x: (x[1:] if x.startswith("+") else x))
                 for i in range(nddevices):
                     typeComboBox =  QComboBox()

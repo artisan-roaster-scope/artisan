@@ -26,11 +26,12 @@ o ET/BT logging and PID control supporting the following devices
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
  - VOLTCRAFT K201, K202, K204, 300K, 302KJ
  - EXTECH 421509
- - Arduino/TC4
+ - Arduino/TC4 with PID
  - TE VA18B
  - HHM28 multimeter
  - non-wireless Amprobe TMD-56 (same as Omega HH806AU)
- - Phidget 1046 and 1048
+ - Phidget USB and remote (1010, 1011, 1018, 1019, 1046, 1048, 1073)
+ - Mastech MS6514
  - virtual devices (symbolic devices)
  - device None (no device)
  - external program 
@@ -140,25 +141,32 @@ Artisan uses the following libraries in unmodified forms:
 
 - Python 2.7.x and 3.3.x released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
-- QT 4.10.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
+- QT 4.8.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
   http://qt-project.org/products/licensing
-- Numpy 1.8.x and Scipy 0.13.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
+- Numpy 1.8.x and Scipy 0.14.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
 - PyQt 4.10.x and SIP 4.15.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
 - matplotlib 1.3.x, Copyright (c) 2002-2013 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
   http://matplotlib.sourceforge.net
-- py2app 0.7.x under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
+- py2app 0.8.x under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
   Copyright (c) 2010-2012 Ronald Oussoren <ronaldoussoren at mac.com>.
   http://packages.python.org/py2app/
 - py2exe, Copyright (c) 2000-2005 Thomas Heller, Mark Hammond, Jimmy Retzlaff
   http://www.py2exe.org/
 - bbfreeze, Copyright (c) 2007-2012 brainbot technologies AG. Distributed under the zlib/libpng license.
-- minimalmodbus 0.4 under the Apache License, Version 2.0 by Jonas Berg
+- minimalmodbus 0.5 under the Apache License, Version 2.0 by Jonas Berg
 - arabic_reshaper.py under GPL by Abd Allah Diab (Mpcabd)
 
 
 VERSION HISTORY
+
+v0.8.0 (25.05.2014)
+- adds Mastech MS6514 support
+- adds Phidget IO support
+- adds Phidget remote support
+- adds Arduino TC4 PID support
+- bug fixes
 
 v0.7.5 (6.04.2014)
 - improved serial communication
