@@ -1412,12 +1412,12 @@ class tgraphcanvas(FigureCanvas):
                     self.setalarm(i)
                     
                 #check quantified events
-                if self.quantifiedEvent:
-                    aw.moveslider(self.quantifiedEvent[0],self.quantifiedEvent[1])
+                for el in self.quantifiedEvent:
+                    aw.moveslider(el[0],el[1])
                     if aw.qmc.flagstart:
-                        value = aw.float2float((self.quantifiedEvent[1] + 10.0) / 10.0)
-                        aw.qmc.EventRecordAction(extraevent = 1,eventtype=self.quantifiedEvent[0],eventvalue=value,eventdescription=u("Q"))
-                    self.quantifiedEvent = []
+                        value = aw.float2float((el[1] + 10.0) / 10.0)
+                        aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription=u("Q"))
+                self.quantifiedEvent = []
 
                     
 
@@ -1781,7 +1781,7 @@ class tgraphcanvas(FigureCanvas):
             return x
 
         #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
-        mathdictionary = {"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
+        mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
                           "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
                           "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
         try:
@@ -6466,7 +6466,7 @@ class SampleThread(QThread):
                                     linespace = aw.eventquantifierlinspaces[i]
                                     linespacethreshold = abs(linespace[1] - linespace[0])
                                     t = temp[-1]
-                                    d = aw.digitize(t,linespace)
+                                    d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
                                     ld = aw.lastdigitizedvalue[i]
                                     lt = aw.lastdigitizedtemp[i]
                                     if d != None and (ld == None or ld != d):
@@ -6477,7 +6477,7 @@ class SampleThread(QThread):
                                             aw.lastdigitizedtemp[i] = t
                                             # now move corresponding slider and add event
                                             v = d * 10.
-                                            aw.qmc.quantifiedEvent = [i,v]
+                                            aw.qmc.quantifiedEvent.append([i,v])
                     except Exception:
                         pass
                         
@@ -10476,7 +10476,7 @@ class ApplicationWindow(QMainWindow):
             # the new dates have the locale independent isodate format:
             if "roastisodate" in profile:
                 try:
-                    self.qmc.roastdate = QDate.fromString(d(profile["roastisodate"],Qt.ISODate))
+                    self.qmc.roastdate = QDate.fromString(d(profile["roastisodate"]),Qt.ISODate)
                 except Exception:
                     pass
             if "specialevents" in profile:
@@ -10532,7 +10532,7 @@ class ApplicationWindow(QMainWindow):
             if "ambientTemp" in profile:
                 self.qmc.ambientTemp = profile["ambientTemp"]    
             if "ambient_humidity" in profile:
-                self.qmc.ambientTemp = profile["ambient_humidity"]
+                self.qmc.ambient_humidity = profile["ambient_humidity"]
             if "bag_humidity" in profile:
                 self.qmc.bag_humidity = profile["bag_humidity"]   
             else:
@@ -14200,6 +14200,8 @@ $cupping_notes
         string1 += "<LI><b>exp(x)</b> " + u(QApplication.translate("Message", "Return e raised to the power of x.",None, QApplication.UnicodeUTF8))
         string1 += "<LI><b>log(x[, base])</b> " + u(QApplication.translate("Message", "Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8))
         string1 += "<LI><b>log10(x)</b> " + u(QApplication.translate("Message", "Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>min(x,y)</b> " + u(QApplication.translate("Message", "Return the minimum of x and y.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>max(x,y)</b> " + u(QApplication.translate("Message", "Return the maximum of x and y.",None, QApplication.UnicodeUTF8))
         string1 += "<LI><b>pow(x, y)</b> " + u(QApplication.translate("Message", "Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8))
         string1 += "<LI><b>radians(x)</b> " + u(QApplication.translate("Message", "Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8))
         string1 += "<LI><b>sin(x)</b> " + u(QApplication.translate("Message", "Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8))
@@ -14540,7 +14542,7 @@ class HUDDlg(ArtisanDialog):
         #altsmoothing
         self.AltSmoothing = QCheckBox(QApplication.translate("CheckBox", "Smooth2",None, QApplication.UnicodeUTF8))
         self.AltSmoothing.setChecked(aw.qmc.altsmoothing)
-        self.connect(self.FilterSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeAltSmoothing(i))
+        self.connect(self.AltSmoothing,SIGNAL("stateChanged(int)"),lambda i=0:self.changeAltSmoothing(i))
         self.AltSmoothing.setFocusPolicy(Qt.NoFocus)
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None, QApplication.UnicodeUTF8))
@@ -15133,7 +15135,7 @@ class HUDDlg(ArtisanDialog):
             if mathexpression[0] == "#":
                 return
             #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
-            mathdictionary = {"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
+            mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
                               "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
                               "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
             try:
@@ -22257,22 +22259,23 @@ class serialport(object):
                 try:
                     if aw.ser.PhidgetIO and aw.ser.PhidgetIO.isAttached():
                         # set data rates of all active inputs to 4ms
-                        for i in min(3,range(aw.ser.PhidgetIO.getSensorCount())):
+#                        print(aw.ser.PhidgetIO.getRatiometric()) # ratiometric is true by default
+                        for i in range(max(3,aw.ser.PhidgetIO.getSensorCount())):
                             try:
-                                # DataRate=8 => 8ms
+                                # DataRate=8 => 8ms (the default and minimum for USB connections)
                                 # DataRate=16 => 16ms (the minimium over SBC/Wireless)
                                 # DataRate=512 => 0.5s
                                 # DataRate=1024 => 1s
                                 # DataRate=1504 => 1.5s
-#                                dataRate=4
                                 dataRate=1024
                                 if i < 2:
-                                    aw.ser.PhidgetIO.setDataRate(i, dataRate)
+                                    aw.ser.PhidgetIO.setSensorChangeTrigger(i,250) # force fixed data rate if 0 (default 10)
+#                                    aw.ser.PhidgetIO.setDataRate(i, dataRate)
                                 elif i < 4 and 41 in aw.qmc.extradevices: 
                                     aw.ser.PhidgetIO.setDataRate(i, dataRate)
                                 elif i < 6 and 42 in aw.qmc.extradevices: 
-                                    aw.ser.PhidgetIO.setDataRate(i, dataRate)
-                            except:
+                                    aw.ser.PhidgetIO.setDataRate(i, dataRate)                                    
+                            except Except as e:
                                 pass
                         libtime.sleep(.3)
                 except:
@@ -22289,7 +22292,8 @@ class serialport(object):
                     probe1 = probe2 = -1
                     try:
                         if sensorCount > 0:
-                            probe1 = aw.ser.PhidgetIO.getSensorValue(0)
+#                            probe1 = aw.ser.PhidgetIO.getSensorValue(0)
+                            probe1 = aw.ser.PhidgetIO.getSensorRawValue(0)
                     except:
                         pass
                     try:
@@ -24915,7 +24919,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         try:
             #line 1
             if l == 1:
-                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor1[i]),self)
+#                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor1[i]),self)
+# the above uses the native dialog, but blocks the GUI on Mac OS X after use
+                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor1[i]),self,"Color",QColorDialog.DontUseNativeDialog)
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor1[i] = colorname
@@ -24923,7 +24929,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))
             #line 2
             elif l == 2:
-                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor2[i]),self)
+#                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor2[i]),self)
+# the above uses the native dialog, but blocks the GUI on Mac OS X after use
+                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor2[i]),self,"Color",QColorDialog.DontUseNativeDialog)
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor2[i] = colorname
@@ -25268,7 +25276,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 elif meter == "Phidget 1048":
                     aw.qmc.device = 34
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
                 ####  DEVICE 35 is +Phidget 1048_34 but +DEVICE cannot be set as main device
                 ##########################
@@ -25278,7 +25286,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 elif meter == "Phidget 1046 RTD":
                     aw.qmc.device = 37
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
                 ####  DEVICE 38 is +Phidget 1046_34 RTD but +DEVICE cannot be set as main device
                 ##########################
@@ -25293,7 +25301,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "Phidget IO 12":
                     aw.qmc.device = 40
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
                 ####  DEVICE 41 is +Phidget IO 34 but +DEVICE cannot be set as main device
                 ##########################
@@ -25436,6 +25444,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.setcommport()
             self.close()
         except Exception as e:
+            print(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " device accept(): %1").arg(str(e)),exc_tb.tb_lineno)
 
