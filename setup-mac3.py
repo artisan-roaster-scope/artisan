@@ -94,7 +94,7 @@ plist.update({ 'CFBundleDisplayName': 'Artisan',
   
 OPTIONS = {
     'strip':True,
-    'argv_emulation': True,
+    'argv_emulation': False, # this would confuses GUI processing
     'semi_standalone': False,
     'site_packages': True,
 #    'packages': ['matplotlib'], # with this the full pkg is copied to Resources/lib/python3.3
