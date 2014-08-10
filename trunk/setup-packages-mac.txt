@@ -1,27 +1,34 @@
 Current Versions:
 
 o XCode 4.5.2 + command line tools
-o Python 2.7.6 or 3.3.5 (change "python3" to "python" in all commands below for python 2.x)
+o Python 2.7.8 or 3.5.1 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial 2.7
-o QT 4.8.5
-o SIP 4.15.5
-o PyQt 4.10.3
+o QT 4.8.6
+o SIP 4.16.2
+o PyQt 4.11.1
 o numpy 1.8.1
 o scipy 0.14.4
 o matplotlib 1.3.1
 o pyaudio 0.2.7
-o minimalmodbus 0.5
+o minimalmodbus 0.6
 o Phidgets Python 2.1.8
-o phyobjc 2.5.1
-
+o pyobjc 2.5.1
 o modulegraph >0.10.4 trunk (21.4.2013)
 o distribute 0.6.36
 o altgraph 0.10.2
 o macholib 1.5.1
-o py2app 0.8
+o py2app 0.9
+o pymodbus 1.3.0
 
 Upgrade History:
 
+- 2014-08-06
+ . Python 2.7.6 => 2.7.8
+ . SIP 4.15.3 => 4.16.2
+ . PyQt 4.10.3 => 4.11.1
+ . py2app 0.8 => 0.9
+ . minimalmodbus 0.5 => 0.6
+ . added pymodbus 1.3.0
 - 2014-05-04
  . numpy 1.8.0 => 1.8.1
  . scipy 0.13.3 => 0.14.0
@@ -184,8 +191,8 @@ download latest source (pyserial-2.6.tar.gz) from http://pypi.python.org/pypi/py
 
 # tar xzf pyserial-2.6.tar.gz
 # cd pyserial-2.6
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 
 new to v2.6:
@@ -207,7 +214,7 @@ Note: PyQt needs to be re-installed after a qt update
 
 # tar xzf sip-4.15.3.tar.gz
 # cd sip-4.15.3
-# python3 configure.py
+# python configure.py
 # make
 # sudo make install
 
@@ -216,8 +223,8 @@ Note: PyQt needs to be re-installed after a qt update
 
 # tar xzf PyQt-mac-gpl-4.10.4.tar.gz 
 # cd PyQt-mac-gpl-4.10.4
-# python3 configure.py
-use: "python3 configure.py -q /Users/<username>/Qt5.0.1/5.0.1/clang_64/bin/qmake"
+# python configure.py
+use: "python configure.py -q /Users/<username>/Qt5.0.1/5.0.1/clang_64/bin/qmake"
 # make
 # sudo make install
 
@@ -228,8 +235,8 @@ download source
 
 # git clone https://github.com/numpy/numpy.git
 # cd numpy
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 NOTE: always remove the build directory completely before recompiling
 
@@ -239,15 +246,15 @@ NOTE: always remove the build directory completely before recompiling
 
 # git clone git://github.com/scipy/scipy.git scipy
 # cd scipy
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 NOTE: always remove the build directory completely before recompiling
 
 
 check installation:
 
-# python3
+# python
 >> import scipy
 >> scipy.__version__
 >> scipy.__file__
@@ -297,8 +304,8 @@ download matplotlib-1.2.1.tar.gz
 
 # tar -xzf matplotlib-1.2.1.tar.gz
 # cd matplotlib-1.2.1
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 
 to make builds smaller:
@@ -322,7 +329,7 @@ value = float(str(field.text()))
 
 solves this (change 2x in src folder).
 
-NOTE: to clean build dir use "python3 setup.py clean --all"
+NOTE: to clean build dir use "python setup.py clean --all"
 
 
 ---
@@ -330,7 +337,7 @@ NOTE: to clean build dir use "python3 setup.py clean --all"
 
 check installation:
 	
-# python3
+# python
 >> import matplotlib
 >> matplotlib.__version__
 '1.2.0rc2
@@ -357,31 +364,32 @@ all: lib/$(PALIB) all-recursive examples selftests
 
 11) pyaudio
 
-# mkdir pyaudio-0.2.7
-# cd pyaudio-0.2.7
+# mkdir pyaudio-0.2.8
+# cd pyaudio-0.2.8
 # git clone https://github.com/bastibe/PyAudio.git
 # cd PyAudio
 
-# cp ../../portaudio/include/pa_mac_core.h src/
-# cp ../../portaudio/include/portaudio.h src/ 
+Download and extract PortAudio pa_stable_v19_20140130.tgz from http://www.portaudio.com/download.html
+# cp ../portaudio/include/pa_mac_core.h src/
+# cp ../portaudio/include/portaudio.h src/ 
 
 # vi src/pa_mac_core.h
 -#include <AudioUnit/AudioUnit.h>
--//#include <AudioToolbox/AudioToolbox.h>
+-#include <AudioToolbox/AudioToolbox.h>
 +#include <CoreAudio/CoreAudio.h>
 
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 
-12) minimalmodbus (v0.5)
+12) minimalmodbus (v0.6)
 
 download from http://pypi.python.org/pypi/MinimalModbus/
 
 # tar -xzf MinimalModbus-0.5.tar.gz
 # cd MinimalModbus-0.5
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 
 
@@ -391,8 +399,8 @@ download from http://pypi.python.org/pypi/MinimalModbus/
 fetch modulegraph 0.10.2 from
 http://pypi.python.org/pypi/modulegraph/#downloads
 # cd modulegraph-0.10.2
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 from source (not needed):
 
@@ -400,8 +408,8 @@ from source (not needed):
 # cd modulegraph-0.10
 # hg clone https://bitbucket.org/ronaldoussoren/modulegraph
 # cd modulegraph
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 
 14) Install distribute 0.6.36
@@ -411,8 +419,8 @@ http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
 # curl -O http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
 # tar -xzvf distribute-0.6.36.tar.gz
 # cd distribute-0.6.36
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 
 15) Install altgraph
@@ -421,8 +429,8 @@ http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
 # cd altgraph-0.10
 # hg clone https://bitbucket.org/ronaldoussoren/altgraph
 # cd altgraph
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 
 16) Install macholib
@@ -431,8 +439,8 @@ http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
 # cd macholib-1.5
 # hg clone https://bitbucket.org/ronaldoussoren/macholib
 # cd macholib
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 
 17) py2app (0.7.1 from source)
@@ -440,14 +448,14 @@ http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
 from repository
 # hg clone https://bitbucket.org/ronaldoussoren/py2app
 # cd py2app
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 from release downloaded from http://pypi.python.org/pypi/py2app/
 # tar -xzf py2app-0.7.3.tar.gz
 # cd py2app-0.7.3
-# python3 setup.py build
-# sudo python3 setup.py install
+# python setup.py build
+# sudo python setup.py install
 
 
 18) Install pyemf-2.0.0.tar.gz (only Python 2; fails on Python 3)
@@ -463,8 +471,8 @@ export FFLAGS=-ff2c
 export LDSHARED='clang -bundle -undefined dynamic_lookup -arch i386 -arch 
 x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g' 
 
-# python3 setup.py build
-# python3 setup.py install
+# python setup.py build
+# python setup.py install
 
 19) Install Phidgets Python
 
@@ -495,3 +503,11 @@ c) install pyobjc-framework-Quartz
 # python setup.py build
 # sudo python setup.py install
 
+
+21) pymodbus
+
+download from https://github.com/bashwork/pymodbus
+
+# cd pymodbus
+# python setup.py build
+# sudo python setup.py install

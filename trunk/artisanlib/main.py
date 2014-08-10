@@ -66,7 +66,7 @@ sip.setapi('QVariant', 1)
 from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
                          QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QFontDatabase,QTableWidgetSelectionRange,
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
-                         QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView,
+                         QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView, QStandardItem,
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton,
                          QPixmap, QImage, QColor, QColorDialog, QPalette, QFrame, QCheckBox, QDesktopServices, QIcon,
                          QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QFontInfo, QBrush, QRadialGradient,
@@ -104,10 +104,24 @@ from Phidgets.Devices.Bridge import Bridge as Phidget1046TemperatureSensor
 from Phidgets.Devices.InterfaceKit import InterfaceKit as Phidget1018IO
 
 #import minimalmodbus
-from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient
+from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient, BaseModbusClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder, BinaryPayloadBuilder
 from pymodbus.pdu import ExceptionResponse
+import socket
+from pymodbus.constants import Defaults
+from pymodbus.transaction import ModbusSocketFramer
+from pymodbus.factory import ClientDecoder
+
+#---------------------------------------------------------------------------# 
+# configure the service logging
+#---------------------------------------------------------------------------# 
+#import logging
+#logging.basicConfig()
+#log = logging.getLogger()
+#log.setLevel(logging.DEBUG)
+#---------------------------------------------------------------------------# 
+
 
 import json
 import unicodedata
@@ -478,6 +492,14 @@ class tgraphcanvas(FigureCanvas):
         self.phidgetRemoteFlag = False
         self.phidgetServerID = ""
         self.phidgetPassword = ""
+        self.phidget1018_raws = [False]*8
+        self.phidget1018_dataRates = [8]*8 # in ms; default 8ms, 16ms if wireless is active
+        self.phidget1018_dataRatesStrings = ["8ms","16ms","32ms","64ms","0.12s","0.25s","0.5s"]
+        self.phidget1018_dataRatesValues = [8,16,32,64,128,256,512]
+        self.phidget1018_changeTriggers = [10]*8
+        self.phidget1018_changeTriggersValues = range(0,310,10)
+        self.phidget1018_changeTriggersStrings = map(lambda x:str(x),self.phidget1018_changeTriggersValues)
+        self.phidget1018Ratiometric = True
 
         #menu of thermocouple devices
         #device with first letter + only shows in extra device tab
@@ -716,6 +738,8 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaBTflag = False
         self.DeltaETlcdflag = True
         self.DeltaBTlcdflag = True
+        self.HUDbuttonflag = False
+        self.PIDbuttonflag = True
         # user filter values x are translated as follows to internal filter values: y = x*2 + 1 (to go the other direction: x = y/2)
         # this is to ensure, that only uneven window values are used and no wrong shift is happening through smoothing
         self.deltafilter = 5 # => corresponds to 2 on the user interface
@@ -6669,7 +6693,7 @@ class ApplicationWindow(QMainWindow):
         
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
-        self.MaxRecentFiles = 10
+        self.MaxRecentFiles = 20
         self.recentFileActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
@@ -8052,6 +8076,13 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
 
+    def colordialog(self,c): # c a QColor
+        if platform.system() == 'Darwin':
+            #return QColorDialog.getColor(c,self,"Color",QColorDialog.DontUseNativeDialog) # works, but does not show native dialog
+            return QColorDialog.getColor(c,self,"Color",QColorDialog.NoButtons) # works (Qt does not hack the Mac dialog)
+        else:
+            return QColorDialog.getColor(c) # blocks on Mac OS X
+
     def adjustPIDsv(self,x):
         if self.qmc.device == 0: # Fuji PID
             self.fujipid.adjustsv(x)
@@ -9014,10 +9045,10 @@ class ApplicationWindow(QMainWindow):
     # currentButtonIndex is from [1-11]
     # buttons that trigger events and can be triggered only once
     def nextActiveButton(self,currentButtonIndex):
-        if currentButtonIndex == 11: # current: EVENT
+        if currentButtonIndex == 11 and aw.qmc.HUDbuttonflag: # current: EVENT
             # the current button index is the event button, we move to the HUD button
             return 1 # next: HUD
-        elif currentButtonIndex == 1: # current: HUD
+        elif currentButtonIndex == 1 or (currentButtonIndex == 11 and not aw.qmc.HUDbuttonflag): # current: HUD
             return 2 # next: ON/OFF
         elif currentButtonIndex == 10: # current: COOL
             # check if the EVENT button is active, else move to the HUD
@@ -9034,10 +9065,10 @@ class ApplicationWindow(QMainWindow):
                 return self.nextActiveButton(currentButtonIndex + 1)
 
     def previousActiveButton(self,currentButtonIndex):
-        if currentButtonIndex == 2: # current: ON/OFF
-            # the current button index is the ON/OFF button, we move to the HUD button
+        if currentButtonIndex == 2 and aw.qmc.HUDbuttonflag: # current: ON/OFF
+            # the current button index is the ON/OFF button, we move to the HUD button (if visible)
             return 1
-        elif currentButtonIndex == 1: # current: HUD
+        elif currentButtonIndex == 1 or (currentButtonIndex == 2 and not aw.qmc.HUDbuttonflag): # current: HUD
             # check if the EVENT button is active, else move to the HUD
             if aw.eventsbuttonflag:
                 return 11 # move to EVENT
@@ -9176,6 +9207,7 @@ class ApplicationWindow(QMainWindow):
                 QDir.setCurrent(oldDir)
 
                 self.sendmessage(QApplication.translate("Message","Profile %1 saved in: %2", None, QApplication.UnicodeUTF8).arg(filename).arg(self.qmc.autosavepath))
+                self.setCurrentFile(filename)
                 self.qmc.safesaveflag = False
 
                 return filename
@@ -9484,20 +9516,28 @@ class ApplicationWindow(QMainWindow):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " fileload() %1").arg(str(ex)),exc_tb.tb_lineno)
-            return
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " %1").arg(str(ex)))
+            # remove file from the recent file list
+            settings = QSettings()
+            files = settings.value('recentFileList').toStringList()
+            try:
+                files.removeAll(filename)
+            except ValueError:
+                pass
+            settings.setValue('recentFileList', files)
+            for widget in QApplication.topLevelWidgets():
+                if isinstance(widget, ApplicationWindow):
+                    widget.updateRecentFileActions()
         except ValueError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
             aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None, QApplication.UnicodeUTF8) + " fileload() %1").arg(str(ex)),exc_tb.tb_lineno)
-            return
         except Exception as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " loadFile() %1").arg(str(ex)),exc_tb.tb_lineno)
-            return
         finally:
             if f:
                 f.close()
@@ -11075,14 +11115,25 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidgetRemoteFlag = bool(settings.value("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag).toBool())
                 self.qmc.phidgetServerID = u(settings.value("phidgetServerID",self.qmc.phidgetServerID).toString())
                 self.qmc.phidgetPassword = u(settings.value("phidgetPassword",self.qmc.phidgetPassword).toString())
+            if settings.contains("phidget1018Ratiometric"):
+                self.qmc.phidget1018Ratiometric = bool(settings.value("phidget1018Ratiometric",self.qmc.phidget1018Ratiometric).toBool())
+                self.qmc.phidget1018_raws = [bool(x.toBool()) for x in settings.value("phidget1018_raws",self.qmc.phidget1018_raws).toList()]
+                self.qmc.phidget1018_dataRates = [x.toInt()[0] for x in settings.value("phidget1018_dataRates",self.qmc.phidget1018_dataRates).toList()]
+                self.qmc.phidget1018_changeTriggers = [x.toInt()[0] for x in settings.value("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers).toList()]              
+            if settings.contains("PIDbuttonflag"):
+                self.qmc.PIDbuttonflag = settings.value("PIDbuttonflag",self.qmc.PIDbuttonflag).toBool()
             # activate CONTROL BUTTON
             if self.qmc.device == 0: # Fuji
                 self.button_10.setVisible(True) #CONTROL BUTTON
                 self.LCD6frame.setVisible(True)
                 self.LCD7frame.setVisible(True)
-# Control button for Arduino does not have any useful function yet, so hide it for now
-            elif self.qmc.device == 26 or self.qmc.device == 19:   #DEVICE 26 = DTA; DEVICE 19 = ARDUINOTC4
+            elif self.qmc.device == 26:   #DEVICE 26 = DTA; 
                 self.button_10.setVisible(True) #CONTROL BUTTON
+            elif self.qmc.device == 19: #DEVICE 19 = ARDUINOTC4
+                if aw.qmc.PIDbuttonflag:
+                    self.button_10.setVisible(True) #CONTROL BUTTON
+                else:
+                    self.button_10.setVisible(False) #CONTROL BUTTON
             if settings.contains("controlETpid"):
                 self.ser.controlETpid = [x.toInt()[0] for x in settings.value("controlETpid").toList()]
             if settings.contains("readBTpid"):
@@ -11091,6 +11142,8 @@ class ApplicationWindow(QMainWindow):
                 self.ser.arduinoETChannel = str(settings.value("arduinoETChannel").toString())
             if settings.contains("arduinoBTChannel"):
                 self.ser.arduinoBTChannel = str(settings.value("arduinoBTChannel").toString())
+            if settings.contains("arduinoATChannel"):
+                self.ser.arduinoATChannel = str(settings.value("arduinoATChannel").toString())
             if settings.contains("useModbusPort"):
                 self.ser.useModbusPort = settings.value("useModbusPort").toBool()
             settings.endGroup()
@@ -11428,6 +11481,10 @@ class ApplicationWindow(QMainWindow):
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
             if settings.contains("hudETpid"):
                 self.qmc.hudETpid = [x.toInt()[0] for x in settings.value("hudETpid").toList()]
+            if settings.contains("buttonFlag"):
+                self.qmc.HUDbuttonflag = settings.value("buttonFlag",self.qmc.HUDbuttonflag).toBool()
+                if not self.qmc.HUDbuttonflag:
+                    aw.button_18.setVisible(False)
             settings.endGroup()
             settings.beginGroup("Style")
             if settings.contains("patheffects"):
@@ -11961,12 +12018,17 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)
             settings.setValue("phidgetServerID",self.qmc.phidgetServerID)
             settings.setValue("phidgetPassword",self.qmc.phidgetPassword)
+            settings.setValue("phidget1018Ratiometric",self.qmc.phidget1018Ratiometric)
+            settings.setValue("phidget1018_raws",self.qmc.phidget1018_raws)
+            settings.setValue("phidget1018_dataRates",self.qmc.phidget1018_dataRates)
+            settings.setValue("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers)
             settings.setValue("controlETpid",self.ser.controlETpid)
             settings.setValue("readBTpid",self.ser.readBTpid)
             settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)
             settings.setValue("arduinoBTChannel",self.ser.arduinoBTChannel)
             settings.setValue("arduinoATChannel",self.ser.arduinoATChannel)
             settings.setValue("useModbusPort",self.ser.useModbusPort)
+            settings.setValue("PIDbuttonflag",self.qmc.PIDbuttonflag)
             settings.endGroup()
             #save of phases is done in the phases dialog
             #only if mode was changed (and therefore the phases values have been converted)
@@ -12152,6 +12214,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("BT2target",self.qmc.BT2target)
             settings.setValue("Mode",self.HUDfunction)
             settings.setValue("hudETpid",self.qmc.hudETpid)
+            settings.setValue("buttonFlag",self.qmc.HUDbuttonflag)
             settings.endGroup()
             settings.beginGroup("Style")
             settings.setValue("patheffects",self.qmc.patheffects)
@@ -14490,6 +14553,11 @@ class HUDDlg(ArtisanDialog):
         self.org_patheffects = aw.qmc.patheffects
         self.org_graphstyle = aw.qmc.graphstyle
         self.org_graphfont = aw.qmc.graphfont
+        self.org_HUDbuttonflag = aw.qmc.HUDbuttonflag
+        self.showHUDbutton = QCheckBox(QApplication.translate("Label", "HUD Button", None, QApplication.UnicodeUTF8))
+        self.showHUDbutton.setChecked(aw.qmc.HUDbuttonflag)
+        self.showHUDbutton.setFocusPolicy(Qt.NoFocus)
+        self.connect(self.showHUDbutton,SIGNAL("stateChanged(int)"),lambda i=0:self.showHUDbuttonToggle(i))
         ETLabel = QLabel(QApplication.translate("Label", "ET Target 1",None, QApplication.UnicodeUTF8))
         ETLabel.setAlignment(Qt.AlignRight)
         BTLabel = QLabel(QApplication.translate("Label", "BT Target 1",None, QApplication.UnicodeUTF8))
@@ -14501,9 +14569,6 @@ class HUDDlg(ArtisanDialog):
         modeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
         modeLabel.setAlignment(Qt.AlignRight)
         ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None, QApplication.UnicodeUTF8))
-        pidhelpButton = QPushButton(QApplication.translate("Button","PID Help",None, QApplication.UnicodeUTF8))
-        pidhelpButton.setFocusPolicy(Qt.NoFocus)
-        self.connect(pidhelpButton,SIGNAL("clicked()"),self.showpidhelp)
         #delta ET
         self.DeltaET = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None, QApplication.UnicodeUTF8))
         self.DeltaET.setChecked(aw.qmc.DeltaETflag)
@@ -14643,7 +14708,7 @@ class HUDDlg(ArtisanDialog):
         hudLayout.addWidget(self.ETpidD,2,3)
         hudLayout.addWidget(modeLabel,3,0)
         hudLayout.addWidget(self.modeComboBox,3,1)
-        hudLayout.addWidget(pidhelpButton,3,3)
+        hudLayout.addWidget(self.showHUDbutton,3,3)
         rorLayout = QGridLayout()
         rorLayout.addWidget(self.projectCheck,0,0)
         rorLayout.addWidget(self.projectionmodeComboBox,0,1)
@@ -15033,8 +15098,13 @@ class HUDDlg(ArtisanDialog):
         self.connect(self.c1ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(4))
         self.connect(self.c2ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))
 
-    def showpidhelp(self):
-        QDesktopServices.openUrl(QUrl("http://en.wikipedia.org/wiki/PID_controller", QUrl.TolerantMode))
+    def showHUDbuttonToggle(self,i):
+        if i:
+            aw.qmc.HUDbuttonflag = True
+            aw.button_18.setVisible(True)
+        else:
+            aw.qmc.HUDbuttonflag = False
+            aw.button_18.setVisible(False)
 
     def changedpi(self):
         try:
@@ -15051,7 +15121,7 @@ class HUDDlg(ArtisanDialog):
 
     def setcurvecolor(self,x):
         try:
-            colorf = QColorDialog.getColor(QColor(aw.qmc.plotcurvecolor[x]),self)
+            colorf = aw.colordialog(QColor(aw.qmc.plotcurvecolor[x]))
             if colorf.isValid():
                 colorname = str(colorf.name())
                 aw.qmc.plotcurvecolor[x] = colorname
@@ -15101,11 +15171,11 @@ class HUDDlg(ArtisanDialog):
                 y_range = []
                 for i in range(len(x_range)):
                     y_range.append(self.eval_curve_expression(equ,x_range[i]))
-            aw.qmc.timeB = x_range[:]
-            aw.qmc.temp1B = y_range[:]
-            aw.qmc.temp2B = [-100]*len(x_range)
-            aw.qmc.background = True
-            aw.qmc.redraw(recomputeAllDeltas=False)
+                aw.qmc.timeB = x_range[:]
+                aw.qmc.temp1B = y_range[:]
+                aw.qmc.temp2B = [-100]*len(x_range)
+                aw.qmc.background = True
+                aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setbackgroundequ1(): %1").arg(str(e)),exc_tb.tb_lineno)
@@ -18059,35 +18129,35 @@ class EventsDlg(ArtisanDialog):
             self.E4SourceComboBox.setCurrentIndex(aw.eventquantifiersource[3])
         self.E1min = QSpinBox()
         self.E1min.setAlignment(Qt.AlignRight)
-        self.E1min.setRange(-999,999)
+        self.E1min.setRange(-99999,99999)
         self.E1min.setValue(aw.eventquantifiermin[0])
         self.E2min = QSpinBox()
         self.E2min.setAlignment(Qt.AlignRight)
-        self.E2min.setRange(-999,999)
+        self.E2min.setRange(-99999,99999)
         self.E2min.setValue(aw.eventquantifiermin[1])
         self.E3min = QSpinBox()
         self.E3min.setAlignment(Qt.AlignRight)
-        self.E3min.setRange(-999,999)
+        self.E3min.setRange(-99999,99999)
         self.E3min.setValue(aw.eventquantifiermin[2])
         self.E4min = QSpinBox()
         self.E4min.setAlignment(Qt.AlignRight)
-        self.E4min.setRange(-999,999)
+        self.E4min.setRange(-99999,99999)
         self.E4min.setValue(aw.eventquantifiermin[3])
         self.E1max = QSpinBox()
         self.E1max.setAlignment(Qt.AlignRight)
-        self.E1max.setRange(-999,999)
+        self.E1max.setRange(-99999,99999)
         self.E1max.setValue(aw.eventquantifiermax[0])
         self.E2max = QSpinBox()
         self.E2max.setAlignment(Qt.AlignRight)
-        self.E2max.setRange(-999,999)
+        self.E2max.setRange(-99999,99999)
         self.E2max.setValue(aw.eventquantifiermax[1])
         self.E3max = QSpinBox()
         self.E3max.setAlignment(Qt.AlignRight)
-        self.E3max.setRange(-999,999)
+        self.E3max.setRange(-99999,99999)
         self.E3max.setValue(aw.eventquantifiermax[2])
         self.E4max = QSpinBox()
         self.E4max.setAlignment(Qt.AlignRight)
-        self.E4max.setRange(-999,999)
+        self.E4max.setRange(-99999,99999)
         self.E4max.setValue(aw.eventquantifiermax[3])
         applyquantifierbutton =  QPushButton(QApplication.translate("Button","Apply",None, QApplication.UnicodeUTF8))
         applyquantifierbutton.setFocusPolicy(Qt.NoFocus)
@@ -18668,7 +18738,7 @@ class EventsDlg(ArtisanDialog):
         aw.qmc.redraw()
 
     def setcoloreventline(self,b):
-        colorf = QColorDialog.getColor(QColor(aw.qmc.EvalueColor[b]),self)
+        colorf = aw.colordialog(QColor(aw.qmc.EvalueColor[b]))
         if colorf.isValid():
             colorname = str(colorf.name())
             aw.qmc.EvalueColor[b] = colorname
@@ -18769,7 +18839,7 @@ class EventsDlg(ArtisanDialog):
 #        header.setResizeMode(5, QHeaderView.Stretch)
 
     def setbuttoncolor(self,x):
-        colorf = QColorDialog.getColor(QColor(aw.extraeventbuttoncolor[x]))
+        colorf = aw.colordialog(QColor(aw.extraeventbuttoncolor[x]))
         if colorf.isValid():
             colorname = str(colorf.name())
             aw.extraeventbuttoncolor[x] = colorname
@@ -18777,7 +18847,7 @@ class EventsDlg(ArtisanDialog):
             aw.buttonlist[x].setStyleSheet(style)
 
     def setbuttontextcolor(self,x):
-        colorf = QColorDialog.getColor(QColor(aw.extraeventbuttontextcolor[x]),self)
+        colorf = aw.colordialog(QColor(aw.extraeventbuttontextcolor[x]))
         if colorf.isValid():
             colorname = str(colorf.name())
             aw.extraeventbuttontextcolor[x] = colorname
@@ -20505,6 +20575,41 @@ class StatisticsDlg(ArtisanDialog):
 #                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
 #                aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
 
+
+
+# hack to allow retry count and timeout to be configured on pymodbus UDP, without it blocks on connection failures
+class ArtisanModbusUdpClient(ModbusUdpClient):
+    ''' Adds timeout to UDP client
+    '''
+    def __init__(self, host='127.0.0.1', port=Defaults.Port,
+        framer=ModbusSocketFramer, **kwargs):
+        ''' Initialize a client instance
+
+        :param host: The host to connect to (default 127.0.0.1)
+        :param port: The modbus port to connect to (default 502)
+        :param framer: The modbus framer to use (default ModbusSocketFramer)
+        '''
+        self.host = host
+        self.port = port
+        self.socket = None
+        self.timeout  = kwargs.get('timeout',  Defaults.Timeout)
+        BaseModbusClient.__init__(self, framer(ClientDecoder()),**kwargs)
+    
+    def connect(self):
+        ''' Connect to the modbus tcp server
+
+        :returns: True if connection succeeded, False otherwise
+        '''
+        if self.socket: return True
+        try:
+            family = ModbusUdpClient._get_address_family(self.host)
+            self.socket = socket.socket(family, socket.SOCK_DGRAM)
+            self.socket.settimeout(self.timeout)
+        except socket.error as ex:
+            self.close()
+        return self.socket != None
+
+
 # pymodbus version
 class modbusport(object):
     """ this class handles the communications with all the modbus devices"""
@@ -20572,7 +20677,6 @@ class modbusport(object):
         if self.master == None:
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
-                # TODO: support for UDB & TCP client
                 if self.type == 1: # Serial ASCII
                     self.master = ModbusSerialClient(
                         method='ascii',
@@ -20590,15 +20694,19 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        timeout=self.timeout)                    
+                        timeout=self.timeout)  
                 elif self.type == 3: # TCP
                     self.master = ModbusTcpClient(
                         host=self.host, 
                         port=self.port)
                 elif self.type == 4: # UDP
-                    self.master = ModbusUdpClient(
+                    self.master = ArtisanModbusUdpClient(
                         host=self.host, 
-                        port=self.port)
+                        port=self.port,
+                        retry_on_empty=False,
+                        retries=1,
+                        timeout=0.5, #self.timeout
+                        )
                 else: # Serial RTU
                     self.master = ModbusSerialClient(
                         method='rtu',
@@ -20670,7 +20778,7 @@ class modbusport(object):
                 res = self.master.read_holding_registers(int(register),2,unit=int(slave))
             else:
                 res = self.master.read_input_registers(int(register),2,unit=int(slave))
-            if isinstance(res,ExceptionResponse):
+            if res == None or isinstance(res,ExceptionResponse):
                 raise Exception("Exception response")
             if self.littleEndianFloats:
                 decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Little)
@@ -20693,13 +20801,13 @@ class modbusport(object):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()
+            self.connect()            
             if code==3:
                 res = self.master.read_holding_registers(int(register),1,unit=int(slave))
             else:
                 res = self.master.read_input_registers(int(register),1,unit=int(slave))
-            if isinstance(res,ExceptionResponse):
-                raise Exception("Exception response")
+            if res == None or isinstance(res,ExceptionResponse):
+                raise Exception("Exception response")          
             decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
             r = decoder.decode_16bit_uint()
             return r
@@ -22259,7 +22367,7 @@ class serialport(object):
                 try:
                     if aw.ser.PhidgetIO and aw.ser.PhidgetIO.isAttached():
                         # set data rates of all active inputs to 4ms
-#                        print(aw.ser.PhidgetIO.getRatiometric()) # ratiometric is true by default
+                        aw.ser.PhidgetIO.setRatiometric(aw.qmc.phidget1018Ratiometric)
                         for i in range(max(3,aw.ser.PhidgetIO.getSensorCount())):
                             try:
                                 # DataRate=8 => 8ms (the default and minimum for USB connections)
@@ -22267,15 +22375,12 @@ class serialport(object):
                                 # DataRate=512 => 0.5s
                                 # DataRate=1024 => 1s
                                 # DataRate=1504 => 1.5s
-                                dataRate=1024
-                                if i < 2:
-                                    aw.ser.PhidgetIO.setSensorChangeTrigger(i,250) # force fixed data rate if 0 (default 10)
-#                                    aw.ser.PhidgetIO.setDataRate(i, dataRate)
-                                elif i < 4 and 41 in aw.qmc.extradevices: 
-                                    aw.ser.PhidgetIO.setDataRate(i, dataRate)
-                                elif i < 6 and 42 in aw.qmc.extradevices: 
-                                    aw.ser.PhidgetIO.setDataRate(i, dataRate)                                    
-                            except Except as e:
+                                if i < 2 or (i < 4 and 41 in aw.qmc.extradevices) or (i < 6 and 42 in aw.qmc.extradevices) or (i < 8 and 43 in aw.qmc.extradevices):
+                                    aw.ser.PhidgetIO.setSensorChangeTrigger(i,aw.qmc.phidget1018_changeTriggers[i]) # force fixed data rate if 0 (default 10)
+                                    aw.ser.PhidgetIO.setDataRate(i, aw.qmc.phidget1018_dataRates[i])
+                            except:
+#                                import traceback
+#                                traceback.print_exc(file=sys.stdout)
                                 pass
                         libtime.sleep(.3)
                 except:
@@ -22292,13 +22397,18 @@ class serialport(object):
                     probe1 = probe2 = -1
                     try:
                         if sensorCount > 0:
-#                            probe1 = aw.ser.PhidgetIO.getSensorValue(0)
-                            probe1 = aw.ser.PhidgetIO.getSensorRawValue(0)
+                            if aw.qmc.phidget1018_raws[0]:
+                                probe1 = aw.ser.PhidgetIO.getSensorRawValue(0)
+                            else:
+                                probe1 = aw.ser.PhidgetIO.getSensorValue(0)
                     except:
                         pass
                     try:
                         if sensorCount > 1:
-                            probe2 = aw.ser.PhidgetIO.getSensorValue(1)
+                            if aw.qmc.phidget1018_raws[1]:
+                                probe2 = aw.ser.PhidgetIO.getSensorRawValue(1)
+                            else:
+                                probe2 = aw.ser.PhidgetIO.getSensorValue(1)
                     except:
                         pass
                     return probe1, probe2
@@ -22306,12 +22416,18 @@ class serialport(object):
                     probe3 = probe4 = -1
                     try:
                         if sensorCount > 3:
-                            probe3 = aw.ser.PhidgetIO.getSensorValue(2)
+                            if aw.qmc.phidget1018_raws[2]:
+                                probe3 = aw.ser.PhidgetIO.getSensorRawValue(2)
+                            else:
+                                probe3 = aw.ser.PhidgetIO.getSensorValue(2)
                     except:
                         pass
                     try:
                         if sensorCount > 4:
-                            probe4 = aw.ser.PhidgetIO.getSensorValue(3)
+                            if aw.qmc.phidget1018_raws[3]:
+                                probe4 = aw.ser.PhidgetIO.getSensorRawValue(3)
+                            else:
+                                probe4 = aw.ser.PhidgetIO.getSensorValue(3)
                     except:
                         pass
                     return probe3, probe4
@@ -22319,12 +22435,18 @@ class serialport(object):
                     probe5 = probe6 = -1
                     try:
                         if sensorCount > 5:
-                            probe5 = aw.ser.PhidgetIO.getSensorValue(4)
+                            if aw.qmc.phidget1018_raws[4]:
+                                probe5 = aw.ser.PhidgetIO.getSensorRawValue(4)
+                            else:
+                                probe5 = aw.ser.PhidgetIO.getSensorValue(4)
                     except:
                         pass
                     try:
                         if sensorCount > 6:
-                            probe6 = aw.ser.PhidgetIO.getSensorValue(5)
+                            if aw.qmc.phidget1018_raws[5]:
+                                probe6 = aw.ser.PhidgetIO.getSensorRawValue(5)
+                            else:
+                                probe6 = aw.ser.PhidgetIO.getSensorValue(5)
                     except:
                         pass
                     return probe5, probe6
@@ -22332,12 +22454,18 @@ class serialport(object):
                     probe7 = probe8 = -1
                     try:
                         if sensorCount > 7:
-                            probe7 = aw.ser.PhidgetIO.getSensorValue(6)
+                            if aw.qmc.phidget1018_raws[6]:
+                                probe7 = aw.ser.PhidgetIO.getSensorRawValue(6)
+                            else:
+                                probe7 = aw.ser.PhidgetIO.getSensorValue(6)
                     except:
                         pass
                     try:
                         if sensorCount > 8:
-                            probe8 = aw.ser.PhidgetIO.getSensorValue(7)
+                            if aw.qmc.phidget1018_raws[7]:
+                                probe8 = aw.ser.PhidgetIO.getSensorRawValue(7)
+                            else:
+                                probe8 = aw.ser.PhidgetIO.getSensorValue(7)
                     except:
                         pass
                     return probe7, probe8
@@ -23741,19 +23869,24 @@ class comportDlg(ArtisanDialog):
         self.modbus_portEdit.setFixedWidth(60)
         self.modbus_portEdit.setAlignment(Qt.AlignRight)
         # modbus help dialog text
-        modbus_help_text = QApplication.translate("Message", "These serial settings are used for all Modbus communication.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "The MODBUS device corresponds to input channels 1 and 2.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "The +MODBUS_34 extra device adds input channels 3 and 4.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Inputs with slave id set to 0 are turned off.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Modbus function 3 'read holding register' is the standard.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Modbus function 4 triggers the use of 'read input register'.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Input registers (fct 4) usually are from the range 30000-39999.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Most devices hold data in 2 byte integer registers.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "A temperature of 145.2C is often sent as 1452.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "In that case you have to use the symbolic assignment 'x/10'.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Few devices hold data as 4 byte floats in two registers.",None, QApplication.UnicodeUTF8) + "<br>"
+#        modbus_help_text = QApplication.translate("Message", "These serial settings are used for all Modbus communication.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text = QApplication.translate("Message", "The MODBUS device corresponds to input channels",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "1 and 2.. The MODBUS_34 extra device adds",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "input channels 3 and 4. Inputs with slave",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "id set to 0 are turned off. Modbus function 3",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "'read holding register' is the standard.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Modbus function 4 triggers the use of 'read ",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "input register'.Input registers (fct 4) usually",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", " are from 30000-39999.Most devices hold data in",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "2 byte integer registers. A temperature of 145.2C",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "is often sent as 1452. In that case you have to",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "use the symbolic assignment 'x/10'. Few devices",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "hold data as 4 byte floats in two registers.",None, QApplication.UnicodeUTF8) + "<br>"
         modbus_help_text += QApplication.translate("Message", "Tick the Float flag in this case.",None, QApplication.UnicodeUTF8)
         modbus_help_label = QLabel(modbus_help_text)
+        fnt = modbus_help_label.font()
+        fnt.setPointSize(11)
+        modbus_help_label.setFont(fnt)
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
         self.scale_deviceEdit = QComboBox()
@@ -23912,6 +24045,7 @@ class comportDlg(ArtisanDialog):
         modbus_input1.addWidget(self.modbus_input1float,4,1)
         modbus_input1group = QGroupBox(QApplication.translate("GroupBox", "Input 1",None, QApplication.UnicodeUTF8))
         modbus_input1group.setLayout(modbus_input1)
+
         modbus_input2 = QGridLayout()
         modbus_input2.addWidget(modbus_input2slavelabel,0,0,Qt.AlignRight)
         modbus_input2.addWidget(self.modbus_input2slaveEdit,0,1)
@@ -23952,6 +24086,8 @@ class comportDlg(ArtisanDialog):
         modbus_input4group = QGroupBox(QApplication.translate("GroupBox", "Input 4",None, QApplication.UnicodeUTF8))
         modbus_input4group.setLayout(modbus_input4)
         modbus_inputV = QHBoxLayout()
+        modbus_inputV.setMargin(0)
+#        modbus_inputV.setSpacing(2)
         modbus_inputV.addWidget(modbus_input1group)
         modbus_inputV.addStretch()
         modbus_inputV.addWidget(modbus_input2group)
@@ -23962,6 +24098,7 @@ class comportDlg(ArtisanDialog):
         modbus_inputV.addStretch()
         modbus_gridVLayout = QHBoxLayout()
         modbus_gridVLayout.addLayout(modbus_gridV)
+
         modbus_gridVLayout.addWidget(modbus_help_label)
         modbus_gridVLayout.addStretch()
         modbus_setup = QHBoxLayout()
@@ -23972,7 +24109,7 @@ class comportDlg(ArtisanDialog):
         modbus_setup.addStretch()
         modbus_setup.addWidget(modbus_hostlabel)
         modbus_setup.addWidget(self.modbus_hostEdit)
-        modbus_setup.addSpacing(10)
+        modbus_setup.addSpacing(7)
         modbus_setup.addWidget(modbus_portlabel)
         modbus_setup.addWidget(self.modbus_portEdit)
         tab3Layout = QVBoxLayout()
@@ -23980,6 +24117,8 @@ class comportDlg(ArtisanDialog):
         tab3Layout.addLayout(modbus_inputV)
         tab3Layout.addLayout(modbus_setup)
         tab3Layout.addStretch()
+        tab3Layout.setMargin(0)
+        tab3Layout.setSpacing(5)
         #LAYOUT TAB 4
         scale_grid = QGridLayout()
         scale_grid.addWidget(scale_devicelabel,0,0,Qt.AlignRight)
@@ -24419,12 +24558,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.arduinoATComboBox = QComboBox()        
         self.arduinoATComboBox.addItems(arduinoTemperatures)
         self.arduinoATComboBox.setCurrentIndex(arduinoTemperatures.index(aw.ser.arduinoATChannel))
+        self.showControlButton = QCheckBox(QApplication.translate("CheckBox", "Control Button",None, QApplication.UnicodeUTF8))
+        self.showControlButton.setChecked(aw.qmc.PIDbuttonflag)
+        self.connect(self.showControlButton,SIGNAL("stateChanged(int)"),lambda i=0:self.showControlbuttonToggle(i))        
         ####################################################
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
-        self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
-        self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+        self.connect(okButton, SIGNAL("clicked()"),self.okEvent)
+        self.connect(cancelButton, SIGNAL("clicked()"),self.cancelEvent)
         labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None, QApplication.UnicodeUTF8))
         labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None, QApplication.UnicodeUTF8))
         self.ETfunctionedit = QLineEdit(str(aw.qmc.ETfunction))
@@ -24489,11 +24631,64 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","1048 Probe Types",None, QApplication.UnicodeUTF8))
         phidget1048GroupBox.setLayout(phidget1048HBox)
         phidget1048HBox.setContentsMargins(0,0,0,0)      
+
+        # ratiometric flag
+        self.phidgetBoxRatiometricFlag = QCheckBox(QApplication.translate("CheckBox","Ratiometric",None, QApplication.UnicodeUTF8))
+        self.phidgetBoxRatiometricFlag.setChecked(aw.qmc.phidget1018Ratiometric)
+        # per each of the 8-channels: raw flag / data rate popup / change trigger popup
+        phidgetBox1018 = QGridLayout()
+        self.rawCheckBoxes = []
+        self.dataRateCombos = []
+        self.changeTriggerCombos = []
+        for i in range(1,9):
+            rowLabel = QLabel(str(i))
+            phidgetBox1018.addWidget(rowLabel,0,i)
+            rawFlag = QCheckBox()
+            rawFlag.setChecked(aw.qmc.phidget1018_raws[i-1])
+            self.rawCheckBoxes.append(rawFlag)
+            phidgetBox1018.addWidget(rawFlag,1,i)
+            dataRatesCombo = QComboBox()
+            model = dataRatesCombo.model()
+            dataRateItems = self.createDataRateItems()
+            for item in dataRateItems:
+                model.appendRow(item)
+            dataRatesCombo.setCurrentIndex(aw.qmc.phidget1018_dataRatesValues.index(aw.qmc.phidget1018_dataRates[i-1]))
+            dataRatesCombo.setMaximumSize(65,100)
+            self.dataRateCombos.append(dataRatesCombo)
+            phidgetBox1018.addWidget(dataRatesCombo,2,i)
+            changeTriggersCombo = QComboBox()
+            model = changeTriggersCombo.model()
+            changeTriggerItems = self.createChangeTriggerItems()
+            for item in changeTriggerItems:
+                model.appendRow(item)
+            changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1018_changeTriggersValues.index(aw.qmc.phidget1018_changeTriggers[i-1])))
+            changeTriggersCombo.setMaximumSize(65,100)
+            self.changeTriggerCombos.append(changeTriggersCombo)
+            phidgetBox1018.addWidget(changeTriggersCombo,3,i)
+        rawLabel = QLabel(QApplication.translate("Label","Raw", None, QApplication.UnicodeUTF8))
+        dataRateLabel = QLabel(QApplication.translate("Label","Data rate", None, QApplication.UnicodeUTF8))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Changes", None, QApplication.UnicodeUTF8))
+        phidgetBox1018.addWidget(rawLabel,1,0,Qt.AlignRight)
+        phidgetBox1018.addWidget(dataRateLabel,2,0,Qt.AlignRight)
+        phidgetBox1018.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
+
+        ratiometricBox = QHBoxLayout()
+        ratiometricBox.addStretch()
+        ratiometricBox.addWidget(self.phidgetBoxRatiometricFlag)
+        phidget1018HBox = QVBoxLayout()
+        phidget1018HBox.addLayout(phidgetBox1018)
+        phidget1018HBox.addLayout(ratiometricBox)
+        
+        phidget1018GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidget IO",None, QApplication.UnicodeUTF8))
+        phidget1018GroupBox.setLayout(phidget1018HBox)
+        phidget1018HBox.setContentsMargins(0,0,0,0)      
+
+
         self.phidgetBoxRemoteFlag = QCheckBox()
         self.phidgetBoxRemoteFlag.setChecked(aw.qmc.phidgetRemoteFlag)
-        phidgetServerIdLabel = QLabel(QApplication.translate("CheckBox","ServerId:", None, QApplication.UnicodeUTF8))
+        phidgetServerIdLabel = QLabel(QApplication.translate("Label","ServerId:", None, QApplication.UnicodeUTF8))
         self.phidgetServerId = QLineEdit(aw.qmc.phidgetServerID)
-        phidgetPasswordLabel = QLabel(QApplication.translate("CheckBox","Password:", None, QApplication.UnicodeUTF8))
+        phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password:", None, QApplication.UnicodeUTF8))
         self.phidgetPassword = QLineEdit(aw.qmc.phidgetPassword)
         self.phidgetPassword.setEchoMode(3)
         phidgetServerBox = QHBoxLayout()
@@ -24516,6 +24711,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetNetworkGroupBox.setLayout(phidgetNetworkGrid)
         phidgetVBox = QVBoxLayout()
         phidgetVBox.addWidget(phidget1048GroupBox)
+        phidgetVBox.addWidget(phidget1018GroupBox)
         phidgetVBox.addWidget(phidgetNetworkGroupBox)
         phidgetVBox.setContentsMargins(0,0,0,0)
         phidgetGroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets",None, QApplication.UnicodeUTF8))
@@ -24545,6 +24741,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         arduinogrid.addWidget(self.arduinoBTComboBox,2,1)
         arduinogrid.addWidget(self.arduinoATComboBox,2,3)
         arduinogrid.addWidget(arduinoATLabel,2,4)
+        arduinogrid.addWidget(self.showControlButton,2,5)
         arduinoBox = QHBoxLayout()
         arduinoBox.addLayout(arduinogrid)
         arduinoBox.addStretch()
@@ -24578,7 +24775,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         grid = QGridLayout()
         grid.addLayout(self.curveBox,0,1)
         grid.addWidget(self.nonpidButton,2,0)
-        grid.addWidget(phidgetGroupBox,1,1)
+#        grid.addWidget(phidgetGroupBox,1,1)
         grid.addLayout(deviceSelector,2,1)
         grid.addWidget(self.pidButton,3,0)
         grid.addWidget(PIDGroupBox,3,1)
@@ -24603,15 +24800,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
         bLayout.addStretch()
         bLayout.addSpacing(10)
         bLayout.addWidget(resetButton)
-        #LAYOUT TAB 2
+        #LAYOUT TAB 2 (Extra Devices)
         tab2Layout = QVBoxLayout()
         tab2Layout.addWidget(self.devicetable)
         tab2Layout.setSpacing(5)
         tab2Layout.setContentsMargins(0,10,0,5)
         tab2Layout.addLayout(bLayout)
-        #LAYOUT TAB 3
+        #LAYOUT TAB 3 (Symb ET/BT)
         tab3Layout = QVBoxLayout()
         tab3Layout.addWidget(adjustmentGroupBox)
+        #LAYOUT TAB 4 (Phidgets)
+        tab4Layout = QVBoxLayout()
+        tab4Layout.addWidget(phidgetGroupBox)
         #main tab widget
         TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -24623,6 +24823,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","Symb ET/BT",None, QApplication.UnicodeUTF8))
+        C4Widget = QWidget()
+        C4Widget.setLayout(tab4Layout)
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Phidgets",None, QApplication.UnicodeUTF8))
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
@@ -24630,6 +24833,32 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout.setMargin(10)
         self.setLayout(Mlayout)
 
+    def createDataRateItems(self):
+        dataRateItems = []
+        for i in range(len(aw.qmc.phidget1018_dataRatesStrings)):
+            item = QStandardItem(aw.qmc.phidget1018_dataRatesStrings[i])
+            if (i == 1 and aw.qmc.phidgetRemoteFlag) or (i == 0 and not aw.qmc.phidgetRemoteFlag):
+                item.setForeground(QColor('blue'))
+            dataRateItems.append(item)
+        return dataRateItems
+
+    def createChangeTriggerItems(self):
+        changeTriggerItems = []
+        for i in range(len(aw.qmc.phidget1018_changeTriggersStrings)):
+            item = QStandardItem(aw.qmc.phidget1018_changeTriggersStrings[i])
+            if i == 1:
+                item.setForeground(QColor('blue'))
+            changeTriggerItems.append(item)
+        return changeTriggerItems
+
+    def showControlbuttonToggle(self,i):
+        if i:
+            aw.qmc.PIDbuttonflag = True
+            if aw.qmc.device in [0,19,26]: # FUJI, DTA, ARDUINOTC4
+                aw.button_10.setVisible(True)
+        else:
+            aw.qmc.PIDbuttonflag = False
+            aw.button_10.setVisible(False)
         
     def createDeviceTable(self):
         try:
@@ -24919,9 +25148,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         try:
             #line 1
             if l == 1:
-#                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor1[i]),self)
-# the above uses the native dialog, but blocks the GUI on Mac OS X after use
-                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor1[i]),self,"Color",QColorDialog.DontUseNativeDialog)
+                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor1[i]))
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor1[i] = colorname
@@ -24929,9 +25156,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))
             #line 2
             elif l == 2:
-#                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor2[i]),self)
-# the above uses the native dialog, but blocks the GUI on Mac OS X after use
-                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor2[i]),self,"Color",QColorDialog.DontUseNativeDialog)
+                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor2[i]))
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor2[i] = colorname
@@ -24941,7 +25166,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setextracolor(): %1").arg(str(e)),exc_tb.tb_lineno)
 
-    def accept(self):
+    
+    def cancelEvent(self):
+        #self.close()
+        self.accept()
+
+    def okEvent(self):
         try:
             #save any extra devices here
             self.savedevicetable()
@@ -25024,7 +25254,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.timeout = 1
                 aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
                 message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
-                aw.button_10.setVisible(True)
+                if aw.qmc.PIDbuttonflag:
+                    aw.button_10.setVisible(True)
             elif self.programButton.isChecked():
                 meter = str(self.programedit.text())
                 aw.ser.externalprogram = meter
@@ -25432,6 +25663,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
             aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
             aw.qmc.phidgetPassword = u(self.phidgetPassword.text())
+            for i in range(8):
+                aw.qmc.phidget1018_raws[i] = self.rawCheckBoxes[i].isChecked()
+                aw.qmc.phidget1018_dataRates[i] = aw.qmc.phidget1018_dataRatesValues[self.dataRateCombos[i].currentIndex()]
+                aw.qmc.phidget1018_changeTriggers[i] = aw.qmc.phidget1018_changeTriggersValues[self.changeTriggerCombos[i].currentIndex()]
+            aw.qmc.phidget1018Ratiometric = self.phidgetBoxRatiometricFlag.isChecked()
             # LCD visibility
             if aw.qmc.flagon:
                 aw.LCD2frame.setVisible(aw.qmc.ETlcd)
@@ -25442,9 +25678,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #if device is not None or not external-program (don't need serial settings config)
             if not(aw.qmc.device in [18,27,34,37,40,41]):
                 aw.setcommport()
-            self.close()
+            #self.close()
+            self.accept()
         except Exception as e:
-            print(e)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " device accept(): %1").arg(str(e)),exc_tb.tb_lineno)
 
@@ -25865,49 +26101,49 @@ class graphColorDlg(ArtisanDialog):
     def paintlcds(self,text,flag,lcdnumber):
         if lcdnumber ==1:
             if flag == 0:
-                aw.lcdpaletteB["timer"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteB["timer"]),self)).name())
+                aw.lcdpaletteB["timer"] = str((aw.colordialog(QColor(aw.lcdpaletteB["timer"]))).name())
             elif flag == 1:
-                aw.lcdpaletteF["timer"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteF["timer"]),self)).name())
+                aw.lcdpaletteF["timer"] = str((aw.colordialog(QColor(aw.lcdpaletteF["timer"]))).name())
             elif flag == 2 and text:
                 aw.lcdpaletteB["timer"] = self.lcdcolors[self.lcd1colorComboBox.currentIndex()]
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
         if lcdnumber ==2:
             if flag == 0:
-                aw.lcdpaletteB["et"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteB["et"]),self)).name())
+                aw.lcdpaletteB["et"] = str((aw.colordialog(QColor(aw.lcdpaletteB["et"]))).name())
             elif flag == 1:
-                aw.lcdpaletteF["et"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteF["et"]),self)).name())
+                aw.lcdpaletteF["et"] = str((aw.colordialog(QColor(aw.lcdpaletteF["et"]))).name())
             elif flag == 2 and text:
                 aw.lcdpaletteB["et"] = self.lcdcolors[self.lcd2colorComboBox.currentIndex()]
             aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         if lcdnumber ==3:
             if flag == 0:
-                aw.lcdpaletteB["bt"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteB["bt"]),self)).name())
+                aw.lcdpaletteB["bt"] = str((aw.colordialog(QColor(aw.lcdpaletteB["bt"]))).name())
             elif flag == 1:
-                aw.lcdpaletteF["bt"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteF["bt"]),self)).name())
+                aw.lcdpaletteF["bt"] = str((aw.colordialog(QColor(aw.lcdpaletteF["bt"]))).name())
             elif flag == 2 and text:
                 aw.lcdpaletteB["bt"] = self.lcdcolors[self.lcd3colorComboBox.currentIndex()]
             aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
         if lcdnumber ==4:
             if flag == 0:
-                aw.lcdpaletteB["deltaet"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteB["deltaet"]),self)).name())
+                aw.lcdpaletteB["deltaet"] = str((aw.colordialog(QColor(aw.lcdpaletteB["deltaet"]))).name())
             elif flag == 1:
-                aw.lcdpaletteF["deltaet"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteF["deltaet"]),self)).name())
+                aw.lcdpaletteF["deltaet"] = str((aw.colordialog(QColor(aw.lcdpaletteF["deltaet"]))).name())
             elif flag == 2 and text:
                 aw.lcdpaletteB["deltaet"] = self.lcdcolors[self.lcd4colorComboBox.currentIndex()]
             aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
         if lcdnumber ==5:
             if flag == 0:
-                aw.lcdpaletteB["deltabt"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteB["deltabt"]),self)).name())
+                aw.lcdpaletteB["deltabt"] = str((aw.colordialog(QColor(aw.lcdpaletteB["deltabt"]))).name())
             elif flag == 1:
-                aw.lcdpaletteF["deltabt"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteF["deltabt"]),self)).name())
+                aw.lcdpaletteF["deltabt"] = str((aw.colordialog(QColor(aw.lcdpaletteF["deltabt"]))).name())
             elif flag == 2 and text:
                 aw.lcdpaletteB["deltabt"] = self.lcdcolors[self.lcd5colorComboBox.currentIndex()]
             aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
         if lcdnumber ==6:
             if flag == 0:
-                aw.lcdpaletteB["sv"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteB["sv"]),self)).name())
+                aw.lcdpaletteB["sv"] = str((aw.colordialog(QColor(aw.lcdpaletteB["sv"]))).name())
             elif flag == 1:
-                aw.lcdpaletteF["sv"] = str((QColorDialog.getColor(QColor(aw.lcdpaletteF["sv"]),self)).name())
+                aw.lcdpaletteF["sv"] = str((aw.colordialog(QColor(aw.lcdpaletteF["sv"]))).name())
             elif flag == 2 and text:
                 aw.lcdpaletteB["sv"] = self.lcdcolors[self.lcd6colorComboBox.currentIndex()]
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
@@ -25954,7 +26190,7 @@ class graphColorDlg(ArtisanDialog):
 
     def setColor(self,title,var,color):
         labelcolor = QColor(aw.qmc.palette[color])
-        colorf = QColorDialog.getColor(labelcolor,self)
+        colorf = aw.colordialog(labelcolor)
         if colorf.isValid():
             aw.qmc.palette[color] = str(colorf.name())
             var.setText(colorf.name())
@@ -26159,7 +26395,7 @@ class WheelDlg(ArtisanDialog):
                 self.labeltable.setCellWidget(i,4,alphaSpinBox)
 
     def setsegmentcolor(self,x,i):
-        colorf = QColorDialog.getColor(QColor(aw.qmc.wheelcolor[x][i]),self)
+        colorf = aw.colordialog(QColor(aw.qmc.wheelcolor[x][i]))
         if colorf.isValid():
             colorname = str(colorf.name())
             aw.qmc.wheelcolor[x][i] = colorname      #add new color to label
@@ -26168,7 +26404,7 @@ class WheelDlg(ArtisanDialog):
 
     #sets a uniform color in wheel
     def setwheelcolor(self,x):
-        colorf = QColorDialog.getColor(QColor(aw.qmc.wheelcolor[x][0]),self)
+        colorf = aw.colordialog(QColor(aw.qmc.wheelcolor[x][0]))
         if colorf.isValid():
             colorname = str(colorf.name())
             for i in range(len(aw.qmc.wheelcolor[x])):
@@ -26260,7 +26496,7 @@ class WheelDlg(ArtisanDialog):
 
     #sets line color
     def setlinecolor(self):
-        colorf = QColorDialog.getColor(QColor(aw.qmc.wheellinecolor),self)
+        colorf = aw.colordialog(QColor(aw.qmc.wheellinecolor))
         if colorf.isValid():
             colorname = str(colorf.name())
             aw.qmc.wheellinecolor = colorname      #add new color to label
