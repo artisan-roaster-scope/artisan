@@ -4,7 +4,7 @@ o Python 2.7.8
 o pyserial 2.7
 o QT 4.8.6
 o PyQt 4.11.1
-o numpy 1.8.1
+o numpy 1.8.2
 o scipy 0.14.0
 o matplotlib 1.3.1
 o pyparsing 2.0.1
@@ -25,6 +25,7 @@ Upgrade History:
  . PyQt 4.10.3 => 4.11.1
  . minimalmodbus 0.5 => 0.6
  . added pymodbus 1.3.0
+ . numpy 1.8.0 => 1.8.2
 - 2014-05-04
  . numpy 1.8.0 => 1.8.1
  . SIP 4.15.3 => 4.15.5
