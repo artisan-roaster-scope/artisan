@@ -498,7 +498,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1018_dataRatesValues = [8,16,32,64,128,256,512]
         self.phidget1018_changeTriggers = [10]*8
         self.phidget1018_changeTriggersValues = range(0,310,10)
-        self.phidget1018_changeTriggersStrings = map(lambda x:str(x),self.phidget1018_changeTriggersValues)
+        self.phidget1018_changeTriggersStrings = list(map(lambda x:str(x),self.phidget1018_changeTriggersValues))
         self.phidget1018Ratiometric = True
 
         #menu of thermocouple devices
