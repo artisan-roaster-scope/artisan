@@ -135,4 +135,5 @@ download from https://github.com/bashwork/pymodbus
 
 # cd pymodbus
 # python setup.py build
-# sudo python setup.py install
+# python setup.py install
+# python setup.py install_lib
