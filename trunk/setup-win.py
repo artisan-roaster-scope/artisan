@@ -16,7 +16,7 @@ import os
 INCLUDES = [
             "sip",
             "serial",
-            "scipy.special._ufuncs_cxx"
+            "scipy.special._ufuncs_cxx",
             ]
 
 EXCLUDES = ['_tkagg',

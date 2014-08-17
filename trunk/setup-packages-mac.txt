@@ -19,6 +19,7 @@ o altgraph 0.10.2
 o macholib 1.5.1
 o py2app 0.9
 o pymodbus 1.3.0
+o yoctopuce 1.10.16490
 
 Upgrade History:
 
@@ -512,3 +513,15 @@ download from https://github.com/bashwork/pymodbus
 # cd pymodbus
 # python setup.py build
 # sudo python setup.py install
+
+22) yoctopuce 1.10.16490
+
+download from https://pypi.python.org/pypi/yoctopuce/1.10.16490
+
+# cd yoctopuce-1.10.16490
+# python setup.py build
+# sudo python setup.py install
+
+copy shared libs
+# sudo mkdir /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/yoctopuce/cdll
+# sudo cp yoctopuce/cdll/* /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/yoctopuce/cdll

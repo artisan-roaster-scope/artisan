@@ -103,6 +103,10 @@ from Phidgets.Devices.TemperatureSensor import TemperatureSensor as Phidget1048T
 from Phidgets.Devices.Bridge import Bridge as Phidget1046TemperatureSensor
 from Phidgets.Devices.InterfaceKit import InterfaceKit as Phidget1018IO
 
+# import Yoctopuce Pyhton library (installed form PyPI)
+from yoctopuce.yocto_api import YAPI, YRefParam
+from yoctopuce.yocto_temperature import YTemperature
+
 #import minimalmodbus
 from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient, BaseModbusClient
 from pymodbus.constants import Endian
@@ -506,7 +510,7 @@ class tgraphcanvas(FigureCanvas):
         #device with first letter - does not show in any tab (but its position in the list is important)
         # device labels (used in Dialog config).
 
-        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
+        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:" in the code
         # - add to self.devices
         self.devices = [#Fuji PID               #0
                        "Omega HH806AU",         #1
@@ -553,7 +557,9 @@ class tgraphcanvas(FigureCanvas):
                        "+Phidget IO 56",        #42
                        "+Phidget IO 78",        #43
                        "+ArduinoTC4_78",        #44
-                       "-Omega HH806W"          #45 NOT WORKING 
+                       "Yocto Thermocouple",    #45
+                       "Yocto PT100",           #46
+                       "-Omega HH806W"          #47 NOT WORKING 
                        ]
 
         #extra devices
@@ -3585,6 +3591,14 @@ class tgraphcanvas(FigureCanvas):
                 aw.ser.PhidgetIO = None
             except:
                 pass
+        if aw.ser.YOCTOsensor:
+            try:
+                YAPI.UnregisterHub("usb")
+            except:
+                pass
+            aw.ser.YOCTOsensor = None
+            aw.ser.YOCTOchan1 = None
+            aw.ser.YOCTOchan2 = None
 
     #Turns ON/OFF flag self.flagon to read and print values. Called from push button_1.
     def ToggleMonitor(self):
@@ -9003,7 +9017,7 @@ class ApplicationWindow(QMainWindow):
                     # keep on looking for digits
                     self.quickEventShortCut = (eventNr,eventValueStr)
             else:
-                palette = button.index(key)
+    #            palette = button.index(key)
     # for now we deactivate this extra dialog step
     #            string = QApplication.translate("Message","Changing palettes will delete the present extra event buttons.\nRestore palette %i?"%palette,
     #                                            None, QApplication.UnicodeUTF8)
@@ -9200,7 +9214,7 @@ class ApplicationWindow(QMainWindow):
                 oldDir = u(QDir.current())
                 QDir.setCurrent(self.qmc.autosavepath)
                 #clean name
-                filename = self.removeDisallowedFilenameChars(filename)
+                filename = self.removeDisallowedFilenameChars(u(filename))
                 #write
                 self.serialize(QString(filename),self.getProfile())
                 #restore dirs
@@ -9217,7 +9231,8 @@ class ApplicationWindow(QMainWindow):
                 self.autosaveconf()
 
         except Exception as e:
-            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None, QApplication.UnicodeUTF8) + " automaticsave() %1").arg(str(e)))
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None, QApplication.UnicodeUTF8) + " automaticsave() %1").arg(str(e)),exc_tb.tb_lineno)
 
     def viewKshortcuts(self):
         string = u(QApplication.translate("Message", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None, QApplication.UnicodeUTF8)) + "<br><br>"
@@ -18957,52 +18972,52 @@ class EventsDlg(ArtisanDialog):
         aw.update_extraeventbuttons_visibility()
 
     def insertextraeventbutton(self):
-           self.savetableextraeventbutton() #save previous changes
-           if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
-               return
-           aw.extraeventsdescriptions.append("")
-           aw.extraeventstypes.append(0)
-           aw.extraeventsvalues.append(0)
-           aw.extraeventsactions.append(0)
-           aw.extraeventsactionstrings.append("")
-           aw.extraeventsvisibility.append(1)
-           aw.extraeventbuttoncolor.append("yellow")
-           aw.extraeventbuttontextcolor.append("black")
-           initialtext = u(aw.qmc.etypesf(aw.extraeventstypes[-1])[0])+str(aw.qmc.eventsvalues(aw.extraeventsvalues[-1]))
-           aw.extraeventslabels.append(initialtext)
-           self.createEventbuttonTable() 
-           aw.buttonlist.append(QPushButton())
-           bindex = len(aw.buttonlist)-1
-           aw.buttonlist[bindex].setFocusPolicy(Qt.NoFocus)
-           aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ")
-           aw.buttonlist[bindex].setMaximumSize(90, 50)
-           aw.buttonlist[bindex].setMinimumHeight(50)
-           aw.buttonlist[bindex].setText(initialtext)
-           aw.connect(aw.buttonlist[bindex], SIGNAL("clicked()"), lambda ee=bindex:aw.recordextraevent(ee))
-           #add button to row
-   #        lowerbuttonvisiblebuttons = len(aw.lowerbuttondialog.buttons())
-   #        for i in range(len(aw.qmc.buttonvisibility)):
-   #            # remove the invisible ones
-   #            if not aw.qmc.buttonvisibility[i]:
-   #                lowerbuttonvisiblebuttons = lowerbuttonvisiblebuttons - 1
-   #        if not self.eventsbuttonflag: # remove another count if EVENT button is invisible
-   #            lowerbuttonvisiblebuttons = lowerbuttonvisiblebuttons - 1
-           if False: # lowerbuttonvisiblebuttons < aw.buttonlistmaxlen:
-               aw.lowerbuttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-           elif len(aw.e1buttondialog.buttons()) < aw.buttonlistmaxlen:
-               aw.e1buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-   #            aw.e1buttondialog.setContentsMargins(0,10,0,0)
-           elif len(aw.e2buttondialog.buttons()) < aw.buttonlistmaxlen:
-               aw.e2buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-   #            aw.e2buttondialog.setContentsMargins(0,10,0,0)
-           elif len(aw.e3buttondialog.buttons()) < aw.buttonlistmaxlen:
-               aw.e3buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-   #            aw.e3buttondialog.setContentsMargins(0,10,0,0)
-           else:
-               aw.e4buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-   #            aw.e4buttondialog.setContentsMargins(0,10,0,0)
-           aw.update_extraeventbuttons_visibility()
-           aw.settooltip()
+        self.savetableextraeventbutton() #save previous changes
+        if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
+            return
+        aw.extraeventsdescriptions.append("")
+        aw.extraeventstypes.append(0)
+        aw.extraeventsvalues.append(0)
+        aw.extraeventsactions.append(0)
+        aw.extraeventsactionstrings.append("")
+        aw.extraeventsvisibility.append(1)
+        aw.extraeventbuttoncolor.append("yellow")
+        aw.extraeventbuttontextcolor.append("black")
+        initialtext = u(aw.qmc.etypesf(aw.extraeventstypes[-1])[0])+str(aw.qmc.eventsvalues(aw.extraeventsvalues[-1]))
+        aw.extraeventslabels.append(initialtext)
+        self.createEventbuttonTable() 
+        aw.buttonlist.append(QPushButton())
+        bindex = len(aw.buttonlist)-1
+        aw.buttonlist[bindex].setFocusPolicy(Qt.NoFocus)
+        aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ")
+        aw.buttonlist[bindex].setMaximumSize(90, 50)
+        aw.buttonlist[bindex].setMinimumHeight(50)
+        aw.buttonlist[bindex].setText(initialtext)
+        aw.connect(aw.buttonlist[bindex], SIGNAL("clicked()"), lambda ee=bindex:aw.recordextraevent(ee))
+#       #add button to row
+#        lowerbuttonvisiblebuttons = len(aw.lowerbuttondialog.buttons())
+#        for i in range(len(aw.qmc.buttonvisibility)):
+#            # remove the invisible ones
+#            if not aw.qmc.buttonvisibility[i]:
+#                lowerbuttonvisiblebuttons = lowerbuttonvisiblebuttons - 1
+#        if not self.eventsbuttonflag: # remove another count if EVENT button is invisible
+#            lowerbuttonvisiblebuttons = lowerbuttonvisiblebuttons - 1
+        if False: # lowerbuttonvisiblebuttons < aw.buttonlistmaxlen:
+            aw.lowerbuttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+        elif len(aw.e1buttondialog.buttons()) < aw.buttonlistmaxlen:
+            aw.e1buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+   #         aw.e1buttondialog.setContentsMargins(0,10,0,0)
+        elif len(aw.e2buttondialog.buttons()) < aw.buttonlistmaxlen:
+            aw.e2buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+   #         aw.e2buttondialog.setContentsMargins(0,10,0,0)
+        elif len(aw.e3buttondialog.buttons()) < aw.buttonlistmaxlen:
+            aw.e3buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+   #         aw.e3buttondialog.setContentsMargins(0,10,0,0)
+        else:
+            aw.e4buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+   #         aw.e4buttondialog.setContentsMargins(0,10,0,0)
+        aw.update_extraeventbuttons_visibility()
+        aw.settooltip()
 
     def eventsbuttonflagChanged(self):
         if self.eventsbuttonflag.isChecked():
@@ -20605,7 +20620,7 @@ class ArtisanModbusUdpClient(ModbusUdpClient):
             family = ModbusUdpClient._get_address_family(self.host)
             self.socket = socket.socket(family, socket.SOCK_DGRAM)
             self.socket.settimeout(self.timeout)
-        except socket.error as ex:
+        except socket.error:
             self.close()
         return self.socket != None
 
@@ -20992,6 +21007,10 @@ class serialport(object):
         self.PhidgetBridgeSensor = None
         #stores the Phidget IO object (None if not initialized)
         self.PhidgetIO = None
+        #Yoctopuce channels
+        self.YOCTOsensor = None
+        self.YOCTOchan1 = None
+        self.YOCTOchan2 = None
         #stores the id of the meter HH506RA as a string
         self.HH506RAid = "X"
         #select PID type that controls the roaster.
@@ -21061,7 +21080,9 @@ class serialport(object):
                                    self.PHIDGET1018_56,     #42
                                    self.PHIDGET1018_78,     #43
                                    self.ARDUINOTC4_78,      #44
-                                   self.HH806W              #45
+                                   self.YOCTO_thermo,       #45
+                                   self.YOCTO_pt100,        #46
+                                   self.HH806W              #47
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -21471,6 +21492,16 @@ class serialport(object):
         t1 = aw.qmc.extraArduinoT5
         t2 = aw.qmc.extraArduinoT6
         return tx,t2,t1
+        
+    def YOCTO_thermo(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.YOCTOtemperatures(0)
+        return tx,v1,v2
+
+    def YOCTO_pt100(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.YOCTOtemperatures(1)
+        return tx,v1,v2
 
     def TEVA18B(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -22483,6 +22514,55 @@ class serialport(object):
             aw.ser.PhidgetIO = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1018values() %1").arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
+
+    # mode = 0 for 2x thermocuple model; mode = 1 for 1x PT100 type probe
+    def YOCTOtemperatures(self,mode=0):
+        try: 
+            if aw.ser.YOCTOsensor == None:
+                errmsg=YRefParam()
+                # alt: PreregisterHub( )
+                if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
+                    aw.ser.YOCTOsensor = YTemperature.FirstTemperature()
+                    if mode == 0 and aw.ser.YOCTOsensor != None and aw.ser.YOCTOsensor.isOnline():
+                        serial=aw.ser.YOCTOsensor.get_module().get_serialNumber()
+                        aw.ser.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
+                        aw.ser.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
+                        aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None, QApplication.UnicodeUTF8))                       
+                    elif mode == 1 and aw.ser.YOCTOsensor != None and aw.ser.YOCTOsensor.isOnline():
+                        aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None, QApplication.UnicodeUTF8))                       
+            probe1 = -1
+            probe2 = -1
+            if mode == 0:
+                try:
+                    if aw.ser.YOCTOchan1 and aw.ser.YOCTOchan1.isOnline():
+                        probe1 = aw.ser.YOCTOchan1.get_currentValue()
+                except:
+                    pass
+                try:
+                    if aw.ser.YOCTOchan2 and aw.ser.YOCTOchan2.isOnline():
+                        probe2 = aw.ser.YOCTOchan2.get_currentValue()
+                except:
+                    pass
+            elif mode == 1:
+                try:
+                    if aw.ser.YOCTOsensor and aw.ser.YOCTOsensor.isOnline():
+                        probe1 = aw.ser.YOCTOsensor.get_currentValue()
+                except:
+                    pass
+            return probe1, probe2
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            try:
+                YAPI.UnregisterHub("usb")
+            except:
+                pass
+            aw.ser.YOCTOsensor = None
+            aw.ser.YOCTOchan1 = None
+            aw.ser.YOCTOchan2 = None
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " YOCTOtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
 
@@ -23885,7 +23965,10 @@ class comportDlg(ArtisanDialog):
         modbus_help_text += QApplication.translate("Message", "Tick the Float flag in this case.",None, QApplication.UnicodeUTF8)
         modbus_help_label = QLabel(modbus_help_text)
         fnt = modbus_help_label.font()
-        fnt.setPointSize(11)
+        if platf == 'Darwin':
+            fnt.setPointSize(fnt.pointSize() - 2)
+        else:
+            fnt.setPointSize(fnt.pointSize() - 1)
         modbus_help_label.setFont(fnt)
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
@@ -24008,7 +24091,8 @@ class comportDlg(ArtisanDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
-        if not(devid in [29,33,34,37,40,41]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS and Phidget devices
+        # "ADD DEVICE:"
+        if not(devid in [29,33,34,37,40,41,45,46]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -24028,6 +24112,8 @@ class comportDlg(ArtisanDialog):
         modbus_grid.addWidget(self.modbus_stopbitsComboBox,4,1)
         modbus_grid.addWidget(modbus_timeoutlabel,5,0,Qt.AlignRight)
         modbus_grid.addWidget(self.modbus_timeoutEdit,5,1)
+        modbus_grid.setMargin(5)
+        modbus_grid.setSpacing(7)
         modbus_gridV = QVBoxLayout()
         modbus_gridV.addStretch()
         modbus_gridV.addLayout(modbus_grid)
@@ -24098,7 +24184,6 @@ class comportDlg(ArtisanDialog):
         modbus_inputV.addStretch()
         modbus_gridVLayout = QHBoxLayout()
         modbus_gridVLayout.addLayout(modbus_gridV)
-
         modbus_gridVLayout.addWidget(modbus_help_label)
         modbus_gridVLayout.addStretch()
         modbus_setup = QHBoxLayout()
@@ -24222,7 +24307,8 @@ class comportDlg(ArtisanDialog):
                     devicename = aw.qmc.devices[devid-1]
                     device = QTableWidgetItem(devicename)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
-                    if not (devid in [29,33,34,37,40,41]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                    # "ADD DEVICE:"
+                    if not (devid in [29,33,34,37,40,41,45,46]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                         comportComboBox = PortComboBox(selection = aw.extracomport[i])
                         self.connect(comportComboBox, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                         comportComboBox.setFixedWidth(200)
@@ -24318,7 +24404,8 @@ class comportDlg(ArtisanDialog):
         timeout = str(self.timeoutEdit.text())
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
-        if not(aw.qmc.device in [29,33,34,37,40,41]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        # "ADD DEVICE:"
+        if not(aw.qmc.device in [29,33,34,37,40,41,45,46]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -25542,8 +25629,20 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 43 is +Phidget IO 78 but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 44 is +ARDUINOTC4_78 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                elif meter == "Yocto Thermocouple":
+                    aw.qmc.device = 45
+                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                ##########################
+                elif meter == "Yocto PT100":
+                    aw.qmc.device = 46
+                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                ##########################
                 elif meter == "Omega HH806W":
-                    aw.qmc.device = 44
+                    aw.qmc.device = 47
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -25609,7 +25708,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 42
                 1, # 43
                 4, # 44
-                8] # 45
+                1, # 45
+                1, # 46
+                8] # 47
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -25676,7 +25777,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
-            if not(aw.qmc.device in [18,27,34,37,40,41]):
+            # "ADD DEVICE:"
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46]):
                 aw.setcommport()
             #self.close()
             self.accept()
