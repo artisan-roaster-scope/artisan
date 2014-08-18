@@ -97,9 +97,13 @@ OPTIONS = {
     'argv_emulation': False, # this would confuses GUI processing
     'semi_standalone': False,
     'site_packages': True,
-#    'packages': ['matplotlib'],
+    'dylib_excludes': ['phonon','QtDBus','QtDeclarative','QtDesigner',
+                    'QtHelp','QtMultimedia','QtNetwork',
+                    'QtOpenGL','QtScript','QtScriptTools',
+                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
+    'packages': ['yoctopuce'],
     'optimize':  2,
-    'compressed': False,
+    'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
     'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'
@@ -112,11 +116,7 @@ OPTIONS = {
     'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
                       '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
                       'bsddb','curses','tcl',
-                      '_wxagg','_gtagg','_cocoaagg','_wx',
-                    'PyQt4.phonon','PyQt4.QtDBus','PyQt4.QtDeclarative','PyQt4.QtDesigner',
-                    'PyQt4.QtHelp','PyQt4.QtMultimedia','PyQt4.QtNetwork',
-                    'PyQt4.QtOpenGL','PyQt4.QtScript','PyQt4.QtScriptTools',
-                    'PyQt4.QtSql','PyQt4.QtTest','PyQt4.QtXmlPatterns','PyQt4.QtWebKit'],
+                      '_wxagg','_gtagg','_cocoaagg','_wx'],
     'plist'    : plist}
 
 setup(
@@ -177,7 +177,7 @@ for root, dirs, files in os.walk('.'):
         elif '_tests' in file:
             print 'Deleting', file            
             os.remove(os.path.join(root,file))            
-        elif file.endswith('.pyc') and file != "site.pyc":
+        elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
         # remove also all .h .in .cpp .cc .html files 

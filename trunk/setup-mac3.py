@@ -97,7 +97,12 @@ OPTIONS = {
     'argv_emulation': False, # this would confuses GUI processing
     'semi_standalone': False,
     'site_packages': True,
+    'dylib_excludes': ['phonon','QtDBus','QtDeclarative','QtDesigner',
+                    'QtHelp','QtMultimedia','QtNetwork',
+                    'QtOpenGL','QtScript','QtScriptTools',
+                    'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
 #    'packages': ['matplotlib'], # with this the full pkg is copied to Resources/lib/python3.4
+    'packages': ['yoctopuce'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',

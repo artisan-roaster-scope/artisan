@@ -16,6 +16,7 @@ o Phidgets Python 2.1.8
 o py2exe 0.6.9
 o NSIS 2.46
 o pymodbus 1.3.0
+o yoctopuce 1.10.16490
 
 
 Upgrade History:
@@ -24,8 +25,9 @@ Upgrade History:
  . Python 2.7.6 => 2.7.8
  . PyQt 4.10.3 => 4.11.1
  . minimalmodbus 0.5 => 0.6
- . added pymodbus 1.3.0
  . numpy 1.8.0 => 1.8.2
+ . added pymodbus 1.3.0
+ . added yoctopuce 1.10.16490
 - 2014-05-04
  . numpy 1.8.0 => 1.8.1
  . SIP 4.15.3 => 4.15.5
@@ -137,3 +139,13 @@ download from https://github.com/bashwork/pymodbus
 # python setup.py build
 # python setup.py install
 # python setup.py install_lib
+
+14) yoctopuce 1.10.16490
+
+# cd yoctopuce-1.10.16490
+# c:\Python27\python.exe setup.py build
+# c:\Python27\python.exe setup.py install
+
+install dll's
+# mkdir c:\Python27\Lib\site-packages\yoctopuce\cdll
+# copy yoctopuce\cdll\*.* c:\Python27\Lib\site-packages\yoctopuce\cdll
