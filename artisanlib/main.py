@@ -1579,7 +1579,12 @@ class tgraphcanvas(FigureCanvas):
             elif self.alarmaction[alarmnumber] == 1:
                 # alarm call program
                 fname = u(self.alarmstrings[alarmnumber])
-                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
+# take care, the QDir().current() directory changes with loads and saves                
+#                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
+                if platf in ['Windows','Linux']:             
+                    QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/" + fname, QUrl.TolerantMode))
+                else: # MacOS X: script is expected to sit next to the Artisan.app
+                    QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/../../../" + fname, QUrl.TolerantMode))
                 aw.sendmessage(QApplication.translate("Message","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
             elif self.alarmaction[alarmnumber] == 2:
                 # alarm event button
@@ -8673,7 +8678,12 @@ class ApplicationWindow(QMainWindow):
                         self.ser.sendTXcommand(cmd_str)
                 elif action == 2:
                     try:
-                        QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
+# take care, the QDir().current() directory changes with loads and saves 
+#                        QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
+                        if platf in ['Windows','Linux']:
+                            QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/" + cmd_str, QUrl.TolerantMode))
+                        else: # on Darwin
+                            QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.TolerantMode))
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " eventaction() %1").arg(str(e)),exc_tb.tb_lineno)
@@ -22521,6 +22531,13 @@ class serialport(object):
         try: 
             if aw.ser.YOCTOsensor == None:
                 errmsg=YRefParam()
+                ## WINDOWS DLL HACK BEGIN
+                if platf == 'Windows' and aw.appFrozen():
+                    if platform.architecture()[0] == '32bit':
+                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\yapi.dll"
+                    else:
+                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\yapi-amd64.dll"
+                ## WINDOWS DLL HACK END
                 # alt: PreregisterHub( )
                 if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
                     aw.ser.YOCTOsensor = YTemperature.FirstTemperature()
