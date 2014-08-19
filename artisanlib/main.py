@@ -1581,11 +1581,15 @@ class tgraphcanvas(FigureCanvas):
                 fname = u(self.alarmstrings[alarmnumber])
 # take care, the QDir().current() directory changes with loads and saves                
 #                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
-                if platf in ['Windows','Linux']:             
-                    QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/" + fname, QUrl.TolerantMode))
+                if platf in ['Windows','Linux']:
+                    f = u("file:///") + u(QApplication.applicationDirPath()) + "/" + u(fname)
                 else: # MacOS X: script is expected to sit next to the Artisan.app
-                    QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/../../../" + fname, QUrl.TolerantMode))
-                aw.sendmessage(QApplication.translate("Message","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
+                    f = u("file:///") + u(QApplication.applicationDirPath()) + "/../../../" + u(fname)
+                res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
+                if res:
+                    aw.sendmessage(QApplication.translate("Message","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
+                else:
+                    aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on %1",None, QApplication.UnicodeUTF8).arg(f))
             elif self.alarmaction[alarmnumber] == 2:
                 # alarm event button
                 button_number = None
