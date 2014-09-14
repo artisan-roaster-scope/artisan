@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="de" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.0" language="de">
 <context>
     <name>About</name>
     <message>
@@ -957,7 +958,7 @@ END</source>
     <message>
         <location filename="artisanlib/main.py" line="19582"/>
         <source>Auto DRY</source>
-        <translation></translation>
+        <translation>Auto TROCKEN</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19584"/>
@@ -967,12 +968,12 @@ END</source>
     <message>
         <location filename="artisanlib/main.py" line="18163"/>
         <source>Auto CHARGE</source>
-        <translation></translation>
+        <translation>Auto FÜLLEN</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="18166"/>
         <source>Auto DROP</source>
-        <translation></translation>
+        <translation>Auto LEEREN</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14952"/>
