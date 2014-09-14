@@ -496,15 +496,24 @@ class tgraphcanvas(FigureCanvas):
             ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
             ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
             ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE] # probe types (ThermocoupleType)
+        self.phidget1048_async = [False]*4
+        self.phidget1048_changeTriggers = [1.0]*4
+        self.phidget1048_changeTriggersValues = [x / 10.0 for x in range(1, 11, 1)]
+        self.phidget1048_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1048_changeTriggersValues))
+        self.phidget1045_async = False
+        self.phidget1045_changeTrigger = 1.0
+        self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(1, 11, 1)]
+        self.phidget1045_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1045_changeTriggersValues))
         self.phidgetRemoteFlag = False
         self.phidgetServerID = ""
         self.phidgetPassword = ""
+        self.phidget1018_async = [False]*8
         self.phidget1018_raws = [False]*8
-        self.phidget1018_dataRates = [8]*8 # in ms; default 8ms, 16ms if wireless is active
-        self.phidget1018_dataRatesStrings = ["8ms","16ms","32ms","64ms","0.12s","0.25s","0.5s"]
-        self.phidget1018_dataRatesValues = [8,16,32,64,128,256,512]
+        self.phidget1018_dataRates = [1000]*8 # in ms; (Phidgets default 8ms, 16ms if wireless is active)
+        self.phidget1018_dataRatesStrings = ["0.25s","0.5s","0.75s","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
+        self.phidget1018_dataRatesValues = [256,512,768,1000] # 8,16,32,64,128,
         self.phidget1018_changeTriggers = [10]*8
-        self.phidget1018_changeTriggersValues = range(0,310,10)
+        self.phidget1018_changeTriggersValues = range(0,51,1)
         self.phidget1018_changeTriggersStrings = list(map(lambda x:str(x),self.phidget1018_changeTriggersValues))
         self.phidget1018Ratiometric = True
 
@@ -626,8 +635,8 @@ class tgraphcanvas(FigureCanvas):
         #read and plot on/off flag
         self.flagon = False  # Artisan turned on
         self.flagstart = False # Artisan logging
-        self.flagstopping = False # Artisan got the signal to turn off logging,
-#                                 # switched on by OffMonitor and cleared by sampling thread once sampling stopped
+        self.flagsampling = False # if True, Artisan is still in the sampling phase and one has to wait for its end to turn OFF
+        self.flagsamplingthreadrunning = False
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
 
@@ -3557,10 +3566,9 @@ class tgraphcanvas(FigureCanvas):
             # stop Recorder if still running
             if self.flagstart:
                 self.OffRecorder()
-            self.flagstopping = True
             self.flagon = False
-            # now wait until the sampling thread successfully terminates
-            while self.flagstopping:
+            # now wait until the current sampling round is done
+            while self.flagsampling:
                 libtime.sleep(.01)
             # clear data from monitoring-only mode
             if len(self.timex) == 1:
@@ -3584,51 +3592,57 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
 
-    def disconnectProbes(self):
-        # close serial port of main device
-        aw.ser.closeport()
-        # close serial port of Modbus device
-        aw.modbus.disconnect()
-        # close serial ports of all extra devices
-        for i in range(len(aw.extraser)):
-            try:
-                if aw.extraser[i].SP.isOpen():
-                    aw.extraser[i].SP.close()
-            except:
-                pass
+
+
+    # close serial port, Phidgets and Yocto ports
+    def disconnectProbesFromSerialDevice(self,ser):
+        # close main serial port
+        try:
+            ser.closeport()
+        except:
+            pass
         # disconnect phidgets
-        if aw.ser.PhidgetTemperatureSensor:
+        if ser.PhidgetTemperatureSensor:
             try:
-                aw.ser.PhidgetTemperatureSensor.closePhidget()
-                aw.ser.PhidgetTemperatureSensor = None
+                ser.PhidgetTemperatureSensor.closePhidget()
+                ser.PhidgetTemperatureSensor = None
             except:
                 pass
-        if aw.ser.PhidgetIRSensor:
+        if ser.PhidgetIRSensor:
             try:
-                aw.ser.PhidgetIRSensor.closePhidget()
-                aw.ser.PhidgetIRSensor = None
+                ser.PhidgetIRSensor.closePhidget()
+                ser.PhidgetIRSensor = None
             except:
                 pass
-        if aw.ser.PhidgetBridgeSensor:
+        if ser.PhidgetBridgeSensor:
             try:
-                aw.ser.PhidgetBridgeSensor.closePhidget()
-                aw.ser.PhidgetBridgeSensor = None
+                ser.PhidgetBridgeSensor.closePhidget()
+                ser.PhidgetBridgeSensor = None
             except:
                 pass
-        if aw.ser.PhidgetIO:
+        if ser.PhidgetIO:
             try:
-                aw.ser.PhidgetIO.closePhidget()
-                aw.ser.PhidgetIO = None
+                ser.PhidgetIO.closePhidget()
+                ser.PhidgetIO = None
             except:
                 pass
-        if aw.ser.YOCTOsensor:
+        if ser.YOCTOsensor:
             try:
                 YAPI.UnregisterHub("usb")
             except:
                 pass
-            aw.ser.YOCTOsensor = None
-            aw.ser.YOCTOchan1 = None
-            aw.ser.YOCTOchan2 = None
+            ser.YOCTOsensor = None
+            ser.YOCTOchan1 = None
+            ser.YOCTOchan2 = None
+
+    def disconnectProbes(self):
+        # close ports of main device
+        self.disconnectProbesFromSerialDevice(aw.ser)
+        # close serial port of Modbus device
+        aw.modbus.disconnect()
+        # close ports of extra devices
+        for i in range(len(aw.extraser)):
+            self.disconnectProbesFromSerialDevice(aw.extraser[i])
 
     #Turns ON/OFF flag self.flagon to read and print values. Called from push button_1.
     def ToggleMonitor(self):
@@ -6684,6 +6698,7 @@ class SampleThread(QThread):
         return self.afterTP
 
     def run(self):
+        aw.qmc.flagsamplingthreadrunning = True
         if sys.platform.startswith("darwin"):
             pool = Foundation.NSAutoreleasePool.alloc().init()
         self.afterTP = False
@@ -6699,7 +6714,9 @@ class SampleThread(QThread):
                     #tx = aw.qmc.timeclock.elapsed()
                     
                     #collect information
+                    aw.qmc.flagsampling = True # we signal that we are sampling
                     self.sample()
+                    aw.qmc.flagsampling = False # we signal that we are done with sampling
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
                     dt = max(0.05,aw.qmc.delay/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
@@ -6708,7 +6725,7 @@ class SampleThread(QThread):
                     if aw.qmc.flagon:
                         libtime.sleep(dt)
                 else:
-                    aw.qmc.flagstopping = False # we signal that we stopped sampling
+                    aw.qmc.flagsampling = False # we signal that we are done with sampling
                     try:
                         if aw.ser.SP.isOpen():
                             aw.ser.closeport()
@@ -6718,8 +6735,10 @@ class SampleThread(QThread):
                     self.quit()
                     break  #thread ends
         except:
+            aw.qmc.flagsampling = False # we signal that we are done with sampling
             pass
         finally:
+            aw.qmc.flagsamplingthreadrunning = False
             if sys.platform.startswith("darwin"):
                 del pool
 
@@ -11275,12 +11294,19 @@ class ApplicationWindow(QMainWindow):
             # Phidget configurations
             if settings.contains("phidget1048_types"):
                 self.qmc.phidget1048_types = [x.toInt()[0] for x in settings.value("phidget1048_types").toList()]
+            if settings.contains("phidget1048_async"):
+                self.qmc.phidget1048_async = [bool(x.toBool()) for x in settings.value("phidget1048_async",self.qmc.phidget1048_async).toList()]
+                self.qmc.phidget1048_changeTriggers = [aw.float2float(x.toFloat()[0]) for x in settings.value("phidget1048_changeTriggers",self.qmc.phidget1048_changeTriggers).toList()]              
+            if settings.contains("phidget1045_async"):
+                self.qmc.phidget1045_async = bool(settings.value("phidget1045_async",self.qmc.phidget1045_async).toBool())
+                self.qmc.phidget1045_changeTrigger = aw.float2float(settings.value("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger).toFloat()[0])
             if settings.contains("phidgetRemoteFlag"):
                 self.qmc.phidgetRemoteFlag = bool(settings.value("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag).toBool())
                 self.qmc.phidgetServerID = u(settings.value("phidgetServerID",self.qmc.phidgetServerID).toString())
                 self.qmc.phidgetPassword = u(settings.value("phidgetPassword",self.qmc.phidgetPassword).toString())
             if settings.contains("phidget1018Ratiometric"):
                 self.qmc.phidget1018Ratiometric = bool(settings.value("phidget1018Ratiometric",self.qmc.phidget1018Ratiometric).toBool())
+                self.qmc.phidget1018_async = [bool(x.toBool()) for x in settings.value("phidget1018_async",self.qmc.phidget1018_async).toList()]
                 self.qmc.phidget1018_raws = [bool(x.toBool()) for x in settings.value("phidget1018_raws",self.qmc.phidget1018_raws).toList()]
                 self.qmc.phidget1018_dataRates = [x.toInt()[0] for x in settings.value("phidget1018_dataRates",self.qmc.phidget1018_dataRates).toList()]
                 self.qmc.phidget1018_changeTriggers = [x.toInt()[0] for x in settings.value("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers).toList()]              
@@ -12181,10 +12207,15 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Device")
             settings.setValue("id",self.qmc.device)
             settings.setValue("phidget1048_types",self.qmc.phidget1048_types)
+            settings.setValue("phidget1048_async",self.qmc.phidget1048_async)
+            settings.setValue("phidget1048_changeTriggers",self.qmc.phidget1048_changeTriggers)
+            settings.setValue("phidget1045_async",self.qmc.phidget1045_async)
+            settings.setValue("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger)
             settings.setValue("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)
             settings.setValue("phidgetServerID",self.qmc.phidgetServerID)
             settings.setValue("phidgetPassword",self.qmc.phidgetPassword)
             settings.setValue("phidget1018Ratiometric",self.qmc.phidget1018Ratiometric)
+            settings.setValue("phidget1018_async",self.qmc.phidget1018_async)
             settings.setValue("phidget1018_raws",self.qmc.phidget1018_raws)
             settings.setValue("phidget1018_dataRates",self.qmc.phidget1018_dataRates)
             settings.setValue("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers)
@@ -12751,6 +12782,9 @@ class ApplicationWindow(QMainWindow):
                 self.showNormal()
             if aw.qmc.flagon:
                 aw.qmc.ToggleMonitor()
+            # now wait until the current sampling thread is terminated
+            while aw.qmc.flagsamplingthreadrunning:
+                libtime.sleep(.01)
             self.closeEvent(None)
             QApplication.exit()
 
@@ -21192,12 +21226,15 @@ class serialport(object):
         ##### SPECIAL METER FLAGS ########
         #stores the Phidget 1048 TemperatureSensor object (None if not initialized)
         self.PhidgetTemperatureSensor = None
+        self.Phidget1048values = [-1]*4 # the values gathered by registered change triggers
         #stores the Phidget 1045 TemperatureSensor object (None if not initialized)
         self.PhidgetIRSensor = None
+        self.Phidget1045value = -1
         #stores the Phidget BridgeSensor object (None if not initialized)
         self.PhidgetBridgeSensor = None
         #stores the Phidget IO object (None if not initialized)
         self.PhidgetIO = None
+        self.PhidgetIOvalues = [-1]*8 # the values gathered by registered change triggers
         #Yoctopuce channels
         self.YOCTOsensor = None
         self.YOCTOchan1 = None
@@ -21516,7 +21553,7 @@ class serialport(object):
     def PHIDGET1045(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t = self.PHIDGET1045temperature()
-        return tx,t,-1        
+        return tx,-1,t        
 
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -21752,11 +21789,11 @@ class serialport(object):
         self.SP.setTimeout(self.timeout)
 
     def closeport(self):
-        if self.SP.isOpen():
-            try:
+        try:
+            if self.SP and self.SP.isOpen():
                 self.SP.close()
-            except:
-                pass
+        except:
+            pass
 
     def closeEvent(self,_):
         try:
@@ -22372,42 +22409,70 @@ class serialport(object):
                 res = 0
         for d in devices:
             if d.getDeviceName() == name:
-                res = d.getSerialNum()
-                break
+                # try if it can be opened (so not yet opened by another channel)
+                try:
+                    if aw.qmc.phidgetRemoteFlag:
+                        d.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
+                    else:
+                        d.openPhidget(serial=ser)
+                    libtime.sleep(.2)
+                    d.waitForAttach(600)
+                    res = d.getSerialNum()
+                    d.closePhidget()
+                    break
+                except:
+                    pass
         return res
+
+    def phidget1045TemperatureChanged(self,e):
+        self.Phidget1045value = (self.Phidget1045value + e.temperature)/2.0
 
     def PHIDGET1045temperature(self):
         try:
-            if aw.ser.PhidgetIRSensor == None:
-                aw.ser.PhidgetIRSensor = PhidgetTemperatureSensor()
+            if self.PhidgetIRSensor == None:
+                self.PhidgetIRSensor = PhidgetTemperatureSensor()
                 libtime.sleep(.1)
                 try: 
                     ser = self.getFirstMatchingPhidgetsSerialNum('Phidget Temperature Sensor IR')
-                    if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetIRSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
-                    else:
-                        aw.ser.PhidgetIRSensor.openPhidget(serial=ser)
-                    libtime.sleep(.2)
-                    aw.ser.PhidgetIRSensor.waitForAttach(600)
-                    aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None, QApplication.UnicodeUTF8))                       
+                    if ser:
+                        if aw.qmc.phidgetRemoteFlag:
+                            self.PhidgetIRSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
+                        else:
+                            self.PhidgetIRSensor.openPhidget(serial=ser)
+                        libtime.sleep(.2)
+                        self.PhidgetIRSensor.waitForAttach(600)
+                        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None, QApplication.UnicodeUTF8))
+
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
                     #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
                     try:
-                        aw.ser.PhidgetIRSensor.closePhidget()
+                        self.PhidgetIRSensor.closePhidget()
                     except:
                         pass
                     aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR not attached",None, QApplication.UnicodeUTF8))
-            if aw.ser.PhidgetIRSensor and not aw.ser.PhidgetIRSensor.isAttached():
+                    
+                if self.PhidgetIRSensor and self.PhidgetIRSensor.isAttached():
+                    if aw.qmc.phidget1045_async:
+                        self.PhidgetIRSensor.setTemperatureChangeTrigger(0,0.5)#aw.qmc.phidget1045_changeTrigger)
+                        self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1045TemperatureChanged(e))
+                    libtime.sleep(.3)
+                    
+            if self.PhidgetIRSensor and not self.PhidgetIRSensor.isAttached():
                 try:
-                    aw.ser.PhidgetIRSensor.closePhidget()
+                    self.PhidgetIRSensor.closePhidget()
                 except:
                     pass
-                aw.ser.PhidgetIRSensor = None
-            if aw.ser.PhidgetIRSensor != None:
+                self.PhidgetIRSensor = None
+            if self.PhidgetIRSensor != None:
                     res = -1
                     try:
-                        probe = aw.ser.PhidgetIRSensor.getTemperature(0)
+                        if aw.qmc.phidget1045_async:
+                            if self.Phidget1045value == -1:
+                                self.Phidget1045value = self.PhidgetIRSensor.getTemperature(0)
+                            probe = self.Phidget1045value
+                        else:
+                            probe = self.PhidgetIRSensor.getTemperature(0)
                         if aw.qmc.mode == "F":
                             probe = aw.qmc.fromCtoF(probe)
                         res = probe
@@ -22420,42 +22485,53 @@ class serialport(object):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             try:
-                aw.ser.PhidgetIRSensor.closePhidget()
+                self.PhidgetIRSensor.closePhidget()
             except:
                 pass
-            aw.ser.PhidgetIRSensor = None
+            self.PhidgetIRSensor = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1
 
+    def phidget1048TemperatureChanged(self,e):
+        self.Phidget1048values[e.index] = (self.Phidget1048values[e.index] + e.temperature)/2.0
+
+    def phidget1048getSensorReading(self,i):
+        if aw.qmc.phidget1048_async[i]:
+            if self.Phidget1048values[i] == -1:
+                self.Phidget1048values[i] = self.PhidgetTemperatureSensor.getTemperature(i)                
+            return self.Phidget1048values[i]
+        else:
+            return self.PhidgetTemperatureSensor.getTemperature(i)
+
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
     def PHIDGET1048temperature(self,mode=0):
         try:
-            if aw.ser.PhidgetTemperatureSensor == None:
-                aw.ser.PhidgetTemperatureSensor = PhidgetTemperatureSensor()
+            if self.PhidgetTemperatureSensor == None:
+                self.PhidgetTemperatureSensor = PhidgetTemperatureSensor()
                 libtime.sleep(.1)
                 try: 
                     ser = self.getFirstMatchingPhidgetsSerialNum('Phidget Temperature Sensor 4-input')
                     if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
+                        self.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
                     else:
-                        aw.ser.PhidgetTemperatureSensor.openPhidget(serial=ser)
+                        self.PhidgetTemperatureSensor.openPhidget(serial=ser)
                     libtime.sleep(.2)
-                    aw.ser.PhidgetTemperatureSensor.waitForAttach(600) 
+                    self.PhidgetTemperatureSensor.waitForAttach(600) 
                     try:
-                        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(0,aw.qmc.phidget1048_types[0])
+                        self.PhidgetTemperatureSensor.setThermocoupleType(0,aw.qmc.phidget1048_types[0])
                     except:
                         pass
                     try:
-                        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(1,aw.qmc.phidget1048_types[1])
+                        self.PhidgetTemperatureSensor.setThermocoupleType(1,aw.qmc.phidget1048_types[1])
                     except:
                         pass
                     try:
-                        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(2,aw.qmc.phidget1048_types[2])
+                        self.PhidgetTemperatureSensor.setThermocoupleType(2,aw.qmc.phidget1048_types[2])
                     except:
                         pass
                     try:
-                        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(3,aw.qmc.phidget1048_types[3])
+                        self.PhidgetTemperatureSensor.setThermocoupleType(3,aw.qmc.phidget1048_types[3])
                     except:
                         pass
                     aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None, QApplication.UnicodeUTF8))                       
@@ -22463,27 +22539,44 @@ class serialport(object):
                     #_, _, exc_tb = sys.exc_info()
                     #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
                     try:
-                        aw.ser.PhidgetTemperatureSensor.closePhidget()
+                        self.PhidgetTemperatureSensor.closePhidget()
                     except:
                         pass
                     aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input not attached",None, QApplication.UnicodeUTF8))
-            if aw.ser.PhidgetTemperatureSensor and not aw.ser.PhidgetTemperatureSensor.isAttached():
+                if self.PhidgetTemperatureSensor and self.PhidgetTemperatureSensor.isAttached():
+                    changeTrigger = False
+                    for i in range(4):
+                        try:
+                            self.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,500.0) # "deactivate" triggers for non async channels
+                            if i < 2 or (i < 4 and 35 in aw.qmc.extradevices):
+                                if aw.qmc.phidget1048_async[i]:
+                                    changeTrigger = True
+                                    self.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,aw.qmc.phidget1048_changeTriggers[i])
+                        except:
+#                            import traceback
+#                            traceback.print_exc(file=sys.stdout)
+                            pass
+                    libtime.sleep(.3)
+                    if changeTrigger:
+                        self.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1048TemperatureChanged(e))
+                    
+            if self.PhidgetTemperatureSensor and not self.PhidgetTemperatureSensor.isAttached():
                 try:
-                    aw.ser.PhidgetTemperatureSensor.closePhidget()
+                    self.PhidgetTemperatureSensor.closePhidget()
                 except:
                     pass
-                aw.ser.PhidgetTemperatureSensor = None
-            if aw.ser.PhidgetTemperatureSensor != None:
+                self.PhidgetTemperatureSensor = None
+            if self.PhidgetTemperatureSensor != None:
                 if mode == 0:
                     probe1 = probe2 = -1
                     try:
-                        probe1 = aw.ser.PhidgetTemperatureSensor.getTemperature(0)
+                        probe1 = self.phidget1048getSensorReading(0)
                         if aw.qmc.mode == "F":
                             probe1 = aw.qmc.fromCtoF(probe1)
                     except:
                         pass
                     try:
-                        probe2 = aw.ser.PhidgetTemperatureSensor.getTemperature(1)
+                        probe2 = self.phidget1048getSensorReading(1)
                         if aw.qmc.mode == "F":
                             probe2 = aw.qmc.fromCtoF(probe2)
                     except:
@@ -22492,13 +22585,13 @@ class serialport(object):
                 elif mode == 1:
                     probe3 = probe4 = -1
                     try:
-                        probe3 = aw.ser.PhidgetTemperatureSensor.getTemperature(2)
+                        probe3 = self.phidget1048getSensorReading(2)
                         if aw.qmc.mode == "F":
                             probe3 = aw.qmc.fromCtoF(probe3)
                     except:
                         pass
                     try:
-                        probe4 = aw.ser.PhidgetTemperatureSensor.getTemperature(3)
+                        probe4 = self.phidget1048getSensorReading(4)
                         if aw.qmc.mode == "F":
                             probe4 = aw.qmc.fromCtoF(probe4)
                     except:
@@ -22506,7 +22599,7 @@ class serialport(object):
                     return probe3, probe4
                 elif mode == 2:
                     try:
-                        at = aw.ser.PhidgetTemperatureSensor.getAmbientTemperature()
+                        at = self.PhidgetTemperatureSensor.getAmbientTemperature()
                         if aw.qmc.mode == "F":
                             at = aw.qmc.fromCtoF(at)
                         return at,-1
@@ -22520,10 +22613,10 @@ class serialport(object):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             try:
-                aw.ser.PhidgetTemperatureSensor.closePhidget()
+                self.PhidgetTemperatureSensor.closePhidget()
             except:
                 pass
-            aw.ser.PhidgetTemperatureSensor = None
+            self.PhidgetTemperatureSensor = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
@@ -22537,52 +22630,56 @@ class serialport(object):
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
     def PHIDGET1046temperature(self,mode=0):
         try:
-            if aw.ser.PhidgetBridgeSensor == None:
-                aw.ser.PhidgetBridgeSensor = Phidget1046TemperatureSensor()
+            if self.PhidgetBridgeSensor == None:
+                self.PhidgetBridgeSensor = Phidget1046TemperatureSensor()
                 libtime.sleep(.1)
                 try: 
                     if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        self.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
                     else:
-                        aw.ser.PhidgetBridgeSensor.openPhidget()
+                        self.PhidgetBridgeSensor.openPhidget()
                     libtime.sleep(.2)
-                    aw.ser.PhidgetBridgeSensor.waitForAttach(600) 
+                    self.PhidgetBridgeSensor.waitForAttach(600) 
                     aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
                     #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
                     try:
-                        aw.ser.PhidgetBridgeSensor.closePhidget()
+                        self.PhidgetBridgeSensor.closePhidget()
                     except:
                         pass
                     aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input not attached",None, QApplication.UnicodeUTF8))
+#                try:
+#                    if self.PhidgetBridgeSensor and self.PhidgetBridgeSensor.isAttached():
+#                        self.PhidgetBridgeSensor.setEnabled(0, True)
+#                        self.PhidgetBridgeSensor.setEnabled(1, True)
+#                        if 38 in aw.qmc.extradevices:
+#                            self.PhidgetBridgeSensor.setEnabled(2, True)
+#                            self.PhidgetBridgeSensor.setEnabled(3, True)
+#                        libtime.sleep(.3)
+#                except:
+#                    pass
+            if self.PhidgetBridgeSensor and not self.PhidgetBridgeSensor.isAttached():
                 try:
-                    if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
-                        aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
-                        aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
-                        if 38 in aw.qmc.extradevices:
-                            aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
-                            aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
-                        libtime.sleep(.3)
+                    self.PhidgetBridgeSensor.closePhidget()
                 except:
                     pass
-            if aw.ser.PhidgetBridgeSensor and not aw.ser.PhidgetBridgeSensor.isAttached():
-                try:
-                    aw.ser.PhidgetBridgeSensor.closePhidget()
-                except:
-                    pass
-                aw.ser.PhidgetBridgeSensor = None
-            if aw.ser.PhidgetBridgeSensor != None:
+                self.PhidgetBridgeSensor = None
+            if self.PhidgetBridgeSensor != None:
                 if mode == 0:
                     probe1 = probe2 = -1
                     try:
-                        probe1 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(0))
+                        self.PhidgetBridgeSensor.setEnabled(0, True)
+                        probe1 = self.bridgeValue2PT100(self.PhidgetBridgeSensor.getBridgeValue(0))
+                        self.PhidgetBridgeSensor.setEnabled(0, False)
                         if aw.qmc.mode == "F":
                             probe1 = aw.qmc.fromCtoF(probe1)
                     except:
                         pass
                     try:
-                        probe2 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(1))
+                        self.PhidgetBridgeSensor.setEnabled(1, True)
+                        probe2 = self.bridgeValue2PT100(self.PhidgetBridgeSensor.getBridgeValue(1))
+                        self.PhidgetBridgeSensor.setEnabled(1, False)
                         if aw.qmc.mode == "F":
                             probe2 = aw.qmc.fromCtoF(probe2)
                     except:
@@ -22591,13 +22688,17 @@ class serialport(object):
                 elif mode == 1:
                     probe3 = probe4 = -1
                     try:
-                        probe3 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(2))
+                        self.PhidgetBridgeSensor.setEnabled(2, True)
+                        probe3 = self.bridgeValue2PT100(self.PhidgetBridgeSensor.getBridgeValue(2))
+                        self.PhidgetBridgeSensor.setEnabled(2, False)
                         if aw.qmc.mode == "F":
                             probe3 = aw.qmc.fromCtoF(probe3)
                     except:
                         pass
                     try:
-                        probe4 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(3))
+                        self.PhidgetBridgeSensor.setEnabled(3, True)
+                        probe4 = self.bridgeValue2PT100(self.PhidgetBridgeSensor.getBridgeValue(3))
+                        self.PhidgetBridgeSensor.setEnabled(3, False)
                         if aw.qmc.mode == "F":
                             probe4 = aw.qmc.fromCtoF(probe4)
                     except:
@@ -22611,81 +22712,95 @@ class serialport(object):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             try:
-                aw.ser.PhidgetBridgeSensor.closePhidget()
+                self.PhidgetBridgeSensor.closePhidget()
             except:
                 pass
-            aw.ser.PhidgetBridgeSensor = None
+            self.PhidgetBridgeSensor = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
-            
+
+    def phidget1018SensorChanged(self,e):
+        self.PhidgetIOvalues[e.index] = (self.PhidgetIOvalues[e.index] + e.value)/2.0
+
+    def phidget1018getSensorReading(self,i):
+        if aw.qmc.phidget1018_raws[i]:
+            return self.PhidgetIO.getSensorRawValue(i)
+        else:
+            if aw.qmc.phidget1018_async[i]:            
+                if self.PhidgetIOvalues[i] == -1:
+                    self.PhidgetIOvalues[i] = self.PhidgetIO.getSensorValue(i)
+                return self.PhidgetIOvalues[i]
+            else:
+                return self.PhidgetIO.getSensorValue(i)
+
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for probe 5 and 6; mode 3 for probe 7 and 8
     def PHIDGET1018values(self,mode=0):
         try:
-            if aw.ser.PhidgetIO == None:
-                aw.ser.PhidgetIO = Phidget1018IO()
+            if self.PhidgetIO == None:
+                self.PhidgetIO = Phidget1018IO()
                 libtime.sleep(.1)
                 try: 
                     if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetIO.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        self.PhidgetIO.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
                     else:
-                        aw.ser.PhidgetIO.openPhidget()
+                        self.PhidgetIO.openPhidget()
                     libtime.sleep(.2)
-                    aw.ser.PhidgetIO.waitForAttach(600)
+                    self.PhidgetIO.waitForAttach(600)
                     aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO attached",None, QApplication.UnicodeUTF8))
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
                     #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1018values() %1").arg(str(ex)),exc_tb.tb_lineno)
                     try:
-                        aw.ser.PhidgetIO.closePhidget()
+                        self.PhidgetIO.closePhidget()
                     except:
                         pass
                     aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO not attached",None, QApplication.UnicodeUTF8))
                 try:
-                    if aw.ser.PhidgetIO and aw.ser.PhidgetIO.isAttached():
+                    if self.PhidgetIO and self.PhidgetIO.isAttached():
                         # set data rates of all active inputs to 4ms
-                        aw.ser.PhidgetIO.setRatiometric(aw.qmc.phidget1018Ratiometric)
-                        for i in range(max(3,aw.ser.PhidgetIO.getSensorCount())):
+                        self.PhidgetIO.setRatiometric(aw.qmc.phidget1018Ratiometric)
+                        changeTrigger = False
+                        for i in range(max(3,self.PhidgetIO.getSensorCount())):
                             try:
                                 # DataRate=8 => 8ms (the default and minimum for USB connections)
                                 # DataRate=16 => 16ms (the minimium over SBC/Wireless)
                                 # DataRate=512 => 0.5s
                                 # DataRate=1024 => 1s
                                 # DataRate=1504 => 1.5s
+                                self.PhidgetIO.setSensorChangeTrigger(i,1000) # "deactivate" triggers for non async channels
                                 if i < 2 or (i < 4 and 41 in aw.qmc.extradevices) or (i < 6 and 42 in aw.qmc.extradevices) or (i < 8 and 43 in aw.qmc.extradevices):
-                                    aw.ser.PhidgetIO.setSensorChangeTrigger(i,aw.qmc.phidget1018_changeTriggers[i]) # force fixed data rate if 0 (default 10)
-                                    aw.ser.PhidgetIO.setDataRate(i, aw.qmc.phidget1018_dataRates[i])
+                                    if not aw.qmc.phidget1018_raws[i] and aw.qmc.phidget1018_async[i]:
+                                        changeTrigger = True
+                                        self.PhidgetIO.setSensorChangeTrigger(i,aw.qmc.phidget1018_changeTriggers[i]) # force fixed data rate if 0 (default 10)
+                                        self.PhidgetIO.setDataRate(i, aw.qmc.phidget1018_dataRates[i])
                             except:
 #                                import traceback
 #                                traceback.print_exc(file=sys.stdout)
                                 pass
                         libtime.sleep(.3)
+                        if changeTrigger:
+                            self.PhidgetIO.setOnSensorChangeHandler(lambda e=None:self.phidget1018SensorChanged(e))
                 except:
                     pass
-            if aw.ser.PhidgetIO and not aw.ser.PhidgetIO.isAttached():
+            if self.PhidgetIO and not self.PhidgetIO.isAttached():
                 try:
-                    aw.ser.PhidgetIO.closePhidget()
+                    self.PhidgetIO.closePhidget()
                 except:
                     pass
-                aw.ser.PhidgetIO = None
-            if aw.ser.PhidgetIO != None:
-                sensorCount = aw.ser.PhidgetIO.getSensorCount()
+                self.PhidgetIO = None
+            if self.PhidgetIO != None:
+                sensorCount = self.PhidgetIO.getSensorCount()
                 if mode == 0:
                     probe1 = probe2 = -1
                     try:
                         if sensorCount > 0:
-                            if aw.qmc.phidget1018_raws[0]:
-                                probe1 = aw.ser.PhidgetIO.getSensorRawValue(0)
-                            else:
-                                probe1 = aw.ser.PhidgetIO.getSensorValue(0)
+                            probe1 = self.phidget1018getSensorReading(0)
                     except:
                         pass
                     try:
                         if sensorCount > 1:
-                            if aw.qmc.phidget1018_raws[1]:
-                                probe2 = aw.ser.PhidgetIO.getSensorRawValue(1)
-                            else:
-                                probe2 = aw.ser.PhidgetIO.getSensorValue(1)
+                            probe2 = self.phidget1018getSensorReading(1)
                     except:
                         pass
                     return probe1, probe2
@@ -22693,18 +22808,12 @@ class serialport(object):
                     probe3 = probe4 = -1
                     try:
                         if sensorCount > 3:
-                            if aw.qmc.phidget1018_raws[2]:
-                                probe3 = aw.ser.PhidgetIO.getSensorRawValue(2)
-                            else:
-                                probe3 = aw.ser.PhidgetIO.getSensorValue(2)
+                            probe3 = self.phidget1018getSensorReading(2)
                     except:
                         pass
                     try:
                         if sensorCount > 4:
-                            if aw.qmc.phidget1018_raws[3]:
-                                probe4 = aw.ser.PhidgetIO.getSensorRawValue(3)
-                            else:
-                                probe4 = aw.ser.PhidgetIO.getSensorValue(3)
+                            probe4 = self.phidget1018getSensorReading(3)
                     except:
                         pass
                     return probe3, probe4
@@ -22712,18 +22821,12 @@ class serialport(object):
                     probe5 = probe6 = -1
                     try:
                         if sensorCount > 5:
-                            if aw.qmc.phidget1018_raws[4]:
-                                probe5 = aw.ser.PhidgetIO.getSensorRawValue(4)
-                            else:
-                                probe5 = aw.ser.PhidgetIO.getSensorValue(4)
+                            probe5 = self.phidget1018getSensorReading(4)
                     except:
                         pass
                     try:
                         if sensorCount > 6:
-                            if aw.qmc.phidget1018_raws[5]:
-                                probe6 = aw.ser.PhidgetIO.getSensorRawValue(5)
-                            else:
-                                probe6 = aw.ser.PhidgetIO.getSensorValue(5)
+                            probe6 = self.phidget1018getSensorReading(5)
                     except:
                         pass
                     return probe5, probe6
@@ -22731,18 +22834,12 @@ class serialport(object):
                     probe7 = probe8 = -1
                     try:
                         if sensorCount > 7:
-                            if aw.qmc.phidget1018_raws[6]:
-                                probe7 = aw.ser.PhidgetIO.getSensorRawValue(6)
-                            else:
-                                probe7 = aw.ser.PhidgetIO.getSensorValue(6)
+                            probe7 = self.phidget1018getSensorReading(6)
                     except:
                         pass
                     try:
                         if sensorCount > 8:
-                            if aw.qmc.phidget1018_raws[7]:
-                                probe8 = aw.ser.PhidgetIO.getSensorRawValue(7)
-                            else:
-                                probe8 = aw.ser.PhidgetIO.getSensorValue(7)
+                            probe8 = self.phidget1018getSensorReading(7)
                     except:
                         pass
                     return probe7, probe8
@@ -22754,10 +22851,10 @@ class serialport(object):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             try:
-                aw.ser.PhidgetIO.closePhidget()
+                self.PhidgetIO.closePhidget()
             except:
                 pass
-            aw.ser.PhidgetIO = None
+            self.PhidgetIO = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1018values() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
@@ -22765,7 +22862,7 @@ class serialport(object):
     # mode = 0 for 2x thermocuple model; mode = 1 for 1x PT100 type probe
     def YOCTOtemperatures(self,mode=0):
         try: 
-            if aw.ser.YOCTOsensor == None:
+            if self.YOCTOsensor == None:
                 errmsg=YRefParam()
                 ## WINDOWS DLL HACK BEGIN
                 if platf == 'Windows' and aw.appFrozen():
@@ -22776,31 +22873,31 @@ class serialport(object):
                 ## WINDOWS DLL HACK END
                 # alt: PreregisterHub( )
                 if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
-                    aw.ser.YOCTOsensor = YTemperature.FirstTemperature()
-                    if mode == 0 and aw.ser.YOCTOsensor != None and aw.ser.YOCTOsensor.isOnline():
-                        serial=aw.ser.YOCTOsensor.get_module().get_serialNumber()
-                        aw.ser.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
-                        aw.ser.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
+                    self.YOCTOsensor = YTemperature.FirstTemperature()
+                    if mode == 0 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
+                        serial=self.YOCTOsensor.get_module().get_serialNumber()
+                        self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
+                        self.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
                         aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None, QApplication.UnicodeUTF8))                       
-                    elif mode == 1 and aw.ser.YOCTOsensor != None and aw.ser.YOCTOsensor.isOnline():
+                    elif mode == 1 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None, QApplication.UnicodeUTF8))                       
             probe1 = -1
             probe2 = -1
             if mode == 0:
                 try:
-                    if aw.ser.YOCTOchan1 and aw.ser.YOCTOchan1.isOnline():
-                        probe1 = aw.ser.YOCTOchan1.get_currentValue()
+                    if self.YOCTOchan1 and self.YOCTOchan1.isOnline():
+                        probe1 = self.YOCTOchan1.get_currentValue()
                 except:
                     pass
                 try:
-                    if aw.ser.YOCTOchan2 and aw.ser.YOCTOchan2.isOnline():
-                        probe2 = aw.ser.YOCTOchan2.get_currentValue()
+                    if self.YOCTOchan2 and self.YOCTOchan2.isOnline():
+                        probe2 = self.YOCTOchan2.get_currentValue()
                 except:
                     pass
             elif mode == 1:
                 try:
-                    if aw.ser.YOCTOsensor and aw.ser.YOCTOsensor.isOnline():
-                        probe1 = aw.ser.YOCTOsensor.get_currentValue()
+                    if self.YOCTOsensor and self.YOCTOsensor.isOnline():
+                        probe1 = self.YOCTOsensor.get_currentValue()
                 except:
                     pass
             return probe1, probe2
@@ -22811,9 +22908,9 @@ class serialport(object):
                 YAPI.UnregisterHub("usb")
             except:
                 pass
-            aw.ser.YOCTOsensor = None
-            aw.ser.YOCTOchan1 = None
-            aw.ser.YOCTOchan2 = None
+            self.YOCTOsensor = None
+            self.YOCTOchan1 = None
+            self.YOCTOchan2 = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " YOCTOtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
@@ -24938,92 +25035,158 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.enableDisableAddDeleteButtons()
         ##########     LAYOUTS
         # create Phidget box
-        phidgetItems = ["K", "J", "E", "T"]
+        phidgetProbeTypeItems = ["K", "J", "E", "T"]
         phidgetBox1048 = QGridLayout()
-        self.phidgetProbe1 = QComboBox()
-        self.phidgetProbe1.addItems(phidgetItems)
-        self.phidgetProbe1.setCurrentIndex(aw.qmc.phidget1048_types[0]-1)        
-        phidgetProbe1label = QLabel(QApplication.translate("Label", "1:",None, QApplication.UnicodeUTF8))
-        self.phidgetProbe2 = QComboBox()
-        self.phidgetProbe2.addItems(phidgetItems)
-        self.phidgetProbe2.setCurrentIndex(aw.qmc.phidget1048_types[1]-1)
-        phidgetProbe2label = QLabel(QApplication.translate("Label", "2:",None, QApplication.UnicodeUTF8))
-        self.phidgetProbe3 = QComboBox()
-        self.phidgetProbe3.addItems(phidgetItems)
-        self.phidgetProbe3.setCurrentIndex(aw.qmc.phidget1048_types[2]-1)
-        phidgetProbe3label = QLabel(QApplication.translate("Label", "3:",None, QApplication.UnicodeUTF8))
-        self.phidgetProbe4 = QComboBox()
-        self.phidgetProbe4.addItems(phidgetItems)
-        self.phidgetProbe4.setCurrentIndex(aw.qmc.phidget1048_types[3]-1)
-        phidgetProbe4label = QLabel(QApplication.translate("Label", "4:",None, QApplication.UnicodeUTF8))
-        phidgetBox1048.addWidget(phidgetProbe1label,0,0)
-        phidgetBox1048.addWidget(self.phidgetProbe1,0,1)
-        phidgetBox1048.addWidget(phidgetProbe2label,0,2)
-        phidgetBox1048.addWidget(self.phidgetProbe2,0,3)
-        phidgetBox1048.addWidget(phidgetProbe3label,0,4)
-        phidgetBox1048.addWidget(self.phidgetProbe3,0,5)
-        phidgetBox1048.addWidget(phidgetProbe4label,0,6)
-        phidgetBox1048.addWidget(self.phidgetProbe4,0,7)
+        self.asyncCheckBoxes1048 = []
+        self.changeTriggerCombos1048 = []
+        self.probeTypeCombos = []
+        for i in range(1,5):
+            changeTriggersCombo = QComboBox()
+            model = changeTriggersCombo.model()
+            changeTriggerItems = self.createItems(aw.qmc.phidget1048_changeTriggersStrings)
+            for item in changeTriggerItems:
+                model.appendRow(item)
+            try:
+                changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1048_changeTriggersValues.index(aw.qmc.phidget1048_changeTriggers[i-1])))
+            except:
+                pass
+            changeTriggersCombo.setMaximumSize(65,100)
+            self.changeTriggerCombos1048.append(changeTriggersCombo)
+            phidgetBox1048.addWidget(changeTriggersCombo,3,i)
+            asyncFlag = QCheckBox()
+            asyncFlag.setChecked(True)
+            self.connect(asyncFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1048(y,x))
+            asyncFlag.setChecked(aw.qmc.phidget1048_async[i-1])
+            self.asyncCheckBoxes1048.append(asyncFlag)
+            phidgetBox1048.addWidget(asyncFlag,2,i)
+            probeTypeCombo = QComboBox()
+            model = probeTypeCombo.model()
+            probeTypeItems = self.createItems(phidgetProbeTypeItems)
+            for item in probeTypeItems:
+                model.appendRow(item)
+            try:
+                probeTypeCombo.setCurrentIndex(aw.qmc.phidget1048_types[i-1]-1)
+            except:
+                pass
+            probeTypeCombo.setMaximumSize(65,100)
+            self.probeTypeCombos.append(probeTypeCombo)
+            phidgetBox1048.addWidget(probeTypeCombo,1,i)            
+            rowLabel = QLabel(str(i))
+            phidgetBox1048.addWidget(rowLabel,0,i)
+        typeLabel = QLabel(QApplication.translate("Label","Type", None, QApplication.UnicodeUTF8))
+        asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None, QApplication.UnicodeUTF8))
+        phidgetBox1048.addWidget(typeLabel,1,0,Qt.AlignRight)
+        phidgetBox1048.addWidget(asyncLabel,2,0,Qt.AlignRight)
+        phidgetBox1048.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
         phidget1048HBox = QHBoxLayout()
         phidget1048HBox.addStretch()
         phidget1048HBox.addLayout(phidgetBox1048)
         phidget1048HBox.addStretch()
-        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","1048 Probe Types",None, QApplication.UnicodeUTF8))
+        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048",None, QApplication.UnicodeUTF8))
         phidget1048GroupBox.setLayout(phidget1048HBox)
-        phidget1048HBox.setContentsMargins(0,0,0,0)      
+        phidget1048HBox.setContentsMargins(0,0,0,0)
+        
+        # Phidget IR
+        phidgetBox1045 = QGridLayout()
+        self.changeTriggerCombos1045 = QComboBox()
+        model = self.changeTriggerCombos1045.model()
+        changeTriggerItems = self.createItems(aw.qmc.phidget1045_changeTriggersStrings)
+        for item in changeTriggerItems:
+            model.appendRow(item)
+        try:
+            self.changeTriggerCombos1045.setCurrentIndex((aw.qmc.phidget1045_changeTriggersValues.index(aw.qmc.phidget1045_changeTrigger)))
+        except:
+            pass
+        changeTriggersCombo.setMaximumSize(65,100)
+        phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,i)
+        self.asyncCheckBoxe1045 = QCheckBox()
+        self.asyncCheckBoxe1045.setChecked(True)
+        self.connect(self.asyncCheckBoxe1045,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1045(y,x))
+        self.asyncCheckBoxe1045.setChecked(aw.qmc.phidget1045_async)
+        phidgetBox1045.addWidget(self.asyncCheckBoxe1045,2,i)
+        asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None, QApplication.UnicodeUTF8))
+        phidgetBox1045.addWidget(asyncLabel,2,0,Qt.AlignRight)
+        phidgetBox1045.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
+        phidget1045HBox = QHBoxLayout()
+        phidget1045HBox.addStretch()
+        phidget1045HBox.addLayout(phidgetBox1045)
+        phidget1045HBox.addStretch()
+        phidget1045GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1045",None, QApplication.UnicodeUTF8))
+        phidget1045GroupBox.setLayout(phidget1045HBox)
+        phidget1045HBox.setContentsMargins(0,0,0,0)           
+
+        phdget10481045GroupBoxHBox = QHBoxLayout()
+        phdget10481045GroupBoxHBox.addWidget(phidget1048GroupBox)
+        phdget10481045GroupBoxHBox.addWidget(phidget1045GroupBox)    
 
         # ratiometric flag
         self.phidgetBoxRatiometricFlag = QCheckBox(QApplication.translate("CheckBox","Ratiometric",None, QApplication.UnicodeUTF8))
         self.phidgetBoxRatiometricFlag.setChecked(aw.qmc.phidget1018Ratiometric)
         # per each of the 8-channels: raw flag / data rate popup / change trigger popup
         phidgetBox1018 = QGridLayout()
+        self.asyncCheckBoxes = []
         self.rawCheckBoxes = []
         self.dataRateCombos = []
         self.changeTriggerCombos = []
         for i in range(1,9):
-            rowLabel = QLabel(str(i))
-            phidgetBox1018.addWidget(rowLabel,0,i)
-            rawFlag = QCheckBox()
-            rawFlag.setChecked(aw.qmc.phidget1018_raws[i-1])
-            self.rawCheckBoxes.append(rawFlag)
-            phidgetBox1018.addWidget(rawFlag,1,i)
             dataRatesCombo = QComboBox()
             model = dataRatesCombo.model()
-            dataRateItems = self.createDataRateItems()
+            dataRateItems = self.createItems(aw.qmc.phidget1018_dataRatesStrings)
             for item in dataRateItems:
                 model.appendRow(item)
-            dataRatesCombo.setCurrentIndex(aw.qmc.phidget1018_dataRatesValues.index(aw.qmc.phidget1018_dataRates[i-1]))
+            try:
+                dataRatesCombo.setCurrentIndex(aw.qmc.phidget1018_dataRatesValues.index(aw.qmc.phidget1018_dataRates[i-1]))
+            except:
+                pass
             dataRatesCombo.setMaximumSize(65,100)
             self.dataRateCombos.append(dataRatesCombo)
-            phidgetBox1018.addWidget(dataRatesCombo,2,i)
+            phidgetBox1018.addWidget(dataRatesCombo,4,i)
             changeTriggersCombo = QComboBox()
             model = changeTriggersCombo.model()
-            changeTriggerItems = self.createChangeTriggerItems()
+            changeTriggerItems = self.createItems(aw.qmc.phidget1018_changeTriggersStrings)
             for item in changeTriggerItems:
                 model.appendRow(item)
-            changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1018_changeTriggersValues.index(aw.qmc.phidget1018_changeTriggers[i-1])))
+            self.connect(changeTriggersCombo,SIGNAL("currentIndexChanged(int)"),lambda x,y=i-1 :self.changeTriggerIndexChanged(y,x))
+            try:
+                changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1018_changeTriggersValues.index(aw.qmc.phidget1018_changeTriggers[i-1])))
+            except:
+                pass
             changeTriggersCombo.setMaximumSize(65,100)
             self.changeTriggerCombos.append(changeTriggersCombo)
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
+            asyncFlag = QCheckBox()
+            asyncFlag.setChecked(True)
+            self.connect(asyncFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged(y,x))
+            asyncFlag.setChecked(aw.qmc.phidget1018_async[i-1])
+            self.asyncCheckBoxes.append(asyncFlag)
+            phidgetBox1018.addWidget(asyncFlag,2,i)
+            rawFlag = QCheckBox()
+            rawFlag.setChecked(False)
+            self.connect(rawFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.rawFlagStateChanged(y,x))
+            rawFlag.setChecked(aw.qmc.phidget1018_raws[i-1])
+            self.rawCheckBoxes.append(rawFlag)
+            phidgetBox1018.addWidget(rawFlag,1,i)
+            rowLabel = QLabel(str(i))
+            phidgetBox1018.addWidget(rowLabel,0,i)
+        asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
         rawLabel = QLabel(QApplication.translate("Label","Raw", None, QApplication.UnicodeUTF8))
-        dataRateLabel = QLabel(QApplication.translate("Label","Data rate", None, QApplication.UnicodeUTF8))
-        changeTriggerLabel = QLabel(QApplication.translate("Label","Changes", None, QApplication.UnicodeUTF8))
+        dataRateLabel = QLabel(QApplication.translate("Label","Rate", None, QApplication.UnicodeUTF8))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None, QApplication.UnicodeUTF8))
         phidgetBox1018.addWidget(rawLabel,1,0,Qt.AlignRight)
-        phidgetBox1018.addWidget(dataRateLabel,2,0,Qt.AlignRight)
+        phidgetBox1018.addWidget(asyncLabel,2,0,Qt.AlignRight)
         phidgetBox1018.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
-
+        phidgetBox1018.addWidget(dataRateLabel,4,0,Qt.AlignRight)
         ratiometricBox = QHBoxLayout()
         ratiometricBox.addStretch()
         ratiometricBox.addWidget(self.phidgetBoxRatiometricFlag)
         phidget1018HBox = QVBoxLayout()
         phidget1018HBox.addLayout(phidgetBox1018)
         phidget1018HBox.addLayout(ratiometricBox)
-        
         phidget1018GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidget IO",None, QApplication.UnicodeUTF8))
         phidget1018GroupBox.setLayout(phidget1018HBox)
-        phidget1018HBox.setContentsMargins(0,0,0,0)      
-
-
+        phidget1018HBox.setContentsMargins(0,0,0,0)
         self.phidgetBoxRemoteFlag = QCheckBox()
         self.phidgetBoxRemoteFlag.setChecked(aw.qmc.phidgetRemoteFlag)
         phidgetServerIdLabel = QLabel(QApplication.translate("Label","ServerId:", None, QApplication.UnicodeUTF8))
@@ -25050,7 +25213,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None, QApplication.UnicodeUTF8))
         phidgetNetworkGroupBox.setLayout(phidgetNetworkGrid)
         phidgetVBox = QVBoxLayout()
-        phidgetVBox.addWidget(phidget1048GroupBox)
+        phidgetVBox.addLayout(phdget10481045GroupBoxHBox)
         phidgetVBox.addWidget(phidget1018GroupBox)
         phidgetVBox.addWidget(phidgetNetworkGroupBox)
         phidgetVBox.setContentsMargins(0,0,0,0)
@@ -25172,24 +25335,66 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout.addLayout(buttonLayout)
         Mlayout.setMargin(10)
         self.setLayout(Mlayout)
+        
+    def asyncFlagStateChanged1048(self,i,x):
+        if x == 0:
+            # disable ChangeTrigger selection
+            self.changeTriggerCombos1048[i].setEnabled(False)
+        else:
+            # enable ChangeTrigger selection
+            self.changeTriggerCombos1048[i].setEnabled(True)
 
-    def createDataRateItems(self):
-        dataRateItems = []
-        for i in range(len(aw.qmc.phidget1018_dataRatesStrings)):
-            item = QStandardItem(aw.qmc.phidget1018_dataRatesStrings[i])
-            if (i == 1 and aw.qmc.phidgetRemoteFlag) or (i == 0 and not aw.qmc.phidgetRemoteFlag):
-                item.setForeground(QColor('blue'))
-            dataRateItems.append(item)
-        return dataRateItems
+    def asyncFlagStateChanged1045(self,i,x):
+        if x == 0:
+            # disable ChangeTrigger selection
+            self.changeTriggerCombos1045.setEnabled(False)
+        else:
+            # enable ChangeTrigger selection
+            self.changeTriggerCombos1045.setEnabled(True)
+        
+    def changeTriggerIndexChanged(self,i,x):
+        if x == 0:
+            # enable DataRate selection
+            self.dataRateCombos[i].setEnabled(True)
+        else:
+            # disable DataRate selection
+            self.dataRateCombos[i].setEnabled(False)
+        
+    def rawFlagStateChanged(self,i,x):
+        if x == 0:
+            # enable ChangeTrigger and if that is 0 also DataRate selection
+            self.asyncCheckBoxes[i].setEnabled(True)
+            if self.asyncCheckBoxes[i].isChecked():
+                self.changeTriggerCombos[i].setEnabled(True)
+                if self.changeTriggerCombos[i].currentIndex() == 0:
+                    self.dataRateCombos[i].setEnabled(True)
+                else:
+                    self.dataRateCombos[i].setEnabled(False)
+        else:
+            # disable DataRate selection
+            self.asyncCheckBoxes[i].setEnabled(False)
+            self.changeTriggerCombos[i].setEnabled(False)
+            self.dataRateCombos[i].setEnabled(False)
+            
+    def asyncFlagStateChanged(self,i,x):
+        if x == 0:
+            # disable DataRate selection
+            self.changeTriggerCombos[i].setEnabled(False)
+            self.dataRateCombos[i].setEnabled(False)
+        else:
+            # enable ChangeTrigger and if that is 0 also DataRate selection
+            self.changeTriggerCombos[i].setEnabled(True)
+            if self.changeTriggerCombos[i].currentIndex() == 0:
+                self.dataRateCombos[i].setEnabled(True)
+            else:
+                self.dataRateCombos[i].setEnabled(False)
 
-    def createChangeTriggerItems(self):
-        changeTriggerItems = []
-        for i in range(len(aw.qmc.phidget1018_changeTriggersStrings)):
-            item = QStandardItem(aw.qmc.phidget1018_changeTriggersStrings[i])
-            if i == 1:
-                item.setForeground(QColor('blue'))
-            changeTriggerItems.append(item)
-        return changeTriggerItems
+    def createItems(self,strs):
+        items = []
+        for i in range(len(strs)):
+            item = QStandardItem(strs[i])
+            items.append(item)
+        return items
 
     def showControlbuttonToggle(self,i):
         if i:
@@ -26014,15 +26219,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.ETlcd = self.ETlcd.isChecked()
             aw.qmc.BTlcd = self.BTlcd.isChecked()
             # Phidget configurations
-            aw.qmc.phidget1048_types = [
-                self.phidgetProbe1.currentIndex()+1,
-                self.phidgetProbe2.currentIndex()+1,
-                self.phidgetProbe3.currentIndex()+1,
-                self.phidgetProbe4.currentIndex()+1]
+            for i in range(4):
+                aw.qmc.phidget1048_types[i] = self.probeTypeCombos[i].currentIndex()+1
+                aw.qmc.phidget1048_async[i] = self.asyncCheckBoxes1048[i].isChecked()
+                aw.qmc.phidget1048_changeTriggers[i] = aw.qmc.phidget1048_changeTriggersValues[self.changeTriggerCombos1048[i].currentIndex()]
+            aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
+            aw.qmc.phidget1045_changeTrigger = aw.qmc.phidget1045_changeTriggersValues[self.changeTriggerCombos1045.currentIndex()]
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
             aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
             aw.qmc.phidgetPassword = u(self.phidgetPassword.text())
             for i in range(8):
+                aw.qmc.phidget1018_async[i] = self.asyncCheckBoxes[i].isChecked()
                 aw.qmc.phidget1018_raws[i] = self.rawCheckBoxes[i].isChecked()
                 aw.qmc.phidget1018_dataRates[i] = aw.qmc.phidget1018_dataRatesValues[self.dataRateCombos[i].currentIndex()]
                 aw.qmc.phidget1018_changeTriggers[i] = aw.qmc.phidget1018_changeTriggersValues[self.changeTriggerCombos[i].currentIndex()]
@@ -31782,19 +31989,20 @@ class ArduinoTC4(object):
                     aw.ser.COMsemaphore.release(1)
 
     def pidOff(self):
-        try:
-            #### lock shared resources #####
-            aw.ser.COMsemaphore.acquire(1)
-            if aw.ser.SP.isOpen():
-                aw.ser.SP.flushInput()
-                aw.ser.SP.flushOutput()
-                aw.ser.SP.write(str2cmd("PID;OFF\n"))
-                aw.sendmessage(QApplication.translate("Message","PID turned off", None, QApplication.UnicodeUTF8))
-        finally:
-            if aw.ser.COMsemaphore.available() < 1:
-                aw.ser.COMsemaphore.release(1)
-        aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
-        self.pidActive = False
+        if aw.ser.ArduinoIsInitialized:
+            try:
+                #### lock shared resources #####
+                aw.ser.COMsemaphore.acquire(1)
+                if aw.ser.SP.isOpen():
+                    aw.ser.SP.flushInput()
+                    aw.ser.SP.flushOutput()
+                    aw.ser.SP.write(str2cmd("PID;OFF\n"))
+                    aw.sendmessage(QApplication.translate("Message","PID turned off", None, QApplication.UnicodeUTF8))
+            finally:
+                if aw.ser.COMsemaphore.available() < 1:
+                    aw.ser.COMsemaphore.release(1)
+            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            self.pidActive = False
         
     def sliderMinValueChanged(self,i):
         self.svSliderMin = i
@@ -31849,22 +32057,23 @@ class ArduinoTC4(object):
             return None
 
     def setSV(self,sv,move=True):
-        sv = max(0,sv)
-        if self.sv != sv: # nothing to do (avoid loops via moveslider!)
-            try:
-                #### lock shared resources #####
-                aw.ser.COMsemaphore.acquire(1)
-                if aw.ser.SP.isOpen():
-                    aw.ser.SP.flushInput()
-                    aw.ser.SP.flushOutput()
-                    aw.ser.SP.write(str2cmd("PID;SV;" + str(sv) +"\n"))
-                    self.sv = sv
-                    if move:
-                        aw.moveSVslider(sv)
-                    libtime.sleep(.1)
-            finally:
-                if aw.ser.COMsemaphore.available() < 1:
-                    aw.ser.COMsemaphore.release(1)
+        if aw.ser.ArduinoIsInitialized:
+            sv = max(0,sv)
+            if self.sv != sv: # nothing to do (avoid loops via moveslider!)
+                try:
+                    #### lock shared resources #####
+                    aw.ser.COMsemaphore.acquire(1)
+                    if aw.ser.SP.isOpen():
+                        aw.ser.SP.flushInput()
+                        aw.ser.SP.flushOutput()
+                        aw.ser.SP.write(str2cmd("PID;SV;" + str(sv) +"\n"))
+                        self.sv = sv
+                        if move:
+                            aw.moveSVslider(sv)
+                        libtime.sleep(.1)
+                finally:
+                    if aw.ser.COMsemaphore.available() < 1:
+                        aw.ser.COMsemaphore.release(1)
 
     def adjustsv(self,diff):
         self.setSV(self.sv + diff,True)
@@ -31907,21 +32116,22 @@ class ArduinoTC4(object):
         self.pidCycle = cycle
     
     def confPID(self,kp,ki,kd,source,cycle):
-        try:
-            #### lock shared resources #####
-            aw.ser.COMsemaphore.acquire(1)
-            if aw.ser.SP.isOpen():
-                aw.ser.SP.flushInput()
-                aw.ser.SP.flushOutput()
-                aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
-                libtime.sleep(.1)
-                aw.ser.SP.write(str2cmd("PID;CHAN;" + str(source) + "\n"))
-                libtime.sleep(.1)
-                aw.ser.SP.write(str2cmd("PID;CT;" + str(cycle) + "\n"))
-                libtime.sleep(.1)
-        finally:
-            if aw.ser.COMsemaphore.available() < 1:
-                aw.ser.COMsemaphore.release(1)
+        if aw.ser.ArduinoIsInitialized:
+            try:
+                #### lock shared resources #####
+                aw.ser.COMsemaphore.acquire(1)
+                if aw.ser.SP.isOpen():
+                    aw.ser.SP.flushInput()
+                    aw.ser.SP.flushOutput()
+                    aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
+                    libtime.sleep(.1)
+                    aw.ser.SP.write(str2cmd("PID;CHAN;" + str(source) + "\n"))
+                    libtime.sleep(.1)
+                    aw.ser.SP.write(str2cmd("PID;CT;" + str(cycle) + "\n"))
+                    libtime.sleep(.1)
+            finally:
+                if aw.ser.COMsemaphore.available() < 1:
+                    aw.ser.COMsemaphore.release(1)
 
 
 ###################################################################################
