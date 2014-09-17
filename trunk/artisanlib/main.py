@@ -1154,6 +1154,13 @@ class tgraphcanvas(FigureCanvas):
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
+    
+    # returns the prefix of length l of s and adds eclipse
+    def abbrevString(self,s,l):
+        if len(s) > l:
+            return s[:l-1] + "..."
+        else:
+            return s
 
     def resizeEvent(self,event):
         self.redrawEnabled = False
@@ -2570,8 +2577,21 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.set_xlabel("")
             else:
                 self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
-                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
-            self.ax.set_title(aw.arabicReshape(self.title), color=self.palette["title"],fontproperties=fontprop_xlarge)
+                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
+            self.ax.set_title(aw.arabicReshape(self.title), color=self.palette["title"],
+                fontproperties=fontprop_xlarge,horizontalalignment="left",x=0
+                )
+            
+            if self.background:
+                fontprop_small = aw.mpl_fontproperties.copy()
+                fontprop_small.set_size("xx-small")
+                if len(self.title) > 20:
+                    stl = 25
+                else:
+                    stl = 30
+                self.fig.suptitle(aw.qmc.abbrevString(self.titleB,stl),
+                    horizontalalignment="right",fontproperties=fontprop_small,x=0.93,y=0.985)
+            
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag
             #self.ax.spines['top'].set_color('none')
@@ -2601,7 +2621,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.flagstart:
                     self.delta_ax.set_ylabel("")
                 else:
-                    self.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),color = self.palette["ylabel"],fontproperties=fontprop_large)
+                    self.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None, QApplication.UnicodeUTF8)),color = self.palette["ylabel"],fontproperties=fontprop_large)
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                 self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -4499,7 +4519,7 @@ class tgraphcanvas(FigureCanvas):
                     #end temperature
                     if locale == "ar":
                         strline = QString("[%4-%5]%3=" + aw.arabicReshape(QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8)) \
-                                    + " " + aw.arabicReshape(QApplication.translate("Label", "d/m", None,QApplication.UnicodeUTF8)) \
+                                    + " " + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min", None,QApplication.UnicodeUTF8)) \
                                     + "%2=" + aw.arabicReshape(QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8)) \
                                     + " %1=" + aw.arabicReshape(QApplication.translate("Label", "MET", None,QApplication.UnicodeUTF8))) \
                                     .arg(u(ETmax)) \
@@ -4512,7 +4532,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         strline = QString(QApplication.translate("Label", "MET", None,QApplication.UnicodeUTF8) + "=%1   " \
                                     + QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8) + "=%2" \
-                                    + QApplication.translate("Label", "d/m", None,QApplication.UnicodeUTF8) + "   " \
+                                    + aw.qmc.mode + QApplication.translate("Label", "/min", None,QApplication.UnicodeUTF8) + "   " \
                                     + QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8) + "=%3[%4-%5]") \
                                     .arg(u(ETmax)) \
                                     .arg(u(ror)) \
@@ -4525,7 +4545,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     self.ax.set_xlabel("P139(2)   Mexican   1.8Kg   15.6%   #97/105",color = aw.qmc.palette["text"],fontproperties=statsprop)
             else:
-                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
+                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -4655,9 +4675,9 @@ class tgraphcanvas(FigureCanvas):
                         st2 = st2 + u(" (")
                         st3 = st3 + u(" (")
                     if self.statisticsflags[4]:
-                        st1 = st1 + "%.1f"%rates_of_changes[0] + aw.arabicReshape(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
-                        st2 = st2 + "%.1f"%rates_of_changes[1] + aw.arabicReshape(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
-                        st3 = st3 + "%.1f"%rates_of_changes[2] + aw.arabicReshape(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
+                        st1 = st1 + "%.1f"%rates_of_changes[0] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None, QApplication.UnicodeUTF8))
+                        st2 = st2 + "%.1f"%rates_of_changes[1] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None, QApplication.UnicodeUTF8))
+                        st3 = st3 + "%.1f"%rates_of_changes[2] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None, QApplication.UnicodeUTF8))
                     if self.statisticsflags[5]:
                         if self.statisticsflags[4]:
                             st1 += u("  ")
@@ -5293,17 +5313,17 @@ class tgraphcanvas(FigureCanvas):
                         etbt3 = "%i"%(ts3)
 
                         if dryphasetime:
-                            dryroc = " %.1f d/m"%((dryramp/dryphasetime)*60.)
+                            dryroc = " %.1f " + aw.qmc.mode + "/m"%((dryramp/dryphasetime)*60.)
                         else:
-                            dryroc = " 0 d/m"
+                            dryroc = " 0 " + aw.qmc.mode + "/min"
 
                         if midphasetime:
-                            midroc = " %.1f d/m"%((midramp/midphasetime)*60.)
+                            midroc = " %.1f " + aw.qmc.mode + "/min"%((midramp/midphasetime)*60.)
                         else:
-                            midroc = " 0 d/m"
+                            midroc = " 0 " + aw.qmc.mode + "/min"
 
                         if finishphasetime:
-                            finishroc = " %.1f d/m"%((finishramp/finishphasetime)*60.)
+                            finishroc = " %.1f " + aw.qmc.mode + "/min"%((finishramp/finishphasetime)*60.)
                         else:
                             finishroc = 0
 
@@ -5576,7 +5596,7 @@ class tgraphcanvas(FigureCanvas):
                 difftemp = self.temp2[self.timeindex[i]] - self.temp2[self.timeindex[lastindexused]]
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = u(QApplication.translate("Label", "BT %1 d/m for %2",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
+                    string = u(QApplication.translate("Label", "BT %1 %2/min for %3",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(aw.qmc.mode).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
                     self.specialevents.append(self.timeindex[lastindexused])
                     self.specialeventstype.append(0)
                     self.specialeventsStrings.append(string)
@@ -5592,7 +5612,7 @@ class tgraphcanvas(FigureCanvas):
                 difftemp = self.temp1[self.timeindex[i]] - self.temp1[self.timeindex[lastindexused]]
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = u(QApplication.translate("Label", "ET %1 d/m for %2",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
+                    string = u(QApplication.translate("Label", "ET %1 %2/min for %3",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(aw.qmc.mode).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
                     self.specialevents.append(self.timeindex[lastindexused])
                     self.specialeventstype.append(0)
                     self.specialeventsStrings.append(string)
@@ -6092,7 +6112,7 @@ class VMToolbar(NavigationToolbar):
                 aw.qmc.ax.set_ylabel(aw.qmc.mode)
                 aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)))
                 if two_ax_mode:
-                    aw.qmc.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)))
+                    aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None, QApplication.UnicodeUTF8)))
             for axes in allaxes:
                 title = axes.get_title()
                 ylabel = axes.get_ylabel()
@@ -7966,8 +7986,8 @@ class ApplicationWindow(QMainWindow):
         level1layout.addWidget(self.ntb)
         level1layout.addStretch()
         level1layout.addWidget(self.phasesLCDs)
-        level1layout.addSpacing(15)
-        level1layout.addStretch()
+        level1layout.addSpacing(20)
+#        level1layout.addStretch()
         level1layout.addWidget(self.button_7)
         level1layout.addSpacing(15)
         level1layout.addWidget(self.button_1)
@@ -13079,7 +13099,7 @@ $cupping_notes
                 met = "%.0f"%cp["MET"] + "&deg;" + self.qmc.mode
             ror = u("--")
             if "total_ror" in cp:
-                ror = u("%d%s"%(cp["total_ror"],QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8)))
+                ror = u("%d%s%s%s"%(cp["total_ror"],uchr(176),aw.qmc.mode,QApplication.translate("Label", "/m",None, QApplication.UnicodeUTF8)))
             if "set_density" in cp:
                 density = u("%.1fg/l (set)"%cp["set_density"])
             else:
@@ -13130,7 +13150,7 @@ $cupping_notes
             else:
                 color = u("--")
             if "det" in cp:
-                cm = u("%.1f/%.1f" % (cp["det"],cp["dbt"])) + aw.qmc.mode
+                cm = u("%.1f/%.1f" % (cp["det"],cp["dbt"])) + uchr(176) + aw.qmc.mode
             else:
                 cm = u("--")
             if aw.qmc.titleB == None or aw.qmc.titleB == "":
@@ -13252,7 +13272,7 @@ $cupping_notes
                 dryphasetime = cp["dryphasetime"]
                 dryphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["dryphasetime"]),int(round(dryphasetime*100./totaltime)))
                 if "dry_phase_ror" in cp:
-                    dryphase += "<br>%.1f deg/min"%cp["dry_phase_ror"]
+                    dryphase += "<br>%.1f%s%s/min"%(cp["dry_phase_ror"],uchr(176),aw.qmc.mode)
                 if "dry_phase_ts" in cp:
                     dryphase += "<br>%d"%(cp["dry_phase_ts"])
                     if "dry_phase_ts_ET" in cp and "dry_phase_ts_BT" in cp:
@@ -13264,7 +13284,7 @@ $cupping_notes
                 midphasetime = cp["midphasetime"]
                 midphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["midphasetime"]),int(round(midphasetime*100./totaltime)))
                 if "mid_phase_ror" in cp:
-                    midphase += "<br>%.1f deg/min"%cp["mid_phase_ror"]
+                    midphase += "<br>%.1f%s%s/min"%(cp["mid_phase_ror"],uchr(176),aw.qmc.mode)
                 if "mid_phase_ts" in cp:
                     midphase += "<br>%d"%(cp["mid_phase_ts"])
                     if "mid_phase_ts_ET" in cp and "mid_phase_ts_BT" in cp:
@@ -13276,7 +13296,7 @@ $cupping_notes
                 finishphasetime = cp["finishphasetime"]
                 finishphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["finishphasetime"]),int(round(finishphasetime*100./totaltime)))
                 if "finish_phase_ror" in cp:
-                    finishphase += "<br>%.1f deg/min"%cp["finish_phase_ror"]
+                    finishphase += "<br>%.1f%s%s/min"%(cp["finish_phase_ror"],uchr(176),aw.qmc.mode)
                 if "finish_phase_ts" in cp:
                     finishphase += "<br>%d"%(cp["finish_phase_ts"])
                     if "finish_phase_ts_ET" in cp and "finish_phase_ts_BT" in cp:
@@ -17897,7 +17917,7 @@ class calculatorDlg(ArtisanDialog):
                 deltaseconds = deltatemperature/deltatime
             deltaminutes = deltaseconds*60.
             string1 = QApplication.translate("Label", "Best approximation was made from %1 to %2",None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- start)).arg(aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- start))
-            string2 = QApplication.translate("Label", "<b>%1</b> deg/sec, <b>%2</b> deg/min",None, QApplication.UnicodeUTF8).arg("%.2f"%(deltaseconds)).arg("%.2f"%(deltaminutes))
+            string2 = QApplication.translate("Label", "<b>%1</b> %2/sec, <b>%3</b> %4/min",None, QApplication.UnicodeUTF8).arg("%.2f"%(deltaseconds)).arg(aw.qmc.mode).arg("%.2f"%(deltaminutes).arg(aw.qmc.mode))
             self.result1.setText(string1)
             self.result2.setText(string2)
         else:
@@ -20422,7 +20442,7 @@ class StatisticsDlg(ArtisanDialog):
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
         self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None, QApplication.UnicodeUTF8))
         self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None, QApplication.UnicodeUTF8))
-        self.ror = QCheckBox(QApplication.translate("CheckBox","d/m",None, QApplication.UnicodeUTF8))
+        self.ror = QCheckBox(aw.qmc.mode + QApplication.translate("CheckBox","/min",None, QApplication.UnicodeUTF8))
         self.ts = QCheckBox(QApplication.translate("CheckBox","ETBTa",None, QApplication.UnicodeUTF8))
         self.flavor = QCheckBox(QApplication.translate("CheckBox","Evaluation",None, QApplication.UnicodeUTF8))
         self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None, QApplication.UnicodeUTF8))
@@ -22408,6 +22428,7 @@ class serialport(object):
             if len(devices) == 0:
                 res = 0
         for d in devices:
+            ser = d.getSerialNum()
             if d.getDeviceName() == name:
                 # try if it can be opened (so not yet opened by another channel)
                 try:
@@ -22417,11 +22438,13 @@ class serialport(object):
                         d.openPhidget(serial=ser)
                     libtime.sleep(.2)
                     d.waitForAttach(600)
-                    res = d.getSerialNum()
                     d.closePhidget()
+                    res = ser
                     break
                 except:
                     pass
+            else:
+                res = 0
         return res
 
     def phidget1045TemperatureChanged(self,e):
@@ -22667,42 +22690,44 @@ class serialport(object):
                 aw.ser.PhidgetBridgeSensor = None
             if aw.ser.PhidgetBridgeSensor != None:
                 if mode == 0:
+                    aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
+                    aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
+                    libtime.sleep(0.03)
                     probe1 = probe2 = -1
                     try:
-                        aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
                         probe1 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(0))
-                        aw.ser.PhidgetBridgeSensor.setEnabled(0, False)
                         if aw.qmc.mode == "F":
                             probe1 = aw.qmc.fromCtoF(probe1)
                     except:
                         pass
                     try:
-                        aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
                         probe2 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(1))
-                        aw.ser.PhidgetBridgeSensor.setEnabled(1, False)
                         if aw.qmc.mode == "F":
                             probe2 = aw.qmc.fromCtoF(probe2)
                     except:
                         pass
+                    aw.ser.PhidgetBridgeSensor.setEnabled(0, False)
+                    aw.ser.PhidgetBridgeSensor.setEnabled(1, False)
                     return probe1, probe2
                 elif mode == 1:
+                    aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
+                    aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
+                    libtime.sleep(0.03)
                     probe3 = probe4 = -1
                     try:
-                        aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
                         probe3 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(2))
-                        aw.ser.PhidgetBridgeSensor.setEnabled(2, False)
                         if aw.qmc.mode == "F":
                             probe3 = aw.qmc.fromCtoF(probe3)
                     except:
                         pass
                     try:
-                        aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
                         probe4 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(3))
-                        aw.ser.PhidgetBridgeSensor.setEnabled(3, False)
                         if aw.qmc.mode == "F":
                             probe4 = aw.qmc.fromCtoF(probe4)
                     except:
                         pass
+                    aw.ser.PhidgetBridgeSensor.setEnabled(2, False)
+                    aw.ser.PhidgetBridgeSensor.setEnabled(3, False)
                     return probe3, probe4
                 else:
                     return -1,-1
@@ -28796,16 +28821,16 @@ class PXRpidDlgControl(ArtisanDialog):
     #get all Ramp Soak values for all 8 segments
     def getallsegments(self):
         for i in range(8):
-            msg = "Reading Ramp/Soak #" + str(i+1)
+            msg = QApplication.translate("StatusBar","Reading Ramp/Soak %1 ...",None, QApplication.UnicodeUTF8).arg(str(i+1))
             self.status.showMessage(msg,500)
             k = self.getsegment(i+1)
+            libtime.sleep(0.03)
             if k == -1:
-                mssg = QApplication.translate("StatusBar","getallsegments(): problem reading R/S ",None, QApplication.UnicodeUTF8)
-                self.status.showMessage(mssg,5000)
-                aw.qmc.adderror(mssg)
+                self.status.showMessage(QApplication.translate("StatusBar","problem reading Ramp/Soak",None, QApplication.UnicodeUTF8),5000)
                 return
             self.paintlabels()
         self.status.showMessage(QApplication.translate("StatusBar","Finished reading Ramp/Soak val.",None, QApplication.UnicodeUTF8),5000)
+        self.createsegmenttable()
 
     def getpid(self):
         if aw.ser.useModbusPort:
