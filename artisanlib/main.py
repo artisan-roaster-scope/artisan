@@ -504,14 +504,22 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1045_changeTrigger = 1.0
         self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(1, 11, 1)]
         self.phidget1045_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1045_changeTriggersValues))
+
+        self.phidget_dataRatesStrings = ["0.25s","0.5s","0.75s","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
+        self.phidget_dataRatesValues = [256,512,768,1000] # 8,16,32,64,128,
+
+        self.phidget1046_on = [True]*4        
+        self.phidget1046_async = [False]*4
+        self.phidget1046_gain = [1]*4
+        self.phidget1046_gainValues = ["1", "8","16","32","64","128"] # 1 for no gain
+        self.phidget1046_dataRate = 1000 # in ms; (Phidgets default 8ms, 16ms if wireless is active)
+        
         self.phidgetRemoteFlag = False
         self.phidgetServerID = ""
         self.phidgetPassword = ""
         self.phidget1018_async = [False]*8
         self.phidget1018_raws = [False]*8
         self.phidget1018_dataRates = [1000]*8 # in ms; (Phidgets default 8ms, 16ms if wireless is active)
-        self.phidget1018_dataRatesStrings = ["0.25s","0.5s","0.75s","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
-        self.phidget1018_dataRatesValues = [256,512,768,1000] # 8,16,32,64,128,
         self.phidget1018_changeTriggers = [10]*8
         self.phidget1018_changeTriggersValues = range(0,51,1)
         self.phidget1018_changeTriggersStrings = list(map(lambda x:str(x),self.phidget1018_changeTriggersValues))
@@ -639,6 +647,8 @@ class tgraphcanvas(FigureCanvas):
         self.flagsamplingthreadrunning = False
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
+        
+        self.flagalignFCs = False
 
         self.roastpropertiesflag = 1  #resets roast properties if not zero
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
@@ -1038,7 +1048,7 @@ class tgraphcanvas(FigureCanvas):
             self.designertemp1init = [500,500,500,500,500,500,500,500]
             self.designertemp2init = [380,300,390,395,410,412,420,420]
         self.BTsplinedegree = 3
-        self.ETsplinedegree = 1
+        self.ETsplinedegree = 3
         self.reproducedesigner = 0      #flag to add events to help reproduce (replay) the profile: 0 = none; 1 = sv; 2 = ramp
 
         ###########################         filterDropOut variables     ################################
@@ -1155,6 +1165,16 @@ class tgraphcanvas(FigureCanvas):
     #################################    FUNCTIONS    ###################################
     #####################################################################################
     
+    # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
+    def draw(self):
+        if self.designerflag and self.ax and self.delta_ax:
+            self.ax.set_zorder(0)
+            self.delta_ax.set_zorder(0.1)
+        FigureCanvas.draw(self)
+        if self.designerflag and self.ax and self.delta_ax:
+            self.ax.set_zorder(0.1)
+            self.delta_ax.set_zorder(0)
+    
     # returns the prefix of length l of s and adds eclipse
     def abbrevString(self,s,l):
         if len(s) > l:
@@ -1168,14 +1188,15 @@ class tgraphcanvas(FigureCanvas):
         self._resizeTimer.start(self.delayTimeout) # triggeres the updateBackground after timeout
 
     def updateBackground(self):
-        self._resizeTimer.stop()
-        self.redrawEnabled = False
-        self.resetlinecountcaches() # ensure that the line counts are up to date
-        self.resetlines() # get rid of HUD, projection and cross lines
-        self.resetdeltalines() # just in case
-        self.fig.canvas.draw()
-        self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)
-        self.redrawEnabled = True
+        if not self.designerflag:
+            self._resizeTimer.stop()
+            self.redrawEnabled = False
+            self.resetlinecountcaches() # ensure that the line counts are up to date
+            self.resetlines() # get rid of HUD, projection and cross lines
+            self.resetdeltalines() # just in case
+            self.fig.canvas.draw()
+            self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)
+            self.redrawEnabled = True
 
     def getetypes(self):
         if len(self.etypes) == 4:
@@ -1527,24 +1548,32 @@ class tgraphcanvas(FigureCanvas):
 #                aw.sendmessage(QApplication.translate("Message","Need some data for HUD to work", None, QApplication.UnicodeUTF8))
 
 
-    # redraws at least the canvas if redraw=True
-    def timealign(self,redraw=True,recompute=False):
+    # redraws at least the canvas if redraw=True, if FCs=True align to FCs if set, otherwise CHARGE (if set)
+    def timealign(self,redraw=True,recompute=False,FCs=False):
         try:
-            if self.timeindexB[0] != -1 and self.timeindex[0] != -1:
+            ptime = None
+            btime = None
+            if FCs and self.timeindexB[2] and self.timeindex[2]:
+                ptime = self.timex[self.timeindex[2]]
+                btime = self.timeB[self.timeindexB[2]]
+            elif self.timeindexB[0] != -1 and self.timeindex[0] != -1:
                 ptime = self.timex[self.timeindex[0]]
                 btime = self.timeB[self.timeindexB[0]]
+            if ptime and btime:
                 difference = ptime - btime
                 if difference > 0:
                     self.movebackground("right",abs(difference))
+                    self.backmoveflag = 0
                     if redraw:
                         self.redraw(recompute)
                 elif difference < 0:
                     self.movebackground("left",abs(difference))
+                    self.backmoveflag = 0
                     if redraw:
                         self.redraw(recompute)
-                elif redraw: # ensure that we at least readraw the canvas
+                elif redraw and not FCs: # ensure that we at least readraw the canvas
                     self.updateBackground()
-            elif redraw:
+            elif redraw and not FCs: # only on aligning with CARGE we redraw even if nothing is moved to redraw the time axis
                     self.updateBackground()
         except Exception as ex:
 #            import traceback
@@ -2575,13 +2604,15 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.flagstart:
                 self.ax.set_ylabel("")
                 self.ax.set_xlabel("")
+                self.ax.set_title("")
             else:
                 self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
                 self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
-            self.ax.set_title(aw.arabicReshape(self.title), color=self.palette["title"],
-                fontproperties=fontprop_xlarge,horizontalalignment="left",x=0
-                )
+                self.ax.set_title(aw.arabicReshape(self.title), color=self.palette["title"],
+                    fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
             
+            two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag)))
+
             if self.background:
                 fontprop_small = aw.mpl_fontproperties.copy()
                 fontprop_small.set_size("xx-small")
@@ -2589,11 +2620,14 @@ class tgraphcanvas(FigureCanvas):
                     stl = 25
                 else:
                     stl = 30
-                self.fig.suptitle(aw.qmc.abbrevString(self.titleB,stl),
-                    horizontalalignment="right",fontproperties=fontprop_small,x=0.93,y=0.985)
+                if two_ax_mode:
+                    suptitleX = 0.93
+                else:
+                    suptitleX = 1
+                self.fig.suptitle("\n" + aw.qmc.abbrevString(self.titleB,stl),
+                    horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
             
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
-            two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag
             #self.ax.spines['top'].set_color('none')
             self.ax.tick_params(\
                 axis='x',           # changes apply to the x-axis
@@ -2730,15 +2764,8 @@ class tgraphcanvas(FigureCanvas):
             #check BACKGROUND flag
             if self.background: 
                 #check to see if there is both a profile loaded and a background loaded
-                if self.timeindex[0] != -1 and self.timeindexB[0] != -1 and self.backmoveflag:
-                    if self.timex[self.timeindex[0]] != self.timeB[self.timeindexB[0]]:
-                        #align the background profile so they both plot with the same CHARGE time
-                        difference = self.timex[self.timeindex[0]] - self.timeB[self.timeindexB[0]]
-                        if difference > 0:
-                            self.movebackground("left",-difference)
-                        elif difference < 0:
-                            self.movebackground("right",difference)
-                        self.backmoveflag = 0
+                if self.backmoveflag:
+                    self.timealign(redraw=False,recompute=False,FCs=self.flagalignFCs)
 
                 #draw background
                 self.l_back1, = self.ax.plot(self.timeB, self.temp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
@@ -2939,14 +2966,14 @@ class tgraphcanvas(FigureCanvas):
                     self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
                     
                 ##### DeltaET,DeltaBT curves
-                if self.DeltaETflag and not self.designerflag:
+                if self.DeltaETflag: 
                     self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                     linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                     handles.append(self.l_delta1)
                     labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                     
-                if self.DeltaBTflag and not self.designerflag:
+                if self.DeltaBTflag:
                     self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
@@ -2954,7 +2981,7 @@ class tgraphcanvas(FigureCanvas):
                     labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
             nrdevices = len(self.extradevices)
-            if nrdevices:
+            if nrdevices and not self.designerflag:
                 xtmpl1idx = 0
                 xtmpl2idx = 0
                 for i in range(nrdevices):
@@ -3646,6 +3673,9 @@ class tgraphcanvas(FigureCanvas):
                 ser.PhidgetIO = None
             except:
                 pass
+        if ser.PhidgetManager:
+            ser.PhidgetManager.closeManager()
+            ser.PhidgetManager = None
         if ser.YOCTOsensor:
             try:
                 YAPI.UnregisterHub("usb")
@@ -3702,6 +3732,7 @@ class tgraphcanvas(FigureCanvas):
             aw.update_minieventline_visibility()
             aw.qmc.ax.set_xlabel("")
             aw.qmc.ax.set_ylabel("")
+            aw.qmc.ax.set_title("")
             if aw.qmc.delta_ax:
                 aw.qmc.delta_ax.set_ylabel("")
         except Exception as ex:
@@ -3933,6 +3964,10 @@ class tgraphcanvas(FigureCanvas):
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
         if self.flagstart:
+            # redraw (within timealign) should not be called if semaphore is hold!
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            if aw.qmc.flagalignFCs:
+                aw.qmc.timealign(redraw=True,recompute=False,FCs=True) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_3.setDisabled(True) # deactivate FCs button
             aw.button_3.setFlat(True)
@@ -3948,7 +3983,8 @@ class tgraphcanvas(FigureCanvas):
             st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
             message = QApplication.translate("Message","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-            aw.sendmessage(message)
+            aw.sendmessage(message)            
+            
 
     #record 1C end markers of BT. called from button_4 of application window
     def mark1Cend(self):
@@ -4751,7 +4787,6 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(lt):
                     self.temp1B[i] -= step
                     self.temp2B[i] -= step
-
         else:
             aw.sendmessage(QApplication.translate("Message","Unable to move background", None, QApplication.UnicodeUTF8))
             return
@@ -5021,7 +5056,7 @@ class tgraphcanvas(FigureCanvas):
         elif self.mode == "F":
             self.designertemp1init = [500.,500.,500.,500.,500.,500.,500.,500.]
             self.designertemp2init = [440.,300.,385.,410.,430.,445.,460.,460.]
-
+            
         #check x limits
         if self.endofx < 960:
             self.endofx = 960
@@ -5092,6 +5127,8 @@ class tgraphcanvas(FigureCanvas):
             #pylint: disable=E0611
             from scipy.interpolate import UnivariateSpline
             #reset (clear) plot
+            if self.DeltaBTflag or self.DeltaETflag:
+                self.delta_ax.lines = []
             if self.background:
                 self.ax.lines = self.ax.lines[0:4]
             else:
@@ -5124,22 +5161,47 @@ class tgraphcanvas(FigureCanvas):
             if self.ETsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
                 self.ETsplinedegree = len(self.timex)-1
 
-            func = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
-            func2 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
             timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
-            #convert all time values to temperature
+            func = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
             btvals = func(timez).tolist()
+            func2 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
             etvals = func2(timez).tolist()
+            #convert all time values to temperature
 
             #add markers (big circles) '0'
-            self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='',markersize=8)     #picker = 10 means 10 points tolerance
-            self.ax.plot(self.timex,self.temp1,color = self.palette["et"],marker = "o",picker=10,linestyle='',markersize=8)
+            if self.ETcurve:
+                self.ax.plot(self.timex,self.temp1,color = self.palette["et"],marker = "o",picker=10,linestyle='',markersize=8)
+            if self.BTcurve:
+                self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='',markersize=8)     #picker = 10 means 10 points tolerance
 
             rcParams['path.sketch'] = (0,0,0)
             #add curves
-            self.ax.plot(timez, btvals, color=self.palette["bt"], linestyle = '-', linewidth=2)
-            self.ax.plot(timez, etvals, color=self.palette["et"], linestyle = '-', linewidth=2)
-
+            if self.ETcurve:
+                self.ax.plot(timez, etvals,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,
+                    linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],
+                        label=u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+            if self.BTcurve:
+                self.ax.plot(timez, btvals, markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,
+                    linestyle=self.BTlinestyle,drawstyle=self.BTlinestyle,color=self.palette["bt"],
+                        label=u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                        
+                        
+            if self.DeltaBTflag:
+                funcDelta = func.derivative()
+                deltabtvals = [x*100 for x in funcDelta(timez).tolist()]
+                self.delta_ax.plot(timez,deltabtvals,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                    linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],
+                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+                    
+            if self.DeltaETflag:
+                funcDelta2 = func2.derivative()
+                deltaetvals = [x*100 for x in funcDelta2(timez).tolist()]
+                self.delta_ax.plot(timez,deltaetvals,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],
+                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))                          
+        
             #plot
             self.fig.canvas.draw()
 
@@ -5152,8 +5214,11 @@ class tgraphcanvas(FigureCanvas):
         self.mousepress = False
         self.setCursor(Qt.OpenHandCursor)
 
-        self.currentx = event.xdata 
-        self.currenty = event.ydata
+        self.currentx = event.xdata
+        if self.delta_ax:
+            self.currenty = self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,event.ydata))[1]))[1]
+        else:
+            self.currenty = event.ydata
 
         designermenu = QMenu(self)
 
@@ -5213,13 +5278,21 @@ class tgraphcanvas(FigureCanvas):
     #handler for moving point
     def on_motion(self,event):
         if not event.inaxes: return
+
+#        if self.delta_ax:
+#            ydata = self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,event.ydata))[1]))[1]
+#        else:
+#            ydata = event.ydata
+        
+        ydata = event.ydata
+        
         try:
             if self.mousepress:                                 #if mouse clicked
                 self.timex[self.indexpoint] = event.xdata
                 if self.workingline == 1:
-                    self.temp1[self.indexpoint] = event.ydata
+                    self.temp1[self.indexpoint] = ydata
                 else:
-                    self.temp2[self.indexpoint] = event.ydata
+                    self.temp2[self.indexpoint] = ydata
 
                 #check point going over point
                 #check to the left    
@@ -5245,11 +5318,11 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(len(self.timex)):
                     if abs(event.xdata - self.timex[i]) < 7.:
                         if i in self.timeindex:
-                            if abs(self.temp2[i] - event.ydata) < 10:
+                            if abs(self.temp2[i] - ydata) < 10:
                                 self.ax.plot(self.timex[i],self.temp2[i],color = "orange",marker = "o",alpha = .3,markersize=30)
                                 self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
-                            elif abs(self.temp1[i] - event.ydata) < 10:
+                            elif abs(self.temp1[i] - ydata) < 10:
                                 self.ax.plot(self.timex[i],self.temp1[i],color = "orange",marker = "o",alpha = .3,markersize=30)
                                 self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
@@ -5277,11 +5350,11 @@ class tgraphcanvas(FigureCanvas):
                                 aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + u(QApplication.translate("Message", "[ DROP ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
                             break
                         else:
-                            if abs(self.temp2[i] - event.ydata) < 10:
+                            if abs(self.temp2[i] - ydata) < 10:
                                 self.ax.plot(self.timex[i],self.temp2[i],color = "blue",marker = "o",alpha = .3,markersize=30)
                                 self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
-                            elif abs(self.temp1[i] - event.ydata) < 10:
+                            elif abs(self.temp1[i] - ydata) < 10:
                                 self.ax.plot(self.timex[i],self.temp1[i],color = "blue",marker = "o",alpha = .3,markersize=30)
                                 self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
@@ -5313,17 +5386,17 @@ class tgraphcanvas(FigureCanvas):
                         etbt3 = "%i"%(ts3)
 
                         if dryphasetime:
-                            dryroc = " %.1f " + aw.qmc.mode + "/m"%((dryramp/dryphasetime)*60.)
+                            dryroc = (" %.1f " + aw.qmc.mode + "/min")%((dryramp/dryphasetime)*60.)
                         else:
                             dryroc = " 0 " + aw.qmc.mode + "/min"
 
                         if midphasetime:
-                            midroc = " %.1f " + aw.qmc.mode + "/min"%((midramp/midphasetime)*60.)
+                            midroc = (" %.1f " + aw.qmc.mode + "/min")%((midramp/midphasetime)*60.)
                         else:
                             midroc = " 0 " + aw.qmc.mode + "/min"
 
                         if finishphasetime:
-                            finishroc = " %.1f " + aw.qmc.mode + "/min"%((finishramp/finishphasetime)*60.)
+                            finishroc = (" %.1f " + aw.qmc.mode + "/min")%((finishramp/finishphasetime)*60.)
                         else:
                             finishroc = 0
 
@@ -6130,6 +6203,7 @@ class VMToolbar(NavigationToolbar):
             if aw.qmc.flagstart:
                 aw.qmc.ax.set_ylabel("")
                 aw.qmc.ax.set_xlabel("")
+                aw.qmf.ax.set_title("")
                 if aw.qmc.delta_ax:
                     aw.qmc.delta_ax.set_ylabel("")
             item, ok = QInputDialog.getItem(self, 'Customize',
@@ -8824,7 +8898,7 @@ class ApplicationWindow(QMainWindow):
             self.fileSaveAction.setEnabled(False)
             self.fileSaveAsAction.setEnabled(False) 
 
-    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command
+    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO)
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -8881,6 +8955,18 @@ class ApplicationWindow(QMainWindow):
                         DTAvalue=cmd_str.split(':')[1]
                         DTAaddress=cmd_str.split(':')[0]
                         aw.dtapid.writeDTE(DTAvalue,DTAaddress)
+                    except:
+                        pass
+                elif action == 6:
+                    try:
+                        if aw.ser.PhidgetIO and aw.ser.PhidgetIO.isAttached():
+                            if cmd_str.startswith('set(') and len(cmd_str)>7:
+                                c,v = cmd_str[4:-1].split(',')
+                                aw.ser.PhidgetIO.setOutputState(int(c),bool(int(v)))
+                            elif cmd-str.startswith('toggle(') and len(cmd_str)>8:
+                                c = int(cmd_str[7:-1])
+                                state = bool(aw.ser.PhidgetIO.getOutputState(c))
+                                aw.ser.PhidgetIO.setOutputState(c,not(state))
                     except:
                         pass
             except:
@@ -11313,10 +11399,15 @@ class ApplicationWindow(QMainWindow):
             self.qmc.device = settings.value("id",self.qmc.device).toInt()[0]
             # Phidget configurations
             if settings.contains("phidget1048_types"):
-                self.qmc.phidget1048_types = [x.toInt()[0] for x in settings.value("phidget1048_types").toList()]
+                self.qmc.phidget1048_types = [x.toInt()[0] for x in settings.value("phidget1048_types",self.qmc.phidget1048_types).toList()]
             if settings.contains("phidget1048_async"):
                 self.qmc.phidget1048_async = [bool(x.toBool()) for x in settings.value("phidget1048_async",self.qmc.phidget1048_async).toList()]
                 self.qmc.phidget1048_changeTriggers = [aw.float2float(x.toFloat()[0]) for x in settings.value("phidget1048_changeTriggers",self.qmc.phidget1048_changeTriggers).toList()]              
+            if settings.contains("phidget1046_on"):
+                self.qmc.phidget1046_on = [bool(x.toBool()) for x in settings.value("phidget1046_on",self.qmc.phidget1046_on).toList()]
+                self.qmc.phidget1046_gain = [x.toInt()[0] for x in settings.value("phidget1046_gain",self.qmc.phidget1046_gain).toList()]
+                self.qmc.phidget1046_async = [bool(x.toBool()) for x in settings.value("phidget1046_async",self.qmc.phidget1046_async).toList()]
+                self.qmc.phidget1046_dataRate = settings.value("phidget1046_dataRate",self.qmc.phidget1046_dataRate).toInt()[0]
             if settings.contains("phidget1045_async"):
                 self.qmc.phidget1045_async = bool(settings.value("phidget1045_async",self.qmc.phidget1045_async).toBool())
                 self.qmc.phidget1045_changeTrigger = aw.float2float(settings.value("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger).toFloat()[0])
@@ -11912,6 +12003,8 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.backgroundeventsflag = settings.value("backgroundevents",aw.qmc.backgroundeventsflag).toBool()
                 aw.qmc.DeltaETBflag = settings.value("DeltaETB",aw.qmc.DeltaETBflag).toBool()
                 aw.qmc.DeltaBTBflag = settings.value("DeltaBTB",aw.qmc.DeltaBTBflag).toBool()
+                if settings.contains("alignFCs"):
+                    aw.qmc.flagalignFCs = settings.value("alignFCs",aw.qmc.flagalignFCs).toBool()
             settings.endGroup()
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = settings.value("autosaveflag",self.qmc.autosaveflag).toInt()[0]
@@ -12229,6 +12322,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidget1048_types",self.qmc.phidget1048_types)
             settings.setValue("phidget1048_async",self.qmc.phidget1048_async)
             settings.setValue("phidget1048_changeTriggers",self.qmc.phidget1048_changeTriggers)
+            settings.setValue("phidget1046_on",self.qmc.phidget1046_on)
+            settings.setValue("phidget1046_async",self.qmc.phidget1046_async)
+            settings.setValue("phidget1046_gain",self.qmc.phidget1046_gain)
+            settings.setValue("phidget1046_dataRate",self.qmc.phidget1046_dataRate)
             settings.setValue("phidget1045_async",self.qmc.phidget1045_async)
             settings.setValue("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger)
             settings.setValue("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)
@@ -12571,6 +12668,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("backgroundevents",aw.qmc.backgroundeventsflag)
             settings.setValue("DeltaETB",aw.qmc.DeltaETBflag)
             settings.setValue("DeltaBTB",aw.qmc.DeltaBTBflag)
+            settings.setValue("alignFCs",aw.qmc.flagalignFCs)
             settings.endGroup()
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
             settings.setValue("autosaveprefix",self.qmc.autosaveprefix)
@@ -17529,7 +17627,7 @@ class WindowsDlg(ArtisanDialog):
         self.connect(self.xaxislencombobox,SIGNAL("currentIndexChanged(int)"),self.xaxislenloc)
         ygridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
         self.ygridSpinBox = QSpinBox()
-        self.ygridSpinBox.setRange(10,100)
+        self.ygridSpinBox.setRange(1,100)
         self.ygridSpinBox.setSingleStep(5)
         self.ygridSpinBox.setValue(aw.qmc.ygrid)
         self.ygridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
@@ -17537,7 +17635,7 @@ class WindowsDlg(ArtisanDialog):
         self.ygridSpinBox.setMaximumWidth(60)
         zgridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
         self.zgridSpinBox = QSpinBox()
-        self.zgridSpinBox.setRange(10,100)
+        self.zgridSpinBox.setRange(1,100)
         self.zgridSpinBox.setSingleStep(5)
         self.zgridSpinBox.setValue(aw.qmc.zgrid)
         self.zgridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
@@ -17686,12 +17784,12 @@ class WindowsDlg(ArtisanDialog):
     def updatewindow(self):
         yl = int(str(self.ylimitEdit.text()))
         yl_min = int(str(self.ylimitEdit_min.text()))
-        if yl > yl_min + 10:
+        if yl > yl_min:
             aw.qmc.ylimit = yl
             aw.qmc.ylimit_min = yl_min
         zl = int(str(self.zlimitEdit.text()))
         zl_min = int(str(self.zlimitEdit_min.text()))
-        if zl > zl_min + 5:
+        if zl > zl_min:
             aw.qmc.zlimit = zl
             aw.qmc.zlimit_min = zl_min
         aw.qmc.endofx = aw.qmc.stringtoseconds(str(self.xlimitEdit.text()))
@@ -18472,7 +18570,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Serial Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Call Program",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8)]
+                       QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "IO Command",None, QApplication.UnicodeUTF8)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None, QApplication.UnicodeUTF8))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -19067,7 +19166,8 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
                                      QApplication.translate("ComboBox","Multiple Event",None, QApplication.UnicodeUTF8),
                                     QApplication.translate("ComboBox","Modbus Command",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox","DTA Command",None, QApplication.UnicodeUTF8)])
+                                    QApplication.translate("ComboBox","DTA Command",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("ComboBox","IO Command",None, QApplication.UnicodeUTF8)])
             actionComboBox.setCurrentIndex(aw.extraeventsactions[i])
             self.connect(actionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setactioneventbutton(z,i))
             #action description
@@ -19515,6 +19615,7 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
         string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br>"
         string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "IO Command: set(n,0), set(n,1), toggle(n) to set Phidget IO digital output n",None, QApplication.UnicodeUTF8)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8)) + "<br>"
         QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
@@ -19989,11 +20090,13 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None, QApplication.UnicodeUTF8))
         self.backgroundDeltaETflag = QCheckBox(QApplication.translate("CheckBox","DeltaET", None, QApplication.UnicodeUTF8))
         self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None, QApplication.UnicodeUTF8))
+        self.backgroundAlignFCsflag = QCheckBox(QApplication.translate("CheckBox","Align FCs", None, QApplication.UnicodeUTF8))
         self.backgroundCheck.setChecked(aw.qmc.background)
         self.backgroundDetails.setChecked(aw.qmc.backgroundDetails)
         self.backgroundeventsflag.setChecked(aw.qmc.backgroundeventsflag)
         self.backgroundDeltaETflag.setChecked(aw.qmc.DeltaETBflag)
         self.backgroundDeltaBTflag.setChecked(aw.qmc.DeltaBTBflag)
+        self.backgroundAlignFCsflag.setChecked(aw.qmc.flagalignFCs)
         loadButton = QPushButton(QApplication.translate("Button","Load", None, QApplication.UnicodeUTF8))
         loadButton.setFocusPolicy(Qt.NoFocus)
         delButton = QPushButton(QApplication.translate("Button","Delete", None, QApplication.UnicodeUTF8))
@@ -20003,7 +20106,7 @@ class backgroundDlg(ArtisanDialog):
         alignButton.setFocusPolicy(Qt.NoFocus)
         self.connect(loadButton, SIGNAL("clicked()"),self.load)
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        self.connect(alignButton, SIGNAL("clicked()"), aw.qmc.timealign)
+        self.connect(alignButton, SIGNAL("clicked()"), lambda : aw.qmc.timealign(FCs=aw.qmc.flagalignFCs))
         self.speedSpinBox = QSpinBox()
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
@@ -20062,6 +20165,7 @@ class backgroundDlg(ArtisanDialog):
         self.connect(self.backgroundeventsflag, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundDeltaETflag, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundDeltaBTflag, SIGNAL("clicked()"),self.readChecks)
+        self.connect(self.backgroundAlignFCsflag, SIGNAL("clicked()"),self.readChecks)
         self.connect(delButton, SIGNAL("clicked()"),self.delete)
         self.connect(self.upButton, SIGNAL("clicked()"), lambda m= "up": self.move(m))
         self.connect(self.downButton, SIGNAL("clicked()"), lambda m="down": self.move(m))
@@ -20106,6 +20210,7 @@ class backgroundDlg(ArtisanDialog):
         checkslayout.addWidget(self.backgroundeventsflag)
         checkslayout.addWidget(self.backgroundDeltaETflag)
         checkslayout.addWidget(self.backgroundDeltaBTflag)
+        checkslayout.addWidget(self.backgroundAlignFCsflag)
         layout = QGridLayout()
         layout.addWidget(intensitylabel,0,0)
         layout.addWidget(self.intensitySpinBox,0,1)
@@ -20116,14 +20221,14 @@ class backgroundDlg(ArtisanDialog):
         layout.addWidget(deltaetcolorlabel,3,0)
         layout.addWidget(self.deltaetcolorComboBox,3,1)
         layout.addWidget(deltabtcolorlabel,4,0)
-        layout.addWidget(self.deltabtcolorComboBox,4,1)
+        layout.addWidget(self.deltabtcolorComboBox,4,1)        
         hlayout = QHBoxLayout()
         hlayout.addStretch()
         hlayout.addLayout(layout)
         upperlayout = QVBoxLayout()
         upperlayout.addLayout(movelayout)
         upperlayout.addLayout(checkslayout)
-        upperlayout.addLayout(hlayout) 
+        upperlayout.addLayout(hlayout)
         layoutBoxed = QHBoxLayout()
         layoutBoxed.addStretch()
         layoutBoxed.addLayout(upperlayout)
@@ -20285,6 +20390,7 @@ class backgroundDlg(ArtisanDialog):
         aw.qmc.backgroundeventsflag = bool(self.backgroundeventsflag.isChecked())
         aw.qmc.DeltaETBflag = bool(self.backgroundDeltaETflag.isChecked())
         aw.qmc.DeltaBTBflag = bool(self.backgroundDeltaBTflag.isChecked())
+        aw.qmc.flagalignFCs = bool(self.backgroundAlignFCsflag.isChecked())
         aw.qmc.redraw(recomputeAllDeltas=False)
 
     def load(self):
@@ -21244,6 +21350,7 @@ class serialport(object):
         #list of comm ports available after Scan
         self.commavailable = []
         ##### SPECIAL METER FLAGS ########
+        self.PhidgetManager = None
         #stores the Phidget 1048 TemperatureSensor object (None if not initialized)
         self.PhidgetTemperatureSensor = None
         self.Phidget1048values = [-1]*4 # the values gathered by registered change triggers
@@ -21252,6 +21359,7 @@ class serialport(object):
         self.Phidget1045value = -1
         #stores the Phidget BridgeSensor object (None if not initialized)
         self.PhidgetBridgeSensor = None
+        self.Phidget1046values = [-1]*4 # the values gathered by registered change triggers
         #stores the Phidget IO object (None if not initialized)
         self.PhidgetIO = None
         self.PhidgetIOvalues = [-1]*8 # the values gathered by registered change triggers
@@ -21572,8 +21680,8 @@ class serialport(object):
         
     def PHIDGET1045(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t = self.PHIDGET1045temperature()
-        return tx,-1,t        
+        t,a = self.PHIDGET1045temperature()
+        return tx,a,t        
 
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -22416,31 +22524,32 @@ class serialport(object):
                 aw.addserial("CENTER309 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def getFirstMatchingPhidgetsSerialNum(self,name):
-        manager = PhidgetManager()
+        if self.PhidgetManager == None:
+            self.PhidgetManager = PhidgetManager()
         if aw.qmc.phidgetRemoteFlag:
-            manager.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+            self.PhidgetManager.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
         else:
-            manager.openManager()
-        devices = manager.getAttachedDevices()
+            self.PhidgetManager.openManager()
+        devices = self.PhidgetManager.getAttachedDevices()
         res = -1
         if len(devices) == 0:
-            devices = manager.getAttachedDevices()
+            libtime.sleep(.2)
+            devices = self.PhidgetManager.getAttachedDevices()
             if len(devices) == 0:
-                res = 0
+                res = 0        
         for d in devices:
             ser = d.getSerialNum()
             if d.getDeviceName() == name:
                 # try if it can be opened (so not yet opened by another channel)
                 try:
-                    if aw.qmc.phidgetRemoteFlag:
-                        d.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
-                    else:
+                    if not aw.qmc.phidgetRemoteFlag:
+#                       d.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
                         d.openPhidget(serial=ser)
-                    libtime.sleep(.2)
-                    d.waitForAttach(600)
-                    d.closePhidget()
+                        libtime.sleep(.2)
+                        d.waitForAttach(600)
+                        d.closePhidget()
                     res = ser
-                    break
+                    break                    
                 except:
                     pass
             else:
@@ -22465,7 +22574,6 @@ class serialport(object):
                         libtime.sleep(.2)
                         self.PhidgetIRSensor.waitForAttach(600)
                         aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None, QApplication.UnicodeUTF8))
-
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
                     #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -22480,7 +22588,6 @@ class serialport(object):
                         self.PhidgetIRSensor.setTemperatureChangeTrigger(0,0.5)#aw.qmc.phidget1045_changeTrigger)
                         self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1045TemperatureChanged(e))
                     libtime.sleep(.3)
-                    
             if self.PhidgetIRSensor and not self.PhidgetIRSensor.isAttached():
                 try:
                     self.PhidgetIRSensor.closePhidget()
@@ -22489,6 +22596,7 @@ class serialport(object):
                 self.PhidgetIRSensor = None
             if self.PhidgetIRSensor != None:
                     res = -1
+                    ambient = -1
                     try:
                         if aw.qmc.phidget1045_async:
                             if self.Phidget1045value == -1:
@@ -22501,9 +22609,13 @@ class serialport(object):
                         res = probe
                     except:
                         pass
-                    return res
+                    try:
+                        ambient = self.PhidgetIRSensor.getAmbientTemperature()
+                    except:
+                        pass
+                    return res,ambient
             else:
-                return -1
+                return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -22514,7 +22626,7 @@ class serialport(object):
             self.PhidgetIRSensor = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
-            return -1
+            return -1,-1
 
     def phidget1048TemperatureChanged(self,e):
         aw.ser.Phidget1048values[e.index] = (aw.ser.Phidget1048values[e.index] + e.temperature)/2.0
@@ -22650,6 +22762,35 @@ class serialport(object):
         bvf = bv / (1000 - bv)
         return 4750.3 * bvf * bvf + 4615.6 * bvf - 242.615                
 
+    def phidget1046TemperatureChanged(self,e):
+        temp = self.bridgeValue2PT100(e.value)
+        if aw.qmc.mode == "F":
+            temp = aw.qmc.fromCtoF(temp)
+        aw.ser.Phidget1046values[e.index] = (aw.ser.Phidget1046values[e.index] + temp)/2.0
+
+    def phidget1046getTemperature(self,i):
+        v = -1
+        try:
+            if not aw.qmc.phidget1046_on[i]:
+                aw.ser.PhidgetBridgeSensor.setEnabled(i, True)
+                libtime.sleep(0.03)
+            v = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(i))
+            if aw.qmc.mode == "F":
+                v = aw.qmc.fromCtoF(v)
+            if not aw.qmc.phidget1046_on[i]:
+                aw.ser.PhidgetBridgeSensor.setEnabled(i, False)
+        except:
+            pass
+        return v
+                        
+    def phidget1046getSensorReading(self,i):
+        if aw.qmc.phidget1046_async[i]:
+            if aw.ser.Phidget1046values[i] == -1:
+                aw.ser.Phidget1046values[i] = self.phidget1046getTemperature(i)               
+            return aw.ser.Phidget1046values[i]
+        else:
+            return self.phidget1046getTemperature(i)
+
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
     def PHIDGET1046temperature(self,mode=0):
         try:
@@ -22672,16 +22813,32 @@ class serialport(object):
                     except:
                         pass
                     aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input not attached",None, QApplication.UnicodeUTF8))
-#                try:
-#                    if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
-#                        aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
-#                        aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
-#                        if 38 in aw.qmc.extradevices:
-#                            aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
-#                            aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
-#                        libtime.sleep(.3)
-#                except:
-#                    pass
+                try:
+                    if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
+                        # set gain
+                        for i in range(4):
+                            try:
+                                aw.ser.PhidgetBridgeSensor.setGain(i, aw.qmc.phidget1046_gain[i])
+                            except:
+                                pass
+                        # set rate
+                        try:
+                            aw.ser.PhidgetBridgeSensor.setDataRate(aw.qmc.phidget1046_dataRate)
+                        except:
+                            pass
+                        # always on if ON is ticked (might have some negative self heating effect)
+                        if aw.qmc.phidget1046_on[0]:
+                            aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
+                        if aw.qmc.phidget1046_on[1]:
+                            aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
+                        if 38 in aw.qmc.extradevices:
+                            if aw.qmc.phidget1046_on[2]:
+                                aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
+                            if aw.qmc.phidget1046_on[3]:
+                                aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
+                        libtime.sleep(.3)
+                except:
+                    pass
             if aw.ser.PhidgetBridgeSensor and not aw.ser.PhidgetBridgeSensor.isAttached():
                 try:
                     aw.ser.PhidgetBridgeSensor.closePhidget()
@@ -22690,44 +22847,26 @@ class serialport(object):
                 aw.ser.PhidgetBridgeSensor = None
             if aw.ser.PhidgetBridgeSensor != None:
                 if mode == 0:
-                    aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
-                    aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
-                    libtime.sleep(0.03)
                     probe1 = probe2 = -1
                     try:
-                        probe1 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(0))
-                        if aw.qmc.mode == "F":
-                            probe1 = aw.qmc.fromCtoF(probe1)
+                        probe1 = self.phidget1046getSensorReading(0)
                     except:
                         pass
                     try:
-                        probe2 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(1))
-                        if aw.qmc.mode == "F":
-                            probe2 = aw.qmc.fromCtoF(probe2)
+                        probe2 = self.phidget1046getSensorReading(1)
                     except:
                         pass
-                    aw.ser.PhidgetBridgeSensor.setEnabled(0, False)
-                    aw.ser.PhidgetBridgeSensor.setEnabled(1, False)
                     return probe1, probe2
                 elif mode == 1:
-                    aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
-                    aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
-                    libtime.sleep(0.03)
                     probe3 = probe4 = -1
                     try:
-                        probe3 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(2))
-                        if aw.qmc.mode == "F":
-                            probe3 = aw.qmc.fromCtoF(probe3)
+                        probe3 = self.phidget1046getSensorReading(2)
                     except:
                         pass
                     try:
-                        probe4 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(3))
-                        if aw.qmc.mode == "F":
-                            probe4 = aw.qmc.fromCtoF(probe4)
+                        probe4 = self.phidget1046getSensorReading(3)
                     except:
                         pass
-                    aw.ser.PhidgetBridgeSensor.setEnabled(2, False)
-                    aw.ser.PhidgetBridgeSensor.setEnabled(3, False)
                     return probe3, probe4
                 else:
                     return -1,-1
@@ -25072,7 +25211,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             for item in changeTriggerItems:
                 model.appendRow(item)
             try:
-                changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1048_changeTriggersValues.index(aw.qmc.phidget1048_changeTriggers[i-1])))
+                changeTriggersCombo.setCurrentIndex(aw.qmc.phidget1048_changeTriggersValues.index(aw.qmc.phidget1048_changeTriggers[i-1]))
             except:
                 pass
             changeTriggersCombo.setMaximumSize(65,100)
@@ -25108,8 +25247,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1048HBox.addStretch()
         phidget1048HBox.addLayout(phidgetBox1048)
         phidget1048HBox.addStretch()
+        phidget1048VBox = QVBoxLayout()
+        phidget1048VBox.addLayout(phidget1048HBox)
+        phidget1048VBox.addStretch()
         phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048",None, QApplication.UnicodeUTF8))
-        phidget1048GroupBox.setLayout(phidget1048HBox)
+        phidget1048GroupBox.setLayout(phidget1048VBox)
         phidget1048HBox.setContentsMargins(0,0,0,0)
         
         # Phidget IR
@@ -25120,10 +25262,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
         for item in changeTriggerItems:
             model.appendRow(item)
         try:
-            self.changeTriggerCombos1045.setCurrentIndex((aw.qmc.phidget1045_changeTriggersValues.index(aw.qmc.phidget1045_changeTrigger)))
+            self.changeTriggerCombos1045.setCurrentIndex(aw.qmc.phidget1045_changeTriggersValues.index(aw.qmc.phidget1045_changeTrigger))
         except:
             pass
-        changeTriggersCombo.setMaximumSize(65,100)
+        self.changeTriggerCombos1045.setMaximumSize(65,100)
         phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,i)
         self.asyncCheckBoxe1045 = QCheckBox()
         self.asyncCheckBoxe1045.setChecked(True)
@@ -25134,18 +25276,84 @@ class DeviceAssignmentDlg(ArtisanDialog):
         changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None, QApplication.UnicodeUTF8))
         phidgetBox1045.addWidget(asyncLabel,2,0,Qt.AlignRight)
         phidgetBox1045.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
-        phidget1045HBox = QHBoxLayout()
-        phidget1045HBox.addStretch()
-        phidget1045HBox.addLayout(phidgetBox1045)
-        phidget1045HBox.addStretch()
+        phidget1045VBox = QVBoxLayout()
+        phidget1045VBox.addStretch()
+        phidget1045VBox.addLayout(phidgetBox1045)
+        phidget1045VBox.addStretch()
+        phidget1045VBox.addStretch()
         phidget1045GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1045",None, QApplication.UnicodeUTF8))
-        phidget1045GroupBox.setLayout(phidget1045HBox)
-        phidget1045HBox.setContentsMargins(0,0,0,0)           
+        phidget1045GroupBox.setLayout(phidget1045VBox)
+        phidget1045VBox.setContentsMargins(0,0,0,0)           
+
+        # 1046 RTD
+        phidgetBox1046 = QGridLayout()
+        self.onCheckBoxes1046 = []
+        self.gainCombos1046 = []
+        self.asyncCheckBoxes1046 = []        
+        for i in range(1,5):
+            onFlag = QCheckBox()
+            onFlag.setChecked(False)
+            onFlag.setChecked(aw.qmc.phidget1046_on[i-1])
+            self.onCheckBoxes1046.append(onFlag)
+            self.connect(onFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.onFlagStateChanged1046(y,x))
+            phidgetBox1046.addWidget(onFlag,1,i)
+            
+            gainCombo = QComboBox()
+            model = gainCombo.model()
+            gainItems = self.createItems(aw.qmc.phidget1046_gainValues)
+            for item in gainItems:
+                model.appendRow(item)
+            try:
+                gainCombo.setCurrentIndex(aw.qmc.phidget1046_gain[i-1] - 1)
+            except:
+                pass
+            gainCombo.setMaximumSize(60,100)
+            self.gainCombos1046.append(gainCombo)
+            phidgetBox1046.addWidget(gainCombo,2,i)
+
+            asyncFlag = QCheckBox()
+            asyncFlag.setChecked(True)
+            asyncFlag.setChecked(aw.qmc.phidget1046_async[i-1])
+            self.asyncCheckBoxes1046.append(asyncFlag)
+            self.connect(asyncFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1046(y,x))
+            phidgetBox1046.addWidget(asyncFlag,3,i)        
+            rowLabel = QLabel(str(i))
+            phidgetBox1046.addWidget(rowLabel,0,i)
+            
+        self.dataRateCombo1046 = QComboBox()
+        model = self.dataRateCombo1046.model()
+        dataRateItems = self.createItems(aw.qmc.phidget_dataRatesStrings)
+        for item in dataRateItems:
+            model.appendRow(item)
+        try:
+            self.dataRateCombo1046.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1046_dataRate))
+        except:
+            pass
+        self.dataRateCombo1046.setMaximumSize(55,100)
+        phidgetBox1046.addWidget(self.dataRateCombo1046,4,1)
+     
+        onLabel = QLabel(QApplication.translate("Label","On", None, QApplication.UnicodeUTF8))
+        gainLabel = QLabel(QApplication.translate("Label","Gain", None, QApplication.UnicodeUTF8))
+        asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
+        rateLabel = QLabel(QApplication.translate("Label","Rate", None, QApplication.UnicodeUTF8))
+        phidgetBox1046.addWidget(onLabel,1,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(gainLabel,2,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(asyncLabel,3,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(rateLabel,4,0,Qt.AlignRight)
+        phidget1046HBox = QHBoxLayout()
+        phidget1046HBox.addStretch()
+        phidget1046HBox.addLayout(phidgetBox1046)
+        phidget1046HBox.addStretch()
+        phidget1046GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1046 RTD",None, QApplication.UnicodeUTF8))
+        phidget1046GroupBox.setLayout(phidget1046HBox)
+        phidget1046HBox.setContentsMargins(0,0,0,0)
 
         phdget10481045GroupBoxHBox = QHBoxLayout()
         phdget10481045GroupBoxHBox.addWidget(phidget1048GroupBox)
-        phdget10481045GroupBoxHBox.addWidget(phidget1045GroupBox)    
+        phdget10481045GroupBoxHBox.addStretch()
+        phdget10481045GroupBoxHBox.addWidget(phidget1046GroupBox) 
 
+        # Phidget IO 1018
         # ratiometric flag
         self.phidgetBoxRatiometricFlag = QCheckBox(QApplication.translate("CheckBox","Ratiometric",None, QApplication.UnicodeUTF8))
         self.phidgetBoxRatiometricFlag.setChecked(aw.qmc.phidget1018Ratiometric)
@@ -25158,14 +25366,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
         for i in range(1,9):
             dataRatesCombo = QComboBox()
             model = dataRatesCombo.model()
-            dataRateItems = self.createItems(aw.qmc.phidget1018_dataRatesStrings)
+            dataRateItems = self.createItems(aw.qmc.phidget_dataRatesStrings)
             for item in dataRateItems:
                 model.appendRow(item)
             try:
-                dataRatesCombo.setCurrentIndex(aw.qmc.phidget1018_dataRatesValues.index(aw.qmc.phidget1018_dataRates[i-1]))
+                dataRatesCombo.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1018_dataRates[i-1]))
             except:
                 pass
-            dataRatesCombo.setMaximumSize(65,100)
+            dataRatesCombo.setMaximumSize(55,100)
             self.dataRateCombos.append(dataRatesCombo)
             phidgetBox1018.addWidget(dataRatesCombo,4,i)
             changeTriggersCombo = QComboBox()
@@ -25178,7 +25386,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1018_changeTriggersValues.index(aw.qmc.phidget1018_changeTriggers[i-1])))
             except:
                 pass
-            changeTriggersCombo.setMaximumSize(65,100)
+            changeTriggersCombo.setMaximumSize(55,100)
             self.changeTriggerCombos.append(changeTriggersCombo)
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
             asyncFlag = QCheckBox()
@@ -25237,13 +25445,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetNetworkGrid.setSpacing(20)
         phidgetNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None, QApplication.UnicodeUTF8))
         phidgetNetworkGroupBox.setLayout(phidgetNetworkGrid)
+        phidget10451018HBox = QHBoxLayout()
+        phidget10451018HBox.addWidget(phidget1045GroupBox)
+        phidget10451018HBox.addWidget(phidget1018GroupBox)
         phidgetVBox = QVBoxLayout()
         phidgetVBox.addLayout(phdget10481045GroupBoxHBox)
-        phidgetVBox.addWidget(phidget1018GroupBox)
+        phidgetVBox.addLayout(phidget10451018HBox)
         phidgetVBox.addWidget(phidgetNetworkGroupBox)
+        phidgetVBox.setSpacing(5)
         phidgetVBox.setContentsMargins(0,0,0,0)
-        phidgetGroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets",None, QApplication.UnicodeUTF8))
-        phidgetGroupBox.setLayout(phidgetVBox)
         # create pid box
         PIDgrid = QGridLayout()
         PIDgrid.addWidget(label1,0,1)
@@ -25303,7 +25513,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
         grid = QGridLayout()
         grid.addLayout(self.curveBox,0,1)
         grid.addWidget(self.nonpidButton,2,0)
-#        grid.addWidget(phidgetGroupBox,1,1)
         grid.addLayout(deviceSelector,2,1)
         grid.addWidget(self.pidButton,3,0)
         grid.addWidget(PIDGroupBox,3,1)
@@ -25339,7 +25548,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         tab3Layout.addWidget(adjustmentGroupBox)
         #LAYOUT TAB 4 (Phidgets)
         tab4Layout = QVBoxLayout()
-        tab4Layout.addWidget(phidgetGroupBox)
+        tab4Layout.addLayout(phidgetVBox)        
+        tab4Layout.setContentsMargins(0,0,0,0)
         #main tab widget
         TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -25360,7 +25570,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout.addLayout(buttonLayout)
         Mlayout.setMargin(10)
         self.setLayout(Mlayout)
-        
+
+    def onFlagStateChanged1046(self,i,x):
+        if x == 0:
+            # disable async flag
+            self.asyncCheckBoxes1046[i].setChecked(False)
+
+    def asyncFlagStateChanged1046(self,i,x):
+        if not x == 0:
+            # enable ON flag
+            self.onCheckBoxes1046[i].setChecked(True)
+            
     def asyncFlagStateChanged1048(self,i,x):
         if x == 0:
             # disable ChangeTrigger selection
@@ -26248,6 +26468,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.phidget1048_types[i] = self.probeTypeCombos[i].currentIndex()+1
                 aw.qmc.phidget1048_async[i] = self.asyncCheckBoxes1048[i].isChecked()
                 aw.qmc.phidget1048_changeTriggers[i] = aw.qmc.phidget1048_changeTriggersValues[self.changeTriggerCombos1048[i].currentIndex()]
+                aw.qmc.phidget1046_on[i] = self.onCheckBoxes1046[i].isChecked()
+                aw.qmc.phidget1046_gain[i] = self.gainCombos1046[i].currentIndex()+1
+                aw.qmc.phidget1046_async[i] = self.asyncCheckBoxes1046[i].isChecked()
+            aw.qmc.phidget1046_dataRate = aw.qmc.phidget_dataRatesValues[self.dataRateCombo1046.currentIndex()]
             aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
             aw.qmc.phidget1045_changeTrigger = aw.qmc.phidget1045_changeTriggersValues[self.changeTriggerCombos1045.currentIndex()]
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
@@ -26256,7 +26480,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             for i in range(8):
                 aw.qmc.phidget1018_async[i] = self.asyncCheckBoxes[i].isChecked()
                 aw.qmc.phidget1018_raws[i] = self.rawCheckBoxes[i].isChecked()
-                aw.qmc.phidget1018_dataRates[i] = aw.qmc.phidget1018_dataRatesValues[self.dataRateCombos[i].currentIndex()]
+                aw.qmc.phidget1018_dataRates[i] = aw.qmc.phidget_dataRatesValues[self.dataRateCombos[i].currentIndex()]
                 aw.qmc.phidget1018_changeTriggers[i] = aw.qmc.phidget1018_changeTriggersValues[self.changeTriggerCombos[i].currentIndex()]
             aw.qmc.phidget1018Ratiometric = self.phidgetBoxRatiometricFlag.isChecked()
             # LCD visibility
