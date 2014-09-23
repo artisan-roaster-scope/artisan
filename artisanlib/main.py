@@ -508,10 +508,12 @@ class tgraphcanvas(FigureCanvas):
         self.phidget_dataRatesStrings = ["0.25s","0.5s","0.75s","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
         self.phidget_dataRatesValues = [256,512,768,1000] # 8,16,32,64,128,
 
-        self.phidget1046_on = [True]*4        
+        self.phidget1046_on = [False]*4        
         self.phidget1046_async = [False]*4
         self.phidget1046_gain = [1]*4
         self.phidget1046_gainValues = ["1", "8","16","32","64","128"] # 1 for no gain
+        self.phidget1046_formula = [1]*4 # 0: 1K Ohm Wheatstone Bridge, 1: 1K Ohm Voltage Divider, 2: raw
+        self.phidget1046_formulaValues = ["WS", "Div","raw"]
         self.phidget1046_dataRate = 1000 # in ms; (Phidgets default 8ms, 16ms if wireless is active)
         
         self.phidgetRemoteFlag = False
@@ -1397,9 +1399,15 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(ndev):
                         if i < aw.nLCDS:
                             if self.extratemp1[i]:
-                                aw.extraLCD1[i].display(lcdformat%float(self.extratemp1[i][-1]))
+                                if -100 < self.extratemp1[i] < 1000:
+                                    aw.extraLCD1[i].display(lcdformat%float(self.extratemp1[i][-1]))
+                                else:
+                                    aw.extraLCD1[i].display("--")
                             if self.extratemp2[i]:
-                                aw.extraLCD2[i].display(lcdformat%float(self.extratemp2[i][-1]))
+                                if -100 < self.extratemp2[i] < 1000:
+                                    aw.extraLCD2[i].display(lcdformat%float(self.extratemp2[i][-1]))
+                                else:
+                                    aw.extraLCD1[i].display("--")
 
                 if self.flagstart:          
                     if aw.qmc.patheffects:
@@ -11406,6 +11414,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("phidget1046_on"):
                 self.qmc.phidget1046_on = [bool(x.toBool()) for x in settings.value("phidget1046_on",self.qmc.phidget1046_on).toList()]
                 self.qmc.phidget1046_gain = [x.toInt()[0] for x in settings.value("phidget1046_gain",self.qmc.phidget1046_gain).toList()]
+                self.qmc.phidget1046_formula = [x.toInt()[0] for x in settings.value("phidget1046_formula",self.qmc.phidget1046_formula).toList()]
                 self.qmc.phidget1046_async = [bool(x.toBool()) for x in settings.value("phidget1046_async",self.qmc.phidget1046_async).toList()]
                 self.qmc.phidget1046_dataRate = settings.value("phidget1046_dataRate",self.qmc.phidget1046_dataRate).toInt()[0]
             if settings.contains("phidget1045_async"):
@@ -12325,6 +12334,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidget1046_on",self.qmc.phidget1046_on)
             settings.setValue("phidget1046_async",self.qmc.phidget1046_async)
             settings.setValue("phidget1046_gain",self.qmc.phidget1046_gain)
+            settings.setValue("phidget1046_formula",self.qmc.phidget1046_formula)
             settings.setValue("phidget1046_dataRate",self.qmc.phidget1046_dataRate)
             settings.setValue("phidget1045_async",self.qmc.phidget1045_async)
             settings.setValue("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger)
@@ -13735,7 +13745,8 @@ $cupping_notes
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
         contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis, Miroslav Stankovic,")
-        contributors += u("<br>Barrie Fairley, Ziv Sade, Nicholas Seckar, Morten M") + uchr(252) + u("nchow")
+        contributors += u("<br>Barrie Fairley, Ziv Sade, Nicholas Seckar,")
+        contributors += u("<br>Morten M") + uchr(252) + u("nchow") + u(", Andrzej Kielbasinski")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -22756,11 +22767,41 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
+    # takes a bridge value in mV/V and returns the resistance of the corresponding RTD, assuming the RTD is connected
+    # via a Wheatstone Bridge build from 1K ohm resistors
+    # http://en.wikipedia.org/wiki/Wheatstone_bridge
+    # Note: the 1046 returns the bridge value in mV/V
+    def R_RTD_WB(self,bv):
+        return (1000 * (1000 - 2 * bv))/(1000 + 2 * bv)
+    
+    # takes a bridge value in mV/V and returns the resistance of the corresponding RTD, assuming the RTD is connnected
+    # via a Voltage Divider build from 1K ohm resistors
+    # http://en.wikipedia.org/wiki/Voltage_divider
+    # Note: the 1046 returns the bridge value in mV/V
+    def R_RTD_DIV(self,bv):
+        return (2000 * bv) / (1000 - bv)
+        
+    # this formula results from a direct mathematical linearization of the Callendar-Van Dusen equation
+    # see Analog Devices Application Note AN-709 http://www.analog.com/static/imported-files/application_notes/AN709_0.pdf
+    # Wikipedia http://en.wikipedia.org/wiki/Resistance_thermometer
+    #  or http://www.abmh.de
+    def bridgeValue2PT100(self,R_RTD):
+        Z1 = -3.9083e-03
+        Z2 = 1.76e-05
+        Z3 = -2.31e-08
+        Z4 = -1.155e-06
+        try:
+            return (Z1 + math.sqrt(abs(Z2 + (Z3 * R_RTD))))/Z4
+        except:
+            return -1
+
     # convert the BridgeValue given by the PhidgetBridge to a temperature value assuming a PT100 probe
     # see http://www.phidgets.com/docs/3175_User_Guide
-    def bridgeValue2PT100(self,bv):
-        bvf = bv / (1000 - bv)
-        return 4750.3 * bvf * bvf + 4615.6 * bvf - 242.615                
+    # this one is a simpler and less accurate approximation as above that directly gives the temperature for a given bridge value in mV/V,
+    # that works only for the Voltage Divider case
+#    def bridgeValue2PT100(self,bv):
+#        bvf = bv / (1000 - bv)
+#        return 4750.3 * bvf * bvf + 4615.6 * bvf - 242.615                
 
     def phidget1046TemperatureChanged(self,e):
         temp = self.bridgeValue2PT100(e.value)
@@ -22774,13 +22815,19 @@ class serialport(object):
             if not aw.qmc.phidget1046_on[i]:
                 aw.ser.PhidgetBridgeSensor.setEnabled(i, True)
                 libtime.sleep(0.03)
-            v = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(i))
+            bv = aw.ser.PhidgetBridgeSensor.getBridgeValue(i)
+            if aw.qmc.phidget1046_formula[i] == 0:
+                v = self.bridgeValue2PT100(self.R_RTD_WB(bv))
+            elif aw.qmc.phidget1046_formula[i] == 1:
+                v = self.bridgeValue2PT100(self.R_RTD_DIV(bv))
+            elif aw.qmc.phidget1046_formula[i] == 2:
+                v = bv
             if aw.qmc.mode == "F":
                 v = aw.qmc.fromCtoF(v)
             if not aw.qmc.phidget1046_on[i]:
                 aw.ser.PhidgetBridgeSensor.setEnabled(i, False)
         except:
-            pass
+            v = -1
         return v
                         
     def phidget1046getSensorReading(self,i):
@@ -25289,6 +25336,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetBox1046 = QGridLayout()
         self.onCheckBoxes1046 = []
         self.gainCombos1046 = []
+        self.formulaCombos1046 = []
         self.asyncCheckBoxes1046 = []        
         for i in range(1,5):
             onFlag = QCheckBox()
@@ -25310,13 +25358,26 @@ class DeviceAssignmentDlg(ArtisanDialog):
             gainCombo.setMaximumSize(60,100)
             self.gainCombos1046.append(gainCombo)
             phidgetBox1046.addWidget(gainCombo,2,i)
+            
+            formulaCombo = QComboBox()
+            model = formulaCombo.model()
+            formulaItems = self.createItems(aw.qmc.phidget1046_formulaValues)
+            for item in formulaItems:
+                model.appendRow(item)
+            try:
+                formulaCombo.setCurrentIndex(aw.qmc.phidget1046_formula[i-1])
+            except:
+                pass
+            formulaCombo.setMaximumSize(60,100)
+            self.formulaCombos1046.append(formulaCombo)
+            phidgetBox1046.addWidget(formulaCombo,3,i)
 
             asyncFlag = QCheckBox()
             asyncFlag.setChecked(True)
             asyncFlag.setChecked(aw.qmc.phidget1046_async[i-1])
             self.asyncCheckBoxes1046.append(asyncFlag)
             self.connect(asyncFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1046(y,x))
-            phidgetBox1046.addWidget(asyncFlag,3,i)        
+            phidgetBox1046.addWidget(asyncFlag,4,i)        
             rowLabel = QLabel(str(i))
             phidgetBox1046.addWidget(rowLabel,0,i)
             
@@ -25330,16 +25391,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
         except:
             pass
         self.dataRateCombo1046.setMaximumSize(55,100)
-        phidgetBox1046.addWidget(self.dataRateCombo1046,4,1)
+        phidgetBox1046.addWidget(self.dataRateCombo1046,5,1)
      
         onLabel = QLabel(QApplication.translate("Label","On", None, QApplication.UnicodeUTF8))
         gainLabel = QLabel(QApplication.translate("Label","Gain", None, QApplication.UnicodeUTF8))
+        formulaLabel = QLabel(QApplication.translate("Label","Wiring", None, QApplication.UnicodeUTF8))
         asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
         rateLabel = QLabel(QApplication.translate("Label","Rate", None, QApplication.UnicodeUTF8))
         phidgetBox1046.addWidget(onLabel,1,0,Qt.AlignRight)
         phidgetBox1046.addWidget(gainLabel,2,0,Qt.AlignRight)
-        phidgetBox1046.addWidget(asyncLabel,3,0,Qt.AlignRight)
-        phidgetBox1046.addWidget(rateLabel,4,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(formulaLabel,3,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(asyncLabel,4,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(rateLabel,5,0,Qt.AlignRight)
         phidget1046HBox = QHBoxLayout()
         phidget1046HBox.addStretch()
         phidget1046HBox.addLayout(phidgetBox1046)
@@ -26470,6 +26533,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.phidget1048_changeTriggers[i] = aw.qmc.phidget1048_changeTriggersValues[self.changeTriggerCombos1048[i].currentIndex()]
                 aw.qmc.phidget1046_on[i] = self.onCheckBoxes1046[i].isChecked()
                 aw.qmc.phidget1046_gain[i] = self.gainCombos1046[i].currentIndex()+1
+                aw.qmc.phidget1046_formula[i] = self.formulaCombos1046[i].currentIndex()
                 aw.qmc.phidget1046_async[i] = self.asyncCheckBoxes1046[i].isChecked()
             aw.qmc.phidget1046_dataRate = aw.qmc.phidget_dataRatesValues[self.dataRateCombo1046.currentIndex()]
             aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
