@@ -7409,6 +7409,13 @@ class ApplicationWindow(QMainWindow):
         if locale == "he":
             self.HebrewLanguage.setChecked(True)
 
+        self.PolishLanguage = QAction(UIconst.CONF_MENU_POLISH,self)
+        self.PolishLanguage.setCheckable(True)
+        self.connect(self.PolishLanguage,SIGNAL("triggered()"),lambda lang="pl":self.changelocale(lang))
+        self.languageMenu.addAction(self.PolishLanguage)
+        if locale == "pl":
+            self.PolishLanguage.setChecked(True)
+
         # TOOLKIT menu
         self.designerAction = QAction(UIconst.TOOLKIT_MENU_DESIGNER,self)
         self.connect(self.designerAction ,SIGNAL("triggered()"),self.designerTriggered)
@@ -14081,6 +14088,10 @@ $cupping_notes
             self.JapaneseLanguage.setChecked(value)
         elif locale == "hu":
             self.HungarianLanguage.setChecked(value)
+        elif locale == "he":
+            self.PolishLanguage.setChecked(value)
+        elif locale == "pl":
+            self.HebrewLanguage.setChecked(value)
     
     def changelocale(self,languagelocale):
         if locale != languagelocale:
@@ -22771,7 +22782,7 @@ class serialport(object):
     # via a Wheatstone Bridge build from 1K ohm resistors
     # http://en.wikipedia.org/wiki/Wheatstone_bridge
     # Note: the 1046 returns the bridge value in mV/V
-    def R_RTD_WB(self,bv):
+    def R_RTD_WS(self,bv):
         return (1000 * (1000 - 2 * bv))/(1000 + 2 * bv)
     
     # takes a bridge value in mV/V and returns the resistance of the corresponding RTD, assuming the RTD is connnected
@@ -22809,19 +22820,26 @@ class serialport(object):
             temp = aw.qmc.fromCtoF(temp)
         aw.ser.Phidget1046values[e.index] = (aw.ser.Phidget1046values[e.index] + temp)/2.0
 
+    def bridgeValue2Temperature(self,i,bv):
+        v = -1
+        if aw.qmc.phidget1046_formula[i] == 0:
+            v = self.bridgeValue2PT100(self.R_RTD_WS(bv))
+        elif aw.qmc.phidget1046_formula[i] == 1:
+            v = self.bridgeValue2PT100(self.R_RTD_DIV(bv))
+        elif aw.qmc.phidget1046_formula[i] == 2:
+            v = bv
+        return v
+
     def phidget1046getTemperature(self,i):
         v = -1
         try:
             if not aw.qmc.phidget1046_on[i]:
                 aw.ser.PhidgetBridgeSensor.setEnabled(i, True)
                 libtime.sleep(0.03)
+#            bv = 51.77844 # about room temperature for Voltage Divider wiring
+#            bv = 400,2949 # about room temperature for Wheatstone Bridge
             bv = aw.ser.PhidgetBridgeSensor.getBridgeValue(i)
-            if aw.qmc.phidget1046_formula[i] == 0:
-                v = self.bridgeValue2PT100(self.R_RTD_WB(bv))
-            elif aw.qmc.phidget1046_formula[i] == 1:
-                v = self.bridgeValue2PT100(self.R_RTD_DIV(bv))
-            elif aw.qmc.phidget1046_formula[i] == 2:
-                v = bv
+            v = self.bridgeValue2Temperature(i,bv)
             if aw.qmc.mode == "F":
                 v = aw.qmc.fromCtoF(v)
             if not aw.qmc.phidget1046_on[i]:
@@ -22844,54 +22862,54 @@ class serialport(object):
             if aw.ser.PhidgetBridgeSensor == None:
                 aw.ser.PhidgetBridgeSensor = Phidget1046TemperatureSensor()
                 libtime.sleep(.1)
-                try: 
-                    if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
-                    else:
-                        aw.ser.PhidgetBridgeSensor.openPhidget()
-                    libtime.sleep(.2)
-                    aw.ser.PhidgetBridgeSensor.waitForAttach(600) 
-                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))
-                except Exception as ex:
-                    #_, _, exc_tb = sys.exc_info()
-                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
-                    try:
-                        aw.ser.PhidgetBridgeSensor.closePhidget()
-                    except:
-                        pass
-                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input not attached",None, QApplication.UnicodeUTF8))
-                try:
-                    if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
-                        # set gain
-                        for i in range(4):
-                            try:
-                                aw.ser.PhidgetBridgeSensor.setGain(i, aw.qmc.phidget1046_gain[i])
-                            except:
-                                pass
-                        # set rate
-                        try:
-                            aw.ser.PhidgetBridgeSensor.setDataRate(aw.qmc.phidget1046_dataRate)
-                        except:
-                            pass
-                        # always on if ON is ticked (might have some negative self heating effect)
-                        if aw.qmc.phidget1046_on[0]:
-                            aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
-                        if aw.qmc.phidget1046_on[1]:
-                            aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
-                        if 38 in aw.qmc.extradevices:
-                            if aw.qmc.phidget1046_on[2]:
-                                aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
-                            if aw.qmc.phidget1046_on[3]:
-                                aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
-                        libtime.sleep(.3)
-                except:
-                    pass
-            if aw.ser.PhidgetBridgeSensor and not aw.ser.PhidgetBridgeSensor.isAttached():
-                try:
-                    aw.ser.PhidgetBridgeSensor.closePhidget()
-                except:
-                    pass
-                aw.ser.PhidgetBridgeSensor = None
+#                try: 
+#                    if aw.qmc.phidgetRemoteFlag:
+#                        aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+#                    else:
+#                        aw.ser.PhidgetBridgeSensor.openPhidget()
+#                    libtime.sleep(.2)
+#                    aw.ser.PhidgetBridgeSensor.waitForAttach(600) 
+#                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))
+#                except Exception as ex:
+#                    #_, _, exc_tb = sys.exc_info()
+#                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+#                    try:
+#                        aw.ser.PhidgetBridgeSensor.closePhidget()
+#                    except:
+#                        pass
+#                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input not attached",None, QApplication.UnicodeUTF8))
+#                try:
+#                    if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
+#                        # set gain
+#                        for i in range(4):
+#                            try:
+#                                aw.ser.PhidgetBridgeSensor.setGain(i, aw.qmc.phidget1046_gain[i])
+#                            except:
+#                                pass
+#                        # set rate
+#                        try:
+#                            aw.ser.PhidgetBridgeSensor.setDataRate(aw.qmc.phidget1046_dataRate)
+#                        except:
+#                            pass
+#                        # always on if ON is ticked (might have some negative self heating effect)
+#                        if aw.qmc.phidget1046_on[0]:
+#                            aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
+#                        if aw.qmc.phidget1046_on[1]:
+#                            aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
+#                        if 38 in aw.qmc.extradevices:
+#                            if aw.qmc.phidget1046_on[2]:
+#                                aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
+#                            if aw.qmc.phidget1046_on[3]:
+#                                aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
+#                        libtime.sleep(.3)
+#                except:
+#                    pass
+#            if aw.ser.PhidgetBridgeSensor and not aw.ser.PhidgetBridgeSensor.isAttached():
+#                try:
+#                    aw.ser.PhidgetBridgeSensor.closePhidget()
+#                except:
+#                    pass
+#                aw.ser.PhidgetBridgeSensor = None
             if aw.ser.PhidgetBridgeSensor != None:
                 if mode == 0:
                     probe1 = probe2 = -1

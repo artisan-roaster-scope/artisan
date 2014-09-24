@@ -108,6 +108,7 @@ os.system(r'copy c:\\Qt\\4.8.5\\translations\\qt_ru.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.5\\translations\\qt_ar.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.5\\translations\\qt_ja.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.5\\translations\\qt_hu.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.5\\translations\\qt_pl.qm dist\\translations')
 os.system(r'rmdir /q /s dist\\mpl-data\\sample_data')
 # YOCTO HACK BEGIN: manually copy over the dlls
 os.system(r'copy c:\\Python27\\Lib\\site-packages\\yoctopuce\\cdll\\yapi.dll dist\\lib')
