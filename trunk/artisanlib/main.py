@@ -508,7 +508,6 @@ class tgraphcanvas(FigureCanvas):
         self.phidget_dataRatesStrings = ["0.25s","0.5s","0.75s","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
         self.phidget_dataRatesValues = [256,512,768,1000] # 8,16,32,64,128,
 
-        self.phidget1046_on = [False]*4        
         self.phidget1046_async = [False]*4
         self.phidget1046_gain = [1]*4
         self.phidget1046_gainValues = ["1", "8","16","32","64","128"] # 1 for no gain
@@ -11418,8 +11417,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("phidget1048_async"):
                 self.qmc.phidget1048_async = [bool(x.toBool()) for x in settings.value("phidget1048_async",self.qmc.phidget1048_async).toList()]
                 self.qmc.phidget1048_changeTriggers = [aw.float2float(x.toFloat()[0]) for x in settings.value("phidget1048_changeTriggers",self.qmc.phidget1048_changeTriggers).toList()]              
-            if settings.contains("phidget1046_on"):
-                self.qmc.phidget1046_on = [bool(x.toBool()) for x in settings.value("phidget1046_on",self.qmc.phidget1046_on).toList()]
+            if settings.contains("phidget1046_gain"):
                 self.qmc.phidget1046_gain = [x.toInt()[0] for x in settings.value("phidget1046_gain",self.qmc.phidget1046_gain).toList()]
                 self.qmc.phidget1046_formula = [x.toInt()[0] for x in settings.value("phidget1046_formula",self.qmc.phidget1046_formula).toList()]
                 self.qmc.phidget1046_async = [bool(x.toBool()) for x in settings.value("phidget1046_async",self.qmc.phidget1046_async).toList()]
@@ -12338,7 +12336,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidget1048_types",self.qmc.phidget1048_types)
             settings.setValue("phidget1048_async",self.qmc.phidget1048_async)
             settings.setValue("phidget1048_changeTriggers",self.qmc.phidget1048_changeTriggers)
-            settings.setValue("phidget1046_on",self.qmc.phidget1046_on)
             settings.setValue("phidget1046_async",self.qmc.phidget1046_async)
             settings.setValue("phidget1046_gain",self.qmc.phidget1046_gain)
             settings.setValue("phidget1046_formula",self.qmc.phidget1046_formula)
@@ -22815,7 +22812,7 @@ class serialport(object):
 #        return 4750.3 * bvf * bvf + 4615.6 * bvf - 242.615                
 
     def phidget1046TemperatureChanged(self,e):
-        temp = self.bridgeValue2PT100(e.value)
+        temp = self.bridgeValue2Temperature(e.index,e.value)
         if aw.qmc.mode == "F":
             temp = aw.qmc.fromCtoF(temp)
         aw.ser.Phidget1046values[e.index] = (aw.ser.Phidget1046values[e.index] + temp)/2.0
@@ -22833,17 +22830,13 @@ class serialport(object):
     def phidget1046getTemperature(self,i):
         v = -1
         try:
-            if not aw.qmc.phidget1046_on[i]:
-                aw.ser.PhidgetBridgeSensor.setEnabled(i, True)
-                libtime.sleep(0.03)
+# test values for the bridge value to temperature conversion
 #            bv = 51.77844 # about room temperature for Voltage Divider wiring
 #            bv = 400,2949 # about room temperature for Wheatstone Bridge
             bv = aw.ser.PhidgetBridgeSensor.getBridgeValue(i)
             v = self.bridgeValue2Temperature(i,bv)
             if aw.qmc.mode == "F":
                 v = aw.qmc.fromCtoF(v)
-            if not aw.qmc.phidget1046_on[i]:
-                aw.ser.PhidgetBridgeSensor.setEnabled(i, False)
         except:
             v = -1
         return v
@@ -22861,55 +22854,57 @@ class serialport(object):
         try:
             if aw.ser.PhidgetBridgeSensor == None:
                 aw.ser.PhidgetBridgeSensor = Phidget1046TemperatureSensor()
+
                 libtime.sleep(.1)
-#                try: 
-#                    if aw.qmc.phidgetRemoteFlag:
-#                        aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
-#                    else:
-#                        aw.ser.PhidgetBridgeSensor.openPhidget()
-#                    libtime.sleep(.2)
-#                    aw.ser.PhidgetBridgeSensor.waitForAttach(600) 
-#                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))
-#                except Exception as ex:
-#                    #_, _, exc_tb = sys.exc_info()
-#                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
-#                    try:
-#                        aw.ser.PhidgetBridgeSensor.closePhidget()
-#                    except:
-#                        pass
-#                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input not attached",None, QApplication.UnicodeUTF8))
-#                try:
-#                    if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
-#                        # set gain
-#                        for i in range(4):
-#                            try:
-#                                aw.ser.PhidgetBridgeSensor.setGain(i, aw.qmc.phidget1046_gain[i])
-#                            except:
-#                                pass
-#                        # set rate
-#                        try:
-#                            aw.ser.PhidgetBridgeSensor.setDataRate(aw.qmc.phidget1046_dataRate)
-#                        except:
-#                            pass
-#                        # always on if ON is ticked (might have some negative self heating effect)
-#                        if aw.qmc.phidget1046_on[0]:
-#                            aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
-#                        if aw.qmc.phidget1046_on[1]:
-#                            aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
-#                        if 38 in aw.qmc.extradevices:
-#                            if aw.qmc.phidget1046_on[2]:
-#                                aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
-#                            if aw.qmc.phidget1046_on[3]:
-#                                aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
-#                        libtime.sleep(.3)
-#                except:
-#                    pass
-#            if aw.ser.PhidgetBridgeSensor and not aw.ser.PhidgetBridgeSensor.isAttached():
-#                try:
-#                    aw.ser.PhidgetBridgeSensor.closePhidget()
-#                except:
-#                    pass
-#                aw.ser.PhidgetBridgeSensor = None
+                try: 
+                    if aw.qmc.phidgetRemoteFlag:
+                        aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                    else:
+                        aw.ser.PhidgetBridgeSensor.openPhidget()
+                    libtime.sleep(.2)
+                    aw.ser.PhidgetBridgeSensor.waitForAttach(600) 
+                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))
+                except Exception as ex:
+                    #_, _, exc_tb = sys.exc_info()
+                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+                    try:
+                        aw.ser.PhidgetBridgeSensor.closePhidget()
+                    except:
+                        pass
+                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input not attached",None, QApplication.UnicodeUTF8))
+                try:
+                    if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
+                        # set gain
+                        for i in range(4):
+                            try:
+                                aw.ser.PhidgetBridgeSensor.setGain(i, aw.qmc.phidget1046_gain[i])
+                            except:
+                                pass
+                        # set rate
+                        try:
+                            aw.ser.PhidgetBridgeSensor.setDataRate(aw.qmc.phidget1046_dataRate)
+                        except:
+                            pass
+                        aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
+                        aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
+                        if 38 in aw.qmc.extradevices:
+                            aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
+                            aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
+                        libtime.sleep(.3)
+                except:
+                    pass
+            if aw.ser.PhidgetBridgeSensor and not aw.ser.PhidgetBridgeSensor.isAttached():
+                try:
+                    for i in range(4):
+                        aw.ser.PhidgetBridgeSensor.setEnabled(i, False)
+                except:
+                    pass
+                try:
+                    aw.ser.PhidgetBridgeSensor.closePhidget()
+                except:
+                    pass
+                aw.ser.PhidgetBridgeSensor = None
+                
             if aw.ser.PhidgetBridgeSensor != None:
                 if mode == 0:
                     probe1 = probe2 = -1
@@ -25357,13 +25352,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.formulaCombos1046 = []
         self.asyncCheckBoxes1046 = []        
         for i in range(1,5):
-            onFlag = QCheckBox()
-            onFlag.setChecked(False)
-            onFlag.setChecked(aw.qmc.phidget1046_on[i-1])
-            self.onCheckBoxes1046.append(onFlag)
-            self.connect(onFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.onFlagStateChanged1046(y,x))
-            phidgetBox1046.addWidget(onFlag,1,i)
-            
             gainCombo = QComboBox()
             model = gainCombo.model()
             gainItems = self.createItems(aw.qmc.phidget1046_gainValues)
@@ -25375,7 +25363,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 pass
             gainCombo.setMaximumSize(60,100)
             self.gainCombos1046.append(gainCombo)
-            phidgetBox1046.addWidget(gainCombo,2,i)
+            phidgetBox1046.addWidget(gainCombo,1,i)
             
             formulaCombo = QComboBox()
             model = formulaCombo.model()
@@ -25388,14 +25376,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 pass
             formulaCombo.setMaximumSize(60,100)
             self.formulaCombos1046.append(formulaCombo)
-            phidgetBox1046.addWidget(formulaCombo,3,i)
+            phidgetBox1046.addWidget(formulaCombo,2,i)
 
             asyncFlag = QCheckBox()
             asyncFlag.setChecked(True)
             asyncFlag.setChecked(aw.qmc.phidget1046_async[i-1])
             self.asyncCheckBoxes1046.append(asyncFlag)
             self.connect(asyncFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1046(y,x))
-            phidgetBox1046.addWidget(asyncFlag,4,i)        
+            phidgetBox1046.addWidget(asyncFlag,3,i)        
             rowLabel = QLabel(str(i))
             phidgetBox1046.addWidget(rowLabel,0,i)
             
@@ -25409,18 +25397,16 @@ class DeviceAssignmentDlg(ArtisanDialog):
         except:
             pass
         self.dataRateCombo1046.setMaximumSize(55,100)
-        phidgetBox1046.addWidget(self.dataRateCombo1046,5,1)
+        phidgetBox1046.addWidget(self.dataRateCombo1046,4,1)
      
-        onLabel = QLabel(QApplication.translate("Label","On", None, QApplication.UnicodeUTF8))
         gainLabel = QLabel(QApplication.translate("Label","Gain", None, QApplication.UnicodeUTF8))
         formulaLabel = QLabel(QApplication.translate("Label","Wiring", None, QApplication.UnicodeUTF8))
         asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
         rateLabel = QLabel(QApplication.translate("Label","Rate", None, QApplication.UnicodeUTF8))
-        phidgetBox1046.addWidget(onLabel,1,0,Qt.AlignRight)
-        phidgetBox1046.addWidget(gainLabel,2,0,Qt.AlignRight)
-        phidgetBox1046.addWidget(formulaLabel,3,0,Qt.AlignRight)
-        phidgetBox1046.addWidget(asyncLabel,4,0,Qt.AlignRight)
-        phidgetBox1046.addWidget(rateLabel,5,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(gainLabel,1,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(formulaLabel,2,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(asyncLabel,3,0,Qt.AlignRight)
+        phidgetBox1046.addWidget(rateLabel,4,0,Qt.AlignRight)
         phidget1046HBox = QHBoxLayout()
         phidget1046HBox.addStretch()
         phidget1046HBox.addLayout(phidgetBox1046)
@@ -26549,7 +26535,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.phidget1048_types[i] = self.probeTypeCombos[i].currentIndex()+1
                 aw.qmc.phidget1048_async[i] = self.asyncCheckBoxes1048[i].isChecked()
                 aw.qmc.phidget1048_changeTriggers[i] = aw.qmc.phidget1048_changeTriggersValues[self.changeTriggerCombos1048[i].currentIndex()]
-                aw.qmc.phidget1046_on[i] = self.onCheckBoxes1046[i].isChecked()
                 aw.qmc.phidget1046_gain[i] = self.gainCombos1046[i].currentIndex()+1
                 aw.qmc.phidget1046_formula[i] = self.formulaCombos1046[i].currentIndex()
                 aw.qmc.phidget1046_async[i] = self.asyncCheckBoxes1046[i].isChecked()
