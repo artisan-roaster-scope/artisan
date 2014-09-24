@@ -25347,7 +25347,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
 
         # 1046 RTD
         phidgetBox1046 = QGridLayout()
-        self.onCheckBoxes1046 = []
         self.gainCombos1046 = []
         self.formulaCombos1046 = []
         self.asyncCheckBoxes1046 = []        
@@ -25382,7 +25381,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
             asyncFlag.setChecked(True)
             asyncFlag.setChecked(aw.qmc.phidget1046_async[i-1])
             self.asyncCheckBoxes1046.append(asyncFlag)
-            self.connect(asyncFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1046(y,x))
             phidgetBox1046.addWidget(asyncFlag,3,i)        
             rowLabel = QLabel(str(i))
             phidgetBox1046.addWidget(rowLabel,0,i)
@@ -25638,16 +25636,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout.setMargin(10)
         self.setLayout(Mlayout)
 
-    def onFlagStateChanged1046(self,i,x):
-        if x == 0:
-            # disable async flag
-            self.asyncCheckBoxes1046[i].setChecked(False)
-
-    def asyncFlagStateChanged1046(self,i,x):
-        if not x == 0:
-            # enable ON flag
-            self.onCheckBoxes1046[i].setChecked(True)
-            
     def asyncFlagStateChanged1048(self,i,x):
         if x == 0:
             # disable ChangeTrigger selection
