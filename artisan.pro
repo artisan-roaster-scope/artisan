@@ -35,4 +35,5 @@ TRANSLATIONS = \
 	translations/artisan_tr.ts \
 	translations/artisan_ja.ts \
 	translations/artisan_hu.ts \
-	translations/artisan_he.ts 
+	translations/artisan_he.ts \
+	translations/artisan_pl.ts 

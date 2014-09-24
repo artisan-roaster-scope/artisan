@@ -58,4 +58,5 @@ cp $QT/translations/qt_ru.qm dist/translations
 cp $QT/translations/qt_ar.qm dist/translations
 cp $QT/translations/qt_ja.qm dist/translations
 cp $QT/translations/qt_hu.qm dist/translations
+cp $QT/translations/qt_pl.qm dist/translations
 tar -cf dist-centos64.tar dist
