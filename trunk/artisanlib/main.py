@@ -13750,7 +13750,7 @@ $cupping_notes
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
         contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis, Miroslav Stankovic,")
         contributors += u("<br>Barrie Fairley, Ziv Sade, Nicholas Seckar,")
-        contributors += u("<br>Morten M") + uchr(252) + u("nchow") + u(", Andrzej Kielbasinski")
+        contributors += u("<br>Morten M") + uchr(252) + u("nchow") + u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -22576,7 +22576,8 @@ class serialport(object):
         return res
 
     def phidget1045TemperatureChanged(self,e):
-        self.Phidget1045value = (self.Phidget1045value + e.temperature)/2.0
+        if aw.qmc.phidget1045_async:
+            self.Phidget1045value = (self.Phidget1045value + e.temperature)/2.0
 
     def PHIDGET1045temperature(self):
         try:
@@ -22648,7 +22649,8 @@ class serialport(object):
             return -1,-1
 
     def phidget1048TemperatureChanged(self,e):
-        aw.ser.Phidget1048values[e.index] = (aw.ser.Phidget1048values[e.index] + e.temperature)/2.0
+        if aw.qmc.phidget1048_async[e.index]:
+            aw.ser.Phidget1048values[e.index] = (aw.ser.Phidget1048values[e.index] + e.temperature)/2.0
 
     def phidget1048getSensorReading(self,i):
         if aw.qmc.phidget1048_async[i]:
@@ -22793,7 +22795,7 @@ class serialport(object):
     # see Analog Devices Application Note AN-709 http://www.analog.com/static/imported-files/application_notes/AN709_0.pdf
     # Wikipedia http://en.wikipedia.org/wiki/Resistance_thermometer
     #  or http://www.abmh.de
-    def bridgeValue2PT100(self,R_RTD):
+    def rRTD2PT100temp(self,R_RTD):
         Z1 = -3.9083e-03
         Z2 = 1.76e-05
         Z3 = -2.31e-08
@@ -22812,17 +22814,18 @@ class serialport(object):
 #        return 4750.3 * bvf * bvf + 4615.6 * bvf - 242.615                
 
     def phidget1046TemperatureChanged(self,e):
-        temp = self.bridgeValue2Temperature(e.index,e.value)
-        if aw.qmc.mode == "F":
-            temp = aw.qmc.fromCtoF(temp)
-        aw.ser.Phidget1046values[e.index] = (aw.ser.Phidget1046values[e.index] + temp)/2.0
+        if aw.qmc.phidget1046_async[e.index]:
+            temp = self.bridgeValue2Temperature(e.index,e.value)
+            if aw.qmc.mode == "F":
+                temp = aw.qmc.fromCtoF(temp)
+            aw.ser.Phidget1046values[e.index] = (aw.ser.Phidget1046values[e.index] + temp)/2.0
 
     def bridgeValue2Temperature(self,i,bv):
         v = -1
         if aw.qmc.phidget1046_formula[i] == 0:
-            v = self.bridgeValue2PT100(self.R_RTD_WS(bv))
+            v = self.rRTD2PT100temp(self.R_RTD_WS(bv))
         elif aw.qmc.phidget1046_formula[i] == 1:
-            v = self.bridgeValue2PT100(self.R_RTD_DIV(bv))
+            v = self.rRTD2PT100temp(self.R_RTD_DIV(bv))
         elif aw.qmc.phidget1046_formula[i] == 2:
             v = bv
         return v
@@ -22830,12 +22833,14 @@ class serialport(object):
     def phidget1046getTemperature(self,i):
         v = -1
         try:
+            bv = aw.ser.PhidgetBridgeSensor.getBridgeValue(i)
+            
 # test values for the bridge value to temperature conversion
 #            bv = 51.77844 # about room temperature for Voltage Divider wiring
-#            bv = 400,2949 # about room temperature for Wheatstone Bridge
-            bv = aw.ser.PhidgetBridgeSensor.getBridgeValue(i)
+#            bv = 400.2949 # about room temperature for Wheatstone Bridge
+
             v = self.bridgeValue2Temperature(i,bv)
-            if aw.qmc.mode == "F":
+            if aw.qmc.mode == "F" and aw.qmc.phidget1046_formula[i] != 2:
                 v = aw.qmc.fromCtoF(v)
         except:
             v = -1
@@ -22890,6 +22895,8 @@ class serialport(object):
                         if 38 in aw.qmc.extradevices:
                             aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
                             aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
+                        if aw.qmc.phidget1046_async[0] or aw.qmc.phidget1046_async[1] or aw.qmc.phidget1046_async[2] or aw.qmc.phidget1046_async[3]:
+                            aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(lambda e=None:self.phidget1046TemperatureChanged(e))
                         libtime.sleep(.3)
                 except:
                     pass
@@ -22945,7 +22952,8 @@ class serialport(object):
             return -1,-1
 
     def phidget1018SensorChanged(self,e):
-        aw.ser.PhidgetIOvalues[e.index] = (aw.ser.PhidgetIOvalues[e.index] + e.value)/2.0
+        if aw.qmc.phidget1018_async[e.index]:
+            aw.ser.PhidgetIOvalues[e.index] = (aw.ser.PhidgetIOvalues[e.index] + e.value)/2.0
 
     def phidget1018getSensorReading(self,i):
         if aw.qmc.phidget1018_raws[i]:
@@ -29228,7 +29236,7 @@ class PXRpidDlgControl(ArtisanDialog):
             soakedit  = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXR[soakkey][0])))
             soakedit.setValidator(QRegExpValidator(regextime,self))
             setButton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
-            self.connect(setButton,SIGNAL("clicked()"),lambda idn =i:self.setsegment(i))
+            self.connect(setButton,SIGNAL("clicked()"),lambda idn = i:self.setsegment(idn))
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
             self.segmenttable.setCellWidget(i,1,rampedit)
