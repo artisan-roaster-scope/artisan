@@ -22823,11 +22823,11 @@ class serialport(object):
     def bridgeValue2Temperature(self,i,bv):
         v = -1
         if aw.qmc.phidget1046_formula[i] == 0:
-            v = self.rRTD2PT100temp(self.R_RTD_WS(bv))
+            v = self.rRTD2PT100temp(self.R_RTD_WS(abs(bv)))  # we add the abs() here to support inverted wirings
         elif aw.qmc.phidget1046_formula[i] == 1:
-            v = self.rRTD2PT100temp(self.R_RTD_DIV(bv))
+            v = self.rRTD2PT100temp(self.R_RTD_DIV(abs(bv)))  # we add the abs() here to support inverted wirings
         elif aw.qmc.phidget1046_formula[i] == 2:
-            v = bv
+            v = bv # no abs() for raw values
         return v
 
     def phidget1046getTemperature(self,i):
