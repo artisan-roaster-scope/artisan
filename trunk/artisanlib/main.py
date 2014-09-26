@@ -39,7 +39,7 @@ import serial.tools.list_ports
 import math
 import binascii
 import time as libtime
-import glob
+#import glob
 import os
 import warnings
 import string as libstring
@@ -64,12 +64,12 @@ sip.setapi('QString', 1)
 sip.setapi('QVariant', 1)
 
 from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
-                         QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QFontDatabase,QTableWidgetSelectionRange,
+                         QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange,
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
                          QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView, QStandardItem,
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton,
                          QPixmap, QImage, QColor, QColorDialog, QPalette, QFrame, QCheckBox, QDesktopServices, QIcon,
-                         QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QFontInfo, QBrush, QRadialGradient,
+                         QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QBrush, QRadialGradient,
                          QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QCursor, QDoubleSpinBox, QTextDocument)
 from PyQt4.QtCore import (QString, QStringList, QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, 
                           QT_VERSION_STR,SIGNAL, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, SLOT,
@@ -85,19 +85,19 @@ from matplotlib.colors import cnames as cnames
 from matplotlib import rcParams
 import matplotlib.patches as patches
 import matplotlib.transforms as transforms
-import matplotlib.font_manager as font_manager
+#import matplotlib.font_manager as font_manager
 import matplotlib.ticker as ticker
 import matplotlib.patheffects as PathEffects
-import matplotlib.dates as md
+#import matplotlib.dates as md
 
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 
 try:
-    import matplotlib.backends.qt_editor.figureoptions as figureoptions
+    import matplotlib.backends.qt_editor.figureoptions as figureoptions # for matplotlib >= v1.4
 except ImportError:
-    figureoptions = None
+    import matplotlib.backends.qt4_editor.figureoptions as figureoptions # for matplotlib <v1.4
     
 from Phidgets.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor, ThermocoupleType
 from Phidgets.Devices.Bridge import Bridge as Phidget1046TemperatureSensor
@@ -775,6 +775,9 @@ class tgraphcanvas(FigureCanvas):
         # this is to ensure, that only uneven window values are used and no wrong shift is happening through smoothing
         self.deltafilter = 5 # => corresponds to 2 on the user interface
         self.curvefilter = 3 # => corresponds to 1 on the user interface
+        self.deltaspan = 6 # the time period taken to compute one deltaBT/ET value (1-15sec)
+        self.deltasamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
+        self.profile_sampling_interval = None # will be updated on loading a profile
         
         self.altsmoothing = False # toggle between standard and alternative smoothing approach
         self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
@@ -945,8 +948,8 @@ class tgraphcanvas(FigureCanvas):
         self.ylimit_min = 0
         self.zlimit = 100
         self.zlimit_min = 0
-        self.RoRlimitF = 50
-        self.RoRlimitC = 35
+        self.RoRlimitF = 80
+        self.RoRlimitC = 45
         self.endofx = 60
         self.startofx = 0
         self.resetmaxtime = 60  #time when pressing reset
@@ -1165,6 +1168,15 @@ class tgraphcanvas(FigureCanvas):
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
+    
+    # update the aw.qmc.deltaspan from the given sampling interval and aw.qmc.deltasamples
+    # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
+    def updateDeltaSamples(self):
+        if self.flagstart or self.profile_sampling_interval == None:
+            interval = self.delay
+        else:
+            interval = self.profile_sampling_interval
+        self.deltasamples = max(1,self.deltaspan / int(interval))
     
     # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
     def draw(self):
@@ -2011,10 +2023,14 @@ class tgraphcanvas(FigureCanvas):
     def fmt_data(self,x):
         if self.fmt_data_RoR and self.delta_ax:
             try:
-                return int(round(self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1]))
+                v = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
+                if aw.qmc.LCDdecimalplaces:
+                    return aw.float2float(v)
+                else:
+                    return int(round(v))
             except:
                 pass
-        return int(round(x))
+        return aw.float2float(x) #int(round(x))
 
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
@@ -2657,7 +2673,7 @@ class tgraphcanvas(FigureCanvas):
             if two_ax_mode:
                 #create a second set of axes in the same position as self.ax
                 self.delta_ax = self.ax.twinx()
-                self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
+                self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put delta_ax in front of ax
                 self.ax.patch.set_visible(True)
                 if aw.qmc.flagstart:
                     self.delta_ax.set_ylabel("")
@@ -2786,7 +2802,7 @@ class tgraphcanvas(FigureCanvas):
 
                 #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
                 if self.DeltaETBflag or self.DeltaBTBflag:
-                    if True: #recomputeAllDeltas:
+                    if True: # recomputeAllDeltas:
                         tx = numpy.array(self.timeB)
                         dtx = numpy.diff(self.timeB) / 60.
                         with numpy.errstate(divide='ignore'):
@@ -2942,20 +2958,26 @@ class tgraphcanvas(FigureCanvas):
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             if self.DeltaETflag or self.DeltaBTflag:
                 if recomputeAllDeltas:
+#                    dtx = numpy.diff(self.timex) / 60.
                     tx = numpy.array(self.timex)
-                    dtx = numpy.diff(self.timex) / 60.
-                    if aw.qmc.flagon or len(dtx) + 1 != len(self.stemp1):
-                        with numpy.errstate(divide='ignore'):
-                            z1 = numpy.diff(self.temp1) / dtx
+                    if aw.qmc.flagon or len(tx) != len(self.stemp1):
+                        t1 = self.temp1
                     else:
-                        with numpy.errstate(divide='ignore'):
-                            z1 = numpy.diff(self.stemp1) / dtx
-                    if aw.qmc.flagon or len(dtx) + 1 != len(self.stemp2):
-                        with numpy.errstate(divide='ignore'):
-                            z2 = numpy.diff(self.temp2) / dtx
+                        t1 = self.stemp1
+                    with numpy.errstate(divide='ignore'):
+#                        z1 = numpy.diff(t1) / dtx
+                        nt1 = numpy.array(t1)
+                        z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+
+                    if aw.qmc.flagon or len(tx) != len(self.stemp2):
+                        t2 = self.temp2
                     else:
-                        with numpy.errstate(divide='ignore'):
-                            z2 = numpy.diff(self.stemp2) / dtx
+                        t2 = self.stemp2
+                    with numpy.errstate(divide='ignore'):
+#                        z2 = numpy.diff(t2) / dtx
+                        nt2 = numpy.array(t2)
+                        z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                            
                     lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
                     # make lists equal in length
                     if lt > ld1:
@@ -2965,6 +2987,11 @@ class tgraphcanvas(FigureCanvas):
                     self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
                     self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
                     # filter out values beyond the delta limits
+                    # cut out the part after DROP
+                    if aw.qmc.timeindex[6]:
+                        self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[-1]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
+                        self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[-1]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
+                    # remove values beyond the RoRlimit
                     if aw.qmc.mode == "C":
                         rorlimit = aw.qmc.RoRlimitC
                     else:
@@ -3372,8 +3399,11 @@ class tgraphcanvas(FigureCanvas):
                             nextra = len(aw.qmc.extratemp1)   
                             if nextra:
                                 for e in range(nextra):
-                                    aw.qmc.extratemp1[e][i] = self.fromCtoF(aw.qmc.extratemp1[e][i])
-                                    aw.qmc.extratemp2[e][i] = self.fromCtoF(aw.qmc.extratemp2[e][i])
+                                    try:
+                                        aw.qmc.extratemp1[e][i] = self.fromCtoF(aw.qmc.extratemp1[e][i])
+                                        aw.qmc.extratemp2[e][i] = self.fromCtoF(aw.qmc.extratemp2[e][i])
+                                    except:
+                                        pass
 
                         self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
                         self.bag_humidity[1] = self.fromCtoF(self.bag_humidity[1]) #greens humidity temperature
@@ -3720,6 +3750,7 @@ class tgraphcanvas(FigureCanvas):
             if not self.flagon:
                 self.OnMonitor()
             self.flagstart = True
+            aw.qmc.updateDeltaSamples()
             aw.disableSaveActions()
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None, QApplication.UnicodeUTF8))
             aw.button_2.setEnabled(False)
@@ -6516,7 +6547,8 @@ class SampleThread(QThread):
                         if aw.qmc.BTcurve:
                             aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
                     #we need a minimum of two readings to calculate rate of change
-                    if local_flagstart and length_of_qmc_timex > 3:
+                    n = 4
+                    if local_flagstart and length_of_qmc_timex > (aw.qmc.deltasamples):
 #                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
 #    #                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
 #    #                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
@@ -6532,16 +6564,16 @@ class SampleThread(QThread):
 #                        aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
                         
                         # replaced above by taking the last and the butbutlast measurements to ensure a higher temperature resolution, reducing fluctuation
-                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-4]   #time difference between last two readings
                         if aw.qmc.altsmoothing:
                             # Use numpy to compute a linear approximation for deltas:
                             aw.qmc.rateofchange1 = self.compute_delta(aw.qmc.timex, aw.qmc.temp1, aw.qmc.smoothingwindowsize)
                             aw.qmc.rateofchange2 = self.compute_delta(aw.qmc.timex, aw.qmc.temp2, aw.qmc.smoothingwindowsize)
                         else:
                             # Compute delta using the last two data points with:
+                            timed = aw.qmc.timex[-1] - aw.qmc.timex[-(aw.qmc.deltasamples + 1)]   #time difference between last aw.qmc.deltasamples readings
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-4])/timed)*60.  #delta ET (degress/minute)
-                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-4])/timed)*60.  #delta  BT (degress/minute)
+                            aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-(aw.qmc.deltasamples + 1)])/timed)*60.  #delta ET (degress/minute)
+                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-(aw.qmc.deltasamples + 1)])/timed)*60.  #delta  BT (degress/minute)
 
 
 
@@ -10327,8 +10359,16 @@ class ApplicationWindow(QMainWindow):
                 roastlogger_action_section = "No actions loaded"
 
                 #Find sliders - exact names of the sliders must be defined
-                slider_power=aw.qmc.etypes.indexOf("Power")
-                slider_fan=aw.qmc.etypes.indexOf("Fan")
+                slider_power = -1
+                slider_fan = -1
+                try:
+                    slider_power=aw.qmc.etypes.index("Power")
+                except:
+                    pass
+                try:
+                    slider_fan=aw.qmc.etypes.index("Fan")
+                except:
+                    pass
                 #load only "Power" and "Fan" events
                 if slider_power != -1 and slider_fan != -1:
                     data_action = csv.reader(infile,delimiter='|')
@@ -10872,6 +10912,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roasted_humidity = [0.,0.]
             if "externalprogram" in profile:
                 self.ser.externalprogram = d(profile["externalprogram"])
+            if "samplinginterval" in profile:
+                # derive aw.qmc.deltasamples from aw.qmc.deltaspan and the sampling interval of the profile
+                self.qmc.profile_sampling_interval = profile["samplinginterval"]
+                self.qmc.updateDeltaSamples()
             # alarms
             if self.qmc.loadalarmsfromprofile:
                 self.qmc.alarmsfile = filename
@@ -11253,9 +11297,9 @@ class ApplicationWindow(QMainWindow):
             profile["etypes"] = [e(et) for et in self.qmc.etypes]
             profile["roastingnotes"] = e(self.qmc.roastingnotes)
             profile["cuppingnotes"] = e(self.qmc.cuppingnotes)
-            profile["timex"] = [self.float2float(x,5) for x in self.qmc.timex]
-            profile["temp1"] = [self.float2float(x,2) for x in self.qmc.temp1]
-            profile["temp2"] = [self.float2float(x,2) for x in self.qmc.temp2]
+            profile["timex"] = [self.float2float(x,6) for x in self.qmc.timex]
+            profile["temp1"] = [self.float2float(x,3) for x in self.qmc.temp1]
+            profile["temp2"] = [self.float2float(x,3) for x in self.qmc.temp2]
             profile["phases"] = self.qmc.phases
             profile["zmax"] = self.qmc.zlimit
             profile["zmin"] = self.qmc.zlimit_min
@@ -11760,6 +11804,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
             self.qmc.deltafilter = settings.value("deltafilter",self.qmc.deltafilter).toInt()[0]
+            if settings.contains("DeltaSpan"):
+                self.qmc.deltaspan = settings.value("DeltaSpan",self.qmc.deltaspan).toInt()[0]
             self.qmc.LCDdecimalplaces = settings.value("LCDdecimalplaces",self.qmc.LCDdecimalplaces).toInt()[0]
             if settings.contains("DeltaETlcd"):
                 self.qmc.DeltaETlcdflag = settings.value("DeltaETlcd",self.qmc.DeltaETlcdflag).toBool()
@@ -12520,6 +12566,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaETlcd",self.qmc.DeltaETlcdflag)
             settings.setValue("DeltaBTlcd",self.qmc.DeltaBTlcdflag)
             settings.setValue("deltafilter",self.qmc.deltafilter)
+            settings.setValue("DeltaSpan",self.qmc.deltaspan)
             settings.setValue("LCDdecimalplaces",self.qmc.LCDdecimalplaces)
             settings.endGroup()
             settings.setValue("curvefilter",self.qmc.curvefilter)
@@ -13741,16 +13788,17 @@ $cupping_notes
 
     def helpAbout(self):
         coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
-        contributors = u("<br>") + uchr(199) + u("etin Barut, Marcio Carnerio, Bradley Collins,")
-        contributors += u("<br>Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall,")
-        contributors += u("<br>Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo,")
-        contributors += u("<br>Savvas Kiretsis, Lukas Kolbe, David Lahoz,")
-        contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
-        contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
-        contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
-        contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis, Miroslav Stankovic,")
-        contributors += u("<br>Barrie Fairley, Ziv Sade, Nicholas Seckar,")
-        contributors += u("<br>Morten M") + uchr(252) + u("nchow") + u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski")
+        contributors = u("<br>") + uchr(199) + u("etin Barut, Marcio Carnerio, Bradley Collins, ")
+        contributors += u("Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall, ")
+        contributors += u("Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo, ")
+        contributors += u("Savvas Kiretsis, Lukas Kolbe, David Lahoz, ")
+        contributors += u("Runar Ostnes, Carlos Pascual, Claudia Raddatz, ")
+        contributors += u("Matthew Sewell, Bertrand Souville, Minoru Yoshida, ")
+        contributors += u("Wa'il, Alex Fan, Piet Dijk, Rubens Gardelli, ")
+        contributors += u("David Trebilcock, Zolt") + uchr(225) + u("n Kis, Miroslav Stankovic, ")
+        contributors += u("Barrie Fairley, Ziv Sade, Nicholas Seckar, ")
+        contributors += u("Morten M") + uchr(252) + u("nchow")
+        contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -15012,6 +15060,17 @@ class HUDDlg(ArtisanDialog):
         self.connect(self.DeltaET,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaET(i))         #toggle
         self.connect(self.DeltaBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaBT(i))         #toggle
         self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.changeProjection(i)) #toggle
+        
+        deltaSpanLabel = QLabel(QApplication.translate("Label", "Delta Span",None, QApplication.UnicodeUTF8))
+        self.deltaSpan = QComboBox()
+        self.spanitems = range(1,16)
+        self.deltaSpan.addItems([str(i) + "s" for i in self.spanitems])
+        try:
+            self.deltaSpan.setCurrentIndex(self.spanitems.index(aw.qmc.deltaspan))
+        except:
+            pass
+        self.connect(self.deltaSpan,SIGNAL("currentIndexChanged(int)"),lambda i=0:self.changeDeltaSpan(i))  #toggle
+
         self.modeComboBox = QComboBox()
         self.modeComboBox.setMaximumWidth(100)
         self.modeComboBox.setMinimumWidth(55)
@@ -15072,6 +15131,8 @@ class HUDDlg(ArtisanDialog):
         rorLayout.addWidget(self.projectionmodeComboBox,0,1)
         rorLayout.addWidget(self.DeltaET,1,0)
         rorLayout.addWidget(self.DeltaBT,1,1)
+        rorLayout.addWidget(deltaSpanLabel,1,2)
+        rorLayout.addWidget(self.deltaSpan,1,3)
         rorBoxLayout = QHBoxLayout()
         rorBoxLayout.addLayout(rorLayout)
         rorBoxLayout.addStretch()
@@ -15859,6 +15920,12 @@ class HUDDlg(ArtisanDialog):
         if aw.qmc.crossmarker:
             aw.qmc.togglecrosslines() # turn crossmarks off to adjust for new coordinate system
         aw.qmc.redraw(recomputeAllDeltas=True)
+        
+    def changeDeltaSpan(self,i):
+        if aw.qmc.deltaspan != self.spanitems[i]:
+            aw.qmc.deltaspan = self.spanitems[i]
+            aw.qmc.updateDeltaSamples()
+            aw.qmc.redraw(recomputeAllDeltas=True)
         
     def changeDecimalPlaceslcd(self,i):
         if self.DecimalPlaceslcd.isChecked():
@@ -22604,9 +22671,17 @@ class serialport(object):
                     aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR not attached",None, QApplication.UnicodeUTF8))
                     
                 if self.PhidgetIRSensor and self.PhidgetIRSensor.isAttached():
-                    if aw.qmc.phidget1045_async:
-                        self.PhidgetIRSensor.setTemperatureChangeTrigger(0,0.5)#aw.qmc.phidget1045_changeTrigger)
-                        self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1045TemperatureChanged(e))
+                    try:
+                        self.PhidgetIRSensor.setTemperatureChangeTrigger(0,aw.qmc.phidget1045_changeTrigger)
+                    except:
+                        pass
+                    try:
+                        if aw.qmc.phidget1045_async:
+                            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1045TemperatureChanged(e))
+                        else:
+                            self.PhidgetIRSensor.setOnTemperatureChangeHandler(None)
+                    except:
+                        pass
                     libtime.sleep(.3)
             if self.PhidgetIRSensor and not self.PhidgetIRSensor.isAttached():
                 try:
@@ -22713,8 +22788,13 @@ class serialport(object):
 #                            traceback.print_exc(file=sys.stdout)
                             pass
                     libtime.sleep(.3)
-                    if changeTrigger:
-                        aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1048TemperatureChanged(e))
+                    try:
+                        if changeTrigger:
+                            aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1048TemperatureChanged(e))
+                        else:
+                            aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(None)
+                    except:
+                        pass
                     
             if aw.ser.PhidgetTemperatureSensor and not aw.ser.PhidgetTemperatureSensor.isAttached():
                 try:
@@ -22895,8 +22975,10 @@ class serialport(object):
                         if 38 in aw.qmc.extradevices:
                             aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
                             aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
-                        if aw.qmc.phidget1046_async[0] or aw.qmc.phidget1046_async[1] or aw.qmc.phidget1046_async[2] or aw.qmc.phidget1046_async[3]:
+                        if aw.qmc.phidget1046_async[0] or aw.qmc.phidget1046_async[1] or (38 in aw.qmc.extradevices and (aw.qmc.phidget1046_async[2] or aw.qmc.phidget1046_async[3])):
                             aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(lambda e=None:self.phidget1046TemperatureChanged(e))
+                        else:
+                            aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(None)
                         libtime.sleep(.3)
                 except:
                     pass
@@ -23011,8 +23093,13 @@ class serialport(object):
 #                                traceback.print_exc(file=sys.stdout)
                                 pass
                         libtime.sleep(.3)
-                        if changeTrigger:
-                            aw.ser.PhidgetIO.setOnSensorChangeHandler(lambda e=None:self.phidget1018SensorChanged(e))
+                        try:
+                            if changeTrigger:
+                                aw.ser.PhidgetIO.setOnSensorChangeHandler(lambda e=None:self.phidget1018SensorChanged(e))
+                            else:
+                                aw.ser.PhidgetIO.setOnSensorChangeHandler(None)
+                        except:
+                            pass
                 except:
                     pass
             if aw.ser.PhidgetIO and not aw.ser.PhidgetIO.isAttached():
@@ -25274,6 +25361,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.probeTypeCombos = []
         for i in range(1,5):
             changeTriggersCombo = QComboBox()
+            changeTriggersCombo.setFocusPolicy(Qt.NoFocus)
             model = changeTriggersCombo.model()
             changeTriggerItems = self.createItems(aw.qmc.phidget1048_changeTriggersStrings)
             for item in changeTriggerItems:
@@ -25286,12 +25374,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.changeTriggerCombos1048.append(changeTriggersCombo)
             phidgetBox1048.addWidget(changeTriggersCombo,3,i)
             asyncFlag = QCheckBox()
+            asyncFlag.setFocusPolicy(Qt.NoFocus)
             asyncFlag.setChecked(True)
             self.connect(asyncFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1048(y,x))
             asyncFlag.setChecked(aw.qmc.phidget1048_async[i-1])
             self.asyncCheckBoxes1048.append(asyncFlag)
             phidgetBox1048.addWidget(asyncFlag,2,i)
             probeTypeCombo = QComboBox()
+            probeTypeCombo.setFocusPolicy(Qt.NoFocus)
             model = probeTypeCombo.model()
             probeTypeItems = self.createItems(phidgetProbeTypeItems)
             for item in probeTypeItems:
@@ -25325,6 +25415,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         # Phidget IR
         phidgetBox1045 = QGridLayout()
         self.changeTriggerCombos1045 = QComboBox()
+        self.changeTriggerCombos1045.setFocusPolicy(Qt.NoFocus)
         model = self.changeTriggerCombos1045.model()
         changeTriggerItems = self.createItems(aw.qmc.phidget1045_changeTriggersStrings)
         for item in changeTriggerItems:
@@ -25336,6 +25427,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.changeTriggerCombos1045.setMaximumSize(65,100)
         phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,i)
         self.asyncCheckBoxe1045 = QCheckBox()
+        self.asyncCheckBoxe1045.setFocusPolicy(Qt.NoFocus)
         self.asyncCheckBoxe1045.setChecked(True)
         self.connect(self.asyncCheckBoxe1045,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1045(y,x))
         self.asyncCheckBoxe1045.setChecked(aw.qmc.phidget1045_async)
@@ -25360,6 +25452,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.asyncCheckBoxes1046 = []        
         for i in range(1,5):
             gainCombo = QComboBox()
+            gainCombo.setFocusPolicy(Qt.NoFocus)
             model = gainCombo.model()
             gainItems = self.createItems(aw.qmc.phidget1046_gainValues)
             for item in gainItems:
@@ -25373,6 +25466,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             phidgetBox1046.addWidget(gainCombo,1,i)
             
             formulaCombo = QComboBox()
+            formulaCombo.setFocusPolicy(Qt.NoFocus)
             model = formulaCombo.model()
             formulaItems = self.createItems(aw.qmc.phidget1046_formulaValues)
             for item in formulaItems:
@@ -25386,6 +25480,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             phidgetBox1046.addWidget(formulaCombo,2,i)
 
             asyncFlag = QCheckBox()
+            asyncFlag.setFocusPolicy(Qt.NoFocus)
             asyncFlag.setChecked(True)
             asyncFlag.setChecked(aw.qmc.phidget1046_async[i-1])
             self.asyncCheckBoxes1046.append(asyncFlag)
@@ -25394,6 +25489,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             phidgetBox1046.addWidget(rowLabel,0,i)
             
         self.dataRateCombo1046 = QComboBox()
+        self.dataRateCombo1046.setFocusPolicy(Qt.NoFocus)
         model = self.dataRateCombo1046.model()
         dataRateItems = self.createItems(aw.qmc.phidget_dataRatesStrings)
         for item in dataRateItems:
@@ -25429,6 +25525,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         # Phidget IO 1018
         # ratiometric flag
         self.phidgetBoxRatiometricFlag = QCheckBox(QApplication.translate("CheckBox","Ratiometric",None, QApplication.UnicodeUTF8))
+        self.phidgetBoxRatiometricFlag.setFocusPolicy(Qt.NoFocus)
         self.phidgetBoxRatiometricFlag.setChecked(aw.qmc.phidget1018Ratiometric)
         # per each of the 8-channels: raw flag / data rate popup / change trigger popup
         phidgetBox1018 = QGridLayout()
@@ -25438,6 +25535,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.changeTriggerCombos = []
         for i in range(1,9):
             dataRatesCombo = QComboBox()
+            dataRatesCombo.setFocusPolicy(Qt.NoFocus)
             model = dataRatesCombo.model()
             dataRateItems = self.createItems(aw.qmc.phidget_dataRatesStrings)
             for item in dataRateItems:
@@ -25450,6 +25548,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombos.append(dataRatesCombo)
             phidgetBox1018.addWidget(dataRatesCombo,4,i)
             changeTriggersCombo = QComboBox()
+            changeTriggersCombo.setFocusPolicy(Qt.NoFocus)
             model = changeTriggersCombo.model()
             changeTriggerItems = self.createItems(aw.qmc.phidget1018_changeTriggersStrings)
             for item in changeTriggerItems:
@@ -25463,12 +25562,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.changeTriggerCombos.append(changeTriggersCombo)
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
             asyncFlag = QCheckBox()
+            asyncFlag.setFocusPolicy(Qt.NoFocus)
             asyncFlag.setChecked(True)
             self.connect(asyncFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged(y,x))
             asyncFlag.setChecked(aw.qmc.phidget1018_async[i-1])
             self.asyncCheckBoxes.append(asyncFlag)
             phidgetBox1018.addWidget(asyncFlag,2,i)
             rawFlag = QCheckBox()
+            rawFlag.setFocusPolicy(Qt.NoFocus)
             rawFlag.setChecked(False)
             self.connect(rawFlag,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.rawFlagStateChanged(y,x))
             rawFlag.setChecked(aw.qmc.phidget1018_raws[i-1])
@@ -25494,6 +25595,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1018GroupBox.setLayout(phidget1018HBox)
         phidget1018HBox.setContentsMargins(0,0,0,0)
         self.phidgetBoxRemoteFlag = QCheckBox()
+        self.phidgetBoxRemoteFlag.setFocusPolicy(Qt.NoFocus)
         self.phidgetBoxRemoteFlag.setChecked(aw.qmc.phidgetRemoteFlag)
         phidgetServerIdLabel = QLabel(QApplication.translate("Label","ServerId:", None, QApplication.UnicodeUTF8))
         self.phidgetServerId = QLineEdit(aw.qmc.phidgetServerID)
@@ -26527,25 +26629,63 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.ETlcd = self.ETlcd.isChecked()
             aw.qmc.BTlcd = self.BTlcd.isChecked()
             # Phidget configurations
+            asyncMode1046 = False
+            asyncMode1048 = False
             for i in range(4):
                 aw.qmc.phidget1048_types[i] = self.probeTypeCombos[i].currentIndex()+1
                 aw.qmc.phidget1048_async[i] = self.asyncCheckBoxes1048[i].isChecked()
+                if aw.qmc.phidget1048_async[i] and (i < 2 or (i < 4 and 35 in aw.qmc.extradevices)):
+                    asyncMode1048 = True
                 aw.qmc.phidget1048_changeTriggers[i] = aw.qmc.phidget1048_changeTriggersValues[self.changeTriggerCombos1048[i].currentIndex()]
                 aw.qmc.phidget1046_gain[i] = self.gainCombos1046[i].currentIndex()+1
                 aw.qmc.phidget1046_formula[i] = self.formulaCombos1046[i].currentIndex()
                 aw.qmc.phidget1046_async[i] = self.asyncCheckBoxes1046[i].isChecked()
+                if aw.qmc.phidget1046_async[i] and (i < 2 or (i < 4 and 38 in aw.qmc.extradevices)):
+                    asyncMode1046 = True
             aw.qmc.phidget1046_dataRate = aw.qmc.phidget_dataRatesValues[self.dataRateCombo1046.currentIndex()]
+            try:
+                if asyncMode1046 and aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
+                    aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(lambda e=None:self.phidget1046TemperatureChanged(e))
+                else:
+                    aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(None)
+            except:
+                pass
+            try:
+                if asyncMode1048 and aw.ser.PhidgetTemperatureSensor and aw.ser.PhidgetTemperatureSensor.isAttached():
+                    aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1048TemperatureChanged(e))
+                else:
+                    aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(None)
+            except:
+                pass
             aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
             aw.qmc.phidget1045_changeTrigger = aw.qmc.phidget1045_changeTriggersValues[self.changeTriggerCombos1045.currentIndex()]
+            if aw.qmc.phidget1045_async and aw.ser.PhidgetIRSensor and aw.ser.PhidgetIRSensor.isAttached():
+                try:
+                    if aw.qmc.phidget1045_async:
+                        aw.ser.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e=None:aw.ser.phidget1045TemperatureChanged(e))
+                    else:
+                        aw.ser.PhidgetIRSensor.setOnTemperatureChangeHandler(None)
+                except:
+                    pass
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
             aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
             aw.qmc.phidgetPassword = u(self.phidgetPassword.text())
+            asyncMode = False
             for i in range(8):
                 aw.qmc.phidget1018_async[i] = self.asyncCheckBoxes[i].isChecked()
+                if aw.qmc.phidget1018_async[i] and (i < 2 or (i < 4 and 41 in aw.qmc.extradevices) or (i < 6 and 42 in aw.qmc.extradevices) or (i < 8 and 43 in aw.qmc.extradevices)):
+                    asyncMode = True
                 aw.qmc.phidget1018_raws[i] = self.rawCheckBoxes[i].isChecked()
                 aw.qmc.phidget1018_dataRates[i] = aw.qmc.phidget_dataRatesValues[self.dataRateCombos[i].currentIndex()]
                 aw.qmc.phidget1018_changeTriggers[i] = aw.qmc.phidget1018_changeTriggersValues[self.changeTriggerCombos[i].currentIndex()]
             aw.qmc.phidget1018Ratiometric = self.phidgetBoxRatiometricFlag.isChecked()
+            try:
+                if asyncMode and aw.ser.PhidgetIO and aw.ser.PhidgetIO.isAttached():
+                    aw.ser.PhidgetIO.setOnSensorChangeHandler(lambda e=None:self.phidget1018SensorChanged(e))
+                else:
+                    aw.ser.PhidgetIO.setOnSensorChangeHandler(None)
+            except:
+                pass
             # LCD visibility
             if aw.qmc.flagon:
                 aw.LCD2frame.setVisible(aw.qmc.ETlcd)
