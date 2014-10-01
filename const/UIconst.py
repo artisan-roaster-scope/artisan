@@ -128,6 +128,7 @@ if platf != 'Darwin':
 TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None, QApplication.UnicodeUTF8)    
 TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None, QApplication.UnicodeUTF8)
 TOOLKIT_MENU_WHEELGRAPH = QApplication.translate("Menu", "Wheel Graph", None, QApplication.UnicodeUTF8)
+TOOLKIT_MENU_LCDS = QApplication.translate("Menu", "LCDs", None, QApplication.UnicodeUTF8)
 TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None, QApplication.UnicodeUTF8)
 
     

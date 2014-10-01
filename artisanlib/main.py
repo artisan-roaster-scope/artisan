@@ -1410,12 +1410,12 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(ndev):
                         if i < aw.nLCDS:
                             if self.extratemp1[i]:
-                                if -100 < self.extratemp1[i] < 1000:
+                                if -100 < self.extratemp1[i][-1] < 1000:
                                     aw.extraLCD1[i].display(lcdformat%float(self.extratemp1[i][-1]))
                                 else:
                                     aw.extraLCD1[i].display("--")
                             if self.extratemp2[i]:
-                                if -100 < self.extratemp2[i] < 1000:
+                                if -100 < self.extratemp2[i][-1] < 1000:
                                     aw.extraLCD2[i].display(lcdformat%float(self.extratemp2[i][-1]))
                                 else:
                                     aw.extraLCD1[i].display("--")
@@ -2815,6 +2815,11 @@ class tgraphcanvas(FigureCanvas):
                             z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
                         self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=self.timeindexB[0]) # CHARGE is the charge for the foreground, so we have to disable this here
                         self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=self.timeindexB[0])
+                        # cut out the part after DROP
+                        if aw.qmc.timeindex[6]:
+                            self.delta1B = numpy.append(self.delta1B[:self.timeindexB[6]+1],[None]*(len(self.delta1B)-self.timeindexB[6]-1))
+                            self.delta2B = numpy.append(self.delta2B[:self.timeindexB[6]+1],[None]*(len(self.delta2B)-self.timeindexB[6]-1))
+                        
                         # filter out values beyond the delta limits
                         if aw.qmc.mode == "C":
                             rorlimit = aw.qmc.RoRlimitC
@@ -2989,8 +2994,8 @@ class tgraphcanvas(FigureCanvas):
                     # filter out values beyond the delta limits
                     # cut out the part after DROP
                     if aw.qmc.timeindex[6]:
-                        self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[-1]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
-                        self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[-1]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
+                        self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
+                        self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
                     # remove values beyond the RoRlimit
                     if aw.qmc.mode == "C":
                         rorlimit = aw.qmc.RoRlimitC
@@ -6241,7 +6246,7 @@ class VMToolbar(NavigationToolbar):
             if aw.qmc.flagstart:
                 aw.qmc.ax.set_ylabel("")
                 aw.qmc.ax.set_xlabel("")
-                aw.qmf.ax.set_title("")
+                aw.qmc.ax.set_title("")
                 if aw.qmc.delta_ax:
                     aw.qmc.delta_ax.set_ylabel("")
             item, ok = QInputDialog.getItem(self, 'Customize',
@@ -6547,8 +6552,7 @@ class SampleThread(QThread):
                         if aw.qmc.BTcurve:
                             aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
                     #we need a minimum of two readings to calculate rate of change
-                    n = 4
-                    if local_flagstart and length_of_qmc_timex > (aw.qmc.deltasamples):
+                    if local_flagstart and length_of_qmc_timex > 1:
 #                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
 #    #                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
 #    #                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
@@ -6570,10 +6574,11 @@ class SampleThread(QThread):
                             aw.qmc.rateofchange2 = self.compute_delta(aw.qmc.timex, aw.qmc.temp2, aw.qmc.smoothingwindowsize)
                         else:
                             # Compute delta using the last two data points with:
-                            timed = aw.qmc.timex[-1] - aw.qmc.timex[-(aw.qmc.deltasamples + 1)]   #time difference between last aw.qmc.deltasamples readings
+                            left_index = max(2,(aw.qmc.deltasamples + 1))
+                            timed = aw.qmc.timex[-1] - aw.qmc.timex[-left_index]   #time difference between last aw.qmc.deltasamples readings
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-(aw.qmc.deltasamples + 1)])/timed)*60.  #delta ET (degress/minute)
-                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-(aw.qmc.deltasamples + 1)])/timed)*60.  #delta  BT (degress/minute)
+                            aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-left_index])/timed)*60.  #delta  BT (degress/minute)
 
 
 
@@ -6620,12 +6625,8 @@ class SampleThread(QThread):
                             user_filter = int(round(aw.qmc.deltafilter/2))
                         else:
                             user_filter = 0
-                        if length_of_qmc_timex > user_filter:
-                            rateofchange1plot = aw.qmc.rateofchange1 # unfiltered RoR
-                            rateofchange2plot = aw.qmc.rateofchange2 # unfiltered RoR
-                        else:
-                            rateofchange1plot = None
-                            rateofchange2plot = None
+                        rateofchange1plot = aw.qmc.rateofchange1
+                        rateofchange2plot = aw.qmc.rateofchange2
                     else:
                         if local_flagstart:
                             aw.qmc.unfiltereddelta1.append(0.)
@@ -6917,6 +6918,8 @@ class ApplicationWindow(QMainWindow):
         self.recentFileActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
+        
+        self.largeLCDs_dialog = None
 
         #flag to reset Qsettings
         self.resetqsettings = 0
@@ -7461,6 +7464,10 @@ class ApplicationWindow(QMainWindow):
         self.wheeleditorAction = QAction(UIconst.TOOLKIT_MENU_WHEELGRAPH,self)
         self.connect(self.wheeleditorAction,SIGNAL("triggered()"),self.graphwheel)
         self.ToolkitMenu.addAction(self.wheeleditorAction)
+
+        self.lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
+        self.connect(self.lcdsAction,SIGNAL("triggered()"),self.largeLCDs)
+        self.ToolkitMenu.addAction(self.lcdsAction)
 
         self.ToolkitMenu.addSeparator()
 
@@ -8314,10 +8321,12 @@ class ApplicationWindow(QMainWindow):
 
     def colordialog(self,c): # c a QColor
         if platform.system() == 'Darwin':
+            res = QColorDialog.getColor(c)
+            return res
             #return QColorDialog.getColor(c,self,"Color",QColorDialog.DontUseNativeDialog) # works, but does not show native dialog
-            return QColorDialog.getColor(c,self,"Color",QColorDialog.NoButtons) # works (Qt does not hack the Mac dialog)
+            #return QColorDialog.getColor(c,self,"Color",QColorDialog.NoButtons) # works (Qt does not hack the Mac dialog)
         else:
-            return QColorDialog.getColor(c) # blocks on Mac OS X
+            return QColorDialog.getColor(c) # blocks on Mac OS X in the build
 
     def adjustPIDsv(self,x):
         if self.qmc.device == 0: # Fuji PID
@@ -14010,6 +14019,15 @@ $cupping_notes
         self.dialog.setFixedSize(self.dialog.size())
         QApplication.processEvents()
         self.dialog.setModal(False)
+        
+    def largeLCDs(self):
+        if not self.largeLCDs_dialog:
+            self.largeLCDs_dialog = LargeLCDs(self)
+        self.largeLCDs_dialog.show()
+        self.largeLCDs_dialog.raise_()
+        self.largeLCDs_dialog.activateWindow()
+        QApplication.processEvents()
+        self.largeLCDs_dialog.setModal(False)
 
     def graphwheel(self):
         if self.qmc.designerflag:
@@ -15476,10 +15494,20 @@ class HUDDlg(ArtisanDialog):
         sLayout.addWidget(self.soundCheck)
         soundGroupWidget = QGroupBox(QApplication.translate("GroupBox","Sound",None, QApplication.UnicodeUTF8))
         soundGroupWidget.setLayout(sLayout)
+        # tick
+        # port
+        self.WebLCDsURL = QLabel('<a href="http://localhost:8081/artisan">http://localhost:8081/artisan</a>')
+        self.WebLCDsURL.setOpenExternalLinks(True)
+        WebLCDsLayout = QHBoxLayout()
+        WebLCDsLayout.addStretch()
+        WebLCDsLayout.addWidget(self.WebLCDsURL)
+        WebLCDsGroupWidget = QGroupBox(QApplication.translate("GroupBox","WebLCDs",None, QApplication.UnicodeUTF8))
+        WebLCDsGroupWidget.setLayout(WebLCDsLayout)
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(appearanceGroupWidget)
         tab5Layout.addWidget(resolutionGroupWidget)
         tab5Layout.addWidget(soundGroupWidget)
+        tab5Layout.addWidget(WebLCDsGroupWidget)
         tab5Layout.addStretch()
         tab5Layout.addLayout(defresLayout)
         ############################  TABS LAYOUT
@@ -26644,29 +26672,53 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     asyncMode1046 = True
             aw.qmc.phidget1046_dataRate = aw.qmc.phidget_dataRatesValues[self.dataRateCombo1046.currentIndex()]
             try:
-                if asyncMode1046 and aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
-                    aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(lambda e=None:self.phidget1046TemperatureChanged(e))
-                else:
-                    aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(None)
+                if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
+                    for i in range(4):
+                        try:
+                            aw.ser.PhidgetBridgeSensor.setGain(i, aw.qmc.phidget1046_gain[i])
+                        except:
+                            pass
+                    # set rate
+                    try:
+                        aw.ser.PhidgetBridgeSensor.setDataRate(aw.qmc.phidget1046_dataRate)
+                    except:
+                        pass
+                    if asyncMode1046:
+                        aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(lambda e=None:aw.ser.phidget1046TemperatureChanged(e))
+                    else:
+                        aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(None)
             except:
                 pass
             try:
-                if asyncMode1048 and aw.ser.PhidgetTemperatureSensor and aw.ser.PhidgetTemperatureSensor.isAttached():
-                    aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1048TemperatureChanged(e))
-                else:
-                    aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(None)
+                if aw.ser.PhidgetTemperatureSensor and aw.ser.PhidgetTemperatureSensor.isAttached():
+                    for i in range(4):
+                        try:
+                            aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,500.0) # "deactivate" triggers for non async channels
+                            if i < 2 or (i < 4 and 35 in aw.qmc.extradevices):
+                                if aw.qmc.phidget1048_async[i]:
+                                    aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,aw.qmc.phidget1048_changeTriggers[i])
+                        except:
+                            pass
+                    if asyncMode1048:
+                        aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:aw.ser.phidget1048TemperatureChanged(e))
+                    else:
+                        aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(None)
             except:
                 pass
             aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
             aw.qmc.phidget1045_changeTrigger = aw.qmc.phidget1045_changeTriggersValues[self.changeTriggerCombos1045.currentIndex()]
-            if aw.qmc.phidget1045_async and aw.ser.PhidgetIRSensor and aw.ser.PhidgetIRSensor.isAttached():
-                try:
+            try:
+                if aw.qmc.phidget1045_async and aw.ser.PhidgetIRSensor and aw.ser.PhidgetIRSensor.isAttached():
+                    try:
+                        aw.ser.PhidgetIRSensor.setTemperatureChangeTrigger(0,aw.qmc.phidget1045_changeTrigger)
+                    except:
+                        pass
                     if aw.qmc.phidget1045_async:
                         aw.ser.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e=None:aw.ser.phidget1045TemperatureChanged(e))
                     else:
                         aw.ser.PhidgetIRSensor.setOnTemperatureChangeHandler(None)
-                except:
-                    pass
+            except:
+                pass
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
             aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
             aw.qmc.phidgetPassword = u(self.phidgetPassword.text())
@@ -26680,10 +26732,21 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.phidget1018_changeTriggers[i] = aw.qmc.phidget1018_changeTriggersValues[self.changeTriggerCombos[i].currentIndex()]
             aw.qmc.phidget1018Ratiometric = self.phidgetBoxRatiometricFlag.isChecked()
             try:
-                if asyncMode and aw.ser.PhidgetIO and aw.ser.PhidgetIO.isAttached():
-                    aw.ser.PhidgetIO.setOnSensorChangeHandler(lambda e=None:self.phidget1018SensorChanged(e))
-                else:
-                    aw.ser.PhidgetIO.setOnSensorChangeHandler(None)
+                if aw.ser.PhidgetIO and aw.ser.PhidgetIO.isAttached():
+                    # set also the raw, changeTrigger and rate things
+                    try:
+                        for i in range(max(3,aw.ser.PhidgetIO.getSensorCount())):
+                            aw.ser.PhidgetIO.setSensorChangeTrigger(i,1000) # "deactivate" triggers for non async channels
+                            if i < 2 or (i < 4 and 41 in aw.qmc.extradevices) or (i < 6 and 42 in aw.qmc.extradevices) or (i < 8 and 43 in aw.qmc.extradevices):
+                                if not aw.qmc.phidget1018_raws[i] and aw.qmc.phidget1018_async[i]:
+                                    aw.ser.PhidgetIO.setSensorChangeTrigger(i,aw.qmc.phidget1018_changeTriggers[i]) # force fixed data rate if 0 (default 10)
+                                    aw.ser.PhidgetIO.setDataRate(i, aw.qmc.phidget1018_dataRates[i])
+                    except:
+                        pass
+                    if asyncMode:
+                        aw.ser.PhidgetIO.setOnSensorChangeHandler(lambda e=None:aw.ser.phidget1018SensorChanged(e))
+                    else:
+                        aw.ser.PhidgetIO.setOnSensorChangeHandler(None)
             except:
                 pass
             # LCD visibility
@@ -27090,16 +27153,22 @@ class graphColorDlg(ArtisanDialog):
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["timer"] = str(color.name())
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+            if aw.largeLCDs_dialog:
+                aw.largeLCDs_dialog.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
         elif lcd == 2:
             color = QColor(aw.lcdpaletteF["et"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["et"] = str(color.name())
             aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+            if aw.largeLCDs_dialog:
+                aw.largeLCDs_dialog.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         elif lcd == 3:
             color = QColor(aw.lcdpaletteF["bt"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["bt"] = str(color.name())
             aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+            if aw.largeLCDs_dialog:
+                aw.largeLCDs_dialog.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
         elif lcd == 4:
             color = QColor(aw.lcdpaletteF["deltaet"])
             color.setHsv(hue,255,255,255)
@@ -27126,6 +27195,8 @@ class graphColorDlg(ArtisanDialog):
             elif flag == 2 and text:
                 aw.lcdpaletteB["timer"] = self.lcdcolors[self.lcd1colorComboBox.currentIndex()]
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+            if aw.largeLCDs_dialog:
+                aw.largeLCDs_dialog.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
         if lcdnumber ==2:
             if flag == 0:
                 aw.lcdpaletteB["et"] = str((aw.colordialog(QColor(aw.lcdpaletteB["et"]))).name())
@@ -27134,6 +27205,8 @@ class graphColorDlg(ArtisanDialog):
             elif flag == 2 and text:
                 aw.lcdpaletteB["et"] = self.lcdcolors[self.lcd2colorComboBox.currentIndex()]
             aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+            if aw.largeLCDs_dialog:
+                aw.largeLCDs_dialog.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         if lcdnumber ==3:
             if flag == 0:
                 aw.lcdpaletteB["bt"] = str((aw.colordialog(QColor(aw.lcdpaletteB["bt"]))).name())
@@ -27142,6 +27215,8 @@ class graphColorDlg(ArtisanDialog):
             elif flag == 2 and text:
                 aw.lcdpaletteB["bt"] = self.lcdcolors[self.lcd3colorComboBox.currentIndex()]
             aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+            if aw.largeLCDs_dialog:
+                aw.largeLCDs_dialog.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
         if lcdnumber ==4:
             if flag == 0:
                 aw.lcdpaletteB["deltaet"] = str((aw.colordialog(QColor(aw.lcdpaletteB["deltaet"]))).name())
@@ -27226,6 +27301,54 @@ class graphColorDlg(ArtisanDialog):
                 aw.setLabelColor(aw.label5,QColor(aw.qmc.palette[color]))
             aw.sendmessage(QApplication.translate("Message","Color of %1 set to %2", None, QApplication.UnicodeUTF8).arg(title).arg(str(aw.qmc.palette[color])))
 
+############################################################
+#######################  LARGE LCDs DIALOG  ################
+############################################################
+
+class LargeLCDs(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(LargeLCDs,self).__init__(parent)
+        settings = QSettings()
+        if settings.contains("LCDGeometry"):
+            self.restoreGeometry(settings.value("LCDGeometry").toByteArray())
+        
+        # time LCD
+        self.lcd1 = QLCDNumber() # time
+        self.lcd1.setSegmentStyle(2)
+        self.lcd1.setDigitCount(5)
+        self.lcd1.display("07:15")
+        self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+        # MET
+        self.lcd2 = QLCDNumber() # Temperature MET
+        self.lcd2.setSegmentStyle(2)
+        self.lcd2.setDigitCount(3)
+        self.lcd2.display("220")
+        self.lcd2.setFrameStyle(QFrame.Plain)
+        self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+        # BT
+        self.lcd3 = QLCDNumber() # Temperature BT
+        self.lcd3.setSegmentStyle(2)
+        self.lcd3.setDigitCount(3)
+        self.lcd3.display("195")
+        self.lcd3.setFrameStyle(QFrame.Plain)        
+        self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+        
+        # Layout
+        templayout = QHBoxLayout()
+        templayout.addWidget(self.lcd2)
+        templayout.addWidget(self.lcd3)
+        mainlayout = QVBoxLayout()
+        mainlayout.addWidget(self.lcd1)
+        mainlayout.addLayout(templayout)
+        mainlayout.setSpacing(0)
+        mainlayout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(mainlayout)
+        
+    def closeEvent(self, event):
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("LCDGeometry",QVariant(self.saveGeometry()))
+        aw.largeLCDs_dialog = None
 
 ############################################################
 #######################  WHEEL GRAPH CONFIG DIALOG  ########
