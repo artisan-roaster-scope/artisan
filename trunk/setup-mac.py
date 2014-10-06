@@ -78,7 +78,14 @@ DATA_FILES = [
     ("../Resources", [r"artisanAlarms.icns"]),
     ("../Resources", [r"artisanPalettes.icns"]),
     ("../Resources", [r"artisanWheel.icns"]),
+    ("../Resources", [r"includes/alarmclock.eot"]),
+    ("../Resources", [r"includes/alarmclock.svg"]),
+    ("../Resources", [r"includes/alarmclock.ttf"]),
+    ("../Resources", [r"includes/alarmclock.woff"]),
+    ("../Resources", [r"includes/artisan.tpl"]),
+    ("../Resources", [r"includes/bigtext.js"]),
     ("../Resources", [r"includes/Humor-Sans.ttf"]),
+    ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
   ]
   
 plist = Plist.fromFile('Info.plist')
@@ -103,7 +110,7 @@ OPTIONS = {
                     'QtHelp','QtMultimedia','QtNetwork',
                     'QtOpenGL','QtScript','QtScriptTools',
                     'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
-    'packages': ['yoctopuce'],
+    'packages': ['yoctopuce','gevent'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
