@@ -31,8 +31,17 @@ from artisanlib import __revision__
 # WARNING: If an ascii str contains characters outside the 7 bit range, Python raises UnicodeEncodeError exception.
 #################################################################################################################
 
-import ast
+import os
+import imp
 import sys
+
+#os = __import__("os")
+#imp = __import__("imp")
+#sys = __import__("sys")
+#import imp, sys
+#os = sys.modules['os']
+
+import ast
 import platform
 import serial
 import serial.tools.list_ports
@@ -40,12 +49,15 @@ import math
 import binascii
 import time as libtime
 #import glob
-import os
 import warnings
 import string as libstring
 import cgi
 import codecs
 import numpy
+import requests
+
+
+
 import artisanlib.arabic_reshaper
 
 # write logtrace to Console on OS X:
@@ -73,7 +85,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, Q
                          QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QCursor, QDoubleSpinBox, QTextDocument)
 from PyQt4.QtCore import (QString, QStringList, QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, 
                           QT_VERSION_STR,SIGNAL, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, SLOT,
-                          QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)
+                          QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, QProcess)
 
 
 import matplotlib as mpl
@@ -118,6 +130,9 @@ from pymodbus.constants import Defaults
 from pymodbus.transaction import ModbusSocketFramer
 from pymodbus.factory import ClientDecoder
 
+
+from artisanlib.weblcds import startWeb, stopWeb
+
 #---------------------------------------------------------------------------# 
 # configure the service logging
 #---------------------------------------------------------------------------# 
@@ -150,6 +165,10 @@ def dependencies_for_myprogram():
     from scipy.interpolate import UnivariateSpline
     import PyQt4.QtSvg
     import PyQt4.QtXml
+    # for gevent bundling    
+    from gevent import core, ares, _semaphore, _util
+    import pprint
+
 
 if sys.version < '3':
     def stringp(x):
@@ -477,6 +496,7 @@ class tgraphcanvas(FigureCanvas):
         #show phases LCDs during roasts
         self.phasesLCDflag = True
         self.phasesLCDmode = 0 # one of 0: time, 1: percentage, 2: temp mode
+        
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
         self.statisticsflags = [1,1,0,1,1,0]
@@ -581,7 +601,9 @@ class tgraphcanvas(FigureCanvas):
                        "Yocto Thermocouple",    #45
                        "Yocto PT100",           #46
                        "Phidget 1045 IR",       #47
-                       "-Omega HH806W"          #48 NOT WORKING 
+                       "+Program_34",           #48
+                       "+Program_56",           #49
+                       "-Omega HH806W"          #50 NOT WORKING 
                        ]
 
         #extra devices
@@ -1146,6 +1168,12 @@ class tgraphcanvas(FigureCanvas):
         self.extraArduinoT4 = 0. # fan duty %
         self.extraArduinoT5 = 0. # SV
         self.extraArduinoT6 = 0. # TC4 internal ambient temperature
+        
+        #used by extra device +Program_34 and +Program_56 to pass values
+        self.program_t3 = -1
+        self.program_t4 = -1
+        self.program_t5 = -1
+        self.program_t6 = -1
 
         #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT
         self.dutycycle = 0.
@@ -1373,6 +1401,32 @@ class tgraphcanvas(FigureCanvas):
             self.specialeventsvalue.append(0)
         aw.qmc.safesaveflag = True
         self.redraw()
+        
+    def updateWebLCDs(self,bt=None,et=None,time=None):
+        try:
+            url = "http://127.0.0.1:" + str(aw.WebLCDsPort) + "/send"
+            headers = {'content-type': 'application/json'}
+            payload = {'data': {}}
+            if bt:
+                payload['data']['bt'] = bt
+            if et:
+                payload['data']['et'] = et
+            if time:
+                payload['data']['time'] = time
+            requests.post(url, data=json.dumps(payload),headers=headers,timeout=0.1)
+        except:
+            pass
+            
+    def updateLargeLCDs(self,bt=None,et=None,time=None):
+        try:
+            if time:
+                aw.largeLCDs_dialog.lcd1.display(time)
+            if et:
+                aw.largeLCDs_dialog.lcd2.display(et)
+            if bt:
+                aw.largeLCDs_dialog.lcd3.display(bt)
+        except:
+            pass
 
     # runs from GUI thread.
     # this function is called by a signal at the end of the thread sample()
@@ -1419,6 +1473,17 @@ class tgraphcanvas(FigureCanvas):
                                     aw.extraLCD2[i].display(lcdformat%float(self.extratemp2[i][-1]))
                                 else:
                                     aw.extraLCD1[i].display("--")
+                                    
+                    # update large LCDs (incl. Web LCDs)
+                    timestr = None
+                    if not self.flagstart:
+                        timestr = "00:00"
+                    btstr = str(aw.float2float(self.temp2[-1],0))
+                    etstr = str(aw.float2float(self.temp1[-1],0))
+                    if aw.WebLCDs:                       
+                        self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
+                    if aw.largeLCDs_dialog:
+                        self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
 
                 if self.flagstart:          
                     if aw.qmc.patheffects:
@@ -1537,7 +1602,15 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and (tx - aw.qmc.timex[aw.qmc.timeindex[6]]) > aw.qmc.statisticsconditions[7]:
                 aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%("red",aw.lcdpaletteB["timer"]))
 
-            aw.lcd1.display(QString(self.stringfromseconds(int(round(ts)))))
+            timestr = self.stringfromseconds(int(round(ts)))
+            aw.lcd1.display(QString(timestr))
+            
+            # update connected WebLCDs
+            if aw.WebLCDs:
+                self.updateWebLCDs(time=timestr)
+            if aw.largeLCDs_dialog:
+                self.updateLargeLCDs(time=timestr)
+            
             QTimer.singleShot(nextreading,self.updateLCDtime)
 
     def toggleHUD(self):
@@ -2105,6 +2178,10 @@ class tgraphcanvas(FigureCanvas):
                 self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]            #reset all variables that need to be reset (but for the actually measurements that will be treated separately at the end of this function)
             self.specialevents=[]
             aw.lcd1.display("00:00")
+            if aw.WebLCDs:
+                self.updateWebLCDs(time="00:00")
+            if aw.largeLCDs_dialog:
+                self.updateLargeLCDs(time="00:00")
             if andLCDs:
                 if self.LCDdecimalplaces:
                     zz = "0.0"
@@ -2816,10 +2893,13 @@ class tgraphcanvas(FigureCanvas):
                         self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=self.timeindexB[0]) # CHARGE is the charge for the foreground, so we have to disable this here
                         self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=self.timeindexB[0])
                         # cut out the part after DROP
-                        if aw.qmc.timeindex[6]:
+                        if aw.qmc.timeindexB[6]:
                             self.delta1B = numpy.append(self.delta1B[:self.timeindexB[6]+1],[None]*(len(self.delta1B)-self.timeindexB[6]-1))
                             self.delta2B = numpy.append(self.delta2B[:self.timeindexB[6]+1],[None]*(len(self.delta2B)-self.timeindexB[6]-1))
-                        
+                        # cut out the part before CHARGE
+                        if aw.qmc.timeindexB[0] > -1 and aw.qmc.timeindexB[0] < aw.qmc.timeindexB[6]:
+                            self.delta1B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta1B[aw.qmc.timeindexB[0]:])
+                            self.delta2B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta2B[aw.qmc.timeindexB[0]:])
                         # filter out values beyond the delta limits
                         if aw.qmc.mode == "C":
                             rorlimit = aw.qmc.RoRlimitC
@@ -2996,6 +3076,10 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.timeindex[6]:
                         self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
                         self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
+                    # cut out the part before CHARGE
+                    if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
+                        self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
+                        self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
                     # remove values beyond the RoRlimit
                     if aw.qmc.mode == "C":
                         rorlimit = aw.qmc.RoRlimitC
@@ -3672,6 +3756,11 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
             aw.hideLCDs()
+            # reset WebLCDs
+            if aw.WebLCDs: 
+                self.updateWebLCDs(bt=" --",et=" --")
+            if aw.largeLCDs_dialog:
+                self.updateLargeLCDs(bt=" --",et=" --")
             aw.hideSliders()
             aw.hideExtraButtons()
             aw.enableEditMenus()
@@ -4295,8 +4384,6 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[7] = len(self.timex)-1
                         else:
                             return
-                    if aw.qmc.phasesbuttonflag:
-                        self.phases[1] = int(round(self.temp2[self.timeindex[7]]))
                     #calculate time elapsed since charge time
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])))
                     #anotate temperature
@@ -6919,7 +7006,12 @@ class ApplicationWindow(QMainWindow):
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         
+        # large LCDs
         self.largeLCDs_dialog = None
+        self.LargeLCDs = False
+        self.WebLCDs = False
+        self.WebLCDsPort = 8080
+
 
         #flag to reset Qsettings
         self.resetqsettings = 0
@@ -8488,7 +8580,6 @@ class ApplicationWindow(QMainWindow):
                 if str(sys.frozen) == "macosx_app":
                     ib = True
             elif platf == "Windows":
-                import imp
                 ib = (hasattr(sys, "frozen") or # new py2exe
                     hasattr(sys, "importers") # old py2exe
                     or imp.is_frozen("__main__")) # tools/freeze
@@ -8874,8 +8965,10 @@ class ApplicationWindow(QMainWindow):
         action = self.eventslideractions[n]
         if action:
             try:
-                # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command)
+                # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command), =4 (Call Program [with argument])
                 action = (action+2 if action > 1 else action)
+                if action == 6:
+                    action == 7 # skip the 6:IO Command
                 value = int(round((self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]))
                 cmd = self.eventslidercommands[n]
                 cmd = cmd.format(value)
@@ -8953,7 +9046,7 @@ class ApplicationWindow(QMainWindow):
             self.fileSaveAction.setEnabled(False)
             self.fileSaveAsAction.setEnabled(False) 
 
-    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO)
+    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO), 7=Call Program with argument
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -9022,6 +9115,15 @@ class ApplicationWindow(QMainWindow):
                                 c = int(cmd_str[7:-1])
                                 state = bool(aw.ser.PhidgetIO.getOutputState(c))
                                 aw.ser.PhidgetIO.setOutputState(c,not(state))
+                    except:
+                        pass
+                elif action == 7:
+                    try:
+                        if platf in ['Windows','Linux']:
+                            prg_file = u(QApplication.applicationDirPath()) + "/" + cmd_str
+                        else: # on Darwin
+                            prg_file = u(QApplication.applicationDirPath()) + "/../../../" + cmd_str                            
+                        QProcess.startDetached(prg_file)
                     except:
                         pass
             except:
@@ -9185,6 +9287,12 @@ class ApplicationWindow(QMainWindow):
         aw.LCD3frame.setVisible(aw.qmc.BTlcd)
         aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)
         aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
+        if aw.largeLCDs_dialog:
+            try:
+                aw.largeLCDs_dialog.lcd2.setVisible(aw.qmc.ETlcd)
+                aw.largeLCDs_dialog.lcd3.setVisible(aw.qmc.BTlcd)
+            except:
+                pass
         if aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid
             aw.LCD6frame.setVisible(True)
             aw.LCD7frame.setVisible(True)
@@ -10762,7 +10870,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.mode = str(profile["mode"])
             #convert modes only if needed comparing the new uploaded mode to the old one.
             #otherwise it would incorrectly convert the uploaded phases
-            if "phases" in profile:
+            if "phases" in profile and aw.qmc.phasesbuttonflag:
                 self.qmc.phases = profile["phases"]
             if self.qmc.mode == "F" and old_mode == "C":
                 self.qmc.fahrenheitMode()
@@ -12079,6 +12187,19 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.autosaveflag = settings.value("autosaveflag",self.qmc.autosaveflag).toInt()[0]
             if settings.contains("autosaveprefix"):
                 self.qmc.autosaveprefix = settings.value("autosaveprefix",self.qmc.autosaveprefix).toString()
+            # WebLCDs            
+            settings.beginGroup("WebLCDs")
+            if settings.contains("active"):
+                self.WebLCDs = settings.value("active",self.WebLCDs).toBool()
+                self.WebLCDsPort = settings.value("port",self.WebLCDsPort).toInt()[0]
+            settings.endGroup()
+            if settings.contains("LargeLCDs"):
+                self.LargeLCDs = settings.value("LargeLCDs",self.LargeLCDs).toBool()
+            if self.LargeLCDs:
+                self.largeLCDs()
+            # start server if needed
+            if self.WebLCDs:
+                self.startWebLCDs(force=True)
             #restore buttons
             settings.beginGroup("ExtraEventButtons")
             if settings.contains("extraeventsactions"):
@@ -12167,6 +12288,41 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " settingsLoad()  @line " + str(exc_tb.tb_lineno))
+
+    def startWebLCDs(self,force=False):
+        try:
+            if not self.WebLCDs or force:
+                res = startWeb(
+                    self.WebLCDsPort,
+                    u(self.getResourcePath()),
+                    aw.lcdpaletteF["timer"],
+                    aw.lcdpaletteB["timer"],
+                    aw.lcdpaletteF["bt"],
+                    aw.lcdpaletteB["bt"],
+                    aw.lcdpaletteF["et"],
+                    aw.lcdpaletteB["et"],
+                    aw.qmc.ETlcd,
+                    aw.qmc.BTlcd)
+                if res:
+                    self.WebLCDs = True
+                    return True
+                else:
+                    self.stopWebLCDs()
+                    return False
+            else:
+                False
+        except Exception as e:
+            self.stopWebLCDs()
+            return False
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            
+    def stopWebLCDs(self):
+        try:
+            stopWeb()
+            self.WebLCDs = False
+        except:
+            pass
 
     def applyStandardButtonVisibility(self):
         if self.eventsbuttonflag:
@@ -12742,6 +12898,11 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
             settings.setValue("autosaveprefix",self.qmc.autosaveprefix)
+            settings.beginGroup("WebLCDs")
+            settings.setValue("active",self.WebLCDs)
+            settings.setValue("port",self.WebLCDsPort)
+            settings.endGroup()
+            settings.setValue("LargeLCDs",self.LargeLCDs)
             #custom event buttons
             settings.beginGroup("ExtraEventButtons")
             settings.setValue("buttonlistmaxlen",self.buttonlistmaxlen)
@@ -12970,6 +13131,13 @@ class ApplicationWindow(QMainWindow):
                 self.showNormal()
             if aw.qmc.flagon:
                 aw.qmc.ToggleMonitor()
+            if aw.WebLCDs:
+            	aw.stopWebLCDs()
+            	aw.WebLCDs = True # to ensure they are started again on restart
+            if aw.LargeLCDs and aw.largeLCDs_dialog:
+                tmp_LargeLCDs = aw.LargeLCDs # we keep the state to properly store it in the settings
+                aw.largeLCDs_dialog.close()
+                aw.LargeLCDs = tmp_LargeLCDs
             # now wait until the current sampling thread is terminated
             while aw.qmc.flagsamplingthreadrunning:
                 libtime.sleep(.01)
@@ -14019,10 +14187,11 @@ $cupping_notes
         self.dialog.setFixedSize(self.dialog.size())
         QApplication.processEvents()
         self.dialog.setModal(False)
-        
+
     def largeLCDs(self):
         if not self.largeLCDs_dialog:
             self.largeLCDs_dialog = LargeLCDs(self)
+            self.LargeLCDs = True
         self.largeLCDs_dialog.show()
         self.largeLCDs_dialog.raise_()
         self.largeLCDs_dialog.activateWindow()
@@ -15496,9 +15665,27 @@ class HUDDlg(ArtisanDialog):
         soundGroupWidget.setLayout(sLayout)
         # tick
         # port
-        self.WebLCDsURL = QLabel('<a href="http://localhost:8081/artisan">http://localhost:8081/artisan</a>')
+        self.WebLCDsURL = QLabel()
         self.WebLCDsURL.setOpenExternalLinks(True)
+        self.WebLCDsFlag = QCheckBox()
+        self.WebLCDsFlag.setChecked(aw.WebLCDs) 
+        self.WebLCDsFlag.setFocusPolicy(Qt.NoFocus)
+        self.WebLCDsPortLabel = QLabel(QApplication.translate("Label", "Port", None, QApplication.UnicodeUTF8))
+        self.WebLCDsPort = QLineEdit(str(aw.WebLCDsPort))
+        self.WebLCDsPort.setAlignment(Qt.AlignRight)
+        self.WebLCDsPort.setValidator(QRegExpValidator(QRegExp(r"^[0-9]{1,4}$"),self))
+        self.WebLCDsPort.setMaximumWidth(45)
+        if aw.WebLCDs:
+            self.setWebLCDsURL()
+        else:
+            self.WebLCDsURL.setText("")
+        self.connect(self.WebLCDsPort,SIGNAL("editingFinished()"),lambda x=0:self.changeWebLCDsPort())
+        self.connect(self.WebLCDsFlag,SIGNAL("clicked(bool)"),lambda i=0:self.toggleWebLCDs(i))
         WebLCDsLayout = QHBoxLayout()
+        WebLCDsLayout.addWidget(self.WebLCDsFlag)
+        WebLCDsLayout.addSpacing(20)
+        WebLCDsLayout.addWidget(self.WebLCDsPortLabel)
+        WebLCDsLayout.addWidget(self.WebLCDsPort)
         WebLCDsLayout.addStretch()
         WebLCDsLayout.addWidget(self.WebLCDsURL)
         WebLCDsGroupWidget = QGroupBox(QApplication.translate("GroupBox","WebLCDs",None, QApplication.UnicodeUTF8))
@@ -15545,6 +15732,30 @@ class HUDDlg(ArtisanDialog):
         self.connect(self.c1ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(4))
         self.connect(self.c2ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))
 
+    def changeWebLCDsPort(self):
+        aw.WebLCDsPort = int(self.WebLCDsPort.text())
+        
+    def setWebLCDsURL(self):
+        localIP = [(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
+        self.WebLCDsURL.setText('<a href="http://' + str(localIP) + ':' + str(aw.WebLCDsPort) + '/artisan">http://' + str(localIP) + ':' + str(aw.WebLCDsPort) + '/artisan</a>')
+        
+    def toggleWebLCDs(self,i):
+        if i:
+            self.WebLCDsPort.setDisabled(True)
+            self.setWebLCDsURL()
+            res = aw.startWebLCDs()
+            if not res:
+                self.WebLCDsPort.setDisabled(False)
+                self.WebLCDsURL.setText("")
+                self.WebLCDsFlag.setChecked(False)
+            else:
+                self.WebLCDsFlag.setChecked(True)
+        else:   
+            self.WebLCDsFlag.setChecked(False)
+            self.WebLCDsPort.setDisabled(False)
+            self.WebLCDsURL.setText("")
+            aw.stopWebLCDs()
+            
     def showHUDbuttonToggle(self,i):
         if i:
             aw.qmc.HUDbuttonflag = True
@@ -18485,7 +18696,8 @@ class EventsDlg(ArtisanDialog):
         self.sliderActionTypes = ["",#QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Serial Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8)]
+                       QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Call Program",None, QApplication.UnicodeUTF8)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -21553,7 +21765,9 @@ class serialport(object):
                                    self.YOCTO_thermo,       #45
                                    self.YOCTO_pt100,        #46
                                    self.PHIDGET1045,        #47
-                                   self.HH806W              #48
+                                   self.callprogram_34,     #48
+                                   self.callprogram_56,     #49
+                                   self.HH806W              #50
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -21754,6 +21968,14 @@ class serialport(object):
             tx = aw.qmc.timeclock.elapsed()/1000.
             if "," in output:
                 parts = output.split(",")
+                if len(parts) > 2:
+                    aw.qmc.program_t3 = float(parts[2])
+                    if len(parts) > 3:
+                        aw.qmc.program_t4 = float(parts[3])
+                        if len(parts) > 4:
+                            aw.qmc.program_t5 = float(parts[4])
+                            if len(parts) > 5:
+                                aw.qmc.program_t6 = float(parts[5])
                 return tx,float(parts[0]),float(parts[1])
             else:
                 return tx,0.,float(output)
@@ -21762,6 +21984,18 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " callprogram(): %1 ").arg(str(e)),exc_tb.tb_lineno)
             return tx,0.,0.
+            
+    def callprogram_34(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.qmc.program_t3
+        t2 = aw.qmc.program_t4
+        return tx,t2,t1
+
+    def callprogram_56(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.qmc.program_t5
+        t2 = aw.qmc.program_t6
+        return tx,t2,t1
 
     def virtual(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -24789,7 +25023,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [29,33,34,37,40,41,45,46,47]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -25005,7 +25239,7 @@ class comportDlg(ArtisanDialog):
                     device = QTableWidgetItem(devicename)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
                     # "ADD DEVICE:"
-                    if not (devid in [29,33,34,37,40,41,45,46,47]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                    if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                         comportComboBox = PortComboBox(selection = aw.extracomport[i])
                         self.connect(comportComboBox, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                         comportComboBox.setFixedWidth(200)
@@ -25102,7 +25336,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [29,33,34,37,40,41,45,46,47]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -26541,8 +26775,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.device = 47
                     message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
+                ####  DEVICE 48 is an external program _34
+                ##########################
+                ##########################
+                ####  DEVICE 49 is an external program _56
+                ##########################
+                ##########################
                 elif meter == "Omega HH806W":
-                    aw.qmc.device = 48
+                    aw.qmc.device = 50
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -26611,7 +26851,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 45
                 1, # 46
                 1, # 47
-                8] # 48
+                3, # 48
+                3, # 49
+                8] # 50
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -26750,15 +26992,20 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except:
                 pass
             # LCD visibility
-            if aw.qmc.flagon:
-                aw.LCD2frame.setVisible(aw.qmc.ETlcd)
-                aw.LCD3frame.setVisible(aw.qmc.BTlcd)
+            aw.LCD2frame.setVisible(aw.qmc.ETlcd)
+            aw.LCD3frame.setVisible(aw.qmc.BTlcd)
+            if aw.largeLCDs_dialog:
+                try:
+                    aw.largeLCDs_dialog.lcd2.setVisible(aw.qmc.ETlcd)
+                    aw.largeLCDs_dialog.lcd3.setVisible(aw.qmc.BTlcd)
+                except:
+                    pass
             aw.qmc.redraw(recomputeAllDeltas=False)
             aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49]):
                 aw.setcommport()
             #self.close()
             self.accept()
@@ -27308,47 +27555,113 @@ class graphColorDlg(ArtisanDialog):
 class LargeLCDs(ArtisanDialog):
     def __init__(self, parent = None):
         super(LargeLCDs,self).__init__(parent)
+        self.lcd1 = None # Timer
+        self.lcd2 = None # ET
+        self.lcd3 = None # BT
         settings = QSettings()
         if settings.contains("LCDGeometry"):
             self.restoreGeometry(settings.value("LCDGeometry").toByteArray())
+        self.resized = False # prevent first resizing event handling
+        self.layoutNr = -1 # 0: landscape, 1: landscape tight, 2: portrait         
+        self.chooseLayout(self.width(),self.height())
         
+        self.resizeEvent = self.resizeDialog
+        
+    def makeLCD(self,s):    
+        lcd = QLCDNumber() # Temperature BT
+        lcd.setSegmentStyle(2)
+        lcd.setFrameStyle(QFrame.Plain)        
+        if s == "timer":
+            lcd.setDigitCount(5)
+            lcd.display("00:00")
+        else:
+            lcd.setDigitCount(3)
+            lcd.display(" --")
+            if s == "et":
+                lcd.setVisible(aw.qmc.ETlcd)
+            elif s == "bt":
+                lcd.setVisible(aw.qmc.BTlcd)
+        lcd.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
+        return lcd
+        
+    def makeLCDs(self):
         # time LCD
-        self.lcd1 = QLCDNumber() # time
-        self.lcd1.setSegmentStyle(2)
-        self.lcd1.setDigitCount(5)
-        self.lcd1.display("07:15")
-        self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-        # MET
-        self.lcd2 = QLCDNumber() # Temperature MET
-        self.lcd2.setSegmentStyle(2)
-        self.lcd2.setDigitCount(3)
-        self.lcd2.display("220")
-        self.lcd2.setFrameStyle(QFrame.Plain)
-        self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+        self.lcd1 = self.makeLCD("timer") # time
+        # ET
+        self.lcd2 = self.makeLCD("et") # Temperature ET
         # BT
-        self.lcd3 = QLCDNumber() # Temperature BT
-        self.lcd3.setSegmentStyle(2)
-        self.lcd3.setDigitCount(3)
-        self.lcd3.display("195")
-        self.lcd3.setFrameStyle(QFrame.Plain)        
-        self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+        self.lcd3 = self.makeLCD("bt") # Temperature BT
         
-        # Layout
+    def landscapeLayout(self):
+        self.makeLCDs()
         templayout = QHBoxLayout()
         templayout.addWidget(self.lcd2)
         templayout.addWidget(self.lcd3)
-        mainlayout = QVBoxLayout()
-        mainlayout.addWidget(self.lcd1)
-        mainlayout.addLayout(templayout)
-        mainlayout.setSpacing(0)
-        mainlayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(mainlayout)
+        landscapelayout = QVBoxLayout()
+        landscapelayout.addWidget(self.lcd1)
+        landscapelayout.addLayout(templayout)
+        landscapelayout.setSpacing(0)
+        landscapelayout.setContentsMargins(0, 0, 0, 0)
+        return landscapelayout
+        
+    def landscapeTightLayout(self):
+        self.makeLCDs()
+        landscapetightlayout = QHBoxLayout()
+        landscapetightlayout.addWidget(self.lcd1)
+        landscapetightlayout.addWidget(self.lcd2)
+        landscapetightlayout.addWidget(self.lcd3)
+        landscapetightlayout.setSpacing(0)
+        landscapetightlayout.setContentsMargins(0, 0, 0, 0)
+        return landscapetightlayout
+        
+    def portraitLayout(self):
+        self.makeLCDs()
+        portraitlayout = QVBoxLayout()
+        portraitlayout.addWidget(self.lcd1)
+        portraitlayout.addWidget(self.lcd2)
+        portraitlayout.addWidget(self.lcd3)
+        portraitlayout.setSpacing(0)
+        portraitlayout.setContentsMargins(0, 0, 0, 0)
+        return portraitlayout
+                
+    # n the number of layout to be set (0: landscape, 1: landscape tight, 2: portrait)
+    def reLayout(self,n):
+        if self.layoutNr != n:
+            # release old layout
+            if self.layout():
+                QWidget().setLayout(self.layout())
+            # install the new layout
+            if n == 0:
+                self.setLayout(self.landscapeLayout())
+            elif n == 1:
+                self.setLayout(self.landscapeTightLayout())
+            elif n == 2:
+                self.setLayout(self.portraitLayout())
+        self.layoutNr = n
+    
+    def chooseLayout(self,w,h):
+        if w > h:
+            if w > 3*h:
+                self.reLayout(1)
+            else:
+                self.reLayout(0)
+        else:
+            self.reLayout(2)
+        
+    def resizeDialog(self,event):
+        if self.resized:
+            w = event.size().width()
+            h = event.size().height()
+            self.chooseLayout(w,h)
+        else:
+            self.resized = True
         
     def closeEvent(self, event):
         settings = QSettings()
         #save window geometry
         settings.setValue("LCDGeometry",QVariant(self.saveGeometry()))
         aw.largeLCDs_dialog = None
+        aw.LargeLCDs = False
 
 ############################################################
 #######################  WHEEL GRAPH CONFIG DIALOG  ########

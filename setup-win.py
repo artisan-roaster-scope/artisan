@@ -72,7 +72,7 @@ setup(
     data_files = DATAFILES,
     zipfile = "lib\library.zip",
     options={"py2exe" :{
-                        "packages": ['matplotlib','pytz'],
+                        "packages": ['matplotlib','pytz','gevent'],
                         "compressed": False, # faster
                         "unbuffered": True,
                         'optimize':  2,
@@ -120,4 +120,11 @@ os.system(r'copy artisanProfile.ico dist')
 os.system(r'copy artisanPalettes.ico dist')
 os.system(r'copy artisanWheel.ico dist')
 os.system(r'copy includes\\Humor-Sans.ttf dist')
+os.system(r'copy includes\\alarmclock.eot dist')
+os.system(r'copy includes\\alarmclock.svg')
+os.system(r'copy includes\\alarmclock.ttf')
+os.system(r'copy includes\\alarmclock.woff')
+os.system(r'copy includes\\artisan.tpl')
+os.system(r'copy includes\\bigtext.js')
+os.system(r'copy includes\\jquery-1.11.1.min.js')
 os.system(r'copy ..\\vcredist_x86.exe dist')

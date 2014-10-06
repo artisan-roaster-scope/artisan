@@ -20,9 +20,18 @@ o macholib 1.5.1
 o py2app 0.9
 o pymodbus 1.3.0
 o yoctopuce 1.10.16490
+o requests 2.3.0
+o bottle 0.12.7
+o gevent 1.0.1
+o geventwebsocket 0.9.3
 
 Upgrade History:
 
+- 2014-10-06
+ . requests 2.3.0
+ . bottle 0.12.7
+ . gevent 1.0.1
+ . geventwebsocket 0.9.3
 - 2014-09-21
  . SIP 4.16.2 => 4.16.3
  . PyQt 4.11.1 => 4.11.2
@@ -529,3 +538,31 @@ download from https://pypi.python.org/pypi/yoctopuce/1.10.16490
 copy shared libs
 # sudo mkdir /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/yoctopuce/cdll
 # sudo cp yoctopuce/cdll/* /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/yoctopuce/cdll
+
+23) requests 2.3.0
+
+https://github.com/kennethreitz/requests/releases
+
+# python setup.py build
+# sudo python setup.py install
+
+24) bottle 0.12.7
+
+https://github.com/defnull/bottle/releases
+
+# python setup.py build
+# sudo python setup.py install
+
+25) gevent 1.0.1
+
+https://pypi.python.org/pypi/gevent
+
+# python setup.py build
+# sudo python setup.py install
+
+26) geventwebsocket 0.9.3
+
+https://pypi.python.org/pypi/gevent-websocket/
+
+# python setup.py build
+# sudo python setup.py install
