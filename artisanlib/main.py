@@ -4709,7 +4709,19 @@ class tgraphcanvas(FigureCanvas):
                             strline = strline + "   " + QString(QApplication.translate("Label", "CM", None,QApplication.UnicodeUTF8) + ("=%.1f/%.1f" % (det,dbt)) + self.mode)
                     self.ax.set_xlabel(strline,color = aw.qmc.palette["text"],fontproperties=statsprop)
                 else:
-                    self.ax.set_xlabel("P139(2)   Mexican   1.8Kg   15.6%   #97/105",color = aw.qmc.palette["text"],fontproperties=statsprop)
+                    sep = u"   "
+                    msg = aw.qmc.roastdate.toString(Qt.SystemLocaleShortDate)
+                    if aw.qmc.beans and aw.qmc.beans != "":
+                        msg += sep + aw.qmc.abbrevString(u(aw.qmc.beans),25)
+                    if aw.qmc.weight[0]:
+                        msg += sep + str(int(round(aw.qmc.weight[0]))) + aw.qmc.weight[2]
+                        if aw.qmc.weight[1]:
+                            msg += sep + str(aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
+                    if aw.qmc.whole_color and aw.qmc.ground_color:
+                       msg += sep + u"#" + str(aw.qmc.whole_color) + u"/" +  str(aw.qmc.ground_color)
+                    elif aw.qmc.ground_color:
+                       msg += sep + u"#" + str(aw.qmc.ground_color)
+                    self.ax.set_xlabel(msg,color = aw.qmc.palette["text"],fontproperties=statsprop)
             else:
                 self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
         except Exception as ex:
@@ -8591,6 +8603,22 @@ class ApplicationWindow(QMainWindow):
             pass
         return ib
 
+    def getAppPath(self):
+        res = ""
+        if platf in ['Darwin','Linux']:
+            if self.appFrozen():
+                res = QApplication.applicationDirPath() + "/../../../"
+            else:
+                res = os.path.dirname(os.path.realpath(__file__)) + "/../"
+        elif platf == "Windows":
+            if self.appFrozen():
+                res = os.path.dirname(sys.executable) + "\\"
+            else:
+                res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\"
+        else:
+            res = QApplication.applicationDirPath() + "/"
+        return res
+
     def getResourcePath(self):
         res = ""
         if platf in ['Darwin','Linux']:
@@ -8968,7 +8996,7 @@ class ApplicationWindow(QMainWindow):
                 # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command), =4 (Call Program [with argument])
                 action = (action+2 if action > 1 else action)
                 if action == 6:
-                    action == 7 # skip the 6:IO Command
+                    action = 7 # skip the 6:IO Command
                 value = int(round((self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]))
                 cmd = self.eventslidercommands[n]
                 cmd = cmd.format(value)
@@ -9119,10 +9147,7 @@ class ApplicationWindow(QMainWindow):
                         pass
                 elif action == 7:
                     try:
-                        if platf in ['Windows','Linux']:
-                            prg_file = u(QApplication.applicationDirPath()) + "/" + cmd_str
-                        else: # on Darwin
-                            prg_file = u(QApplication.applicationDirPath()) + "/../../../" + cmd_str                            
+                        prg_file = aw.getAppPath()+ cmd_str
                         QProcess.startDetached(prg_file)
                     except:
                         pass
@@ -22034,7 +22059,7 @@ class serialport(object):
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(0)
-        return tx,t1,t2
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
 
     def PHIDGET1048_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
