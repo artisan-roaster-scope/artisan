@@ -119,7 +119,7 @@ CONF_MENU_TURKISH = u("T\xfcrk") # Do not translate
 CONF_MENU_JAPANESE = u("\u65e5\u672c\u8a9e") # Do not translate
 CONF_MENU_HUNGARIAN = u("Hungarian") # Do not translate
 CONF_MENU_HEBREW = u("\u05e2\u05d1\u05e8\u05d9\u05ea") # Do not translate
-CONF_MENU_POLISH = u("Polskie") # Do not translate
+CONF_MENU_POLISH = u("Polski") # Do not translate
 
 #Toolkit menu
 TOOLKIT_MENU = QApplication.translate("Menu", "Tools", None, QApplication.UnicodeUTF8)

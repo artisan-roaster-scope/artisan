@@ -10,7 +10,7 @@
          };
          ws.onmessage = function (evt) {
              var data = JSON.parse(evt.data);
-             if (data.data) {
+             if (data.data) { // { "data" : { "time": <string>, "bt": <string>, "et": <string> }}
                  if (data.data.time) {
                      document.getElementById("time").innerHTML = data.data.time;
                  }
@@ -23,8 +23,8 @@
                      document.getElementById("et2").innerHTML = v;
                  }
              }
-             if (data.alert) {
-                 alert(data.alert);
+             if (data.alert && data.alert.text) { // { "alert" : { "title": <string>, "text": <string>, "timeout": <int> }}
+                 alert(data.alert.text);
              }
          };
       </script>
@@ -103,6 +103,7 @@
              $(window).load(function() {
                  $('#artisan').bigtext();
                  });
+             $( "#dialog" ).dialog({ autoOpen: false });
          });
       </script>
    </body>
