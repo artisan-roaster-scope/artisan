@@ -55,7 +55,7 @@ import cgi
 import codecs
 import numpy
 import requests
-
+import subprocess
 
 
 import artisanlib.arabic_reshaper
@@ -85,7 +85,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, Q
                          QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QCursor, QDoubleSpinBox, QTextDocument)
 from PyQt4.QtCore import (QString, QStringList, QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, 
                           QT_VERSION_STR,SIGNAL, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, SLOT,
-                          QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore, QProcess)
+                          QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)
 
 
 import matplotlib as mpl
@@ -187,7 +187,7 @@ if sys.version < '3':
                 return x
         else:
             return None
-    def e(x):
+    def encodeLocal(x):
         if x is not None:
             return codecs.unicode_escape_encode(unicode(x))[0]
         else:
@@ -212,7 +212,7 @@ else:
             return codecs.unicode_escape_decode(x)[0]
         else:
             return None
-    def e(x):
+    def encodeLocal(x):
         if x is not None:
             return codecs.unicode_escape_encode(str(x))[0].decode("utf8")
         else:
@@ -1402,7 +1402,7 @@ class tgraphcanvas(FigureCanvas):
         aw.qmc.safesaveflag = True
         self.redraw()
         
-    def updateWebLCDs(self,bt=None,et=None,time=None):
+    def updateWebLCDs(self,bt=None,et=None,time=None,alertTitle=None,alertText=None,alertTimeout=None):
         try:
             url = "http://127.0.0.1:" + str(aw.WebLCDsPort) + "/send"
             headers = {'content-type': 'application/json'}
@@ -1413,6 +1413,13 @@ class tgraphcanvas(FigureCanvas):
                 payload['data']['et'] = et
             if time:
                 payload['data']['time'] = time
+            if alertText != None:
+                payload['alert'] = {}
+                payload['alert']['text'] = alertText
+                if alertTitle:
+                    payload['alert']['title'] = alertTitle
+                if alertTimeout:
+                    payload['alert']['timeout'] = alertTimeout
             requests.post(url, data=json.dumps(payload),headers=headers,timeout=0.1)
         except:
             pass
@@ -1722,7 +1729,12 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.alarmaction[alarmnumber] == 0:
                 # alarm popup message
-                QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None, QApplication.UnicodeUTF8),self.alarmstrings[alarmnumber])
+                #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None, QApplication.UnicodeUTF8),self.alarmstrings[alarmnumber])
+                # alarm popup message with 10sec timeout
+                ArtisanMessageBox(self,QApplication.translate("Message", "Alarm notice",None, QApplication.UnicodeUTF8),u(self.alarmstrings[alarmnumber]),timeout=10)
+                #send alarm also to connected WebLCDs clients
+                if aw.WebLCDs and aw.WebLCDsAlerts:
+                    aw.qmc.updateWebLCDs(alertText=u(self.alarmstrings[alarmnumber]),alertTimeout=10)
             elif self.alarmaction[alarmnumber] == 1:
                 # alarm call program
                 fname = u(self.alarmstrings[alarmnumber])
@@ -2705,6 +2717,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.set_ylabel("")
                 self.ax.set_xlabel("")
                 self.ax.set_title("")
+                self.fig.suptitle("")
             else:
                 self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
                 self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
@@ -2724,8 +2737,11 @@ class tgraphcanvas(FigureCanvas):
                     suptitleX = 0.93
                 else:
                     suptitleX = 1
-                self.fig.suptitle("\n" + aw.qmc.abbrevString(self.titleB,stl),
-                    horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
+                if aw.qmc.flagstart:
+                    self.fig.suptitle("")
+                else:
+                    self.fig.suptitle("\n" + aw.qmc.abbrevString(self.titleB,stl),
+                        horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
             
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             #self.ax.spines['top'].set_color('none')
@@ -3844,6 +3860,7 @@ class tgraphcanvas(FigureCanvas):
             if not self.flagon:
                 self.OnMonitor()
             self.flagstart = True
+            aw.qmc.fig.suptitle("")
             aw.qmc.updateDeltaSamples()
             aw.disableSaveActions()
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None, QApplication.UnicodeUTF8))
@@ -7023,6 +7040,7 @@ class ApplicationWindow(QMainWindow):
         self.LargeLCDs = False
         self.WebLCDs = False
         self.WebLCDsPort = 8080
+        self.WebLCDsAlerts = False
 
 
         #flag to reset Qsettings
@@ -9147,10 +9165,13 @@ class ApplicationWindow(QMainWindow):
                         pass
                 elif action == 7:
                     try:
-                        prg_file = aw.getAppPath()+ cmd_str
-                        QProcess.startDetached(prg_file)
-                    except:
-                        pass
+                        prg_file = u(aw.getAppPath()) + u(cmd_str)
+                        proc=subprocess.Popen(prg_file, shell=True)
+                        # alternative approach, that seems to fail on some Mac OS X versions:
+                        #QProcess.startDetached(prg_file)
+                    except Exception as e:
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " callProgram(): %1").arg(str(e)),exc_tb.tb_lineno)
             except:
                 pass
                     
@@ -10407,10 +10428,16 @@ class ApplicationWindow(QMainWindow):
         self.resetExtraDevices()
         # the RoastLogger file might be in utf-8 or latin1 encoding, we cannot know so let's test both
         try:
-            self.importRoastLoggerEnc(filename,'utf-8')
-        except:
-            self.importRoastLoggerEnc(filename,'latin1')
-        aw.qmc.safesaveflag = True
+            try:
+                self.importRoastLoggerEnc(filename,'utf-8')
+            except:
+                self.importRoastLoggerEnc(filename,'latin1')
+            aw.qmc.safesaveflag = True
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importRoastLogger() %1").arg(str(ex)),exc_tb.tb_lineno)
             
     def resetExtraDevices(self):
         try:
@@ -10442,6 +10469,8 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " resetExtraDevices(): %1").arg(str(e)),exc_tb.tb_lineno)
             
     def importRoastLoggerEnc(self,filename,enc='utf-8'):
+        res = None
+        roastlogger_action_section = ""
         # use io.open instead of open to have encoding support on Python 2
         import io
         infile = io.open(filename, 'r', encoding=enc)
@@ -10449,7 +10478,7 @@ class ApplicationWindow(QMainWindow):
         obj["mode"] = "C"
         obj["title"] = u(QFileInfo(filename).fileName())
         import csv
-        obj["roastdate"] = e(QDate.currentDate().toString())
+        obj["roastdate"] = encodeLocal(QDate.currentDate().toString())
         # read roastdate from file
         while True:
             l = infile.readline()
@@ -10457,7 +10486,7 @@ class ApplicationWindow(QMainWindow):
                 #extract roast date
                 roastdate = QDate.fromString(l.split(" ")[-1][0:10],"dd'/'MM'/'yyyy")
                 if not roastdate.isNull():
-                    obj["roastdate"] = e(roastdate.toString())
+                    obj["roastdate"] = encodeLocal(roastdate.toString())
                 break
             if l == '':
                 break
@@ -10475,8 +10504,16 @@ class ApplicationWindow(QMainWindow):
                 break
             else:
                 timex.append(float(self.qmc.stringtoseconds(fields[0])))
-                temp1.append(float(fields[1]))
-                temp2.append(float(fields[2]))
+                try:
+                    t1 = float(fields[1])
+                except:
+                    t1 = -1
+                temp1.append(t1)
+                try:
+                    t2 = float(fields[2])
+                except:
+                    t2 = -1
+                temp2.append(t2)
                 event = fields[3]
                 if event == "Beans loaded":
                     timeindex[0] = len(timex) - 1
@@ -10493,9 +10530,9 @@ class ApplicationWindow(QMainWindow):
         obj["temp1"] = temp2
         obj["temp2"] = temp1
         res = self.setProfile(filename,obj)
-        
-        error_msg = ""
+            
         try:
+            error_msg = ""
             if aw.qmc.loadalarmsfromprofile:
                 aw.qmc.alarmsfile = filename
                 roastlogger_action_section = "No actions loaded"
@@ -10664,7 +10701,9 @@ class ApplicationWindow(QMainWindow):
                         if slider_fan == -1: error_msg += "Could not find slider named 'Fan' "
                         error_msg += "Please rename sliders in Config - Events menu"
 
-        except:
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             if roastlogger_action_section == "No actions loaded":
                 error_msg += "Roastlogger file does not contain actions.  Alarms will not be loaded."
             else:
@@ -11398,16 +11437,16 @@ class ApplicationWindow(QMainWindow):
             profile["mode"] = self.qmc.mode
             profile["timeindex"] = self.qmc.timeindex
             profile["flavors"] = self.qmc.flavors
-            profile["flavorlabels"] = [e(fl) for fl in self.qmc.flavorlabels]
+            profile["flavorlabels"] = [encodeLocal(fl) for fl in self.qmc.flavorlabels]
             profile["flavorstartangle"] = self.qmc.flavorstartangle
             profile["flavoraspect"] = self.qmc.flavoraspect
-            profile["title"] = e(self.qmc.title)
-            profile["beans"] = e(self.qmc.beans)
-            profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],e(self.qmc.weight[2])]
+            profile["title"] = encodeLocal(self.qmc.title)
+            profile["beans"] = encodeLocal(self.qmc.beans)
+            profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocal(self.qmc.weight[2])]
             profile["volume"] = self.qmc.volume
-            profile["density"] = [self.qmc.density[0],e(self.qmc.density[1]),self.qmc.density[2],e(self.qmc.density[3])]
-            profile["roastertype"] = e(self.qmc.roastertype)
-            profile["operator"] = e(self.qmc.operator)
+            profile["density"] = [self.qmc.density[0],encodeLocal(self.qmc.density[1]),self.qmc.density[2],encodeLocal(self.qmc.density[3])]
+            profile["roastertype"] = encodeLocal(self.qmc.roastertype)
+            profile["operator"] = encodeLocal(self.qmc.operator)
             profile["heavyFC"] = self.qmc.heavyFC_flag
             profile["lowFC"] = self.qmc.lowFC_flag
             profile["lightCut"] = self.qmc.lightCut_flag
@@ -11423,22 +11462,22 @@ class ApplicationWindow(QMainWindow):
             profile["color_system"] = self.qmc.color_systems[self.qmc.color_system_idx]
             # write roastdate that respects locale and potential cannot be read in under a different locale (just for compatibility to older versions)
             try:
-                profile["roastdate"] = e(self.qmc.roastdate.toString())
+                profile["roastdate"] = encodeLocal(self.qmc.roastdate.toString())
             except:
                 pass
             # write roast date
             try:
-                profile["roastisodate"] = e(self.qmc.roastdate.toString(Qt.ISODate))
+                profile["roastisodate"] = encodeLocal(self.qmc.roastdate.toString(Qt.ISODate))
             except:
                 pass
             profile["beansize"] = str(self.qmc.beansize)
             profile["specialevents"] = self.qmc.specialevents
             profile["specialeventstype"] = self.qmc.specialeventstype
             profile["specialeventsvalue"] = self.qmc.specialeventsvalue
-            profile["specialeventsStrings"] = [e(ses) for ses in self.qmc.specialeventsStrings]
-            profile["etypes"] = [e(et) for et in self.qmc.etypes]
-            profile["roastingnotes"] = e(self.qmc.roastingnotes)
-            profile["cuppingnotes"] = e(self.qmc.cuppingnotes)
+            profile["specialeventsStrings"] = [encodeLocal(ses) for ses in self.qmc.specialeventsStrings]
+            profile["etypes"] = [encodeLocal(et) for et in self.qmc.etypes]
+            profile["roastingnotes"] = encodeLocal(self.qmc.roastingnotes)
+            profile["cuppingnotes"] = encodeLocal(self.qmc.cuppingnotes)
             profile["timex"] = [self.float2float(x,6) for x in self.qmc.timex]
             profile["temp1"] = [self.float2float(x,3) for x in self.qmc.temp1]
             profile["temp2"] = [self.float2float(x,3) for x in self.qmc.temp2]
@@ -11454,26 +11493,26 @@ class ApplicationWindow(QMainWindow):
             profile["bag_humidity"] = self.qmc.bag_humidity
             profile["roasted_humidity"] = self.qmc.roasted_humidity
             profile["extradevices"] = self.qmc.extradevices
-            profile["extraname1"] = [e(n) for n in self.qmc.extraname1]
-            profile["extraname2"] = [e(n) for n in self.qmc.extraname2]
+            profile["extraname1"] = [encodeLocal(n) for n in self.qmc.extraname1]
+            profile["extraname2"] = [encodeLocal(n) for n in self.qmc.extraname2]
             profile["extratimex"] = [[self.float2float(t,5) for t in x] for x in self.qmc.extratimex]
             profile["extratemp1"] = [[self.float2float(t,2) for t in x] for x in self.qmc.extratemp1]
             profile["extratemp2"] = [[self.float2float(t,2) for t in x] for x in self.qmc.extratemp2]
             profile["extramathexpression1"] = self.qmc.extramathexpression1
             profile["extramathexpression2"] = self.qmc.extramathexpression2  
-            profile["extradevicecolor1"] = [e(x) for x in self.qmc.extradevicecolor1]
-            profile["extradevicecolor2"] = [e(x) for x in self.qmc.extradevicecolor2]
+            profile["extradevicecolor1"] = [encodeLocal(x) for x in self.qmc.extradevicecolor1]
+            profile["extradevicecolor2"] = [encodeLocal(x) for x in self.qmc.extradevicecolor2]
             profile["extramarkersizes1"] = self.qmc.extramarkersizes1
             profile["extramarkersizes2"] = self.qmc.extramarkersizes2
-            profile["extramarkers1"] = [e(x) for x in self.qmc.extramarkers1]
-            profile["extramarkers2"] = [e(x) for x in self.qmc.extramarkers2]
+            profile["extramarkers1"] = [encodeLocal(x) for x in self.qmc.extramarkers1]
+            profile["extramarkers2"] = [encodeLocal(x) for x in self.qmc.extramarkers2]
             profile["extralinewidths1"] = self.qmc.extralinewidths1
             profile["extralinewidths2"] = self.qmc.extralinewidths2
-            profile["extralinestyles1"] = [e(x) for x in self.qmc.extralinestyles1]
-            profile["extralinestyles2"] = [e(x) for x in self.qmc.extralinestyles2]
-            profile["extradrawstyles1"] = [e(x) for x in self.qmc.extradrawstyles1]
-            profile["extradrawstyles2"] = [e(x) for x in self.qmc.extradrawstyles2]
-            profile["externalprogram"] = e(self.ser.externalprogram)
+            profile["extralinestyles1"] = [encodeLocal(x) for x in self.qmc.extralinestyles1]
+            profile["extralinestyles2"] = [encodeLocal(x) for x in self.qmc.extralinestyles2]
+            profile["extradrawstyles1"] = [encodeLocal(x) for x in self.qmc.extradrawstyles1]
+            profile["extradrawstyles2"] = [encodeLocal(x) for x in self.qmc.extradrawstyles2]
+            profile["externalprogram"] = encodeLocal(self.ser.externalprogram)
             #alarms
             profile["alarmflag"] = self.qmc.alarmflag
             profile["alarmguard"] = self.qmc.alarmguard
@@ -11485,9 +11524,9 @@ class ApplicationWindow(QMainWindow):
             profile["alarmtemperature"] = self.qmc.alarmtemperature
             profile["alarmaction"] = self.qmc.alarmaction
             profile["alarmbeep"] = self.qmc.alarmbeep
-            profile["alarmstrings"] = [e(x) for x in self.qmc.alarmstrings]
+            profile["alarmstrings"] = [encodeLocal(x) for x in self.qmc.alarmstrings]
             # remember background profile path
-            profile["backgroundpath"] = e(self.qmc.backgroundpath)
+            profile["backgroundpath"] = encodeLocal(self.qmc.backgroundpath)
             #write only:
             profile["samplinginterval"] = self.qmc.delay / 1000.
             profile["oversampling"] = self.qmc.oversampling
@@ -12217,6 +12256,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("active"):
                 self.WebLCDs = settings.value("active",self.WebLCDs).toBool()
                 self.WebLCDsPort = settings.value("port",self.WebLCDsPort).toInt()[0]
+                self.WebLCDsAlerts = settings.value("alerts",self.WebLCDsAlerts).toBool()
             settings.endGroup()
             if settings.contains("LargeLCDs"):
                 self.LargeLCDs = settings.value("LargeLCDs",self.LargeLCDs).toBool()
@@ -12926,6 +12966,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("WebLCDs")
             settings.setValue("active",self.WebLCDs)
             settings.setValue("port",self.WebLCDsPort)
+            settings.setValue("alerts",self.WebLCDsAlerts)
             settings.endGroup()
             settings.setValue("LargeLCDs",self.LargeLCDs)
             #custom event buttons
@@ -14000,7 +14041,7 @@ $cupping_notes
         contributors += u("David Trebilcock, Zolt") + uchr(225) + u("n Kis, Miroslav Stankovic, ")
         contributors += u("Barrie Fairley, Ziv Sade, Nicholas Seckar, ")
         contributors += u("Morten M") + uchr(252) + u("nchow")
-        contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese")
+        contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -15152,6 +15193,27 @@ class ArtisanDialog(QDialog):
         if key == 16777216 or (key == 87 and modifiers == Qt.ControlModifier): #ESCAPE or CMD-W
             self.close()
 
+class ArtisanMessageBox(QMessageBox):
+    def __init__(self, parent = None, title=None, text=None, timeout=0): 
+        super(ArtisanMessageBox, self).__init__(parent)
+        self.setWindowTitle(title)
+        self.setText(text)
+        self.setIcon(QMessageBox.Information)
+        self.setStandardButtons(QMessageBox.Ok)
+        self.setDefaultButton(QMessageBox.Ok)
+        self.timeout = timeout # configured timeout, defaults to 0 (no timeout)
+        self.currentTime = 0 # counts seconds after timer start
+        
+    def showEvent(self,event):
+        self.currentTime = 0
+        if (self.timeout and self.timeout != 0):
+            self.startTimer(1000)
+    
+    def timerEvent(self,event):
+    	self.currentTime = self.currentTime + 1
+        if (self.currentTime >= self.timeout):
+            self.done(0)
+
 ##########################################################################
 #####################     HUD  EDIT DLG     ##############################
 ##########################################################################
@@ -15704,6 +15766,12 @@ class HUDDlg(ArtisanDialog):
             self.setWebLCDsURL()
         else:
             self.WebLCDsURL.setText("")
+        self.WebLCDsAlerts = QCheckBox(QApplication.translate("CheckBox", "Alarm Popups",None, QApplication.UnicodeUTF8))
+        self.WebLCDsAlerts.setChecked(aw.WebLCDsAlerts)
+        self.WebLCDsAlerts.setFocusPolicy(Qt.NoFocus)
+        if not aw.WebLCDs:
+            self.WebLCDsAlerts.setDisabled(True)
+        self.connect(self.WebLCDsAlerts,SIGNAL("stateChanged(int)"),lambda i=0:self.toggleWebLCDsAlerts()) #toggle
         self.connect(self.WebLCDsPort,SIGNAL("editingFinished()"),lambda x=0:self.changeWebLCDsPort())
         self.connect(self.WebLCDsFlag,SIGNAL("clicked(bool)"),lambda i=0:self.toggleWebLCDs(i))
         WebLCDsLayout = QHBoxLayout()
@@ -15713,8 +15781,14 @@ class HUDDlg(ArtisanDialog):
         WebLCDsLayout.addWidget(self.WebLCDsPort)
         WebLCDsLayout.addStretch()
         WebLCDsLayout.addWidget(self.WebLCDsURL)
+        WebLCDsLayoutHLayout = QHBoxLayout()
+        WebLCDsLayoutHLayout.addStretch()
+        WebLCDsLayoutHLayout.addWidget(self.WebLCDsAlerts)
+        WebLCDsLayoutVLayout = QVBoxLayout()
+        WebLCDsLayoutVLayout.addLayout(WebLCDsLayout)
+        WebLCDsLayoutVLayout.addLayout(WebLCDsLayoutHLayout)
         WebLCDsGroupWidget = QGroupBox(QApplication.translate("GroupBox","WebLCDs",None, QApplication.UnicodeUTF8))
-        WebLCDsGroupWidget.setLayout(WebLCDsLayout)
+        WebLCDsGroupWidget.setLayout(WebLCDsLayoutVLayout)
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(appearanceGroupWidget)
         tab5Layout.addWidget(resolutionGroupWidget)
@@ -15757,6 +15831,9 @@ class HUDDlg(ArtisanDialog):
         self.connect(self.c1ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(4))
         self.connect(self.c2ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))
 
+    def toggleWebLCDsAlerts(self):
+        aw.WebLCDsAlerts = not aw.WebLCDsAlerts
+        
     def changeWebLCDsPort(self):
         aw.WebLCDsPort = int(self.WebLCDsPort.text())
         
@@ -15766,6 +15843,7 @@ class HUDDlg(ArtisanDialog):
         
     def toggleWebLCDs(self,i):
         if i:
+            self.WebLCDsAlerts.setDisabled(False)
             self.WebLCDsPort.setDisabled(True)
             self.setWebLCDsURL()
             res = aw.startWebLCDs()
@@ -15776,6 +15854,7 @@ class HUDDlg(ArtisanDialog):
             else:
                 self.WebLCDsFlag.setChecked(True)
         else:   
+            self.WebLCDsAlerts.setDisabled(True)
             self.WebLCDsFlag.setChecked(False)
             self.WebLCDsPort.setDisabled(False)
             self.WebLCDsURL.setText("")
@@ -27250,7 +27329,7 @@ class graphColorDlg(ArtisanDialog):
         self.connect(self.lcd4spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd4spinbox.value(),lcd=4:self.setLED(val,lcd))
         self.lcd5spinbox = QSpinBox()
         self.lcd5spinbox.setSingleStep(10)
-        self.lcd1spinbox.setWrapping(True)
+        self.lcd1sspinbox.setWrapping(True)
         self.lcd5spinbox.setMaximum(359)
         self.connect(self.lcd5spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd5spinbox.value(),lcd=5:self.setLED(val,lcd))
         self.lcd6spinbox = QSpinBox()
