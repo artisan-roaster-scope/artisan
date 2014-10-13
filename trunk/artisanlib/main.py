@@ -34,13 +34,6 @@ from artisanlib import __revision__
 import os
 import imp
 import sys
-
-#os = __import__("os")
-#imp = __import__("imp")
-#sys = __import__("sys")
-#import imp, sys
-#os = sys.modules['os']
-
 import ast
 import platform
 import serial
@@ -167,7 +160,7 @@ def dependencies_for_myprogram():
     import PyQt4.QtXml
     # for gevent bundling    
     from gevent import core, ares, _semaphore, _util
-    import pprint
+#    import pprint
 
 
 if sys.version < '3':

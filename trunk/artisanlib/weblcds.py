@@ -7,7 +7,11 @@ import signal
 from gevent.pywsgi import WSGIServer
 from geventwebsocket import WebSocketError
 from geventwebsocket.handler import WebSocketHandler
+import platform
+
 import multiprocessing
+#import threading
+
 import json
 import requests
 
@@ -40,7 +44,14 @@ def startWeb(p,resourcePath,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag
         showet = showetflag
         showbt = showbtflag
         server = WSGIServer(("0.0.0.0", port), app, handler_class=WebSocketHandler)
-        gevent.signal(signal.SIGQUIT, gevent.kill)
+        if platform.system() != 'Windows':
+            gevent.signal(signal.SIGQUIT, gevent.kill)
+
+#        # start the server in a separate thread
+#        t = threading.Thread(target=server.serve_forever)
+#        t.daemon = True
+#        t.start()
+        
         # start the server in a separate process
         process = multiprocessing.Process(target=server.serve_forever)
         process.start()
@@ -52,8 +63,8 @@ def startWeb(p,resourcePath,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag
             return True
         else:
             return False
+            
     except Exception as e:
-#        print(e)
 #        import traceback
 #        import sys
 #        traceback.print_exc(file=sys.stdout)
