@@ -124,7 +124,6 @@ from pymodbus.transaction import ModbusSocketFramer
 from pymodbus.factory import ClientDecoder
 
 
-from artisanlib.weblcds import startWeb, stopWeb
 
 #---------------------------------------------------------------------------# 
 # configure the service logging
@@ -148,6 +147,9 @@ if sys.platform.startswith("darwin"):
     from artisanlib.list_ports_osx import comports
     serial.tools.list_ports.comports = comports
     from artisanlib.list_ports_vid_pid_osx_posix import *
+    
+    # WebLCDs for now only available on MacOS X
+    from artisanlib.weblcds import startWeb, stopWeb
 elif os.name == 'posix':
     from artisanlib.list_ports_vid_pid_osx_posix import *
 
@@ -969,6 +971,8 @@ class tgraphcanvas(FigureCanvas):
         self.startofx = 0
         self.resetmaxtime = 60  #time when pressing reset
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
+        self.locktimex = False # if true, do not set time axis min and max from profile on load
+        self.locktimex_start = 0 # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
         self.xgrid = 60   #initial time separation; 60 = 1 minute
         self.ygrid = 100  #initial temperature separation
         self.zgrid = 10   #initial RoR separation
@@ -1724,7 +1728,8 @@ class tgraphcanvas(FigureCanvas):
                 # alarm popup message
                 #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None, QApplication.UnicodeUTF8),self.alarmstrings[alarmnumber])
                 # alarm popup message with 10sec timeout
-                ArtisanMessageBox(self,QApplication.translate("Message", "Alarm notice",None, QApplication.UnicodeUTF8),u(self.alarmstrings[alarmnumber]),timeout=10)
+                amb = ArtisanMessageBox(self,QApplication.translate("Message", "Alarm notice",None, QApplication.UnicodeUTF8),u(self.alarmstrings[alarmnumber]),timeout=10)
+                amb.show()
                 #send alarm also to connected WebLCDs clients
                 if aw.WebLCDs and aw.WebLCDsAlerts:
                     aw.qmc.updateWebLCDs(alertText=u(self.alarmstrings[alarmnumber]),alertTimeout=10)
@@ -2160,6 +2165,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.fileSave(None)  #if accepted, makes safesaveflag = False
                 return True
             elif reply == QMessageBox.Discard:
+                self.safesaveflag = False
                 return True
             elif reply == QMessageBox.Cancel:
                 aw.sendmessage(QApplication.translate("Message","Action canceled",None, QApplication.UnicodeUTF8))
@@ -3371,10 +3377,11 @@ class tgraphcanvas(FigureCanvas):
 
     #Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
     #acepted formats: "00:00","-00:00"
-    def stringtoseconds(self, string):
+    def stringtoseconds(self, string,errormsg=False):
         timeparts = string.split(":")
         if len(timeparts) != 2:
-            aw.sendmessage(QApplication.translate("Message","Time format error encountered", None, QApplication.UnicodeUTF8))
+            if errormsg:
+                aw.sendmessage(QApplication.translate("Message","Time format error encountered", None, QApplication.UnicodeUTF8))
             return -1
         else:
             if timeparts[0][0] != "-":  #if number is positive
@@ -10155,7 +10162,10 @@ class ApplicationWindow(QMainWindow):
         try:
             import csv
             import io
-            csvFile = io.open(filename, 'r', encoding='utf-8')
+            if sys.version < '3':
+                csvFile = io.open(filename, 'rb') # , encoding='utf-8'
+            else:
+                csvFile = io.open(filename, 'r', newline="") # , encoding='utf-8'
             data = csv.reader(csvFile,delimiter='\t')
             #read file header
             header = next(data)
@@ -10182,7 +10192,10 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extraname1[int(i/2)] = extra_fields[i]
             #read data
             last_time = None
+            
+            i = 0
             for row in data:
+                i = i + 1
                 items = list(zip(fields, row))
                 item = {}
                 for (name, value) in items:
@@ -10209,32 +10222,33 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.temp1 = self.qmc.temp2
                 self.qmc.temp2 = tmp
             #set events
-            CHARGE = self.qmc.stringtoseconds(header[2].split('CHARGE:')[1])
+            CHARGE = self.qmc.stringtoseconds(header[2].split('CHARGE:')[1],False)
             if CHARGE > 0:
                 self.qmc.timeindex[0] = self.time2index(CHARGE)
-            DRYe = self.qmc.stringtoseconds(header[4].split('DRYe:')[1])
+            DRYe = self.qmc.stringtoseconds(header[4].split('DRYe:')[1],False)
             if DRYe > 0:
                 self.qmc.timeindex[1] = self.time2index(DRYe)
-            FCs = self.qmc.stringtoseconds(header[5].split('FCs:')[1])
+            FCs = self.qmc.stringtoseconds(header[5].split('FCs:')[1],False)
             if FCs > 0:
                 self.qmc.timeindex[2] = self.time2index(FCs)
-            FCe = self.qmc.stringtoseconds(header[6].split('FCe:')[1])
+            FCe = self.qmc.stringtoseconds(header[6].split('FCe:')[1],False)
             if FCe > 0:
                 self.qmc.timeindex[3] = self.time2index(FCe)
-            SCs = self.qmc.stringtoseconds(header[7].split('SCs:')[1])
+            SCs = self.qmc.stringtoseconds(header[7].split('SCs:')[1],False)
             if SCs > 0:
                 self.qmc.timeindex[4] = self.time2index(SCs)
-            SCe = self.qmc.stringtoseconds(header[8].split('SCe:')[1])
+            SCe = self.qmc.stringtoseconds(header[8].split('SCe:')[1],False)
             if SCe> 0:
-                self.qmc.timeindex[5] = self.time2index(SCe) 
-            DROP = self.qmc.stringtoseconds(header[9].split('DROP:')[1])
+                self.qmc.timeindex[5] = self.time2index(SCe)
+            DROP = self.qmc.stringtoseconds(header[9].split('DROP:')[1],False)
             if DROP > 0:
                 self.qmc.timeindex[6] = self.time2index(DROP)
-            COOL = self.qmc.stringtoseconds(header[10].split('COOL:')[1])
+            COOL = self.qmc.stringtoseconds(header[10].split('COOL:')[1],False)
             if COOL > 0:
                 self.qmc.timeindex[7] = self.time2index(COOL)
             self.qmc.endofx = self.qmc.timex[-1]
             self.sendmessage(QApplication.translate("Message","Artisan CSV file loaded successfully", None, QApplication.UnicodeUTF8))
+            self.qmc.safesaveflag = True
             self.qmc.redraw()
         except Exception as ex:
 #            import traceback
@@ -10766,7 +10780,10 @@ class ApplicationWindow(QMainWindow):
                     [COOL, "COOL",False],
                     ]
                 import csv
-                outfile = open(filename, 'w')
+                if sys.version < '3':
+                    outfile = open(filename, 'wb')
+                else:
+                    outfile = open(filename, 'w',newline="")
                 writer= csv.writer(outfile,delimiter='\t')
                 writer.writerow([
                     u("Date:" + self.qmc.roastdate.toString("dd'.'MM'.'yyyy")),
@@ -10797,8 +10814,14 @@ class ApplicationWindow(QMainWindow):
                     if not last_time or last_time != time1:
                         extratemps = []
                         for j in range(len(self.qmc.extradevices)):
-                            extratemps.append(u(self.qmc.extratemp1[j][i]))
-                            extratemps.append(u(self.qmc.extratemp2[j][i]))
+                            if j < len(self.qmc.extratemp1) and i < len(self.qmc.extratemp1[j]):
+                                extratemps.append(u(self.qmc.extratemp1[j][i]))
+                            else:
+                                extratemps.append(u("-1"))
+                            if j < len(self.qmc.extratemp2) and i < len(self.qmc.extratemp2[j]):
+                                extratemps.append(u(self.qmc.extratemp2[j][i]))
+                            else:
+                                extratemps.append(u("-1"))                            
                         writer.writerow([u(time1),u(time2),u(self.qmc.temp2[i]),u(self.qmc.temp1[i]),u(event)] + extratemps)
                     last_time = time1
                 outfile.close()
@@ -10806,8 +10829,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 return False
         except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportCSV() %1").arg(str(ex)),exc_tb.tb_lineno)
             return False
@@ -11065,13 +11088,14 @@ class ApplicationWindow(QMainWindow):
     #        if "ymin" in profile:
     #            self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),-150)
             if "xmin" in profile:
-                self.qmc.startofx = int(profile["xmin"])
-            if "xmax" in profile:
-                self.qmc.endofx = int(profile["xmax"])
-            else:
-                #Set the xlimits
-                if self.qmc.timex:
-                    self.qmc.endofx = self.qmc.timex[-1] + 40
+                self.qmc.startofx = int(profile["xmin"])            
+            if  not self.qmc.locktimex:
+                if "xmax" in profile:
+                    self.qmc.endofx = int(profile["xmax"])
+                else:
+                    #Set the xlimits
+                    if self.qmc.timex:
+                        self.qmc.endofx = self.qmc.timex[-1] + 40
             if "ambientTemp" in profile:
                 self.qmc.ambientTemp = profile["ambientTemp"]    
             if "ambient_humidity" in profile:
@@ -11148,6 +11172,15 @@ class ApplicationWindow(QMainWindow):
                     aw.arduino.svSoaks = profile["svSoaks"]
             if "timeindex" in profile:
                 self.qmc.timeindex = profile["timeindex"]
+                if self.qmc.locktimex:
+                    if self.qmc.locktimex_start >= 0 and self.qmc.timeindex[0] != -1:
+                        self.qmc.startofx = self.qmc.timex[aw.qmc.timeindex[0]] + self.qmc.locktimex_start
+                    elif self.qmc.locktimex_start >= 0 and self.qmc.timeindex[0] == -1:
+                        self.qmc.startofx = self.qmc.locktimex_start
+                    elif self.qmc.locktimex_start < 0 and self.qmc.timeindex[0] != -1:
+                        self.qmc.startofx = self.qmc.timex[self.qmc.timeindex[0]]-abs(self.qmc.locktimex_start)
+                    else:
+                        self.qmc.startofx = self.qmc.locktimex
             else:
                 ###########      OLD PROFILE FORMAT
                 if "startend" in profile:
@@ -12049,6 +12082,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.resetmaxtime = settings.value("resetmaxtime",self.qmc.resetmaxtime).toInt()[0]
             if settings.contains("lockmax"):
                 self.qmc.fixmaxtime = settings.value("lockmax",self.qmc.fixmaxtime).toBool()
+            if settings.contains("locktimex"):
+                self.qmc.locktimex = settings.value("locktimex",self.qmc.locktimex).toBool()
+            if settings.contains("locktimex_start"):
+                self.qmc.locktimex_start = settings.value("locktimex_start",self.qmc.locktimex_start).toInt()[0]
             self.qmc.legendloc = settings.value("legendloc",self.qmc.legendloc).toInt()[0]
             settings.endGroup()
             settings.beginGroup("RoastProperties")
@@ -12370,10 +12407,10 @@ class ApplicationWindow(QMainWindow):
             else:
                 False
         except Exception as e:
-            self.stopWebLCDs()
-            return False
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
+            self.stopWebLCDs()
+            return False
             
     def stopWebLCDs(self):
         try:
@@ -12831,6 +12868,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("zmin",self.qmc.zlimit_min)
             settings.setValue("resetmaxtime",self.qmc.resetmaxtime)
             settings.setValue("lockmax",self.qmc.fixmaxtime)
+            settings.setValue("locktimex",self.qmc.locktimex)
+            settings.setValue("locktimex_start",self.qmc.locktimex_start)
             settings.setValue("legendloc",self.qmc.legendloc)
             settings.endGroup()
             settings.beginGroup("RoastProperties")
@@ -14279,25 +14318,30 @@ $cupping_notes
         self.qmc.backmoveflag = 1
 
     def switch(self):
-        if aw.qmc.checkSaved():
-            foreground_profile_path = aw.curFile
-            background_profile_path = aw.qmc.backgroundpath
-            if background_profile_path:
-                # load background into foreground
-                aw.loadFile(background_profile_path)
-            else:
-                # reset
-                aw.qmc.reset(soundOn=False)
-            if foreground_profile_path:
-                # load foreground into background
-                aw.loadbackground(u(foreground_profile_path))
-                aw.qmc.background = True
-                aw.qmc.timealign(redraw=False)
-            else:
-                # delete background
-                self.deleteBackground()
-            if foreground_profile_path or background_profile_path:
-                aw.qmc.redraw(recomputeAllDeltas=False)
+        try:
+            if aw.qmc.checkSaved():
+                foreground_profile_path = aw.curFile
+                background_profile_path = aw.qmc.backgroundpath
+                if background_profile_path:
+                    # load background into foreground
+                    aw.loadFile(background_profile_path)
+                else:
+                    # reset
+                    aw.qmc.reset(soundOn=False)
+                if foreground_profile_path:
+                    # load foreground into background
+                    aw.loadbackground(u(foreground_profile_path))
+                    aw.qmc.background = True
+                    aw.qmc.timealign(redraw=False)
+                else:
+                    # delete background
+                    self.deleteBackground()
+                if foreground_profile_path or background_profile_path:
+                    aw.qmc.redraw(recomputeAllDeltas=False)
+        except Exception as e:
+            pass
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
 
     def flavorchart(self):
         dialog = flavorDlg(self)
@@ -15748,13 +15792,17 @@ class HUDDlg(ArtisanDialog):
         self.WebLCDsURL = QLabel()
         self.WebLCDsURL.setOpenExternalLinks(True)
         self.WebLCDsFlag = QCheckBox()
-        self.WebLCDsFlag.setChecked(aw.WebLCDs) 
+        self.WebLCDsFlag.setChecked(aw.WebLCDs)
         self.WebLCDsFlag.setFocusPolicy(Qt.NoFocus)
         self.WebLCDsPortLabel = QLabel(QApplication.translate("Label", "Port", None, QApplication.UnicodeUTF8))
         self.WebLCDsPort = QLineEdit(str(aw.WebLCDsPort))
         self.WebLCDsPort.setAlignment(Qt.AlignRight)
         self.WebLCDsPort.setValidator(QRegExpValidator(QRegExp(r"^[0-9]{1,4}$"),self))
         self.WebLCDsPort.setMaximumWidth(45)
+        # we disable WebLCDs feature for now on non Mac OS X systems
+        if not sys.platform.startswith("darwin"):
+            self.WebLCDsFlag.setDisabled(True)
+            self.WebLCDsPort.setDisabled(True)        
         if aw.WebLCDs:
             self.setWebLCDsURL()
         else:
@@ -18034,6 +18082,9 @@ class WindowsDlg(ArtisanDialog):
         # fixmaxtime flag
         self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Lock Max",None, QApplication.UnicodeUTF8))
         self.fixmaxtimeFlag.setChecked(aw.qmc.fixmaxtime)
+        # locktimex flag
+        self.locktimexFlag = QCheckBox(QApplication.translate("CheckBox", "Lock",None, QApplication.UnicodeUTF8))
+        self.locktimexFlag.setChecked(aw.qmc.locktimex)
         # time axis steps
         timegridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
         self.xaxislencombobox = QComboBox()
@@ -18094,17 +18145,18 @@ class WindowsDlg(ArtisanDialog):
         self.connect(okButton,SIGNAL("clicked()"),self.updatewindow)
         self.connect(resetButton,SIGNAL("clicked()"),self.reset)
         xlayout = QGridLayout()
-        xlayout.addWidget(xlimitLabel_min,0,0)
-        xlayout.addWidget(self.xlimitEdit_min,0,1)
-        xlayout.addWidget(xlimitLabel,0,2)
-        xlayout.addWidget(self.xlimitEdit,0,3)
-        xlayout.addWidget(timegridlabel,1,0)
-        xlayout.addWidget(self.xaxislencombobox,1,1)
-        xlayout.addWidget(resettimelabel,1,2)
-        xlayout.addWidget(self.resetEdit,1,3)
-        xlayout.addWidget(xrotationlabel,2,0)
-        xlayout.addWidget(self.fixmaxtimeFlag,2,2)
-        xlayout.addWidget(self.xrotationSpinBox,2,1)
+        xlayout.addWidget(self.locktimexFlag,0,0)
+        xlayout.addWidget(xlimitLabel_min,1,0)
+        xlayout.addWidget(self.xlimitEdit_min,1,1)
+        xlayout.addWidget(xlimitLabel,1,2)
+        xlayout.addWidget(self.xlimitEdit,1,3)
+        xlayout.addWidget(timegridlabel,2,0)
+        xlayout.addWidget(self.xaxislencombobox,2,1)
+        xlayout.addWidget(resettimelabel,2,2)
+        xlayout.addWidget(self.resetEdit,2,3)
+        xlayout.addWidget(xrotationlabel,3,0)
+        xlayout.addWidget(self.fixmaxtimeFlag,3,2)
+        xlayout.addWidget(self.xrotationSpinBox,3,1)
         ylayout = QGridLayout()
         ylayout.addWidget(ylimitLabel_min,0,0)
         ylayout.addWidget(self.ylimitEdit_min,0,1)
@@ -18227,11 +18279,14 @@ class WindowsDlg(ArtisanDialog):
                 aw.qmc.startofx = aw.qmc.timex[aw.qmc.timeindex[0]]-abs(starteditime)
             else:
                 aw.qmc.startofx = starteditime
+            aw.qmc.locktimex_start = starteditime
         else:
             aw.qmc.startofx = 0
+            aw.qmc.locktimex_start = 0
         if resettime > 0:
             aw.qmc.resetmaxtime = resettime
         aw.qmc.fixmaxtime = self.fixmaxtimeFlag.isChecked()
+        aw.qmc.locktimex = self.locktimexFlag.isChecked()
         aw.qmc.redraw(recomputeAllDeltas=False)
         string = QApplication.translate("Message","xlimit = (%3,%4) ylimit = (%1,%2) zlimit = (%5,%6)",None, QApplication.UnicodeUTF8).arg(str(self.ylimitEdit_min.text())).arg(str(self.ylimitEdit.text())).arg(str(self.xlimitEdit_min.text())).arg(str(self.xlimitEdit.text())).arg(str(self.zlimitEdit_min.text())).arg(str(self.zlimitEdit.text()))                                   
         aw.sendmessage(string)
