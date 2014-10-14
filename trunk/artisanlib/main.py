@@ -5196,7 +5196,7 @@ class tgraphcanvas(FigureCanvas):
             if reply == QMessageBox.Yes:
                 self.initfromprofile()
                 self.connect_designer()
-                self.redraw(False)
+                self.redraw(True)
             elif reply == QMessageBox.Cancel:
                 aw.designerAction.setChecked(False)
         else:

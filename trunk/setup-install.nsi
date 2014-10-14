@@ -250,13 +250,13 @@ Section Uninstall
   Delete "$INSTDIR\artisanPalettes.ico"
   Delete "$INSTDIR\artisanWheel.ico"
   Delete "$INSTDIR\Humor-Sans.ttf"
-  Delete "$INSTDIR\alarmclock.eot dist')
-  Delete "$INSTDIR\alarmclock.svg')
-  Delete "$INSTDIR\alarmclock.ttf')
-  Delete "$INSTDIR\alarmclock.woff')
-  Delete "$INSTDIR\artisan.tpl')
-  Delete "$INSTDIR\bigtext.js')
-  Delete "$INSTDIR\jquery-1.11.1.min.js')  
+  Delete "$INSTDIR\alarmclock.eot dist"
+  Delete "$INSTDIR\alarmclock.svg"
+  Delete "$INSTDIR\alarmclock.ttf"
+  Delete "$INSTDIR\alarmclock.woff"
+  Delete "$INSTDIR\artisan.tpl"
+  Delete "$INSTDIR\bigtext.js"
+  Delete "$INSTDIR\jquery-1.11.1.min.js"
   Delete "$INSTDIR\qt.conf"
   Delete "$INSTDIR\vcredist_x86.exe"
 
