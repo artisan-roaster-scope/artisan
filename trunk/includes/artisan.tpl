@@ -15,13 +15,22 @@
                      document.getElementById("time").innerHTML = data.data.time;
                  }
                  if (data.data.bt) {
-                     document.getElementById("bt").innerHTML = (("   " + data.data.bt).slice(-3)).replace(" ","&nbsp;");
+                     if (data.data.bt.toString().indexOf(".") > -1) {
+                         document.getElementById("bt").innerHTML = (("   " + data.data.bt).slice(-5)).replace(" ","&nbsp;");
+                     } else {
+                         document.getElementById("bt").innerHTML = (("   " + data.data.bt).slice(-3)).replace(" ","&nbsp;");
+                     }
                  }
                  if (data.data.et) {
-                     v = (("   " + data.data.et).slice(-3)).replace(" ","&nbsp;");
+                     if (data.data.bt.toString().indexOf(".") > -1) {
+                         v = (("   " + data.data.et).slice(-5)).replace(" ","&nbsp;");
+                     } else {
+                         v = (("   " + data.data.et).slice(-3)).replace(" ","&nbsp;");
+                     }
                      document.getElementById("et").innerHTML = v;
                      document.getElementById("et2").innerHTML = v;
                  }
+                 $('#artisan').bigtext();
              }
              if (data.alert && data.alert.text) { // { "alert" : { "title": <string>, "text": <string>, "timeout": <int> }}
                  alert(data.alert.text);
@@ -93,8 +102,8 @@
    <body>
       <div id="artisan" style="width:100%;">
          <div>&nbsp;<span class="tspace">&nbsp;</span><span id="time">00:00</span><span class="tspace">&nbsp;</span>&nbsp;</div>
-         <div><span id="showbt"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="bt">&nbsp;--</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span><span id="showet"><span class="space">&thinsp;</span><span id="et">&nbsp;--</span></span></div>
-         <div id="het"><span id="showhet"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="et2">&nbsp;--</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span></div>
+         <div><span id="showbt"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="bt">{{!nonesymbol}}</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span><span id="showet"><span class="space">&thinsp;</span><span id="et">{{!nonesymbol}}</span></span></div>
+         <div id="het"><span id="showhet"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="et2">{{!nonesymbol}}</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span></div>
       </div>
       <script src="jquery-1.11.1.min.js"></script>
       <script src="bigtext.js"></script>
@@ -103,7 +112,6 @@
              $(window).load(function() {
                  $('#artisan').bigtext();
                  });
-             $( "#dialog" ).dialog({ autoOpen: false });
          });
       </script>
    </body>
