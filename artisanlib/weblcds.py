@@ -20,6 +20,7 @@ wsocks = [] # list of open web sockets
 server = None
 process = None
 port = None
+nonesymbol = "--"
 timecolor="#FFF",
 timebackground="#000",
 btcolor="#00007F",
@@ -29,12 +30,13 @@ etbackground="#CCCCCC"
 showet = True
 showbt = True
         
-def startWeb(p,resourcePath,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
-    global port, server, process, TEMPLATE_PATH, static_path, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt
+def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
+    global port, server, process, TEMPLATE_PATH, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt
     try:
         port = p
         static_path = resourcePath
         TEMPLATE_PATH.insert(0,resourcePath)
+        nonesymbol = nonesym
         timecolor = timec
         timebackground = timebg
         btcolor = btc
@@ -143,6 +145,7 @@ def index():
         showet_str = "none"
     return template('artisan',
         port=str(port),
+        nonesymbol=nonesymbol,
         timecolor=timecolor,
         timebackground=timebackground,
         btcolor=btcolor,

@@ -1482,8 +1482,9 @@ class tgraphcanvas(FigureCanvas):
                     timestr = None
                     if not self.flagstart:
                         timestr = "00:00"
-                    btstr = str(aw.float2float(self.temp2[-1],0))
-                    etstr = str(aw.float2float(self.temp1[-1],0))
+                    digits = (1 if aw.qmc.LCDdecimalplaces else 0)
+                    btstr = str(aw.float2float(self.temp2[-1],digits))
+                    etstr = str(aw.float2float(self.temp1[-1],digits))
                     if aw.WebLCDs:                       
                         self.updateWebLCDs(bt=btstr,et=etstr,time=timestr)
                     if aw.largeLCDs_dialog:
@@ -2663,7 +2664,8 @@ class tgraphcanvas(FigureCanvas):
                 if timeindex[7] and not timeindex2:
                     tidx = timeindex[7]
                     endidx = self.ax.get_xlim()[1] # or timex[-1]
-                    self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None,lod=False)
+                    if timex[tidx] < endidx:
+                        self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None,lod=False)
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -3773,10 +3775,14 @@ class tgraphcanvas(FigureCanvas):
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
             aw.hideLCDs()
             # reset WebLCDs
+            if aw.qmc.LCDdecimalplaces:
+                resLCD = "-.-"
+            else:
+                resLCD = "--"
             if aw.WebLCDs: 
-                self.updateWebLCDs(bt=" --",et=" --")
+                self.updateWebLCDs(bt=resLCD,et=resLCD)
             if aw.largeLCDs_dialog:
-                self.updateLargeLCDs(bt=" --",et=" --")
+                self.updateLargeLCDs(bt=resLCD,et=resLCD)
             aw.hideSliders()
             aw.hideExtraButtons()
             aw.enableEditMenus()
@@ -4735,9 +4741,9 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.weight[1]:
                             msg += sep + str(aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
                     if aw.qmc.whole_color and aw.qmc.ground_color:
-                       msg += sep + u"#" + str(aw.qmc.whole_color) + u"/" +  str(aw.qmc.ground_color)
+                        msg += sep + u"#" + str(aw.qmc.whole_color) + u"/" +  str(aw.qmc.ground_color)
                     elif aw.qmc.ground_color:
-                       msg += sep + u"#" + str(aw.qmc.ground_color)
+                        msg += sep + u"#" + str(aw.qmc.ground_color)
                     self.ax.set_xlabel(msg,color = aw.qmc.palette["text"],fontproperties=statsprop)
             else:
                 self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
@@ -8574,20 +8580,31 @@ class ApplicationWindow(QMainWindow):
             self.extraLCD2[i].setDigitCount(n)
             self.extraLCD2[i].setMinimumWidth(n*16)
             self.extraLCD2[i].setMaximumWidth(n*16)
+        if aw.largeLCDs_dialog:
+            aw.largeLCDs_dialog.lcd2.setDigitCount(n+1)
+            aw.largeLCDs_dialog.lcd3.setDigitCount(n+1)
+            if aw.qmc.LCDdecimalplaces:
+                aw.largeLCDs_dialog.lcd2.display("-.-")
+                aw.largeLCDs_dialog.lcd3.display("-.-")
+            else:
+                aw.largeLCDs_dialog.lcd2.display("--")
+                aw.largeLCDs_dialog.lcd3.display("--")
             
     def ArtisanLCD(self):
         lcd = QLCDNumber()
         lcd.setSegmentStyle(2)
         lcd.setFrameStyle(QFrame.Plain)
         lcd.setMinimumHeight(35)
+#        lcd.setSmallDecimalPoint(True)
+        x = 16
         if self.qmc.LCDdecimalplaces:
             lcd.setDigitCount(5) # default is 5
-            lcd.setMinimumWidth(5*16)     
-            lcd.setMaximumWidth(5*16)
+            lcd.setMinimumWidth(5*x)
+            lcd.setMaximumWidth(5*x)
         else:
             lcd.setDigitCount(3) # default is 5
-            lcd.setMinimumWidth(3*16)
-            lcd.setMaximumWidth(3*16)
+            lcd.setMinimumWidth(3*x)
+            lcd.setMaximumWidth(3*x)
         return lcd
 
     # set slider focus to Qt.StrongFocus to allow keyboard control and
@@ -9166,7 +9183,7 @@ class ApplicationWindow(QMainWindow):
                 elif action == 7:
                     try:
                         prg_file = u(aw.getAppPath()) + u(cmd_str)
-                        proc=subprocess.Popen(prg_file, shell=True)
+                        subprocess.Popen(prg_file, shell=True)
                         # alternative approach, that seems to fail on some Mac OS X versions:
                         #QProcess.startDetached(prg_file)
                     except Exception as e:
@@ -10476,7 +10493,6 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " resetExtraDevices(): %1").arg(str(e)),exc_tb.tb_lineno)
             
     def importRoastLoggerEnc(self,filename,enc='utf-8'):
-        res = None
         roastlogger_action_section = ""
         # use io.open instead of open to have encoding support on Python 2
         import io
@@ -10708,7 +10724,7 @@ class ApplicationWindow(QMainWindow):
                         if slider_fan == -1: error_msg += "Could not find slider named 'Fan' "
                         error_msg += "Please rename sliders in Config - Events menu"
 
-        except Exception as e:
+        except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             if roastlogger_action_section == "No actions loaded":
@@ -10829,8 +10845,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 return False
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportCSV() %1").arg(str(ex)),exc_tb.tb_lineno)
             return False
@@ -12390,6 +12406,7 @@ class ApplicationWindow(QMainWindow):
                 res = startWeb(
                     self.WebLCDsPort,
                     u(self.getResourcePath()),
+                    ("&nbsp;&nbsp;-.-" if aw.qmc.LCDdecimalplaces else "&nbsp;--"),
                     aw.lcdpaletteF["timer"],
                     aw.lcdpaletteB["timer"],
                     aw.lcdpaletteF["bt"],
@@ -12406,7 +12423,7 @@ class ApplicationWindow(QMainWindow):
                     return False
             else:
                 False
-        except Exception as e:
+        except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             self.stopWebLCDs()
@@ -13230,8 +13247,8 @@ class ApplicationWindow(QMainWindow):
             if aw.qmc.flagon:
                 aw.qmc.ToggleMonitor()
             if aw.WebLCDs:
-            	aw.stopWebLCDs()
-            	aw.WebLCDs = True # to ensure they are started again on restart
+                aw.stopWebLCDs()
+                aw.WebLCDs = True # to ensure they are started again on restart
             if aw.LargeLCDs and aw.largeLCDs_dialog:
                 tmp_LargeLCDs = aw.LargeLCDs # we keep the state to properly store it in the settings
                 aw.largeLCDs_dialog.close()
@@ -14338,7 +14355,7 @@ $cupping_notes
                     self.deleteBackground()
                 if foreground_profile_path or background_profile_path:
                     aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as e:
+        except Exception:
             pass
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -15247,7 +15264,7 @@ class ArtisanMessageBox(QMessageBox):
             self.startTimer(1000)
     
     def timerEvent(self,event):
-    	self.currentTime = self.currentTime + 1
+        self.currentTime = self.currentTime + 1
         if (self.currentTime >= self.timeout):
             self.done(0)
 
@@ -27719,7 +27736,7 @@ class LargeLCDs(ArtisanDialog):
         
         self.resizeEvent = self.resizeDialog
         
-    def makeLCD(self,s):    
+    def makeLCD(self,s,tight=False):    
         lcd = QLCDNumber() # Temperature BT
         lcd.setSegmentStyle(2)
         lcd.setFrameStyle(QFrame.Plain)        
@@ -27727,8 +27744,21 @@ class LargeLCDs(ArtisanDialog):
             lcd.setDigitCount(5)
             lcd.display("00:00")
         else:
-            lcd.setDigitCount(3)
-            lcd.display(" --")
+            lcd.setSmallDecimalPoint(True)
+            if aw.qmc.LCDdecimalplaces:
+                if tight:
+                    lcd.setDigitCount(4)
+                    lcd.display("  -.-")
+                else:
+                    lcd.setDigitCount(5)
+                    lcd.display("   -.-")
+            else:
+                if tight:
+                    lcd.setDigitCount(3)
+                    lcd.display(" --")
+                else:
+                    lcd.setDigitCount(4)
+                    lcd.display("  --")
             if s == "et":
                 lcd.setVisible(aw.qmc.ETlcd)
             elif s == "bt":
@@ -27736,13 +27766,14 @@ class LargeLCDs(ArtisanDialog):
         lcd.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF[s],aw.lcdpaletteB[s]))
         return lcd
         
-    def makeLCDs(self):
+    # tight 0: leading space on lcd2 and lcd 1, 1: leading space on lcd3, 2: no leading spaces
+    def makeLCDs(self,tight=False):
         # time LCD
-        self.lcd1 = self.makeLCD("timer") # time
+        self.lcd1 = self.makeLCD("timer",False) # time
         # ET
-        self.lcd2 = self.makeLCD("et") # Temperature ET
+        self.lcd2 = self.makeLCD("et",tight) # Temperature ET
         # BT
-        self.lcd3 = self.makeLCD("bt") # Temperature BT
+        self.lcd3 = self.makeLCD("bt",tight) # Temperature BT
         
     def landscapeLayout(self):
         self.makeLCDs()
@@ -27767,7 +27798,7 @@ class LargeLCDs(ArtisanDialog):
         return landscapetightlayout
         
     def portraitLayout(self):
-        self.makeLCDs()
+        self.makeLCDs(tight=True)
         portraitlayout = QVBoxLayout()
         portraitlayout.addWidget(self.lcd1)
         portraitlayout.addWidget(self.lcd2)
