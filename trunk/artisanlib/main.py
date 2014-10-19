@@ -674,9 +674,11 @@ class tgraphcanvas(FigureCanvas):
         self.ambientTempSource = 0 # indicates the temperature curve that is used to automatically fill the ambient temperature on DROP
 #                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
         self.ambient_humidity = 0.
-        #relative humidity percentage [0], corresponding temperature [1], temperature unit [2]
-        self.bag_humidity = [0.,0.]
-        self.roasted_humidity = [0.,0.]
+        #relative humidity percentage [0], corresponding temperature [1]
+        
+        self.moisture_greens = 0.
+        self.moisture_roasted = 0.
+        
         self.beansize = 0.0
 
         self.whole_color = 0
@@ -725,6 +727,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundpath = ""
         self.titleB = ""
         self.temp1B,self.temp2B,self.timeB = [],[],[]
+        self.stemp1B,self.stemp2B = [],[] # smoothed versions of the background courves
         self.delta1B,self.delta2B = [],[]
         self.timeindexB = [-1,0,0,0,0,0,0,0]
         self.backgroundEvents = [] #indexes of background events
@@ -836,6 +839,8 @@ class tgraphcanvas(FigureCanvas):
         self.volume = [0,0,"l"]
         #[0]probe weight, [1]weight unit, [2]probe volume, [3]volume unit
         self.density = [0,"g",0,"l"]
+        
+        self.volumeCalcUnit = 0
 
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
@@ -2991,7 +2996,7 @@ class tgraphcanvas(FigureCanvas):
                             startB = self.timeB[self.timeindexB[0]]
                         else:
                             startB = 0
-                    self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.temp2B,startB,self.timex,self.timeindex)
+                    self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex)
                     
                 #END of Background
                 
@@ -3513,8 +3518,6 @@ class tgraphcanvas(FigureCanvas):
                                         pass
 
                         self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
-                        self.bag_humidity[1] = self.fromCtoF(self.bag_humidity[1]) #greens humidity temperature
-                        self.roasted_humidity[1] = self.fromCtoF(self.roasted_humidity[1]) #roasted humidity temperature
 
                         #prevents accidentally deleting a modified profile. 
                         self.safesaveflag = True
@@ -3559,8 +3562,6 @@ class tgraphcanvas(FigureCanvas):
                                     aw.qmc.extratemp2[e][i] = self.fromFtoC(aw.qmc.extratemp2[e][i])
 
                         self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
-                        self.bag_humidity[1] = self.fromFtoC(self.bag_humidity[1])  #greens humidity temperature
-                        self.roasted_humidity[1] = self.fromFtoC(self.roasted_humidity[1])  #roasted humidity temperature
 
                         for i in range(len(self.timeB)):
                             self.temp1B[i] = self.fromFtoC(self.temp1B[i]) #ET B
@@ -4561,8 +4562,12 @@ class tgraphcanvas(FigureCanvas):
                                     self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
-                        temp = "%.1f "%self.temp2[i]
-                        timed = self.stringfromseconds(self.timex[i])
+                        temp = "%.1f "%self.temp2[i]            
+                        if aw.qmc.timeindex[0] != -1:
+                            start = aw.qmc.timex[aw.qmc.timeindex[0]]
+                        else:
+                            start = 0
+                        timed = self.stringfromseconds(self.timex[i] - start)
                         message = QApplication.translate("Message","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
                         aw.sendmessage(message)
                         #write label in mini recorder if flag checked
@@ -6743,12 +6748,16 @@ class SampleThread(QThread):
 #                        else:
 #                            rateofchange2plot = None
 # Instead we draw RoR only after the RoR filter fully applies
-                        if aw.qmc.deltafilter:
-                            user_filter = int(round(aw.qmc.deltafilter/2))
+#                        if aw.qmc.deltafilter:
+#                            user_filter = int(round(aw.qmc.deltafilter/2))
+#                        else:
+#                            user_filter = 0
+                        if aw.qmc.timeindex[6]:
+                            rateofchange1plot = None
+                            rateofchange2plot = None
                         else:
-                            user_filter = 0
-                        rateofchange1plot = aw.qmc.rateofchange1
-                        rateofchange2plot = aw.qmc.rateofchange2
+                            rateofchange1plot = aw.qmc.rateofchange1
+                            rateofchange2plot = aw.qmc.rateofchange2
                     else:
                         if local_flagstart:
                             aw.qmc.unfiltereddelta1.append(0.)
@@ -10055,10 +10064,13 @@ class ApplicationWindow(QMainWindow):
                 f.close()
                 profile = self.deserialize(filename)
                 tb = profile["timex"]
-                b1 = self.qmc.smooth_list(tb,profile["temp1"],window_len=self.qmc.curvefilter)
-                b2 = self.qmc.smooth_list(tb,profile["temp2"],window_len=self.qmc.curvefilter)
+                t1 = profile["temp1"]
+                t2 = profile["temp2"]
+                self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB = t1,t2,tb
+                b1 = self.qmc.smooth_list(tb,t1,window_len=self.qmc.curvefilter)
+                b2 = self.qmc.smooth_list(tb,t2,window_len=self.qmc.curvefilter)
                 # NOTE: parallel assignment after time intensive smoothing is necessary to avoid redraw failure!
-                self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB = b1,b2,tb
+                self.qmc.stemp1B,self.qmc.stemp2B = b1,b2
                 self.qmc.backgroundEvents = profile["specialevents"]
                 self.qmc.backgroundEtypes = profile["specialeventstype"]
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
@@ -11116,14 +11128,14 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ambientTemp = profile["ambientTemp"]    
             if "ambient_humidity" in profile:
                 self.qmc.ambient_humidity = profile["ambient_humidity"]
-            if "bag_humidity" in profile:
-                self.qmc.bag_humidity = profile["bag_humidity"]   
+            if "moisture_greens" in profile:
+                self.qmc.moisture_greens = profile["moisture_greens"]
             else:
-                self.qmc.bag_humidity = [0.,0.]
-            if "roasted_humidity" in profile:
-                self.qmc.roasted_humidity = profile["roasted_humidity"]
+                self.qmc.moisture_greens = 0.
+            if "moisture_roasted" in profile:
+                self.qmc.moisture_roasted = profile["moisture_roasted"]
             else:
-                self.qmc.roasted_humidity = [0.,0.]
+                self.qmc.moisture_roasted = 0.
             if "externalprogram" in profile:
                 self.ser.externalprogram = d(profile["externalprogram"])
             if "samplinginterval" in profile:
@@ -11443,14 +11455,10 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)                
         ######### Humidity #########
         try:
-            if aw.qmc.bag_humidity[0] != 0.0 and not math.isnan(aw.qmc.bag_humidity[0]):
-                computedProfile["bag_humidity"] = self.float2float(aw.qmc.bag_humidity[0])
-            if aw.qmc.bag_humidity[1] != 0.0 and not math.isnan(aw.qmc.bag_humidity[1]):
-                computedProfile["bag_temperature"] = self.float2float(aw.qmc.bag_humidity[1])
-            if aw.qmc.roasted_humidity[0] != 0.0 and not math.isnan(aw.qmc.roasted_humidity[0]):
-                computedProfile["roasted_humidity"] = self.float2float(aw.qmc.roasted_humidity[0])
-            if aw.qmc.roasted_humidity[1] != 0.0 and not math.isnan(aw.qmc.roasted_humidity[1]):
-                computedProfile["roasted_temperature"] = self.float2float(aw.qmc.roasted_humidity[1])
+            if aw.qmc.moisture_greens != 0.0 and not math.isnan(aw.qmc.moisture_greens):
+                computedProfile["moisture_greens"] = self.float2float(aw.qmc.moisture_greens)
+            if aw.qmc.moisture_roasted != 0.0 and not math.isnan(aw.qmc.moisture_roasted):
+                computedProfile["moisture_roasted"] = self.float2float(aw.qmc.moisture_roasted)
             if aw.qmc.ambient_humidity != 0.0 and not math.isnan(aw.qmc.ambient_humidity):
                 computedProfile["ambient_humidity"] = self.float2float(aw.qmc.ambient_humidity)
             if aw.qmc.ambientTemp != 0.0 and not math.isnan(aw.qmc.ambientTemp):
@@ -11485,7 +11493,7 @@ class ApplicationWindow(QMainWindow):
             profile["title"] = encodeLocal(self.qmc.title)
             profile["beans"] = encodeLocal(self.qmc.beans)
             profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocal(self.qmc.weight[2])]
-            profile["volume"] = self.qmc.volume
+            profile["volume"] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocal(self.qmc.volume[2])]
             profile["density"] = [self.qmc.density[0],encodeLocal(self.qmc.density[1]),self.qmc.density[2],encodeLocal(self.qmc.density[3])]
             profile["roastertype"] = encodeLocal(self.qmc.roastertype)
             profile["operator"] = encodeLocal(self.qmc.operator)
@@ -11532,8 +11540,8 @@ class ApplicationWindow(QMainWindow):
             profile["xmax"] = self.qmc.endofx
             profile["ambientTemp"] = self.qmc.ambientTemp
             profile["ambient_humidity"] = self.qmc.ambient_humidity
-            profile["bag_humidity"] = self.qmc.bag_humidity
-            profile["roasted_humidity"] = self.qmc.roasted_humidity
+            profile["moisture_greens"] = self.qmc.moisture_greens
+            profile["moisture_roasted"] = self.qmc.moisture_roasted
             profile["extradevices"] = self.qmc.extradevices
             profile["extraname1"] = [encodeLocal(n) for n in self.qmc.extraname1]
             profile["extraname2"] = [encodeLocal(n) for n in self.qmc.extraname2]
@@ -11632,10 +11640,12 @@ class ApplicationWindow(QMainWindow):
     def fileExportRoastLogger(self):
         self.fileExport(QApplication.translate("Message", "Export RoastLogger",None, QApplication.UnicodeUTF8),"*.csv",self.exportRoastLogger)
 
-    def fileImport(self,msg,loader):
+    def fileImport(self,msg,loader,reset=False):
         try:
             filename = self.ArtisanOpenFileDialog(msg=msg)
             if filename:
+                if reset:
+                    aw.qmc.reset(True,False)
                 loader(filename)
                 self.sendmessage(QApplication.translate("Message","Readings imported", None, QApplication.UnicodeUTF8))
             else:
@@ -11645,13 +11655,13 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " fileImport(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def fileImportCSV(self):
-        self.fileImport(QApplication.translate("Message", "Import CSV",None, QApplication.UnicodeUTF8),self.importCSV)
+        self.fileImport(QApplication.translate("Message", "Import CSV",None, QApplication.UnicodeUTF8),self.importCSV,True)
 
     def fileImportJSON(self):
-        self.fileImport(QApplication.translate("Message", "Import JSON",None, QApplication.UnicodeUTF8),self.importJSON)
+        self.fileImport(QApplication.translate("Message", "Import JSON",None, QApplication.UnicodeUTF8),self.importJSON,True)
 
     def fileImportRoastLogger(self):
-        self.fileImport(QApplication.translate("Message", "Import RoastLogger",None, QApplication.UnicodeUTF8),self.importRoastLogger)
+        self.fileImport(QApplication.translate("Message", "Import RoastLogger",None, QApplication.UnicodeUTF8),self.importRoastLogger,True)
 
     #loads the settings at the start of application. See the oppposite closeEvent()
     def settingsLoad(self):
@@ -11843,6 +11853,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.volume[2] = str(settings.value("volume",self.qmc.volume[2]).toString())
                 self.qmc.density[1] = str(settings.value("densityweight",self.qmc.density[1]).toString())
                 self.qmc.density[3] = str(settings.value("densityvolume",self.qmc.density[3]).toString())
+            if settings.contains("volumeCalcUnit"):
+                self.qmc.volumeCalcUnit = settings.value("volumeCalcUnit",int(self.qmc.volumeCalcUnit)).toInt()[0]
             settings.endGroup()
             #restore serial port
             settings.beginGroup("SerialPort")
@@ -12901,6 +12913,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("volume",self.qmc.volume[2])
             settings.setValue("densityweight",self.qmc.density[1])
             settings.setValue("densityvolume",self.qmc.density[3])
+            settings.setValue("volumeCalcUnit",self.qmc.volumeCalcUnit)
             settings.endGroup()
             #save alarms
             settings.beginGroup("Alarms")
@@ -13343,7 +13356,11 @@ th {
 <td>$density</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Humidity:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Moisture:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<td>$moisture</td>
+</tr>
+<tr>
+<th>""") + u(QApplication.translate("HTML Report Template", "Ambient:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$humidity</td>
 </tr>
 <tr>
@@ -13572,26 +13589,23 @@ $cupping_notes
                     density = u("%.1fg/l (green)<br>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"]))
             else:
                 degree = u("--")
+
+            moisture = u("")
+            if "moisture_greens" in cp:
+                moisture = u("%d%%"%cp["moisture_greens"])
+                moisture += " (" + u(QApplication.translate("Label","greens")) + ")"
+            if "moisture_roasted" in cp:
+                moisture = u("%d%%"%cp["moisture_roasted"])
+                moisture += " (" + u(QApplication.translate("Label","roasted")) + ")"
+                
             humidity = u("")
-            if "bag_humidity" in cp:
-                humidity = u("%d%%"%cp["bag_humidity"])
-                if "bag_temperature" in cp:
-                    humidity += u(" at %d%s"%(cp["bag_temperature"],self.qmc.mode))
-                humidity += " (" + u(QApplication.translate("Label","greens")) + ")"
-            if "roasted_humidity" in cp:
-                if humidity != "":
-                    humidity += u("<br>")
-                humidity += u("%d%%"%cp["roasted_humidity"])
-                if "roasted_temperature" in cp:
-                    humidity += u(" at %d%s"%(cp["roasted_temperature"],self.qmc.mode))
-                humidity += " (" + u(QApplication.translate("Label","roasted")) + ")"
             if "ambient_humidity" in cp:
-                if humidity != "":
-                    humidity += u("<br>")
                 humidity += u("%d%%"%cp["ambient_humidity"])
                 if "ambient_temperature" in cp:
                     humidity += u(" at %d%s"%(cp["ambient_temperature"],self.qmc.mode))
-                humidity += " (" + u(QApplication.translate("Label","ambient")) + ")"
+            else:
+                if "ambient_temperature" in cp:
+                    humidity += u("%d%s"%(cp["ambient_temperature"],self.qmc.mode))
             if len(humidity) == 0:
                 humidity = u("--")
             if self.qmc.whole_color or self.qmc.ground_color:
@@ -13622,6 +13636,7 @@ $cupping_notes
                 charge=charge,
                 size=u("--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm"),
                 density=density,
+                moisture=moisture,
                 humidity=humidity,
                 TP=self.event2html(cp,"TP_time","TP_BT"),
                 DRY=self.event2html(cp,"DRY_time","DRY_BT"),
@@ -16494,6 +16509,241 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.accept()
 
+########################################################################################
+#####################  Volume Calculator DLG  ##########################################
+########################################################################################
+
+class volumeCalculatorDlg(ArtisanDialog):
+    def __init__(self, parent = None, weightIn=None, weightOut=None,
+        weightunit=0,volumeunit=0,inlineedit=None,outlineedit=None): # weight in and out expected in g (int)
+        # weightunit 0:g, 1:Kg  volumeunit 0:ml, 1:l
+        super(volumeCalculatorDlg,self).__init__(parent)
+        self.setModal(True)
+        self.setWindowTitle(QApplication.translate("Form Caption","Volume Calculator",None, QApplication.UnicodeUTF8))
+
+        self.weightIn = weightIn
+        self.weightOut = weightOut
+        
+        # the units
+        self.weightunit = weightunit
+        self.volumeunit = volumeunit
+        
+        # the results
+        self.inVolume = None
+        self.outVolume = None
+        
+        # the QLineedits of the RoastProperties dialog to be updated
+        self.inlineedit = inlineedit
+        self.outlineedit = outlineedit
+        
+        # Unit Group
+        unitvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit", None, QApplication.UnicodeUTF8)) + "</b>")
+        self.unitvolumeEdit = QLineEdit(str(aw.qmc.volumeCalcUnit))
+        self.unitvolumeEdit.setValidator(QIntValidator(0, 9999,self.unitvolumeEdit))
+        self.unitvolumeEdit.setMinimumWidth(60)
+        self.unitvolumeEdit.setMaximumWidth(60)
+        self.unitvolumeEdit.setAlignment(Qt.AlignRight)
+        unitvolumeUnit = QLabel(QApplication.translate("Label","ml", None, QApplication.UnicodeUTF8))
+        unitLayout = QHBoxLayout()
+        unitLayout.addStretch()
+        unitLayout.addWidget(unitvolumeLabel)
+        unitLayout.addWidget(self.unitvolumeEdit)
+        unitLayout.addWidget(unitvolumeUnit)
+        unitLayout.addStretch()
+        
+        # In Group
+        coffeeinunitweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit Weight", None, QApplication.UnicodeUTF8)) + "</b>")
+        self.coffeeinweightEdit = QLineEdit()
+        self.coffeeinweightEdit.setMinimumWidth(60)
+        self.coffeeinweightEdit.setMaximumWidth(60)
+        self.coffeeinweightEdit.setAlignment(Qt.AlignRight)
+        coffeeinunitweightUnit = QLabel(QApplication.translate("Label","g", None, QApplication.UnicodeUTF8))
+
+        coffeeinweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Weight", None, QApplication.UnicodeUTF8)) + "</b>")
+        self.coffeeinweight = QLineEdit()
+        if self.weightIn:
+            self.coffeeinweight.setText(str(aw.float2float(self.weightIn)))
+        self.coffeeinweight.setMinimumWidth(60)
+        self.coffeeinweight.setMaximumWidth(60)
+        self.coffeeinweight.setAlignment(Qt.AlignRight)
+        self.coffeeinweight.setReadOnly(True)
+        self.coffeeinweight.setFocusPolicy(Qt.NoFocus)
+        if weightunit:
+            coffeeinweightUnit = QLabel(QApplication.translate("Label","Kg", None, QApplication.UnicodeUTF8))
+        else:
+            coffeeinweightUnit = QLabel(QApplication.translate("Label","g", None, QApplication.UnicodeUTF8))
+        
+        coffeeinvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None, QApplication.UnicodeUTF8)) + "</b>")
+        self.coffeeinvolume = QLineEdit()
+        self.coffeeinvolume.setMinimumWidth(60)
+        self.coffeeinvolume.setMaximumWidth(60)
+        
+        palette = QPalette()
+        palette.setColor(self.coffeeinvolume.foregroundRole(), QColor('red'))
+        self.coffeeinvolume.setPalette(palette)
+        
+        self.coffeeinvolume.setAlignment(Qt.AlignRight)
+        self.coffeeinvolume.setReadOnly(True)
+        self.coffeeinvolume.setFocusPolicy(Qt.NoFocus)
+        if volumeunit:
+            coffeeinvolumeUnit = QLabel(QApplication.translate("Label","l", None, QApplication.UnicodeUTF8))
+        else:
+            coffeeinvolumeUnit = QLabel(QApplication.translate("Label","ml", None, QApplication.UnicodeUTF8))
+        
+        inGrid = QGridLayout()
+        inGrid.addWidget(coffeeinweightLabel,0,0)
+        inGrid.addWidget(self.coffeeinweight,0,1)
+        inGrid.addWidget(coffeeinweightUnit,0,2)
+        inGrid.addWidget(coffeeinvolumeLabel,1,0)
+        inGrid.addWidget(self.coffeeinvolume,1,1)
+        inGrid.addWidget(coffeeinvolumeUnit,1,2)
+        
+        volumeInLayout = QHBoxLayout()
+        volumeInLayout.addWidget(coffeeinunitweightLabel)
+        volumeInLayout.addWidget(self.coffeeinweightEdit)
+        volumeInLayout.addWidget(coffeeinunitweightUnit)
+        volumeInLayout.addSpacing(15)
+        volumeInLayout.addLayout(inGrid)
+        
+        volumeInGroupLayout = QGroupBox(QApplication.translate("Label","in", None, QApplication.UnicodeUTF8))
+        volumeInGroupLayout.setLayout(volumeInLayout)
+        if weightIn == None:
+            volumeInGroupLayout.setDisabled(True)
+
+        # Out Group
+        coffeeoutunitweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit Weight", None, QApplication.UnicodeUTF8)) + "</b>")
+        self.coffeeoutweightEdit = QLineEdit()
+        self.coffeeoutweightEdit.setMinimumWidth(60)
+        self.coffeeoutweightEdit.setMaximumWidth(60)
+        self.coffeeoutweightEdit.setAlignment(Qt.AlignRight)
+        coffeeoutunitweightUnit = QLabel(QApplication.translate("Label","g", None, QApplication.UnicodeUTF8))
+
+        coffeeoutweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Weight", None, QApplication.UnicodeUTF8)) + "</b>")
+        self.coffeeoutweight = QLineEdit()
+        if self.weightOut:
+            self.coffeeoutweight.setText(str(aw.float2float(self.weightOut)))        
+        self.coffeeoutweight.setMinimumWidth(60)
+        self.coffeeoutweight.setMaximumWidth(60)
+        self.coffeeoutweight.setAlignment(Qt.AlignRight)
+        self.coffeeoutweight.setReadOnly(True)
+        self.coffeeoutweight.setFocusPolicy(Qt.NoFocus)
+        if weightunit:
+            coffeeoutweightUnit = QLabel(QApplication.translate("Label","Kg", None, QApplication.UnicodeUTF8))
+        else:
+            coffeeoutweightUnit = QLabel(QApplication.translate("Label","g", None, QApplication.UnicodeUTF8))
+
+        coffeeoutvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None, QApplication.UnicodeUTF8)) + "</b>")
+        self.coffeeoutvolume = QLineEdit()
+        self.coffeeoutvolume.setMinimumWidth(60)
+        self.coffeeoutvolume.setMaximumWidth(60)
+        
+        palette = QPalette()
+        palette.setColor(self.coffeeoutvolume.foregroundRole(), QColor('red'))
+        self.coffeeoutvolume.setPalette(palette)
+
+        self.coffeeoutvolume.setAlignment(Qt.AlignRight)
+        self.coffeeoutvolume.setReadOnly(True)
+        self.coffeeoutvolume.setFocusPolicy(Qt.NoFocus)
+        if volumeunit:
+            coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","l", None, QApplication.UnicodeUTF8))
+        else:
+            coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","ml", None, QApplication.UnicodeUTF8))
+        
+        outGrid = QGridLayout()
+        outGrid.addWidget(coffeeoutweightLabel,0,0)
+        outGrid.addWidget(self.coffeeoutweight,0,1)
+        outGrid.addWidget(coffeeoutweightUnit,0,2)
+        outGrid.addWidget(coffeeoutvolumeLabel,1,0)
+        outGrid.addWidget(self.coffeeoutvolume,1,1)
+        outGrid.addWidget(coffeeoutvolumeUnit,1,2)
+        
+        volumeOutLayout = QHBoxLayout()
+        volumeOutLayout.addWidget(coffeeoutunitweightLabel)
+        volumeOutLayout.addWidget(self.coffeeoutweightEdit)
+        volumeOutLayout.addWidget(coffeeoutunitweightUnit)
+        volumeOutLayout.addSpacing(15)
+        volumeOutLayout.addLayout(outGrid)
+        
+        volumeOutGroupLayout = QGroupBox(QApplication.translate("Label","out", None, QApplication.UnicodeUTF8))
+        volumeOutGroupLayout.setLayout(volumeOutLayout)
+        if weightOut == None:
+            volumeOutGroupLayout.setDisabled(True)
+        
+        self.connect(self.coffeeinweightEdit,SIGNAL("editingFinished()"),self.resetInVolume)
+        self.connect(self.coffeeoutweightEdit,SIGNAL("editingFinished()"),self.resetOutVolume)
+        self.connect(self.unitvolumeEdit,SIGNAL("editingFinished()"),self.resetVolume)
+
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        cancelButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(cancelButton,SIGNAL("clicked()"),self.close)
+        self.connect(okButton,SIGNAL("clicked()"),self.updateVolumes)
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
+
+        mainlayout = QVBoxLayout()
+        mainlayout.addLayout(unitLayout)
+        mainlayout.addWidget(volumeInGroupLayout)
+        mainlayout.addWidget(volumeOutGroupLayout)
+        mainlayout.addLayout(buttonLayout)
+        self.setLayout(mainlayout)
+        self.coffeeinweightEdit.setFocus()
+        
+    def resetVolume(self):
+        self.resetInVolume()
+        self.resetOutVolume()
+
+    def resetInVolume(self):
+        try:
+            if self.volumeunit:
+                k = 1000.
+            else:
+                k = 1.
+            line = self.coffeeinweightEdit.text()
+            if line == None or str(line).strip() == "":
+                self.coffeeinvolume.setText("")
+                self.inVolume = None
+            else:
+                res = self.weightIn / (k * (int(str(self.coffeeinweightEdit.text())) / float(self.unitvolumeEdit.text())))
+                self.coffeeinvolume.setText(str(aw.float2float(res)))
+                self.inVolume = res
+        except:
+            pass
+
+    def resetOutVolume(self):
+        try:
+            if self.weightunit:
+                k = 1000.
+            else:
+                k = 1.
+            line = self.coffeeoutweightEdit.text()
+            if line == None or str(line).strip() == "":
+                self.coffeeoutvolume.setText("")
+                self.outVolume = None
+            else:
+                res = self.weightOut / (k * (int(str(self.coffeeoutweightEdit.text())) / float(self.unitvolumeEdit.text())))
+                self.coffeeoutvolume.setText(str(aw.float2float(res)))
+                self.outVolume = res
+        except:
+            pass
+
+    def updateVolumes(self):
+        if self.inVolume:
+            self.inlineedit.setText(str(aw.float2float(self.inVolume)))
+        if self.outVolume:
+            self.outlineedit.setText(str(aw.float2float(self.outVolume)))
+        self.closeEvent(None)
+        
+    def closeEvent(self,_):
+        aw.qmc.volumeCalcUnit = int(self.unitvolumeEdit.text())
+        self.accept()
+
+    def close(self):
+        self.closeEvent(None)
+    
 
 ########################################################################################
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
@@ -16694,13 +16944,13 @@ class editGraphDlg(ArtisanDialog):
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
         self.weightinedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightinedit))
-        self.weightinedit.setMinimumWidth(55)
-        self.weightinedit.setMaximumWidth(55)
+        self.weightinedit.setMinimumWidth(60)
+        self.weightinedit.setMaximumWidth(60)
         self.weightinedit.setAlignment(Qt.AlignRight)
         self.weightoutedit = QLineEdit(outw)
         self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
-        self.weightoutedit.setMinimumWidth(55)
-        self.weightoutedit.setMaximumWidth(55)
+        self.weightoutedit.setMinimumWidth(60)
+        self.weightoutedit.setMaximumWidth(60)
         self.weightoutedit.setAlignment(Qt.AlignRight)
         self.weightpercentlabel = QLabel(QApplication.translate("Label", " %",None, QApplication.UnicodeUTF8))
         self.weightpercentlabel.setMinimumWidth(45)
@@ -16720,6 +16970,7 @@ class editGraphDlg(ArtisanDialog):
             self.unitsComboBox.setCurrentIndex(0)
         else:
             self.unitsComboBox.setCurrentIndex(1)
+        self.connect(self.unitsComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.unitsComboBox.currentIndex() :self.changeWeightUnit(i))
         #volume
         volumelabel = QLabel("<b>" + u(QApplication.translate("Label", "Volume",None, QApplication.UnicodeUTF8)) + "</b>")
         volumeinlabel = QLabel(QApplication.translate("Label", " in",None, QApplication.UnicodeUTF8))
@@ -16728,13 +16979,13 @@ class editGraphDlg(ArtisanDialog):
         outv = str(aw.qmc.volume[1])
         self.volumeinedit = QLineEdit(inv)
         self.volumeinedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeinedit))
-        self.volumeinedit.setMinimumWidth(55)
-        self.volumeinedit.setMaximumWidth(55)
+        self.volumeinedit.setMinimumWidth(60)
+        self.volumeinedit.setMaximumWidth(60)
         self.volumeinedit.setAlignment(Qt.AlignRight)
         self.volumeoutedit = QLineEdit(outv)
         self.volumeoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeoutedit))
-        self.volumeoutedit.setMinimumWidth(55)
-        self.volumeoutedit.setMaximumWidth(55)
+        self.volumeoutedit.setMinimumWidth(60)
+        self.volumeoutedit.setMaximumWidth(60)
         self.volumeoutedit.setAlignment(Qt.AlignRight)
         self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None, QApplication.UnicodeUTF8))
         self.volumepercentlabel.setMinimumWidth(45)
@@ -16751,6 +17002,7 @@ class editGraphDlg(ArtisanDialog):
             self.volumeUnitsComboBox.setCurrentIndex(0)
         else:
             self.volumeUnitsComboBox.setCurrentIndex(1)
+        self.connect(self.volumeUnitsComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.volumeUnitsComboBox.currentIndex() :self.changeVolumeUnit(i))
         self.calculateddensitylabel = QLabel("")
         self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.calculated_density)
         self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.calculated_density)
@@ -16762,8 +17014,8 @@ class editGraphDlg(ArtisanDialog):
         bean_density_label = QLabel("<b>" + u(QApplication.translate("Label", "Density",None, QApplication.UnicodeUTF8)) + "</b>")
         self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
         self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_weight_edit))
-        self.bean_density_weight_edit.setMinimumWidth(55)
-        self.bean_density_weight_edit.setMaximumWidth(55)
+        self.bean_density_weight_edit.setMinimumWidth(60)
+        self.bean_density_weight_edit.setMaximumWidth(60)
         self.bean_density_weight_edit.setAlignment(Qt.AlignRight)
         self.bean_density_weightUnitsComboBox = QComboBox()
         self.bean_density_weightUnitsComboBox.setMaximumWidth(60)
@@ -16777,8 +17029,8 @@ class editGraphDlg(ArtisanDialog):
         bean_density_per_label = QLabel(QApplication.translate("Label", "per",None, QApplication.UnicodeUTF8))
         self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
         self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
-        self.bean_density_volume_edit.setMinimumWidth(55)
-        self.bean_density_volume_edit.setMaximumWidth(55)
+        self.bean_density_volume_edit.setMinimumWidth(60)
+        self.bean_density_volume_edit.setMaximumWidth(60)
         self.bean_density_volume_edit.setAlignment(Qt.AlignRight)
         self.bean_density_volumeUnitsComboBox = QComboBox()
         self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
@@ -16793,6 +17045,15 @@ class editGraphDlg(ArtisanDialog):
         self.standard_density()
         self.connect(self.bean_density_volume_edit,SIGNAL("editingFinished()"),self.standard_density)
         self.connect(self.bean_density_weight_edit,SIGNAL("editingFinished()"),self.standard_density)
+        
+        # volume calc button
+        volumeCalcButton = QPushButton(QApplication.translate("Button", "calc",None, QApplication.UnicodeUTF8))
+        self.connect(volumeCalcButton, SIGNAL("clicked()"),self.volumeCalculator)
+        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
+        volumeCalcButton.setMaximumSize(60,35)
+        volumeCalcButton.setMinimumSize(60,35) 
+        volumeCalcButton.setFocusPolicy(Qt.NoFocus)
+        
         #bean size
         bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Bean Size",None, QApplication.UnicodeUTF8)) + "</b>")
         self.bean_size_edit = QLineEdit(str(aw.qmc.beansize))
@@ -16819,42 +17080,23 @@ class editGraphDlg(ArtisanDialog):
         self.colorSystemComboBox.addItems(aw.qmc.color_systems)
         self.colorSystemComboBox.setCurrentIndex(aw.qmc.color_system_idx)
         #Moisture Greens
-        bag_humidity_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Greens",None, QApplication.UnicodeUTF8)) + "</b>")
-        bag_humidity_unitslabel = QLabel(aw.qmc.mode)
-        bag_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
-        self.humidity_edit = QLineEdit()
-        self.humidity_edit.setText(str(aw.qmc.bag_humidity[0]))
-        self.humidity_edit.setMaximumWidth(50)
-        self.humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.humidity_edit))
-        self.humidity_edit.setAlignment(Qt.AlignRight)
-        bag_humidity_at_label = QLabel(QApplication.translate("Label", "at",None, QApplication.UnicodeUTF8))
-        self.bag_temp_edit = QLineEdit()
-        self.bag_temp_edit.setText(str(aw.qmc.bag_humidity[1]))
-        self.bag_temp_edit.setMaximumWidth(50)
-        self.bag_temp_edit.setValidator(QDoubleValidator(0., 200., 1, self.bag_temp_edit))
-        self.bag_temp_edit.setAlignment(Qt.AlignRight)
-        self.bag_humiditity_tempUnitsComboBox = QComboBox()
-        self.bag_humiditity_tempUnitsComboBox.setMaximumWidth(60)
-        self.bag_humiditity_tempUnitsComboBox.setMinimumWidth(60)        
-        #Moisture Roasted        
+        moisture_greens_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Greens",None, QApplication.UnicodeUTF8)) + "</b>")
+#        moisture_greens_unitslabel = QLabel(aw.qmc.mode)
+        moisture_greens_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
+        self.moisture_greens_edit = QLineEdit()
+        self.moisture_greens_edit.setText(str(aw.qmc.moisture_greens))
+        self.moisture_greens_edit.setMaximumWidth(50)
+        self.moisture_greens_edit.setValidator(QDoubleValidator(0., 100., 1, self.moisture_greens_edit))
+        self.moisture_greens_edit.setAlignment(Qt.AlignRight)
+        #Moisture Roasted
         #bag humidity
-        roasted_humidity_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Roasted",None, QApplication.UnicodeUTF8)) + "</b>")
-        roasted_humidity_unitslabel = QLabel(aw.qmc.mode)
-        roasted_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
-        self.humidity_roasted_edit = QLineEdit()
-        self.humidity_roasted_edit.setText(str(aw.qmc.roasted_humidity[0]))
-        self.humidity_roasted_edit.setMaximumWidth(50)
-        self.humidity_roasted_edit.setValidator(QDoubleValidator(0., 100., 1, self.humidity_roasted_edit))
-        self.humidity_roasted_edit.setAlignment(Qt.AlignRight)
-        roasted_humidity_at_label = QLabel(QApplication.translate("Label", "at",None, QApplication.UnicodeUTF8))
-        self.roasted_temp_edit = QLineEdit()
-        self.roasted_temp_edit.setText(str(aw.qmc.roasted_humidity[1]))
-        self.roasted_temp_edit.setMaximumWidth(50)
-        self.roasted_temp_edit.setValidator(QDoubleValidator(0., 200., 1, self.bag_temp_edit))
-        self.roasted_temp_edit.setAlignment(Qt.AlignRight)
-        self.roasted_humiditity_tempUnitsComboBox = QComboBox()
-        self.roasted_humiditity_tempUnitsComboBox.setMaximumWidth(60)
-        self.roasted_humiditity_tempUnitsComboBox.setMinimumWidth(60)        
+        moisture_roasted_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Roasted",None, QApplication.UnicodeUTF8)) + "</b>")
+        moisture_roasted_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
+        self.moisture_roasted_edit = QLineEdit()
+        self.moisture_roasted_edit.setText(str(aw.qmc.moisture_roasted))
+        self.moisture_roasted_edit.setMaximumWidth(50)
+        self.moisture_roasted_edit.setValidator(QDoubleValidator(0., 100., 1, self.moisture_roasted_edit))
+        self.moisture_roasted_edit.setAlignment(Qt.AlignRight)
         #Ambient temperature (uses display mode as unit (F or C)
         ambientlabel = QLabel("<b>" + u(QApplication.translate("Label", "Ambient Conditions",None, QApplication.UnicodeUTF8)) + "</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
@@ -17013,11 +17255,11 @@ class editGraphDlg(ArtisanDialog):
         weightLayout.addWidget(self.weightpercentlabel)
         weightLayout.addSpacing(10)
         weightLayout.addWidget(self.roastdegreelabel)
-        if aw.scale.device != None and aw.scale.device != "" and aw.color.device != "None":
+        weightLayout.addStretch()  
+        if aw.scale.device != None and aw.scale.device != "" and aw.scale.device != "None":
             weightLayout.addWidget(inButton) 
             weightLayout.addSpacing(10)
-            weightLayout.addWidget(outButton) 
-        weightLayout.addStretch()  
+            weightLayout.addWidget(outButton)
         volumeLayout = QHBoxLayout()
         volumeLayout.setSpacing(0)
         volumeLayout.addWidget(volumelabel)
@@ -17034,6 +17276,7 @@ class editGraphDlg(ArtisanDialog):
         volumeLayout.addSpacing(15)
         volumeLayout.addWidget(self.volumepercentlabel)
         volumeLayout.addStretch()
+        volumeLayout.addWidget(volumeCalcButton)
         densityLayout = QHBoxLayout()
         densityLayout.setContentsMargins(0,0,0,0)
         densityLayout.setSpacing(0)
@@ -17078,18 +17321,12 @@ class editGraphDlg(ArtisanDialog):
         colorLayout.addStretch()
         colorLayout.addWidget(self.colorSystemComboBox)        
         humidityGrid = QGridLayout()
-        humidityGrid.addWidget(bag_humidity_label,0,0)
-        humidityGrid.addWidget(self.humidity_edit,0,1)
-        humidityGrid.addWidget(bag_humidity_unit_label,0,2)
-        humidityGrid.addWidget(bag_humidity_at_label,0,4)
-        humidityGrid.addWidget(self.bag_temp_edit,0,6)
-        humidityGrid.addWidget(bag_humidity_unitslabel,0,7)        
-        humidityGrid.addWidget(roasted_humidity_label,1,0)
-        humidityGrid.addWidget(self.humidity_roasted_edit,1,1)
-        humidityGrid.addWidget(roasted_humidity_unit_label,1,2)
-        humidityGrid.addWidget(roasted_humidity_at_label,1,4)
-        humidityGrid.addWidget(self.roasted_temp_edit,1,6)
-        humidityGrid.addWidget(roasted_humidity_unitslabel,1,7)
+        humidityGrid.addWidget(moisture_greens_label,0,0)
+        humidityGrid.addWidget(self.moisture_greens_edit,0,1)
+        humidityGrid.addWidget(moisture_greens_unit_label,0,2)
+        humidityGrid.addWidget(moisture_roasted_label,1,0)
+        humidityGrid.addWidget(self.moisture_roasted_edit,1,1)
+        humidityGrid.addWidget(moisture_roasted_unit_label,1,2)
         humidityGrid.addWidget(ambientSourceLabel,1,8,Qt.AlignRight)
         humidityGrid.addWidget(ambientlabel,2,0)
         humidityGrid.addWidget(self.ambient_humidity_edit,2,1)
@@ -17126,6 +17363,7 @@ class editGraphDlg(ArtisanDialog):
         timeLayoutBox = QHBoxLayout()
 #        timeLayout.setSpacing(3)
 #        timeLayout.setContentsMargins(0, 0, 0, 0)
+        timeLayoutBox.addStretch()
         timeLayoutBox.addLayout(timeLayout)
         timeLayoutBox.addStretch()
         mainLayout = QVBoxLayout()
@@ -17212,6 +17450,22 @@ class editGraphDlg(ArtisanDialog):
         #totallayout.addStretch()
         #totallayout.addLayout(buttonsLayout)
         self.setLayout(totallayout)
+        
+    def changeUnit(self,i,lineedits):
+        for le in lineedits:
+            if le.text() and le.text() != "":
+                wi = float(le.text())
+                if wi != 0.0:
+                    if i == 0:
+                        le.setText(str(wi*1000.))
+                    else:
+                        le.setText(str(wi/1000.))
+
+    def changeWeightUnit(self,i):
+        self.changeUnit(i,[self.weightinedit,self.weightoutedit])
+        
+    def changeVolumeUnit(self,i):
+        self.changeUnit(i,[self.volumeinedit,self.volumeoutedit])
 
     def tabSwitched(self,i):
         if i == 3:
@@ -17259,6 +17513,39 @@ class editGraphDlg(ArtisanDialog):
         v = max(0,min(250,v))
         aw.qmc.ground_color = v
         self.ground_color_edit.setText(str(v))
+
+    def volumeCalculator(self):
+        weightin = None
+        weightout = None
+        try:
+            weightin = float(self.weightinedit.text())
+        except:
+            pass
+        try:
+            weightout = float(self.weightoutedit.text())
+        except:
+            pass
+        if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8):
+            k = 1000.
+        else:
+            k = 1.
+        if weightin:
+            weightin = int(round(weightin * k))
+        else:
+            weightin = None
+        if weightout:
+            weightout = int(round(weightout * k))
+        else:
+            weightout = None
+        volumedialog = volumeCalculatorDlg(self,
+            weightIn=weightin,
+            weightOut=weightout,
+            weightunit=self.unitsComboBox.currentIndex(),
+            volumeunit=self.volumeUnitsComboBox.currentIndex(),
+            inlineedit=self.volumeinedit,
+            outlineedit=self.volumeoutedit)
+        volumedialog.show()
+        volumedialog.setFixedSize(volumedialog.size())        
 
     def outWeight(self):
         aw.retrieveWeightOut()
@@ -17521,7 +17808,7 @@ class editGraphDlg(ArtisanDialog):
             aw.sendmessage(message)
 
     def percent(self):
-        if float(str(self.weightoutedit.text())) != 0.0:
+        if self.weightoutedit.text() != "" and float(str(self.weightoutedit.text())) != 0.0:
             percent = aw.weight_loss(float(str(self.weightinedit.text())),float(str(self.weightoutedit.text())))
         else:
             percent = 0.
@@ -17534,7 +17821,7 @@ class editGraphDlg(ArtisanDialog):
 #        self.roastdegreelabel.setText(QString(roastdegreestring))
 
     def volume_percent(self):
-        if float(str(self.volumeoutedit.text())) != 0.0:
+        if self.volumeoutedit.text() != "" and float(str(self.volumeoutedit.text())) != 0.0:
             percent = aw.weight_loss(float(str(self.volumeoutedit.text())),float(str(self.volumeinedit.text())))
         else:
             percent = 0.
@@ -17543,19 +17830,20 @@ class editGraphDlg(ArtisanDialog):
         
     def calc_density(self):
         din = dout = 0.0
-        volumein = float(str(self.volumeinedit.text()))
-        volumeout = float(str(self.volumeoutedit.text()))
-        weightin = float(str(self.weightinedit.text()))
-        weightout = float(str(self.weightoutedit.text()))
-        if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
-            if self.volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
-                volumein = volumein / 1000.0
-                volumeout = volumeout / 1000.0
-            if self.unitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8) :
-                weightin = weightin * 1000.0
-                weightout = weightout * 1000.0
-            din = (weightin / volumein) 
-            dout = (weightout / volumeout)
+        if self.volumeinedit.text() != "" and self.volumeoutedit.text() != "" and self.weightinedit.text() != "" and self.weightoutedit.text() != "":
+            volumein = float(str(self.volumeinedit.text()))
+            volumeout = float(str(self.volumeoutedit.text()))
+            weightin = float(str(self.weightinedit.text()))
+            weightout = float(str(self.weightoutedit.text()))
+            if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
+                if self.volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
+                    volumein = volumein / 1000.0
+                    volumeout = volumeout / 1000.0
+                if self.unitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8) :
+                    weightin = weightin * 1000.0
+                    weightout = weightout * 1000.0
+                din = (weightin / volumein) 
+                dout = (weightout / volumeout)
         return din,dout
 
     def calculated_density(self):
@@ -17568,9 +17856,12 @@ class editGraphDlg(ArtisanDialog):
             self.tab1aLayout.removeWidget(self.calculateddensitylabel)
 
     def standard_density(self):
-        volume = float(str(self.bean_density_volume_edit.text()))
-        weight = float(str(self.bean_density_weight_edit.text()))
-        if volume != 0.0 and weight != 0.0:
+        if self.bean_density_volume_edit.text() != "" and \
+            float(self.bean_density_volume_edit.text()) != 0.0 and  \
+            self.bean_density_weight_edit.text() != "" and \
+            float(self.bean_density_weight_edit.text()) != 0.0:
+            volume = float(str(self.bean_density_volume_edit.text()))
+            weight = float(str(self.bean_density_weight_edit.text()))
             if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
                 volume = volume / 1000.0
             if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8) :
@@ -17728,22 +18019,14 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.color_system_idx = self.colorSystemComboBox.currentIndex()
         #update greens moisture
         try:
-            aw.qmc.bag_humidity[0] = float(str(self.humidity_edit.text()))
+            aw.qmc.moisture_greens = float(str(self.moisture_greens_edit.text()))
         except:
-            aw.qmc.bag_humidity[0] = 0
-        try:
-            aw.qmc.bag_humidity[1] = float(str(self.bag_temp_edit.text()))
-        except:
-            aw.qmc.bag_humidity[1] = 0
+            aw.qmc.moisture_greens = 0.
         #update roasted moisture
         try:
-            aw.qmc.roasted_humidity[0] = float(str(self.humidity_roasted_edit.text()))
+            aw.qmc.moisture_roasted = float(str(self.moisture_roasted_edit.text()))
         except:
-            aw.qmc.roasted_humidity[0] = 0
-        try:
-            aw.qmc.roasted_humidity[1] = float(str(self.roasted_temp_edit.text()))
-        except:
-            aw.qmc.roasted_humidity[1] = 0
+            aw.qmc.moisture_roasted = 0.
         #update ambient temperature
         try:
             aw.qmc.ambientTemp = float(str(self.ambientedit.text()))
