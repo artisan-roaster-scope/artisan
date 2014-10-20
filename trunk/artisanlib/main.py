@@ -598,7 +598,8 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget 1045 IR",       #47
                        "+Program_34",           #48
                        "+Program_56",           #49
-                       "-Omega HH806W"          #50 NOT WORKING 
+                       "DUMMY",                 #50
+                       "-Omega HH806W"          #51 NOT WORKING 
                        ]
 
         #extra devices
@@ -2308,7 +2309,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.keyboardmoveflag = 0
                 aw.resetKeyboardButtonMarks()
                 
-                self.startofx = 0
+                if not self.locktimex_start:
+                    self.startofx = 0
                 self.endofx = self.resetmaxtime 
                 if self.endofx < 1:
                     self.endofx = 60
@@ -22219,7 +22221,8 @@ class serialport(object):
                                    self.PHIDGET1045,        #47
                                    self.callprogram_34,     #48
                                    self.callprogram_56,     #49
-                                   self.HH806W              #50
+                                   self.DUMMY,              #50
+                                   self.HH806W              #51
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -22477,6 +22480,10 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.HH806Wtemperature()
         return tx,t2,t1
+    
+    def DUMMY(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        return tx,0,0 # note that values -1 would deactivate math_expressions
         
     def PHIDGET1045(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -25475,7 +25482,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,50]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -25691,7 +25698,7 @@ class comportDlg(ArtisanDialog):
                     device = QTableWidgetItem(devicename)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
                     # "ADD DEVICE:"
-                    if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                    if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                         comportComboBox = PortComboBox(selection = aw.extracomport[i])
                         self.connect(comportComboBox, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                         comportComboBox.setFixedWidth(200)
@@ -25788,7 +25795,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,50]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -27232,9 +27239,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 49 is an external program _56
                 ##########################
+                elif meter == "DUMMY":
+                    aw.qmc.device = 50
+                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
                 elif meter == "Omega HH806W":
-                    aw.qmc.device = 50
+                    aw.qmc.device = 51
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -27305,7 +27315,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 47
                 3, # 48
                 3, # 49
-                8] # 50
+                3, # 50
+                8] # 51
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -27457,7 +27468,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50]):
                 aw.setcommport()
             #self.close()
             self.accept()
