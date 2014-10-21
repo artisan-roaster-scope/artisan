@@ -15002,16 +15002,18 @@ $cupping_notes
         string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8))
         string1 += "</UL>"
         string2 = "<UL><LI><b>x current curve value</b>"
-        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "previous ET value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "previous BT value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "previous Extra #1 T1 value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "previous Extra #1 T2 value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "previous Extra #2 T1 value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "previous Extra #2 T2 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra #1 T2 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra #2 T1 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra #2 T2 value",None, QApplication.UnicodeUTF8))
         string2 += "<LI><b>...</b> "
         string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None, QApplication.UnicodeUTF8))
         string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None, QApplication.UnicodeUTF8))
         string2 += "</UL>"
+        string2 += "<br>"
+        string2 += u(QApplication.translate("Message", "Yn holds values sampled in the actual interval if refering to ET/BT or extra channels from devices listed before, otherwise Yn hold values sampled in the previous interval",None, QApplication.UnicodeUTF8))
         #format help
         string3 = "<TABLE  WIDTH=550><TR><TH>"
         string3 += QApplication.translate("Message",  "MATHEMATICAL FUNCTIONS",None, QApplication.UnicodeUTF8)
@@ -17052,8 +17054,8 @@ class editGraphDlg(ArtisanDialog):
         volumeCalcButton = QPushButton(QApplication.translate("Button", "calc",None, QApplication.UnicodeUTF8))
         self.connect(volumeCalcButton, SIGNAL("clicked()"),self.volumeCalculator)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        volumeCalcButton.setMaximumSize(60,35)
-        volumeCalcButton.setMinimumSize(60,35) 
+#        volumeCalcButton.setMaximumSize(60,35)
+#        volumeCalcButton.setMinimumSize(60,35) 
         volumeCalcButton.setFocusPolicy(Qt.NoFocus)
         
         #bean size
@@ -17167,36 +17169,35 @@ class editGraphDlg(ArtisanDialog):
         cancelButton = QPushButton(QApplication.translate("Button", "Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        #cancelButton.setMaximumSize(70, 30)
         cancelButton.setMaximumSize(cancelButton.sizeHint())
         cancelButton.setMinimumSize(cancelButton.minimumSize())
         # in button
         inButton = QPushButton(QApplication.translate("Button", "in",None, QApplication.UnicodeUTF8))
         self.connect(inButton, SIGNAL("clicked()"),self.inWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        inButton.setMaximumSize(60,35)
-        inButton.setMinimumSize(60,35) 
+#        inButton.setMaximumSize(60,35)
+#        inButton.setMinimumSize(60,35) 
         inButton.setFocusPolicy(Qt.NoFocus)
         # out button
         outButton = QPushButton(QApplication.translate("Button", "out",None, QApplication.UnicodeUTF8))
         self.connect(outButton, SIGNAL("clicked()"),self.outWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        outButton.setMaximumSize(60,35)
-        outButton.setMinimumSize(60,35) 
+#        outButton.setMaximumSize(60,35)
+#        outButton.setMinimumSize(60,35) 
         outButton.setFocusPolicy(Qt.NoFocus)
         # scan whole button
         scanWholeButton = QPushButton(QApplication.translate("Button", "scan",None, QApplication.UnicodeUTF8))
         self.connect(scanWholeButton, SIGNAL("clicked()"),self.scanWholeColor)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        scanWholeButton.setMaximumSize(60,35)
-        scanWholeButton.setMinimumSize(60,35) 
+#        scanWholeButton.setMaximumSize(60,35)
+#        scanWholeButton.setMinimumSize(60,35) 
         scanWholeButton.setFocusPolicy(Qt.NoFocus)
         # scan ground button
         scanGroundButton = QPushButton(QApplication.translate("Button", "scan",None, QApplication.UnicodeUTF8))
         self.connect(scanGroundButton, SIGNAL("clicked()"),self.scanGroundColor)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        scanGroundButton.setMaximumSize(60,35)
-        scanGroundButton.setMinimumSize(60,35) 
+#        scanGroundButton.setMaximumSize(60,35)
+#        scanGroundButton.setMinimumSize(60,35) 
         scanGroundButton.setFocusPolicy(Qt.NoFocus)
         # Ambient Temperature Source Selector
         self.ambientComboBox = QComboBox()
@@ -17204,7 +17205,7 @@ class editGraphDlg(ArtisanDialog):
         self.ambientComboBox.setCurrentIndex(aw.qmc.ambientTempSource)
         self.connect(self.ambientComboBox, SIGNAL("currentIndexChanged(int)"),self.ambientComboBoxIndexChanged)
         ambientSourceLabel = QLabel(QApplication.translate("Label", "Ambient Source",None, QApplication.UnicodeUTF8))
-        updateAmbientTemp = QPushButton(QApplication.translate("Button", "Update",None, QApplication.UnicodeUTF8))
+        updateAmbientTemp = QPushButton(QApplication.translate("Button", "calc",None, QApplication.UnicodeUTF8))
         updateAmbientTemp.setFocusPolicy(Qt.NoFocus)
         self.connect(updateAmbientTemp, SIGNAL("clicked()"),self.updateAmbientTemp)
         ##### LAYOUTS
@@ -17329,14 +17330,15 @@ class editGraphDlg(ArtisanDialog):
         humidityGrid.addWidget(moisture_roasted_label,1,0)
         humidityGrid.addWidget(self.moisture_roasted_edit,1,1)
         humidityGrid.addWidget(moisture_roasted_unit_label,1,2)
-        humidityGrid.addWidget(ambientSourceLabel,1,8,Qt.AlignRight)
+        humidityGrid.addWidget(ambientSourceLabel,1,9,Qt.AlignRight)
         humidityGrid.addWidget(ambientlabel,2,0)
         humidityGrid.addWidget(self.ambient_humidity_edit,2,1)
         humidityGrid.addWidget(ambient_humidity_unit_label,2,2)
         humidityGrid.addWidget(ambient_humidity_at_label,2,4)
         humidityGrid.addWidget(self.ambientedit,2,6)
         humidityGrid.addWidget(ambientunitslabel,2,7)
-        humidityGrid.addWidget(self.ambientComboBox,2,8,Qt.AlignRight)
+        humidityGrid.addWidget(updateAmbientTemp,2,8)
+        humidityGrid.addWidget(self.ambientComboBox,2,9,Qt.AlignRight)
         roastFlagsLayout = QHBoxLayout()
         roastFlagsGrid = QGridLayout()
         roastFlagsGrid.addWidget(self.lowFC,0,0)
@@ -17403,7 +17405,7 @@ class editGraphDlg(ArtisanDialog):
         roastpropertiesLayout = QHBoxLayout()
         roastpropertiesLayout.addWidget(self.roastproperties)
         roastpropertiesLayout.addStretch()
-        roastpropertiesLayout.addWidget(updateAmbientTemp)
+#        roastpropertiesLayout.addWidget(updateAmbientTemp)
         tab1Layout = QVBoxLayout()
         tab1Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         tab1Layout.setMargin(0)
