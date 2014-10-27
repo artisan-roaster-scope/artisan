@@ -31,6 +31,9 @@ from artisanlib import __revision__
 # WARNING: If an ascii str contains characters outside the 7 bit range, Python raises UnicodeEncodeError exception.
 #################################################################################################################
 
+import appnope
+appnope.nope()
+
 import os
 import imp
 import sys
@@ -483,7 +486,10 @@ class tgraphcanvas(FigureCanvas):
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases_fahrenheit_defaults = [200,300,390,450]
         self.phases_celsius_defaults = [95,150,200,230]
-        self.phases = list(self.phases_fahrenheit_defaults)
+        self.phases = list(self.phases_fahrenheit_defaults) # contains either the phases_filter or phases_espresso, depending on the mode
+        self.phases_mode = 0 # indicates the active phases mode: 0: filter; 1: espresso
+        self.phases_filter = self.phases
+        self.phases_espresso = self.phases
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
         self.phasesbuttonflag = True #False no change; True make the DRY and FC buttons change the phases during roast automatically
         self.watermarksflag = True
@@ -3427,6 +3433,8 @@ class tgraphcanvas(FigureCanvas):
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
                 self.phases[i] = int(round(self.fromCtoF(self.phases[i])))
+                self.phases_espresso[i] = int(round(self.fromCtoF(self.phases_espresso[i])))
+                self.phases_filter[i] = int(round(self.fromCtoF(self.phases_filter[i])))
             self.ETtarget = int(round(self.fromCtoF(self.ETtarget)))
             self.ET2target = int(round(self.fromCtoF(self.ET2target)))
             self.BTtarget = int(round(self.fromCtoF(self.BTtarget)))
@@ -3458,6 +3466,8 @@ class tgraphcanvas(FigureCanvas):
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
                 self.phases[i] = int(round(self.fromFtoC(self.phases[i])))
+                self.phases_espresso[i] = int(round(self.fromFtoC(self.phases_espresso[i])))
+                self.phases_filter[i] = int(round(self.fromFtoC(self.phases_filter[i])))
             self.ETtarget = int(round(self.fromFtoC(self.ETtarget)))
             self.ET2target = int(round(self.fromFtoC(self.ET2target)))
             self.BTtarget = int(round(self.fromFtoC(self.BTtarget)))
@@ -8252,7 +8262,7 @@ class ApplicationWindow(QMainWindow):
         level1layout.addWidget(self.ntb)
         level1layout.addStretch()
         level1layout.addWidget(self.phasesLCDs)
-        level1layout.addSpacing(20)
+        level1layout.addSpacing(15)
 #        level1layout.addStretch()
         level1layout.addWidget(self.button_7)
         level1layout.addSpacing(15)
@@ -8263,7 +8273,7 @@ class ApplicationWindow(QMainWindow):
         level1layout.addWidget(self.button_10)
         level1layout.addSpacing(15)
         level1layout.addWidget(self.button_18)
-        level1layout.addSpacing(20)
+        level1layout.addSpacing(15)
         level1layout.addWidget(self.lcd1)
         level1layout.setMargin(0)
         level1layout.setSpacing(0)
@@ -11424,20 +11434,34 @@ class ApplicationWindow(QMainWindow):
             volumeout = self.qmc.volume[1]
             weightin = self.qmc.weight[0]
             weightout = self.qmc.weight[1]
-            weight_loss =self.weight_loss(weightin,weightout)
+            weight_loss = self.weight_loss(weightin,weightout)
             volume_gain = self.weight_loss(volumeout,volumein)
             if weight_loss:
                 computedProfile["weight_loss"] = self.float2float(weight_loss)
             if volume_gain:
                 computedProfile["volume_gain"] = self.float2float(volume_gain)
+            if self.qmc.moisture_greens and self.qmc.moisture_roasted:
+                moisture_loss = self.qmc.moisture_greens - self.qmc.moisture_roasted
+                computedProfile["moisture_loss"] = self.float2float(moisture_loss)
+                if weight_loss:
+                    computedProfile["organic_loss"] = self.float2float(weight_loss - moisture_loss)
             din = dout = 0
-            if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
-                if self.qmc.volume[2] == "ml" :
+            # standardize unit of volume and weight to l and g
+            if volumein != 0.0 and volumeout != 0.0:
+                if self.qmc.volume[2] == "ml":
                     volumein = volumein / 1000.0
                     volumeout = volumeout / 1000.0
+            # store volume in l
+            computedProfile["volumein"] = volumein
+            computedProfile["volumeout"] = volumeout
+            if weightin != 0.0 and weightout != 0.0:
                 if self.qmc.weight[2] != "g":
                     weightin = weightin * 1000.0
                     weightout = weightout * 1000.0
+            # store weight in Kg
+            computedProfile["weightin"] = weightin * 1000.
+            computedProfile["weightout"] = weightout * 1000.
+            if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
                 din = (weightin / volumein) 
                 dout = (weightout / volumeout)
             if din > 0.:
@@ -11744,6 +11768,10 @@ class ApplicationWindow(QMainWindow):
             #restore phases
             if settings.contains("Phases"):
                 self.qmc.phases = [x.toInt()[0] for x in settings.value("Phases").toList()]
+            if settings.contains("PhasesFilter"):
+                self.qmc.phases_mode = settings.value("PhasesMode",int(self.qmc.phases_mode)).toInt()[0]
+                self.qmc.phases_filter = [x.toInt()[0] for x in settings.value("PhasesFilter").toList()]
+                self.qmc.phases_espresso = [x.toInt()[0] for x in settings.value("PhasesEspresso").toList()]
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toBool()
             if settings.contains("watermarks"):
@@ -12695,6 +12723,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("useModbusPort",self.ser.useModbusPort)
             settings.setValue("PIDbuttonflag",self.qmc.PIDbuttonflag)
             settings.endGroup()
+            settings.setValue("PhasesMode",self.qmc.phases_mode)
+            settings.setValue("PhasesEspresso",self.qmc.phases_espresso)
+            settings.setValue("PhasesFilter",self.qmc.phases_filter)
             #save of phases is done in the phases dialog
             #only if mode was changed (and therefore the phases values have been converted)
             #we update the defaults here
@@ -13102,6 +13133,8 @@ class ApplicationWindow(QMainWindow):
         device["arduinoBTChannel"] = str(self.ser.arduinoBTChannel)
         device["arduinoATChannel"] = str(self.ser.arduinoATChannel)
         phases["Phases"] = str(self.qmc.phases)
+        phases["PhasesEspress"] = str(self.qmc.phases_espresso)
+        phases["PhasesFilter"] = str(self.qmc.phases_filter)
         phases["phasesbuttonflag"] = str(self.qmc.phasesbuttonflag)
         phases["watermarks"] = str(self.qmc.watermarksflag)
         phases["phasesLCDs"] = str(self.qmc.phasesLCDflag)
@@ -13596,8 +13629,10 @@ $cupping_notes
             if "moisture_greens" in cp:
                 moisture = u("%d%%"%cp["moisture_greens"])
                 moisture += " (" + u(QApplication.translate("Label","greens")) + ")"
+                if "moisture_roasted" in cp:
+                    moisture += u("<br>")
             if "moisture_roasted" in cp:
-                moisture = u("%d%%"%cp["moisture_roasted"])
+                moisture += u("%d%%"%cp["moisture_roasted"])
                 moisture += " (" + u(QApplication.translate("Label","roasted")) + ")"
                 
             humidity = u("")
@@ -17101,6 +17136,8 @@ class editGraphDlg(ArtisanDialog):
         self.moisture_roasted_edit.setMaximumWidth(50)
         self.moisture_roasted_edit.setValidator(QDoubleValidator(0., 100., 1, self.moisture_roasted_edit))
         self.moisture_roasted_edit.setAlignment(Qt.AlignRight)
+        self.connect(self.moisture_greens_edit,SIGNAL("editingFinished()"),self.calculated_organic_loss)        
+        self.connect(self.moisture_roasted_edit,SIGNAL("editingFinished()"),self.calculated_organic_loss)
         #Ambient temperature (uses display mode as unit (F or C)
         ambientlabel = QLabel("<b>" + u(QApplication.translate("Label", "Ambient Conditions",None, QApplication.UnicodeUTF8)) + "</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
@@ -17119,6 +17156,7 @@ class editGraphDlg(ArtisanDialog):
         self.ambientedit_tempUnitsComboBox = QComboBox()
         self.ambientedit_tempUnitsComboBox.setMaximumWidth(60)
         self.ambientedit_tempUnitsComboBox.setMinimumWidth(60)
+        self.calculateorganiclosslabel = QLabel("")
         # NOTES
         roastertypelabel = QLabel()
         roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Roaster",None, QApplication.UnicodeUTF8)) + "</b>")
@@ -17392,25 +17430,20 @@ class editGraphDlg(ArtisanDialog):
         self.tab1aLayout.addLayout(weightLayout)
         self.tab1aLayout.addLayout(volumeLayout)
         self.tab1aLayout.addLayout(densityLayout)
-        tab1bLayout = QVBoxLayout()
-        tab1bLayout.setMargin(0)
-        tab1bLayout.setSpacing(2)
-        tab1bLayout.addLayout(beansizeLayout)
-        tab1bLayout.addLayout(colorLayout)
-#        tab1bLayout.addStretch()
-#        tab1bLayout.addLayout(humidityLayout)
-        tab1bLayout.addLayout(humidityGrid)
-#        tab1bLayout.addLayout(roastedhumidityLayout)
-#        tab1bLayout.addLayout(ambientLayout)
+        self.tab1bLayout = QVBoxLayout()
+        self.tab1bLayout.setMargin(0)
+        self.tab1bLayout.setSpacing(2)
+        self.tab1bLayout.addLayout(beansizeLayout)
+        self.tab1bLayout.addLayout(colorLayout)
+        self.tab1bLayout.addLayout(humidityGrid)
         roastpropertiesLayout = QHBoxLayout()
         roastpropertiesLayout.addWidget(self.roastproperties)
         roastpropertiesLayout.addStretch()
-#        roastpropertiesLayout.addWidget(updateAmbientTemp)
         tab1Layout = QVBoxLayout()
         tab1Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         tab1Layout.setMargin(0)
         tab1Layout.addLayout(self.tab1aLayout)
-        tab1Layout.addLayout(tab1bLayout)
+        tab1Layout.addLayout(self.tab1bLayout)
         tab1Layout.addLayout(roastpropertiesLayout)
         self.calculated_density()
         #tab 2
@@ -17858,6 +17891,35 @@ class editGraphDlg(ArtisanDialog):
         else:
             self.calculateddensitylabel.setText("")
             self.tab1aLayout.removeWidget(self.calculateddensitylabel)
+        self.calculated_organic_loss()
+            
+    def calc_organic_loss(self):
+        wloss = 0. # weight (moisture + organic)
+        mloss = 0. # moisture
+        oloss = 0. # organic
+        try:
+            if self.weightpercentlabel.text() and self.weightpercentlabel.text() != "":
+                wloss = float(self.weightpercentlabel.text().split("%")[0])
+        except Exception as e:
+            pass
+        try:
+            if self.moisture_greens_edit.text() and self.moisture_greens_edit.text() != "" and self.moisture_roasted_edit.text() and self.moisture_roasted_edit.text() != "":
+                mloss = float(self.moisture_greens_edit.text()) - float(self.moisture_roasted_edit.text())
+        except Exception as e:
+            pass
+        if mloss != 0. and wloss != 0.:
+            return mloss, wloss - mloss
+        else:
+            return 0., 0.
+
+    def calculated_organic_loss(self):
+        mloss, oloss = self.calc_organic_loss()
+        if oloss > 0. and mloss > 0.:
+            self.calculateorganiclosslabel.setText(QApplication.translate("Label","Moisture loss: %1%    Organic loss: %2%", None, QApplication.UnicodeUTF8).arg("%.1f"%mloss).arg("%.1f"%oloss))
+            self.tab1bLayout.addWidget(self.calculateorganiclosslabel)
+        else:
+            self.calculateorganiclosslabel.setText("")
+            self.tab1bLayout.removeWidget(self.calculateorganiclosslabel)
 
     def standard_density(self):
         if self.bean_density_volume_edit.text() != "" and \
@@ -20434,7 +20496,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.startfinish.setMinimumWidth(80)
         self.endfinish = QSpinBox()
         self.endfinish.setAlignment(Qt.AlignRight)
-        self.endfinish.setMinimumWidth(80)
+        self.endfinish.setMinimumWidth(80)        
         self.events2phases()
         if aw.qmc.mode == "F":
             self.startdry.setSuffix(" F")
@@ -20460,7 +20522,6 @@ class phasesGraphDlg(ArtisanDialog):
         self.connect(self.startmid,SIGNAL("valueChanged(int)"),self.enddry.setValue)
         self.connect(self.endmid,SIGNAL("valueChanged(int)"),self.startfinish.setValue)
         self.connect(self.startfinish,SIGNAL("valueChanged(int)"),self.endmid.setValue)
-        self.getphases()
         self.pushbuttonflag = QCheckBox(QApplication.translate("CheckBox","Auto Adjusted",None, QApplication.UnicodeUTF8))
         self.pushbuttonflag.setChecked(bool(aw.qmc.phasesbuttonflag))
         self.connect(self.pushbuttonflag,SIGNAL("stateChanged(int)"),self.pushbuttonflagChanged)
@@ -20484,6 +20545,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.connect(cancelButton,SIGNAL("clicked()"),self.cancel)
         self.connect(okButton,SIGNAL("clicked()"),self.updatephases)
         self.connect(setDefaultButton,SIGNAL("clicked()"),self.setdefault)
+        
         phaseLayout = QGridLayout()
         phaseLayout.addWidget(minf,0,1,Qt.AlignCenter)
         phaseLayout.addWidget(maxf,0,2,Qt.AlignCenter)
@@ -20496,9 +20558,88 @@ class phasesGraphDlg(ArtisanDialog):
         phaseLayout.addWidget(finishLabel,3,0,Qt.AlignRight)
         phaseLayout.addWidget(self.startfinish,3,1)
         phaseLayout.addWidget(self.endfinish,3,2)
+
+        dryEspressoLabel = QLabel(QApplication.translate("Label", "Drying",None, QApplication.UnicodeUTF8))
+        midEspressoLabel = QLabel(QApplication.translate("Label", "Maillard",None, QApplication.UnicodeUTF8))
+        finishEspressoLabel = QLabel(QApplication.translate("Label", "Development",None, QApplication.UnicodeUTF8))
+        minfEspresso = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
+        maxfEspresso = QLabel(QApplication.translate("Label", "max",None, QApplication.UnicodeUTF8))
+
+        self.startdryEspresso = QSpinBox()
+        self.startdryEspresso.setAlignment(Qt.AlignRight)
+        self.startdryEspresso.setMinimumWidth(80)
+        self.enddryEspresso = QSpinBox()
+        self.enddryEspresso.setAlignment(Qt.AlignRight)
+        self.enddryEspresso.setMinimumWidth(80)
+        self.startmidEspresso = QSpinBox()
+        self.startmidEspresso.setAlignment(Qt.AlignRight)
+        self.startmidEspresso.setMinimumWidth(80)
+        self.endmidEspresso = QSpinBox()
+        self.endmidEspresso.setAlignment(Qt.AlignRight)
+        self.endmidEspresso.setMinimumWidth(80)
+        self.startfinishEspresso = QSpinBox()
+        self.startfinishEspresso.setAlignment(Qt.AlignRight)
+        self.startfinishEspresso.setMinimumWidth(80)
+        self.endfinishEspresso = QSpinBox()
+        self.endfinishEspresso.setAlignment(Qt.AlignRight)
+        self.endfinishEspresso.setMinimumWidth(80)
+                
+        self.startdryEspresso.setRange(0,1000)    #(min,max)
+        self.enddryEspresso.setRange(0,1000)
+        self.startmidEspresso.setRange(0,1000)
+        self.endmidEspresso.setRange(0,1000)
+        self.startfinishEspresso.setRange(0,1000)
+        self.endfinishEspresso.setRange(0,1000)
+        self.connect(self.enddryEspresso,SIGNAL("valueChanged(int)"),self.startmidEspresso.setValue)
+        self.connect(self.startmidEspresso,SIGNAL("valueChanged(int)"),self.enddryEspresso.setValue)
+        self.connect(self.endmidEspresso,SIGNAL("valueChanged(int)"),self.startfinishEspresso.setValue)
+        self.connect(self.startfinishEspresso,SIGNAL("valueChanged(int)"),self.endmidEspresso.setValue)
+        
+        if aw.qmc.mode == "F":
+            self.startdryEspresso.setSuffix(" F")
+            self.enddryEspresso.setSuffix(" F")
+            self.startmidEspresso.setSuffix(" F")
+            self.endmidEspresso.setSuffix(" F")
+            self.startfinishEspresso.setSuffix(" F")
+            self.endfinishEspresso.setSuffix(" F")
+        elif aw.qmc.mode == "C":
+            self.startdryEspresso.setSuffix(" C")
+            self.enddryEspresso.setSuffix(" C")
+            self.startmidEspresso.setSuffix(" C")
+            self.endmidEspresso.setSuffix(" C")
+            self.startfinishEspresso.setSuffix(" C")
+            self.endfinishEspresso.setSuffix(" C")
+            
+        self.getphases()
+
+        phaseEspressoLayout = QGridLayout()
+        phaseEspressoLayout.addWidget(minfEspresso,0,1,Qt.AlignCenter)
+        phaseEspressoLayout.addWidget(maxfEspresso,0,2,Qt.AlignCenter)
+        phaseEspressoLayout.addWidget(dryEspressoLabel,1,0,Qt.AlignRight)
+        phaseEspressoLayout.addWidget(self.startdryEspresso,1,1)
+        phaseEspressoLayout.addWidget(self.enddryEspresso,1,2)
+        phaseEspressoLayout.addWidget(midEspressoLabel,2,0,Qt.AlignRight)
+        phaseEspressoLayout.addWidget(self.startmidEspresso,2,1)
+        phaseEspressoLayout.addWidget(self.endmidEspresso,2,2)
+        phaseEspressoLayout.addWidget(finishEspressoLabel,3,0,Qt.AlignRight)
+        phaseEspressoLayout.addWidget(self.startfinishEspresso,3,1)
+        phaseEspressoLayout.addWidget(self.endfinishEspresso,3,2)        
+        
+        self.phasesTabs = QTabWidget()
+        # filter phases tab
+        FilterWidget = QWidget()
+        FilterWidget.setLayout(phaseLayout)
+        self.phasesTabs.addTab(FilterWidget,QApplication.translate("Tab","Filter",None, QApplication.UnicodeUTF8))
+        # filter phases tab
+        EspressoWidget = QWidget()
+        EspressoWidget.setLayout(phaseEspressoLayout)
+        self.phasesTabs.addTab(EspressoWidget,QApplication.translate("Tab","Espresso",None, QApplication.UnicodeUTF8))
+        
+        self.phasesTabs.setCurrentIndex(aw.qmc.phases_mode)
+        
         boxedPhaseLayout = QHBoxLayout()
         boxedPhaseLayout.addStretch()
-        boxedPhaseLayout.addLayout(phaseLayout)
+        boxedPhaseLayout.addWidget(self.phasesTabs)
         boxedPhaseLayout.addStretch()
         boxedPhaseFlagGrid = QGridLayout()
         boxedPhaseFlagGrid.addWidget(self.pushbuttonflag,0,0)
@@ -20584,10 +20725,25 @@ class phasesGraphDlg(ArtisanDialog):
             self.autoFCsFlag.setChecked(False)
 
     def updatephases(self):
-        aw.qmc.phases[0] = self.startdry.value()
-        aw.qmc.phases[1] = self.enddry.value()
-        aw.qmc.phases[2] = self.endmid.value()
-        aw.qmc.phases[3] = self.endfinish.value()
+        aw.qmc.phases_filter[0] = self.startdry.value()
+        aw.qmc.phases_filter[1] = self.enddry.value()
+        aw.qmc.phases_filter[2] = self.endmid.value()
+        aw.qmc.phases_filter[3] = self.endfinish.value()
+        
+        aw.qmc.phases_espresso[0] = self.startdryEspresso.value()
+        aw.qmc.phases_espresso[1] = self.enddryEspresso.value()
+        aw.qmc.phases_espresso[2] = self.endmidEspresso.value()
+        aw.qmc.phases_espresso[3] = self.endfinishEspresso.value()
+        
+        aw.qmc.phases_mode = self.phasesTabs.currentIndex()
+        
+        if aw.qmc.phases_mode:
+            # espresso mode
+            aw.qmc.phases = aw.qmc.phases_espresso
+        else:
+            # filter mode
+            aw.qmc.phases = aw.qmc.phases_filter
+        	
         if self.pushbuttonflag.isChecked():
             aw.qmc.phasesbuttonflag = True
         else:
@@ -20603,12 +20759,25 @@ class phasesGraphDlg(ArtisanDialog):
         self.close()
 
     def getphases(self):
-        self.startdry.setValue(aw.qmc.phases[0])
-        self.enddry.setValue(aw.qmc.phases[1])
-        self.endmid.setValue(aw.qmc.phases[2])
-        self.endfinish.setValue(aw.qmc.phases[3])
+        if aw.qmc.phases_mode:
+            # espresso mode
+            aw.qmc.phases_espresso = aw.qmc.phases          
+        else:
+            # filter mode
+            aw.qmc.phases_filter = aw.qmc.phases
 
+        self.startdry.setValue(aw.qmc.phases_filter[0])
+        self.enddry.setValue(aw.qmc.phases_filter[1])
+        self.endmid.setValue(aw.qmc.phases_filter[2])
+        self.endfinish.setValue(aw.qmc.phases_filter[3])
+        
+        self.startdryEspresso.setValue(aw.qmc.phases_espresso[0])
+        self.enddryEspresso.setValue(aw.qmc.phases_espresso[1])
+        self.endmidEspresso.setValue(aw.qmc.phases_espresso[2])
+        self.endfinishEspresso.setValue(aw.qmc.phases_espresso[3])
+        
     def setdefault(self):
+        aw.qmc.phases_mode = self.phasesTabs.currentIndex()
         if aw.qmc.mode == "F":
             aw.qmc.phases = list(aw.qmc.phases_fahrenheit_defaults)
         elif aw.qmc.mode == "C":
@@ -23992,10 +24161,10 @@ class serialport(object):
                     else:
                     #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
                         command = "CHAN;" + et_channel + bt_channel + "00"
-                    if aw.qmc.extradevices in [32,44]: # +ArduinoTC4_56 or +ArduinoTC4_78
-                        self.SP.write(str2cmd("PID;XON" + "\n"))       #activate extra PID OT1/OT2 channels
-                    else:
-                        self.SP.write(str2cmd("PID;XOFF" + "\n"))       #activate extra PID OT1/OT2 channels
+#                    if aw.qmc.extradevices in [32,44]: # +ArduinoTC4_56 or +ArduinoTC4_78
+#                        self.SP.write(str2cmd("PID;XON" + "\n"))       #activate extra PID OT1/OT2 channels
+#                    else:
+#                        self.SP.write(str2cmd("PID;XOFF" + "\n"))       #activate extra PID OT1/OT2 channels
                     #self.SP.flush()
                     libtime.sleep(0.3)
                     self.SP.write(str2cmd(command + "\n"))       #send command
