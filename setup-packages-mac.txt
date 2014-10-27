@@ -8,7 +8,7 @@ o SIP 4.16.3
 o PyQt 4.11.2
 o numpy 1.8.2
 o scipy 0.14.0
-o matplotlib 1.3.1
+o matplotlib 1.4.1
 o pyaudio 0.2.7
 o minimalmodbus 0.6
 o Phidgets Python 2.1.8
@@ -24,9 +24,13 @@ o requests 2.3.0
 o bottle 0.12.7
 o gevent 1.0.1
 o geventwebsocket 0.9.3
+o appnope 0.1
 
 Upgrade History:
 
+- 2014-10-26
+ . appnope 0.1
+ . matplotlib 1.3.1 => 1.4.1
 - 2014-10-06
  . requests 2.3.0
  . bottle 0.12.7
@@ -563,6 +567,13 @@ https://pypi.python.org/pypi/gevent
 26) geventwebsocket 0.9.3
 
 https://pypi.python.org/pypi/gevent-websocket/
+
+# python setup.py build
+# sudo python setup.py install
+
+27) appnope 0.1
+
+https://github.com/minrk/appnope
 
 # python setup.py build
 # sudo python setup.py install
