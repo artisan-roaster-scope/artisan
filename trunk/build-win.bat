@@ -1,4 +1,4 @@
-c:@echo off
+@echo off
 
 C:\Python27\python setup-win.py py2exe
 
