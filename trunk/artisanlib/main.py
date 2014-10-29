@@ -9040,7 +9040,8 @@ class ApplicationWindow(QMainWindow):
         aw.arduino.setSV(self.sliderSV.value(),False)
 
     def moveSVslider(self,v):
-        self.sliderSV.setValue(v)
+        if aw.arduino.svSlider:
+            self.sliderSV.setValue(v)
 
     def sliderReleased(self,n):
         if n == 0:
@@ -24270,8 +24271,8 @@ class serialport(object):
                         aw.qmc.extraArduinoT3 = float(res[5])
                         aw.qmc.extraArduinoT4 = float(res[6])
                     except:
-                        aw.qmc.extraArduinoT3 = -1
-                        aw.qmc.extraArduinoT4 = -1
+                        aw.qmc.extraArduinoT3 = 0
+                        aw.qmc.extraArduinoT4 = 0
                 else:
                     aw.qmc.extraArduinoT3 = aw.qmc.extraArduinoT4 = -1                
                 if 44 in aw.qmc.extradevices: # +ArduinoTC4_78
@@ -24279,12 +24280,12 @@ class serialport(object):
                     try:
                         aw.qmc.extraArduinoT5 = float(res[7])
                     except:
-                        aw.qmc.extraArduinoT5 = -1
+                        aw.qmc.extraArduinoT5 = 0
                     # report Ambient Temperature as extraArduinoT6
                     try:
                         aw.qmc.extraArduinoT6 = float(res[0])
                     except:
-                        aw.qmc.extraArduinoT6 = -1
+                        aw.qmc.extraArduinoT6 = 0
                 # overwrite temps by AT internal Ambient Temperature
                 if aw.ser.arduinoATChannel != "None":
                     if aw.ser.arduinoATChannel == "T1":
