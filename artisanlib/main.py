@@ -32,7 +32,6 @@ from artisanlib import __revision__
 #################################################################################################################
 
 import appnope
-appnope.nope()
 
 import os
 import imp
@@ -525,6 +524,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1045_changeTrigger = 1.0
         self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(1, 11, 1)]
         self.phidget1045_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1045_changeTriggersValues))
+        self.phidget1045_emissivity = 1.0
 
         self.phidget_dataRatesStrings = ["0.25s","0.5s","0.75s","1s"] # too fast: "8ms","16ms","32ms","64ms","0.12s",
         self.phidget_dataRatesValues = [256,512,768,1000] # 8,16,32,64,128,
@@ -3736,6 +3736,7 @@ class tgraphcanvas(FigureCanvas):
 
     def OnMonitor(self):
         try:
+            appnope.nope()
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             aw.qmc.clearMeasurements()
             self.timeclock.start()   #set time to the current computer time
@@ -3801,6 +3802,7 @@ class tgraphcanvas(FigureCanvas):
             aw.enableEditMenus()
             aw.arduino.activateONOFFeasySV(False)
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+            appnope.nap()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -3983,6 +3985,20 @@ class tgraphcanvas(FigureCanvas):
                     tx = self.timex[self.timeindex[0]]
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                     self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
+                    # mark active slider values that are not zero                   
+                    for slidernr in range(4):
+                        if aw.eventslidervisibilities[slidernr]:
+                            if slidernr == 0:
+                                slidervalue = aw.slider1.value()
+                            elif slidernr == 1:
+                                slidervalue = aw.slider2.value()
+                            elif slidernr == 2:
+                                slidervalue = aw.slider3.value()
+                            elif slidernr == 3:
+                                slidervalue = aw.slider4.value()
+                            if slidervalue != 0:
+                                value = aw.float2float((slidervalue + 10.0) / 10.0)
+                            	aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
                 except:
                     pass
             else:
@@ -11728,6 +11744,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("phidget1045_async"):
                 self.qmc.phidget1045_async = bool(settings.value("phidget1045_async",self.qmc.phidget1045_async).toBool())
                 self.qmc.phidget1045_changeTrigger = aw.float2float(settings.value("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger).toFloat()[0])
+            if settings.contains("phidget1045_emissivity"):
+                self.qmc.phidget1045_emissivity = settings.value("phidget1045_emissivity",self.qmc.phidget1045_emissivity).toDouble()[0]
             if settings.contains("phidgetRemoteFlag"):
                 self.qmc.phidgetRemoteFlag = bool(settings.value("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag).toBool())
                 self.qmc.phidgetServerID = u(settings.value("phidgetServerID",self.qmc.phidgetServerID).toString())
@@ -11762,6 +11780,8 @@ class ApplicationWindow(QMainWindow):
                 self.ser.arduinoBTChannel = str(settings.value("arduinoBTChannel").toString())
             if settings.contains("arduinoATChannel"):
                 self.ser.arduinoATChannel = str(settings.value("arduinoATChannel").toString())
+            if settings.contains("ArduinoFILT"):
+                self.ser.ArduinoFILT = [x.toInt()[0] for x in settings.value("ArduinoFILT").toList()]
             if settings.contains("useModbusPort"):
                 self.ser.useModbusPort = settings.value("useModbusPort").toBool()
             settings.endGroup()
@@ -12707,6 +12727,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidget1046_dataRate",self.qmc.phidget1046_dataRate)
             settings.setValue("phidget1045_async",self.qmc.phidget1045_async)
             settings.setValue("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger)
+            settings.setValue("phidget1045_emissivity",self.qmc.phidget1045_emissivity)
             settings.setValue("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)
             settings.setValue("phidgetServerID",self.qmc.phidgetServerID)
             settings.setValue("phidgetPassword",self.qmc.phidgetPassword)
@@ -12720,6 +12741,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)
             settings.setValue("arduinoBTChannel",self.ser.arduinoBTChannel)
             settings.setValue("arduinoATChannel",self.ser.arduinoATChannel)
+            settings.setValue("ArduinoFILT",self.ser.ArduinoFILT)
             settings.setValue("useModbusPort",self.ser.useModbusPort)
             settings.setValue("PIDbuttonflag",self.qmc.PIDbuttonflag)
             settings.endGroup()
@@ -20583,7 +20605,6 @@ class phasesGraphDlg(ArtisanDialog):
         self.endfinishEspresso = QSpinBox()
         self.endfinishEspresso.setAlignment(Qt.AlignRight)
         self.endfinishEspresso.setMinimumWidth(80)
-                
         self.startdryEspresso.setRange(0,1000)    #(min,max)
         self.enddryEspresso.setRange(0,1000)
         self.startmidEspresso.setRange(0,1000)
@@ -22334,6 +22355,7 @@ class serialport(object):
         self.arduinoBTChannel = "2"
         self.arduinoATChannel = "None" # the channel the Ambient Temperature of the Arduino TC4 is reported as (this value will overwrite the corresponding real channel)
         self.ArduinoIsInitialized = 0
+        self.ArduinoFILT = [10,10,10,10] # Arduino Filter settings per channel in %
         self.HH806Winitflag = 0
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
@@ -23537,6 +23559,9 @@ class serialport(object):
     def phidget1045TemperatureChanged(self,e):
         if aw.qmc.phidget1045_async:
             self.Phidget1045value = (self.Phidget1045value + e.temperature)/2.0
+            
+    def phidget1045temp(self,temp,ambient):
+        return (temp - ambient) * aw.qmc.phidget1045_emissivity + ambient
 
     def PHIDGET1045temperature(self):
         try:
@@ -23563,6 +23588,7 @@ class serialport(object):
                     aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR not attached",None, QApplication.UnicodeUTF8))
                     
                 if self.PhidgetIRSensor and self.PhidgetIRSensor.isAttached():
+                    self.Phidget1045value = -1
                     try:
                         self.PhidgetIRSensor.setTemperatureChangeTrigger(0,aw.qmc.phidget1045_changeTrigger)
                     except:
@@ -23600,7 +23626,7 @@ class serialport(object):
                         ambient = self.PhidgetIRSensor.getAmbientTemperature()
                     except:
                         pass
-                    return res,ambient
+                    return self.phidget1045temp(res,ambient),ambient
             else:
                 return -1,-1
         except Exception as ex:
@@ -23667,6 +23693,7 @@ class serialport(object):
                         pass
                     aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input not attached",None, QApplication.UnicodeUTF8))
                 if aw.ser.PhidgetTemperatureSensor and aw.ser.PhidgetTemperatureSensor.isAttached():
+                    aw.ser.Phidget1048values = [-1]*4
                     changeTrigger = False
                     for i in range(4):
                         try:
@@ -23794,12 +23821,16 @@ class serialport(object):
 
     def bridgeValue2Temperature(self,i,bv):
         v = -1
-        if aw.qmc.phidget1046_formula[i] == 0:
-            v = self.rRTD2PT100temp(self.R_RTD_WS(abs(bv)))  # we add the abs() here to support inverted wirings
-        elif aw.qmc.phidget1046_formula[i] == 1:
-            v = self.rRTD2PT100temp(self.R_RTD_DIV(abs(bv)))  # we add the abs() here to support inverted wirings
-        elif aw.qmc.phidget1046_formula[i] == 2:
-            v = bv # no abs() for raw values
+        try:
+            if aw.qmc.phidget1046_formula[i] == 0:
+                v = self.rRTD2PT100temp(self.R_RTD_WS(abs(bv)))  # we add the abs() here to support inverted wirings
+            elif aw.qmc.phidget1046_formula[i] == 1:
+                v = self.rRTD2PT100temp(self.R_RTD_DIV(abs(bv)))  # we add the abs() here to support inverted wirings
+            elif aw.qmc.phidget1046_formula[i] == 2:
+                v = bv # no abs() for raw values
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " bridgeValue2Temperature(): %1").arg(str(e)),exc_tb.tb_lineno)            
         return v
 
     def phidget1046getTemperature(self,i):
@@ -23851,6 +23882,8 @@ class serialport(object):
                     aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input not attached",None, QApplication.UnicodeUTF8))
                 try:
                     if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
+                        # reset async values
+                        aw.ser.Phidget1046values = [-1]*4
                         # set gain
                         for i in range(4):
                             try:
@@ -23862,11 +23895,17 @@ class serialport(object):
                             aw.ser.PhidgetBridgeSensor.setDataRate(aw.qmc.phidget1046_dataRate)
                         except:
                             pass
-                        aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
-                        aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
-                        if 38 in aw.qmc.extradevices:
-                            aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
-                            aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
+                        try:
+                            aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
+                            aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
+                        except:
+                            pass
+                        try:
+                            if 38 in aw.qmc.extradevices:
+                                aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
+                                aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
+                        except:
+                            pass
                         if aw.qmc.phidget1046_async[0] or aw.qmc.phidget1046_async[1] or (38 in aw.qmc.extradevices and (aw.qmc.phidget1046_async[2] or aw.qmc.phidget1046_async[3])):
                             aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(lambda e=None:self.phidget1046TemperatureChanged(e))
                         else:
@@ -23878,6 +23917,8 @@ class serialport(object):
                 try:
                     for i in range(4):
                         aw.ser.PhidgetBridgeSensor.setEnabled(i, False)
+                    # reset async values
+                    aw.ser.Phidget1046values = [-1]*4
                 except:
                     pass
                 try:
@@ -23920,6 +23961,7 @@ class serialport(object):
                 aw.ser.PhidgetBridgeSensor.closePhidget()
             except:
                 pass
+            aw.ser.Phidget1046values = [-1]*4
             aw.ser.PhidgetBridgeSensor = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -23965,6 +24007,7 @@ class serialport(object):
                 try:
                     if aw.ser.PhidgetIO and aw.ser.PhidgetIO.isAttached():
                         # set data rates of all active inputs to 4ms
+                        aw.ser.PhidgetIOvalues = [-1]*8
                         aw.ser.PhidgetIO.setRatiometric(aw.qmc.phidget1018Ratiometric)
                         changeTrigger = False
                         for i in range(max(3,aw.ser.PhidgetIO.getSensorCount())):
@@ -24185,8 +24228,20 @@ class serialport(object):
                         if (not len(result) == 0 and not result.startswith("#")):
                             raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None, QApplication.UnicodeUTF8))
                         else:
-                            ### EVERYTHING OK  ###
-                            self.ArduinoIsInitialized = 1
+                            #OK. NOW SET FILTER
+                            self.SP.flushInput()
+                            self.SP.flushOutput()
+                            filt =  ",".join(map(str,aw.ser.ArduinoFILT))
+                            command = "FILT;" + filt + "\n"   #Set filters
+                            self.SP.write(str2cmd(command))
+                            #self.SP.flush()
+                            libtime.sleep(.1)
+                            result = self.SP.readline().decode('utf-8')[:-2]
+                            if (not len(result) == 0 and not result.startswith("#")):
+                                raise Exception(QApplication.translate("Error Message","Arduino could not set filters",None, QApplication.UnicodeUTF8))
+                            else:
+                                ### EVERYTHING OK  ###
+                                self.ArduinoIsInitialized = 1
                 #READ TEMPERATURE
                 command = "READ\n"  #Read command.
                 self.SP.flushInput()
@@ -26105,7 +26160,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.BTlcd = QCheckBox(QApplication.translate("CheckBox", "BT",None, QApplication.UnicodeUTF8))
         self.BTlcd.setChecked(aw.qmc.BTlcd)
         self.curveHBox = QHBoxLayout()
-        self.curveHBox.setContentsMargins(10,0,10,0)
+        self.curveHBox.setContentsMargins(10,5,10,5)
         self.curveHBox.setSpacing(5)
         self.curveHBox.addWidget(self.ETcurve)
         self.curveHBox.addSpacing(10)
@@ -26114,7 +26169,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.curves = QGroupBox(QApplication.translate("GroupBox","Curves",None, QApplication.UnicodeUTF8))
         self.curves.setLayout(self.curveHBox)
         self.lcdHBox = QHBoxLayout()
-        self.lcdHBox.setContentsMargins(30,0,30,0)
+        self.lcdHBox.setContentsMargins(30,5,30,5)
         self.lcdHBox.setSpacing(5)
         self.lcdHBox.addWidget(self.ETlcd)
         self.lcdHBox.addSpacing(10)
@@ -26208,7 +26263,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.arduinoATComboBox.setCurrentIndex(arduinoTemperatures.index(aw.ser.arduinoATChannel))
         self.showControlButton = QCheckBox(QApplication.translate("CheckBox", "Control Button",None, QApplication.UnicodeUTF8))
         self.showControlButton.setChecked(aw.qmc.PIDbuttonflag)
-        self.connect(self.showControlButton,SIGNAL("stateChanged(int)"),lambda i=0:self.showControlbuttonToggle(i))        
+        self.connect(self.showControlButton,SIGNAL("stateChanged(int)"),lambda i=0:self.showControlbuttonToggle(i))
+        FILTLabel =QLabel(QApplication.translate("Label", "Filter",None, QApplication.UnicodeUTF8))
+        self.FILTspinBoxes = []
+        for i in range(4):
+            spinBox = QSpinBox()
+            spinBox.setAlignment(Qt.AlignRight)
+            spinBox.setRange(0,100)
+            spinBox.setSingleStep(5)
+            spinBox.setSuffix(" %")
+            spinBox.setValue(aw.ser.ArduinoFILT[i])
+            self.FILTspinBoxes.append(spinBox)
         ####################################################
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
@@ -26317,17 +26382,25 @@ class DeviceAssignmentDlg(ArtisanDialog):
         except:
             pass
         self.changeTriggerCombos1045.setMaximumSize(65,100)
-        phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,i)
+        phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,1)
         self.asyncCheckBoxe1045 = QCheckBox()
         self.asyncCheckBoxe1045.setFocusPolicy(Qt.NoFocus)
         self.asyncCheckBoxe1045.setChecked(True)
         self.connect(self.asyncCheckBoxe1045,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1045(y,x))
         self.asyncCheckBoxe1045.setChecked(aw.qmc.phidget1045_async)
-        phidgetBox1045.addWidget(self.asyncCheckBoxe1045,2,i)
+        phidgetBox1045.addWidget(self.asyncCheckBoxe1045,2,1)
         asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
         changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None, QApplication.UnicodeUTF8))
+        EmissivityLabel = QLabel(QApplication.translate("Label","Emissivity", None, QApplication.UnicodeUTF8))
+        self.emissivitySpinBox = QDoubleSpinBox()
+        self.emissivitySpinBox.setAlignment(Qt.AlignRight)
+        self.emissivitySpinBox.setRange(0.,1.)
+        self.emissivitySpinBox.setSingleStep(.1)
+        self.emissivitySpinBox.setValue(aw.qmc.phidget1045_emissivity)
         phidgetBox1045.addWidget(asyncLabel,2,0,Qt.AlignRight)
         phidgetBox1045.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
+        phidgetBox1045.addWidget(EmissivityLabel,4,0,Qt.AlignRight)
+        phidgetBox1045.addWidget(self.emissivitySpinBox,4,1,Qt.AlignRight)
         phidget1045VBox = QVBoxLayout()
         phidget1045VBox.addStretch()
         phidget1045VBox.addLayout(phidgetBox1045)
@@ -26390,7 +26463,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombo1046.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1046_dataRate))
         except:
             pass
-        self.dataRateCombo1046.setMaximumSize(55,100)
+        self.dataRateCombo1046.setMaximumSize(70,100)
         phidgetBox1046.addWidget(self.dataRateCombo1046,4,1)
      
         gainLabel = QLabel(QApplication.translate("Label","Gain", None, QApplication.UnicodeUTF8))
@@ -26405,8 +26478,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1046HBox.addStretch()
         phidget1046HBox.addLayout(phidgetBox1046)
         phidget1046HBox.addStretch()
+        phidget1046VBox = QVBoxLayout()
+        phidget1046VBox.addLayout(phidget1046HBox)
+        phidget1046VBox.addStretch()
         phidget1046GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1046 RTD",None, QApplication.UnicodeUTF8))
-        phidget1046GroupBox.setLayout(phidget1046HBox)
+        phidget1046GroupBox.setLayout(phidget1046VBox)
         phidget1046HBox.setContentsMargins(0,0,0,0)
 
         phdget10481045GroupBoxHBox = QHBoxLayout()
@@ -26535,10 +26611,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
         PIDBox = QHBoxLayout()
         PIDBox.addLayout(PIDgrid)
         PIDBox.addStretch()
-        PIDBox.setContentsMargins(0,0,0,0)
+        PIDBox.setContentsMargins(5,0,5,5)
         PIDGroupBox = QGroupBox(QApplication.translate("GroupBox","PID",None, QApplication.UnicodeUTF8))
         PIDGroupBox.setLayout(PIDBox)
         # create arduino box
+        filtgrid = QGridLayout()
+        filtgrid.addWidget(FILTLabel,1,0)
+        for i in range(4):
+            filtgrid.addWidget(self.FILTspinBoxes[i],1,i+2)
+        filtgridBox = QHBoxLayout()
+        filtgridBox.addLayout(filtgrid)
+        filtgridBox.addStretch()
+        filtgridBox.setContentsMargins(5,5,5,5)
         arduinogrid = QGridLayout()
         arduinogrid.addWidget(arduinoETLabel,1,0,Qt.AlignRight)
         arduinogrid.addWidget(self.arduinoETComboBox,1,1)
@@ -26547,10 +26631,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
         arduinogrid.addWidget(self.arduinoATComboBox,2,3)
         arduinogrid.addWidget(arduinoATLabel,2,4)
         arduinogrid.addWidget(self.showControlButton,2,5)
-        arduinoBox = QHBoxLayout()
-        arduinoBox.addLayout(arduinogrid)
-        arduinoBox.addStretch()
-        arduinoBox.setContentsMargins(0,0,0,0)
+        arduinogridBox = QHBoxLayout()
+        arduinogridBox.addLayout(arduinogrid)
+        arduinogridBox.addStretch()
+        arduinogridBox.setContentsMargins(5,5,5,5)
+        arduinoBox = QVBoxLayout()
+        arduinoBox.addLayout(arduinogridBox)
+        arduinoBox.addLayout(filtgridBox)
+        arduinoBox.setContentsMargins(5,5,5,5)
         arduinoGroupBox = QGroupBox(QApplication.translate("GroupBox","Arduino TC4",None, QApplication.UnicodeUTF8))
         arduinoGroupBox.setLayout(arduinoBox)
         #create program Box
@@ -26587,16 +26675,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
         grid.addWidget(arduinoGroupBox,4,1)
         grid.addWidget(self.programButton,5,0)
         grid.addWidget(programGroupBox,5,1)
-        gridBoxLayout = QHBoxLayout()
-        gridBoxLayout.addLayout(grid)
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(cancelButton)
         buttonLayout.addWidget(okButton)
         tab1Layout = QVBoxLayout()
-        tab1Layout.addLayout(gridBoxLayout)
-        tab1Layout.setSpacing(5)
-        tab1Layout.setContentsMargins(5,5,0,0)
+        tab1Layout.addLayout(grid)
+        tab1Layout.setContentsMargins(5,5,0,5)
         tab1Layout.addStretch()
         bLayout = QHBoxLayout()
         bLayout.addWidget(self.addButton)
@@ -27032,6 +27117,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.LCD6frame.setVisible(False)
             aw.LCD7frame.setVisible(False)
             aw.qmc.resetlinecountcaches()
+            aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
+            aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
+            aw.ser.arduinoATChannel = str(self.arduinoATComboBox.currentText())
+            aw.ser.ArduinoFILT = [sb.value() for sb in self.FILTspinBoxes]
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA
                 if str(self.controlpidtypeComboBox.currentText()) == "Fuji PXG":
@@ -27089,9 +27178,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.LCD6frame.setVisible(True)
                 aw.LCD7frame.setVisible(True)
             elif self.arduinoButton.isChecked():
-                aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
-                aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
-                aw.ser.arduinoATChannel = str(self.arduinoATComboBox.currentText())
                 meter = "Arduino (TC4)"
                 aw.qmc.device = 19
                 aw.ser.baudrate = 115200
@@ -27583,6 +27669,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 pass
             aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
             aw.qmc.phidget1045_changeTrigger = aw.qmc.phidget1045_changeTriggersValues[self.changeTriggerCombos1045.currentIndex()]
+            aw.qmc.phidget1045_emissivity = self.emissivitySpinBox.value()
             try:
                 if aw.qmc.phidget1045_async and aw.ser.PhidgetIRSensor and aw.ser.PhidgetIRSensor.isAttached():
                     try:
