@@ -31,7 +31,6 @@ from artisanlib import __revision__
 # WARNING: If an ascii str contains characters outside the 7 bit range, Python raises UnicodeEncodeError exception.
 #################################################################################################################
 
-import appnope
 
 import os
 import imp
@@ -142,6 +141,8 @@ import unicodedata
 
 # platform dependent imports:
 if sys.platform.startswith("darwin"):
+    # control app napping on OS X >= 10.9
+    import appnope
     # to establish a thread pool on OS X
     import objc
     import Foundation
@@ -24269,7 +24270,8 @@ class serialport(object):
                         aw.qmc.extraArduinoT3 = float(res[5])
                         aw.qmc.extraArduinoT4 = float(res[6])
                     except:
-                        pass
+                        aw.qmc.extraArduinoT3 = -1
+                        aw.qmc.extraArduinoT4 = -1
                 else:
                     aw.qmc.extraArduinoT3 = aw.qmc.extraArduinoT4 = -1                
                 if 44 in aw.qmc.extradevices: # +ArduinoTC4_78
@@ -26400,7 +26402,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetBox1045.addWidget(asyncLabel,2,0,Qt.AlignRight)
         phidgetBox1045.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
         phidgetBox1045.addWidget(EmissivityLabel,4,0,Qt.AlignRight)
-        phidgetBox1045.addWidget(self.emissivitySpinBox,4,1,Qt.AlignRight)
+        phidgetBox1045.addWidget(self.emissivitySpinBox,4,1)
         phidget1045VBox = QVBoxLayout()
         phidget1045VBox.addStretch()
         phidget1045VBox.addLayout(phidgetBox1045)
