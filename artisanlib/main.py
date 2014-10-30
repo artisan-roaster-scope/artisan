@@ -9200,6 +9200,13 @@ class ApplicationWindow(QMainWindow):
                                 aw.modbus.writeRegister(*cmds)
                         except:
                             pass
+                    elif cmd_str.startswith("wcoils"):
+                        cmds = eval(cmd_str[len('wcoils'):])
+                        if isinstance(cmds,tuple):
+                            if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                # cmd has format "write(s,r,[<b>,..<b>])"
+                                aw.modbus.writeCoils(*cmds)
+                                libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)                        
                 elif action == 5:
                     try:
                         DTAvalue=cmd_str.split(':')[1]
@@ -19729,7 +19736,7 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<b>Action</b> Perform an action on slider release",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>Command</b> depends on the action type ('{}' is replaced by <i>value</i>*<i>factor</i> + <i>offset</i>)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
         string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) or wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>Factor</b> multiplicator of the slider value",None, QApplication.UnicodeUTF8))
@@ -20481,7 +20488,7 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
         string += u(QApplication.translate("Message", "Call Program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
         string += u(QApplication.translate("Message", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) or wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br>"
         string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8)) + "<br>"
         string += u(QApplication.translate("Message", "IO Command: set(n,0), set(n,1), toggle(n) to set Phidget IO digital output n",None, QApplication.UnicodeUTF8)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8)) + "<br>"
@@ -22060,6 +22067,20 @@ class modbusport(object):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(ex)),exc_tb.tb_lineno)
 
+    # write multiple cois on slave
+    def writeCoils(self,slave,register,values):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            self.master.write_coils(int(register),list(values),unit=int(slave))
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeCoils() %1").arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+        
     # write value to register on slave
     # value can be one of string (containing an int or float), an int or a float
     def writeRegister(self,slave,register,value):

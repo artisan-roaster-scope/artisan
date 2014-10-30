@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 
 from bottle import default_app, request, Bottle, abort, route, template, static_file, get, TEMPLATE_PATH, debug
-import gevent
-import signal
+from gevent import Timeout, signal as gsignal, kill
+from signal import SIGQUIT
 from gevent.pywsgi import WSGIServer
 from geventwebsocket import WebSocketError
 from geventwebsocket.handler import WebSocketHandler
-import platform
+from platform import system as psystem
 
-import multiprocessing
-#import threading
+from multiprocessing import Process as mProcess
 
-import json
-import requests
+from json import dumps as jdumps
+from requests import get as rget
 
-app = default_app() #Bottle()
+import time as libtime
+
 wsocks = [] # list of open web sockets
 server = None
 process = None
@@ -45,22 +45,19 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         etbackground = etbg
         showet = showetflag
         showbt = showbtflag
-        server = WSGIServer(("0.0.0.0", port), app, handler_class=WebSocketHandler)
-        if platform.system() != 'Windows':
-            gevent.signal(signal.SIGQUIT, gevent.kill)
-
-#        # start the server in a separate thread
-#        t = threading.Thread(target=server.serve_forever)
-#        t.daemon = True
-#        t.start()
+        server = WSGIServer(("0.0.0.0", port), default_app(), handler_class=WebSocketHandler)
+        if psystem() != 'Windows':
+            gsignal(SIGQUIT, kill)
         
         # start the server in a separate process
-        process = multiprocessing.Process(target=server.serve_forever)
+        process = mProcess(target=server.serve_forever)
         process.start()
+        
+        libtime.sleep(0.2)
         
         # check successful start
         url = "http://127.0.0.1:" + str(port) + "/artisan/status"
-        r = requests.get(url,timeout=0.5)
+        r = rget(url,timeout=0.5)
         if r.status_code == 200:
             return True
         else:
@@ -83,7 +80,6 @@ def stopWeb():
         process = None
     server = None
 
-from gevent import Timeout
 class TooLong(Exception):
     pass
 time_to_wait = 1 # seconds
@@ -104,7 +100,7 @@ def send_all(msg):
 # route to push new data to the client
 @route('/send', method='POST')
 def send():
-    send_all(json.dumps(request.json))
+    send_all(jdumps(request.json))
 
 # route that establishes the websocket between the Artisan app and the clients
 @route('/websocket')
