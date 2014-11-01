@@ -1,23 +1,41 @@
 Current Versions:
 
-o Python 2.7.6
+o Python 2.7.8
 o pyserial 2.7
-o QT 4.8.5
-o SIP 4.14.6
-o PyQt 4.10.1
-o numpy 1.8.0
+o QT 4.8.6
+o SIP 4.16.4
+o PyQt 4.11.2
+o numpy 1.9.1RC1
 o scipy 0.13.1
-o matplotlib 1.3.1
+o matplotlib 1.4.2
 o MinimalModbus 0.5
 o pyemf 2.0.0
-
 o cx_freeze (tip from 2013-03-26)
 o patchelf
 o bbfreeze 1.2.0
+o pymodbus 1.3.0
+o yoctopuce 1.10.17849
+o requests 2.3.0
+o gevent-1.0.1
+o bottle 0.12.7
+o gevent-websocket-0.9.3
 
 
 Upgrade History:
 
+- 2014-10-30
+ . Python 2.7.6 => 2.7.8
+ . Qt 4.8.5 => 4.8.6
+ . SIP 4.14.6 => 4.16.4
+ . PyQt 4.10.1 => 4.11.2
+ . numpy 1.8.2 => 1.9.1RC1
+ . matplotlib 1.3.1 => 1.4.2
+ . added pymodbus 1.3.0
+ . added yoctopuce 1.10.17849
+ . added requests 2.3.0
+ . added gevent-1.0.1
+ . added bottle 0.12.7
+ . added gevent-websocket-0.9.3
 - 2014-04-02
  . minimalmodbus 0.4 => 0.5
 - 2014-01-11:
@@ -150,7 +168,7 @@ src/gui/styles/qgtkstyle_p.cpp Line 510-513
 
 Add path to your environment (eg. .bashrc)
 
-PATH=/usr/local/Trolltech/Qt-4.8.5/bin:$PATH
+PATH=/usr/local/Trolltech/Qt-4.8.6/bin:usr/local/Trolltech/Qt-4.8.6/lib:$PATH
 export PATH
 
 test correct path
@@ -253,6 +271,53 @@ or download the src package
 # su
 # perl Makefile.PL; make; make install
 
+14) pymodbus 1.3.0 (from master)
+
+download from https://github.com/bashwork/pymodbus
+
+# cd pymodbus
+# python setup.py build
+# sudo python setup.py install
+
+15) yoctopuce 1.10.17849
+
+download from https://pypi.python.org/pypi/yoctopuce/1.10.16490
+
+# cd yoctopuce-1.10.17849
+# python2.7 setup.py build
+# sudo python2.7 setup.py install
+
+copy shared libs
+# sudo mkdir /usr/local/lib/python2.7/site-packages/yoctopuce/cdll
+# sudo cp yoctopuce/cdll/* /usr/local/lib/python2.7/site-packages/yoctopuce/cdll
+
+16) requests 2.3.0
+
+https://github.com/kennethreitz/requests/releases
+
+# python setup.py build
+# sudo python setup.py install
+
+17) gevent-1.0.1
+
+https://pypi.python.org/pypi/gevent
+
+# python setup.py build
+# sudo python setup.py install
+
+18) bottle 0.12.7
+
+https://github.com/defnull/bottle/releases
+
+# python setup.py build
+# sudo python setup.py install
+
+19) gevent-websocket-0.9.3
+
+https://pypi.python.org/pypi/gevent-websocket/
+
+# python setup.py build
+# sudo python setup.py install
 
 ====
 
@@ -274,3 +339,4 @@ o minimalmodbus (??)
 # pip install -U minimalmodbus
 o bbfreeze (??)
 # sudo easy_install bbfreeze
+

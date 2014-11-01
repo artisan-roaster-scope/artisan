@@ -1,6 +1,6 @@
 #!/bin/sh
 
-QT=/usr/local/Trolltech/Qt-4.8.5/
+QT=/usr/local/Trolltech/Qt-4.8.6/
 
 # translations
 pylupdate4 artisan.pro
@@ -25,6 +25,14 @@ cp artisan-alrm.xml dist
 cp artisan-apal.xml dist
 cp artisan-wg.xml dist
 cp includes/Humor-Sans.ttf dist
+cp /usr/local/lib/python2.7/site-packages/yoctopuce/cdll/* dist
+cp includes/alarmclock.eot dist
+cp includes/alarmclock.svg dist
+cp includes/alarmclock.ttf dist
+cp includes/alarmclock.woff dist
+cp includes/artisan.tpl dist
+cp includes/bigtext.js dist
+cp includes/jquery-1.11.1.min.js dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from bottle import default_app, request, Bottle, abort, route, template, static_file, get, TEMPLATE_PATH, debug
+from bottle import default_app, request, abort, route, template, static_file, get, TEMPLATE_PATH
 from gevent import Timeout, signal as gsignal, kill
 from signal import SIGQUIT
 from gevent.pywsgi import WSGIServer
@@ -29,9 +29,10 @@ etcolor="#FF0000",
 etbackground="#CCCCCC"
 showet = True
 showbt = True
+static_path = ""
         
 def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
-    global port, server, process, TEMPLATE_PATH, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt
+    global port, server, process, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt
     try:
         port = p
         static_path = resourcePath
@@ -63,14 +64,14 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         else:
             return False
             
-    except Exception as e:
+    except WebSocketError:
 #        import traceback
 #        import sys
 #        traceback.print_exc(file=sys.stdout)
         return False
     
 def stopWeb():
-    global wsocks, process
+    global wsocks, process, server
     for ws in wsocks:
         ws.close()
     wsocks = []
@@ -85,7 +86,6 @@ class TooLong(Exception):
 time_to_wait = 1 # seconds
     
 def send_all(msg):
-    global wsocks
     socks = wsocks[:]
     for ws in socks:
         try:
@@ -94,7 +94,7 @@ def send_all(msg):
                     wsocks.remove(ws)
                 else:
                     ws.send(msg)
-        except:
+        except WebSocketError:
             wsocks.remove(ws)
 
 # route to push new data to the client
@@ -105,7 +105,6 @@ def send():
 # route that establishes the websocket between the Artisan app and the clients
 @route('/websocket')
 def handle_websocket():
-    global wsocks
     wsock = request.environ.get('wsgi.websocket')
     if not wsock:
         abort(400, 'Expected WebSocket request.')
@@ -120,7 +119,7 @@ def handle_websocket():
                 if message is None:
                     wsocks.remove(wsock)
                     break
-        except Exception: #WebSocketError:
+        except WebSocketError:
             wsocks.remove(wsock)
             break
             
@@ -154,19 +153,11 @@ def index():
         
 # Static Routes
 
-@get('/<filename:re:.*\.js>')
+@get(r'/<filename:re:.*\.js>')
 def javascripts(filename):
     return static_file(filename, root=static_path)
 
-#@get('/<filename:re:.*\.css>')
-#def stylesheets(filename):
-#    return static_file(filename, root='static/css')
-#
-#@get('/<filename:re:.*\.(jpg|png|gif|ico)>')
-#def images(filename):
-#    return static_file(filename, root='static/img')
-
-@get('/<filename:re:.*\.(eot|ttf|woff|svg)>')
+@get(r'/<filename:re:.*\.(eot|ttf|woff|svg)>')
 def fonts(filename):
     return static_file(filename, root=static_path)
 
