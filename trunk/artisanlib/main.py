@@ -849,6 +849,11 @@ class tgraphcanvas(FigureCanvas):
         self.density = [0,"g",0,"l"]
         
         self.volumeCalcUnit = 0
+        
+        # container scale tare
+        self.container_names = []
+        self.container_weights = [] # all weights in g
+        self.container_idx = -1 # the empty field (as -1 + 2 = 1)
 
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
@@ -3737,7 +3742,10 @@ class tgraphcanvas(FigureCanvas):
 
     def OnMonitor(self):
         try:
-            appnope.nope()
+            try:
+                appnope.nope()
+            except:
+                pass
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             aw.qmc.clearMeasurements()
             self.timeclock.start()   #set time to the current computer time
@@ -3803,7 +3811,7 @@ class tgraphcanvas(FigureCanvas):
             aw.enableEditMenus()
             aw.arduino.activateONOFFeasySV(False)
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
-            appnope.nap()
+            #appnope.nap()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -7030,7 +7038,6 @@ class SampleThread(QThread):
                     break  #thread ends
         except:
             aw.qmc.flagsampling = False # we signal that we are done with sampling
-            pass
         finally:
             aw.qmc.flagsamplingthreadrunning = False
             if sys.platform.startswith("darwin"):
@@ -11915,6 +11922,14 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("volumeCalcUnit"):
                 self.qmc.volumeCalcUnit = settings.value("volumeCalcUnit",int(self.qmc.volumeCalcUnit)).toInt()[0]
             settings.endGroup()
+            settings.beginGroup("Tare")
+            if settings.contains("names"):
+                self.qmc.container_names = list(map(u,list(settings.value("names",self.qmc.container_names).toStringList())))
+            if settings.contains("weights"):
+                self.qmc.container_weights = [x.toInt()[0] for x in settings.value("weights").toList()]
+            if settings.contains("idx"):
+                self.qmc.container_idx = settings.value("idx",int(self.qmc.container_idx)).toInt()[0]
+            settings.endGroup()
             #restore serial port
             settings.beginGroup("SerialPort")
             self.ser.comport = str(settings.value("comport",self.ser.comport).toString())
@@ -12493,7 +12508,7 @@ class ApplicationWindow(QMainWindow):
                     self.stopWebLCDs()
                     return False
             else:
-                False
+                return False
         except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -12812,6 +12827,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("colorsystem",self.qmc.color_system_idx)
             #soundflag
             settings.setValue("sound",self.soundflag)
+            settings.beginGroup("Tare")
+            settings.setValue("names",self.qmc.container_names)
+            settings.setValue("weights",self.qmc.container_weights)
+            settings.setValue("idx",self.qmc.container_idx)
+            settings.endGroup()            
             #save serial port
             settings.beginGroup("SerialPort")
             settings.setValue("comport",self.ser.comport)
@@ -14220,21 +14240,21 @@ $cupping_notes
         if fileName:
             imag.save(fileName, fmt) 
 
-    def retrieveWeightIn(self):
-        v = aw.scale.readWeight() # read value from weight in 'g'
+    def retrieveWeightIn(self,tare=0):
+        v = aw.scale.readWeight() # read value from scale in 'g'
         if v and v > -1:
+            v = v - tare
             if aw.qmc.weight[2] != 'g':
                 v = v / 1000.0
             aw.qmc.weight[0] = v
-            aw.qmc.weight[1] = 0
 
-    def retrieveWeightOut(self):
-        v = aw.scale.readWeight() # read value from weight in 'g'
+    def retrieveWeightOut(self,tare=0):
+        v = aw.scale.readWeight() # read value from scale in 'g'
         if v and v > -1:
+            v = v - tare
             if aw.qmc.weight[2] != 'g':
                 v = v / 1000.0
-            if aw.qmc.weight[0] > v:
-                aw.qmc.weight[1] = v
+            aw.qmc.weight[1] = v
 
     def desktopscreenshot(self):
         imag = QPixmap.grabWindow(QApplication.desktop().winId())
@@ -17029,8 +17049,8 @@ class editGraphDlg(ArtisanDialog):
         self.roastdegreelabel.setMinimumWidth(80)
         self.roastdegreelabel.setMaximumWidth(80)
         self.percent()
-        self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.percent)
-        self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.percent)
+        self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.weightouteditChanged)
+        self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.weightineditChanged)
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
@@ -17240,6 +17260,19 @@ class editGraphDlg(ArtisanDialog):
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         cancelButton.setMaximumSize(cancelButton.sizeHint())
         cancelButton.setMinimumSize(cancelButton.minimumSize())
+        
+        # container tare
+        self.tareComboBox = QComboBox()
+        self.tareComboBox.addItem("<edit> TARE")
+        self.tareComboBox.addItem("")
+        self.tareComboBox.insertSeparator(1)
+        self.tareComboBox.addItems(aw.qmc.container_names)
+        self.tareComboBox.setMaximumWidth(80)
+        self.tareComboBox.setMinimumWidth(80)
+        self.tareComboBox.setCurrentIndex(aw.qmc.container_idx + 3)
+        self.connect(self.tareComboBox,SIGNAL("currentIndexChanged(int)"),self.tareChanged)
+        self.tarePopupEnabled = True # controls if the popup will process tareChange events
+        
         # in button
         inButton = QPushButton(QApplication.translate("Button", "in",None, QApplication.UnicodeUTF8))
         self.connect(inButton, SIGNAL("clicked()"),self.inWeight)
@@ -17325,10 +17358,12 @@ class editGraphDlg(ArtisanDialog):
         weightLayout.addWidget(weightoutlabel)
         weightLayout.addSpacing(15)
         weightLayout.addWidget(self.weightpercentlabel)
-        weightLayout.addSpacing(10)
-        weightLayout.addWidget(self.roastdegreelabel)
+#        weightLayout.addSpacing(10)
+#        weightLayout.addWidget(self.roastdegreelabel)
         weightLayout.addStretch()  
+        weightLayout.addWidget(self.tareComboBox)
         if aw.scale.device != None and aw.scale.device != "" and aw.scale.device != "None":
+            weightLayout.addSpacing(10)
             weightLayout.addWidget(inButton) 
             weightLayout.addSpacing(10)
             weightLayout.addWidget(outButton)
@@ -17519,6 +17554,14 @@ class editGraphDlg(ArtisanDialog):
         #totallayout.addLayout(buttonsLayout)
         self.setLayout(totallayout)
         
+    def tareChanged(self,i):
+        if i == 0 and self.tarePopupEnabled:
+            self.tareDLG = tareDlg(self,tarePopup=self)
+            self.tareDLG.show()
+            QApplication.processEvents()
+            # reset index and popup
+            self.tareComboBox.setCurrentIndex(aw.qmc.container_idx + 3)
+
     def changeUnit(self,i,lineedits):
         for le in lineedits:
             if le.text() and le.text() != "":
@@ -17530,9 +17573,11 @@ class editGraphDlg(ArtisanDialog):
                         le.setText(str(wi/1000.))
 
     def changeWeightUnit(self,i):
+        aw.qmc.weight[2] = u(self.unitsComboBox.currentText())
         self.changeUnit(i,[self.weightinedit,self.weightoutedit])
         
     def changeVolumeUnit(self,i):
+        aw.qmc.volume[2] = u(self.volumeUnitsComboBox.currentText())
         self.changeUnit(i,[self.volumeinedit,self.volumeoutedit])
 
     def tabSwitched(self,i):
@@ -17616,14 +17661,48 @@ class editGraphDlg(ArtisanDialog):
         volumedialog.setFixedSize(volumedialog.size())        
 
     def outWeight(self):
-        aw.retrieveWeightOut()
-        self.weightinedit.setText(str(aw.qmc.weight[0]))
-        self.weightoutedit.setText(str(aw.qmc.weight[1]))
+        tare = 0
+        try:
+            tare_idx = self.tareComboBox.currentIndex() - 3
+            if tare_idx > -1:
+                tare = aw.qmc.container_weights[tare_idx]
+        except:
+            pass
+        previous_out = aw.qmc.weight[1]
+        aw.retrieveWeightOut(tare)
+        if tare != 0 and previous_out == aw.qmc.weight[1] and self.weightoutedit.text() != "" and self.weightoutedit.text().toFloat()[0] != 0.0:
+            # no value received from scale:
+            # we reduce the tare from the outWeight
+            text_out = self.weightoutedit.text().toFloat()[0]
+            if aw.qmc.weight[2] != 'g':
+                text_out = ((text_out*1000.) - tare) / 1000.
+            else:
+                text_out = text_out - tare
+            self.weightoutedit.setText(str(aw.float2float(text_out)))
+        elif previous_out != aw.qmc.weight[1]:
+            self.weightoutedit.setText(str(aw.float2float(aw.qmc.weight[1])))
 
     def inWeight(self):
-        aw.retrieveWeightIn()
-        self.weightinedit.setText(str(aw.qmc.weight[0]))
-        self.weightoutedit.setText(str(aw.qmc.weight[1]))
+        tare = 0
+        try:
+            tare_idx = self.tareComboBox.currentIndex() - 3
+            if tare_idx > -1:
+                tare = aw.qmc.container_weights[tare_idx]
+        except:
+            pass
+        previous_in = aw.qmc.weight[0]
+        aw.retrieveWeightIn(tare)
+        if tare != 0 and previous_in == aw.qmc.weight[0] and self.weightinedit.text() != "" and self.weightinedit.text().toFloat()[0] != 0.0:
+            # no value received from scale:
+            # we reduce the tare from the inWeight
+            text_in = self.weightinedit.text().toFloat()[0]
+            if aw.qmc.weight[2] != 'g':
+                text_in = ((text_in*1000.) - tare) / 1000.
+            else:
+                text_in = text_in - tare
+            self.weightinedit.setText(str(aw.float2float(text_in)))
+        elif previous_in != aw.qmc.weight[0]:
+            self.weightinedit.setText(str(aw.float2float(aw.qmc.weight[0])))
 
     def roastpropertiesChanged(self):
         if self.roastproperties.isChecked():
@@ -17875,6 +17954,12 @@ class editGraphDlg(ArtisanDialog):
             message = QApplication.translate("Message","No events found", None, QApplication.UnicodeUTF8)
             aw.sendmessage(message)
 
+    def weightouteditChanged(self):
+        self.percent()
+
+    def weightineditChanged(self):
+        self.percent()
+        
     def percent(self):
         if self.weightoutedit.text() != "" and float(str(self.weightoutedit.text())) != 0.0:
             percent = aw.weight_loss(float(str(self.weightinedit.text())),float(str(self.weightoutedit.text())))
@@ -17927,16 +18012,15 @@ class editGraphDlg(ArtisanDialog):
     def calc_organic_loss(self):
         wloss = 0. # weight (moisture + organic)
         mloss = 0. # moisture
-        oloss = 0. # organic
         try:
             if self.weightpercentlabel.text() and self.weightpercentlabel.text() != "":
                 wloss = float(self.weightpercentlabel.text().split("%")[0])
-        except Exception as e:
+        except:
             pass
         try:
             if self.moisture_greens_edit.text() and self.moisture_greens_edit.text() != "" and self.moisture_roasted_edit.text() and self.moisture_roasted_edit.text() != "":
                 mloss = float(self.moisture_greens_edit.text()) - float(self.moisture_roasted_edit.text())
-        except Exception as e:
+        except:
             pass
         if mloss != 0. and wloss != 0.:
             return mloss, wloss - mloss
@@ -18059,6 +18143,7 @@ class editGraphDlg(ArtisanDialog):
         # Update Title
 #        aw.qmc.ax.set_title(aw.arabicReshape(u(self.titleedit.text())),size=18,color=aw.qmc.palette["title"])
         aw.qmc.title = u(self.titleedit.text())
+        aw.qmc.container_idx = self.tareComboBox.currentIndex() - 3
         # Update beans
         aw.qmc.beans = u(self.beansedit.toPlainText())
         #update ambient temperature source
@@ -18144,6 +18229,148 @@ class editGraphDlg(ArtisanDialog):
         aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None, QApplication.UnicodeUTF8))
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.close()
+
+
+##########################################################################
+#####################  VIEW Tare  ########################################
+##########################################################################
+
+
+class tareDlg(ArtisanDialog):
+    def __init__(self, parent = None, tarePopup = None):
+        super(tareDlg,self).__init__(parent)
+        self.tarePopup = tarePopup
+        self.setModal(True)
+        self.setWindowTitle(QApplication.translate("Form Caption","Tare Setup", None, QApplication.UnicodeUTF8))
+
+        self.taretable = QTableWidget()
+        self.taretable.setTabKeyNavigation(True)
+        self.createTareTable()
+        
+        self.connect(self.taretable,SIGNAL("itemSelectionChanged()"),self.selectionChanged)
+        
+        addButton = QPushButton(QApplication.translate("Button","Add", None, QApplication.UnicodeUTF8))
+        addButton.setFocusPolicy(Qt.NoFocus)
+        self.delButton = QPushButton(QApplication.translate("Button","Delete", None, QApplication.UnicodeUTF8))
+        self.delButton.setDisabled(True)
+        self.delButton.setFocusPolicy(Qt.NoFocus)
+        
+        self.connect(addButton,SIGNAL("clicked()"),self.addTare)
+        self.connect(self.delButton,SIGNAL("clicked()"),self.delTare)
+        
+        okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        cancelButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(okButton,SIGNAL("clicked()"),self.close)
+        self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+        contentbuttonLayout = QHBoxLayout()
+        contentbuttonLayout.addStretch()
+        contentbuttonLayout.addWidget(addButton)
+        contentbuttonLayout.addWidget(self.delButton)
+        contentbuttonLayout.addStretch()
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
+        layout = QVBoxLayout()
+        layout.addWidget(self.taretable)
+        layout.addLayout(contentbuttonLayout)
+        layout.addLayout(buttonLayout)
+        self.setLayout(layout)
+        
+    def selectionChanged(self):
+        if len(self.taretable.selectedRanges()) > 0:
+            self.delButton.setDisabled(False)
+        else:
+            self.delButton.setDisabled(False)
+        
+    def closeEvent(self,_):
+        self.saveTareTable()
+        # update popup
+        self.tarePopup.tarePopupEnabled = False
+        self.tarePopup.tareComboBox.clear()
+        self.tarePopup.tareComboBox.addItem("<edit> TARE")
+        self.tarePopup.tareComboBox.addItem("")
+        self.tarePopup.tareComboBox.insertSeparator(2)
+        self.tarePopup.tareComboBox.addItems(aw.qmc.container_names)
+        self.tarePopup.tareComboBox.setCurrentIndex(2) # reset to the empty entry
+        aw.qmc.container_idx = -1
+        self.tarePopup.tarePopupEnabled = True
+        self.accept()
+
+    def addTare(self):
+#        self.taretable.setSortingEnabled(False)
+        rows = self.taretable.rowCount()
+        self.taretable.setRowCount(rows + 1)
+        #add widgets to the table
+        name = QLineEdit()
+        name.setAlignment(Qt.AlignRight)
+        name.setText("name")
+        w = aw.scale.readWeight() # read value from scale in 'g'
+        weight = QLineEdit()
+        weight.setAlignment(Qt.AlignRight)
+        if w > -1:
+            weight.setText(str(w))
+        else:
+            weight.setText(str(0))
+        weight.setValidator(QIntValidator(0,999,weight))    
+        self.taretable.setCellWidget(rows,0,name)
+        self.taretable.setCellWidget(rows,1,weight)
+#        self.taretable.setSortingEnabled(True)
+        
+    def delTare(self):
+        selected = self.taretable.selectedRanges()
+        if len(selected) > 0:
+            bindex = selected[0].topRow()
+            if bindex >= 0:
+#                self.taretable.setSortingEnabled(False)
+                self.taretable.removeRow(bindex)
+#                self.taretable.setSortingEnabled(True)
+
+    def saveTareTable(self):
+        tars = self.taretable.rowCount() 
+        names = []
+        weights = []
+        for i in range(tars):
+            name = u(self.taretable.cellWidget(i,0).text())
+            weight = int(self.taretable.cellWidget(i,1).text())
+            names.append(name)
+            weights.append(weight)            
+        aw.qmc.container_names = names
+        aw.qmc.container_weights = weights
+        
+    def createTareTable(self):
+        self.taretable.clear()        
+        self.taretable.setRowCount(len(aw.qmc.container_names))
+        self.taretable.setColumnCount(2)
+        self.taretable.setHorizontalHeaderLabels([QApplication.translate("Table","Name",None, QApplication.UnicodeUTF8),
+                                                         QApplication.translate("Table","Weight",None, QApplication.UnicodeUTF8)])
+        self.taretable.setAlternatingRowColors(True)
+        self.taretable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.taretable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.taretable.setSelectionMode(QTableWidget.SingleSelection)
+        self.taretable.setShowGrid(True)
+        self.taretable.verticalHeader().setResizeMode(2)
+        for i in range(len(aw.qmc.container_names)):
+            #add widgets to the table
+            name = QLineEdit()
+            name.setAlignment(Qt.AlignRight)
+            name.setText(aw.qmc.container_names[i])
+            weight = QLineEdit()
+            weight.setAlignment(Qt.AlignRight)
+            weight.setText(str(aw.qmc.container_weights[i]))
+            weight.setValidator(QIntValidator(0,999,weight))
+            
+            self.taretable.setCellWidget(i,0,name)
+            self.taretable.setCellWidget(i,1,weight)
+        header = self.taretable.horizontalHeader()
+        header.setResizeMode(0, QHeaderView.Stretch)
+        header.setResizeMode(1, QHeaderView.Fixed)
+#        header.setResizeMode(QHeaderView.Stretch)
+        self.taretable.setColumnWidth(1,65)
+#        self.taretable.setSortingEnabled(True)
+
 
 ##########################################################################
 #####################  VIEW PLATFORM      ################################
@@ -18889,7 +19116,7 @@ class calculatorDlg(ArtisanDialog):
                 deltaseconds = deltatemperature/deltatime
             deltaminutes = deltaseconds*60.
             string1 = QApplication.translate("Label", "Best approximation was made from %1 to %2",None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- start)).arg(aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- start))
-            string2 = QApplication.translate("Label", "<b>%1</b> %2/sec, <b>%3</b> %4/min",None, QApplication.UnicodeUTF8).arg("%.2f"%(deltaseconds)).arg(aw.qmc.mode).arg("%.2f"%(deltaminutes).arg(aw.qmc.mode))
+            string2 = QApplication.translate("Label", "<b>%1</b> %2/sec, <b>%3</b> %4/min",None, QApplication.UnicodeUTF8).arg("%.2f"%(deltaseconds)).arg(aw.qmc.mode).arg("%.2f"%(deltaminutes)).arg(aw.qmc.mode)
             self.result1.setText(string1)
             self.result2.setText(string2)
         else:
@@ -22119,7 +22346,7 @@ class modbusport(object):
             else:
                 builder = BinaryPayloadBuilder(endian=Endian.Big)
             builder.add_32bit_float(float(value))
-            payload = builder.tolist()
+            payload = builder.build() # .tolist()
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -22259,7 +22486,7 @@ class scaleport(extraserialport):
                 self.connect()
             if self.SP:
                 if not self.SP.isOpen():
-                    self.openportnport()
+                    self.openport()
                 if self.SP.isOpen():
                     #self.SP.write(str2cmd('s')) # only stable
                     self.SP.write(str2cmd('w')) # any weight
