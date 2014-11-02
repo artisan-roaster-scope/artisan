@@ -2327,7 +2327,7 @@ class tgraphcanvas(FigureCanvas):
                 
                 if not self.locktimex_start:
                     self.startofx = 0
-                self.endofx = self.resetmaxtime 
+                    self.endofx = self.resetmaxtime 
                 if self.endofx < 1:
                     self.endofx = 60
 
@@ -11164,7 +11164,7 @@ class ApplicationWindow(QMainWindow):
     #        if "ymin" in profile:
     #            self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),-150)
             if "xmin" in profile:
-                self.qmc.startofx = int(profile["xmin"])            
+                self.qmc.startofx = int(profile["xmin"])
             if  not self.qmc.locktimex:
                 if "xmax" in profile:
                     self.qmc.endofx = int(profile["xmax"])
