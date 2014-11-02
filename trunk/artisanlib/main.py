@@ -24374,13 +24374,18 @@ class serialport(object):
         try: 
             if self.YOCTOsensor == None:
                 errmsg=YRefParam()
-                ## WINDOWS DLL HACK BEGIN
+                ## WINDOWS/Linux DLL HACK BEGIN
                 if platf == 'Windows' and aw.appFrozen():
                     if platform.architecture()[0] == '32bit':
                         YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\yapi.dll"
                     else:
                         YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\yapi-amd64.dll"
-                ## WINDOWS DLL HACK END
+                elif platf == "Linux" and aw.appFrozen():
+                    if platform.architecture()[0] == '32bit':
+                        YAPI._yApiCLibFile = u(QApplication.applicationDirPath() + "/libyapi-i386.so")
+                    else:                    
+                        YAPI._yApiCLibFile = u(QApplication.applicationDirPath() + "/libyapi-amd64.so")
+                ## WINDOWS/Linux DLL HACK END
                 # alt: PreregisterHub( )
                 if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
                     self.YOCTOsensor = YTemperature.FirstTemperature()
