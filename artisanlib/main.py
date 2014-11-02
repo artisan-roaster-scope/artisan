@@ -151,7 +151,7 @@ if sys.platform.startswith("darwin"):
     serial.tools.list_ports.comports = comports
     from artisanlib.list_ports_vid_pid_osx_posix import *
     
-    # WebLCDs for now only available on MacOS X
+    # WebLCDs for now only available on MacOS X and Linux
     from artisanlib.weblcds import startWeb, stopWeb
 elif os.name == 'posix':
     from artisanlib.list_ports_vid_pid_osx_posix import *
@@ -226,6 +226,10 @@ else:
         return str(c,"latin1")
 
 platf = str(platform.system())
+
+if platf == "Linux":
+    # WebLCDs for now only available on MacOS X and Linux
+    from artisanlib.weblcds import startWeb, stopWeb
 
 #######################################################################################
 #################### minimal modbus monkey patch to support little-endian  ############
@@ -12509,9 +12513,11 @@ class ApplicationWindow(QMainWindow):
                     return False
             else:
                 return False
-        except Exception:
+        except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " startWebLCDs() %1").arg(str(e)),exc_tb.tb_lineno)
             self.stopWebLCDs()
             return False
             
@@ -15922,7 +15928,7 @@ class HUDDlg(ArtisanDialog):
         self.WebLCDsPort.setValidator(QRegExpValidator(QRegExp(r"^[0-9]{1,4}$"),self))
         self.WebLCDsPort.setMaximumWidth(45)
         # we disable WebLCDs feature for now on non Mac OS X systems
-        if not sys.platform.startswith("darwin"):
+        if platf in ['Windows']: # not sys.platform.startswith("darwin"):
             self.WebLCDsFlag.setDisabled(True)
             self.WebLCDsPort.setDisabled(True)        
         if aw.WebLCDs:
