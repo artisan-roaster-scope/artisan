@@ -64,7 +64,7 @@ The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and C
   # sudo rpm -e artisan
 }}}
 
-In case you run into permission problems such that Artisan is not allowed to read or write to the selected /dev/<usb> device, you might need to add yourself to the *dialout* group via
+In case you run into permission problems such that Artisan is not allowed to read or write to the selected /dev/_USB_ device, you might need to add yourself to the *dialout* group via
 
 {{{
   # sudo adduser pepelepoisson dialout
