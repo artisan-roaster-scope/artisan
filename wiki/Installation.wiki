@@ -64,6 +64,20 @@ The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and C
   # sudo rpm -e artisan
 }}}
 
+In case you run into permission problems such that Artisan is not allowed to read or write to the selected /dev/<usb> device, you might need to add yourself to the *dialout* group via
+
+{{{
+  # sudo adduser pepelepoisson dialout
+}}}
+
+After this command you might need to logout and login again. Try 
+
+{{{
+  # id
+}}}
+
+that your account was successful added to the dialout group.
+
 =Device Configuration=
 
 Once Artisan is up, chose your device using the menu *Conf* and then select the *Device* submenu. RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers (but they need an RS485-RS232 converter). Most common are the following drivers (check your serial2USB device chip to decide which one to install)
