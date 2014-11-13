@@ -4012,7 +4012,7 @@ class tgraphcanvas(FigureCanvas):
                                 slidervalue = aw.slider4.value()
                             if slidervalue != 0:
                                 value = aw.float2float((slidervalue + 10.0) / 10.0)
-                            	aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
+                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
                 except:
                     pass
             else:
@@ -21018,7 +21018,7 @@ class phasesGraphDlg(ArtisanDialog):
         else:
             # filter mode
             aw.qmc.phases = aw.qmc.phases_filter
-        	
+
         if self.pushbuttonflag.isChecked():
             aw.qmc.phasesbuttonflag = True
         else:
