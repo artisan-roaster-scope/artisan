@@ -22,33 +22,33 @@ wsocks = [] # list of open web sockets
 process = None
 port = None
 nonesymbol = "--"
-timecolor="#FFF",
-timebackground="#000",
-btcolor="#00007F",
-btbackground="#CCCCCC",
-etcolor="#FF0000",
+timecolor="#FFF"
+timebackground="#000"
+btcolor="#00007F"
+btbackground="#CCCCCC"
+etcolor="#FF0000"
 etbackground="#CCCCCC"
 showet = True
 showbt = True
 static_path = ""
         
 # pickle hack:
-def work(p,rp):
-    global port
+def work(p,rp,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
+    global port, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showbt, showet
     port = p
+    static_path = rp
+    nonesymbol = nonesym
+    timecolor = timec
+    timebackground = timebg
+    btcolor = btc
+    btbackground = btbg
+    etcolor = etc
+    etbackground = etbg
+    showbt = showetflag
+    showet = showbtflag
     TEMPLATE_PATH.insert(0,rp)
     s = WSGIServer(("0.0.0.0", p), default_app(), handler_class=WebSocketHandler)
     s.serve_forever()
-
-#showbt
-#showet
-#nonesymbol
-#timecolor
-#timebackground
-#btcolor
-#btbackground
-#etcolor
-#etcolorground
         
 def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
     global port, process, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt
@@ -69,14 +69,25 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         
         # start the server in a separate process
 # using multiprocessing
-        process = mProcess(target=work,args=(port,resourcePath,))
+        process = mProcess(target=work,args=(
+            port,
+            resourcePath,
+            nonesym,
+            timec,
+            timebg,
+            btc,
+            btbg,
+            etc,
+            etbg,
+            showetflag,
+            showbtflag,))
         process.start()
        
-        libtime.sleep(1)
+        libtime.sleep(1.5)
         
         # check successful start
         url = "http://127.0.0.1:" + str(port) + "/artisan/status"
-        r = rget(url,timeout=1)
+        r = rget(url,timeout=2)
         
         if r.status_code == 200:
             return True
