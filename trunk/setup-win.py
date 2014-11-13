@@ -11,6 +11,10 @@ import py2exe
 
 import os
 
+# Remove the build folder, a bit slower but ensures that build contains the latest
+import shutil
+shutil.rmtree("build", ignore_errors=True)
+shutil.rmtree("dist", ignore_errors=True)
 
 
 INCLUDES = [
@@ -70,12 +74,13 @@ setup(
             "icon_resources": [(0, cwd + "\\artisan.ico")]
             }],
     data_files = DATAFILES,
-    zipfile = "lib\library.zip",
+    zipfile = None, # "lib\library.zip",
     options={"py2exe" :{
-                        "packages": ['matplotlib','pytz','gevent'],
+                        "packages": ['matplotlib','pytz'],
                         "compressed": False, # faster
                         "unbuffered": True,
                         'optimize':  2,
+                        "bundle_files": 2,
                         "dll_excludes":[
                             'MSVCP90.dll','tcl84.dll','tk84.dll','libgdk-win32-2.0-0.dll',
                             'libgdk_pixbuf-2.0-0.dll','libgobject-2.0-0.dll'],
@@ -111,6 +116,7 @@ os.system(r'copy c:\\Qt\\4.8.5\\translations\\qt_hu.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.5\\translations\\qt_pl.qm dist\\translations')
 os.system(r'rmdir /q /s dist\\mpl-data\\sample_data')
 # YOCTO HACK BEGIN: manually copy over the dlls
+os.system(r'mkdir dist\\lib')
 os.system(r'copy c:\\Python27\\Lib\\site-packages\\yoctopuce\\cdll\\yapi.dll dist\\lib')
 os.system(r'copy c:\\Python27\\Lib\\site-packages\\yoctopuce\\cdll\\yapi64.dll dist\\lib')
 # YOCTO HACK END
@@ -121,10 +127,10 @@ os.system(r'copy artisanPalettes.ico dist')
 os.system(r'copy artisanWheel.ico dist')
 os.system(r'copy includes\\Humor-Sans.ttf dist')
 os.system(r'copy includes\\alarmclock.eot dist')
-os.system(r'copy includes\\alarmclock.svg')
-os.system(r'copy includes\\alarmclock.ttf')
-os.system(r'copy includes\\alarmclock.woff')
-os.system(r'copy includes\\artisan.tpl')
-os.system(r'copy includes\\bigtext.js')
-os.system(r'copy includes\\jquery-1.11.1.min.js')
+os.system(r'copy includes\\alarmclock.svg dist')
+os.system(r'copy includes\\alarmclock.ttf dist')
+os.system(r'copy includes\\alarmclock.woff dist')
+os.system(r'copy includes\\artisan.tpl dist')
+os.system(r'copy includes\\bigtext.js dist')
+os.system(r'copy includes\\jquery-1.11.1.min.js dist')
 os.system(r'copy ..\\vcredist_x86.exe dist')
