@@ -3,7 +3,7 @@ Current Versions:
 o Python 2.7.8
 o pyserial 2.7
 o QT 4.8.6
-o PyQt 4.11.1
+o PyQt 4.11.2
 o numpy 1.9.1RC1
 o scipy 0.14.0
 o matplotlib 1.4.2

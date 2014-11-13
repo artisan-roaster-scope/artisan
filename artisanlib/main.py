@@ -139,6 +139,8 @@ from pymodbus.factory import ClientDecoder
 import json
 import unicodedata
 
+from artisanlib.weblcds import startWeb, stopWeb
+
 # platform dependent imports:
 if sys.platform.startswith("darwin"):
     # control app napping on OS X >= 10.9
@@ -150,9 +152,6 @@ if sys.platform.startswith("darwin"):
     from artisanlib.list_ports_osx import comports
     serial.tools.list_ports.comports = comports
     from artisanlib.list_ports_vid_pid_osx_posix import *
-    
-    # WebLCDs for now only available on MacOS X and Linux
-    from artisanlib.weblcds import startWeb, stopWeb
 elif os.name == 'posix':
     from artisanlib.list_ports_vid_pid_osx_posix import *
 
@@ -230,6 +229,8 @@ platf = str(platform.system())
 if platf == "Linux":
     # WebLCDs for now only available on MacOS X and Linux
     from artisanlib.weblcds import startWeb, stopWeb
+
+
 
 #######################################################################################
 #################### minimal modbus monkey patch to support little-endian  ############
@@ -1426,11 +1427,11 @@ class tgraphcanvas(FigureCanvas):
             url = "http://127.0.0.1:" + str(aw.WebLCDsPort) + "/send"
             headers = {'content-type': 'application/json'}
             payload = {'data': {}}
-            if bt:
+            if bt != None:
                 payload['data']['bt'] = bt
-            if et:
+            if et != None:
                 payload['data']['et'] = et
-            if time:
+            if time != None:
                 payload['data']['time'] = time
             if alertText != None:
                 payload['alert'] = {}
@@ -4035,7 +4036,12 @@ class tgraphcanvas(FigureCanvas):
             aw.button_8.setDisabled(True)
             aw.button_8.setFlat(True)
             try:
-                message = QApplication.translate("Message","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(str(self.temp2[self.timeindex[0]]) + self.mode)
+                if aw.qmc.LCDdecimalplaces:
+                    fmt = "%.1f"
+                else:
+                    fmt = "%.0f"
+                bt = fmt%self.temp2[self.timeindex[0]] + aw.qmc.mode
+                message = QApplication.translate("Message","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(bt)
                 aw.sendmessage(message) 
             except:
                 pass
@@ -12734,6 +12740,9 @@ class ApplicationWindow(QMainWindow):
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
     def closeEvent(self,_):
+        self.closeApp()
+    
+    def closeEventSettings(self,_):
         #save window geometry and position. See QSettings documentation.
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
@@ -13345,7 +13354,7 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDframe1[i].setVisible(False)
             self.extraLCDframe2[i].setVisible(False)
 
-    def fileQuit(self):
+    def closeApp(self):
         if aw.qmc.checkSaved(): # if not canceled
             if self.full_screen_mode_active:
                 self.showNormal()
@@ -13358,11 +13367,14 @@ class ApplicationWindow(QMainWindow):
                 tmp_LargeLCDs = aw.LargeLCDs # we keep the state to properly store it in the settings
                 aw.largeLCDs_dialog.close()
                 aw.LargeLCDs = tmp_LargeLCDs
+            self.closeEventSettings(self)
             # now wait until the current sampling thread is terminated
             while aw.qmc.flagsamplingthreadrunning:
                 libtime.sleep(.01)
-            self.closeEvent(None)
             QApplication.exit()
+
+    def fileQuit(self):
+        self.closeApp()
 
     def filePrint(self):
         image = QPixmap.grabWidget(aw.qmc).toImage()
@@ -14248,7 +14260,7 @@ $cupping_notes
 
     def retrieveWeightIn(self,tare=0):
         v = aw.scale.readWeight() # read value from scale in 'g'
-        if v and v > -1:
+        if v != None and v > -1:
             v = v - tare
             if aw.qmc.weight[2] != 'g':
                 v = v / 1000.0
@@ -14256,7 +14268,7 @@ $cupping_notes
 
     def retrieveWeightOut(self,tare=0):
         v = aw.scale.readWeight() # read value from scale in 'g'
-        if v and v > -1:
+        if v != None and v > -1:
             v = v - tare
             if aw.qmc.weight[2] != 'g':
                 v = v / 1000.0
@@ -15927,10 +15939,10 @@ class HUDDlg(ArtisanDialog):
         self.WebLCDsPort.setAlignment(Qt.AlignRight)
         self.WebLCDsPort.setValidator(QRegExpValidator(QRegExp(r"^[0-9]{1,4}$"),self))
         self.WebLCDsPort.setMaximumWidth(45)
-        # we disable WebLCDs feature for now on non Mac OS X systems
-        if platf in ['Windows']: # not sys.platform.startswith("darwin"):
-            self.WebLCDsFlag.setDisabled(True)
-            self.WebLCDsPort.setDisabled(True)        
+#        # we disable WebLCDs feature for now on non Mac OS X systems
+#        if platf in ['Windows']: # not sys.platform.startswith("darwin"):
+#            self.WebLCDsFlag.setDisabled(True)
+#            self.WebLCDsPort.setDisabled(True)        
         if aw.WebLCDs:
             self.setWebLCDsURL()
         else:
@@ -24377,9 +24389,9 @@ class serialport(object):
                 ## WINDOWS/Linux DLL HACK BEGIN
                 if platf == 'Windows' and aw.appFrozen():
                     if platform.architecture()[0] == '32bit':
-                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\yapi.dll"
+                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\lib\\yapi.dll"
                     else:
-                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\yapi-amd64.dll"
+                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\lib\\yapi-amd64.dll"
                 elif platf == "Linux" and aw.appFrozen():
                     if platform.architecture()[0] == '32bit':
                         YAPI._yApiCLibFile = u(QApplication.applicationDirPath() + "/libyapi-i386.so")
@@ -28208,12 +28220,12 @@ class graphColorDlg(ArtisanDialog):
         self.connect(self.lcd4spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd4spinbox.value(),lcd=4:self.setLED(val,lcd))
         self.lcd5spinbox = QSpinBox()
         self.lcd5spinbox.setSingleStep(10)
-        self.lcd1sspinbox.setWrapping(True)
+        self.lcd5spinbox.setWrapping(True)
         self.lcd5spinbox.setMaximum(359)
         self.connect(self.lcd5spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd5spinbox.value(),lcd=5:self.setLED(val,lcd))
         self.lcd6spinbox = QSpinBox()
         self.lcd6spinbox.setSingleStep(10)
-        self.lcd1spinbox.setWrapping(True)
+        self.lcd6spinbox.setWrapping(True)
         self.lcd6spinbox.setMaximum(359)
         self.connect(self.lcd6spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd6spinbox.value(),lcd=6:self.setLED(val,lcd))
         LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None, QApplication.UnicodeUTF8))
@@ -34089,6 +34101,7 @@ class DtaPID(object):
 
 ###########################################################################################################################################
 ###########################################################################################################################################
+
 
 def main():
     # suppress all warnings

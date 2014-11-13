@@ -3,11 +3,13 @@
 
 from bottle import default_app, request, abort, route, template, static_file, get, TEMPLATE_PATH
 from gevent import Timeout, signal as gsignal, kill
-from signal import SIGQUIT
 from gevent.pywsgi import WSGIServer
-from geventwebsocket import WebSocketError
+#from geventwebsocket import WebSocketError
 from geventwebsocket.handler import WebSocketHandler
 from platform import system as psystem
+
+if psystem() != 'Windows':
+    from signal import SIGQUIT
 
 from multiprocessing import Process as mProcess
 
@@ -17,7 +19,6 @@ from requests import get as rget
 import time as libtime
 
 wsocks = [] # list of open web sockets
-server = None
 process = None
 port = None
 nonesymbol = "--"
@@ -31,12 +32,29 @@ showet = True
 showbt = True
 static_path = ""
         
+# pickle hack:
+def work(p,rp):
+    global port
+    port = p
+    TEMPLATE_PATH.insert(0,rp)
+    s = WSGIServer(("0.0.0.0", p), default_app(), handler_class=WebSocketHandler)
+    s.serve_forever()
+
+#showbt
+#showet
+#nonesymbol
+#timecolor
+#timebackground
+#btcolor
+#btbackground
+#etcolor
+#etcolorground
+        
 def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
-    global port, server, process, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt
+    global port, process, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt
     try:
         port = p
         static_path = resourcePath
-        TEMPLATE_PATH.insert(0,resourcePath)
         nonesymbol = nonesym
         timecolor = timec
         timebackground = timebg
@@ -46,32 +64,33 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         etbackground = etbg
         showet = showetflag
         showbt = showbtflag
-        server = WSGIServer(("0.0.0.0", port), default_app(), handler_class=WebSocketHandler)
         if psystem() != 'Windows':
             gsignal(SIGQUIT, kill)
         
         # start the server in a separate process
-        process = mProcess(target=server.serve_forever)
+# using multiprocessing
+        process = mProcess(target=work,args=(port,resourcePath,))
         process.start()
-        
-        libtime.sleep(0.2)
+       
+        libtime.sleep(1)
         
         # check successful start
         url = "http://127.0.0.1:" + str(port) + "/artisan/status"
-        r = rget(url,timeout=0.5)
+        r = rget(url,timeout=1)
+        
         if r.status_code == 200:
             return True
         else:
             return False
-            
-    except WebSocketError:
+
+    except Exception:
 #        import traceback
 #        import sys
 #        traceback.print_exc(file=sys.stdout)
         return False
     
 def stopWeb():
-    global wsocks, process, server
+    global wsocks, process
     for ws in wsocks:
         ws.close()
     wsocks = []
@@ -79,7 +98,6 @@ def stopWeb():
         process.terminate()
         process.join()
         process = None
-    server = None
 
 class TooLong(Exception):
     pass
@@ -94,7 +112,7 @@ def send_all(msg):
                     wsocks.remove(ws)
                 else:
                     ws.send(msg)
-        except WebSocketError:
+        except Exception:
             wsocks.remove(ws)
 
 # route to push new data to the client
@@ -119,7 +137,7 @@ def handle_websocket():
                 if message is None:
                     wsocks.remove(wsock)
                     break
-        except WebSocketError:
+        except Exception:
             wsocks.remove(wsock)
             break
             
