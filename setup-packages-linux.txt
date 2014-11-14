@@ -4,7 +4,7 @@ o Python 2.7.8
 o pyserial 2.7
 o QT 4.8.6
 o SIP 4.16.4
-o PyQt 4.11.2
+o PyQt 4.11.3
 o numpy 1.9.1RC1
 o scipy 0.13.1
 o matplotlib 1.4.2
@@ -22,7 +22,10 @@ o gevent-websocket-0.9.3
 
 
 Upgrade History:
-
+- 2014-11-07
+ . PyQt 4.11.2 => 4.11.3
+ . numpy 1.9.1RC1 => 1.9.1
+ . bottle 0.12.7 => 0.13 trunk
 - 2014-10-30
  . Python 2.7.6 => 2.7.8
  . Qt 4.8.5 => 4.8.6

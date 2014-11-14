@@ -3,8 +3,8 @@ Current Versions:
 o Python 2.7.8
 o pyserial 2.7
 o QT 4.8.6
-o PyQt 4.11.2
-o numpy 1.9.1RC1
+o PyQt 4.11.3
+o numpy 1.9.1
 o scipy 0.14.0
 o matplotlib 1.4.2
 o pyparsing 2.0.1
@@ -25,6 +25,11 @@ o geventwebsocket 0.9.3
 
 Upgrade History:
 
+- 2014-11-07
+ . SIP 4.16.3 => 4.16.4
+ . PyQt 4.11.2 => 4.11.3
+ . numpy 1.9.1RC1 => 1.9.1
+ . bottle 0.12.7 => 0.13 trunk
 - 2014-10-29
  . PyQt 4.11.1 => 4.11.2
  . numpy 1.8.2 => 1.9.1RC1
