@@ -5405,7 +5405,7 @@ class tgraphcanvas(FigureCanvas):
                         
             if self.DeltaBTflag:
                 funcDelta = func.derivative()
-                deltabtvals = [x*100 for x in funcDelta(timez).tolist()]
+                deltabtvals = [x*60 for x in funcDelta(timez).tolist()]
                 self.delta_ax.plot(timez,deltabtvals,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],
@@ -5413,7 +5413,7 @@ class tgraphcanvas(FigureCanvas):
                     
             if self.DeltaETflag:
                 funcDelta2 = func2.derivative()
-                deltaetvals = [x*100 for x in funcDelta2(timez).tolist()]
+                deltaetvals = [x*60 for x in funcDelta2(timez).tolist()]
                 self.delta_ax.plot(timez,deltaetvals,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                     linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],
@@ -5433,7 +5433,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.currentx = event.xdata
         if self.delta_ax:
-            self.currenty = self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,event.ydata))[1]))[1]
+#            self.currenty = self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,event.ydata))[1]))[1]
+            self.currenty = event.ydata
         else:
             self.currenty = event.ydata
 
@@ -34114,10 +34115,14 @@ def main():
     try:
         v, _, _ = platform.mac_ver()
         v = float('.'.join(v.split('.')[:2]))
-        if v >= 10.9:
-            # fix Mac OS X 10.9 (mavericks) font issue
+        if v >= 10.10:
+            # fix Mac OS X 10.10 (Yosemite) font issue
+            # https://bugreports.qt-project.org/browse/QTBUG-40833
+            QFont.insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue")  
+        elif v >= 10.9:
+            # fix Mac OS X 10.9 (Mavericks) font issue
             # https://bugreports.qt-project.org/browse/QTBUG-32789
-            QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
+            QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")            
     except:
         pass
 

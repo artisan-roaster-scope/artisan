@@ -29,6 +29,8 @@ o appnope 0.1
 Upgrade History:
 
 - 2014-11-07
+ . SIP 4.16.3 => 4.16.4
+ . PyQt 4.11.2 => 4.11.3
  . numpy 1.9.1RC1 => 1.9.1
  . bottle 0.12.7 => 0.13 trunk
 - 2014-10-29

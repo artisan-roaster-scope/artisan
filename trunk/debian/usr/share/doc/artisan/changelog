@@ -1,3 +1,13 @@
+artisan (0.9.0-1) precise; urgency=low
+  * new upstream release
+  * changes since 0.8.0:
+   - adds Mastech MS6514 support
+   - adds Phidget IO support
+   - adds Phidget remote support
+   - adds Arduino TC4 PID support
+   - bug fixes
+ --  <marko.luther@gmx.net>  Sun, 25 May 2014 19:32:14 +0200
+ 
 artisan (0.8.0-1) precise; urgency=low
   * new upstream release
   * changes since 0.7.5:
