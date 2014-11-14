@@ -1,6 +1,69 @@
 #summary Detailed Release History
 
 
+==v0.9.0 (17.11.2014)==
+
+ * New Features
+  * adds MODBUS ASCII/TCP/UDP support (via pymodbus)
+  * adds Yocto thermocouple and PT100 support
+  * adds Phidget 1045 IR support
+  * adds support for Phidgets 1046 Wheatstone Bridge wiring variant
+  * extended Phidgets configurations (adds async support, data rates and change triggers)
+  * adds program_34 and program_56 device to read extra channels from external program
+  * adds DUMMY device that returns always 0 to allow mapping of extra channels to the main device (ET/BT)
+  * adds "wcoils" to write MODBUS command "Write Multiple Coils" (function 15)
+  * extended Italien translations
+  * adds Polish translations
+  * logs active non-zero slider values at CHARGE
+  * adds coarse quantifiers 0-10 in 10 steps
+  * Phidget 1048 sets ambient temperature (in roast dialog) automatically on DROP
+  * adds quick custom event keybord shortcuts (keys q-w-e-r followed by 3 digits)
+  * file from which alarms were loaded is now displayed in the alarms dialog
+  * extends phases lcds by Rao's style ratios and BT deltas
+  * adds MET calculation (maximum ET between TP and DROP)
+  * adds moisture of roasted beans to roast properties
+  * background title as subtitle
+  * adds flag to align of background profiles also wrt. FCs
+  * adds button action to set digital outputs on Phidgets IO
+  * adds BT/ET rate-of-rise to the designer
+  * adds "Delta Span" setting
+  * adds "Call Program" action to sliders
+  * LargeLCDs and WebLCDs
+  * adds 2nd characteristics line on right click
+  * adds time axis lock mode
+  * adds Volume Calculator
+  * adds moisture loss and organic loss calculation
+  * second set of phases definitions (now one for Espresso and one for Filter roasts)
+  * adds configuration of Arduino/TC4 filter settings
+  * container tare setup
+ * Changes
+  * recent file menu size extended from 10 to 20 entries
+  * missing files are removed from recent file menu
+  * automatic saved files are added to the recent files menu
+  * updated build setup on Windows and Mac OS X
+  * quantifier range extended from [-999,999] to [-99999,99999]
+  * removes leading zeros from time annotations
+  * faster OFF
+  * moved Phidgets configurations to extra tab
+  * precision of times and temperatures in stored profiles extended by another digit
+  * alarm dialogs auto close after 10sec
+ * Bug Fixes
+  * fixes autosafe failure on invalid filenames
+  * allow to hide HUD button and Control button in ArduinoTC4 mode
+  * all serial ports and other connections are closed on OFF
+  * x-Axis min limit can now be set to 00:00
+  * fixed palette switching using keyboard shortcuts
+  * native color dialog on Mac OS X blocked other dialogs and menu actions
+  * call-program action fixed
+  * mouse cross lines in deltaBT/ET mode fixed
+  * fixed designer resize redraw issue
+  * fixed the Fuji PXR SetRS
+  * phases were updated on profile load despite the Auto Adjust phases not being ticked
+  * CSV roundtrip on Windows
+  * missing reset before import added
+  * settings are stored on closing Artisan by closing its main window
+  * fixed quantifier application
+
 ==v0.8.0 (25.05.2014)==
 
  * New Features
