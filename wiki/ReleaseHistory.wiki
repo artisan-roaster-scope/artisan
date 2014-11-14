@@ -31,7 +31,7 @@
   * LargeLCDs and WebLCDs
   * adds 2nd characteristics line on right click
   * adds time axis lock mode
-  * adds Volume Calculator
+  * adds a volume calculator
   * adds moisture loss and organic loss calculation
   * second set of phases definitions (now one for Espresso and one for Filter roasts)
   * adds configuration of Arduino/TC4 filter settings
