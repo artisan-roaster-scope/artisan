@@ -21,7 +21,7 @@ o runs on Windows, Mac OS X 10.6/10.7/10.8 on Intel 64bit processor, and Linux
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
  - Delta DTA PID
- - Modbus RTU
+ - Modbus Serial ASCII/RTU/Binary, TCP and UDP
  - Omega HH309, HH506RA, HH802U, HH806AU, HHM28
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
  - VOLTCRAFT K201, K202, K204, 300K, 302KJ
@@ -33,7 +33,8 @@ o ET/BT logging and PID control supporting the following devices
  - Phidget USB and remote (1010, 1011, 1018, 1019, 1046, 1048, 1073)
  - Mastech MS6514
  - virtual devices (symbolic devices)
- - device None (no device)
+ - device None (no device; manual input)
+ - Yocto Thermocouple and PT100
  - external program 
 o unlimited number of devices/curves running at the same time
 o symbolic manipulation of device outputs
@@ -55,7 +56,6 @@ o profile designer
 o wheel graph editor
 o mathematical plotter
 o localizations (German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norsk, Greek, Turkish..)
-o multi-core CPU performance enhancement support
 o template/background reproduction playback aid
 o cascading alarms with programmable outputs
 o automatic CHARGE/DROP event detection
@@ -64,7 +64,8 @@ o event sliders supporting the Hottop Roaster Interface
 o event quantifiers
 o spike filter and curve smoothing
 o color input from color meters
-
+o LargeLCDs and WebLCDs
+o volume calculator
 
 
 INSTALLATION
@@ -94,7 +95,7 @@ o Mac OS X (>=10.6.x)
    (on Mac OS X 10.8 and higher some reported that the org. Profilic driver failed to 
     work, but the [http://sourceforge.net/projects/osx-pl2303/ NoZAP driver] did work)
 - Download and run the Artisan OS X installer
-(on OS X 10.8 Mountain Lion you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
+(on OS X >=10.8 Mountain Lion you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
 - Double click on the dmg file you just downloaded
 - Double click the disk image which appears on your desktop
 - Drag the artisan application icon to your Applications directory
@@ -116,6 +117,17 @@ Installation on CentOS/Redhat
 
 Uninstall on CentOS/Redhat
 # sudo rpm -e artisan
+
+In case you run into permission problems such that Artisan is not allowed to read or write to the selected /dev/USB device, you might need to add your account (username) to the dialout group via
+
+# sudo adduser <username> dialout
+
+After this command you might need to logout and login again. Try
+
+# id
+
+that your account was successful added to the dialout group.
+
 
 
 LICENCE
@@ -139,27 +151,44 @@ LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
 
-- Python 2.7.x and 3.3.x released under the PSF licence http://www.python.org/psf/
+- Python 2.7.x and 3.4.x released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
 - QT 4.8.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
   http://qt-project.org/products/licensing
-- Numpy 1.8.x and Scipy 0.14.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
+- Numpy 1.9.x and Scipy 0.14.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
-- PyQt 4.10.x and SIP 4.15.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
+- PyQt 4.11.x and SIP 4.16.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
-- matplotlib 1.3.x, Copyright (c) 2002-2013 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
+- matplotlib 1.4.x, Copyright (c) 2002-2013 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
   http://matplotlib.sourceforge.net
-- py2app 0.8.x under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
+- py2app 0.9.x under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
   Copyright (c) 2010-2012 Ronald Oussoren <ronaldoussoren at mac.com>.
   http://packages.python.org/py2app/
 - py2exe, Copyright (c) 2000-2005 Thomas Heller, Mark Hammond, Jimmy Retzlaff
   http://www.py2exe.org/
 - bbfreeze, Copyright (c) 2007-2012 brainbot technologies AG. Distributed under the zlib/libpng license.
-- minimalmodbus 0.5 under the Apache License, Version 2.0 by Jonas Berg
+- minimalmodbus 0.6 under the Apache License, Version 2.0 by Jonas Berg
+- pymodbus 1.3.x under the BSD License by Galen Collins
 - arabic_reshaper.py under GPL by Abd Allah Diab (Mpcabd)
 
 
 VERSION HISTORY
+
+v0.9.0 (17.11.2014)
+- adds MODBUS ASCII/TCP/UDP support
+- adds Yocto TC and PT100 support
+- adds Phidget 1045 IR support
+- adds Phidget 1046 Wheatstone Bridge wiring support
+- adds Phidgets async mode
+- adds Polish translations
+- adds LargeLCDs and WebLCDs
+- adds 2nd set of roast phases
+- adds volume calculator
+- adds moisture loss and organic loss
+- adds container tar
+- adds RoR delta span
+- adds phasesLCDs showing Rao's development ratio
+- bug fixes
 
 v0.8.0 (25.05.2014)
 - adds Mastech MS6514 support
