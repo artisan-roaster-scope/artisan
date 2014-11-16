@@ -1,0 +1,427 @@
+Current Versions:
+
+o XCode 4.5.2 + command line tools
+o Python 2.7.4 or 3.3.1 (change "python3" to "python" in all commands below for python 2.x)
+o pyserial
+o QT 4.8.4
+o SIP 4.14.5
+o PyQt 4.10.0
+o numpy 1.7.1
+o scipy 0.12.0
+o matplotlib 1.2.1
+o pyaudio 0.2.7
+o minimalmodbus 0.4
+
+o modulegraph >0.10.4 trunk (21.4.2013)
+o distribute 0.6.36
+o altgraph 0.10.2
+o macholib 1.5.1
+o py2app >0.7.3 trunk (21.4.2013)
+
+Upgrade History:
+
+- 2013-04-21:
+ . distribute 0.6.29 => 0.6.36
+ . macholib 1.5 => 1.5.1
+ . modulegraph 10.4 => trunk (21.4.2013)
+ . py2app 0.7.3 => trunk ((21.4.2013)
+- 2013-04-12:
+ . Python 3.3.0 => 3.3.1
+ . numpy 1.7.0 => 1.7.1
+ . scipy 0.12.0b1 => 0.12.0
+ . matplotlib 1.2.0 => 1.2.1
+ . SIP 4.14.4 => 4.14.5
+- 2013-03-14:
+ . nupmpy from trunk
+ . scipy 0.12.0b beta from git repository (25.1.2012) => 0.12.0b from trunk
+- 2013-03-10:
+ . altgraph => 0.10.0 => 0.10.2
+ . modulegraph 0.10.0 => 0.10.4
+ . py2app 0.7.1 => 0.7.3
+ . Qt 4.8.4 (=> Qt 5.0.1 failed: Qt 5.0.1 crashs on builds)
+ . PyQt 4.9.6 => 4.10.0
+ . sip 4.14.2 => 4.14.4
+ . numpy 1.7rc1 => 1.7.0
+- 2012-01-05:
+ . scipy 0.11.0 => scipy-0.12.0 beta from git repository
+ . numpy 1.7.0b2 => 1.7.0rc1 ++ from repository
+- 2012-12-13:
+ . SIP 4.14.1 => 4.14.2
+ . PyQt 4.9.5 => 4.9.6
+- 2012-07-12:
+ . QT 4.8.3 => 4.8.4
+- 2012-11-30:
+ . py2app 0.7 => 0.7.1
+ . numpy >1.7.0b2 (27.10.2012) => 1.7.0b2 (30.11.2012)
+- 2012-11-10:
+ . XCode => 4.5.1
+ . Python 3.3.0a3 => 3.3.0
+ . QT 4.8.1 => 4.8.3
+ . numpy 1.6.1 => 1.7.0b2
+ . SIP 4.13.3-snapshot => 4.14.1
+ . PyQt snapshot-4.9.2 => 4.9.5
+ . scipy 0.10.1 => 0.11.0
+ . modulegraph 0.8.2 => 0.10
+ . altgraph 0.10
+ . distribute 0.6.28 => 0.6.29
+ . macholib 1.5
+ . py2app 0.6.5 => 0.7
+ . minimalmodbus 0.3.2 => 0.4
+ . matplotlib 1.1.0 => 1.2.0
+- 2012-05-17: Upgrade Python/QT/PyQt/SIP
+ . Python 3.3.0a1 => 3.3.0a3
+ . QT 4.8.0 => 4.8.1
+ . SIP 4.13.2 => 4.13.3-snapshot
+- 2012-01-09: Upgrade Qt/PyQt/SIP
+ . QT 4.7.4 => 4.8.0
+ . SIP 4.13 => 4.13.2
+ . PyQt 4.8.6 => 4.9.1
+ . scipy 0.9.0 => 0.10.1
+ . py2app 0.6.3 => 0.6.5
+ . modbus_tk 0.4.2 => minimalmodbus 0.3.2
+- 2011-11-26: Upgraded PyQt
+ . PyQt 4.8.5 => 4.8.6
+ . SIP 4.12.4 => 4.13
+- 2011-10-09: Upgraded to QT 4.7.4 Cocoa (OS X 10.5. only)
+ . QT 4.7.3 => 4.7.4
+ . matplotlib 1.0.1 => 1.1.0
+- 2011-08-07: Moved to OS X 10.7 and Upgraded
+ . PyQt 4.8.4 => 4.8.5
+ . SIP 4.12.3 => 4.12.4
+ . Mercurial 1.7.3 => 1.9.1
+ . modulegraph 0.8.2 => 0.9.2
+- 2011-07-22: Upgraded
+ . Numpy 1.6.0 => 1.6.1 
+- 2011-06-30: Upgraded
+ . py2app 0.5.2 => 0.6.3
+- 2011-06-28: Upgraded
+ . Python 2.7.1 => 2.7.2
+- 2011-05-12: Upgraded 
+ . Qt 4.7.2 => Qt 4.7.3
+ . Numpy 1.5.1 => 1.6.0
+ . SIP 4.12.1 => 4.12.3
+ . PyQt 4.8.3 => 4.8.4
+
+
+Installation Instructions:
+
+
+*) ensure to switch back to gcc-4.2 if you have a XCode 3/4 setup
+
+sudo rm /usr/bin/cc
+sudo rm /usr/bin/gcc
+sudo rm /usr/bin/c++
+sudo rm /usr/bin/g++
+sudo ln -s /usr/bin/gcc-4.2 /usr/bin/cc
+sudo ln -s /usr/bin/gcc-4.2 /usr/bin/gcc
+sudo ln -s /usr/bin/c++-4.2 /usr/bin/c++
+sudo ln -s /usr/bin/g++-4.2 /usr/bin/g++
+
+
+NOTE: if XCode is updated after a complete setup for Artisan, the SVG icons might disappear in that case, reinstalling QT helps
+
+
+
+1) Install XCode 4.5.2
+
+not needed anymore:
+# sudo ln -s /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer /Developer 
+
+install command line tools via Preferences/Downloads/Components
+
+
+2) Install Python 3.3.1
+
+download and install:
+
+http://www.python.org/ftp/python/3.3.1/python-3.3.1-macosx10.6.dmg
+
+set default to 64bit:
+# defaults write com.apple.versioner.python Prefer-32-Bit -bool no
+
+
+3) Install pyserial 
+
+download latest source (pyserial-2.6.tar.gz) from http://pypi.python.org/pypi/pyserial
+
+# tar xzf pyserial-2.6.tar.gz
+# cd pyserial-2.6
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+new to v2.6:
+
+# import serial.tools.list_ports.
+# serial.tools.list_ports.comports()
+
+4) Install QT ("Framework Only" without the debug libs and not the "SDK/Complete Component Environment")
+
+download and install (only Mac OS X 10.5 - 10.6, 32-bit and 64-bit Intel!!):
+
+qt-mac-opensource-4.8.4.dmg (OS X 10.6+, Cocoa, 64bit only)
+or
+qt-mac-opensource-5.0.1-clang-offline.dmg (OS X 10.6+, Cocoa, 64bit only)
+
+
+5) Install SIP
+
+# tar xzf sip-4.14.4.tar.gz
+# cd sip-4.14.4
+# python3 configure.py
+# make
+# sudo make install
+
+
+6) Install PyQt
+
+# tar xzf PyQt-mac-gpl-4.9.6.tar.gz 
+# cd PyQt-mac-gpl-4.9.6
+# python3 configure.py
+use: "python3 configure.py -q /Users/<username>/Qt5.0.1/5.0.1/clang_64/bin/qmake"
+# make
+# sudo make install
+
+
+7) Install Numpy
+
+download source
+
+# git clone https://github.com/numpy/numpy.git
+# cd numpy
+# python3 setup.py build
+# sudo python3 setup.py install
+
+NOTE: always remove the build directory completely before recompiling
+
+8) scipy from git repository
+
+# git clone git://github.com/scipy/scipy.git scipy
+# cd scipy
+# python3 setup.py build
+# sudo python3 setup.py install
+
+NOTE: always remove the build directory completely before recompiling
+
+
+check installation:
+
+# python3
+>> import scipy
+>> scipy.__version__
+>> scipy.__file__
+
+
+
+  File "/Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/scipy/weave/catalog.py", line 107
+    fname = base + `i`
+                   ^
+SyntaxError: invalid syntax
+
+fix:
+        fname = base + repr(i)
+=>
+        fname = base + str(repr(i))
+
+
+
+9) Install matplotlib
+
+
+9.1) install freetype and libpng dependencies
+
+installed homebrew via
+
+# ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"
+# brew doctor
+
+installed matplotlib dependencies before its compilation via
+# brew install libpng freetype
+
+# sudo mv /usr/local/include/freetype2 freetype2.off
+# sudo mv /usr/local/bin/freetype-config /usr/local/bin/freetype-config.org
+
+# sudo mv /usr/local/share/aclocal/freetype2.m4 /usr/local/share/aclocal/freetype2.m4.org
+# sudo mv /usr/local/lib/pkgconfig/freetype2.pc /usr/local/lib/pkgconfig/freetype2.pc.org
+# sudo mv /usr/local/lib/libfreetype.dylib /usr/local/lib/libfreetype.dylib.org
+# sudo mv /usr/local/lib/libfreetype.a /usr/local/lib/libfreetype.a.org
+# sudo mv /usr/local/lib/libfreetype.6.dylib /usr/local/lib/libfreetype.6.dylib.org
+# brew link freetype
+
+# brew install pkg-config
+
+9.2) Install matplotlib library
+
+download matplotlib-1.2.1.tar.gz
+
+# tar -xzf matplotlib-1.2.1.tar.gz
+# cd matplotlib-1.2.1
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+to make builds smaller:
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/matplotlib/mpl-data/sample_data
+to avoid conflicts with py2app
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/matplotlib/tests
+
+---
+Using matplotlib 1.2 within pyqt on Python 3.3 I receive (on click on the greenflag button and leaving the dialog with OK)
+NOTE: not fix in Python 3.3.1 either (despite my report)
+
+
+formlayout.py", line 343, in get
+value = float(field.text())
+TypeError: float() argument must be a string or a number
+
+That does not happen under Python 2.7.
+Modifying that line in lib/matplotlib/backends/qt4_editor/formlayout.py by wrapping the field.text() into a str() like
+
+value = float(str(field.text()))
+
+solves this (change 2x in src folder).
+
+NOTE: to clean build dir use "python3 setup.py clean --all"
+
+
+---
+
+
+check installation:
+	
+# python3
+>> import matplotlib
+>> matplotlib.__version__
+'1.2.0rc2
+
+
+
+10) PortAudio
+
+# mkdir PortAudio-19
+# cd PortAudio-19
+# curl -O http://www.portaudio.com/archives/pa_stable_v19_20111121.tgz
+# tar -xzf pa_stable_v19_20111121.tgz
+# cd portaudio
+# ./configure 
+
+# vi Makefile
+all: lib/$(PALIB) all-recursive test examples selftests
+=>
+all: lib/$(PALIB) all-recursive examples selftests
+
+# make 
+# sudo make install
+
+
+11) pyaudio
+
+# mkdir pyaudio-0.2.7
+# cd pyaudio-0.2.7
+# git clone https://github.com/bastibe/PyAudio.git
+# cd PyAudio
+
+# cp ../../portaudio/include/pa_mac_core.h src/
+# cp ../../portaudio/include/portaudio.h src/ 
+
+# vi src/pa_mac_core.h
+-#include <AudioUnit/AudioUnit.h>
+-//#include <AudioToolbox/AudioToolbox.h>
++#include <CoreAudio/CoreAudio.h>
+
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+12) minimalmodbus (v0.4)
+
+download from http://pypi.python.org/pypi/MinimalModbus/
+
+# tar -xzf MinimalModbus-0.4.tar.gz
+# cd MinimalModbus-0.4
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+
+13) Install modulegraph
+
+
+fetch modulegraph 0.10.2 from
+http://pypi.python.org/pypi/modulegraph/#downloads
+# cd modulegraph-0.10.2
+# python3 setup.py build
+# sudo python3 setup.py install
+
+from source (not needed):
+
+# mkdir modulegraph-0.10
+# cd modulegraph-0.10
+# hg clone https://bitbucket.org/ronaldoussoren/modulegraph
+# cd modulegraph
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+14) Install distribute 0.6.36
+
+http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
+
+# curl -O http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
+# tar -xzvf distribute-0.6.36.tar.gz
+# cd distribute-0.6.36
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+15) Install altgraph
+
+# mkdir altgraph-0.10
+# cd altgraph-0.10
+# hg clone https://bitbucket.org/ronaldoussoren/altgraph
+# cd altgraph
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+16) Install macholib
+
+# mkdir macholib-1.5
+# cd macholib-1.5
+# hg clone https://bitbucket.org/ronaldoussoren/macholib
+# cd macholib
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+17) py2app (0.7.1 from source)
+
+from repository
+# hg clone https://bitbucket.org/ronaldoussoren/py2app
+# cd py2app
+# python3 setup.py build
+# sudo python3 setup.py install
+
+from release downloaded from http://pypi.python.org/pypi/py2app/
+# tar -xzf py2app-0.7.3.tar.gz
+# cd py2app-0.7.3
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+18) Install pyemf-2.0.0.tar.gz (only Python 2; fails on Python 3)
+
+# python setup.py build
+# sudo python setup.py install
+
+XX) cx_freeze
+
+export CC=clang
+export CXX=clang
+export FFLAGS=-ff2c
+export LDSHARED='clang -bundle -undefined dynamic_lookup -arch i386 -arch 
+x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g' 
+
+# python3 setup.py build
+# python3 setup.py install
+

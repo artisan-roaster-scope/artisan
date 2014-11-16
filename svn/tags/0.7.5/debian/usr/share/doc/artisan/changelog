@@ -1,0 +1,226 @@
+artisan (0.7.5-1) precise; urgency=low
+  * new upstream release
+  * changes since 0.7.4:
+   - improved serial communication
+   - fixed extra event manual entry to allow digits
+   - adds Phidgets 1048 probe type configuration
+   - adds security patch
+   - fixed background profile color selection
+   - increased resolution of temperatures in profiles to two digits
+   - adds event quantifiers
+   - adds CM correlation measure between fore- and background profile to statistics bar
+   - font fix for OS X 10.9
+   - adds symbolic variables for background temperatures for symbolic assignments
+   - adds xy scale toggle via key d
+   - adds modbus temperature mode per channel
+   - updated Modbus lib
+   - adds Modbus/Fuji merger
+ --  <marko.luther@gmx.net>  Sun, 6 Apr 2014 19:32:14 +0200
+
+artisan (0.7.4-1) precise; urgency=low
+  * new upstream release
+  * fixes since 0.7.3:
+   - fixes ETBT swap functionality
+ --  <marko.luther@gmx.net>  Mon, 13 Jan 2014 19:32:14 +0200
+
+artisan (0.7.3-1) precise; urgency=low
+  * new upstream release
+  * fixes since 0.7.2:
+   - improved curve and RoR smoothing
+   - adds oversampling
+   - adds support for floats to the Modbus write command
+   - improved autoCharge/autoDrop recognizer
+   - updated Phidget library
+ --  <marko.luther@gmx.net>  Sun, 12 Jan 2014 19:32:14 +0200
+
+artisan (0.7.2-1) precise; urgency=low
+  * new upstream release
+  * fixes since 0.7.1:
+   - fixed always active min/max filter
+   - spike filter improvements
+   - beep after an alarm trigger if sound is on and beep flag is set
+   - fixes time axis labels on CHARGE
+   - fixed alarm trigger for button 1
+   - autosave with empty prefix takes roast name as prefix if available
+   - external program path added to program settings
+   - improved autoCHARGE and autoDROP recognizers
+   - fixes minieditor event type handling
+   - fixes and improvements to RoastLogger import
+   - makes the extra serial ports widget editable
+ --  <marko.luther@gmx.net>  Thu, 19 Dec 2013 19:32:14 +0200
+
+artisan (0.7.1-1) precise; urgency=low
+  * new upstream release
+  * fixes since 0.7.0:
+   - redraw issue on axis changes
+   - lock up due to extra devices
+   - serial default configurations for extra devices
+   - fixes minieditor navigation
+   - fixes early autoDRY and autoFCs
+ --  <marko.luther@gmx.net>  Mo, 1 Dec 2013 19:32:14 +0200
+
+artisan (0.7.0-1) precise; urgency=low
+
+  * new upstream release
+  * changes since 0.6.0:
+   - support for the Phidget 1046/1048 devices
+   - TP event marks (show on graph and in the message log)
+   - phase LCDs (TP, DRY, FCs) estimating time to the event and counting time after the event (aka a roast development counter)
+   - adds autoDRY and autoFCs
+   - links profiles to background profiles
+   - new graph style using xkcd, path effects and the Humor or Comic font
+   - allows ETBTa and RoR statistics to be displayed together
+   - various extensions to the alarms system
+   - keyboard control for sliders
+   - adds support for the (to be released) Tonino roast color meter
+   - some Fuji PID control enhancements
+   - improved manual mode
+   - bug fixes
+
+ --  <marko.luther@gmx.net>  Sat, 30 Nov 2013 19:32:14 +0200
+
+artisan (0.6.0-1) precise; urgency=low
+
+  * new upstream release
+  * changes since 0.5.6:
+   - adds monitoring-only mode
+   - adds Modbus RTU support
+   - adds event sliders
+   - adds extended alarms
+   - adds spike filter
+   - adds additional localizations
+   - bug fixes
+
+ --  <marko.luther@gmx.net>  Fri, 31 May 2013 19:32:14 +0200
+
+artisan (0.5.2-0) maverick; urgency=low
+
+  * new upstream release
+  * changes since 0.5.0:
+   - added Delta DTA PID support
+   - added automatic CHARGE/DROP event detection
+   - added separate RoR axis
+   - added cross lines locator
+   - smaller Mac OS builds with faster startup
+   - optimized legend and statistics layout
+   - improved Wheel Graph editor
+   - performance improvements
+   - bug fixes
+
+ --  <lukas@einfachkaffee.de>  Sun, 24 Jul 2011 19:32:14 +0200
+
+artisan (0.5.0-0) maverick; urgency=low
+
+  * new upstream release
+  * changes since beta1:
+    - improved cupping graphs
+    - improved performance/responsiveness in multi-core CPUs
+    - bug fixes
+
+ -- lukas <lukas@einfachkaffee.de>  Sat, 18 Jun 2011 16:33:39 +0200
+
+artisan (0.5.0-0.b1) maverick; urgency=low
+
+  * new upstream beta release
+  * changes: 
+    - support for Mac OS X 10.4 and PPC added
+    - added more translations
+    - added wheel graph editor
+    - added custom event-control buttons
+    - added Omega HHM28 multimeter device support
+    - added support for devices with 4 thermocouples
+    - added PID duty cycle
+    - added math plotter in Extras
+    - added run-time multiple device compatibility and symbolic expressions support
+    - improved configuration of Axes
+    - improved configuration of PID
+    - improved Arduino code
+    - bug fixes
+
+ -- lukas <lukas@einfachkaffee.de>  Sat, 28 May 2011 21:20:16 +0200
+
+artisan (0.4.1-1) maverick; urgency=low
+
+  * add .desktop file for menu entry
+  * add icon to desktop menu entry
+
+ -- lukas <lukas@einfachkaffee.de>  Thu, 21 Apr 2011 17:28:59 +0200
+
+artisan (0.4.1-0) maverick; urgency=low
+
+  * new upstream release 0.4.1:
+    - import of CSV is not limited anymore to filenames with "csv" extension
+    - improved VA18B support
+    - Windows binary includes the language translations that were missing in v0.4.0
+  * new upstream release 0.4.0:
+    - improved CSV import/export
+    - K202 CSV support added
+    - adds localization support
+    - adds german, french, spanish, swedish, italian menu translations
+    - fixed cut-copy-paste on Mac and added cut-copy-paste menu
+    - LCD color configuration
+    - replay of events via background dialog
+    - relative times are used everywhere
+    - adds profile designer
+    - adds alarms
+    - more robust Arduino/TC4 communication
+    - bug fixes
+
+ -- lukas <lukas@einfachkaffee.de>  Thu, 21 Apr 2011 16:37:58 +0200
+
+artisan (0.3.3-2) maverick; urgency=low
+
+  * Rebuild with some last-minute fixes:
+   - comments out a line in qmc.reset() that affects device NONE
+   - revised
+   - moves filterdropouts() from ser to qmc.
+
+ -- lukas <lukas@einfachkaffee.de>  Mon, 14 Feb 2011 00:47:11 +0100
+
+artisan (0.3.3-1) maverick; urgency=low
+
+  * New Upstream release (0.3.3). Upstream changes:
+    - updates findDryEnd() line 4499
+    - restores previous revision
+    - adds a flag to Conf Axis Dlg to keep max profile time if wanted (also saved in settings)
+    - added roastertype and operator to the application preferences
+    - fixed HH506RAGetID
+    - upper limit in outOfRange reduced to 500
+    - fixes typo in line 8432: change delay from 1 miliseconds to 1 second.
+    - fixes serial NONE. updates serialscan() to set last com port found on editbox.
+    - fixed nonedevDlg layout
+    - added x-axis limits to application preferences and fixed Axis dialog
+    - fixes typo in WindowsDlg-def updatewindow()
+    - added tooltips to conf/Autosave
+    - updated version to 0.3.3
+    - fixed button layout in new autosave dialog; improved lcd label positions on main window; remove min-y window restriction to allow to run it also on smaller displays (requested by user)
+    - add 35 milliseconds delay in serial sendFUJIcommand()
+    - erase a print statement
+    - updates resetlines() in qmc (it was slowing down the app)
+    - updated serial comms
+    - Do later import of pyaudio, wrap in try..except
+    - revised autosave() for keyboard shortcut
+    - fixes issue 17,18,15
+    - add function createFromManual() to interpolate data when pressing [OFF] (end of roast) and using device 18 (manual mode)
+    - small changes to events annotations
+    - updated serial exceptions
+    - improved a little device NONE
+    - fix small typo line 7512
+    - added device NONE
+    - enhance keyboard functions
+    - fix some small details (HUD, markers)
+    - moved sound menu to and additional extra flag and fixed extras tab layout
+    - adds optional sound as feedback for buttons
+    - added keyPressEvent() and help/keyboard shortcuts
+    - First steps towards a debian (ubuntu, ...) package
+    - add automatic annotation height to prevent text over text
+    - fixed an issue with the "phases adjusted by events" feature that lead wrong DryEnd temperature values if DryEnd was not set
+    - fixed typo in htmlReport causing CHARGE to be rendered wrongly
+
+ -- lukas <lukas@einfachkaffee.de>  Sun, 13 Feb 2011 21:37:09 +0100
+
+artisan (0.3.2-1) unstable; urgency=low
+
+  * Initial release 
+
+ -- Lukas Kolbe <lukas@einfachkaffee.de>  Mon, 31 Jan 2011 09:52:51 +0100
