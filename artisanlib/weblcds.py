@@ -44,8 +44,8 @@ def work(p,rp,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
     btbackground = btbg
     etcolor = etc
     etbackground = etbg
-    showbt = showetflag
-    showet = showbtflag
+    showet = showetflag
+    showbt = showbtflag
     TEMPLATE_PATH.insert(0,rp)
     s = WSGIServer(("0.0.0.0", p), default_app(), handler_class=WebSocketHandler)
     s.serve_forever()
