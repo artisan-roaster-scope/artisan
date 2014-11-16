@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Artisan Visual Scope for Coffee Roasters
+GenericName=Visual Scope for Coffee Roasters
+Comment=Visualizes the coffee roasting process
+Exec=artisan.sh %U
+TryExec=artisan.sh
+Icon=/usr/share/artisan/artisan.png
+Terminal=false
+Categories=Utility;Chart;
+StartupNotify=false

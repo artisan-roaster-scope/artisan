@@ -1,0 +1,9 @@
+#summary Artisan Downloads
+
+= Downloads =
+
+As Google decided to disable the upload of new downloads on [http://code.google.com GoogleCode], Artisan releases are now hosted on the following [https://drive.google.com/ GoogleDrive].
+
+*[https://drive.google.com/folderview?id=0B4HTX5wS3NB2ZFdWd0NFdG1qUFk&usp=sharing Artisan GoogleDrive]*
+
+Older versions can still be downloaded from the [http://code.google.com GoogleCode] [http://code.google.com/p/artisan/downloads/list?can=1&q=&colspec=Filename+Summary+Uploaded+ReleaseDate+Size+DownloadCount Download area]
