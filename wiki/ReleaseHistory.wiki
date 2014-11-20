@@ -15,7 +15,7 @@
   * extended Italien translations
   * adds Polish translations
   * logs active non-zero slider values at CHARGE
-  * adds coarse quantifiers 0-10 in 10 steps
+  * adds coarse quantifiers 0-10, 10 steps instead of 100 as for standard quantifiers
   * Phidget 1048 sets ambient temperature (in roast dialog) automatically on DROP
   * adds quick custom event keybord shortcuts (keys q-w-e-r followed by 3 digits)
   * file from which alarms were loaded is now displayed in the alarms dialog
