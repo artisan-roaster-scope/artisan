@@ -2081,10 +2081,14 @@ class tgraphcanvas(FigureCanvas):
         mfactor2 =  round(float(2. + int(self.endofx)/int(self.xgrid)))
 
         majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
-        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid/6.)
-
-        list(map(round,majorloc))
-        list(map(round,minorloc))
+#        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid/5.)
+        if self.xgrid == 60:
+            minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 30)
+        else:
+            minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 60)
+        
+#        list(map(round,majorloc))
+#        list(map(round,minorloc))
 
         #majorlocator = ticker.IndexLocator(self.xgrid, starttime)  #IndexLocator does not work right when updating (new value)self.endofx
         #majorlocator = ticker.MultipleLocator(self.xgrid)          #MultipleLocator does not provide an offset for starttime
@@ -6753,7 +6757,7 @@ class SampleThread(QThread):
                             timed = aw.qmc.timex[-1] - aw.qmc.timex[-left_index]   #time difference between last aw.qmc.deltasamples readings
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-left_index])/timed)*60.  #delta ET (degress/minute)
-                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-left_index])/timed)*60.  #delta  BT (degress/minute)
+                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-left_index])/timed)*60.  #delta BT (degress/minute)
 
 
 
@@ -8323,20 +8327,20 @@ class ApplicationWindow(QMainWindow):
 
         extrabuttonsLayout = QVBoxLayout()
         extrabuttonsLayout.setMargin(0)
-        extrabuttonsLayout.setSpacing(0)
+#        extrabuttonsLayout.setSpacing(0)
         extrabuttonsLayout.setContentsMargins(0,0,0,0)
         extrabuttonsLayout.addWidget(self.e1buttondialog)
-        self.e1buttondialog.setContentsMargins(0,0,0,0)
+#        self.e1buttondialog.setContentsMargins(0,0,0,0)
         extrabuttonsLayout.addWidget(self.e2buttondialog)
-        self.e2buttondialog.setContentsMargins(0,0,0,0)
+#        self.e2buttondialog.setContentsMargins(0,0,0,0)
         extrabuttonsLayout.addWidget(self.e3buttondialog)
-        self.e3buttondialog.setContentsMargins(0,0,0,0)
+#        self.e3buttondialog.setContentsMargins(0,0,0,0)
         extrabuttonsLayout.addWidget(self.e4buttondialog)
-        self.e4buttondialog.setContentsMargins(0,0,0,0)
+#        self.e4buttondialog.setContentsMargins(0,0,0,0)
         self.extrabuttondialogs = QFrame()
         self.extrabuttondialogs.setLayout(extrabuttonsLayout)
         self.extrabuttondialogs.setVisible(False)
-        self.extrabuttondialogs.setContentsMargins(0,0,0,0)
+#        self.extrabuttondialogs.setContentsMargins(0,0,0,0)
 
         midleftlayout = QVBoxLayout()
         midleftlayout.setSpacing(0)
@@ -17980,10 +17984,12 @@ class editGraphDlg(ArtisanDialog):
         self.percent()
         
     def percent(self):
-        if self.weightoutedit.text() != "" and float(str(self.weightoutedit.text())) != 0.0:
-            percent = aw.weight_loss(float(str(self.weightinedit.text())),float(str(self.weightoutedit.text())))
-        else:
-            percent = 0.
+        percent = 0.
+        try:
+            if self.weightoutedit.text() != "" and float(str(self.weightoutedit.text())) != 0.0:
+                percent = aw.weight_loss(float(str(self.weightinedit.text())),float(str(self.weightoutedit.text())))
+        except:
+            pass
         percentstring =  "%.1f" %(percent) + "%"
         self.weightpercentlabel.setText(QString(percentstring))    #weight percent loss
 # do not disclose this roast degree resulting from an oversimplified calculation
@@ -17993,10 +17999,12 @@ class editGraphDlg(ArtisanDialog):
 #        self.roastdegreelabel.setText(QString(roastdegreestring))
 
     def volume_percent(self):
-        if self.volumeoutedit.text() != "" and float(str(self.volumeoutedit.text())) != 0.0:
-            percent = aw.weight_loss(float(str(self.volumeoutedit.text())),float(str(self.volumeinedit.text())))
-        else:
-            percent = 0.
+        percent = 0.
+        try:
+            if self.volumeoutedit.text() != "" and float(str(self.volumeoutedit.text())) != 0.0:
+                percent = aw.weight_loss(float(str(self.volumeoutedit.text())),float(str(self.volumeinedit.text())))
+        except:
+            pass
         percentstring =  "%.1f" %(percent) + "%"
         self.volumepercentlabel.setText(QString(percentstring))    #volume percent gain
         
@@ -18731,14 +18739,16 @@ class WindowsDlg(ArtisanDialog):
         # time axis steps
         timegridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
         self.xaxislencombobox = QComboBox()
-        timelocs =   [QApplication.translate("ComboBox", "30 seconds",None, QApplication.UnicodeUTF8),
+        timelocs =   [
+                    #QApplication.translate("ComboBox", "30 seconds",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "1 minute",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "2 minute",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "3 minute",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "4 minute",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "5 minute",None, QApplication.UnicodeUTF8)]
         self.xaxislencombobox.addItems(timelocs)
-        self.timeconversion = [30,60,120,180,240,300]
+#        self.timeconversion = [30,60,120,180,240,300]
+        self.timeconversion = [60,120,180,240,300]
         self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(aw.qmc.xgrid))
         self.connect(self.xaxislencombobox,SIGNAL("currentIndexChanged(int)"),self.xaxislenloc)
         ygridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
@@ -20728,7 +20738,7 @@ class EventsDlg(ArtisanDialog):
         string = u(QApplication.translate("Message", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None, QApplication.UnicodeUTF8)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Event Description</b> Description of the Event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br>"  
         string += u(QApplication.translate("Message", "<b>Event type</b> Type of event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>Event value</b> Value of event (1-10) to be recorded",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Event value</b> Value of event (1-100) to be recorded",None, QApplication.UnicodeUTF8)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Action</b> Perform an action at the time of the event",None, QApplication.UnicodeUTF8)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Documentation</b> depends on the action type ('{}' is replaced by the event value):",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
         string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
@@ -24052,7 +24062,7 @@ class serialport(object):
     def R_RTD_WS(self,bv):
         return (1000 * (1000 - 2 * bv))/(1000 + 2 * bv)
     
-    # takes a bridge value in mV/V and returns the resistance of the corresponding RTD, assuming the RTD is connnected
+    # takes a bridge value in mV/V and returns the resistance of the corresponding RTD, assuming the RTD is connected
     # via a Voltage Divider build from 1K ohm resistors
     # http://en.wikipedia.org/wiki/Voltage_divider
     # Note: the 1046 returns the bridge value in mV/V
@@ -24494,7 +24504,7 @@ class serialport(object):
                         #OK. NOW SET UNITS
                         self.SP.flushInput()
                         self.SP.flushOutput()
-                        command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
+                        command = "UNITS;" + aw.qmc.mode + "\n"   #Set units
                         self.SP.write(str2cmd(command))
                         #self.SP.flush()
                         libtime.sleep(.1)

@@ -5,8 +5,8 @@ o pyserial 2.7
 o QT 4.8.6
 o SIP 4.16.4
 o PyQt 4.11.3
-o numpy 1.9.1RC1
-o scipy 0.13.1
+o numpy 1.9.1
+o scipy 0.14.1
 o matplotlib 1.4.2
 o MinimalModbus 0.5
 o pyemf 2.0.0
@@ -25,7 +25,6 @@ Upgrade History:
 - 2014-11-07
  . PyQt 4.11.2 => 4.11.3
  . numpy 1.9.1RC1 => 1.9.1
- . bottle 0.12.7 => 0.13 trunk
 - 2014-10-30
  . Python 2.7.6 => 2.7.8
  . Qt 4.8.5 => 4.8.6
@@ -181,12 +180,16 @@ test correct path
 
 4) SIP
 
+ENSURE THAT THE QT PATH IS SET CORRECTLY (see under 3)
+
 # python2.7 configure.py
 # make
 # sudo make install
 
 
 5) PyQT
+
+ENSURE THAT THE QT PATH IS SET CORRECTLY (see under 3)
 
 # python2.7 configure.py
 # make
