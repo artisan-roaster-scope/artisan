@@ -117,10 +117,10 @@ from yoctopuce.yocto_temperature import YTemperature
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
-    if sys.platform.startswith("Windows"):
-        import win_inet_pton
+  if str(platform.system()).startswith("Windows"):
+      import win_inet_pton
 except:
-    pass
+  pass
 
 #import minimalmodbus
 from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient, BaseModbusClient
