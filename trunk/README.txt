@@ -59,7 +59,7 @@ o localizations (German, French, Spanish, Portuguese, Swedish, Italian, Arabic, 
 o template/background reproduction playback aid
 o cascading alarms with programmable outputs
 o automatic CHARGE/DROP event detection
-o support for digital scales (only KERN with serial support for now)
+o support for digital scales (only Kern and acaia for now)
 o event sliders supporting the Hottop Roaster Interface
 o event quantifiers
 o spike filter and curve smoothing
@@ -173,6 +173,11 @@ Artisan uses the following libraries in unmodified forms:
 
 
 VERSION HISTORY
+
+v0.9.1 (3.1.2015)
+- adds QR code for WebLCD URL
+- adds support for the acaia BT coffee scale
+- bug fixes
 
 v0.9.0 (17.11.2014)
 - adds MODBUS ASCII/TCP/UDP support
