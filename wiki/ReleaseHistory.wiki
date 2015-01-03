@@ -8,7 +8,7 @@
   * adds keyboard short cut to retrieve readings from a serial scale (press ENTER in roast properties weight-in/out fields or volume calculator field)
   * adds support for the acaia BT coffee scale
   * adds serial scale support to Volume Calculator
-- adds tare support to Volume Calculator
+  * adds tare support to Volume Calculator
  * Changes
   * changes x-axis minor ticks to one minute distance
   * Python updated to v2.7.9
