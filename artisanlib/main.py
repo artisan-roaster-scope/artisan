@@ -96,6 +96,7 @@ import matplotlib.ticker as ticker
 import matplotlib.patheffects as PathEffects
 #import matplotlib.dates as md
 
+import qrcode
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
@@ -113,6 +114,13 @@ from Phidgets.Manager import Manager as PhidgetManager
 # import Yoctopuce Pyhton library (installed form PyPI)
 from yoctopuce.yocto_api import YAPI, YRefParam
 from yoctopuce.yocto_temperature import YTemperature
+
+# fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
+try:
+    if sys.platform.startswith("Windows"):
+        import win_inet_pton
+except:
+    pass
 
 #import minimalmodbus
 from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient, BaseModbusClient
@@ -225,10 +233,6 @@ else:
         return str(c,"latin1")
 
 platf = str(platform.system())
-
-if platf == "Linux":
-    # WebLCDs for now only available on MacOS X and Linux
-    from artisanlib.weblcds import startWeb, stopWeb
 
 
 
@@ -851,13 +855,15 @@ class tgraphcanvas(FigureCanvas):
         #[0]volume in, [1]volume out, [2]units (string)
         self.volume = [0,0,"l"]
         #[0]probe weight, [1]weight unit, [2]probe volume, [3]volume unit
-        self.density = [0,"g",0,"l"]
+        self.density = [0.,"g",1.,"l"]
         
         self.volumeCalcUnit = 0
+        self.volumeCalcWeightInStr = ""
+        self.volumeCalcWeightOutStr = ""
         
         # container scale tare
         self.container_names = []
-        self.container_weights = [] # all weights in g
+        self.container_weights = [] # all weights in g and as int
         self.container_idx = -1 # the empty field (as -1 + 2 = 1)
 
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
@@ -981,7 +987,7 @@ class tgraphcanvas(FigureCanvas):
         self.temporaryalarmflag = -3 #holds temporary index value of triggered alarm in updategraphics()
         self.TPalarmtimeindex = None # is set to the current  aw.qmc.timeindex by sample(), if alarms are defined and once the TP is detected
         
-        self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>]
+        self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>]q
 
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 600
@@ -2305,6 +2311,14 @@ class tgraphcanvas(FigureCanvas):
                     self.beansize = 0.
                     self.whole_color = 0
                     self.ground_color = 0
+                    self.moisture_greens = 0.
+                    self.moisture_roasted = 0.
+                    self.volumeCalcWeightInStr = ""
+                    self.volumeCalcWeightOutStr = ""
+                else:
+                    self.weight = [self.weight[0],0,self.weight[2]]
+                    self.volume = [self.volume[0],0,self.volume[2]]
+                    
 
                 self.roastdate = QDate.currentDate()
                 self.errorlog = []
@@ -4795,7 +4809,9 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.weight[0]:
                         msg += sep + str(int(round(aw.qmc.weight[0]))) + aw.qmc.weight[2]
                         if aw.qmc.weight[1]:
-                            msg += sep + str(aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
+                            msg += sep + str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
+                    if aw.qmc.volume[0] and aw.qmc.volume[1]:
+                            msg += sep + str(aw.float2float(aw.weight_loss(aw.qmc.volume[1],aw.qmc.volume[0]),1)) + "%"
                     if aw.qmc.whole_color and aw.qmc.ground_color:
                         msg += sep + u"#" + str(aw.qmc.whole_color) + u"/" +  str(aw.qmc.ground_color)
                     elif aw.qmc.ground_color:
@@ -6887,7 +6903,10 @@ class SampleThread(QThread):
                                 temp,_ = aw.quantifier2tempandtime(i)
                                 if temp: # corresponding curve is available
                                     linespace = aw.eventquantifierlinspaces[i]
-                                    linespacethreshold = abs(linespace[1] - linespace[0])
+                                    if aw.eventquantifiercoarse[i]:
+                                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
+                                    else:
+                                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine                        
                                     t = temp[-1]
                                     d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
                                     ld = aw.lastdigitizedvalue[i]
@@ -7220,6 +7239,8 @@ class ApplicationWindow(QMainWindow):
         self.eventquantifiercoarse = [0,0,0,0]
         self.eventquantifierlinspaces = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
         self.eventquantifiersteps = 10
+        self.eventquantifierthresholdfine = 1.5
+        self.eventquantifierthresholdcoarse = .5
         self.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
         self.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
 
@@ -8507,12 +8528,13 @@ class ApplicationWindow(QMainWindow):
         aw.qmc.phasesLCDmode = (aw.qmc.phasesLCDmode + 1)%3
         aw.updatePhasesLCDs()
 
-    def colordialog(self,c): # c a QColor
+    def colordialog(self,c,noButtons=False): # c a QColor
         if platform.system() == 'Darwin':
-            res = QColorDialog.getColor(c)
-            return res
+            if noButtons:
+                return QColorDialog.getColor(c,self,"Color",QColorDialog.NoButtons)
+            else:
+                return QColorDialog.getColor(c)
             #return QColorDialog.getColor(c,self,"Color",QColorDialog.DontUseNativeDialog) # works, but does not show native dialog
-            #return QColorDialog.getColor(c,self,"Color",QColorDialog.NoButtons) # works (Qt does not hack the Mac dialog)
         else:
             return QColorDialog.getColor(c) # blocks on Mac OS X in the build
 
@@ -9565,7 +9587,10 @@ class ApplicationWindow(QMainWindow):
                     # both digits entered, create the event
                     self.quickEventShortCut = None
                     value = int(eventValueStr)
-                    aw.qmc.EventRecordAction(extraevent = 1,eventtype=eventNr,eventvalue=(value + 10)/10. )
+                    aw.moveslider(eventNr,value)
+                    if aw.qmc.flagstart:
+                        aw.qmc.EventRecordAction(extraevent = 1,eventtype=eventNr,eventvalue=(value + 10)/10.)
+                    aw.fireslideraction(eventNr)
                 else:
                     # keep on looking for digits
                     self.quickEventShortCut = (eventNr,eventValueStr)
@@ -11120,6 +11145,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ground_color = profile["ground_color"]
             if "color_system" in profile and profile["color_system"] in self.qmc.color_systems:
                 self.qmc.color_system_idx = self.qmc.color_systems.index(profile["color_system"])
+            if "volumeCalcWeightIn" in profile:
+                self.qmc.volumeCalcWeightInStr = profile["volumeCalcWeightIn"]
+            if "volumeCalcWeightOut" in profile:
+                self.qmc.volumeCalcWeightOutStr = profile["volumeCalcWeightOut"]
             # for compatibility with older profiles:
             if "roastdate" in profile:
                 try:
@@ -11583,6 +11612,8 @@ class ApplicationWindow(QMainWindow):
             profile["whole_color"] = self.qmc.whole_color
             profile["ground_color"] = self.qmc.ground_color
             profile["color_system"] = self.qmc.color_systems[self.qmc.color_system_idx]
+            profile["volumeCalcWeightIn"] = str(self.qmc.volumeCalcWeightInStr)
+            profile["volumeCalcWeightOut"] = str(self.qmc.volumeCalcWeightOutStr)
             # write roastdate that respects locale and potential cannot be read in under a different locale (just for compatibility to older versions)
             try:
                 profile["roastdate"] = encodeLocal(self.qmc.roastdate.toString())
@@ -13376,7 +13407,36 @@ class ApplicationWindow(QMainWindow):
             # now wait until the current sampling thread is terminated
             while aw.qmc.flagsamplingthreadrunning:
                 libtime.sleep(.01)
+            try:
+                self.closeserialports()
+            except Exception:
+                pass
             QApplication.exit()
+
+    def closeserialports(self):
+        # close main instrument port
+        aw.ser.closeport()
+        # close extra device ports
+        for i in range(len(aw.extraser)):
+            try:
+                if aw.extraser[i].SP.isOpen():
+                    aw.extraser[i].SP.close()
+            except:
+                pass
+        # close modbus port
+        aw.modbus.disconnect()
+        # close scale port
+        try:
+            if aw.scale:
+                aw.scale.closeport()
+        except:
+            pass
+        # close color meter port
+        try:
+            if aw.color:
+                aw.color.closeport()
+        except:
+            pass
 
     def fileQuit(self):
         self.closeApp()
@@ -13742,7 +13802,7 @@ $cupping_notes
                 volume=volume,
                 roaster=u(cgi.escape(self.qmc.roastertype)),
                 operator=u(cgi.escape(self.qmc.operator)),
-                cup=u(str(self.cuppingSum())),
+                cup=u(str(aw.float2float(self.cuppingSum()))),
                 color=color,
                 charge=charge,
                 size=u("--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm"),
@@ -14217,6 +14277,7 @@ $cupping_notes
         contributors += u("Barrie Fairley, Ziv Sade, Nicholas Seckar, ")
         contributors += u("Morten M") + uchr(252) + u("nchow")
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
+        contributors += u(", Paolo Scimone")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -15193,7 +15254,7 @@ $cupping_notes
             tip += u(QApplication.translate("Tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsdescriptions[i]) + "<br>"
             if self.extraeventstypes[i] < 4:
                 tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8)) + u(self.qmc.etypesf(self.extraeventstypes[i])) + "<br>"
-                tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsvalues[i]-1) + "<br>" 
+                tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8)) + u(int(round((self.extraeventsvalues[i]-1)*10.))) + "<br>" 
             tip += u(QApplication.translate("Tooltip","<b>Documentation </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsactionstrings[i]) + "<br>"
             tip += u(QApplication.translate("Tooltip","<b>Button# </b>= ", None, QApplication.UnicodeUTF8)) + str(i+1)
             self.buttonlist[i].setToolTip(tip)
@@ -15293,7 +15354,10 @@ $cupping_notes
                     if len(palette[key]):
                         for x in range(9):
                             if x < 4:
-                                nextpalette[x] = list(map(int,palette[key][x]))     #  type int
+                                if x == 1:
+                                    nextpalette[x] = list(map(float,palette[key][x]))     #  type double
+                                else:
+                                    nextpalette[x] = list(map(int,palette[key][x]))     #  type int
                             else:
                                 nextpalette[x] = list(map(str,palette[key][x])) #  type unicode
                         # read in extended palette data containing slider settings:
@@ -15396,6 +15460,34 @@ class ArtisanMessageBox(QMessageBox):
         if (self.currentTime >= self.timeout):
             self.done(0)
 
+##########################################################################
+#####################     QR Image   #####################################
+##########################################################################
+
+class QRImage(qrcode.image.base.BaseImage):
+    def __init__(self, border, width, box_size):
+        self.border = border
+        self.width = width
+        self.box_size = box_size
+        size = (width + border * 2) * box_size
+        self._image = QImage(
+            size, size, QImage.Format_RGB16)
+        self._image.fill(Qt.white)
+
+    def pixmap(self):
+        return QPixmap.fromImage(self._image)
+
+    def drawrect(self, row, col):
+        painter = QPainter(self._image)
+        painter.fillRect(
+            (col + self.border) * self.box_size,
+            (row + self.border) * self.box_size,
+            self.box_size, self.box_size,
+            Qt.black)
+
+    def save(self, stream, kind=None):
+        pass
+        
 ##########################################################################
 #####################     HUD  EDIT DLG     ##############################
 ##########################################################################
@@ -15947,11 +16039,13 @@ class HUDDlg(ArtisanDialog):
 #        # we disable WebLCDs feature for now on non Mac OS X systems
 #        if platf in ['Windows']: # not sys.platform.startswith("darwin"):
 #            self.WebLCDsFlag.setDisabled(True)
-#            self.WebLCDsPort.setDisabled(True)        
+#            self.WebLCDsPort.setDisabled(True)
+        self.QRpic = QLabel() # the QLabel holding the QR code image
         if aw.WebLCDs:
             self.setWebLCDsURL()
         else:
             self.WebLCDsURL.setText("")
+            self.QRpic.setPixmap(QPixmap())
         self.WebLCDsAlerts = QCheckBox(QApplication.translate("CheckBox", "Alarm Popups",None, QApplication.UnicodeUTF8))
         self.WebLCDsAlerts.setChecked(aw.WebLCDsAlerts)
         self.WebLCDsAlerts.setFocusPolicy(Qt.NoFocus)
@@ -15968,8 +16062,9 @@ class HUDDlg(ArtisanDialog):
         WebLCDsLayout.addStretch()
         WebLCDsLayout.addWidget(self.WebLCDsURL)
         WebLCDsLayoutHLayout = QHBoxLayout()
-        WebLCDsLayoutHLayout.addStretch()
         WebLCDsLayoutHLayout.addWidget(self.WebLCDsAlerts)
+        WebLCDsLayoutHLayout.addStretch()
+        WebLCDsLayoutHLayout.addWidget(self.QRpic)
         WebLCDsLayoutVLayout = QVBoxLayout()
         WebLCDsLayoutVLayout.addLayout(WebLCDsLayout)
         WebLCDsLayoutVLayout.addLayout(WebLCDsLayoutHLayout)
@@ -16024,8 +16119,24 @@ class HUDDlg(ArtisanDialog):
         aw.WebLCDsPort = int(self.WebLCDsPort.text())
         
     def setWebLCDsURL(self):
+        url_str = self.getWebLCDsURL()
+        # set URL label
+        self.WebLCDsURL.setText('<a href="' + url_str + '">' + url_str + '</a>')
+        # set QR label  
+        qr = qrcode.QRCode(
+            version=None, # 1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=4,
+            border=1,
+            image_factory=QRImage)
+        qr.add_data(url_str)
+        qr.make(fit=True)
+        self.QRpic.setPixmap(qr.make_image().pixmap())
+        
+        
+    def getWebLCDsURL(self):
         localIP = [(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
-        self.WebLCDsURL.setText('<a href="http://' + str(localIP) + ':' + str(aw.WebLCDsPort) + '/artisan">http://' + str(localIP) + ':' + str(aw.WebLCDsPort) + '/artisan</a>')
+        return 'http://' + str(localIP) + ':' + str(aw.WebLCDsPort) + '/artisan'
         
     def toggleWebLCDs(self,i):
         if i:
@@ -16036,6 +16147,7 @@ class HUDDlg(ArtisanDialog):
             if not res:
                 self.WebLCDsPort.setDisabled(False)
                 self.WebLCDsURL.setText("")
+                self.QRpic.setPixmap(QPixmap())
                 self.WebLCDsFlag.setChecked(False)
             else:
                 self.WebLCDsFlag.setChecked(True)
@@ -16044,6 +16156,7 @@ class HUDDlg(ArtisanDialog):
             self.WebLCDsFlag.setChecked(False)
             self.WebLCDsPort.setDisabled(False)
             self.WebLCDsURL.setText("")
+            self.QRpic.setPixmap(QPixmap())
             aw.stopWebLCDs()
             
     def showHUDbuttonToggle(self,i):
@@ -16628,11 +16741,17 @@ class HUDDlg(ArtisanDialog):
 
 class volumeCalculatorDlg(ArtisanDialog):
     def __init__(self, parent = None, weightIn=None, weightOut=None,
-        weightunit=0,volumeunit=0,inlineedit=None,outlineedit=None): # weight in and out expected in g (int)
+        weightunit=0,volumeunit=0,
+        inlineedit=None,outlineedit=None,tare=0): # weight in and out expected in g (int)
         # weightunit 0:g, 1:Kg  volumeunit 0:ml, 1:l
         super(volumeCalculatorDlg,self).__init__(parent)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Volume Calculator",None, QApplication.UnicodeUTF8))
+
+        if aw.scale.device != None and aw.scale.device != "" and aw.scale.device != "None":
+            self.scale_connected = True
+        else:
+            self.scale_connected = False
 
         self.weightIn = weightIn
         self.weightOut = weightOut
@@ -16649,6 +16768,9 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.inlineedit = inlineedit
         self.outlineedit = outlineedit
         
+        # the current active tare
+        self.tare = tare
+        
         # Unit Group
         unitvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit", None, QApplication.UnicodeUTF8)) + "</b>")
         self.unitvolumeEdit = QLineEdit(str(aw.qmc.volumeCalcUnit))
@@ -16657,16 +16779,30 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.unitvolumeEdit.setMaximumWidth(60)
         self.unitvolumeEdit.setAlignment(Qt.AlignRight)
         unitvolumeUnit = QLabel(QApplication.translate("Label","ml", None, QApplication.UnicodeUTF8))
+        
+        # unit button
+        unitButton = QPushButton(QApplication.translate("Button", "unit",None, QApplication.UnicodeUTF8))
+        self.connect(unitButton, SIGNAL("clicked()"),self.unitWeight)
+        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
+#        unitButton.setMaximumSize(60,35)
+#        unitButton.setMinimumSize(60,35) 
+        unitButton.setFocusPolicy(Qt.NoFocus)
+        
+                
         unitLayout = QHBoxLayout()
+        if self.scale_connected:
+            unitLayout.addStretch()
         unitLayout.addStretch()
         unitLayout.addWidget(unitvolumeLabel)
         unitLayout.addWidget(self.unitvolumeEdit)
         unitLayout.addWidget(unitvolumeUnit)
         unitLayout.addStretch()
+        if self.scale_connected:
+            unitLayout.addWidget(unitButton)
         
         # In Group
         coffeeinunitweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit Weight", None, QApplication.UnicodeUTF8)) + "</b>")
-        self.coffeeinweightEdit = QLineEdit()
+        self.coffeeinweightEdit = QLineEdit(aw.qmc.volumeCalcWeightInStr)
         self.coffeeinweightEdit.setMinimumWidth(60)
         self.coffeeinweightEdit.setMaximumWidth(60)
         self.coffeeinweightEdit.setAlignment(Qt.AlignRight)
@@ -16702,6 +16838,14 @@ class volumeCalculatorDlg(ArtisanDialog):
             coffeeinvolumeUnit = QLabel(QApplication.translate("Label","l", None, QApplication.UnicodeUTF8))
         else:
             coffeeinvolumeUnit = QLabel(QApplication.translate("Label","ml", None, QApplication.UnicodeUTF8))
+            
+        # in button
+        inButton = QPushButton(QApplication.translate("Button", "in",None, QApplication.UnicodeUTF8))
+        self.connect(inButton, SIGNAL("clicked()"),self.inWeight)
+        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
+#        inButton.setMaximumSize(60,35)
+#        inButton.setMinimumSize(60,35) 
+        inButton.setFocusPolicy(Qt.NoFocus)        
         
         inGrid = QGridLayout()
         inGrid.addWidget(coffeeinweightLabel,0,0)
@@ -16718,14 +16862,25 @@ class volumeCalculatorDlg(ArtisanDialog):
         volumeInLayout.addSpacing(15)
         volumeInLayout.addLayout(inGrid)
         
+        inButtonLayout = QHBoxLayout()
+        inButtonLayout.addWidget(inButton)
+        inButtonLayout.addStretch()
+        
+        volumeInVLayout = QVBoxLayout()
+        volumeInVLayout.addLayout(volumeInLayout)
+        if self.scale_connected:
+            volumeInVLayout.addLayout(inButtonLayout)
+        
         volumeInGroupLayout = QGroupBox(QApplication.translate("Label","in", None, QApplication.UnicodeUTF8))
-        volumeInGroupLayout.setLayout(volumeInLayout)
+        volumeInGroupLayout.setLayout(volumeInVLayout)
         if weightIn == None:
             volumeInGroupLayout.setDisabled(True)
 
+        self.resetInVolume()
+
         # Out Group
         coffeeoutunitweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit Weight", None, QApplication.UnicodeUTF8)) + "</b>")
-        self.coffeeoutweightEdit = QLineEdit()
+        self.coffeeoutweightEdit = QLineEdit(aw.qmc.volumeCalcWeightOutStr)
         self.coffeeoutweightEdit.setMinimumWidth(60)
         self.coffeeoutweightEdit.setMaximumWidth(60)
         self.coffeeoutweightEdit.setAlignment(Qt.AlignRight)
@@ -16761,7 +16916,15 @@ class volumeCalculatorDlg(ArtisanDialog):
             coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","l", None, QApplication.UnicodeUTF8))
         else:
             coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","ml", None, QApplication.UnicodeUTF8))
-        
+
+        # out button
+        outButton = QPushButton(QApplication.translate("Button", "out",None, QApplication.UnicodeUTF8))
+        self.connect(outButton, SIGNAL("clicked()"),self.outWeight)
+        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
+#        outButton.setMaximumSize(60,35)
+#        outButton.setMinimumSize(60,35) 
+        outButton.setFocusPolicy(Qt.NoFocus)
+                
         outGrid = QGridLayout()
         outGrid.addWidget(coffeeoutweightLabel,0,0)
         outGrid.addWidget(self.coffeeoutweight,0,1)
@@ -16777,10 +16940,21 @@ class volumeCalculatorDlg(ArtisanDialog):
         volumeOutLayout.addSpacing(15)
         volumeOutLayout.addLayout(outGrid)
         
+        outButtonLayout = QHBoxLayout()
+        outButtonLayout.addWidget(outButton)
+        outButtonLayout.addStretch()
+        
+        volumeOutVLayout = QVBoxLayout()
+        volumeOutVLayout.addLayout(volumeOutLayout)
+        if self.scale_connected:
+            volumeOutVLayout.addLayout(outButtonLayout)
+        
         volumeOutGroupLayout = QGroupBox(QApplication.translate("Label","out", None, QApplication.UnicodeUTF8))
-        volumeOutGroupLayout.setLayout(volumeOutLayout)
+        volumeOutGroupLayout.setLayout(volumeOutVLayout)
         if weightOut == None:
             volumeOutGroupLayout.setDisabled(True)
+
+        self.resetOutVolume()
         
         self.connect(self.coffeeinweightEdit,SIGNAL("editingFinished()"),self.resetInVolume)
         self.connect(self.coffeeoutweightEdit,SIGNAL("editingFinished()"),self.resetOutVolume)
@@ -16805,6 +16979,47 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.setLayout(mainlayout)
         self.coffeeinweightEdit.setFocus()
         
+    #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
+    def keyPressEvent(self,event):
+        key = int(event.key())
+        if key == 16777220 and self.scale_connected: # ENTER key pressed
+            v = self.retrieveWeight()
+            if v and v != 0:
+                if self.unitvolumeEdit.hasFocus():
+                    self.unitvolumeEdit.setText(str(v))
+                elif self.coffeeinweightEdit.hasFocus():
+                    self.coffeeinweightEdit.setText(str(v))
+                elif self.coffeeoutweightEdit.hasFocus():
+                    self.coffeeoutweightEdit.setText(str(v))
+                    
+    def widgetWeight(self,widget):
+        if widget.text() != "":
+            c = widget.text().toFloat()[0]
+        else:
+            c = 0.
+        v = aw.float2float(self.retrieveWeight(c))
+        widget.setText(str(v))
+        
+    def unitWeight(self):
+        self.widgetWeight(self.unitvolumeEdit)
+        
+    def inWeight(self):
+        self.widgetWeight(self.coffeeinweightEdit)
+        
+    def outWeight(self):
+        self.widgetWeight(self.coffeeoutweightEdit)
+        
+    def retrieveWeight(self,current=0):
+        v = aw.scale.readWeight() # read value from scale in 'g'
+        if v != None and v > -1: # value received
+            # substruct tare
+            return (v - self.tare)
+        elif current != 0:
+            # substruct tare from current value
+            return current - self.tare
+        else:
+            return 0
+
     def resetVolume(self):
         self.resetInVolume()
         self.resetOutVolume()
@@ -16815,43 +17030,66 @@ class volumeCalculatorDlg(ArtisanDialog):
                 k = 1000.
             else:
                 k = 1.
+            if self.weightunit:
+                j = 1000.
+            else:
+                j = 1.
             line = self.coffeeinweightEdit.text()
             if line == None or str(line).strip() == "":
                 self.coffeeinvolume.setText("")
                 self.inVolume = None
             else:
-                res = self.weightIn / (k * (int(str(self.coffeeinweightEdit.text())) / float(self.unitvolumeEdit.text())))
-                self.coffeeinvolume.setText(str(aw.float2float(res)))
+                res = self.weightIn / (k * (int(str(self.coffeeinweightEdit.text())) / (j * float(self.unitvolumeEdit.text()))))
+                if self.volumeunit:
+                    self.coffeeinvolume.setText(str(aw.float2float(res,4)))
+                else:
+                    self.coffeeinvolume.setText(str(aw.float2float(res)))
                 self.inVolume = res
         except:
             pass
 
     def resetOutVolume(self):
         try:
-            if self.weightunit:
+            if self.volumeunit:
                 k = 1000.
             else:
                 k = 1.
+            if self.weightunit:
+                j = 1000.
+            else:
+                j = 1.
             line = self.coffeeoutweightEdit.text()
             if line == None or str(line).strip() == "":
                 self.coffeeoutvolume.setText("")
                 self.outVolume = None
             else:
-                res = self.weightOut / (k * (int(str(self.coffeeoutweightEdit.text())) / float(self.unitvolumeEdit.text())))
-                self.coffeeoutvolume.setText(str(aw.float2float(res)))
+                res = self.weightOut / (k * (int(str(self.coffeeoutweightEdit.text())) / (j * float(self.unitvolumeEdit.text()))))
+                if self.volumeunit:
+                    self.coffeeoutvolume.setText(str(aw.float2float(res,4)))
+                else:
+                    self.coffeeoutvolume.setText(str(aw.float2float(res)))
                 self.outVolume = res
         except:
             pass
 
     def updateVolumes(self):
-        if self.inVolume:
-            self.inlineedit.setText(str(aw.float2float(self.inVolume)))
-        if self.outVolume:
-            self.outlineedit.setText(str(aw.float2float(self.outVolume)))
+        if self.inVolume and self.inVolume != "":
+            if self.volumeunit:
+                self.inlineedit.setText(str(aw.float2float(self.inVolume,4)))
+            else:
+                self.inlineedit.setText(str(aw.float2float(self.inVolume)))
+        if self.outVolume and self.outVolume != "":
+            if self.volumeunit:
+                self.outlineedit.setText(str(aw.float2float(self.outVolume,4)))
+            else:
+                self.outlineedit.setText(str(aw.float2float(self.outVolume)))
         self.closeEvent(None)
         
     def closeEvent(self,_):
-        aw.qmc.volumeCalcUnit = int(self.unitvolumeEdit.text())
+        if self.unitvolumeEdit.text() and self.unitvolumeEdit.text() != "":
+            aw.qmc.volumeCalcUnit = int(round(float(self.unitvolumeEdit.text())))
+            aw.qmc.volumeCalcWeightInStr = str(self.coffeeinweightEdit.text())
+            aw.qmc.volumeCalcWeightOutStr = str(self.coffeeoutweightEdit.text())
         self.accept()
 
     def close(self):
@@ -17158,6 +17396,8 @@ class editGraphDlg(ArtisanDialog):
         self.standard_density()
         self.connect(self.bean_density_volume_edit,SIGNAL("editingFinished()"),self.standard_density)
         self.connect(self.bean_density_weight_edit,SIGNAL("editingFinished()"),self.standard_density)
+        self.connect(self.bean_density_weightUnitsComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.unitsComboBox.currentIndex() :self.changeDensityWeightUnit(i))
+        self.connect(self.bean_density_volumeUnitsComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.unitsComboBox.currentIndex() :self.changeDensityVolumeUnit(i))
         
         # volume calc button
         volumeCalcButton = QPushButton(QApplication.translate("Button", "calc",None, QApplication.UnicodeUTF8))
@@ -17384,8 +17624,8 @@ class editGraphDlg(ArtisanDialog):
 #        weightLayout.addSpacing(10)
 #        weightLayout.addWidget(self.roastdegreelabel)
         weightLayout.addStretch()  
-        weightLayout.addWidget(self.tareComboBox)
         if aw.scale.device != None and aw.scale.device != "" and aw.scale.device != "None":
+            weightLayout.addWidget(self.tareComboBox)
             weightLayout.addSpacing(10)
             weightLayout.addWidget(inButton) 
             weightLayout.addSpacing(10)
@@ -17518,10 +17758,10 @@ class editGraphDlg(ArtisanDialog):
         self.tab1aLayout.addStretch()
         self.tab1aLayout.addLayout(weightLayout)
         self.tab1aLayout.addLayout(volumeLayout)
-        self.tab1aLayout.addLayout(densityLayout)
         self.tab1bLayout = QVBoxLayout()
         self.tab1bLayout.setMargin(0)
         self.tab1bLayout.setSpacing(2)
+        self.tab1bLayout.addLayout(densityLayout)
         self.tab1bLayout.addLayout(beansizeLayout)
         self.tab1bLayout.addLayout(colorLayout)
         self.tab1bLayout.addLayout(humidityGrid)
@@ -17576,7 +17816,44 @@ class editGraphDlg(ArtisanDialog):
         #totallayout.addStretch()
         #totallayout.addLayout(buttonsLayout)
         self.setLayout(totallayout)
-        
+
+    # calcs volume (in ml) from density (in g/l) and weight (in g)
+    def calc_volume(self,density,weight):
+        return (1./density) * weight * 1000
+
+    #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
+    def keyPressEvent(self,event):
+        key = int(event.key())
+        if key == 16777220 and aw.scale.device != None and aw.scale.device != "" and aw.scale.device != "None": # ENTER key pressed and scale connected
+            if self.weightinedit.hasFocus():
+                self.inWeight()
+            elif self.weightoutedit.hasFocus():
+                self.outWeight()
+            elif self.volumeinedit.hasFocus() and (str(self.volumeinedit.text()) == "" or float(self.volumeinedit.text()) == 0.):
+                try:
+                    dw = float(str(self.bean_density_weight_edit.text()))
+                    dv = float(str(self.bean_density_volume_edit.text()))                    
+                    if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8) :
+                        dw = dw * 1000.0
+                    if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
+                        dv = dv / 1000.0
+                    d = dw / dv
+                    w = self.weightinedit.text()
+                    if self.unitsComboBox.currentIndex() == 1:
+                        w = w * 1000.0
+                    if d and d != "" and w and w != "":
+                        # calculate in-volume from density and weight
+                        d = float(d)
+                        w = float(w)
+                        res = self.calc_volume(d,w)
+                        if self.volumeUnitsComboBox.currentIndex() == 1:
+                            res = res / 1000.0
+                            self.volumeinedit.setText(str(aw.float2float(res,4)))
+                        else:
+                            self.volumeinedit.setText(str(aw.float2float(res)))
+                except:
+                    pass
+                        
     def tareChanged(self,i):
         if i == 0 and self.tarePopupEnabled:
             self.tareDLG = tareDlg(self,tarePopup=self)
@@ -17602,6 +17879,14 @@ class editGraphDlg(ArtisanDialog):
     def changeVolumeUnit(self,i):
         aw.qmc.volume[2] = u(self.volumeUnitsComboBox.currentText())
         self.changeUnit(i,[self.volumeinedit,self.volumeoutedit])
+        
+    def changeDensityWeightUnit(self,i):
+        aw.qmc.density[1] = u(self.bean_density_volumeUnitsComboBox.currentText())
+        self.changeUnit(i,[self.bean_density_weight_edit])
+
+    def changeDensityVolumeUnit(self,i):
+        aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
+        self.changeUnit(i,[self.bean_density_volume_edit])
 
     def tabSwitched(self,i):
         if i == 3:
@@ -17666,20 +17951,28 @@ class editGraphDlg(ArtisanDialog):
         else:
             k = 1.
         if weightin:
-            weightin = int(round(weightin * k))
+            weightin = weightin * k
         else:
             weightin = None
         if weightout:
-            weightout = int(round(weightout * k))
+            weightout = weightout * k
         else:
             weightout = None
+        tare = 0
+        try:
+            tare_idx = self.tareComboBox.currentIndex() - 3
+            if tare_idx > -1:
+                tare = aw.qmc.container_weights[tare_idx]
+        except:
+            pass
         volumedialog = volumeCalculatorDlg(self,
             weightIn=weightin,
             weightOut=weightout,
             weightunit=self.unitsComboBox.currentIndex(),
             volumeunit=self.volumeUnitsComboBox.currentIndex(),
             inlineedit=self.volumeinedit,
-            outlineedit=self.volumeoutedit)
+            outlineedit=self.volumeoutedit,
+            tare=tare)
         volumedialog.show()
         volumedialog.setFixedSize(volumedialog.size())        
 
@@ -18031,6 +18324,13 @@ class editGraphDlg(ArtisanDialog):
         if din > 0. and dout > 0.:
             self.calculateddensitylabel.setText(QApplication.translate("Label","Density in: %1 g/l   =>   Density out: %2 g/l", None, QApplication.UnicodeUTF8).arg("%.1f"%din).arg("%.1f"%dout))
             self.tab1aLayout.addWidget(self.calculateddensitylabel)
+            # set also the green density if not yet set
+            if (str(self.bean_density_weight_edit.text()) == "" or float(str(self.bean_density_weight_edit.text())) == 0.) and \
+                (str(self.bean_density_volume_edit.text()) == "" or float(str(self.bean_density_volume_edit.text())) in [0.,1.]):
+                self.bean_density_weightUnitsComboBox.setCurrentIndex(0) # "g"
+                self.bean_density_volumeUnitsComboBox.setCurrentIndex(1) # "l"
+                self.bean_density_weight_edit.setText(str(aw.float2float(din)))
+                self.bean_density_volume_edit.setText("1.0")
         else:
             self.calculateddensitylabel.setText("")
             self.tab1aLayout.removeWidget(self.calculateddensitylabel)
@@ -18046,7 +18346,10 @@ class editGraphDlg(ArtisanDialog):
             pass
         try:
             if self.moisture_greens_edit.text() and self.moisture_greens_edit.text() != "" and self.moisture_roasted_edit.text() and self.moisture_roasted_edit.text() != "":
-                mloss = float(self.moisture_greens_edit.text()) - float(self.moisture_roasted_edit.text())
+                m_in = float(self.moisture_greens_edit.text())
+                m_out = float(self.moisture_roasted_edit.text())
+                if m_in > 0 and m_out > 0:
+                    mloss = m_in - m_out
         except:
             pass
         if mloss != 0. and wloss != 0.:
@@ -18067,7 +18370,10 @@ class editGraphDlg(ArtisanDialog):
         if self.bean_density_volume_edit.text() != "" and \
             float(self.bean_density_volume_edit.text()) != 0.0 and  \
             self.bean_density_weight_edit.text() != "" and \
-            float(self.bean_density_weight_edit.text()) != 0.0:
+            float(self.bean_density_weight_edit.text()) != 0.0 and \
+            not (float(self.bean_density_volume_edit.text()) == 1. and  
+            self.bean_density_volumeUnitsComboBox.currentIndex() == 1 and 
+            self.bean_density_weightUnitsComboBox.currentIndex() == 0):
             volume = float(str(self.bean_density_volume_edit.text()))
             weight = float(str(self.bean_density_weight_edit.text()))
             if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
@@ -18361,7 +18667,7 @@ class tareDlg(ArtisanDialog):
         weights = []
         for i in range(tars):
             name = u(self.taretable.cellWidget(i,0).text())
-            weight = int(self.taretable.cellWidget(i,1).text())
+            weight = int(round(float(self.taretable.cellWidget(i,1).text())))
             names.append(name)
             weights.append(weight)            
         aw.qmc.container_names = names
@@ -19263,7 +19569,8 @@ class EventsDlg(ArtisanDialog):
         self.connect(self.E3colorButton,SIGNAL("clicked()"),lambda b=2:self.setcoloreventline(b))
         self.connect(self.E4colorButton,SIGNAL("clicked()"),lambda b=3:self.setcoloreventline(b))
         #marker selection for comboboxes
-        self.markers = [QApplication.translate("Marker","Circle",None, QApplication.UnicodeUTF8),
+        self.markers = ["",
+                        QApplication.translate("Marker","Circle",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Marker","Square",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Marker","Pentagon",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Marker","Diamond",None, QApplication.UnicodeUTF8),
@@ -19274,27 +19581,39 @@ class EventsDlg(ArtisanDialog):
                         QApplication.translate("Marker","x",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Marker","None",None, QApplication.UnicodeUTF8)]
         #keys interpreted by matplotlib. Must match order of self.markers 
-        self.markervals = ["o","s","p","D","*","h","H","+","x","None"]
+        self.markervals = [None,"o","s","p","D","*","h","H","+","x","None"]
         #Marker type
         self.marker1typeComboBox =  QComboBox()
         self.marker1typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker1typeComboBox.addItems(self.markers)
-        self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
+        if aw.qmc.EvalueMarker[0] in self.markervals:
+            self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
+        else:
+            self.marker1typeComboBox.setCurrentIndex(0) # set to first empty entry
         self.connect(self.marker1typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=0:self.seteventmarker(x,m))
         self.marker2typeComboBox =  QComboBox()
         self.marker2typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker2typeComboBox.addItems(self.markers)
-        self.marker2typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[1]))
+        if aw.qmc.EvalueMarker[1] in self.markervals:
+            self.marker2typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[1]))
+        else:
+            self.marker2typeComboBox.setCurrentIndex(0) # set to first empty entry
         self.connect(self.marker2typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=1:self.seteventmarker(x,m))
         self.marker3typeComboBox =  QComboBox()
         self.marker3typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker3typeComboBox.addItems(self.markers)
-        self.marker3typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[2]))
+        if aw.qmc.EvalueMarker[2] in self.markervals:
+            self.marker3typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[2]))
+        else:
+            self.marker3typeComboBox.setCurrentIndex(0) # set to first empty entry
         self.connect(self.marker3typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=2:self.seteventmarker(x,m))
         self.marker4typeComboBox =  QComboBox()
         self.marker4typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker4typeComboBox.addItems(self.markers)
-        self.marker4typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[3]))
+        if aw.qmc.EvalueMarker[3] in self.markervals:
+            self.marker4typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[3]))
+        else:
+            self.marker4typeComboBox.setCurrentIndex(0) # set to first empty entry
         self.connect(self.marker4typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=3:self.seteventmarker(x,m))
         valuecolorlabel = QLabel(QApplication.translate("Label","Color",None, QApplication.UnicodeUTF8))
         valuecolorlabel.setFont(titlefont)
@@ -20011,7 +20330,10 @@ class EventsDlg(ArtisanDialog):
                 if temp:
                     # a temp curve exists
                     linespace = aw.eventquantifierlinspaces[i]
-                    linespacethreshold = abs(linespace[1] - linespace[0]) * 1.5
+                    if aw.eventquantifiercoarse[i]:
+                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
+                    else:
+                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine
                     # loop over that data and classify each value
                     ld = None # last digitized value
                     lt = None # last digitized temp value
@@ -20050,7 +20372,7 @@ class EventsDlg(ArtisanDialog):
             self.updateSliderTab()
             self.saveQuantifierSettings()
         elif i == 3: # switched to Quantifier tab
-            pass
+            self.updateQuantifierTab()
         elif i == 4: # switched to Palette tab
             # store slider settings from Slider tab to global variables
             # store sliders
@@ -20058,10 +20380,16 @@ class EventsDlg(ArtisanDialog):
             self.saveQuantifierSettings()
             # store buttons
             self.savetableextraeventbutton()
-        elif i == 4: # switched to Style tab
+        elif i == 5: # switched to Style tab
             self.updateStyleTab()
             self.saveSliderSettings()
             self.saveQuantifierSettings()
+
+    def updateQuantifierTab(self):
+        self.E1active.setText(self.etype0.text())
+        self.E2active.setText(self.etype1.text())
+        self.E3active.setText(self.etype2.text())
+        self.E4active.setText(self.etype3.text())
 
     def updateStyleTab(self):
         # update color button texts
@@ -20070,10 +20398,22 @@ class EventsDlg(ArtisanDialog):
         self.E3colorButton.setText(self.etype2.text())
         self.E4colorButton.setText(self.etype3.text())
         # update markers
-        self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
-        self.marker2typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[1]))
-        self.marker3typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[2]))
-        self.marker4typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[3]))
+        if aw.qmc.EvalueMarker[0] in self.markervals:
+            self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
+        else:
+            self.marker1typeComboBox.setCurrentIndex(0)
+        if aw.qmc.EvalueMarker[1] in self.markervals:
+            self.marker2typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[1]))
+        else:
+            self.marker2typeComboBox.setCurrentIndex(0)
+        if aw.qmc.EvalueMarker[2] in self.markervals:
+            self.marker3typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[2]))
+        else:
+            self.marker3typeComboBox.setCurrentIndex(0)
+        if aw.qmc.EvalueMarker[3] in self.markervals:
+            self.marker4typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[3]))
+        else:
+            self.marker4typeComboBox.setCurrentIndex(0)
         # line thickness
         self.E1thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[0])
         self.E2thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[1])
@@ -20228,13 +20568,13 @@ class EventsDlg(ArtisanDialog):
         self.changingcolorflag = False
 
     def seteventmarker(self,_,m):
-        if m == 0:
+        if m == 0 and self.marker1typeComboBox.currentIndex() != 0:
             aw.qmc.EvalueMarker[m] = str(self.markervals[self.marker1typeComboBox.currentIndex()])
-        if m == 1:
+        if m == 1 and self.marker2typeComboBox.currentIndex() != 0:
             aw.qmc.EvalueMarker[m] = str(self.markervals[self.marker2typeComboBox.currentIndex()])
-        if m == 2:
+        if m == 2 and self.marker3typeComboBox.currentIndex() != 0:
             aw.qmc.EvalueMarker[m] = str(self.markervals[self.marker3typeComboBox.currentIndex()])
-        if m == 3:
+        if m == 3 and self.marker4typeComboBox.currentIndex() != 0:
             aw.qmc.EvalueMarker[m] = str(self.markervals[self.marker4typeComboBox.currentIndex()])
         aw.qmc.redraw()
 
@@ -22461,7 +22801,6 @@ class extraserialport(object):
 
     def openport(self):
         try:
-            #self.closeport()
             self.confport()
             #open port
             if not self.SP.isOpen():
@@ -22474,7 +22813,8 @@ class extraserialport(object):
             aw.qmc.adderror(timez + " " + error + " Unable to open serial port",exc_tb.tb_lineno)
 
     def closeport(self):
-        self.SP.close()
+        if self.SP == None:
+            self.SP.close()
 
     def connect(self):
         if self.SP == None:
@@ -22499,14 +22839,70 @@ class scaleport(extraserialport):
         self.timeout = 1
         self.devicefunctionlist = {
             "None" : None,
-            "KERN NDE" : self.readKERN_NDE
+            "KERN NDE" : self.readKERN_NDE,
+            "acaia" : self.readAcaia,
         }
 
+    def closeport(self):
+        if u(self.device) == "acaia":
+            # disconnect from acaia scale
+            try:
+                if self.SP.isOpen():
+                    self.SP.write(str2cmd('￼BTDS\r\n'))
+            except Exception:
+                pass
+        super(scaleport, self).closeport()
+        
     # returns weight as int in g or -1 if something went wrong
     def readWeight(self):
         if self.device != None and self.device != "None" and self.device != "":
-            return self.devicefunctionlist[u(self.device)]()
+            return aw.float2float(self.devicefunctionlist[u(self.device)]())
         else:
+            return -1
+            
+    def readLine(self):
+        return str(self.SP.readline().decode('ascii'))
+
+    def readAcaia(self):
+        try:
+            if not self.SP:
+                # connect serial port if not yet connected
+                self.connect()
+            if self.SP:
+                if not self.SP.isOpen():
+                    # open serial port if not yet open
+                    self.openport()
+                if self.SP.isOpen(): 
+                    self.SP.write(str2cmd('￼BTST\r\n')) # request connection state
+                    v = self.readLine()
+                    if v.startswith('status=DISCONNECTED'):
+                        # connect to scale if not yet connected
+                        self.SP.write(str2cmd('￼BTLS\r\n')) # scan for scales
+                        # read reply until "SCAN_STOP"
+                        v = self.readLine()
+                        while not v.startswith(' SCAN_STOP'):                        
+                            v = str(self.SP.readline().decode('ascii'))                        
+                        self.SP.write(str2cmd('￼BTCN1\r\n')) # connect to scale 1
+                        # read until non-empty reply
+                        v = self.readLine()
+                        while v == "": # read until non-empty line
+                            v = self.readLine()
+                        if v.startswith('status=connected'):
+                            # we read another line after the "connected" message
+                            v = self.readLine()
+                    # request weight
+                    self.SP.write(str2cmd('￼GWT1,1,1\r\n'))
+                    self.readLine() # first line of the reply contains reading number
+                    v = self.readLine() # the second line of the reply contains the reading
+                    res = v.strip().split(' ')
+                    n = float(res[0])
+                    # if res[1] = ' ' and res[2] = v.strip().split(' ') then weight in g
+                    # if res[1] = 'oz' then weight in oz
+                    if res[1] == 'oz':
+                        return n * 28.3495231
+                    else:
+                        return n
+        except Exception:
             return -1
 
     def readKERN_NDE(self):
@@ -23815,7 +24211,7 @@ class serialport(object):
             libtime.sleep(.2)
             devices = self.PhidgetManager.getAttachedDevices()
             if len(devices) == 0:
-                res = 0        
+                res = 0
         for d in devices:
             ser = d.getSerialNum()
             if d.getDeviceName() == name:
@@ -23824,8 +24220,8 @@ class serialport(object):
                     if not aw.qmc.phidgetRemoteFlag:
 #                       d.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
                         d.openPhidget(serial=ser)
-                        libtime.sleep(.2)
-                        d.waitForAttach(600)
+                        libtime.sleep(.4)
+                        d.waitForAttach(800)
                         d.closePhidget()
                     res = ser
                     break                    
@@ -23854,8 +24250,8 @@ class serialport(object):
                             self.PhidgetIRSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
                         else:
                             self.PhidgetIRSensor.openPhidget(serial=ser)
-                        libtime.sleep(.2)
-                        self.PhidgetIRSensor.waitForAttach(600)
+                        libtime.sleep(.3)
+                        self.PhidgetIRSensor.waitForAttach(800)
                         aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None, QApplication.UnicodeUTF8))
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
@@ -23944,8 +24340,8 @@ class serialport(object):
                         aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
                     else:
                         aw.ser.PhidgetTemperatureSensor.openPhidget(serial=ser)
-                    libtime.sleep(.2)
-                    aw.ser.PhidgetTemperatureSensor.waitForAttach(600) 
+                    libtime.sleep(.3)
+                    aw.ser.PhidgetTemperatureSensor.waitForAttach(800) 
                     try:
                         aw.ser.PhidgetTemperatureSensor.setThermocoupleType(0,aw.qmc.phidget1048_types[0])
                     except:
@@ -24148,8 +24544,8 @@ class serialport(object):
                         aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
                     else:
                         aw.ser.PhidgetBridgeSensor.openPhidget()
-                    libtime.sleep(.2)
-                    aw.ser.PhidgetBridgeSensor.waitForAttach(600) 
+                    libtime.sleep(.3)
+                    aw.ser.PhidgetBridgeSensor.waitForAttach(800) 
                     aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
@@ -24272,8 +24668,8 @@ class serialport(object):
                         aw.ser.PhidgetIO.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
                     else:
                         aw.ser.PhidgetIO.openPhidget()
-                    libtime.sleep(.2)
-                    aw.ser.PhidgetIO.waitForAttach(600)
+                    libtime.sleep(.3)
+                    aw.ser.PhidgetIO.waitForAttach(800)
                     aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO attached",None, QApplication.UnicodeUTF8))
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
@@ -26403,23 +26799,7 @@ class comportDlg(ArtisanDialog):
 #            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " scanforport(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def closeserialports(self):
-        # close main instrument port
-        aw.ser.closeport()
-        # close extra device ports
-        for i in range(len(aw.extraser)):
-            try:
-                if aw.extraser[i].SP.isOpen():
-                    aw.extraser[i].SP.close()
-            except:
-                pass
-        # close modbus port
-        aw.modbus.disconnect()
-        # close scale port
-        try:
-            if aw.scale.SP.isOpen():
-                aw.scale.SP.close()
-        except:
-            pass
+        aw.closeserialports()
 
 
 #################################################################################
@@ -26554,7 +26934,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         for i in range(4):
             spinBox = QSpinBox()
             spinBox.setAlignment(Qt.AlignRight)
-            spinBox.setRange(0,100)
+            spinBox.setRange(0,99)
             spinBox.setSingleStep(5)
             spinBox.setSuffix(" %")
             spinBox.setValue(aw.ser.ArduinoFILT[i])
@@ -27365,7 +27745,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         try:
             #line 1
             if l == 1:
-                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor1[i]))
+                # use native no buttons dialog on Mac OS X, blocks otherwise
+                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor1[i]),True)
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor1[i] = colorname
@@ -27373,7 +27754,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))
             #line 2
             elif l == 2:
-                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor2[i]))
+                # use native no buttons dialog on Mac OS X, blocks otherwise
+                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor2[i]),True)
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor2[i] = colorname
