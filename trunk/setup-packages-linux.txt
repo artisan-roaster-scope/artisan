@@ -1,6 +1,6 @@
 Current Versions:
 
-o Python 2.7.8
+o Python 2.7.9
 o pyserial 2.7
 o QT 4.8.6
 o SIP 4.16.4
@@ -19,9 +19,14 @@ o requests 2.3.0
 o gevent-1.0.1
 o bottle 0.12.7
 o gevent-websocket-0.9.3
+o python-qrcode 5.1
 
 
 Upgrade History:
+
+- 2014-12-31
+ . python-qrcode 5.1
+ . Python 2.7.8 => 2.7.9
 - 2014-11-07
  . PyQt 4.11.2 => 4.11.3
  . numpy 1.9.1RC1 => 1.9.1

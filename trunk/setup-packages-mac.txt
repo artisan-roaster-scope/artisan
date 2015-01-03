@@ -1,7 +1,7 @@
 Current Versions:
 
 o XCode 4.5.2 + command line tools
-o Python 2.7.8 or 3.5.1 (change "python3" to "python" in all commands below for python 2.x)
+o Python 2.7.9 or 3.4.2 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial 2.7
 o QT 4.8.6
 o SIP 4.16.3
@@ -25,9 +25,13 @@ o bottle 0.12.7
 o gevent 1.0.1
 o geventwebsocket 0.9.3
 o appnope 0.1
+o python-qrcode 5.1
 
 Upgrade History:
 
+- 2014-12-31
+ . python-qrcode 5.1
+ . Python 2.7.8 => 2.7.9
 - 2014-11-07
  . SIP 4.16.3 => 4.16.4
  . PyQt 4.11.2 => 4.11.3
@@ -581,6 +585,13 @@ https://pypi.python.org/pypi/gevent-websocket/
 27) appnope 0.1
 
 https://github.com/minrk/appnope
+
+# python setup.py build
+# sudo python setup.py install
+
+28) python-qrcode
+
+https://github.com/lincolnloop/python-qrcode
 
 # python setup.py build
 # sudo python setup.py install
