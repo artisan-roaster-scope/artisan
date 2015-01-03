@@ -7347,6 +7347,10 @@ class ApplicationWindow(QMainWindow):
         self.connect(fullsizeAction,SIGNAL("triggered()"),lambda x=0,y=1:self.resize(x,y))
         self.saveGraphMenu.addAction(fullsizeAction)
 
+        HukyForumAction = QAction("HukyForum.com (1200x?)...",self)
+        self.connect(HukyForumAction,SIGNAL("triggered()"),lambda x=1200,y=1:self.resize(x,y))
+        self.saveGraphMenu.addAction(HukyForumAction)
+
         KaffeeNetzAction = QAction("Kaffee-Netz.de (800x?)...",self)
         self.connect(KaffeeNetzAction,SIGNAL("triggered()"),lambda x=800,y=1:self.resize(x,y))
         self.saveGraphMenu.addAction(KaffeeNetzAction)
@@ -7366,7 +7370,7 @@ class ApplicationWindow(QMainWindow):
         CoffeeGeekAction = QAction("CoffeeGeek.com (500x?)...",self)
         self.connect(CoffeeGeekAction,SIGNAL("triggered()"),lambda x=500,y=1:self.resize(x,y))
         self.saveGraphMenu.addAction(CoffeeGeekAction)
-
+        
         SVGAction = QAction("SVG...",self)
         self.connect(SVGAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".svg"))
         self.saveGraphMenu.addAction(SVGAction)
