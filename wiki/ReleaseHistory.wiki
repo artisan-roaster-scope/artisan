@@ -1,6 +1,24 @@
 #summary Detailed Release History
 
 
+==v0.9.1 (3.1.2015)==
+
+ * New Features
+  * adds QR code for WebLCD URL
+  * adds keyboard short cut to retrieve readings from a serial scale (press ENTER in roast properties weight-in/out fields or volume calculator field)
+  * adds support for the acaia BT coffee scale
+  * adds serial scale support to Volume Calculator
+- adds tare support to Volume Calculator
+ * Changes
+  * changes x-axis minor ticks to one minute distance
+  * Python updated to v2.7.9
+  * Italian translations update
+ * Bug Fixes
+  * fixes Arduino/TC4 temperature units
+  * fixes button value restoring on palette load
+  * fixes Volume Calculater unit conversion
+
+
 ==v0.9.0 (17.11.2014)==
 
  * New Features
