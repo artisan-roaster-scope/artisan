@@ -117,10 +117,10 @@ from yoctopuce.yocto_temperature import YTemperature
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
-  if str(platform.system()).startswith("Windows"):
-      import win_inet_pton
+    if str(platform.system()).startswith("Windows"):
+        import win_inet_pton
 except:
-  pass
+    pass
 
 #import minimalmodbus
 from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient, BaseModbusClient
@@ -1171,6 +1171,9 @@ class tgraphcanvas(FigureCanvas):
         self.wheelaspect = 1.0
 
         self.samplingsemaphore = QSemaphore(1)
+        self.messagesemaphore = QSemaphore(1)
+        self.errorsemaphore = QSemaphore(1)
+        self.serialsemaphore = QSemaphore(1)
 
         #flag to plot cross lines from mouse
         self.crossmarker = False
@@ -1699,7 +1702,7 @@ class tgraphcanvas(FigureCanvas):
                         self.redraw(recompute)
                 elif redraw and not FCs: # ensure that we at least readraw the canvas
                     self.updateBackground()
-            elif redraw and not FCs: # only on aligning with CARGE we redraw even if nothing is moved to redraw the time axis
+            elif redraw and not FCs: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
                     self.updateBackground()
         except Exception as ex:
 #            import traceback
@@ -2003,7 +2006,7 @@ class tgraphcanvas(FigureCanvas):
     #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
     #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
     def eval_math_expression(self,mathexpression,x,tx):
-        if len(mathexpression) == 0 or x == -1:
+        if len(mathexpression) == 0 or (x == -1 and "x" in mathexpression):
             return x
 
         #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
@@ -2211,7 +2214,7 @@ class tgraphcanvas(FigureCanvas):
     def clearMeasurements(self,andLCDs=True):
         try:
             #### lock shared resources #####
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             self.safesaveflag = False  #now flag is cleared (OFF)
             self.rateofchange1 = 0.0
             self.rateofchange2 = 0.0
@@ -2261,7 +2264,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 
                 #### lock shared resources #####
-                self.samplingsemaphore.acquire(1)
+                aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagon:
                     self.OffMonitor()
 
@@ -2719,7 +2722,7 @@ class tgraphcanvas(FigureCanvas):
     def redraw(self, recomputeAllDeltas=True, smooth=False):
         try:
             #### lock shared resources   ####
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
 
             rcParams['path.effects'] = []
             if aw.qmc.graphstyle == 1:
@@ -3386,8 +3389,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()    
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " redraw() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
@@ -3853,12 +3856,14 @@ class tgraphcanvas(FigureCanvas):
             try:
                 ser.PhidgetTemperatureSensor.closePhidget()
                 ser.PhidgetTemperatureSensor = None
+                ser.PhidgetTemperatureSensorAttached = False
             except:
                 pass
         if ser.PhidgetIRSensor:
             try:
                 ser.PhidgetIRSensor.closePhidget()
                 ser.PhidgetIRSensor = None
+                ser.PhidgetIRSensorSensorAttached = False
             except:
                 pass
         if ser.PhidgetBridgeSensor:
@@ -3987,7 +3992,7 @@ class tgraphcanvas(FigureCanvas):
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
         try:
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 try:
                     aw.soundpop()
@@ -4040,8 +4045,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markCharge() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
@@ -4125,8 +4130,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markDryEnd() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:                
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_19.setDisabled(True) # deactivate DRY button
@@ -4147,7 +4152,7 @@ class tgraphcanvas(FigureCanvas):
     #record 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
         try:
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
@@ -4182,8 +4187,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark1Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
@@ -4210,7 +4215,7 @@ class tgraphcanvas(FigureCanvas):
     #record 1C end markers of BT. called from button_4 of application window
     def mark1Cend(self):
         try:
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
@@ -4239,8 +4244,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark1Cend() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_4.setDisabled(True) # deactivate FCe button
@@ -4264,7 +4269,7 @@ class tgraphcanvas(FigureCanvas):
     #record 2C start markers of BT. Called from button_5 of application window
     def mark2Cstart(self):
         try:
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
@@ -4295,8 +4300,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark2Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_5.setDisabled(True) # deactivate SCs button
@@ -4322,7 +4327,7 @@ class tgraphcanvas(FigureCanvas):
     #record 2C end markers of BT. Called from button_6  of application window
     def mark2Cend(self):
         try:
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
@@ -4350,8 +4355,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark2Cend() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)  
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)  
         if self.flagstart:                      
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_6.setDisabled(True) # deactivate SCe button
@@ -4379,7 +4384,7 @@ class tgraphcanvas(FigureCanvas):
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
         try:
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
@@ -4425,8 +4430,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markDrop() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             try:
@@ -4458,7 +4463,7 @@ class tgraphcanvas(FigureCanvas):
 
     def markCoolEnd(self):
         try:
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
@@ -4488,8 +4493,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markCoolEnd() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_20.setDisabled(True) # deactivate COOL button
@@ -4538,7 +4543,7 @@ class tgraphcanvas(FigureCanvas):
     # extraevent is given when called from aw.recordextraevent() from an extra Event Button
     def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription=""):
         try:
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0 or self.device == 18:
                     aw.soundpop()
@@ -4655,13 +4660,13 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " EventRecordAction() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
     def DeviceEventRecord(self,command):
         try:
-            self.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
@@ -4740,8 +4745,8 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " DeviceEventRecord() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
     def writecharacteristics(self,TP_index=None,LP=None):
         try:
@@ -5251,14 +5256,22 @@ class tgraphcanvas(FigureCanvas):
 
     #adds errors
     def adderror(self,error,line=None):
-        timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-        #keep a max of 500 errors
-        if len(self.errorlog) > 499:
-            self.errorlog = self.errorlog[1:]
-        if line:
-            error = error + "@line " + str(line)
-        self.errorlog.append(timez + " " + error)
-        aw.sendmessage(error)
+        try:
+            #### lock shared resources #####
+            aw.qmc.errorsemaphore.acquire(1)
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(self.errorlog) > 499:
+                self.errorlog = self.errorlog[1:]
+            if line:
+                error = error + "@line " + str(line)
+            self.errorlog.append(timez + " " + error)
+            aw.sendmessage(error)
+        except:
+            pass
+        finally:
+            if aw.qmc.errorsemaphore.available() < 1:
+                aw.qmc.errorsemaphore.release(1)
 
     ####################  PROFILE DESIGNER   ###################################################################################
     #launches designer
@@ -6612,9 +6625,9 @@ class SampleThread(QThread):
                             xtra_dev_lines2 = 0
                             for i in range(nxdevices):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)                               
-                                if len(aw.qmc.extramathexpression1[i]):
+                                if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,extratx)
-                                if len(aw.qmc.extramathexpression2[i]):
+                                if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2,extratx)
                                 # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                                 # modbus channel 1+2, respect input temperature scale setting
@@ -6701,9 +6714,9 @@ class SampleThread(QThread):
                             t2 = (t2 + t2_2) / 2.0
                             t1 = (t1 + t1_2) / 2.0
                     ####### all values retrieved
-                    if len(aw.qmc.ETfunction):
+                    if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
                         t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1,tx)
-                    if len(aw.qmc.BTfunction):
+                    if aw.qmc.BTfunction != None and len(aw.qmc.BTfunction):
                         t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2,tx)
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
@@ -9164,11 +9177,19 @@ class ApplicationWindow(QMainWindow):
 
     #adds errors
     def addserial(self,serialstring):
-        timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-        #keep a max of 1000 comm strings
-        if len(self.seriallog) > 999:
-            self.seriallog = self.seriallog[1:]
-        self.seriallog.append(timez + " " + serialstring)
+        try:
+            #### lock shared resources #####
+            aw.qmc.serialsemaphore.acquire(1)
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 1000 comm strings
+            if len(self.seriallog) > 999:
+                self.seriallog = self.seriallog[1:]
+            self.seriallog.append(timez + " " + serialstring)
+        except:
+            pass
+        finally:
+            if aw.qmc.serialsemaphore.available() < 1:
+                aw.qmc.serialsemaphore.release(1)
 
     def resizeEvent(self, event):
         #if HUD is ON when resizing application. No drawing should be done inside this handler
@@ -9361,13 +9382,21 @@ class ApplicationWindow(QMainWindow):
             pass
 
     def sendmessage(self,message):
-        message = aw.arabicReshape(message)
-        #keep a max of 100 messages
-        if len(self.messagehist) > 99:
-            self.messagehist = self.messagehist[1:]
-        timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz ")))    #zzz = miliseconds
-        self.messagehist.append(timez + message)
-        self.messagelabel.setText(message)
+        try:
+            #### lock shared resources #####
+            aw.qmc.messagesemaphore.acquire(1)
+            message = aw.arabicReshape(message)
+            #keep a max of 100 messages
+            if len(self.messagehist) > 99:
+                self.messagehist = self.messagehist[1:]
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz ")))    #zzz = miliseconds
+            self.messagehist.append(timez + message)
+            self.messagelabel.setText(message)
+        except:
+            pass
+        finally:
+            if aw.qmc.messagesemaphore.available() < 1:
+                aw.qmc.messagesemaphore.release(1)
 
     def hideDefaultButtons(self):
         self.lowerbuttondialog.setVisible(False)
@@ -22667,7 +22696,7 @@ class modbusport(object):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(ex)),exc_tb.tb_lineno)
 
-    # write multiple cois on slave
+    # write multiple coils on slave
     def writeCoils(self,slave,register,values):
         try:
             #### lock shared resources #####
@@ -22679,9 +22708,23 @@ class modbusport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeCoils() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)    
+                
+    # write single coil on slave (function 5)
+    def writeCoil(self,slave,register,value):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            self.master.write_coil(int(register),value,unit=int(slave))
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeCoil() %1").arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
         
-    # write value to register on slave
+    # write value to register on slave (function 6)
     # value can be one of string (containing an int or float), an int or a float
     def writeRegister(self,slave,register,value):
         if stringp(value):
@@ -23004,9 +23047,11 @@ class serialport(object):
         self.PhidgetManager = None
         #stores the Phidget 1048 TemperatureSensor object (None if not initialized)
         self.PhidgetTemperatureSensor = None
+        self.PhidgetTemperatureSensorAttached = False
         self.Phidget1048values = [-1]*4 # the values gathered by registered change triggers
         #stores the Phidget 1045 TemperatureSensor object (None if not initialized)
         self.PhidgetIRSensor = None
+        self.PhidgetIRSensorSensorAttached = False
         self.Phidget1045value = -1
         #stores the Phidget BridgeSensor object (None if not initialized)
         self.PhidgetBridgeSensor = None
@@ -23355,7 +23400,7 @@ class serialport(object):
     
     def DUMMY(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        return tx,0,0 # note that values -1 would deactivate math_expressions
+        return tx,0,0
         
     def PHIDGET1045(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -24206,13 +24251,14 @@ class serialport(object):
         if self.PhidgetManager == None:
             self.PhidgetManager = PhidgetManager()
         if aw.qmc.phidgetRemoteFlag:
+            libtime.sleep(.1)
             self.PhidgetManager.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
         else:
             self.PhidgetManager.openManager()
         devices = self.PhidgetManager.getAttachedDevices()
         res = -1
         if len(devices) == 0:
-            libtime.sleep(.2)
+            libtime.sleep(.3)
             devices = self.PhidgetManager.getAttachedDevices()
             if len(devices) == 0:
                 res = 0
@@ -24221,7 +24267,7 @@ class serialport(object):
             if d.getDeviceName() == name:
                 # try if it can be opened (so not yet opened by another channel)
                 try:
-                    if not aw.qmc.phidgetRemoteFlag:
+                    if not aw.qmc.phidgetRemoteFlag and name == 'Phidget Temperature Sensor IR': # only for the IR we support multiple devices
 #                       d.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
                         d.openPhidget(serial=ser)
                         libtime.sleep(.4)
@@ -24242,51 +24288,48 @@ class serialport(object):
     def phidget1045temp(self,temp,ambient):
         return (temp - ambient) * aw.qmc.phidget1045_emissivity + ambient
 
+    def configure1045(self):
+        self.Phidget1045value = -1
+        if aw.qmc.phidget1045_async:
+            self.PhidgetIRSensor.setTemperatureChangeTrigger(0,aw.qmc.phidget1045_changeTrigger)
+        else:
+            self.PhidgetIRSensor.setTemperatureChangeTrigger(0,0.5)
+        if aw.qmc.phidget1045_async:
+            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1045TemperatureChanged(e))
+        else:
+            self.PhidgetIRSensor.setOnTemperatureChangeHandler(None)
+
+    def phidget1045attached(self,e):
+        self.configure1045()
+        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None, QApplication.UnicodeUTF8))
+        self.PhidgetIRSensorSensorAttached = True
+        
+    def phidget1045detached(self,e):
+        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR detached",None, QApplication.UnicodeUTF8))
+        self.PhidgetIRSensorSensorAttached = False
+
     def PHIDGET1045temperature(self):
         try:
             if self.PhidgetIRSensor == None:
-                self.PhidgetIRSensor = PhidgetTemperatureSensor()
-                libtime.sleep(.1)
-                try: 
-                    ser = self.getFirstMatchingPhidgetsSerialNum('Phidget Temperature Sensor IR')
-                    if ser:
+                ser = self.getFirstMatchingPhidgetsSerialNum('Phidget Temperature Sensor IR')
+                if ser:
+                    self.PhidgetIRSensor = PhidgetTemperatureSensor()
+                    try:
+                        self.PhidgetIRSensor.setOnAttachHandler(self.phidget1045attached)
+                        self.PhidgetIRSensor.setOnDetachHandler(self.phidget1045detached)
                         if aw.qmc.phidgetRemoteFlag:
                             self.PhidgetIRSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
                         else:
                             self.PhidgetIRSensor.openPhidget(serial=ser)
-                        libtime.sleep(.3)
-                        self.PhidgetIRSensor.waitForAttach(800)
-                        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None, QApplication.UnicodeUTF8))
-                except Exception as ex:
-                    #_, _, exc_tb = sys.exc_info()
-                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
-                    try:
-                        self.PhidgetIRSensor.closePhidget()
-                    except:
-                        pass
-                    aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR not attached",None, QApplication.UnicodeUTF8))
-                    
-                if self.PhidgetIRSensor and self.PhidgetIRSensor.isAttached():
-                    self.Phidget1045value = -1
-                    try:
-                        self.PhidgetIRSensor.setTemperatureChangeTrigger(0,aw.qmc.phidget1045_changeTrigger)
-                    except:
-                        pass
-                    try:
-                        if aw.qmc.phidget1045_async:
-                            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1045TemperatureChanged(e))
-                        else:
-                            self.PhidgetIRSensor.setOnTemperatureChangeHandler(None)
-                    except:
-                        pass
-                    libtime.sleep(.3)
-            if self.PhidgetIRSensor and not self.PhidgetIRSensor.isAttached():
-                try:
-                    self.PhidgetIRSensor.closePhidget()
-                except:
-                    pass
-                self.PhidgetIRSensor = None
-            if self.PhidgetIRSensor != None:
+                    except Exception as ex:
+                        #_, _, exc_tb = sys.exc_info()
+                        #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+                        try:
+                            self.PhidgetIRSensor.closePhidget()
+                        except:
+                            pass
+                        self.PhidgetIRSensor = None
+            if self.PhidgetIRSensorSensorAttached:
                     res = -1
                     ambient = -1
                     try:
@@ -24331,76 +24374,59 @@ class serialport(object):
             return aw.ser.Phidget1048values[i]
         else:
             return aw.ser.PhidgetTemperatureSensor.getTemperature(i)
+    
+    def configure1048(self):
+        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(0,aw.qmc.phidget1048_types[0])
+        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(1,aw.qmc.phidget1048_types[1])
+        if 35 in aw.qmc.extradevices:
+            aw.ser.PhidgetTemperatureSensor.setThermocoupleType(2,aw.qmc.phidget1048_types[2])
+            aw.ser.PhidgetTemperatureSensor.setThermocoupleType(3,aw.qmc.phidget1048_types[3])
+        aw.ser.Phidget1048values = [-1]*4
+        changeTrigger = False
+        for i in range(4):
+            if i < 2 or (i < 4 and 35 in aw.qmc.extradevices):
+                if aw.qmc.phidget1048_async[i]:
+                    aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,aw.qmc.phidget1048_changeTriggers[i])
+                    changeTrigger = True
+                else:
+                    aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,0.5)
+        if changeTrigger:
+            aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1048TemperatureChanged(e))
+        else:
+            aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(None)
+
+    def phidget1048attached(self,e):
+        self.configure1048()
+        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None, QApplication.UnicodeUTF8))
+        aw.ser.PhidgetTemperatureSensorAttached = True
+        
+    def phidget1048detached(self,e):
+        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input detached",None, QApplication.UnicodeUTF8))
+        aw.ser.PhidgetTemperatureSensorAttached = False
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
     def PHIDGET1048temperature(self,mode=0):
         try:
             if aw.ser.PhidgetTemperatureSensor == None:
-                aw.ser.PhidgetTemperatureSensor = PhidgetTemperatureSensor()
-                libtime.sleep(.1)
-                try: 
-                    ser = self.getFirstMatchingPhidgetsSerialNum('Phidget Temperature Sensor 4-input')
-                    if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
-                    else:
-                        aw.ser.PhidgetTemperatureSensor.openPhidget(serial=ser)
-                    libtime.sleep(.3)
-                    aw.ser.PhidgetTemperatureSensor.waitForAttach(800) 
+                ser = self.getFirstMatchingPhidgetsSerialNum('Phidget Temperature Sensor 4-input')
+                if ser:
+                    aw.ser.PhidgetTemperatureSensor = PhidgetTemperatureSensor()
                     try:
-                        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(0,aw.qmc.phidget1048_types[0])
-                    except:
-                        pass
-                    try:
-                        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(1,aw.qmc.phidget1048_types[1])
-                    except:
-                        pass
-                    try:
-                        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(2,aw.qmc.phidget1048_types[2])
-                    except:
-                        pass
-                    try:
-                        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(3,aw.qmc.phidget1048_types[3])
-                    except:
-                        pass
-                    aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None, QApplication.UnicodeUTF8))                       
-                except Exception as ex:
-                    #_, _, exc_tb = sys.exc_info()
-                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
-                    try:
-                        aw.ser.PhidgetTemperatureSensor.closePhidget()
-                    except:
-                        pass
-                    aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input not attached",None, QApplication.UnicodeUTF8))
-                if aw.ser.PhidgetTemperatureSensor and aw.ser.PhidgetTemperatureSensor.isAttached():
-                    aw.ser.Phidget1048values = [-1]*4
-                    changeTrigger = False
-                    for i in range(4):
-                        try:
-                            aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,500.0) # "deactivate" triggers for non async channels
-                            if i < 2 or (i < 4 and 35 in aw.qmc.extradevices):
-                                if aw.qmc.phidget1048_async[i]:
-                                    changeTrigger = True
-                                    aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,aw.qmc.phidget1048_changeTriggers[i])
-                        except:
-#                            import traceback
-#                            traceback.print_exc(file=sys.stdout)
-                            pass
-                    libtime.sleep(.3)
-                    try:
-                        if changeTrigger:
-                            aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1048TemperatureChanged(e))
+                        aw.ser.PhidgetTemperatureSensor.setOnAttachHandler(self.phidget1048attached)
+                        aw.ser.PhidgetTemperatureSensor.setOnDetachHandler(self.phidget1048detached)
+                        if aw.qmc.phidgetRemoteFlag:
+                            aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
                         else:
-                            aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(None)
-                    except:
-                        pass
-                    
-            if aw.ser.PhidgetTemperatureSensor and not aw.ser.PhidgetTemperatureSensor.isAttached():
-                try:
-                    aw.ser.PhidgetTemperatureSensor.closePhidget()
-                except:
-                    pass
-                aw.ser.PhidgetTemperatureSensor = None
-            if aw.ser.PhidgetTemperatureSensor != None:
+                            aw.ser.PhidgetTemperatureSensor.openPhidget(serial=ser)
+                    except Exception as ex:
+                        #_, _, exc_tb = sys.exc_info()
+                        #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+                        try:
+                            aw.ser.PhidgetTemperatureSensor.closePhidget()
+                        except:
+                            pass
+                        aw.ser.PhidgetTemperatureSensor = None
+            if aw.ser.PhidgetTemperatureSensorAttached:
                 if mode == 0:
                     probe1 = probe2 = -1
                     try:
@@ -28291,12 +28317,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.BTlcd = self.BTlcd.isChecked()
             # Phidget configurations
             asyncMode1046 = False
-            asyncMode1048 = False
             for i in range(4):
                 aw.qmc.phidget1048_types[i] = self.probeTypeCombos[i].currentIndex()+1
                 aw.qmc.phidget1048_async[i] = self.asyncCheckBoxes1048[i].isChecked()
-                if aw.qmc.phidget1048_async[i] and (i < 2 or (i < 4 and 35 in aw.qmc.extradevices)):
-                    asyncMode1048 = True
                 aw.qmc.phidget1048_changeTriggers[i] = aw.qmc.phidget1048_changeTriggersValues[self.changeTriggerCombos1048[i].currentIndex()]
                 aw.qmc.phidget1046_gain[i] = self.gainCombos1046[i].currentIndex()+1
                 aw.qmc.phidget1046_formula[i] = self.formulaCombos1046[i].currentIndex()
@@ -28322,37 +28345,20 @@ class DeviceAssignmentDlg(ArtisanDialog):
                         aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(None)
             except:
                 pass
-            try:
-                if aw.ser.PhidgetTemperatureSensor and aw.ser.PhidgetTemperatureSensor.isAttached():
-                    for i in range(4):
-                        try:
-                            aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,500.0) # "deactivate" triggers for non async channels
-                            if i < 2 or (i < 4 and 35 in aw.qmc.extradevices):
-                                if aw.qmc.phidget1048_async[i]:
-                                    aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,aw.qmc.phidget1048_changeTriggers[i])
-                        except:
-                            pass
-                    if asyncMode1048:
-                        aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:aw.ser.phidget1048TemperatureChanged(e))
-                    else:
-                        aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(None)
-            except:
-                pass
+            if aw.ser.PhidgetTemperatureSensor:
+                try:
+                    aw.ser.PhidgetTemperatureSensor.closePhidget()
+                except:
+                    pass
+                aw.ser.PhidgetTemperatureSensor = None                
             aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
             aw.qmc.phidget1045_changeTrigger = aw.qmc.phidget1045_changeTriggersValues[self.changeTriggerCombos1045.currentIndex()]
-            aw.qmc.phidget1045_emissivity = self.emissivitySpinBox.value()
-            try:
-                if aw.qmc.phidget1045_async and aw.ser.PhidgetIRSensor and aw.ser.PhidgetIRSensor.isAttached():
-                    try:
-                        aw.ser.PhidgetIRSensor.setTemperatureChangeTrigger(0,aw.qmc.phidget1045_changeTrigger)
-                    except:
-                        pass
-                    if aw.qmc.phidget1045_async:
-                        aw.ser.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e=None:aw.ser.phidget1045TemperatureChanged(e))
-                    else:
-                        aw.ser.PhidgetIRSensor.setOnTemperatureChangeHandler(None)
-            except:
-                pass
+            aw.qmc.phidget1045_emissivity = self.emissivitySpinBox.value()            
+            if aw.qmc.phidget1045_async:
+                try:
+                    aw.ser.PhidgetIRSensor.closePhidget()
+                except:
+                    pass
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
             aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
             aw.qmc.phidgetPassword = u(self.phidgetPassword.text())

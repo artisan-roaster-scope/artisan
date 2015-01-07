@@ -83,7 +83,7 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
             showbtflag,))
         process.start()
        
-        libtime.sleep(1.5)
+        libtime.sleep(4)
         
         # check successful start
         url = "http://127.0.0.1:" + str(port) + "/artisan/status"
