@@ -74,16 +74,17 @@ setup(
             "icon_resources": [(0, cwd + "\\artisan.ico")]
             }],
     data_files = DATAFILES,
-    zipfile = None, # "lib\library.zip",
+    zipfile = "lib\library.zip",
     options={"py2exe" :{
                         "packages": ['matplotlib','pytz'],
                         "compressed": False, # faster
                         "unbuffered": True,
                         'optimize':  2,
-                        "bundle_files": 2,
+                        "bundle_files": 2, # default bundle_files: 3 breaks WebLCDs on Windows
                         "dll_excludes":[
                             'MSVCP90.dll','tcl84.dll','tk84.dll','libgdk-win32-2.0-0.dll',
-                            'libgdk_pixbuf-2.0-0.dll','libgobject-2.0-0.dll'],
+                            'libgdk_pixbuf-2.0-0.dll','libgobject-2.0-0.dll',
+                            'MSVCR90.dll','MSVCN90.dll','mwsock.dll','powrprof.dll'],
                         "includes" : INCLUDES,
                         "excludes" : EXCLUDES}
             }

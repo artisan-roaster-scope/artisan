@@ -165,15 +165,17 @@ elif os.name == 'posix':
 
 
 # to make py2exe happy with scipy >0.11
-def dependencies_for_myprogram():
+def __dependencies_for_freezing():
     from scipy.sparse.csgraph import _validation
     from scipy.interpolate import UnivariateSpline
     import PyQt4.QtSvg
     import PyQt4.QtXml
-    # for gevent bundling    
-    from gevent import core, ares, _semaphore, _util
-#    import pprint
+    # for gevent bundling
+    from gevent import core, resolver_thread, resolver_ares, socket,\
+        threadpool, thread, threading, select, subprocess,\
+        pywsgi, server, baseserver, event, hub
 
+del __dependencies_for_freezing
 
 if sys.version < '3':
     def stringp(x):
@@ -1578,7 +1580,8 @@ class tgraphcanvas(FigureCanvas):
                             self.fig.canvas.blit(aw.qmc.ax.bbox)
                         else:
                             # we do not have a background to bitblit, so do a full redraw
-                            self.fig.canvas.draw()
+                            #self.fig.canvas.draw()
+                            self.updateBackground() # does the canvas draw, but also fills the ax_background cache
                     #####
 
                     #update phase lcds
@@ -1701,7 +1704,7 @@ class tgraphcanvas(FigureCanvas):
                     self.backmoveflag = 0
                     if redraw:
                         self.redraw(recompute)
-                elif redraw and not FCs: # ensure that we at least readraw the canvas
+                elif redraw and not FCs: # ensure that we at least redraw the canvas
                     self.updateBackground()
             elif redraw and not FCs: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
                     self.updateBackground()
@@ -2074,7 +2077,7 @@ class tgraphcanvas(FigureCanvas):
             return 0
 
     #format X axis labels
-    def xaxistosm(self):
+    def xaxistosm(self,redraw=True):
 
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
             starttime = self.timex[self.timeindex[0]]
@@ -2125,7 +2128,10 @@ class tgraphcanvas(FigureCanvas):
             for label in self.ax.xaxis.get_ticklabels():
                 label.set_rotation(self.xrotation)
         # we have to update the canvas cache
-        self.updateBackground()
+        if redraw:
+            self.updateBackground()
+        else:
+            self.ax_background = None
 
     def fmt_timedata(self,x):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -2348,9 +2354,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.keyboardmoveflag = 0
                 aw.resetKeyboardButtonMarks()
                 
-                if not self.locktimex_start:
+                if not self.locktimex:
                     self.startofx = 0
-                    self.endofx = self.resetmaxtime 
+                    self.endofx = self.resetmaxtime
                 if self.endofx < 1:
                     self.endofx = 60
 
@@ -6877,7 +6883,7 @@ class SampleThread(QThread):
                         #readjust xlimit of plot if needed
                         if  not aw.qmc.fixmaxtime and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
                             aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
-                            aw.qmc.xaxistosm()
+                            aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
                         if aw.qmc.projectFlag:
                             aw.qmc.updateProjection()
                         if aw.qmc.background and aw.qmc.backgroundReproduce:
@@ -7016,10 +7022,10 @@ class SampleThread(QThread):
                 else:
                     tx = int(aw.qmc.timeclock.elapsed()/1000.)
                     #readjust xlimit of plot if needed
-                    if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
+                    if  not aw.qmc.fixmaxtime and tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
                         aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
                         aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
-                        aw.qmc.xaxistosm()
+                        aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
                     #aw.qmc.resetlines()
                     #add to plot a vertical time line
                     aw.qmc.l_timeline, = aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
@@ -31506,7 +31512,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         dlabel.setMargin(10)
         dlabel.setStyleSheet("background-color:'#CCCCCC';")
         dlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "D",None, QApplication.UnicodeUTF8) + "</b></font>")
-        dlabel.setMaximumSize(50, 42)
+        dlabel.setMaximumSize(50, 420)
         dlabel.setMinimumHeight(50)
         wlabel = QLabel()
         wlabel.setMargin(10)
