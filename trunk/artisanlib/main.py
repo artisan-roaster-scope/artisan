@@ -2053,11 +2053,13 @@ class tgraphcanvas(FigureCanvas):
                             if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
                                 number += mathexpression[i+2]
                         Yval.append(number)
-
                 #build Ys float values
                 if len(self.timex) > 0:
                     Y = [self.temp1[-1],self.temp2[-1]]
-                    for i in range(len(self.extradevices)):
+                else:
+                    Y = [-1,-1]
+                for i in range(len(self.extradevices)):
+                    if len(self.extratimex[i]):
                         try:
                             Y.append(self.extratemp1[i][-1])
                         except:
@@ -2066,6 +2068,8 @@ class tgraphcanvas(FigureCanvas):
                             Y.append(self.extratemp2[i][-1])
                         except:
                             Y.append(-1)
+                    else:
+                        Y.append(-1).append(-1)
                     #add Ys and their value to math dictionary 
                     for i in range(len(Yval)):
                         idx = int(Yval[i])-1
@@ -2073,9 +2077,6 @@ class tgraphcanvas(FigureCanvas):
                             mathdictionary["Y"+ Yval[i]] = 0
                         else:
                         	mathdictionary["Y"+ Yval[i]] = Y[idx]
-                else:
-                    for i in range(len(Yval)):
-                        mathdictionary["Y"+ Yval[i]] = 0
             return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
 
         except Exception as e:

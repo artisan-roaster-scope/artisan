@@ -282,7 +282,6 @@ v0.5.6 (8.11.2012)
 - adds additional localizations
 - bug fixes
 
-
 v0.5.5 (28.9.2011)
 - fixes ArdruinoTC4 extra devices
 - fixed autoDrop recognition
