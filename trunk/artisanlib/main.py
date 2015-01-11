@@ -831,6 +831,9 @@ class tgraphcanvas(FigureCanvas):
         self.buttonvisibility = [True]*8
         self.buttonactions = [0]*8
         self.buttonactionstrings = [""]*8
+        #variables to configure the 0: ON, 1: OFF buttons and 2: SAMPLE action
+        self.extrabuttonactions = [0]*3
+        self.extrabuttonactionstrings = [""]*3
 
         #flag to activate the automatic marking of the CHARGE and DROP events
         #self.autoChargeDropFlag = False # has been replaced by the following two separate flags
@@ -2065,7 +2068,11 @@ class tgraphcanvas(FigureCanvas):
                             Y.append(-1)
                     #add Ys and their value to math dictionary 
                     for i in range(len(Yval)):
-                        mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
+                        idx = int(Yval[i])-1
+                        if idx >= len(Y):
+                            mathdictionary["Y"+ Yval[i]] = 0
+                        else:
+                        	mathdictionary["Y"+ Yval[i]] = Y[idx]
                 else:
                     for i in range(len(Yval)):
                         mathdictionary["Y"+ Yval[i]] = 0
@@ -3779,6 +3786,11 @@ class tgraphcanvas(FigureCanvas):
                 appnope.nope()
             except:
                 pass
+            try:
+                a = aw.qmc.extrabuttonactions[0]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.extrabuttonactionstrings[0])
+            except:
+                pass
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             aw.qmc.clearMeasurements()
             self.timeclock.start()   #set time to the current computer time
@@ -3845,11 +3857,14 @@ class tgraphcanvas(FigureCanvas):
             aw.arduino.activateONOFFeasySV(False)
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
             #appnope.nap()
+            try:
+                a = aw.qmc.extrabuttonactions[1]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.extrabuttonactionstrings[1])
+            except:
+                pass
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
-
-
 
     # close serial port, Phidgets and Yocto ports
     def disconnectProbesFromSerialDevice(self,ser):
@@ -6617,6 +6632,13 @@ class SampleThread(QThread):
                 if not local_flagstart and len(aw.qmc.timex) < 2:
                     aw.qmc.timeclock.start()
                     
+                # send sampling action if any                
+                try:
+                    a = aw.qmc.extrabuttonactions[2]
+                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.extrabuttonactionstrings[2])
+                except:
+                    pass
+                    
                 #if using a meter (thermocouple device)
                 if aw.qmc.device != 18: # not NONE device
                 
@@ -6708,6 +6730,12 @@ class SampleThread(QThread):
                             raise Exception(errormessage)
                     timeAfterExtra = libtime.time() # the time the data of all extra devices was received
                     if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
+                        # send another sampling action if any
+                        try:
+                            a = aw.qmc.extrabuttonactions[2]
+                            aw.eventaction((a if (a < 3) else a + 1),aw.qmc.extrabuttonactionstrings[2])
+                        except:
+                            pass
                         # let's do the oversampling thing and take a second reading from the main device
                         sampling_interval = aw.qmc.delay/1000.
 #                        remaining_time = sampling_interval - (timeAfterExtra - timeBeforeETBT)
@@ -9259,39 +9287,67 @@ class ApplicationWindow(QMainWindow):
                         if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
                             self.recordextraevent(buttonnumber)
                 elif action == 4:
-                    if cmd_str.startswith('write'):
-                        try:
-                            cmds = eval(cmd_str[len('write'):])
-                            if isinstance(cmds,tuple):
-                                if len(cmds) == 3 and not isinstance(cmds[0],list):
-                                    # cmd has format "write(s,r,v)"
-                                    libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)
-                                    aw.modbus.writeRegister(*cmds)
-                                else:
-                                # cmd has format "write([s,r,v],..,[s,r,v])"
-                                    for cmd in cmds:
+                    # TODO: add "_" substitution and read command
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        followupCmd = False #
+                        for c in cmds:
+                            cs = c.replace("_",str(aw.modbus.lastReadResult)) # the last read value can be accessed via the "_" symbol
+                            if followupCmd:
+                                libtime.sleep(0.80) # add time between commands to let the server compute the results
+                            if cs.startswith('write'):
+                                try:
+                                    cmds = eval(cs[len('write'):])
+                                    if isinstance(cmds,tuple):
+                                        if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                            # cmd has format "write(s,r,v)"
+                                            libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)
+                                            aw.modbus.writeRegister(*cmds)
+                                            followupCmd = True
+                                        else:
+                                        # cmd has format "write([s,r,v],..,[s,r,v])"
+                                            for cmd in cmds:
+                                                libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)
+                                                aw.modbus.writeRegister(*cmd)
+                                            followupCmd = True
+                                    else:
+                                        # cmd has format "write([s,r,v])"
                                         libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)
-                                        aw.modbus.writeRegister(*cmd)
-                            else:
-                                # cmd has format "write([s,r,v])"
-                                libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)
-                                aw.modbus.writeRegister(*cmds)
-                        except:
-                            pass
-                    elif cmd_str.startswith("wcoils"):
-                        cmds = eval(cmd_str[len('wcoils'):])
-                        if isinstance(cmds,tuple):
-                            if len(cmds) == 3 and not isinstance(cmds[0],list):
-                                # cmd has format "write(s,r,[<b>,..<b>])"
-                                aw.modbus.writeCoils(*cmds)
-                                libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)  
-                    elif cmd_str.startswith("wcoil"):
-                        cmds = eval(cmd_str[len('wcoil'):])
-                        if isinstance(cmds,tuple):
-                            if len(cmds) == 3:
-                                # cmd has format "write(s,r,<b>)"
-                                aw.modbus.writeCoil(*cmds)
-                                libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)                       
+                                        aw.modbus.writeRegister(*cmds)
+                                        followupCmd = True
+                                except:
+                                    pass
+                            elif cs.startswith("wcoils"):
+                                try:
+                                    cmds = eval(cs[len('wcoils'):])
+                                    if isinstance(cmds,tuple):
+                                        if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                            # cmd has format "wcoils(s,r,[<b>,..<b>])"
+                                            libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)  
+                                            aw.modbus.writeCoils(*cmds)
+                                            followupCmd = True
+                                except:
+                                    pass
+                            elif cs.startswith("wcoil"):
+                                try:
+                                    cmds = eval(cs[len('wcoil'):])
+                                    if isinstance(cmds,tuple) and len(cmds) == 3:
+                                        # cmd has format "wcoil(s,r,<b>)"
+                                        libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)                       
+                                        aw.modbus.writeCoil(*cmds)
+                                        followupCmd = True
+                                except:
+                                    pass
+                            elif cs.startswith("read"):
+                                try:
+                                    cmds = eval(cs[len('read'):])
+                                    if isinstance(cmds,tuple) and len(cmds) == 2:
+                                        # cmd has format "read(s,r)"
+                                        libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)                       
+                                        aw.modbus.lastReadResult = aw.modbus.readSingleRegister(*cmds)
+                                        followupCmd = True
+                                except:
+                                    pass
                 elif action == 5:
                     try:
                         DTAvalue=cmd_str.split(':')[1]
@@ -12235,6 +12291,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.buttonactions = [x.toInt()[0] for x in settings.value("buttonactions").toList()]
             if settings.contains("buttonactionstrings"):
                 self.qmc.buttonactionstrings = list(map(str,list(settings.value("buttonactionstrings",self.qmc.buttonactionstrings).toStringList())))
+            if settings.contains("extrabuttonactions"):
+                self.qmc.extrabuttonactions = [x.toInt()[0] for x in settings.value("extrabuttonactions").toList()]
+            if settings.contains("extrabuttonactionstrings"):
+                self.qmc.extrabuttonactionstrings = list(map(str,list(settings.value("extrabuttonactionstrings",self.qmc.extrabuttonactionstrings).toStringList())))
             settings.endGroup()
             settings.beginGroup("HUD")
             self.qmc.projectFlag = settings.value("Projection",self.qmc.projectFlag).toBool()
@@ -13052,6 +13112,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("buttonvisibility",self.qmc.buttonvisibility)
             settings.setValue("buttonactions",self.qmc.buttonactions)
             settings.setValue("buttonactionstrings",self.qmc.buttonactionstrings)
+            settings.setValue("extrabuttonactions",self.qmc.extrabuttonactions)
+            settings.setValue("extrabuttonactionstrings",self.qmc.extrabuttonactionstrings)
             settings.endGroup()
             settings.beginGroup("HUD")
             settings.setValue("Projection",self.qmc.projectFlag)
@@ -19104,7 +19166,10 @@ class WindowsDlg(ArtisanDialog):
         self.xaxislencombobox.addItems(timelocs)
 #        self.timeconversion = [30,60,120,180,240,300]
         self.timeconversion = [60,120,180,240,300]
-        self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(aw.qmc.xgrid))
+        try:
+            self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(aw.qmc.xgrid))
+        except:
+            self.xaxislencombobox.setCurrentIndex(0)
         self.connect(self.xaxislencombobox,SIGNAL("currentIndexChanged(int)"),self.xaxislenloc)
         ygridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
         self.ygridSpinBox = QSpinBox()
@@ -20143,31 +20208,61 @@ class EventsDlg(ArtisanDialog):
         self.COOLbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[7])
         self.COOLbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[7])
         self.COOLbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
+        
+        self.ONbuttonLabel = QLabel(QApplication.translate("Label", "ON", None, QApplication.UnicodeUTF8))
+        self.ONbuttonActionType = QComboBox()
+        self.ONbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.ONbuttonActionType.setFocusPolicy(Qt.NoFocus)
+        self.ONbuttonActionType.addItems(self.buttonActionTypes)
+        self.ONbuttonActionType.setCurrentIndex(aw.qmc.extrabuttonactions[0])
+        self.ONbuttonActionString = QLineEdit(aw.qmc.extrabuttonactionstrings[0])
+        self.ONbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))        
+        self.OFFbuttonActionType = QComboBox()
+        self.OFFbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.OFFbuttonActionType.setFocusPolicy(Qt.NoFocus)
+        self.OFFbuttonActionType.addItems(self.buttonActionTypes)
+        self.OFFbuttonActionType.setCurrentIndex(aw.qmc.extrabuttonactions[1])
+        self.OFFbuttonActionString = QLineEdit(aw.qmc.extrabuttonactionstrings[1])
+        self.OFFbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
+        self.OFFbuttonLabel = QLabel(QApplication.translate("Label", "OFF", None, QApplication.UnicodeUTF8))
+        self.SAMPLINGbuttonActionType = QComboBox()
+        self.SAMPLINGbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.SAMPLINGbuttonActionType.setFocusPolicy(Qt.NoFocus)
+        self.SAMPLINGbuttonActionType.addItems(self.buttonActionTypes)
+        self.SAMPLINGbuttonActionType.setCurrentIndex(aw.qmc.extrabuttonactions[2])
+        self.SAMPLINGbuttonActionString = QLineEdit(aw.qmc.extrabuttonactionstrings[2])
+        self.SAMPLINGbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))        
         defaultButtonsLayout = QGridLayout()
-        defaultButtonsLayout.addWidget(self.CHARGEbutton,0,0)
-        defaultButtonsLayout.addWidget(self.CHARGEbuttonActionType,0,1)
-        defaultButtonsLayout.addWidget(self.CHARGEbuttonActionString,0,2)
-        defaultButtonsLayout.addWidget(self.DRYbutton,1,0)
-        defaultButtonsLayout.addWidget(self.DRYbuttonActionType,1,1)
-        defaultButtonsLayout.addWidget(self.DRYbuttonActionString,1,2)
-        defaultButtonsLayout.addWidget(self.FCSbutton,2,0)
-        defaultButtonsLayout.addWidget(self.FCSbuttonActionType,2,1)
-        defaultButtonsLayout.addWidget(self.FCSbuttonActionString,2,2)
-        defaultButtonsLayout.addWidget(self.FCEbutton,3,0)
-        defaultButtonsLayout.addWidget(self.FCEbuttonActionType,3,1)
-        defaultButtonsLayout.addWidget(self.FCEbuttonActionString,3,2)
-        defaultButtonsLayout.addWidget(self.SCSbutton,4,0)
-        defaultButtonsLayout.addWidget(self.SCSbuttonActionType,4,1)
-        defaultButtonsLayout.addWidget(self.SCSbuttonActionString,4,2)
-        defaultButtonsLayout.addWidget(self.SCEbutton,5,0)
-        defaultButtonsLayout.addWidget(self.SCEbuttonActionType,5,1)
-        defaultButtonsLayout.addWidget(self.SCEbuttonActionString,5,2)
-        defaultButtonsLayout.addWidget(self.DROPbutton,6,0)
-        defaultButtonsLayout.addWidget(self.DROPbuttonActionType,6,1)
-        defaultButtonsLayout.addWidget(self.DROPbuttonActionString,6,2)
-        defaultButtonsLayout.addWidget(self.COOLbutton,7,0)
-        defaultButtonsLayout.addWidget(self.COOLbuttonActionType,7,1)
-        defaultButtonsLayout.addWidget(self.COOLbuttonActionString,7,2)
+        defaultButtonsLayout.addWidget(self.ONbuttonLabel,0,0,Qt.AlignCenter)
+        defaultButtonsLayout.addWidget(self.ONbuttonActionType,0,1)
+        defaultButtonsLayout.addWidget(self.ONbuttonActionString,0,2)
+        defaultButtonsLayout.addWidget(self.CHARGEbutton,1,0)
+        defaultButtonsLayout.addWidget(self.CHARGEbuttonActionType,1,1)
+        defaultButtonsLayout.addWidget(self.CHARGEbuttonActionString,1,2)
+        defaultButtonsLayout.addWidget(self.DRYbutton,2,0)
+        defaultButtonsLayout.addWidget(self.DRYbuttonActionType,2,1)
+        defaultButtonsLayout.addWidget(self.DRYbuttonActionString,2,2)
+        defaultButtonsLayout.addWidget(self.FCSbutton,3,0)
+        defaultButtonsLayout.addWidget(self.FCSbuttonActionType,3,1)
+        defaultButtonsLayout.addWidget(self.FCSbuttonActionString,3,2)
+        defaultButtonsLayout.addWidget(self.FCEbutton,4,0)
+        defaultButtonsLayout.addWidget(self.FCEbuttonActionType,4,1)
+        defaultButtonsLayout.addWidget(self.FCEbuttonActionString,4,2)
+        defaultButtonsLayout.addWidget(self.SCSbutton,5,0)
+        defaultButtonsLayout.addWidget(self.SCSbuttonActionType,5,1)
+        defaultButtonsLayout.addWidget(self.SCSbuttonActionString,5,2)
+        defaultButtonsLayout.addWidget(self.SCEbutton,6,0)
+        defaultButtonsLayout.addWidget(self.SCEbuttonActionType,6,1)
+        defaultButtonsLayout.addWidget(self.SCEbuttonActionString,6,2)
+        defaultButtonsLayout.addWidget(self.DROPbutton,7,0)
+        defaultButtonsLayout.addWidget(self.DROPbuttonActionType,7,1)
+        defaultButtonsLayout.addWidget(self.DROPbuttonActionString,7,2)
+        defaultButtonsLayout.addWidget(self.COOLbutton,8,0)
+        defaultButtonsLayout.addWidget(self.COOLbuttonActionType,8,1)
+        defaultButtonsLayout.addWidget(self.COOLbuttonActionString,8,2)
+        defaultButtonsLayout.addWidget(self.OFFbuttonLabel,9,0,Qt.AlignCenter)
+        defaultButtonsLayout.addWidget(self.OFFbuttonActionType,9,1)
+        defaultButtonsLayout.addWidget(self.OFFbuttonActionString,9,2)
         defaultButtonsLayout.setContentsMargins(5,5,5,5)
         defaultButtonsLayout.setHorizontalSpacing(10)
         defaultButtonsLayout.setVerticalSpacing(7)
@@ -20180,10 +20275,18 @@ class EventsDlg(ArtisanDialog):
         autoLayout.addSpacing(20)
         autoLayout.addWidget(self.markTP)
         autoLayout.addStretch()
+        samplingLayout = QHBoxLayout()
+        samplingLayout.addStretch()
+        samplingLayout.addWidget(self.SAMPLINGbuttonActionType)
+        samplingLayout.addWidget(self.SAMPLINGbuttonActionString)
+        samplingLayout.addStretch()
+        SamplingGroupLayout = QGroupBox(QApplication.translate("GroupBox","Sampling Interval",None, QApplication.UnicodeUTF8))
+        SamplingGroupLayout.setLayout(samplingLayout)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(FlagsLayout)
         tab1layout.addWidget(TypeGroupLayout)
         tab1layout.addWidget(ButtonGroupLayout)
+        tab1layout.addWidget(SamplingGroupLayout)
         tab1layout.addLayout(autoLayout)
         tab1layout.addStretch()
         tab1layout.setContentsMargins(5,5,5,5)
@@ -21074,6 +21177,9 @@ class EventsDlg(ArtisanDialog):
             aw.qmc.buttonactions[5] = self.SCEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[6] = self.DROPbuttonActionType.currentIndex()
             aw.qmc.buttonactions[7] = self.COOLbuttonActionType.currentIndex()
+            aw.qmc.extrabuttonactions[0] = self.ONbuttonActionType.currentIndex()
+            aw.qmc.extrabuttonactions[1] = self.OFFbuttonActionType.currentIndex()
+            aw.qmc.extrabuttonactions[2] = self.SAMPLINGbuttonActionType.currentIndex()
             aw.qmc.buttonactionstrings[0] = u(self.CHARGEbuttonActionString.text())
             aw.qmc.buttonactionstrings[1] = u(self.DRYbuttonActionString.text())
             aw.qmc.buttonactionstrings[2] = u(self.FCSbuttonActionString.text())
@@ -21082,6 +21188,9 @@ class EventsDlg(ArtisanDialog):
             aw.qmc.buttonactionstrings[5] = u(self.SCEbuttonActionString.text())
             aw.qmc.buttonactionstrings[6] = u(self.DROPbuttonActionString.text())
             aw.qmc.buttonactionstrings[7] = u(self.COOLbuttonActionString.text())
+            aw.qmc.extrabuttonactionstrings[0] = u(self.ONbuttonActionString.text())
+            aw.qmc.extrabuttonactionstrings[1] = u(self.OFFbuttonActionString.text())
+            aw.qmc.extrabuttonactionstrings[2] = u(self.SAMPLINGbuttonActionString.text())
             #save etypes
             if len(u(self.etype0.text())) and len(u(self.etype1.text())) and len(u(self.etype2.text())) and len(u(self.etype3.text())):
                 aw.qmc.etypes[0] = u(self.etype0.text())
@@ -22643,6 +22752,7 @@ class modbusport(object):
         #    2: Serial Binary
         #    3: TCP
         #    4: UDP
+        self.lastReadResult = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
     
     def address2register(self,addr,code=3):
         if code == 3 or code == 6:
