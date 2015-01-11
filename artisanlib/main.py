@@ -2069,7 +2069,8 @@ class tgraphcanvas(FigureCanvas):
                         except:
                             Y.append(-1)
                     else:
-                        Y.append(-1).append(-1)
+                        Y.append(-1)
+                        Y.append(-1)
                     #add Ys and their value to math dictionary 
                     for i in range(len(Yval)):
                         idx = int(Yval[i])-1
@@ -17151,7 +17152,7 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeinvolume.setText("")
                 self.inVolume = None
             else:
-                res = self.weightIn / (k * (int(str(self.coffeeinweightEdit.text())) / (j * float(self.unitvolumeEdit.text()))))
+                res = self.weightIn / (k * (float(str(self.coffeeinweightEdit.text())) / (j * float(self.unitvolumeEdit.text()))))
                 if self.volumeunit:
                     self.coffeeinvolume.setText(str(aw.float2float(res,4)))
                 else:
@@ -17175,7 +17176,7 @@ class volumeCalculatorDlg(ArtisanDialog):
                 self.coffeeoutvolume.setText("")
                 self.outVolume = None
             else:
-                res = self.weightOut / (k * (int(str(self.coffeeoutweightEdit.text())) / (j * float(self.unitvolumeEdit.text()))))
+                res = self.weightOut / (k * (float(str(self.coffeeoutweightEdit.text())) / (j * float(self.unitvolumeEdit.text()))))
                 if self.volumeunit:
                     self.coffeeoutvolume.setText(str(aw.float2float(res,4)))
                 else:
@@ -24840,7 +24841,7 @@ class serialport(object):
         aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO attached",None, QApplication.UnicodeUTF8))
         aw.ser.PhidgetIOAttached = True
         
-    def phidget1041detached(self,e):
+    def phidget1018detached(self,e):
         aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO detached",None, QApplication.UnicodeUTF8))
         aw.ser.PhidgetIOAttached = False
 
@@ -24865,7 +24866,6 @@ class serialport(object):
                     except:
                         pass
                     aw.ser.PhidgetIO = None
-                    aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO not attached",None, QApplication.UnicodeUTF8))
             if aw.ser.PhidgetIOAttached:
                 sensorCount = aw.ser.PhidgetIO.getSensorCount()
                 if mode == 0:
