@@ -968,7 +968,7 @@ class tgraphcanvas(FigureCanvas):
         self.ETBdeltamarker = self.marker_default
         self.ETBdeltamarkersize = self.markersize_default
 
-        #Temperature Alarms lists. Data is writen in  alarmDlg 
+        #Temperature Alarms lists. Data is written in  alarmDlg 
         self.alarmflag = []    # 0 = OFF; 1 = ON flags
         self.alarmguard = []   # points to another alarm by index that has to be triggered before; -1 indicates no guard
         self.alarmnegguard = []   # points to another alarm by index that should not has been triggered before; -1 indicates no guard
@@ -7149,6 +7149,7 @@ class Athreadserver(QWidget):
         sthread.start()
         sthread.wait(300)    #needed in some Win OS
 
+
 ########################################################################################
 #################### MAIN APPLICATION WINDOW ###########################################
 ########################################################################################
@@ -8584,10 +8585,17 @@ class ApplicationWindow(QMainWindow):
         aw.qmc.phasesLCDmode = (aw.qmc.phasesLCDmode + 1)%3
         aw.updatePhasesLCDs()
 
-    def colordialog(self,c,noButtons=False): # c a QColor
+    def colordialog(self,c,noButtons=False,parent=None): # c a QColor
         if platform.system() == 'Darwin':
             if noButtons:
-                return QColorDialog.getColor(c,self,"Color",QColorDialog.NoButtons)
+                if parent == None:
+                    parent = self
+                cd = QColorDialog(parent)
+                cd.setOption(QColorDialog.NoButtons,True)
+                cd.setCurrentColor(c)
+                cd.exec_()
+                cr = cd.currentColor()
+                return cr
             else:
                 return QColorDialog.getColor(c)
             #return QColorDialog.getColor(c,self,"Color",QColorDialog.DontUseNativeDialog) # works, but does not show native dialog
@@ -16900,8 +16908,7 @@ class volumeCalculatorDlg(ArtisanDialog):
 #        unitButton.setMaximumSize(60,35)
 #        unitButton.setMinimumSize(60,35) 
         unitButton.setFocusPolicy(Qt.NoFocus)
-        
-                
+
         unitLayout = QHBoxLayout()
         if self.scale_connected:
             unitLayout.addStretch()
@@ -26751,7 +26758,11 @@ class comportDlg(ArtisanDialog):
                 for i in range(nssdevices):
                     devid = aw.qmc.extradevices[i]
                     devicename = aw.qmc.devices[devid-1]
-                    device = QTableWidgetItem(devicename)    #type identification of the device. Non editable
+                    if devicename[0] == "+":
+                        devname = devicename[1:]
+                    else:
+                        devname = devicename
+                    device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
                     # "ADD DEVICE:"
                     if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
@@ -27895,7 +27906,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #line 1
             if l == 1:
                 # use native no buttons dialog on Mac OS X, blocks otherwise
-                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor1[i]),True)
+                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor1[i]),True,self)
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor1[i] = colorname
@@ -27904,7 +27915,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #line 2
             elif l == 2:
                 # use native no buttons dialog on Mac OS X, blocks otherwise
-                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor2[i]),True)
+                colorf = aw.colordialog(QColor(aw.qmc.extradevicecolor2[i]),True,self)
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor2[i] = colorname
@@ -33318,7 +33329,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             aw.fujipid.PXG4[rampkey][0] = ramp
             aw.fujipid.PXG4[soakkey][0] = soak
             self.paintlabels()
-            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully writen",None, QApplication.UnicodeUTF8),5000) 
+            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully written",None, QApplication.UnicodeUTF8),5000) 
         else:
             aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None, QApplication.UnicodeUTF8))
 
