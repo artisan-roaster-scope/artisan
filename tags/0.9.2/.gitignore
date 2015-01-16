@@ -1,0 +1,8 @@
+/.svn/
+/build/
+/dist/
+/artisan.py.bak
+/artisan.py.org.py
+/artisan.py.python2.py
+/artisan.py.zip
+/*.DS_Store
