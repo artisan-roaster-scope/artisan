@@ -174,6 +174,9 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.9.2 (16.1.2015)
+- bug fixes
+
 v0.9.1 (3.1.2015)
 - adds QR code for WebLCD URL
 - adds support for the acaia BT coffee scale
