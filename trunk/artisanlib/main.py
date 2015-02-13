@@ -618,7 +618,8 @@ class tgraphcanvas(FigureCanvas):
                        "+Program_34",           #48
                        "+Program_56",           #49
                        "DUMMY",                 #50
-                       "-Omega HH806W"          #51 NOT WORKING 
+                       "+CENTER 304_34",        #52
+                       "-Omega HH806W"          #52 NOT WORKING 
                        ]
 
         #extra devices
@@ -1514,7 +1515,7 @@ class tgraphcanvas(FigureCanvas):
                                 if -100 < self.extratemp2[i][-1] < 1000:
                                     aw.extraLCD2[i].display(lcdformat%float(self.extratemp2[i][-1]))
                                 else:
-                                    aw.extraLCD1[i].display("--")
+                                    aw.extraLCD2[i].display("--")
                                     
                     # update large LCDs (incl. Web LCDs)
                     timestr = None
@@ -2315,10 +2316,10 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_2.setText(QApplication.translate("Button", "START",None, QApplication.UnicodeUTF8))
                 aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
 
-                self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
                 aw.setWindowTitle(aw.windowTitle)
 
                 if self.roastpropertiesflag:
+                    self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
                     self.roastingnotes = ""
                     self.cuppingnotes = ""
                     self.beans = ""
@@ -3612,8 +3613,10 @@ class tgraphcanvas(FigureCanvas):
                             self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
                             self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
                             if self.device != 18:
-                                self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
-                                self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
+                                if len(self.delta1):
+                                    self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
+                                if len(self.delta2):
+                                    self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
                             #extra devices curves
                             nextra = len(aw.qmc.extratemp1)
                             if nextra:
@@ -6657,7 +6660,7 @@ class SampleThread(QThread):
                             xtra_dev_lines1 = 0
                             xtra_dev_lines2 = 0
                             for i in range(nxdevices):
-                                extratx,extrat2,extrat1 = self.sample_extra_device(i)                               
+                                extratx,extrat2,extrat1 = self.sample_extra_device(i)
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,extratx)
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
@@ -6685,8 +6688,7 @@ class SampleThread(QThread):
                                         extrat2 = aw.qmc.fromFtoC(extrat2)                                
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
                                     extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
-                                if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
-                                    extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
+                                    extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)                                    
                                 if local_flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
                                     aw.qmc.extratemp2[i].append(float(extrat2))
@@ -15065,30 +15067,30 @@ $cupping_notes
         if len(self.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
             ETreachTime,BTreachTime,ET2reachTime,BT2reachTime = self.qmc.getTargetTime()
             if ETreachTime > 0 and ETreachTime < 2000:
-                text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
+                text1 = u(QApplication.translate("Label","%1 to reach ET %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
                     text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
             else:
-                text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
+                text1 = u(QApplication.translate("Label","%1 to reach ET %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
             if ET2reachTime > 0 and ET2reachTime < 2000:
-                text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
+                text2 = u(QApplication.translate("Label","%1 to reach ET %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
                     text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
             else:
-                text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ET2target) + self.qmc.mode))
+                text2 = u(QApplication.translate("Label","%1 to reach ET %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ET2target) + self.qmc.mode))
                 
             if BTreachTime > 0 and BTreachTime < 2000:    
-                text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
+                text3 = u(QApplication.translate("Label","%1 to reach BT %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
                     text3 = text3 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
             else:
-                text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
+                text3 = u(QApplication.translate("Label","%1 to reach BT %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
             if BT2reachTime > 0 and BT2reachTime < 2000:
-                text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
+                text4 = u(QApplication.translate("Label","%1 to reach BT %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
                     text4 = text4 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
             else:
-                text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BT2target) + self.qmc.mode))
+                text4 = u(QApplication.translate("Label","%1 to reach BT %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BT2target) + self.qmc.mode))
             ####  Phase Texts #####
             phasetext1 = u("") # lower textline
             phasetext2 = u("") # higher textline
@@ -23048,7 +23050,7 @@ class scaleport(extraserialport):
     def readAcaia(self):
         try:
             if not self.SP:
-                # connect serial port if not yet connected
+                # connect serial port if not yet connected                
                 self.connect()
             if self.SP:
                 if not self.SP.isOpen():
@@ -23063,7 +23065,7 @@ class scaleport(extraserialport):
                         # read reply until "SCAN_STOP"
                         v = self.readLine()
                         while not v.startswith(' SCAN_STOP'):                        
-                            v = str(self.SP.readline().decode('ascii'))                        
+                            v = str(self.SP.readline().decode('ascii'))
                         self.SP.write(str2cmd('￼BTCN1\r\n')) # connect to scale 1
                         # read until non-empty reply
                         v = self.readLine()
@@ -23276,7 +23278,8 @@ class serialport(object):
                                    self.callprogram_34,     #48
                                    self.callprogram_56,     #49
                                    self.DUMMY,              #50
-                                   self.HH806W              #51
+                                   self.CENTER304_34,       #51
+                                   self.HH806W              #52
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -23616,6 +23619,10 @@ class serialport(object):
     def CENTER309_34(self):
         #return saved readings collected at self.CENTER309temperature()
         return aw.qmc.extra309TX,aw.qmc.extra309T4,aw.qmc.extra309T3
+
+    #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
+    def CENTER304_34(self):
+        return self.CENTER309_34()
 
     def CENTER306(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -26545,7 +26552,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,50]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -26765,7 +26772,7 @@ class comportDlg(ArtisanDialog):
                     device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
                     # "ADD DEVICE:"
-                    if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                    if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                         comportComboBox = PortComboBox(selection = aw.extracomport[i])
                         self.connect(comportComboBox, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                         comportComboBox.setFixedWidth(200)
@@ -26862,7 +26869,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,50]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,50,51]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -28327,8 +28334,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.device = 50
                     message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
+                ####  DEVICE 51 is +304_34 but +DEVICE cannot be set as main device
+                ##########################
                 elif meter == "Omega HH806W":
-                    aw.qmc.device = 51
+                    aw.qmc.device = 52
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -28400,7 +28409,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 3, # 48
                 3, # 49
                 3, # 50
-                8] # 51
+                3, # 51
+                8] # 52
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -28522,7 +28532,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51]):
                 aw.setcommport()
             #self.close()
             self.accept()
@@ -33529,6 +33539,7 @@ class FujiPID(object):
         else:
             return -1
 
+    # returns Fuji duty signal in the range 0-100 or -1
     def readdutycycle(self):
         if aw.ser.useModbusPort:
             reg = None
@@ -33551,7 +33562,7 @@ class FujiPID(object):
             elif aw.ser.controlETpid[0] == 1:
                 command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
             val = self.readoneword(command)/100.
-        if val != -0.01:
+        if val >= 0 and val <= 110:
             return val
         else:
             return -1

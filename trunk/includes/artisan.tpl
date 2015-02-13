@@ -2,6 +2,9 @@
 <html lang="en">
    <head>
       <meta charset="utf-8"/>
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-status-bar-style" content="black">
+      <meta name="apple-mobile-web-app-title" content="Artisan">
       <title>Artisan WebLCDs</title>
       <script type="text/javascript">
          var ws = new WebSocket("ws://" + location.host.split(":")[0] + ":{{port}}/websocket");
@@ -62,8 +65,14 @@
          #bt, .space, .tspace {
          display: inline;  
          }
+         #showspacel,#showspacer {
+            display: {{showspace}};
+         }
          }
          @media screen and (orientation: portrait)  {
+         #showspacel,#showspacer {
+            display: none;
+         }
          .space, #bt, .spacel {
          display: none;  
          }
@@ -72,6 +81,9 @@
          }
          }
          @media only screen and (orientation: portrait) and (min-device-width : 768px) and (max-device-width : 1024px) {
+         #showspacel,#showspacer {
+            display: none;
+         }
          .space, #et, .spacer {
          display: none;
          }
@@ -102,10 +114,10 @@
    <body>
       <div id="artisan" style="width:100%;">
          <div>&nbsp;<span class="tspace">&nbsp;</span><span id="time">00:00</span><span class="tspace">&nbsp;</span>&nbsp;</div>
-         <div><span id="showet"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="et">{{!nonesymbol}}</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span><span id="showbt"><span class="space">&thinsp;</span><span id="bt">{{!nonesymbol}}</span></span></div>
+         <div><span id="showspacel">&nbsp;</span><span id="showet"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="et">{{!nonesymbol}}</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span><span id="showbt"><span class="space">&thinsp;</span><span id="bt">{{!nonesymbol}}</span></span><span id="showspacer">&nbsp;</span></div>
          <div id="hbt"><span id="showhbt"><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span><span id="bt2">{{!nonesymbol}}</span><span class="spacel">&nbsp;</span><span class="spacer">&thinsp;</span></span></div>
       </div>
-      <script src="jquery-1.11.1.min.js"></script>
+      <script src="jquery-1.11.2.min.js"></script>
       <script src="bigtext.js"></script>
       <script>
          $(document).ready(function() {
