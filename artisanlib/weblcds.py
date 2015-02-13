@@ -159,6 +159,10 @@ def status():
 # route to serve the static page
 @route('/artisan')
 def index():
+    if not (showbt and showet):
+        showspace_str = "inline"
+    else:
+        showspace_str = "none"
     if showbt:
         showbt_str = "inline"
     else:
@@ -177,7 +181,8 @@ def index():
         etcolor=etcolor,
         etbackground=etbackground,
         showbt=showbt_str,
-        showet=showet_str)
+        showet=showet_str,
+        showspace=showspace_str)
 
         
 # Static Routes
