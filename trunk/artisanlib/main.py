@@ -9266,7 +9266,7 @@ class ApplicationWindow(QMainWindow):
             self.fileSaveAction.setEnabled(False)
             self.fileSaveAsAction.setEnabled(False) 
 
-    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO), 7=Call Program with argument
+    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO), 7=Call Program with argument (slider action)
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -9281,14 +9281,17 @@ class ApplicationWindow(QMainWindow):
                         self.ser.sendTXcommand(cmd_str_bin)
                     else:
                         self.ser.sendTXcommand(cmd_str)
-                elif action == 2:
+                elif action == 2: # alarm and button call program action (without any argument)
                     try:
+                        if cmd_str and len(cmd_str.split(" ")) > 1:
+                            self.call_prog_with_args(cmd_str) # a command with argument
+                        else:
 # take care, the QDir().current() directory changes with loads and saves 
 #                        QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
-                        if platf in ['Windows','Linux']:
-                            QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/" + cmd_str, QUrl.TolerantMode))
-                        else: # on Darwin
-                            QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.TolerantMode))
+                            if platf in ['Windows','Linux']:
+                                QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/" + cmd_str, QUrl.TolerantMode))
+                            else: # on Darwin
+                                QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.TolerantMode))
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " eventaction() %1").arg(str(e)),exc_tb.tb_lineno)
@@ -9379,17 +9382,23 @@ class ApplicationWindow(QMainWindow):
                                 aw.ser.PhidgetIO.setOutputState(c,not(state))
                     except:
                         pass
-                elif action == 7:
+                elif action == 7: # slider call-program action
                     try:
-                        prg_file = u(aw.getAppPath()) + u(cmd_str)
-                        subprocess.Popen(prg_file, shell=True)
-                        # alternative approach, that seems to fail on some Mac OS X versions:
-                        #QProcess.startDetached(prg_file)
+                        self.call_prog_with_args(cmd_str)
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " callProgram(): %1").arg(str(e)),exc_tb.tb_lineno)
             except:
                 pass
+                
+    def call_prog_with_args(self,cmd_str):
+        cmd_str_parts = cmd_str.split(" ")
+        if len(cmd_str_parts) > 0:
+            cmd = cmd_str_parts[0].strip()
+            prg_file = u(aw.getAppPath()) + u(cmd)
+            subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]])
+            # alternative approach, that seems to fail on some Mac OS X versions:
+            #QProcess.startDetached(prg_file)
                     
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     # updates corresponding eventslidervalues
