@@ -3183,6 +3183,7 @@ class tgraphcanvas(FigureCanvas):
                     labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
             nrdevices = len(self.extradevices)
+            
             if nrdevices and not self.designerflag:
                 xtmpl1idx = 0
                 xtmpl2idx = 0
@@ -3195,7 +3196,7 @@ class tgraphcanvas(FigureCanvas):
                         handles.append(self.extratemp2lines[xtmpl2idx])
                         xtmpl2idx = xtmpl2idx + 1
                         labels.append(aw.arabicReshape(self.extraname2[i]))
-                    
+                        
             if not self.designerflag and aw.qmc.BTcurve:
                 if self.flagon: # no smoothed lines in this case, pass normal BT
                     self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
@@ -3375,9 +3376,9 @@ class tgraphcanvas(FigureCanvas):
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("x-small")
                 if two_ax_mode:
-                    leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=4,fancybox=True,prop=prop)
+                    leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=int(math.ceil(len(handles)/2.)),fancybox=True,prop=prop)
                 else:
-                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,fancybox=True,prop=prop)
+                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=int(math.ceil(len(handles)/2.)),fancybox=True,prop=prop)
                 if aw.qmc.graphstyle == 1:
                     leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
 
@@ -24968,9 +24969,11 @@ class serialport(object):
                 ## WINDOWS/Linux DLL HACK BEGIN
                 if platf == 'Windows' and aw.appFrozen():
                     if platform.architecture()[0] == '32bit':
-                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\lib\\yapi.dll"
+#                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\lib\\yapi.dll"
+                        YAPI._yApiCLibFile = os.path.dirname(sys.executable) + "\\lib\\yapi.dll"
                     else:
-                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\lib\\yapi-amd64.dll"
+#                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\lib\\yapi-amd64.dll"
+                        YAPI._yApiCLibFile = os.path.dirname(sys.executable) + "\\lib\\yapi-amd64.dll"
                 elif platf == "Linux" and aw.appFrozen():
                     if platform.architecture()[0] == '32bit':
                         YAPI._yApiCLibFile = u(QApplication.applicationDirPath() + "/libyapi-i386.so")
