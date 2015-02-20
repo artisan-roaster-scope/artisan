@@ -3375,10 +3375,14 @@ class tgraphcanvas(FigureCanvas):
                 rcParams['path.effects'] = []
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("x-small")
-                if two_ax_mode:
-                    leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=int(math.ceil(len(handles)/2.)),fancybox=True,prop=prop)
+                if len(handles) > 3:
+                    ncol = int(math.ceil(len(handles)/2.))
                 else:
-                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=int(math.ceil(len(handles)/2.)),fancybox=True,prop=prop)
+                    ncol = int(math.ceil(len(handles)))
+                if two_ax_mode:
+                    leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop)
+                else:
+                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop)
                 if aw.qmc.graphstyle == 1:
                     leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
 
@@ -10426,10 +10430,10 @@ class ApplicationWindow(QMainWindow):
             for i in range(len(extra_fields)):
                 if i % 2 == 1:
                     # odd
-                    self.qmc.extraname2[int(i/2)] = extra_fields[i]
+                    self.qmc.extraname2[int(i/2)] = d(extra_fields[i])
                 else:
                     # even
-                    self.qmc.extraname1[int(i/2)] = extra_fields[i]
+                    self.qmc.extraname1[int(i/2)] = d(extra_fields[i])
             #read data
             last_time = None
             
@@ -11036,7 +11040,9 @@ class ApplicationWindow(QMainWindow):
                     u("SCe:" + self.eventtime2string(SCe)),
                     u("DROP:" + self.eventtime2string(DROP)),
                     u("COOL:" + self.eventtime2string(COOL))])
-                writer.writerow([u('Time1'),u('Time2'),u('BT'),u('ET'),u('Event')] + freduce(lambda x,y: x + [u(str(y[0])),u(str(y[1]))], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))
+                row = ([u('Time1'),u('Time2'),u('BT'),u('ET'),u('Event')] + freduce(lambda x,y: x + [u(y[0]),u(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))
+                row = [encodeLocal(e) for e in row]
+                writer.writerow(row)
                 last_time = None
                 for i in range(len(self.qmc.timex)):
                     if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
