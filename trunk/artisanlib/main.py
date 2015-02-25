@@ -9904,6 +9904,24 @@ class ApplicationWindow(QMainWindow):
         cleanedFilename = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore')
         return ''.join(c for c in cleanedFilename if c in validFilenameChars)
     
+    
+    def generateFilename(self,prefix=""):
+        title = None
+        if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
+            title = aw.qmc.title
+        if prefix == "" and title:
+            filename = title
+        else:
+            filename = prefix
+        if filename != "":                
+            filename += "-" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
+        else:
+            filename += str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
+        filename += ".alog"
+        #clean name
+        filename = self.removeDisallowedFilenameChars(u(filename))                    
+        return filename
+        
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting.
     def automaticsave(self):
         try:
@@ -9911,34 +9929,20 @@ class ApplicationWindow(QMainWindow):
             if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
                 title = aw.qmc.title
             if self.qmc.autosavepath and self.qmc.autosaveflag:
-                if self.qmc.autosaveprefix == "" and title:
-                    filename = title
-                else:
-                    filename = self.qmc.autosaveprefix
-                if filename != "":                
-                    filename += "-" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
-                else:
-                    filename += str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
-                filename += ".alog"
+                filename = self.generateFilename(prefix=self.qmc.autosaveprefix)
                 oldDir = u(QDir.current())
                 QDir.setCurrent(self.qmc.autosavepath)
-                #clean name
-                filename = self.removeDisallowedFilenameChars(u(filename))
                 #write
                 self.serialize(QString(filename),self.getProfile())
                 #restore dirs
                 QDir.setCurrent(oldDir)
-
                 self.sendmessage(QApplication.translate("Message","Profile %1 saved in: %2", None, QApplication.UnicodeUTF8).arg(filename).arg(self.qmc.autosavepath))
                 self.setCurrentFile(filename)
                 self.qmc.safesaveflag = False
-
                 return filename
-
             else:
                 self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None, QApplication.UnicodeUTF8))
                 self.autosaveconf()
-
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None, QApplication.UnicodeUTF8) + " automaticsave() %1").arg(str(e)),exc_tb.tb_lineno)
@@ -11838,7 +11842,10 @@ class ApplicationWindow(QMainWindow):
         try:
             filename = fname
             if not filename:
-                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None, QApplication.UnicodeUTF8)) 
+                path = QDir()
+                path.setPath(self.getDefaultPath())
+                fname = path.absoluteFilePath(self.generateFilename())
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None, QApplication.UnicodeUTF8), path=fname)
             if filename:
                 #write
                 pf = self.getProfile()
@@ -24975,10 +24982,8 @@ class serialport(object):
                 ## WINDOWS/Linux DLL HACK BEGIN
                 if platf == 'Windows' and aw.appFrozen():
                     if platform.architecture()[0] == '32bit':
-#                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\lib\\yapi.dll"
                         YAPI._yApiCLibFile = os.path.dirname(sys.executable) + "\\lib\\yapi.dll"
                     else:
-#                        YAPI._yApiCLibFile = os.path.dirname(__file__) + "\\..\\..\\lib\\yapi-amd64.dll"
                         YAPI._yApiCLibFile = os.path.dirname(sys.executable) + "\\lib\\yapi-amd64.dll"
                 elif platf == "Linux" and aw.appFrozen():
                     if platform.architecture()[0] == '32bit':
