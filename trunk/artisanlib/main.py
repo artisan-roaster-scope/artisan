@@ -10465,7 +10465,9 @@ class ApplicationWindow(QMainWindow):
                 last_time = timez
             csvFile.close()
             #swap temperature curves if needed such that BT is the lower and ET the upper one
-            if len(self.qmc.temp2) > 0 and len(self.qmc.temp1) > 0 and (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
+            sumTemp2 = freduce(lambda x,y:x + y, self.qmc.temp2)
+            sumTemp1 = freduce(lambda x,y:x + y, self.qmc.temp1)
+            if len(self.qmc.temp2) > 0 and len(self.qmc.temp1) > 0 and sumTemp2 > 0 and sumTemp1 > 0 and sumTemp2 > sumTemp1:
                 tmp = self.qmc.temp1
                 self.qmc.temp1 = self.qmc.temp2
                 self.qmc.temp2 = tmp
@@ -11070,7 +11072,7 @@ class ApplicationWindow(QMainWindow):
                             if j < len(self.qmc.extratemp2) and i < len(self.qmc.extratemp2[j]):
                                 extratemps.append(u(self.qmc.extratemp2[j][i]))
                             else:
-                                extratemps.append(u("-1"))                            
+                                extratemps.append(u("-1"))
                         writer.writerow([u(time1),u(time2),u(self.qmc.temp2[i]),u(self.qmc.temp1[i]),u(event)] + extratemps)
                     last_time = time1
                 outfile.close()
@@ -14166,8 +14168,11 @@ $cupping_notes
     # converts times (values of timex) to indices
     def time2index(self,time):
         for i in range(len(self.qmc.timex)):
-            if self.qmc.timex[i] > time:
-                return i
+            if self.qmc.timex[i] >= time:
+                if i > 0 and abs(time - self.qmc.timex[i]) > abs(time - self.qmc.timex[i-1]):
+                    return i-1
+                else:
+                    return i
         return -1
 
     #returns the index of the lowest point in BT; return -1 if no such value found
