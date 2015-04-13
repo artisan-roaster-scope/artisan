@@ -1,4 +1,4 @@
-[Artisan](https://github.com/MAKOMO/artisan)
+[Artisan](https://github.com/MAKOMO/artisan/blob/master/README.md)
 ==========
 Visual scope for coffee roasters
 
@@ -8,6 +8,9 @@ Summary
 Artisan is a software that helps coffee roasters record, analyze, and control roast profiles. When used in conjunction with a thermocouple data logger or a proportional–integral–derivative controller (PID controller), this software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
 
 ![](wiki/screenshots/teaser.jpg?raw=true)
+
+
+[Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)
 
 Features
 --------
