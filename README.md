@@ -1,6 +1,8 @@
-[Artisan](https://github.com/MAKOMO/artisan/blob/master/README.md)
+<img style="float: right" src="wiki/screenshots/artisan.png">
+[Artisan](https://github.com/MAKOMO/artisan/blob/master/README.md) 
 ==========
 Visual scope for coffee roasters
+
 
 Summary
 -------
@@ -9,7 +11,7 @@ Artisan is a software that helps coffee roasters record, analyze, and control ro
 
 [Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)
 
-![](wiki/screenshots/teaser.jpg?raw=true)
+![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/teaser.jpg?raw=true)
 
 
 Features
