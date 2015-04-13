@@ -1,4 +1,5 @@
-<img style="float: right" src="https://raw.githubusercontent.com/MAKOMO/artisan/master/wiki/screenshots/artisan.png">
+<img align="right" src="https://raw.githubusercontent.com/MAKOMO/artisan/master/wiki/screenshots/artisan.png">
+
 [Artisan](https://github.com/MAKOMO/artisan/blob/master/README.md) 
 ==========
 Visual scope for coffee roasters
