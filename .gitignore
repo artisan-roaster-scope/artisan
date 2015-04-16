@@ -1,3 +1,4 @@
+*.pyc
 /.svn/
 /build/
 /dist/

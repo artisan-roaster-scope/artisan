@@ -2803,8 +2803,12 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.flagstart:
                     self.fig.suptitle("")
                 else:
-                    self.fig.suptitle("\n" + aw.qmc.abbrevString(self.titleB,stl),
-                        horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
+                    if self.title == None or u(self.title).strip() == "":
+                        self.fig.suptitle(aw.qmc.abbrevString(self.titleB,stl),
+                            horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
+                    else:
+                        self.fig.suptitle("\n" + aw.qmc.abbrevString(self.titleB,stl),
+                            horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
             
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             #self.ax.spines['top'].set_color('none')
@@ -2947,11 +2951,11 @@ class tgraphcanvas(FigureCanvas):
                     self.timealign(redraw=False,recompute=False,FCs=self.flagalignFCs)
 
                 #draw background
-                self.l_back1, = self.ax.plot(self.timeB, self.temp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
+                self.l_back1, = self.ax.plot(self.timeB, self.stemp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
                                             sketch_params=None,path_effects=[],
                                             linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
                                             alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None, QApplication.UnicodeUTF8)))
-                self.l_back2, = self.ax.plot(self.timeB, self.temp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker, 
+                self.l_back2, = self.ax.plot(self.timeB, self.stemp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker, 
                                             linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
                                             sketch_params=None,path_effects=[],
                                             alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
@@ -2962,8 +2966,8 @@ class tgraphcanvas(FigureCanvas):
                         tx = numpy.array(self.timeB)
                         dtx = numpy.diff(self.timeB) / 60.
                         with numpy.errstate(divide='ignore'):
-                            z1 = numpy.diff(self.temp1B) / dtx
-                            z2 = numpy.diff(self.temp2B) / dtx
+                            z1 = numpy.diff(self.stemp1B) / dtx
+                            z2 = numpy.diff(self.stemp2B) / dtx
                         lt,ld1,ld2 = len(self.timeB),len(z1),len(z2)
                         if lt > ld1:
                             z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
@@ -3269,9 +3273,9 @@ class tgraphcanvas(FigureCanvas):
                         elif self.specialeventstype[i] == 3:
                             netypes[3].append(self.timex[self.specialevents[i]])
                             
-                    letters = char1+char2+char3+char4   #"NPDF" fisrt letter for each type (None, Power, Damper, Fan)
+                    letters = char1+char2+char3+char4   #"NPDF" first letter for each type (None, Power, Damper, Fan)
                     colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
-                    for p in range(len(letters)):    
+                    for p in range(len(letters)):
                         if len(netypes[p]) > 1:
                             for i in range(len(netypes[p])-1):
                                 #draw differentiating color bars between events and place then in a different height acording with type
@@ -14428,7 +14432,7 @@ $cupping_notes
         contributors += u("Barrie Fairley, Ziv Sade, Nicholas Seckar, ")
         contributors += u("Morten M") + uchr(252) + u("nchow")
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
-        contributors += u(", Paolo Scimone")
+        contributors += u(", Paolo Scimone, Google, eightbit11")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -18518,10 +18522,10 @@ class editGraphDlg(ArtisanDialog):
 
     def standard_density(self):
         if self.bean_density_volume_edit.text() != "" and \
-            float(self.bean_density_volume_edit.text()) != 0.0 and  \
+            float(str(self.bean_density_volume_edit.text())) != 0.0 and  \
             self.bean_density_weight_edit.text() != "" and \
-            float(self.bean_density_weight_edit.text()) != 0.0 and \
-            not (float(self.bean_density_volume_edit.text()) == 1. and  
+            float(str(self.bean_density_weight_edit.text())) != 0.0 and \
+            not (float(str(self.bean_density_volume_edit.text())) == 1. and  
             self.bean_density_volumeUnitsComboBox.currentIndex() == 1 and 
             self.bean_density_weightUnitsComboBox.currentIndex() == 0):
             volume = float(str(self.bean_density_volume_edit.text()))
@@ -21206,8 +21210,6 @@ class EventsDlg(ArtisanDialog):
             #save sliders   
             self.saveSliderSettings()
             self.saveQuantifierSettings()
-            #save quantifiers
-            aw.updateSlidersProperties() # set visibility and event names on slider widgets
             aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
             aw.qmc.buttonactions[2] = self.FCSbuttonActionType.currentIndex()
@@ -21253,6 +21255,8 @@ class EventsDlg(ArtisanDialog):
                 self.close()
             else:
                 aw.sendmessage(QApplication.translate("Message","Found empty event type box", None, QApplication.UnicodeUTF8))
+            #save quantifiers
+            aw.updateSlidersProperties() # set visibility and event names on slider widgets
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -23840,17 +23844,85 @@ class serialport(object):
 #                self.SP.flushOutput()
 #                self.SP.write(command)
 #                libtime.sleep(.1)
-                r = self.SP.read(16)
-                if len(r) == 16:
-                    #convert to binary to hex string
-                    s1 = hex2int(r[5],r[6])/10.
-                    s2 = hex2int(r[7],r[8])/10.
-                    #we convert the strings to integers. Divide by 10.0 (decimal position)
-                    return s1,s2
+                r = self.SP.read(18)
+                index = -1
+                if(len(r) == 18 and r[0] == "\x65" and r[1] == "\x14"):
+                    index = 0
                 else:
-                    nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): %1 bytes received but 16 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
-                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+                    if(len(r) >= 9):
+                        # find 0x65 0x14
+                        for i in range(len(r)-1):
+                            if(r[i] == "\x65" and r[i+1] == "\x14"):
+                                index = i
+                                break
+                
+                    if index > 0:
+                        r += self.SP.read(index)
+                    else:
+                        r += self.SP.read(18-1)     # maybe last character is 0x65. otherwise error.
+                
+                        if(len(r) >= 9):
+                            # find 0x65 0x14
+                            for i in range(len(r)-1):
+                                if(r[i] == "\x65" and r[i+1] == "\x14"):
+                                    index = i
+                                    break
+                
+                if(index >= 0 and len(r) >= index+18):
+                    if(r[index+16] == "\x0d" and r[index+17] == "\x0a"):
+                        #convert to binary to hex string
+                        # Display [5-6] [7-8]  [11]                                          [12]
+                        #   T1     T1    T2    T1: OK(08), NC(40)                            T2: OK(08), NC(40)
+                        #   T2     T2    T1    T2: OK(09), NC(41)                            T1: OK(08), NC(40)
+                        #  T1-T2  T1-T2  T1    T1+T2: OK+(0A), OK-(8A), T1NC(42), T2NC(C2)   T1: OK(08), NC(40)
+                        #  T1-T2  T1-T2  T2    T1-T2: OK+(0B), OK-(8B), T1NC(43), T2NC(C3)   T2: OK(08), NC(40)
+                        s1 = hex2int(r[index+5],r[index+6])/10.
+                        s2 = hex2int(r[index+7],r[index+8])/10.
+
+                        if((r[index+11] >= "\x40" and r[index+11] <= "\x43") or (r[index+11] >= "\xC2" and r[index+11] <= "\xC3")):
+                            s1 = -1
+                    
+                        if(r[index+12] == "\x40"):
+                            s2 = -1
+
+                        #return original T1 T2
+                        if(r[index+11] == "\x09" or r[index+11] == "\x41"):
+                            temp = s2
+                            s2 = s1
+                            s1 = temp
+                        elif(r[index+11] == "\x0a"):
+                            temp = s2
+                            s2 = s2-s1
+                            s1 = temp
+                        elif(r[index+11] == "\x8a"):
+                            temp = s2
+                            s2 = s2+s1
+                            s1 = temp
+                        elif(r[index+11] == "\x42" or r[index+11] == "\xc2"):
+                            s1 = s2
+                            s2 = -1
+                        elif(r[index+11] == "\x0b"):
+                            s1 += s2
+                        elif(r[index+11] == "\x8b"):
+                            s1 == s2-s1
+
+                        #we convert the strings to integers. Divide by 10.0 (decimal position)
+                        self.MS6514PrevTemp1 = s1
+                        self.MS6514PrevTemp2 = s2
+                        return s1,s2
+                
+                # error but return previous temperature
+                if(self.MS6514PrevTemp1 != -1 or self.MS6514PrevTemp2 != -1):
+                    s1 = self.MS6514PrevTemp1
+                    s2 = self.MS6514PrevTemp2
+                    self.MS6514PrevTemp1 = -1
+                    self.MS6514PrevTemp2 = -1
+                    return s1,s2
+                    
+                # error
+                nbytes = len(r)
+                aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): %1 bytes received but 16 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
+                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
         except serial.SerialException:
@@ -23867,7 +23939,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H806 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r)))
+                aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
 
     #t2 and t1 from Omega HH806 or HH802 meter 
@@ -24997,7 +25069,12 @@ class serialport(object):
                         YAPI._yApiCLibFile = u(QApplication.applicationDirPath() + "/libyapi-amd64.so")
                 ## WINDOWS/Linux DLL HACK END
                 # alt: PreregisterHub( )
-                if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
+#                if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
+                try:
+                    YAPI.RegisterHub("usb", errmsg)
+                except:
+                    pass
+                try:
                     self.YOCTOsensor = YTemperature.FirstTemperature()
                     if mode == 0 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
@@ -25006,6 +25083,8 @@ class serialport(object):
                         aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None, QApplication.UnicodeUTF8))                       
                     elif mode == 1 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None, QApplication.UnicodeUTF8))                       
+                except:
+                    pass
             probe1 = -1
             probe2 = -1
             if mode == 0:
