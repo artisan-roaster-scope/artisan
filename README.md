@@ -83,10 +83,10 @@ Version History
 | v0.7.1 | 02.12.2013 | Bug fixes |
 | v0.7.0 | 30.11.2013 | Phidget 1046/1048, phases LCDs, xkcd style, extended alarms, [Tonino](http://my-tonino.com/) support |
 | v0.6.0 | 14.06.2013 | Monitoring-only mode, sliders, extended alarms, Modbus RTU, Amprobe TMD-56, spike filter, additional localizations |
-| v0.5.6 | 08.11.2012 | Bug fixes |
+| v0.5.6 | 08.11.2012 | Bug fixes |
 | v0.5.2 | 23.07.2011 | Delta DTA PID support, automatic CHARGE/DROP |
 | v0.5.0 | 10.06.2011 | HHM28, wheel graph, math plotter, multiple and virtual devices, symbolic expressions, custom buttons |
-| v0.4.0 | 10.04.2011 | localization, events replay, alarms, profile designer |
+| v0.4.0 | 10.04.2011 | Localization, events replay, alarms, profile designer |
 | v0.3.4 | 28.02.2011 | Arduino TC4, TE VA18B, delta filter |
 | v0.3.3 | 13.02.2011 | Fuji PXR5/PXG5, manual device, keyboard shortcuts, Linux |
 | v0.3.0 | 11.01.2011 | New profile file format |
