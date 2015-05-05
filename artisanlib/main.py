@@ -381,7 +381,7 @@ class tgraphcanvas(FigureCanvas):
 
         #default palette of colors
         self.palette = {"background":'white',"grid":'green',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',"rect1":'green',
-                        "rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"et":'red',"bt":'#00007f',"deltaet":'orange',
+                        "rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue'}
 
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
@@ -618,8 +618,11 @@ class tgraphcanvas(FigureCanvas):
                        "+Program_34",           #48
                        "+Program_56",           #49
                        "DUMMY",                 #50
-                       "+CENTER 304_34",        #52
-                       "-Omega HH806W"          #52 NOT WORKING 
+                       "+CENTER 304_34",        #51
+                       "Phidget 1051",          #52
+                       "Hottop BT/ET",          #53
+                       "+Hottop Heater/Fan",     #54
+                       "-Omega HH806W"          #55 NOT WORKING 
                        ]
 
         #extra devices
@@ -747,8 +750,11 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundeventsflag = False
         self.backgroundpath = ""
         self.titleB = ""
-        self.temp1B,self.temp2B,self.timeB = [],[],[]
-        self.stemp1B,self.stemp2B = [],[] # smoothed versions of the background courves
+        self.temp1B,self.temp2B,self.temp1BX,self.temp2BX,self.timeB = [],[],[],[],[]
+        self.stemp1B,self.stemp2B,self.stemp1BX,self.stemp2BX = [],[],[],[] # smoothed versions of the background courves
+        self.extraname1B,self.extraname2B = [],[]
+        self.extratimexB = []
+        self.xtcurveidx = 0 # the selected extra background courve to be displayed
         self.delta1B,self.delta2B = [],[]
         self.timeindexB = [-1,0,0,0,0,0,0,0]
         self.backgroundEvents = [] #indexes of background events
@@ -758,6 +764,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundalpha = 0.3
         self.backgroundmetcolor = self.palette["et"]
         self.backgroundbtcolor = self.palette["bt"]
+        self.backgroundxtcolor = self.palette["xt"]
         self.backgrounddeltaetcolor = self.palette["deltaet"]
         self.backgrounddeltabtcolor = self.palette["deltabt"]
         self.backmoveflag = 1
@@ -873,7 +880,8 @@ class tgraphcanvas(FigureCanvas):
         self.container_weights = [] # all weights in g and as int
         self.container_idx = -1 # the empty field (as -1 + 2 = 1)
 
-        #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
+        #stores _indexes_ of self.timex to record events. 
+        # Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
         self.specialevents = []
         #ComboBox text event types. They can be modified in eventsDlg()
@@ -948,6 +956,11 @@ class tgraphcanvas(FigureCanvas):
         self.ETbacklinewidth = self.linewidth_default
         self.ETbackmarker = self.marker_default
         self.ETbackmarkersize = self.markersize_default
+        self.XTbacklinestyle = self.linestyle_default
+        self.XTbackdrawstyle = self.drawstyle_default
+        self.XTbacklinewidth = self.linewidth_default
+        self.XTbackmarker = self.marker_default
+        self.XTbackmarkersize = self.markersize_default                
         self.BTBdeltalinestyle = self.linestyle_default
         self.BTBdeltadrawstyle = self.drawstyle_default
         self.BTBdeltalinewidth = self.linewidth_default
@@ -1060,6 +1073,7 @@ class tgraphcanvas(FigureCanvas):
         self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=u(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
         self.l_back1 = None
         self.l_back2 = None
+        self.l_back3 = None # one extra background curve
         self.l_delta1B = None
         self.l_delta2B = None
 
@@ -1191,6 +1205,26 @@ class tgraphcanvas(FigureCanvas):
         self.extra309T3 = -1
         self.extra309T4 = -1
         self.extra309TX = 0.
+        
+        #temporary storage to pass values. Holds all values retrieved from a Hottop roaster
+        self.hottop_ET = -1
+        self.hottop_BT = -1
+        self.hottop_VERSION = 0
+        self.hottop_HEATER = 0 # 0-100
+        self.hottop_FAN = 0
+        self.hottop_MAIN_FAN = 0 # 0-10 (!)
+        self.hottop_SOLENOID = 0
+        self.hottop_DRUM_MOTOR =0
+        self.hottop_COOLING_MOTOR = 0
+        self.hottop_CHAFF_TRAY = 0
+        self.hottop_TX = 0.
+        #hottop values to be send
+        self.hottop_SET_HEATER = None # 0-100
+        self.hottop_SET_FAN = None
+        self.hottop_SET_MAIN_FAN = None # 0-100
+        self.hottop_SET_SOLENOID = None
+        self.hottop_SET_DRUM_MOTOR = None
+        self.hottop_SET_COOLING_MOTOR = None
         
         #temporary storage to pass values. Holds extra T3 and T4 values for MODBUS connected devices
         self.extraMODBUSt3 = -1
@@ -2382,6 +2416,13 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.scorching_flag = False
                 aw.qmc.divots_flag = False
 
+                aw.qmc.hottop_SET_HEATER = None
+                aw.qmc.hottop_SET_FAN = None
+                aw.qmc.hottop_SET_MAIN_FAN = None
+                aw.qmc.hottop_SET_SOLENOID = None
+                aw.qmc.hottop_SET_DRUM_MOTOR = None
+                aw.qmc.hottop_SET_COOLING_MOTOR = None
+
                 #color variables
                 aw.qmc.whole_color = 0
                 aw.qmc.ground_color = 0
@@ -2949,6 +2990,21 @@ class tgraphcanvas(FigureCanvas):
                 #check to see if there is both a profile loaded and a background loaded
                 if self.backmoveflag:
                     self.timealign(redraw=False,recompute=False,FCs=self.flagalignFCs)
+                    
+                #draw one extra device on background stemp1BX
+                if aw.qmc.xtcurveidx > 0:
+                    idx3 = aw.qmc.xtcurveidx - 1
+                    n3 = idx3 // 2
+                    if len(self.stemp1BX) > n3 and len(self.extratimexB) > n3:
+                        if aw.qmc.xtcurveidx % 2:
+                            stemp3B = self.stemp1BX[n3]
+                        else:
+                            stemp3B = self.stemp2BX[n3]
+                        timex3 = self.extratimexB[n3]
+                        self.l_back3, = self.ax.plot(timex3, stemp3B,markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
+                                                    sketch_params=None,path_effects=[],
+                                                    linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
+                                                    alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None, QApplication.UnicodeUTF8)))                                    
 
                 #draw background
                 self.l_back1, = self.ax.plot(self.timeB, self.stemp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
@@ -3317,19 +3373,19 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(Nevents):
                         if self.specialeventstype[i] == 0:           
                             self.E1timex.append(self.timex[self.specialevents[i]])
-                            self.E1values.append(self.eventpositionbars[int(self.specialeventsvalue[i])])
+                            self.E1values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
                             E1_nonempty = True
                         elif self.specialeventstype[i] == 1:
                             self.E2timex.append(self.timex[self.specialevents[i]])
-                            self.E2values.append(self.eventpositionbars[int(self.specialeventsvalue[i])])
+                            self.E2values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
                             E2_nonempty = True
                         elif self.specialeventstype[i] == 2:
                             self.E3timex.append(self.timex[self.specialevents[i]])
-                            self.E3values.append(self.eventpositionbars[int(self.specialeventsvalue[i])])
+                            self.E3values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
                             E3_nonempty = True
                         elif self.specialeventstype[i] == 3:
                             self.E4timex.append(self.timex[self.specialevents[i]])
-                            self.E4values.append(self.eventpositionbars[int(self.specialeventsvalue[i])])
+                            self.E4values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
                             E4_nonempty = True
 
                     self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
@@ -3802,7 +3858,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             try:
                 a = aw.qmc.extrabuttonactions[0]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.extrabuttonactionstrings[0])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[0])
             except:
                 pass
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
@@ -3856,6 +3912,9 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
             aw.hideLCDs()
+            # switch off Hottop Control
+            if aw.qmc.device == 53:
+                aw.HottopControlOff()
             # reset WebLCDs
             if aw.qmc.LCDdecimalplaces:
                 resLCD = "-.-"
@@ -3873,7 +3932,7 @@ class tgraphcanvas(FigureCanvas):
             #appnope.nap()
             try:
                 a = aw.qmc.extrabuttonactions[1]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.extrabuttonactionstrings[1])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[1])
             except:
                 pass
         except Exception as ex:
@@ -4062,18 +4121,20 @@ class tgraphcanvas(FigureCanvas):
                     self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
                     # mark active slider values that are not zero                   
                     for slidernr in range(4):
-                        if aw.eventslidervisibilities[slidernr]:
-                            if slidernr == 0:
-                                slidervalue = aw.slider1.value()
-                            elif slidernr == 1:
-                                slidervalue = aw.slider2.value()
-                            elif slidernr == 2:
-                                slidervalue = aw.slider3.value()
-                            elif slidernr == 3:
-                                slidervalue = aw.slider4.value()
-                            if slidervalue != 0:
-                                value = aw.float2float((slidervalue + 10.0) / 10.0)
-                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
+#                        if aw.eventslidervisibilities[slidernr]:
+                        # we record also for inactive sliders as some button press actions might have changed the event values also for those
+                        if slidernr == 0:
+                            slidervalue = aw.slider1.value()
+                        elif slidernr == 1:
+                            slidervalue = aw.slider2.value()
+                        elif slidernr == 2:
+                            slidervalue = aw.slider3.value()
+                        elif slidernr == 3:
+                            slidervalue = aw.slider4.value()
+                        if slidervalue != 0:
+                            value = aw.float2float((slidervalue + 10.0) / 10.0)
+                            # note that EventRecordAction avoids to generate events were type and value matches to the previously recorded one
+                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
                 except:
                     pass
             else:
@@ -4091,7 +4152,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             try:
                 a = aw.qmc.buttonactions[0]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[0])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[0])
             except:
                 pass
             aw.button_8.setDisabled(True)
@@ -4178,7 +4239,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_8.setFlat(True)
             try:
                 a = aw.qmc.buttonactions[1]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[1])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[1])
             except:
                 pass
             st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
@@ -4241,7 +4302,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_19.setFlat(True)
             try:
                 a = aw.qmc.buttonactions[2]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[2])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[2])
             except:
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
@@ -4296,7 +4357,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_3.setFlat(True)
             try:
                 a = aw.qmc.buttonactions[3]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[3])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[3])
             except:
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
@@ -4354,7 +4415,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_4.setFlat(True)
             try:
                 a = aw.qmc.buttonactions[4]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[4])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[4])
             except:
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
@@ -4411,7 +4472,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_5.setFlat(True)
             try:
                 a = aw.qmc.buttonactions[5]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[5])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[5])
             except:
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
@@ -4420,9 +4481,10 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(message)
 
     #record end of roast (drop of beans). Called from push button 'Drop'
-    def markDrop(self):
+    def markDrop(self,takeLock=True):
         try:
-            aw.qmc.samplingsemaphore.acquire(1)
+            if takeLock:
+                aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
@@ -4468,7 +4530,7 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markDrop() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
+            if takeLock and aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
@@ -4491,7 +4553,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             try:
                 a = aw.qmc.buttonactions[6]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[6])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[6])
             except:
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
@@ -4553,7 +4615,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_9.setFlat(True)
             try:
                 a = aw.qmc.buttonactions[7]
-                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[7])
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[7])
             except:
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
@@ -4579,9 +4641,10 @@ class tgraphcanvas(FigureCanvas):
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
     # extraevent is given when called from aw.recordextraevent() from an extra Event Button
-    def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription=""):
+    def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription="",takeLock=True):
         try:
-            aw.qmc.samplingsemaphore.acquire(1)
+            if takeLock:
+                aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0 or self.device == 18:
                     aw.soundpop()
@@ -4698,7 +4761,7 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " EventRecordAction() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
+            if takeLock and aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
@@ -6649,7 +6712,7 @@ class SampleThread(QThread):
                 # send sampling action if any                
                 try:
                     a = aw.qmc.extrabuttonactions[2]
-                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.extrabuttonactionstrings[2])
+                    aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[2])
                 except:
                     pass
                     
@@ -6746,7 +6809,7 @@ class SampleThread(QThread):
                         # send another sampling action if any
                         try:
                             a = aw.qmc.extrabuttonactions[2]
-                            aw.eventaction((a if (a < 3) else a + 1),aw.qmc.extrabuttonactionstrings[2])
+                            aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[2])
                         except:
                             pass
                         # let's do the oversampling thing and take a second reading from the main device
@@ -6961,28 +7024,29 @@ class SampleThread(QThread):
 
                     #process active quantifiers
                     try:
-                        for i in range(4):
-                            if aw.eventquantifieractive[i]:
-                                temp,_ = aw.quantifier2tempandtime(i)
-                                if temp: # corresponding curve is available
-                                    linespace = aw.eventquantifierlinspaces[i]
-                                    if aw.eventquantifiercoarse[i]:
-                                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
-                                    else:
-                                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine                        
-                                    t = temp[-1]
-                                    d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
-                                    ld = aw.lastdigitizedvalue[i]
-                                    lt = aw.lastdigitizedtemp[i]
-                                    if d != None and (ld == None or ld != d):
-                                        # and only if significantly different than previous to avoid fluktuation
-                                        if ld == None or linespacethreshold < abs(t - lt):
-                                            # establish this one
-                                            aw.lastdigitizedvalue[i] = d
-                                            aw.lastdigitizedtemp[i] = t
-                                            # now move corresponding slider and add event
-                                            v = d * 10.
-                                            aw.qmc.quantifiedEvent.append([i,v])
+                        if local_flagstart:
+                            for i in range(4):
+                                if aw.eventquantifieractive[i]:
+                                    temp,_ = aw.quantifier2tempandtime(i)
+                                    if temp: # corresponding curve is available
+                                        linespace = aw.eventquantifierlinspaces[i]
+                                        if aw.eventquantifiercoarse[i]:
+                                            linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
+                                        else:
+                                            linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine                        
+                                        t = temp[-1]
+                                        d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
+                                        ld = aw.lastdigitizedvalue[i]
+                                        lt = aw.lastdigitizedtemp[i]
+                                        if d != None and (ld == None or ld != d):
+                                            # and only if significantly different than previous to avoid fluktuation
+                                            if ld == None or linespacethreshold < abs(t - lt):
+                                                # establish this one
+                                                aw.lastdigitizedvalue[i] = d
+                                                aw.lastdigitizedtemp[i] = t
+                                                # now move corresponding slider and add event
+                                                v = d * 10.
+                                                aw.qmc.quantifiedEvent.append([i,v])
                     except Exception:
                         pass
                         
@@ -7118,7 +7182,13 @@ class SampleThread(QThread):
                     aw.qmc.flagsampling = False # we signal that we are done with sampling
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    dt = max(0.05,aw.qmc.delay/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
+                    
+                    # limit sampling delay in Hottop control mode to max 3sec
+                    if aw.HottopControlActive:
+                        min_delay = 3000
+                    else:
+                        min_delay = aw.qmc.delay
+                    dt = max(0.05,min(min_delay,aw.qmc.delay)/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     if aw.qmc.flagon:
@@ -7233,6 +7303,9 @@ class ApplicationWindow(QMainWindow):
         self.dpi = self.defaultdpi
         self.qmc = tgraphcanvas(self.main_widget)
         #self.qmc.setAttribute(Qt.WA_NoSystemBackground)
+        
+        #### Hottop Control
+        self.HottopControlActive = False
 
         ####    HUD
         self.HUD = QLabel()  #main canvas for hud widget
@@ -7290,7 +7363,7 @@ class ApplicationWindow(QMainWindow):
         #event sliders
         self.eventslidervalues = [0,0,0,0]
         self.eventslidervisibilities = [0,0,0,0]
-        self.eventslideractions = [0,0,0,0] # 0: None, 1: Serial Command, 2: Modbus Command, 3: DTA Command
+        self.eventslideractions = [0,0,0,0] # 0: None, 1: Serial Command, 2: Modbus Command, 3: DTA Command, 4: Call Program, 5: Hottop Heater, 6: Hottop Fan
         self.eventslidercommands = ["","","",""]
         self.eventslideroffsets = [0,0,0,0]
         self.eventsliderfactors = [1.0,1.0,1.0,1.0]
@@ -8643,15 +8716,15 @@ class ApplicationWindow(QMainWindow):
             temp = aw.qmc.temp2
         else:
             x = (aw.eventquantifiersource[i]-2)
-            timex = aw.qmc.extratimex[x / 2]
+            timex = aw.qmc.extratimex[x // 2]
             if x % 2 == 0:
                 # even
                 if len(aw.qmc.extratemp1) > (x/2):
-                    temp = aw.qmc.extratemp1[x / 2]
+                    temp = aw.qmc.extratemp1[x // 2]
             else:
                 # odd
                 if len(aw.qmc.extratemp2) > (x/2):
-                    temp = aw.qmc.extratemp2[x / 2]
+                    temp = aw.qmc.extratemp2[x // 2]
         return temp,timex
         
     # returns min/max 0/10 for values outside of the given linespace ls defining the interval
@@ -9188,11 +9261,14 @@ class ApplicationWindow(QMainWindow):
             try:
                 # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command), =4 (Call Program [with argument])
                 action = (action+2 if action > 1 else action)
-                if action == 6:
-                    action = 7 # skip the 6:IO Command
+                if action > 5:
+                    action = action + 1 # skip the 6:IO Command
                 value = int(round((self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]))
-                cmd = self.eventslidercommands[n]
-                cmd = cmd.format(value)
+                if action in [8,9]:
+                    cmd = value
+                else:
+                    cmd = self.eventslidercommands[n]
+                    cmd = cmd.format(value)
                 self.eventaction(action,cmd)
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
@@ -9275,7 +9351,8 @@ class ApplicationWindow(QMainWindow):
             self.fileSaveAction.setEnabled(False)
             self.fileSaveAsAction.setEnabled(False) 
 
-    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO), 7=Call Program with argument (slider action)
+    #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
+    #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan ; 10= HOTTOP Cooling Fan
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -9311,7 +9388,6 @@ class ApplicationWindow(QMainWindow):
                         if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
                             self.recordextraevent(buttonnumber)
                 elif action == 4:
-                    # TODO: add "_" substitution and read command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         followupCmd = False #
@@ -9397,6 +9473,56 @@ class ApplicationWindow(QMainWindow):
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " callProgram(): %1").arg(str(e)),exc_tb.tb_lineno)
+                elif action == 8: # HOTTOP Heater
+                    aw.qmc.hottop_SET_HEATER = int(cmd)
+                elif action == 9: # HOTTOP Main Fan
+                    aw.qmc.hottop_SET_MAIN_FAN = int(cmd)
+                elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer")
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for cs in cmds:
+                            if cs.startswith("heater"):
+                                try:
+                                    cmds = eval(cs[len('heater'):])
+                                    if isinstance(cmds,int):
+                                        aw.qmc.hottop_SET_HEATER = min(max(cmds,0),100)
+                                except:
+                                    pass
+                            elif cs.startswith("fan"):
+                                try:
+                                    cmds = eval(cs[len('fan'):])
+                                    if isinstance(cmds,int):
+                                        aw.qmc.hottop_SET_MAIN_FAN = min(max(cmds,0),10) * 10
+                                except:
+                                    pass
+                            elif cs.startswith("motor"):
+                                try:
+                                    cmds = eval(cs[len('motor'):])
+                                    if cmds:
+                                        aw.qmc.hottop_SET_DRUM_MOTOR = True
+                                    else:
+                                        aw.qmc.hottop_SET_DRUM_MOTOR = False
+                                except:
+                                    pass
+                            elif cs.startswith("solenoid"):
+                                try:
+                                    cmds = eval(cs[len('solenoid'):])
+                                    if cmds:
+                                        aw.qmc.hottop_SET_SOLENOID = True
+                                    else:
+                                        aw.qmc.hottop_SET_SOLENOID = False
+                                except:
+                                    pass
+                            elif cs.startswith("stirrer"):
+                                try:
+                                    cmds = eval(cs[len('stirrer'):])
+                                    if cmds:
+                                        aw.qmc.hottop_SET_COOLING_MOTOR = True
+                                    else:
+                                        aw.qmc.hottop_SET_COOLING_MOTOR = False
+                                except:
+                                    pass
+                    
             except:
                 pass
                 
@@ -9447,7 +9573,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.EventRecord(extraevent = ee)
             value = (self.extraeventsvalues[ee] - 1) # TODO: why "-1" here??
             cmdvalue = int(round((self.eventsliderfactors[eventtype] * value) + self.eventslideroffsets[eventtype]))
-            self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
+            if self.extraeventsactions[ee] in [8,9]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
+                self.eventaction(self.extraeventsactions[ee],u(int((self.extraeventsvalues[ee] - 1) * 10.0)))
+            else:
+                self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
             # move corresponding slider to new value:
             self.moveslider(eventtype,aw.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee]))
         else:
@@ -10289,11 +10418,24 @@ class ApplicationWindow(QMainWindow):
                 tb = profile["timex"]
                 t1 = profile["temp1"]
                 t2 = profile["temp2"]
-                self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB = t1,t2,tb
+                t1x = profile["extratemp1"]
+                t2x = profile["extratemp2"]
+                names1x = profile["extraname1"]
+                names2x = profile["extraname2"]
+                timex = profile["extratimex"]
+                self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
+                self.qmc.extratimexB = timex
                 b1 = self.qmc.smooth_list(tb,t1,window_len=self.qmc.curvefilter)
                 b2 = self.qmc.smooth_list(tb,t2,window_len=self.qmc.curvefilter)
+                self.qmc.temp1BX,self.qmc.temp2BX = [],[]
+                self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
+                b1x = []
+                b2x = []
+                for i in range(min(len(t1x),len(t2x))):
+                    b1x.append(self.qmc.smooth_list(tb,t1x[i],window_len=self.qmc.curvefilter))
+                    b2x.append(self.qmc.smooth_list(tb,t2x[i],window_len=self.qmc.curvefilter))
                 # NOTE: parallel assignment after time intensive smoothing is necessary to avoid redraw failure!
-                self.qmc.stemp1B,self.qmc.stemp2B = b1,b2
+                self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = b1,b2,b1x,b2x
                 self.qmc.backgroundEvents = profile["specialevents"]
                 self.qmc.backgroundEtypes = profile["specialeventstype"]
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
@@ -10432,7 +10574,7 @@ class ApplicationWindow(QMainWindow):
             fields = next(data) 
             extra_fields = fields[5:] # colums after 'Event'
             # add devices if needed
-            for i in range(max(0,(len(extra_fields) / 2) - len(self.qmc.extradevices))):
+            for i in range(max(0,(len(extra_fields) // 2) - len(self.qmc.extradevices))):
                 self.addDevice()
             # set extra device names # NOTE: eventuelly we want to set/change the names only for devices that were just added in the line above!?
             for i in range(len(extra_fields)):
@@ -11971,7 +12113,7 @@ class ApplicationWindow(QMainWindow):
                 self.button_10.setVisible(True) #CONTROL BUTTON
                 self.LCD6frame.setVisible(True)
                 self.LCD7frame.setVisible(True)
-            elif self.qmc.device == 26:   #DEVICE 26 = DTA; 
+            elif self.qmc.device in [26,53]:   #DEVICE 26 = DTA or DEVICE 53 = HOTTOP
                 self.button_10.setVisible(True) #CONTROL BUTTON
             elif self.qmc.device == 19: #DEVICE 19 = ARDUINOTC4
                 if aw.qmc.PIDbuttonflag:
@@ -14111,7 +14253,7 @@ $cupping_notes
     def specialevents2html(self):
         html = u("")
         if self.qmc.specialevents and len(self.qmc.specialevents) > 0:
-            html += u('<center>\n<table cellpadding="2">\n')
+            html += u('<center>\n<table cellpadding="10" cellspacing="8">\n')
             if self.qmc.timeindex[0] != -1:
                 start = self.qmc.timex[self.qmc.timeindex[0]]
             else:
@@ -14127,12 +14269,15 @@ $cupping_notes
                 seventsType.append(self.qmc.specialeventstype[sorted_pos])
                 seventsValue.append(self.qmc.specialeventsvalue[sorted_pos])
             for i in range(len(self.qmc.specialevents)):
+                temps = ""
+                if self.qmc.mode == "F":
+                    temps += "%.1fF"%self.qmc.temp2[sevents[i]] + " / " + "%.1fF"%self.qmc.temp1[sevents[i]]
+                else:
+                    temps += "%.1f&deg;C"%self.qmc.temp2[sevents[i]] + " / " "%.1f&deg;C"%self.qmc.temp1[sevents[i]]
                 html += ("<tr>"+
-                     "\n<td>" + str(i+1) + "</td><td>[" +
+                     "\n<td>" + str(i+1) + "</td><td>" +
                      self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i]] - start)) +
-                     "</td><td>at " + "%.1f"%self.qmc.temp2[sevents[i]] + self.qmc.mode +
-#                     "]</td><td>" + seventsString[i] + "</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")
-                     "]</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
+                     "</td><td>at " + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
             html += '</table>\n</center>'
         return u(html)
 
@@ -14594,6 +14739,33 @@ $cupping_notes
             self.color.parity = str(dialog.color_parityComboBox.currentText())
             self.color.timeout = int(str(dialog.color_timeoutEdit.text()))
 
+    def toggleHottopControl(self):
+        if self.HottopControlActive:
+            self.HottopControlOff()
+        else:
+            self.HottopControlOn()
+            
+    def HottopControlOff(self):
+        if self.HottopControlActive:
+            aw.sendmessage(QApplication.translate("Message","Hottop control turned off", None, QApplication.UnicodeUTF8))
+        self.HottopControlActive = False
+        aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+    
+    def HottopControlOn(self):
+        if aw.qmc.flagon:
+            # start drum motor
+            aw.qmc.hottop_SET_DRUM_MOTOR = 1
+            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
+            if not self.HottopControlActive:
+                aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
+            self.HottopControlActive = True
+            self.sendHottopControl()
+        
+    def sendHottopControl(self):
+        if self.HottopControlActive:   
+            aw.ser.HOTTOPsendControl()       
+            QTimer.singleShot(400.,self.sendHottopControl)
+
     def PIDcontrol(self):
         #pid
         if self.qmc.device == 0 or self.qmc.device == 26:
@@ -14608,6 +14780,9 @@ $cupping_notes
             dialog.setFixedSize(dialog.size())
             QApplication.processEvents()
             dialog.setModal(False)
+        # Hottop
+        elif self.qmc.device == 53: 
+            self.toggleHottopControl()
         #arduino
         elif self.qmc.device == 19:
             modifiers = QApplication.keyboardModifiers()
@@ -14670,10 +14845,12 @@ $cupping_notes
     def deleteBackground(self):
         self.qmc.backgroundpath = ""
         self.qmc.titleB = ""
-        self.qmc.temp1B, self.qmc.temp2B, self.qmc.timeB = [],[],[]
+        self.qmc.temp1B, self.qmc.temp2B, self.temp1BX, self.temp2BX, self.qmc.timeB = [],[],[],[],[]
+        self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = [],[],[],[] # smoothed versions of the background courves
+        self.qmc.extraname1B,self.qmc.extraname2B = [],[]
         self.qmc.backgroundEvents, self.qmc.backgroundEtypes = [],[]
         self.qmc.backgroundEvalues, self.qmc.backgroundEStrings,self.qmc.backgroundFlavors = [],[],[]
-        self.qmc.timeindexB = [-1,0,0,0,0,0,0]
+        self.qmc.timeindexB = [-1,0,0,0,0,0,0,0]
         self.qmc.backmoveflag = 1
 
     def switch(self):
@@ -18285,9 +18462,10 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.clear()
         nevents = len(aw.qmc.specialevents)
         self.eventtable.setRowCount(nevents)
-        self.eventtable.setColumnCount(5)
+        self.eventtable.setColumnCount(6)
         self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table", "Time", None, QApplication.UnicodeUTF8),
                                                    QApplication.translate("Table", "BT", None, QApplication.UnicodeUTF8),
+                                                   QApplication.translate("Table", "ET", None, QApplication.UnicodeUTF8),
                                                    QApplication.translate("Table", "Description", None, QApplication.UnicodeUTF8),
                                                    QApplication.translate("Table", "Type", None, QApplication.UnicodeUTF8),
                                                    QApplication.translate("Table", "Value", None, QApplication.UnicodeUTF8)])
@@ -18314,6 +18492,13 @@ class editGraphDlg(ArtisanDialog):
             bttemp = "%.0f"%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
             self.eventtablecopy.append(btline) 
             btline.setText(bttemp)
+
+            etline = QLineEdit()
+            etline.setReadOnly(True)
+            etline.setAlignment(Qt.AlignRight)
+            ettemp = "%.0f"%(aw.qmc.temp1[aw.qmc.specialevents[i]]) + aw.qmc.mode
+            self.eventtablecopy.append(etline) 
+            etline.setText(ettemp)
             
             valueEdit = QLineEdit()
             valueEdit.setAlignment(Qt.AlignRight)
@@ -18331,22 +18516,24 @@ class editGraphDlg(ArtisanDialog):
             #add widgets to the table
             self.eventtable.setCellWidget(i,0,timeline)
             self.eventtable.setCellWidget(i,1,btline)
-            self.eventtable.setCellWidget(i,2,stringline)
-            self.eventtable.setCellWidget(i,3,typeComboBox)
-            self.eventtable.setCellWidget(i,4,valueEdit)
+            self.eventtable.setCellWidget(i,2,etline)
+            self.eventtable.setCellWidget(i,3,stringline)
+            self.eventtable.setCellWidget(i,4,typeComboBox)
+            self.eventtable.setCellWidget(i,5,valueEdit)
 #        self.eventtable.resizeColumnsToContents()
         header = self.eventtable.horizontalHeader()
         #header.setStretchLastSection(True)
         header.setResizeMode(0, QHeaderView.Fixed)
         header.setResizeMode(1, QHeaderView.Fixed)
-        header.setResizeMode(2, QHeaderView.Stretch)
-        header.setResizeMode(3, QHeaderView.ResizeToContents)
-        header.setResizeMode(4, QHeaderView.Fixed)
+        header.setResizeMode(2, QHeaderView.Fixed)
+        header.setResizeMode(3, QHeaderView.Stretch)
+        header.setResizeMode(4, QHeaderView.ResizeToContents)
+        header.setResizeMode(5, QHeaderView.Fixed)
         # improve width of Time column
         self.eventtable.setColumnWidth(0,60)
         self.eventtable.setColumnWidth(1,65)
 #        self.eventtable.setColumnWidth(2,315)
-        self.eventtable.setColumnWidth(4,55)
+        self.eventtable.setColumnWidth(5,55)
         # header.setResizeMode(QHeaderView.Stretch)
 
     def saveEventTable(self):
@@ -18355,11 +18542,11 @@ class editGraphDlg(ArtisanDialog):
             timez = self.eventtable.cellWidget(i,0)
             if self.eventtablecopy[i] !=  str(timez.text()):
                 aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(str(timez.text())))
-            description = self.eventtable.cellWidget(i,2)
+            description = self.eventtable.cellWidget(i,3)
             aw.qmc.specialeventsStrings[i] = u(description.text())
-            etype = self.eventtable.cellWidget(i,3)
+            etype = self.eventtable.cellWidget(i,4)
             aw.qmc.specialeventstype[i] = etype.currentIndex()
-            evalue = self.eventtable.cellWidget(i,4).text()
+            evalue = self.eventtable.cellWidget(i,5).text()
             aw.qmc.specialeventsvalue[i] = aw.qmc.str2eventsvalue(str(evalue))
 
     def orderEventTable(self):
@@ -19978,7 +20165,10 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Serial Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Call Program",None, QApplication.UnicodeUTF8)]
+                       QApplication.translate("ComboBox", "Call Program",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Hottop Heater",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Hottop Fan",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Hottop Command",None, QApplication.UnicodeUTF8)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -20178,7 +20368,10 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Call Program",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "IO Command",None, QApplication.UnicodeUTF8)]
+                       QApplication.translate("ComboBox", "IO Command",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Hottop Heater",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Hottop Fan",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Hottop Command",None, QApplication.UnicodeUTF8)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None, QApplication.UnicodeUTF8))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -20809,7 +21002,7 @@ class EventsDlg(ArtisanDialog):
                       QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8)]
         for i in range(nbuttons):
             #label
-            labeledit = QLineEdit(u(aw.extraeventslabels[i]))
+            labeledit = QLineEdit(u(aw.extraeventslabels[i]).replace(chr(10),"\\n"))
             self.connect(labeledit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setlabeleventbutton(z,i))
             #description
             descriptionedit = QLineEdit(u(aw.extraeventsdescriptions[i]))
@@ -20833,8 +21026,14 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","Multiple Event",None, QApplication.UnicodeUTF8),
                                     QApplication.translate("ComboBox","Modbus Command",None, QApplication.UnicodeUTF8),
                                     QApplication.translate("ComboBox","DTA Command",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox","IO Command",None, QApplication.UnicodeUTF8)])
-            actionComboBox.setCurrentIndex(aw.extraeventsactions[i])
+                                    QApplication.translate("ComboBox","IO Command",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("ComboBox", "Hottop Heater",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("ComboBox", "Hottop Fan",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("ComboBox", "Hottop Command",None, QApplication.UnicodeUTF8)])
+            act = aw.extraeventsactions[i]
+            if act > 7:
+                act = act - 1
+            actionComboBox.setCurrentIndex(act)
             self.connect(actionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setactioneventbutton(z,i))
             #action description
             actiondescriptionedit = QLineEdit(u(aw.extraeventsactionstrings[i]))
@@ -20908,6 +21107,8 @@ class EventsDlg(ArtisanDialog):
             aw.extraeventsvalues[i] = aw.qmc.str2eventsvalue(str(valueedit.text()))
             actioncombobox = self.eventbuttontable.cellWidget(i,4)
             aw.extraeventsactions[i] = actioncombobox.currentIndex()
+            if aw.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
+                aw.extraeventsactions[i] = aw.extraeventsactions[i] + 1
             actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
             ades = u(actiondescriptionedit.text())
             aw.extraeventsactionstrings[i] = ades
@@ -20936,6 +21137,8 @@ class EventsDlg(ArtisanDialog):
     def setactioneventbutton(self,_,i):
         actioncombobox = self.eventbuttontable.cellWidget(i,4)
         aw.extraeventsactions[i] = actioncombobox.currentIndex()
+        if aw.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
+            aw.extraeventsactions[i] = aw.extraeventsactions[i] + 1
         aw.settooltip()
 
     def setvalueeventbutton(self,_,i):
@@ -21916,6 +22119,31 @@ class backgroundDlg(ArtisanDialog):
         self.btcolorComboBox.insertSeparator(4)
         self.btcolorComboBox.addItems(self.colors)
         self.btcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundbtcolor))
+        
+        
+        xtcolorlabel = QLabel(QApplication.translate("Label", "XT Color",None, QApplication.UnicodeUTF8))
+        xtcolorlabel.setAlignment(Qt.AlignRight)
+        self.xtcolorComboBox = QComboBox()
+        self.xtcolorComboBox.addItems(self.defaultcolors)
+        self.xtcolorComboBox.insertSeparator(4)
+        self.xtcolorComboBox.addItems(self.colors)
+        self.xtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundxtcolor))
+        
+        
+        xtcurvelabel = QLabel(QApplication.translate("Label", "XT",None, QApplication.UnicodeUTF8))
+        xtcurvelabel.setAlignment(Qt.AlignRight)
+        self.xtcurveComboBox = QComboBox()
+        self.xtcurveComboBox.setMinimumWidth(120)
+        curvenames = [""] # first entry is the empty one, no extra curve displayed
+        for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
+            curvenames.append(str(i) + "xT1: " + aw.qmc.extraname1B[i])
+            curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2B[i])        
+        self.xtcurveComboBox.addItems(curvenames)
+        if aw.qmc.xtcurveidx < len(curvenames):
+            self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
+        self.connect(self.xtcurveComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.xtcurveComboBox.currentIndex() :self.changeXTcurveidx(i))
+
+        
         deltaetcolorlabel = QLabel(QApplication.translate("Label", "DeltaET Color",None, QApplication.UnicodeUTF8))
         deltaetcolorlabel.setAlignment(Qt.AlignRight)
         self.deltaetcolorComboBox = QComboBox()
@@ -21950,6 +22178,7 @@ class backgroundDlg(ArtisanDialog):
         self.connect(self.leftButton, SIGNAL("clicked()"), lambda m="left": self.move(m))
         self.connect(self.rightButton, SIGNAL("clicked()"),lambda m="right": self.move(m))
         self.connect(self.intensitySpinBox, SIGNAL("valueChanged(int)"),self.adjustintensity)
+        self.connect(self.xtcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color="", curve = "xt": self.adjustcolor(color,curve))
         self.connect(self.btcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color="", curve = "bt": self.adjustcolor(color,curve))
         self.connect(self.metcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color= "", curve = "et": self.adjustcolor(color,curve))
         self.connect(self.deltabtcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color="", curve = "deltabt": self.adjustcolor(color,curve))
@@ -21982,30 +22211,40 @@ class backgroundDlg(ArtisanDialog):
         movelayout.addWidget(self.speedSpinBox,1,1)
         movelayout.addWidget(self.rightButton,1,2)
         movelayout.addWidget(self.downButton,2,1)
-        checkslayout = QHBoxLayout()
-        checkslayout.addWidget(self.backgroundCheck)
-        checkslayout.addWidget(self.backgroundDetails)
-        checkslayout.addWidget(self.backgroundeventsflag)
-        checkslayout.addWidget(self.backgroundDeltaETflag)
-        checkslayout.addWidget(self.backgroundDeltaBTflag)
-        checkslayout.addWidget(self.backgroundAlignFCsflag)
+        checkslayout1 = QHBoxLayout()
+        checkslayout1.addStretch()
+        checkslayout1.addWidget(self.backgroundCheck)
+        checkslayout1.addWidget(self.backgroundDetails)
+        checkslayout1.addWidget(self.backgroundeventsflag)
+        checkslayout1.addWidget(self.backgroundAlignFCsflag)
+        checkslayout1.addStretch()
+        checkslayout2 = QHBoxLayout()
+        checkslayout2.addStretch()
+        checkslayout2.addWidget(self.backgroundDeltaETflag)
+        checkslayout2.addWidget(self.backgroundDeltaBTflag)
+        checkslayout2.addStretch()
         layout = QGridLayout()
-        layout.addWidget(intensitylabel,0,0)
-        layout.addWidget(self.intensitySpinBox,0,1)
-        layout.addWidget(metcolorlabel,1,0)
-        layout.addWidget(self.metcolorComboBox,1,1)
-        layout.addWidget(btcolorlabel,2,0)
-        layout.addWidget(self.btcolorComboBox,2,1)
-        layout.addWidget(deltaetcolorlabel,3,0)
-        layout.addWidget(self.deltaetcolorComboBox,3,1)
-        layout.addWidget(deltabtcolorlabel,4,0)
-        layout.addWidget(self.deltabtcolorComboBox,4,1)        
+        layout.addWidget(intensitylabel,0,2)
+        layout.addWidget(self.intensitySpinBox,0,3)
+        layout.addWidget(metcolorlabel,1,2)
+        layout.addWidget(self.metcolorComboBox,1,3)
+        layout.addWidget(btcolorlabel,2,2)
+        layout.addWidget(self.btcolorComboBox,2,3)
+        layout.addWidget(xtcurvelabel,3,0)
+        layout.addWidget(self.xtcurveComboBox,3,1)
+        layout.addWidget(xtcolorlabel,3,2)
+        layout.addWidget(self.xtcolorComboBox,3,3)
+        layout.addWidget(deltaetcolorlabel,4,2)
+        layout.addWidget(self.deltaetcolorComboBox,4,3)
+        layout.addWidget(deltabtcolorlabel,5,2)
+        layout.addWidget(self.deltabtcolorComboBox,5,3)
         hlayout = QHBoxLayout()
         hlayout.addStretch()
         hlayout.addLayout(layout)
         upperlayout = QVBoxLayout()
         upperlayout.addLayout(movelayout)
-        upperlayout.addLayout(checkslayout)
+        upperlayout.addLayout(checkslayout1)
+        upperlayout.addLayout(checkslayout2)
         upperlayout.addLayout(hlayout)
         layoutBoxed = QHBoxLayout()
         layoutBoxed.addStretch()
@@ -22130,7 +22369,8 @@ class backgroundDlg(ArtisanDialog):
 #        aw.qmc.backgroundDetails = False
 # but we have to deactivate the show flag
         self.backgroundCheck.setChecked(False)
-        aw.qmc.background = False
+        aw.qmc.background = False        
+        self.xtcurveComboBox.clear()
         aw.deleteBackground()
         self.eventtable.clear()
         self.datatable.clear()
@@ -22171,6 +22411,10 @@ class backgroundDlg(ArtisanDialog):
         aw.qmc.flagalignFCs = bool(self.backgroundAlignFCsflag.isChecked())
         aw.qmc.redraw(recomputeAllDeltas=False)
 
+    def changeXTcurveidx(self,i):
+        aw.qmc.xtcurveidx = i
+        aw.qmc.redraw(recomputeAllDeltas=False)
+
     def load(self):
         self.filename = aw.ArtisanOpenFileDialog()
         if len(u(self.filename)) == 0:
@@ -22178,6 +22422,15 @@ class backgroundDlg(ArtisanDialog):
         aw.sendmessage(QApplication.translate("Message","Reading background profile...",None, QApplication.UnicodeUTF8))
         aw.qmc.resetlinecountcaches()
         aw.loadbackground(u(self.filename))
+        # reset XT curve popup
+        self.xtcurveComboBox.clear()
+        curvenames = [""] # first entry is the empty one (no extra curve displayed)
+        for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
+            curvenames.append(str(i) + "xT1: " + aw.qmc.extraname1B[i])
+            curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2B[i])
+        self.xtcurveComboBox.addItems(curvenames)
+        if aw.qmc.xtcurveidx < len(curvenames):
+            self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
         self.pathedit.setText(u(self.filename))
         self.backgroundCheck.setChecked(True)
         self.readChecks()
@@ -23218,6 +23471,7 @@ class serialport(object):
         self.PhidgetTemperatureSensor = None
         self.PhidgetTemperatureSensorAttached = False
         self.Phidget1048values = [-1]*4 # the values gathered by registered change triggers
+        self.PhidgetTemperatureInputCount = 0
         #stores the Phidget 1045 TemperatureSensor object (None if not initialized)
         self.PhidgetIRSensor = None
         self.PhidgetIRSensorSensorAttached = False
@@ -23311,7 +23565,10 @@ class serialport(object):
                                    self.callprogram_56,     #49
                                    self.DUMMY,              #50
                                    self.CENTER304_34,       #51
-                                   self.HH806W              #52
+                                   self.PHIDGET1048,        #52
+                                   self.HOTTOP_BTET,        #53
+                                   self.HOTTOP_HF,          #54
+                                   self.HH806W              #55
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -23623,6 +23880,15 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         v2,v1 = self.PHIDGET1018values(3)
         return tx,v1,v2
+        
+    def HOTTOP_BTET(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.HOTTOPtemperatures()
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
+        
+    def HOTTOP_HF(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        return aw.qmc.hottop_TX,aw.qmc.hottop_MAIN_FAN * 10,aw.qmc.hottop_HEATER # time, Fan (chan2), Heater (chan1)
 
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -23647,12 +23913,12 @@ class serialport(object):
         t2,t1 = self.CENTER309temperature()
         return tx,t2,t1
 
-    #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
+    #special function that collects extra T3 and T4 from center 309 while keeping compatibility
     def CENTER309_34(self):
         #return saved readings collected at self.CENTER309temperature()
         return aw.qmc.extra309TX,aw.qmc.extra309T4,aw.qmc.extra309T3
 
-    #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
+    #special function that collects extra T3 and T4 from center 304 while keeping compatibility
     def CENTER304_34(self):
         return self.CENTER309_34()
 
@@ -23801,7 +24067,7 @@ class serialport(object):
             #open port
             if not self.SP.isOpen():
                 self.SP.open()
-                libtime.sleep(.5) # avoid possible hickups on startup
+                libtime.sleep(.2) # avoid possible hickups on startup
         except serial.SerialException:
             self.SP.close()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + QApplication.translate("Error Message","Unable to open serial port",None, QApplication.UnicodeUTF8)
@@ -23927,7 +24193,7 @@ class serialport(object):
                 return -1,-1
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806AUtemperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.MS6514temperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
@@ -23941,21 +24207,139 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
+    def HOTTOPcontrol(self):
+        cmd = bytearray([0x00]*36)
+        cmd[0] = 0xA5
+        cmd[1] = 0x96
+        cmd[2] = 0xB0
+        cmd[3] = 0xA0
+        cmd[4] = 0x01
+        cmd[5] = 0x01
+        cmd[6] = 0x24
+        
+        if aw.qmc.hottop_SET_HEATER != None:
+            cmd[10] = aw.qmc.hottop_SET_HEATER
+        else:
+            cmd[10] = aw.qmc.hottop_HEATER
+            
+        if aw.qmc.hottop_SET_FAN != None:
+            cmd[11] = int(round(aw.qmc.hottop_SET_FAN / 10.))
+        else:
+            cmd[11] = aw.qmc.hottop_FAN
+            
+        if aw.qmc.hottop_SET_MAIN_FAN != None: # 0-100
+            cmd[12] = int(round(aw.qmc.hottop_SET_MAIN_FAN / 10.))
+        else:
+            cmd[12] = aw.qmc.hottop_MAIN_FAN # 0-10
+            
+        if aw.qmc.hottop_SET_SOLENOID != None:
+            cmd[16] = aw.qmc.hottop_SET_SOLENOID
+        else:
+            cmd[16] = aw.qmc.hottop_SOLENOID
+            
+        if aw.qmc.hottop_SET_DRUM_MOTOR != None:
+            cmd[17] = aw.qmc.hottop_SET_DRUM_MOTOR
+        else:
+            cmd[17] = aw.qmc.hottop_DRUM_MOTOR
+            
+        if aw.qmc.hottop_SET_COOLING_MOTOR != None:
+            cmd[18] = aw.qmc.hottop_SET_COOLING_MOTOR
+        else:
+            cmd[18] = aw.qmc.hottop_COOLING_MOTOR
+
+        cmd[35] = sum([b for b in cmd[:35]]) & 0xFF # checksum
+        
+        return bytes(cmd)
+        
+    def HOTTOPsendControl(self):
+        try:
+            ###  lock resources ##
+            aw.qmc.samplingsemaphore.acquire(1)
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+                cmd = self.HOTTOPcontrol()
+#                print("".join("\\x%02x" % o(i) for i in cmd))
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write(cmd) 
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)        
+    
+    def HOTTOPtemperatures(self,retry=True):
+        try:
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                r = self.SP.read(36)
+#                print("".join("\\x%02x" % o(i) for i in r))
+                if len(r) != 36:
+                    self.closeport()
+                    if retry: # we retry once
+                        self.HOTTOPtemperatures(retry=False)
+                else:
+                    P0 = hex2int(r[0])
+                    P1 = hex2int(r[1])
+                    chksum = sum([hex2int(c) for c in r[:35]]) & 0xFF 
+                    P35 = hex2int(r[35])
+                    if P0 != 165 or P1 != 150 or P35 != chksum:
+                        self.closeport()
+                        if retry: # we retry once
+                            self.HOTTOPtemperatures(retry=False)
+                    else:
+#                        print("master: ", hex2int(r[2]))
+#                        print("slave: ", hex2int(r[3]))
+                        aw.qmc.hottop_VERSION = hex2int(r[4])
+                        aw.qmc.hottop_HEATER = hex2int(r[10])
+                        aw.qmc.hottop_FAN = hex2int(r[11])
+                        aw.qmc.hottop_MAIN_FAN = hex2int(r[12])
+                        aw.qmc.hottop_SOLENOID = hex2int(r[16])
+                        aw.qmc.hottop_DRUM_MOTOR = hex2int(r[17])
+                        aw.qmc.hottop_COOLING_MOTOR = hex2int(r[18])
+                        aw.qmc.hottop_CHAFF_TRAY = hex2int(r[19])
+                        aw.qmc.hottop_ET = hex2int(r[23],r[24]) # ET
+                        aw.qmc.hottop_BT = hex2int(r[25],r[26]) # BT
+                        
+                        # mark DROP if SOLENOID is open, currently recording and DROP not yet marked
+                        if aw.qmc.flagstart and aw.qmc.hottop_SOLENOID and aw.qmc.timeindex[6] == 0:
+                            aw.qmc.markDrop(takeLock=False)
+            aw.qmc.hottop_TX = aw.qmc.timeclock.elapsed()/1000.
+            return aw.qmc.hottop_BT,aw.qmc.hottop_ET
+        except serial.SerialException:
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures()"
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("Hottop :" + settings + " || Version = " + str(aw.qmc.hottop_VERSION) + " || Tx = " + str(self.cmd) + " || Rx = " + cmd2str(binascii.hexlify(r)))                        
+
 
     #t2 and t1 from Omega HH806 or HH802 meter 
-    def HH806AUtemperature(self):
+    def HH806AUtemperature(self, retry=True):
         #init command = "#0A0000RA6\r\n"
         try:
             command = str2cmd("#0A0000NA2\r\n")  #"#0A0101NA4\r\n"
             r = ""
             if not self.SP.isOpen():
                 self.openport()
+                libtime.sleep(.05)
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
 #                self.SP.flush() # was added in 0.7.x but seems to produce problems on some Macs
-                libtime.sleep(.1)
+                libtime.sleep(.05)
                 r = self.SP.read(16)
                 if len(r) == 16:
                     #convert to binary to hex string
@@ -23966,6 +24350,11 @@ class serialport(object):
                 else:
                     nbytes = len(r)
                     aw.qmc.adderror(QApplication.translate("Error Message","HH806AUtemperature(): %1 bytes received but 16 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
+                    if retry:
+                        self.closeport()
+                        libtime.sleep(.05)
+                        a,b = self.HH806AUtemperature(retry=False)
+                        return a,b
                     return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
@@ -24442,7 +24831,7 @@ class serialport(object):
                 self.SP.flushOutput()
                 self.SP.write(command)
                 #self.SP.flush()
-                libtime.sleep(.1)
+                libtime.sleep(.5)
                 r = self.SP.read(45)
                 if len(r) == 45:
                     T1 = T2 = T3 = T3 = -1
@@ -24620,14 +25009,12 @@ class serialport(object):
             return aw.ser.PhidgetTemperatureSensor.getTemperature(i)
     
     def configure1048(self):
-        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(0,aw.qmc.phidget1048_types[0])
-        aw.ser.PhidgetTemperatureSensor.setThermocoupleType(1,aw.qmc.phidget1048_types[1])
-        if 35 in aw.qmc.extradevices:
-            aw.ser.PhidgetTemperatureSensor.setThermocoupleType(2,aw.qmc.phidget1048_types[2])
-            aw.ser.PhidgetTemperatureSensor.setThermocoupleType(3,aw.qmc.phidget1048_types[3])
+        for i in range(aw.ser.PhidgetTemperatureInputCount):
+            if i < 2 or  (i > 1 and i < 4 and 35 in aw.qmc.extradevices):
+                aw.ser.PhidgetTemperatureSensor.setThermocoupleType(i,aw.qmc.phidget1048_types[i])
         aw.ser.Phidget1048values = [-1]*4
         changeTrigger = False
-        for i in range(4):
+        for i in range(aw.ser.PhidgetTemperatureInputCount):
             if i < 2 or (i < 4 and 35 in aw.qmc.extradevices):
                 if aw.qmc.phidget1048_async[i]:
                     aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,aw.qmc.phidget1048_changeTriggers[i])
@@ -24640,6 +25027,7 @@ class serialport(object):
             aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(None)
 
     def phidget1048attached(self,e):
+        aw.ser.PhidgetTemperatureInputCount = aw.ser.PhidgetTemperatureSensor.getTemperatureInputCount()
         self.configure1048()
         aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None, QApplication.UnicodeUTF8))
         aw.ser.PhidgetTemperatureSensorAttached = True
@@ -24673,30 +25061,34 @@ class serialport(object):
                 if mode == 0:
                     probe1 = probe2 = -1
                     try:
-                        probe1 = self.phidget1048getSensorReading(0)
-                        if aw.qmc.mode == "F":
-                            probe1 = aw.qmc.fromCtoF(probe1)
+                        if aw.ser.PhidgetTemperatureInputCount > 0:
+                            probe1 = self.phidget1048getSensorReading(0)
+                            if aw.qmc.mode == "F":
+                                probe1 = aw.qmc.fromCtoF(probe1)
                     except:
                         pass
                     try:
-                        probe2 = self.phidget1048getSensorReading(1)
-                        if aw.qmc.mode == "F":
-                            probe2 = aw.qmc.fromCtoF(probe2)
+                        if aw.ser.PhidgetTemperatureInputCount > 1:
+                            probe2 = self.phidget1048getSensorReading(1)
+                            if aw.qmc.mode == "F":
+                                probe2 = aw.qmc.fromCtoF(probe2)
                     except:
                         pass
                     return probe1, probe2
                 elif mode == 1:
                     probe3 = probe4 = -1
                     try:
-                        probe3 = self.phidget1048getSensorReading(2)
-                        if aw.qmc.mode == "F":
-                            probe3 = aw.qmc.fromCtoF(probe3)
+                        if aw.ser.PhidgetTemperatureInputCount > 2:
+                            probe3 = self.phidget1048getSensorReading(2)
+                            if aw.qmc.mode == "F":
+                                probe3 = aw.qmc.fromCtoF(probe3)
                     except:
                         pass
                     try:
-                        probe4 = self.phidget1048getSensorReading(3)
-                        if aw.qmc.mode == "F":
-                            probe4 = aw.qmc.fromCtoF(probe4)
+                        if aw.ser.PhidgetTemperatureInputCount > 2:
+                            probe4 = self.phidget1048getSensorReading(3)
+                            if aw.qmc.mode == "F":
+                                probe4 = aw.qmc.fromCtoF(probe4)
                     except:
                         pass
                     return probe3, probe4
@@ -26659,7 +27051,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -26879,7 +27271,7 @@ class comportDlg(ArtisanDialog):
                     device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
                     # "ADD DEVICE:"
-                    if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                    if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                         comportComboBox = PortComboBox(selection = aw.extracomport[i])
                         self.connect(comportComboBox, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                         comportComboBox.setFixedWidth(200)
@@ -26976,7 +27368,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,50,51]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -27304,7 +27696,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1048VBox = QVBoxLayout()
         phidget1048VBox.addLayout(phidget1048HBox)
         phidget1048VBox.addStretch()
-        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048",None, QApplication.UnicodeUTF8))
+        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048/1051",None, QApplication.UnicodeUTF8))
         phidget1048GroupBox.setLayout(phidget1048VBox)
         phidget1048HBox.setContentsMargins(0,0,0,0)
         
@@ -28443,8 +28835,24 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 51 is +304_34 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Omega HH806W":
+                elif meter == "Phidget 1051":
                     aw.qmc.device = 52
+                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                elif meter == "Hottop BT/ET":
+                    aw.qmc.device = 53
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 115200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1
+                    aw.button_10.setVisible(True)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                ##########################
+                ####  DEVICE 54 is +VOLTCRAFT 204_34 but +DEVICE cannot be set as main device
+                ##########################                    
+                elif meter == "Omega HH806W":
+                    aw.qmc.device = 55
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -28517,7 +28925,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 3, # 49
                 3, # 50
                 3, # 51
-                8] # 52
+                1, # 52
+                8, # 53
+                8, # 54
+                8] # 55
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -28639,7 +29050,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52]):
                 aw.setcommport()
             #self.close()
             self.accept()
