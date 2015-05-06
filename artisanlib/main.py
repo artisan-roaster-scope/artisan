@@ -1524,7 +1524,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
                     else:
                         aw.lcd3.display("--")
-                    if -100 < self.rateofchange1 < 100:
+                    if -100 < self.rateofchange1 < 1000:
                         aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
                     else:
                         aw.lcd4.display("--")
@@ -24302,6 +24302,10 @@ class serialport(object):
                         aw.qmc.hottop_CHAFF_TRAY = hex2int(r[19])
                         aw.qmc.hottop_ET = hex2int(r[23],r[24]) # ET
                         aw.qmc.hottop_BT = hex2int(r[25],r[26]) # BT
+                        
+                        if aw.qmc.mode == "F":
+                            aw.qmc.hottop_ET = aw.qmc.fromCtoF(aw.qmc.hottop_ET)
+                            aw.qmc.hottop_BT = aw.qmc.fromCtoF(aw.qmc.hottop_BT)
                         
                         # mark DROP if SOLENOID is open, currently recording and DROP not yet marked
                         if aw.qmc.flagstart and aw.qmc.hottop_SOLENOID and aw.qmc.timeindex[6] == 0:
