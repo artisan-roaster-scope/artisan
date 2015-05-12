@@ -493,6 +493,9 @@ class tgraphcanvas(FigureCanvas):
         # oversampling flag
         self.oversampling = False
         self.oversampling_min_delay = 3000
+        
+        # extra event sampling interval in miliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
+        self.extra_event_sampling_delay = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, ..
 
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases_fahrenheit_defaults = [200,300,390,450]
@@ -2485,6 +2488,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.hideExtraButtons()
                 aw.hideLCDs()
                 aw.hideSliders()
+                
+                aw.arduino.pidActive = False
 
                 self.wheelflag = False
                 self.designerflag = False
@@ -3849,7 +3854,31 @@ class tgraphcanvas(FigureCanvas):
             self.ax1.fill_between(angles,0,plotf, facecolor='green', alpha=0.1, interpolate=True)
 
         self.fig.canvas.draw()
-
+        
+    def samplingAction(self):
+        try:
+            ###  lock resources ##
+            aw.qmc.samplingsemaphore.acquire(1)
+            if aw.qmc.extra_event_sampling_delay != 0:
+                a = aw.qmc.extrabuttonactions[2]
+                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[2])
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
+    
+    def AsyncSamplingActionTrigger(self):
+        if aw.AsyncSamplingAction and aw.qmc.extra_event_sampling_delay:
+            self.samplingAction()       
+            QTimer.singleShot(aw.qmc.extra_event_sampling_delay,self.AsyncSamplingActionTrigger)
+        
+    def StartAsyncSamplingAction(self):
+        if aw.qmc.flagon and aw.qmc.extra_event_sampling_delay != 0:
+            aw.AsyncSamplingAction = True
+            self.AsyncSamplingActionTrigger()
+            
+    def StopAsyncSamplingAction(self):
+        aw.AsyncSamplingAction = False
+        
     def OnMonitor(self):
         try:
             try:
@@ -3883,6 +3912,7 @@ class tgraphcanvas(FigureCanvas):
             aw.arduino.activateONOFFeasySV(aw.arduino.svButtons)
             aw.arduino.activateSVSlider(aw.arduino.svSlider)
             self.threadserver.createSampleThread()
+            self.StartAsyncSamplingAction()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -3902,6 +3932,7 @@ class tgraphcanvas(FigureCanvas):
             # clear data from monitoring-only mode
             if len(self.timex) == 1:
                 aw.qmc.clearMeasurements()
+            aw.arduino.pidOff()
             self.disconnectProbes()
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
@@ -3928,6 +3959,7 @@ class tgraphcanvas(FigureCanvas):
             aw.hideExtraButtons()
             aw.enableEditMenus()
             aw.arduino.activateONOFFeasySV(False)
+            self.StopAsyncSamplingAction()
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
             #appnope.nap()
             try:
@@ -6709,10 +6741,11 @@ class SampleThread(QThread):
                 if not local_flagstart and len(aw.qmc.timex) < 2:
                     aw.qmc.timeclock.start()
                     
-                # send sampling action if any                
+                # send sampling action if any interval is set to "sync" (extra_event_sampling_delay = 0)
                 try:
-                    a = aw.qmc.extrabuttonactions[2]
-                    aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[2])
+                    if aw.qmc.extra_event_sampling_delay == 0:
+                        a = aw.qmc.extrabuttonactions[2]
+                        aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[2])
                 except:
                     pass
                     
@@ -7306,6 +7339,9 @@ class ApplicationWindow(QMainWindow):
         
         #### Hottop Control
         self.HottopControlActive = False
+        
+        #### Async Sampling Action
+        self.AsyncSamplingAction = False
 
         ####    HUD
         self.HUD = QLabel()  #main canvas for hud widget
@@ -9390,31 +9426,30 @@ class ApplicationWindow(QMainWindow):
                 elif action == 4:
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
-                        followupCmd = False #
+                        followupCmd = 0 # contains the required sleep time
                         for c in cmds:
                             cs = c.replace("_",str(aw.modbus.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             if followupCmd:
-                                libtime.sleep(0.80) # add time between commands to let the server compute the results
+                                libtime.sleep(followupCmd) #this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec)
                             if cs.startswith('write'):
                                 try:
                                     cmds = eval(cs[len('write'):])
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
                                             # cmd has format "write(s,r,v)"
-                                            libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)
                                             aw.modbus.writeRegister(*cmds)
-                                            followupCmd = True
+                                            followupCmd = 0.08
                                         else:
                                         # cmd has format "write([s,r,v],..,[s,r,v])"
                                             for cmd in cmds:
-                                                libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)
+                                                if followupCmd:
+                                                    libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
                                                 aw.modbus.writeRegister(*cmd)
-                                            followupCmd = True
+                                                followupCmd = 0.08
                                     else:
                                         # cmd has format "write([s,r,v])"
-                                        libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)
                                         aw.modbus.writeRegister(*cmds)
-                                        followupCmd = True
+                                        followupCmd = 0.08
                                 except:
                                     pass
                             elif cs.startswith("wcoils"):
@@ -9423,29 +9458,26 @@ class ApplicationWindow(QMainWindow):
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
                                             # cmd has format "wcoils(s,r,[<b>,..<b>])"
-                                            libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)  
                                             aw.modbus.writeCoils(*cmds)
-                                            followupCmd = True
+                                            followupCmd = 0.08
                                 except:
                                     pass
                             elif cs.startswith("wcoil"):
                                 try:
                                     cmds = eval(cs[len('wcoil'):])
                                     if isinstance(cmds,tuple) and len(cmds) == 3:
-                                        # cmd has format "wcoil(s,r,<b>)"
-                                        libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)                       
+                                        # cmd has format "wcoil(s,r,<b>)"                    
                                         aw.modbus.writeCoil(*cmds)
-                                        followupCmd = True
+                                        followupCmd = 0.08
                                 except:
                                     pass
                             elif cs.startswith("read"):
                                 try:
                                     cmds = eval(cs[len('read'):])
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
-                                        # cmd has format "read(s,r)"
-                                        libtime.sleep(0.30) # respect the MODBUS timing (a MODBUS command might have preceeded)                       
+                                        # cmd has format "read(s,r)"                    
                                         aw.modbus.lastReadResult = aw.modbus.readSingleRegister(*cmds)
-                                        followupCmd = True
+                                        followupCmd = 0.03
                                 except:
                                     pass
                 elif action == 5:
@@ -9814,16 +9846,16 @@ class ApplicationWindow(QMainWindow):
             self.toggleSlidersVisibility()
         elif key == 84:                     #letter T (mouse cross)
             self.qmc.togglecrosslines()
-        elif key == 81 and aw.qmc.flagstart:  #letter q (quick entry of custom event 1)
+        elif key == 81 and aw.qmc.flagon:  #letter q (quick entry of custom event 1)
             self.quickEventShortCut = (0,"")
             aw.sendmessage("%s"%aw.qmc.etypes[0])
-        elif key == 87 and aw.qmc.flagstart:  #letter w (quick entry of custom event 2)
+        elif key == 87 and aw.qmc.flagon:  #letter w (quick entry of custom event 2)
             self.quickEventShortCut = (1,"")
             aw.sendmessage("%s"%aw.qmc.etypes[1])
-        elif key == 69 and aw.qmc.flagstart:  #letter e (quick entry of custom event 3)
+        elif key == 69 and aw.qmc.flagon:  #letter e (quick entry of custom event 3)
             self.quickEventShortCut = (2,"")
             aw.sendmessage("%s"%aw.qmc.etypes[2])
-        elif key == 82 and aw.qmc.flagstart:  #letter r (quick entry of custom event 4)
+        elif key == 82 and aw.qmc.flagson:  #letter r (quick entry of custom event 4)
             self.quickEventShortCut = (3,"")
             aw.sendmessage("%s"%aw.qmc.etypes[3])
         elif key == 66:  #letter b hides/shows extra rows of event buttons
@@ -12205,6 +12237,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Oversampling"):
                 self.qmc.oversampling = settings.value("Oversampling",self.qmc.oversampling).toBool()
                 aw.oversamplingAction.setChecked(aw.qmc.oversampling)
+            # restore extra event sampling interval
+            if settings.contains("ExtraEventSamplingDelay"):
+                self.qmc.extra_event_sampling_delay = settings.value("ExtraEventSamplingDelay",int(self.qmc.extra_event_sampling_delay)).toInt()[0]
             #restore colors
             for (k, v) in list(settings.value("Colors").toMap().items()):
                 self.qmc.palette[str(k)] = str(v.toString())
@@ -12246,6 +12281,13 @@ class ApplicationWindow(QMainWindow):
             #restore roast color system
             if settings.contains("colorsystem"):
                 self.qmc.color_system_idx = settings.value("colorsystem",int(self.qmc.color_system_idx)).toInt()[0]
+            #restore extra background curve color and index
+            settings.beginGroup("XT")
+            if settings.contains("color"):
+                self.qmc.backgroundxtcolor = str(settings.value("color",self.qmc.backgroundxtcolor).toString())
+            if settings.contains("index"):
+                self.qmc.xtcurveidx = settings.value("index",int(self.qmc.xtcurveidx)).toInt()[0]
+            settings.endGroup()
             #restore units
             settings.beginGroup("Units")
             if settings.contains("weight"):
@@ -12593,6 +12635,11 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ETbacklinewidth = settings.value("ETbacklinewidth",self.qmc.ETbacklinewidth).toInt()[0]
                 self.qmc.ETbackmarker = str(settings.value("ETbackmarker",self.qmc.ETbackmarker).toString())
                 self.qmc.ETbackmarkersize = settings.value("ETbackmarkersize",self.qmc.ETbackmarkersize).toInt()[0]
+                self.qmc.XTbacklinestyle = str(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle).toString())
+                self.qmc.XTbackdrawstyle = str(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle).toString())
+                self.qmc.XTbacklinewidth = settings.value("XTbacklinewidth",self.qmc.XTbacklinewidth).toInt()[0]
+                self.qmc.XTbackmarker = str(settings.value("XTbackmarker",self.qmc.XTbackmarker).toString())
+                self.qmc.XTbackmarkersize = settings.value("XTbackmarkersize",self.qmc.ETbackmarkersize).toInt()[0]
                 self.qmc.extralinestyles1 = list(map(str,list(settings.value("extralinestyles1",self.qmc.extralinestyles1).toStringList())))
                 self.qmc.extralinestyles2 = list(map(str,list(settings.value("extralinestyles2",self.qmc.extralinestyles2).toStringList())))
                 self.qmc.extradrawstyles1 = list(map(str,list(settings.value("extradrawstyles1",self.qmc.extradrawstyles1).toStringList())))
@@ -12971,6 +13018,19 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTbackmarker = m                                
                 self.qmc.BTbackmarkersize = aw.qmc.l_back2.get_markersize()
                 self.qmc.backgroundbtcolor = aw.qmc.l_back2.get_color()
+            if aw.qmc.l_back3:
+                self.qmc.XTbacklinestyle = aw.qmc.l_back3.get_linestyle()
+                #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
+                if self.qmc.XTbacklinestyle == self.qmc.linestyle_default:
+                    self.qmc.XTbackdrawstyle = aw.qmc.l_back3.get_drawstyle()
+                else:
+                    self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
+                self.qmc.XTbacklinewidth = aw.qmc.l_back3.get_linewidth()
+                m = aw.qmc.l_back3.get_marker()
+                if not isinstance(m, (int)):
+                    self.qmc.XTbackmarker = m                                
+                self.qmc.XTbackmarkersize = aw.qmc.l_back3.get_markersize()
+                self.qmc.backgroundxtcolor = aw.qmc.l_back3.get_color()
             if aw.qmc.l_delta1B:
                 self.qmc.ETBdeltalinestyle = aw.qmc.l_delta1B.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -13155,6 +13215,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Delay",self.qmc.delay)
             # save oversampling
             settings.setValue("Oversampling",self.qmc.oversampling)
+            # save extra event sampling interval
+            settings.setValue("ExtraEventSamplingDelay",self.qmc.extra_event_sampling_delay)
             #save colors
             settings.setValue("Colors",self.qmc.palette)
             settings.setValue("LCDColors",self.lcdpaletteB)
@@ -13337,6 +13399,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("densitySampleVolume",self.qmc.density[2])
             settings.setValue("densitySampleVolumeUnit",self.qmc.density[3])
             settings.endGroup()
+            settings.beginGroup("XT")
+            settings.setValue("color",self.qmc.backgroundxtcolor)
+            settings.setValue("index",self.qmc.xtcurveidx)
+            settings.endGroup()
             settings.beginGroup("Units")
             settings.setValue("weight",self.qmc.weight[2])
             settings.setValue("volume",self.qmc.volume[2])
@@ -13423,6 +13489,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETbacklinewidth",self.qmc.ETbacklinewidth)
             settings.setValue("ETbackmarker",self.qmc.ETbackmarker)
             settings.setValue("ETbackmarkersize",self.qmc.ETbackmarkersize)
+            settings.setValue("XTbacklinestyle",self.qmc.XTbacklinestyle)
+            settings.setValue("XTbackdrawstyle",self.qmc.XTbackdrawstyle)
+            settings.setValue("XTbacklinewidth",self.qmc.XTbacklinewidth)
+            settings.setValue("XTbackmarker",self.qmc.XTbackmarker)
+            settings.setValue("XTbackmarkersize",self.qmc.XTbackmarkersize)
             settings.setValue("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle)
             settings.setValue("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle)
             settings.setValue("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth)
@@ -14764,7 +14835,7 @@ $cupping_notes
     def sendHottopControl(self):
         if self.HottopControlActive:   
             aw.ser.HOTTOPsendControl()       
-            QTimer.singleShot(400.,self.sendHottopControl)
+            QTimer.singleShot(400,self.sendHottopControl)
 
     def PIDcontrol(self):
         #pid
@@ -16448,7 +16519,7 @@ class HUDDlg(ArtisanDialog):
         aw.WebLCDsAlerts = not aw.WebLCDsAlerts
         
     def changeWebLCDsPort(self):
-        aw.WebLCDsPort = int(self.WebLCDsPort.text())
+        aw.WebLCDsPort = int(str(self.WebLCDsPort.text()))
         
     def setWebLCDsURL(self):
         url_str = self.getWebLCDsURL()
@@ -20467,7 +20538,17 @@ class EventsDlg(ArtisanDialog):
         self.SAMPLINGbuttonActionType.addItems(self.buttonActionTypes)
         self.SAMPLINGbuttonActionType.setCurrentIndex(aw.qmc.extrabuttonactions[2])
         self.SAMPLINGbuttonActionString = QLineEdit(aw.qmc.extrabuttonactionstrings[2])
-        self.SAMPLINGbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))        
+        self.SAMPLINGbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))      
+        self.SAMPLINGbuttonActionInterval = QComboBox()
+        self.SAMPLINGbuttonActionInterval.setToolTip(QApplication.translate("Tooltip", "Interval", None, QApplication.UnicodeUTF8))
+        self.SAMPLINGbuttonActionInterval.setFocusPolicy(Qt.NoFocus)
+        buttonActionIntervals = ["sync", "1.0s", "1.5s", "2.0s", "2.5s", "3.0s", "3.5s", "4.0s", "4.5s", "5.0s"]
+        self.sampling_delays = [0,1000,1500,2000,2500,3000,3500,4000,4500,5000]
+        self.SAMPLINGbuttonActionInterval.addItems(buttonActionIntervals)
+        try:
+            self.SAMPLINGbuttonActionInterval.setCurrentIndex(self.sampling_delays.index(aw.qmc.extra_event_sampling_delay))
+        except:
+            pass
         defaultButtonsLayout = QGridLayout()
         defaultButtonsLayout.addWidget(self.ONbuttonLabel,0,0,Qt.AlignCenter)
         defaultButtonsLayout.addWidget(self.ONbuttonActionType,0,1)
@@ -20515,8 +20596,9 @@ class EventsDlg(ArtisanDialog):
         samplingLayout.addStretch()
         samplingLayout.addWidget(self.SAMPLINGbuttonActionType)
         samplingLayout.addWidget(self.SAMPLINGbuttonActionString)
+        samplingLayout.addWidget(self.SAMPLINGbuttonActionInterval)
         samplingLayout.addStretch()
-        SamplingGroupLayout = QGroupBox(QApplication.translate("GroupBox","Sampling Interval",None, QApplication.UnicodeUTF8))
+        SamplingGroupLayout = QGroupBox(QApplication.translate("GroupBox","Sampling",None, QApplication.UnicodeUTF8))
         SamplingGroupLayout.setLayout(samplingLayout)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(FlagsLayout)
@@ -21435,6 +21517,10 @@ class EventsDlg(ArtisanDialog):
             aw.qmc.extrabuttonactionstrings[0] = u(self.ONbuttonActionString.text())
             aw.qmc.extrabuttonactionstrings[1] = u(self.OFFbuttonActionString.text())
             aw.qmc.extrabuttonactionstrings[2] = u(self.SAMPLINGbuttonActionString.text())
+            try:
+                aw.qmc.extra_event_sampling_delay = self.sampling_delays[self.SAMPLINGbuttonActionInterval.currentIndex()]
+            except:
+                pass
             #save etypes
             if len(u(self.etype0.text())) and len(u(self.etype1.text())) and len(u(self.etype2.text())) and len(u(self.etype3.text())):
                 aw.qmc.etypes[0] = u(self.etype0.text())
@@ -22119,8 +22205,6 @@ class backgroundDlg(ArtisanDialog):
         self.btcolorComboBox.insertSeparator(4)
         self.btcolorComboBox.addItems(self.colors)
         self.btcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundbtcolor))
-        
-        
         xtcolorlabel = QLabel(QApplication.translate("Label", "XT Color",None, QApplication.UnicodeUTF8))
         xtcolorlabel.setAlignment(Qt.AlignRight)
         self.xtcolorComboBox = QComboBox()
@@ -22128,8 +22212,6 @@ class backgroundDlg(ArtisanDialog):
         self.xtcolorComboBox.insertSeparator(4)
         self.xtcolorComboBox.addItems(self.colors)
         self.xtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundxtcolor))
-        
-        
         xtcurvelabel = QLabel(QApplication.translate("Label", "XT",None, QApplication.UnicodeUTF8))
         xtcurvelabel.setAlignment(Qt.AlignRight)
         self.xtcurveComboBox = QComboBox()
@@ -24465,7 +24547,7 @@ class serialport(object):
             res1 = -1
         if aw.modbus.input2slave:
             if just_send:
-                libtime.sleep(0.30)   #this garantees a minimum of 30 miliseconds between readings (according to the Modbus spec)
+                libtime.sleep(0.10)   #this garantees a minimum of 30 miliseconds between readings (according to the Modbus spec)
             if aw.modbus.input2float:
                 res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             else:
@@ -24477,7 +24559,7 @@ class serialport(object):
             res2 = -1
         if aw.modbus.input3slave:
             if just_send:
-                libtime.sleep(0.30)   #this garantees a minimum of 30 miliseconds between readings (according to the Modbus spec)
+                libtime.sleep(0.10)   #this garantees a minimum of 30 miliseconds between readings (according to the Modbus spec)
             if aw.modbus.input3float:
                 res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             else:
@@ -24489,7 +24571,7 @@ class serialport(object):
             res3 = -1
         if aw.modbus.input4slave:
             if just_send:
-                libtime.sleep(0.30)   #this garantees a minimum of 30 miliseconds between readings (according to the Modbus spec)
+                libtime.sleep(0.10)   #this garantees a minimum of 30 miliseconds between readings (according to the Modbus spec)
             if aw.modbus.input4float:
                 res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             else:
@@ -24895,7 +24977,7 @@ class serialport(object):
         devices = self.PhidgetManager.getAttachedDevices()
         res = -1
         if len(devices) == 0:
-            libtime.sleep(.3)
+            libtime.sleep(.2)
             devices = self.PhidgetManager.getAttachedDevices()
             if len(devices) == 0:
                 res = 0
@@ -25526,7 +25608,7 @@ class serialport(object):
             t1,t2 = 0.,0.
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(2)
+                libtime.sleep(1.5)
                 #Reinitialize Arduino in case communication was interupted
                 self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
@@ -25550,15 +25632,10 @@ class serialport(object):
                     else:
                     #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
                         command = "CHAN;" + et_channel + bt_channel + "00"
-#                    if aw.qmc.extradevices in [32,44]: # +ArduinoTC4_56 or +ArduinoTC4_78
-#                        self.SP.write(str2cmd("PID;XON" + "\n"))       #activate extra PID OT1/OT2 channels
-#                    else:
-#                        self.SP.write(str2cmd("PID;XOFF" + "\n"))       #activate extra PID OT1/OT2 channels
                     #self.SP.flush()
-                    libtime.sleep(0.3)
                     self.SP.write(str2cmd(command + "\n"))       #send command
                     #self.SP.flush()
-                    libtime.sleep(.1)
+                    libtime.sleep(.05)
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
                         raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None, QApplication.UnicodeUTF8))
@@ -25569,7 +25646,7 @@ class serialport(object):
                         command = "UNITS;" + aw.qmc.mode + "\n"   #Set units
                         self.SP.write(str2cmd(command))
                         #self.SP.flush()
-                        libtime.sleep(.1)
+                        libtime.sleep(.05)
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
                             raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None, QApplication.UnicodeUTF8))
@@ -25581,7 +25658,7 @@ class serialport(object):
                             command = "FILT;" + filt + "\n"   #Set filters
                             self.SP.write(str2cmd(command))
                             #self.SP.flush()
-                            libtime.sleep(.1)
+                            libtime.sleep(.05)
                             result = self.SP.readline().decode('utf-8')[:-2]
                             if (not len(result) == 0 and not result.startswith("#")):
                                 raise Exception(QApplication.translate("Error Message","Arduino could not set filters",None, QApplication.UnicodeUTF8))
@@ -25594,9 +25671,12 @@ class serialport(object):
                 self.SP.flushOutput()
                 self.SP.write(str2cmd(command))
                 #self.SP.flush()
-                libtime.sleep(.1)
+                libtime.sleep(.05)
                 rl = self.SP.readline().decode('utf-8')[:-2]
-                res = rl.rsplit(',')  #response: list ["t0","t1","t2"] with t0 = internal temp; t1 = ET; t2 = BT
+                res = rl.rsplit(',')  
+                #response: list ["t0","t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT on "CHAN;1200" 
+                #response: list ["t0","t1","t2","t3","t4"]  with t0 = internal temp; t1 = ET; t2 = BT, t3 = chan3, t4 = chan4 on "CHAN;1234" if ArduinoTC4_34 is configured
+                # after PID_ON: + [,"Heater", "Fan", "SV"]
                 if self.arduinoETChannel == "None":
                     t1 = -1
                 else:
@@ -25605,31 +25685,53 @@ class serialport(object):
                     t2 = -1
                 else:
                     t2 = float(res[2])
-                #if extra device +ArduinoTC4_34 or +ArduinoTC4_56, but not both
-                if 28 in aw.qmc.extradevices or (32 in aw.qmc.extradevices and not 28 in aw.qmc.extradevices):
+                #if extra device +ArduinoTC4_34
+                if 28 in aw.qmc.extradevices:
                     #set the other values to extra temp variables
                     aw.qmc.extraArduinoT1 = float(res[3])
                     aw.qmc.extraArduinoT2 = float(res[4])
-                if 28 in aw.qmc.extradevices and 32 in aw.qmc.extradevices: # +ArduinoTC4_34 and +ArduinoTC4_56
-                    try:
-                        aw.qmc.extraArduinoT3 = float(res[5])
-                        aw.qmc.extraArduinoT4 = float(res[6])
-                    except:
-                        aw.qmc.extraArduinoT3 = 0
-                        aw.qmc.extraArduinoT4 = 0
+                    if 32 in aw.qmc.extradevices: # +ArduinoTC4_56
+                        try:
+                            aw.qmc.extraArduinoT3 = float(res[5])
+                            aw.qmc.extraArduinoT4 = float(res[6])
+                        except:
+                            aw.qmc.extraArduinoT3 = 0
+                            aw.qmc.extraArduinoT4 = 0
+                    if 44 in aw.qmc.extradevices: # +ArduinoTC4_78
+                        # report SV as extraArduinoT5
+                        try:
+                            aw.qmc.extraArduinoT5 = float(res[7])
+                        except:
+                            aw.qmc.extraArduinoT5 = 0
+                        # report Ambient Temperature as extraArduinoT6
+                        try:
+                            aw.qmc.extraArduinoT6 = float(res[0])
+                        except:
+                            aw.qmc.extraArduinoT6 = 0                    
                 else:
-                    aw.qmc.extraArduinoT3 = aw.qmc.extraArduinoT4 = -1                
-                if 44 in aw.qmc.extradevices: # +ArduinoTC4_78
-                    # report SV as extraArduinoT5
-                    try:
-                        aw.qmc.extraArduinoT5 = float(res[7])
-                    except:
-                        aw.qmc.extraArduinoT5 = 0
-                    # report Ambient Temperature as extraArduinoT6
-                    try:
-                        aw.qmc.extraArduinoT6 = float(res[0])
-                    except:
-                        aw.qmc.extraArduinoT6 = 0
+                    aw.qmc.extraArduinoT1 = -1.
+                    aw.qmc.extraArduinoT2 = -1.
+                    if 32 in aw.qmc.extradevices: # +ArduinoTC4_56
+                        try:
+                            aw.qmc.extraArduinoT3 = float(res[3])
+                            aw.qmc.extraArduinoT4 = float(res[4])
+                        except:
+                            aw.qmc.extraArduinoT3 = 0
+                            aw.qmc.extraArduinoT4 = 0
+                    else:
+                        aw.qmc.extraArduinoT3 = -1.
+                        aw.qmc.extraArduinoT4 = -1.
+                    if 44 in aw.qmc.extradevices: # +ArduinoTC4_78
+                        # report SV as extraArduinoT5
+                        try:
+                            aw.qmc.extraArduinoT5 = float(res[5])
+                        except:
+                            aw.qmc.extraArduinoT5 = 0
+                        # report Ambient Temperature as extraArduinoT6
+                        try:
+                            aw.qmc.extraArduinoT6 = float(res[0])
+                        except:
+                            aw.qmc.extraArduinoT6 = 0                        
                 # overwrite temps by AT internal Ambient Temperature
                 if aw.ser.arduinoATChannel != "None":
                     if aw.ser.arduinoATChannel == "T1":
@@ -25663,6 +25765,7 @@ class serialport(object):
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f, %.2f, %.2f, %.2f, %.2f, %.2f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2,aw.qmc.extraArduinoT3,aw.qmc.extraArduinoT4))
+
 
     def TEVA18Bconvert(self, seg):
         if seg == 0x7D:
@@ -33748,7 +33851,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             msg = QApplication.translate("StatusBar","Reading Ramp/Soak %1 ...",None, QApplication.UnicodeUTF8).arg(str(i))
             self.status.showMessage(msg,500)
             k = self.getsegment(i)
-            libtime.sleep(0.03)
+            libtime.sleep(0.035)
             if k == -1:
                 self.status.showMessage(QApplication.translate("StatusBar","problem reading Ramp/Soak",None, QApplication.UnicodeUTF8),5000)
                 return
