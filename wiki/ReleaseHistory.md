@@ -1,6 +1,31 @@
 Detailed Release History
 ========================
 
+v0.9.3 (15.1.2015)
+------------------
+
+ * New Features
+   * adds CENTER304_34
+   * adds Phidgets 1051 support
+   * adds Hottop KN-8828B-2K+ support
+   * display one (selectable) extra curve from the background profile
+   * adds asynchronous, but regularly triggered event commands
+   * proposes a file name in the file dialog on first save
+ * Changes
+   * roast report now lists additionally the ET temperature of events
+ * Bug Fixes
+   * fix unicode handling in CSV import/export
+   * slider and button actions with command arguments fixed
+   * Mastech MS6514 communication improvements (thanks to eightbit11)
+   * Omega HH806AU retry on failure during communication
+   * fixes Yocto shared libary loading on Windows and improves the reconnect on reset
+   * missing quantifiers application on START
+   * TC4 "Start PID on CHARGE" now works on consequtive roasts
+   * TC4 enable ArduinoTC4_56 and ArduinoTC4_78 extra device use without adding ArduinoTC4_34 
+   * MODBUS communication improvements
+   
+
+----
 v0.9.2 (16.1.2015)
 ------------------
 

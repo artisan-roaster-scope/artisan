@@ -2115,7 +2115,7 @@ class tgraphcanvas(FigureCanvas):
                         if idx >= len(Y):
                             mathdictionary["Y"+ Yval[i]] = 0
                         else:
-                        	mathdictionary["Y"+ Yval[i]] = Y[idx]
+                            mathdictionary["Y"+ Yval[i]] = Y[idx]
             return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
 
         except Exception as e:
@@ -3124,152 +3124,15 @@ class tgraphcanvas(FigureCanvas):
                 
             if aw.qmc.patheffects:
                 rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
-
-            ##### Extra devices-curves
-            self.extratemp1lines,self.extratemp2lines = [],[]
-            for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                if aw.extraCurveVisibility1[i]:
-                    if aw.qmc.flagon:
-                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
-                        markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
-                    else:
-                        if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
-                            self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
-                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
-                        markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
-                if aw.extraCurveVisibility2[i]:
-                    if aw.qmc.flagon:
-                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
-                        markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
-                    else:
-                        if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
-                            self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
-                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
-                        markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
-
-            ##### ET,BT curves
+                
+                
+            handles = []
+            labels = []
+            
             if smooth or len(self.stemp1) != len(self.timex):
                 self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
             if smooth or len(self.stemp2) != len(self.timex):
                 self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
-            if aw.qmc.ETcurve:
-                if aw.qmc.flagon:
-                    self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
-                else:
-                    self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
-            if aw.qmc.BTcurve:
-                if aw.qmc.flagon:
-                    self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
-                else:
-                    self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
-
-            handles = []
-            labels = []
-            if aw.qmc.ETcurve:
-                handles.append(self.l_temp1)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
-            if aw.qmc.BTcurve:
-                handles.append(self.l_temp2)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
-
-            #populate delta ET (self.delta1) and delta BT (self.delta2)
-            if self.DeltaETflag or self.DeltaBTflag:
-                if recomputeAllDeltas:
-#                    dtx = numpy.diff(self.timex) / 60.
-                    tx = numpy.array(self.timex)
-                    if aw.qmc.flagon or len(tx) != len(self.stemp1):
-                        t1 = self.temp1
-                    else:
-                        t1 = self.stemp1
-                    with numpy.errstate(divide='ignore'):
-#                        z1 = numpy.diff(t1) / dtx
-                        nt1 = numpy.array(t1)
-                        z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-
-                    if aw.qmc.flagon or len(tx) != len(self.stemp2):
-                        t2 = self.temp2
-                    else:
-                        t2 = self.stemp2
-                    with numpy.errstate(divide='ignore'):
-#                        z2 = numpy.diff(t2) / dtx
-                        nt2 = numpy.array(t2)
-                        z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                            
-                    lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
-                    # make lists equal in length
-                    if lt > ld1:
-                        z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
-                    if lt > ld2:
-                        z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
-                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
-                    # filter out values beyond the delta limits
-                    # cut out the part after DROP
-                    if aw.qmc.timeindex[6]:
-                        self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
-                        self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
-                    # cut out the part before CHARGE
-                    if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
-                        self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
-                        self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
-                    # remove values beyond the RoRlimit
-                    if aw.qmc.mode == "C":
-                        rorlimit = aw.qmc.RoRlimitC
-                    else:
-                        rorlimit = aw.qmc.RoRlimitF
-                    self.delta1 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1]
-                    self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
-                    
-                ##### DeltaET,DeltaBT curves
-                if self.DeltaETflag: 
-                    self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
-                    handles.append(self.l_delta1)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
-                    
-                if self.DeltaBTflag:
-                    self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
-                    handles.append(self.l_delta2)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
-
-            nrdevices = len(self.extradevices)
-            
-            if nrdevices and not self.designerflag:
-                xtmpl1idx = 0
-                xtmpl2idx = 0
-                for i in range(nrdevices):
-                    if aw.extraCurveVisibility1[i]:
-                        handles.append(self.extratemp1lines[xtmpl1idx])
-                        xtmpl1idx = xtmpl1idx + 1
-                        labels.append(aw.arabicReshape(self.extraname1[i]))
-                    if aw.extraCurveVisibility2[i]:
-                        handles.append(self.extratemp2lines[xtmpl2idx])
-                        xtmpl2idx = xtmpl2idx + 1
-                        labels.append(aw.arabicReshape(self.extraname2[i]))
-                        
-            if not self.designerflag and aw.qmc.BTcurve:
-                if self.flagon: # no smoothed lines in this case, pass normal BT
-                    self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
-                else:
-                    TP_index = aw.findTP()
-                    self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
-                    if self.timeindex[6]:
-                        self.writestatistics(TP_index)
 
             if self.eventsshowflag:
                 Nevents = len(self.specialevents)
@@ -3352,24 +3215,22 @@ class tgraphcanvas(FigureCanvas):
                             firstletter = self.etypes[self.specialeventstype[i]][0]
                             secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
                             #some times ET is not drawn (ET = 0) when using device NONE
-                            if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:                            
-                                if aw.qmc.flagon:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
-                                                 xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                            if aw.qmc.ETcurve or aw.qmc.BTcurve:
+                                if (aw.qmc.ETcurve and self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]) or (not aw.qmc.BTcurve):
+                                    col = self.palette["et"]
+                                    if aw.qmc.flagon:
+                                        temps = self.temp1
+                                    else:
+                                        temps = self.stemp1
                                 else:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp1[int(self.specialevents[i])]),
+                                    col = self.palette["bt"]
+                                    if aw.qmc.flagon:
+                                        temps = self.temp2
+                                    else:
+                                        temps = self.stemp2
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temps[int(self.specialevents[i])]),
                                                  xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
-                            else:
-                                if aw.qmc.flagon:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                                             xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
-                                else:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp2[int(self.specialevents[i])]),
-                                             xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
 
                 elif self.eventsGraphflag == 2:
                     self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
@@ -3414,6 +3275,149 @@ class tgraphcanvas(FigureCanvas):
                     if E4_nonempty:
                         handles.append(self.l_eventtype4dots)
                         labels.append(aw.arabicReshape(self.etypesf(3)))
+                        
+            ##### Extra devices-curves
+            self.extratemp1lines,self.extratemp2lines = [],[]
+            for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                if aw.extraCurveVisibility1[i]:
+                    if aw.qmc.flagon:
+                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
+                        markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
+                    else:
+                        if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
+                            self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
+                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
+                        markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
+                if aw.extraCurveVisibility2[i]:
+                    if aw.qmc.flagon:
+                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
+                        markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+                    else:
+                        if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
+                            self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
+                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
+                        markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+
+
+
+            #populate delta ET (self.delta1) and delta BT (self.delta2)
+            if self.DeltaETflag or self.DeltaBTflag:
+                if recomputeAllDeltas:
+#                    dtx = numpy.diff(self.timex) / 60.
+                    tx = numpy.array(self.timex)
+                    if aw.qmc.flagon or len(tx) != len(self.stemp1):
+                        t1 = self.temp1
+                    else:
+                        t1 = self.stemp1
+                    with numpy.errstate(divide='ignore'):
+#                        z1 = numpy.diff(t1) / dtx
+                        nt1 = numpy.array(t1)
+                        z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+
+                    if aw.qmc.flagon or len(tx) != len(self.stemp2):
+                        t2 = self.temp2
+                    else:
+                        t2 = self.stemp2
+                    with numpy.errstate(divide='ignore'):
+#                        z2 = numpy.diff(t2) / dtx
+                        nt2 = numpy.array(t2)
+                        z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                            
+                    lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
+                    # make lists equal in length
+                    if lt > ld1:
+                        z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+                    if lt > ld2:
+                        z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
+                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
+                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
+                    # filter out values beyond the delta limits
+                    # cut out the part after DROP
+                    if aw.qmc.timeindex[6]:
+                        self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
+                        self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
+                    # cut out the part before CHARGE
+                    if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
+                        self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
+                        self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
+                    # remove values beyond the RoRlimit
+                    if aw.qmc.mode == "C":
+                        rorlimit = aw.qmc.RoRlimitC
+                    else:
+                        rorlimit = aw.qmc.RoRlimitF
+                    self.delta1 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1]
+                    self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
+                    
+                ##### DeltaET,DeltaBT curves
+                if self.DeltaETflag: 
+                    self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+                    handles.append(self.l_delta1)
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+                    
+                if self.DeltaBTflag:
+                    self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                    linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+                    handles.append(self.l_delta2)
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+
+            ##### ET,BT curves
+            if aw.qmc.ETcurve:
+                if aw.qmc.flagon:
+                    self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
+                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                else:
+                    self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
+                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+            if aw.qmc.BTcurve:
+                if aw.qmc.flagon:
+                    self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
+                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                else:
+                    self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
+                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+
+            if aw.qmc.ETcurve:
+                handles.append(self.l_temp1)
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+            if aw.qmc.BTcurve:
+                handles.append(self.l_temp2)
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+
+            nrdevices = len(self.extradevices)
+            
+            if nrdevices and not self.designerflag:
+                xtmpl1idx = 0
+                xtmpl2idx = 0
+                for i in range(nrdevices):
+                    if aw.extraCurveVisibility1[i]:
+                        handles.append(self.extratemp1lines[xtmpl1idx])
+                        xtmpl1idx = xtmpl1idx + 1
+                        labels.append(aw.arabicReshape(self.extraname1[i]))
+                    if aw.extraCurveVisibility2[i]:
+                        handles.append(self.extratemp2lines[xtmpl2idx])
+                        xtmpl2idx = xtmpl2idx + 1
+                        labels.append(aw.arabicReshape(self.extraname2[i]))
+                        
+            if not self.designerflag and aw.qmc.BTcurve:
+                if self.flagon: # no smoothed lines in this case, pass normal BT
+                    self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
+                else:
+                    TP_index = aw.findTP()
+                    self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
+                    if self.timeindex[6]:
+                        self.writestatistics(TP_index)
+
 
                 #if recorder on
                 if self.flagon:
@@ -14648,7 +14652,7 @@ $cupping_notes
         contributors += u("Barrie Fairley, Ziv Sade, Nicholas Seckar, ")
         contributors += u("Morten M") + uchr(252) + u("nchow")
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
-        contributors += u(", Paolo Scimone, Google, eightbit11")
+        contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -24252,7 +24256,7 @@ class serialport(object):
                         elif(r[index+11] == "\x0b"):
                             s1 += s2
                         elif(r[index+11] == "\x8b"):
-                            s1 == s2-s1
+                            s1 = s2-s1
 
                         #we convert the strings to integers. Divide by 10.0 (decimal position)
                         self.MS6514PrevTemp1 = s1
@@ -29061,7 +29065,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     else:
                         aw.extratimeout.append(dsettings[4])
             if self.nonpidButton.isChecked():
-                aw.button_10.setVisible(False)
+                if meter != "Hottop BT/ET":
+                    aw.button_10.setVisible(False)
                 aw.button_12.setVisible(False)
                 aw.button_13.setVisible(False)
                 aw.button_14.setVisible(False)

@@ -30,11 +30,12 @@ o ET/BT logging and PID control supporting the following devices
  - TE VA18B
  - HHM28 multimeter
  - non-wireless Amprobe TMD-56 (same as Omega HH806AU)
- - Phidget USB and remote (1010, 1011, 1018, 1019, 1046, 1048, 1073)
+ - Phidget USB and remote (1010, 1011, 1018, 1019, 1046, 1048, 1051, 1073)
  - Mastech MS6514
  - virtual devices (symbolic devices)
  - device None (no device; manual input)
  - Yocto Thermocouple and PT100
+ - Hottop KN-8828B-2K+
  - external program 
 o unlimited number of devices/curves running at the same time
 o symbolic manipulation of device outputs
@@ -173,6 +174,12 @@ Artisan uses the following libraries in unmodified forms:
 
 
 VERSION HISTORY
+
+v0.9.3 (15.5.2015)
+- adds Phidget 1051 support
+- adds Hottop KN-8828B-2K+ support
+- adds an extra background curve
+- bug fixes
 
 v0.9.2 (16.1.2015)
 - bug fixes
