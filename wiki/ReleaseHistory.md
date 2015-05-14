@@ -33,7 +33,7 @@ v0.9.2 (16.1.2015)
    * configurable commands on ON, OFF and per sampling interval
    * command sequencing using the semicolon as delimiter
    * adds MODBUS read, wcoil, wcoils commands and last result substitution variable accessible via the underline character
-   * adds [http://www.hukyforum.com/index.php HukyForum.com] image export
+   * adds [HukyForum.com](http://www.hukyforum.com/index.php) image export
  * Bug Fixes
    * fixes color dialog for extra devices on OS X
    * fixes a potential crasher caused by x-axis realignment during sampling
@@ -209,7 +209,7 @@ v0.7.2 (19.12.2013)
    * fixed alarm trigger for button 1
    * improved autoCHARGE and autoDROP recognizers
    * fixes minieditor event type handling
-   * fixes and improvements to [http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm RoastLogger] import
+   * fixes and improvements to [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm9 import
    * makes the extra serial ports widget editable
 
 
@@ -230,7 +230,7 @@ v0.7.0 (30.11.2013)
 -------------------
 
  * New Features
-   * adds support for the [http://www.phidgets.com/products.php?product_id=1046_0 Phidget 1046 4-Input PT100/RTD  Bridge] and for the [http://www.phidgets.com/products.php?product_id=1048 Phidget 1048 4-Input Temperature Sensor J/K/E/T-Type] devices
+   * adds support for the [Phidget 1046 4-Input PT100/RTD  Bridge](http://www.phidgets.com/products.php?product_id=1046_0) and for the [Phidget 1048 4-Input Temperature Sensor J/K/E/T-Type](http://www.phidgets.com/products.php?product_id=1048) devices
    * adds TP event marks (show on graph and in the message log)
    * adds flag in events dialog to control the display of the TP mark
    * adds autoDRY and autoFCs to phases dialog
@@ -244,9 +244,9 @@ v0.7.0 (30.11.2013)
      * adds insert alarm button
      * adds new alarm actions to trigger default event actions like START, FCs,..
      * triggered alarms hold a gray background in the alarms dialog
-     * imports alarms from [http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm RoastLogger] profiles (thanks to Miroslav)
+     * imports alarms from [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm) profiles (thanks to Miroslav)
    * allows ETBTa and RoR statistics to be displayed together
-   * adds support for the [http://my-tonino.com Tonino roast color meter]
+   * adds support for the [Tonino roast color meter](http://my-tonino.com)
    * the last used extra event button is marked
    * adds extra device data to Roast Properties data table
    * adds "cool end" event to the event popup menu on right mouse click on the BT
@@ -282,7 +282,7 @@ v0.7.0 (30.11.2013)
    * improved reliability of serial and modbus commands
    * fixes issue with Roast Reports on Windows
    * several fixes to alarm system
-   * fixes the [http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm RoastLogger] import of latin1 encoded files
+   * fixes the [ RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm) import of latin1 encoded files
    * PID LCD visibility
    * scan for ports on Linux
    * better error handling on exporting data
