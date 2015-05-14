@@ -209,7 +209,7 @@ v0.7.2 (19.12.2013)
    * fixed alarm trigger for button 1
    * improved autoCHARGE and autoDROP recognizers
    * fixes minieditor event type handling
-   * fixes and improvements to [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm9 import
+   * fixes and improvements to [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm) import
    * makes the extra serial ports widget editable
 
 
