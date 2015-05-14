@@ -36,7 +36,7 @@ Features
   * Phidgets (1010, 1011, 1018, 1019, 1045, 1046, 1048, 1051, 1073)
   * Mastech MS6514
   * Yocto Thermocouple and PT100
-  * Hottop KN-8828B-2K+
+  * [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html)
   * external program
 - multi-format (import and export of various file formats: HTML, PDF, SVG, CSV, JSON, Omega HH506RA, K202, K204, [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm))
 - unlimited number of temperature and virtual curves incl. rate-of-rise curves for ET and BT
@@ -73,7 +73,7 @@ Version History
 
 | Version | Date | Comment |
 |---------|------|---------|
-| v0.9.3 | 15.05.2015 | Phidget 1051, Hottop KN-8828B-2K+, one extra background curve, bug fixes |
+| v0.9.3 | 15.05.2015 | Phidget 1051, [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html), one extra background curve, bug fixes |
 | v0.9.2 | 16.01.2015 | Bug fixes |
 | v0.9.1 | 03.01.2015 | [Acaia](http://acaia.co/) scale support, QR code, bug fixes |
 | v0.9.0 | 17.11.2014 | MODBUS ASCII/TCP/UDP, Yocto TC and PT100, Phidget 1045 IR, Phidget 1046 Wheatstone Bridge wiring, Phidgets async mode, Polish translations, LargeLCDs, WebLCDs, 2nd set of roast phases, volume calculator, moisture loss and organic loss, container tare, RoR delta span, phasesLCDs showing Rao's development ratio |
