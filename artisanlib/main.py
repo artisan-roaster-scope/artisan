@@ -3952,8 +3952,8 @@ class tgraphcanvas(FigureCanvas):
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
             aw.hideLCDs()
             # switch off Hottop Control
-            if aw.qmc.device == 53:
-                aw.HottopControlOff()
+#            if aw.qmc.device == 53:
+#                aw.HottopControlOff()
             # reset WebLCDs
             if aw.qmc.LCDdecimalplaces:
                 resLCD = "-.-"
@@ -3963,8 +3963,9 @@ class tgraphcanvas(FigureCanvas):
                 self.updateWebLCDs(bt=resLCD,et=resLCD)
             if aw.largeLCDs_dialog:
                 self.updateLargeLCDs(bt=resLCD,et=resLCD)
-            aw.hideSliders()
-            aw.hideExtraButtons()
+            if not aw.HottopControlActive:
+                aw.hideSliders()
+                aw.hideExtraButtons()
             aw.enableEditMenus()
             aw.arduino.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
@@ -14831,14 +14832,13 @@ $cupping_notes
         aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
     
     def HottopControlOn(self):
-        if aw.qmc.flagon:
-            # start drum motor
-            aw.qmc.hottop_SET_DRUM_MOTOR = 1
-            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
-            if not self.HottopControlActive:
-                aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
-            self.HottopControlActive = True
-            self.sendHottopControl()
+        # start drum motor
+        aw.qmc.hottop_SET_DRUM_MOTOR = 1
+        aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
+        if not self.HottopControlActive:
+            aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
+        self.HottopControlActive = True
+        self.sendHottopControl()
         
     def sendHottopControl(self):
         if self.HottopControlActive:   
