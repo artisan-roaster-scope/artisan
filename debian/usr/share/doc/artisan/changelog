@@ -1,4 +1,4 @@
-artisan (0.9.3-1) precise; urgency=low
+artisan (0.9.3-3) precise; urgency=low
   * new upstream release
   * changes since 0.9.2:
    - adds Phidgets 1051 support
@@ -8,7 +8,7 @@ artisan (0.9.3-1) precise; urgency=low
    - proposes a file name in the file dialog on first save
    - roast report now lists additionally the ET temperature of events
    - bug fixes
- --  <marko.luther@gmx.net>  Fri, 15 May 2015 19:32:14 +0200
+ --  <marko.luther@gmx.net>  Sun, 17 May 2015 19:32:14 +0200
 
 artisan (0.9.2-1) precise; urgency=low
   * new upstream release

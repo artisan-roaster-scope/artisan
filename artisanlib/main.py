@@ -1761,6 +1761,11 @@ class tgraphcanvas(FigureCanvas):
         c = curves.count(True)
         if aw.qmc.background:
             c += 2
+            if aw.qmc.xtcurveidx > 0: # 3rd background courve set?
+                idx3 = aw.qmc.xtcurveidx - 1
+                n3 = idx3 // 2
+                if len(self.stemp1BX) > n3 and len(self.extratimexB) > n3:
+                    c += 1
             if aw.qmc.backgroundeventsflag and aw.qmc.eventsGraphflag == 2:
                 c += 4
         if aw.qmc.eventsshowflag and aw.qmc.eventsGraphflag == 2:
@@ -3005,8 +3010,7 @@ class tgraphcanvas(FigureCanvas):
                             stemp3B = self.stemp1BX[n3]
                         else:
                             stemp3B = self.stemp2BX[n3]
-                        timex3 = self.extratimexB[n3]
-                        self.l_back3, = self.ax.plot(timex3, stemp3B,markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
+                        self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                     sketch_params=None,path_effects=[],
                                                     linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
                                                     alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None, QApplication.UnicodeUTF8)))                                    
@@ -15721,6 +15725,7 @@ $cupping_notes
                 self.eventsliderfactors = copy[13][:]
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
+            self.updateSlidersProperties()
             self.sendmessage(QApplication.translate("Message","Palette #%i restored"%(pindex), None, QApplication.UnicodeUTF8))
             return 1  #success
         else:
@@ -20189,14 +20194,15 @@ class EventsDlg(ArtisanDialog):
         self.colorSpinBox.setRange(0,359)
         self.connect(self.colorSpinBox, SIGNAL("valueChanged(int)"),self.colorizebuttons)
         ## tab4
-        transferpalettebutton = QPushButton(QApplication.translate("Button","Transfer To", None, QApplication.UnicodeUTF8))
+        transferpalettebutton = QPushButton(QApplication.translate("Button","<<", None, QApplication.UnicodeUTF8))
         transferpalettebutton.setFocusPolicy(Qt.NoFocus)
-        setpalettebutton = QPushButton(QApplication.translate("Button","Restore From", None, QApplication.UnicodeUTF8))
+        setpalettebutton = QPushButton(QApplication.translate("Button",">>", None, QApplication.UnicodeUTF8))
         setpalettebutton.setFocusPolicy(Qt.NoFocus)
         palette = QApplication.translate("Label","palette #", None, QApplication.UnicodeUTF8)
         palettelist = []
         for i in range(10):
             palettelist.append(palette + str(i))
+        transferpalettecurrentLabel = QLabel((QApplication.translate("Label","current palette", None, QApplication.UnicodeUTF8)))
         self.transferpalettecombobox = QComboBox()
         self.transferpalettecombobox.setFocusPolicy(Qt.NoFocus)
         self.transferpalettecombobox.setMaximumWidth(120)
@@ -20632,9 +20638,10 @@ class EventsDlg(ArtisanDialog):
         tab2layout.setContentsMargins(0,10,0,5)
         ### tab4 layout
         paletteGrid = QGridLayout()
-        paletteGrid.addWidget(transferpalettebutton,0,0)
-        paletteGrid.addWidget(self.transferpalettecombobox,1,1)
-        paletteGrid.addWidget(setpalettebutton,2,0)
+        paletteGrid.addWidget(transferpalettebutton,0,1)
+        paletteGrid.addWidget(self.transferpalettecombobox,1,0)
+        paletteGrid.addWidget(transferpalettecurrentLabel,1,2)
+        paletteGrid.addWidget(setpalettebutton,2,1)
         paletteBox = QHBoxLayout()
         paletteBox.addStretch()
         paletteBox.addLayout(paletteGrid)
@@ -23403,7 +23410,7 @@ class scaleport(extraserialport):
             # disconnect from acaia scale
             try:
                 if self.SP.isOpen():
-                    self.SP.write(str2cmd('￼BTDS\r\n'))
+                    self.SP.write(str2cmd('BTDS\r\n'))
             except Exception:
                 pass
         super(scaleport, self).closeport()
@@ -23428,16 +23435,16 @@ class scaleport(extraserialport):
                     # open serial port if not yet open
                     self.openport()
                 if self.SP.isOpen(): 
-                    self.SP.write(str2cmd('￼BTST\r\n')) # request connection state
+                    self.SP.write(str2cmd('BTST\r\n')) # request connection state
                     v = self.readLine()
                     if v.startswith('status=DISCONNECTED'):
                         # connect to scale if not yet connected
-                        self.SP.write(str2cmd('￼BTLS\r\n')) # scan for scales
+                        self.SP.write(str2cmd('BTLS\r\n')) # scan for scales
                         # read reply until "SCAN_STOP"
                         v = self.readLine()
                         while not v.startswith(' SCAN_STOP'):                        
                             v = str(self.SP.readline().decode('ascii'))
-                        self.SP.write(str2cmd('￼BTCN1\r\n')) # connect to scale 1
+                        self.SP.write(str2cmd('BTCN1\r\n')) # connect to scale 1
                         # read until non-empty reply
                         v = self.readLine()
                         while v == "": # read until non-empty line
@@ -23446,7 +23453,7 @@ class scaleport(extraserialport):
                             # we read another line after the "connected" message
                             v = self.readLine()
                     # request weight
-                    self.SP.write(str2cmd('￼GWT1,1,1\r\n'))
+                    self.SP.write(str2cmd('GWT1,1,1\r\n'))
                     self.readLine() # first line of the reply contains reading number
                     v = self.readLine() # the second line of the reply contains the reading
                     res = v.strip().split(' ')
