@@ -2820,6 +2820,8 @@ class tgraphcanvas(FigureCanvas):
                 self.endofx = 60
             self.ax.set_ylim(self.ylimit_min, self.ylimit)
             self.ax.set_autoscale_on(False)
+            fontprop_small = aw.mpl_fontproperties.copy()
+            fontprop_small.set_size("xx-small")
             fontprop_medium = aw.mpl_fontproperties.copy()
             fontprop_medium.set_size("medium")
             fontprop_large = aw.mpl_fontproperties.copy()
@@ -3031,8 +3033,15 @@ class tgraphcanvas(FigureCanvas):
                         tx = numpy.array(self.timeB)
                         dtx = numpy.diff(self.timeB) / 60.
                         with numpy.errstate(divide='ignore'):
-                            z1 = numpy.diff(self.stemp1B) / dtx
-                            z2 = numpy.diff(self.stemp2B) / dtx
+#                            z1 = numpy.diff(self.stemp1B) / dtx
+                            nt1 = numpy.array(self.stemp1B)
+                            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)                            
+                        
+                        with numpy.errstate(divide='ignore'):
+#                            z2 = numpy.diff(self.stemp2B) / dtx
+                            nt2 = numpy.array(self.stemp2B)
+                            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                        
                         lt,ld1,ld2 = len(self.timeB),len(z1),len(z2)
                         if lt > ld1:
                             z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
@@ -3173,9 +3182,41 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 temp = None
                             if temp:
+#                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+#                                             xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
+#                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",
+#                                             fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                                
+                                if self.specialeventstype[i] == 0:
+                                    boxstyle = 'square,pad=0.2'
+                                    boxcolor = self.EvalueColor[0]
+                                    textcolor = 'white'
+                                elif self.specialeventstype[i] == 1:
+                                    boxstyle = 'circle,pad=0.1'
+                                    boxcolor = self.EvalueColor[1]
+                                    textcolor = 'white'
+                                elif self.specialeventstype[i] == 2:
+                                    boxstyle = 'sawtooth,pad=0.4,tooth_size=0.8'
+                                    boxcolor = self.EvalueColor[2]
+                                    textcolor = 'white'
+                                elif self.specialeventstype[i] == 3:
+                                    boxstyle = 'round4,pad=0.3,rounding_size=0.15'
+                                    boxcolor = self.EvalueColor[3]
+                                    textcolor = 'white'
+                                elif self.specialeventstype[i] == 4:
+                                    boxstyle = 'square,pad=0.2'
+                                    boxcolor = 'yellow'
+                                    textcolor = self.palette["text"]
+                                
                                 self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                             xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                                             xytext=(self.timex[int(self.specialevents[i])],temp+height),
+                                             alpha=0.9,
+                                             color=textcolor,
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
+                                             bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                             fontproperties=fontprop_small,
+                                             path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                             )
 
                 if self.eventsGraphflag == 1 and Nevents:
                     char1 = self.etypes[0][0]
@@ -3234,9 +3275,13 @@ class tgraphcanvas(FigureCanvas):
                                         temps = self.stemp2
                                 self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temps[int(self.specialevents[i])]),
                                                  xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                                                 bbox=dict(boxstyle='square,pad=0.1', fc='yellow', ec='none'),
+                                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
+                                                 fontsize="xx-small",
+                                                 fontproperties=fontprop_small)
 
-                elif self.eventsGraphflag == 2:
+                elif self.eventsGraphflag == 2 and Nevents:
                     self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                     self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                     E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
@@ -3267,18 +3312,7 @@ class tgraphcanvas(FigureCanvas):
                     self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                           linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
 
-                    if E1_nonempty:
-                        handles.append(self.l_eventtype1dots)
-                        labels.append(aw.arabicReshape(self.etypesf(0)))
-                    if E2_nonempty:
-                        handles.append(self.l_eventtype2dots)
-                        labels.append(aw.arabicReshape(self.etypesf(1)))
-                    if E3_nonempty:
-                        handles.append(self.l_eventtype3dots)
-                        labels.append(aw.arabicReshape(self.etypesf(2)))
-                    if E4_nonempty:
-                        handles.append(self.l_eventtype4dots)
-                        labels.append(aw.arabicReshape(self.etypesf(3)))
+
                         
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
@@ -3360,16 +3394,11 @@ class tgraphcanvas(FigureCanvas):
                 if self.DeltaETflag: 
                     self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
-                    handles.append(self.l_delta1)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
-                    
+                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))                    
                 if self.DeltaBTflag:
                     self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
-                    handles.append(self.l_delta2)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
             ##### ET,BT curves
             if aw.qmc.ETcurve:
@@ -3398,6 +3427,14 @@ class tgraphcanvas(FigureCanvas):
                 handles.append(self.l_temp2)
                 labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
 
+            if self.DeltaETflag: 
+                handles.append(self.l_delta1)
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+            if self.DeltaBTflag:
+                handles.append(self.l_delta2)
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+
+
             nrdevices = len(self.extradevices)
             
             if nrdevices and not self.designerflag:
@@ -3412,6 +3449,20 @@ class tgraphcanvas(FigureCanvas):
                         handles.append(self.extratemp2lines[xtmpl2idx])
                         xtmpl2idx = xtmpl2idx + 1
                         labels.append(aw.arabicReshape(self.extraname2[i]))
+
+            if self.eventsshowflag and self.eventsGraphflag == 2 and Nevents:
+                if E1_nonempty:
+                    handles.append(self.l_eventtype1dots)
+                    labels.append(aw.arabicReshape(self.etypesf(0)))
+                if E2_nonempty:
+                    handles.append(self.l_eventtype2dots)
+                    labels.append(aw.arabicReshape(self.etypesf(1)))
+                if E3_nonempty:
+                    handles.append(self.l_eventtype3dots)
+                    labels.append(aw.arabicReshape(self.etypesf(2)))
+                if E4_nonempty:
+                    handles.append(self.l_eventtype4dots)
+                    labels.append(aw.arabicReshape(self.etypesf(3)))                        
                         
             if not self.designerflag and aw.qmc.BTcurve:
                 if self.flagon: # no smoothed lines in this case, pass normal BT
@@ -14616,33 +14667,32 @@ $cupping_notes
         return (rc1,rc2,rc3)
 
     def viewErrorLog(self):
-        self.error = errorDlg(self)
-        self.error.show()
+        error = errorDlg(self)
+        error.show()
         QApplication.processEvents()
-        self.error.setModal(False)
+        error.setModal(False)
 
     def viewSerialLog(self):
-        self.serialDLG = serialLogDlg(self)
-        self.serialDLG.show()
+        serialDLG = serialLogDlg(self)
+        serialDLG.show()
         QApplication.processEvents()
-        self.serialDLG.setModal(False)
-        
+        serialDLG.setModal(False)
         
     def viewartisansettings(self):
         settingsDLG = artisansettingsDlg(self)
         settingsDLG.show()
 
     def viewplatform(self):
-        self.platformDLG = platformDlg(self)
-        self.platformDLG.show()
+        platformDLG = platformDlg(self)
+        platformDLG.show()
         QApplication.processEvents()
-        self.platformDLG.setModal(False)
+        platformDLG.setModal(False)
 
     def viewMessageLog(self):
-        self.message = messageDlg(self)
-        self.message.show()
+        message = messageDlg(self)
+        message.show()
         QApplication.processEvents()
-        self.message.setModal(False)
+        message.setModal(False)
 
     def helpAbout(self):
         coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
@@ -14893,11 +14943,11 @@ $cupping_notes
         dialog.setFixedSize(dialog.size())
 
     def calculator(self):
-        self.dialog = calculatorDlg(self)
-        self.dialog.show()
-        self.dialog.setFixedSize(self.dialog.size())
+        dialog = calculatorDlg(self)
+        dialog.show()
+        dialog.setFixedSize(self.dialog.size())
         QApplication.processEvents()
-        self.dialog.setModal(False)
+        dialog.setModal(False)
 
     def largeLCDs(self):
         if not self.largeLCDs_dialog:
@@ -14924,7 +14974,7 @@ $cupping_notes
     def deleteBackground(self):
         self.qmc.backgroundpath = ""
         self.qmc.titleB = ""
-        self.qmc.temp1B, self.qmc.temp2B, self.temp1BX, self.temp2BX, self.qmc.timeB = [],[],[],[],[]
+        self.qmc.temp1B, self.qmc.temp2B, self.qmc.temp1BX, self.qmc.temp2BX, self.qmc.timeB = [],[],[],[],[]
         self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = [],[],[],[] # smoothed versions of the background courves
         self.qmc.extraname1B,self.qmc.extraname2B = [],[]
         self.qmc.backgroundEvents, self.qmc.backgroundEtypes = [],[]
@@ -18267,8 +18317,8 @@ class editGraphDlg(ArtisanDialog):
                         
     def tareChanged(self,i):
         if i == 0 and self.tarePopupEnabled:
-            self.tareDLG = tareDlg(self,tarePopup=self)
-            self.tareDLG.show()
+            tareDLG = tareDlg(self,tarePopup=self)
+            tareDLG.show()
             QApplication.processEvents()
             # reset index and popup
             self.tareComboBox.setCurrentIndex(aw.qmc.container_idx + 3)
@@ -18524,11 +18574,12 @@ class editGraphDlg(ArtisanDialog):
                     extra_qtw1 = QTableWidgetItem(fmtstr%aw.qmc.extratemp1[k][i])
                     extra_qtw1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                     self.datatable.setItem(i,j,extra_qtw1)
+                    j = j + 1
                 if len(aw.qmc.extratemp2) > k and len(aw.qmc.extratemp2[k]) > i:
                     extra_qtw2 = QTableWidgetItem(fmtstr%aw.qmc.extratemp2[k][i])
                     extra_qtw2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                    self.datatable.setItem(i,j+1,extra_qtw2)
-                j = j + 2
+                    self.datatable.setItem(i,j,extra_qtw2)
+                    j = j + 1
         header = self.datatable.horizontalHeader()
         header.setResizeMode(0, QHeaderView.Fixed)
         header.setResizeMode(1, QHeaderView.Fixed)
@@ -24419,7 +24470,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("Hottop :" + settings + " || Version = " + str(aw.qmc.hottop_VERSION) + " || Tx = " + str(self.cmd) + " || Rx = " + cmd2str(binascii.hexlify(r)))                        
+                aw.addserial("Hottop :" + settings + " || Version = " + str(aw.qmc.hottop_VERSION) + " || Rx = " + cmd2str(binascii.hexlify(r)))                        
 
 
     #t2 and t1 from Omega HH806 or HH802 meter 
@@ -31613,7 +31664,8 @@ class PXRpidDlgControl(ArtisanDialog):
         else:
             msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["rampsoakmode"][1],1)
             currentmode = aw.fujipid.readoneword(msg)
-        aw.fujipid.PXR["rampsoakstartend"][0] = currentmode
+        currentmode = 0
+        aw.fujipid.PXR["rampsoakmode"][0] = currentmode
         if currentmode == 0:
             mode = ["0",
                     QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8),
@@ -31725,7 +31777,13 @@ class PXRpidDlgControl(ArtisanDialog):
         string += QApplication.translate("Message","If you need to change it, change it now and come back later",None, QApplication.UnicodeUTF8) + "\n"
         string += QApplication.translate("Message","Use the Parameter Loader Software by Fuji if you need to\n\n",None, QApplication.UnicodeUTF8) + "\n\n\n"
         string += QApplication.translate("Message","Continue?",None, QApplication.UnicodeUTF8)
-        QMessageBox.information(self,QApplication.translate("Message", "RampSoak Mode",None, QApplication.UnicodeUTF8),string)
+#        QMessageBox.information(self,QApplication.translate("Message", "RampSoak Mode",None, QApplication.UnicodeUTF8),string)
+        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None,QApplication.UnicodeUTF8),string,
+                            QMessageBox.Yes|QMessageBox.Cancel)
+        if reply == QMessageBox.Cancel:
+            return 0
+        elif reply == QMessageBox.Yes:
+            return 1
 
     def setONOFFrampsoak(self,flag):
         #flag =0 OFF, flag = 1 ON, flag = 2 hold
