@@ -3031,7 +3031,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.DeltaETBflag or self.DeltaBTBflag:
                     if True: # recomputeAllDeltas:
                         tx = numpy.array(self.timeB)
-                        dtx = numpy.diff(self.timeB) / 60.
+#                        dtx = numpy.diff(self.timeB) / 60.
                         with numpy.errstate(divide='ignore'):
 #                            z1 = numpy.diff(self.stemp1B) / dtx
                             nt1 = numpy.array(self.stemp1B)
@@ -10150,9 +10150,9 @@ class ApplicationWindow(QMainWindow):
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting.
     def automaticsave(self):
         try:
-            title = None
-            if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
-                title = aw.qmc.title
+#            title = None
+#            if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
+#                title = aw.qmc.title
             if self.qmc.autosavepath and self.qmc.autosaveflag:
                 filename = self.generateFilename(prefix=self.qmc.autosaveprefix)
                 oldDir = u(QDir.current())
@@ -24031,7 +24031,6 @@ class serialport(object):
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
         
     def HOTTOP_HF(self):
-        tx = aw.qmc.timeclock.elapsed()/1000.
         return aw.qmc.hottop_TX,aw.qmc.hottop_MAIN_FAN * 10,aw.qmc.hottop_HEATER # time, Fan (chan2), Heater (chan1)
 
     def MODBUS(self):
@@ -30428,6 +30427,36 @@ class WheelDlg(ArtisanDialog):
 #######################  ALARM DIALOG  #####################
 ############################################################
 
+class MyTableWidgetItemQLineEdit(QTableWidgetItem):
+    def __init__(self, sortKey):
+        #call custom constructor with UserType item type
+        QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+        self.sortKey = sortKey
+
+    #Qt uses a simple < check for sorting items, override this to use the sortKey
+    def __lt__(self, other):
+        return self.sortKey.text() < other.sortKey.text()
+        
+class MyTableWidgetItemQCheckBox(QTableWidgetItem):
+    def __init__(self, sortKey):
+        #call custom constructor with UserType item type
+        QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+        self.sortKey = sortKey
+
+    #Qt uses a simple < check for sorting items, override this to use the sortKey
+    def __lt__(self, other):
+        return self.sortKey.isChecked() < other.sortKey.isChecked()
+        
+class MyTableWidgetItemQComboBox(QTableWidgetItem):
+    def __init__(self, sortKey):
+        #call custom constructor with UserType item type
+        QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+        self.sortKey = sortKey
+
+    #Qt uses a simple < check for sorting items, override this to use the sortKey
+    def __lt__(self, other):
+        return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
+
 class AlarmDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(AlarmDlg,self).__init__(parent)
@@ -30541,7 +30570,9 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmaction = []
         aw.qmc.alarmbeep = []
         aw.qmc.alarmstrings = []
+        self.alarmtable.setSortingEnabled(False)
         self.alarmtable.setRowCount(0)
+        self.alarmtable.setSortingEnabled(True)
 
     def alarmson(self,flag):
         for i in range(len(aw.qmc.alarmflag)):
@@ -30564,17 +30595,18 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmaction.append(0)
         aw.qmc.alarmbeep.append(0)
         aw.qmc.alarmstrings.append(QApplication.translate("Label","Enter description",None, QApplication.UnicodeUTF8))
+        self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         self.alarmtable.setRowCount(nalarms + 1)
         self.setalarmtablerow(nalarms)
         self.alarmtable.resizeColumnsToContents()
         self.alarmtable.resizeRowsToContents()
         # improve width of Qlineedit columns
-        self.alarmtable.setColumnWidth(1,50)
         self.alarmtable.setColumnWidth(2,50)
-        self.alarmtable.setColumnWidth(4,50)
-        self.alarmtable.setColumnWidth(5,80)
-        self.alarmtable.setColumnWidth(7,40)
+        self.alarmtable.setColumnWidth(3,50)
+        self.alarmtable.setColumnWidth(5,50)
+        self.alarmtable.setColumnWidth(6,80)
+        self.alarmtable.setColumnWidth(8,40)
         header = self.alarmtable.horizontalHeader()
         header.setStretchLastSection(False)
         self.deselectAll()
@@ -30582,8 +30614,10 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(nalarms,0,nalarms,self.alarmtable.columnCount()-1),True)
         header.setStretchLastSection(True)
         self.markNotEnabledAlarmRows()
+        self.alarmtable.setSortingEnabled(True)
 
     def insertalarm(self):
+        self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         if nalarms:
             # check for selection
@@ -30606,11 +30640,11 @@ class AlarmDlg(ArtisanDialog):
                 self.setalarmtablerow(selected_row)
                 self.alarmtable.resizeColumnsToContents()
                 #  improve width of Qlineedit columns
-                self.alarmtable.setColumnWidth(1,50)
                 self.alarmtable.setColumnWidth(2,50)
-                self.alarmtable.setColumnWidth(4,50)
-                self.alarmtable.setColumnWidth(5,80)
-                self.alarmtable.setColumnWidth(7,40)
+                self.alarmtable.setColumnWidth(3,50)
+                self.alarmtable.setColumnWidth(5,50)
+                self.alarmtable.setColumnWidth(6,80)
+                self.alarmtable.setColumnWidth(8,40)
                 header = self.alarmtable.horizontalHeader()
                 header.setStretchLastSection(False)
                 self.deselectAll()
@@ -30618,8 +30652,10 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(selected_row,0,selected_row,self.alarmtable.columnCount()-1),True)
                 header.setStretchLastSection(True)
                 self.markNotEnabledAlarmRows()
+        self.alarmtable.setSortingEnabled(True)
 
     def deletealarm(self):
+        self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         if nalarms:
             # check for selection
@@ -30661,6 +30697,7 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmtable.setRowCount(nalarms - 1)
                 self.deselectAll()
             self.markNotEnabledAlarmRows()
+        self.alarmtable.setSortingEnabled(True)
 
     def importalarms(self):
         aw.fileImport(QApplication.translate("Message", "Load Alarms",None, QApplication.UnicodeUTF8),self.importalarmsJSON)
@@ -30764,9 +30801,9 @@ class AlarmDlg(ArtisanDialog):
             aw.qmc.alarmbeep = [0]*nalarms
             aw.qmc.alarmstrings = [""]*nalarms
             for i in range(nalarms):
-                flag = self.alarmtable.cellWidget(i,0)
+                flag = self.alarmtable.cellWidget(i,1)
                 aw.qmc.alarmflag[i] = int(flag.isChecked())
-                guard = self.alarmtable.cellWidget(i,1)
+                guard = self.alarmtable.cellWidget(i,2)
                 try:
                     guard_value = int(str(guard.text())) - 1
                 except:
@@ -30775,7 +30812,7 @@ class AlarmDlg(ArtisanDialog):
                     aw.qmc.alarmguard[i] = guard_value
                 else:
                     aw.qmc.alarmguard[i] = -1
-                negguard = self.alarmtable.cellWidget(i,2)
+                negguard = self.alarmtable.cellWidget(i,3)
                 try:
                     negguard_value = int(str(negguard.text())) - 1
                 except:
@@ -30784,27 +30821,27 @@ class AlarmDlg(ArtisanDialog):
                     aw.qmc.alarmnegguard[i] = negguard_value
                 else:
                     aw.qmc.alarmnegguard[i] = -1
-                timez =  self.alarmtable.cellWidget(i,3)
+                timez =  self.alarmtable.cellWidget(i,4)
                 aw.qmc.alarmtime[i] = aw.qmc.menuidx2alarmtime[timez.currentIndex()]
-                offset =  self.alarmtable.cellWidget(i,4)
+                offset =  self.alarmtable.cellWidget(i,5)
                 if offset and offset != "":
                     aw.qmc.alarmoffset[i] = max(0,aw.qmc.stringtoseconds(str(offset.text())))
-                atype = self.alarmtable.cellWidget(i,5)
+                atype = self.alarmtable.cellWidget(i,6)
                 aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3
-                cond = self.alarmtable.cellWidget(i,6)
+                cond = self.alarmtable.cellWidget(i,7)
                 aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
-                temp = self.alarmtable.cellWidget(i,7)
+                temp = self.alarmtable.cellWidget(i,8)
                 try:
                     aw.qmc.alarmtemperature[i] = int(str(temp.text()))
                 except:
                     aw.qmc.alarmtemperature[i] = 0
-                action = self.alarmtable.cellWidget(i,8)
+                action = self.alarmtable.cellWidget(i,9)
                 aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
-                beepWidget = self.alarmtable.cellWidget(i,9)
+                beepWidget = self.alarmtable.cellWidget(i,10)
                 beep = beepWidget.layout().itemAt(1).widget()
                 if beep and beep != None:
                     aw.qmc.alarmbeep[i] = int(beep.isChecked())
-                description = self.alarmtable.cellWidget(i,10)
+                description = self.alarmtable.cellWidget(i,11)
                 aw.qmc.alarmstrings[i] = u(description.text())
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -30923,32 +30960,45 @@ class AlarmDlg(ArtisanDialog):
         #text description
         descriptionedit = QLineEdit(u(aw.qmc.alarmstrings[i]))
         descriptionedit.setCursorPosition(0)
-        self.alarmtable.setCellWidget(i,0,flagComboBox)
-        self.alarmtable.setCellWidget(i,1,guardedit)
-        self.alarmtable.setCellWidget(i,2,negguardedit)
-        self.alarmtable.setCellWidget(i,3,timeComboBox)
-        self.alarmtable.setCellWidget(i,4,timeoffsetedit)
-        self.alarmtable.setCellWidget(i,5,typeComboBox)
-        self.alarmtable.setCellWidget(i,6,condComboBox)
-        self.alarmtable.setCellWidget(i,7,tempedit)
-        self.alarmtable.setCellWidget(i,8,actionComboBox)
-        self.alarmtable.setCellWidget(i,9,beepWidget)
-        self.alarmtable.setCellWidget(i,10,descriptionedit)
+        self.alarmtable.setItem (i, 0, QTableWidgetItem(str(i)))
+        self.alarmtable.setCellWidget(i,1,flagComboBox)
+        self.alarmtable.setItem (i, 1, MyTableWidgetItemQCheckBox(flagComboBox))
+        self.alarmtable.setCellWidget(i,2,guardedit)
+        self.alarmtable.setItem (i, 2, MyTableWidgetItemQLineEdit(guardedit))
+        self.alarmtable.setCellWidget(i,3,negguardedit)
+        self.alarmtable.setItem (i, 3, MyTableWidgetItemQLineEdit(negguardedit))
+        self.alarmtable.setCellWidget(i,4,timeComboBox)
+        self.alarmtable.setItem (i, 4, MyTableWidgetItemQComboBox(timeComboBox))
+        self.alarmtable.setCellWidget(i,5,timeoffsetedit)
+        self.alarmtable.setItem (i, 5, MyTableWidgetItemQLineEdit(timeoffsetedit))
+        self.alarmtable.setCellWidget(i,6,typeComboBox)
+        self.alarmtable.setItem (i, 6, MyTableWidgetItemQComboBox(typeComboBox))
+        self.alarmtable.setCellWidget(i,7,condComboBox)
+        self.alarmtable.setItem (i, 7, MyTableWidgetItemQComboBox(condComboBox))
+        self.alarmtable.setCellWidget(i,8,tempedit)
+        self.alarmtable.setItem (i, 8, MyTableWidgetItemQLineEdit(tempedit))
+        self.alarmtable.setCellWidget(i,9,actionComboBox)
+        self.alarmtable.setItem (i, 9, MyTableWidgetItemQComboBox(actionComboBox))
+        self.alarmtable.setCellWidget(i,10,beepWidget)
+        self.alarmtable.setItem (i, 10, MyTableWidgetItemQCheckBox(beepWidget.layout().itemAt(1).widget()))
+        self.alarmtable.setCellWidget(i,11,descriptionedit)
+        self.alarmtable.setItem (i, 11, MyTableWidgetItemQLineEdit(descriptionedit))
 
     # puts a gray background on alarm rows that have already been fired
     def markNotEnabledAlarmRows(self):
         for i in range(self.alarmtable.rowCount()):
-            for j in range(10):
+            for j in range(11):
                 if aw.qmc.alarmstate[i]:
-                    self.alarmtable.setItem(i,j,QTableWidgetItem())
+                    #self.alarmtable.setItem(i,j,QTableWidgetItem())
                     self.alarmtable.item(i,j).setBackgroundColor(QColor(191, 191, 191))
 
     def createalarmtable(self):
         try:
             self.alarmtable.clear()
             self.alarmtable.setTabKeyNavigation(True)
-            self.alarmtable.setColumnCount(11)
-            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
+            self.alarmtable.setColumnCount(12)
+            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Nr",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","But Not",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
@@ -30966,6 +31016,8 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.setShowGrid(True)
             nalarms = len(aw.qmc.alarmtemperature)
             self.alarmtable.verticalHeader().setResizeMode(2)
+            self.alarmtable.verticalHeader().setVisible(False)
+            self.alarmtable.setSortingEnabled(False)
             if nalarms:
                 self.alarmtable.setRowCount(nalarms)
                 #populate table
@@ -30973,14 +31025,15 @@ class AlarmDlg(ArtisanDialog):
                     self.setalarmtablerow(i)
                 self.alarmtable.resizeColumnsToContents()
                 # improve width of Qlineedit columns
-                self.alarmtable.setColumnWidth(1,50)
                 self.alarmtable.setColumnWidth(2,50)
-                self.alarmtable.setColumnWidth(4,50)
-                self.alarmtable.setColumnWidth(5,80)
-                self.alarmtable.setColumnWidth(7,40)
+                self.alarmtable.setColumnWidth(3,50)
+                self.alarmtable.setColumnWidth(5,50)
+                self.alarmtable.setColumnWidth(6,80)
+                self.alarmtable.setColumnWidth(8,40)
                 header = self.alarmtable.horizontalHeader()
                 header.setStretchLastSection(True)
                 self.markNotEnabledAlarmRows()
+                self.alarmtable.setSortingEnabled(True)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " createalarmtable() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -31664,7 +31717,6 @@ class PXRpidDlgControl(ArtisanDialog):
         else:
             msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR["rampsoakmode"][1],1)
             currentmode = aw.fujipid.readoneword(msg)
-        currentmode = 0
         aw.fujipid.PXR["rampsoakmode"][0] = currentmode
         if currentmode == 0:
             mode = ["0",
