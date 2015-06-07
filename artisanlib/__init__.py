@@ -1,3 +1,3 @@
-__version__ = '0.9.3'
+__version__ = '0.9.4'
 #__revision__ = ''.join(list(filter(str.isdigit, "$Revision$")))
-__revision__ = '3'
+__revision__ = '0'

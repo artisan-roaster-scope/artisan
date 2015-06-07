@@ -175,6 +175,9 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.9.3 (6.6.2015)
+- bug fixes
+
 v0.9.3 (15.5.2015)
 - adds Phidget 1051 support
 - adds Hottop KN-8828B-2K+ support

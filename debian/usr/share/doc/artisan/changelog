@@ -1,3 +1,10 @@
+artisan (0.9.4-0) precise; urgency=low
+  * new upstream release
+  * changes since 0.9.3:
+   - adds alarm table sorting
+   - bug fixes
+ --  <marko.luther@gmx.net>  Sat, 6 Jun 2015 19:32:14 +0200
+ 
 artisan (0.9.3-3) precise; urgency=low
   * new upstream release
   * changes since 0.9.2:

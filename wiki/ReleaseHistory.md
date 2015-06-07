@@ -1,6 +1,21 @@
 Detailed Release History
 ========================
 
+v0.9.4 (6.6.2015)
+------------------
+
+ * New Features
+   * adds alarm table sorting
+ * Changes
+   * improved custom event annotation rendering
+   * roast report now lists additionally the ET temperature of events
+   * updated underlying libs like Python/Qt/PyQt/Matplotlib/.. (Mac OS only)
+ * Bug Fixes
+   * fixed element order in legend
+   * fixed WebLCDs
+   * fixes to Fuji PXR "RampSoak ON" mechanism
+   
+   
 v0.9.3 (15.1.2015)
 ------------------
 

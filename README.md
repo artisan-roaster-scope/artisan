@@ -73,6 +73,7 @@ Version History
 
 | Version | Date | Comment |
 |---------|------|---------|
+| v0.9.4 | 06.06.2015 | Bug fixes |
 | v0.9.3 | 15.05.2015 | Phidget 1051, [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html), one extra background curve, bug fixes |
 | v0.9.2 | 16.01.2015 | Bug fixes |
 | v0.9.1 | 03.01.2015 | [Acaia](http://acaia.co/) scale support, QR code, bug fixes |

@@ -21,7 +21,7 @@ o py2app 0.9
 o pymodbus 1.3.0
 o yoctopuce 1.10.16490
 o requests 2.3.0
-o bottle 0.12.7
+o bottle 0.13 trunk
 o gevent 1.0.1
 o geventwebsocket 0.9.3
 o appnope 0.1

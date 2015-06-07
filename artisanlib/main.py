@@ -3475,7 +3475,7 @@ class tgraphcanvas(FigureCanvas):
 
 
                 #if recorder on
-                if self.flagon:
+                if self.flagon and self.eventsshowflag:
                     #update to last event
                     if Nevents:
                         aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
@@ -14882,13 +14882,15 @@ $cupping_notes
         aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
     
     def HottopControlOn(self):
-        # start drum motor
-        aw.qmc.hottop_SET_DRUM_MOTOR = 1
-        aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
-        if not self.HottopControlActive:
-            aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
-        self.HottopControlActive = True
-        self.sendHottopControl()
+        pass
+# deactivated for now due to safety concerns
+#        # start drum motor
+#        aw.qmc.hottop_SET_DRUM_MOTOR = 1
+#        aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
+#        if not self.HottopControlActive:
+#            aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
+#        self.HottopControlActive = True
+#        self.sendHottopControl()
         
     def sendHottopControl(self):
         if self.HottopControlActive:   
@@ -23634,6 +23636,9 @@ class serialport(object):
         self.YOCTOchan2 = None
         #stores the id of the meter HH506RA as a string
         self.HH506RAid = "X"
+        #MS6514 variables
+        self.MS6514PrevTemp1 = -1
+        self.MS6514PrevTemp2 = -1
         #select PID type that controls the roaster.
         # Reads/Controls ET
         self.controlETpid = [0,1]        # index0: type of pid: 0 = FujiPXG, 1 = FujiPXR3, 2 = DTA 
@@ -35393,12 +35398,15 @@ def main():
     # font fix for OS X 10.9
     try:
         v, _, _ = platform.mac_ver()
-        v = float('.'.join(v.split('.')[:2]))
-        if v >= 10.10:
-            # fix Mac OS X 10.10 (Yosemite) font issue
+        #v = float('.'.join(v.split('.')[:2]))
+        v = v.split('.')[:2]
+        major = int(v[0])
+        minor = int(v[1])
+        if major >= 10 and minor >= 10: #v >= 10.10:
+            # fix Mac OS X 10.10 (Yosemite) font issue [seems not to have any effect!?]
             # https://bugreports.qt-project.org/browse/QTBUG-40833
             QFont.insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue")  
-        elif v >= 10.9:
+        if major >= 10 and minor >= 9: #v >= 10.9:
             # fix Mac OS X 10.9 (Mavericks) font issue
             # https://bugreports.qt-project.org/browse/QTBUG-32789
             QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")            
