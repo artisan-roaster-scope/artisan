@@ -148,6 +148,7 @@ import json
 import unicodedata
 
 from artisanlib.weblcds import startWeb, stopWeb
+from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopControl, releaseHottopControl, setHottop
 
 # platform dependent imports:
 if sys.platform.startswith("darwin"):
@@ -178,6 +179,8 @@ def __dependencies_for_freezing():
 del __dependencies_for_freezing
 
 if sys.version < '3':
+    def arange(x):
+        return xrange(x)
     def stringp(x):
         return isinstance(x, basestring)
     def uchr(x):
@@ -206,6 +209,8 @@ if sys.version < '3':
     def cmd2str(c):
         return c
 else:
+    def arange(x):
+        return range(x)
     def stringp(x):
         return isinstance(x, str)
     def uchr(x):
@@ -1216,18 +1221,11 @@ class tgraphcanvas(FigureCanvas):
         self.hottop_HEATER = 0 # 0-100
         self.hottop_FAN = 0
         self.hottop_MAIN_FAN = 0 # 0-10 (!)
-        self.hottop_SOLENOID = 0
+        self.hottop_SOLENOID = False # False: closed, True: Open
         self.hottop_DRUM_MOTOR =0
         self.hottop_COOLING_MOTOR = 0
         self.hottop_CHAFF_TRAY = 0
         self.hottop_TX = 0.
-        #hottop values to be send
-        self.hottop_SET_HEATER = None # 0-100
-        self.hottop_SET_FAN = None
-        self.hottop_SET_MAIN_FAN = None # 0-100
-        self.hottop_SET_SOLENOID = None
-        self.hottop_SET_DRUM_MOTOR = None
-        self.hottop_SET_COOLING_MOTOR = None
         
         #temporary storage to pass values. Holds extra T3 and T4 values for MODBUS connected devices
         self.extraMODBUSt3 = -1
@@ -1821,11 +1819,23 @@ class tgraphcanvas(FigureCanvas):
                 fname = u(self.alarmstrings[alarmnumber])
 # take care, the QDir().current() directory changes with loads and saves                
 #                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
-                if platf in ['Windows','Linux']:
+                if platf == 'Windows':
                     f = u("file:///") + u(QApplication.applicationDirPath()) + "/" + u(fname)
-                else: # MacOS X: script is expected to sit next to the Artisan.app
-                    f = u("file:///") + u(QApplication.applicationDirPath()) + "/../../../" + u(fname)
-                res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
+                    res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
+                else:
+                    # MacOS X: script is expected to sit next to the Artisan.app or being specified with its full path
+                    # Linux: script is expected to sit next to the artisan binary or being specified with its full path
+                    #
+                    # to get the effect of speaking alarms a text containing the following two lines called "say.sh" could do
+                    #                #!/bin/sh
+                    #                say "Hello" &
+                    # don't forget to do
+                    #                # cd 
+                    #                # chmod +x say.sh
+                    #
+                    # alternatively use "say $@ &" as command and send text strings along
+                    aw.call_prog_with_args(fname)
+                    res = True
                 if res:
                     aw.sendmessage(QApplication.translate("Message","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
                 else:
@@ -2015,7 +2025,7 @@ class tgraphcanvas(FigureCanvas):
                         #get y points
                         ypoints = [self.temp2[-1]]                                  # start initializing with last BT
                         K =  self.projectionconstant*aw.qmc.delta2[-1]/den/60.                 # multiplier
-                        for _ in range(len(xpoints)-1):                                     # create new points from previous points
+                        for _ in arange(len(xpoints)-1):                                     # create new points from previous points
                             DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
                             ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
 
@@ -2423,13 +2433,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.tipping_flag = False
                 aw.qmc.scorching_flag = False
                 aw.qmc.divots_flag = False
-
-                aw.qmc.hottop_SET_HEATER = None
-                aw.qmc.hottop_SET_FAN = None
-                aw.qmc.hottop_SET_MAIN_FAN = None
-                aw.qmc.hottop_SET_SOLENOID = None
-                aw.qmc.hottop_SET_DRUM_MOTOR = None
-                aw.qmc.hottop_SET_COOLING_MOTOR = None
 
                 #color variables
                 aw.qmc.whole_color = 0
@@ -2843,8 +2846,6 @@ class tgraphcanvas(FigureCanvas):
             two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag)))
 
             if self.background:
-                fontprop_small = aw.mpl_fontproperties.copy()
-                fontprop_small.set_size("xx-small")
                 if len(self.title) > 20:
                     stl = 25
                 else:
@@ -2932,7 +2933,7 @@ class tgraphcanvas(FigureCanvas):
                 i.set_markersize(5)
 
             #update X ticks, labels, and colors
-            self.xaxistosm()
+            self.xaxistosm(redraw=False)
 
             rcParams['path.sketch'] = (0,0,0)
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
@@ -3325,7 +3326,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
                             self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
-                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],
+                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
                         sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
                         markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
                 if aw.extraCurveVisibility2[i]:
@@ -3339,8 +3340,6 @@ class tgraphcanvas(FigureCanvas):
                         self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],
                         sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
                         markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
-
-
 
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             if self.DeltaETflag or self.DeltaBTflag:
@@ -3690,7 +3689,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.FahrenheitAction.setEnabled(True)
                         aw.ConvertToCelsiusAction.setDisabled(True)
                         aw.ConvertToFahrenheitAction.setEnabled(True)
-                        for i in range(profilelength):
+                        for i in arange(profilelength):
                             self.temp1[i] = self.fromCtoF(self.temp1[i])    #ET
                             self.temp2[i] = self.fromCtoF(self.temp2[i])    #BT
                             if len(self.delta1):
@@ -3713,7 +3712,7 @@ class tgraphcanvas(FigureCanvas):
                         self.safesaveflag = True
 
                         #background
-                        for i in range(len(self.timeB)):
+                        for i in arange(len(self.timeB)):
                             self.temp1B[i] = self.fromCtoF(self.temp1B[i])
                             self.temp2B[i] = self.fromCtoF(self.temp2B[i])
 
@@ -3738,7 +3737,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.ConvertToCelsiusAction.setEnabled(True) 
                         aw.FahrenheitAction.setDisabled(True)
                         aw.CelsiusAction.setEnabled(True)   
-                        for i in range(profilelength):
+                        for i in arange(profilelength):
                             self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
                             self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
                             if self.device != 18:
@@ -3755,7 +3754,7 @@ class tgraphcanvas(FigureCanvas):
 
                         self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
 
-                        for i in range(len(self.timeB)):
+                        for i in arange(len(self.timeB)):
                             self.temp1B[i] = self.fromFtoC(self.temp1B[i]) #ET B
                             self.temp2B[i] = self.fromFtoC(self.temp2B[i]) #BT B
 
@@ -3944,6 +3943,8 @@ class tgraphcanvas(FigureCanvas):
                 appnope.nope()
             except:
                 pass
+            if aw.qmc.device == 53:    
+                startHottop(0.8,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
                 a = aw.qmc.extrabuttonactions[0]
                 aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[0])
@@ -4204,7 +4205,7 @@ class tgraphcanvas(FigureCanvas):
                                 message = QApplication.translate("Message","Not enough variables collected yet. Try again in a few seconds", None, QApplication.UnicodeUTF8)
                         if self.device == 19 and aw.arduino.pidOnCHARGE and not aw.arduino.pidActive: # Arduino/TC4
                             aw.arduino.pidOn()
-                    self.xaxistosm() # need to fix uneven x-axis labels like -0:13
+                    self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE 00:00", None, QApplication.UnicodeUTF8))
                     t2 = self.temp2[self.timeindex[0]]
@@ -5431,7 +5432,7 @@ class tgraphcanvas(FigureCanvas):
     def timeindexupdate(self,times):
 ##        #          START            DRYEND          FCs             FCe         SCs         SCe         DROP
 ##        times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
-        for i in range(len(times)):               
+        for i in arange(len(times)):               
             if times[i]:
                 self.timeindex[i] = self.time2index(times[i])
             else:
@@ -5441,7 +5442,7 @@ class tgraphcanvas(FigureCanvas):
     def timebackgroundindexupdate(self,times):
 ##        #          STARTB            DRYENDB          FCsB       FCeB         SCsB         SCeB               DROPB
 ##        times = [self.startendB[0],self.dryendB[0],self.varCB[0],self.varCB[2],self.varCB[4],self.varCB[6],self.startendB[2]]
-        for i in range(len(times)):               
+        for i in arange(len(times)):               
             if times[i]:
                 self.timeindexB[i] = self.backgroundtime2index(times[i])
             else:
@@ -5506,13 +5507,13 @@ class tgraphcanvas(FigureCanvas):
             self.redraw()
 
         self.timex,self.temp1,self.temp2 = [],[],[]
-        for i in range(len(self.timeindex)):
+        for i in arange(len(self.timeindex)):
             self.timex.append(self.designertimeinit[i])
             self.temp1.append(self.designertemp1init[i])
             self.temp2.append(self.designertemp2init[i])
             self.timeindex[i] = i
 
-        self.xaxistosm()
+        self.xaxistosm(redraw=False)
         self.redrawdesigner()
 
     #loads main points from a profile so that they can be edited
@@ -5561,7 +5562,7 @@ class tgraphcanvas(FigureCanvas):
             self.currenty = lptemp2
             self.addpoint()
 
-        self.xaxistosm()
+        self.xaxistosm(redraw=False)
         self.redrawdesigner()                                   #redraw the designer screen
 
     #redraws designer
@@ -5752,14 +5753,14 @@ class tgraphcanvas(FigureCanvas):
 
                 #check for possible CHARGE time moving
                 if self.indexpoint == self.timeindex[0]:
-                    self.xaxistosm()
+                    self.xaxistosm(redraw=False)
 
                 #redraw
                 self.redrawdesigner()
                 return
 
             if type(event.xdata):                       #outside graph type is None
-                for i in range(len(self.timex)):
+                for i in arange(len(self.timex)):
                     if abs(event.xdata - self.timex[i]) < 7.:
                         if i in self.timeindex:
                             if abs(self.temp2[i] - ydata) < 10:
@@ -6959,6 +6960,7 @@ class SampleThread(QThread):
                             length_of_qmc_timex += 1
                         else:
                             aw.qmc.timex[-1] = tx
+
                     # update lines data using the lists with new data
                     if local_flagstart:
                         if aw.qmc.ETcurve:
@@ -9566,9 +9568,9 @@ class ApplicationWindow(QMainWindow):
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " callProgram(): %1").arg(str(e)),exc_tb.tb_lineno)
                 elif action == 8: # HOTTOP Heater
-                    aw.qmc.hottop_SET_HEATER = int(cmd)
+                    setHottop(heater=int(cmd))
                 elif action == 9: # HOTTOP Main Fan
-                    aw.qmc.hottop_SET_MAIN_FAN = int(cmd)
+                    setHottop(main_fan=int(cmd))
                 elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer")
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -9577,41 +9579,41 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cmds = eval(cs[len('heater'):])
                                     if isinstance(cmds,int):
-                                        aw.qmc.hottop_SET_HEATER = min(max(cmds,0),100)
+                                        setHottop(heater = min(max(cmds,0),100))
                                 except:
                                     pass
                             elif cs.startswith("fan"):
                                 try:
                                     cmds = eval(cs[len('fan'):])
                                     if isinstance(cmds,int):
-                                        aw.qmc.hottop_SET_MAIN_FAN = min(max(cmds,0),10) * 10
+                                        setHottop(main_fan = int(min(max(cmds,0),10) * 10))
                                 except:
                                     pass
                             elif cs.startswith("motor"):
                                 try:
                                     cmds = eval(cs[len('motor'):])
                                     if cmds:
-                                        aw.qmc.hottop_SET_DRUM_MOTOR = True
+                                        setHottop(drum_motor=True)
                                     else:
-                                        aw.qmc.hottop_SET_DRUM_MOTOR = False
+                                        setHottop(drum_motor=False)
                                 except:
                                     pass
                             elif cs.startswith("solenoid"):
                                 try:
                                     cmds = eval(cs[len('solenoid'):])
                                     if cmds:
-                                        aw.qmc.hottop_SET_SOLENOID = True
+                                        setHottop(solenoid=True)
                                     else:
-                                        aw.qmc.hottop_SET_SOLENOID = False
+                                        setHottop(solenoid=False)
                                 except:
                                     pass
                             elif cs.startswith("stirrer"):
                                 try:
                                     cmds = eval(cs[len('stirrer'):])
                                     if cmds:
-                                        aw.qmc.hottop_SET_COOLING_MOTOR = True
+                                        setHottop(cooling_motor=True)
                                     else:
-                                        aw.qmc.hottop_SET_COOLING_MOTOR = False
+                                        setHottop(cooling_motor=False)
                                 except:
                                     pass
                     
@@ -9622,8 +9624,12 @@ class ApplicationWindow(QMainWindow):
         cmd_str_parts = cmd_str.split(" ")
         if len(cmd_str_parts) > 0:
             cmd = cmd_str_parts[0].strip()
-            prg_file = u(aw.getAppPath()) + u(cmd)
+            qd = QDir(u(cmd))
+            current = QDir.current()
+            QDir.setCurrent(u(aw.getAppPath()))
+            prg_file = u(qd.absolutePath())            
             subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]])
+            QDir.setCurrent(current.absolutePath())
             # alternative approach, that seems to fail on some Mac OS X versions:
             #QProcess.startDetached(prg_file)
                     
@@ -9860,6 +9866,7 @@ class ApplicationWindow(QMainWindow):
         key = int(event.key())
         #uncomment next line to find the integer value of a key
         #key)
+        #print(key)
         
         if key == 70: # F SELECTS FULL SCREEN MODE
             if self.full_screen_mode_active or self.isFullScreen():
@@ -10842,7 +10849,7 @@ class ApplicationWindow(QMainWindow):
             import csv
             writer= csv.writer(outfile,delimiter=',')
             writer.writerow(["Elapsed time "," T1 "," T2 "," Event type"])
-            for i in range(len(aw.qmc.timex)):
+            for i in arange(len(aw.qmc.timex)):
                 if i == aw.qmc.timeindex[0]:
                     kind = "Beans loaded"
                 elif i!=0 and i == aw.qmc.timeindex[2]:
@@ -13819,6 +13826,7 @@ class ApplicationWindow(QMainWindow):
         if aw.qmc.checkSaved(): # if not canceled
             if self.full_screen_mode_active:
                 self.showNormal()
+            stopHottop()
             if aw.qmc.flagon:
                 aw.qmc.ToggleMonitor()
             if aw.WebLCDs:
@@ -14427,7 +14435,7 @@ $cupping_notes
     def BTfromseconds(self,seconds):
         if len(self.qmc.timex):
             #find when input time crosses timex
-            for i in range(len(self.qmc.timex)):
+            for i in arange(len(self.qmc.timex)):
                 if self.qmc.timex[i] > seconds:
                     break
             return float(self.qmc.temp2[i-1])           #return the BT temperature
@@ -14438,7 +14446,7 @@ $cupping_notes
     def ETfromseconds(self,seconds):
         if len(self.qmc.timex):
             #find when input time crosses timex
-            for i in range(len(self.qmc.timex)):
+            for i in arange(len(self.qmc.timex)):
                 if self.qmc.timex[i] > seconds:
                     break
             return float(self.qmc.temp1[i-1])           #return the ET temperature
@@ -14447,7 +14455,7 @@ $cupping_notes
 
     # converts times (values of timex) to indices
     def time2index(self,time):
-        for i in range(len(self.qmc.timex)):
+        for i in arange(len(self.qmc.timex)):
             if self.qmc.timex[i] >= time:
                 if i > 0 and abs(time - self.qmc.timex[i]) > abs(time - self.qmc.timex[i-1]):
                     return i-1
@@ -14876,26 +14884,28 @@ $cupping_notes
             self.HottopControlOn()
             
     def HottopControlOff(self):
-        if self.HottopControlActive:
-            aw.sendmessage(QApplication.translate("Message","Hottop control turned off", None, QApplication.UnicodeUTF8))
-        self.HottopControlActive = False
-        aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+        res = releaseHottopControl()
+        if res:
+            if self.HottopControlActive:
+                aw.sendmessage(QApplication.translate("Message","Hottop control turned off", None, QApplication.UnicodeUTF8))
+            self.HottopControlActive = False
+            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
     
     def HottopControlOn(self):
-        pass
+        res = takeHottopControl()
 # deactivated for now due to safety concerns
 #        # start drum motor
-#        aw.qmc.hottop_SET_DRUM_MOTOR = 1
-#        aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
-#        if not self.HottopControlActive:
-#            aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
-#        self.HottopControlActive = True
-#        self.sendHottopControl()
+        if res:
+            setHottop(drum_motor=True)
+            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
+            if not self.HottopControlActive:
+                aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
+            self.HottopControlActive = True
         
-    def sendHottopControl(self):
-        if self.HottopControlActive:   
-            aw.ser.HOTTOPsendControl()       
-            QTimer.singleShot(400,self.sendHottopControl)
+#    def sendHottopControl(self):
+#        if self.HottopControlActive:   
+#            aw.ser.HOTTOPsendControl()       
+#            QTimer.singleShot(400,self.sendHottopControl)
 
     def PIDcontrol(self):
         #pid
@@ -16661,7 +16671,7 @@ class HUDDlg(ArtisanDialog):
         for e in range(2):
             #create y range
             y_range = []
-            for i in range(len(aw.qmc.timex)):
+            for i in arange(len(aw.qmc.timex)):
                 y_range.append(self.eval_curve_expression(EQU[e],aw.qmc.timex[i]))
             if e:
                 extratemp2 = y_range
@@ -18571,7 +18581,7 @@ class editGraphDlg(ArtisanDialog):
             self.datatable.setItem(i,3,deltaET)
             self.datatable.setItem(i,4,deltaBT)
             j = 5
-            for k in range(len(aw.qmc.extratimex)):
+            for k in arange(len(aw.qmc.extratimex)):
                 if len(aw.qmc.extratemp1) > k and len(aw.qmc.extratemp1[k]) > i:
                     extra_qtw1 = QTableWidgetItem(fmtstr%aw.qmc.extratemp1[k][i])
                     extra_qtw1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
@@ -18869,18 +18879,18 @@ class editGraphDlg(ArtisanDialog):
                 if aw.qmc.stringtoseconds(str(self.chargeedit.text())) > 0 and aw.qmc.timeindex[0] != -1:
                     startindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]] + aw.qmc.stringtoseconds(str(self.chargeedit.text())))
                     aw.qmc.timeindex[0] = startindex
-                    aw.qmc.xaxistosm()
+                    aw.qmc.xaxistosm(redraw=False)
                 #if there is a CHARGE recorded and the time entered is negative. Use relative time
                 elif aw.qmc.stringtoseconds(str(self.chargeedit.text())) < 0 and aw.qmc.timeindex[0] != -1:
                     relativetime = aw.qmc.timex[aw.qmc.timeindex[0]]-abs(aw.qmc.stringtoseconds(str(self.chargeedit.text())))
                     startindex = aw.qmc.time2index(relativetime)
                     aw.qmc.timeindex[0] = startindex
-                    aw.qmc.xaxistosm()
+                    aw.qmc.xaxistosm(redraw=False)
                 #if there is _no_ CHARGE recorded and the time entered is positive. Use absolute time 
                 elif aw.qmc.stringtoseconds(str(self.chargeedit.text())) > 0 and aw.qmc.timeindex[0] == -1:
                     startindex = aw.qmc.time2index(aw.qmc.stringtoseconds(str(self.chargeedit.text())))
                     aw.qmc.timeindex[0] = startindex
-                    aw.qmc.xaxistosm()
+                    aw.qmc.xaxistosm(redraw=False)
                 #if there is _no_ CHARGE recorded and the time entered is negative. ERROR
                 elif aw.qmc.stringtoseconds(str(self.chargeedit.text())) < 0 and aw.qmc.timeindex[0] == -1:
                     aw.qmc.adderror(QApplication.translate("Error Message", "Unable to move CHARGE to a value that does not exist",None, QApplication.UnicodeUTF8))
@@ -19644,7 +19654,7 @@ class WindowsDlg(ArtisanDialog):
     def changexrotation(self):
         aw.qmc.xrotation = self.xrotationSpinBox.value()
         self.xrotationSpinBox.setDisabled(True)
-        aw.qmc.xaxistosm()
+        aw.qmc.xaxistosm(redraw=False)
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.xrotationSpinBox.setDisabled(False)
         self.xrotationSpinBox.setFocus()
@@ -19673,7 +19683,7 @@ class WindowsDlg(ArtisanDialog):
 
     def xaxislenloc(self):
         aw.qmc.xgrid = self.timeconversion[self.xaxislencombobox.currentIndex()]
-        aw.qmc.xaxistosm()
+        aw.qmc.xaxistosm(redraw=False)
         aw.qmc.redraw(recomputeAllDeltas=False)
 
     def changeygrid(self):
@@ -20871,7 +20881,7 @@ class EventsDlg(ArtisanDialog):
                     # loop over that data and classify each value
                     ld = None # last digitized value
                     lt = None # last digitized temp value
-                    for ii in range(len(temp)):
+                    for ii in arange(len(temp)):
                         t = temp[ii]
                         d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
                         if d != None and (ld == None or ld != d):
@@ -23420,7 +23430,7 @@ class extraserialport(object):
             #open port
             if not self.SP.isOpen():
                 self.SP.open()
-        except serial.SerialException:
+        except Exception: #serial.SerialException:
             self.SP.close()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -24033,10 +24043,11 @@ class serialport(object):
     def HOTTOP_BTET(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.HOTTOPtemperatures()
+        aw.qmc.hottop_TX = tx
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
         
     def HOTTOP_HF(self):
-        return aw.qmc.hottop_TX,aw.qmc.hottop_MAIN_FAN * 10,aw.qmc.hottop_HEATER # time, Fan (chan2), Heater (chan1)
+        return aw.qmc.hottop_TX,aw.qmc.hottop_MAIN_FAN,aw.qmc.hottop_HEATER # time, Fan (chan2), Heater (chan1)
 
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -24216,7 +24227,7 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.SP.open()
                 libtime.sleep(.2) # avoid possible hickups on startup
-        except serial.SerialException:
+        except Exception: #serial.SerialException:
             self.SP.close()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + QApplication.translate("Error Message","Unable to open serial port",None, QApplication.UnicodeUTF8)
             aw.qmc.adderror(error)
@@ -24355,126 +24366,146 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
-    def HOTTOPcontrol(self):
-        cmd = bytearray([0x00]*36)
-        cmd[0] = 0xA5
-        cmd[1] = 0x96
-        cmd[2] = 0xB0
-        cmd[3] = 0xA0
-        cmd[4] = 0x01
-        cmd[5] = 0x01
-        cmd[6] = 0x24
-        
-        if aw.qmc.hottop_SET_HEATER != None:
-            cmd[10] = aw.qmc.hottop_SET_HEATER
-        else:
-            cmd[10] = aw.qmc.hottop_HEATER
-            
-        if aw.qmc.hottop_SET_FAN != None:
-            cmd[11] = int(round(aw.qmc.hottop_SET_FAN / 10.))
-        else:
-            cmd[11] = aw.qmc.hottop_FAN
-            
-        if aw.qmc.hottop_SET_MAIN_FAN != None: # 0-100
-            cmd[12] = int(round(aw.qmc.hottop_SET_MAIN_FAN / 10.))
-        else:
-            cmd[12] = aw.qmc.hottop_MAIN_FAN # 0-10
-            
-        if aw.qmc.hottop_SET_SOLENOID != None:
-            cmd[16] = aw.qmc.hottop_SET_SOLENOID
-        else:
-            cmd[16] = aw.qmc.hottop_SOLENOID
-            
-        if aw.qmc.hottop_SET_DRUM_MOTOR != None:
-            cmd[17] = aw.qmc.hottop_SET_DRUM_MOTOR
-        else:
-            cmd[17] = aw.qmc.hottop_DRUM_MOTOR
-            
-        if aw.qmc.hottop_SET_COOLING_MOTOR != None:
-            cmd[18] = aw.qmc.hottop_SET_COOLING_MOTOR
-        else:
-            cmd[18] = aw.qmc.hottop_COOLING_MOTOR
+#    def HOTTOPcontrol(self):
+#        cmd = bytearray([0x00]*36)
+#        cmd[0] = 0xA5
+#        cmd[1] = 0x96
+#        cmd[2] = 0xB0
+#        cmd[3] = 0xA0
+#        cmd[4] = 0x01
+#        cmd[5] = 0x01
+#        cmd[6] = 0x24
+#        
+#        if aw.qmc.hottop_SET_HEATER != None:
+#            cmd[10] = aw.qmc.hottop_SET_HEATER
+#        else:
+#            cmd[10] = aw.qmc.hottop_HEATER
+#            
+#        if aw.qmc.hottop_SET_FAN != None:
+#            cmd[11] = int(round(aw.qmc.hottop_SET_FAN / 10.))
+#        else:
+#            cmd[11] = aw.qmc.hottop_FAN
+#            
+#        if aw.qmc.hottop_SET_MAIN_FAN != None: # 0-100
+#            cmd[12] = int(round(aw.qmc.hottop_SET_MAIN_FAN / 10.))
+#        else:
+#            cmd[12] = aw.qmc.hottop_MAIN_FAN # 0-10
+#            
+#        if aw.qmc.hottop_SET_SOLENOID != None:
+#            cmd[16] = aw.qmc.hottop_SET_SOLENOID
+#        else:
+#            cmd[16] = aw.qmc.hottop_SOLENOID
+#            
+#        if aw.qmc.hottop_SET_DRUM_MOTOR != None:
+#            cmd[17] = aw.qmc.hottop_SET_DRUM_MOTOR
+#        else:
+#            cmd[17] = aw.qmc.hottop_DRUM_MOTOR
+#            
+#        if aw.qmc.hottop_SET_COOLING_MOTOR != None:
+#            cmd[18] = aw.qmc.hottop_SET_COOLING_MOTOR
+#        else:
+#            cmd[18] = aw.qmc.hottop_COOLING_MOTOR
+#
+#        cmd[35] = sum([b for b in cmd[:35]]) & 0xFF # checksum
+#        
+#        return bytes(cmd)
+#        
+#    def HOTTOPsendControl(self):
+#        try:
+#            ###  lock resources ##
+#            aw.qmc.samplingsemaphore.acquire(1)
+#            if not self.SP.isOpen():
+#                self.openport()
+#            if self.SP.isOpen():
+#                cmd = self.HOTTOPcontrol()
+##                print("".join("\\x%02x" % o(i) for i in cmd))
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
+#                self.SP.write(cmd) 
+#        finally:
+#            if aw.qmc.samplingsemaphore.available() < 1:
+#                aw.qmc.samplingsemaphore.release(1)        
+#    
 
-        cmd[35] = sum([b for b in cmd[:35]]) & 0xFF # checksum
-        
-        return bytes(cmd)
-        
-    def HOTTOPsendControl(self):
+    def HOTTOPtemperatures(self):
         try:
-            ###  lock resources ##
-            aw.qmc.samplingsemaphore.acquire(1)
-            if not self.SP.isOpen():
-                self.openport()
-            if self.SP.isOpen():
-                cmd = self.HOTTOPcontrol()
-#                print("".join("\\x%02x" % o(i) for i in cmd))
-                self.SP.flushInput()
-                self.SP.flushOutput()
-                self.SP.write(cmd) 
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)        
-    
-    def HOTTOPtemperatures(self,retry=True):
-        try:
-            if not self.SP.isOpen():
-                self.openport()
-            if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
-                r = self.SP.read(36)
-#                print("".join("\\x%02x" % o(i) for i in r))
-                if len(r) != 36:
-                    self.closeport()
-                    if retry: # we retry once
-                        self.HOTTOPtemperatures(retry=False)
-                else:
-                    P0 = hex2int(r[0])
-                    P1 = hex2int(r[1])
-                    chksum = sum([hex2int(c) for c in r[:35]]) & 0xFF 
-                    P35 = hex2int(r[35])
-                    if P0 != 165 or P1 != 150 or P35 != chksum:
-                        self.closeport()
-                        if retry: # we retry once
-                            self.HOTTOPtemperatures(retry=False)
-                    else:
-#                        print("master: ", hex2int(r[2]))
-#                        print("slave: ", hex2int(r[3]))
-                        aw.qmc.hottop_VERSION = hex2int(r[4])
-                        aw.qmc.hottop_HEATER = hex2int(r[10])
-                        aw.qmc.hottop_FAN = hex2int(r[11])
-                        aw.qmc.hottop_MAIN_FAN = hex2int(r[12])
-                        aw.qmc.hottop_SOLENOID = hex2int(r[16])
-                        aw.qmc.hottop_DRUM_MOTOR = hex2int(r[17])
-                        aw.qmc.hottop_COOLING_MOTOR = hex2int(r[18])
-                        aw.qmc.hottop_CHAFF_TRAY = hex2int(r[19])
-                        aw.qmc.hottop_ET = hex2int(r[23],r[24]) # ET
-                        aw.qmc.hottop_BT = hex2int(r[25],r[26]) # BT
-                        
-                        if aw.qmc.mode == "F":
-                            aw.qmc.hottop_ET = aw.qmc.fromCtoF(aw.qmc.hottop_ET)
-                            aw.qmc.hottop_BT = aw.qmc.fromCtoF(aw.qmc.hottop_BT)
-                        
-                        # mark DROP if SOLENOID is open, currently recording and DROP not yet marked
-                        if aw.qmc.flagstart and aw.qmc.hottop_SOLENOID and aw.qmc.timeindex[6] == 0:
-                            aw.qmc.markDrop(takeLock=False)
-            aw.qmc.hottop_TX = aw.qmc.timeclock.elapsed()/1000.
+            BT, ET, heater, main_fan, solenoid = getHottop()
+            aw.qmc.hottop_HEATER = heater
+            aw.qmc.hottop_MAIN_FAN = main_fan
+            aw.qmc.hottop_SOLENOID = solenoid
+            aw.qmc.hottop_ET = ET
+            aw.qmc.hottop_BT = BT
+            if aw.qmc.mode == "F":
+                aw.qmc.hottop_ET = aw.qmc.fromCtoF(aw.qmc.hottop_ET)
+                aw.qmc.hottop_BT = aw.qmc.fromCtoF(aw.qmc.hottop_BT)
             return aw.qmc.hottop_BT,aw.qmc.hottop_ET
-        except serial.SerialException:
-            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures()"
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
-        finally:
-            #note: logged chars should be unicode not binary
-            if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("Hottop :" + settings + " || Version = " + str(aw.qmc.hottop_VERSION) + " || Rx = " + cmd2str(binascii.hexlify(r)))                        
+    
+#    def HOTTOPtemperatures(self,retry=True):
+#        try:
+#            if not self.SP.isOpen():
+#                self.openport()
+#            if self.SP.isOpen():
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
+#                r = self.SP.read(36)
+##                print("".join("\\x%02x" % o(i) for i in r))
+#                if len(r) != 36:
+#                    self.closeport()
+#                    if retry: # we retry once
+#                        self.HOTTOPtemperatures(retry=False)
+#                else:
+#                    P0 = hex2int(r[0])
+#                    P1 = hex2int(r[1])
+#                    chksum = sum([hex2int(c) for c in r[:35]]) & 0xFF 
+#                    P35 = hex2int(r[35])
+#                    if P0 != 165 or P1 != 150 or P35 != chksum:
+#                        self.closeport()
+#                        if retry: # we retry once
+#                            self.HOTTOPtemperatures(retry=False)
+#                    else:
+##                        print("master: ", hex2int(r[2]))
+##                        print("slave: ", hex2int(r[3]))
+#                        aw.qmc.hottop_VERSION = hex2int(r[4])
+#                        aw.qmc.hottop_HEATER = hex2int(r[10])
+#                        aw.qmc.hottop_FAN = hex2int(r[11])
+#                        aw.qmc.hottop_MAIN_FAN = hex2int(r[12])
+#                        aw.qmc.hottop_SOLENOID = hex2int(r[16])
+#                        aw.qmc.hottop_DRUM_MOTOR = hex2int(r[17])
+#                        aw.qmc.hottop_COOLING_MOTOR = hex2int(r[18])
+#                        aw.qmc.hottop_CHAFF_TRAY = hex2int(r[19])
+#                        aw.qmc.hottop_ET = hex2int(r[23],r[24]) # ET
+#                        aw.qmc.hottop_BT = hex2int(r[25],r[26]) # BT
+#                        
+#                        if aw.qmc.mode == "F":
+#                            aw.qmc.hottop_ET = aw.qmc.fromCtoF(aw.qmc.hottop_ET)
+#                            aw.qmc.hottop_BT = aw.qmc.fromCtoF(aw.qmc.hottop_BT)
+#                        
+#                        # mark DROP if SOLENOID is open, currently recording and DROP not yet marked
+#                        if aw.qmc.flagstart and aw.qmc.hottop_SOLENOID and aw.qmc.timeindex[6] == 0:
+#                            aw.qmc.markDrop(takeLock=False)
+#            aw.qmc.hottop_TX = aw.qmc.timeclock.elapsed()/1000.
+#            return aw.qmc.hottop_BT,aw.qmc.hottop_ET
+#        except serial.SerialException:
+#            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+#            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures()"
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+#            return -1,-1
+#        except Exception as ex:
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
+#            return -1,-1
+#        finally:
+#            #note: logged chars should be unicode not binary
+#            if aw.seriallogflag:
+#                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+#                aw.addserial("Hottop :" + settings + " || Version = " + str(aw.qmc.hottop_VERSION) + " || Rx = " + cmd2str(binascii.hexlify(r)))                        
 
 
     #t2 and t1 from Omega HH806 or HH802 meter 
@@ -26577,7 +26608,7 @@ class designerconfigDlg(ArtisanDialog):
             aw.qmc.temp1[aw.qmc.timeindex[6]] = float(str(self.Edit6et.text()))
         for i in range(1,6): #1-5
             aw.qmc.designertimeinit[i] = aw.qmc.timex[aw.qmc.timeindex[i]]
-        aw.qmc.xaxistosm()
+        aw.qmc.xaxistosm(redraw=False)
         aw.qmc.redrawdesigner()
         return 0
 
@@ -26734,7 +26765,7 @@ class designerconfigDlg(ArtisanDialog):
             aw.qmc.timeindex[idi] = newindex
             aw.qmc.temp2[aw.qmc.timeindex[idi]] = bt
             aw.qmc.temp1[aw.qmc.timeindex[idi]] = et
-            aw.qmc.xaxistosm()
+            aw.qmc.xaxistosm(redraw=False)
             aw.qmc.redrawdesigner()
 
 #########################################################################
