@@ -43,21 +43,21 @@ else:
         else:
             return int(h1)
         
-def openport():
+def openport(SP):
     try:
         if not SP.isOpen():
             SP.open()
     except Exception:
         pass
         
-def closeport():
+def closeport(SP):
     try:
         if SP == None and SP.isOpen():
             SP.close()
     except Exception:
         pass
         
-def gettemperatures(retry=True):
+def gettemperatures(SP,retry=True):
     BT = -1
     ET = -1
     HEATER = -1
@@ -68,25 +68,25 @@ def gettemperatures(retry=True):
     COOLING_MOTOR = -1
     CHAFF_TRAY = -1
     try:
-        openport()
+        openport(SP)
         if SP.isOpen():
             SP.flushInput()
             SP.flushOutput()
             r = SP.read(36)
 #            print(len(r),"".join("\\x%02x" % ord(i) for i in r))
             if len(r) != 36:
-                closeport()
+                closeport(SP)
                 if retry: # we retry once
-                    return gettemperatures(retry=False)
+                    return gettemperatures(SP,retry=False)
             else:
                 P0 = hex2int(r[0])
                 P1 = hex2int(r[1])
                 chksum = sum([hex2int(c) for c in r[:35]]) & 0xFF 
                 P35 = hex2int(r[35])
                 if P0 != 165 or P1 != 150 or P35 != chksum:
-                    closeport()
+                    closeport(SP)
                     if retry: # we retry once
-                        return gettemperatures(retry=False)
+                        return gettemperatures(SP,retry=False)
                 else:
                     #VERSION = hex2int(r[4])
                     HEATER = hex2int(r[10]) # 0-100
@@ -102,11 +102,20 @@ def gettemperatures(retry=True):
         pass
     return BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY
 
-def doWork(interval, aBT, aET, aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
+def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
+        aBT, aET, aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aSET_CHAFF_TRAY, aCONTROL):
+    SP = serial.Serial()
+    # configure serial port
+    SP.setPort(comport)
+    SP.setBaudrate(baudrate)
+    SP.setByteSize(bytesize)
+    SP.setParity(parity)
+    SP.setStopbits(stopbits)
+    SP.setTimeout(timeout)
     while True:
         # logging part
-        BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY = gettemperatures()
+        BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY = gettemperatures(SP)
         if BT != -1:
             if aBT.value == -1:
                 aBT.value = float(BT)
@@ -136,7 +145,7 @@ def doWork(interval, aBT, aET, aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR,
 
         # control part
         if aCONTROL.value:
-            sendControl(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
+            sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
                     aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aSET_CHAFF_TRAY)            
             
         time.sleep(interval)
@@ -147,10 +156,10 @@ def doWork(interval, aBT, aET, aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR,
 
 # Control processing 
 
-def sendControl(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
+def sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aSET_CHAFF_TRAY):
     try:
-        openport()
+        openport(SP)
         if SP.isOpen():
             cmd = HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
                     aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aSET_CHAFF_TRAY)
@@ -216,10 +225,10 @@ def releaseHottopControl():
 # main_fan : 0-100 (will be converted from the internal int(0-10))
 # solenoid : bool
 def getHottop():
-    if xBT != None and xET != None and xHEATER != None and xMAIN_FAN != None and xSOLENOID != None:
-        return xBT.value, xET.value, xHEATER.value, xMAIN_FAN.value * 10, bool(xSOLENOID.value)
+    if xBT != None and xET != None and xHEATER != None and xMAIN_FAN != None:
+        return xBT.value, xET.value, xHEATER.value, xMAIN_FAN.value * 10
     else:
-        return -1, -1, 0, 0, False
+        return -1, -1, 0, 0
 
 
 # heater : int(0-100)
@@ -245,17 +254,10 @@ def setHottop(heater=None,fan=None,main_fan=None,solenoid=None,drum_motor=None,c
 
 # interval has to be smaller than 1 (= 1sec)
 def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',stopbits=1,timeout=1):
-    global process, SP, xCONTROL, xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
+    global process, xCONTROL, xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
         xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xSET_CHAFF_TRAY
     try:
-        SP = serial.Serial()
-        # configure serial port
-        SP.setPort(comport)
-        SP.setBaudrate(baudrate)
-        SP.setByteSize(bytesize)
-        SP.setParity(parity)
-        SP.setStopbits(stopbits)
-        SP.setTimeout(timeout)
+        stopHottop() # we stop an already running process to ensure that only one is running
         lock = Lock()
         xCONTROL = Value(c_bool, False, lock=lock)
         # variables to read from the Hottop
@@ -278,7 +280,8 @@ def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',
         xSET_CHAFF_TRAY = Value('i', -1, lock=lock)
         # variables to write to the Hottop
         
-        process = Process(target=doWork, args=(interval, xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
+        process = Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
+            xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
             xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xSET_CHAFF_TRAY, xCONTROL))
         process.start()
         return True

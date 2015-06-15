@@ -1217,14 +1217,8 @@ class tgraphcanvas(FigureCanvas):
         #temporary storage to pass values. Holds all values retrieved from a Hottop roaster
         self.hottop_ET = -1
         self.hottop_BT = -1
-        self.hottop_VERSION = 0
         self.hottop_HEATER = 0 # 0-100
-        self.hottop_FAN = 0
         self.hottop_MAIN_FAN = 0 # 0-10 (!)
-        self.hottop_SOLENOID = False # False: closed, True: Open
-        self.hottop_DRUM_MOTOR =0
-        self.hottop_COOLING_MOTOR = 0
-        self.hottop_CHAFF_TRAY = 0
         self.hottop_TX = 0.
         
         #temporary storage to pass values. Holds extra T3 and T4 values for MODBUS connected devices
@@ -7278,11 +7272,7 @@ class SampleThread(QThread):
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
                     
-                    # limit sampling delay in Hottop control mode to max 3sec
-                    if aw.HottopControlActive:
-                        min_delay = 3000
-                    else:
-                        min_delay = aw.qmc.delay
+                    min_delay = aw.qmc.delay
                     dt = max(0.05,min(min_delay,aw.qmc.delay)/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
@@ -7332,6 +7322,8 @@ class Athreadserver(QWidget):
 
 class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
+    
+        self.superusermode = False
 
         self.defaultAppearance = None
         # matplotlib font properties:
@@ -8222,7 +8214,11 @@ class ApplicationWindow(QMainWindow):
         self.lcd1.setSegmentStyle(2)
         self.lcd1.setMinimumHeight(40)
         self.lcd1.setMinimumWidth(100)
-        self.lcd1.setFrameStyle(QFrame.Plain)
+        self.lcd1.setFrameStyle(QFrame.Plain)        
+        # switch superusermode action:
+        self.lcd1.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.connect( self.lcd1, SIGNAL("customContextMenuRequested(QPoint)"), self.superusermodeClicked)
+
 
         self.lcd2 = self.ArtisanLCD() # Temperature MET
         self.lcd3 = self.ArtisanLCD() # Temperature BT
@@ -8763,7 +8759,14 @@ class ApplicationWindow(QMainWindow):
 
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
-    def PhaseslcdClicked(self,x):
+    def superusermodeClicked(self,_):
+        self.superusermode = not self.superusermode
+        if self.superusermode:
+            aw.sendmessage("super on")
+        else:
+            aw.sendmessage("super off")
+
+    def PhaseslcdClicked(self,_):
         aw.qmc.phasesLCDmode = (aw.qmc.phasesLCDmode + 1)%3
         aw.updatePhasesLCDs()
 
@@ -9865,7 +9868,6 @@ class ApplicationWindow(QMainWindow):
     def keyPressEvent(self,event):
         key = int(event.key())
         #uncomment next line to find the integer value of a key
-        #key)
         #print(key)
         
         if key == 70: # F SELECTS FULL SCREEN MODE
@@ -14717,6 +14719,7 @@ $cupping_notes
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop")
         box = QMessageBox(self)
+        
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
         box.about(self,
@@ -14798,14 +14801,13 @@ $cupping_notes
 
 
     def calibratedelay(self):
-        calSpinBox = QDoubleSpinBox()
-        calSpinBox.setRange(aw.qmc.min_delay/1000.,30.)
-        calSpinBox.setValue(self.qmc.delay/1000.)
-        calSpinBox.setAlignment(Qt.AlignRight)
         secondsdelay, ok = QInputDialog.getDouble(self,
                 QApplication.translate("Message", "Sampling Interval",None, QApplication.UnicodeUTF8),
                 QApplication.translate("Message", "Seconds",None, QApplication.UnicodeUTF8),
-                calSpinBox.value(),aw.qmc.min_delay/1000.,30.)
+                #calSpinBox.value(),
+                self.qmc.delay/1000.,
+                aw.qmc.min_delay/1000.,30.)
+           
         if ok:
             self.qmc.delay = int(secondsdelay*1000.)
             if self.qmc.delay <= self.qmc.min_delay + 1000:
@@ -14892,20 +14894,16 @@ $cupping_notes
             aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
     
     def HottopControlOn(self):
-        res = takeHottopControl()
-# deactivated for now due to safety concerns
-#        # start drum motor
-        if res:
-            setHottop(drum_motor=True)
-            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
-            if not self.HottopControlActive:
-                aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
-            self.HottopControlActive = True
-        
-#    def sendHottopControl(self):
-#        if self.HottopControlActive:   
-#            aw.ser.HOTTOPsendControl()       
-#            QTimer.singleShot(400,self.sendHottopControl)
+        if aw.superusermode: # Hottop control mode can for now activated only in super user mode
+            res = takeHottopControl()
+    # deactivated for now due to safety concerns
+    #        # start drum motor
+            if res:
+                setHottop(drum_motor=True)
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
+                if not self.HottopControlActive:
+                    aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
+                self.HottopControlActive = True
 
     def PIDcontrol(self):
         #pid
@@ -24364,75 +24362,13 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r)))
-
-#    def HOTTOPcontrol(self):
-#        cmd = bytearray([0x00]*36)
-#        cmd[0] = 0xA5
-#        cmd[1] = 0x96
-#        cmd[2] = 0xB0
-#        cmd[3] = 0xA0
-#        cmd[4] = 0x01
-#        cmd[5] = 0x01
-#        cmd[6] = 0x24
-#        
-#        if aw.qmc.hottop_SET_HEATER != None:
-#            cmd[10] = aw.qmc.hottop_SET_HEATER
-#        else:
-#            cmd[10] = aw.qmc.hottop_HEATER
-#            
-#        if aw.qmc.hottop_SET_FAN != None:
-#            cmd[11] = int(round(aw.qmc.hottop_SET_FAN / 10.))
-#        else:
-#            cmd[11] = aw.qmc.hottop_FAN
-#            
-#        if aw.qmc.hottop_SET_MAIN_FAN != None: # 0-100
-#            cmd[12] = int(round(aw.qmc.hottop_SET_MAIN_FAN / 10.))
-#        else:
-#            cmd[12] = aw.qmc.hottop_MAIN_FAN # 0-10
-#            
-#        if aw.qmc.hottop_SET_SOLENOID != None:
-#            cmd[16] = aw.qmc.hottop_SET_SOLENOID
-#        else:
-#            cmd[16] = aw.qmc.hottop_SOLENOID
-#            
-#        if aw.qmc.hottop_SET_DRUM_MOTOR != None:
-#            cmd[17] = aw.qmc.hottop_SET_DRUM_MOTOR
-#        else:
-#            cmd[17] = aw.qmc.hottop_DRUM_MOTOR
-#            
-#        if aw.qmc.hottop_SET_COOLING_MOTOR != None:
-#            cmd[18] = aw.qmc.hottop_SET_COOLING_MOTOR
-#        else:
-#            cmd[18] = aw.qmc.hottop_COOLING_MOTOR
-#
-#        cmd[35] = sum([b for b in cmd[:35]]) & 0xFF # checksum
-#        
-#        return bytes(cmd)
-#        
-#    def HOTTOPsendControl(self):
-#        try:
-#            ###  lock resources ##
-#            aw.qmc.samplingsemaphore.acquire(1)
-#            if not self.SP.isOpen():
-#                self.openport()
-#            if self.SP.isOpen():
-#                cmd = self.HOTTOPcontrol()
-##                print("".join("\\x%02x" % o(i) for i in cmd))
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
-#                self.SP.write(cmd) 
-#        finally:
-#            if aw.qmc.samplingsemaphore.available() < 1:
-#                aw.qmc.samplingsemaphore.release(1)        
-#    
+                aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r))) 
 
     def HOTTOPtemperatures(self):
         try:
-            BT, ET, heater, main_fan, solenoid = getHottop()
+            BT, ET, heater, main_fan = getHottop()
             aw.qmc.hottop_HEATER = heater
             aw.qmc.hottop_MAIN_FAN = main_fan
-            aw.qmc.hottop_SOLENOID = solenoid
             aw.qmc.hottop_ET = ET
             aw.qmc.hottop_BT = BT
             if aw.qmc.mode == "F":
@@ -24445,68 +24381,6 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
-    
-#    def HOTTOPtemperatures(self,retry=True):
-#        try:
-#            if not self.SP.isOpen():
-#                self.openport()
-#            if self.SP.isOpen():
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
-#                r = self.SP.read(36)
-##                print("".join("\\x%02x" % o(i) for i in r))
-#                if len(r) != 36:
-#                    self.closeport()
-#                    if retry: # we retry once
-#                        self.HOTTOPtemperatures(retry=False)
-#                else:
-#                    P0 = hex2int(r[0])
-#                    P1 = hex2int(r[1])
-#                    chksum = sum([hex2int(c) for c in r[:35]]) & 0xFF 
-#                    P35 = hex2int(r[35])
-#                    if P0 != 165 or P1 != 150 or P35 != chksum:
-#                        self.closeport()
-#                        if retry: # we retry once
-#                            self.HOTTOPtemperatures(retry=False)
-#                    else:
-##                        print("master: ", hex2int(r[2]))
-##                        print("slave: ", hex2int(r[3]))
-#                        aw.qmc.hottop_VERSION = hex2int(r[4])
-#                        aw.qmc.hottop_HEATER = hex2int(r[10])
-#                        aw.qmc.hottop_FAN = hex2int(r[11])
-#                        aw.qmc.hottop_MAIN_FAN = hex2int(r[12])
-#                        aw.qmc.hottop_SOLENOID = hex2int(r[16])
-#                        aw.qmc.hottop_DRUM_MOTOR = hex2int(r[17])
-#                        aw.qmc.hottop_COOLING_MOTOR = hex2int(r[18])
-#                        aw.qmc.hottop_CHAFF_TRAY = hex2int(r[19])
-#                        aw.qmc.hottop_ET = hex2int(r[23],r[24]) # ET
-#                        aw.qmc.hottop_BT = hex2int(r[25],r[26]) # BT
-#                        
-#                        if aw.qmc.mode == "F":
-#                            aw.qmc.hottop_ET = aw.qmc.fromCtoF(aw.qmc.hottop_ET)
-#                            aw.qmc.hottop_BT = aw.qmc.fromCtoF(aw.qmc.hottop_BT)
-#                        
-#                        # mark DROP if SOLENOID is open, currently recording and DROP not yet marked
-#                        if aw.qmc.flagstart and aw.qmc.hottop_SOLENOID and aw.qmc.timeindex[6] == 0:
-#                            aw.qmc.markDrop(takeLock=False)
-#            aw.qmc.hottop_TX = aw.qmc.timeclock.elapsed()/1000.
-#            return aw.qmc.hottop_BT,aw.qmc.hottop_ET
-#        except serial.SerialException:
-#            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-#            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures()"
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-#            return -1,-1
-#        except Exception as ex:
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
-#            return -1,-1
-#        finally:
-#            #note: logged chars should be unicode not binary
-#            if aw.seriallogflag:
-#                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-#                aw.addserial("Hottop :" + settings + " || Version = " + str(aw.qmc.hottop_VERSION) + " || Rx = " + cmd2str(binascii.hexlify(r)))                        
-
 
     #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self, retry=True):
