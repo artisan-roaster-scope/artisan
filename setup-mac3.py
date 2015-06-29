@@ -27,7 +27,9 @@ import artisanlib
 VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
-QTDIR = r'/Developer/Applications/Qt/'
+#QTDIR = r'/Developer/Applications/Qt/' # qt4
+QTDIR = r'/Users/luther/Qt5.4.2/5.4/clang_64/' # qt5
+
 
 APP = ['artisan.py']
 
@@ -38,45 +40,56 @@ DATA_FILES = [
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),
+    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
+    ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
     ("../translations", [QTDIR + r'/translations/qt_de.qm']),
     ("../translations", [QTDIR + r'/translations/qt_es.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_fi.qm']),
     ("../translations", [QTDIR + r'/translations/qt_fr.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_sv.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_zh_CN.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_zh_TW.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_he.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_hu.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_it.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_ja.qm']),
     ("../translations", [QTDIR + r'/translations/qt_ko.qm']),
     ("../translations", [QTDIR + r'/translations/qt_pt.qm']),
     ("../translations", [QTDIR + r'/translations/qt_ru.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_ja.qm']),
-    ("../translations", [QTDIR + r'/translations/qt_hu.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_sv.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_zh_CN.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_zh_TW.qm']),
+    ("../translations", [r'translations/artisan_ar.qm']), 
     ("../translations", [r"translations/artisan_de.qm"]),
     ("../translations", [r"translations/artisan_es.qm"]),
+    ("../translations", [r"translations/artisan_fi.qm"]),
     ("../translations", [r"translations/artisan_fr.qm"]),
-    ("../translations", [r"translations/artisan_sv.qm"]),
-    ("../translations", [r'translations/artisan_zh_CN.qm']),
-    ("../translations", [r'translations/artisan_zh_TW.qm']),
+    ("../translations", [r"translations/artisan_he.qm"]),
+    ("../translations", [r"translations/artisan_hu.qm"]),   
+    ("../translations", [r"translations/artisan_it.qm"]),
+    ("../translations", [r"translations/artisan_ja.qm"]),
     ("../translations", [r'translations/artisan_ko.qm']),
     ("../translations", [r'translations/artisan_pt.qm']),
     ("../translations", [r'translations/artisan_ru.qm']),
-    ("../translations", [r'translations/artisan_ar.qm']),    
-    ("../translations", [r"translations/artisan_it.qm"]),
+    ("../translations", [r"translations/artisan_sv.qm"]),
+    ("../translations", [r'translations/artisan_zh_CN.qm']),
+    ("../translations", [r'translations/artisan_zh_TW.qm']),
     ("../translations", [r"translations/artisan_el.qm"]),
     ("../translations", [r"translations/artisan_no.qm"]),
     ("../translations", [r"translations/artisan_nl.qm"]),
-    ("../translations", [r"translations/artisan_fi.qm"]),
     ("../translations", [r"translations/artisan_tr.qm"]),
-    ("../translations", [r"translations/artisan_ja.qm"]),
-    ("../translations", [r"translations/artisan_hu.qm"]),
-    ("../translations", [r"translations/artisan_he.qm"]),
     ("../Resources", [r"qt.conf"]),
     ("../Resources", [r"artisanProfile.icns"]),
     ("../Resources", [r"artisanAlarms.icns"]),
     ("../Resources", [r"artisanPalettes.icns"]),
     ("../Resources", [r"artisanWheel.icns"]),
+    ("../Resources", [r"includes/alarmclock.eot"]),
+    ("../Resources", [r"includes/alarmclock.svg"]),
+    ("../Resources", [r"includes/alarmclock.ttf"]),
+    ("../Resources", [r"includes/alarmclock.woff"]),
+    ("../Resources", [r"includes/artisan.tpl"]),
+    ("../Resources", [r"includes/bigtext.js"]),
     ("../Resources", [r"includes/Humor-Sans.ttf"]),
+    ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
   ]
   
 plist = Plist.fromFile('Info3.plist')
@@ -102,7 +115,7 @@ OPTIONS = {
                     'QtOpenGL','QtScript','QtScriptTools',
                     'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
 #    'packages': ['matplotlib'], # with this the full pkg is copied to Resources/lib/python3.4
-    'packages': ['yoctopuce'],
+    'packages': ['yoctopuce','gevent'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
@@ -160,6 +173,8 @@ for fw in [
             'QtScript',
             'QtScriptTools',
             'QtSql',
+            'QtDBus',
+            'QtDesigner',
             'QtTest',
             'QtWebKit',
             'QtXMLPatterns']:
@@ -179,8 +194,8 @@ for root, dirs, files in os.walk('.'):
             os.remove(os.path.join(root,file))
         elif '_tests' in file:
             print('Deleting', file)            
-            os.remove(os.path.join(root,file))            
-        elif file.endswith('.pyc') and file != "site.pyc":
+            os.remove(os.path.join(root,file))               
+        elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
             print('Deleting', file)
             os.remove(os.path.join(root,file))
         # remove also all .h .in .cpp .cc .html files 

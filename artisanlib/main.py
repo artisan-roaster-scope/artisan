@@ -80,7 +80,21 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, Q
 from PyQt4.QtCore import (QString, QStringList, QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, 
                           QT_VERSION_STR,SIGNAL, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, SLOT,
                           QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)
-
+# PyQt5 variant
+# from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
+#                          QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange,
+#                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
+#                          QLCDNumber, QSpinBox, QComboBox, QHeaderView,
+#                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton,
+#                          QColorDialog, QFrame, QCheckBox,QStatusBar, 
+#                          QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox)
+# from PyQt5.QtGui import (QKeySequence,QStandardItem,QImage,QPixmap,QColor,QPalette,QDesktopServices,QIcon,
+#                             QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor,QTextDocument)
+# from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)
+# from PyQt5.QtCore import (QString, QStringList, QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, 
+#                           QT_VERSION_STR,SIGNAL, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, SLOT,
+#                           QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)
+    
 
 import matplotlib as mpl
 from functools import reduce as freduce
@@ -1458,6 +1472,9 @@ class tgraphcanvas(FigureCanvas):
     def event_popup_action(self,action):
         if action.key[0] >= 0:
             self.timeindex[action.key[0]] = action.key[1]
+            if action.key[0] == 0: # CHARGE
+                # realign to background
+                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
         else:
             # add a special event at the current timepoint
             self.specialevents.append(action.key[1]) # absolut time index
@@ -1753,7 +1770,7 @@ class tgraphcanvas(FigureCanvas):
         c = curves.count(True)
         if aw.qmc.background:
             c += 2
-            if aw.qmc.xtcurveidx > 0: # 3rd background courve set?
+            if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
                 idx3 = aw.qmc.xtcurveidx - 1
                 n3 = idx3 // 2
                 if len(self.stemp1BX) > n3 and len(self.extratimexB) > n3:
@@ -2204,16 +2221,21 @@ class tgraphcanvas(FigureCanvas):
         return '%s%d:%02d'%(sign,m,s)
         
     def fmt_data(self,x):
-        if self.fmt_data_RoR and self.delta_ax:
+        res = x
+        if self.fmt_data_RoR and not aw.qmc.designerflag and self.delta_ax:
             try:
-                v = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
-                if aw.qmc.LCDdecimalplaces:
-                    return aw.float2float(v)
-                else:
-                    return int(round(v))
+                res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
             except:
                 pass
-        return aw.float2float(x) #int(round(x))
+        elif not self.fmt_data_RoR and aw.qmc.designerflag and self.delta_ax:
+            try:
+                res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
+            except:
+                pass
+        if aw.qmc.LCDdecimalplaces:
+            return aw.float2float(res)
+        else:
+            return int(round(res))
 
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
@@ -3276,7 +3298,7 @@ class tgraphcanvas(FigureCanvas):
                                                  fontsize="xx-small",
                                                  fontproperties=fontprop_small)
 
-                elif self.eventsGraphflag == 2 and Nevents:
+                elif self.eventsGraphflag == 2: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
                     self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                     self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                     E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
@@ -3469,6 +3491,8 @@ class tgraphcanvas(FigureCanvas):
 
                 #if recorder on
                 if self.flagon and self.eventsshowflag:
+                    if not self.eventsshowflag:
+                        Nevents = len(self.specialevents)
                     #update to last event
                     if Nevents:
                         aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
@@ -5571,7 +5595,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.lines = self.ax.lines[0:4]
             else:
                 self.ax.lines = []
-
+                
             #create statistics bar
             #calculate the positions for the statistics elements
             ydist = self.ylimit - self.ylimit_min
@@ -7922,7 +7946,7 @@ class ApplicationWindow(QMainWindow):
         self.helpMenu.addAction(helpAboutAction)
         
         aboutQtAction = QAction(UIconst.HELP_MENU_ABOUTQT,self)
-        aboutQtAction.setMenuRole(QAction.AboutRole)
+        aboutQtAction.setMenuRole(QAction.AboutQtRole)
         self.connect(aboutQtAction,SIGNAL("triggered()"),self.showAboutQt)
         self.helpMenu.addAction(aboutQtAction)
 
@@ -9148,7 +9172,7 @@ class ApplicationWindow(QMainWindow):
 
                 # TP phase LCD
                 if aw.qmc.phasesLCDmode == 0: # time mode
-                    if self.qmc.TPalarmtimeindex:
+                    if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
                         # after TP
                         self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")                    
                         if self.qmc.timeindex[6]:
@@ -9630,8 +9654,8 @@ class ApplicationWindow(QMainWindow):
             qd = QDir(u(cmd))
             current = QDir.current()
             QDir.setCurrent(u(aw.getAppPath()))
-            prg_file = u(qd.absolutePath())            
-            subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]])
+            prg_file = u(qd.absolutePath())
+            subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False)
             QDir.setCurrent(current.absolutePath())
             # alternative approach, that seems to fail on some Mac OS X versions:
             #QProcess.startDetached(prg_file)
@@ -10136,24 +10160,31 @@ class ApplicationWindow(QMainWindow):
     def removeDisallowedFilenameChars(self,filename):
         validFilenameChars = "-_.() %s%s" % (libstring.ascii_letters, libstring.digits)
         cleanedFilename = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore')
-        return ''.join(c for c in cleanedFilename if c in validFilenameChars)
+        return ''.join(c for c in d(cleanedFilename) if c in validFilenameChars)
     
     
     def generateFilename(self,prefix=""):
-        title = None
-        if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
-            title = aw.qmc.title
-        if prefix == "" and title:
-            filename = title
-        else:
-            filename = prefix
-        if filename != "":                
-            filename += "-" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
-        else:
-            filename += str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
-        filename += ".alog"
-        #clean name
-        filename = self.removeDisallowedFilenameChars(u(filename))                    
+        filename = ""
+        try:
+            title = None
+            if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
+                title = aw.qmc.title
+            if prefix == "" and title:
+                filename = title
+            else:
+                filename = prefix
+            if filename != "":                
+                filename += "-" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
+            else:
+                filename += str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
+            filename += ".alog"
+            #clean name
+            filename = self.removeDisallowedFilenameChars(u(filename))
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+#            print(e)
+            pass
         return filename
         
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting.
@@ -17215,6 +17246,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     def __init__(self, parent = None, weightIn=None, weightOut=None,
         weightunit=0,volumeunit=0,
         inlineedit=None,outlineedit=None,tare=0): # weight in and out expected in g (int)
+        self.parent_dialog = parent
         # weightunit 0:g, 1:Kg  volumeunit 0:ml, 1:l
         super(volumeCalculatorDlg,self).__init__(parent)
         self.setModal(True)
@@ -17561,6 +17593,7 @@ class volumeCalculatorDlg(ArtisanDialog):
             aw.qmc.volumeCalcUnit = int(round(float(self.unitvolumeEdit.text())))
             aw.qmc.volumeCalcWeightInStr = str(self.coffeeinweightEdit.text())
             aw.qmc.volumeCalcWeightOutStr = str(self.coffeeoutweightEdit.text())
+            self.parent_dialog.calculated_density()
         self.accept()
 
     def close(self):
@@ -17781,7 +17814,8 @@ class editGraphDlg(ArtisanDialog):
         self.roastdegreelabel.setMinimumWidth(80)
         self.roastdegreelabel.setMaximumWidth(80)
         self.percent()
-        self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.weightouteditChanged)
+#        self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.weightouteditChanged)
+        self.weightoutedit.editingFinished.connect(self.weightouteditChanged)
         self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.weightineditChanged)
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
@@ -17812,7 +17846,6 @@ class editGraphDlg(ArtisanDialog):
         self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None, QApplication.UnicodeUTF8))
         self.volumepercentlabel.setMinimumWidth(45)
         self.volumepercentlabel.setMaximumWidth(45)
-        self.volume_percent()
         self.connect(self.volumeoutedit,SIGNAL("editingFinished()"),self.volume_percent)
         self.connect(self.volumeinedit,SIGNAL("editingFinished()"),self.volume_percent)
         self.volumeUnitsComboBox = QComboBox()
@@ -17826,11 +17859,6 @@ class editGraphDlg(ArtisanDialog):
             self.volumeUnitsComboBox.setCurrentIndex(1)
         self.connect(self.volumeUnitsComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.volumeUnitsComboBox.currentIndex() :self.changeVolumeUnit(i))
         self.calculateddensitylabel = QLabel("")
-        self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.calculated_density)
-        self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.calculated_density)
-        self.connect(self.volumeoutedit,SIGNAL("editingFinished()"),self.calculated_density)
-        self.connect(self.volumeinedit,SIGNAL("editingFinished()"),self.calculated_density)
-        self.connect(self.volumeUnitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
         self.connect(self.unitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
         #density
         bean_density_label = QLabel("<b>" + u(QApplication.translate("Label", "Density",None, QApplication.UnicodeUTF8)) + "</b>")
@@ -18286,6 +18314,7 @@ class editGraphDlg(ArtisanDialog):
         totallayout.setContentsMargins(10,10,10,0)
         #totallayout.addStretch()
         #totallayout.addLayout(buttonsLayout)
+        self.volume_percent()
         self.setLayout(totallayout)
 
     # calcs volume (in ml) from density (in g/l) and weight (in g)
@@ -18350,6 +18379,7 @@ class editGraphDlg(ArtisanDialog):
     def changeVolumeUnit(self,i):
         aw.qmc.volume[2] = u(self.volumeUnitsComboBox.currentText())
         self.changeUnit(i,[self.volumeinedit,self.volumeoutedit])
+        self.calculated_density()
         
     def changeDensityWeightUnit(self,i):
         aw.qmc.density[1] = u(self.bean_density_volumeUnitsComboBox.currentText())
@@ -18752,11 +18782,13 @@ class editGraphDlg(ArtisanDialog):
             message = QApplication.translate("Message","No events found", None, QApplication.UnicodeUTF8)
             aw.sendmessage(message)
 
-    def weightouteditChanged(self):
+    def weightouteditChanged(self):        
         self.percent()
+        self.calculated_density()
 
     def weightineditChanged(self):
         self.percent()
+        self.calculated_density()
         
     def percent(self):
         percent = 0.
@@ -18782,6 +18814,7 @@ class editGraphDlg(ArtisanDialog):
             pass
         percentstring =  "%.1f" %(percent) + "%"
         self.volumepercentlabel.setText(QString(percentstring))    #volume percent gain
+        self.calculated_density()
         
     def calc_density(self):
         din = dout = 0.0
@@ -24694,8 +24727,7 @@ class serialport(object):
                     nbytes = len(r)
                     error = QApplication.translate("Error Message","CENTER302temperature(): %1 bytes received but 7 needed",None, QApplication.UnicodeUTF8).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+                    aw.qmc.adderror(timez + " " + error)
                     return -1,-1 
             else:
                 return -1,-1 
@@ -25500,11 +25532,13 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1018values() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
-    # mode = 0 for 2x thermocuple model; mode = 1 for 1x PT100 type probe
+    # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe
     def YOCTOtemperatures(self,mode=0):
         try: 
             if self.YOCTOsensor == None:
+#                aw.sendmessage(str(YAPI._yApiCLibFile))
                 errmsg=YRefParam()
+#                aw.sendmessage(str(errmsg))
                 ## WINDOWS/Linux DLL HACK BEGIN
                 if platf == 'Windows' and aw.appFrozen():
                     if platform.architecture()[0] == '32bit':
@@ -25520,15 +25554,22 @@ class serialport(object):
                 # alt: PreregisterHub( )
 #                if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
                 try:
-                    YAPI.RegisterHub("usb", errmsg)
-                except:
-                    pass
+#                    aw.sendmessage("try")
+                    res = YAPI.RegisterHub("usb", errmsg)
+#                    aw.sendmessage("res: " + str(res))
+                except Exception as e:
+                    aw.sendmessage(str(e))
+#                    aw.sendmessage("error: " + str(errmsg))
                 try:
                     self.YOCTOsensor = YTemperature.FirstTemperature()
+#                    aw.sendmessage("first: " + str(self.YOCTOsensor))
                     if mode == 0 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
+#                        aw.sendmessage("serial: " + str(serial))
                         self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
+#                        aw.sendmessage("serial: " + str(self.YOCTOchan1))
                         self.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
+#                        aw.sendmessage("serial: " + str(self.YOCTOchan2))
                         aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None, QApplication.UnicodeUTF8))                       
                     elif mode == 1 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None, QApplication.UnicodeUTF8))                       

@@ -136,11 +136,12 @@ TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None, QApplica
 HELP_MENU = QApplication.translate("Menu", "Help", None, QApplication.UnicodeUTF8)
 if platf != 'Darwin':
     HELP_MENU = "&" + HELP_MENU
-#note that the "About" menu item is recognized only if it is named "About" on the Mac, but automatically translated by the Qt standard tranlators
-if platf == 'Darwin':
-    HELP_MENU_ABOUT = "About"
-else:
-    HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About %1", None, QApplication.UnicodeUTF8).arg("Artisan") 
+##note that the "About" menu item is recognized only if it is named "About" on the Mac, but automatically translated by the Qt standard tranlators
+#if platf == 'Darwin':
+#    HELP_MENU_ABOUT = "About"
+#else:
+#    HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About %1", None, QApplication.UnicodeUTF8).arg("Artisan") 
+HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About %1", None, QApplication.UnicodeUTF8).arg("Artisan") 
 HELP_MENU_ABOUTQT = QApplication.translate("Menu", "About Qt", None, QApplication.UnicodeUTF8)
 HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None, QApplication.UnicodeUTF8)
 #HELP_MENU_BLOG = QApplication.translate("Menu", "Blog", None, QApplication.UnicodeUTF8)
