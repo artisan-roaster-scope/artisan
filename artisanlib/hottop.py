@@ -31,7 +31,6 @@ xSET_MAIN_FAN = None
 xSET_SOLENOID = None # False: closed; True: open
 xSET_DRUM_MOTOR = None
 xSET_COOLING_MOTOR = None
-xSET_CHAFF_TRAY = None
 
 if sys.version < '3':
     def hex2int(h1,h2=""):
@@ -104,7 +103,7 @@ def gettemperatures(SP,retry=True):
 
 def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
         aBT, aET, aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
-        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aSET_CHAFF_TRAY, aCONTROL):
+        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aCONTROL):
     SP = serial.Serial()
     # configure serial port
     SP.setPort(comport)
@@ -143,26 +142,29 @@ def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
         if CHAFF_TRAY != -1:
             aCHAFF_TRAY.value = xCHAFF_TRAY
 
-        # control part
-        if aCONTROL.value:
-            sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
-                    aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aSET_CHAFF_TRAY)            
+        # safety cut at BT=212C
+        if BT >= 212:
+            # set main fan to maximum (set to 10), turn off heater (set to 0), open solenoid for eject, turn on drum and stirrer (all set to 1)
+            sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
+                    0, 10, 10, 1, 1, 1)
+        else:
+            # control part
+            if aCONTROL.value:
+                sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
+                        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR)
             
         time.sleep(interval)
-        # needs a flag to know if control commands should be send
-        # needs a different sleep in control mode
-        # how often to "read" data? At the same speed as the "send" commands? This is a lot!
       
 
 # Control processing 
 
-def sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
-        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aSET_CHAFF_TRAY):
+def sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
+        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR):
     try:
         openport(SP)
         if SP.isOpen():
-            cmd = HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
-                    aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aSET_CHAFF_TRAY)
+            cmd = HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
+                    aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR)
 #            print("".join("\\x%02x" % ord(i) for i in cmd))
             SP.flushInput()
             SP.flushOutput()
@@ -182,8 +184,8 @@ def newValue(set_value,get_value):
     else:
         return 0
 
-def HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR, aCHAFF_TRAY,
-        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aSET_CHAFF_TRAY):
+def HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
+        aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR):
     cmd = bytearray([0x00]*36)
     cmd[0] = 0xA5
     cmd[1] = 0x96
@@ -233,9 +235,9 @@ def getHottop():
 
 # heater : int(0-100)
 # fan, main_fan : int(0-100) (will be converted to the internal int(0-10))
-# solenoid, drum_motor, cooling_motor, chaff_tray : bool (will be converted to the internal 0 or 1)
+# solenoid, drum_motor, cooling_motor : bool (will be converted to the internal 0 or 1)
 # all parameters are optional and default to None (meanging: don't change value)
-def setHottop(heater=None,fan=None,main_fan=None,solenoid=None,drum_motor=None,cooling_motor=None,chaff_tray=None):
+def setHottop(heater=None,fan=None,main_fan=None,solenoid=None,drum_motor=None,cooling_motor=None):
     if heater != None:
         xSET_HEATER.value = int(heater)
     if fan != None:
@@ -248,14 +250,12 @@ def setHottop(heater=None,fan=None,main_fan=None,solenoid=None,drum_motor=None,c
         xSET_DRUM_MOTOR.value = int(drum_motor)
     if cooling_motor != None:
         xSET_COOLING_MOTOR.value = int(cooling_motor)
-    if chaff_tray != None:
-        xSET_CHAFF_TRAY.value = int(chaff_tray)
 
 
 # interval has to be smaller than 1 (= 1sec)
 def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',stopbits=1,timeout=1):
     global process, xCONTROL, xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
-        xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xSET_CHAFF_TRAY
+        xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR
     try:
         stopHottop() # we stop an already running process to ensure that only one is running
         lock = Lock()
@@ -277,12 +277,11 @@ def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',
         xSET_SOLENOID = Value('i', -1, lock=lock)
         xSET_DRUM_MOTOR = Value('i', -1, lock=lock)
         xSET_COOLING_MOTOR = Value('i', -1, lock=lock)
-        xSET_CHAFF_TRAY = Value('i', -1, lock=lock)
         # variables to write to the Hottop
         
         process = Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
             xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
-            xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xSET_CHAFF_TRAY, xCONTROL))
+            xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))
         process.start()
         return True
     except Exception:
