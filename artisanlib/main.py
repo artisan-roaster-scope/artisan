@@ -3961,7 +3961,7 @@ class tgraphcanvas(FigureCanvas):
                 appnope.nope()
             except:
                 pass
-            if aw.qmc.device == 53:    
+            if aw.qmc.device == 53:
                 startHottop(0.8,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
                 a = aw.qmc.extrabuttonactions[0]

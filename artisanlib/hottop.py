@@ -14,6 +14,9 @@ control = False # Hottop under control?
 # serial port configurations
 SP = None
 
+# safety cut-off BT temperature
+BTcutoff = 212
+
 xCONTROL = None # False: just logging; True: logging+control
 xBT = None
 xET = None
@@ -142,15 +145,18 @@ def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
         if CHAFF_TRAY != -1:
             aCHAFF_TRAY.value = xCHAFF_TRAY
 
-        # safety cut at BT=212C
-        if BT >= 212:
-            # set main fan to maximum (set to 10), turn off heater (set to 0), open solenoid for eject, turn on drum and stirrer (all set to 1)
+        # control part
+        if aCONTROL.value:
+            # safety cut at BT=212C
+            if BT >= BTcutoff:
+                # set main fan to maximum (set to 10), turn off heater (set to 0), open solenoid for eject, turn on drum and stirrer (all set to 1)
+                aSET_HEATER.value = 0
+                #aSET_FAN.value = 10
+                aSET_MAIN_FAN.value = 10
+                aSET_SOLENOID.value = 1
+                aSET_DRUM_MOTOR.value = 1
+                aSET_COOLING_MOTOR.value = 1
             sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
-                    0, 10, 10, 1, 1, 1)
-        else:
-            # control part
-            if aCONTROL.value:
-                sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
                         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR)
             
         time.sleep(interval)
@@ -216,7 +222,7 @@ def takeHottopControl():
         return False
     
 def releaseHottopControl():
-    if xCONTROL:
+    if xCONTROL and xBT.value < BTcutoff:
         xCONTROL.value = False
         return True
     else:
@@ -257,33 +263,36 @@ def startHottop(interval=1,comport="COM4",baudrate=115200,bytesize=8,parity='N',
     global process, xCONTROL, xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
         xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR
     try:
-        stopHottop() # we stop an already running process to ensure that only one is running
-        lock = Lock()
-        xCONTROL = Value(c_bool, False, lock=lock)
-        # variables to read from the Hottop
-        xBT = Value(c_double, -1.0, lock=lock)
-        xET = Value(c_double, -1.0, lock=lock)
-        xHEATER = Value('i', -1, lock=lock)
-        xFAN = Value('i', -1, lock=lock)
-        xMAIN_FAN = Value('i', -1, lock=lock)
-        xSOLENOID = Value(c_bool, False, lock=lock)
-        xDRUM_MOTOR = Value(c_bool, False, lock=lock)
-        xCOOLING_MOTOR = Value(c_bool, False, lock=lock)
-        xCHAFF_TRAY = Value(c_bool, False, lock=lock)
-        # set variables to write to the Hottop
-        xSET_HEATER = Value('i', -1, lock=lock)
-        xSET_FAN = Value('i', -1, lock=lock)
-        xSET_MAIN_FAN = Value('i', -1, lock=lock)
-        xSET_SOLENOID = Value('i', -1, lock=lock)
-        xSET_DRUM_MOTOR = Value('i', -1, lock=lock)
-        xSET_COOLING_MOTOR = Value('i', -1, lock=lock)
-        # variables to write to the Hottop
-        
-        process = Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
-            xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
-            xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))
-        process.start()
-        return True
+        if process:
+            return False
+        else:
+            stopHottop() # we stop an already running process to ensure that only one is running
+            lock = Lock()
+            xCONTROL = Value(c_bool, False, lock=lock)
+            # variables to read from the Hottop
+            xBT = Value(c_double, -1.0, lock=lock)
+            xET = Value(c_double, -1.0, lock=lock)
+            xHEATER = Value('i', -1, lock=lock)
+            xFAN = Value('i', -1, lock=lock)
+            xMAIN_FAN = Value('i', -1, lock=lock)
+            xSOLENOID = Value(c_bool, False, lock=lock)
+            xDRUM_MOTOR = Value(c_bool, False, lock=lock)
+            xCOOLING_MOTOR = Value(c_bool, False, lock=lock)
+            xCHAFF_TRAY = Value(c_bool, False, lock=lock)
+            # set variables to write to the Hottop
+            xSET_HEATER = Value('i', -1, lock=lock)
+            xSET_FAN = Value('i', -1, lock=lock)
+            xSET_MAIN_FAN = Value('i', -1, lock=lock)
+            xSET_SOLENOID = Value('i', -1, lock=lock)
+            xSET_DRUM_MOTOR = Value('i', -1, lock=lock)
+            xSET_COOLING_MOTOR = Value('i', -1, lock=lock)
+            # variables to write to the Hottop
+            
+            process = Process(target=doWork, args=(interval,comport,baudrate,bytesize,parity,stopbits,timeout,
+                xBT, xET, xHEATER, xFAN, xMAIN_FAN, xSOLENOID, xDRUM_MOTOR, xCOOLING_MOTOR, xCHAFF_TRAY, \
+                xSET_HEATER, xSET_FAN, xSET_MAIN_FAN, xSET_SOLENOID, xSET_DRUM_MOTOR, xSET_COOLING_MOTOR, xCONTROL))
+            process.start()
+            return True
     except Exception:
         return False
 
