@@ -403,94 +403,94 @@ class tgraphcanvas(FigureCanvas):
                         "rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue'}
 
-        self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Clean Cup",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Head",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Fragrance",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8)]
+        self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
+                                            QApplication.translate("Textbox", "Aftertaste",None),
+                                            QApplication.translate("Textbox", "Clean Cup",None),
+                                            QApplication.translate("Textbox", "Head",None),
+                                            QApplication.translate("Textbox", "Fragrance",None),
+                                            QApplication.translate("Textbox", "Sweetness",None),
+                                            QApplication.translate("Textbox", "Aroma",None),
+                                            QApplication.translate("Textbox", "Balance",None),
+                                            QApplication.translate("Textbox", "Body",None)]
 
         # custom labels are stored in the application settings and can be edited by the user
         self.customflavorlabels = self.artisanflavordefaultlabels
 
-        self.SCCAflavordefaultlabels = [QApplication.translate("Textbox", "Sour",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Flavor",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Critical\nStimulus",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Bitter",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Astringency",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Solubles\nConcentration",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Mouthfeel",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Other",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Aromatic\nComplexity",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Roast\nColor",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Aromatic\nPungency",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Sweet",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "pH",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
+        self.SCCAflavordefaultlabels = [QApplication.translate("Textbox", "Sour",None),
+                                        QApplication.translate("Textbox", "Flavor",None),
+                                        QApplication.translate("Textbox", "Critical\nStimulus",None),
+                                        QApplication.translate("Textbox", "Aftertaste",None),
+                                        QApplication.translate("Textbox", "Bitter",None),
+                                        QApplication.translate("Textbox", "Astringency",None),
+                                        QApplication.translate("Textbox", "Solubles\nConcentration",None),
+                                        QApplication.translate("Textbox", "Mouthfeel",None),
+                                        QApplication.translate("Textbox", "Other",None),
+                                        QApplication.translate("Textbox", "Aromatic\nComplexity",None),
+                                        QApplication.translate("Textbox", "Roast\nColor",None),
+                                        QApplication.translate("Textbox", "Aromatic\nPungency",None),
+                                        QApplication.translate("Textbox", "Sweet",None),
+                                        QApplication.translate("Textbox", "Acidity",None),
+                                        QApplication.translate("Textbox", "pH",None),
+                                        QApplication.translate("Textbox", "Balance",None)]
 
-        self.CQIflavordefaultlabels =  [QApplication.translate("Textbox", "Fragance",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Flavor",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8)]
+        self.CQIflavordefaultlabels =  [QApplication.translate("Textbox", "Fragance",None),
+                                        QApplication.translate("Textbox", "Aroma",None),
+                                        QApplication.translate("Textbox", "Flavor",None),
+                                        QApplication.translate("Textbox", "Acidity",None),
+                                        QApplication.translate("Textbox", "Body",None),
+                                        QApplication.translate("Textbox", "Aftertaste",None)]
 
-        self.SweetMariasflavordefaultlabels = [QApplication.translate("Textbox", "Dry Fragrance",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Uniformity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Complexity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Clean Cup",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Finish",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Flavor",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Brightness",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Wet Aroma",None, QApplication.UnicodeUTF8)]
+        self.SweetMariasflavordefaultlabels = [QApplication.translate("Textbox", "Dry Fragrance",None),
+                                            QApplication.translate("Textbox", "Uniformity",None),
+                                            QApplication.translate("Textbox", "Complexity",None),
+                                            QApplication.translate("Textbox", "Clean Cup",None),
+                                            QApplication.translate("Textbox", "Sweetness",None),
+                                            QApplication.translate("Textbox", "Finish",None),
+                                            QApplication.translate("Textbox", "Body",None),
+                                            QApplication.translate("Textbox", "Flavor",None),
+                                            QApplication.translate("Textbox", "Brightness",None),
+                                            QApplication.translate("Textbox", "Wet Aroma",None)]
 
-        self.Cflavordefaultlabels = [QApplication.translate("Textbox", "Fragrance",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Taste",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Nose",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8)]
+        self.Cflavordefaultlabels = [QApplication.translate("Textbox", "Fragrance",None),
+                                            QApplication.translate("Textbox", "Aroma",None),
+                                            QApplication.translate("Textbox", "Taste",None),
+                                            QApplication.translate("Textbox", "Nose",None),
+                                            QApplication.translate("Textbox", "Aftertaste",None),
+                                            QApplication.translate("Textbox", "Body",None),
+                                            QApplication.translate("Textbox", "Acidity",None)]
 
-        self.Eflavordefaultlabels = [QApplication.translate("Textbox", "Fragrance-Aroma",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Flavor",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
-
-
-        self.coffeegeekflavordefaultlabels = [QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Mouthfeel",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Flavour",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
+        self.Eflavordefaultlabels = [QApplication.translate("Textbox", "Fragrance-Aroma",None),
+                                            QApplication.translate("Textbox", "Acidity",None),
+                                            QApplication.translate("Textbox", "Flavor",None),
+                                            QApplication.translate("Textbox", "Body",None),
+                                            QApplication.translate("Textbox", "Aftertaste",None),
+                                            QApplication.translate("Textbox", "Balance",None)]
 
 
-        self.Intelligentsiaflavordefaultlabels = [QApplication.translate("Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Finish",None, QApplication.UnicodeUTF8)]
+        self.coffeegeekflavordefaultlabels = [QApplication.translate("Textbox", "Aroma",None),
+                                            QApplication.translate("Textbox", "Acidity",None),
+                                            QApplication.translate("Textbox", "Mouthfeel",None),
+                                            QApplication.translate("Textbox", "Flavour",None),
+                                            QApplication.translate("Textbox", "Aftertaste",None),
+                                            QApplication.translate("Textbox", "Balance",None)]
 
-        self.IstitutoInternazionaleAssaggiatoriCaffe = [QApplication.translate("Textbox", "Roast Color",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Crema Texture",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Crema Volume",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Fragrance",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Bitterness",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Defects",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Aroma Intensity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Aroma Persistence",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
+
+        self.Intelligentsiaflavordefaultlabels = [QApplication.translate("Textbox", "Sweetness",None),
+                                            QApplication.translate("Textbox", "Acidity",None),
+                                            QApplication.translate("Textbox", "Body",None),
+                                            QApplication.translate("Textbox", "Finish",None)]
+
+        self.IstitutoInternazionaleAssaggiatoriCaffe = [QApplication.translate("Textbox", "Roast Color",None),
+                                            QApplication.translate("Textbox", "Crema Texture",None),
+                                            QApplication.translate("Textbox", "Crema Volume",None),
+                                            QApplication.translate("Textbox", "Fragrance",None),
+                                            QApplication.translate("Textbox", "Body",None),
+                                            QApplication.translate("Textbox", "Acidity",None),
+                                            QApplication.translate("Textbox", "Bitterness",None),
+                                            QApplication.translate("Textbox", "Defects",None),
+                                            QApplication.translate("Textbox", "Aroma Intensity",None),
+                                            QApplication.translate("Textbox", "Aroma Persistence",None),
+                                            QApplication.translate("Textbox", "Balance",None)]
 
         self.ax1 = self.ax2 = None
 
@@ -715,7 +715,7 @@ class tgraphcanvas(FigureCanvas):
         self.flagalignFCs = False
 
         self.roastpropertiesflag = 1  #resets roast properties if not zero
-        self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
+        self.title = QApplication.translate("Scope Title", "Roaster Scope",None)
         self.ambientTemp = 0.
         self.ambientTempSource = 0 # indicates the temperature curve that is used to automatically fill the ambient temperature on DROP
 #                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
@@ -772,6 +772,9 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundeventsflag = False
         self.backgroundpath = ""
         self.titleB = ""
+        self.roastbatchnrB = 0
+        self.roastbatchprefixB = u("")
+        self.roastbatchposB = 0
         self.temp1B,self.temp2B,self.temp1BX,self.temp2BX,self.timeB = [],[],[],[],[]
         self.stemp1B,self.stemp2B,self.stemp1BX,self.stemp2BX = [],[],[],[] # smoothed versions of the background courves
         self.extraname1B,self.extraname2B = [],[]
@@ -792,10 +795,10 @@ class tgraphcanvas(FigureCanvas):
         self.backmoveflag = 1
         self.detectBackgroundEventTime = 20 #seconds
         self.backgroundReproduce = False
-        self.Betypes = [QApplication.translate("Scope Annotation", "Speed",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Scope Annotation", "Heater",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Scope Annotation", "Damper",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Scope Annotation", "Fan",None, QApplication.UnicodeUTF8),
+        self.Betypes = [QApplication.translate("Scope Annotation", "Speed",None),
+                        QApplication.translate("Scope Annotation", "Heater",None),
+                        QApplication.translate("Scope Annotation", "Damper",None),
+                        QApplication.translate("Scope Annotation", "Fan",None),
                         "--"]
         self.backgroundFlavors = []
         self.flavorbackgroundflag = False
@@ -825,7 +828,18 @@ class tgraphcanvas(FigureCanvas):
         self.operator = ""
         self.roastingnotes = ""
         self.cuppingnotes = ""
-        self.roastdate = QDate.currentDate()
+        self.roastdate = QDateTime.currentDateTime()
+        # system batch nr system
+        self.roastepoch = QDateTime.currentDateTime().toTime_t() # in seconds
+        self.lastroastepoch = self.roastepoch # the epoch of the last roast in seconds
+        self.batchcounter = -1 # global batch counter; if batchcounter is -1, batchcounter system is inactive
+        self.batchsequence = 0 # global counter of position in sequence of batches of one session
+        self.batchprefix = u("")
+        # profile batch nr
+        self.roastbatchnr = 0 # batch number of the roast; if roastbatchnr=0, prefix/counter is hidden/inactiv (initialized to 0 on roast START)
+        self.roastbatchprefix = self.batchprefix # batch prefix of the roast
+        self.roastbatchpos = 0 # position of the roast in the roast session (first batch, second batch,..)
+        self.roasttzoffset = libtime.timezone # timezone offset to be added to roastepoch to get time in local timezone
         self.beans = ""
 
         #flags to show projections, draw Delta ET, and draw Delta BT
@@ -907,16 +921,16 @@ class tgraphcanvas(FigureCanvas):
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
         self.specialevents = []
         #ComboBox text event types. They can be modified in eventsDlg()
-        self.etypes = [QApplication.translate("ComboBox", "Speed",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Power",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Damper",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Fan",None, QApplication.UnicodeUTF8),
+        self.etypes = [QApplication.translate("ComboBox", "Speed",None),
+                       QApplication.translate("ComboBox", "Power",None),
+                       QApplication.translate("ComboBox", "Damper",None),
+                       QApplication.translate("ComboBox", "Fan",None),
                        "--"]
         #default etype settings to restore
-        self.etypesdefault = [QApplication.translate("ComboBox", "Speed",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox", "Power",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox", "Damper",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox", "Fan",None, QApplication.UnicodeUTF8),
+        self.etypesdefault = [QApplication.translate("ComboBox", "Speed",None),
+                              QApplication.translate("ComboBox", "Power",None),
+                              QApplication.translate("ComboBox", "Damper",None),
+                              QApplication.translate("ComboBox", "Fan",None),
                               "--"]
         #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc.
         self.specialeventstype = []
@@ -1089,10 +1103,10 @@ class tgraphcanvas(FigureCanvas):
             label.set_color(self.palette["xlabel"])
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
-        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
-        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTlinestyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
-        self.l_delta1, = self.ax.plot(self.timex,self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=u(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
-        self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=u(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None)))
+        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTlinestyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None)))
+        self.l_delta1, = self.ax.plot(self.timex,self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=u(QApplication.translate("Label", "DeltaET", None)))
+        self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=u(QApplication.translate("Label", "DeltaBT", None)))
         self.l_back1 = None
         self.l_back2 = None
         self.l_back3 = None # one extra background curve
@@ -1467,7 +1481,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " onclick() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() %1").arg(str(e)),exc_tb.tb_lineno)
 
     def event_popup_action(self,action):
         if action.key[0] >= 0:
@@ -1678,7 +1692,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " updategraphics() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() %1").arg(str(e)),exc_tb.tb_lineno)
 
     def updateLCDtime(self):
         if self.flagon and self.flagstart:
@@ -1713,7 +1727,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.stack.setCurrentIndex(0)
             self.resetlines()
-            aw.sendmessage(QApplication.translate("Message","HUD OFF", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","HUD OFF", None))
             
         #ON
         else:
@@ -1726,9 +1740,9 @@ class tgraphcanvas(FigureCanvas):
             self.HUDflag = True
             aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
             aw.stack.setCurrentIndex(1)
-            aw.sendmessage(QApplication.translate("Message","HUD ON", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","HUD ON", None))
 #            else:
-#                aw.sendmessage(QApplication.translate("Message","Need some data for HUD to work", None, QApplication.UnicodeUTF8))
+#                aw.sendmessage(QApplication.translate("Message","Need some data for HUD to work", None))
 
 
     # redraws at least the canvas if redraw=True, if FCs=True align to FCs if set, otherwise CHARGE (if set)
@@ -1762,7 +1776,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " timealign() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " timealign() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def lenaxlines(self):
         active_curves = len(self.extratimex)
@@ -1812,15 +1826,15 @@ class tgraphcanvas(FigureCanvas):
 
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
-        aw.sendmessage(QApplication.translate("Message","Alarm %1 triggered", None, QApplication.UnicodeUTF8).arg(alarmnumber + 1))
+        aw.sendmessage(QApplication.translate("Message","Alarm %1 triggered", None).arg(alarmnumber + 1))
         if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
             QApplication.beep()
         try:
             if self.alarmaction[alarmnumber] == 0:
                 # alarm popup message
-                #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None, QApplication.UnicodeUTF8),self.alarmstrings[alarmnumber])
+                #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber])
                 # alarm popup message with 10sec timeout
-                amb = ArtisanMessageBox(self,QApplication.translate("Message", "Alarm notice",None, QApplication.UnicodeUTF8),u(self.alarmstrings[alarmnumber]),timeout=10)
+                amb = ArtisanMessageBox(self,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=10)
                 amb.show()
                 #send alarm also to connected WebLCDs clients
                 if aw.WebLCDs and aw.WebLCDsAlerts:
@@ -1848,16 +1862,16 @@ class tgraphcanvas(FigureCanvas):
                     aw.call_prog_with_args(fname)
                     res = True
                 if res:
-                    aw.sendmessage(QApplication.translate("Message","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
+                    aw.sendmessage(QApplication.translate("Message","Alarm is calling: %1",None).arg(u(self.alarmstrings[alarmnumber])))
                 else:
-                    aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on %1",None, QApplication.UnicodeUTF8).arg(f))
+                    aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on %1",None).arg(f))
             elif self.alarmaction[alarmnumber] == 2:
                 # alarm event button
                 button_number = None
                 try:
                     button_number = int(str(self.alarmstrings[alarmnumber])) - 1 # the event buttons presented to the user are numbered from 1 on
                 except:
-                    aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '%1' not a number",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
+                    aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '%1' not a number",None).arg(u(self.alarmstrings[alarmnumber])))
                 if button_number != None:
                     if button_number > -1 and button_number < len(aw.buttonlist):
                         aw.recordextraevent(button_number)
@@ -1884,8 +1898,8 @@ class tgraphcanvas(FigureCanvas):
                         aw.fireslideraction(slidernr)
                 except Exception as e:
                     _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setalarm() %1").arg(str(e)),exc_tb.tb_lineno)
-                    aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() %1").arg(str(e)),exc_tb.tb_lineno)
+                    aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None).arg(u(self.alarmstrings[alarmnumber])))
                     
             elif self.alarmaction[alarmnumber] == 7:
                 # START
@@ -1925,7 +1939,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.ToggleMonitor()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setalarm() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def playbackevent(self):
         try:
@@ -1992,7 +2006,7 @@ class tgraphcanvas(FigureCanvas):
                                 aw.messagelabel.setStyleSheet("background-color:'transparent';")
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " playbackevent() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackevent() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #make a projection of change of rate of BT on the graph
     def updateProjection(self):
@@ -2052,7 +2066,7 @@ class tgraphcanvas(FigureCanvas):
                             self.l_BTprojection.set_data([],[])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " updateProjection() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updateProjection() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     # this function is called from the HUD DLg and reports the linear time (straight line) it would take to reach a temperature target
     # acording to the current rate of change
@@ -2146,7 +2160,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " eval_math_expression() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_math_expression() %1").arg(str(e)),exc_tb.tb_lineno)
             return 0
 
     #format X axis labels
@@ -2280,8 +2294,8 @@ class tgraphcanvas(FigureCanvas):
     def checkSaved(self):
         #prevents deleting accidentally a finished roast
         if self.safesaveflag == True:
-            string = QApplication.translate("Message","Save the profile, Discard the profile (Reset), or Cancel?", None, QApplication.UnicodeUTF8)
-            reply = QMessageBox.warning(self,QApplication.translate("Message","Profile unsaved", None, QApplication.UnicodeUTF8),string,
+            string = QApplication.translate("Message","Save the profile, Discard the profile (Reset), or Cancel?", None)
+            reply = QMessageBox.warning(self,QApplication.translate("Message","Profile unsaved", None),string,
                                 QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
             if reply == QMessageBox.Save:
                 aw.fileSave(None)  #if accepted, makes safesaveflag = False
@@ -2290,7 +2304,7 @@ class tgraphcanvas(FigureCanvas):
                 self.safesaveflag = False
                 return True
             elif reply == QMessageBox.Cancel:
-                aw.sendmessage(QApplication.translate("Message","Action canceled",None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","Action canceled",None))
                 return False
         else:
             # nothing to be saved
@@ -2333,7 +2347,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " reset() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -2355,12 +2369,16 @@ class tgraphcanvas(FigureCanvas):
 
                 #reset time
                 aw.qmc.timeclock.start()
+                
+                aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
+                aw.qmc.roastbatchpos = 0 # initialized to 0, set to increased batchsequence on DROP
+                aw.qmc.roastbatchprefix = aw.qmc.batchprefix
 
                 if self.HUDflag:
                     self.toggleHUD()
                 self.hudresizeflag = False
 
-                aw.sendmessage(QApplication.translate("Message","Scope has been reset",None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","Scope has been reset",None))
                 aw.button_3.setDisabled(False)
                 aw.button_4.setDisabled(False)
                 aw.button_5.setDisabled(False)
@@ -2379,15 +2397,15 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_9.setFlat(False)
                 aw.button_19.setFlat(False)
                 aw.button_20.setFlat(False)
-                aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8))
+                aw.button_1.setText(QApplication.translate("Button", "ON",None))
                 aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
-                aw.button_2.setText(QApplication.translate("Button", "START",None, QApplication.UnicodeUTF8))
+                aw.button_2.setText(QApplication.translate("Button", "START",None))
                 aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
 
                 aw.setWindowTitle(aw.windowTitle)
 
                 if self.roastpropertiesflag:
-                    self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
+                    self.title = QApplication.translate("Scope Title", "Roaster Scope",None)
                     self.roastingnotes = ""
                     self.cuppingnotes = ""
                     self.beans = ""
@@ -2408,7 +2426,9 @@ class tgraphcanvas(FigureCanvas):
                     self.volume = [self.volume[0],0,self.volume[2]]
                     
 
-                self.roastdate = QDate.currentDate()
+                self.roastdate = QDateTime.currentDateTime()
+                self.roastepoch = QDateTime.currentDateTime().toTime_t()
+                self.roasttzoffset = libtime.timezone
                 self.errorlog = []
                 aw.seriallog = []
 
@@ -2525,7 +2545,7 @@ class tgraphcanvas(FigureCanvas):
     #            import traceback
     #            traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " reset() %1").arg(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() %1").arg(str(ex)),exc_tb.tb_lineno)
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -2586,7 +2606,7 @@ class tgraphcanvas(FigureCanvas):
 ##            import traceback
 ##            traceback.print_exc(file=sys.stdout)
 #            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
 #            return x
 
     def smooth(self, x, y, window_len=15, window='hanning'):
@@ -2617,7 +2637,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
             return x
 
     def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1):  # default 'hanning'
@@ -2666,14 +2686,14 @@ class tgraphcanvas(FigureCanvas):
                     e = 40
                     a = aw.qmc.backgroundalpha
                 else:
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None, QApplication.UnicodeUTF8))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
                     e = 0
                     a = 1.  
                 self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
                 #Add TP marker
                 if self.markTPflag and TP_index and TP_index > 0:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[TP_index]-t0,False)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP %1", None),u(self.stringfromseconds(timex[TP_index]-t0,False)))
                     a = 1.
                     e = 0
                     self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a)
@@ -2681,7 +2701,7 @@ class tgraphcanvas(FigureCanvas):
                 if timeindex[1]:
                     tidx = timeindex[1]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[tidx],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0,False)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE %1", None),u(self.stringfromseconds(timex[tidx]-t0,False)))
                     if timeindex2:
                         a = aw.qmc.backgroundalpha
                     else:
@@ -2698,7 +2718,7 @@ class tgraphcanvas(FigureCanvas):
                         ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[1]],stemp[tidx],d)
                     else:
                         ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0,False)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs %1", None),u(self.stringfromseconds(timex[tidx]-t0,False)))
                     if timeindex2:
                         a = aw.qmc.backgroundalpha
                     else:
@@ -2712,7 +2732,7 @@ class tgraphcanvas(FigureCanvas):
                 if timeindex[3]:
                     tidx = timeindex[3]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[2]],stemp[tidx],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0,False)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe %1", None),u(self.stringfromseconds(timex[tidx]-t0,False)))
                     if timeindex2:
                         a = aw.qmc.backgroundalpha
                     else:
@@ -2732,7 +2752,7 @@ class tgraphcanvas(FigureCanvas):
                         ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[3]],stemp[tidx],d)
                     else:
                         ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0,False)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs %1", None),u(self.stringfromseconds(timex[tidx]-t0,False)))
                     if timeindex2:
                         a = aw.qmc.backgroundalpha
                     else:
@@ -2746,7 +2766,7 @@ class tgraphcanvas(FigureCanvas):
                 if timeindex[5]:
                     tidx = timeindex[5]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[4]],stemp[tidx],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0,False)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe %1", None),u(self.stringfromseconds(timex[tidx]-t0,False)))
                     if timeindex2:
                         a = aw.qmc.backgroundalpha
                     else:
@@ -2775,7 +2795,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         tx = t0idx
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP %1", None, QApplication.UnicodeUTF8),str(self.stringfromseconds(timex[tidx]-t0,False)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP %1", None),str(self.stringfromseconds(timex[tidx]-t0,False)))
                     if timeindex2:
                         a = aw.qmc.backgroundalpha
                     else:
@@ -2802,7 +2822,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " place_annotations() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() %1").arg(str(e)),exc_tb.tb_lineno)
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
@@ -2855,8 +2875,12 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.suptitle("")
             else:
                 self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
-                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
-                self.ax.set_title(aw.arabicReshape(self.title), color=self.palette["title"],
+                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
+                if self.roastbatchnr == 0:
+                    title = self.title
+                else:
+                    title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + self.title
+                self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                     fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
             
             two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag)))
@@ -2873,11 +2897,15 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.flagstart:
                     self.fig.suptitle("")
                 else:
+                    if self.roastbatchnrB == 0:
+                        titleB = self.titleB
+                    else:
+                        titleB = self.roastbatchprefixB + u(self.roastbatchnrB) + u(" ") + self.titleB
                     if self.title == None or u(self.title).strip() == "":
-                        self.fig.suptitle(aw.qmc.abbrevString(self.titleB,stl),
+                        self.fig.suptitle(aw.qmc.abbrevString(titleB,stl),
                             horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
                     else:
-                        self.fig.suptitle("\n" + aw.qmc.abbrevString(self.titleB,stl),
+                        self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
                             horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
             
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
@@ -2908,7 +2936,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.flagstart:
                     self.delta_ax.set_ylabel("")
                 else:
-                    self.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None, QApplication.UnicodeUTF8)),color = self.palette["ylabel"],fontproperties=fontprop_large)
+                    self.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)),color = self.palette["ylabel"],fontproperties=fontprop_large)
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                 self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -3032,17 +3060,17 @@ class tgraphcanvas(FigureCanvas):
                         self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                     sketch_params=None,path_effects=[],
                                                     linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
-                                                    alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None, QApplication.UnicodeUTF8)))                                    
+                                                    alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None)))                                    
 
                 #draw background
                 self.l_back1, = self.ax.plot(self.timeB, self.stemp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
                                             sketch_params=None,path_effects=[],
                                             linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
-                                            alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None, QApplication.UnicodeUTF8)))
+                                            alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None)))
                 self.l_back2, = self.ax.plot(self.timeB, self.stemp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker, 
                                             linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
                                             sketch_params=None,path_effects=[],
-                                            alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
+                                            alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None)))
 
                 #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
                 if self.DeltaETBflag or self.DeltaBTBflag:
@@ -3086,11 +3114,11 @@ class tgraphcanvas(FigureCanvas):
                     if self.DeltaETBflag:
                         self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,
                         sketch_params=None,path_effects=[],
-                        marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None, QApplication.UnicodeUTF8)))
+                        marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None)))
                     if self.DeltaBTBflag:
                         self.l_delta2B, = self.delta_ax.plot(self.timeB, self.delta2B,markersize=self.BTBdeltamarkersize,
                         sketch_params=None,path_effects=[],
-                        marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None, QApplication.UnicodeUTF8)))
+                        marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
 
                 #check backgroundevents flag
                 if self.backgroundeventsflag:
@@ -3409,45 +3437,45 @@ class tgraphcanvas(FigureCanvas):
                 if self.DeltaETflag: 
                     self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))                    
+                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
                 if self.DeltaBTflag:
                     self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+                    linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
 
             ##### ET,BT curves
             if aw.qmc.ETcurve:
                 if aw.qmc.flagon:
                     self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
                 else:
                     self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
             if aw.qmc.BTcurve:
                 if aw.qmc.flagon:
                     self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
                 else:
                     self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
 
             if aw.qmc.ETcurve:
                 handles.append(self.l_temp1)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None)))
             if aw.qmc.BTcurve:
                 handles.append(self.l_temp2)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None)))
 
             if self.DeltaETflag: 
                 handles.append(self.l_delta1)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))
             if self.DeltaBTflag:
                 handles.append(self.l_delta2)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
 
 
             nrdevices = len(self.extradevices)
@@ -3550,7 +3578,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()    
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " redraw() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -3591,7 +3619,7 @@ class tgraphcanvas(FigureCanvas):
         timeparts = string.split(":")
         if len(timeparts) != 2:
             if errormsg:
-                aw.sendmessage(QApplication.translate("Message","Time format error encountered", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","Time format error encountered", None))
             return -1
         else:
             if timeparts[0][0] != "-":  #if number is positive
@@ -3696,8 +3724,8 @@ class tgraphcanvas(FigureCanvas):
         profilelength = len(self.timex)
         if profilelength > 0:
             if t == "F":
-                string = QApplication.translate("Message", "Convert profile data to Fahrenheit?",None, QApplication.UnicodeUTF8)
-                reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None, QApplication.UnicodeUTF8),string,
+                string = QApplication.translate("Message", "Convert profile data to Fahrenheit?",None)
+                reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None),string,
                         QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Cancel:
                     return 
@@ -3735,17 +3763,17 @@ class tgraphcanvas(FigureCanvas):
                             self.temp2B[i] = self.fromCtoF(self.temp2B[i])
 
                         self.fahrenheitMode()
-                        aw.sendmessage(QApplication.translate("Message","Profile changed to Fahrenheit", None, QApplication.UnicodeUTF8))
+                        aw.sendmessage(QApplication.translate("Message","Profile changed to Fahrenheit", None))
 
                     else:
-                        QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Temperature",None, QApplication.UnicodeUTF8),
-                                                QApplication.translate("Message", "Unable to comply. You already are in Fahrenheit", None, QApplication.UnicodeUTF8))
-                        aw.sendmessage(QApplication.translate("Message","Profile not changed", None, QApplication.UnicodeUTF8))
+                        QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Temperature",None),
+                                                QApplication.translate("Message", "Unable to comply. You already are in Fahrenheit", None))
+                        aw.sendmessage(QApplication.translate("Message","Profile not changed", None))
                         return
 
             elif t == "C":
-                string = QApplication.translate("Message", "Convert profile data to Celsius?",None, QApplication.UnicodeUTF8)
-                reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None, QApplication.UnicodeUTF8),string,
+                string = QApplication.translate("Message", "Convert profile data to Celsius?",None)
+                reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None),string,
                         QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Cancel:
                     return 
@@ -3777,19 +3805,19 @@ class tgraphcanvas(FigureCanvas):
                             self.temp2B[i] = self.fromFtoC(self.temp2B[i]) #BT B
 
                     else:
-                        QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Temperature",None, QApplication.UnicodeUTF8),
-                                                QApplication.translate("Message", "Unable to comply. You already are in Celsius",None, QApplication.UnicodeUTF8))
-                        aw.sendmessage(QApplication.translate("Message","Profile not changed", None, QApplication.UnicodeUTF8))
+                        QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Temperature",None),
+                                                QApplication.translate("Message", "Unable to comply. You already are in Celsius",None))
+                        aw.sendmessage(QApplication.translate("Message","Profile not changed", None))
                         return
 
                     self.celsiusMode()
-                    aw.sendmessage(QApplication.translate("Message","Profile changed to Celsius", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","Profile changed to Celsius", None))
 
             self.redraw(recomputeAllDeltas=True,smooth=True)
 
         else:
-            QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Scale",None, QApplication.UnicodeUTF8),
-                                          QApplication.translate("Message", "No profile data found",None, QApplication.UnicodeUTF8))
+            QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Scale",None),
+                                          QApplication.translate("Message", "No profile data found",None))
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
     def changeGColor(self,color):
@@ -3805,12 +3833,12 @@ class tgraphcanvas(FigureCanvas):
 
         #load selected dictionary
         if color == 1:
-            aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
             for key in list(palette1.keys()):
                 self.palette[key] = palette1[key]
             
         if color == 2:
-            aw.sendmessage(QApplication.translate("Message","Colors set to grey", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Colors set to grey", None))
             for key in list(palette1.keys()):
                 self.palette[key] = palette2[key]
                 
@@ -3973,13 +4001,13 @@ class tgraphcanvas(FigureCanvas):
             self.timeclock.start()   #set time to the current computer time
             self.flagon = True
             if self.designerflag: return
-            aw.sendmessage(QApplication.translate("Message","Scope monitoring...", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Scope monitoring...", None))
             #disable RESET button:
             aw.button_7.setEnabled(False)
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])
-            aw.button_1.setText(QApplication.translate("Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
-            aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None, QApplication.UnicodeUTF8))
+            aw.button_1.setText(QApplication.translate("Button", "OFF",None)) # text means click to turn OFF (it is ON)
+            aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None))
             aw.button_2.setEnabled(True) # ensure that the START button is enabled
             aw.showLCDs()
             aw.showSliders()
@@ -3993,7 +4021,7 @@ class tgraphcanvas(FigureCanvas):
             self.StartAsyncSamplingAction()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def OffMonitor(self):
         try:
@@ -4016,9 +4044,9 @@ class tgraphcanvas(FigureCanvas):
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.button_7.setEnabled(True)
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
-            aw.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None, QApplication.UnicodeUTF8))
-            aw.sendmessage(QApplication.translate("Message","Scope stopped", None, QApplication.UnicodeUTF8))
-            aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
+            aw.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None))
+            aw.sendmessage(QApplication.translate("Message","Scope stopped", None))
+            aw.button_1.setText(QApplication.translate("Button", "ON",None)) # text means click to turn OFF (it is ON)
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
             aw.hideLCDs()
             # switch off Hottop Control
@@ -4048,7 +4076,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     # close serial port, Phidgets and Yocto ports
     def disconnectProbesFromSerialDevice(self,ser):
@@ -4126,13 +4154,15 @@ class tgraphcanvas(FigureCanvas):
             if not self.flagon:
                 self.OnMonitor()
             self.flagstart = True
+            aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
+            aw.qmc.roastbatchpos = 0 # initialized to 0, set to increased batchsequence on DROP
             aw.qmc.fig.suptitle("")
             aw.qmc.updateDeltaSamples()
             aw.disableSaveActions()
-            aw.sendmessage(QApplication.translate("Message","Scope recording...", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Scope recording...", None))
             aw.button_2.setEnabled(False)
             aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
-            aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None, QApplication.UnicodeUTF8))
+            aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None))
             aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
             #disable RESET button:
             aw.button_7.setEnabled(False)
@@ -4152,7 +4182,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.delta_ax.set_ylabel("")
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def OffRecorder(self):
         try:
@@ -4170,8 +4200,8 @@ class tgraphcanvas(FigureCanvas):
             #prevents accidentally deleting a modified profile.
             if len(self.timex) > 2:
                 self.safesaveflag = True
-            aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None, QApplication.UnicodeUTF8))
-            aw.button_2.setText(QApplication.translate("Button", "START",None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None))
+            aw.button_2.setText(QApplication.translate("Button", "START",None))
             aw.lowerbuttondialog.setVisible(False)
             aw.phasesLCDs.hide()
             aw.hideEventsMinieditor()
@@ -4179,7 +4209,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.automaticsave()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #Turns START/STOP flag self.flagon to read and plot. Called from push button_2.
     def ToggleRecorder(self):
@@ -4220,12 +4250,12 @@ class tgraphcanvas(FigureCanvas):
                             if len(self.timex) > 0:
                                 self.timeindex[0] = len(self.timex)-1
                             else:
-                                message = QApplication.translate("Message","Not enough variables collected yet. Try again in a few seconds", None, QApplication.UnicodeUTF8)
+                                message = QApplication.translate("Message","Not enough variables collected yet. Try again in a few seconds", None)
                         if self.device == 19 and aw.arduino.pidOnCHARGE and not aw.arduino.pidActive: # Arduino/TC4
                             aw.arduino.pidOn()
                     self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE 00:00", None, QApplication.UnicodeUTF8))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE 00:00", None))
                     t2 = self.temp2[self.timeindex[0]]
                     tx = self.timex[self.timeindex[0]]
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
@@ -4249,11 +4279,11 @@ class tgraphcanvas(FigureCanvas):
                 except:
                     pass
             else:
-                message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markCharge() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCharge() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4274,7 +4304,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     fmt = "%.0f"
                 bt = fmt%self.temp2[self.timeindex[0]] + aw.qmc.mode
-                message = QApplication.translate("Message","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(bt)
+                message = QApplication.translate("Message","Roast time starts now 00:00 BT = %1",None).arg(bt)
                 aw.sendmessage(message) 
             except:
                 pass
@@ -4286,7 +4316,7 @@ class tgraphcanvas(FigureCanvas):
             if self.flagstart and self.markTPflag:
                 if aw.qmc.TPalarmtimeindex and self.timeindex[0] != -1 and len(self.timex) > aw.qmc.TPalarmtimeindex:
                     st = self.stringfromseconds(self.timex[aw.qmc.TPalarmtimeindex]-self.timex[self.timeindex[0]])
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP %1", None, QApplication.UnicodeUTF8).arg(st))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP %1", None).arg(st))
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
@@ -4294,12 +4324,12 @@ class tgraphcanvas(FigureCanvas):
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
                     st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
-                    message = QApplication.translate("Message","[TP] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st).arg(st2)
+                    message = QApplication.translate("Message","[TP] recorded at %1 BT = %2", None).arg(st).arg(st2)
                     #set message at bottom
                     aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markTP() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markTP() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -4325,7 +4355,7 @@ class tgraphcanvas(FigureCanvas):
                         self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
                     #calculate time elapsed since charge time
                     st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(st))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE %1", None).arg(st))
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
@@ -4334,11 +4364,11 @@ class tgraphcanvas(FigureCanvas):
                     self.updateBackground() # but we need
 
             else:
-                message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markDryEnd() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDryEnd() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4355,7 +4385,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
-            message = QApplication.translate("Message","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st).arg(st2)
+            message = QApplication.translate("Message","[DRY END] recorded at %1 BT = %2", None).arg(st).arg(st2)
             #set message at bottom
             aw.sendmessage(message)
 
@@ -4381,7 +4411,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.phasesbuttonflag:
                         self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
                     #calculate time elapsed since charge time
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs %1", None).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     if self.timeindex[1]:
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
@@ -4391,11 +4421,11 @@ class tgraphcanvas(FigureCanvas):
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
             else:
-                message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark1Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4418,7 +4448,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
-            message = QApplication.translate("Message","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            message = QApplication.translate("Message","[FC START] recorded at %1 BT = %2", None).arg(st1).arg(st2)
             aw.sendmessage(message)            
             
 
@@ -4441,18 +4471,18 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             return
                     #calculate time elapsed since charge time
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe %1", None).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                     self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
             else:
-                message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark1Cend() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark1Cend() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4473,7 +4503,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
-            message = QApplication.translate("Message","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            message = QApplication.translate("Message","[FC END] recorded at %1 BT = %2", None).arg(st1).arg(st2)
             aw.sendmessage(message)
 
     #record 2C start markers of BT. Called from button_5 of application window
@@ -4494,7 +4524,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[4] = len(self.timex)-1
                         else:
                             return
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs %1", None).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     if self.timeindex[3]:
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
@@ -4504,11 +4534,11 @@ class tgraphcanvas(FigureCanvas):
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
             else:
-                message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark2Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4531,7 +4561,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
-            message = QApplication.translate("Message","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            message = QApplication.translate("Message","[SC START] recorded at %1 BT = %2", None).arg(st1).arg(st2)
             aw.sendmessage(message)
 
     #record 2C end markers of BT. Called from button_6  of application window
@@ -4552,18 +4582,18 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[5] = len(self.timex)-1
                         else:
                             return
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe %1", None).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                     self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
             else:
-                message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark2Cend() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " mark2Cend() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)  
@@ -4588,7 +4618,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
-            message = QApplication.translate("Message","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            message = QApplication.translate("Message","[SC END] recorded at %1 BT = %2", None).arg(st1).arg(st2)
             aw.sendmessage(message)
 
     #record end of roast (drop of beans). Called from push button 'Drop'
@@ -4598,6 +4628,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
                 if len(self.timex) > 0:
+                    self.incBatchCounter()
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.safesaveflag = True
@@ -4613,7 +4644,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[6] = len(self.timex)-1
                         else:
                             return
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP %1", None).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     if self.timeindex[5]:
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
@@ -4635,11 +4666,11 @@ class tgraphcanvas(FigureCanvas):
                     except:
                         pass
             else:
-                message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markDrop() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markDrop() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if takeLock and aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4669,9 +4700,45 @@ class tgraphcanvas(FigureCanvas):
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
-            message = QApplication.translate("Message","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            message = QApplication.translate("Message","Roast ended at %1 BT = %2", None).arg(st1).arg(st2)
             aw.sendmessage(message)
 
+    def incBatchCounter(self):
+        if aw.qmc.batchcounter > -1:
+            aw.qmc.batchcounter += 1 # we increase the batch counter
+            # set the batchcounter of the current profile
+            aw.qmc.roastbatchnr = aw.qmc.batchcounter
+            # set the batchprefix of the current profile
+            aw.qmc.roastbatchprefix = aw.qmc.batchprefix
+            # incr. the batchcounter of the loaded app settings
+            if aw.settingspath and aw.settingspath != "":
+                try:
+                    settings = QSettings(aw.settingspath,QSettings.IniFormat)
+                    settings.beginGroup("Batch")
+                    if settings.contains("batchcounter"):
+                        bc = settings.value("batchcounter",aw.qmc.batchcounter).toInt()[0]
+                        if bc > -1:
+                            settings.setValue("batchcounter",bc + 1)
+                    settings.endGroup()
+                except:
+                    aw.settingspath = u("")
+            # update batchsequence by estimating batch sequence (roastbatchpos) from lastroastepoch and roastepoch
+            # if this roasts DROP is more than 1.5h after the last registered DROP, we assume a new session starts
+            if aw.qmc.lastroastepoch + 5400 < aw.qmc.roastepoch:
+                # reset the sequence counter
+                aw.qmc.batchsequence = 0
+            else:
+                aw.qmc.batchsequence += 1
+            # set roastbatchpos
+            aw.qmc.roastbatchpos = aw.qmc.batchsequence
+        else: # batch counter system inactive
+            # set the batchcounter of the current profile
+            aw.qmc.batchsequence = 0
+            aw.qmc.roastbatchnr = 0
+            aw.qmc.roastbatchpos = 0
+        # update lastroastepoch to time of roastdate
+        aw.qmc.lastroastepoch = aw.qmc.roastepoch
+        
     def markCoolEnd(self):
         try:
             aw.qmc.samplingsemaphore.acquire(1)
@@ -4690,7 +4757,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             return
                     #calculate time elapsed since charge time
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE %1", None).arg(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])))
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
@@ -4698,11 +4765,11 @@ class tgraphcanvas(FigureCanvas):
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
             else:
-                message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markCoolEnd() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " markCoolEnd() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4731,7 +4798,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
-            message = QApplication.translate("Message","[COOL END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            message = QApplication.translate("Message","[COOL END] recorded at %1 BT = %2", None).arg(st1).arg(st2)
             #set message at bottom
             aw.sendmessage(message)
 
@@ -4747,7 +4814,7 @@ class tgraphcanvas(FigureCanvas):
                 self.EventRecordAction(extraevent=extraevent)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " EventRecord() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " EventRecord() %1").arg(str(e)),exc_tb.tb_lineno)
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
@@ -4850,11 +4917,11 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             start = 0
                         timed = self.stringfromseconds(self.timex[i] - start)
-                        message = QApplication.translate("Message","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
+                        message = QApplication.translate("Message","Event # %1 recorded at BT = %2 Time = %3", None).arg(str(Nevents+1)).arg(temp).arg(timed)
                         aw.sendmessage(message)
                         #write label in mini recorder if flag checked
                         if aw.minieventsflag:
-                            aw.eventlabel.setText(QApplication.translate("Label", "Event #<b>%1 </b>",None, QApplication.UnicodeUTF8).arg(Nevents+1))
+                            aw.eventlabel.setText(QApplication.translate("Label", "Event #<b>%1 </b>",None).arg(Nevents+1))
                             aw.eNumberSpinBox.blockSignals(True)
                             aw.eNumberSpinBox.setValue(Nevents+1)
                             aw.eNumberSpinBox.blockSignals(False)
@@ -4865,12 +4932,12 @@ class tgraphcanvas(FigureCanvas):
                             aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents]))
                             aw.lineEvent.setText(self.specialeventsStrings[Nevents])
             else:
-                aw.sendmessage(QApplication.translate("Message","Timer is OFF", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","Timer is OFF", None))
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " EventRecordAction() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " EventRecordAction() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if takeLock and aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4897,7 +4964,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     timed = self.stringfromseconds(self.timex[i]-start)
-                    message = QApplication.translate("Message","Computer Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
+                    message = QApplication.translate("Message","Computer Event # %1 recorded at BT = %2 Time = %3", None).arg(str(Nevents+1)).arg(temp).arg(timed)
                     aw.sendmessage(message)
                     #write label in mini recorder if flag checked
                     if aw.minieventsflag:
@@ -4955,7 +5022,7 @@ class tgraphcanvas(FigureCanvas):
                     self.updateBackground() # but we need
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " DeviceEventRecord() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " DeviceEventRecord() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4994,33 +5061,36 @@ class tgraphcanvas(FigureCanvas):
                 
                     #end temperature
                     if locale == "ar":
-                        strline = QString("[%4-%5]%3=" + aw.arabicReshape(QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8)) \
-                                    + " " + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min", None,QApplication.UnicodeUTF8)) \
-                                    + "%2=" + aw.arabicReshape(QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8)) \
-                                    + " %1=" + aw.arabicReshape(QApplication.translate("Label", "MET", None,QApplication.UnicodeUTF8))) \
+                        strline = QString("[%4-%5]%3=" + aw.arabicReshape(QApplication.translate("Label", "ETBTa", None)) \
+                                    + " " + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min", None)) \
+                                    + "%2=" + aw.arabicReshape(QApplication.translate("Label", "RoR", None)) \
+                                    + " %1=" + aw.arabicReshape(QApplication.translate("Label", "MET", None))) \
                                     .arg(u(ETmax)) \
                                     .arg(u(ror)) \
                                     .arg(u("%d"%ts)) \
                                     .arg(u(int(tse))) \
                                     .arg(u(int(tsb)))
                         if det != None:
-                            strline = QString(("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None,QApplication.UnicodeUTF8) + " ") + strline
+                            strline = QString(("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None) + " ") + strline
                     else:
-                        strline = QString(QApplication.translate("Label", "MET", None,QApplication.UnicodeUTF8) + "=%1   " \
-                                    + QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8) + "=%2" \
-                                    + aw.qmc.mode + QApplication.translate("Label", "/min", None,QApplication.UnicodeUTF8) + "   " \
-                                    + QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8) + "=%3[%4-%5]") \
+                        strline = QString(QApplication.translate("Label", "MET", None) + "=%1   " \
+                                    + QApplication.translate("Label", "RoR", None) + "=%2" \
+                                    + aw.qmc.mode + QApplication.translate("Label", "/min", None) + "   " \
+                                    + QApplication.translate("Label", "ETBTa", None) + "=%3[%4-%5]") \
                                     .arg(u(ETmax)) \
                                     .arg(u(ror)) \
                                     .arg(u("%d"%ts)) \
                                     .arg(u(int(tse))) \
                                     .arg(u(int(tsb)))
                         if det != None:
-                            strline = strline + "   " + QString(QApplication.translate("Label", "CM", None,QApplication.UnicodeUTF8) + ("=%.1f/%.1f" % (det,dbt)) + self.mode)
+                            strline = strline + "   " + QString(QApplication.translate("Label", "CM", None) + ("=%.1f/%.1f" % (det,dbt)) + self.mode)
                     self.ax.set_xlabel(strline,color = aw.qmc.palette["text"],fontproperties=statsprop)
                 else:
                     sep = u"   "
-                    msg = aw.qmc.roastdate.toString(Qt.SystemLocaleShortDate)
+                    msg = aw.qmc.roastdate.date().toString(Qt.SystemLocaleShortDate)
+                    tm = u(aw.qmc.roastdate.time().toString()[:-3])
+                    if tm != "00:00":
+                        msg += ", " + tm
                     if aw.qmc.beans and aw.qmc.beans != "":
                         msg += sep + aw.qmc.abbrevString(u(aw.qmc.beans),25)
                     if aw.qmc.weight[0]:
@@ -5035,12 +5105,12 @@ class tgraphcanvas(FigureCanvas):
                         msg += sep + u"#" + str(aw.qmc.ground_color)
                     self.ax.set_xlabel(msg,color = aw.qmc.palette["text"],fontproperties=statsprop)
             else:
-                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
+                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " writecharacteristics() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writecharacteristics() %1").arg(str(ex)),exc_tb.tb_lineno)
     
 
     # Writes information about the finished profile in the graph
@@ -5059,7 +5129,7 @@ class tgraphcanvas(FigureCanvas):
             if self.timeindex[6] and self.timeindex[2]:
                 totaltime = int(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
                 if totaltime == 0:
-                    aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [DROP]", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","Statistics cancelled: need complete profile [CHARGE] + [DROP]", None))
                     return
 
                 self.statisticstimes[0] = totaltime
@@ -5165,9 +5235,9 @@ class tgraphcanvas(FigureCanvas):
                         st2 = st2 + u(" (")
                         st3 = st3 + u(" (")
                     if self.statisticsflags[4]:
-                        st1 = st1 + "%.1f"%rates_of_changes[0] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None, QApplication.UnicodeUTF8))
-                        st2 = st2 + "%.1f"%rates_of_changes[1] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None, QApplication.UnicodeUTF8))
-                        st3 = st3 + "%.1f"%rates_of_changes[2] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None, QApplication.UnicodeUTF8))
+                        st1 = st1 + "%.1f"%rates_of_changes[0] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None))
+                        st2 = st2 + "%.1f"%rates_of_changes[1] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None))
+                        st3 = st3 + "%.1f"%rates_of_changes[2] + aw.arabicReshape(aw.qmc.mode + QApplication.translate("Label", "/min",None))
                     if self.statisticsflags[5]:
                         if self.statisticsflags[4]:
                             st1 += u("  ")
@@ -5203,7 +5273,7 @@ class tgraphcanvas(FigureCanvas):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " writestatistics() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " writestatistics() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #used in EventRecord()
     def restorebutton_11(self):
@@ -5242,7 +5312,7 @@ class tgraphcanvas(FigureCanvas):
                     self.temp1B[i] -= step
                     self.temp2B[i] -= step
         else:
-            aw.sendmessage(QApplication.translate("Message","Unable to move background", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Unable to move background", None))
             return
 
     #points are used to draw interpolation
@@ -5301,7 +5371,7 @@ class tgraphcanvas(FigureCanvas):
             return Xpoints,Ypoints
 
         else:
-            aw.sendmessage(QApplication.translate("Message","No finished profile found", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","No finished profile found", None))
             return [],[]
 
     #collects info about the univariate interpolation
@@ -5320,28 +5390,28 @@ class tgraphcanvas(FigureCanvas):
             #spline=[ans[0,i]+(x-xi)*(ans[1,i]+(x-xi)*(ans[2,i]+(x-xi)*ans[3,i]/3)/2) for i,xi in enumerate(a[:-1])]
             
             string = "<b>" + u(QApplication.translate("Message","Polynomial coefficients (Horner form):",
-                                                    None, QApplication.UnicodeUTF8)) + "</b><br><br>"
+                                                    None)) + "</b><br><br>"
             string += str(coeffs) + "<br><br>"
             string += "<b>" + u(QApplication.translate("Message","Knots:",
-                                                     None, QApplication.UnicodeUTF8)) + "</b><br><br>"
+                                                     None)) + "</b><br><br>"
             string += str(knots) + "<br><br>"
             string += "<b>" + u(QApplication.translate("Message","Residual:",
-                                                     None, QApplication.UnicodeUTF8)) + "</b><br><br>"
+                                                     None)) + "</b><br><br>"
             string += str(resid) + "<br><br>"      
             string += "<b>" + u(QApplication.translate("Message","Roots:",
-                                                     None, QApplication.UnicodeUTF8)) + "</b><br><br>"
+                                                     None)) + "</b><br><br>"
             string += str(roots)
 
-            QMessageBox.information(self,QApplication.translate("Message","Profile information",None, QApplication.UnicodeUTF8),string)
+            QMessageBox.information(self,QApplication.translate("Message","Profile information",None),string)
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " univariateinfo() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None) + " univariateinfo() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " univariateinfo() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " univariateinfo() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
     def polyfit(self,xarray,yarray,deg,startindex,endindex,deltacurvep):
@@ -5383,14 +5453,14 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
 
         except ValueError:
-            aw.qmc.adderror(QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " univariate()")
+            aw.qmc.adderror(QApplication.translate("Error Message","Value Error:",None) + " univariate()")
             return
 
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " univariate() " + str(e),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " univariate() " + str(e),exc_tb.tb_lineno)
             return
 
     def drawinterp(self,mode):
@@ -5407,12 +5477,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " drawinterp() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None) + " drawinterp() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " drawinterp() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " drawinterp() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
     def timearray2index(self,timearray,seconds):
@@ -5493,8 +5563,8 @@ class tgraphcanvas(FigureCanvas):
             self.togglecrosslines()
 
         if len(self.timex):
-            reply = QMessageBox.question(self,QApplication.translate("Message","Designer Start",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("Message","Importing a profile in to Designer will decimate all data except the main [points].\nContinue?",None, QApplication.UnicodeUTF8),
+            reply = QMessageBox.question(self,QApplication.translate("Message","Designer Start",None),
+                                         QApplication.translate("Message","Importing a profile in to Designer will decimate all data except the main [points].\nContinue?",None),
                                          QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
                 self.initfromprofile()
@@ -5537,8 +5607,8 @@ class tgraphcanvas(FigureCanvas):
     #loads main points from a profile so that they can be edited
     def initfromprofile(self):
         if self.timeindex[0] == -1 or self.timeindex[6] == 0:
-            QMessageBox.information(self,QApplication.translate("Message","Designer Init",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Message","Unable to start designer.\nProfile missing [CHARGE] or [DROP]",None, QApplication.UnicodeUTF8))
+            QMessageBox.information(self,QApplication.translate("Message","Designer Init",None),
+                                    QApplication.translate("Message","Unable to start designer.\nProfile missing [CHARGE] or [DROP]",None))
             self.disconnect_designer()
             return()
 
@@ -5641,11 +5711,11 @@ class tgraphcanvas(FigureCanvas):
             if self.ETcurve:
                 self.ax.plot(timez, etvals,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,
                     linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],
-                        label=u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                        label=u(QApplication.translate("Label", "ET", None)))
             if self.BTcurve:
                 self.ax.plot(timez, btvals, markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,
                     linestyle=self.BTlinestyle,drawstyle=self.BTlinestyle,color=self.palette["bt"],
-                        label=u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                        label=u(QApplication.translate("Label", "BT", None)))
                         
                         
             if self.DeltaBTflag:
@@ -5654,7 +5724,7 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax.plot(timez,deltabtvals,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],
-                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
                     
             if self.DeltaETflag:
                 funcDelta2 = func2.derivative()
@@ -5662,7 +5732,7 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax.plot(timez,deltaetvals,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                     linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],
-                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))                          
+                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                          
         
             #plot
             self.fig.canvas.draw()
@@ -5685,11 +5755,11 @@ class tgraphcanvas(FigureCanvas):
 
         designermenu = QMenu(self)
 
-        createAction = QAction(QApplication.translate("Contextual Menu", "Create",None, QApplication.UnicodeUTF8),self)
+        createAction = QAction(QApplication.translate("Contextual Menu", "Create",None),self)
         self.connect(createAction,SIGNAL("triggered()"),self.convert_designer)
         designermenu.addAction(createAction)
 
-        configAction = QAction(QApplication.translate("Contextual Menu", "Config...",None, QApplication.UnicodeUTF8),self)
+        configAction = QAction(QApplication.translate("Contextual Menu", "Config...",None),self)
         self.connect(configAction,SIGNAL("triggered()"),self.desconfig)
         designermenu.addAction(configAction)
 
@@ -5699,21 +5769,21 @@ class tgraphcanvas(FigureCanvas):
 
         designermenu.addSeparator()
 
-        addpointAction = QAction(QApplication.translate("Contextual Menu", "Add point",None, QApplication.UnicodeUTF8),self)
+        addpointAction = QAction(QApplication.translate("Contextual Menu", "Add point",None),self)
         self.connect(addpointAction,SIGNAL("triggered()"),self.addpoint)
         designermenu.addAction(addpointAction)
 
-        removepointAction = QAction(QApplication.translate("Contextual Menu", "Remove point",None, QApplication.UnicodeUTF8),self)
+        removepointAction = QAction(QApplication.translate("Contextual Menu", "Remove point",None),self)
         self.connect(removepointAction,SIGNAL("triggered()"),self.removepoint)
         designermenu.addAction(removepointAction)
 
         designermenu.addSeparator()
 
-        resetAction = QAction(QApplication.translate("Contextual Menu", "Reset Designer",None, QApplication.UnicodeUTF8),self)
+        resetAction = QAction(QApplication.translate("Contextual Menu", "Reset Designer",None),self)
         self.connect(resetAction,SIGNAL("triggered()"),self.reset_designer)
         designermenu.addAction(resetAction)
 
-        exitAction = QAction(QApplication.translate("Contextual Menu", "Exit Designer",None, QApplication.UnicodeUTF8),self)
+        exitAction = QAction(QApplication.translate("Contextual Menu", "Exit Designer",None),self)
         self.connect(exitAction,SIGNAL("triggered()"),aw.stopdesigner)
         designermenu.addAction(exitAction)
 
@@ -5792,25 +5862,25 @@ class tgraphcanvas(FigureCanvas):
                             index = self.timeindex.index(i)
                             if index == 0:
                                 timez = self.stringfromseconds(0)
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + u(QApplication.translate("Message", "[ CHARGE ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + u(QApplication.translate("Message", "[ CHARGE ]",None)) + "</font> " + timez)
                             elif index == 1:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ DRY END ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ DRY END ]",None)) + "</font> " + timez)
                             elif index == 2:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ FC START ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ FC START ]",None)) + "</font> " + timez)
                             elif index == 3:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ FC END ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ FC END ]",None)) + "</font> " + timez)
                             elif index == 4:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ SC START ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ SC START ]",None)) + "</font> " + timez)
                             elif index == 5:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ SC END ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ SC END ]",None)) + "</font> " + timez)
                             elif index == 6:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + u(QApplication.translate("Message", "[ DROP ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + u(QApplication.translate("Message", "[ DROP ]",None)) + "</font> " + timez)
                             break
                         else:
                             if abs(self.temp2[i] - ydata) < 10:
@@ -5874,7 +5944,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " on_motion() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " on_motion() %1").arg(str(e)),exc_tb.tb_lineno)
             self.unrarefy_designer()
             return
 
@@ -5957,7 +6027,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " addpoint() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addpoint() %1").arg(str(e)),exc_tb.tb_lineno)
             return 
 
     #removes point
@@ -5993,7 +6063,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " removepoint() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " removepoint() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
     #finds a proper index location for a time that does not exists yet.
@@ -6073,16 +6143,16 @@ class tgraphcanvas(FigureCanvas):
                 functioncall[self.reproducedesigner]()
 
             self.redraw()
-            aw.sendmessage(QApplication.translate("Message", "New profile created",None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message", "New profile created",None))
 
         except ValueError:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error:",None, QApplication.UnicodeUTF8) + " createFromDesigner()",exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error:",None) + " createFromDesigner()",exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " createFromDesigner() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createFromDesigner() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
     #activates mouse events
@@ -6132,7 +6202,7 @@ class tgraphcanvas(FigureCanvas):
                 difftemp = self.temp2[self.timeindex[i]] - self.temp2[self.timeindex[lastindexused]]
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = u(QApplication.translate("Label", "BT %1 %2/min for %3",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(aw.qmc.mode).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
+                    string = u(QApplication.translate("Label", "BT %1 %2/min for %3",None).arg("%.1f"%(difftemp/difftime)).arg(aw.qmc.mode).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
                     self.specialevents.append(self.timeindex[lastindexused])
                     self.specialeventstype.append(0)
                     self.specialeventsStrings.append(string)
@@ -6148,7 +6218,7 @@ class tgraphcanvas(FigureCanvas):
                 difftemp = self.temp1[self.timeindex[i]] - self.temp1[self.timeindex[lastindexused]]
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = u(QApplication.translate("Label", "ET %1 %2/min for %3",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(aw.qmc.mode).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
+                    string = u(QApplication.translate("Label", "ET %1 %2/min for %3",None).arg("%.1f"%(difftemp/difftime)).arg(aw.qmc.mode).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
                     self.specialevents.append(self.timeindex[lastindexused])
                     self.specialeventstype.append(0)
                     self.specialeventsStrings.append(string)
@@ -6250,7 +6320,7 @@ class tgraphcanvas(FigureCanvas):
         string = "Wheels" + "\\" + path
         direct = QDir()
         pathDir = direct.toNativeSeparators(QString(string))
-        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Open Wheel Graph",None, QApplication.UnicodeUTF8),path=pathDir,ext="*.wg")
+        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Open Wheel Graph",None),path=pathDir,ext="*.wg")
         if filename:
             self.connectWheel()
             aw.loadWheel(filename)
@@ -6259,13 +6329,13 @@ class tgraphcanvas(FigureCanvas):
     def addTocuppingnotes(self):
         descriptor =  u(self.wheelnames[self.wheelx][self.wheelz]) 
         self.cuppingnotes += "\n" + descriptor 
-        string = u(QApplication.translate("Message", " added to cupping notes",None, QApplication.UnicodeUTF8))
+        string = u(QApplication.translate("Message", " added to cupping notes",None))
         aw.sendmessage(descriptor + string)
 
     def addToroastingnotes(self):
         descriptor =  u(self.wheelnames[self.wheelx][self.wheelz]) + " "
         self.roastingnotes +=  "\n" + descriptor + " "
-        string = u(QApplication.translate("Message", " added to roasting notes",None, QApplication.UnicodeUTF8))
+        string = u(QApplication.translate("Message", " added to roasting notes",None))
         aw.sendmessage(descriptor + string)
 
     def wheel_pick(self,event):
@@ -6297,23 +6367,23 @@ class tgraphcanvas(FigureCanvas):
 
         elif event.button == 3:                  #if right click
             designermenu = QMenu(self)
-            cuppingAction = QAction(QApplication.translate("Contextual Menu", "Add to Cupping Notes",None, QApplication.UnicodeUTF8),self)
+            cuppingAction = QAction(QApplication.translate("Contextual Menu", "Add to Cupping Notes",None),self)
             self.connect(cuppingAction,SIGNAL("triggered()"),self.addTocuppingnotes)
             designermenu.addAction(cuppingAction)
 
-            roastingAction = QAction(QApplication.translate("Contextual Menu", "Add to Roasting Notes",None, QApplication.UnicodeUTF8),self)
+            roastingAction = QAction(QApplication.translate("Contextual Menu", "Add to Roasting Notes",None),self)
             self.connect(roastingAction,SIGNAL("triggered()"),self.addToroastingnotes)
             designermenu.addAction(roastingAction)
 
-            cancelwheelAction = QAction(QApplication.translate("Contextual Menu", "Cancel selection",None, QApplication.UnicodeUTF8),self)
+            cancelwheelAction = QAction(QApplication.translate("Contextual Menu", "Cancel selection",None),self)
             self.connect(cancelwheelAction,SIGNAL("triggered()"),self.cancelwheelselection)
             designermenu.addAction(cancelwheelAction)
 
-            editAction = QAction(QApplication.translate("Contextual Menu", "Edit Mode",None, QApplication.UnicodeUTF8),self)
+            editAction = QAction(QApplication.translate("Contextual Menu", "Edit Mode",None),self)
             self.connect(editAction,SIGNAL("triggered()"),self.editmode)
             designermenu.addAction(editAction)
 
-            exitAction = QAction(QApplication.translate("Contextual Menu", "Exit",None, QApplication.UnicodeUTF8),self)
+            exitAction = QAction(QApplication.translate("Contextual Menu", "Exit",None),self)
             self.connect(exitAction,SIGNAL("triggered()"),self.exitviewmode)
             designermenu.addAction(exitAction)
 
@@ -6448,12 +6518,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None, QApplication.UnicodeUTF8) + " drawWheel() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " drawWheel() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " drawWheel() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " drawWheel() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
     def makewheelcolorpattern(self):
@@ -6532,7 +6602,7 @@ class tgraphcanvas(FigureCanvas):
             self.l_verticalcrossline = None
             self.updateBackground() # update bitlblit backgrounds
             self.crossmarker = True
-            message = QApplication.translate("Message", "Mouse Cross ON: move mouse around",None, QApplication.UnicodeUTF8)
+            message = QApplication.translate("Message", "Mouse Cross ON: move mouse around",None)
             aw.sendmessage(message)
             self.crossmouseid = self.fig.canvas.mpl_connect('motion_notify_event', self.drawcross)
         else:
@@ -6544,7 +6614,7 @@ class tgraphcanvas(FigureCanvas):
                 self.resetlines()
             self.fig.canvas.draw()
             self.updateBackground() # update bitlblit backgrounds
-            message = QApplication.translate("Message", "Mouse cross OFF",None, QApplication.UnicodeUTF8)
+            message = QApplication.translate("Message", "Mouse cross OFF",None)
             aw.sendmessage(message)
             self.fig.canvas.mpl_disconnect(self.crossmouseid)
             self.l_horizontalcrossline = None
@@ -6646,18 +6716,18 @@ class VMToolbar(NavigationToolbar):
             if aw.qmc.flagstart:
                 # temporary set the axis to get proper menu items (same code as in redraw)
                 aw.qmc.ax.set_ylabel(aw.qmc.mode)
-                aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)))
+                aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None)))
                 if two_ax_mode:
-                    aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None, QApplication.UnicodeUTF8)))
+                    aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
             for axes in allaxes:
                 title = axes.get_title()
                 ylabel = axes.get_ylabel()
                 if title:
-                    fmt = u(QApplication.translate("Label","Curves",None, QApplication.UnicodeUTF8))
+                    fmt = u(QApplication.translate("Label","Curves",None))
                     if ylabel:
                         fmt += " (%(ylabel)s)"
                 elif ylabel:
-                    fmt = u(QApplication.translate("Label","Delta Curves",None, QApplication.UnicodeUTF8)) + u(" (%(ylabel)s)")
+                    fmt = u(QApplication.translate("Label","Delta Curves",None)) + u(" (%(ylabel)s)")
                 else:
                     fmt = "%(axes_repr)s"
                 titles.append(fmt % dict(title = title,
@@ -6724,10 +6794,10 @@ class SampleThread(QThread):
 #            # c) handle outliers if it could be detected
             if wrong_reading:
 #                if wrong_reading == 1:
-#                    aw.sendmessage(QApplication.translate("Message","Overflow detected",None, QApplication.UnicodeUTF8))
+#                    aw.sendmessage(QApplication.translate("Message","Overflow detected",None))
 #                    pass
 #                elif wrong_reading == 2:
-#                    aw.sendmessage(QApplication.translate("Message","Spike detected",None, QApplication.UnicodeUTF8))
+#                    aw.sendmessage(QApplication.translate("Message","Spike detected",None))
 #                # simple repeat strategy (should alternate between repeat-previous and keep-RoR strategy
                 #m = aw.qmc.filterDropOut_replaceRoR_period
                 if len(tempx) > 0 and tempx[-1] != -1:
@@ -6755,7 +6825,7 @@ class SampleThread(QThread):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " filterDropOuts() %1").arg(str(e)),exc_tb.tb_lineno)            
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " filterDropOuts() %1").arg(str(e)),exc_tb.tb_lineno)            
             return temp
 
     def sample_main_device(self):
@@ -7257,7 +7327,7 @@ class SampleThread(QThread):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " sample() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " sample() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -7361,7 +7431,8 @@ class ApplicationWindow(QMainWindow):
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
         self.MaxRecentFiles = 20
-        self.recentFileActs = []
+        self.recentFileActs = []        
+        self.recentSettingActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         
@@ -7375,6 +7446,8 @@ class ApplicationWindow(QMainWindow):
 
         #flag to reset Qsettings
         self.resetqsettings = 0
+        #path of last loadded QSettings
+        self.settingspath = u("") # if empty string, the settingspath will be ignored, otherwise it will be used to update the batchcounter of those settings
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month file-open/save will point to profilepath
         self.profilepath = ""
@@ -7498,10 +7571,16 @@ class ApplicationWindow(QMainWindow):
         # set window title
         self.windowTitle = "Artisan %s"%str(__version__)
         self.setWindowTitle(self.windowTitle)
+        # populate recent file menu
         for i in range(self.MaxRecentFiles):
             self.recentFileActs.append(
                     QAction(self, visible=False,
                             triggered=self.openRecentFile))
+        # populate recent settings menu
+        for i in range(self.MaxRecentFiles):
+            self.recentSettingActs.append(
+                    QAction(self, visible=False,
+                            triggered=self.openRecentSetting))
 
         #records serial comm (Help menu)
         self.seriallogflag = False
@@ -7521,11 +7600,11 @@ class ApplicationWindow(QMainWindow):
         self.helpMenu = self.menuBar().addMenu(UIconst.HELP_MENU)
 
         #FILE menu
-        newRoastAction = QAction(UIconst.FILE_MENU_NEW,self)
+        self.newRoastAction = QAction(UIconst.FILE_MENU_NEW,self)
 
-        newRoastAction.setShortcut(QKeySequence.New)
-        self.connect(newRoastAction,SIGNAL("triggered()"),self.newRoast)
-        self.fileMenu.addAction(newRoastAction)
+        self.newRoastAction.setShortcut(QKeySequence.New)
+        self.connect(self.newRoastAction,SIGNAL("triggered()"),self.newRoast)
+        self.fileMenu.addAction(self.newRoastAction)
 
         self.fileLoadAction = QAction(UIconst.FILE_MENU_OPEN,self)
         self.fileLoadAction.setShortcut(QKeySequence.Open)
@@ -7539,27 +7618,27 @@ class ApplicationWindow(QMainWindow):
 
         self.importMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_IMPORT)
 
-        fileImportCSVAction = QAction(QApplication.translate("Menu", "CSV...",None, QApplication.UnicodeUTF8),self)
+        fileImportCSVAction = QAction(QApplication.translate("Menu", "CSV...",None),self)
         self.connect(fileImportCSVAction,SIGNAL("triggered()"),self.fileImportCSV)
         self.importMenu.addAction(fileImportCSVAction)
 
-        fileImportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None, QApplication.UnicodeUTF8),self)
+        fileImportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None),self)
         self.connect(fileImportJSONAction,SIGNAL("triggered()"),self.fileImportJSON)
         self.importMenu.addAction(fileImportJSONAction)
 
-        fileImportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None, QApplication.UnicodeUTF8),self)
+        fileImportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
         self.connect(fileImportRoastLoggerAction,SIGNAL("triggered()"),self.fileImportRoastLogger)
         self.importMenu.addAction(fileImportRoastLoggerAction)
 
-        importHH506RAAction = QAction(QApplication.translate("Menu", "HH506RA...",None, QApplication.UnicodeUTF8),self)
+        importHH506RAAction = QAction(QApplication.translate("Menu", "HH506RA...",None),self)
         self.connect(importHH506RAAction,SIGNAL("triggered()"),self.importHH506RA)
         self.importMenu.addAction(importHH506RAAction)
 
-        importK202Action = QAction(QApplication.translate("Menu", "K202...",None, QApplication.UnicodeUTF8),self)
+        importK202Action = QAction(QApplication.translate("Menu", "K202...",None),self)
         self.connect(importK202Action,SIGNAL("triggered()"),self.importK202)
         self.importMenu.addAction(importK202Action)
 
-        importK204Action = QAction(QApplication.translate("Menu", "K204...",None, QApplication.UnicodeUTF8),self)
+        importK204Action = QAction(QApplication.translate("Menu", "K204...",None),self)
         self.connect(importK204Action,SIGNAL("triggered()"),self.importK204)
         self.importMenu.addAction(importK204Action)
 
@@ -7578,15 +7657,15 @@ class ApplicationWindow(QMainWindow):
 
         self.exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_EXPORT)
 
-        fileExportCSVAction = QAction(QApplication.translate("Menu", "CSV...",None, QApplication.UnicodeUTF8),self)
+        fileExportCSVAction = QAction(QApplication.translate("Menu", "CSV...",None),self)
         self.connect(fileExportCSVAction,SIGNAL("triggered()"),self.fileExportCSV)
         self.exportMenu.addAction(fileExportCSVAction)
 
-        fileExportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None, QApplication.UnicodeUTF8),self)
+        fileExportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None),self)
         self.connect(fileExportJSONAction,SIGNAL("triggered()"),self.fileExportJSON)
         self.exportMenu.addAction(fileExportJSONAction)
 
-        fileExportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None, QApplication.UnicodeUTF8),self)
+        fileExportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
         self.connect(fileExportRoastLoggerAction,SIGNAL("triggered()"),self.fileExportRoastLogger)
         self.exportMenu.addAction(fileExportRoastLoggerAction)
 
@@ -7711,13 +7790,13 @@ class ApplicationWindow(QMainWindow):
         self.GraphMenu.addAction(self.switchAction)  
 
         # CONFIGURATION menu
-        deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
-        self.connect(deviceAction,SIGNAL("triggered()"),self.deviceassigment)
-        self.ConfMenu.addAction(deviceAction)
+        self.deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
+        self.connect(self.deviceAction,SIGNAL("triggered()"),self.deviceassigment)
+        self.ConfMenu.addAction(self.deviceAction)
 
-        commportAction = QAction(UIconst.CONF_MENU_SERIALPORT,self)
-        self.connect(commportAction,SIGNAL("triggered()"),self.setcommport)
-        self.ConfMenu.addAction(commportAction)
+        self.commportAction = QAction(UIconst.CONF_MENU_SERIALPORT,self)
+        self.connect(self.commportAction,SIGNAL("triggered()"),self.setcommport)
+        self.ConfMenu.addAction(self.commportAction)
 
         calibrateDelayAction = QAction(UIconst.CONF_MENU_SAMPLING,self)
         self.connect(calibrateDelayAction,SIGNAL("triggered()"),self.calibratedelay)
@@ -7762,6 +7841,10 @@ class ApplicationWindow(QMainWindow):
         autosaveAction = QAction(UIconst.CONF_MENU_AUTOSAVE,self)
         self.connect(autosaveAction,SIGNAL("triggered()"),self.autosaveconf)
         self.ConfMenu.addAction(autosaveAction)
+
+        batchAction = QAction(UIconst.CONF_MENU_BATCH,self)
+        self.connect(batchAction,SIGNAL("triggered()"),self.batchconf)
+        self.ConfMenu.addAction(batchAction)
 
         self.ConfMenu.addSeparator()
 
@@ -7938,6 +8021,7 @@ class ApplicationWindow(QMainWindow):
         hudAction = QAction(UIconst.TOOLKIT_MENU_EXTRAS,self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.ToolkitMenu.addAction(hudAction)
+        
 
         # HELP menu
         helpAboutAction = QAction(UIconst.HELP_MENU_ABOUT,self)
@@ -7957,6 +8041,7 @@ class ApplicationWindow(QMainWindow):
         KshortCAction = QAction(UIconst.HELP_MENU_KEYBOARDSHORTCUTS,self)
         self.connect(KshortCAction,SIGNAL("triggered()"),self.viewKshortcuts)
         self.helpMenu.addAction(KshortCAction)
+                
 
         self.helpMenu.addSeparator()
 
@@ -7979,6 +8064,23 @@ class ApplicationWindow(QMainWindow):
         platformAction = QAction(UIconst.HELP_MENU_PLATFORM,self)
         self.connect(platformAction,SIGNAL("triggered()"),self.viewplatform)
         self.helpMenu.addAction(platformAction)
+        
+                
+        # SETTINGS submenu
+        self.helpMenu.addSeparator()
+        
+        self.loadSettingsAction = QAction(UIconst.SETTINGS_MENU_LOAD,self)
+        self.connect(self.loadSettingsAction,SIGNAL("triggered()"),self.loadSettings)
+        self.helpMenu.addAction(self.loadSettingsAction)
+                
+        self.openRecentSettingMenu = self.helpMenu.addMenu(UIconst.SETTINGS_MENU_LOADRECENT)
+        for i in range(self.MaxRecentFiles):
+            self.openRecentSettingMenu.addAction(self.recentSettingActs[i])
+        self.updateRecentSettingActions()
+        
+        self.saveAsSettingsAction = QAction(UIconst.SETTINGS_MENU_SAVEAS,self)
+        self.connect(self.saveAsSettingsAction,SIGNAL("triggered()"),self.saveSettings)
+        self.helpMenu.addAction(self.saveAsSettingsAction)
 
         self.helpMenu.addSeparator()
 
@@ -8042,9 +8144,9 @@ class ApplicationWindow(QMainWindow):
                                      }
 
         #create ON/OFF buttons
-        self.button_1 = QPushButton(QApplication.translate("Button", "ON", None, QApplication.UnicodeUTF8))
+        self.button_1 = QPushButton(QApplication.translate("Button", "ON", None))
         self.button_1.setFocusPolicy(Qt.NoFocus)
-        self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None, QApplication.UnicodeUTF8))
+        self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
         if locale in ["el", "no"]:
             self.button_1.setMinimumWidth(120)
@@ -8055,9 +8157,9 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.ToggleMonitor)
 
         #create START/STOP buttons
-        self.button_2 = QPushButton(QApplication.translate("Button", "START", None, QApplication.UnicodeUTF8))
+        self.button_2 = QPushButton(QApplication.translate("Button", "START", None))
         self.button_2.setFocusPolicy(Qt.NoFocus)
-        self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None, QApplication.UnicodeUTF8))
+        self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None))
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
         if locale in ["el", "no"]:
             self.button_2.setMinimumWidth(120)
@@ -8068,36 +8170,36 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_2, SIGNAL("clicked()"), self.qmc.ToggleRecorder)
 
         #create 1C START, 1C END, 2C START and 2C END buttons
-        self.button_3 = QPushButton(QApplication.translate("Button", "FC\nSTART", None, QApplication.UnicodeUTF8))
+        self.button_3 = QPushButton(QApplication.translate("Button", "FC\nSTART", None))
         self.button_3.setFocusPolicy(Qt.NoFocus)
         self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
         self.button_3.setMinimumHeight(50)
-        self.button_3.setToolTip(QApplication.translate("Tooltip", "Marks the begining of First Crack (FCs)", None, QApplication.UnicodeUTF8))
+        self.button_3.setToolTip(QApplication.translate("Tooltip", "Marks the begining of First Crack (FCs)", None))
         self.connect(self.button_3, SIGNAL("clicked()"), self.qmc.mark1Cstart)
 
-        self.button_4 = QPushButton(QApplication.translate("Button", "FC\nEND", None, QApplication.UnicodeUTF8))
+        self.button_4 = QPushButton(QApplication.translate("Button", "FC\nEND", None))
         self.button_4.setFocusPolicy(Qt.NoFocus)
         self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
         self.button_4.setMinimumHeight(50)
-        self.button_4.setToolTip(QApplication.translate("Tooltip", "Marks the end of First Crack (FCs)", None, QApplication.UnicodeUTF8))
+        self.button_4.setToolTip(QApplication.translate("Tooltip", "Marks the end of First Crack (FCs)", None))
         self.connect(self.button_4, SIGNAL("clicked()"), self.qmc.mark1Cend)
 
-        self.button_5 = QPushButton(QApplication.translate("Button", "SC\nSTART", None, QApplication.UnicodeUTF8))
+        self.button_5 = QPushButton(QApplication.translate("Button", "SC\nSTART", None))
         self.button_5.setFocusPolicy(Qt.NoFocus)
         self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
         self.button_5.setMinimumHeight(50)
-        self.button_5.setToolTip(QApplication.translate("Tooltip", "Marks the begining of Second Crack (SCs)", None, QApplication.UnicodeUTF8))
+        self.button_5.setToolTip(QApplication.translate("Tooltip", "Marks the begining of Second Crack (SCs)", None))
         self.connect(self.button_5, SIGNAL("clicked()"), self.qmc.mark2Cstart)
 
-        self.button_6 = QPushButton(QApplication.translate("Button", "SC\nEND", None, QApplication.UnicodeUTF8))
+        self.button_6 = QPushButton(QApplication.translate("Button", "SC\nEND", None))
         self.button_6.setFocusPolicy(Qt.NoFocus)
         self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
         self.button_6.setMinimumHeight(50)
-        self.button_6.setToolTip(QApplication.translate("Tooltip", "Marks the end of Second Crack (SCe)", None, QApplication.UnicodeUTF8))
+        self.button_6.setToolTip(QApplication.translate("Tooltip", "Marks the end of Second Crack (SCe)", None))
         self.connect(self.button_6, SIGNAL("clicked()"), self.qmc.mark2Cend)
 
         #create RESET button
-        self.button_7 = QPushButton(QApplication.translate("Button", "RESET", None, QApplication.UnicodeUTF8))
+        self.button_7 = QPushButton(QApplication.translate("Button", "RESET", None))
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
         if locale in ["el", "no"]:
@@ -8106,90 +8208,90 @@ class ApplicationWindow(QMainWindow):
         else:
             self.button_7.setMinimumWidth(100)
             self.button_7.setMaximumSize(100, 45)
-        self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None, QApplication.UnicodeUTF8))
+        self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
         self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset)
 
         #create CHARGE button
-        self.button_8 = QPushButton(QApplication.translate("Button", "CHARGE", None, QApplication.UnicodeUTF8))
+        self.button_8 = QPushButton(QApplication.translate("Button", "CHARGE", None))
         self.button_8.setFocusPolicy(Qt.NoFocus)
         self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
         self.button_8.setMinimumHeight(50)
-        self.button_8.setToolTip(QApplication.translate("Tooltip", "Marks the begining of the roast (beans in)", None, QApplication.UnicodeUTF8))
+        self.button_8.setToolTip(QApplication.translate("Tooltip", "Marks the begining of the roast (beans in)", None))
         self.connect(self.button_8, SIGNAL("clicked()"), self.qmc.markCharge)
 
         #create DROP button
-        self.button_9 = QPushButton(QApplication.translate("Button", "DROP", None, QApplication.UnicodeUTF8))
+        self.button_9 = QPushButton(QApplication.translate("Button", "DROP", None))
         self.button_9.setFocusPolicy(Qt.NoFocus)
         self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
         self.button_9.setMinimumHeight(50)
-        self.button_9.setToolTip(QApplication.translate("Tooltip", "Marks the end of the roast (drop beans)", None, QApplication.UnicodeUTF8))
+        self.button_9.setToolTip(QApplication.translate("Tooltip", "Marks the end of the roast (drop beans)", None))
         self.connect(self.button_9, SIGNAL("clicked()"), self.qmc.markDrop)
 
         #create PID control button
-        self.button_10 = QPushButton(QApplication.translate("Button", "Control", None, QApplication.UnicodeUTF8))
+        self.button_10 = QPushButton(QApplication.translate("Button", "Control", None))
         self.button_10.setFocusPolicy(Qt.NoFocus)
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
         self.button_10.setMaximumSize(90, 45)
         self.connect(self.button_10, SIGNAL("clicked()"), self.PIDcontrol)
 
         #create EVENT record button
-        self.button_11 = QPushButton(QApplication.translate("Button", "EVENT", None, QApplication.UnicodeUTF8))
+        self.button_11 = QPushButton(QApplication.translate("Button", "EVENT", None))
         self.button_11.setFocusPolicy(Qt.NoFocus)
         self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
         self.button_11.setMinimumHeight(50)
-        self.button_11.setToolTip(QApplication.translate("Tooltip", "Marks an Event", None, QApplication.UnicodeUTF8))
+        self.button_11.setToolTip(QApplication.translate("Tooltip", "Marks an Event", None))
         self.connect(self.button_11, SIGNAL("clicked()"), self.qmc.EventRecord)
 
         #create PID+5 button
-        self.button_12 = QPushButton(QApplication.translate("Button", "SV +5", None, QApplication.UnicodeUTF8))
+        self.button_12 = QPushButton(QApplication.translate("Button", "SV +5", None))
         self.button_12.setFocusPolicy(Qt.NoFocus)
         self.button_12.setStyleSheet(self.pushbuttonstyles["SV +"])
         self.button_12.setMaximumSize(90, 50)
         self.button_12.setMinimumHeight(50)
-        self.button_12.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 5", None, QApplication.UnicodeUTF8))
+        self.button_12.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 5", None))
 
         #create PID+10 button
-        self.button_13 = QPushButton(QApplication.translate("Button", "SV +10", None, QApplication.UnicodeUTF8))
+        self.button_13 = QPushButton(QApplication.translate("Button", "SV +10", None))
         self.button_13.setFocusPolicy(Qt.NoFocus)
         self.button_13.setStyleSheet(self.pushbuttonstyles["SV +"])
         self.button_13.setMaximumSize(90, 50)
         self.button_13.setMinimumHeight(50)
-        self.button_13.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 10", None, QApplication.UnicodeUTF8))
+        self.button_13.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 10", None))
 
         #create PID+20 button
-        self.button_14 = QPushButton(QApplication.translate("Button", "SV +20", None, QApplication.UnicodeUTF8))
+        self.button_14 = QPushButton(QApplication.translate("Button", "SV +20", None))
         self.button_14.setFocusPolicy(Qt.NoFocus)
         self.button_14.setStyleSheet(self.pushbuttonstyles["SV +"])
         self.button_14.setMaximumSize(90, 50)
         self.button_14.setMinimumHeight(50)
-        self.button_14.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 20", None, QApplication.UnicodeUTF8))
+        self.button_14.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 20", None))
 
         #create PID-20 button
-        self.button_15 = QPushButton(QApplication.translate("Button", "SV -20", None, QApplication.UnicodeUTF8))
+        self.button_15 = QPushButton(QApplication.translate("Button", "SV -20", None))
         self.button_15.setFocusPolicy(Qt.NoFocus)
         self.button_15.setStyleSheet(self.pushbuttonstyles["SV -"])
         self.button_15.setMaximumSize(90, 50)
         self.button_15.setMinimumHeight(50)
-        self.button_15.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 20", None, QApplication.UnicodeUTF8))
+        self.button_15.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 20", None))
 
         #create PID-10 button
-        self.button_16 = QPushButton(QApplication.translate("Button", "SV -10", None, QApplication.UnicodeUTF8))
+        self.button_16 = QPushButton(QApplication.translate("Button", "SV -10", None))
         self.button_16.setFocusPolicy(Qt.NoFocus)
         self.button_16.setStyleSheet(self.pushbuttonstyles["SV -"])
         self.button_16.setMaximumSize(90, 50)
         self.button_16.setMinimumHeight(50)
-        self.button_16.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 10", None, QApplication.UnicodeUTF8))
+        self.button_16.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 10", None))
 
         #create PID-5 button
-        self.button_17 = QPushButton(QApplication.translate("Button", "SV -5", None, QApplication.UnicodeUTF8))
+        self.button_17 = QPushButton(QApplication.translate("Button", "SV -5", None))
         self.button_17.setFocusPolicy(Qt.NoFocus)
         self.button_17.setStyleSheet(self.pushbuttonstyles["SV -"])
         self.button_17.setMaximumSize(90, 50)
         self.button_17.setMinimumHeight(50)
-        self.button_17.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 5", None, QApplication.UnicodeUTF8))
+        self.button_17.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 5", None))
 
         #create HUD button
-        self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None, QApplication.UnicodeUTF8))
+        self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None))
         self.button_18.setFocusPolicy(Qt.NoFocus)
         self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
         if locale in ["el", "no"]:
@@ -8200,24 +8302,24 @@ class ApplicationWindow(QMainWindow):
             self.button_18.setMaximumSize(80, 45)
         self.button_18.setContentsMargins(0,0,0,0)
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
-        self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None, QApplication.UnicodeUTF8))
+        self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None))
         self.button_18.setEnabled(False)
 
         #create DRY button
-        self.button_19 = QPushButton(QApplication.translate("Button", "DRY\nEND", None, QApplication.UnicodeUTF8))
+        self.button_19 = QPushButton(QApplication.translate("Button", "DRY\nEND", None))
         self.button_19.setFocusPolicy(Qt.NoFocus)
         self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
         #self.button_19.setMaximumSize(90, 50)
         self.button_19.setMinimumHeight(50)
-        self.button_19.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Drying phase (DRYEND)", None, QApplication.UnicodeUTF8))
+        self.button_19.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Drying phase (DRYEND)", None))
         self.connect(self.button_19, SIGNAL("clicked()"), self.qmc.markDryEnd)
 
         #create COOLe button
-        self.button_20 = QPushButton(QApplication.translate("Button", "COOL\nEND", None, QApplication.UnicodeUTF8))
+        self.button_20 = QPushButton(QApplication.translate("Button", "COOL\nEND", None))
         self.button_20.setFocusPolicy(Qt.NoFocus)
         self.button_20.setStyleSheet(self.pushbuttonstyles["COOL END"])
         self.button_20.setMinimumHeight(50)
-        self.button_20.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Cooling phase (COOLEND)", None, QApplication.UnicodeUTF8))
+        self.button_20.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Cooling phase (COOLEND)", None))
         self.connect(self.button_20, SIGNAL("clicked()"), self.qmc.markCoolEnd)
 
         #connect PID sv easy buttons
@@ -8271,38 +8373,38 @@ class ApplicationWindow(QMainWindow):
         self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
         self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
 
-        self.lcd1.setToolTip(QApplication.translate("Tooltip", "Timer",None, QApplication.UnicodeUTF8))
-        self.lcd2.setToolTip(QApplication.translate("Tooltip", "ET Temperature",None, QApplication.UnicodeUTF8))
-        self.lcd3.setToolTip(QApplication.translate("Tooltip", "BT Temperature",None, QApplication.UnicodeUTF8))
-        self.lcd4.setToolTip(QApplication.translate("Tooltip", "ET/time (degrees/min)",None, QApplication.UnicodeUTF8))
-        self.lcd5.setToolTip(QApplication.translate("Tooltip", "BT/time (degrees/min)",None, QApplication.UnicodeUTF8))
-        self.lcd6.setToolTip(QApplication.translate("Tooltip", "Value of SV in PID",None, QApplication.UnicodeUTF8))
-        self.lcd7.setToolTip(QApplication.translate("Tooltip", "PID power %",None, QApplication.UnicodeUTF8))
+        self.lcd1.setToolTip(QApplication.translate("Tooltip", "Timer",None))
+        self.lcd2.setToolTip(QApplication.translate("Tooltip", "ET Temperature",None))
+        self.lcd3.setToolTip(QApplication.translate("Tooltip", "BT Temperature",None))
+        self.lcd4.setToolTip(QApplication.translate("Tooltip", "ET/time (degrees/min)",None))
+        self.lcd5.setToolTip(QApplication.translate("Tooltip", "BT/time (degrees/min)",None))
+        self.lcd6.setToolTip(QApplication.translate("Tooltip", "Value of SV in PID",None))
+        self.lcd7.setToolTip(QApplication.translate("Tooltip", "PID power %",None))
 
         #MET
         self.label2 = QLabel()
         self.label2.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label2.setText("<big><b>" + u(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8)) + "</b></big>")
+        self.label2.setText("<big><b>" + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
         #BT
         self.label3 = QLabel()
         self.label3.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label3.setText("<big><b>" + u(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8)) + "</b></big>")
+        self.label3.setText("<big><b>" + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label4.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8)) + "</b></big>")
+        self.label4.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label5.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8)) + "</b></big>")
+        self.label5.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label6.setText("<big><b>" + u(QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8)) + "</b></big>")
+        self.label6.setText("<big><b>" + u(QApplication.translate("Label", "PID SV",None)) + "</b></big>")
         # pid power % duty cycle
         self.label7 = QLabel()
         self.label7.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label7.setText("<big><b>" + u(QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8)) + "</b></big>")
+        self.label7.setText("<big><b>" + u(QApplication.translate("Label", "PID %",None)) + "</b></big>")
 
         #extra LCDs
         self.nLCDS = 10 # maximum number of LCDs and extra devices
@@ -8329,8 +8431,8 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDframe2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-#            string1 = u(QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8))
-#            string2 = u(QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None, QApplication.UnicodeUTF8))
+#            string1 = u(QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None))
+#            string2 = u(QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None))
             #configure Labels
             self.extraLCDlabel1[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
@@ -8355,13 +8457,13 @@ class ApplicationWindow(QMainWindow):
         self.button_17.setVisible(False)
 
         #### EVENT MINI EDITOR: View&Edits events without opening roast properties Dlg.
-        self.eventlabel = QLabel(QApplication.translate("Label","Event #<b>0 </b>", None, QApplication.UnicodeUTF8))
+        self.eventlabel = QLabel(QApplication.translate("Label","Event #<b>0 </b>", None))
         self.eventlabel.setIndent(5)
         self.eNumberSpinBox = QSpinBox()
 
 #        self.eNumberSpinBox.setFocusPolicy(Qt.NoFocus)
         self.eNumberSpinBox.setAlignment(Qt.AlignCenter)
-        self.eNumberSpinBox.setToolTip(QApplication.translate("Tooltip", "Number of events found", None, QApplication.UnicodeUTF8))
+        self.eNumberSpinBox.setToolTip(QApplication.translate("Tooltip", "Number of events found", None))
         self.eNumberSpinBox.setRange(0,20)
         self.connect(self.eNumberSpinBox, SIGNAL("valueChanged(int)"),self.changeEventNumber)
         self.eNumberSpinBox.setMaximumWidth(40)
@@ -8372,14 +8474,14 @@ class ApplicationWindow(QMainWindow):
         self.eventlabel.setStyleSheet("background-color:'yellow';")
 
         self.etypeComboBox = QComboBox()
-        self.etypeComboBox.setToolTip(QApplication.translate("Tooltip", "Type of event", None, QApplication.UnicodeUTF8))
+        self.etypeComboBox.setToolTip(QApplication.translate("Tooltip", "Type of event", None))
 #        self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.etypeComboBox.addItems(self.qmc.etypes)
 
         regexvalue = QRegExp(r"^100|\d?\d?$")
         self.valueEdit = QLineEdit()
         self.valueEdit.setValidator(QRegExpValidator(regexvalue,self))
-        self.valueEdit.setToolTip(QApplication.translate("Tooltip", "Value of event", None, QApplication.UnicodeUTF8))
+        self.valueEdit.setToolTip(QApplication.translate("Tooltip", "Value of event", None))
 #        self.valueEdit.setFocusPolicy(Qt.ClickFocus)
         self.valueEdit.setMaximumWidth(50)
 
@@ -8390,10 +8492,10 @@ class ApplicationWindow(QMainWindow):
         self.etimeline.setMaximumWidth(50)
 
         #create EVENT mini button
-        self.buttonminiEvent = QPushButton(QApplication.translate("Button", "Update", None, QApplication.UnicodeUTF8))
+        self.buttonminiEvent = QPushButton(QApplication.translate("Button", "Update", None))
         self.buttonminiEvent.setFocusPolicy(Qt.StrongFocus)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
-        self.buttonminiEvent.setToolTip(QApplication.translate("Tooltip", "Updates the event", None, QApplication.UnicodeUTF8))
+        self.buttonminiEvent.setToolTip(QApplication.translate("Tooltip", "Updates the event", None))
 
         #### CUSTOM events buttons
         self.buttonlist = []
@@ -8523,7 +8625,7 @@ class ApplicationWindow(QMainWindow):
         
         # TP
         self.TPlabel = QLabel()
-        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
+        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
         self.TPlcd = QLCDNumber()        
         self.TPlcd.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect( self.TPlcd, SIGNAL("customContextMenuRequested(QPoint)"), self.PhaseslcdClicked)
@@ -8540,7 +8642,7 @@ class ApplicationWindow(QMainWindow):
 
         # DRY
         self.DRYlabel = QLabel()
-        self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b></small>")
+        self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
         self.DRYlcd = QLCDNumber()
         self.DRYlcd.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect( self.DRYlcd, SIGNAL("customContextMenuRequested(QPoint)"), self.PhaseslcdClicked)
@@ -8557,7 +8659,7 @@ class ApplicationWindow(QMainWindow):
 
         # FCs
         self.FCslabel = QLabel()
-        self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b></small>")
+        self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
         self.FCslcd = QLCDNumber()
         self.FCslcd.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect( self.FCslcd, SIGNAL("customContextMenuRequested(QPoint)"), self.PhaseslcdClicked)
@@ -9174,7 +9276,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.phasesLCDmode == 0: # time mode
                     if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
                         # after TP
-                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")                    
+                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")                    
                         if self.qmc.timeindex[6]:
                             ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
                         else:
@@ -9185,7 +9287,7 @@ class ApplicationWindow(QMainWindow):
                         # before TP
                         self.TPlcd.display(QString("--:--"))
                 elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None, QApplication.UnicodeUTF8)) + "</b></small>")
+                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
                     if self.qmc.timeindex[1]: # after DRY
                         ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
                         dryphaseP = fmtstr%(ts*100/totaltime)
@@ -9201,7 +9303,7 @@ class ApplicationWindow(QMainWindow):
                         else:
                             dBT = self.qmc.temp2[-1]
                         dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.TPalarmtimeindex])
-                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
+                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
                         self.TPlcd.display(QString(dBT + self.qmc.mode))                       
                     else:
                         # before TP
@@ -9214,7 +9316,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                     if aw.qmc.phasesLCDmode == 0: # time mode
-                        self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
+                        self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None)) + "&raquo;</b></small>")
                         self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
                     elif aw.qmc.phasesLCDmode == 1: # percentage mode
                         if self.qmc.timeindex[2]:
@@ -9222,7 +9324,7 @@ class ApplicationWindow(QMainWindow):
                         midphaseP = fmtstr%(ts*100/totaltime)
                         if not aw.qmc.LCDdecimalplaces:
                             midphaseP += " "
-                        self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "RAMP%",None, QApplication.UnicodeUTF8)) + "</b></small>")
+                        self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "RAMP%",None)) + "</b></small>")
                         self.DRYlcd.display(QString(midphaseP))
                     elif aw.qmc.phasesLCDmode == 2: # temp mode
                         if self.qmc.timeindex[6]: # after drop
@@ -9230,7 +9332,7 @@ class ApplicationWindow(QMainWindow):
                         else:
                             dBT = self.qmc.temp2[-1]
                         dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[1]])
-                        self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
+                        self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None)) + "&raquo;</b></small>")
                         self.DRYlcd.display(QString(dBT + self.qmc.mode))                       
                     # TP2DRY
                     if window_width > 950 and self.qmc.TPalarmtimeindex:
@@ -9240,7 +9342,7 @@ class ApplicationWindow(QMainWindow):
                         self.TP2DRYlabel.setText("")
                 else:
                     # before DRY
-                    self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b></small>")
+                    self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
                     if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         # display expected time to reach DRY as defined in the background profile or the phases dialog
                         if self.qmc.background and self.qmc.timeindexB[1]:
@@ -9265,13 +9367,13 @@ class ApplicationWindow(QMainWindow):
                     else: # before drop
                         ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
                     if aw.qmc.phasesLCDmode == 0: # time mode
-                        self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
+                        self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
                         self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
                     elif aw.qmc.phasesLCDmode == 1: # percentage mode
                         finishphaseP = fmtstr%(ts*100/totaltime)
                         if not aw.qmc.LCDdecimalplaces:
                             finishphaseP += " "
-                        self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "DEV%",None, QApplication.UnicodeUTF8)) + "</b></small>")
+                        self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "DEV%",None)) + "</b></small>")
                         self.FCslcd.display(QString(finishphaseP))
                     elif aw.qmc.phasesLCDmode == 2: # temp mode
                         if self.qmc.timeindex[6]: # after drop
@@ -9279,7 +9381,7 @@ class ApplicationWindow(QMainWindow):
                         else:
                             dBT = self.qmc.temp2[-1]
                         dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[2]])
-                        self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
+                        self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
                         self.FCslcd.display(QString(dBT + self.qmc.mode))                        
                     # DRY2FCs
                     if  window_width > 950 and self.qmc.timeindex[1]:
@@ -9289,7 +9391,7 @@ class ApplicationWindow(QMainWindow):
                         self.DRY2FCslabel.setText("")
                 else:
                     # before FCs
-                    self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b></small>")
+                    self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
                     if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                         self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
@@ -9311,7 +9413,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " updatePhasesLCDs() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() %1").arg(str(e)),exc_tb.tb_lineno)
 
     def makeLCDbox(self,label,lcd,lcdframe):
         LCDbox = QVBoxLayout()
@@ -9353,7 +9455,7 @@ class ApplicationWindow(QMainWindow):
             s = "%.1f"%self.sliderSV.value()
         else:
             s = "%.0f"%self.sliderSV.value()
-        aw.sendmessage(QApplication.translate("Message","SV set to %s"%s, None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","SV set to %s"%s, None))
         aw.arduino.setSV(self.sliderSV.value(),False)
 
     def moveSVslider(self,v):
@@ -9397,7 +9499,7 @@ class ApplicationWindow(QMainWindow):
                 self.eventaction(action,cmd)
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " fireslideraction() %1").arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fireslideraction() %1").arg(str(e)),exc_tb.tb_lineno)
 
     def recordsliderevent(self,n):
         if self.qmc.flagstart:
@@ -9505,7 +9607,7 @@ class ApplicationWindow(QMainWindow):
                                 QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.TolerantMode))
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " eventaction() %1").arg(str(e)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " eventaction() %1").arg(str(e)),exc_tb.tb_lineno)
                 elif action == 3:
                     cmds = cmd_str.split(",")
                     for i in range(len(cmds)):
@@ -9593,7 +9695,7 @@ class ApplicationWindow(QMainWindow):
                         self.call_prog_with_args(cmd_str)
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " callProgram(): %1").arg(str(e)),exc_tb.tb_lineno)
+                        aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " callProgram(): %1").arg(str(e)),exc_tb.tb_lineno)
                 elif action == 8: # HOTTOP Heater
                     setHottop(heater=int(cmd))
                 elif action == 9: # HOTTOP Main Fan
@@ -9709,8 +9811,8 @@ class ApplicationWindow(QMainWindow):
             self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]))
 
     def resetApplication(self):
-        string = QApplication.translate("Message","Do you want to reset all settings?", None, QApplication.UnicodeUTF8)
-        reply = QMessageBox.warning(self,QApplication.translate("Message","Factory Reset", None, QApplication.UnicodeUTF8),string,
+        string = QApplication.translate("Message","Do you want to reset all settings?", None)
+        reply = QMessageBox.warning(self,QApplication.translate("Message","Factory Reset", None),string,
                             QMessageBox.Cancel | QMessageBox.Reset)
         if reply == QMessageBox.Reset :
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
@@ -9847,6 +9949,7 @@ class ApplicationWindow(QMainWindow):
             self.setLCDsDigitCount(3)
 
     def enableEditMenus(self):
+#        self.newRoastAction.setEnabled(True) # new
         self.fileLoadAction.setEnabled(True) # open
         self.openRecentMenu.setEnabled(True) # open recent
         self.importMenu.setEnabled(True) # import
@@ -9859,12 +9962,18 @@ class ApplicationWindow(QMainWindow):
         self.flavorAction.setEnabled(True)
         self.temperatureMenu.setEnabled(True)
         self.languageMenu.setEnabled(True)
+        self.deviceAction.setEnabled(True)
+        self.commportAction.setEnabled(True)
         self.designerAction.setEnabled(True)
         self.wheeleditorAction.setEnabled(True)
+        self.loadSettingsAction.setEnabled(True)
+        self.openRecentSettingMenu.setEnabled(True)
+        self.saveAsSettingsAction.setEnabled(True)
         self.resetAction.setEnabled(True)
         self.switchAction.setEnabled(True)
 
     def disableEditMenus(self):
+#        self.newRoastAction.setEnabled(False) # new
         self.fileLoadAction.setEnabled(False) # open
         self.openRecentMenu.setEnabled(False) # open recent
         self.importMenu.setEnabled(False) # import
@@ -9877,8 +9986,13 @@ class ApplicationWindow(QMainWindow):
         self.flavorAction.setEnabled(False)
         self.temperatureMenu.setEnabled(False)
         self.languageMenu.setEnabled(False)
+        self.deviceAction.setEnabled(False)
+        self.commportAction.setEnabled(False)
         self.designerAction.setEnabled(False)
         self.wheeleditorAction.setEnabled(False)
+        self.loadSettingsAction.setEnabled(False)
+        self.openRecentSettingMenu.setEnabled(False)
+        self.saveAsSettingsAction.setEnabled(False)
         self.resetAction.setEnabled(False)
         self.switchAction.setEnabled(False)
 
@@ -9915,8 +10029,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 #if designer ON
                 if self.qmc.designerflag:
-                    string = QApplication.translate("Message","Exit Designer?", None, QApplication.UnicodeUTF8)
-                    reply = QMessageBox.question(self,QApplication.translate("Message", "Designer Mode ON",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
+                    string = QApplication.translate("Message","Exit Designer?", None)
+                    reply = QMessageBox.question(self,QApplication.translate("Message", "Designer Mode ON",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                     if reply == QMessageBox.Yes:
                         self.stopdesigner()
                     else:
@@ -9987,8 +10101,8 @@ class ApplicationWindow(QMainWindow):
     #            palette = button.index(key)
     # for now we deactivate this extra dialog step
     #            string = QApplication.translate("Message","Changing palettes will delete the present extra event buttons.\nRestore palette %i?"%palette,
-    #                                            None, QApplication.UnicodeUTF8)
-    #            reply = QMessageBox.question(self,QApplication.translate("Message", "Extra Event Button Palette",None, QApplication.UnicodeUTF8),
+    #                                            None)
+    #            reply = QMessageBox.question(self,QApplication.translate("Message", "Extra Event Button Palette",None),
     #                                         string,QMessageBox.Yes|QMessageBox.Cancel)
     #            if reply == QMessageBox.Yes:
     #                self.setbuttonsfrom(button.index(key))
@@ -10096,7 +10210,7 @@ class ApplicationWindow(QMainWindow):
                 # deactivate slider keyboard control
                 self.setSliderFocusPolicy(Qt.NoFocus)
                 self.keyboardmoveindex = 2
-                self.sendmessage(QApplication.translate("Message","Keyboard moves turned ON", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","Keyboard moves turned ON", None))
                 self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                 
             elif self.keyboardmoveflag == 1:
@@ -10105,7 +10219,7 @@ class ApplicationWindow(QMainWindow):
                 # activate slider keyboard control
                 self.setSliderFocusPolicy(Qt.StrongFocus)
                 # clear all
-                self.sendmessage(QApplication.translate("Message","Keyboard moves turned OFF", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","Keyboard moves turned OFF", None))
                 self.resetKeyboardButtonMarks()
         #if moves on
         if self.keyboardmoveflag:
@@ -10167,20 +10281,21 @@ class ApplicationWindow(QMainWindow):
         filename = ""
         try:
             title = None
-            if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
+            if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None):
                 title = aw.qmc.title
             if prefix == "" and title:
                 filename = title
             else:
                 filename = prefix
             if filename != "":                
-                filename += "-" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
+                filename += "_" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
             else:
                 filename += str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
             filename += ".alog"
             #clean name
             filename = self.removeDisallowedFilenameChars(u(filename))
-        except Exception as e:
+        except Exception:
+#        except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            print(e)
@@ -10191,47 +10306,53 @@ class ApplicationWindow(QMainWindow):
     def automaticsave(self):
         try:
 #            title = None
-#            if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
+#            if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None):
 #                title = aw.qmc.title
             if self.qmc.autosavepath and self.qmc.autosaveflag:
-                filename = self.generateFilename(prefix=self.qmc.autosaveprefix)
+                if self.qmc.autosaveprefix != "":
+                    prefix = self.qmc.autosaveprefix
+                elif aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
+                    prefix = u(aw.qmc.batchprefix) + u(aw.qmc.roastbatchnr)
+                else:
+                    prefix = u("")                    
+                filename = self.generateFilename(prefix=prefix)
                 oldDir = u(QDir.current())
                 QDir.setCurrent(self.qmc.autosavepath)
                 #write
                 self.serialize(QString(filename),self.getProfile())
                 #restore dirs
                 QDir.setCurrent(oldDir)
-                self.sendmessage(QApplication.translate("Message","Profile %1 saved in: %2", None, QApplication.UnicodeUTF8).arg(filename).arg(self.qmc.autosavepath))
+                self.sendmessage(QApplication.translate("Message","Profile %1 saved in: %2", None).arg(filename).arg(self.qmc.autosavepath))
                 self.setCurrentFile(filename)
                 self.qmc.safesaveflag = False
                 return filename
             else:
-                self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None))
                 self.autosaveconf()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None, QApplication.UnicodeUTF8) + " automaticsave() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " automaticsave() %1").arg(str(e)),exc_tb.tb_lineno)
 
     def viewKshortcuts(self):
-        string = u(QApplication.translate("Message", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[SPACE]</b> = Choses current button",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[LEFT]</b> = Move to the left",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[RIGHT]</b> = Move to the right",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[a]</b> = Autosave",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + START",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[d]</b> = Toggle xy scale (T/Delta)",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[:]</b> = Desktop ScreenShot",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[q,w,e,r + <i>nn</i>]</b> = Quick Custom Event",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[f]</b> = Full Screen Mode",None, QApplication.UnicodeUTF8))
+        string = u(QApplication.translate("Message", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[SPACE]</b> = Choses current button",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[LEFT]</b> = Move to the left",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[RIGHT]</b> = Move to the right",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[a]</b> = Autosave",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + START",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[d]</b> = Toggle xy scale (T/Delta)",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[:]</b> = Desktop ScreenShot",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[q,w,e,r + <i>nn</i>]</b> = Quick Custom Event",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[f]</b> = Full Screen Mode",None))
 
-        QMessageBox.information(self,QApplication.translate("Message", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
+        QMessageBox.information(self,QApplication.translate("Message", "Keyboard Shotcuts",None),string)
 
     #moves events in minieditor
     def changeEventNumber(self):
@@ -10242,7 +10363,7 @@ class ApplicationWindow(QMainWindow):
         currentevent = self.eNumberSpinBox.value()
         self.eNumberSpinBox.setDisabled(True)
         try:
-            self.eventlabel.setText(QApplication.translate("Label", "Event #<b>%1 </b>",None, QApplication.UnicodeUTF8).arg(currentevent))
+            self.eventlabel.setText(QApplication.translate("Label", "Event #<b>%1 </b>",None).arg(currentevent))
             if currentevent == 0:
                 self.lineEvent.setText("")
                 self.valueEdit.setText("")
@@ -10275,7 +10396,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " changeEventNumber() %1").arg(str(e)),exc_tb.tb_lineno)        
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " changeEventNumber() %1").arg(str(e)),exc_tb.tb_lineno)        
         finally:
             self.eNumberSpinBox.setDisabled(False)
             self.eNumberSpinBox.setFocus()
@@ -10311,7 +10432,7 @@ class ApplicationWindow(QMainWindow):
                 string += self.qmc.specialeventsStrings[lenevents-1][0:5]
                 string += "..."
 
-            message = u(QApplication.translate("Message","Event #%1:  %2 has been updated", None, QApplication.UnicodeUTF8).arg(str(lenevents)).arg(string))
+            message = u(QApplication.translate("Message","Event #%1:  %2 has been updated", None).arg(str(lenevents)).arg(string))
             self.sendmessage(message)
 
     def strippedName(self, fullFileName):
@@ -10398,7 +10519,7 @@ class ApplicationWindow(QMainWindow):
  
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None, QApplication.UnicodeUTF8),ext="*.alog",path=None):
+    def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
         if path == None:
             path = self.getDefaultPath() 
         f = u(QFileDialog.getSaveFileName(self,msg,path,ext))
@@ -10407,7 +10528,7 @@ class ApplicationWindow(QMainWindow):
  
     #the central ExistingDirectoryDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None, QApplication.UnicodeUTF8),path=None):
+    def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None),path=None):
         if path == None:
             path = self.getDefaultPath()
         f = u(QFileDialog.getExistingDirectory(self,msg,path))
@@ -10439,7 +10560,7 @@ class ApplicationWindow(QMainWindow):
         #########################################
         if self.qmc.flagstart:
             if self.qmc.timeindex[0] == -1:
-                self.sendmessage(QApplication.translate("Message","No profile found", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","No profile found", None))
                 return
             #mark drop if not yet done
             if self.qmc.timeindex[6] == 0:
@@ -10454,20 +10575,22 @@ class ApplicationWindow(QMainWindow):
 #            if self.qmc.autosavepath and self.qmc.autosaveflag:
 #                #if autosave mode active we just save automatic
 #            else:
-#                self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None, QApplication.UnicodeUTF8))
+#                self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None))
 #                self.autosaveconf()
 #                return
             if self.qmc.reset():
                 #start new roast
                 self.qmc.ToggleRecorder()
-                self.sendmessage(QApplication.translate("Message","%1 has been saved. New roast has started", None, QApplication.UnicodeUTF8).arg(filename))
+                self.sendmessage(QApplication.translate("Message","%1 has been saved. New roast has started", None).arg(filename))
         else:
-            if not len(self.qmc.timex):
+            if len(self.qmc.timex) > 1:
                 self.qmc.ToggleRecorder()
             else:
+                if self.qmc.flagon:
+                    self.qmc.OffMonitor()
                 if self.qmc.reset():
                     self.qmc.ToggleRecorder()
-
+        
     def fileLoad(self):
         try:
             fileName = self.ArtisanOpenFileDialog()
@@ -10477,7 +10600,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " fileLoad() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #loads stored profiles. Called from file menu
     def loadFile(self,filename):
@@ -10493,7 +10616,7 @@ class ApplicationWindow(QMainWindow):
                     f.close()
                     res = self.setProfile(filename,self.deserialize(filename))
                 else:
-                    self.sendmessage(QApplication.translate("Message","Invalid artisan format", None, QApplication.UnicodeUTF8))
+                    self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
                     res = False
                 if res:
                     self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
@@ -10502,14 +10625,14 @@ class ApplicationWindow(QMainWindow):
                     self.etypeComboBox.addItems(self.qmc.etypes)
                     #Plot everything
                     self.qmc.redraw()
-                    message = u(QApplication.translate("Message","%1  loaded ", None, QApplication.UnicodeUTF8).arg(u(filename)))
+                    message = u(QApplication.translate("Message","%1  loaded ", None).arg(u(filename)))
                     self.sendmessage(message)
                     self.setCurrentFile(filename)
         except IOError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " %1").arg(str(ex)))
             # remove file from the recent file list
             settings = QSettings()
             files = settings.value('recentFileList').toStringList()
@@ -10525,12 +10648,12 @@ class ApplicationWindow(QMainWindow):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None, QApplication.UnicodeUTF8) + " fileload() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " fileload() %1").arg(str(ex)),exc_tb.tb_lineno)
         except Exception as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " loadFile() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadFile() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if f:
                 f.close()
@@ -10574,6 +10697,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEStrings = profile["specialeventsStrings"]
                 self.qmc.backgroundFlavors = profile["flavors"]
                 self.qmc.titleB = profile["title"]
+                self.qmc.roastbatchnrB = profile["roastbatchnr"]
+                self.qmc.roastbatchprefixB = profile["roastbatchprefix"]
+                self.qmc.roastbatchposB = profile["roastbatchpos"]
+                
 # we don't load alarms from backgrounds as this would overload the one of the foreground profile that automatically loads this background
 #                # alarms
 #                if self.qmc.loadalarmsfromprofile:
@@ -10652,26 +10779,26 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
                 backgroundDrop = self.qmc.timeindexB[6]
                 if len(self.qmc.timeB) > backgroundDrop:
-                    message =  u(QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(u(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))))
+                    message =  u(QApplication.translate("Message", "Background %1 loaded successfully %2",None).arg(u(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))))
                 else:
-                    message =  u(QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(u(filename)).arg(""))                    
+                    message =  u(QApplication.translate("Message", "Background %1 loaded successfully %2",None).arg(u(filename)).arg(""))                    
                 self.sendmessage(message)
                 self.qmc.backgroundpath = u(filename)
             else:
-                self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None))
         except IOError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " loadbackground() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " loadbackground() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None, QApplication.UnicodeUTF8) + " loadbackground() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None) + " loadbackground() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " loadbackground() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " loadbackground() %1").arg(str(e)),exc_tb.tb_lineno)
             return
         finally:
             if f:
@@ -10695,7 +10822,17 @@ class ApplicationWindow(QMainWindow):
             data = csv.reader(csvFile,delimiter='\t')
             #read file header
             header = next(data)
-            self.qmc.roastdate = QDate.fromString(header[0].split('Date:')[1],"dd'.'MM'.'yyyy")
+            date = QDate.fromString(header[0].split('Date:')[1],"dd'.'MM'.'yyyy")
+            if len(header) > 11:
+                try:
+                    tm = QTime.fromString(header[11].split('Time:')[1])
+                    self.qmc.roastdate = QDateTime(date,tm)
+                except:
+                    self.qmc.roastdate = QDateTime(date)
+            else:
+                self.qmc.roastdate = QDateTime(date)
+            self.qmc.roastepoch = self.qmc.roastdate.toTime_t()
+            self.qmc.roasttzoffset = 0
             unit = header[1].split('Unit:')[1]
             #set temperature mode
             if unit == "F" and self.qmc.mode == "C":
@@ -10775,14 +10912,14 @@ class ApplicationWindow(QMainWindow):
             if COOL > 0:
                 self.qmc.timeindex[7] = self.time2index(COOL)
             self.qmc.endofx = self.qmc.timex[-1]
-            self.sendmessage(QApplication.translate("Message","Artisan CSV file loaded successfully", None, QApplication.UnicodeUTF8))
+            self.sendmessage(QApplication.translate("Message","Artisan CSV file loaded successfully", None))
             self.qmc.safesaveflag = True
             self.qmc.redraw()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importCSV() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCSV() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def addSerialPort(self):
         self.extraser.append(serialport()) 
@@ -10855,14 +10992,14 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
             return False
 
     #Write readings to RoastLogger CSV file
     def exportRoastLogger(self,filename):
         outfile = open(filename, 'w')
         try:
-            outfile.write("Log created at 09:00:00 "+ self.qmc.roastdate.toString("dd'/'MM'/'yyyy") + "\n")
+            outfile.write("Log created at 09:00:00 "+ self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + "\n")
             outfile.write("Use Options|Set template for new log to modify this template.\n")
             outfile.write("------------------------------------------------------\n")
             outfile.write("Bean/Blend name:\n")
@@ -10874,7 +11011,7 @@ class ApplicationWindow(QMainWindow):
             outfile.write("Cupping results:\n")
             outfile.write("\n")
             outfile.write("Roast Logger Copyright ? T. R. Coxon (GreenBean TMC).\n")
-            outfile.write("Roast started at 09:00:00 " + self.qmc.roastdate.toString("dd'/'MM'/'yyyy") + "\n")
+            outfile.write("Roast started at 09:00:00 " + self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + "\n")
             if len(self.qmc.timex) > 0:
                 CHARGE = aw.qmc.timex[aw.qmc.timeindex[0]] 
             else:
@@ -10933,7 +11070,7 @@ class ApplicationWindow(QMainWindow):
 #           import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportRoastLogger() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportRoastLogger() %1").arg(str(ex)),exc_tb.tb_lineno)
             return False
         finally:
             outfile.close()
@@ -10957,7 +11094,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def importRoastLogger(self,filename):
         self.resetExtraDevices()
@@ -10972,7 +11109,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importRoastLogger() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importRoastLogger() %1").arg(str(ex)),exc_tb.tb_lineno)
             
     def resetExtraDevices(self):
         try:
@@ -11001,7 +11138,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.resetlinecountcaches()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " resetExtraDevices(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " resetExtraDevices(): %1").arg(str(e)),exc_tb.tb_lineno)
             
     def importRoastLoggerEnc(self,filename,enc='utf-8'):
         roastlogger_action_section = ""
@@ -11018,9 +11155,9 @@ class ApplicationWindow(QMainWindow):
             l = infile.readline()
             if l.startswith("Roast started at "):
                 #extract roast date
-                roastdate = QDate.fromString(l.split(" ")[-1][0:10],"dd'/'MM'/'yyyy")
+                roastdate = QDateTime(QDate.fromString(l.split(" ")[-1][0:10],"dd'/'MM'/'yyyy"))
                 if not roastdate.isNull():
-                    obj["roastdate"] = encodeLocal(roastdate.toString())
+                    obj["roastdate"] = encodeLocal(roastdate.date().toString())
                 break
             if l == '':
                 break
@@ -11121,7 +11258,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtemperature.append(fields_action[0])
                                     aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
                                     aw.qmc.alarmbeep.append(0)
-                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None, QApplication.UnicodeUTF8))
+                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None))
 
                                     #add temp alarm - FAN
                                     aw.qmc.alarmflag.append(1)
@@ -11135,7 +11272,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtemperature.append(fields_action[0])
                                     aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
                                     aw.qmc.alarmbeep.append(0)
-                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None, QApplication.UnicodeUTF8))
+                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None))
 
                             elif roastlogger_action_section.startswith("@actionSecsFCTable"):
                                 if len(fields_action) == 3 and fields_action[0] != "null":
@@ -11152,7 +11289,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtemperature.append(0)
                                     aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
                                     aw.qmc.alarmbeep.append(0)
-                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None, QApplication.UnicodeUTF8))
+                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None))
 
                                     #add time alarm - FAN
                                     aw.qmc.alarmflag.append(1)
@@ -11166,7 +11303,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtemperature.append(0)
                                     aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
                                     aw.qmc.alarmbeep.append(0)
-                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None, QApplication.UnicodeUTF8))
+                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None))
 
                             elif roastlogger_action_section.startswith("@actionResetTable"):
                                 if len(fields_action) == 2 and fields_action[0] != "null":
@@ -11183,7 +11320,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtemperature.insert(0,0)
                                     aw.qmc.alarmaction.insert(0,3+slider_power)    #SLIDER POWER
                                     aw.qmc.alarmbeep.insert(0,0)
-                                    aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[0],None, QApplication.UnicodeUTF8))
+                                    aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[0],None))
 
                                     #add temp alarm - FAN
                                     aw.qmc.alarmflag.insert(0,1)
@@ -11197,7 +11334,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtemperature.insert(0,0)
                                     aw.qmc.alarmaction.insert(0,3+slider_fan)    #SLIDER POWER
                                     aw.qmc.alarmbeep.insert(0,0)
-                                    aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[1],None, QApplication.UnicodeUTF8))
+                                    aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[1],None))
 
                             elif roastlogger_action_section.startswith("@loadBeansTable"):
                                 if len(fields_action) == 1 and fields_action[0] != "null":
@@ -11214,7 +11351,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtemperature.insert(2,str(int(fields_action[0])-10))
                                     aw.qmc.alarmaction.insert(2,7)    #inititate 7 (START)
                                     aw.qmc.alarmbeep.insert(2,0)
-                                    aw.qmc.alarmstrings.insert(2,QApplication.translate("Label","Start recording",None, QApplication.UnicodeUTF8))
+                                    aw.qmc.alarmstrings.insert(2,QApplication.translate("Label","Start recording",None))
 
                                     #add CHARGE alarm
                                     aw.qmc.alarmflag.insert(3,1)
@@ -11228,7 +11365,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmtemperature.insert(3,fields_action[0])
                                     aw.qmc.alarmaction.insert(3,0)    #POPUP
                                     aw.qmc.alarmbeep.insert(3,1)      #do beep for charge
-                                    aw.qmc.alarmstrings.insert(3,QApplication.translate("Label","Charge the beans",None, QApplication.UnicodeUTF8))
+                                    aw.qmc.alarmstrings.insert(3,QApplication.translate("Label","Charge the beans",None))
                                 break;
                     else:
                         if slider_power == -1: error_msg += "Could not find slider named 'Power' "
@@ -11250,7 +11387,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.redraw()
 
         if error_msg: 
-            aw.qmc.adderror(QApplication.translate("Error Message","Roastlogger log file exception: " + error_msg,None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Roastlogger log file exception: " + error_msg,None))
 
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
@@ -11313,7 +11450,7 @@ class ApplicationWindow(QMainWindow):
                     outfile = open(filename, 'w',newline="")
                 writer= csv.writer(outfile,delimiter='\t')
                 writer.writerow([
-                    u("Date:" + self.qmc.roastdate.toString("dd'.'MM'.'yyyy")),
+                    u("Date:" + self.qmc.roastdate.date().toString("dd'.'MM'.'yyyy")),
                     u("Unit:" + self.qmc.mode),
                     u("CHARGE:" + self.eventtime2string(CHARGE)),
                     u("TP:" + self.eventtime2string(TP)),
@@ -11323,7 +11460,8 @@ class ApplicationWindow(QMainWindow):
                     u("SCs:" + self.eventtime2string(SCs)),
                     u("SCe:" + self.eventtime2string(SCe)),
                     u("DROP:" + self.eventtime2string(DROP)),
-                    u("COOL:" + self.eventtime2string(COOL))])
+                    u("COOL:" + self.eventtime2string(COOL)),
+                    u("Time:" + self.qmc.roastdate.time().toString()[:-3])])
                 row = ([u('Time1'),u('Time2'),u('BT'),u('ET'),u('Event')] + freduce(lambda x,y: x + [u(y[0]),u(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))
                 row = [encodeLocal(e) for e in row]
                 writer.writerow(row)
@@ -11361,7 +11499,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportCSV() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportCSV() %1").arg(str(ex)),exc_tb.tb_lineno)
             return False
 
     #Write object to file
@@ -11391,8 +11529,8 @@ class ApplicationWindow(QMainWindow):
             if "extratimex" in profile and len(profile["extratimex"]) > 0:
                 if "extradevices" in profile:
                     if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
-                        string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None, QApplication.UnicodeUTF8))
-                        reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
+                        string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
+                        reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                         if reply == QMessageBox.Yes:
                             aw.qmc.resetlinecountcaches()
                             self.qmc.extradevices = profile["extradevices"]
@@ -11506,7 +11644,7 @@ class ApplicationWindow(QMainWindow):
             if "title" in profile:
                 self.qmc.title = d(profile["title"])
             else:            
-                self.qmc.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
+                self.qmc.title = QApplication.translate("Scope Title", "Roaster Scope",None)
             if "beans" in profile:
                 self.qmc.beans = d(profile["beans"])
             else:
@@ -11569,15 +11707,35 @@ class ApplicationWindow(QMainWindow):
             # for compatibility with older profiles:
             if "roastdate" in profile:
                 try:
-                    self.qmc.roastdate = QDate.fromString(d(profile["roastdate"]))
+                    date = QDate.fromString(d(profile["roastdate"]))
+                    if "roasttime" in profile:
+                        try:
+                            time = QTime.fromString(d(profile["roasttime"]))
+                            self.qmc.roastdate = QDateTime(date,time)
+                        except Exception:
+                            self.qmc.roastdate = QDateTime(date)
+                    else:
+                        self.qmc.roastdate = QDateTime(date)
                 except Exception:
                     pass
             # the new dates have the locale independent isodate format:
             if "roastisodate" in profile:
                 try:
-                    self.qmc.roastdate = QDate.fromString(d(profile["roastisodate"]),Qt.ISODate)
+                    date = QDate.fromString(d(profile["roastisodate"]),Qt.ISODate)
+                    if "roasttime" in profile:
+                        try:
+                            time = QTime.fromString(d(profile["roasttime"]))
+                            self.qmc.roastdate = QDateTime(date,time)
+                        except Exception:
+                            self.qmc.roastdate = QDateTime(date)
+                    else:
+                        self.qmc.roastdate = QDateTime(date)
                 except Exception:
                     pass
+            if "roastbatchnr" in profile:
+                self.qmc.roastbatchnr = profile["roastbatchnr"]
+                self.qmc.roastbatchprefix = d(profile["roastbatchprefix"])
+                self.qmc.roastbatchpos = profile["roastbatchpos"]
             if "specialevents" in profile:
                 self.qmc.specialevents = profile["specialevents"]
             else:
@@ -11759,13 +11917,16 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.backgroundpath = ""
                     self.qmc.titleB = ""
+                    self.qmc.roastbatchnrB = 0
+                    self.qmc.roastbatchprefixB = u("")
+                    self.qmc.roastbatchposB = 0
             return True
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(self,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
 
     # the int n specifies the number of digits
     def float2float(self,f,n=1):
@@ -11854,7 +12015,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["COOL_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[7]])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)        
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)        
         ######### Phases #########
         try:
             if self.qmc.statisticstimes[0]:
@@ -11869,7 +12030,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["coolphasetime"] = self.qmc.statisticstimes[4]
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
         ######### Evaluations #########
         try:
             evaluations = self.defect_estimation()
@@ -11879,7 +12040,7 @@ class ApplicationWindow(QMainWindow):
             computedProfile["coolphaseeval"] = u(evaluations[3])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
         ######### RoR ######### 
         try:
             if TP_time_idx and DRY_time_idx:
@@ -11891,7 +12052,7 @@ class ApplicationWindow(QMainWindow):
                     computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
         ######### ETBTarea #########
         try:
             ts,tse,tsb = aw.ts(self.qmc.timeindex[0],self.qmc.timeindex[6])
@@ -11971,7 +12132,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["set_density"] = self.float2float(setdensity)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)                
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)                
         ######### Humidity #########
         try:
             if aw.qmc.moisture_greens != 0.0 and not math.isnan(aw.qmc.moisture_greens):
@@ -11984,7 +12145,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["ambient_temperature"] = self.float2float(aw.qmc.ambientTemp)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
         ######### Similarity #########
         try:
             det,dbt = aw.curveSimilarity(aw.qmc.phases[1])
@@ -12033,14 +12194,24 @@ class ApplicationWindow(QMainWindow):
             profile["volumeCalcWeightOut"] = str(self.qmc.volumeCalcWeightOutStr)
             # write roastdate that respects locale and potential cannot be read in under a different locale (just for compatibility to older versions)
             try:
-                profile["roastdate"] = encodeLocal(self.qmc.roastdate.toString())
+                profile["roastdate"] = encodeLocal(self.qmc.roastdate.date().toString())
             except:
                 pass
-            # write roast date
+            # write ISO roast date
             try:
-                profile["roastisodate"] = encodeLocal(self.qmc.roastdate.toString(Qt.ISODate))
+                profile["roastisodate"] = encodeLocal(self.qmc.roastdate.date().toString(Qt.ISODate))
             except:
                 pass
+            # write roast time
+            try:
+                profile["roasttime"] = encodeLocal(self.qmc.roastdate.time().toString())
+                profile["roastepoch"] = self.qmc.roastepoch
+                profile["roasttzoffset"] = self.qmc.roasttzoffset
+            except:
+                pass
+            profile["roastbatchnr"] = self.qmc.roastbatchnr
+            profile["roastbatchprefix"] = encodeLocal(u(self.qmc.roastbatchprefix))
+            profile["roastbatchpos"] = self.qmc.roastbatchpos
             profile["beansize"] = str(self.qmc.beansize)
             profile["specialevents"] = self.qmc.specialevents
             profile["specialeventstype"] = self.qmc.specialeventstype
@@ -12114,7 +12285,7 @@ class ApplicationWindow(QMainWindow):
             return profile
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " getProfile(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " getProfile(): %1").arg(str(ex)),exc_tb.tb_lineno)
             return None
 
     #saves recorded profile in hard drive. Called from file menu 
@@ -12124,23 +12295,27 @@ class ApplicationWindow(QMainWindow):
             if not filename:
                 path = QDir()
                 path.setPath(self.getDefaultPath())
-                fname = path.absoluteFilePath(self.generateFilename())
-                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None, QApplication.UnicodeUTF8), path=fname)
+                if aw.qmc.batchcounter > -1 and aw.qmc.roastbatchnr > 0:
+                    prefix = u(aw.qmc.batchprefix) + u(aw.qmc.roastbatchnr)
+                else:
+                    prefix = u("")
+                fname = path.absoluteFilePath(self.generateFilename(prefix=prefix))
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None), path=fname)
             if filename:
                 #write
                 pf = self.getProfile()
                 if pf:
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
-                    self.sendmessage(QApplication.translate("Message","Profile saved", None, QApplication.UnicodeUTF8))
+                    self.sendmessage(QApplication.translate("Message","Profile saved", None))
                     self.qmc.safesaveflag = False
                 else:
-                    self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
+                    self.sendmessage(QApplication.translate("Message","Cancelled", None))
             else:
-                self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " filesave(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " filesave(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def fileExport(self,msg,ext,dumper):
         try:
@@ -12148,21 +12323,21 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 res = dumper(filename)
                 if res:
-                    self.sendmessage(QApplication.translate("Message","Readings exported", None, QApplication.UnicodeUTF8))
+                    self.sendmessage(QApplication.translate("Message","Readings exported", None))
             else:
-                self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " fileExport(): %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " fileExport(): %1").arg(str(ex)))
             return
 
     def fileExportCSV(self):
-        self.fileExport(QApplication.translate("Message", "Export CSV",None, QApplication.UnicodeUTF8),"*.csv",self.exportCSV)
+        self.fileExport(QApplication.translate("Message", "Export CSV",None),"*.csv",self.exportCSV)
 
     def fileExportJSON(self):
-        self.fileExport(QApplication.translate("Message", "Export JSON",None, QApplication.UnicodeUTF8),"*.json",self.exportJSON)
+        self.fileExport(QApplication.translate("Message", "Export JSON",None),"*.json",self.exportJSON)
 
     def fileExportRoastLogger(self):
-        self.fileExport(QApplication.translate("Message", "Export RoastLogger",None, QApplication.UnicodeUTF8),"*.csv",self.exportRoastLogger)
+        self.fileExport(QApplication.translate("Message", "Export RoastLogger",None),"*.csv",self.exportRoastLogger)
 
     def fileImport(self,msg,loader,reset=False):
         try:
@@ -12171,26 +12346,30 @@ class ApplicationWindow(QMainWindow):
                 if reset:
                     aw.qmc.reset(True,False)
                 loader(filename)
-                self.sendmessage(QApplication.translate("Message","Readings imported", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","Readings imported", None))
             else:
-                self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","Cancelled", None))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " fileImport(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " fileImport(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def fileImportCSV(self):
-        self.fileImport(QApplication.translate("Message", "Import CSV",None, QApplication.UnicodeUTF8),self.importCSV,True)
+        self.fileImport(QApplication.translate("Message", "Import CSV",None),self.importCSV,True)
 
     def fileImportJSON(self):
-        self.fileImport(QApplication.translate("Message", "Import JSON",None, QApplication.UnicodeUTF8),self.importJSON,True)
+        self.fileImport(QApplication.translate("Message", "Import JSON",None),self.importJSON,True)
 
     def fileImportRoastLogger(self):
-        self.fileImport(QApplication.translate("Message", "Import RoastLogger",None, QApplication.UnicodeUTF8),self.importRoastLogger,True)
+        self.fileImport(QApplication.translate("Message", "Import RoastLogger",None),self.importRoastLogger,True)
 
-    #loads the settings at the start of application. See the oppposite closeEvent()
-    def settingsLoad(self):
+    #loads the settings at the start of application. See the oppposite closeEventSettings()
+    def settingsLoad(self, filename=None):
         try: 
-            settings = QSettings()
+            if filename:
+                settings = QSettings(filename,QSettings.IniFormat)
+                self.settingspath = filename
+            else:
+                settings = QSettings()
             if settings.contains("resetqsettings"):
                 self.resetqsettings = settings.value("resetqsettings",self.resetqsettings).toInt()[0]
                 if self.resetqsettings:
@@ -12679,6 +12858,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.beansize = settings.value("beansize",self.qmc.beansize).toDouble()[0]
             settings.endGroup()
             self.userprofilepath = u(settings.value("profilepath",self.userprofilepath).toString())
+            if settings.contains("settingspath"):            
+                self.settingspath = u(settings.value("settingspath",self.settingspath).toString())
             if settings.contains("autosavepath"):
                 self.qmc.autosavepath = u(settings.value("autosavepath",self.qmc.autosavepath).toString())
             if settings.contains("externalprogram"):
@@ -12852,6 +13033,13 @@ class ApplicationWindow(QMainWindow):
                 if settings.contains("quantifiercoarse"):
                     self.eventquantifiercoarse = [x.toInt()[0] for x in settings.value("quantifiercoarse").toList()]
             settings.endGroup()
+            settings.beginGroup("Batch")
+            if settings.contains("batchcounter"):
+                aw.qmc.batchcounter = settings.value("batchcounter",aw.qmc.batchcounter).toInt()[0]
+                aw.qmc.batchsequence = settings.value("batchsequence",aw.qmc.batchsequence).toInt()[0]
+                aw.qmc.batchprefix = u(settings.value("batchprefix",aw.qmc.batchprefix).toString())
+                aw.qmc.lastroastepoch = settings.value("lastroastepoch",aw.qmc.lastroastepoch).toInt()[0]
+            settings.endGroup()
             self.computeLinespaces()
             self.updateSlidersProperties()
             #restore background profile settings
@@ -12941,7 +13129,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "  settingsLoad()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + "  settingsLoad()  @line " + str(exc_tb.tb_lineno))
 
 #--------------------------------
         try:
@@ -12969,7 +13157,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " settingsLoad()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " settingsLoad()  @line " + str(exc_tb.tb_lineno))
 
     def startWebLCDs(self,force=False):
         try:
@@ -12998,7 +13186,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " startWebLCDs() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() %1").arg(str(e)),exc_tb.tb_lineno)
             self.stopWebLCDs()
             return False
             
@@ -13224,19 +13412,22 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " fetchCurveStyles() %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fetchCurveStyles() %1").arg(str(e)),exc_tb.tb_lineno)
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
     def closeEvent(self,_):
         self.closeApp()
     
-    def closeEventSettings(self,_):
+    def closeEventSettings(self, filename=None):
         #save window geometry and position. See QSettings documentation.
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
         #many applications (including the KDE applications) use INI text files
         try:
-            settings = QSettings()
+            if filename:
+                settings = QSettings(filename,QSettings.IniFormat)
+            else:
+                settings = QSettings()
             #save window geometry
             settings.setValue("Geometry",QVariant(self.saveGeometry()))
             #save mode
@@ -13527,6 +13718,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("alarmsfile",self.qmc.alarmsfile)
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
+            settings.setValue("settingspath",self.settingspath)
             settings.setValue("autosavepath",self.qmc.autosavepath)
             settings.setValue("externalprogram",self.ser.externalprogram)
             #save extra devices
@@ -13672,6 +13864,12 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("roastpropertiesflag",self.qmc.roastpropertiesflag)
             settings.setValue("customflavorlabels",self.qmc.customflavorlabels)
+            settings.beginGroup("Batch")
+            settings.setValue("batchcounter",self.qmc.batchcounter)
+            settings.setValue("batchsequence",self.qmc.batchsequence)
+            settings.setValue("batchprefix",self.qmc.batchprefix)
+            settings.setValue("lastroastepoch",self.qmc.lastroastepoch)
+            settings.endGroup()
             try:
                 settings.setValue("appearance",str(aw.style().objectName()).lower())
             except:
@@ -13682,7 +13880,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info() 
-            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " closeEvent()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEvent()  @line " + str(exc_tb.tb_lineno))
 
     #used for trouble shooting.
     def readartisansettings(self):
@@ -13869,7 +14067,7 @@ class ApplicationWindow(QMainWindow):
                 tmp_LargeLCDs = aw.LargeLCDs # we keep the state to properly store it in the settings
                 aw.largeLCDs_dialog.close()
                 aw.LargeLCDs = tmp_LargeLCDs
-            self.closeEventSettings(self)
+            self.closeEventSettings()
             # now wait until the current sampling thread is terminated
             while aw.qmc.flagsamplingthreadrunning:
                 libtime.sleep(.01)
@@ -13938,7 +14136,7 @@ class ApplicationWindow(QMainWindow):
 <html lang="en">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>""") + u(QApplication.translate("HTML Report Template", "Roasting Report", None, QApplication.UnicodeUTF8)) + u("""</title>
+<title>""") + u(QApplication.translate("HTML Report Template", "Roasting Report", None)) + u("""</title>
 <style type="text/css">
 td { 
   vertical-align: top;
@@ -13963,55 +14161,55 @@ th {
 <td>
 <table width="230">
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Date:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Date:", None)) + u("""</th>
 <td>$datetime</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Beans:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Beans:", None)) + u("""</th>
 <td>$beans</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Size:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Size:", None)) + u("""</th>
 <td>$size</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Weight:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Weight:", None)) + u("""</th>
 <td>$weight</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Degree:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Degree:", None)) + u("""</th>
 <td>$degree</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Volume:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Volume:", None)) + u("""</th>
 <td>$volume</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Density:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Density:", None)) + u("""</th>
 <td>$density</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Moisture:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Moisture:", None)) + u("""</th>
 <td>$moisture</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Ambient:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Ambient:", None)) + u("""</th>
 <td>$humidity</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Roaster:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Roaster:", None)) + u("""</th>
 <td>$roaster</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Operator:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Operator:", None)) + u("""</th>
 <td>$operator</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Cupping:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Cupping:", None)) + u("""</th>
 <td>$cup</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Color:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Color:", None)) + u("""</th>
 <td>$color</td>
 </tr>
 </table>
@@ -14019,55 +14217,55 @@ th {
 <td>
 <table width="230">
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "CHARGE:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "CHARGE:", None)) + u("""</th>
 <td>$charge</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "TP:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "TP:", None)) + u("""</th>
 <td>$TP</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "DRY:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "DRY:", None)) + u("""</th>
 <td>$DRY</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "FCs:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "FCs:", None)) + u("""</th>
 <td>$FCs</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "FCe:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "FCe:", None)) + u("""</th>
 <td>$FCe</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "SCs:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "SCs:", None)) + u("""</th>
 <td>$SCs</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "SCe:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "SCe:", None)) + u("""</th>
 <td>$SCe</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "DROP:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "DROP:", None)) + u("""</th>
 <td>$drop</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "COOL:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "COOL:", None)) + u("""</th>
 <td>$cool</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "MET:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "MET:", None)) + u("""</th>
 <td>$met</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "RoR:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "RoR:", None)) + u("""</th>
 <td>$ror</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "ETBTa:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "ETBTa:", None)) + u("""</th>
 <td>$etbta</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "CM:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "CM:", None)) + u("""</th>
 <td>$cm</td>
 </tr>
 </table>
@@ -14075,25 +14273,25 @@ th {
 <td>
 <table width="250">
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Drying:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Drying:", None)) + u("""</th>
 <td>$dry_phase</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Maillard:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Maillard:", None)) + u("""</th>
 <td>$mid_phase</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Development:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Development:", None)) + u("""</th>
 <td>$finish_phase</td>
 </tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Cooling:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Cooling:", None)) + u("""</th>
 <td>$cool_phase</td>
 </tr>
 <tr><th></th><td></td></tr>
 <tr><th></th><td></td></tr>
 <tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Background:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Background:", None)) + u("""</th>
 <td>$background</td>
 </tr>
 </table>
@@ -14107,13 +14305,13 @@ th {
 <td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='file:///$graph_image'></td>
 </tr>
 <tr>
-<td><center><b>""" + unicode(QApplication.translate("HTML Report Template", "Events", None, QApplication.UnicodeUTF8)) + """</b></center><br>
+<td><center><b>""" + unicode(QApplication.translate("HTML Report Template", "Events", None)) + """</b></center><br>
 $specialevents
 </td>
 </tr>
 <tr>
 <td>
-<center><b>""") + u(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + u("""</b></center>
+<center><b>""") + u(QApplication.translate("HTML Report Template", "Roasting Notes", None)) + u("""</b></center>
 $roasting_notes$roast_attributes
 </td>
 </tr>
@@ -14123,7 +14321,7 @@ $roasting_notes$roast_attributes
 <td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='file:///$flavor_image'></td>
 </tr>
 <tr>
-<td><center><b>""") + u(QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8)) + u("""</b></center>
+<td><center><b>""") + u(QApplication.translate("HTML Report Template", "Cupping Notes", None)) + u("""</b></center>
 $cupping_notes
 </td>
 </tr>
@@ -14202,7 +14400,7 @@ $cupping_notes
                 met = "%.0f"%cp["MET"] + "&deg;" + self.qmc.mode
             ror = u("--")
             if "total_ror" in cp:
-                ror = u("%d%s%s%s"%(cp["total_ror"],uchr(176),aw.qmc.mode,QApplication.translate("Label", "/m",None, QApplication.UnicodeUTF8)))
+                ror = u("%d%s%s%s"%(cp["total_ror"],uchr(176),aw.qmc.mode,QApplication.translate("Label", "/m",None)))
             if "set_density" in cp:
                 density = u("%.1fg/l (set)"%cp["set_density"])
             else:
@@ -14246,7 +14444,15 @@ $cupping_notes
             if len(humidity) == 0:
                 humidity = u("--")
             if self.qmc.whole_color or self.qmc.ground_color:
-                color = u(str(self.qmc.whole_color) + "/" + str(self.qmc.ground_color))
+                if self.qmc.whole_color:
+                    wcolor = u(self.qmc.whole_color)
+                else:
+                    wcolor = u("--")
+                if self.qmc.ground_color:
+                    gcolor = u(self.qmc.ground_color)
+                else:
+                    gcolor = u("--")
+                color = wcolor + u("/") + gcolor
                 if self.qmc.color_system_idx:
                     color = color + u(" (" + self.qmc.color_systems[self.qmc.color_system_idx] + ")")
             else:
@@ -14258,10 +14464,18 @@ $cupping_notes
             if aw.qmc.titleB == None or aw.qmc.titleB == "":
                 background = u("--")
             else:
-                background = u(aw.qmc.titleB)
+                if aw.qmc.roastbatchnrB == 0:
+                    titleB = u(aw.qmc.titleB)
+                else:
+                    titleB = aw.qmc.roastbatchprefixB + u(aw.qmc.roastbatchnrB) + u(" ") + u(aw.qmc.titleB)
+                background = u(titleB)
+            if aw.qmc.roastbatchnr == 0:
+                batch = u("")
+            else:
+                batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + u(" ")
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
-                title=u(cgi.escape(self.qmc.title)),
-                datetime=u(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
+                title=u(cgi.escape(batch)) + u(cgi.escape(self.qmc.title)),
+                datetime=u(self.qmc.roastdate.date().toString()) + ", " + u(self.qmc.roastdate.time().toString()[:-3]), 
                 beans=beans,
                 weight=weight,
                 degree=degree,
@@ -14313,7 +14527,7 @@ $cupping_notes
                 QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
                 
             except IOError as e:
-                aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " htmlReport() %1").arg(str(e)))
+                aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " htmlReport() %1").arg(str(e)))
             finally:
                 if f:
                     f.close()
@@ -14321,31 +14535,31 @@ $cupping_notes
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " htmlReport() %1").arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " htmlReport() %1").arg(str(e)),exc_tb.tb_lineno)
 
     # returns a string with all the activated roast attributes
     def roastattributes(self):
         res = []
         if aw.qmc.heavyFC_flag:
-            res.append(u(QApplication.translate("CheckBox","Heavy FC", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Heavy FC", None)))
         if aw.qmc.lowFC_flag:
-            res.append(u(QApplication.translate("CheckBox","Low FC", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Low FC", None)))
         if aw.qmc.lightCut_flag:
-            res.append(u(QApplication.translate("CheckBox","Light Cut", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Light Cut", None)))
         if aw.qmc.darkCut_flag:
-            res.append(u(QApplication.translate("CheckBox","Dark Cut", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Dark Cut", None)))
         if aw.qmc.drops_flag:
-            res.append(u(QApplication.translate("CheckBox","Drops", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Drops", None)))
         if aw.qmc.oily_flag:
-            res.append(u(QApplication.translate("CheckBox","Oily", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Oily", None)))
         if aw.qmc.uneven_flag:
-            res.append(u(QApplication.translate("CheckBox","Uneven", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Uneven", None)))
         if aw.qmc.tipping_flag:
-            res.append(u(QApplication.translate("CheckBox","Tipping", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Tipping", None)))
         if aw.qmc.scorching_flag:
-            res.append(u(QApplication.translate("CheckBox","Scorching", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Scorching", None)))
         if aw.qmc.divots_flag:
-            res.append(u(QApplication.translate("CheckBox","Divots", None, QApplication.UnicodeUTF8)))
+            res.append(u(QApplication.translate("CheckBox","Divots", None)))
         if len(res) > 0:
             return u("\n<center><pre>" + ', '.join(res) + "</pre></center>")
         else:
@@ -14545,16 +14759,16 @@ $cupping_notes
         midphasetime = self.qmc.statisticstimes[2]
         finishphasetime = self.qmc.statisticstimes[3]
         coolphasetime = self.qmc.statisticstimes[4]
-        PerfectPhase = u(QApplication.translate("Flavor Scope Label", "OK",None, QApplication.UnicodeUTF8))
-        ShortDryingPhase = u(QApplication.translate("Flavor Scope Label", "Grassy",None, QApplication.UnicodeUTF8))
-        LongDryingPhase = u(QApplication.translate("Flavor Scope Label", "Leathery",None, QApplication.UnicodeUTF8))
-        ShortTo1CPhase = u(QApplication.translate("Flavor Scope Label", "Toasty",None, QApplication.UnicodeUTF8))
-        LongTo1CPhase = u(QApplication.translate("Flavor Scope Label", "Bready",None, QApplication.UnicodeUTF8))
-        ShortFinishPhase = u(QApplication.translate("Flavor Scope Label", "Acidic",None, QApplication.UnicodeUTF8))
-        LongFinishPhase = u(QApplication.translate("Flavor Scope Label", "Flat",None, QApplication.UnicodeUTF8))
-        ShortCoolPhase = u(QApplication.translate("Flavor Scope Label", "Fracturing",None, QApplication.UnicodeUTF8))
-        PerfectCoolPhase = u(QApplication.translate("Flavor Scope Label", "Sweet",None, QApplication.UnicodeUTF8))
-        LongCoolPhase = u(QApplication.translate("Flavor Scope Label", "Less Sweet",None, QApplication.UnicodeUTF8))
+        PerfectPhase = u(QApplication.translate("Flavor Scope Label", "OK",None))
+        ShortDryingPhase = u(QApplication.translate("Flavor Scope Label", "Grassy",None))
+        LongDryingPhase = u(QApplication.translate("Flavor Scope Label", "Leathery",None))
+        ShortTo1CPhase = u(QApplication.translate("Flavor Scope Label", "Toasty",None))
+        LongTo1CPhase = u(QApplication.translate("Flavor Scope Label", "Bready",None))
+        ShortFinishPhase = u(QApplication.translate("Flavor Scope Label", "Acidic",None))
+        LongFinishPhase = u(QApplication.translate("Flavor Scope Label", "Flat",None))
+        ShortCoolPhase = u(QApplication.translate("Flavor Scope Label", "Fracturing",None))
+        PerfectCoolPhase = u(QApplication.translate("Flavor Scope Label", "Sweet",None))
+        LongCoolPhase = u(QApplication.translate("Flavor Scope Label", "Less Sweet",None))
         #CHECK CONDITIONS
         #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
         #  => ShortDryingPhase
@@ -14680,7 +14894,7 @@ $cupping_notes
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ts() %1").arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ts() %1").arg(str(e)),exc_tb.tb_lineno)
             return int(round(delta/60)), int(round(ET/60)), int(round(BT/60))
 
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
@@ -14754,7 +14968,7 @@ $cupping_notes
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
         box.about(self,
-                QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
+                QApplication.translate("About", "About",None),
                 u("""<big><b>{0}</b> {1}</big> ({2})
                 <p>
                 <b>Based on:</b><br>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}
@@ -14774,9 +14988,9 @@ $cupping_notes
                 mpl.__version__,
                 numpy.__version__,
                 SCIPY_VERSION_STR,
-                QApplication.translate("About", "Core developers:",None, QApplication.UnicodeUTF8),
+                QApplication.translate("About", "Core developers:",None),
                 coredevelopers,
-                QApplication.translate("About", "Contributors:",None, QApplication.UnicodeUTF8),
+                QApplication.translate("About", "Contributors:",None),
                 contributors))
 
     def showAboutQt(self):
@@ -14826,15 +15040,14 @@ $cupping_notes
         aw.qmc.oversampling = not aw.qmc.oversampling
         aw.oversamplingAction.setChecked(aw.qmc.oversampling)
         if aw.qmc.oversampling and self.qmc.delay < aw.qmc.oversampling_min_delay:
-            QMessageBox.warning(self,QApplication.translate("Message", "Warning",None, 
-            QApplication.UnicodeUTF8),QApplication.translate("Message", 
-            "Oversampling is only active with a sampling interval equal or larger than 3s.",None, QApplication.UnicodeUTF8))
+            QMessageBox.warning(self,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", 
+            "Oversampling is only active with a sampling interval equal or larger than 3s.",None))
 
 
     def calibratedelay(self):
         secondsdelay, ok = QInputDialog.getDouble(self,
-                QApplication.translate("Message", "Sampling Interval",None, QApplication.UnicodeUTF8),
-                QApplication.translate("Message", "Seconds",None, QApplication.UnicodeUTF8),
+                QApplication.translate("Message", "Sampling Interval",None),
+                QApplication.translate("Message", "Seconds",None),
                 #calSpinBox.value(),
                 self.qmc.delay/1000.,
                 aw.qmc.min_delay/1000.,30.)
@@ -14842,7 +15055,7 @@ $cupping_notes
         if ok:
             self.qmc.delay = int(secondsdelay*1000.)
             if self.qmc.delay <= self.qmc.min_delay + 1000:
-                QMessageBox.warning(self,QApplication.translate("Message", "Warning",None, QApplication.UnicodeUTF8),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None, QApplication.UnicodeUTF8))
+                QMessageBox.warning(self,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))
 
     def setcommport(self):
         dialog = comportDlg(self)
@@ -14920,7 +15133,7 @@ $cupping_notes
         res = releaseHottopControl()
         if res:
             if self.HottopControlActive:
-                aw.sendmessage(QApplication.translate("Message","Hottop control turned off", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","Hottop control turned off", None))
             self.HottopControlActive = False
             aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
     
@@ -14933,7 +15146,7 @@ $cupping_notes
                 setHottop(drum_motor=True)
                 aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
                 if not self.HottopControlActive:
-                    aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None, QApplication.UnicodeUTF8))            
+                    aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None))            
                 self.HottopControlActive = True
 
     def PIDcontrol(self):
@@ -14983,13 +15196,110 @@ $cupping_notes
         dialog.show()
         dialog.setFixedSize(dialog.size())
 
+    def batchconf(self):
+        dialog = batchDlg(self)
+        dialog.show()
+        dialog.setFixedSize(dialog.size())
+
     def calculator(self):
         dialog = calculatorDlg(self)
         dialog.show()
-        dialog.setFixedSize(self.dialog.size())
+        dialog.setFixedSize(dialog.size())
         QApplication.processEvents()
         dialog.setModal(False)
-
+        
+    def loadSettings(self,fn=None):
+        try:
+            if fn:
+                filename = fn
+            else:
+                filename = self.ArtisanOpenFileDialog()
+            if filename:
+                try:
+                    aw.settingsLoad(filename)
+                    # update recentSettings menu
+                    settings = QSettings()
+                    files = settings.value('recentSettingList').toStringList()
+                    try:
+                        files.removeAll(filename)
+                    except ValueError:
+                        pass
+                    files.insert(0, filename)
+                    del files[self.MaxRecentFiles:]
+                    settings.setValue('recentSettingList', files)
+                    for widget in QApplication.topLevelWidgets():
+                        if isinstance(widget, ApplicationWindow):
+                            widget.updateRecentSettingActions()
+                    aw.qmc.reset(soundOn=False)
+                    self.sendmessage(QApplication.translate("Message","Settings loaded", None))
+                except:
+                    # remove file from the recent file list
+                    settings = QSettings()
+                    files = settings.value('recentSettingList').toStringList()
+                    try:
+                        files.removeAll(filename)
+                    except ValueError:
+                        pass
+                    settings.setValue('recentSettingList', files)
+                    for widget in QApplication.topLevelWidgets():
+                        if isinstance(widget, ApplicationWindow):
+                            widget.updateRecentSettingActions()
+            else:
+                self.sendmessage(QApplication.translate("Message","Cancelled", None))
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() %1").arg(str(ex)),exc_tb.tb_lineno)
+        
+    def updateRecentSettingActions(self):
+        settings = QSettings()
+        files = settings.value('recentSettingList').toStringList()
+        strippedNames = list(map(self.strippedName,files))
+        numRecentSettings = min(len(files), self.MaxRecentFiles)
+ 
+        for i in range(numRecentSettings):
+            strippedName = self.strippedName(files[i])
+            if strippedNames.count(strippedName) > 1:
+                text = "&%s (%s)" % (strippedName, self.strippedDir(files[i]))
+            else:
+                text = "&%s" % strippedName
+            self.recentSettingActs[i].setText(text)
+            self.recentSettingActs[i].setData(files[i])
+            self.recentSettingActs[i].setVisible(True)
+ 
+        for j in range(numRecentSettings, self.MaxRecentFiles):
+            self.recentSettingActs[j].setVisible(False)
+ 
+    def openRecentSetting(self):
+        action = self.sender()
+        if action:
+            self.loadSettings(file=action.data().toString())
+        
+    def saveSettings(self):
+        path = QDir()
+        path.setPath(self.getDefaultPath())
+        fname = path.absoluteFilePath(QApplication.translate("Message","artisan-settings", None))
+        filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Settings",None), path=fname, ext="*.aset")
+        if filename:
+            aw.closeEventSettings(filename)
+            self.sendmessage(QApplication.translate("Message","Settings saved", None))
+            # update recentSettings menu
+            settings = QSettings()
+            files = settings.value('recentSettingList').toStringList()
+            try:
+                files.removeAll(filename)
+            except ValueError:
+                pass
+            files.insert(0, filename)
+            del files[self.MaxRecentFiles:]
+            settings.setValue('recentSettingList', files)
+            for widget in QApplication.topLevelWidgets():
+                if isinstance(widget, ApplicationWindow):
+                    widget.updateRecentSettingActions()            
+        else:
+            self.sendmessage(QApplication.translate("Message","Cancelled", None))
+        
     def largeLCDs(self):
         if not self.largeLCDs_dialog:
             self.largeLCDs_dialog = LargeLCDs(self)
@@ -15015,6 +15325,9 @@ $cupping_notes
     def deleteBackground(self):
         self.qmc.backgroundpath = ""
         self.qmc.titleB = ""
+        self.qmc.roastbatchnrB = 0
+        self.qmc.roastbatchprefixB = u("")
+        self.qmc.roastbatchposB = 0
         self.qmc.temp1B, self.qmc.temp2B, self.qmc.temp1BX, self.qmc.temp2BX, self.qmc.timeB = [],[],[],[],[]
         self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = [],[],[],[] # smoothed versions of the background courves
         self.qmc.extraname1B,self.qmc.extraname2B = [],[]
@@ -15085,8 +15398,8 @@ $cupping_notes
             dialog = AlarmDlg(self)
             dialog.show()
         else:
-            QMessageBox.information(self,QApplication.translate("Message", "Alarm Config",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Message", "Alarms are not available for device None",None, QApplication.UnicodeUTF8))
+            QMessageBox.information(self,QApplication.translate("Message", "Alarm Config",None),
+                                    QApplication.translate("Message", "Alarms are not available for device None",None))
 
     def switchLanguageFlag(self,locale,value):
         if locale == "en" or locale == "en_US":
@@ -15142,8 +15455,8 @@ $cupping_notes
             self.switchLanguageFlag(languagelocale,True)
             settings = QSettings()
             settings.setValue('locale', languagelocale)
-            QMessageBox.information(self,QApplication.translate("Message", "Switch Language",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Message","Language successfully changed. Restart the application.",None, QApplication.UnicodeUTF8))
+            QMessageBox.information(self,QApplication.translate("Message", "Switch Language",None),
+                                    QApplication.translate("Message","Language successfully changed. Restart the application.",None))
 
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loss in percentage as float
@@ -15159,21 +15472,21 @@ $cupping_notes
         if percent < 13.5:
             return ""
         elif percent < 14.5:
-            return u(QApplication.translate("Label", "City",None, QApplication.UnicodeUTF8))
+            return u(QApplication.translate("Label", "City",None))
         elif percent < 15.5:
-            return u(QApplication.translate("Label", "City+",None, QApplication.UnicodeUTF8))
+            return u(QApplication.translate("Label", "City+",None))
         elif percent < 16.5:
-            return u(QApplication.translate("Label", "Full City",None, QApplication.UnicodeUTF8))
+            return u(QApplication.translate("Label", "Full City",None))
         elif percent < 17.5:
-            return u(QApplication.translate("Label", "Full City+",None, QApplication.UnicodeUTF8))
+            return u(QApplication.translate("Label", "Full City+",None))
         elif percent < 18.5:
-            return u(QApplication.translate("Label", "Light French",None, QApplication.UnicodeUTF8))
+            return u(QApplication.translate("Label", "Light French",None))
         else:
-            return u(QApplication.translate("Label", "French",None, QApplication.UnicodeUTF8))
+            return u(QApplication.translate("Label", "French",None))
 
     def importK202(self):
         try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import K202 CSV",None, QApplication.UnicodeUTF8))
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import K202 CSV",None))
             if len(filename) == 0:
                 return
             if self.qmc.reset():
@@ -15191,8 +15504,10 @@ $cupping_notes
                     try:
                         #set date
                         if not roastdate:
-                            roastdate = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                            roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
                             self.qmc.roastdate = roastdate
+                            self.qmc.roastepoch = self.qmc.roastdate.toTime_t()
+                            self.qmc.roasttzoffset = 0
                         #set zero
                         if not zero_t:
                             date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
@@ -15223,21 +15538,21 @@ $cupping_notes
                     self.qmc.temp1 = self.qmc.temp2
                     self.qmc.temp2 = tmp
                 self.qmc.endofx = self.qmc.timex[-1]
-                self.sendmessage(QApplication.translate("Message","K202 file loaded successfully", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","K202 file loaded successfully", None))
                 self.qmc.redraw()
         except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " importK202(): %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importK202(): %1").arg(str(ex)))
         except ValueError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None, QApplication.UnicodeUTF8) + " importK202(): %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK202(): %1").arg(str(ex)))
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importK202() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK202() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def importK204(self):
         try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import K204 CSV",None, QApplication.UnicodeUTF8))
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import K204 CSV",None))
             if len(filename) == 0:
                 return
             if self.qmc.reset():
@@ -15257,8 +15572,10 @@ $cupping_notes
                     try:
                         #set date
                         if not roastdate:
-                            roastdate = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                            roastdate = QDateTime(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
                             self.qmc.roastdate = roastdate
+                            self.qmc.roastepoch = self.qmc.roastdate.toTime_t()
+                            self.qmc.roasttzoffset = 0
                         #set zero
                         if not zero_t:
                             date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
@@ -15301,21 +15618,21 @@ $cupping_notes
                     self.qmc.temp1 = self.qmc.temp2
                     self.qmc.temp2 = tmp
                 self.qmc.endofx = self.qmc.timex[-1]
-                self.sendmessage(QApplication.translate("Message","K204 file loaded successfully", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","K204 file loaded successfully", None))
                 self.qmc.redraw()
         except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " importK204(): %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importK204(): %1").arg(str(ex)))
         except ValueError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None, QApplication.UnicodeUTF8) + " importK204(): %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importK204(): %1").arg(str(ex)))
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importK204() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK204() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def importHH506RA(self):
         try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import HH506RA CSV", None, QApplication.UnicodeUTF8))
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import HH506RA CSV", None))
             if len(filename) == 0:
                 return
             if self.qmc.reset():
@@ -15329,8 +15646,10 @@ $cupping_notes
                 #read file header
                 header = next(data)
                 zero = QDateTime()
-                date = QDate.fromString(header[0].split('Date:')[1],"yyyy'/'MM'/'dd")
+                date = QDateTime(QDate.fromString(header[0].split('Date:')[1],"yyyy'/'MM'/'dd"))
                 self.qmc.roastdate = date
+                self.qmc.roastepoch = self.qmc.roastdate.toTime_t()
+                self.qmc.roasttzoffset = 0
                 zero.setDate(date)
                 zero.setTime(QTime.fromString(header[1].split('Time:')[1],"hh':'mm':'ss"))
                 zero_t = zero.toTime_t()
@@ -15364,35 +15683,35 @@ $cupping_notes
                     self.qmc.temp1 = self.qmc.temp2
                     self.qmc.temp2 = tmp
                 self.qmc.endofx = self.qmc.timex[-1]
-                self.sendmessage(QApplication.translate("Message","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","HH506RA file loaded successfully", None))
                 self.qmc.redraw()
         except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " importHH506RA(): %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importHH506RA(): %1").arg(str(ex)))
         except ValueError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None, QApplication.UnicodeUTF8) + " importHH506RA(): %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importHH506RA(): %1").arg(str(ex)))
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importHH506RA() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importHH506RA() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #checks or creates directory structure
     def dirstruct(self):
         currentdir = QDir().current()     #selects the current dir
-        if not currentdir.exists(QApplication.translate("Directory","profiles", None, QApplication.UnicodeUTF8)):
-            currentdir.mkdir(QApplication.translate("Directory","profiles",None, QApplication.UnicodeUTF8))
+        if not currentdir.exists(QApplication.translate("Directory","profiles", None)):
+            currentdir.mkdir(QApplication.translate("Directory","profiles",None))
         #check/create 'other' directory inside profiles/
-        otherpath = QString(QApplication.translate("Directory","profiles", None, QApplication.UnicodeUTF8) + "/" + QApplication.translate("Directory","other", None, QApplication.UnicodeUTF8))
+        otherpath = QString(QApplication.translate("Directory","profiles", None) + "/" + QApplication.translate("Directory","other", None))
         if not currentdir.exists(otherpath):
             currentdir.mkdir(otherpath)
         #find current year,month
         date =  QDate.currentDate()
         #check / create year dir 
-        yearpath = QString(QApplication.translate("Directory","profiles", None, QApplication.UnicodeUTF8) + "/" + str(date.year()))
+        yearpath = QString(QApplication.translate("Directory","profiles", None) + "/" + str(date.year()))
         if not currentdir.exists(yearpath):
             currentdir.mkdir(yearpath)
         #check /create month dir to store profiles
-        monthpath = QString(QApplication.translate("Directory","profiles", None, QApplication.UnicodeUTF8) + "/" + str(date.year()) + "/" + str(date.month()))
+        monthpath = QString(QApplication.translate("Directory","profiles", None) + "/" + str(date.year()) + "/" + str(date.month()))
         if not currentdir.exists(monthpath):
             currentdir.mkdir(monthpath)
         if len(self.profilepath) == 0:
@@ -15405,30 +15724,30 @@ $cupping_notes
 #            image = aw.qmc.grab()
             if w != 0:
                 image = image.scaledToWidth(w,transformationmode)
-            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None, QApplication.UnicodeUTF8),ext="*.png")
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None),ext="*.png")
             if filename:
                 if ".png" not in filename:
                     filename += ".png"
                 image.save(filename)
                 x = image.width()
                 y = image.height()
-                self.sendmessage(QApplication.translate("Message","%1  size(%2,%3) saved", None, QApplication.UnicodeUTF8).arg(str(filename)).arg(str(x)).arg(str(y)))
+                self.sendmessage(QApplication.translate("Message","%1  size(%2,%3) saved", None).arg(str(filename)).arg(str(x)).arg(str(y)))
         except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " resize() %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() %1").arg(str(ex)))
 
     def saveVectorGraph(self,extension=".pdf"):
         try: 
             if extension == ".pdf":
-                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PDF", None, QApplication.UnicodeUTF8),ext=extension)
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PDF", None),ext=extension)
             else:
-                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as SVG", None, QApplication.UnicodeUTF8),ext=extension)
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as SVG", None),ext=extension)
             if filename:
                 if extension not in filename:
                     filename += extension
                 aw.qmc.fig.savefig(filename)
-                self.sendmessage(QApplication.translate("Message","%1 saved", None, QApplication.UnicodeUTF8).arg(str(filename)))
+                self.sendmessage(QApplication.translate("Message","%1 saved", None).arg(str(filename)))
         except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " saveVectorGraph() %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " saveVectorGraph() %1").arg(str(ex)))
 
     #displays Dialog for the setting of the HUD
     def hudset(self):
@@ -15446,30 +15765,30 @@ $cupping_notes
         if len(self.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
             ETreachTime,BTreachTime,ET2reachTime,BT2reachTime = self.qmc.getTargetTime()
             if ETreachTime > 0 and ETreachTime < 2000:
-                text1 = u(QApplication.translate("Label","%1 to reach ET %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
+                text1 = u(QApplication.translate("Label","%1 to reach ET %2", None).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
-                    text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
+                    text1 = text1 + u(QApplication.translate("Label"," at %1", None).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
             else:
-                text1 = u(QApplication.translate("Label","%1 to reach ET %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
+                text1 = u(QApplication.translate("Label","%1 to reach ET %2", None).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
             if ET2reachTime > 0 and ET2reachTime < 2000:
-                text2 = u(QApplication.translate("Label","%1 to reach ET %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
+                text2 = u(QApplication.translate("Label","%1 to reach ET %2", None).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
-                    text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
+                    text2 = text2 + u(QApplication.translate("Label"," at %1", None).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
             else:
-                text2 = u(QApplication.translate("Label","%1 to reach ET %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ET2target) + self.qmc.mode))
+                text2 = u(QApplication.translate("Label","%1 to reach ET %2", None).arg("xx:xx").arg(str(self.qmc.ET2target) + self.qmc.mode))
                 
             if BTreachTime > 0 and BTreachTime < 2000:    
-                text3 = u(QApplication.translate("Label","%1 to reach BT %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
+                text3 = u(QApplication.translate("Label","%1 to reach BT %2", None).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
-                    text3 = text3 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
+                    text3 = text3 + u(QApplication.translate("Label"," at %1", None).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
             else:
-                text3 = u(QApplication.translate("Label","%1 to reach BT %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
+                text3 = u(QApplication.translate("Label","%1 to reach BT %2", None).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
             if BT2reachTime > 0 and BT2reachTime < 2000:
-                text4 = u(QApplication.translate("Label","%1 to reach BT %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
+                text4 = u(QApplication.translate("Label","%1 to reach BT %2", None).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
                 if self.qmc.timeindex[0] > -1:
-                    text4 = text4 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
+                    text4 = text4 + u(QApplication.translate("Label"," at %1", None).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
             else:
-                text4 = u(QApplication.translate("Label","%1 to reach BT %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BT2target) + self.qmc.mode))
+                text4 = u(QApplication.translate("Label","%1 to reach BT %2", None).arg("xx:xx").arg(str(self.qmc.BT2target) + self.qmc.mode))
             ####  Phase Texts #####
             phasetext1 = u("") # lower textline
             phasetext2 = u("") # higher textline
@@ -15479,14 +15798,14 @@ $cupping_notes
                     afterFCs = self.qmc.timex[self.qmc.timeindex[6]] - FCs_time
                 else:
                     afterFCs = self.qmc.timex[-1] - FCs_time
-                phasetext1 = u(QApplication.translate("Label","%1 after FCs", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(afterFCs))))
+                phasetext1 = u(QApplication.translate("Label","%1 after FCs", None).arg(self.qmc.stringfromseconds(int(afterFCs))))
             if self.qmc.timeindex[3]: # after FCe
                 FCe_time = self.qmc.timex[self.qmc.timeindex[3]]
                 if self.qmc.timeindex[6]: # after DROP
                     afterFCe = self.qmc.timex[self.qmc.timeindex[6]] - FCe_time
                 else:
                     afterFCe = self.qmc.timex[-1] - FCe_time
-                phasetext2 = u(QApplication.translate("Label","%1 after FCe", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(afterFCe))))
+                phasetext2 = u(QApplication.translate("Label","%1 after FCe", None).arg(self.qmc.stringfromseconds(int(afterFCe))))
                 if self.qmc.timeindex[2]:
                     phasetext2 = phasetext2 + u(" (") + u(self.qmc.stringfromseconds(int(FCe_time - self.qmc.timex[self.qmc.timeindex[2]]))) + u(" FC)")
             ####   ET pid    ######
@@ -15526,7 +15845,7 @@ $cupping_notes
             p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3),QString(pidstring))
             p.drawRect(Wwidth/7+140, Wheight - Wheight/3-12, 100, 12)
             p.fillRect(Wwidth/7+140, Wheight - Wheight/3-12, MVV, 12, QColor("pink"))
-            delta = u(QApplication.translate("Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])))
+            delta = u(QApplication.translate("Label","ET - BT = %1", None).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])))
             p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3.5),QString(delta))
             #draw phase texts
             p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/6),QString(phasetext1))
@@ -15577,7 +15896,7 @@ $cupping_notes
         p.drawEllipse(Wwidth/2 -ETradius/2 , Wheight/2 - ETradius/2 , ETradius,ETradius)
         #draw BT circle
         p.drawEllipse(Wwidth/2 -BTradius/2 , Wheight/2 - BTradius/2 , BTradius,BTradius)
-        delta = QApplication.translate("Label","ET - BT = %1%2", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])).arg(self.qmc.mode)
+        delta = QApplication.translate("Label","ET - BT = %1%2", None).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])).arg(self.qmc.mode)
         p.setFont(QFont('Utopia', 14, -1))
         p.drawText(QPoint(Wwidth/2,Wheight/2),QString(delta))
         p.end()
@@ -15634,65 +15953,65 @@ $cupping_notes
                 else:
                     self.qmc.wheelaspect = 1.0
             else:
-                message = QApplication.translate("Message","Invalid Wheel graph format", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Invalid Wheel graph format", None)
                 self.sendmessage(message)
                 return
-            message =QApplication.translate("Message","Wheel Graph succesfully open", None, QApplication.UnicodeUTF8)
+            message =QApplication.translate("Message","Wheel Graph succesfully open", None)
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " loadWheel() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadWheel() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except ValueError as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None, QApplication.UnicodeUTF8) + " loadWheel() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " loadWheel() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None, QApplication.UnicodeUTF8) + " loadWheel() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadWheel() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         finally:
             if f:
                 f.close()
 
     def showSymbolicHelp(self):
-        string1 = "<UL><LI><b>abs(x)</b> " + u(QApplication.translate("Message","Return the absolute value of x.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>acos(x)</b> " + u(QApplication.translate("Message","Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>asin(x)</b> " + u(QApplication.translate("Message","Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>atan(x)</b> " + u(QApplication.translate("Message","Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>cos(x)</b> " + u(QApplication.translate("Message","Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>degrees(x)</b> " + u(QApplication.translate("Message", "Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>exp(x)</b> " + u(QApplication.translate("Message", "Return e raised to the power of x.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>log(x[, base])</b> " + u(QApplication.translate("Message", "Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>log10(x)</b> " + u(QApplication.translate("Message", "Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>min(x,y)</b> " + u(QApplication.translate("Message", "Return the minimum of x and y.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>max(x,y)</b> " + u(QApplication.translate("Message", "Return the maximum of x and y.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>pow(x, y)</b> " + u(QApplication.translate("Message", "Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>radians(x)</b> " + u(QApplication.translate("Message", "Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>sin(x)</b> " + u(QApplication.translate("Message", "Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None, QApplication.UnicodeUTF8))
-        string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8))
+        string1 = "<UL><LI><b>abs(x)</b> " + u(QApplication.translate("Message","Return the absolute value of x.",None))
+        string1 += "<LI><b>acos(x)</b> " + u(QApplication.translate("Message","Return the arc cosine (measured in radians) of x.",None))
+        string1 += "<LI><b>asin(x)</b> " + u(QApplication.translate("Message","Return the arc sine (measured in radians) of x.",None))
+        string1 += "<LI><b>atan(x)</b> " + u(QApplication.translate("Message","Return the arc tangent (measured in radians) of x.",None))
+        string1 += "<LI><b>cos(x)</b> " + u(QApplication.translate("Message","Return the cosine of x (measured in radians).",None))
+        string1 += "<LI><b>degrees(x)</b> " + u(QApplication.translate("Message", "Convert angle x from radians to degrees.",None))
+        string1 += "<LI><b>exp(x)</b> " + u(QApplication.translate("Message", "Return e raised to the power of x.",None))
+        string1 += "<LI><b>log(x[, base])</b> " + u(QApplication.translate("Message", "Return the logarithm of x to the given base. ",None))
+        string1 += "<LI><b>log10(x)</b> " + u(QApplication.translate("Message", "Return the base 10 logarithm of x.",None))
+        string1 += "<LI><b>min(x,y)</b> " + u(QApplication.translate("Message", "Return the minimum of x and y.",None))
+        string1 += "<LI><b>max(x,y)</b> " + u(QApplication.translate("Message", "Return the maximum of x and y.",None))
+        string1 += "<LI><b>pow(x, y)</b> " + u(QApplication.translate("Message", "Return x**y (x to the power of y).",None))
+        string1 += "<LI><b>radians(x)</b> " + u(QApplication.translate("Message", "Convert angle x from degrees to radians.",None))
+        string1 += "<LI><b>sin(x)</b> " + u(QApplication.translate("Message", "Return the sine of x (measured in radians).",None))
+        string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
+        string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
         string1 += "</UL>"
         string2 = "<UL><LI><b>x current curve value</b>"
-        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra #1 T2 value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra #2 T1 value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra #2 T2 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
+        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
+        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None))
+        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra #1 T2 value",None))
+        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra #2 T1 value",None))
+        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra #2 T2 value",None))
         string2 += "<LI><b>...</b> "
-        string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None))
+        string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None))
         string2 += "</UL>"
         string2 += "<br>"
-        string2 += u(QApplication.translate("Message", "Yn holds values sampled in the actual interval if refering to ET/BT or extra channels from devices listed before, otherwise Yn hold values sampled in the previous interval",None, QApplication.UnicodeUTF8))
+        string2 += u(QApplication.translate("Message", "Yn holds values sampled in the actual interval if refering to ET/BT or extra channels from devices listed before, otherwise Yn hold values sampled in the previous interval",None))
         #format help
         string3 = "<TABLE  WIDTH=550><TR><TH>"
-        string3 += QApplication.translate("Message",  "MATHEMATICAL FUNCTIONS",None, QApplication.UnicodeUTF8)
+        string3 += QApplication.translate("Message",  "MATHEMATICAL FUNCTIONS",None)
         string3 += "</TH><TH>"
-        string3 += QApplication.translate("Message",  "SYMBOLIC VARIABLES",None, QApplication.UnicodeUTF8)
+        string3 += QApplication.translate("Message",  "SYMBOLIC VARIABLES",None)
         string3 += "</TH></TR><TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD></TR></TABLE>"
-        QMessageBox.information(self,QApplication.translate("Message", "Symbolic Functions",None, QApplication.UnicodeUTF8),string3)
+        QMessageBox.information(self,QApplication.translate("Message", "Symbolic Functions",None),string3)
 
     def toggleextraeventrows(self):
         if self.extraeventsbuttonsflag:
@@ -15752,13 +16071,13 @@ $cupping_notes
     #assigns tooltips to extra event buttons
     def settooltip(self):
         for i in range(len(self.buttonlist)):
-            tip = u(QApplication.translate("Tooltip","<b>Label</b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventslabels[i]) + "<br>"
-            tip += u(QApplication.translate("Tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsdescriptions[i]) + "<br>"
+            tip = u(QApplication.translate("Tooltip","<b>Label</b>= ", None)) + u(self.extraeventslabels[i]) + "<br>"
+            tip += u(QApplication.translate("Tooltip","<b>Description </b>= ", None)) + u(self.extraeventsdescriptions[i]) + "<br>"
             if self.extraeventstypes[i] < 4:
-                tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8)) + u(self.qmc.etypesf(self.extraeventstypes[i])) + "<br>"
-                tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8)) + u(int(round((self.extraeventsvalues[i]-1)*10.))) + "<br>" 
-            tip += u(QApplication.translate("Tooltip","<b>Documentation </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsactionstrings[i]) + "<br>"
-            tip += u(QApplication.translate("Tooltip","<b>Button# </b>= ", None, QApplication.UnicodeUTF8)) + str(i+1)
+                tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None)) + u(self.qmc.etypesf(self.extraeventstypes[i])) + "<br>"
+                tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None)) + u(int(round((self.extraeventsvalues[i]-1)*10.))) + "<br>" 
+            tip += u(QApplication.translate("Tooltip","<b>Documentation </b>= ", None)) + u(self.extraeventsactionstrings[i]) + "<br>"
+            tip += u(QApplication.translate("Tooltip","<b>Button# </b>= ", None)) + str(i+1)
             self.buttonlist[i].setToolTip(tip)
 
     def update_extraeventbuttons_visibility(self):
@@ -15788,7 +16107,7 @@ $cupping_notes
         copy.append(self.eventsliderfactors[:])
         self.buttonpalette[pindex] = copy[:] 
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
-        self.sendmessage(QApplication.translate("Message","Buttons copied to Palette #%i"%(pindex), None, QApplication.UnicodeUTF8))
+        self.sendmessage(QApplication.translate("Message","Buttons copied to Palette #%i"%(pindex), None))
 
     #stores a palette number from current buttons
     def setbuttonsfrom(self,pindex):
@@ -15817,10 +16136,10 @@ $cupping_notes
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
             self.updateSlidersProperties()
-            self.sendmessage(QApplication.translate("Message","Palette #%i restored"%(pindex), None, QApplication.UnicodeUTF8))
+            self.sendmessage(QApplication.translate("Message","Palette #%i restored"%(pindex), None))
             return 1  #success
         else:
-            self.sendmessage(QApplication.translate("Message","Palette #%i empty"%(pindex), None, QApplication.UnicodeUTF8))
+            self.sendmessage(QApplication.translate("Message","Palette #%i empty"%(pindex), None))
             return 0  #failed
 
     def backuppaletteeventbuttons(self):
@@ -15831,13 +16150,13 @@ $cupping_notes
             palette[key] = self.buttonpalette[i]
         palette["maxlen"] = self.buttonpalettemaxlen
         try:
-            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Palettes",None, QApplication.UnicodeUTF8),ext="*.apal")
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Palettes",None),ext="*.apal")
             if filename:
                 #write
                 self.serialize(filename,palette)
-                self.sendmessage(QApplication.translate("Message","Palettes saved",None, QApplication.UnicodeUTF8))
+                self.sendmessage(QApplication.translate("Message","Palettes saved",None))
         except IOError as ex:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:",None, QApplication.UnicodeUTF8) + " backuppaletteeventbuttons(): %1").arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:",None) + " backuppaletteeventbuttons(): %1").arg(str(ex)))
             return
 
     def loadPalettes(self,filename):
@@ -15878,22 +16197,22 @@ $cupping_notes
                             nextpalette[13] = self.buttonpalette[13]
                     self.buttonpalette[i] = nextpalette[:]
             else:
-                message = QApplication.translate("Message","Invalid palettes file format", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Invalid palettes file format", None)
                 self.sendmessage(message)
                 return
-            message =QApplication.translate("Message","Palettes loaded", None, QApplication.UnicodeUTF8)
+            message =QApplication.translate("Message","Palettes loaded", None)
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " loadPalettes() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadPalettes() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None, QApplication.UnicodeUTF8) + " loadPalettes() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadPalettes() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
 
     def restorepaletteeventbuttons(self):
-        filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Palettes",None, QApplication.UnicodeUTF8),path=self.profilepath)
+        filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Palettes",None),path=self.profilepath)
         if filename:
             self.loadPalettes(filename)
 
@@ -15914,15 +16233,15 @@ $cupping_notes
             aw.qmc.alarmaction = alarms["alarmactions"]
             aw.qmc.alarmbeep = alarms["alarmbeep"]
             aw.qmc.alarmstrings = alarms["alarmstrings"]
-            message =QApplication.translate("Message","Alarms loaded", None, QApplication.UnicodeUTF8)
+            message =QApplication.translate("Message","Alarms loaded", None)
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " loadAlarms() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadAlarms() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None, QApplication.UnicodeUTF8) + " loadAlarms() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None) + " loadAlarms() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
 
 
@@ -15999,7 +16318,7 @@ class HUDDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(HUDDlg,self).__init__(parent)
         
-        self.setWindowTitle(QApplication.translate("Form Caption","Extras", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Extras", None))
         self.setModal(True)
         # keep old values to be restored on Cancel
         self.org_DeltaET = aw.qmc.DeltaETflag
@@ -16011,28 +16330,28 @@ class HUDDlg(ArtisanDialog):
         self.org_graphstyle = aw.qmc.graphstyle
         self.org_graphfont = aw.qmc.graphfont
         self.org_HUDbuttonflag = aw.qmc.HUDbuttonflag
-        self.showHUDbutton = QCheckBox(QApplication.translate("Label", "HUD Button", None, QApplication.UnicodeUTF8))
+        self.showHUDbutton = QCheckBox(QApplication.translate("Label", "HUD Button", None))
         self.showHUDbutton.setChecked(aw.qmc.HUDbuttonflag)
         self.showHUDbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(self.showHUDbutton,SIGNAL("stateChanged(int)"),lambda i=0:self.showHUDbuttonToggle(i))
-        ETLabel = QLabel(QApplication.translate("Label", "ET Target 1",None, QApplication.UnicodeUTF8))
+        ETLabel = QLabel(QApplication.translate("Label", "ET Target 1",None))
         ETLabel.setAlignment(Qt.AlignRight)
-        BTLabel = QLabel(QApplication.translate("Label", "BT Target 1",None, QApplication.UnicodeUTF8))
+        BTLabel = QLabel(QApplication.translate("Label", "BT Target 1",None))
         BTLabel.setAlignment(Qt.AlignRight)        
-        ET2Label = QLabel(QApplication.translate("Label", "ET Target 2",None, QApplication.UnicodeUTF8))
+        ET2Label = QLabel(QApplication.translate("Label", "ET Target 2",None))
         ET2Label.setAlignment(Qt.AlignRight)
-        BT2Label = QLabel(QApplication.translate("Label", "BT Target 2",None, QApplication.UnicodeUTF8))
+        BT2Label = QLabel(QApplication.translate("Label", "BT Target 2",None))
         BT2Label.setAlignment(Qt.AlignRight)        
-        modeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
+        modeLabel = QLabel(QApplication.translate("Label", "Mode",None))
         modeLabel.setAlignment(Qt.AlignRight)
-        ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None, QApplication.UnicodeUTF8))
+        ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None))
         #delta ET
-        self.DeltaET = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None, QApplication.UnicodeUTF8))
+        self.DeltaET = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None))
         self.DeltaET.setChecked(aw.qmc.DeltaETflag)
         #delta BT
-        self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None, QApplication.UnicodeUTF8))
+        self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None))
         self.DeltaBT.setChecked(aw.qmc.DeltaBTflag)
-        filterlabel = QLabel(QApplication.translate("Label", "Smooth Deltas",None, QApplication.UnicodeUTF8))
+        filterlabel = QLabel(QApplication.translate("Label", "Smooth Deltas",None))
         #DeltaFilter holds the number of pads in filter
         self.DeltaFilter = QSpinBox()
         self.DeltaFilter.setSingleStep(1)
@@ -16040,7 +16359,7 @@ class HUDDlg(ArtisanDialog):
         self.DeltaFilter.setAlignment(Qt.AlignRight)
         self.DeltaFilter.setValue(aw.qmc.deltafilter/2)
         self.connect(self.DeltaFilter ,SIGNAL("editingFinished()"),lambda x=0:self.changeDeltaFilter(0))
-        curvefilterlabel = QLabel(QApplication.translate("Label", "Smooth Curves",None, QApplication.UnicodeUTF8))
+        curvefilterlabel = QLabel(QApplication.translate("Label", "Smooth Curves",None))
         #Filter holds the number of pads in filter
         self.Filter = QSpinBox()
         self.Filter.setSingleStep(1)
@@ -16048,7 +16367,7 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setAlignment(Qt.AlignRight)
         self.Filter.setValue(aw.qmc.curvefilter/2)
         self.connect(self.Filter,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))        
-        windowlabel = QLabel(QApplication.translate("Label", "Window",None, QApplication.UnicodeUTF8))
+        windowlabel = QLabel(QApplication.translate("Label", "Window",None))
         #Window holds the number of pads in filter
         self.Window = QSpinBox()
         self.Window.setSingleStep(1)
@@ -16057,33 +16376,33 @@ class HUDDlg(ArtisanDialog):
         self.Window.setValue(aw.qmc.smoothingwindowsize)
         self.connect(self.Window,SIGNAL("editingFinished()"),lambda x=0:self.changeWindow(0))        
         #filterspikes
-        self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None, QApplication.UnicodeUTF8))
+        self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None))
         self.FilterSpikes.setChecked(aw.qmc.filterDropOuts)
         self.connect(self.FilterSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDropFilter(i))
         self.FilterSpikes.setFocusPolicy(Qt.NoFocus)    
         #altsmoothing
-        self.AltSmoothing = QCheckBox(QApplication.translate("CheckBox", "Smooth2",None, QApplication.UnicodeUTF8))
+        self.AltSmoothing = QCheckBox(QApplication.translate("CheckBox", "Smooth2",None))
         self.AltSmoothing.setChecked(aw.qmc.altsmoothing)
         self.connect(self.AltSmoothing,SIGNAL("stateChanged(int)"),lambda i=0:self.changeAltSmoothing(i))
         self.AltSmoothing.setFocusPolicy(Qt.NoFocus)
         #dropspikes
-        self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None, QApplication.UnicodeUTF8))
+        self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None))
         self.DropSpikes.setChecked(aw.qmc.dropSpikes)
         self.connect(self.DropSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeSpikeFilter(i))
         self.DropSpikes.setFocusPolicy(Qt.NoFocus)
         #min-max-limits
-        self.MinMaxLimits = QCheckBox(QApplication.translate("CheckBox", "Limits",None, QApplication.UnicodeUTF8))
+        self.MinMaxLimits = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
         self.MinMaxLimits.setChecked(aw.qmc.minmaxLimits)
         self.connect(self.MinMaxLimits,SIGNAL("stateChanged(int)"),lambda i=0:self.changeMinMaxLimits(i))
         self.MinMaxLimits.setFocusPolicy(Qt.NoFocus)
         #swapETBT flag
-        self.swapETBT = QCheckBox(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8) + " <-> " + QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8))
+        self.swapETBT = QCheckBox(QApplication.translate("Label", "ET", None) + " <-> " + QApplication.translate("Label", "BT", None))
         self.swapETBT.setChecked(aw.qmc.swapETBT)
         self.swapETBT.setFocusPolicy(Qt.NoFocus)
         self.connect(self.swapETBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeSwapETBT(i))
         #limits
-        minlabel = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
-        maxlabel = QLabel(QApplication.translate("Label", "max",None, QApplication.UnicodeUTF8))
+        minlabel = QLabel(QApplication.translate("Label", "min",None))
+        maxlabel = QLabel(QApplication.translate("Label", "max",None))
         self.minLimit = QSpinBox()
         self.minLimit.setRange(0,1000)    #(min,max)
         self.minLimit.setAlignment(Qt.AlignRight)
@@ -16101,10 +16420,10 @@ class HUDDlg(ArtisanDialog):
             self.minLimit.setSuffix(" C")
             self.maxLimit.setSuffix(" C")
         #show projection
-        self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection",None, QApplication.UnicodeUTF8))
+        self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection",None))
         self.projectionmodeComboBox = QComboBox()
-        self.projectionmodeComboBox.addItems([QApplication.translate("ComboBox","linear",None, QApplication.UnicodeUTF8),
-                                              QApplication.translate("ComboBox","newton",None, QApplication.UnicodeUTF8)])
+        self.projectionmodeComboBox.addItems([QApplication.translate("ComboBox","linear",None),
+                                              QApplication.translate("ComboBox","newton",None)])
         self.projectionmodeComboBox.setCurrentIndex(aw.qmc.projectionmode)
         self.connect(self.projectionmodeComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.projectionmodeComboBox.currentIndex() :self.changeProjectionMode(i))
         self.projectCheck.setChecked(aw.qmc.projectFlag)
@@ -16112,7 +16431,7 @@ class HUDDlg(ArtisanDialog):
         self.connect(self.DeltaBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaBT(i))         #toggle
         self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.changeProjection(i)) #toggle
         
-        deltaSpanLabel = QLabel(QApplication.translate("Label", "Delta Span",None, QApplication.UnicodeUTF8))
+        deltaSpanLabel = QLabel(QApplication.translate("Label", "Delta Span",None))
         self.deltaSpan = QComboBox()
         self.spanitems = range(1,16)
         self.deltaSpan.addItems([str(i) + "s" for i in self.spanitems])
@@ -16125,8 +16444,8 @@ class HUDDlg(ArtisanDialog):
         self.modeComboBox = QComboBox()
         self.modeComboBox.setMaximumWidth(100)
         self.modeComboBox.setMinimumWidth(55)
-        self.modeComboBox.addItems([QApplication.translate("ComboBox","metrics",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox","thermal",None, QApplication.UnicodeUTF8)])
+        self.modeComboBox.addItems([QApplication.translate("ComboBox","metrics",None),
+                                    QApplication.translate("ComboBox","thermal",None)])
         self.modeComboBox.setCurrentIndex(aw.HUDfunction)
         self.ETlineEdit = QLineEdit(str(aw.qmc.ETtarget))
         self.ETlineEdit.setAlignment(Qt.AlignRight)
@@ -16156,8 +16475,8 @@ class HUDDlg(ArtisanDialog):
         self.ETpidP.setMaximumWidth(60)
         self.ETpidI.setMaximumWidth(60)
         self.ETpidD.setMaximumWidth(60)
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
@@ -16187,11 +16506,11 @@ class HUDDlg(ArtisanDialog):
         rorBoxLayout = QHBoxLayout()
         rorBoxLayout.addLayout(rorLayout)
         rorBoxLayout.addStretch()
-        self.DeltaETlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None, QApplication.UnicodeUTF8))
+        self.DeltaETlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None))
         self.DeltaETlcd.setChecked(aw.qmc.DeltaETlcdflag)
-        self.DeltaBTlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None, QApplication.UnicodeUTF8))
+        self.DeltaBTlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None))
         self.DeltaBTlcd.setChecked(aw.qmc.DeltaBTlcdflag)
-        self.DecimalPlaceslcd = QCheckBox(QApplication.translate("CheckBox", "Decimal Places",None, QApplication.UnicodeUTF8))
+        self.DecimalPlaceslcd = QCheckBox(QApplication.translate("CheckBox", "Decimal Places",None))
         self.DecimalPlaceslcd.setChecked(aw.qmc.LCDdecimalplaces)
         self.connect(self.DeltaETlcd,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaETlcd(i))         #toggle
         self.connect(self.DeltaBTlcd,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaBTlcd(i))         #toggle
@@ -16221,11 +16540,11 @@ class HUDDlg(ArtisanDialog):
         curvesLayout.addLayout(rorBoxLayout)
         curvesLayout.addLayout(sensitivityLayout)
         curvesLayout.addLayout(spikesLayout)
-        rorGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curves",None, QApplication.UnicodeUTF8))
+        rorGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curves",None))
         rorGroupLayout.setLayout(curvesLayout)
-        rorLCDGroupLayout = QGroupBox(QApplication.translate("GroupBox","LCDs",None, QApplication.UnicodeUTF8))
+        rorLCDGroupLayout = QGroupBox(QApplication.translate("GroupBox","LCDs",None))
         rorLCDGroupLayout.setLayout(lcdsLayout)
-        hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","HUD",None, QApplication.UnicodeUTF8))
+        hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","HUD",None))
         hudGroupLayout.setLayout(hudLayout)
         inputFilterGrid = QGridLayout()
         inputFilterGrid.setColumnMinimumWidth(3,20)
@@ -16239,10 +16558,10 @@ class HUDDlg(ArtisanDialog):
         inputFilterHBox = QHBoxLayout()
         inputFilterHBox.addLayout(inputFilterGrid)
         inputFilterHBox.addStretch()
-        inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filters",None, QApplication.UnicodeUTF8))
+        inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filters",None))
         inputFilterGroupLayout.setLayout(inputFilterHBox)
         # path effects
-        effectslabel = QLabel(QApplication.translate("Label", "Path Effects",None, QApplication.UnicodeUTF8))
+        effectslabel = QLabel(QApplication.translate("Label", "Path Effects",None))
         self.PathEffects = QSpinBox()
         self.PathEffects.setSingleStep(1)
         self.PathEffects.setRange(0,5)
@@ -16255,23 +16574,23 @@ class HUDDlg(ArtisanDialog):
         pathEffectsLayout.addWidget(effectslabel)
         pathEffectsLayout.addStretch()
         # graph style
-        stylelabel = QLabel(QApplication.translate("Label", "Style",None, QApplication.UnicodeUTF8))
+        stylelabel = QLabel(QApplication.translate("Label", "Style",None))
         self.GraphStyle = QComboBox()
-        self.GraphStyle.addItems([QApplication.translate("ComboBox","classic",None, QApplication.UnicodeUTF8),
-                                  QApplication.translate("ComboBox","xkcd",None, QApplication.UnicodeUTF8)])
+        self.GraphStyle.addItems([QApplication.translate("ComboBox","classic",None),
+                                  QApplication.translate("ComboBox","xkcd",None)])
         self.GraphStyle.setCurrentIndex(aw.qmc.graphstyle)
         self.connect(self.GraphStyle,SIGNAL("currentIndexChanged(int)"),lambda i=self.GraphStyle.currentIndex():self.changeGraphStyle(i))
         # graph font
-        fontlabel = QLabel(QApplication.translate("Label", "Font",None, QApplication.UnicodeUTF8))
+        fontlabel = QLabel(QApplication.translate("Label", "Font",None))
         self.GraphFont = QComboBox()
         # no Comic on Linux!
         if platf == "Linux":
-            self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None, QApplication.UnicodeUTF8),
-                                      QApplication.translate("ComboBox","Humor",None, QApplication.UnicodeUTF8)])
+            self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None),
+                                      QApplication.translate("ComboBox","Humor",None)])
         else:
-            self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None, QApplication.UnicodeUTF8),
-                                      QApplication.translate("ComboBox","Humor",None, QApplication.UnicodeUTF8),
-                                      QApplication.translate("ComboBox","Comic",None, QApplication.UnicodeUTF8)])
+            self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None),
+                                      QApplication.translate("ComboBox","Humor",None),
+                                      QApplication.translate("ComboBox","Comic",None)])
         self.GraphFont.setCurrentIndex(aw.qmc.graphfont)
         self.connect(self.GraphFont,SIGNAL("currentIndexChanged(int)"),lambda i=self.GraphFont.currentIndex():self.changeGraphFont(i))
         graphLayout = QHBoxLayout()
@@ -16284,7 +16603,7 @@ class HUDDlg(ArtisanDialog):
         stylesLayout = QVBoxLayout()
         stylesLayout.addLayout(pathEffectsLayout)
         stylesLayout.addLayout(graphLayout)
-        styleGroupLayout = QGroupBox(QApplication.translate("GroupBox","Look",None, QApplication.UnicodeUTF8))
+        styleGroupLayout = QGroupBox(QApplication.translate("GroupBox","Look",None))
         styleGroupLayout.setLayout(stylesLayout)
         #tab0
         tab0Layout = QVBoxLayout()
@@ -16299,45 +16618,45 @@ class HUDDlg(ArtisanDialog):
         tab1Layout.addStretch()
         #tab2
         #Equation plotter
-        equlabel = QLabel(QApplication.translate("Label", "Y(x)",None, QApplication.UnicodeUTF8))
+        equlabel = QLabel(QApplication.translate("Label", "Y(x)",None))
         self.equedit1 = QLineEdit(aw.qmc.plotcurves[0])
         self.equedit2 = QLineEdit(aw.qmc.plotcurves[1])
         self.equedit3 = QLineEdit(aw.qmc.plotcurves[2])
         self.equedit4 = QLineEdit(aw.qmc.plotcurves[3])
         self.equedit5 = QLineEdit(aw.qmc.plotcurves[4])
         self.equedit6 = QLineEdit(aw.qmc.plotcurves[5])
-        color1Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
+        color1Button = QPushButton(QApplication.translate("Button","Color",None))
         color1Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color1Button, SIGNAL("clicked()"),lambda x=0: self.setcurvecolor(x))
-        color2Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
+        color2Button = QPushButton(QApplication.translate("Button","Color",None))
         color2Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color2Button, SIGNAL("clicked()"),lambda x=1: self.setcurvecolor(x))
-        color3Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
+        color3Button = QPushButton(QApplication.translate("Button","Color",None))
         color3Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color3Button, SIGNAL("clicked()"),lambda x=2: self.setcurvecolor(x))
-        color4Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
+        color4Button = QPushButton(QApplication.translate("Button","Color",None))
         color4Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color4Button, SIGNAL("clicked()"),lambda x=3: self.setcurvecolor(x))
-        color5Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
+        color5Button = QPushButton(QApplication.translate("Button","Color",None))
         color5Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color5Button, SIGNAL("clicked()"),lambda x=4: self.setcurvecolor(x))
-        color6Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
+        color6Button = QPushButton(QApplication.translate("Button","Color",None))
         color6Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color6Button, SIGNAL("clicked()"),lambda x=5: self.setcurvecolor(x))
-        equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None, QApplication.UnicodeUTF8))
+        equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None))
         equdrawbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equdrawbutton,SIGNAL("clicked()"),self.plotequ)
-        equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
+        equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None))
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equbackgroundbutton ,SIGNAL("clicked()"),self.setbackgroundequ1)
-        equvdevicebutton = QPushButton(QApplication.translate("Button","Virtual Device",None, QApplication.UnicodeUTF8))
+        equvdevicebutton = QPushButton(QApplication.translate("Button","Virtual Device",None))
         equvdevicebutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equvdevicebutton ,SIGNAL("clicked()"),self.setvdevice)
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None, QApplication.UnicodeUTF8))
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
-        saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None, QApplication.UnicodeUTF8))
+        saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
-        helpcurveButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
+        helpcurveButton = QPushButton(QApplication.translate("Button","Help",None))
         helpcurveButton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpcurveButton, SIGNAL("clicked()"),aw.showSymbolicHelp)
         curve1Layout = QGridLayout()
@@ -16371,25 +16690,25 @@ class HUDDlg(ArtisanDialog):
         tab2Layout.addLayout(curvebuttonlayout)
         tab2Layout.addStretch()
         ##### TAB 3
-        self.interpCheck = QCheckBox(QApplication.translate("CheckBox","Show",None, QApplication.UnicodeUTF8))
+        self.interpCheck = QCheckBox(QApplication.translate("CheckBox","Show",None))
         self.interpCheck.setFocusPolicy(Qt.NoFocus)
         self.connect(self.interpCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.interpolation(i)) #toggle
         self.interpComboBox = QComboBox()
         self.interpComboBox.setMaximumWidth(100)
         self.interpComboBox.setMinimumWidth(55)
-        self.interpComboBox.addItems([QApplication.translate("ComboBox","linear",None, QApplication.UnicodeUTF8),
-                                      QApplication.translate("ComboBox","cubic",None, QApplication.UnicodeUTF8),
-                                      QApplication.translate("ComboBox","nearest",None, QApplication.UnicodeUTF8)])
-        self.interpComboBox.setToolTip(QApplication.translate("Tooltip", "linear: linear interpolation\ncubic: 3rd order spline interpolation\nnearest: y value of the nearest point", None, QApplication.UnicodeUTF8))
+        self.interpComboBox.addItems([QApplication.translate("ComboBox","linear",None),
+                                      QApplication.translate("ComboBox","cubic",None),
+                                      QApplication.translate("ComboBox","nearest",None)])
+        self.interpComboBox.setToolTip(QApplication.translate("Tooltip", "linear: linear interpolation\ncubic: 3rd order spline interpolation\nnearest: y value of the nearest point", None))
         self.interpComboBox.setFocusPolicy(Qt.NoFocus)
         self.connect(self.interpComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.interpComboBox.currentIndex() :self.changeInterpolationMode(i))
 #         'linear'  : linear interpolation
 #         'cubic'   : 3rd order spline interpolation
 #         'nearest' : take the y value of the nearest point
-        self.univarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None, QApplication.UnicodeUTF8))
+        self.univarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
         self.univarCheck.setFocusPolicy(Qt.NoFocus)
         self.connect(self.univarCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.univar(i)) #toggle
-        univarButton = QPushButton(QApplication.translate("Button","Info",None, QApplication.UnicodeUTF8))
+        univarButton = QPushButton(QApplication.translate("Button","Info",None))
         univarButton.setFocusPolicy(Qt.NoFocus)
         univarButton.setMaximumSize(univarButton.sizeHint())
         univarButton.setMinimumSize(univarButton.minimumSizeHint()) 
@@ -16405,13 +16724,13 @@ class HUDDlg(ArtisanDialog):
         self.c1ComboBox = QComboBox()
         self.c2ComboBox = QComboBox()
         self.connect(univarButton,SIGNAL("clicked()"),self.showunivarinfo)
-        self.polyfitCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None, QApplication.UnicodeUTF8))
+        self.polyfitCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
         self.polyfitCheck.setFocusPolicy(Qt.NoFocus)
         self.connect(self.polyfitCheck,SIGNAL("clicked(bool)"),lambda i=0:self.polyfit(i)) #toggle
         self.result = QLabel()
         self.result.setStyleSheet("background-color:'lightgrey';")
-        startlabel = QLabel(QApplication.translate("Label", "Start",None, QApplication.UnicodeUTF8))
-        endlabel = QLabel(QApplication.translate("Label", "End",None, QApplication.UnicodeUTF8))
+        startlabel = QLabel(QApplication.translate("Label", "Start",None))
+        endlabel = QLabel(QApplication.translate("Label", "End",None))
         self.startEdit = QLineEdit()
         self.startEdit.setMaximumWidth(60)
         self.startEdit.setAlignment(Qt.AlignRight)
@@ -16441,13 +16760,13 @@ class HUDDlg(ArtisanDialog):
         interLayout.addWidget(self.interpCheck)
         interLayout.addStretch()
         interLayout.addWidget(self.interpComboBox)
-        interGroupLayout = QGroupBox(QApplication.translate("GroupBox","Interpolate",None, QApplication.UnicodeUTF8))
+        interGroupLayout = QGroupBox(QApplication.translate("GroupBox","Interpolate",None))
         interGroupLayout.setLayout(interLayout)
         uniLayout = QHBoxLayout()
         uniLayout.addWidget(self.univarCheck)
         uniLayout.addStretch()
         uniLayout.addWidget(univarButton)
-        univarGroupLayout = QGroupBox(QApplication.translate("GroupBox","Univariate",None, QApplication.UnicodeUTF8))
+        univarGroupLayout = QGroupBox(QApplication.translate("GroupBox","Univariate",None))
         univarGroupLayout.setLayout(uniLayout)
         polytimes = QHBoxLayout()
         polytimes.addWidget(startlabel)
@@ -16474,7 +16793,7 @@ class HUDDlg(ArtisanDialog):
         polyVLayout.addLayout(polyevents)
         polyVLayout.addLayout(polyCurves)
         polyVLayout.addWidget(self.result)
-        polyfitGroupLayout = QGroupBox(QApplication.translate("GroupBox","Polyfit",None, QApplication.UnicodeUTF8))
+        polyfitGroupLayout = QGroupBox(QApplication.translate("GroupBox","Polyfit",None))
         polyfitGroupLayout.setLayout(polyVLayout)
         tab3Layout.addWidget(interGroupLayout)
         tab3Layout.addWidget(univarGroupLayout)
@@ -16496,16 +16815,16 @@ class HUDDlg(ArtisanDialog):
         self.resolutionSpinBox.setSingleStep(5)
         self.resolutionSpinBox.setValue(aw.dpi)
         self.resolutionSpinBox.setFocusPolicy(Qt.NoFocus)
-        resButton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+        resButton = QPushButton(QApplication.translate("Button","Set",None))
         resButton.setFocusPolicy(Qt.NoFocus)
         self.connect(resButton,SIGNAL("clicked()"),self.changedpi)
-        defresButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
+        defresButton = QPushButton(QApplication.translate("Button","Defaults",None))
         defresButton.setFocusPolicy(Qt.NoFocus)
         self.connect(defresButton,SIGNAL("clicked()"),self.setdefaults)
         appLayout = QHBoxLayout()
         appLayout.addStretch()
         appLayout.addWidget(self.styleComboBox)
-        appearanceGroupWidget = QGroupBox(QApplication.translate("GroupBox","Appearance",None, QApplication.UnicodeUTF8))
+        appearanceGroupWidget = QGroupBox(QApplication.translate("GroupBox","Appearance",None))
         appearanceGroupWidget.setLayout(appLayout)
         setresLayout = QHBoxLayout()
         setresLayout.addStretch()
@@ -16513,19 +16832,19 @@ class HUDDlg(ArtisanDialog):
         setresLayout.addWidget(resButton)
         resLayout = QVBoxLayout()
         resLayout.addLayout(setresLayout)
-        resolutionGroupWidget = QGroupBox(QApplication.translate("GroupBox","Resolution",None, QApplication.UnicodeUTF8))
+        resolutionGroupWidget = QGroupBox(QApplication.translate("GroupBox","Resolution",None))
         resolutionGroupWidget.setLayout(resLayout)
         defresLayout = QHBoxLayout()
         defresLayout.addStretch()
         defresLayout.addWidget(defresButton)
-        self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None, QApplication.UnicodeUTF8))
+        self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None))
         self.soundCheck.setChecked(aw.soundflag) 
         self.soundCheck.setFocusPolicy(Qt.NoFocus)
         self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
         sLayout = QHBoxLayout()
         sLayout.addStretch()
         sLayout.addWidget(self.soundCheck)
-        soundGroupWidget = QGroupBox(QApplication.translate("GroupBox","Sound",None, QApplication.UnicodeUTF8))
+        soundGroupWidget = QGroupBox(QApplication.translate("GroupBox","Sound",None))
         soundGroupWidget.setLayout(sLayout)
         # tick
         # port
@@ -16534,7 +16853,7 @@ class HUDDlg(ArtisanDialog):
         self.WebLCDsFlag = QCheckBox()
         self.WebLCDsFlag.setChecked(aw.WebLCDs)
         self.WebLCDsFlag.setFocusPolicy(Qt.NoFocus)
-        self.WebLCDsPortLabel = QLabel(QApplication.translate("Label", "Port", None, QApplication.UnicodeUTF8))
+        self.WebLCDsPortLabel = QLabel(QApplication.translate("Label", "Port", None))
         self.WebLCDsPort = QLineEdit(str(aw.WebLCDsPort))
         self.WebLCDsPort.setAlignment(Qt.AlignRight)
         self.WebLCDsPort.setValidator(QRegExpValidator(QRegExp(r"^[0-9]{1,4}$"),self))
@@ -16549,7 +16868,7 @@ class HUDDlg(ArtisanDialog):
         else:
             self.WebLCDsURL.setText("")
             self.QRpic.setPixmap(QPixmap())
-        self.WebLCDsAlerts = QCheckBox(QApplication.translate("CheckBox", "Alarm Popups",None, QApplication.UnicodeUTF8))
+        self.WebLCDsAlerts = QCheckBox(QApplication.translate("CheckBox", "Alarm Popups",None))
         self.WebLCDsAlerts.setChecked(aw.WebLCDsAlerts)
         self.WebLCDsAlerts.setFocusPolicy(Qt.NoFocus)
         if not aw.WebLCDs:
@@ -16571,7 +16890,7 @@ class HUDDlg(ArtisanDialog):
         WebLCDsLayoutVLayout = QVBoxLayout()
         WebLCDsLayoutVLayout.addLayout(WebLCDsLayout)
         WebLCDsLayoutVLayout.addLayout(WebLCDsLayoutHLayout)
-        WebLCDsGroupWidget = QGroupBox(QApplication.translate("GroupBox","WebLCDs",None, QApplication.UnicodeUTF8))
+        WebLCDsGroupWidget = QGroupBox(QApplication.translate("GroupBox","WebLCDs",None))
         WebLCDsGroupWidget.setLayout(WebLCDsLayoutVLayout)
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(appearanceGroupWidget)
@@ -16584,19 +16903,19 @@ class HUDDlg(ArtisanDialog):
         TabWidget = QTabWidget()
         C0Widget = QWidget()
         C0Widget.setLayout(tab0Layout)
-        TabWidget.addTab(C0Widget,QApplication.translate("Tab","Graph",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C0Widget,QApplication.translate("Tab","Graph",None))
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","HUD",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","HUD",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Plotter",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Plotter",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Math",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Math",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None))
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(cancelButton)
@@ -16676,7 +16995,7 @@ class HUDDlg(ArtisanDialog):
             aw.setdpi(value)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " changedpi(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changedpi(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setdefaults(self):
         self.resolutionSpinBox.setValue(80)
@@ -16692,7 +17011,7 @@ class HUDDlg(ArtisanDialog):
             self.plotequ()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setcurvecolor(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setcurvecolor(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setvdevice(self):
         # compute values
@@ -16742,7 +17061,7 @@ class HUDDlg(ArtisanDialog):
                 aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setbackgroundequ1(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ1(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def plotequ(self):
         try:
@@ -16762,7 +17081,7 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.fig.canvas.draw()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " plotequ(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def eval_curve_expression(self,mathexpression,x):
         if len(mathexpression):
@@ -16816,7 +17135,7 @@ class HUDDlg(ArtisanDialog):
                     return res
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " Plotter: %1").arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " Plotter: %1").arg(str(e)),exc_tb.tb_lineno)
                 return -1
         return -1
 
@@ -16825,12 +17144,12 @@ class HUDDlg(ArtisanDialog):
             app.setStyle(str(self.styleComboBox.currentText()))
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setappearance(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setappearance(): %1").arg(str(e)),exc_tb.tb_lineno)
 
 #    def showsound(self):
 #        try:
 #            warnings.simplefilter('ignore', Warning) #for Complex warning 
-#            aw.sendmessage(QApplication.translate("Message","Testing Mike...", None, QApplication.UnicodeUTF8))
+#            aw.sendmessage(QApplication.translate("Message","Testing Mike...", None))
 #            aw.stack.setCurrentIndex(2)
 #            aw.sound.opensound()
 #            for i in range(80):
@@ -16843,7 +17162,7 @@ class HUDDlg(ArtisanDialog):
 #            warnings.simplefilter('default', Warning)
 #        except Exception as e:
 #            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror(QApplication.translate("Error Message", "showsound(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+#            aw.qmc.adderror(QApplication.translate("Error Message", "showsound(): %1 ",None).arg(str(e)),exc_tb.tb_lineno)
 
     def saveinterp(self):
         pass
@@ -16852,7 +17171,7 @@ class HUDDlg(ArtisanDialog):
         if aw.qmc.timeindex[6]:
             aw.qmc.univariateinfo()
         else:
-            aw.sendmessage(QApplication.translate("Univariate: no profile data available", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Univariate: no profile data available", None))
 
     def univar(self,i):
         if self.univarCheck.isChecked():
@@ -16860,7 +17179,7 @@ class HUDDlg(ArtisanDialog):
             if aw.qmc.timeindex[6]:
                 aw.qmc.univariate()
             else:
-                aw.sendmessage(QApplication.translate("Error Message", "Univariate: no profile data available", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Error Message", "Univariate: no profile data available", None))
                 self.univarCheck.setChecked(False)
         else:
             aw.qmc.resetlines()
@@ -16896,13 +17215,13 @@ class HUDDlg(ArtisanDialog):
         if aw.qmc.timeindex[0] > -1:
             events.append(("CHARGE",aw.qmc.timeindex[0]))
         names = [
-            QApplication.translate("Table", "DRY END",None, QApplication.UnicodeUTF8),
-            QApplication.translate("Table", "FC START",None, QApplication.UnicodeUTF8),
-            QApplication.translate("Table", "FC END",None, QApplication.UnicodeUTF8),
-            QApplication.translate("Table", "SC START",None, QApplication.UnicodeUTF8),
-            QApplication.translate("Table", "SC END",None, QApplication.UnicodeUTF8),
-            QApplication.translate("Table", "DROP",None, QApplication.UnicodeUTF8),
-            QApplication.translate("Table", "COOL",None, QApplication.UnicodeUTF8)]
+            QApplication.translate("Table", "DRY END",None),
+            QApplication.translate("Table", "FC START",None),
+            QApplication.translate("Table", "FC END",None),
+            QApplication.translate("Table", "SC START",None),
+            QApplication.translate("Table", "SC END",None),
+            QApplication.translate("Table", "DROP",None),
+            QApplication.translate("Table", "COOL",None)]
         for e in range(len(names)):
             if aw.qmc.timeindex[e+1]:
                 events.append((names[e],aw.qmc.timeindex[e+1]))
@@ -16992,17 +17311,17 @@ class HUDDlg(ArtisanDialog):
         self.curvenames = []
         self.deltacurves = [] # list of flags. True if delta curve, False otherwise
         if aw.qmc.DeltaETflag:
-            self.curvenames.append(QApplication.translate("ComboBox","DeltaET",None, QApplication.UnicodeUTF8))
+            self.curvenames.append(QApplication.translate("ComboBox","DeltaET",None))
             self.curves.append(aw.qmc.delta1)
             self.deltacurves.append(True)
             idx = idx + 1
         if aw.qmc.DeltaBTflag:
-            self.curvenames.append(QApplication.translate("ComboBox","DeltaBT",None, QApplication.UnicodeUTF8))
+            self.curvenames.append(QApplication.translate("ComboBox","DeltaBT",None))
             self.curves.append(aw.qmc.delta2)
             self.deltacurves.append(True)
             idx = idx + 1
-        self.curvenames.append(QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8))
-        self.curvenames.append(QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8))
+        self.curvenames.append(QApplication.translate("ComboBox","ET",None))
+        self.curvenames.append(QApplication.translate("ComboBox","BT",None))
         self.curves.append(aw.qmc.temp1)
         self.curves.append(aw.qmc.temp2)
         self.deltacurves.append(False)
@@ -17031,7 +17350,7 @@ class HUDDlg(ArtisanDialog):
             if len(aw.qmc.timex) > 2:
                 self.doPolyfit()
             else:
-                aw.sendmessage(QApplication.translate("Error Message", "Polyfit: no profile data available", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Error Message", "Polyfit: no profile data available", None))
                 self.polyfitCheck.setChecked(False)
         else:
             self.result.setText("")
@@ -17045,7 +17364,7 @@ class HUDDlg(ArtisanDialog):
             if aw.qmc.timeindex[6]:
                 aw.qmc.drawinterp(mode)
             else:
-                aw.sendmessage(QApplication.translate("Message","Interpolation failed: no profile available", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","Interpolation failed: no profile available", None))
                 self.interpCheck.setChecked(False)
         else:
             aw.qmc.resetlines()
@@ -17054,11 +17373,11 @@ class HUDDlg(ArtisanDialog):
     def soundset(self,i):
         if aw.soundflag == 0:
             aw.soundflag = 1
-            aw.sendmessage(QApplication.translate("Message","Sound turned ON", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Sound turned ON", None))
             aw.soundpop()
         else:
             aw.soundflag = 0
-            aw.sendmessage(QApplication.translate("Message","Sound turned OFF", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Sound turned OFF", None))
 
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
@@ -17104,7 +17423,7 @@ class HUDDlg(ArtisanDialog):
                 self.PathEffects.blockSignals(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "changePathEffects(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changePathEffects(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def changeGraphStyle(self,n):
         aw.qmc.graphstyle = n
@@ -17126,7 +17445,7 @@ class HUDDlg(ArtisanDialog):
                 self.DeltaFilter.blockSignals(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "changeDeltaFilter(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaFilter(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def changeDropFilter(self,i):
         aw.qmc.filterDropOuts = not aw.qmc.filterDropOuts
@@ -17156,7 +17475,7 @@ class HUDDlg(ArtisanDialog):
                 self.Window.setFocus()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " changeWindow(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changeWindow(): %1").arg(str(e)),exc_tb.tb_lineno)
         
     def changeFilter(self,i):
         try:
@@ -17169,7 +17488,7 @@ class HUDDlg(ArtisanDialog):
                 self.Filter.setFocus()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " changeFilter(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changeFilter(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def changeProjection(self,i):
         aw.qmc.projectFlag = not aw.qmc.projectFlag
@@ -17213,9 +17532,9 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
         aw.qmc.filterDropOut_tmax = int(self.maxLimit.value())
         mode = u(self.modeComboBox.currentText())
-        if mode == QApplication.translate("ComboBox","metrics", None, QApplication.UnicodeUTF8):
+        if mode == QApplication.translate("ComboBox","metrics", None):
             aw.HUDfunction = 0
-        elif mode == QApplication.translate("ComboBox","thermal", None, QApplication.UnicodeUTF8):
+        elif mode == QApplication.translate("ComboBox","thermal", None):
             aw.HUDfunction = 1
         aw.qmc.ETtarget = int(str(self.ETlineEdit.text()))
         aw.qmc.BTtarget = int(str(self.BTlineEdit.text()))
@@ -17230,7 +17549,7 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.hudETpid[0] = int(str(self.ETpidP.text()))
         aw.qmc.hudETpid[1] = int(str(self.ETpidI.text()))
         aw.qmc.hudETpid[2] = int(str(self.ETpidD.text()))
-        string = u(QApplication.translate("Message","[ET target 1 = %1] [BT target 1 = %2] [ET target 2 = %3] [BT target 2 = %4]", None, QApplication.UnicodeUTF8).arg(str(aw.qmc.ETtarget)).arg(str(aw.qmc.BTtarget)).arg(str(aw.qmc.ET2target)).arg(str(aw.qmc.BT2target)))
+        string = u(QApplication.translate("Message","[ET target 1 = %1] [BT target 1 = %2] [ET target 2 = %3] [BT target 2 = %4]", None).arg(str(aw.qmc.ETtarget)).arg(str(aw.qmc.BTtarget)).arg(str(aw.qmc.ET2target)).arg(str(aw.qmc.BT2target)))
         aw.sendmessage(string)
         aw.qmc.resetlinecountcaches()
         aw.qmc.resetdeltalines()
@@ -17250,7 +17569,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         # weightunit 0:g, 1:Kg  volumeunit 0:ml, 1:l
         super(volumeCalculatorDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Volume Calculator",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Volume Calculator",None))
 
         if aw.scale.device != None and aw.scale.device != "" and aw.scale.device != "None":
             self.scale_connected = True
@@ -17276,16 +17595,16 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.tare = tare
         
         # Unit Group
-        unitvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit", None, QApplication.UnicodeUTF8)) + "</b>")
+        unitvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit", None)) + "</b>")
         self.unitvolumeEdit = QLineEdit(str(aw.qmc.volumeCalcUnit))
         self.unitvolumeEdit.setValidator(QIntValidator(0, 9999,self.unitvolumeEdit))
         self.unitvolumeEdit.setMinimumWidth(60)
         self.unitvolumeEdit.setMaximumWidth(60)
         self.unitvolumeEdit.setAlignment(Qt.AlignRight)
-        unitvolumeUnit = QLabel(QApplication.translate("Label","ml", None, QApplication.UnicodeUTF8))
+        unitvolumeUnit = QLabel(QApplication.translate("Label","ml", None))
         
         # unit button
-        unitButton = QPushButton(QApplication.translate("Button", "unit",None, QApplication.UnicodeUTF8))
+        unitButton = QPushButton(QApplication.translate("Button", "unit",None))
         self.connect(unitButton, SIGNAL("clicked()"),self.unitWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
 #        unitButton.setMaximumSize(60,35)
@@ -17304,14 +17623,14 @@ class volumeCalculatorDlg(ArtisanDialog):
             unitLayout.addWidget(unitButton)
         
         # In Group
-        coffeeinunitweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit Weight", None, QApplication.UnicodeUTF8)) + "</b>")
+        coffeeinunitweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit Weight", None)) + "</b>")
         self.coffeeinweightEdit = QLineEdit(aw.qmc.volumeCalcWeightInStr)
         self.coffeeinweightEdit.setMinimumWidth(60)
         self.coffeeinweightEdit.setMaximumWidth(60)
         self.coffeeinweightEdit.setAlignment(Qt.AlignRight)
-        coffeeinunitweightUnit = QLabel(QApplication.translate("Label","g", None, QApplication.UnicodeUTF8))
+        coffeeinunitweightUnit = QLabel(QApplication.translate("Label","g", None))
 
-        coffeeinweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Weight", None, QApplication.UnicodeUTF8)) + "</b>")
+        coffeeinweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Weight", None)) + "</b>")
         self.coffeeinweight = QLineEdit()
         if self.weightIn:
             self.coffeeinweight.setText(str(aw.float2float(self.weightIn)))
@@ -17321,11 +17640,11 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeinweight.setReadOnly(True)
         self.coffeeinweight.setFocusPolicy(Qt.NoFocus)
         if weightunit:
-            coffeeinweightUnit = QLabel(QApplication.translate("Label","Kg", None, QApplication.UnicodeUTF8))
+            coffeeinweightUnit = QLabel(QApplication.translate("Label","Kg", None))
         else:
-            coffeeinweightUnit = QLabel(QApplication.translate("Label","g", None, QApplication.UnicodeUTF8))
+            coffeeinweightUnit = QLabel(QApplication.translate("Label","g", None))
         
-        coffeeinvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None, QApplication.UnicodeUTF8)) + "</b>")
+        coffeeinvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None)) + "</b>")
         self.coffeeinvolume = QLineEdit()
         self.coffeeinvolume.setMinimumWidth(60)
         self.coffeeinvolume.setMaximumWidth(60)
@@ -17338,12 +17657,12 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeinvolume.setReadOnly(True)
         self.coffeeinvolume.setFocusPolicy(Qt.NoFocus)
         if volumeunit:
-            coffeeinvolumeUnit = QLabel(QApplication.translate("Label","l", None, QApplication.UnicodeUTF8))
+            coffeeinvolumeUnit = QLabel(QApplication.translate("Label","l", None))
         else:
-            coffeeinvolumeUnit = QLabel(QApplication.translate("Label","ml", None, QApplication.UnicodeUTF8))
+            coffeeinvolumeUnit = QLabel(QApplication.translate("Label","ml", None))
             
         # in button
-        inButton = QPushButton(QApplication.translate("Button", "in",None, QApplication.UnicodeUTF8))
+        inButton = QPushButton(QApplication.translate("Button", "in",None))
         self.connect(inButton, SIGNAL("clicked()"),self.inWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
 #        inButton.setMaximumSize(60,35)
@@ -17374,7 +17693,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         if self.scale_connected:
             volumeInVLayout.addLayout(inButtonLayout)
         
-        volumeInGroupLayout = QGroupBox(QApplication.translate("Label","in", None, QApplication.UnicodeUTF8))
+        volumeInGroupLayout = QGroupBox(QApplication.translate("Label","in", None))
         volumeInGroupLayout.setLayout(volumeInVLayout)
         if weightIn == None:
             volumeInGroupLayout.setDisabled(True)
@@ -17382,14 +17701,14 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.resetInVolume()
 
         # Out Group
-        coffeeoutunitweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit Weight", None, QApplication.UnicodeUTF8)) + "</b>")
+        coffeeoutunitweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit Weight", None)) + "</b>")
         self.coffeeoutweightEdit = QLineEdit(aw.qmc.volumeCalcWeightOutStr)
         self.coffeeoutweightEdit.setMinimumWidth(60)
         self.coffeeoutweightEdit.setMaximumWidth(60)
         self.coffeeoutweightEdit.setAlignment(Qt.AlignRight)
-        coffeeoutunitweightUnit = QLabel(QApplication.translate("Label","g", None, QApplication.UnicodeUTF8))
+        coffeeoutunitweightUnit = QLabel(QApplication.translate("Label","g", None))
 
-        coffeeoutweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Weight", None, QApplication.UnicodeUTF8)) + "</b>")
+        coffeeoutweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Weight", None)) + "</b>")
         self.coffeeoutweight = QLineEdit()
         if self.weightOut:
             self.coffeeoutweight.setText(str(aw.float2float(self.weightOut)))        
@@ -17399,11 +17718,11 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeoutweight.setReadOnly(True)
         self.coffeeoutweight.setFocusPolicy(Qt.NoFocus)
         if weightunit:
-            coffeeoutweightUnit = QLabel(QApplication.translate("Label","Kg", None, QApplication.UnicodeUTF8))
+            coffeeoutweightUnit = QLabel(QApplication.translate("Label","Kg", None))
         else:
-            coffeeoutweightUnit = QLabel(QApplication.translate("Label","g", None, QApplication.UnicodeUTF8))
+            coffeeoutweightUnit = QLabel(QApplication.translate("Label","g", None))
 
-        coffeeoutvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None, QApplication.UnicodeUTF8)) + "</b>")
+        coffeeoutvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None)) + "</b>")
         self.coffeeoutvolume = QLineEdit()
         self.coffeeoutvolume.setMinimumWidth(60)
         self.coffeeoutvolume.setMaximumWidth(60)
@@ -17416,12 +17735,12 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeoutvolume.setReadOnly(True)
         self.coffeeoutvolume.setFocusPolicy(Qt.NoFocus)
         if volumeunit:
-            coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","l", None, QApplication.UnicodeUTF8))
+            coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","l", None))
         else:
-            coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","ml", None, QApplication.UnicodeUTF8))
+            coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","ml", None))
 
         # out button
-        outButton = QPushButton(QApplication.translate("Button", "out",None, QApplication.UnicodeUTF8))
+        outButton = QPushButton(QApplication.translate("Button", "out",None))
         self.connect(outButton, SIGNAL("clicked()"),self.outWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
 #        outButton.setMaximumSize(60,35)
@@ -17452,7 +17771,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         if self.scale_connected:
             volumeOutVLayout.addLayout(outButtonLayout)
         
-        volumeOutGroupLayout = QGroupBox(QApplication.translate("Label","out", None, QApplication.UnicodeUTF8))
+        volumeOutGroupLayout = QGroupBox(QApplication.translate("Label","out", None))
         volumeOutGroupLayout.setLayout(volumeOutVLayout)
         if weightOut == None:
             volumeOutGroupLayout.setDisabled(True)
@@ -17463,8 +17782,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.connect(self.coffeeoutweightEdit,SIGNAL("editingFinished()"),self.resetOutVolume)
         self.connect(self.unitvolumeEdit,SIGNAL("editingFinished()"),self.resetVolume)
 
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updateVolumes)
@@ -17608,10 +17927,10 @@ class editGraphDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #MARKERS
-        chargelabel = QLabel("<b>" + u(QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8)) + "</b>")
+        chargelabel = QLabel("<b>" + u(QApplication.translate("Label", "CHARGE",None)) + "</b>")
         chargelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         chargelabel.setStyleSheet("background-color:'#f07800';")
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
@@ -17642,7 +17961,7 @@ class editGraphDlg(ArtisanDialog):
         self.chargeestimate = QLabel(charge_str)
 #        self.chargeestimate.setMaximumWidth(50)
 #        self.chargeestimate.setMinimumWidth(50)
-        drylabel = QLabel("<b>" + u(QApplication.translate("Label", "DRY END",None, QApplication.UnicodeUTF8)) + "</b>")
+        drylabel = QLabel("<b>" + u(QApplication.translate("Label", "DRY END",None)) + "</b>")
         drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[1]:
@@ -17656,7 +17975,7 @@ class editGraphDlg(ArtisanDialog):
         self.dryedit.setMaximumWidth(50)
         self.dryedit.setMinimumWidth(50)
         drylabel.setBuddy(self.dryedit)
-        Cstartlabel = QLabel("<b>" + u(QApplication.translate("Label","FC START",None, QApplication.UnicodeUTF8)) + "</b>")
+        Cstartlabel = QLabel("<b>" + u(QApplication.translate("Label","FC START",None)) + "</b>")
         Cstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[2]:
@@ -17671,7 +17990,7 @@ class editGraphDlg(ArtisanDialog):
         self.Cstartedit.setMinimumWidth(50)
         Cstartlabel.setBuddy(self.Cstartedit)
         
-        Cendlabel = QLabel("<b>" + u(QApplication.translate("Label","FC END",None, QApplication.UnicodeUTF8)) + "</b>")
+        Cendlabel = QLabel("<b>" + u(QApplication.translate("Label","FC END",None)) + "</b>")
         Cendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[3]:
@@ -17685,7 +18004,7 @@ class editGraphDlg(ArtisanDialog):
         self.Cendedit.setMaximumWidth(50)
         self.Cendedit.setMinimumWidth(50)
         Cendlabel.setBuddy(self.Cendedit)
-        CCstartlabel = QLabel("<b>" + u(QApplication.translate("Label","SC START",None, QApplication.UnicodeUTF8)) + "</b>")
+        CCstartlabel = QLabel("<b>" + u(QApplication.translate("Label","SC START",None)) + "</b>")
         CCstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[4]:
@@ -17699,7 +18018,7 @@ class editGraphDlg(ArtisanDialog):
         self.CCstartedit.setMaximumWidth(50)
         self.CCstartedit.setMinimumWidth(50)
         CCstartlabel.setBuddy(self.CCstartedit)
-        CCendlabel = QLabel("<b>" + u(QApplication.translate("Label","SC END",None, QApplication.UnicodeUTF8)) + "</b>")
+        CCendlabel = QLabel("<b>" + u(QApplication.translate("Label","SC END",None)) + "</b>")
         CCendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[5]:
@@ -17713,7 +18032,7 @@ class editGraphDlg(ArtisanDialog):
         self.CCendedit.setMaximumWidth(50)
         self.CCendedit.setMinimumWidth(50)
         CCendlabel.setBuddy(self.CCendedit)
-        droplabel = QLabel("<b>" + u(QApplication.translate("Label", "DROP",None, QApplication.UnicodeUTF8)) + "</b>")
+        droplabel = QLabel("<b>" + u(QApplication.translate("Label", "DROP",None)) + "</b>")
         droplabel.setStyleSheet("background-color:'#f07800';")
         droplabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         if aw.qmc.timeindex[6]:
@@ -17730,7 +18049,7 @@ class editGraphDlg(ArtisanDialog):
         self.dropestimate = QLabel(drop_str)
 #        self.dropestimate.setMaximumWidth(50)
 #        self.dropestimate.setMinimumWidth(50)
-        coollabel = QLabel("<b>" + u(QApplication.translate("Label", "COOL",None, QApplication.UnicodeUTF8)) + "</b>")
+        coollabel = QLabel("<b>" + u(QApplication.translate("Label", "COOL",None)) + "</b>")
         coollabel.setStyleSheet("background-color:'#6666ff';")
         coollabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         if aw.qmc.timeindex[7]:
@@ -17744,7 +18063,7 @@ class editGraphDlg(ArtisanDialog):
         self.cooledit.setMaximumWidth(50)
         self.cooledit.setMinimumWidth(50)
         coollabel.setBuddy(self.cooledit)
-        self.roastproperties = QCheckBox(QApplication.translate("CheckBox","Delete roast properties on RESET", None, QApplication.UnicodeUTF8))
+        self.roastproperties = QCheckBox(QApplication.translate("CheckBox","Delete roast properties on RESET", None))
         self.roastproperties.setChecked(bool(aw.qmc.roastpropertiesflag))
         self.connect(self.roastproperties,SIGNAL("stateChanged(int)"),self.roastpropertiesChanged)
         # EVENTS
@@ -17753,17 +18072,17 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.setTabKeyNavigation(True)
         self.eventtablecopy = []
         self.createEventTable()
-        self.ordereventTableButton = QPushButton(QApplication.translate("Button", "Order",None, QApplication.UnicodeUTF8))
+        self.ordereventTableButton = QPushButton(QApplication.translate("Button", "Order",None))
         self.ordereventTableButton.setFocusPolicy(Qt.NoFocus)
         self.ordereventTableButton.setMaximumSize(self.ordereventTableButton.sizeHint())
         self.ordereventTableButton.setMinimumSize(self.ordereventTableButton.minimumSizeHint())
         self.connect(self.ordereventTableButton,SIGNAL("clicked()"),self.orderEventTable)
-        self.neweventTableButton = QPushButton(QApplication.translate("Button", "Add",None, QApplication.UnicodeUTF8))
+        self.neweventTableButton = QPushButton(QApplication.translate("Button", "Add",None))
         self.neweventTableButton.setFocusPolicy(Qt.NoFocus)
         self.neweventTableButton.setMaximumSize(self.neweventTableButton.sizeHint())
         self.neweventTableButton.setMinimumSize(self.neweventTableButton.minimumSizeHint())
         self.connect(self.neweventTableButton,SIGNAL("clicked()"),self.addEventTable)
-        self.deleventTableButton = QPushButton(QApplication.translate("Button", "Delete",None, QApplication.UnicodeUTF8))
+        self.deleventTableButton = QPushButton(QApplication.translate("Button", "Delete",None))
         self.deleventTableButton.setFocusPolicy(Qt.NoFocus)
         self.deleventTableButton.setMaximumSize(self.deleventTableButton.sizeHint())
         self.deleventTableButton.setMinimumSize(self.deleventTableButton.minimumSizeHint())
@@ -17773,16 +18092,31 @@ class editGraphDlg(ArtisanDialog):
         self.datatable.setTabKeyNavigation(True)
         #self.createDataTable()        
         #TITLE
-        titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None, QApplication.UnicodeUTF8)) + "</b>")
+        titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
         self.titleedit = QLineEdit(aw.qmc.title)
         #Date
-        datelabel1 = QLabel("<b>" + u(QApplication.translate("Label", "Date",None, QApplication.UnicodeUTF8)) + "</b>")
-        date = aw.qmc.roastdate.toString()
+        datelabel1 = QLabel("<b>" + u(QApplication.translate("Label", "Date",None)) + "</b>")
+        date = aw.qmc.roastdate.date().toString()
+        date += ", " + u(aw.qmc.roastdate.time().toString()[:-3])
         dateedit = QLineEdit(date)
         dateedit.setReadOnly(True)
         dateedit.setStyleSheet("background-color:'lightgrey'")
+        #Batch
+        batchlabel = QLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
+        batch = u("")
+        if aw.qmc.roastbatchpos != 0:
+            roastpos = u" (" + u(aw.qmc.roastbatchpos) + u")"
+        else:
+            roastpos = u("")
+        if aw.qmc.roastbatchnr == 0:
+            batch = u("")
+        else:
+            batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + roastpos + u(" ")
+        batchedit = QLineEdit(batch)
+        batchedit.setReadOnly(True)
+        batchedit.setStyleSheet("background-color:'lightgrey'")
         #Beans
-        beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None, QApplication.UnicodeUTF8)) + "</b>")
+        beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
         self.beansedit = QTextEdit()
         self.beansedit.setMaximumHeight(45)
         if aw.qmc.beans is not None:
@@ -17792,9 +18126,9 @@ class editGraphDlg(ArtisanDialog):
         #operator
         self.operator = QLineEdit(aw.qmc.operator)
         #weight
-        weightlabel = QLabel("<b>" + u(QApplication.translate("Label", "Weight",None, QApplication.UnicodeUTF8)) + "</b>")
-        weightinlabel = QLabel(QApplication.translate("Label", " in",None, QApplication.UnicodeUTF8))
-        weightoutlabel = QLabel(QApplication.translate("Label", " out",None, QApplication.UnicodeUTF8))
+        weightlabel = QLabel("<b>" + u(QApplication.translate("Label", "Weight",None)) + "</b>")
+        weightinlabel = QLabel(QApplication.translate("Label", " in",None))
+        weightoutlabel = QLabel(QApplication.translate("Label", " out",None))
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
@@ -17807,7 +18141,7 @@ class editGraphDlg(ArtisanDialog):
         self.weightoutedit.setMinimumWidth(60)
         self.weightoutedit.setMaximumWidth(60)
         self.weightoutedit.setAlignment(Qt.AlignRight)
-        self.weightpercentlabel = QLabel(QApplication.translate("Label", " %",None, QApplication.UnicodeUTF8))
+        self.weightpercentlabel = QLabel(QApplication.translate("Label", " %",None))
         self.weightpercentlabel.setMinimumWidth(45)
         self.weightpercentlabel.setMaximumWidth(45)
         self.roastdegreelabel = QLabel("")
@@ -17820,17 +18154,17 @@ class editGraphDlg(ArtisanDialog):
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
-        self.unitsComboBox.addItems([QApplication.translate("ComboBox", "g", None, QApplication.UnicodeUTF8),
-                                     QApplication.translate("ComboBox", "Kg", None, QApplication.UnicodeUTF8)])
-        if aw.qmc.weight[2] == QApplication.translate("ComboBox", "g", None, QApplication.UnicodeUTF8):
+        self.unitsComboBox.addItems([QApplication.translate("ComboBox", "g", None),
+                                     QApplication.translate("ComboBox", "Kg", None)])
+        if aw.qmc.weight[2] == QApplication.translate("ComboBox", "g", None):
             self.unitsComboBox.setCurrentIndex(0)
         else:
             self.unitsComboBox.setCurrentIndex(1)
         self.connect(self.unitsComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.unitsComboBox.currentIndex() :self.changeWeightUnit(i))
         #volume
-        volumelabel = QLabel("<b>" + u(QApplication.translate("Label", "Volume",None, QApplication.UnicodeUTF8)) + "</b>")
-        volumeinlabel = QLabel(QApplication.translate("Label", " in",None, QApplication.UnicodeUTF8))
-        volumeoutlabel = QLabel(QApplication.translate("Label", " out",None, QApplication.UnicodeUTF8))
+        volumelabel = QLabel("<b>" + u(QApplication.translate("Label", "Volume",None)) + "</b>")
+        volumeinlabel = QLabel(QApplication.translate("Label", " in",None))
+        volumeoutlabel = QLabel(QApplication.translate("Label", " out",None))
         inv = str(aw.qmc.volume[0])
         outv = str(aw.qmc.volume[1])
         self.volumeinedit = QLineEdit(inv)
@@ -17843,7 +18177,7 @@ class editGraphDlg(ArtisanDialog):
         self.volumeoutedit.setMinimumWidth(60)
         self.volumeoutedit.setMaximumWidth(60)
         self.volumeoutedit.setAlignment(Qt.AlignRight)
-        self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None, QApplication.UnicodeUTF8))
+        self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None))
         self.volumepercentlabel.setMinimumWidth(45)
         self.volumepercentlabel.setMaximumWidth(45)
         self.connect(self.volumeoutedit,SIGNAL("editingFinished()"),self.volume_percent)
@@ -17851,9 +18185,9 @@ class editGraphDlg(ArtisanDialog):
         self.volumeUnitsComboBox = QComboBox()
         self.volumeUnitsComboBox.setMaximumWidth(60)
         self.volumeUnitsComboBox.setMinimumWidth(60)
-        self.volumeUnitsComboBox.addItems([QApplication.translate("ComboBox", "ml",None, QApplication.UnicodeUTF8),
-                                           QApplication.translate("ComboBox", "l",None, QApplication.UnicodeUTF8)])
-        if aw.qmc.volume[2] == QApplication.translate("ComboBox", "ml",None, QApplication.UnicodeUTF8):
+        self.volumeUnitsComboBox.addItems([QApplication.translate("ComboBox", "ml",None),
+                                           QApplication.translate("ComboBox", "l",None)])
+        if aw.qmc.volume[2] == QApplication.translate("ComboBox", "ml",None):
             self.volumeUnitsComboBox.setCurrentIndex(0)
         else:
             self.volumeUnitsComboBox.setCurrentIndex(1)
@@ -17861,7 +18195,7 @@ class editGraphDlg(ArtisanDialog):
         self.calculateddensitylabel = QLabel("")
         self.connect(self.unitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
         #density
-        bean_density_label = QLabel("<b>" + u(QApplication.translate("Label", "Density",None, QApplication.UnicodeUTF8)) + "</b>")
+        bean_density_label = QLabel("<b>" + u(QApplication.translate("Label", "Density",None)) + "</b>")
         self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
         self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_weight_edit))
         self.bean_density_weight_edit.setMinimumWidth(60)
@@ -17870,13 +18204,13 @@ class editGraphDlg(ArtisanDialog):
         self.bean_density_weightUnitsComboBox = QComboBox()
         self.bean_density_weightUnitsComboBox.setMaximumWidth(60)
         self.bean_density_weightUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_weightUnitsComboBox.addItems([QApplication.translate("ComboBox", "g",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("ComboBox", "Kg",None, QApplication.UnicodeUTF8)])
-        if aw.qmc.density[1] == QApplication.translate("ComboBox", "g",None, QApplication.UnicodeUTF8):
+        self.bean_density_weightUnitsComboBox.addItems([QApplication.translate("ComboBox", "g",None),
+                                                        QApplication.translate("ComboBox", "Kg",None)])
+        if aw.qmc.density[1] == QApplication.translate("ComboBox", "g",None):
             self.bean_density_weightUnitsComboBox.setCurrentIndex(0)
         else:
             self.bean_density_weightUnitsComboBox.setCurrentIndex(1)
-        bean_density_per_label = QLabel(QApplication.translate("Label", "per",None, QApplication.UnicodeUTF8))
+        bean_density_per_label = QLabel(QApplication.translate("Label", "per",None))
         self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
         self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
         self.bean_density_volume_edit.setMinimumWidth(60)
@@ -17885,9 +18219,9 @@ class editGraphDlg(ArtisanDialog):
         self.bean_density_volumeUnitsComboBox = QComboBox()
         self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
         self.bean_density_volumeUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_volumeUnitsComboBox.addItems([QApplication.translate("ComboBox", "ml",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("ComboBox", "l",None, QApplication.UnicodeUTF8)])
-        if aw.qmc.density[3] == QApplication.translate("ComboBox", "ml",None, QApplication.UnicodeUTF8):
+        self.bean_density_volumeUnitsComboBox.addItems([QApplication.translate("ComboBox", "ml",None),
+                                                        QApplication.translate("ComboBox", "l",None)])
+        if aw.qmc.density[3] == QApplication.translate("ComboBox", "ml",None):
             self.bean_density_volumeUnitsComboBox.setCurrentIndex(0)
         else:
             self.bean_density_volumeUnitsComboBox.setCurrentIndex(1)
@@ -17899,7 +18233,7 @@ class editGraphDlg(ArtisanDialog):
         self.connect(self.bean_density_volumeUnitsComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.unitsComboBox.currentIndex() :self.changeDensityVolumeUnit(i))
         
         # volume calc button
-        volumeCalcButton = QPushButton(QApplication.translate("Button", "calc",None, QApplication.UnicodeUTF8))
+        volumeCalcButton = QPushButton(QApplication.translate("Button", "calc",None))
         self.connect(volumeCalcButton, SIGNAL("clicked()"),self.volumeCalculator)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
 #        volumeCalcButton.setMaximumSize(60,35)
@@ -17907,21 +18241,21 @@ class editGraphDlg(ArtisanDialog):
         volumeCalcButton.setFocusPolicy(Qt.NoFocus)
         
         #bean size
-        bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Bean Size",None, QApplication.UnicodeUTF8)) + "</b>")
+        bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Bean Size",None)) + "</b>")
         self.bean_size_edit = QLineEdit(str(aw.qmc.beansize))
         self.bean_size_edit.setValidator(QDoubleValidator(0., 10., 1,self.bean_density_weight_edit))
         self.bean_size_edit.setMinimumWidth(45)
         self.bean_size_edit.setMaximumWidth(45)
         self.bean_size_edit.setAlignment(Qt.AlignRight)
-        bean_size_unit_label = QLabel(QApplication.translate("Label", "mm",None, QApplication.UnicodeUTF8))
+        bean_size_unit_label = QLabel(QApplication.translate("Label", "mm",None))
         #bean color
-        whole_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Whole Color",None, QApplication.UnicodeUTF8)) + "</b>")
+        whole_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Whole Color",None)) + "</b>")
         self.whole_color_edit = QLineEdit(str(aw.qmc.whole_color))
         self.whole_color_edit.setValidator(QIntValidator(0, 1000, self.bean_density_weight_edit))
         self.whole_color_edit.setMinimumWidth(45)
         self.whole_color_edit.setMaximumWidth(45)
         self.whole_color_edit.setAlignment(Qt.AlignRight)
-        ground_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Ground Color",None, QApplication.UnicodeUTF8)) + "</b>")
+        ground_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Ground Color",None)) + "</b>")
         self.ground_color_edit = QLineEdit(str(aw.qmc.ground_color))
         self.ground_color_edit.setValidator(QIntValidator(0, 1000, self.bean_density_weight_edit))
         self.ground_color_edit.setMinimumWidth(45)
@@ -17932,9 +18266,9 @@ class editGraphDlg(ArtisanDialog):
         self.colorSystemComboBox.addItems(aw.qmc.color_systems)
         self.colorSystemComboBox.setCurrentIndex(aw.qmc.color_system_idx)
         #Moisture Greens
-        moisture_greens_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Greens",None, QApplication.UnicodeUTF8)) + "</b>")
+        moisture_greens_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Greens",None)) + "</b>")
 #        moisture_greens_unitslabel = QLabel(aw.qmc.mode)
-        moisture_greens_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
+        moisture_greens_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.moisture_greens_edit = QLineEdit()
         self.moisture_greens_edit.setText(str(aw.qmc.moisture_greens))
         self.moisture_greens_edit.setMaximumWidth(50)
@@ -17942,8 +18276,8 @@ class editGraphDlg(ArtisanDialog):
         self.moisture_greens_edit.setAlignment(Qt.AlignRight)
         #Moisture Roasted
         #bag humidity
-        moisture_roasted_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Roasted",None, QApplication.UnicodeUTF8)) + "</b>")
-        moisture_roasted_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
+        moisture_roasted_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Roasted",None)) + "</b>")
+        moisture_roasted_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.moisture_roasted_edit = QLineEdit()
         self.moisture_roasted_edit.setText(str(aw.qmc.moisture_roasted))
         self.moisture_roasted_edit.setMaximumWidth(50)
@@ -17952,15 +18286,15 @@ class editGraphDlg(ArtisanDialog):
         self.connect(self.moisture_greens_edit,SIGNAL("editingFinished()"),self.calculated_organic_loss)        
         self.connect(self.moisture_roasted_edit,SIGNAL("editingFinished()"),self.calculated_organic_loss)
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>" + u(QApplication.translate("Label", "Ambient Conditions",None, QApplication.UnicodeUTF8)) + "</b>")
+        ambientlabel = QLabel("<b>" + u(QApplication.translate("Label", "Ambient Conditions",None)) + "</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
-        ambient_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
+        ambient_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.ambient_humidity_edit = QLineEdit()
         self.ambient_humidity_edit.setText(str(aw.qmc.ambient_humidity))
         self.ambient_humidity_edit.setMaximumWidth(50)
         self.ambient_humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.ambient_humidity_edit))  
         self.ambient_humidity_edit.setAlignment(Qt.AlignRight) 
-        ambient_humidity_at_label = QLabel(QApplication.translate("Label", "at",None, QApplication.UnicodeUTF8))
+        ambient_humidity_at_label = QLabel(QApplication.translate("Label", "at",None))
         self.ambientedit = QLineEdit()
         self.ambientedit.setText(str(aw.qmc.ambientTemp))
         self.ambientedit.setMaximumWidth(50)
@@ -17972,52 +18306,52 @@ class editGraphDlg(ArtisanDialog):
         self.calculateorganiclosslabel = QLabel("")
         # NOTES
         roastertypelabel = QLabel()
-        roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Roaster",None, QApplication.UnicodeUTF8)) + "</b>")
+        roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Roaster",None)) + "</b>")
         operatorlabel = QLabel()
-        operatorlabel.setText("<b>" + u(QApplication.translate("Label", "Operator",None, QApplication.UnicodeUTF8)) + "</b>")
-        roastinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Roasting Notes",None, QApplication.UnicodeUTF8)) + "</b>")
+        operatorlabel.setText("<b>" + u(QApplication.translate("Label", "Operator",None)) + "</b>")
+        roastinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Roasting Notes",None)) + "</b>")
         self.roastingeditor = QTextEdit()
         if aw.qmc.roastingnotes is not None:
             self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
-        cuppinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Cupping Notes",None, QApplication.UnicodeUTF8)) + "</b>")
+        cuppinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Cupping Notes",None)) + "</b>")
         self.cuppingeditor =  QTextEdit()
         if aw.qmc.cuppingnotes is not None:
             self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
         # Flags
-        self.heavyFC = QCheckBox(QApplication.translate("CheckBox","Heavy FC", None, QApplication.UnicodeUTF8))
+        self.heavyFC = QCheckBox(QApplication.translate("CheckBox","Heavy FC", None))
         self.heavyFC.setChecked(aw.qmc.heavyFC_flag)
         self.connect(self.heavyFC,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("heavyFC",x))
-        self.lowFC = QCheckBox(QApplication.translate("CheckBox","Low FC", None, QApplication.UnicodeUTF8))
+        self.lowFC = QCheckBox(QApplication.translate("CheckBox","Low FC", None))
         self.lowFC.setChecked(aw.qmc.lowFC_flag)
         self.connect(self.lowFC,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("lowFC",x))
-        self.lightCut = QCheckBox(QApplication.translate("CheckBox","Light Cut", None, QApplication.UnicodeUTF8))
+        self.lightCut = QCheckBox(QApplication.translate("CheckBox","Light Cut", None))
         self.lightCut.setChecked(aw.qmc.lightCut_flag)
         self.connect(self.lightCut,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("lightCut",x))
-        self.darkCut = QCheckBox(QApplication.translate("CheckBox","Dark Cut", None, QApplication.UnicodeUTF8))
+        self.darkCut = QCheckBox(QApplication.translate("CheckBox","Dark Cut", None))
         self.darkCut.setChecked(aw.qmc.darkCut_flag)
         self.connect(self.darkCut,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("darkCut",x))        
-        self.drops = QCheckBox(QApplication.translate("CheckBox","Drops", None, QApplication.UnicodeUTF8))
+        self.drops = QCheckBox(QApplication.translate("CheckBox","Drops", None))
         self.drops.setChecked(aw.qmc.drops_flag)
         self.connect(self.drops,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("drops",x))
-        self.oily = QCheckBox(QApplication.translate("CheckBox","Oily", None, QApplication.UnicodeUTF8))
+        self.oily = QCheckBox(QApplication.translate("CheckBox","Oily", None))
         self.oily.setChecked(aw.qmc.oily_flag)
         self.connect(self.oily,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("oily",x))
-        self.uneven = QCheckBox(QApplication.translate("CheckBox","Uneven", None, QApplication.UnicodeUTF8))
+        self.uneven = QCheckBox(QApplication.translate("CheckBox","Uneven", None))
         self.uneven.setChecked(aw.qmc.uneven_flag)
-        self.tipping = QCheckBox(QApplication.translate("CheckBox","Tipping", None, QApplication.UnicodeUTF8))
+        self.tipping = QCheckBox(QApplication.translate("CheckBox","Tipping", None))
         self.tipping.setChecked(aw.qmc.tipping_flag)
-        self.scorching = QCheckBox(QApplication.translate("CheckBox","Scorching", None, QApplication.UnicodeUTF8))
+        self.scorching = QCheckBox(QApplication.translate("CheckBox","Scorching", None))
         self.scorching.setChecked(aw.qmc.scorching_flag)
-        self.divots = QCheckBox(QApplication.translate("CheckBox","Divots", None, QApplication.UnicodeUTF8))
+        self.divots = QCheckBox(QApplication.translate("CheckBox","Divots", None))
         self.divots.setChecked(aw.qmc.divots_flag)
         # Save button
-        saveButton = QPushButton(QApplication.translate("Button", "OK",None, QApplication.UnicodeUTF8))
+        saveButton = QPushButton(QApplication.translate("Button", "OK",None))
         self.connect(saveButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         saveButton.setMaximumSize(saveButton.sizeHint())
         saveButton.setMinimumSize(saveButton.minimumSizeHint()) 
         #Cancel Button
-        cancelButton = QPushButton(QApplication.translate("Button", "Cancel",None, QApplication.UnicodeUTF8))
+        cancelButton = QPushButton(QApplication.translate("Button", "Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         cancelButton.setMaximumSize(cancelButton.sizeHint())
@@ -18036,28 +18370,28 @@ class editGraphDlg(ArtisanDialog):
         self.tarePopupEnabled = True # controls if the popup will process tareChange events
         
         # in button
-        inButton = QPushButton(QApplication.translate("Button", "in",None, QApplication.UnicodeUTF8))
+        inButton = QPushButton(QApplication.translate("Button", "in",None))
         self.connect(inButton, SIGNAL("clicked()"),self.inWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
 #        inButton.setMaximumSize(60,35)
 #        inButton.setMinimumSize(60,35) 
         inButton.setFocusPolicy(Qt.NoFocus)
         # out button
-        outButton = QPushButton(QApplication.translate("Button", "out",None, QApplication.UnicodeUTF8))
+        outButton = QPushButton(QApplication.translate("Button", "out",None))
         self.connect(outButton, SIGNAL("clicked()"),self.outWeight)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
 #        outButton.setMaximumSize(60,35)
 #        outButton.setMinimumSize(60,35) 
         outButton.setFocusPolicy(Qt.NoFocus)
         # scan whole button
-        scanWholeButton = QPushButton(QApplication.translate("Button", "scan",None, QApplication.UnicodeUTF8))
+        scanWholeButton = QPushButton(QApplication.translate("Button", "scan",None))
         self.connect(scanWholeButton, SIGNAL("clicked()"),self.scanWholeColor)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
 #        scanWholeButton.setMaximumSize(60,35)
 #        scanWholeButton.setMinimumSize(60,35) 
         scanWholeButton.setFocusPolicy(Qt.NoFocus)
         # scan ground button
-        scanGroundButton = QPushButton(QApplication.translate("Button", "scan",None, QApplication.UnicodeUTF8))
+        scanGroundButton = QPushButton(QApplication.translate("Button", "scan",None))
         self.connect(scanGroundButton, SIGNAL("clicked()"),self.scanGroundColor)
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
 #        scanGroundButton.setMaximumSize(60,35)
@@ -18068,8 +18402,8 @@ class editGraphDlg(ArtisanDialog):
         self.ambientComboBox.addItems(self.buildAmbientTemperatureSourceList())
         self.ambientComboBox.setCurrentIndex(aw.qmc.ambientTempSource)
         self.connect(self.ambientComboBox, SIGNAL("currentIndexChanged(int)"),self.ambientComboBoxIndexChanged)
-        ambientSourceLabel = QLabel(QApplication.translate("Label", "Ambient Source",None, QApplication.UnicodeUTF8))
-        updateAmbientTemp = QPushButton(QApplication.translate("Button", "calc",None, QApplication.UnicodeUTF8))
+        ambientSourceLabel = QLabel(QApplication.translate("Label", "Ambient Source",None))
+        updateAmbientTemp = QPushButton(QApplication.translate("Button", "calc",None))
         updateAmbientTemp.setFocusPolicy(Qt.NoFocus)
         self.connect(updateAmbientTemp, SIGNAL("clicked()"),self.updateAmbientTemp)
         ##### LAYOUTS
@@ -18097,14 +18431,16 @@ class editGraphDlg(ArtisanDialog):
         textLayout = QGridLayout()
         textLayout.addWidget(datelabel1,0,0)
         textLayout.addWidget(dateedit,0,1)
-        textLayout.addWidget(titlelabel,1,0)
-        textLayout.addWidget(self.titleedit,1,1)
-        textLayout.addWidget(beanslabel,2,0)
-        textLayout.addWidget(self.beansedit,2,1)
-        textLayout.addWidget(roastertypelabel,3,0)
-        textLayout.addWidget(self.roaster,3,1)
-        textLayout.addWidget(operatorlabel,4,0)
-        textLayout.addWidget(self.operator,4,1)
+        textLayout.addWidget(batchlabel,1,0)
+        textLayout.addWidget(batchedit,1,1)
+        textLayout.addWidget(titlelabel,2,0)
+        textLayout.addWidget(self.titleedit,2,1)
+        textLayout.addWidget(beanslabel,3,0)
+        textLayout.addWidget(self.beansedit,3,1)
+        textLayout.addWidget(roastertypelabel,4,0)
+        textLayout.addWidget(self.roaster,4,1)
+        textLayout.addWidget(operatorlabel,5,0)
+        textLayout.addWidget(self.operator,5,1)
         weightLayout = QHBoxLayout()
         weightLayout.setSpacing(0)
         weightLayout.addWidget(weightlabel)
@@ -18240,7 +18576,7 @@ class editGraphDlg(ArtisanDialog):
         mainLayout.addLayout(timeLayoutBox)
 #        mainLayout.setSpacing(3)
         mainLayout.setContentsMargins(3, 3, 3, 3)
-        timeGroupLayout = QGroupBox(QApplication.translate("GroupBox", "Times",None, QApplication.UnicodeUTF8))
+        timeGroupLayout = QGroupBox(QApplication.translate("GroupBox", "Times",None))
         timeGroupLayout.setLayout(mainLayout)
         eventbuttonLayout = QHBoxLayout()
         eventbuttonLayout.addStretch()
@@ -18295,16 +18631,16 @@ class editGraphDlg(ArtisanDialog):
         self.TabWidget.setContentsMargins(0,0,0,0)
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab", "General",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab", "General",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab", "Notes",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab", "Notes",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab", "Events",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab", "Events",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None, QApplication.UnicodeUTF8))        
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None))        
         self.connect(self.TabWidget,SIGNAL("currentChanged(int)"),lambda i=0:self.tabSwitched(i))
         #incorporate layouts
         totallayout = QVBoxLayout()
@@ -18333,9 +18669,9 @@ class editGraphDlg(ArtisanDialog):
                 try:
                     dw = float(str(self.bean_density_weight_edit.text()))
                     dv = float(str(self.bean_density_volume_edit.text()))                    
-                    if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8) :
+                    if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None) :
                         dw = dw * 1000.0
-                    if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
+                    if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None) :
                         dv = dv / 1000.0
                     d = dw / dv
                     w = self.weightinedit.text()
@@ -18417,8 +18753,8 @@ class editGraphDlg(ArtisanDialog):
             extra_names.append(u(i) + "xT1: " + aw.qmc.extraname1[i])
             extra_names.append(u(i) + "xT2: " + aw.qmc.extraname2[i])
         return ["",
-                QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8),
-                QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8)] + extra_names
+                QApplication.translate("ComboBox","ET",None),
+                QApplication.translate("ComboBox","BT",None)] + extra_names
 
     def updateAmbientTemp(self):
         aw.qmc.updateAmbientTemp()
@@ -18447,7 +18783,7 @@ class editGraphDlg(ArtisanDialog):
             weightout = float(self.weightoutedit.text())
         except:
             pass
-        if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8):
+        if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None):
             k = 1000.
         else:
             k = 1.
@@ -18531,11 +18867,11 @@ class editGraphDlg(ArtisanDialog):
         self.datatable.clear()
         ndata = len(aw.qmc.timex)
         self.datatable.setRowCount(ndata)
-        columns = [QApplication.translate("Table", "Time",None, QApplication.UnicodeUTF8),
-                                                  QApplication.translate("Table", "ET",None, QApplication.UnicodeUTF8),
-                                                  QApplication.translate("Table", "BT",None, QApplication.UnicodeUTF8),
-                                                  QApplication.translate("Table", "DeltaET",None, QApplication.UnicodeUTF8),
-                                                  QApplication.translate("Table", "DeltaBT",None, QApplication.UnicodeUTF8)]
+        columns = [QApplication.translate("Table", "Time",None),
+                                                  QApplication.translate("Table", "ET",None),
+                                                  QApplication.translate("Table", "BT",None),
+                                                  QApplication.translate("Table", "DeltaET",None),
+                                                  QApplication.translate("Table", "DeltaBT",None)]
         for i in range(len(aw.qmc.extratimex)):
             columns.append(aw.qmc.extraname1[i])
             columns.append(aw.qmc.extraname2[i])
@@ -18571,28 +18907,28 @@ class editGraphDlg(ArtisanDialog):
                     #identify by color and add notation
                 if i == aw.qmc.timeindex[0]:
                     Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = QApplication.translate("Table", "CHARGE",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "CHARGE",None)
                 elif i == aw.qmc.timeindex[1]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "DRY END",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "DRY END",None)
                 elif i == aw.qmc.timeindex[2]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "FC START",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "FC START",None)
                 elif i == aw.qmc.timeindex[3]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "FC END",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "FC END",None)
                 elif i == aw.qmc.timeindex[4]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "SC START",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "SC START",None)
                 elif i == aw.qmc.timeindex[5]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "SC END",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "SC END",None)
                 elif i == aw.qmc.timeindex[6]:
                     Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = QApplication.translate("Table", "DROP",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "DROP",None)
                 elif i == aw.qmc.timeindex[7]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "COOL",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "COOL",None)
                 else:
                     text = u("")
                 Rtime.setText(text + u(" " + Rtime.text()))
@@ -18600,7 +18936,7 @@ class editGraphDlg(ArtisanDialog):
             if i in aw.qmc.specialevents:
                 Rtime.setBackgroundColor(QColor('yellow'))
                 index = aw.qmc.specialevents.index(i)
-                text = QApplication.translate("Table", "EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(str(index+1)).arg(aw.qmc.etypesf(aw.qmc.specialeventstype[index])[0]).arg(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[index]))
+                text = QApplication.translate("Table", "EVENT #%2 %3%4",None).arg(str(index+1)).arg(aw.qmc.etypesf(aw.qmc.specialeventstype[index])[0]).arg(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[index]))
                 Rtime.setText(text + u(" " + Rtime.text()))
 #            self.datatable.setItem(i,0,Atime) 
             self.datatable.setItem(i,0,Rtime)
@@ -18634,12 +18970,12 @@ class editGraphDlg(ArtisanDialog):
         nevents = len(aw.qmc.specialevents)
         self.eventtable.setRowCount(nevents)
         self.eventtable.setColumnCount(6)
-        self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table", "Time", None, QApplication.UnicodeUTF8),
-                                                   QApplication.translate("Table", "BT", None, QApplication.UnicodeUTF8),
-                                                   QApplication.translate("Table", "ET", None, QApplication.UnicodeUTF8),
-                                                   QApplication.translate("Table", "Description", None, QApplication.UnicodeUTF8),
-                                                   QApplication.translate("Table", "Type", None, QApplication.UnicodeUTF8),
-                                                   QApplication.translate("Table", "Value", None, QApplication.UnicodeUTF8)])
+        self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table", "Time", None),
+                                                   QApplication.translate("Table", "BT", None),
+                                                   QApplication.translate("Table", "ET", None),
+                                                   QApplication.translate("Table", "Description", None),
+                                                   QApplication.translate("Table", "Type", None),
+                                                   QApplication.translate("Table", "Value", None)])
         self.eventtable.setAlternatingRowColors(True)
         self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -18751,10 +19087,10 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.specialeventsvalue.append(0)
             self.createEventTable()
             aw.qmc.redraw(recomputeAllDeltas=False)
-            message = QApplication.translate("Message","Event #%1 added", None, QApplication.UnicodeUTF8).arg(str(len(aw.qmc.specialevents))) 
+            message = QApplication.translate("Message","Event #%1 added", None).arg(str(len(aw.qmc.specialevents))) 
             aw.sendmessage(message)
         else:
-            message = QApplication.translate("Message","No profile found", None, QApplication.UnicodeUTF8)
+            message = QApplication.translate("Message","No profile found", None)
             aw.sendmessage(message)
 
     def deleteEventTable(self):
@@ -18768,18 +19104,18 @@ class editGraphDlg(ArtisanDialog):
                 aw.qmc.specialeventstype = aw.qmc.specialeventstype[0:selected_row] + aw.qmc.specialeventstype[selected_row + 1:]
                 aw.qmc.specialeventsStrings = aw.qmc.specialeventsStrings[0:selected_row] + aw.qmc.specialeventsStrings[selected_row + 1:]
                 aw.qmc.specialeventsvalue = aw.qmc.specialeventsvalue[0:selected_row] + aw.qmc.specialeventsvalue[selected_row + 1:]
-                message = QApplication.translate("Message"," Event #%1 deleted", None, QApplication.UnicodeUTF8).arg(str(selected_row+1))
+                message = QApplication.translate("Message"," Event #%1 deleted", None).arg(str(selected_row+1))
             else:
                 aw.qmc.specialevents.pop()
                 aw.qmc.specialeventstype.pop()
                 aw.qmc.specialeventsStrings.pop()
                 aw.qmc.specialeventsvalue.pop()
-                message = QApplication.translate("Message"," Event #%1 deleted", None, QApplication.UnicodeUTF8).arg(str(len(aw.qmc.specialevents)+1))
+                message = QApplication.translate("Message"," Event #%1 deleted", None).arg(str(len(aw.qmc.specialevents)+1))
             self.createEventTable()
             aw.qmc.redraw(recomputeAllDeltas=False)
             aw.sendmessage(message)
         else:
-            message = QApplication.translate("Message","No events found", None, QApplication.UnicodeUTF8)
+            message = QApplication.translate("Message","No events found", None)
             aw.sendmessage(message)
 
     def weightouteditChanged(self):        
@@ -18824,10 +19160,10 @@ class editGraphDlg(ArtisanDialog):
             weightin = float(str(self.weightinedit.text()))
             weightout = float(str(self.weightoutedit.text()))
             if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
-                if self.volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
+                if self.volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None) :
                     volumein = volumein / 1000.0
                     volumeout = volumeout / 1000.0
-                if self.unitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8) :
+                if self.unitsComboBox.currentText() != QApplication.translate("ComboBox","g", None) :
                     weightin = weightin * 1000.0
                     weightout = weightout * 1000.0
                 din = (weightin / volumein) 
@@ -18837,7 +19173,7 @@ class editGraphDlg(ArtisanDialog):
     def calculated_density(self):
         din, dout = self.calc_density()
         if din > 0. and dout > 0.:
-            self.calculateddensitylabel.setText(QApplication.translate("Label","Density in: %1 g/l   =>   Density out: %2 g/l", None, QApplication.UnicodeUTF8).arg("%.1f"%din).arg("%.1f"%dout))
+            self.calculateddensitylabel.setText(QApplication.translate("Label","Density in: %1 g/l   =>   Density out: %2 g/l", None).arg("%.1f"%din).arg("%.1f"%dout))
             self.tab1aLayout.addWidget(self.calculateddensitylabel)
             # set also the green density if not yet set
             if (str(self.bean_density_weight_edit.text()) == "" or float(str(self.bean_density_weight_edit.text())) == 0.) and \
@@ -18875,7 +19211,7 @@ class editGraphDlg(ArtisanDialog):
     def calculated_organic_loss(self):
         mloss, oloss = self.calc_organic_loss()
         if oloss > 0. and mloss > 0.:
-            self.calculateorganiclosslabel.setText(QApplication.translate("Label","Moisture loss: %1%    Organic loss: %2%", None, QApplication.UnicodeUTF8).arg("%.1f"%mloss).arg("%.1f"%oloss))
+            self.calculateorganiclosslabel.setText(QApplication.translate("Label","Moisture loss: %1%    Organic loss: %2%", None).arg("%.1f"%mloss).arg("%.1f"%oloss))
             self.tab1bLayout.addWidget(self.calculateorganiclosslabel)
         else:
             self.calculateorganiclosslabel.setText("")
@@ -18891,11 +19227,11 @@ class editGraphDlg(ArtisanDialog):
             self.bean_density_weightUnitsComboBox.currentIndex() == 0):
             volume = float(str(self.bean_density_volume_edit.text()))
             weight = float(str(self.bean_density_weight_edit.text()))
-            if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
+            if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None) :
                 volume = volume / 1000.0
-            if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8) :
+            if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None) :
                 weight = weight * 1000.0
-            self.standarddensitylabel.setText(QApplication.translate("Label","(%1 g/l)", None, QApplication.UnicodeUTF8).arg((weight / volume)))
+            self.standarddensitylabel.setText(QApplication.translate("Label","(%1 g/l)", None).arg((weight / volume)))
         else:
             self.standarddensitylabel.setText("")
 
@@ -18924,7 +19260,7 @@ class editGraphDlg(ArtisanDialog):
                     aw.qmc.xaxistosm(redraw=False)
                 #if there is _no_ CHARGE recorded and the time entered is negative. ERROR
                 elif aw.qmc.stringtoseconds(str(self.chargeedit.text())) < 0 and aw.qmc.timeindex[0] == -1:
-                    aw.qmc.adderror(QApplication.translate("Error Message", "Unable to move CHARGE to a value that does not exist",None, QApplication.UnicodeUTF8))
+                    aw.qmc.adderror(QApplication.translate("Error Message", "Unable to move CHARGE to a value that does not exist",None))
                     return
             # check CHARGE (with index aw.qmc.timeindex[0])
             if aw.qmc.timeindex[0] == -1:
@@ -19074,7 +19410,7 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.operator = u(self.operator.text())
         aw.qmc.roastingnotes = u(self.roastingeditor.toPlainText())
         aw.qmc.cuppingnotes = u(self.cuppingeditor.toPlainText())
-        aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None))
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.close()
 
@@ -19089,7 +19425,7 @@ class tareDlg(ArtisanDialog):
         super(tareDlg,self).__init__(parent)
         self.tarePopup = tarePopup
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Tare Setup", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Tare Setup", None))
 
         self.taretable = QTableWidget()
         self.taretable.setTabKeyNavigation(True)
@@ -19097,17 +19433,17 @@ class tareDlg(ArtisanDialog):
         
         self.connect(self.taretable,SIGNAL("itemSelectionChanged()"),self.selectionChanged)
         
-        addButton = QPushButton(QApplication.translate("Button","Add", None, QApplication.UnicodeUTF8))
+        addButton = QPushButton(QApplication.translate("Button","Add", None))
         addButton.setFocusPolicy(Qt.NoFocus)
-        self.delButton = QPushButton(QApplication.translate("Button","Delete", None, QApplication.UnicodeUTF8))
+        self.delButton = QPushButton(QApplication.translate("Button","Delete", None))
         self.delButton.setDisabled(True)
         self.delButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(addButton,SIGNAL("clicked()"),self.addTare)
         self.connect(self.delButton,SIGNAL("clicked()"),self.delTare)
         
-        okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK", None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(okButton,SIGNAL("clicked()"),self.close)
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
@@ -19192,8 +19528,8 @@ class tareDlg(ArtisanDialog):
         self.taretable.clear()        
         self.taretable.setRowCount(len(aw.qmc.container_names))
         self.taretable.setColumnCount(2)
-        self.taretable.setHorizontalHeaderLabels([QApplication.translate("Table","Name",None, QApplication.UnicodeUTF8),
-                                                         QApplication.translate("Table","Weight",None, QApplication.UnicodeUTF8)])
+        self.taretable.setHorizontalHeaderLabels([QApplication.translate("Table","Name",None),
+                                                         QApplication.translate("Table","Weight",None)])
         self.taretable.setAlternatingRowColors(True)
         self.taretable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.taretable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -19228,7 +19564,7 @@ class platformDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(platformDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Platform", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Platform", None))
         platformdic = {}
         platformdic["Architecture"] = str(platform.architecture())
         platformdic["Machine"] = str(platform.machine())
@@ -19268,7 +19604,7 @@ class platformDlg(ArtisanDialog):
 class artisansettingsDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(artisansettingsDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Settings Viewer", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Settings Viewer", None))
         self.htmlsettings = ""
         self.ncategoriesComboBox = QComboBox()
         self.settingsEdit = QTextEdit()
@@ -19276,11 +19612,11 @@ class artisansettingsDlg(ArtisanDialog):
         names = self.getstring()
         self.ncategoriesComboBox.addItems(names)
         self.connect(self.ncategoriesComboBox,SIGNAL("currentIndexChanged(int)"),self.searchstringfromcombobox)
-        searchButton = QPushButton(QApplication.translate("Button","Search", None, QApplication.UnicodeUTF8))
+        searchButton = QPushButton(QApplication.translate("Button","Search", None))
         searchButton.setMaximumWidth(150)
         self.connect(searchButton,SIGNAL("clicked()"),self.findtext)
         self.searchbox = QLineEdit(aw.searchtextartisansettings)
-        updateButton = QPushButton(QApplication.translate("Button","Update", None, QApplication.UnicodeUTF8))
+        updateButton = QPushButton(QApplication.translate("Button","Update", None))
         updateButton.setMaximumWidth(150)
         self.connect(updateButton,SIGNAL("clicked()"),self.getstring)
         searchlayout = QHBoxLayout()
@@ -19326,15 +19662,15 @@ class serialLogDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(serialLogDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Serial Log", None, QApplication.UnicodeUTF8))
-        self.serialcheckbox = QCheckBox(QApplication.translate("CheckBox","Serial Log ON/OFF", None, QApplication.UnicodeUTF8))
-        self.serialcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF logs serial communication",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Serial Log", None))
+        self.serialcheckbox = QCheckBox(QApplication.translate("CheckBox","Serial Log ON/OFF", None))
+        self.serialcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF logs serial communication",None))
         self.serialcheckbox.setChecked(aw.seriallogflag)
         self.connect(self.serialcheckbox,SIGNAL("stateChanged(int)"),self.serialcheckboxChanged)
         self.serialEdit = QTextEdit()
         self.serialEdit.setReadOnly(True)
         self.serialEdit.setHtml(self.getstring())
-        updateButton = QPushButton(QApplication.translate("Button","Update", None, QApplication.UnicodeUTF8))
+        updateButton = QPushButton(QApplication.translate("Button","Update", None))
         updateButton.setMaximumWidth(150)
         self.connect(updateButton,SIGNAL("clicked()"),self.update)
         layout = QVBoxLayout()
@@ -19370,14 +19706,14 @@ class errorDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(errorDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Error Log", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Error Log", None))
         #convert list of errors to an html string
         htmlerr = "version = " +__version__ +"<br><br>"
         lenl = len(aw.qmc.errorlog)
         for i in range(len(aw.qmc.errorlog)):
             htmlerr += "<b>" + str(lenl-i) + "</b> <i>" + aw.qmc.errorlog[-i-1] + "</i><br><br>"
         enumber = len(aw.qmc.errorlog)
-        labelstr =  "<b>"+ QApplication.translate("Label","Number of errors found %1", None, QApplication.UnicodeUTF8).arg(str(enumber)) + "</b>"
+        labelstr =  "<b>"+ QApplication.translate("Label","Number of errors found %1", None).arg(str(enumber)) + "</b>"
         elabel = QLabel(labelstr)
         errorEdit = QTextEdit()
         errorEdit.setHtml(htmlerr)
@@ -19395,7 +19731,7 @@ class messageDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(messageDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Message History", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Message History", None))
         #convert list of messages to an html string
         htmlmessage = ""
         for i in range(len(aw.messagehist)):
@@ -19415,23 +19751,23 @@ class autosaveDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(autosaveDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Keyboard Autosave [a]", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Keyboard Autosave [a]", None))
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
-        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None, QApplication.UnicodeUTF8))
-        autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]", None, QApplication.UnicodeUTF8))
+        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None))
+        autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]", None))
         self.autocheckbox = QCheckBox()
-        self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None, QApplication.UnicodeUTF8))
+        self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None))
         self.autocheckbox.setChecked(aw.qmc.autosaveflag)
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None, QApplication.UnicodeUTF8)))
-        okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel", None, QApplication.UnicodeUTF8))
+        prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None)))
+        okButton = QPushButton(QApplication.translate("Button","OK", None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel", None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
-        pathButton = QPushButton(QApplication.translate("Button","Path", None, QApplication.UnicodeUTF8))
+        pathButton = QPushButton(QApplication.translate("Button","Path", None))
         pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(str(aw.qmc.autosavepath))
-        self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None, QApplication.UnicodeUTF8))
+        self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None))
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.autoChanged)
         self.connect(pathButton,SIGNAL("clicked()"),self.getpath)
@@ -19453,7 +19789,7 @@ class autosaveDlg(ArtisanDialog):
         self.setLayout(mainLayout)
 
     def getpath(self):
-        filename = aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Path", None, QApplication.UnicodeUTF8))
+        filename = aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Path", None))
         self.pathEdit.setText(filename)
 
     def autoChanged(self):
@@ -19465,10 +19801,86 @@ class autosaveDlg(ArtisanDialog):
             aw.sendmessage(message)
         else:
             aw.qmc.autosaveflag = 0
-            message = QApplication.translate("Message","Autosave OFF", None, QApplication.UnicodeUTF8)
+            message = QApplication.translate("Message","Autosave OFF", None)
             aw.sendmessage(message)
         self.close()
 
+##########################################################################
+#####################  BATCH DLG  ########################################
+##########################################################################
+
+class batchDlg(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(batchDlg,self).__init__(parent)
+        self.setModal(True)
+        self.setWindowTitle(QApplication.translate("Form Caption","Batch", None))
+        self.prefixEdit = QLineEdit(aw.qmc.batchprefix)
+        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Batch prefix",None))        
+        self.counterSpinBox = QSpinBox()
+        self.counterSpinBox.setRange(0,999999)
+        self.counterSpinBox.setSingleStep(1)
+        if aw.qmc.batchcounter > -1:
+            self.counterSpinBox.setValue(aw.qmc.batchcounter)
+            self.counterSpinBox.setEnabled(True)
+            self.prefixEdit.setEnabled(True)
+        else:
+            self.counterSpinBox.setValue(0)
+            self.counterSpinBox.setEnabled(False)
+            self.prefixEdit.setEnabled(False)
+        self.counterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)                
+        batchchecklabel = QLabel(QApplication.translate("CheckBox","Batch Counter", None))
+        self.batchcheckbox = QCheckBox()
+        self.batchcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF batch counter",None))
+        if aw.qmc.batchcounter > -1:
+            self.batchcheckbox.setChecked(True)
+        else:
+            self.batchcheckbox.setChecked(False)
+        prefixlabel = QLabel()
+        prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None)))
+        counterlabel = QLabel()
+        counterlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        counterlabel.setText(u(QApplication.translate("Label", "Counter",None)))
+        okButton = QPushButton(QApplication.translate("Button","OK", None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel", None))
+        cancelButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(cancelButton,SIGNAL("clicked()"),self.close)
+        self.connect(okButton,SIGNAL("clicked()"),self.batchChanged)
+        self.connect(self.batchcheckbox,SIGNAL("stateChanged(int)"),self.toggleCounterFlag)
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
+        batchlayout = QGridLayout()
+        batchlayout.addWidget(self.batchcheckbox,0,0,Qt.AlignRight)
+        batchlayout.addWidget(batchchecklabel,0,1)
+        batchlayout.addWidget(prefixlabel,1,0)
+        batchlayout.addWidget(self.prefixEdit,1,1)
+        batchlayout.addWidget(counterlabel,2,0)
+        batchlayout.addWidget(self.counterSpinBox,2,1)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(batchlayout)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonLayout)
+        self.setLayout(mainLayout)
+
+    def toggleCounterFlag(self):
+        if self.batchcheckbox.isChecked():
+            self.prefixEdit.setEnabled(True)
+            self.counterSpinBox.setEnabled(True)
+        else:
+            self.prefixEdit.setEnabled(False)
+            self.counterSpinBox.setEnabled(False)
+
+    def batchChanged(self):
+        aw.qmc.batchprefix = self.prefixEdit.text()
+        if self.batchcheckbox.isChecked():
+            aw.qmc.batchcounter = self.counterSpinBox.value()
+        else:
+            aw.qmc.batchcounter = -1
+            aw.qmc.batchsequence = 0
+        self.close()
+        
 ##########################################################################
 #####################  WINDOW PROPERTIES DLG  ############################
 ##########################################################################
@@ -19476,14 +19888,14 @@ class autosaveDlg(ArtisanDialog):
 class WindowsDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(WindowsDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Axes",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Axes",None))
         self.setModal(True)
-        xlimitLabel = QLabel(QApplication.translate("Label", "Max",None, QApplication.UnicodeUTF8))
-        xlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None, QApplication.UnicodeUTF8))
-        ylimitLabel = QLabel(QApplication.translate("Label", "Max",None, QApplication.UnicodeUTF8))
-        ylimitLabel_min = QLabel(QApplication.translate("Label", "Min",None, QApplication.UnicodeUTF8))
-        zlimitLabel = QLabel(QApplication.translate("Label", "Max",None, QApplication.UnicodeUTF8))
-        zlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None, QApplication.UnicodeUTF8))
+        xlimitLabel = QLabel(QApplication.translate("Label", "Max",None))
+        xlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
+        ylimitLabel = QLabel(QApplication.translate("Label", "Max",None))
+        ylimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
+        zlimitLabel = QLabel(QApplication.translate("Label", "Max",None))
+        zlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
         self.xlimitEdit = QLineEdit()
         self.xlimitEdit.setMaximumWidth(60)
         self.xlimitEdit.setMinimumWidth(60)
@@ -19520,7 +19932,7 @@ class WindowsDlg(ArtisanDialog):
         self.ylimitEdit_min.setText(str(aw.qmc.ylimit_min))
         self.zlimitEdit.setText(str(aw.qmc.zlimit))
         self.zlimitEdit_min.setText(str(aw.qmc.zlimit_min))
-        xrotationlabel = QLabel(QApplication.translate("Label", "Rotation",None, QApplication.UnicodeUTF8))
+        xrotationlabel = QLabel(QApplication.translate("Label", "Rotation",None))
         self.xrotationSpinBox = QSpinBox()
         self.xrotationSpinBox.setRange(0,90)
         self.xrotationSpinBox.setSingleStep(5)
@@ -19529,21 +19941,21 @@ class WindowsDlg(ArtisanDialog):
         self.xrotationSpinBox.setMaximumWidth(40)
         self.legendComboBox = QComboBox()
         self.legendComboBox.setMaximumWidth(160)
-        legendlocs = ["",#QApplication.translate("ComboBox", "none",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "upper right",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "upper left",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "lower left",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "lower right",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "right",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "center left",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "center right",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "lower center",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "upper center",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "center",None, QApplication.UnicodeUTF8)]
+        legendlocs = ["",#QApplication.translate("ComboBox", "none",None),
+                      QApplication.translate("ComboBox", "upper right",None),
+                      QApplication.translate("ComboBox", "upper left",None),
+                      QApplication.translate("ComboBox", "lower left",None),
+                      QApplication.translate("ComboBox", "lower right",None),
+                      QApplication.translate("ComboBox", "right",None),
+                      QApplication.translate("ComboBox", "center left",None),
+                      QApplication.translate("ComboBox", "center right",None),
+                      QApplication.translate("ComboBox", "lower center",None),
+                      QApplication.translate("ComboBox", "upper center",None),
+                      QApplication.translate("ComboBox", "center",None)]
         self.legendComboBox.addItems(legendlocs)
         self.legendComboBox.setCurrentIndex(aw.qmc.legendloc)
         self.connect(self.legendComboBox,SIGNAL("currentIndexChanged(int)"),self.changelegendloc)
-        resettimelabel = QLabel(QApplication.translate("Label", "Initial Max",None, QApplication.UnicodeUTF8))
+        resettimelabel = QLabel(QApplication.translate("Label", "Initial Max",None))
         self.resetEdit = QLineEdit()
         self.resetEdit.setMaximumWidth(60)
         self.resetEdit.setMinimumWidth(60)
@@ -19552,21 +19964,21 @@ class WindowsDlg(ArtisanDialog):
         self.resetEdit.setValidator(QRegExpValidator(regextime,self))
         self.resetEdit.setText(aw.qmc.stringfromseconds(aw.qmc.resetmaxtime))
         # fixmaxtime flag
-        self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Lock Max",None, QApplication.UnicodeUTF8))
+        self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Lock Max",None))
         self.fixmaxtimeFlag.setChecked(aw.qmc.fixmaxtime)
         # locktimex flag
-        self.locktimexFlag = QCheckBox(QApplication.translate("CheckBox", "Lock",None, QApplication.UnicodeUTF8))
+        self.locktimexFlag = QCheckBox(QApplication.translate("CheckBox", "Lock",None))
         self.locktimexFlag.setChecked(aw.qmc.locktimex)
         # time axis steps
-        timegridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
+        timegridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.xaxislencombobox = QComboBox()
         timelocs =   [
-                    #QApplication.translate("ComboBox", "30 seconds",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "1 minute",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "2 minute",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "3 minute",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "4 minute",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "5 minute",None, QApplication.UnicodeUTF8)]
+                    #QApplication.translate("ComboBox", "30 seconds",None),
+                      QApplication.translate("ComboBox", "1 minute",None),
+                      QApplication.translate("ComboBox", "2 minute",None),
+                      QApplication.translate("ComboBox", "3 minute",None),
+                      QApplication.translate("ComboBox", "4 minute",None),
+                      QApplication.translate("ComboBox", "5 minute",None)]
         self.xaxislencombobox.addItems(timelocs)
 #        self.timeconversion = [30,60,120,180,240,300]
         self.timeconversion = [60,120,180,240,300]
@@ -19575,7 +19987,7 @@ class WindowsDlg(ArtisanDialog):
         except:
             self.xaxislencombobox.setCurrentIndex(0)
         self.connect(self.xaxislencombobox,SIGNAL("currentIndexChanged(int)"),self.xaxislenloc)
-        ygridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
+        ygridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.ygridSpinBox = QSpinBox()
         self.ygridSpinBox.setRange(1,100)
         self.ygridSpinBox.setSingleStep(5)
@@ -19583,7 +19995,7 @@ class WindowsDlg(ArtisanDialog):
         self.ygridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.connect(self.ygridSpinBox, SIGNAL("valueChanged(int)"),self.changeygrid)
         self.ygridSpinBox.setMaximumWidth(60)
-        zgridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
+        zgridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.zgridSpinBox = QSpinBox()
         self.zgridSpinBox.setRange(1,100)
         self.zgridSpinBox.setSingleStep(5)
@@ -19591,32 +20003,32 @@ class WindowsDlg(ArtisanDialog):
         self.zgridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.connect(self.zgridSpinBox, SIGNAL("valueChanged(int)"),self.changezgrid)
         self.zgridSpinBox.setMaximumWidth(60)
-        linestylegridlabel = QLabel(QApplication.translate("Label", "Style",None, QApplication.UnicodeUTF8))
+        linestylegridlabel = QLabel(QApplication.translate("Label", "Style",None))
         self.gridstylecombobox = QComboBox()
-        gridstyles = [QApplication.translate("ComboBox", "solid",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "dashed",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "dashed-dot",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "dotted",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8)]
+        gridstyles = [QApplication.translate("ComboBox", "solid",None),
+                      QApplication.translate("ComboBox", "dashed",None),
+                      QApplication.translate("ComboBox", "dashed-dot",None),
+                      QApplication.translate("ComboBox", "dotted",None),
+                      QApplication.translate("ComboBox", "None",None)]
         self.gridstylecombobox.addItems(gridstyles) 
         self.gridstylecombobox.setCurrentIndex(aw.qmc.gridlinestyle)
         self.connect(self.gridstylecombobox,SIGNAL("currentIndexChanged(int)"),self.changegridstyle)
-        gridthicknesslabel = QLabel(QApplication.translate("Label", "Width",None, QApplication.UnicodeUTF8))
+        gridthicknesslabel = QLabel(QApplication.translate("Label", "Width",None))
         self.gridwidthSpinBox = QSpinBox()
         self.gridwidthSpinBox.setRange(1,5)
         self.gridwidthSpinBox.setValue(aw.qmc.gridthickness)
         self.connect(self.gridwidthSpinBox, SIGNAL("valueChanged(int)"),self.changegridwidth)
         self.gridwidthSpinBox.setMaximumWidth(40)
-        gridalphalabel = QLabel(QApplication.translate("Label", "Opaqueness",None, QApplication.UnicodeUTF8))
+        gridalphalabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
         self.gridalphaSpinBox = QSpinBox()
         self.gridalphaSpinBox.setRange(1,10)
         self.gridalphaSpinBox.setValue(int(aw.qmc.gridalpha*10))
         self.connect(self.gridalphaSpinBox, SIGNAL("valueChanged(int)"),self.changegridalpha)
         self.gridalphaSpinBox.setMaximumWidth(40)
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
-        resetButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
+        resetButton = QPushButton(QApplication.translate("Button","Defaults",None))
         resetButton.setFocusPolicy(Qt.NoFocus)
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatewindow)
@@ -19657,15 +20069,15 @@ class WindowsDlg(ArtisanDialog):
         graphgridlayout.addWidget(self.gridwidthSpinBox,1,3,Qt.AlignLeft)
         graphgridlayout.addWidget(gridalphalabel,2,0)
         graphgridlayout.addWidget(self.gridalphaSpinBox,2,1,Qt.AlignLeft)
-        xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None, QApplication.UnicodeUTF8))
+        xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None))
         xGroupLayout.setLayout(xlayout)
-        yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None, QApplication.UnicodeUTF8))
+        yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None))
         yGroupLayout.setLayout(ylayout)
-        zGroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT/DeltaET Axis",None, QApplication.UnicodeUTF8))
+        zGroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT/DeltaET Axis",None))
         zGroupLayout.setLayout(zlayout)
-        legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None, QApplication.UnicodeUTF8))
+        legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None))
         legendLayout.setLayout(legentlayout)
-        GridGroupLayout = QGroupBox(QApplication.translate("GroupBox","Grid",None, QApplication.UnicodeUTF8))
+        GridGroupLayout = QGroupBox(QApplication.translate("GroupBox","Grid",None))
         GridGroupLayout.setLayout(graphgridlayout)
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(resetButton)
@@ -19765,7 +20177,7 @@ class WindowsDlg(ArtisanDialog):
         aw.qmc.fixmaxtime = self.fixmaxtimeFlag.isChecked()
         aw.qmc.locktimex = self.locktimexFlag.isChecked()
         aw.qmc.redraw(recomputeAllDeltas=False)
-        string = QApplication.translate("Message","xlimit = (%3,%4) ylimit = (%1,%2) zlimit = (%5,%6)",None, QApplication.UnicodeUTF8).arg(str(self.ylimitEdit_min.text())).arg(str(self.ylimitEdit.text())).arg(str(self.xlimitEdit_min.text())).arg(str(self.xlimitEdit.text())).arg(str(self.zlimitEdit_min.text())).arg(str(self.zlimitEdit.text()))                                   
+        string = QApplication.translate("Message","xlimit = (%3,%4) ylimit = (%1,%2) zlimit = (%5,%6)",None).arg(str(self.ylimitEdit_min.text())).arg(str(self.ylimitEdit.text())).arg(str(self.xlimitEdit_min.text())).arg(str(self.xlimitEdit.text())).arg(str(self.zlimitEdit_min.text())).arg(str(self.zlimitEdit.text()))                                   
         aw.sendmessage(string)
         self.close()
 
@@ -19794,13 +20206,13 @@ class calculatorDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(calculatorDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Calculator",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Calculator",None))
         #RATE OF CHANGE
-        self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile",None, QApplication.UnicodeUTF8))
+        self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile",None))
         self.result2 = QLabel()
         self.result2.setStyleSheet("background-color:'lightgrey';")
-        startlabel = QLabel(QApplication.translate("Label", "Start (00:00)",None, QApplication.UnicodeUTF8))
-        endlabel = QLabel(QApplication.translate("Label", "End (00:00)",None, QApplication.UnicodeUTF8))
+        startlabel = QLabel(QApplication.translate("Label", "Start (00:00)",None))
+        endlabel = QLabel(QApplication.translate("Label", "End (00:00)",None))
         self.startEdit = QLineEdit()
         self.endEdit = QLineEdit()
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
@@ -19809,9 +20221,9 @@ class calculatorDlg(ArtisanDialog):
         self.connect(self.startEdit,SIGNAL("editingFinished()"),self.calculateRC)
         self.connect(self.endEdit,SIGNAL("editingFinished()"),self.calculateRC)
         nevents = len(aw.qmc.specialevents)
-        events_found = [QApplication.translate("ComboBox","Event #0",None, QApplication.UnicodeUTF8)]
+        events_found = [QApplication.translate("ComboBox","Event #0",None)]
         for i in range(nevents):
-            events_found.append(QApplication.translate("ComboBox","Event #%1",None, QApplication.UnicodeUTF8).arg(str(i+1)))
+            events_found.append(QApplication.translate("ComboBox","Event #%1",None).arg(str(i+1)))
         self.eventAComboBox = QComboBox()
         self.eventAComboBox.addItems(events_found)
         self.connect(self.eventAComboBox,SIGNAL("currentIndexChanged(int)"),self.calcEventRC)
@@ -19819,8 +20231,8 @@ class calculatorDlg(ArtisanDialog):
         self.eventBComboBox.addItems(events_found)
         self.connect(self.eventBComboBox,SIGNAL("currentIndexChanged(int)"),self.calcEventRC)
         #TEMPERATURE CONVERSION
-        flabel = QLabel(QApplication.translate("Label", "Fahrenheit",None, QApplication.UnicodeUTF8))
-        clabel = QLabel(QApplication.translate("Label", "Celsius",None, QApplication.UnicodeUTF8))
+        flabel = QLabel(QApplication.translate("Label", "Fahrenheit",None))
+        clabel = QLabel(QApplication.translate("Label", "Celsius",None))
         self.faEdit = QLineEdit()
         self.ceEdit = QLineEdit()
         self.faEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.faEdit))
@@ -19829,9 +20241,9 @@ class calculatorDlg(ArtisanDialog):
         self.connect(self.ceEdit,SIGNAL("editingFinished()"),lambda x="CtoF":self.convertTemp(x))
         #WEIGHT CONVERSION
         self.WinComboBox = QComboBox()
-        weightunits = [QApplication.translate("ComboBox","g",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox","Kg",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox","lb",None, QApplication.UnicodeUTF8)]
+        weightunits = [QApplication.translate("ComboBox","g",None),
+                       QApplication.translate("ComboBox","Kg",None),
+                       QApplication.translate("ComboBox","lb",None)]
         self.WinComboBox.addItems(weightunits)
         self.WinComboBox.setMaximumWidth(80)
         self.WinComboBox.setMinimumWidth(80)
@@ -19852,12 +20264,12 @@ class calculatorDlg(ArtisanDialog):
         self.connect(self.WoutEdit,SIGNAL("editingFinished()"),lambda x="OtoI":self.convertWeight(x))
         #VOLUME CONVERSION
         self.VinComboBox = QComboBox()
-        volumeunits = [QApplication.translate("ComboBox","liter",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox","gallon",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox","quart",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox","pint",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox","cup",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox","cm^3",None, QApplication.UnicodeUTF8)]
+        volumeunits = [QApplication.translate("ComboBox","liter",None),
+                       QApplication.translate("ComboBox","gallon",None),
+                       QApplication.translate("ComboBox","quart",None),
+                       QApplication.translate("ComboBox","pint",None),
+                       QApplication.translate("ComboBox","cup",None),
+                       QApplication.translate("ComboBox","cm^3",None)]
         self.VinComboBox.addItems(volumeunits)
         self.VinComboBox.setMaximumWidth(80)
         self.VinComboBox.setMinimumWidth(80)
@@ -19907,13 +20319,13 @@ class calculatorDlg(ArtisanDialog):
         volumeLayout.addWidget(self.VinEdit)
         volumeLayout.addWidget(self.VoutEdit)
         volumeLayout.addWidget(self.VoutComboBox)
-        RoCGroup = QGroupBox(QApplication.translate("GroupBox","Rate of Change",None, QApplication.UnicodeUTF8))
+        RoCGroup = QGroupBox(QApplication.translate("GroupBox","Rate of Change",None))
         RoCGroup.setLayout(rclayout)
-        tempConvGroup = QGroupBox(QApplication.translate("GroupBox","Temperature Conversion",None, QApplication.UnicodeUTF8))
+        tempConvGroup = QGroupBox(QApplication.translate("GroupBox","Temperature Conversion",None))
         tempConvGroup.setLayout(tempLayout)
-        weightConvGroup = QGroupBox(QApplication.translate("GroupBox","Weight Conversion",None, QApplication.UnicodeUTF8))
+        weightConvGroup = QGroupBox(QApplication.translate("GroupBox","Weight Conversion",None))
         weightConvGroup.setLayout(weightLayout)
-        volumeConvGroup = QGroupBox(QApplication.translate("GroupBox","Volume Conversion",None, QApplication.UnicodeUTF8))
+        volumeConvGroup = QGroupBox(QApplication.translate("GroupBox","Volume Conversion",None))
         volumeConvGroup.setLayout(volumeLayout)
         #main
         mainlayout = QVBoxLayout()
@@ -19947,11 +20359,11 @@ class calculatorDlg(ArtisanDialog):
             starttime = aw.qmc.stringtoseconds(str(self.startEdit.text()))
             endtime = aw.qmc.stringtoseconds(str(self.endEdit.text()))
             if starttime == -1 or endtime == -1:
-                self.result1.setText(QApplication.translate("Label", "Time syntax error. Time not valid",None, QApplication.UnicodeUTF8))
+                self.result1.setText(QApplication.translate("Label", "Time syntax error. Time not valid",None))
                 self.result2.setText("")
                 return
             if  endtime > aw.qmc.timex[-1] or endtime < starttime:
-                self.result1.setText(QApplication.translate("Label", "Error: End time smaller than Start time",None, QApplication.UnicodeUTF8))
+                self.result1.setText(QApplication.translate("Label", "Error: End time smaller than Start time",None))
                 self.result2.setText("")
                 return
             if aw.qmc.timeindex[0] != -1:
@@ -19968,12 +20380,12 @@ class calculatorDlg(ArtisanDialog):
             else:
                 deltaseconds = deltatemperature/deltatime
             deltaminutes = deltaseconds*60.
-            string1 = QApplication.translate("Label", "Best approximation was made from %1 to %2",None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- start)).arg(aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- start))
-            string2 = QApplication.translate("Label", "<b>%1</b> %2/sec, <b>%3</b> %4/min",None, QApplication.UnicodeUTF8).arg("%.2f"%(deltaseconds)).arg(aw.qmc.mode).arg("%.2f"%(deltaminutes)).arg(aw.qmc.mode)
+            string1 = QApplication.translate("Label", "Best approximation was made from %1 to %2",None).arg(aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- start)).arg(aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- start))
+            string2 = QApplication.translate("Label", "<b>%1</b> %2/sec, <b>%3</b> %4/min",None).arg("%.2f"%(deltaseconds)).arg(aw.qmc.mode).arg("%.2f"%(deltaminutes)).arg(aw.qmc.mode)
             self.result1.setText(string1)
             self.result2.setText(string2)
         else:
-            self.result1.setText(QApplication.translate("Label", "No profile found",None, QApplication.UnicodeUTF8))
+            self.result1.setText(QApplication.translate("Label", "No profile found",None))
             self.result2.setText("")
 
     def convertTemp(self,x):
@@ -20034,24 +20446,24 @@ class EventsDlg(ArtisanDialog):
         titlefont = QFont()
         titlefont.setBold(True)
         titlefont.setWeight(75)
-        self.setWindowTitle(QApplication.translate("Form Caption","Events",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Events",None))
         self.setModal(True)
         self.storeState()
         ## TAB 1
-        self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button",None, QApplication.UnicodeUTF8))
+        self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button",None))
         self.eventsbuttonflag.setChecked(bool(aw.eventsbuttonflag))
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)
-        self.eventsshowflagbox = QCheckBox(QApplication.translate("CheckBox","Show",None, QApplication.UnicodeUTF8))
+        self.eventsshowflagbox = QCheckBox(QApplication.translate("CheckBox","Show",None))
         self.eventsshowflagbox.setChecked(bool(aw.qmc.eventsshowflag))
         self.connect(self.eventsshowflagbox,SIGNAL("stateChanged(int)"),self.eventsshowflagChanged)
-        self.minieventsflag = QCheckBox(QApplication.translate("CheckBox","Mini Editor",None, QApplication.UnicodeUTF8))
-        self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event",None, QApplication.UnicodeUTF8))
+        self.minieventsflag = QCheckBox(QApplication.translate("CheckBox","Mini Editor",None))
+        self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event",None))
         self.minieventsflag.setChecked(bool(aw.minieventsflag))
         self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)
-        barstylelabel = QLabel(QApplication.translate("Label","Bars",None, QApplication.UnicodeUTF8))
+        barstylelabel = QLabel(QApplication.translate("Label","Bars",None))
         barstyles = ["",
-                    QApplication.translate("ComboBox","Type",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("ComboBox","Value",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("ComboBox","Type",None),
+                    QApplication.translate("ComboBox","Value",None)]
         self.bartypeComboBox =  QComboBox()
         self.bartypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.bartypeComboBox.setMaximumWidth(80)
@@ -20088,16 +20500,16 @@ class EventsDlg(ArtisanDialog):
         self.connect(self.E4colorButton,SIGNAL("clicked()"),lambda b=3:self.setcoloreventline(b))
         #marker selection for comboboxes
         self.markers = ["",
-                        QApplication.translate("Marker","Circle",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Marker","Square",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Marker","Pentagon",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Marker","Diamond",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Marker","Star",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Marker","Hexagon 1",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Marker","Hexagon 2",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Marker","+",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Marker","x",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Marker","None",None, QApplication.UnicodeUTF8)]
+                        QApplication.translate("Marker","Circle",None),
+                        QApplication.translate("Marker","Square",None),
+                        QApplication.translate("Marker","Pentagon",None),
+                        QApplication.translate("Marker","Diamond",None),
+                        QApplication.translate("Marker","Star",None),
+                        QApplication.translate("Marker","Hexagon 1",None),
+                        QApplication.translate("Marker","Hexagon 2",None),
+                        QApplication.translate("Marker","+",None),
+                        QApplication.translate("Marker","x",None),
+                        QApplication.translate("Marker","None",None)]
         #keys interpreted by matplotlib. Must match order of self.markers 
         self.markervals = [None,"o","s","p","D","*","h","H","+","x","None"]
         #Marker type
@@ -20133,15 +20545,15 @@ class EventsDlg(ArtisanDialog):
         else:
             self.marker4typeComboBox.setCurrentIndex(0) # set to first empty entry
         self.connect(self.marker4typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=3:self.seteventmarker(x,m))
-        valuecolorlabel = QLabel(QApplication.translate("Label","Color",None, QApplication.UnicodeUTF8))
+        valuecolorlabel = QLabel(QApplication.translate("Label","Color",None))
         valuecolorlabel.setFont(titlefont)
-        valuesymbollabel = QLabel(QApplication.translate("Label","Marker",None, QApplication.UnicodeUTF8))
+        valuesymbollabel = QLabel(QApplication.translate("Label","Marker",None))
         valuesymbollabel.setFont(titlefont)
-        valuethicknesslabel = QLabel(QApplication.translate("Label","Thickness",None, QApplication.UnicodeUTF8))
+        valuethicknesslabel = QLabel(QApplication.translate("Label","Thickness",None))
         valuethicknesslabel.setFont(titlefont)
-        valuealphalabel = QLabel(QApplication.translate("Label","Opacity",None, QApplication.UnicodeUTF8))
+        valuealphalabel = QLabel(QApplication.translate("Label","Opacity",None))
         valuealphalabel.setFont(titlefont)
-        valuesizelabel = QLabel(QApplication.translate("Label","Size",None, QApplication.UnicodeUTF8))
+        valuesizelabel = QLabel(QApplication.translate("Label","Size",None))
         valuesizelabel.setFont(titlefont)
         valuecolorlabel.setMaximumSize(80,20)
         valuesymbollabel.setMaximumSize(70,20)
@@ -20233,18 +20645,18 @@ class EventsDlg(ArtisanDialog):
         self.E4sizeSpinBox.setRange(1,14)
         self.E4sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[3])
         self.connect(self.E4sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=3:self.setEmarkersize(w,x))
-        self.autoCharge = QCheckBox(QApplication.translate("CheckBox","Auto CHARGE",None, QApplication.UnicodeUTF8))
+        self.autoCharge = QCheckBox(QApplication.translate("CheckBox","Auto CHARGE",None))
         self.autoCharge.setChecked(aw.qmc.autoChargeFlag)
         self.autoCharge.setFocusPolicy(Qt.NoFocus)
-        self.autoDrop = QCheckBox(QApplication.translate("CheckBox","Auto DROP",None, QApplication.UnicodeUTF8))
+        self.autoDrop = QCheckBox(QApplication.translate("CheckBox","Auto DROP",None))
         self.autoDrop.setChecked(aw.qmc.autoDropFlag)
         self.autoDrop.setFocusPolicy(Qt.NoFocus)
-        self.markTP = QCheckBox(QApplication.translate("CheckBox","Mark TP",None, QApplication.UnicodeUTF8))
+        self.markTP = QCheckBox(QApplication.translate("CheckBox","Mark TP",None))
         self.markTP.setChecked(aw.qmc.markTPflag)
         self.markTP.setFocusPolicy(Qt.NoFocus)
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
-        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        closeButton = QPushButton(QApplication.translate("Button","Cancel",None))
+        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
         self.connect(closeButton,SIGNAL("clicked()"),self.restoreState)
@@ -20252,7 +20664,7 @@ class EventsDlg(ArtisanDialog):
         self.connect(defaultButton,SIGNAL("clicked()"),self.settypedefault)
         ###  TAB 2
         #number of buttons per row
-        self.nbuttonslabel = QLabel(QApplication.translate("Label","Max buttons per row", None, QApplication.UnicodeUTF8))
+        self.nbuttonslabel = QLabel(QApplication.translate("Label","Max buttons per row", None))
         self.nbuttonsSpinBox = QSpinBox()
         self.nbuttonsSpinBox.setMaximumWidth(100)
         self.nbuttonsSpinBox.setAlignment(Qt.AlignCenter)
@@ -20263,24 +20675,24 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
         self.createEventbuttonTable()
-        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
-        addButton.setToolTip(QApplication.translate("Tooltip","Add new extra Event button",None, QApplication.UnicodeUTF8))
+        addButton = QPushButton(QApplication.translate("Button","Add",None))
+        addButton.setToolTip(QApplication.translate("Tooltip","Add new extra Event button",None))
         #addButton.setMaximumWidth(100)
         addButton.setFocusPolicy(Qt.NoFocus)
         self.connect(addButton, SIGNAL("clicked()"),self.insertextraeventbutton)
-        delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
-        delButton.setToolTip(QApplication.translate("Tooltip","Delete the last extra Event button",None, QApplication.UnicodeUTF8))
+        delButton = QPushButton(QApplication.translate("Button","Delete",None))
+        delButton.setToolTip(QApplication.translate("Tooltip","Delete the last extra Event button",None))
         #delButton.setMaximumWidth(100)
         delButton.setFocusPolicy(Qt.NoFocus)
         self.connect(delButton, SIGNAL("clicked()"),self.delextraeventbutton)
-        helpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
-        helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None, QApplication.UnicodeUTF8))
+        helpButton = QPushButton(QApplication.translate("Button","Help",None))
+        helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         helpButton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpButton, SIGNAL("clicked()"),self.showEventbuttonhelp)
         #color patterns
         #flag that prevents changing colors too fast
         self.changingcolorflag = False
-        colorpatternlabel = QLabel(QApplication.translate("Label","Color Pattern", None, QApplication.UnicodeUTF8))
+        colorpatternlabel = QLabel(QApplication.translate("Label","Color Pattern", None))
         self.colorSpinBox = QSpinBox()
         self.colorSpinBox.setWrapping(True)
         self.colorSpinBox.setMaximumWidth(100)
@@ -20288,41 +20700,41 @@ class EventsDlg(ArtisanDialog):
         self.colorSpinBox.setRange(0,359)
         self.connect(self.colorSpinBox, SIGNAL("valueChanged(int)"),self.colorizebuttons)
         ## tab4
-        transferpalettebutton = QPushButton(QApplication.translate("Button","<<", None, QApplication.UnicodeUTF8))
+        transferpalettebutton = QPushButton(QApplication.translate("Button","<<", None))
         transferpalettebutton.setFocusPolicy(Qt.NoFocus)
-        setpalettebutton = QPushButton(QApplication.translate("Button",">>", None, QApplication.UnicodeUTF8))
+        setpalettebutton = QPushButton(QApplication.translate("Button",">>", None))
         setpalettebutton.setFocusPolicy(Qt.NoFocus)
-        palette = QApplication.translate("Label","palette #", None, QApplication.UnicodeUTF8)
+        palette = QApplication.translate("Label","palette #", None)
         palettelist = []
         for i in range(10):
             palettelist.append(palette + str(i))
-        transferpalettecurrentLabel = QLabel((QApplication.translate("Label","current palette", None, QApplication.UnicodeUTF8)))
+        transferpalettecurrentLabel = QLabel((QApplication.translate("Label","current palette", None)))
         self.transferpalettecombobox = QComboBox()
         self.transferpalettecombobox.setFocusPolicy(Qt.NoFocus)
         self.transferpalettecombobox.setMaximumWidth(120)
         self.transferpalettecombobox.addItems(palettelist)
         self.connect(transferpalettebutton, SIGNAL("clicked()"),self.transferbuttonsto)
         self.connect(setpalettebutton, SIGNAL("clicked()"),self.setbuttonsfrom)
-        backupbutton = QPushButton(QApplication.translate("Button","Save", None, QApplication.UnicodeUTF8))
+        backupbutton = QPushButton(QApplication.translate("Button","Save", None))
         backupbutton.setFocusPolicy(Qt.NoFocus)
-        restorebutton = QPushButton(QApplication.translate("Button","Load", None, QApplication.UnicodeUTF8))
+        restorebutton = QPushButton(QApplication.translate("Button","Load", None))
         restorebutton.setFocusPolicy(Qt.NoFocus)
-        backupbutton.setToolTip(QApplication.translate("Tooltip","Backup all palettes to a text file",None, QApplication.UnicodeUTF8))
-        restorebutton.setToolTip(QApplication.translate("Tooltip","Restore all palettes from a text file",None, QApplication.UnicodeUTF8))
+        backupbutton.setToolTip(QApplication.translate("Tooltip","Backup all palettes to a text file",None))
+        restorebutton.setToolTip(QApplication.translate("Tooltip","Restore all palettes from a text file",None))
         backupbutton.setMaximumWidth(140)
         restorebutton.setMaximumWidth(140)
         self.connect(backupbutton, SIGNAL("clicked()"),aw.backuppaletteeventbuttons)
         self.connect(restorebutton, SIGNAL("clicked()"),aw.restorepaletteeventbuttons)
         ## tab3
-        eventtitlelabel = QLabel(QApplication.translate("Label","Event", None, QApplication.UnicodeUTF8))
+        eventtitlelabel = QLabel(QApplication.translate("Label","Event", None))
         eventtitlelabel.setFont(titlefont)
-        actiontitlelabel = QLabel(QApplication.translate("Label","Action", None, QApplication.UnicodeUTF8))
+        actiontitlelabel = QLabel(QApplication.translate("Label","Action", None))
         actiontitlelabel.setFont(titlefont)
-        commandtitlelabel = QLabel(QApplication.translate("Label","Command", None, QApplication.UnicodeUTF8))
+        commandtitlelabel = QLabel(QApplication.translate("Label","Command", None))
         commandtitlelabel.setFont(titlefont)
-        offsettitlelabel = QLabel(QApplication.translate("Label","Offset", None, QApplication.UnicodeUTF8))
+        offsettitlelabel = QLabel(QApplication.translate("Label","Offset", None))
         offsettitlelabel.setFont(titlefont)
-        factortitlelabel = QLabel(QApplication.translate("Label","Factor", None, QApplication.UnicodeUTF8))
+        factortitlelabel = QLabel(QApplication.translate("Label","Factor", None))
         factortitlelabel.setFont(titlefont)
         self.E1visibility = QCheckBox(aw.qmc.etypesf(0))
         self.E1visibility.setFocusPolicy(Qt.NoFocus)
@@ -20336,31 +20748,31 @@ class EventsDlg(ArtisanDialog):
         self.E4visibility = QCheckBox(aw.qmc.etypesf(3))
         self.E4visibility.setFocusPolicy(Qt.NoFocus)
         self.E4visibility.setChecked(bool(aw.eventslidervisibilities[3]))
-        self.sliderActionTypes = ["",#QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Serial Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Call Program",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Hottop Heater",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Hottop Fan",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Hottop Command",None, QApplication.UnicodeUTF8)]
+        self.sliderActionTypes = ["",#QApplication.translate("ComboBox", "None",None),
+                       QApplication.translate("ComboBox", "Serial Command",None),
+                       QApplication.translate("ComboBox", "Modbus Command",None),
+                       QApplication.translate("ComboBox", "DTA Command",None),
+                       QApplication.translate("ComboBox", "Call Program",None),
+                       QApplication.translate("ComboBox", "Hottop Heater",None),
+                       QApplication.translate("ComboBox", "Hottop Fan",None),
+                       QApplication.translate("ComboBox", "Hottop Command",None)]
         self.E1action = QComboBox()
-        self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E1action.setFocusPolicy(Qt.NoFocus)
         self.E1action.addItems(self.sliderActionTypes)
         self.E1action.setCurrentIndex(aw.eventslideractions[0])
         self.E2action = QComboBox()
-        self.E2action.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.E2action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E2action.setFocusPolicy(Qt.NoFocus)
         self.E2action.addItems(self.sliderActionTypes)
         self.E2action.setCurrentIndex(aw.eventslideractions[1])
         self.E3action = QComboBox()
-        self.E3action.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.E3action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E3action.setFocusPolicy(Qt.NoFocus)
         self.E3action.addItems(self.sliderActionTypes)
         self.E3action.setCurrentIndex(aw.eventslideractions[2])
         self.E4action = QComboBox()
-        self.E4action.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.E4action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E4action.setFocusPolicy(Qt.NoFocus)
         self.E4action.addItems(self.sliderActionTypes)
         self.E4action.setCurrentIndex(aw.eventslideractions[3])
@@ -20408,19 +20820,19 @@ class EventsDlg(ArtisanDialog):
         self.E4factor.setDecimals(2)
         self.E4factor.setValue(aw.eventsliderfactors[3])
         self.E4factor.setMaximumWidth(60)
-        helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
+        helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpsliderbutton, SIGNAL("clicked()"),self.showSliderHelp)
         ## tab4
-        qeventtitlelabel = QLabel(QApplication.translate("Label","Event", None, QApplication.UnicodeUTF8))
+        qeventtitlelabel = QLabel(QApplication.translate("Label","Event", None))
         qeventtitlelabel.setFont(titlefont)
-        sourcetitlelabel = QLabel(QApplication.translate("Label","Source", None, QApplication.UnicodeUTF8))
+        sourcetitlelabel = QLabel(QApplication.translate("Label","Source", None))
         sourcetitlelabel.setFont(titlefont)
-        mintitlelabel = QLabel(QApplication.translate("Label","Min", None, QApplication.UnicodeUTF8))
+        mintitlelabel = QLabel(QApplication.translate("Label","Min", None))
         mintitlelabel.setFont(titlefont)
-        maxtitlelabel = QLabel(QApplication.translate("Label","Max", None, QApplication.UnicodeUTF8))
+        maxtitlelabel = QLabel(QApplication.translate("Label","Max", None))
         maxtitlelabel.setFont(titlefont)
-        coarsetitlelabel = QLabel(QApplication.translate("Label","Coarse", None, QApplication.UnicodeUTF8))
+        coarsetitlelabel = QLabel(QApplication.translate("Label","Coarse", None))
         coarsetitlelabel.setFont(titlefont)
         self.E1active = QCheckBox(aw.qmc.etypesf(0))
         self.E1active.setFocusPolicy(Qt.NoFocus)
@@ -20447,8 +20859,8 @@ class EventsDlg(ArtisanDialog):
         self.E4coarse.setFocusPolicy(Qt.NoFocus)
         self.E4coarse.setChecked(bool(aw.eventquantifiercoarse[3]))
         self.curvenames = []
-        self.curvenames.append(QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8))
-        self.curvenames.append(QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8))
+        self.curvenames.append(QApplication.translate("ComboBox","ET",None))
+        self.curvenames.append(QApplication.translate("ComboBox","BT",None))
         for i in range(len(aw.qmc.extradevices)):
             self.curvenames.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
             self.curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
@@ -20500,7 +20912,7 @@ class EventsDlg(ArtisanDialog):
         self.E4max.setAlignment(Qt.AlignRight)
         self.E4max.setRange(-99999,99999)
         self.E4max.setValue(aw.eventquantifiermax[3])
-        applyquantifierbutton =  QPushButton(QApplication.translate("Button","Apply",None, QApplication.UnicodeUTF8))
+        applyquantifierbutton =  QPushButton(QApplication.translate("Button","Apply",None))
         applyquantifierbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(applyquantifierbutton, SIGNAL("clicked()"),self.applyQuantifiers)
         ### LAYOUTS
@@ -20536,115 +20948,115 @@ class EventsDlg(ArtisanDialog):
         typeHBox.addLayout(typeLayout)
         typeHBox.addStretch()
         typeHBox.addWidget(defaultButton)
-        TypeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Event Types",None, QApplication.UnicodeUTF8))
+        TypeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Event Types",None))
         TypeGroupLayout.setLayout(typeHBox)
-        self.buttonActionTypes = ["",#QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Serial Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Call Program",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "IO Command",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Hottop Heater",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Hottop Fan",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Hottop Command",None, QApplication.UnicodeUTF8)]
-        self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None, QApplication.UnicodeUTF8))
+        self.buttonActionTypes = ["",#QApplication.translate("ComboBox", "None",None),
+                       QApplication.translate("ComboBox", "Serial Command",None),
+                       QApplication.translate("ComboBox", "Call Program",None),
+                       QApplication.translate("ComboBox", "Modbus Command",None),
+                       QApplication.translate("ComboBox", "DTA Command",None),
+                       QApplication.translate("ComboBox", "IO Command",None),
+                       QApplication.translate("ComboBox", "Hottop Heater",None),
+                       QApplication.translate("ComboBox", "Hottop Fan",None),
+                       QApplication.translate("ComboBox", "Hottop Command",None)]
+        self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
-        self.CHARGEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.CHARGEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.CHARGEbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.CHARGEbuttonActionType.addItems(self.buttonActionTypes)
         self.CHARGEbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[0])
         self.CHARGEbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[0])
-        self.CHARGEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
-        self.DRYbutton = QCheckBox(QApplication.translate("CheckBox", "DRY END",None, QApplication.UnicodeUTF8))
+        self.CHARGEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
+        self.DRYbutton = QCheckBox(QApplication.translate("CheckBox", "DRY END",None))
         self.DRYbutton.setChecked(bool(aw.qmc.buttonvisibility[1]))
         self.DRYbuttonActionType = QComboBox()
-        self.DRYbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.DRYbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.DRYbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.DRYbuttonActionType.addItems(self.buttonActionTypes)
         self.DRYbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[1])
         self.DRYbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[1])
-        self.DRYbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
-        self.FCSbutton = QCheckBox(QApplication.translate("CheckBox", "FC START",None, QApplication.UnicodeUTF8))
+        self.DRYbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
+        self.FCSbutton = QCheckBox(QApplication.translate("CheckBox", "FC START",None))
         self.FCSbutton.setChecked(bool(aw.qmc.buttonvisibility[2]))
         self.FCSbuttonActionType = QComboBox()
-        self.FCSbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.FCSbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.FCSbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.FCSbuttonActionType.addItems(self.buttonActionTypes)
         self.FCSbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[2])
         self.FCSbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[2])
-        self.FCSbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
-        self.FCEbutton = QCheckBox(QApplication.translate("CheckBox", "FC END",None, QApplication.UnicodeUTF8))
+        self.FCSbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
+        self.FCEbutton = QCheckBox(QApplication.translate("CheckBox", "FC END",None))
         self.FCEbutton.setChecked(bool(aw.qmc.buttonvisibility[3]))
         self.FCEbuttonActionType = QComboBox()
-        self.FCEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.FCEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.FCEbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.FCEbuttonActionType.addItems(self.buttonActionTypes)
         self.FCEbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[3])
         self.FCEbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[3])
-        self.FCEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
-        self.SCSbutton = QCheckBox(QApplication.translate("CheckBox", "SC START",None, QApplication.UnicodeUTF8))
+        self.FCEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
+        self.SCSbutton = QCheckBox(QApplication.translate("CheckBox", "SC START",None))
         self.SCSbutton.setChecked(bool(aw.qmc.buttonvisibility[4]))
         self.SCSbuttonActionType = QComboBox()
-        self.SCSbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.SCSbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.SCSbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.SCSbuttonActionType.addItems(self.buttonActionTypes)
         self.SCSbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[4])
         self.SCSbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[4])
-        self.SCSbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
-        self.SCEbutton = QCheckBox(QApplication.translate("CheckBox", "SC END",None, QApplication.UnicodeUTF8))
+        self.SCSbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
+        self.SCEbutton = QCheckBox(QApplication.translate("CheckBox", "SC END",None))
         self.SCEbutton.setChecked(bool(aw.qmc.buttonvisibility[5]))
         self.SCEbuttonActionType = QComboBox()
-        self.SCEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.SCEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.SCEbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.SCEbuttonActionType.addItems(self.buttonActionTypes)
         self.SCEbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[5])
         self.SCEbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[5])
-        self.SCEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
-        self.DROPbutton = QCheckBox(QApplication.translate("CheckBox", "DROP",None, QApplication.UnicodeUTF8))
+        self.SCEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
+        self.DROPbutton = QCheckBox(QApplication.translate("CheckBox", "DROP",None))
         self.DROPbutton.setChecked(bool(aw.qmc.buttonvisibility[6]))
         self.DROPbuttonActionType = QComboBox()
-        self.DROPbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.DROPbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.DROPbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.DROPbuttonActionType.addItems(self.buttonActionTypes)
         self.DROPbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[6])
         self.DROPbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[6])
-        self.DROPbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
-        self.COOLbutton = QCheckBox(QApplication.translate("CheckBox", "COOL END",None, QApplication.UnicodeUTF8))
+        self.DROPbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
+        self.COOLbutton = QCheckBox(QApplication.translate("CheckBox", "COOL END",None))
         self.COOLbutton.setChecked(bool(aw.qmc.buttonvisibility[7]))
         self.COOLbuttonActionType = QComboBox()
-        self.COOLbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.COOLbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.COOLbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.COOLbuttonActionType.addItems(self.buttonActionTypes)
         self.COOLbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[7])
         self.COOLbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[7])
-        self.COOLbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
+        self.COOLbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
         
-        self.ONbuttonLabel = QLabel(QApplication.translate("Label", "ON", None, QApplication.UnicodeUTF8))
+        self.ONbuttonLabel = QLabel(QApplication.translate("Label", "ON", None))
         self.ONbuttonActionType = QComboBox()
-        self.ONbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.ONbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.ONbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.ONbuttonActionType.addItems(self.buttonActionTypes)
         self.ONbuttonActionType.setCurrentIndex(aw.qmc.extrabuttonactions[0])
         self.ONbuttonActionString = QLineEdit(aw.qmc.extrabuttonactionstrings[0])
-        self.ONbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))        
+        self.ONbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))        
         self.OFFbuttonActionType = QComboBox()
-        self.OFFbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.OFFbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.OFFbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.OFFbuttonActionType.addItems(self.buttonActionTypes)
         self.OFFbuttonActionType.setCurrentIndex(aw.qmc.extrabuttonactions[1])
         self.OFFbuttonActionString = QLineEdit(aw.qmc.extrabuttonactionstrings[1])
-        self.OFFbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
-        self.OFFbuttonLabel = QLabel(QApplication.translate("Label", "OFF", None, QApplication.UnicodeUTF8))
+        self.OFFbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
+        self.OFFbuttonLabel = QLabel(QApplication.translate("Label", "OFF", None))
         self.SAMPLINGbuttonActionType = QComboBox()
-        self.SAMPLINGbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
+        self.SAMPLINGbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.SAMPLINGbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.SAMPLINGbuttonActionType.addItems(self.buttonActionTypes)
         self.SAMPLINGbuttonActionType.setCurrentIndex(aw.qmc.extrabuttonactions[2])
         self.SAMPLINGbuttonActionString = QLineEdit(aw.qmc.extrabuttonactionstrings[2])
-        self.SAMPLINGbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))      
+        self.SAMPLINGbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))      
         self.SAMPLINGbuttonActionInterval = QComboBox()
-        self.SAMPLINGbuttonActionInterval.setToolTip(QApplication.translate("Tooltip", "Interval", None, QApplication.UnicodeUTF8))
+        self.SAMPLINGbuttonActionInterval.setToolTip(QApplication.translate("Tooltip", "Interval", None))
         self.SAMPLINGbuttonActionInterval.setFocusPolicy(Qt.NoFocus)
         buttonActionIntervals = ["sync", "1.0s", "1.5s", "2.0s", "2.5s", "3.0s", "3.5s", "4.0s", "4.5s", "5.0s"]
         self.sampling_delays = [0,1000,1500,2000,2500,3000,3500,4000,4500,5000]
@@ -20687,7 +21099,7 @@ class EventsDlg(ArtisanDialog):
         defaultButtonsLayout.setContentsMargins(5,5,5,5)
         defaultButtonsLayout.setHorizontalSpacing(10)
         defaultButtonsLayout.setVerticalSpacing(7)
-        ButtonGroupLayout = QGroupBox(QApplication.translate("GroupBox","Default Buttons",None, QApplication.UnicodeUTF8))
+        ButtonGroupLayout = QGroupBox(QApplication.translate("GroupBox","Default Buttons",None))
         ButtonGroupLayout.setLayout(defaultButtonsLayout)
         autoLayout = QHBoxLayout()
         autoLayout.addWidget(self.autoCharge)
@@ -20702,7 +21114,7 @@ class EventsDlg(ArtisanDialog):
         samplingLayout.addWidget(self.SAMPLINGbuttonActionString)
         samplingLayout.addWidget(self.SAMPLINGbuttonActionInterval)
         samplingLayout.addStretch()
-        SamplingGroupLayout = QGroupBox(QApplication.translate("GroupBox","Sampling",None, QApplication.UnicodeUTF8))
+        SamplingGroupLayout = QGroupBox(QApplication.translate("GroupBox","Sampling",None))
         SamplingGroupLayout.setLayout(samplingLayout)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(FlagsLayout)
@@ -20740,7 +21152,7 @@ class EventsDlg(ArtisanDialog):
         paletteBox.addStretch()
         paletteBox.addLayout(paletteGrid)
         paletteBox.addStretch()
-        paletteGroupLayout = QGroupBox(QApplication.translate("GroupBox","Management",None, QApplication.UnicodeUTF8))
+        paletteGroupLayout = QGroupBox(QApplication.translate("GroupBox","Management",None))
         paletteGroupLayout.setLayout(paletteBox)
         paletteButtons = QHBoxLayout()
         paletteButtons.addStretch()
@@ -20855,25 +21267,25 @@ class EventsDlg(ArtisanDialog):
         self.connect(self.TabWidget,SIGNAL("currentChanged(int)"),lambda i=i:self.tabSwitched(i))
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
-        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Buttons",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Buttons",None))
         C5Widget = QWidget()
         C5Widget.setLayout(C5VBox)
-        self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Sliders",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Sliders",None))
         C6Widget = QWidget()
         C6Widget.setLayout(C6VBox)
-        self.TabWidget.addTab(C6Widget,QApplication.translate("Tab","Quantifiers",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C6Widget,QApplication.translate("Tab","Quantifiers",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
-        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Palettes",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Palettes",None))
         valueVLayout = QVBoxLayout()
         valueVLayout.addLayout(valueHLayout)
         valueVLayout.addStretch()
         C4Widget = QWidget()
         C4Widget.setLayout(valueVLayout)
-        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Style",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Style",None))
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.TabWidget)
         mainLayout.setSpacing(5)
@@ -20882,15 +21294,15 @@ class EventsDlg(ArtisanDialog):
         self.setLayout(mainLayout)
         
     def showSliderHelp(self):
-        string = u(QApplication.translate("Message", "<b>Event</b> hide or show the corresponding slider",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Action</b> Perform an action on slider release",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Command</b> depends on the action type ('{}' is replaced by <i>value</i>*<i>factor</i> + <i>offset</i>)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) or wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;]) or wcoils(slaveId,register,&lt;bool&gt;) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Factor</b> multiplicator of the slider value",None, QApplication.UnicodeUTF8))
-        QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
+        string = u(QApplication.translate("Message", "<b>Event</b> hide or show the corresponding slider",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Action</b> Perform an action on slider release",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Command</b> depends on the action type ('{}' is replaced by <i>value</i>*<i>factor</i> + <i>offset</i>)",None)) + "<br><br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None)) + "<br><br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) or wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;]) or wcoils(slaveId,register,&lt;bool&gt;) writes values to the registers in slaves specified by the given ids",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Factor</b> multiplicator of the slider value",None))
+        QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None),string)
 
 
     def applyQuantifiers(self):
@@ -21170,23 +21582,23 @@ class EventsDlg(ArtisanDialog):
         nbuttons = len(aw.extraeventstypes) 
         self.eventbuttontable.setRowCount(nbuttons)
         self.eventbuttontable.setColumnCount(10)
-        self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None, QApplication.UnicodeUTF8),
-                                                         QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8),
-                                                         QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
-                                                         QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8),
-                                                         QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
-                                                         QApplication.translate("Table","Documentation",None, QApplication.UnicodeUTF8),
-                                                         QApplication.translate("Table","Visibility",None, QApplication.UnicodeUTF8),
-                                                         QApplication.translate("Table","Color",None, QApplication.UnicodeUTF8),
-                                                         QApplication.translate("Table","Text Color",None, QApplication.UnicodeUTF8),""])
+        self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None),
+                                                         QApplication.translate("Table","Description",None),
+                                                         QApplication.translate("Table","Type",None),
+                                                         QApplication.translate("Table","Value",None),
+                                                         QApplication.translate("Table","Action",None),
+                                                         QApplication.translate("Table","Documentation",None),
+                                                         QApplication.translate("Table","Visibility",None),
+                                                         QApplication.translate("Table","Color",None),
+                                                         QApplication.translate("Table","Text Color",None),""])
         self.eventbuttontable.setAlternatingRowColors(True)
         self.eventbuttontable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
         self.eventbuttontable.setShowGrid(True)
         self.eventbuttontable.verticalHeader().setResizeMode(2)
-        visibility = [QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8)]
+        visibility = [QApplication.translate("ComboBox","OFF",None),
+                      QApplication.translate("ComboBox","ON",None)]
         for i in range(nbuttons):
             #label
             labeledit = QLineEdit(u(aw.extraeventslabels[i]).replace(chr(10),"\\n"))
@@ -21207,16 +21619,16 @@ class EventsDlg(ArtisanDialog):
             self.connect(valueEdit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setvalueeventbutton(z,i))
             #action
             actionComboBox = QComboBox()
-            actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox","Serial Command",None, QApplication.UnicodeUTF8),
-                                     QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
-                                     QApplication.translate("ComboBox","Multiple Event",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox","Modbus Command",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox","DTA Command",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox","IO Command",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox", "Hottop Heater",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox", "Hottop Fan",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("ComboBox", "Hottop Command",None, QApplication.UnicodeUTF8)])
+            actionComboBox.addItems([QApplication.translate("ComboBox","None",None),
+                                    QApplication.translate("ComboBox","Serial Command",None),
+                                     QApplication.translate("ComboBox","Call Program",None),
+                                     QApplication.translate("ComboBox","Multiple Event",None),
+                                    QApplication.translate("ComboBox","Modbus Command",None),
+                                    QApplication.translate("ComboBox","DTA Command",None),
+                                    QApplication.translate("ComboBox","IO Command",None),
+                                    QApplication.translate("ComboBox", "Hottop Heater",None),
+                                    QApplication.translate("ComboBox", "Hottop Fan",None),
+                                    QApplication.translate("ComboBox", "Hottop Command",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1
@@ -21645,17 +22057,17 @@ class EventsDlg(ArtisanDialog):
                 self.savetableextraeventbutton()
                 aw.realignbuttons()
                 aw.qmc.redraw(recomputeAllDeltas=False)
-                aw.sendmessage(QApplication.translate("Message","Event configuration saved", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","Event configuration saved", None))
                 self.close()
             else:
-                aw.sendmessage(QApplication.translate("Message","Found empty event type box", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","Found empty event type box", None))
             #save quantifiers
             aw.updateSlidersProperties() # set visibility and event names on slider widgets
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " updatetypes(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatetypes(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
@@ -21670,21 +22082,21 @@ class EventsDlg(ArtisanDialog):
         aw.settooltip()
 
     def showEventbuttonhelp(self):
-        string = u(QApplication.translate("Message", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None, QApplication.UnicodeUTF8)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>Event Description</b> Description of the Event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br>"  
-        string += u(QApplication.translate("Message", "<b>Event type</b> Type of event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>Event value</b> Value of event (1-100) to be recorded",None, QApplication.UnicodeUTF8)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>Action</b> Perform an action at the time of the event",None, QApplication.UnicodeUTF8)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>Documentation</b> depends on the action type ('{}' is replaced by the event value):",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Call Program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) or wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br>"
-        string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8)) + "<br>"
-        string += u(QApplication.translate("Message", "IO Command: set(n,0), set(n,1), toggle(n) to set Phidget IO digital output n",None, QApplication.UnicodeUTF8)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8)) + "<br>"
-        QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
+        string = u(QApplication.translate("Message", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Event Description</b> Description of the Event to be recorded.",None)) + "<br>"  
+        string += u(QApplication.translate("Message", "<b>Event type</b> Type of event to be recorded.",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Event value</b> Value of event (1-100) to be recorded",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Action</b> Perform an action at the time of the event",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Documentation</b> depends on the action type ('{}' is replaced by the event value):",None)) + "<br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None)) + "<br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Call Program: A program/script path (absolute or relative)",None)) + "<br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None)) + "<br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) or wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;]) writes values to the registers in slaves specified by the given ids",None)) + "<br>"
+        string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None)) + "<br>"
+        string += u(QApplication.translate("Message", "IO Command: set(n,0), set(n,1), toggle(n) to set Phidget IO digital output n",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None)) + "<br>"
+        QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None),string)
 
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
@@ -21693,14 +22105,14 @@ class EventsDlg(ArtisanDialog):
 class phasesGraphDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(phasesGraphDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Phases",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Phases",None))
         self.setModal(True)
         self.phases = list(aw.qmc.phases)
-        dryLabel = QLabel(QApplication.translate("Label", "Drying",None, QApplication.UnicodeUTF8))
-        midLabel = QLabel(QApplication.translate("Label", "Maillard",None, QApplication.UnicodeUTF8))
-        finishLabel = QLabel(QApplication.translate("Label", "Development",None, QApplication.UnicodeUTF8))
-        minf = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
-        maxf = QLabel(QApplication.translate("Label", "max",None, QApplication.UnicodeUTF8))
+        dryLabel = QLabel(QApplication.translate("Label", "Drying",None))
+        midLabel = QLabel(QApplication.translate("Label", "Maillard",None))
+        finishLabel = QLabel(QApplication.translate("Label", "Development",None))
+        minf = QLabel(QApplication.translate("Label", "min",None))
+        maxf = QLabel(QApplication.translate("Label", "max",None))
         self.startdry = QSpinBox()
         self.startdry.setAlignment(Qt.AlignRight)
         self.startdry.setMinimumWidth(80)
@@ -21744,24 +22156,24 @@ class phasesGraphDlg(ArtisanDialog):
         self.connect(self.startmid,SIGNAL("valueChanged(int)"),self.enddry.setValue)
         self.connect(self.endmid,SIGNAL("valueChanged(int)"),self.startfinish.setValue)
         self.connect(self.startfinish,SIGNAL("valueChanged(int)"),self.endmid.setValue)
-        self.pushbuttonflag = QCheckBox(QApplication.translate("CheckBox","Auto Adjusted",None, QApplication.UnicodeUTF8))
+        self.pushbuttonflag = QCheckBox(QApplication.translate("CheckBox","Auto Adjusted",None))
         self.pushbuttonflag.setChecked(bool(aw.qmc.phasesbuttonflag))
         self.connect(self.pushbuttonflag,SIGNAL("stateChanged(int)"),self.pushbuttonflagChanged)
-        self.watermarksflag = QCheckBox(QApplication.translate("CheckBox","Watermarks",None, QApplication.UnicodeUTF8))
+        self.watermarksflag = QCheckBox(QApplication.translate("CheckBox","Watermarks",None))
         self.watermarksflag.setChecked(bool(aw.qmc.watermarksflag))
-        self.phasesLCDflag = QCheckBox(QApplication.translate("CheckBox","Phases LCDs",None, QApplication.UnicodeUTF8))
+        self.phasesLCDflag = QCheckBox(QApplication.translate("CheckBox","Phases LCDs",None))
         self.phasesLCDflag.setChecked(bool(aw.qmc.phasesLCDflag))
-        self.autoDRYflag = QCheckBox(QApplication.translate("CheckBox","Auto DRY",None, QApplication.UnicodeUTF8))
+        self.autoDRYflag = QCheckBox(QApplication.translate("CheckBox","Auto DRY",None))
         self.autoDRYflag.setChecked(bool(aw.qmc.autoDRYflag))
-        self.autoFCsFlag = QCheckBox(QApplication.translate("CheckBox","Auto FCs",None, QApplication.UnicodeUTF8))
+        self.autoFCsFlag = QCheckBox(QApplication.translate("CheckBox","Auto FCs",None))
         self.autoFCsFlag.setChecked(bool(aw.qmc.autoFCsFlag))
         self.connect(self.watermarksflag,SIGNAL("stateChanged(int)"),self.watermarksflagChanged)
         self.connect(self.phasesLCDflag,SIGNAL("stateChanged(int)"),self.phasesLCDsflagChanged)
         self.connect(self.autoDRYflag,SIGNAL("stateChanged(int)"),self.autoDRYflagChanged)
         self.connect(self.autoFCsFlag,SIGNAL("stateChanged(int)"),self.autoFCsFlagChanged)
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
-        setDefaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
+        setDefaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         setDefaultButton.setFocusPolicy(Qt.NoFocus)
         self.connect(cancelButton,SIGNAL("clicked()"),self.cancel)
@@ -21781,11 +22193,11 @@ class phasesGraphDlg(ArtisanDialog):
         phaseLayout.addWidget(self.startfinish,3,1)
         phaseLayout.addWidget(self.endfinish,3,2)
 
-        dryEspressoLabel = QLabel(QApplication.translate("Label", "Drying",None, QApplication.UnicodeUTF8))
-        midEspressoLabel = QLabel(QApplication.translate("Label", "Maillard",None, QApplication.UnicodeUTF8))
-        finishEspressoLabel = QLabel(QApplication.translate("Label", "Development",None, QApplication.UnicodeUTF8))
-        minfEspresso = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
-        maxfEspresso = QLabel(QApplication.translate("Label", "max",None, QApplication.UnicodeUTF8))
+        dryEspressoLabel = QLabel(QApplication.translate("Label", "Drying",None))
+        midEspressoLabel = QLabel(QApplication.translate("Label", "Maillard",None))
+        finishEspressoLabel = QLabel(QApplication.translate("Label", "Development",None))
+        minfEspresso = QLabel(QApplication.translate("Label", "min",None))
+        maxfEspresso = QLabel(QApplication.translate("Label", "max",None))
 
         self.startdryEspresso = QSpinBox()
         self.startdryEspresso.setAlignment(Qt.AlignRight)
@@ -21850,11 +22262,11 @@ class phasesGraphDlg(ArtisanDialog):
         # filter phases tab
         FilterWidget = QWidget()
         FilterWidget.setLayout(phaseLayout)
-        self.phasesTabs.addTab(FilterWidget,QApplication.translate("Tab","Filter",None, QApplication.UnicodeUTF8))
+        self.phasesTabs.addTab(FilterWidget,QApplication.translate("Tab","Filter",None))
         # filter phases tab
         EspressoWidget = QWidget()
         EspressoWidget.setLayout(phaseEspressoLayout)
-        self.phasesTabs.addTab(EspressoWidget,QApplication.translate("Tab","Espresso",None, QApplication.UnicodeUTF8))
+        self.phasesTabs.addTab(EspressoWidget,QApplication.translate("Tab","Espresso",None))
         
         self.phasesTabs.setCurrentIndex(aw.qmc.phases_mode)
         
@@ -22005,7 +22417,7 @@ class phasesGraphDlg(ArtisanDialog):
             aw.qmc.phases = list(aw.qmc.phases_celsius_defaults)
         self.events2phases()
         self.getphases()
-        aw.sendmessage(QApplication.translate("Message","Phases changed to %1 default: %2",None, QApplication.UnicodeUTF8).arg(aw.qmc.mode).arg(str(aw.qmc.phases)))
+        aw.sendmessage(QApplication.translate("Message","Phases changed to %1 default: %2",None).arg(aw.qmc.mode).arg(str(aw.qmc.phases)))
         aw.qmc.redraw(recomputeAllDeltas=False)
 
 ############################################################################
@@ -22022,8 +22434,8 @@ class flavorDlg(ArtisanDialog):
         helpFlag = Qt.WindowContextHelpButtonHint
         flags = flags & (~helpFlag)
         self.setWindowFlags(flags)
-        self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None, QApplication.UnicodeUTF8))
-        defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None))
+        defaultlabel = QLabel(QApplication.translate("Label","Default",None))
         self.defaultcombobox = QComboBox()
         self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","*CUSTOM*"])
         self.defaultcombobox.setCurrentIndex(0)
@@ -22038,24 +22450,24 @@ class flavorDlg(ArtisanDialog):
         rightButton = QPushButton(">")
         rightButton.setFocusPolicy(Qt.NoFocus)
         self.connect(rightButton, SIGNAL("clicked()"),lambda x=1:self.move(x))
-        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
+        addButton = QPushButton(QApplication.translate("Button","Add",None))
         addButton.setFocusPolicy(Qt.NoFocus)
         self.connect(addButton, SIGNAL("clicked()"),self.addlabel)
-        delButton = QPushButton(QApplication.translate("Button","Del",None, QApplication.UnicodeUTF8))
+        delButton = QPushButton(QApplication.translate("Button","Del",None))
         delButton.setFocusPolicy(Qt.NoFocus)
         self.connect(delButton, SIGNAL("clicked()"),self.poplabel)
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None, QApplication.UnicodeUTF8))
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
-        backButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        backButton = QPushButton(QApplication.translate("Button","OK",None))
         self.connect(backButton,SIGNAL("clicked()"),self.close)
-        self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Background", None, QApplication.UnicodeUTF8))
+        self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Background", None))
         if aw.qmc.flavorbackgroundflag:
             self.backgroundCheck.setChecked(True)
         self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.showbackground)
-        aspectlabel = QLabel(QApplication.translate("Label","Aspect Ratio",None, QApplication.UnicodeUTF8))
+        aspectlabel = QLabel(QApplication.translate("Label","Aspect Ratio",None))
         self.aspectSpinBox = QDoubleSpinBox()
-        self.aspectSpinBox.setToolTip(QApplication.translate("Tooltip","Aspect Ratio",None, QApplication.UnicodeUTF8))
+        self.aspectSpinBox.setToolTip(QApplication.translate("Tooltip","Aspect Ratio",None))
         self.aspectSpinBox.setRange(0.,2.)
         self.aspectSpinBox.setSingleStep(.1)
         self.aspectSpinBox.setValue(aw.qmc.flavoraspect)
@@ -22110,8 +22522,8 @@ class flavorDlg(ArtisanDialog):
         if nflavors:
             self.flavortable.setRowCount(nflavors)
             self.flavortable.setColumnCount(2)
-            self.flavortable.setHorizontalHeaderLabels([QApplication.translate("Table", "Label",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Value",None, QApplication.UnicodeUTF8)])
+            self.flavortable.setHorizontalHeaderLabels([QApplication.translate("Table", "Label",None),
+                                                        QApplication.translate("Table", "Value",None)])
             self.flavortable.setAlternatingRowColors(True)
             self.flavortable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.flavortable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -22140,12 +22552,12 @@ class flavorDlg(ArtisanDialog):
     def showbackground(self):
         if self.backgroundCheck.isChecked():
             if not aw.qmc.background:
-                message = QApplication.translate("Message","Background profile not found", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Background profile not found", None)
                 aw.sendmessage(message)
                 self.backgroundCheck.setChecked(False)
             else:
                 if len(aw.qmc.backgroundFlavors) != len(aw.qmc.flavors):
-                    message = QApplication.translate("Message","Background does not match number of labels", None, QApplication.UnicodeUTF8)
+                    message = QApplication.translate("Message","Background does not match number of labels", None)
                     aw.sendmessage(message)
                     self.backgroundCheck.setChecked(False)
                 else:
@@ -22250,31 +22662,31 @@ class flavorDlg(ArtisanDialog):
 class backgroundDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(backgroundDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Profile Background", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Profile Background", None))
         self.setModal(True)
         #TAB 1
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
         self.pathedit.setReadOnly(True)
         self.filename = ""
-        self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Show", None, QApplication.UnicodeUTF8))
-        self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Text", None, QApplication.UnicodeUTF8))
-        self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None, QApplication.UnicodeUTF8))
-        self.backgroundDeltaETflag = QCheckBox(QApplication.translate("CheckBox","DeltaET", None, QApplication.UnicodeUTF8))
-        self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None, QApplication.UnicodeUTF8))
-        self.backgroundAlignFCsflag = QCheckBox(QApplication.translate("CheckBox","Align FCs", None, QApplication.UnicodeUTF8))
+        self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Show", None))
+        self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Text", None))
+        self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None))
+        self.backgroundDeltaETflag = QCheckBox(QApplication.translate("CheckBox","DeltaET", None))
+        self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None))
+        self.backgroundAlignFCsflag = QCheckBox(QApplication.translate("CheckBox","Align FCs", None))
         self.backgroundCheck.setChecked(aw.qmc.background)
         self.backgroundDetails.setChecked(aw.qmc.backgroundDetails)
         self.backgroundeventsflag.setChecked(aw.qmc.backgroundeventsflag)
         self.backgroundDeltaETflag.setChecked(aw.qmc.DeltaETBflag)
         self.backgroundDeltaBTflag.setChecked(aw.qmc.DeltaBTBflag)
         self.backgroundAlignFCsflag.setChecked(aw.qmc.flagalignFCs)
-        loadButton = QPushButton(QApplication.translate("Button","Load", None, QApplication.UnicodeUTF8))
+        loadButton = QPushButton(QApplication.translate("Button","Load", None))
         loadButton.setFocusPolicy(Qt.NoFocus)
-        delButton = QPushButton(QApplication.translate("Button","Delete", None, QApplication.UnicodeUTF8))
+        delButton = QPushButton(QApplication.translate("Button","Delete", None))
         delButton.setFocusPolicy(Qt.NoFocus)
-        okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))
-        alignButton = QPushButton(QApplication.translate("Button","Align", None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK", None))
+        alignButton = QPushButton(QApplication.translate("Button","Align", None))
         alignButton.setFocusPolicy(Qt.NoFocus)
         self.connect(loadButton, SIGNAL("clicked()"),self.load)
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("reject()"))
@@ -22283,7 +22695,7 @@ class backgroundDlg(ArtisanDialog):
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
         self.speedSpinBox.setValue(30)
-        intensitylabel =QLabel(QApplication.translate("Label", "Opaqueness",None, QApplication.UnicodeUTF8))
+        intensitylabel =QLabel(QApplication.translate("Label", "Opaqueness",None))
         intensitylabel.setAlignment(Qt.AlignRight)
         self.intensitySpinBox = QSpinBox()
         self.intensitySpinBox.setAlignment(Qt.AlignRight)
@@ -22296,28 +22708,28 @@ class backgroundDlg(ArtisanDialog):
         self.colors.sort()
         self.defaultcolors = ["ET","BT","DeltaET","DeltaBT"]
         self.defaultcolorsmapped = [aw.qmc.palette["et"],aw.qmc.palette["bt"],aw.qmc.palette["deltaet"],aw.qmc.palette["deltabt"]]
-        metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None, QApplication.UnicodeUTF8))
+        metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None))
         metcolorlabel.setAlignment(Qt.AlignRight)
         self.metcolorComboBox = QComboBox()
         self.metcolorComboBox.addItems(self.defaultcolors)
         self.metcolorComboBox.insertSeparator(4)
         self.metcolorComboBox.addItems(self.colors)
         self.metcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundmetcolor))
-        btcolorlabel = QLabel(QApplication.translate("Label", "BT Color",None, QApplication.UnicodeUTF8))
+        btcolorlabel = QLabel(QApplication.translate("Label", "BT Color",None))
         btcolorlabel.setAlignment(Qt.AlignRight)
         self.btcolorComboBox = QComboBox()
         self.btcolorComboBox.addItems(self.defaultcolors)
         self.btcolorComboBox.insertSeparator(4)
         self.btcolorComboBox.addItems(self.colors)
         self.btcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundbtcolor))
-        xtcolorlabel = QLabel(QApplication.translate("Label", "XT Color",None, QApplication.UnicodeUTF8))
+        xtcolorlabel = QLabel(QApplication.translate("Label", "XT Color",None))
         xtcolorlabel.setAlignment(Qt.AlignRight)
         self.xtcolorComboBox = QComboBox()
         self.xtcolorComboBox.addItems(self.defaultcolors)
         self.xtcolorComboBox.insertSeparator(4)
         self.xtcolorComboBox.addItems(self.colors)
         self.xtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundxtcolor))
-        xtcurvelabel = QLabel(QApplication.translate("Label", "XT",None, QApplication.UnicodeUTF8))
+        xtcurvelabel = QLabel(QApplication.translate("Label", "XT",None))
         xtcurvelabel.setAlignment(Qt.AlignRight)
         self.xtcurveComboBox = QComboBox()
         self.xtcurveComboBox.setMinimumWidth(120)
@@ -22331,27 +22743,27 @@ class backgroundDlg(ArtisanDialog):
         self.connect(self.xtcurveComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.xtcurveComboBox.currentIndex() :self.changeXTcurveidx(i))
 
         
-        deltaetcolorlabel = QLabel(QApplication.translate("Label", "DeltaET Color",None, QApplication.UnicodeUTF8))
+        deltaetcolorlabel = QLabel(QApplication.translate("Label", "DeltaET Color",None))
         deltaetcolorlabel.setAlignment(Qt.AlignRight)
         self.deltaetcolorComboBox = QComboBox()
         self.deltaetcolorComboBox.addItems(self.defaultcolors)
         self.deltaetcolorComboBox.insertSeparator(4)
         self.deltaetcolorComboBox.addItems(self.colors)
         self.deltaetcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltaetcolor))
-        deltabtcolorlabel = QLabel(QApplication.translate("Label", "DeltaBT Color",None, QApplication.UnicodeUTF8))
+        deltabtcolorlabel = QLabel(QApplication.translate("Label", "DeltaBT Color",None))
         deltabtcolorlabel.setAlignment(Qt.AlignRight)
         self.deltabtcolorComboBox = QComboBox()
         self.deltabtcolorComboBox.addItems(self.defaultcolors)
         self.deltabtcolorComboBox.insertSeparator(4)
         self.deltabtcolorComboBox.addItems(self.colors)
         self.deltabtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltabtcolor))
-        self.upButton = QPushButton(QApplication.translate("Button","Up",None, QApplication.UnicodeUTF8))
+        self.upButton = QPushButton(QApplication.translate("Button","Up",None))
         self.upButton.setFocusPolicy(Qt.NoFocus)
-        self.downButton = QPushButton(QApplication.translate("Button","Down",None, QApplication.UnicodeUTF8))
+        self.downButton = QPushButton(QApplication.translate("Button","Down",None))
         self.downButton.setFocusPolicy(Qt.NoFocus)
-        self.leftButton = QPushButton(QApplication.translate("Button","Left",None, QApplication.UnicodeUTF8))
+        self.leftButton = QPushButton(QApplication.translate("Button","Left",None))
         self.leftButton.setFocusPolicy(Qt.NoFocus)
-        self.rightButton = QPushButton(QApplication.translate("Button","Right",None, QApplication.UnicodeUTF8))
+        self.rightButton = QPushButton(QApplication.translate("Button","Right",None))
         self.rightButton.setFocusPolicy(Qt.NoFocus)
         self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundDetails, SIGNAL("clicked()"),self.readChecks)
@@ -22381,12 +22793,12 @@ class backgroundDlg(ArtisanDialog):
         self.datatable.setTabKeyNavigation(True)
         self.createDataTable()
         #TAB 4
-        self.backgroundReproduce = QCheckBox(QApplication.translate("CheckBox","Playback Aid",None, QApplication.UnicodeUTF8))
+        self.backgroundReproduce = QCheckBox(QApplication.translate("CheckBox","Playback Aid",None))
         self.backgroundReproduce.setChecked(aw.qmc.backgroundReproduce)
         self.backgroundReproduce.setFocusPolicy(Qt.NoFocus)
         self.connect(self.backgroundReproduce, SIGNAL("stateChanged(int)"),self.setreproduce)
-        etimelabel =QLabel(QApplication.translate("Label", "Text Warning",None, QApplication.UnicodeUTF8))
-        etimeunit =QLabel(QApplication.translate("Label", "sec",None, QApplication.UnicodeUTF8))
+        etimelabel =QLabel(QApplication.translate("Label", "Text Warning",None))
+        etimeunit =QLabel(QApplication.translate("Label", "sec",None))
         self.etimeSpinBox = QSpinBox()
         self.etimeSpinBox.setRange(1,60)
         self.etimeSpinBox.setValue(aw.qmc.detectBackgroundEventTime)
@@ -22468,13 +22880,13 @@ class backgroundDlg(ArtisanDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Events",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Events",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Data",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Data",None))
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(okButton)
@@ -22498,15 +22910,15 @@ class backgroundDlg(ArtisanDialog):
             aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
             if self.backgroundReproduce.isChecked():
                 aw.qmc.backgroundReproduce = True
-                msg = QApplication.translate("Message","Playback Aid set ON at %1 secs",None, QApplication.UnicodeUTF8).arg(str(aw.qmc.detectBackgroundEventTime))
+                msg = QApplication.translate("Message","Playback Aid set ON at %1 secs",None).arg(str(aw.qmc.detectBackgroundEventTime))
             else:
                 aw.qmc.backgroundReproduce = False
-                msg = QApplication.translate("StatusBar","Playback Aid set OFF",None, QApplication.UnicodeUTF8)
+                msg = QApplication.translate("StatusBar","Playback Aid set OFF",None)
                 aw.messagelabel.setStyleSheet("background-color:'transparent';")
             aw.sendmessage(msg)
         else:
             self.backgroundReproduce.setChecked(False)
-            aw.sendmessage(QApplication.translate("Message","No profile background found",None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","No profile background found",None))
 
     def adjustcolor(self,color,curve):
         color = str(color)
@@ -22606,7 +23018,7 @@ class backgroundDlg(ArtisanDialog):
         self.filename = aw.ArtisanOpenFileDialog()
         if len(u(self.filename)) == 0:
             return
-        aw.sendmessage(QApplication.translate("Message","Reading background profile...",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Reading background profile...",None))
         aw.qmc.resetlinecountcaches()
         aw.loadbackground(u(self.filename))
         # reset XT curve popup
@@ -22632,10 +23044,10 @@ class backgroundDlg(ArtisanDialog):
         if ndata:
             self.eventtable.setRowCount(ndata)
             self.eventtable.setColumnCount(4)
-            self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8)])
+            self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None),
+                                                       QApplication.translate("Table","Description",None),
+                                                       QApplication.translate("Table","Type",None),
+                                                       QApplication.translate("Table","Value",None)])
             self.eventtable.setAlternatingRowColors(True)
             self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -22672,11 +23084,11 @@ class backgroundDlg(ArtisanDialog):
         if ndata:
             self.datatable.setRowCount(ndata)
             self.datatable.setColumnCount(6)
-            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","ET",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","BT",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","DeltaBT",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","DeltaET",None, QApplication.UnicodeUTF8),
+            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None),
+                                                      QApplication.translate("Table","ET",None),
+                                                      QApplication.translate("Table","BT",None),
+                                                      QApplication.translate("Table","DeltaBT",None),
+                                                      QApplication.translate("Table","DeltaET",None),
                                                       ""], # dummy column that stretches
                                                       )
             self.datatable.setAlternatingRowColors(True)
@@ -22711,32 +23123,32 @@ class backgroundDlg(ArtisanDialog):
                     #identify by color and add notation
                     if i == aw.qmc.timeindexB[0] != -1:
                         Rtime.setBackgroundColor(QColor('#f07800'))
-                        text = QApplication.translate("Table", "CHARGE",None, QApplication.UnicodeUTF8)
+                        text = QApplication.translate("Table", "CHARGE",None)
                     elif i == aw.qmc.timeindexB[1]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = QApplication.translate("Table", "DRY END",None, QApplication.UnicodeUTF8)
+                        text = QApplication.translate("Table", "DRY END",None)
                     elif i == aw.qmc.timeindexB[2]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = QApplication.translate("Table", "FC START",None, QApplication.UnicodeUTF8)
+                        text = QApplication.translate("Table", "FC START",None)
                     elif i == aw.qmc.timeindexB[3]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = QApplication.translate("Table", "FC END",None, QApplication.UnicodeUTF8)
+                        text = QApplication.translate("Table", "FC END",None)
                     elif i == aw.qmc.timeindexB[4]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = QApplication.translate("Table", "SC START",None, QApplication.UnicodeUTF8)
+                        text = QApplication.translate("Table", "SC START",None)
                     elif i == aw.qmc.timeindexB[5]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = QApplication.translate("Table", "SC END",None, QApplication.UnicodeUTF8)
+                        text = QApplication.translate("Table", "SC END",None)
                     elif i == aw.qmc.timeindexB[6]:
                         Rtime.setBackgroundColor(QColor('#f07800'))
-                        text = QApplication.translate("Table", "DROP",None, QApplication.UnicodeUTF8)
+                        text = QApplication.translate("Table", "DROP",None)
                     elif i == aw.qmc.timeindexB[7]:
                         Rtime.setBackgroundColor(QColor('#f07800'))
-                        text = QApplication.translate("Table", "COOL",None, QApplication.UnicodeUTF8)
+                        text = QApplication.translate("Table", "COOL",None)
                     elif i in aw.qmc.backgroundEvents:
                         Rtime.setBackgroundColor(QColor('yellow'))
                         index = aw.qmc.backgroundEvents.index(i)
-                        text = QApplication.translate("Table", "EVENT #%1 %2%3",None, QApplication.UnicodeUTF8).arg(str(index+1)).arg(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0]).arg(str(aw.qmc.backgroundEvalues[index]-1))
+                        text = QApplication.translate("Table", "EVENT #%1 %2%3",None).arg(str(index+1)).arg(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0]).arg(str(aw.qmc.backgroundEvalues[index]-1))
                     else:
                         text = u("")
                     Rtime.setText(text + u(" " + Rtime.text()))
@@ -22761,15 +23173,15 @@ class backgroundDlg(ArtisanDialog):
 class StatisticsDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(StatisticsDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Statistics",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Statistics",None))
         self.setModal(True)
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
-        self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None, QApplication.UnicodeUTF8))
-        self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None, QApplication.UnicodeUTF8))
-        self.ror = QCheckBox(aw.qmc.mode + QApplication.translate("CheckBox","/min",None, QApplication.UnicodeUTF8))
-        self.ts = QCheckBox(QApplication.translate("CheckBox","ETBTa",None, QApplication.UnicodeUTF8))
-        self.flavor = QCheckBox(QApplication.translate("CheckBox","Evaluation",None, QApplication.UnicodeUTF8))
-        self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None, QApplication.UnicodeUTF8))
+        self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None))
+        self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None))
+        self.ror = QCheckBox(aw.qmc.mode + QApplication.translate("CheckBox","/min",None))
+        self.ts = QCheckBox(QApplication.translate("CheckBox","ETBTa",None))
+        self.flavor = QCheckBox(QApplication.translate("CheckBox","Evaluation",None))
+        self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None))
         self.mindryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))
         self.mindryedit.setAlignment(Qt.AlignRight)
         self.mindryedit.setMinimumWidth(60)
@@ -22810,12 +23222,12 @@ class StatisticsDlg(ArtisanDialog):
         self.maxfinishedit.setValidator(QRegExpValidator(regextime,self))
         self.mincooledit.setValidator(QRegExpValidator(regextime,self))
         self.maxcooledit.setValidator(QRegExpValidator(regextime,self))
-        drylabel =QLabel(QApplication.translate("Label", "Drying",None, QApplication.UnicodeUTF8))
-        midlabel =QLabel(QApplication.translate("Label", "Maillard",None, QApplication.UnicodeUTF8))
-        finishlabel =QLabel(QApplication.translate("Label", "Development",None, QApplication.UnicodeUTF8))
-        coollabel =QLabel(QApplication.translate("Label", "Cooling",None, QApplication.UnicodeUTF8))
-        minf = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
-        maxf = QLabel(QApplication.translate("Label", "max",None, QApplication.UnicodeUTF8))
+        drylabel =QLabel(QApplication.translate("Label", "Drying",None))
+        midlabel =QLabel(QApplication.translate("Label", "Maillard",None))
+        finishlabel =QLabel(QApplication.translate("Label", "Development",None))
+        coollabel =QLabel(QApplication.translate("Label", "Cooling",None))
+        minf = QLabel(QApplication.translate("Label", "min",None))
+        maxf = QLabel(QApplication.translate("Label", "max",None))
         #temp fix for possible bug aw.qmc.statisticsflags=[] > empty list out of range
         if aw.qmc.statisticsflags:
             if aw.qmc.statisticsflags[0]:
@@ -22848,8 +23260,8 @@ class StatisticsDlg(ArtisanDialog):
         self.connect(self.area,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,3))
         self.connect(self.ror,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,4))
         self.connect(self.ts,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,5))
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        resetButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        resetButton = QPushButton(QApplication.translate("Button","Defaults",None))
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(resetButton, SIGNAL("clicked()"),self.initialsettings)
         flagsLayout = QGridLayout()
@@ -22878,9 +23290,9 @@ class StatisticsDlg(ArtisanDialog):
         layoutHorizontal = QHBoxLayout()
         layoutHorizontal.addLayout(layout)
         layoutHorizontal.addStretch()
-        eventsGroupLayout = QGroupBox(QApplication.translate("GroupBox","Evaluation",None, QApplication.UnicodeUTF8))
+        eventsGroupLayout = QGroupBox(QApplication.translate("GroupBox","Evaluation",None))
         eventsGroupLayout.setLayout(layoutHorizontal)
-        displayGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display",None, QApplication.UnicodeUTF8))
+        displayGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display",None))
         displayGroupLayout.setLayout(flagsLayout)
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(resetButton)
@@ -22988,7 +23400,7 @@ class StatisticsDlg(ArtisanDialog):
 #                self.master.set_timeout(1.0)
 #                self.master.set_verbose(False)
 #            except Exception as e:
-#                aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(e))) 
+#                aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() %1").arg(str(e))) 
 #           
 #    def writeSingleRegister(self,slave,register,value):
 #        try:
@@ -23074,7 +23486,7 @@ class StatisticsDlg(ArtisanDialog):
 #                    libtime.sleep(.3) # avoid possible hickups on startup
 #            except Exception as ex:
 #                _, _, exc_tb = sys.exc_info()
-#                aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(ex)),exc_tb.tb_lineno)
+#                aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() %1").arg(str(ex)),exc_tb.tb_lineno)
 #
 #    # write value to register on slave
 #    # value can be one of string (containing an int or float), an int or a float
@@ -23098,7 +23510,7 @@ class StatisticsDlg(ArtisanDialog):
 #            self.master.write_register(int(register),int(value),0,6)
 #        except Exception as ex:
 #            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
 #        finally:
 #            if self.COMsemaphore.available() < 1:
 #                self.COMsemaphore.release(1)
@@ -23114,7 +23526,7 @@ class StatisticsDlg(ArtisanDialog):
 #            self.master.write_float(int(register),float(value),2)
 #        except Exception as ex:
 #            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeWord() %1").arg(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() %1").arg(str(ex)),exc_tb.tb_lineno)
 #        finally:
 #            if self.COMsemaphore.available() < 1:
 #                self.COMsemaphore.release(1)
@@ -23129,7 +23541,7 @@ class StatisticsDlg(ArtisanDialog):
 #            return r
 #        except Exception as ex:
 #            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " readFloat() %1").arg(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() %1").arg(str(ex)),exc_tb.tb_lineno)
 #        finally:
 #            if self.COMsemaphore.available() < 1:
 #                self.COMsemaphore.release(1)
@@ -23148,7 +23560,7 @@ class StatisticsDlg(ArtisanDialog):
 #            return r
 #        except Exception as ex:
 #            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " readSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
 #        finally:
 #            if self.COMsemaphore.available() < 1:
 #                self.COMsemaphore.release(1)
@@ -23303,7 +23715,7 @@ class modbusport(object):
                 libtime.sleep(.3) # avoid possible hickups on startup
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     # write multiple coils on slave
     def writeCoils(self,slave,register,values):
@@ -23314,7 +23726,7 @@ class modbusport(object):
             self.master.write_coils(int(register),list(values),unit=int(slave))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeCoils() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoils() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)    
@@ -23328,7 +23740,7 @@ class modbusport(object):
             self.master.write_coil(int(register),value,unit=int(slave))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeCoil() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoil() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -23354,7 +23766,7 @@ class modbusport(object):
             self.master.write_register(int(register),int(value),unit=int(slave))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -23375,7 +23787,7 @@ class modbusport(object):
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeWord() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -23399,7 +23811,7 @@ class modbusport(object):
             return r
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " readFloat() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -23424,7 +23836,7 @@ class modbusport(object):
             return r
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " readSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -23463,7 +23875,7 @@ class extraserialport(object):
                 self.SP.open()
         except Exception: #serial.SerialException:
             self.SP.close()
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error + " Unable to open serial port",exc_tb.tb_lineno)
@@ -23479,7 +23891,7 @@ class extraserialport(object):
                 self.openport()
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None) + " connect() %1").arg(str(e)),exc_tb.tb_lineno)
 
 
 class scaleport(extraserialport):
@@ -23787,16 +24199,16 @@ class serialport(object):
                     # CHECK FOR RECEIVED ERROR CODES
                     if ord(r[1]) == 128:
                         if ord(r[2]) == 1:
-                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + QString(" 1: A nonexistent function code was specified. Please check the function code.")
-                            errorcode += (QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + QString(" SendFUJIcommand() 1: Illegal Function in unit %1")).arg(ord(binstring[0]))
+                            errorcode = QApplication.translate("Error Message","F80h Error",None) + QString(" 1: A nonexistent function code was specified. Please check the function code.")
+                            errorcode += (QApplication.translate("Error Message","Exception:",None) + QString(" SendFUJIcommand() 1: Illegal Function in unit %1")).arg(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                         if ord(r[2]) == 2:
-                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + QString(" 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code.")
-                            errorcode += (QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + QString(" SendFUJIcommand() 2 Illegal Address for unit %1")).arg(ord(binstring[0]))
+                            errorcode = QApplication.translate("Error Message","F80h Error",None) + QString(" 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code.")
+                            errorcode += (QApplication.translate("Error Message","Exception:",None) + QString(" SendFUJIcommand() 2 Illegal Address for unit %1")).arg(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                         if ord(r[2]) == 3:
-                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + QString(" 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers.")
-                            errorcode += (QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + QString(" SendFUJIcommand() 3 Illegal Data Value for unit %1")).arg(ord(binstring[0]))
+                            errorcode = QApplication.translate("Error Message","F80h Error",None) + QString(" 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers.")
+                            errorcode += (QApplication.translate("Error Message","Exception:",None) + QString(" SendFUJIcommand() 3 Illegal Data Value for unit %1")).arg(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                     else:
                         #Check crc16
@@ -23805,16 +24217,16 @@ class serialport(object):
                         if crcCal1 == crcRx:
                             return r           #OK. Return r after it has been checked for errors
                         else:
-                            aw.qmc.adderror(QApplication.translate("Error Message","CRC16 data corruption ERROR. TX does not match RX. Check wiring",None, QApplication.UnicodeUTF8))
+                            aw.qmc.adderror(QApplication.translate("Error Message","CRC16 data corruption ERROR. TX does not match RX. Check wiring",None))
                             return "0"
                 else:
-                    aw.qmc.adderror(QApplication.translate("Error Message","No RX data received",None, QApplication.UnicodeUTF8))
+                    aw.qmc.adderror(QApplication.translate("Error Message","No RX data received",None))
                     return "0"
             else:
                 return "0"
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendFUJIcommand()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendFUJIcommand()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return "0"
@@ -23854,7 +24266,7 @@ class serialport(object):
             aw.qmc.dutycycleTX = aw.qmc.timeclock.elapsed()/1000.
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","",None, QApplication.UnicodeUTF8) + " fujitemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","",None) + " fujitemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
         return tx,t1,t2
 
     #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
@@ -23920,7 +24332,7 @@ class serialport(object):
                         t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float
                         return t1
 ##                        else:
-##                            aw.qmc.adderror(QApplication.translate("Error Message","DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8))            
+##                            aw.qmc.adderror(QApplication.translate("Error Message","DTAtemperature(): Data corruption. Check wiring",None))            
 ##                            if len(aw.qmc.timex) > 2:
 ##                                return aw.qmc.temp1[-1]
 ##                            else:
@@ -23936,13 +24348,13 @@ class serialport(object):
 ##                            return 0
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","DTAcommand(): %1 bytes received but 15 needed",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                    aw.qmc.adderror(QApplication.translate("Error Message","DTAcommand(): %1 bytes received but 15 needed",None).arg(nbytes))            
                     if len(aw.qmc.timex) > 2:
                         return aw.qmc.temp1[-1]
                     else:
                         return -1.
         except serial.SerialException:
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendDTAcommand()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendDTAcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds            
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -23973,7 +24385,7 @@ class serialport(object):
         except Exception as e:
             tx = aw.qmc.timeclock.elapsed()/1000.
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " callprogram(): %1 ").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " callprogram(): %1 ").arg(str(e)),exc_tb.tb_lineno)
             return tx,0.,0.
             
     def callprogram_34(self):
@@ -24260,7 +24672,7 @@ class serialport(object):
                 libtime.sleep(.2) # avoid possible hickups on startup
         except Exception: #serial.SerialException:
             self.SP.close()
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + QApplication.translate("Error Message","Unable to open serial port",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None) + QApplication.translate("Error Message","Unable to open serial port",None)
             aw.qmc.adderror(error)
 
     #loads configuration to ports
@@ -24377,19 +24789,19 @@ class serialport(object):
                     
                 # error
                 nbytes = len(r)
-                aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): %1 bytes received but 16 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
+                aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): %1 bytes received but 16 needed",None).arg(nbytes))
                 return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.MS6514temperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.MS6514temperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.MS6514temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.MS6514temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -24412,7 +24824,7 @@ class serialport(object):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HOTTOPtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HOTTOPtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
     #t2 and t1 from Omega HH806 or HH802 meter 
@@ -24439,7 +24851,7 @@ class serialport(object):
                     return s1,s2
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","HH806AUtemperature(): %1 bytes received but 16 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
+                    aw.qmc.adderror(QApplication.translate("Error Message","HH806AUtemperature(): %1 bytes received but 16 needed",None).arg(nbytes))
                     if retry:
                         self.closeport()
                         libtime.sleep(.05)
@@ -24450,13 +24862,13 @@ class serialport(object):
                 return -1,-1
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806AUtemperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH806AUtemperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806AUtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806AUtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -24480,12 +24892,12 @@ class serialport(object):
                 self.HH806Winitflag = 1
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806Winit()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH806Winit()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806Winit() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806Winit() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -24499,7 +24911,7 @@ class serialport(object):
         if self.HH806Winitflag == 0:
             self.HH806Winit()
             if self.HH806Winitflag == 0:
-                aw.qmc.adderror(QApplication.translate("Error Message","HH806Wtemperature(): Unable to initiate device",None, QApplication.UnicodeUTF8))
+                aw.qmc.adderror(QApplication.translate("Error Message","HH806Wtemperature(): Unable to initiate device",None))
                 return -1,-1
         try:
             if not self.SP.isOpen():
@@ -24521,13 +24933,13 @@ class serialport(object):
                 return -1.,-1.
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806Wtemperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH806Wtemperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806Wtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806Wtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -24627,17 +25039,17 @@ class serialport(object):
                     self.HH506RAid = ID[0:3]               # Assign new id to self.HH506RAid
                 else:
                     nbytes = len(ID)
-                    aw.qmc.adderror(QApplication.translate("Error Message","HH506RAGetID: %1 bytes received but 5 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
+                    aw.qmc.adderror(QApplication.translate("Error Message","HH506RAGetID: %1 bytes received but 5 needed",None).arg(nbytes))
         except serial.SerialException:
             self.closeport()
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAGetID()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH506RAGetID()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAGetID() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH506RAGetID() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -24652,7 +25064,7 @@ class serialport(object):
         if self.HH506RAid == "X":
             self.HH506RAGetID()                       # obtain new id one time; self.HH506RAid should not be "X" any more
             if self.HH506RAid == "X":                 # if self.HH506RAGetID() went wrong and self.HH506RAid is still "X"
-                aw.qmc.adderror(QApplication.translate("Error Message","HH506RAtemperature(): Unable to get id from HH506RA device ",None, QApplication.UnicodeUTF8))
+                aw.qmc.adderror(QApplication.translate("Error Message","HH506RAtemperature(): Unable to get id from HH506RA device ",None))
                 return -1,-1
         try:
             command = b"#" + self.HH506RAid + b"N" # + "\r\n" this seems not to be needed
@@ -24671,21 +25083,21 @@ class serialport(object):
                     return int(r[1:5],16)/10., int(r[7:11],16)/10.
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","HH506RAtemperature(): %1 bytes received but 14 needed",None, QApplication.UnicodeUTF8).arg(nbytes))               
+                    aw.qmc.adderror(QApplication.translate("Error Message","HH506RAtemperature(): %1 bytes received but 14 needed",None).arg(nbytes))               
                     return -1,-1
             else:
                 return -1,-1
         except serial.SerialException:
             #self.closeport()
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAtemperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH506RAtemperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH506RAtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -24725,7 +25137,7 @@ class serialport(object):
                     return T1,0
                 else:
                     nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER302temperature(): %1 bytes received but 7 needed",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    error = QApplication.translate("Error Message","CENTER302temperature(): %1 bytes received but 7 needed",None).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
                     aw.qmc.adderror(timez + " " + error)
                     return -1,-1 
@@ -24733,7 +25145,7 @@ class serialport(object):
                 return -1,-1 
         except serial.SerialException:
             #self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER302temperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER302temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -24741,7 +25153,7 @@ class serialport(object):
         except Exception as ex:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER302temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER302temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -24793,7 +25205,7 @@ class serialport(object):
                 else:
                     _, _, exc_tb = sys.exc_info()
                     nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER303temperature(): %1 bytes received but 8 needed",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    error = QApplication.translate("Error Message","CENTER303temperature(): %1 bytes received but 8 needed",None).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -24803,7 +25215,7 @@ class serialport(object):
         except serial.SerialException:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER303temperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER303temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -24811,7 +25223,7 @@ class serialport(object):
         except Exception as ex:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER303temperature() %1").arg(str(ex)),exc_tb.tb_lineno)            
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER303temperature() %1").arg(str(ex)),exc_tb.tb_lineno)            
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -24862,7 +25274,7 @@ class serialport(object):
                     return T1,T2
                 else:
                     nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER306temperature(): %1 bytes received but 10 needed",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    error = QApplication.translate("Error Message","CENTER306temperature(): %1 bytes received but 10 needed",None).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -24871,7 +25283,7 @@ class serialport(object):
                 return -1,-1
         except serial.SerialException:
             #self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER306temperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER306temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -24879,7 +25291,7 @@ class serialport(object):
         except Exception as ex:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER306temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER306temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -24947,13 +25359,13 @@ class serialport(object):
                     return T1,T2
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","CENTER309temperature(): %1 bytes received but 45 needed",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                    aw.qmc.adderror(QApplication.translate("Error Message","CENTER309temperature(): %1 bytes received but 45 needed",None).arg(nbytes))            
                     return -1,-1 
             else:
                 return -1,-1
         except serial.SerialException:
             #self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER309temperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER309temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -24961,7 +25373,7 @@ class serialport(object):
         except Exception as ex:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER309temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER309temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -25023,11 +25435,11 @@ class serialport(object):
 
     def phidget1045attached(self,e):
         self.configure1045()
-        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None))
         self.PhidgetIRSensorSensorAttached = True
         
     def phidget1045detached(self,e):
-        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR detached",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR detached",None))
         self.PhidgetIRSensorSensorAttached = False
 
     def PHIDGET1045temperature(self):
@@ -25045,7 +25457,7 @@ class serialport(object):
                             self.PhidgetIRSensor.openPhidget(serial=ser)
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
-                        #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+                        #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
                         try:
                             self.PhidgetIRSensor.closePhidget()
                         except:
@@ -25082,7 +25494,7 @@ class serialport(object):
                 pass
             self.PhidgetIRSensor = None
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
     def phidget1048TemperatureChanged(self,e):
@@ -25118,11 +25530,11 @@ class serialport(object):
     def phidget1048attached(self,e):
         aw.ser.PhidgetTemperatureInputCount = aw.ser.PhidgetTemperatureSensor.getTemperatureInputCount()
         self.configure1048()
-        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None))
         aw.ser.PhidgetTemperatureSensorAttached = True
         
     def phidget1048detached(self,e):
-        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input detached",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input detached",None))
         aw.ser.PhidgetTemperatureSensorAttached = False
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
@@ -25139,7 +25551,7 @@ class serialport(object):
                         aw.ser.PhidgetTemperatureSensor.openPhidget()
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
-                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
                     aw.ser.PhidgetBridgeSensorAttached = False
                     try:
                         aw.ser.PhidgetTemperatureSensor.closePhidget()
@@ -25203,7 +25615,7 @@ class serialport(object):
             aw.ser.PhidgetTemperatureSensor = None
             aw.ser.PhidgetBridgeSensorAttached = False
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
     # takes a bridge value in mV/V and returns the resistance of the corresponding RTD, assuming the RTD is connected
@@ -25260,7 +25672,7 @@ class serialport(object):
                 v = bv # no abs() for raw values
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " bridgeValue2Temperature(): %1").arg(str(e)),exc_tb.tb_lineno)            
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " bridgeValue2Temperature(): %1").arg(str(e)),exc_tb.tb_lineno)            
         return v
 
     def phidget1046getTemperature(self,i):
@@ -25320,11 +25732,11 @@ class serialport(object):
 
     def phidget1046attached(self,e):
         self.configure1046()
-        aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None))
         aw.ser.PhidgetBridgeSensorAttached = True
         
     def phidget1046detached(self,e):
-        aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input detached",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input detached",None))
         aw.ser.PhidgetBridgeSensorAttached = False
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
@@ -25341,7 +25753,7 @@ class serialport(object):
                         aw.ser.PhidgetBridgeSensor.openPhidget()
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
-                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
                     aw.ser.PhidgetBridgeSensorAttached = False
                     try:
                         aw.ser.PhidgetBridgeSensor.closePhidget()
@@ -25386,7 +25798,7 @@ class serialport(object):
             aw.ser.PhidgetBridgeSensor = None
             aw.ser.PhidgetBridgeSensorAttached = False
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
     def phidget1018SensorChanged(self,e):
@@ -25433,11 +25845,11 @@ class serialport(object):
                 
     def phidget1018attached(self,e):
         self.configure1018()
-        aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO attached",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO attached",None))
         aw.ser.PhidgetIOAttached = True
         
     def phidget1018detached(self,e):
-        aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO detached",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Phidget 1018 IO detached",None))
         aw.ser.PhidgetIOAttached = False
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for probe 5 and 6; mode 3 for probe 7 and 8
@@ -25454,7 +25866,7 @@ class serialport(object):
                         aw.ser.PhidgetIO.openPhidget()
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
-                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1018values() %1").arg(str(ex)),exc_tb.tb_lineno)
+                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1018values() %1").arg(str(ex)),exc_tb.tb_lineno)
                     aw.ser.PhidgetIOAttached = False
                     try:
                         aw.ser.PhidgetIO.closePhidget()
@@ -25529,7 +25941,7 @@ class serialport(object):
                 pass
             aw.ser.PhidgetIO = None
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1018values() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1018values() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
     # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe
@@ -25554,25 +25966,21 @@ class serialport(object):
                 # alt: PreregisterHub( )
 #                if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
                 try:
-#                    aw.sendmessage("try")
-                    res = YAPI.RegisterHub("usb", errmsg)
+                    YAPI.RegisterHub("usb", errmsg)
+#                    res = YAPI.RegisterHub("usb", errmsg)
 #                    aw.sendmessage("res: " + str(res))
                 except Exception as e:
                     aw.sendmessage(str(e))
 #                    aw.sendmessage("error: " + str(errmsg))
                 try:
                     self.YOCTOsensor = YTemperature.FirstTemperature()
-#                    aw.sendmessage("first: " + str(self.YOCTOsensor))
                     if mode == 0 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
-#                        aw.sendmessage("serial: " + str(serial))
                         self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
-#                        aw.sendmessage("serial: " + str(self.YOCTOchan1))
                         self.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
-#                        aw.sendmessage("serial: " + str(self.YOCTOchan2))
-                        aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None, QApplication.UnicodeUTF8))                       
+                        aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None))                       
                     elif mode == 1 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
-                        aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None, QApplication.UnicodeUTF8))                       
+                        aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None))                       
                 except:
                     pass
             probe1 = -1
@@ -25606,7 +26014,7 @@ class serialport(object):
             self.YOCTOchan1 = None
             self.YOCTOchan2 = None
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " YOCTOtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " YOCTOtemperatures() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
 
@@ -25650,7 +26058,7 @@ class serialport(object):
                     libtime.sleep(.05)
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
-                        raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None, QApplication.UnicodeUTF8))
+                        raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None))
                     elif result.startswith("#"):
                         #OK. NOW SET UNITS
                         self.SP.flushInput()
@@ -25661,7 +26069,7 @@ class serialport(object):
                         libtime.sleep(.05)
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
-                            raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None, QApplication.UnicodeUTF8))
+                            raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None))
                         else:
                             #OK. NOW SET FILTER
                             self.SP.flushInput()
@@ -25673,7 +26081,7 @@ class serialport(object):
                             libtime.sleep(.05)
                             result = self.SP.readline().decode('utf-8')[:-2]
                             if (not len(result) == 0 and not result.startswith("#")):
-                                raise Exception(QApplication.translate("Error Message","Arduino could not set filters",None, QApplication.UnicodeUTF8))
+                                raise Exception(QApplication.translate("Error Message","Arduino could not set filters",None))
                             else:
                                 ### EVERYTHING OK  ###
                                 self.ArduinoIsInitialized = 1
@@ -25761,7 +26169,7 @@ class serialport(object):
                 return t1, t2
         except serial.SerialException as e:
             #self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.ARDUINOTC4temperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.ARDUINOTC4temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + " " + str(e),exc_tb.tb_lineno)
@@ -25769,7 +26177,7 @@ class serialport(object):
         except Exception as e:
             # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " ser.ARDUINOTC4temperature(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " ser.ARDUINOTC4temperature(): %1").arg(str(e)),exc_tb.tb_lineno)
             return -1.,-1.
         finally:
             if self.COMsemaphore.available() < 1:
@@ -25940,14 +26348,14 @@ class serialport(object):
                 raise ValueError
         except ValueError:
             #self.closeport()
-            error = QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " ser.TEVA18Btemperature()"
+            error = QApplication.translate("Error Message","Value Error:",None) + " ser.TEVA18Btemperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1 
         except serial.SerialException:
             #self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.TEVA18Btemperature()"
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.TEVA18Btemperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -25955,7 +26363,7 @@ class serialport(object):
         except Exception as ex:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.TEVA18Btemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.TEVA18Btemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should not be binary
@@ -26048,7 +26456,7 @@ class serialport(object):
                 raise ValueError(str("Needed 14 bytes but only received %i"%(len(frame))))
         except ValueError:
             #self.closeport()
-            error  = QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " ser.HHM28multimeter()"
+            error  = QApplication.translate("Error Message","Value Error:",None) + " ser.HHM28multimeter()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -26066,7 +26474,7 @@ class serialport(object):
                     return "0","0"
         except serial.SerialException:
             #self.closeport()
-            error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HHM28multimeter()"
+            error  = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HHM28multimeter()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -26074,7 +26482,7 @@ class serialport(object):
         except Exception as ex:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HHM28multimeter() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HHM28multimeter() %1").arg(str(ex)),exc_tb.tb_lineno)
             return "0"""
         finally:
             #note: logged chars should not be binary
@@ -26102,14 +26510,14 @@ class serialport(object):
                 #self.SP.flush()
         except serial.SerialException as e:
             #self.closeport() # do not close the serial port as reopening might take too long
-            error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand()"
+            error  = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendTXcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + " " + str(e),exc_tb.tb_lineno)
         except Exception as ex:
             #self.closeport() # do not close the serial port as reopening might take too long
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.sendTXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)        
@@ -26131,14 +26539,14 @@ class serialport(object):
 #                return "ERR"
 #        except serial.SerialException:
 #            self.closeport()
-#            error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXRXcommand()"
+#            error  = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendTXRXcommand()"
 #            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
 #            _, _, exc_tb = sys.exc_info()
 #            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
 #        except Exception as ex:
 #            self.closeport()
 #            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXRXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.sendTXRXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
 #        finally:
 #            #note: logged chars should not be binary
 #            if aw.seriallogflag:
@@ -26152,23 +26560,23 @@ class serialport(object):
 class designerconfigDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(designerconfigDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Designer Config",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Designer Config",None))
         self.setModal(True)
         #landmarks
-        charge = QLabel(QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8))
+        charge = QLabel(QApplication.translate("Label", "CHARGE",None))
         charge.setAlignment(Qt.AlignRight)
         charge.setStyleSheet("background-color: #f07800")
-        self.dryend = QCheckBox(QApplication.translate("CheckBox","DRY END",None, QApplication.UnicodeUTF8))
+        self.dryend = QCheckBox(QApplication.translate("CheckBox","DRY END",None))
         self.dryend.setStyleSheet("background-color: orange")
-        self.fcs = QCheckBox(QApplication.translate("CheckBox","FC START",None, QApplication.UnicodeUTF8))
+        self.fcs = QCheckBox(QApplication.translate("CheckBox","FC START",None))
         self.fcs.setStyleSheet("background-color: orange")
-        self.fce = QCheckBox(QApplication.translate("CheckBox","FC END",None, QApplication.UnicodeUTF8))
+        self.fce = QCheckBox(QApplication.translate("CheckBox","FC END",None))
         self.fce.setStyleSheet("background-color: orange")
-        self.scs = QCheckBox(QApplication.translate("CheckBox","SC START",None, QApplication.UnicodeUTF8))
+        self.scs = QCheckBox(QApplication.translate("CheckBox","SC START",None))
         self.scs.setStyleSheet("background-color: orange")
-        self.sce = QCheckBox(QApplication.translate("CheckBox","SC END",None, QApplication.UnicodeUTF8))
+        self.sce = QCheckBox(QApplication.translate("CheckBox","SC END",None))
         self.sce.setStyleSheet("background-color: orange")
-        drop = QLabel(QApplication.translate("Label", "DROP",None, QApplication.UnicodeUTF8))
+        drop = QLabel(QApplication.translate("Label", "DROP",None))
         drop.setAlignment(Qt.AlignRight)
         drop.setStyleSheet("background-color: #f07800")
         self.loadconfigflags()
@@ -26181,13 +26589,13 @@ class designerconfigDlg(ArtisanDialog):
             start = aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
             start = 0
-        markersettinglabel = QLabel(QApplication.translate("Label", "Marker",None, QApplication.UnicodeUTF8))
+        markersettinglabel = QLabel(QApplication.translate("Label", "Marker",None))
         markersettinglabel.setAlignment(Qt.AlignCenter)
-        timesettinglabel = QLabel(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8))
+        timesettinglabel = QLabel(QApplication.translate("Label", "Time",None))
         timesettinglabel.setAlignment(Qt.AlignCenter)
-        btsettinglabel = QLabel(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8))
+        btsettinglabel = QLabel(QApplication.translate("Label", "BT",None))
         btsettinglabel.setAlignment(Qt.AlignCenter)
-        etsettinglabel = QLabel(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
+        etsettinglabel = QLabel(QApplication.translate("Label", "ET",None))
         etsettinglabel.setAlignment(Qt.AlignCenter)
         self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))
         self.Edit0.setEnabled(False)
@@ -26325,9 +26733,9 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4et.setValidator(QDoubleValidator(0., 999., 1, self.Edit4et))
         self.Edit5et.setValidator(QDoubleValidator(0., 999., 1, self.Edit5et))
         self.Edit6et.setValidator(QDoubleValidator(0., 999., 1, self.Edit6et))
-        curvinesslabel = QLabel(QApplication.translate("Label", "Curviness",None, QApplication.UnicodeUTF8))
-        etcurviness = QLabel(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
-        btcurviness = QLabel(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8))
+        curvinesslabel = QLabel(QApplication.translate("Label", "Curviness",None))
+        etcurviness = QLabel(QApplication.translate("Label", "ET",None))
+        btcurviness = QLabel(QApplication.translate("Label", "BT",None))
         etcurviness.setAlignment(Qt.AlignRight)
         btcurviness.setAlignment(Qt.AlignRight)
         self.ETsplineComboBox = QComboBox()
@@ -26338,27 +26746,27 @@ class designerconfigDlg(ArtisanDialog):
         self.BTsplineComboBox.addItems(["1","2","3","4","5"])
         self.BTsplineComboBox.setCurrentIndex(aw.qmc.BTsplinedegree - 1)
         self.connect(self.BTsplineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
-        reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None, QApplication.UnicodeUTF8))
+        reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None))
         self.reproduceComboBox = QComboBox()
         self.reproduceComboBox.addItems(["",
-                                         QApplication.translate("ComboBox","DeltaBT",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","DeltaET",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","SV Commands",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Ramp Commands",None, QApplication.UnicodeUTF8)])
+                                         QApplication.translate("ComboBox","DeltaBT",None),
+                                         QApplication.translate("ComboBox","DeltaET",None),
+                                         QApplication.translate("ComboBox","SV Commands",None),
+                                         QApplication.translate("ComboBox","Ramp Commands",None)])
         self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
         self.connect(self.reproduceComboBox,SIGNAL("currentIndexChanged(int)"), self.changereproducemode)
-        updateButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
+        updateButton = QPushButton(QApplication.translate("Button","Update",None))
         updateButton.setFocusPolicy(Qt.NoFocus)
         self.connect(updateButton, SIGNAL("clicked()"), self.settimes)
         updateButton.setMinimumWidth(100)
-        defaultButton = QPushButton(QApplication.translate("Button","Reset",None, QApplication.UnicodeUTF8))
+        defaultButton = QPushButton(QApplication.translate("Button","Reset",None))
         defaultButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setMinimumWidth(100)
         self.connect(defaultButton, SIGNAL("clicked()"), self.reset)
-        closeButton = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
+        closeButton = QPushButton(QApplication.translate("Button","Close",None))
         closeButton.setFocusPolicy(Qt.NoFocus)
         self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("accept()"))
-        convertButton = QPushButton(QApplication.translate("Button","Create",None, QApplication.UnicodeUTF8))
+        convertButton = QPushButton(QApplication.translate("Button","Create",None))
         self.connect(convertButton, SIGNAL("clicked()"),self.create)
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(closeButton)
@@ -26414,7 +26822,7 @@ class designerconfigDlg(ArtisanDialog):
         modLayout = QVBoxLayout()
         modLayout.addLayout(curvinessLayout)
         modLayout.addLayout(reproduceLayout)
-        marksGroupLayout = QGroupBox(QApplication.translate("GroupBox","Initial Settings",None, QApplication.UnicodeUTF8))
+        marksGroupLayout = QGroupBox(QApplication.translate("GroupBox","Initial Settings",None))
         marksGroupLayout.setLayout(settingsLayout)
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(marksGroupLayout)
@@ -26434,35 +26842,35 @@ class designerconfigDlg(ArtisanDialog):
         else:
             aw.qmc.ETsplinedegree = len(aw.qmc.timex)-1
             self.ETsplineComboBox.setCurrentIndex(aw.qmc.ETsplinedegree-1)
-            ms = QApplication.translate("Message","Not enough time points for an ET curviness of %1. Set curviness to %2",None, QApplication.UnicodeUTF8).arg(ETcurviness).arg(aw.qmc.ETsplinedegree)
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None, QApplication.UnicodeUTF8),ms)
+            ms = QApplication.translate("Message","Not enough time points for an ET curviness of %1. Set curviness to %2",None).arg(ETcurviness).arg(aw.qmc.ETsplinedegree)
+            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),ms)
         if (timepoints - BTcurviness) >= 1:
             aw.qmc.BTsplinedegree = BTcurviness
         else:
             aw.qmc.BTsplinedegree = len(aw.qmc.timex)-1
             self.BTsplineComboBox.setCurrentIndex(aw.qmc.BTsplinedegree-1)
-            ms = QApplication.translate("Message","Not enough time points for an BT curviness of %1. Set curviness to %2",None, QApplication.UnicodeUTF8).arg(BTcurviness).arg(aw.qmc.BTsplinedegree)
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None, QApplication.UnicodeUTF8),ms)
+            ms = QApplication.translate("Message","Not enough time points for an BT curviness of %1. Set curviness to %2",None).arg(BTcurviness).arg(aw.qmc.BTsplinedegree)
+            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),ms)
         aw.qmc.redrawdesigner()
 
     def settimes(self):
         #check input
-        strings = [QApplication.translate("Message","CHARGE",None, QApplication.UnicodeUTF8),
-                   QApplication.translate("Message","DRY END",None, QApplication.UnicodeUTF8),
-                   QApplication.translate("Message","FC START",None, QApplication.UnicodeUTF8),
-                   QApplication.translate("Message","FC END",None, QApplication.UnicodeUTF8),
-                   QApplication.translate("Message","SC START",None, QApplication.UnicodeUTF8),
-                   QApplication.translate("Message","SC END",None, QApplication.UnicodeUTF8),
-                   QApplication.translate("Message","DROP",None, QApplication.UnicodeUTF8)]
+        strings = [QApplication.translate("Message","CHARGE",None),
+                   QApplication.translate("Message","DRY END",None),
+                   QApplication.translate("Message","FC START",None),
+                   QApplication.translate("Message","FC END",None),
+                   QApplication.translate("Message","SC START",None),
+                   QApplication.translate("Message","SC END",None),
+                   QApplication.translate("Message","DROP",None)]
         timecheck = self.validatetime()
         if timecheck != 1000:
-            st = QApplication.translate("Message","Incorrect time format. Please recheck %1 time",None, QApplication.UnicodeUTF8).arg(strings[timecheck])
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None, QApplication.UnicodeUTF8),st)
+            st = QApplication.translate("Message","Incorrect time format. Please recheck %1 time",None).arg(strings[timecheck])
+            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),st)
             return 1
         checkvalue = self.validatetimeorder()
         if checkvalue != 1000:
-            st = QApplication.translate("Message","Times need to be in ascending order. Please recheck %1 time",None, QApplication.UnicodeUTF8).arg(strings[checkvalue+1])
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None, QApplication.UnicodeUTF8),st)            
+            st = QApplication.translate("Message","Times need to be in ascending order. Please recheck %1 time",None).arg(strings[checkvalue+1])
+            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),st)            
             return 1
         if self.Edit0bt.text() != self.Edit0btcopy:
             aw.qmc.temp2[aw.qmc.timeindex[0]] = float(str(self.Edit0bt.text()))
@@ -26608,7 +27016,7 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit4et.setText("%.1f"%aw.qmc.temp1[aw.qmc.timeindex[4]])
         self.Edit5et.setText("%.1f"%aw.qmc.temp1[aw.qmc.timeindex[5]])
         self.Edit6et.setText("%.1f"%aw.qmc.temp1[aw.qmc.timeindex[6]])
-        aw.sendmessage(QApplication.translate("Message","Designer has been reset",None, QApplication.UnicodeUTF8))
+        aw.sendmessage(QApplication.translate("Message","Designer has been reset",None))
 
     def loadconfigflags(self):
         self.dryend.setChecked(aw.qmc.timeindex[1])
@@ -26636,15 +27044,15 @@ class designerconfigDlg(ArtisanDialog):
                 if self.sce.isChecked():
                     self.sce.setChecked(False)
             #ERROR time from edit boxes is not in ascending order
-            strings = [QApplication.translate("Message","CHARGE",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("Message","DRY END",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("Message","FC START",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("Message","FC END",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("Message","SC START",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("Message","SC END",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("Message","DROP",None, QApplication.UnicodeUTF8)]
-            st = QApplication.translate("Message","Times need to be in ascending order. Please recheck %1 time",None, QApplication.UnicodeUTF8).arg(strings[idi])
-            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None, QApplication.UnicodeUTF8),st)
+            strings = [QApplication.translate("Message","CHARGE",None),
+                       QApplication.translate("Message","DRY END",None),
+                       QApplication.translate("Message","FC START",None),
+                       QApplication.translate("Message","FC END",None),
+                       QApplication.translate("Message","SC START",None),
+                       QApplication.translate("Message","SC END",None),
+                       QApplication.translate("Message","DROP",None)]
+            st = QApplication.translate("Message","Times need to be in ascending order. Please recheck %1 time",None).arg(strings[idi])
+            QMessageBox.information(self,QApplication.translate("Message","Designer Config",None),st)
             return
         #idi = id index
         if aw.qmc.timeindex[idi]:
@@ -26691,7 +27099,7 @@ class designerconfigDlg(ArtisanDialog):
 class nonedevDlg(QDialog):
     def __init__(self, parent = None):
         super(nonedevDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Manual Temperature Logger",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Manual Temperature Logger",None))
         if len(aw.qmc.timex):
             if aw.qmc.manuallogETflag:
                 etval = str(int(aw.qmc.temp1[-1]))
@@ -26702,20 +27110,20 @@ class nonedevDlg(QDialog):
             etval = "0"
             btval = "0"
         self.etEdit = QLineEdit(etval)
-        btlabel = QLabel(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8))
+        btlabel = QLabel(QApplication.translate("Label", "BT",None))
         self.btEdit = QLineEdit(btval)
         self.etEdit.setValidator(QIntValidator(0, 1000, self.etEdit))
         self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
         self.btEdit.setFocus()
-        self.ETbox = QCheckBox(QApplication.translate("CheckBox","ET",None, QApplication.UnicodeUTF8))
+        self.ETbox = QCheckBox(QApplication.translate("CheckBox","ET",None))
         if aw.qmc.manuallogETflag == True:
             self.ETbox.setChecked(True)
         else:
             self.ETbox.setChecked(False)
             self.etEdit.setVisible(False)
         self.connect(self.ETbox,SIGNAL("stateChanged(int)"),self.changemanuallogETflag)
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
@@ -26817,93 +27225,93 @@ class PortComboBox(QComboBox):
 class comportDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(comportDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Serial Ports Configuration",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Serial Ports Configuration",None))
         self.setModal(True)
         ##########################    TAB 1 WIDGETS
-        comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
+        comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None))
         self.comportEdit = PortComboBox(selection = aw.ser.comport)
         self.connect(self.comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.comportEdit,i)) 
         comportlabel.setBuddy(self.comportEdit)
-        baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
+        baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None))
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
         self.bauds = ["2400","9600","19200","38400","57600","115200"]
         self.baudrateComboBox.addItems(self.bauds)
         self.baudrateComboBox.setCurrentIndex(self.bauds.index(str(aw.ser.baudrate)))
-        bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None, QApplication.UnicodeUTF8))
+        bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None))
         self.bytesizeComboBox = QComboBox()
         bytesizelabel.setBuddy(self.bytesizeComboBox)
         self.bytesizes = ["7","8"]
         self.bytesizeComboBox.addItems(self.bytesizes)
         self.bytesizeComboBox.setCurrentIndex(self.bytesizes.index(str(aw.ser.bytesize)))
-        paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
+        paritylabel = QLabel(QApplication.translate("Label", "Parity",None))
         self.parityComboBox = QComboBox()
         paritylabel.setBuddy(self.parityComboBox)
         #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
         self.parity = ["O","E","N"]
         self.parityComboBox.addItems(self.parity)
         self.parityComboBox.setCurrentIndex(self.parity.index(aw.ser.parity))
-        stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None, QApplication.UnicodeUTF8))
+        stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None))
         self.stopbitsComboBox = QComboBox()
         stopbitslabel.setBuddy(self.stopbitsComboBox)
         self.stopbits = ["0","1","2"]
         self.stopbitsComboBox.addItems(self.stopbits)
         self.stopbitsComboBox.setCurrentIndex(aw.ser.stopbits)
-        timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
+        timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
         self.timeoutEdit.setValidator(QIntValidator(0,5,self.timeoutEdit))
-        etbt_help_label = QLabel(QApplication.translate("Label", "Settings for non-Modbus devices",None, QApplication.UnicodeUTF8) + "<br>")
+        etbt_help_label = QLabel(QApplication.translate("Label", "Settings for non-Modbus devices",None) + "<br>")
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
         self.serialtable = QTableWidget()
         self.serialtable.setTabKeyNavigation(True)
         self.createserialTable()
         ##########################    TAB 3 WIDGETS   MODBUS
-        modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
+        modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None))
         self.modbus_comportEdit = PortComboBox(selection = aw.modbus.comport)
         self.connect(self.modbus_comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.modbus_comportEdit,i)) 
         modbus_comportlabel.setBuddy(self.modbus_comportEdit)
-        modbus_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
+        modbus_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None))
         self.modbus_baudrateComboBox = QComboBox()
         modbus_baudratelabel.setBuddy(self.modbus_baudrateComboBox)
         self.modbus_bauds = ["2400","9600","19200","38400","57600","115200"]
         self.modbus_baudrateComboBox.addItems(self.modbus_bauds)
         self.modbus_baudrateComboBox.setCurrentIndex(self.modbus_bauds.index(str(aw.modbus.baudrate)))
-        modbus_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None, QApplication.UnicodeUTF8))
+        modbus_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None))
         self.modbus_bytesizeComboBox = QComboBox()
         modbus_bytesizelabel.setBuddy(self.modbus_bytesizeComboBox)
         self.modbus_bytesizes = ["7","8"]
         self.modbus_bytesizeComboBox.addItems(self.modbus_bytesizes)
         self.modbus_bytesizeComboBox.setCurrentIndex(self.modbus_bytesizes.index(str(aw.modbus.bytesize)))
-        modbus_paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
+        modbus_paritylabel = QLabel(QApplication.translate("Label", "Parity",None))
         self.modbus_parityComboBox = QComboBox()
         modbus_paritylabel.setBuddy(self.modbus_parityComboBox)
         #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
         self.modbus_parity = ["O","E","N"]
         self.modbus_parityComboBox.addItems(self.modbus_parity)
         self.modbus_parityComboBox.setCurrentIndex(self.modbus_parity.index(aw.modbus.parity))
-        modbus_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None, QApplication.UnicodeUTF8))
+        modbus_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None))
         self.modbus_stopbitsComboBox = QComboBox()
         modbus_stopbitslabel.setBuddy(self.modbus_stopbitsComboBox)
         self.modbus_stopbits = ["0","1","2"]
         self.modbus_stopbitsComboBox.addItems(self.stopbits)
         self.modbus_stopbitsComboBox.setCurrentIndex(aw.modbus.stopbits)
-        modbus_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
+        modbus_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.modbus_timeoutEdit = QLineEdit(str(aw.modbus.timeout))
         self.modbus_timeoutEdit.setValidator(QIntValidator(1,5,self.modbus_timeoutEdit))
-        modbus_input1slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
+        modbus_input1slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
         self.modbus_input1slaveEdit = QLineEdit(str(aw.modbus.input1slave))
         self.modbus_input1slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input1slaveEdit))
         self.modbus_input1slaveEdit.setFixedWidth(50)
         self.modbus_input1slaveEdit.setAlignment(Qt.AlignRight)
-        modbus_input1registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
+        modbus_input1registerlabel = QLabel(QApplication.translate("Label", "Register",None))
         self.modbus_input1registerEdit = QLineEdit(str(aw.modbus.input1register))
         self.modbus_input1registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input1registerEdit))
         self.modbus_input1registerEdit.setFixedWidth(50)
         self.modbus_input1registerEdit.setAlignment(Qt.AlignRight)
         modbus_function_codes = ["3","4"]
         modbus_modes = ["", "C","F"]
-        modbus_input1floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
-        modbus_input1codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
+        modbus_input1floatlabel = QLabel(QApplication.translate("Label", "Float",None))
+        modbus_input1codelabel = QLabel(QApplication.translate("Label", "Function",None))
         self.modbus_input1float = QCheckBox()
         self.modbus_input1float.setChecked(aw.modbus.input1float)
         self.modbus_input1float.setFocusPolicy(Qt.NoFocus) 
@@ -26913,24 +27321,24 @@ class comportDlg(ArtisanDialog):
         self.modbus_input1code.addItems(modbus_function_codes)
         self.modbus_input1code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input1code)))
         self.modbus_input1code.setFixedWidth(50)
-        modbus_input1modelabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
+        modbus_input1modelabel = QLabel(QApplication.translate("Label", "Mode",None))
         self.modbus_input1mode = QComboBox()
         self.modbus_input1mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input1mode.addItems(modbus_modes)
         self.modbus_input1mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input1mode)))
         self.modbus_input1mode.setFixedWidth(50)
-        modbus_input2slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
+        modbus_input2slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
         self.modbus_input2slaveEdit = QLineEdit(str(aw.modbus.input2slave))
         self.modbus_input2slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input2slaveEdit))
         self.modbus_input2slaveEdit.setFixedWidth(50)
         self.modbus_input2slaveEdit.setAlignment(Qt.AlignRight)
-        modbus_input2registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
+        modbus_input2registerlabel = QLabel(QApplication.translate("Label", "Register",None))
         self.modbus_input2registerEdit = QLineEdit(str(aw.modbus.input2register))
         self.modbus_input2registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input2registerEdit))
         self.modbus_input2registerEdit.setFixedWidth(50)
         self.modbus_input2registerEdit.setAlignment(Qt.AlignRight)
-        modbus_input2floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
-        modbus_input2codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
+        modbus_input2floatlabel = QLabel(QApplication.translate("Label", "Float",None))
+        modbus_input2codelabel = QLabel(QApplication.translate("Label", "Function",None))
         self.modbus_input2float = QCheckBox()
         self.modbus_input2float.setChecked(aw.modbus.input2float)
         self.modbus_input2float.setFocusPolicy(Qt.NoFocus)  
@@ -26940,24 +27348,24 @@ class comportDlg(ArtisanDialog):
         self.modbus_input2code.addItems(modbus_function_codes)
         self.modbus_input2code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input2code)))
         self.modbus_input2code.setFixedWidth(50)
-        modbus_input2modelabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
+        modbus_input2modelabel = QLabel(QApplication.translate("Label", "Mode",None))
         self.modbus_input2mode = QComboBox()
         self.modbus_input2mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input2mode.addItems(modbus_modes)
         self.modbus_input2mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input2mode)))
         self.modbus_input2mode.setFixedWidth(50)
-        modbus_input3slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
+        modbus_input3slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
         self.modbus_input3slaveEdit = QLineEdit(str(aw.modbus.input3slave))
         self.modbus_input3slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input3slaveEdit))
         self.modbus_input3slaveEdit.setFixedWidth(50)
         self.modbus_input3slaveEdit.setAlignment(Qt.AlignRight)
-        modbus_input3registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
+        modbus_input3registerlabel = QLabel(QApplication.translate("Label", "Register",None))
         self.modbus_input3registerEdit = QLineEdit(str(aw.modbus.input3register))
         self.modbus_input3registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input3registerEdit))
         self.modbus_input3registerEdit.setFixedWidth(50)
         self.modbus_input3registerEdit.setAlignment(Qt.AlignRight)
-        modbus_input3floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
-        modbus_input3codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
+        modbus_input3floatlabel = QLabel(QApplication.translate("Label", "Float",None))
+        modbus_input3codelabel = QLabel(QApplication.translate("Label", "Function",None))
         self.modbus_input3float = QCheckBox()
         self.modbus_input3float.setChecked(aw.modbus.input3float)
         self.modbus_input3float.setFocusPolicy(Qt.NoFocus) 
@@ -26967,24 +27375,24 @@ class comportDlg(ArtisanDialog):
         self.modbus_input3code.addItems(modbus_function_codes)
         self.modbus_input3code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input3code)))
         self.modbus_input3code.setFixedWidth(50)
-        modbus_input3modelabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
+        modbus_input3modelabel = QLabel(QApplication.translate("Label", "Mode",None))
         self.modbus_input3mode = QComboBox()
         self.modbus_input3mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input3mode.addItems(modbus_modes)
         self.modbus_input3mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input3mode)))
         self.modbus_input3mode.setFixedWidth(50)
-        modbus_input4slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
+        modbus_input4slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
         self.modbus_input4slaveEdit = QLineEdit(str(aw.modbus.input4slave))
         self.modbus_input4slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input4slaveEdit))
         self.modbus_input4slaveEdit.setFixedWidth(50)
         self.modbus_input4slaveEdit.setAlignment(Qt.AlignRight)
-        modbus_input4registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
+        modbus_input4registerlabel = QLabel(QApplication.translate("Label", "Register",None))
         self.modbus_input4registerEdit = QLineEdit(str(aw.modbus.input4register))
         self.modbus_input4registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input4registerEdit))
         self.modbus_input4registerEdit.setFixedWidth(50)
         self.modbus_input4registerEdit.setAlignment(Qt.AlignRight)
-        modbus_input4floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
-        modbus_input4codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
+        modbus_input4floatlabel = QLabel(QApplication.translate("Label", "Float",None))
+        modbus_input4codelabel = QLabel(QApplication.translate("Label", "Function",None))
         self.modbus_input4float = QCheckBox()
         self.modbus_input4float.setChecked(aw.modbus.input4float)
         self.modbus_input4float.setFocusPolicy(Qt.NoFocus)
@@ -26994,13 +27402,13 @@ class comportDlg(ArtisanDialog):
         self.modbus_input4code.addItems(modbus_function_codes)
         self.modbus_input4code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input4code)))
         self.modbus_input4code.setFixedWidth(50)
-        modbus_input4modelabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
+        modbus_input4modelabel = QLabel(QApplication.translate("Label", "Mode",None))
         self.modbus_input4mode = QComboBox()
         self.modbus_input4mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input4mode.addItems(modbus_modes)
         self.modbus_input4mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input4mode)))
         self.modbus_input4mode.setFixedWidth(50)
-        self.modbus_littleEndianFloats = QCheckBox(QApplication.translate("ComboBox","little-endian",None, QApplication.UnicodeUTF8))
+        self.modbus_littleEndianFloats = QCheckBox(QApplication.translate("ComboBox","little-endian",None))
         self.modbus_littleEndianFloats.setChecked(aw.modbus.littleEndianFloats)
         self.modbus_littleEndianFloats.setFocusPolicy(Qt.NoFocus)
 # always enabled, because also MODBUS write commands now support floats and respect little vs big endian mode
@@ -27010,37 +27418,37 @@ class comportDlg(ArtisanDialog):
 #            self.modbus_littleEndianFloats.setEnabled(False)
         # type
         self.modbus_type = QComboBox()
-        modbus_typelabel = QLabel(QApplication.translate("Label", "Type",None, QApplication.UnicodeUTF8))
+        modbus_typelabel = QLabel(QApplication.translate("Label", "Type",None))
         modbus_typelabel.setBuddy(self.modbus_type)
         self.modbus_type.setFocusPolicy(Qt.NoFocus)
         self.modbus_type.addItems(["Serial RTU", "Serial ASCII", "Serial Binary", "TCP", "UDP"])
         self.modbus_type.setCurrentIndex(aw.modbus.type)
         # host (IP or hostname)
-        modbus_hostlabel = QLabel(QApplication.translate("Label", "Host",None, QApplication.UnicodeUTF8))
+        modbus_hostlabel = QLabel(QApplication.translate("Label", "Host",None))
         self.modbus_hostEdit = QLineEdit(str(aw.modbus.host))
         self.modbus_hostEdit.setFixedWidth(120)
         self.modbus_hostEdit.setAlignment(Qt.AlignRight)
         # port (default 502)
-        modbus_portlabel = QLabel(QApplication.translate("Label", "Port",None, QApplication.UnicodeUTF8))
+        modbus_portlabel = QLabel(QApplication.translate("Label", "Port",None))
         self.modbus_portEdit = QLineEdit(str(aw.modbus.port))
         self.modbus_portEdit.setValidator(QIntValidator(1,65535,self.modbus_input4slaveEdit))        
         self.modbus_portEdit.setFixedWidth(60)
         self.modbus_portEdit.setAlignment(Qt.AlignRight)
         # modbus help dialog text
-#        modbus_help_text = QApplication.translate("Message", "These serial settings are used for all Modbus communication.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text = QApplication.translate("Message", "The MODBUS device corresponds to input channels",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "1 and 2.. The MODBUS_34 extra device adds",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "input channels 3 and 4. Inputs with slave",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "id set to 0 are turned off. Modbus function 3",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "'read holding register' is the standard.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Modbus function 4 triggers the use of 'read ",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "input register'. Input registers (fct 4) usually",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", " are from 30000-39999. Most devices hold data in",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "2 byte integer registers. A temperature of 145.2C",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "is often sent as 1452. In that case you have to",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "use the symbolic assignment 'x/10'. Few devices",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "hold data as 4 byte floats in two registers.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Tick the Float flag in this case.",None, QApplication.UnicodeUTF8)
+#        modbus_help_text = QApplication.translate("Message", "These serial settings are used for all Modbus communication.",None) + "<br>"
+        modbus_help_text = QApplication.translate("Message", "The MODBUS device corresponds to input channels",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "1 and 2.. The MODBUS_34 extra device adds",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "input channels 3 and 4. Inputs with slave",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "id set to 0 are turned off. Modbus function 3",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "'read holding register' is the standard.",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Modbus function 4 triggers the use of 'read ",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "input register'. Input registers (fct 4) usually",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", " are from 30000-39999. Most devices hold data in",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "2 byte integer registers. A temperature of 145.2C",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "is often sent as 1452. In that case you have to",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "use the symbolic assignment 'x/10'. Few devices",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "hold data as 4 byte floats in two registers.",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Tick the Float flag in this case.",None)
         modbus_help_label = QLabel(modbus_help_text)
         fnt = modbus_help_label.font()
         if platf == 'Darwin':
@@ -27049,7 +27457,7 @@ class comportDlg(ArtisanDialog):
             fnt.setPointSize(fnt.pointSize() - 1)
         modbus_help_label.setFont(fnt)
         ##########################    TAB 4 WIDGETS   SCALE
-        scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
+        scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None))
         self.scale_deviceEdit = QComboBox()
         supported_scales = list(aw.scale.devicefunctionlist.keys())
         self.scale_deviceEdit.addItems(supported_scales)
@@ -27059,40 +27467,40 @@ class comportDlg(ArtisanDialog):
             self.scale_deviceEdit.setCurrentIndex(0)
         self.scale_deviceEdit.setEditable(False)
         scale_devicelabel.setBuddy(self.scale_deviceEdit)
-        scale_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
+        scale_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None))
         self.scale_comportEdit = PortComboBox(selection = aw.scale.comport)
         self.connect(self.scale_comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.scale_comportEdit,i))
         scale_comportlabel.setBuddy(self.scale_comportEdit)
-        scale_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
+        scale_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None))
         self.scale_baudrateComboBox = QComboBox()
         scale_baudratelabel.setBuddy(self.scale_baudrateComboBox)
         self.scale_bauds = ["1200","2400","4800","9600","19200","38400","57600","115200"]
         self.scale_baudrateComboBox.addItems(self.scale_bauds)
         self.scale_baudrateComboBox.setCurrentIndex(self.scale_bauds.index(str(aw.scale.baudrate)))
-        scale_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None, QApplication.UnicodeUTF8))
+        scale_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None))
         self.scale_bytesizeComboBox = QComboBox()
         scale_bytesizelabel.setBuddy(self.scale_bytesizeComboBox)
         self.scale_bytesizes = ["7","8"]
         self.scale_bytesizeComboBox.addItems(self.scale_bytesizes)
         self.scale_bytesizeComboBox.setCurrentIndex(self.scale_bytesizes.index(str(aw.scale.bytesize)))
-        scale_paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
+        scale_paritylabel = QLabel(QApplication.translate("Label", "Parity",None))
         self.scale_parityComboBox = QComboBox()
         scale_paritylabel.setBuddy(self.scale_parityComboBox)
         #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
         self.scale_parity = ["O","E","N"]
         self.scale_parityComboBox.addItems(self.scale_parity)
         self.scale_parityComboBox.setCurrentIndex(self.scale_parity.index(aw.scale.parity))
-        scale_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None, QApplication.UnicodeUTF8))
+        scale_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None))
         self.scale_stopbitsComboBox = QComboBox()
         scale_stopbitslabel.setBuddy(self.scale_stopbitsComboBox)
         self.scale_stopbits = ["0","1","2"]
         self.scale_stopbitsComboBox.addItems(self.stopbits)
         self.scale_stopbitsComboBox.setCurrentIndex(aw.scale.stopbits)
-        scale_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
+        scale_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.scale_timeoutEdit = QLineEdit(str(aw.scale.timeout))
         self.scale_timeoutEdit.setValidator(QIntValidator(1,5,self.scale_timeoutEdit))
         ##########################    TAB 5 WIDGETS   COLOR
-        color_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
+        color_devicelabel = QLabel(QApplication.translate("Label", "Device", None))
         self.color_deviceEdit = QComboBox()
         supported_color_meters = list(aw.color.devicefunctionlist.keys())
         self.color_deviceEdit.addItems(supported_color_meters)
@@ -27102,43 +27510,43 @@ class comportDlg(ArtisanDialog):
             self.color_deviceEdit.setCurrentIndex(0)
         self.color_deviceEdit.setEditable(False)
         color_devicelabel.setBuddy(self.color_deviceEdit)
-        color_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
+        color_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None))
         self.color_comportEdit = PortComboBox(selection = aw.color.comport)
         self.connect(self.color_comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.color_comportEdit,i))
         color_comportlabel.setBuddy(self.color_comportEdit)
-        color_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
+        color_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None))
         self.color_baudrateComboBox = QComboBox()
         color_baudratelabel.setBuddy(self.color_baudrateComboBox)
         self.color_bauds = ["1200","2400","4800","9600","19200","38400","57600","115200"]
         self.color_baudrateComboBox.addItems(self.color_bauds)
         self.color_baudrateComboBox.setCurrentIndex(self.color_bauds.index(str(aw.color.baudrate)))
-        color_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None, QApplication.UnicodeUTF8))
+        color_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None))
         self.color_bytesizeComboBox = QComboBox()
         color_bytesizelabel.setBuddy(self.color_bytesizeComboBox)
         self.color_bytesizes = ["7","8"]
         self.color_bytesizeComboBox.addItems(self.color_bytesizes)
         self.color_bytesizeComboBox.setCurrentIndex(self.color_bytesizes.index(str(aw.color.bytesize)))
-        color_paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
+        color_paritylabel = QLabel(QApplication.translate("Label", "Parity",None))
         self.color_parityComboBox = QComboBox()
         color_paritylabel.setBuddy(self.color_parityComboBox)
         #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
         self.color_parity = ["O","E","N"]
         self.color_parityComboBox.addItems(self.color_parity)
         self.color_parityComboBox.setCurrentIndex(self.color_parity.index(aw.color.parity))
-        color_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None, QApplication.UnicodeUTF8))
+        color_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None))
         self.color_stopbitsComboBox = QComboBox()
         color_stopbitslabel.setBuddy(self.color_stopbitsComboBox)
         self.color_stopbits = ["0","1","2"]
         self.color_stopbitsComboBox.addItems(self.stopbits)
         self.color_stopbitsComboBox.setCurrentIndex(aw.color.stopbits)
-        color_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
+        color_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.color_timeoutEdit = QLineEdit(str(aw.color.timeout))
         self.color_timeoutEdit.setValidator(QIntValidator(1,5,self.color_timeoutEdit))
         #### dialog buttons
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
-#        scanButton = QPushButton(QApplication.translate("Button","Scan for Ports",None, QApplication.UnicodeUTF8))
+#        scanButton = QPushButton(QApplication.translate("Button","Scan for Ports",None))
 #        scanButton.setFocusPolicy(Qt.NoFocus)
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
@@ -27207,7 +27615,7 @@ class comportDlg(ArtisanDialog):
         modbus_input1.addWidget(self.modbus_input1mode,3,1)
         modbus_input1.addWidget(modbus_input1floatlabel,4,0,Qt.AlignRight)
         modbus_input1.addWidget(self.modbus_input1float,4,1)
-        modbus_input1group = QGroupBox(QApplication.translate("GroupBox", "Input 1",None, QApplication.UnicodeUTF8))
+        modbus_input1group = QGroupBox(QApplication.translate("GroupBox", "Input 1",None))
         modbus_input1group.setLayout(modbus_input1)
 
         modbus_input2 = QGridLayout()
@@ -27221,7 +27629,7 @@ class comportDlg(ArtisanDialog):
         modbus_input2.addWidget(self.modbus_input2mode,3,1)
         modbus_input2.addWidget(modbus_input2floatlabel,4,0,Qt.AlignRight)
         modbus_input2.addWidget(self.modbus_input2float,4,1)
-        modbus_input2group = QGroupBox(QApplication.translate("GroupBox", "Input 2",None, QApplication.UnicodeUTF8))
+        modbus_input2group = QGroupBox(QApplication.translate("GroupBox", "Input 2",None))
         modbus_input2group.setLayout(modbus_input2)
         modbus_input3 = QGridLayout()
         modbus_input3.addWidget(modbus_input3slavelabel,0,0,Qt.AlignRight)
@@ -27234,7 +27642,7 @@ class comportDlg(ArtisanDialog):
         modbus_input3.addWidget(self.modbus_input3mode,3,1)
         modbus_input3.addWidget(modbus_input3floatlabel,4,0,Qt.AlignRight)
         modbus_input3.addWidget(self.modbus_input3float,4,1)
-        modbus_input3group = QGroupBox(QApplication.translate("GroupBox", "Input 3",None, QApplication.UnicodeUTF8))
+        modbus_input3group = QGroupBox(QApplication.translate("GroupBox", "Input 3",None))
         modbus_input3group.setLayout(modbus_input3)
         modbus_input4 = QGridLayout()
         modbus_input4.addWidget(modbus_input4slavelabel,0,0,Qt.AlignRight)
@@ -27247,7 +27655,7 @@ class comportDlg(ArtisanDialog):
         modbus_input4.addWidget(self.modbus_input4mode,3,1)
         modbus_input4.addWidget(modbus_input4floatlabel,4,0,Qt.AlignRight)
         modbus_input4.addWidget(self.modbus_input4float,4,1)
-        modbus_input4group = QGroupBox(QApplication.translate("GroupBox", "Input 4",None, QApplication.UnicodeUTF8))
+        modbus_input4group = QGroupBox(QApplication.translate("GroupBox", "Input 4",None))
         modbus_input4group.setLayout(modbus_input4)
         modbus_inputV = QHBoxLayout()
         modbus_inputV.setMargin(0)
@@ -27330,19 +27738,19 @@ class comportDlg(ArtisanDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Modbus",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Modbus",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Scale",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Scale",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Color",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Color",None))
         if devid == 29: # switch to MODBUS tab if MODBUS device was selected as main device
             TabWidget.setCurrentIndex(2)
         #incorporate layouts
@@ -27367,13 +27775,13 @@ class comportDlg(ArtisanDialog):
             if nssdevices:
                 self.serialtable.setRowCount(nssdevices)
                 self.serialtable.setColumnCount(7)
-                self.serialtable.setHorizontalHeaderLabels([QApplication.translate("Table","Device",None, QApplication.UnicodeUTF8),
-                                                            QApplication.translate("Table","Comm Port",None, QApplication.UnicodeUTF8),
-                                                            QApplication.translate("Table","Baud Rate",None, QApplication.UnicodeUTF8),
-                                                            QApplication.translate("Table","Byte Size",None, QApplication.UnicodeUTF8),
-                                                            QApplication.translate("Table","Parity",None, QApplication.UnicodeUTF8),
-                                                            QApplication.translate("Table","Stopbits",None, QApplication.UnicodeUTF8),
-                                                            QApplication.translate("Table","Timeout",None, QApplication.UnicodeUTF8)])
+                self.serialtable.setHorizontalHeaderLabels([QApplication.translate("Table","Device",None),
+                                                            QApplication.translate("Table","Comm Port",None),
+                                                            QApplication.translate("Table","Baud Rate",None),
+                                                            QApplication.translate("Table","Byte Size",None),
+                                                            QApplication.translate("Table","Parity",None),
+                                                            QApplication.translate("Table","Stopbits",None),
+                                                            QApplication.translate("Table","Timeout",None)])
                 self.serialtable.setAlternatingRowColors(True)
                 self.serialtable.setEditTriggers(QTableWidget.NoEditTriggers)
                 self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -27425,7 +27833,7 @@ class comportDlg(ArtisanDialog):
                 self.serialtable.resizeColumnsToContents()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " createserialTable(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createserialTable(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def saveserialtable(self):
         try:
@@ -27467,7 +27875,7 @@ class comportDlg(ArtisanDialog):
                 aw.extraser[i].timeout = aw.extratimeout[i]
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " saveserialtable(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " saveserialtable(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def accept(self):
         #validate serial parameter against input errors
@@ -27495,14 +27903,14 @@ class comportDlg(ArtisanDialog):
                 if not timeout:
                     raise timeoutError
                 #add more checks here
-                aw.sendmessage(QApplication.translate("Message","Serial Port Settings: %1, %2, %3, %4, %5, %6", None, QApplication.UnicodeUTF8).arg(comport).arg(baudrate).arg(bytesize).arg(parity).arg(stopbits).arg(timeout))
+                aw.sendmessage(QApplication.translate("Message","Serial Port Settings: %1, %2, %3, %4, %5, %6", None).arg(comport).arg(baudrate).arg(bytesize).arg(parity).arg(stopbits).arg(timeout))
             except comportError:
-                aw.qmc.adderror(QApplication.translate("Error Message","Serial Exception: invalid comm port", None, QApplication.UnicodeUTF8))
+                aw.qmc.adderror(QApplication.translate("Error Message","Serial Exception: invalid comm port", None))
                 self.comportEdit.selectAll()
                 self.comportEdit.setFocus()
                 return
             except timeoutError:
-                aw.qmc.adderror(QApplication.translate("Error Message","Serial Exception: timeout", None, QApplication.UnicodeUTF8))
+                aw.qmc.adderror(QApplication.translate("Error Message","Serial Exception: timeout", None))
                 self.timeoutEdit.selectAll()
                 self.timeoutEdit.setFocus()
                 return
@@ -27552,7 +27960,7 @@ class comportDlg(ArtisanDialog):
 #                from serial.tools import list_ports
 #                available = list([port[0] for port in list_ports.comports()])
 #        else:
-#            self.sendmessage(QApplication.translate("Message","Port scan on this platform not yet supported", None, QApplication.UnicodeUTF8))
+#            self.sendmessage(QApplication.translate("Message","Port scan on this platform not yet supported", None))
 #        return available
 #
 
@@ -27581,7 +27989,7 @@ class comportDlg(ArtisanDialog):
 #                            comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)
 #        except Exception as e:
 #            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " scanforport(): %1").arg(str(e)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " scanforport(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def closeserialports(self):
         aw.closeserialports()
@@ -27594,20 +28002,20 @@ class comportDlg(ArtisanDialog):
 class DeviceAssignmentDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(DeviceAssignmentDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment", None))
         self.setModal(True)
         ################ TAB 1   WIDGETS
         #ETcurve
-        self.ETcurve = QCheckBox(QApplication.translate("CheckBox", "ET",None, QApplication.UnicodeUTF8))
+        self.ETcurve = QCheckBox(QApplication.translate("CheckBox", "ET",None))
         self.ETcurve.setChecked(aw.qmc.ETcurve)
         #BTcurve
-        self.BTcurve = QCheckBox(QApplication.translate("CheckBox", "BT",None, QApplication.UnicodeUTF8))
+        self.BTcurve = QCheckBox(QApplication.translate("CheckBox", "BT",None))
         self.BTcurve.setChecked(aw.qmc.BTcurve)
         #ETlcd
-        self.ETlcd = QCheckBox(QApplication.translate("CheckBox", "ET",None, QApplication.UnicodeUTF8))
+        self.ETlcd = QCheckBox(QApplication.translate("CheckBox", "ET",None))
         self.ETlcd.setChecked(aw.qmc.ETlcd)
         #BTlcd
-        self.BTlcd = QCheckBox(QApplication.translate("CheckBox", "BT",None, QApplication.UnicodeUTF8))
+        self.BTlcd = QCheckBox(QApplication.translate("CheckBox", "BT",None))
         self.BTlcd.setChecked(aw.qmc.BTlcd)
         self.curveHBox = QHBoxLayout()
         self.curveHBox.setContentsMargins(10,5,10,5)
@@ -27616,7 +28024,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.curveHBox.addSpacing(10)
         self.curveHBox.addWidget(self.BTcurve)
         self.curveHBox.addStretch()
-        self.curves = QGroupBox(QApplication.translate("GroupBox","Curves",None, QApplication.UnicodeUTF8))
+        self.curves = QGroupBox(QApplication.translate("GroupBox","Curves",None))
         self.curves.setLayout(self.curveHBox)
         self.lcdHBox = QHBoxLayout()
         self.lcdHBox.setContentsMargins(30,5,30,5)
@@ -27625,15 +28033,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.lcdHBox.addSpacing(10)
         self.lcdHBox.addWidget(self.BTlcd)
         self.lcdHBox.addStretch()
-        self.lcds = QGroupBox(QApplication.translate("GroupBox","LCDs",None, QApplication.UnicodeUTF8))
+        self.lcds = QGroupBox(QApplication.translate("GroupBox","LCDs",None))
         self.lcds.setLayout(self.lcdHBox)
         self.curveBox = QHBoxLayout()
         self.curveBox.addWidget(self.curves)
         self.curveBox.addWidget(self.lcds)
-        self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Meter", None, QApplication.UnicodeUTF8))
-        self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None, QApplication.UnicodeUTF8))
-        self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","TC4", None, QApplication.UnicodeUTF8))
-        self.programButton = QRadioButton(QApplication.translate("Radio Button","Program", None, QApplication.UnicodeUTF8))
+        self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Meter", None))
+        self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None))
+        self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","TC4", None))
+        self.programButton = QRadioButton(QApplication.translate("Radio Button","Program", None))
         #As a main device, don't show the devices that start with a "+"
         # devices with a first letter "+" are extra devices an depend on another device
         # each device provides 2 curves
@@ -27650,24 +28058,24 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.devicetypeComboBox = QComboBox()
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(aw.ser.externalprogram)
-        selectprogrambutton =  QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
+        selectprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
         selectprogrambutton.setFocusPolicy(Qt.NoFocus)
         self.connect(selectprogrambutton, SIGNAL("clicked()"),self.loadprogramname)
-        helpprogrambutton =  QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
+        helpprogrambutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpprogrambutton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpprogrambutton, SIGNAL("clicked()"),self.showhelpprogram)
         ###################################################
         # PID
-        controllabel =QLabel(QApplication.translate("Label", "Control ET",None, QApplication.UnicodeUTF8))
+        controllabel =QLabel(QApplication.translate("Label", "Control ET",None))
         self.controlpidtypeComboBox = QComboBox()
         self.controlpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","Delta DTA"])
         self.controlpidtypeComboBox.setCurrentIndex(aw.ser.controlETpid[0])  #pid type is index 0
-        btlabel =QLabel(QApplication.translate("Label", "Read BT",None, QApplication.UnicodeUTF8))
+        btlabel =QLabel(QApplication.translate("Label", "Read BT",None))
         self.btpidtypeComboBox = QComboBox()
         self.btpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","None","Delta DTA"])
         self.btpidtypeComboBox.setCurrentIndex(aw.ser.readBTpid[0]) #pid type is index 0
-        label1 = QLabel(QApplication.translate("Label", "Type",None, QApplication.UnicodeUTF8))
-        label2 = QLabel(QApplication.translate("Label", "RS485 Unit ID",None, QApplication.UnicodeUTF8))
+        label1 = QLabel(QApplication.translate("Label", "Type",None))
+        label2 = QLabel(QApplication.translate("Label", "RS485 Unit ID",None))
         #rs485 possible unit IDs (1-32); unit 0 is master (computer)
         unitids = list(map(str,list(range(1,33))))
         self.controlpidunitidComboBox = QComboBox()
@@ -27678,15 +28086,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.controlpidunitidComboBox.setCurrentIndex(unitids.index(str(aw.ser.controlETpid[1])))
         self.btpidunitidComboBox.setCurrentIndex(unitids.index(str(aw.ser.readBTpid[1])))
         #Reuse Modbus port
-        self.useModbusPort = QCheckBox(QApplication.translate("CheckBox", "Modbus Port",None, QApplication.UnicodeUTF8))
+        self.useModbusPort = QCheckBox(QApplication.translate("CheckBox", "Modbus Port",None))
         self.useModbusPort.setChecked(aw.ser.useModbusPort)
         ####################################################
         #Arduino TC4 channel config
         arduinoChannels = ["None","1","2","3","4"]
-        arduinoETLabel =QLabel(QApplication.translate("Label", "ET Channel",None, QApplication.UnicodeUTF8))
+        arduinoETLabel =QLabel(QApplication.translate("Label", "ET Channel",None))
         self.arduinoETComboBox = QComboBox()
         self.arduinoETComboBox.addItems(arduinoChannels)
-        arduinoBTLabel =QLabel(QApplication.translate("Label", "BT Channel",None, QApplication.UnicodeUTF8))
+        arduinoBTLabel =QLabel(QApplication.translate("Label", "BT Channel",None))
         self.arduinoBTComboBox = QComboBox()
         self.arduinoBTComboBox.addItems(arduinoChannels)
         #check previous settings for radio button
@@ -27706,15 +28114,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.devicetypeComboBox.setCurrentIndex(selected_device_index)
         self.arduinoETComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoETChannel))
         self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoBTChannel))
-        arduinoATLabel =QLabel(QApplication.translate("Label", "AT Channel",None, QApplication.UnicodeUTF8))
+        arduinoATLabel =QLabel(QApplication.translate("Label", "AT Channel",None))
         arduinoTemperatures = ["None","T1","T2","T3","T4","T5","T6"]
         self.arduinoATComboBox = QComboBox()        
         self.arduinoATComboBox.addItems(arduinoTemperatures)
         self.arduinoATComboBox.setCurrentIndex(arduinoTemperatures.index(aw.ser.arduinoATChannel))
-        self.showControlButton = QCheckBox(QApplication.translate("CheckBox", "Control Button",None, QApplication.UnicodeUTF8))
+        self.showControlButton = QCheckBox(QApplication.translate("CheckBox", "Control Button",None))
         self.showControlButton.setChecked(aw.qmc.PIDbuttonflag)
         self.connect(self.showControlButton,SIGNAL("stateChanged(int)"),lambda i=0:self.showControlbuttonToggle(i))
-        FILTLabel =QLabel(QApplication.translate("Label", "Filter",None, QApplication.UnicodeUTF8))
+        FILTLabel =QLabel(QApplication.translate("Label", "Filter",None))
         self.FILTspinBoxes = []
         for i in range(4):
             spinBox = QSpinBox()
@@ -27725,16 +28133,16 @@ class DeviceAssignmentDlg(ArtisanDialog):
             spinBox.setValue(aw.ser.ArduinoFILT[i])
             self.FILTspinBoxes.append(spinBox)
         ####################################################
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(okButton, SIGNAL("clicked()"),self.okEvent)
         self.connect(cancelButton, SIGNAL("clicked()"),self.cancelEvent)
-        labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None, QApplication.UnicodeUTF8))
-        labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None, QApplication.UnicodeUTF8))
+        labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None))
+        labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None))
         self.ETfunctionedit = QLineEdit(str(aw.qmc.ETfunction))
         self.BTfunctionedit = QLineEdit(str(aw.qmc.BTfunction))
-        symbolicHelpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
+        symbolicHelpButton = QPushButton(QApplication.translate("Button","Help",None))
         symbolicHelpButton.setMaximumSize(symbolicHelpButton.sizeHint())
         symbolicHelpButton.setMinimumSize(symbolicHelpButton.minimumSizeHint())
         symbolicHelpButton.setFocusPolicy(Qt.NoFocus)
@@ -27744,16 +28152,16 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.devicetable = QTableWidget()
         self.devicetable.setTabKeyNavigation(True)
         self.createDeviceTable()
-        self.addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
+        self.addButton = QPushButton(QApplication.translate("Button","Add",None))
         self.addButton.setFocusPolicy(Qt.NoFocus)
         self.addButton.setMinimumWidth(100)
         self.addButton.setMaximumWidth(100)
         self.connect(self.addButton, SIGNAL("clicked()"),self.adddevice)
-        resetButton = QPushButton(QApplication.translate("Button","Reset",None, QApplication.UnicodeUTF8))
+        resetButton = QPushButton(QApplication.translate("Button","Reset",None))
         resetButton.setFocusPolicy(Qt.NoFocus)
         resetButton.setMinimumWidth(100)
         self.connect(resetButton, SIGNAL("clicked()"),self.resetextradevices)
-        self.delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
+        self.delButton = QPushButton(QApplication.translate("Button","Delete",None))
         self.delButton.setFocusPolicy(Qt.NoFocus)
         self.delButton.setMinimumWidth(100)
         self.delButton.setMaximumWidth(100)
@@ -27802,9 +28210,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
             phidgetBox1048.addWidget(probeTypeCombo,1,i)            
             rowLabel = QLabel(str(i))
             phidgetBox1048.addWidget(rowLabel,0,i)
-        typeLabel = QLabel(QApplication.translate("Label","Type", None, QApplication.UnicodeUTF8))
-        asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
-        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None, QApplication.UnicodeUTF8))
+        typeLabel = QLabel(QApplication.translate("Label","Type", None))
+        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
         phidgetBox1048.addWidget(typeLabel,1,0,Qt.AlignRight)
         phidgetBox1048.addWidget(asyncLabel,2,0,Qt.AlignRight)
         phidgetBox1048.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
@@ -27815,7 +28223,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1048VBox = QVBoxLayout()
         phidget1048VBox.addLayout(phidget1048HBox)
         phidget1048VBox.addStretch()
-        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048/1051",None, QApplication.UnicodeUTF8))
+        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048/1051",None))
         phidget1048GroupBox.setLayout(phidget1048VBox)
         phidget1048HBox.setContentsMargins(0,0,0,0)
         
@@ -27839,9 +28247,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.connect(self.asyncCheckBoxe1045,SIGNAL("stateChanged(int)"),lambda x,y=i-1 :self.asyncFlagStateChanged1045(y,x))
         self.asyncCheckBoxe1045.setChecked(aw.qmc.phidget1045_async)
         phidgetBox1045.addWidget(self.asyncCheckBoxe1045,2,1)
-        asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
-        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None, QApplication.UnicodeUTF8))
-        EmissivityLabel = QLabel(QApplication.translate("Label","Emissivity", None, QApplication.UnicodeUTF8))
+        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
+        EmissivityLabel = QLabel(QApplication.translate("Label","Emissivity", None))
         self.emissivitySpinBox = QDoubleSpinBox()
         self.emissivitySpinBox.setAlignment(Qt.AlignRight)
         self.emissivitySpinBox.setRange(0.,1.)
@@ -27856,7 +28264,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1045VBox.addLayout(phidgetBox1045)
         phidget1045VBox.addStretch()
         phidget1045VBox.addStretch()
-        phidget1045GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1045",None, QApplication.UnicodeUTF8))
+        phidget1045GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1045",None))
         phidget1045GroupBox.setLayout(phidget1045VBox)
         phidget1045VBox.setContentsMargins(0,0,0,0)           
 
@@ -27916,10 +28324,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.dataRateCombo1046.setMaximumSize(70,100)
         phidgetBox1046.addWidget(self.dataRateCombo1046,4,1)
      
-        gainLabel = QLabel(QApplication.translate("Label","Gain", None, QApplication.UnicodeUTF8))
-        formulaLabel = QLabel(QApplication.translate("Label","Wiring", None, QApplication.UnicodeUTF8))
-        asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
-        rateLabel = QLabel(QApplication.translate("Label","Rate", None, QApplication.UnicodeUTF8))
+        gainLabel = QLabel(QApplication.translate("Label","Gain", None))
+        formulaLabel = QLabel(QApplication.translate("Label","Wiring", None))
+        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
+        rateLabel = QLabel(QApplication.translate("Label","Rate", None))
         phidgetBox1046.addWidget(gainLabel,1,0,Qt.AlignRight)
         phidgetBox1046.addWidget(formulaLabel,2,0,Qt.AlignRight)
         phidgetBox1046.addWidget(asyncLabel,3,0,Qt.AlignRight)
@@ -27931,7 +28339,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1046VBox = QVBoxLayout()
         phidget1046VBox.addLayout(phidget1046HBox)
         phidget1046VBox.addStretch()
-        phidget1046GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1046 RTD",None, QApplication.UnicodeUTF8))
+        phidget1046GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1046 RTD",None))
         phidget1046GroupBox.setLayout(phidget1046VBox)
         phidget1046HBox.setContentsMargins(0,0,0,0)
 
@@ -27942,7 +28350,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
 
         # Phidget IO 1018
         # ratiometric flag
-        self.phidgetBoxRatiometricFlag = QCheckBox(QApplication.translate("CheckBox","Ratiometric",None, QApplication.UnicodeUTF8))
+        self.phidgetBoxRatiometricFlag = QCheckBox(QApplication.translate("CheckBox","Ratiometric",None))
         self.phidgetBoxRatiometricFlag.setFocusPolicy(Qt.NoFocus)
         self.phidgetBoxRatiometricFlag.setChecked(aw.qmc.phidget1018Ratiometric)
         # per each of the 8-channels: raw flag / data rate popup / change trigger popup
@@ -27995,10 +28403,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
             phidgetBox1018.addWidget(rawFlag,1,i)
             rowLabel = QLabel(str(i))
             phidgetBox1018.addWidget(rowLabel,0,i)
-        asyncLabel = QLabel(QApplication.translate("Label","Async", None, QApplication.UnicodeUTF8))
-        rawLabel = QLabel(QApplication.translate("Label","Raw", None, QApplication.UnicodeUTF8))
-        dataRateLabel = QLabel(QApplication.translate("Label","Rate", None, QApplication.UnicodeUTF8))
-        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None, QApplication.UnicodeUTF8))
+        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
+        rawLabel = QLabel(QApplication.translate("Label","Raw", None))
+        dataRateLabel = QLabel(QApplication.translate("Label","Rate", None))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
         phidgetBox1018.addWidget(rawLabel,1,0,Qt.AlignRight)
         phidgetBox1018.addWidget(asyncLabel,2,0,Qt.AlignRight)
         phidgetBox1018.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
@@ -28009,15 +28417,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1018HBox = QVBoxLayout()
         phidget1018HBox.addLayout(phidgetBox1018)
         phidget1018HBox.addLayout(ratiometricBox)
-        phidget1018GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidget IO",None, QApplication.UnicodeUTF8))
+        phidget1018GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidget IO",None))
         phidget1018GroupBox.setLayout(phidget1018HBox)
         phidget1018HBox.setContentsMargins(0,0,0,0)
         self.phidgetBoxRemoteFlag = QCheckBox()
         self.phidgetBoxRemoteFlag.setFocusPolicy(Qt.NoFocus)
         self.phidgetBoxRemoteFlag.setChecked(aw.qmc.phidgetRemoteFlag)
-        phidgetServerIdLabel = QLabel(QApplication.translate("Label","ServerId:", None, QApplication.UnicodeUTF8))
+        phidgetServerIdLabel = QLabel(QApplication.translate("Label","ServerId:", None))
         self.phidgetServerId = QLineEdit(aw.qmc.phidgetServerID)
-        phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password:", None, QApplication.UnicodeUTF8))
+        phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password:", None))
         self.phidgetPassword = QLineEdit(aw.qmc.phidgetPassword)
         self.phidgetPassword.setEchoMode(3)
         phidgetServerBox = QHBoxLayout()
@@ -28036,7 +28444,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetNetworkGrid.addLayout(phidgetPasswordBox,0,2)
         phidgetNetworkGrid.setContentsMargins(0,0,0,0)
         phidgetNetworkGrid.setSpacing(20)
-        phidgetNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None, QApplication.UnicodeUTF8))
+        phidgetNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None))
         phidgetNetworkGroupBox.setLayout(phidgetNetworkGrid)
         phidget10451018HBox = QHBoxLayout()
         phidget10451018HBox.addWidget(phidget1045GroupBox)
@@ -28062,7 +28470,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         PIDBox.addLayout(PIDgrid)
         PIDBox.addStretch()
         PIDBox.setContentsMargins(5,0,5,5)
-        PIDGroupBox = QGroupBox(QApplication.translate("GroupBox","PID",None, QApplication.UnicodeUTF8))
+        PIDGroupBox = QGroupBox(QApplication.translate("GroupBox","PID",None))
         PIDGroupBox.setLayout(PIDBox)
         # create arduino box
         filtgrid = QGridLayout()
@@ -28089,20 +28497,20 @@ class DeviceAssignmentDlg(ArtisanDialog):
         arduinoBox.addLayout(arduinogridBox)
         arduinoBox.addLayout(filtgridBox)
         arduinoBox.setContentsMargins(5,5,5,5)
-        arduinoGroupBox = QGroupBox(QApplication.translate("GroupBox","Arduino TC4",None, QApplication.UnicodeUTF8))
+        arduinoGroupBox = QGroupBox(QApplication.translate("GroupBox","Arduino TC4",None))
         arduinoGroupBox.setLayout(arduinoBox)
         #create program Box
         programlayout = QHBoxLayout()
         programlayout.addWidget(helpprogrambutton)
         programlayout.addWidget(selectprogrambutton)
         programlayout.addWidget(self.programedit)
-        programGroupBox = QGroupBox(QApplication.translate("GroupBox","External Program",None, QApplication.UnicodeUTF8))
+        programGroupBox = QGroupBox(QApplication.translate("GroupBox","External Program",None))
         programGroupBox.setLayout(programlayout)
         #ET BT symbolic adjustments/assignments Box
         adjustmentHelp = QHBoxLayout()
         adjustmentHelp.addStretch()
         adjustmentHelp.addWidget(symbolicHelpButton)
-        adjustmentGroupBox = QGroupBox(QApplication.translate("GroupBox","Symbolic Assignments",None, QApplication.UnicodeUTF8))
+        adjustmentGroupBox = QGroupBox(QApplication.translate("GroupBox","Symbolic Assignments",None))
         adjustmentsLayout = QVBoxLayout()
         adjustmentsLayout.addWidget(labelETadvanced)
         adjustmentsLayout.addWidget(self.ETfunctionedit)
@@ -28156,16 +28564,16 @@ class DeviceAssignmentDlg(ArtisanDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Devices",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Devices",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Symb ET/BT",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Symb ET/BT",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Phidgets",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Phidgets",None))
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
@@ -28248,17 +28656,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
             nddevices = len(aw.qmc.extradevices)
             self.devicetable.setRowCount(nddevices)
             self.devicetable.setColumnCount(11)
-            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Color 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Color 2",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Label 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Label 2",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "y1(x)",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "y2(x)",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "LCD 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "LCD 2",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Curve 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Curve 2",None, QApplication.UnicodeUTF8)])
+            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None),
+                                                        QApplication.translate("Table", "Color 1",None),
+                                                        QApplication.translate("Table", "Color 2",None),
+                                                        QApplication.translate("Table", "Label 1",None),
+                                                        QApplication.translate("Table", "Label 2",None),
+                                                        QApplication.translate("Table", "y1(x)",None),
+                                                        QApplication.translate("Table", "y2(x)",None),
+                                                        QApplication.translate("Table", "LCD 1",None),
+                                                        QApplication.translate("Table", "LCD 2",None),
+                                                        QApplication.translate("Table", "Curve 1",None),
+                                                        QApplication.translate("Table", "Curve 2",None)])
             self.devicetable.setAlternatingRowColors(True)
             self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -28284,18 +28692,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
                         typeComboBox.setCurrentIndex(devices.index(dev_name))
                     except:
                         pass
-                    color1Button = QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
+                    color1Button = QPushButton(QApplication.translate("Button","Select",None))
                     color1Button.setFocusPolicy(Qt.NoFocus)
                     self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
-                    color2Button = QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
+                    color2Button = QPushButton(QApplication.translate("Button","Select",None))
                     color2Button.setFocusPolicy(Qt.NoFocus)
                     self.connect(color2Button, SIGNAL("clicked()"),lambda l = 2, c = i: self.setextracolor(l,c))
                     name1edit = QLineEdit(u(aw.qmc.extraname1[i]))
                     name2edit = QLineEdit(u(aw.qmc.extraname2[i]))
                     mexpr1edit = QLineEdit(u(aw.qmc.extramathexpression1[i]))
                     mexpr2edit = QLineEdit(u(aw.qmc.extramathexpression2[i]))
-                    mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None, QApplication.UnicodeUTF8))
-                    mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None, QApplication.UnicodeUTF8))
+                    mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None))
+                    mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None))
                     LCD1visibilityComboBox =  QCheckBox()
                     if aw.extraLCDvisibility1[i]:
                         LCD1visibilityComboBox.setCheckState(Qt.Checked)
@@ -28337,7 +28745,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 header.setStretchLastSection(True)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " createDeviceTable(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createDeviceTable(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def showhelpprogram(self):
         string = "<b>Allows to link to external programs that print temperature when called</b><br><br>"
@@ -28349,8 +28757,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         string += "#comment: print a string with two numbers separated by a comma<br><br>"
         string += "#!/usr/bin/env python<br>"
         string += "print (\"237.1,100.4\")"
-        translatedstring = QApplication.translate("Message",string,None, QApplication.UnicodeUTF8)
-        QMessageBox.information(self,QApplication.translate("Message", "External program",None, QApplication.UnicodeUTF8),translatedstring)
+        translatedstring = QApplication.translate("Message",string,None)
+        QMessageBox.information(self,QApplication.translate("Message", "External program",None),translatedstring)
 
     def loadprogramname(self):
         fileName = aw.ArtisanOpenFileDialog()
@@ -28379,7 +28787,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " adddevice(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " adddevice(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def deldevice(self):
         try:
@@ -28394,7 +28802,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.enableDisableAddDeleteButtons()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " deldevice(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " deldevice(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def resetextradevices(self):
         try:
@@ -28407,7 +28815,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " resetextradevices(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " resetextradevices(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def delextradevice(self,x):
         try:
@@ -28469,7 +28877,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "delextradevice(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "delextradevice(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def savedevicetable(self):
         try:
@@ -28509,7 +28917,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "savedevicetable(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "savedevicetable(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def updateLCDvisibility(self,x,lcd,ind):
         if lcd == 1:
@@ -28548,7 +28956,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.setLabelColor(aw.extraLCDlabel2[i],QColor(colorname))
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setextracolor(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setextracolor(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     
     def cancelEvent(self):
@@ -28559,7 +28967,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         try:
             #save any extra devices here
             self.savedevicetable()
-            message = QApplication.translate("Message","Device not set", None, QApplication.UnicodeUTF8)
+            message = QApplication.translate("Message","Device not set", None)
             # by default switch PID buttons/LCDs off
             aw.button_10.setVisible(False)
 #            aw.label6.setVisible(False)
@@ -28621,7 +29029,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                 message = QApplication.translate("Message","PID to control ET set to %1 %2" + \
-                                                 " ; PID to read BT set to %3 %4", None, QApplication.UnicodeUTF8).arg(str1).arg(str(aw.ser.controlETpid[1])).arg(str2).arg(str(aw.ser.readBTpid[1]))
+                                                 " ; PID to read BT set to %3 %4", None).arg(str1).arg(str(aw.ser.controlETpid[1])).arg(str2).arg(str(aw.ser.readBTpid[1]))
                 aw.button_10.setVisible(True)
 #                aw.label6.setVisible(True)
 #                aw.lcd6.setVisible(True)
@@ -28638,14 +29046,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout = 1
                 aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
-                message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+                message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None).arg(meter)
                 if aw.qmc.PIDbuttonflag:
                     aw.button_10.setVisible(True)
             elif self.programButton.isChecked():
                 meter = str(self.programedit.text())
                 aw.ser.externalprogram = meter
                 aw.qmc.device = 27
-                message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+                message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None).arg(meter)
             elif self.nonpidButton.isChecked():
                 meter = str(self.devicetypeComboBox.currentText())
                 if meter == "Omega HH806AU":
@@ -28656,7 +29064,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None).arg(meter)
                 elif meter == "Omega HH506RA":
                     aw.qmc.device = 2
                     #aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
@@ -28666,7 +29074,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     aw.ser.HH506RAid = "X" # ensure the HH506RA gets reinitalized if settings changed
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None).arg(meter)
                 elif meter == "CENTER 309":
                     aw.qmc.device = 3
                     #aw.ser.comport = "COM4"
@@ -28675,7 +29083,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None).arg(meter)
                 elif meter == "CENTER 306":
                     aw.qmc.device = 4
                     #aw.ser.comport = "COM4"
@@ -28684,7 +29092,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None).arg(meter)
                 elif meter == "CENTER 305":
                     aw.qmc.device = 5
                     #aw.ser.comport = "COM4"
@@ -28693,7 +29101,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port", None).arg(meter)
                 elif meter == "CENTER 304":
                     aw.qmc.device = 6
                     #aw.ser.comport = "COM4"
@@ -28702,7 +29110,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None).arg(meter)
                 elif meter == "CENTER 303":
                     aw.qmc.device = 7
                     #aw.ser.comport = "COM4"
@@ -28711,7 +29119,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None).arg(meter)
                 elif meter == "CENTER 302":
                     aw.qmc.device = 8
                     #aw.ser.comport = "COM4"
@@ -28720,7 +29128,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None).arg(meter)
                 elif meter == "CENTER 301":
                     aw.qmc.device = 9
                     #aw.ser.comport = "COM4"
@@ -28729,7 +29137,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None).arg(meter)
                 elif meter == "CENTER 300":
                     aw.qmc.device = 10
                     #aw.ser.comport = "COM4"
@@ -28738,7 +29146,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None).arg(meter)
                 elif meter == "VOLTCRAFT K204":
                     aw.qmc.device = 11
                     #aw.ser.comport = "COM4"
@@ -28747,7 +29155,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None).arg(meter)
                 elif meter == "VOLTCRAFT K202":
                     aw.qmc.device = 12
                     #aw.ser.comport = "COM4"
@@ -28756,7 +29164,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 306. Now, chose serial port", None).arg(meter)
                 elif meter == "VOLTCRAFT 300K":
                     aw.qmc.device = 13
                     #aw.ser.comport = "COM4"
@@ -28765,7 +29173,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None).arg(meter)
                 elif meter == "VOLTCRAFT 302KJ":
                     aw.qmc.device = 14
                     #aw.ser.comport = "COM4"
@@ -28774,7 +29182,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None).arg(meter)
                 elif meter == "EXTECH 421509":
                     aw.qmc.device = 15
                     #aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
@@ -28783,7 +29191,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to Omega HH506RA. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to Omega HH506RA. Now, chose serial port", None).arg(meter)
                 elif meter == "Omega HH802U":
                     aw.qmc.device = 16
                     #aw.ser.comport = "COM11"
@@ -28792,7 +29200,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None).arg(meter)
                 elif meter == "Omega HH309":
                     aw.qmc.device = 17
                     #aw.ser.comport = "COM4"
@@ -28801,11 +29209,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None).arg(meter)
                 #special device manual mode. No serial settings.
                 elif meter == "NONE":
                     aw.qmc.device = 18
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None).arg(meter)
                     st = ""
                     if aw.qmc.delay != aw.qmc.min_delay:
                         aw.qmc.delay = aw.qmc.min_delay
@@ -28813,7 +29221,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     # ensure that events button is shown
                     aw.eventsbuttonflag = 1
                     aw.button_11.setVisible(True)
-                    message = QApplication.translate("Message","Device set to %1%2", None, QApplication.UnicodeUTF8).arg(meter).arg(st)
+                    message = QApplication.translate("Message","Device set to %1%2", None).arg(meter).arg(st)
                 ##########################
                 ####  DEVICE 19 is the Arduino/TC4
                 ##########################
@@ -28825,7 +29233,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None).arg(meter)
                 ##########################
                 ####  DEVICE 21 is +309_34 but +DEVICE cannot be set as main device
                 ##########################
@@ -28840,7 +29248,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None).arg(meter)
 # +DEVICEs cannot be set as main device
                 ##########################
                 ####  DEVICE 24 is +VOLTCRAFT 204_34 but +DEVICE cannot be set as main device
@@ -28865,7 +29273,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose Modbus serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose Modbus serial port", None).arg(meter)
                 elif meter == "VOLTCRAFT K201":
                     aw.qmc.device = 30
                     #aw.ser.comport = "COM4"
@@ -28874,7 +29282,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 302. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to CENTER 302. Now, chose serial port", None).arg(meter)
                 elif meter == "Amprobe TMD-56":
                     aw.qmc.device = 31
                     #aw.ser.comport = "COM11"
@@ -28883,7 +29291,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None).arg(meter)
                 ##########################
                 ####  DEVICE 32 is +ArduinoTC4_56 but +DEVICE cannot be set as main device
                 ##########################
@@ -28892,7 +29300,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 elif meter == "Phidget 1048":
                     aw.qmc.device = 34
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None).arg(meter)
                 ##########################
                 ####  DEVICE 35 is +Phidget 1048_34 but +DEVICE cannot be set as main device
                 ##########################
@@ -28902,7 +29310,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 elif meter == "Phidget 1046 RTD":
                     aw.qmc.device = 37
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None).arg(meter)
                 ##########################
                 ####  DEVICE 38 is +Phidget 1046_34 RTD but +DEVICE cannot be set as main device
                 ##########################
@@ -28914,10 +29322,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None).arg(meter)
                 elif meter == "Phidget IO 12":
                     aw.qmc.device = 40
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None).arg(meter)
                 ##########################
                 ####  DEVICE 41 is +Phidget IO 34 but +DEVICE cannot be set as main device
                 ##########################
@@ -28933,15 +29341,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 elif meter == "Yocto Thermocouple":
                     aw.qmc.device = 45
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None).arg(meter)
                 ##########################
                 elif meter == "Yocto PT100":
                     aw.qmc.device = 46
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None).arg(meter)
                 ##########################
                 elif meter == "Phidget 1045 IR":
                     aw.qmc.device = 47
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None).arg(meter)
                 ##########################
                 ####  DEVICE 48 is an external program _34
                 ##########################
@@ -28950,13 +29358,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 elif meter == "DUMMY":
                     aw.qmc.device = 50
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None).arg(meter)
                 ##########################
                 ####  DEVICE 51 is +304_34 but +DEVICE cannot be set as main device
                 ##########################
                 elif meter == "Phidget 1051":
                     aw.qmc.device = 52
-                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None).arg(meter)
                 elif meter == "Hottop BT/ET":
                     aw.qmc.device = 53
                     #aw.ser.comport = "COM4"
@@ -28966,7 +29374,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     aw.button_10.setVisible(True)
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None).arg(meter)
                 ##########################
                 ####  DEVICE 54 is +VOLTCRAFT 204_34 but +DEVICE cannot be set as main device
                 ##########################                    
@@ -28978,7 +29386,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None).arg(meter)
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
                 if meter != "NONE":
                     aw.qmc.delay = max(aw.qmc.delay,aw.qmc.min_delay)
@@ -29176,7 +29584,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.accept()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " device accept(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " device accept(): %1").arg(str(e)),exc_tb.tb_lineno)
 
 ############################################################
 #######################  CUSTOM COLOR DIALOG  ##############
@@ -29185,147 +29593,147 @@ class DeviceAssignmentDlg(ArtisanDialog):
 class graphColorDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(graphColorDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Colors", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Colors", None))
         frameStyle = QFrame.Sunken | QFrame.Panel
         #TAB1
         self.backgroundLabel = QLabel(aw.qmc.palette["background"])
         self.backgroundLabel.setPalette(QPalette(QColor(aw.qmc.palette["background"])))
         self.backgroundLabel.setAutoFillBackground(True)
-        self.backgroundButton = QPushButton(QApplication.translate("Button","Background", None, QApplication.UnicodeUTF8))
+        self.backgroundButton = QPushButton(QApplication.translate("Button","Background", None))
         self.backgroundButton.setFocusPolicy(Qt.NoFocus)
         self.backgroundLabel.setFrameStyle(frameStyle)
         self.connect(self.backgroundButton, SIGNAL("clicked()"), lambda var=self.backgroundLabel,color="background": self.setColor("Background",var,color))
         self.gridLabel =QLabel(aw.qmc.palette["grid"])
         self.gridLabel.setPalette(QPalette(QColor(aw.qmc.palette["grid"])))
         self.gridLabel.setAutoFillBackground(True)
-        self.gridButton = QPushButton(QApplication.translate("Button","Grid", None, QApplication.UnicodeUTF8))
+        self.gridButton = QPushButton(QApplication.translate("Button","Grid", None))
         self.gridButton.setFocusPolicy(Qt.NoFocus)
         self.gridLabel.setFrameStyle(frameStyle)
         self.connect(self.gridButton, SIGNAL("clicked()"), lambda var=self.gridLabel, color= "grid": self.setColor("Grid",var,color))
         self.titleLabel =QLabel(aw.qmc.palette["title"])
         self.titleLabel.setPalette(QPalette(QColor(aw.qmc.palette["title"])))
         self.titleLabel.setAutoFillBackground(True)
-        self.titleButton = QPushButton(QApplication.translate("Button","Title", None, QApplication.UnicodeUTF8))
+        self.titleButton = QPushButton(QApplication.translate("Button","Title", None))
         self.titleButton.setFocusPolicy(Qt.NoFocus)
         self.titleLabel.setFrameStyle(frameStyle)
         self.connect(self.titleButton, SIGNAL("clicked()"), lambda var=self.titleLabel,color="title": self.setColor("Title",var,color))
         self.yLabel =QLabel(aw.qmc.palette["ylabel"])
         self.yLabel.setPalette(QPalette(QColor(aw.qmc.palette["ylabel"])))
         self.yLabel.setAutoFillBackground(True)
-        self.yButton = QPushButton(QApplication.translate("Button","Y Label", None, QApplication.UnicodeUTF8))
+        self.yButton = QPushButton(QApplication.translate("Button","Y Label", None))
         self.yButton.setFocusPolicy(Qt.NoFocus)
         self.yLabel.setFrameStyle(frameStyle)
         self.connect(self.yButton, SIGNAL("clicked()"), lambda var=self.yLabel,color="ylabel": self.setColor("Y Label",var,color))
         self.xLabel =QLabel(aw.qmc.palette["xlabel"])
         self.xLabel.setPalette(QPalette(QColor(aw.qmc.palette["xlabel"])))
         self.xLabel.setAutoFillBackground(True)
-        self.xButton = QPushButton(QApplication.translate("Button","X Label", None, QApplication.UnicodeUTF8))
+        self.xButton = QPushButton(QApplication.translate("Button","X Label", None))
         self.xButton.setFocusPolicy(Qt.NoFocus)
         self.xLabel.setFrameStyle(frameStyle)
         self.connect(self.xButton, SIGNAL("clicked()"), lambda var=self.xLabel,color="xlabel": self.setColor("X Label",var,color))
         self.rect1Label =QLabel(aw.qmc.palette["rect1"])
         self.rect1Label.setPalette(QPalette(QColor(aw.qmc.palette["rect1"])))
         self.rect1Label.setAutoFillBackground(True)
-        self.rect1Button = QPushButton(QApplication.translate("Button","Drying Phase", None, QApplication.UnicodeUTF8))
+        self.rect1Button = QPushButton(QApplication.translate("Button","Drying Phase", None))
         self.rect1Button.setFocusPolicy(Qt.NoFocus)
         self.rect1Label.setFrameStyle(frameStyle)
         self.connect(self.rect1Button, SIGNAL("clicked()"), lambda var=self.rect1Label,color="rect1": self.setColor("Drying Phase",var,color))
         self.rect2Label =QLabel(aw.qmc.palette["rect2"])
         self.rect2Label.setPalette(QPalette(QColor(aw.qmc.palette["rect2"])))
         self.rect2Label.setAutoFillBackground(True)
-        self.rect2Button = QPushButton(QApplication.translate("Button","Maillard Phase", None, QApplication.UnicodeUTF8))
+        self.rect2Button = QPushButton(QApplication.translate("Button","Maillard Phase", None))
         self.rect2Button.setFocusPolicy(Qt.NoFocus)
         self.rect2Label.setFrameStyle(frameStyle)
         self.connect(self.rect2Button, SIGNAL("clicked()"), lambda var=self.rect2Label,color="rect2": self.setColor("Maillard Phase",var,color))
         self.rect3Label =QLabel(aw.qmc.palette["rect3"])
         self.rect3Label.setPalette(QPalette(QColor(aw.qmc.palette["rect3"])))
         self.rect3Label.setAutoFillBackground(True)
-        self.rect3Button = QPushButton(QApplication.translate("Button","Development Phase", None, QApplication.UnicodeUTF8))
+        self.rect3Button = QPushButton(QApplication.translate("Button","Development Phase", None))
         self.rect3Button.setFocusPolicy(Qt.NoFocus)
         self.rect3Label.setFrameStyle(frameStyle)
         self.connect(self.rect3Button, SIGNAL("clicked()"), lambda var=self.rect3Label,color="rect3": self.setColor("Development Phase",var,color))
         self.rect4Label =QLabel(aw.qmc.palette["rect4"])
         self.rect4Label.setPalette(QPalette(QColor(aw.qmc.palette["rect4"])))
         self.rect4Label.setAutoFillBackground(True)
-        self.rect4Button = QPushButton(QApplication.translate("Button","Cooling Phase", None, QApplication.UnicodeUTF8))
+        self.rect4Button = QPushButton(QApplication.translate("Button","Cooling Phase", None))
         self.rect4Button.setFocusPolicy(Qt.NoFocus)
         self.rect4Label.setFrameStyle(frameStyle)
         self.connect(self.rect4Button, SIGNAL("clicked()"), lambda var=self.rect4Label,color="rect4": self.setColor("Cooling Phase",var,color))
         self.metLabel =QLabel(aw.qmc.palette["et"])
         self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["et"])))
         self.metLabel.setAutoFillBackground(True)
-        self.metButton = QPushButton(QApplication.translate("Button","ET", None, QApplication.UnicodeUTF8))
+        self.metButton = QPushButton(QApplication.translate("Button","ET", None))
         self.metButton.setFocusPolicy(Qt.NoFocus)
         self.metLabel.setFrameStyle(frameStyle)
         self.connect(self.metButton, SIGNAL("clicked()"), lambda var=self.metLabel,color="et": self.setColor("ET",var,color))
         self.btLabel =QLabel(aw.qmc.palette["bt"])
         self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
         self.btLabel.setAutoFillBackground(True)
-        self.btButton = QPushButton(QApplication.translate("Button","BT", None, QApplication.UnicodeUTF8))
+        self.btButton = QPushButton(QApplication.translate("Button","BT", None))
         self.btButton.setFocusPolicy(Qt.NoFocus)
         self.btLabel.setFrameStyle(frameStyle)
         self.connect(self.btButton, SIGNAL("clicked()"), lambda var=self.btLabel,color="bt": self.setColor("BT",var,color))
         self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
         self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
         self.deltametLabel.setAutoFillBackground(True)
-        self.deltametButton = QPushButton(QApplication.translate("Button","DeltaET", None, QApplication.UnicodeUTF8))
+        self.deltametButton = QPushButton(QApplication.translate("Button","DeltaET", None))
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
         self.connect(self.deltametButton, SIGNAL("clicked()"), lambda var=self.deltametLabel,color="deltaet": self.setColor("DeltaET",var,color))
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
         self.deltabtLabel.setAutoFillBackground(True)
-        self.deltabtButton = QPushButton(QApplication.translate("Button","DeltaBT", None, QApplication.UnicodeUTF8))
+        self.deltabtButton = QPushButton(QApplication.translate("Button","DeltaBT", None))
         self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtLabel.setFrameStyle(frameStyle)
         self.connect(self.deltabtButton, SIGNAL("clicked()"), lambda var=self.deltabtLabel,color="deltabt": self.setColor("DeltaBT",var,color))
         self.markersLabel =QLabel(aw.qmc.palette["markers"])
         self.markersLabel.setPalette(QPalette(QColor(aw.qmc.palette["markers"])))
         self.markersLabel.setAutoFillBackground(True)
-        self.markersButton = QPushButton(QApplication.translate("Button","Markers", None, QApplication.UnicodeUTF8))
+        self.markersButton = QPushButton(QApplication.translate("Button","Markers", None))
         self.markersButton.setFocusPolicy(Qt.NoFocus)
         self.markersLabel.setFrameStyle(frameStyle)
         self.connect(self.markersButton, SIGNAL("clicked()"), lambda var=self.markersLabel,color="markers": self.setColor("Markers",var,color))
         self.textLabel =QLabel(aw.qmc.palette["text"])
         self.textLabel.setPalette(QPalette(QColor(aw.qmc.palette["text"])))
         self.textLabel.setAutoFillBackground(True)
-        self.textButton = QPushButton(QApplication.translate("Button","Text", None, QApplication.UnicodeUTF8))
+        self.textButton = QPushButton(QApplication.translate("Button","Text", None))
         self.textButton.setFocusPolicy(Qt.NoFocus)
         self.textLabel.setFrameStyle(frameStyle)
         self.connect(self.textButton, SIGNAL("clicked()"), lambda var=self.textLabel,color="text": self.setColor("Text",var,color))
         self.watermarksLabel =QLabel(aw.qmc.palette["watermarks"])
         self.watermarksLabel.setPalette(QPalette(QColor(aw.qmc.palette["watermarks"])))
         self.watermarksLabel.setAutoFillBackground(True)
-        self.watermarksButton = QPushButton(QApplication.translate("Button","Watermarks", None, QApplication.UnicodeUTF8))
+        self.watermarksButton = QPushButton(QApplication.translate("Button","Watermarks", None))
         self.watermarksButton.setFocusPolicy(Qt.NoFocus)
         self.watermarksLabel.setFrameStyle(frameStyle)
         self.connect(self.watermarksButton, SIGNAL("clicked()"), lambda var=self.watermarksLabel,color="watermarks": self.setColor("Watermarks",var,color))
         self.ClineLabel =QLabel(aw.qmc.palette["Cline"])
         self.ClineLabel.setPalette(QPalette(QColor(aw.qmc.palette["Cline"])))
         self.ClineLabel.setAutoFillBackground(True)
-        self.ClineButton = QPushButton(QApplication.translate("Button","C Lines", None, QApplication.UnicodeUTF8))
+        self.ClineButton = QPushButton(QApplication.translate("Button","C Lines", None))
         self.ClineButton.setFocusPolicy(Qt.NoFocus)
         self.ClineLabel.setFrameStyle(frameStyle)
         self.connect(self.ClineButton, SIGNAL("clicked()"), lambda var=self.ClineLabel,color="Cline": self.setColor("C Lines",var,color))
-        okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK", None))
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
-        defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None, QApplication.UnicodeUTF8))
+        defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
         defaultsButton.setFocusPolicy(Qt.NoFocus)
         self.connect(defaultsButton, SIGNAL("clicked()"),lambda x=1:self.recolor(x))
-        greyButton = QPushButton(QApplication.translate("Button","Grey", None, QApplication.UnicodeUTF8))
+        greyButton = QPushButton(QApplication.translate("Button","Grey", None))
         greyButton.setFocusPolicy(Qt.NoFocus)
         self.connect(greyButton, SIGNAL("clicked()"),lambda x=2:self.recolor(x))
         #TAB 2
         #use indexes to translate
         self.lcdcolors = ["","grey","darkGrey","slateGrey","lightGray","black","white","transparent"]     #this one is not to be translated as arguments need to be in English
         lcdcolorstranslate = ["",
-                              QApplication.translate("ComboBox","grey",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox","Dark Grey",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox","Slate Grey",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox","Light Gray",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox","Black",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox","White",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox","Transparent",None, QApplication.UnicodeUTF8)]  # translated
+                              QApplication.translate("ComboBox","grey",None),
+                              QApplication.translate("ComboBox","Dark Grey",None),
+                              QApplication.translate("ComboBox","Slate Grey",None),
+                              QApplication.translate("ComboBox","Light Gray",None),
+                              QApplication.translate("ComboBox","Black",None),
+                              QApplication.translate("ComboBox","White",None),
+                              QApplication.translate("ComboBox","Transparent",None)]  # translated
         self.lcd1colorComboBox =  QComboBox()
         self.lcd1colorComboBox.addItems(lcdcolorstranslate)
         self.connect(self.lcd1colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd1colorComboBox.currentText(),flag = 2,x=1:self.paintlcds(text,flag,x))
@@ -29344,29 +29752,29 @@ class graphColorDlg(ArtisanDialog):
         self.lcd6colorComboBox =  QComboBox()
         self.lcd6colorComboBox.addItems(lcdcolorstranslate)
         self.connect(self.lcd6colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd6colorComboBox.currentText(),flag = 2,x=6:self.paintlcds(text,flag,x))
-        lcd1backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
+        lcd1backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.connect(lcd1backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=1:self.paintlcds(text,flag,x))
-        lcd2backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
+        lcd2backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.connect(lcd2backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=2:self.paintlcds(text,flag,x))
-        lcd3backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
+        lcd3backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.connect(lcd3backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=3:self.paintlcds(text,flag,x))
-        lcd4backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
+        lcd4backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.connect(lcd4backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=4:self.paintlcds(text,flag,x))
-        lcd5backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
+        lcd5backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.connect(lcd5backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=5:self.paintlcds(text,flag,x))
-        lcd6backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
+        lcd6backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.connect(lcd6backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=6:self.paintlcds(text,flag,x))
-        lcd1LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
+        lcd1LEDButton = QPushButton(QApplication.translate("Button","LED",None))
         self.connect(lcd1LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=1:self.paintlcds(text,flag,x))
-        lcd2LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
+        lcd2LEDButton = QPushButton(QApplication.translate("Button","LED",None))
         self.connect(lcd2LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=2:self.paintlcds(text,flag,x))
-        lcd3LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
+        lcd3LEDButton = QPushButton(QApplication.translate("Button","LED",None))
         self.connect(lcd3LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=3:self.paintlcds(text,flag,x))
-        lcd4LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
+        lcd4LEDButton = QPushButton(QApplication.translate("Button","LED",None))
         self.connect(lcd4LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=4:self.paintlcds(text,flag,x))
-        lcd5LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
+        lcd5LEDButton = QPushButton(QApplication.translate("Button","LED",None))
         self.connect(lcd5LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=5:self.paintlcds(text,flag,x))
-        lcd6LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
+        lcd6LEDButton = QPushButton(QApplication.translate("Button","LED",None))
         self.connect(lcd6LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=6:self.paintlcds(text,flag,x))
         self.lcd1spinbox = QSpinBox()
         self.lcd1spinbox.setSingleStep(10)
@@ -29398,7 +29806,7 @@ class graphColorDlg(ArtisanDialog):
         self.lcd6spinbox.setWrapping(True)
         self.lcd6spinbox.setMaximum(359)
         self.connect(self.lcd6spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd6spinbox.value(),lcd=6:self.setLED(val,lcd))
-        LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None, QApplication.UnicodeUTF8))
+        LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None))
         self.connect(LCDdefaultButton, SIGNAL("clicked()"),self.setLCDdefaults)
         #LAYOUTS
         #tab1 layout
@@ -29480,22 +29888,22 @@ class graphColorDlg(ArtisanDialog):
         lcd6layout.addWidget(self.lcd6colorComboBox,1)
         lcd6layout.addWidget(lcd6LEDButton,2)
         lcd6layout.addWidget(self.lcd6spinbox,3)
-        LCD1GroupLayout = QGroupBox(QApplication.translate("GroupBox","Timer LCD",None, QApplication.UnicodeUTF8))
+        LCD1GroupLayout = QGroupBox(QApplication.translate("GroupBox","Timer LCD",None))
         LCD1GroupLayout.setLayout(lcd1layout)
         lcd1layout.setMargin(0)
-        LCD2GroupLayout = QGroupBox(QApplication.translate("GroupBox","ET LCD",None, QApplication.UnicodeUTF8))
+        LCD2GroupLayout = QGroupBox(QApplication.translate("GroupBox","ET LCD",None))
         LCD2GroupLayout.setLayout(lcd2layout)
         lcd2layout.setMargin(0)
-        LCD3GroupLayout = QGroupBox(QApplication.translate("GroupBox","BT LCD",None, QApplication.UnicodeUTF8))
+        LCD3GroupLayout = QGroupBox(QApplication.translate("GroupBox","BT LCD",None))
         LCD3GroupLayout.setLayout(lcd3layout)
         lcd3layout.setMargin(0)
-        LCD4GroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaET LCD",None, QApplication.UnicodeUTF8))
+        LCD4GroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaET LCD",None))
         LCD4GroupLayout.setLayout(lcd4layout)
         lcd4layout.setMargin(0)
-        LCD5GroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT LCD",None, QApplication.UnicodeUTF8))
+        LCD5GroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT LCD",None))
         LCD5GroupLayout.setLayout(lcd5layout)
         lcd5layout.setMargin(0)
-        LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV LCD",None, QApplication.UnicodeUTF8))
+        LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV LCD",None))
         LCD6GroupLayout.setLayout(lcd6layout)
         lcd6layout.setMargin(0)
         buttonlayout  = QHBoxLayout()
@@ -29516,10 +29924,10 @@ class graphColorDlg(ArtisanDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(graphLayout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Graph",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Graph",None))
         C2Widget = QWidget()
         C2Widget.setLayout(lcdlayout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","LCDs",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","LCDs",None))
         okLayout = QHBoxLayout()
         okLayout.addStretch()
         okLayout.addWidget(okButton)
@@ -29711,7 +30119,7 @@ class graphColorDlg(ArtisanDialog):
                 aw.setLabelColor(aw.label4,QColor(aw.qmc.palette[color]))
             elif title == "DeltaBT":
                 aw.setLabelColor(aw.label5,QColor(aw.qmc.palette[color]))
-            aw.sendmessage(QApplication.translate("Message","Color of %1 set to %2", None, QApplication.UnicodeUTF8).arg(title).arg(str(aw.qmc.palette[color])))
+            aw.sendmessage(QApplication.translate("Message","Color of %1 set to %2", None).arg(title).arg(str(aw.qmc.palette[color])))
 
 ############################################################
 #######################  LARGE LCDs DIALOG  ################
@@ -29853,84 +30261,84 @@ class WheelDlg(ArtisanDialog):
         rcParams['path.effects'] = []
             
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None))
         self.viewmodeflag = False
         #table for alarms
         self.datatable = QTableWidget()
         self.createdatatable()
         #table for labels
         self.labeltable = QTableWidget()
-        self.labelCloseButton = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
+        self.labelCloseButton = QPushButton(QApplication.translate("Button","Close",None))
         self.connect(self.labelCloseButton, SIGNAL("clicked()"),self.closelabels)
-        self.labelResetButton = QPushButton(QApplication.translate("Button","Reset Parents",None, QApplication.UnicodeUTF8))
-        self.labelResetButton.setToolTip(QApplication.translate("Tooltip","Erases wheel parent hierarchy",None, QApplication.UnicodeUTF8))
+        self.labelResetButton = QPushButton(QApplication.translate("Button","Reset Parents",None))
+        self.labelResetButton.setToolTip(QApplication.translate("Tooltip","Erases wheel parent hierarchy",None))
         self.connect(self.labelResetButton, SIGNAL("clicked()"),self.resetlabelparents)
         self.labelwheelx = 0   #index of wheel being edited on labeltable
-        self.hierarchyButton = QPushButton(QApplication.translate("Button","Reverse Hierarchy",None, QApplication.UnicodeUTF8))
-        self.hierarchyButton.setToolTip(QApplication.translate("Tooltip","Sets graph hierarchy child->parent instead of parent->child",None, QApplication.UnicodeUTF8))
+        self.hierarchyButton = QPushButton(QApplication.translate("Button","Reverse Hierarchy",None))
+        self.hierarchyButton.setToolTip(QApplication.translate("Tooltip","Sets graph hierarchy child->parent instead of parent->child",None))
         self.connect(self.hierarchyButton, SIGNAL("clicked()"),aw.qmc.setWheelHierarchy)
         self.labeltable.setVisible(False)
         self.labelCloseButton.setVisible(False)
         self.labelResetButton.setVisible(False)
-        aspectlabel = QLabel(QApplication.translate("Label","Ratio",None, QApplication.UnicodeUTF8))
+        aspectlabel = QLabel(QApplication.translate("Label","Ratio",None))
         self.aspectSpinBox = QDoubleSpinBox()
-        self.aspectSpinBox.setToolTip(QApplication.translate("Tooltip","Aspect Ratio",None, QApplication.UnicodeUTF8))
+        self.aspectSpinBox.setToolTip(QApplication.translate("Tooltip","Aspect Ratio",None))
         self.aspectSpinBox.setRange(0.,2.)
         self.aspectSpinBox.setSingleStep(.1)
         self.aspectSpinBox.setValue(aw.qmc.wheelaspect)
         self.connect(self.aspectSpinBox, SIGNAL("valueChanged(double)"),self.setaspect)
-        txtlabel = QLabel(QApplication.translate("Label","Text",None, QApplication.UnicodeUTF8))
-        txtButtonplus = QPushButton(QApplication.translate("Button","+",None, QApplication.UnicodeUTF8))
-        txtButtonplus.setToolTip(QApplication.translate("Tooltip","Increase size of text in all the graph",None, QApplication.UnicodeUTF8))
+        txtlabel = QLabel(QApplication.translate("Label","Text",None))
+        txtButtonplus = QPushButton(QApplication.translate("Button","+",None))
+        txtButtonplus.setToolTip(QApplication.translate("Tooltip","Increase size of text in all the graph",None))
         self.connect(txtButtonplus, SIGNAL("clicked()"),lambda x = 1: self.changetext(x))
-        txtButtonminus = QPushButton(QApplication.translate("Button","-",None, QApplication.UnicodeUTF8))
-        txtButtonminus.setToolTip(QApplication.translate("Tooltip","Decrease size of text in all the graph",None, QApplication.UnicodeUTF8))
+        txtButtonminus = QPushButton(QApplication.translate("Button","-",None))
+        txtButtonminus.setToolTip(QApplication.translate("Tooltip","Decrease size of text in all the graph",None))
         self.connect(txtButtonminus, SIGNAL("clicked()"),lambda x = 0: self.changetext(x))
-        edgelabel = QLabel(QApplication.translate("Label","Edge",None, QApplication.UnicodeUTF8))
+        edgelabel = QLabel(QApplication.translate("Label","Edge",None))
         self.edgeSpinBox = QSpinBox()
-        self.edgeSpinBox.setToolTip(QApplication.translate("Tooltip","Decorative edge beween wheels",None, QApplication.UnicodeUTF8))
+        self.edgeSpinBox.setToolTip(QApplication.translate("Tooltip","Decorative edge beween wheels",None))
         self.edgeSpinBox.setRange(0,5)
         self.edgeSpinBox.setValue(int(aw.qmc.wheeledge*100))
         self.connect(self.edgeSpinBox, SIGNAL("valueChanged(int)"),self.setedge)
-        linewidthlabel = QLabel(QApplication.translate("Label","Line",None, QApplication.UnicodeUTF8))
+        linewidthlabel = QLabel(QApplication.translate("Label","Line",None))
         self.linewidthSpinBox = QSpinBox()
-        self.linewidthSpinBox.setToolTip(QApplication.translate("Tooltip","Line thickness",None, QApplication.UnicodeUTF8))
+        self.linewidthSpinBox.setToolTip(QApplication.translate("Tooltip","Line thickness",None))
         self.linewidthSpinBox.setRange(0,20)
         self.linewidthSpinBox.setValue(aw.qmc.wheellinewidth)
         self.connect(self.linewidthSpinBox, SIGNAL("valueChanged(int)"),self.setlinewidth)
-        linecolor = QPushButton(QApplication.translate("Button","Line Color",None, QApplication.UnicodeUTF8))
-        linecolor.setToolTip(QApplication.translate("Tooltip","Line color",None, QApplication.UnicodeUTF8))
+        linecolor = QPushButton(QApplication.translate("Button","Line Color",None))
+        linecolor.setToolTip(QApplication.translate("Tooltip","Line color",None))
         self.connect(linecolor, SIGNAL("clicked()"),self.setlinecolor)
-        colorlabel = QLabel(QApplication.translate("Label","Color pattern",None, QApplication.UnicodeUTF8))
+        colorlabel = QLabel(QApplication.translate("Label","Color pattern",None))
         self.colorSpinBox = QSpinBox()
-        self.colorSpinBox.setToolTip(QApplication.translate("Tooltip","Apply color pattern to whole graph",None, QApplication.UnicodeUTF8))
+        self.colorSpinBox.setToolTip(QApplication.translate("Tooltip","Apply color pattern to whole graph",None))
         self.colorSpinBox.setRange(0,255)
         self.colorSpinBox.setValue(aw.qmc.wheelcolorpattern)
         self.colorSpinBox.setWrapping(True)
         self.connect(self.colorSpinBox, SIGNAL("valueChanged(int)"),self.setcolorpattern)
-        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
-        addButton.setToolTip(QApplication.translate("Tooltip","Add new wheel",None, QApplication.UnicodeUTF8))
+        addButton = QPushButton(QApplication.translate("Button","Add",None))
+        addButton.setToolTip(QApplication.translate("Tooltip","Add new wheel",None))
         self.connect(addButton, SIGNAL("clicked()"),self.insertwheel)
-        rotateLeftButton = QPushButton(QApplication.translate("Button","<",None, QApplication.UnicodeUTF8))
-        rotateLeftButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree counter clockwise",None, QApplication.UnicodeUTF8))
+        rotateLeftButton = QPushButton(QApplication.translate("Button","<",None))
+        rotateLeftButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree counter clockwise",None))
         self.connect(rotateLeftButton, SIGNAL("clicked()"),lambda x = 1: self.rotatewheels(x))
-        rotateRightButton = QPushButton(QApplication.translate("Button",">",None, QApplication.UnicodeUTF8))
-        rotateRightButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree clockwise",None, QApplication.UnicodeUTF8))
+        rotateRightButton = QPushButton(QApplication.translate("Button",">",None))
+        rotateRightButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree clockwise",None))
         self.connect(rotateRightButton, SIGNAL("clicked()"),lambda x = 0: self.rotatewheels(x))
-        saveButton = QPushButton(QApplication.translate("Button","Save File",None, QApplication.UnicodeUTF8))
+        saveButton = QPushButton(QApplication.translate("Button","Save File",None))
         self.connect(saveButton, SIGNAL("clicked()"),self.fileSave)
-        saveButton.setToolTip(QApplication.translate("Tooltip","Save graph to a text file.wg",None, QApplication.UnicodeUTF8))
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None, QApplication.UnicodeUTF8))
-        saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None, QApplication.UnicodeUTF8))
+        saveButton.setToolTip(QApplication.translate("Tooltip","Save graph to a text file.wg",None))
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None))
+        saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
-        viewModeButton = QPushButton(QApplication.translate("Button","View Mode",None, QApplication.UnicodeUTF8))
-        viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None, QApplication.UnicodeUTF8))
+        viewModeButton = QPushButton(QApplication.translate("Button","View Mode",None))
+        viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None))
         self.connect(viewModeButton, SIGNAL("clicked()"),self.viewmode)
-        openButton = QPushButton(QApplication.translate("Button","Open",None, QApplication.UnicodeUTF8))
-        openButton.setToolTip(QApplication.translate("Tooltip","open graph file.wg",None, QApplication.UnicodeUTF8))
+        openButton = QPushButton(QApplication.translate("Button","Open",None))
+        openButton.setToolTip(QApplication.translate("Tooltip","open graph file.wg",None))
         self.connect(openButton, SIGNAL("clicked()"),self.loadWheel)
-        closeButton = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
-        closeButton.setToolTip(QApplication.translate("Tooltip","Close wheel graph editor",None, QApplication.UnicodeUTF8))
+        closeButton = QPushButton(QApplication.translate("Button","Close",None))
+        closeButton.setToolTip(QApplication.translate("Tooltip","Close wheel graph editor",None))
         self.connect(closeButton, SIGNAL("clicked()"),self.close)
         aw.qmc.drawWheel()
         label1layout = QVBoxLayout()
@@ -29939,7 +30347,7 @@ class WheelDlg(ArtisanDialog):
         label2layout.addWidget(self.labelCloseButton)
         label2layout.addWidget(self.labelResetButton)
         label1layout.addLayout(label2layout)
-        self.labelGroupLayout = QGroupBox(QApplication.translate("GroupBox","Label Properties",None, QApplication.UnicodeUTF8))
+        self.labelGroupLayout = QGroupBox(QApplication.translate("GroupBox","Label Properties",None))
         self.labelGroupLayout.setLayout(label1layout)
         self.labelGroupLayout.setVisible(False)
         buttonlayout = QHBoxLayout()
@@ -29986,11 +30394,11 @@ class WheelDlg(ArtisanDialog):
         if nlabels:
             self.labeltable.setRowCount(nlabels)
             self.labeltable.setColumnCount(5)
-            self.labeltable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Parent",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Width",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Color",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Opaqueness",None, QApplication.UnicodeUTF8)])
+            self.labeltable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None),
+                                                       QApplication.translate("Table","Parent",None),
+                                                       QApplication.translate("Table","Width",None),
+                                                       QApplication.translate("Table","Color",None),
+                                                       QApplication.translate("Table","Opaqueness",None)])
             self.labeltable.setAlternatingRowColors(True)
             self.labeltable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -30150,16 +30558,16 @@ class WheelDlg(ArtisanDialog):
         if ndata:
             self.datatable.setRowCount(ndata)
             self.datatable.setColumnCount(10)
-            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Delete Wheel",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Edit Labels",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Update Labels",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Properties",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Radius",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Starting angle",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Projection",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Text Size",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Color",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Color Pattern",None, QApplication.UnicodeUTF8)])
+            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Delete Wheel",None),
+                                                      QApplication.translate("Table","Edit Labels",None),
+                                                      QApplication.translate("Table","Update Labels",None),
+                                                      QApplication.translate("Table","Properties",None),
+                                                      QApplication.translate("Table","Radius",None),
+                                                      QApplication.translate("Table","Starting angle",None),
+                                                      QApplication.translate("Table","Projection",None),
+                                                      QApplication.translate("Table","Text Size",None),
+                                                      QApplication.translate("Table","Color",None),
+                                                      QApplication.translate("Table","Color Pattern",None)])
             self.datatable.setAlternatingRowColors(True)
             self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -30168,12 +30576,12 @@ class WheelDlg(ArtisanDialog):
             self.datatable.verticalHeader().setResizeMode(2)
             #populate table
             for i in range(ndata):
-                delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
+                delButton = QPushButton(QApplication.translate("Button","Delete",None))
                 self.connect(delButton, SIGNAL("clicked()"),lambda x = i: self.popwheel(x))
                 labelsedit = QLineEdit(str(",".join(aw.qmc.wheelnames[i])))
-                updateButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
+                updateButton = QPushButton(QApplication.translate("Button","Update",None))
                 self.connect(updateButton, SIGNAL("clicked()"),lambda x = i: self.updatelabels(x))
-                setButton = QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
+                setButton = QPushButton(QApplication.translate("Button","Select",None))
                 self.connect(setButton, SIGNAL("clicked()"),lambda x = i: self.createlabeltable(x))
                 widthSpinBox = QDoubleSpinBox()
                 widthSpinBox.setRange(1.,100.)
@@ -30181,22 +30589,22 @@ class WheelDlg(ArtisanDialog):
                 widthSpinBox.setSuffix("%")
                 self.connect(widthSpinBox, SIGNAL("valueChanged(double)"),lambda z=1,x=i: self.setwidth(z,x))
                 angleSpinBox = QSpinBox()
-                angleSpinBox.setSuffix(QApplication.translate("Label"," dg",None, QApplication.UnicodeUTF8))
+                angleSpinBox.setSuffix(QApplication.translate("Label"," dg",None))
                 angleSpinBox.setRange(0,359)
                 angleSpinBox.setWrapping(True)
                 angleSpinBox.setValue(aw.qmc.startangle[i])
                 self.connect(angleSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=i: self.setangle(z,x))
                 projectionComboBox =  QComboBox()
-                projectionComboBox.addItems([QApplication.translate("ComboBox","Flat",None, QApplication.UnicodeUTF8),
-                                             QApplication.translate("ComboBox","Perpendicular",None, QApplication.UnicodeUTF8),
-                                             QApplication.translate("ComboBox","Radial",None, QApplication.UnicodeUTF8)])
+                projectionComboBox.addItems([QApplication.translate("ComboBox","Flat",None),
+                                             QApplication.translate("ComboBox","Perpendicular",None),
+                                             QApplication.translate("ComboBox","Radial",None)])
                 projectionComboBox.setCurrentIndex(aw.qmc.projection[i])
                 self.connect(projectionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setprojection(z,x))
                 txtSpinBox = QSpinBox()
                 txtSpinBox.setRange(1,30)
                 txtSpinBox.setValue(aw.qmc.wheeltextsize[i])
                 self.connect(txtSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=i: self.setTextsizeX(z,x))
-                colorButton = QPushButton(QApplication.translate("Button","Set Color",None, QApplication.UnicodeUTF8))
+                colorButton = QPushButton(QApplication.translate("Button","Set Color",None))
                 self.connect(colorButton, SIGNAL("clicked()"),lambda x =i: self.setwheelcolor(x))
                 colorSpinBox = QSpinBox()
                 colorSpinBox.setRange(0,255)
@@ -30344,17 +30752,17 @@ class WheelDlg(ArtisanDialog):
 
     def fileSave(self):
         try:
-            filename = aw.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Wheel graph",None, QApplication.UnicodeUTF8),ext="*.wg")
+            filename = aw.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Wheel graph",None),ext="*.wg")
             if filename:
                 #write
                 aw.serialize(filename,aw.getWheelGraph())
-                aw.sendmessage(QApplication.translate("Message","Wheel Graph saved",None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","Wheel Graph saved",None))
         except IOError as e:
-            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:",None, QApplication.UnicodeUTF8) + " Wheel graph filesave(): %1").arg(str(e)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:",None) + " Wheel graph filesave(): %1").arg(str(e)))
             return
 
     def loadWheel(self):
-        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Open Wheel Graph",None, QApplication.UnicodeUTF8),path = aw.getDefaultPath(),ext="*.wg")
+        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Open Wheel Graph",None),path = aw.getDefaultPath(),ext="*.wg")
         if filename:
             aw.loadWheel(filename)
             self.createdatatable()
@@ -30412,50 +30820,50 @@ class AlarmDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(AlarmDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Alarms",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Alarms",None))
         #table for alarms
         self.alarmtable = QTableWidget()
         self.connect(self.alarmtable, SIGNAL("itemSelectionChanged()"),self.selectionChanged)
         self.createalarmtable()
-        allonButton = QPushButton(QApplication.translate("Button","All On",None, QApplication.UnicodeUTF8))
+        allonButton = QPushButton(QApplication.translate("Button","All On",None))
         self.connect(allonButton,  SIGNAL("clicked()"), lambda flag=1: self.alarmson(flag))
         allonButton.setFocusPolicy(Qt.NoFocus)
-        alloffButton = QPushButton(QApplication.translate("Button","All Off",None, QApplication.UnicodeUTF8))
+        alloffButton = QPushButton(QApplication.translate("Button","All Off",None))
         self.connect(alloffButton, SIGNAL("clicked()"), lambda flag=0: self.alarmson(flag))
         alloffButton.setFocusPolicy(Qt.NoFocus)
-        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
+        addButton = QPushButton(QApplication.translate("Button","Add",None))
         self.connect(addButton, SIGNAL("clicked()"),self.addalarm)
         addButton.setMinimumWidth(80)
         addButton.setFocusPolicy(Qt.NoFocus)
-        self.insertButton = QPushButton(QApplication.translate("Button","Insert",None, QApplication.UnicodeUTF8))
+        self.insertButton = QPushButton(QApplication.translate("Button","Insert",None))
         self.connect(self.insertButton, SIGNAL("clicked()"),self.insertalarm)
         self.insertButton.setMinimumWidth(80)
         self.insertButton.setFocusPolicy(Qt.NoFocus)
         self.insertButton.setEnabled(False)
-        deleteButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
+        deleteButton = QPushButton(QApplication.translate("Button","Delete",None))
         self.connect(deleteButton, SIGNAL("clicked()"),self.deletealarm)
         deleteButton.setMinimumWidth(80)
         deleteButton.setFocusPolicy(Qt.NoFocus)
-        importButton = QPushButton(QApplication.translate("Button","Load",None, QApplication.UnicodeUTF8))
+        importButton = QPushButton(QApplication.translate("Button","Load",None))
         self.connect(importButton, SIGNAL("clicked()"),self.importalarms)
         importButton.setMinimumWidth(80)
         importButton.setFocusPolicy(Qt.NoFocus)
-        exportButton = QPushButton(QApplication.translate("Button","Save",None, QApplication.UnicodeUTF8))
+        exportButton = QPushButton(QApplication.translate("Button","Save",None))
         self.connect(exportButton, SIGNAL("clicked()"),self.exportalarms)
         exportButton.setMinimumWidth(80)
         exportButton.setFocusPolicy(Qt.NoFocus)
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
         self.connect(okButton, SIGNAL("clicked()"),self.closealarms)
-        helpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
-        helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None, QApplication.UnicodeUTF8))
+        helpButton = QPushButton(QApplication.translate("Button","Help",None))
+        helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         helpButton.setFocusPolicy(Qt.NoFocus)
         helpButton.setMinimumWidth(80)
         self.connect(helpButton, SIGNAL("clicked()"),self.showAlarmbuttonhelp)
-        clearButton = QPushButton(QApplication.translate("Button","Clear",None, QApplication.UnicodeUTF8))
-        clearButton.setToolTip(QApplication.translate("Tooltip","Clear alarms table",None, QApplication.UnicodeUTF8))
+        clearButton = QPushButton(QApplication.translate("Button","Clear",None))
+        clearButton.setToolTip(QApplication.translate("Tooltip","Clear alarms table",None))
         clearButton.setFocusPolicy(Qt.NoFocus)
         clearButton.setMinimumWidth(80)
-        self.loadAlarmsFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load alarms from profile",None, QApplication.UnicodeUTF8))
+        self.loadAlarmsFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load alarms from profile",None))
         self.loadAlarmsFromProfile.setChecked(aw.qmc.loadalarmsfromprofile)
         self.connect(clearButton, SIGNAL("clicked()"),self.clearalarms)
         self.alarmsfile = QLabel(aw.qmc.alarmsfile)
@@ -30545,7 +30953,7 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmtemperature.append(500)
         aw.qmc.alarmaction.append(0)
         aw.qmc.alarmbeep.append(0)
-        aw.qmc.alarmstrings.append(QApplication.translate("Label","Enter description",None, QApplication.UnicodeUTF8))
+        aw.qmc.alarmstrings.append(QApplication.translate("Label","Enter description",None))
         self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         self.alarmtable.setRowCount(nalarms + 1)
@@ -30586,7 +30994,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmtemperature.insert(selected_row,500)
                 aw.qmc.alarmaction.insert(selected_row,0)
                 aw.qmc.alarmbeep.insert(selected_row,0)
-                aw.qmc.alarmstrings.insert(selected_row,QApplication.translate("Label","Enter description",None, QApplication.UnicodeUTF8))
+                aw.qmc.alarmstrings.insert(selected_row,QApplication.translate("Label","Enter description",None))
                 self.alarmtable.insertRow(selected_row)
                 self.setalarmtablerow(selected_row)
                 self.alarmtable.resizeColumnsToContents()
@@ -30651,7 +31059,7 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setSortingEnabled(True)
 
     def importalarms(self):
-        aw.fileImport(QApplication.translate("Message", "Load Alarms",None, QApplication.UnicodeUTF8),self.importalarmsJSON)
+        aw.fileImport(QApplication.translate("Message", "Load Alarms",None),self.importalarmsJSON)
 
     def importalarmsJSON(self,filename):
         try:
@@ -30688,10 +31096,10 @@ class AlarmDlg(ArtisanDialog):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importalarmsJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importalarmsJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def exportalarms(self):
-        aw.fileExport(QApplication.translate("Message", "Save Alarms",None, QApplication.UnicodeUTF8),"*.alrm",self.exportalarmsJSON)
+        aw.fileExport(QApplication.translate("Message", "Save Alarms",None),"*.alrm",self.exportalarmsJSON)
 
     def exportalarmsJSON(self,filename):
         try:
@@ -30715,7 +31123,7 @@ class AlarmDlg(ArtisanDialog):
             return True
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " exportalarmsJSON(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " exportalarmsJSON(): %1").arg(str(ex)),exc_tb.tb_lineno)
             return False
 
     def closealarms(self):
@@ -30723,18 +31131,18 @@ class AlarmDlg(ArtisanDialog):
         self.accept()
 
     def showAlarmbuttonhelp(self):
-        string  = u(QApplication.translate("Message", "<b>Status:</b> activate or deactive alarm",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>If Alarm:</b> alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.",None, QApplication.UnicodeUTF8)) + "<br><br>"  
-        string += u(QApplication.translate("Message", "<b>But Not:</b> alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.",None, QApplication.UnicodeUTF8)) + "<br><br>"  
-        string += u(QApplication.translate("Message", "<b>From:</b> alarm only triggered after the given event",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Time:</b> if not 00:00, alarm is triggered mm:ss after the event 'From' happend",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Source:</b> the temperature source that is observed",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Condition:</b> alarm is triggered if source rises above or below the specified temperature",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Temp:</b> the speficied temperature limit",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Action:</b> if all conditions are fulfilled the alarm triggeres the corresponding action",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button or the new value of the slider",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>NOTE:</b> each alarm is only triggered once",None, QApplication.UnicodeUTF8))
-        QMessageBox.information(self,QApplication.translate("Button", "Help",None, QApplication.UnicodeUTF8),string)
+        string  = u(QApplication.translate("Message", "<b>Status:</b> activate or deactive alarm",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>If Alarm:</b> alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.",None)) + "<br><br>"  
+        string += u(QApplication.translate("Message", "<b>But Not:</b> alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.",None)) + "<br><br>"  
+        string += u(QApplication.translate("Message", "<b>From:</b> alarm only triggered after the given event",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Time:</b> if not 00:00, alarm is triggered mm:ss after the event 'From' happend",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Source:</b> the temperature source that is observed",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Condition:</b> alarm is triggered if source rises above or below the specified temperature",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Temp:</b> the speficied temperature limit",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Action:</b> if all conditions are fulfilled the alarm triggeres the corresponding action",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button or the new value of the slider",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>NOTE:</b> each alarm is only triggered once",None))
+        QMessageBox.information(self,QApplication.translate("Button", "Help",None),string)
 
     def savealarms(self):
         try:
@@ -30796,7 +31204,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmstrings[i] = u(description.text())
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " savealarms(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " savealarms(): %1").arg(str(ex)),exc_tb.tb_lineno)
             
     def buildAlarmSourceList(self):
         extra_names = []
@@ -30804,17 +31212,17 @@ class AlarmDlg(ArtisanDialog):
             extra_names.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
             extra_names.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
         return ["",
-             QApplication.translate("ComboBox","DeltaET",None, QApplication.UnicodeUTF8),
-             QApplication.translate("ComboBox","DeltaBT",None, QApplication.UnicodeUTF8),
-             QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8),
-             QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8)] + extra_names
+             QApplication.translate("ComboBox","DeltaET",None),
+             QApplication.translate("ComboBox","DeltaBT",None),
+             QApplication.translate("ComboBox","ET",None),
+             QApplication.translate("ComboBox","BT",None)] + extra_names
 
     # creates Widget in row i of self.alarmtable and sets them to values from local dialog variables at position i
     def setalarmtablerow(self,i):
         #flag
         flagComboBox = QCheckBox()
         flagComboBox.setFocusPolicy(Qt.NoFocus)
-        flagComboBox.setText(QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8))
+        flagComboBox.setText(QApplication.translate("ComboBox","ON",None))
         if aw.qmc.alarmflag[i]:
             flagComboBox.setCheckState(Qt.Checked)
         else:
@@ -30837,17 +31245,17 @@ class AlarmDlg(ArtisanDialog):
         negguardedit.setAlignment(Qt.AlignRight)
         #Effective time from
         timeComboBox = QComboBox()
-        timeComboBox.addItems([QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8), # qmc.alarmtime 9
-                               QApplication.translate("ComboBox","START",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
-                               QApplication.translate("ComboBox","CHARGE",None, QApplication.UnicodeUTF8), # qmc.alarmtime 0
-                               QApplication.translate("ComboBox","TP",None, QApplication.UnicodeUTF8), # qmc.alarmtime 8
-                               QApplication.translate("ComboBox","DRY END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 1
-                               QApplication.translate("ComboBox","FC START",None, QApplication.UnicodeUTF8), # qmc.alarmtime 2
-                               QApplication.translate("ComboBox","FC END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 3
-                               QApplication.translate("ComboBox","SC START",None, QApplication.UnicodeUTF8), # qmc.alarmtime 4
-                               QApplication.translate("ComboBox","SC END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 5
-                               QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8), # qmc.alarmtime 6
-                               QApplication.translate("ComboBox","COOL",None, QApplication.UnicodeUTF8)]) # qmc.alarmtime 7
+        timeComboBox.addItems([QApplication.translate("ComboBox","ON",None), # qmc.alarmtime 9
+                               QApplication.translate("ComboBox","START",None), # qmc.alarmtime -1
+                               QApplication.translate("ComboBox","CHARGE",None), # qmc.alarmtime 0
+                               QApplication.translate("ComboBox","TP",None), # qmc.alarmtime 8
+                               QApplication.translate("ComboBox","DRY END",None), # qmc.alarmtime 1
+                               QApplication.translate("ComboBox","FC START",None), # qmc.alarmtime 2
+                               QApplication.translate("ComboBox","FC END",None), # qmc.alarmtime 3
+                               QApplication.translate("ComboBox","SC START",None), # qmc.alarmtime 4
+                               QApplication.translate("ComboBox","SC END",None), # qmc.alarmtime 5
+                               QApplication.translate("ComboBox","DROP",None), # qmc.alarmtime 6
+                               QApplication.translate("ComboBox","COOL",None)]) # qmc.alarmtime 7
         timeComboBox.setCurrentIndex(aw.qmc.alarmtime2menuidx[aw.qmc.alarmtime[i]])
         #time after selected event
         timeoffsetedit = QLineEdit(aw.qmc.stringfromseconds(max(0,aw.qmc.alarmoffset[i])))
@@ -30864,8 +31272,8 @@ class AlarmDlg(ArtisanDialog):
             typeComboBox.setCurrentIndex(3)
         #condition
         condComboBox = QComboBox()
-        condComboBox.addItems([QApplication.translate("ComboBox","below",None, QApplication.UnicodeUTF8),
-                               QApplication.translate("ComboBox","above",None, QApplication.UnicodeUTF8)])
+        condComboBox.addItems([QApplication.translate("ComboBox","below",None),
+                               QApplication.translate("ComboBox","above",None)])
         condComboBox.setCurrentIndex(aw.qmc.alarmcond[i])
         #temperature
         tempedit = QLineEdit(str(aw.qmc.alarmtemperature[i]))
@@ -30875,22 +31283,22 @@ class AlarmDlg(ArtisanDialog):
         #action
         actionComboBox = QComboBox()
         actionComboBox.addItems(["",
-                                 QApplication.translate("ComboBox","Pop Up",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","Event Button",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(0)),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(1)),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(2)),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(3)),
-                                 QApplication.translate("ComboBox","START",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","DRY",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","FCs",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","FCe",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","SCs",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","SCe",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","COOL END",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8)])
+                                 QApplication.translate("ComboBox","Pop Up",None),
+                                 QApplication.translate("ComboBox","Call Program",None),
+                                 QApplication.translate("ComboBox","Event Button",None),
+                                 QApplication.translate("ComboBox","Slider",None) + " " + u(aw.qmc.etypesf(0)),
+                                 QApplication.translate("ComboBox","Slider",None) + " " + u(aw.qmc.etypesf(1)),
+                                 QApplication.translate("ComboBox","Slider",None) + " " + u(aw.qmc.etypesf(2)),
+                                 QApplication.translate("ComboBox","Slider",None) + " " + u(aw.qmc.etypesf(3)),
+                                 QApplication.translate("ComboBox","START",None),
+                                 QApplication.translate("ComboBox","DRY",None),
+                                 QApplication.translate("ComboBox","FCs",None),
+                                 QApplication.translate("ComboBox","FCe",None),
+                                 QApplication.translate("ComboBox","SCs",None),
+                                 QApplication.translate("ComboBox","SCe",None),
+                                 QApplication.translate("ComboBox","DROP",None),
+                                 QApplication.translate("ComboBox","COOL END",None),
+                                 QApplication.translate("ComboBox","OFF",None)])
         actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i] + 1)
         #beep
         beepWidget = QWidget()
@@ -30948,18 +31356,18 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.clear()
             self.alarmtable.setTabKeyNavigation(True)
             self.alarmtable.setColumnCount(12)
-            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Nr",None, QApplication.UnicodeUTF8),
-                                                            QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","But Not",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","Temp",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","Beep",None, QApplication.UnicodeUTF8),
-                                                           QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8)])
+            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Nr",None),
+                                                            QApplication.translate("Table","Status",None),
+                                                           QApplication.translate("Table","If Alarm",None),
+                                                           QApplication.translate("Table","But Not",None),
+                                                           QApplication.translate("Table","From",None),
+                                                           QApplication.translate("Table","Time",None),
+                                                           QApplication.translate("Table","Source",None),
+                                                           QApplication.translate("Table","Condition",None),
+                                                           QApplication.translate("Table","Temp",None),
+                                                           QApplication.translate("Table","Action",None),
+                                                           QApplication.translate("Table","Beep",None),
+                                                           QApplication.translate("Table","Description",None)])
             self.alarmtable.setAlternatingRowColors(True)
             self.alarmtable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.alarmtable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -30987,7 +31395,7 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmtable.setSortingEnabled(True)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " createalarmtable() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createalarmtable() %1").arg(str(ex)),exc_tb.tb_lineno)
 
 
 # UNDER WORK 
@@ -31093,25 +31501,25 @@ class PXRpidDlgControl(ArtisanDialog):
         super(PXRpidDlgControl,self).__init__(parent)
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXR PID Control",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXR PID Control",None))
         #create Ramp Soak control button colums
         self.labelrs1 = QLabel()
         self.labelrs1.setMargin(5)
         self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(1-4)",None, QApplication.UnicodeUTF8) + "</b></font>")
+        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(1-4)",None) + "</b></font>")
         self.labelrs1.setMaximumSize(120, 62)
         self.labelrs2 = QLabel()
         self.labelrs2.setMargin(5)
         self.labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(5-8)",None, QApplication.UnicodeUTF8) + "</b></font>")
+        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(5-8)",None) + "</b></font>")
         self.labelrs2.setMaximumSize(120, 62)
-        labelpattern = QLabel(QApplication.translate("Label", "Ramp/Soak Pattern",None, QApplication.UnicodeUTF8))
+        labelpattern = QLabel(QApplication.translate("Label", "Ramp/Soak Pattern",None))
         self.patternComboBox =  QComboBox()
         self.patternComboBox.addItems(["1-4","5-8","1-8"])
         self.patternComboBox.setCurrentIndex(aw.fujipid.PXR["rampsoakpattern"][0])
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Ready",None),5000)
         self.label_rs1 =  QLabel()
         self.label_rs2 =  QLabel()
         self.label_rs3 =  QLabel()
@@ -31122,12 +31530,12 @@ class PXRpidDlgControl(ArtisanDialog):
         self.label_rs8 =  QLabel()
         self.paintlabels()
         #update button and exit button
-        button_getall = QPushButton(QApplication.translate("Button","Read Ra/So values",None, QApplication.UnicodeUTF8))
-        button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None, QApplication.UnicodeUTF8))
-        button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None, QApplication.UnicodeUTF8))
-        button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None, QApplication.UnicodeUTF8))
-        button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None, QApplication.UnicodeUTF8))
-        button_exit = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
+        button_getall = QPushButton(QApplication.translate("Button","Read Ra/So values",None))
+        button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None))
+        button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None))
+        button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None))
+        button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None))
+        button_exit = QPushButton(QApplication.translate("Button","Close",None))
         self.connect(self.patternComboBox,SIGNAL("currentIndexChanged(int)"),self.paintlabels)
         self.connect(button_getall, SIGNAL("clicked()"), self.getallsegments)
         self.connect(button_rson, SIGNAL("clicked()"), lambda flag=1: self.setONOFFrampsoak(flag))
@@ -31136,32 +31544,32 @@ class PXRpidDlgControl(ArtisanDialog):
         self.connect(button_standbyOFF, SIGNAL("clicked()"), lambda flag=0: self.setONOFFstandby(flag))
         self.connect(button_exit, SIGNAL("clicked()"),self, SLOT("reject()"))
         #TAB 2
-        tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None, QApplication.UnicodeUTF8))
-        tab2cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
-        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","SV Buttons ON",None, QApplication.UnicodeUTF8))
+        tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None))
+        tab2cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None))
+        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","SV Buttons ON",None))
         tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: #ffaaff}")
-        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","SV Buttons OFF",None, QApplication.UnicodeUTF8))
+        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","SV Buttons OFF",None))
         tab2easyOFFsvbutton.setStyleSheet("QPushButton { background-color: lightblue}")
-        tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV",None, QApplication.UnicodeUTF8))
+        tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV",None))
         self.readsvedit = QLineEdit()
         self.connect(tab2svbutton, SIGNAL("clicked()"),self.setsv)
         self.connect(tab2getsvbutton, SIGNAL("clicked()"),self.getsv)
         self.connect(tab2cancelbutton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(tab2easyONsvbutton, SIGNAL("clicked()"), lambda flag=1: aw.fujipid.activateONOFFeasySV(flag))
         self.connect(tab2easyOFFsvbutton, SIGNAL("clicked()"), lambda flag=0: aw.fujipid.activateONOFFeasySV(flag))
-        svwarning1 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None, QApplication.UnicodeUTF8) + "</b><br>"
-                            + QApplication.translate("Label", "Writing eeprom memory",None, QApplication.UnicodeUTF8) + "<br>"
-                            + QApplication.translate("Label", "<u>Max life</u> 10,000 writes",None, QApplication.UnicodeUTF8) + "<br>"
-                            + QApplication.translate("Label", "Infinite read life.",None, QApplication.UnicodeUTF8) + "</CENTER>")
-        svwarning2 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None, QApplication.UnicodeUTF8) + "</b><br>"
-                            + QApplication.translate("Label", "After <u>writing</u> an adjustment,<br>never power down the pid<br>for the next 5 seconds <br>or the pid may never recover.",None, QApplication.UnicodeUTF8) + "<br>"
-                            + QApplication.translate("Label", "Read operations manual",None, QApplication.UnicodeUTF8) + "</CENTER>")
+        svwarning1 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None) + "</b><br>"
+                            + QApplication.translate("Label", "Writing eeprom memory",None) + "<br>"
+                            + QApplication.translate("Label", "<u>Max life</u> 10,000 writes",None) + "<br>"
+                            + QApplication.translate("Label", "Infinite read life.",None) + "</CENTER>")
+        svwarning2 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None) + "</b><br>"
+                            + QApplication.translate("Label", "After <u>writing</u> an adjustment,<br>never power down the pid<br>for the next 5 seconds <br>or the pid may never recover.",None) + "<br>"
+                            + QApplication.translate("Label", "Read operations manual",None) + "</CENTER>")
         self.svedit = QLineEdit()
         self.svedit.setValidator(QDoubleValidator(0., 999., 1, self.svedit))
         #TAB 3
-        button_p = QPushButton(QApplication.translate("Button","Set p",None, QApplication.UnicodeUTF8))
-        button_i = QPushButton(QApplication.translate("Button","Set i",None, QApplication.UnicodeUTF8))
-        button_d = QPushButton(QApplication.translate("Button","Set d",None, QApplication.UnicodeUTF8))
+        button_p = QPushButton(QApplication.translate("Button","Set p",None))
+        button_i = QPushButton(QApplication.translate("Button","Set i",None))
+        button_d = QPushButton(QApplication.translate("Button","Set d",None))
         plabel =  QLabel("p")
         ilabel =  QLabel("i")
         dlabel =  QLabel("d")
@@ -31174,10 +31582,10 @@ class PXRpidDlgControl(ArtisanDialog):
         self.pedit.setValidator(QDoubleValidator(0., 999., 1, self.pedit))
         self.iedit.setValidator(QIntValidator(0, 3200, self.iedit))
         self.dedit.setValidator(QDoubleValidator(0., 999.0, 1, self.dedit))
-        button_autotuneON = QPushButton(QApplication.translate("Button","Autotune ON",None, QApplication.UnicodeUTF8))
-        button_autotuneOFF = QPushButton(QApplication.translate("Button","Autotune OFF",None, QApplication.UnicodeUTF8))
-        button_readpid = QPushButton(QApplication.translate("Button","Read PID Values",None, QApplication.UnicodeUTF8))
-        tab3cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        button_autotuneON = QPushButton(QApplication.translate("Button","Autotune ON",None))
+        button_autotuneOFF = QPushButton(QApplication.translate("Button","Autotune OFF",None))
+        button_readpid = QPushButton(QApplication.translate("Button","Read PID Values",None))
+        tab3cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None))
         self.connect(button_autotuneON, SIGNAL("clicked()"), lambda flag=1: self.setONOFFautotune(flag))
         self.connect(button_autotuneOFF, SIGNAL("clicked()"), lambda flag=0: self.setONOFFautotune(flag))
         self.connect(button_p, SIGNAL("clicked()"), lambda var="p": self.setpid(var))
@@ -31190,7 +31598,7 @@ class PXRpidDlgControl(ArtisanDialog):
         self.segmenttable = QTableWidget()
         self.createsegmenttable()
         #****************************   TAB5 WIDGETS
-        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None, QApplication.UnicodeUTF8))
+        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
         #self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
@@ -31266,10 +31674,10 @@ class PXRpidDlgControl(ArtisanDialog):
             self.BTthermocombobox.addItems(self.PXRthermotypes)
         if aw.fujipid.PXR["pvinputtype"][0] in self.PXRconversiontoindex:
             self.ETthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(aw.fujipid.PXR["pvinputtype"][0]))
-        setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
-        setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
-        getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
-        getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
+        setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
+        setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
+        getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
+        getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
         setETthermocouplebutton.setMaximumWidth(80)
         getETthermocouplebutton.setMaximumWidth(80)
         setBTthermocouplebutton.setMaximumWidth(80)
@@ -31278,13 +31686,13 @@ class PXRpidDlgControl(ArtisanDialog):
         self.connect(setBTthermocouplebutton, SIGNAL("clicked()"), lambda PID="BT": self.setthermocoupletype(PID))
         self.connect(getETthermocouplebutton, SIGNAL("clicked()"), lambda PID="ET": self.readthermocoupletype(PID))
         self.connect(getBTthermocouplebutton, SIGNAL("clicked()"), lambda PID="BT": self.readthermocoupletype(PID))
-        PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None, QApplication.UnicodeUTF8))
+        PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None))
         PointButtonET.setFocusPolicy(Qt.NoFocus)
-        PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None, QApplication.UnicodeUTF8))
+        PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None))
         PointButtonBT.setFocusPolicy(Qt.NoFocus)
         PointButtonET.setMaximumWidth(250)
         PointButtonBT.setMaximumWidth(250)
-        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None, QApplication.UnicodeUTF8))
+        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
         self.connect(PointButtonET, SIGNAL("clicked()"), lambda PID="ET": self.setpoint(PID))
         self.connect(PointButtonBT, SIGNAL("clicked()"), lambda PID="BT": self.setpoint(PID))
         #create layouts
@@ -31348,14 +31756,14 @@ class PXRpidDlgControl(ArtisanDialog):
         thermolayoutET.addStretch()
         thermolayoutET.addWidget(getETthermocouplebutton)
         thermolayoutET.addWidget(setETthermocouplebutton)
-        ETGroupBox = QGroupBox(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
+        ETGroupBox = QGroupBox(QApplication.translate("Label","ET Thermocouple type",None))
         ETGroupBox.setLayout(thermolayoutET)
         thermolayoutBT = QHBoxLayout()
         thermolayoutBT.addWidget(self.BTthermocombobox)
         thermolayoutBT.addStretch()
         thermolayoutBT.addWidget(getBTthermocouplebutton)
         thermolayoutBT.addWidget(setBTthermocouplebutton)
-        BTGroupBox = QGroupBox(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
+        BTGroupBox = QGroupBox(QApplication.translate("Label","BT Thermocouple type",None))
         BTGroupBox.setLayout(thermolayoutBT)
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(ETGroupBox)
@@ -31370,19 +31778,19 @@ class PXRpidDlgControl(ArtisanDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(buttonMasterLayout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","RS",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","RS",None))
         C2Widget = QWidget()
         C2Widget.setLayout(svlayout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","SV",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","SV",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","PID",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","PID",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Set RS",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Set RS",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Extra",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Extra",None))
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(self.status,0)
@@ -31417,13 +31825,13 @@ class PXRpidDlgControl(ArtisanDialog):
                 r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
-                message = QApplication.translate("StatusBar","Decimal position successfully set to 1",None,QApplication.UnicodeUTF8)
+                message = QApplication.translate("StatusBar","Decimal position successfully set to 1",None)
                 self.status.showMessage(message, 5000)
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None,QApplication.UnicodeUTF8),5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setpoint(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setpoint(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setthermocoupletype(self,PID):
         command = ""
@@ -31467,13 +31875,13 @@ class PXRpidDlgControl(ArtisanDialog):
                     aw.fujipid.PXG4["pvinputtype"][0] = self.PXRconversiontoindex[self.ETthermocombobox.currentIndex()]
                 elif PID == "BT":
                     pass #this info is not stored
-                message = QApplication.translate("StatusBar","Thermocouple type successfully set to %i"%(value),None,QApplication.UnicodeUTF8)
+                message = QApplication.translate("StatusBar","Thermocouple type successfully set to %i"%(value),None)
                 self.status.showMessage(message, 5000)
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None,QApplication.UnicodeUTF8),5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def readthermocoupletype(self,PID):
         message = "empty"
@@ -31520,7 +31928,7 @@ class PXRpidDlgControl(ArtisanDialog):
                 self.status.showMessage(message,5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " readthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " readthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def paintlabels(self):
         str1 = "T = " + str(aw.fujipid.PXR["segment1sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment1ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment1soak"][0]))
@@ -31577,7 +31985,7 @@ class PXRpidDlgControl(ArtisanDialog):
             self.label_rs8.setStyleSheet("background-color:white;")
 
     def setONOFFautotune(self,flag):
-        self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None, QApplication.UnicodeUTF8),500)
+        self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None),500)
         if aw.ser.useModbusPort:
             reg = aw.modbus.address2register(aw.fujipid.PXR["autotuning"][1],6)
             aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
@@ -31589,19 +31997,19 @@ class PXRpidDlgControl(ArtisanDialog):
         if len(r) == 8:
             if flag == 0:
                 aw.fujipid.PXR["autotuning"][0] = 0
-                self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned OFF",None, QApplication.UnicodeUTF8),5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned OFF",None),5000)
             if flag == 1:
                 aw.fujipid.PXR["autotuning"][0] = 1
-                self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned ON",None, QApplication.UnicodeUTF8),5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned ON",None),5000)
         else:
-            mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setONOFFautotune()"
+            mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFautotune()"
             self.status.showMessage(mssg,5000)
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setONOFFautotune()")
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setONOFFautotune()")
 
     def setONOFFstandby(self,flag):
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-        self.status.showMessage(QApplication.translate("StatusBar","wait...",None, QApplication.UnicodeUTF8),500)
+        self.status.showMessage(QApplication.translate("StatusBar","wait...",None),500)
         if aw.ser.useModbusPort:
             reg = aw.modbus.address2register(aw.fujipid.PXR["runstandby"][1],6)
             aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
@@ -31612,14 +32020,14 @@ class PXRpidDlgControl(ArtisanDialog):
             r = aw.ser.sendFUJIcommand(command,8)
         if r == command:
             if flag == 1:
-                message = QApplication.translate("StatusBar","PID OFF",None, QApplication.UnicodeUTF8)     #put pid in standby 1 (pid on)
+                message = QApplication.translate("StatusBar","PID OFF",None)     #put pid in standby 1 (pid on)
                 aw.fujipid.PXR["runstandby"][0] = 1
             elif flag == 0:
-                message = QApplication.translate("StatusBar","PID ON",None, QApplication.UnicodeUTF8)      #put pid in standby 0 (pid off)
+                message = QApplication.translate("StatusBar","PID ON",None)      #put pid in standby 0 (pid off)
                 aw.fujipid.PXR["runstandby"][0] = 0
             self.status.showMessage(message,5000)
         else:
-            mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setONOFFstandby()"
+            mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
@@ -31629,7 +32037,7 @@ class PXRpidDlgControl(ArtisanDialog):
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXR["sv0"][1],6)
                 aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,newSVvalue)
-                message = QApplication.translate("StatusBar","SV successfully set to %1",None, QApplication.UnicodeUTF8).arg(self.svedit.text())
+                message = QApplication.translate("StatusBar","SV successfully set to %1",None).arg(self.svedit.text())
                 aw.fujipid.PXR["sv0"][0] = float(str(self.svedit.text()))
                 self.status.showMessage(message,5000)
                 #record command as an Event 
@@ -31639,18 +32047,18 @@ class PXRpidDlgControl(ArtisanDialog):
                 command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["sv0"][1],newSVvalue)
                 r = aw.ser.sendFUJIcommand(command,8)
                 if r == command:
-                    message = QApplication.translate("StatusBar","SV successfully set to %1",None, QApplication.UnicodeUTF8).arg(self.svedit.text())
+                    message = QApplication.translate("StatusBar","SV successfully set to %1",None).arg(self.svedit.text())
                     aw.fujipid.PXR["sv0"][0] = float(str(self.svedit.text()))
                     self.status.showMessage(message,5000)
                     #record command as an Event 
                     strcommand = "SETSV::"+ str("%.1f"%(newSVvalue/10.))
                     aw.qmc.DeviceEventRecord(strcommand)
                 else:
-                    mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setsv()"
+                    mssg = QApplication.translate("Error Message","Exception:",None) + " setsv()"
                     self.status.showMessage(mssg,5000)
                     aw.qmc.adderror(mssg)
         else:
-            self.status.showMessage(QApplication.translate("StatusBar","Empty SV box",None, QApplication.UnicodeUTF8),5000)
+            self.status.showMessage(QApplication.translate("StatusBar","Empty SV box",None),5000)
 
     def getsv(self):
         temp = aw.fujipid.readcurrentsv()
@@ -31659,7 +32067,7 @@ class PXRpidDlgControl(ArtisanDialog):
             aw.lcd6.display(aw.fujipid.PXR["sv0"][0])
             self.readsvedit.setText(str(aw.fujipid.PXR["sv0"][0]))
         else:
-            self.status.showMessage(QApplication.translate("StatusBar","Unable to read SV",None, QApplication.UnicodeUTF8),5000)
+            self.status.showMessage(QApplication.translate("StatusBar","Unable to read SV",None),5000)
 
     def checkrampsoakmode(self):
         if aw.ser.useModbusPort:
@@ -31671,117 +32079,117 @@ class PXRpidDlgControl(ArtisanDialog):
         aw.fujipid.PXR["rampsoakmode"][0] = currentmode
         if currentmode == 0:
             mode = ["0",
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 1:
             mode = ["1",
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 2:
             mode = ["2",
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 3:
             mode = ["3",
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 4:
             mode = ["4",
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 5:
             mode = ["5",
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 6:
             mode = ["6",
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 7:
             mode = ["7",
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 8:
             mode = ["8",
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 9:
             mode = ["9",
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 10:
             mode = ["10",
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 11:
             mode = ["11",
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 12:
             mode = ["12",
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 13:
             mode = ["13",
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 14:
             mode = ["14",
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 15:
             mode = ["15",
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None, QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None, QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","ON",None)]
         else:
             return -1
-        string =  QApplication.translate("Message","The rampsoak-mode tells how to start and end the ramp/soak",None, QApplication.UnicodeUTF8) + "\n\n"
-        string += QApplication.translate("Message","Your rampsoak mode in this pid is:",None, QApplication.UnicodeUTF8) + "\n\n"
-        string += QApplication.translate("Message","Mode = %1",None, QApplication.UnicodeUTF8).arg(mode[0]) + "\n"
+        string =  QApplication.translate("Message","The rampsoak-mode tells how to start and end the ramp/soak",None) + "\n\n"
+        string += QApplication.translate("Message","Your rampsoak mode in this pid is:",None) + "\n\n"
+        string += QApplication.translate("Message","Mode = %1",None).arg(mode[0]) + "\n"
         string += "-----------------------------------------------------------------------\n"
-        string += QApplication.translate("Message","Start to run from PV value: %1",None, QApplication.UnicodeUTF8).arg(mode[1]) + "\n"
-        string += QApplication.translate("Message","End output status at the end of ramp/soak: %1",None, QApplication.UnicodeUTF8).arg(mode[2]) + "\n"
-        string += QApplication.translate("Message","Output status while ramp/soak operation set to OFF: %1",None, QApplication.UnicodeUTF8).arg(mode[3]) + "\n"
-        string += QApplication.translate("Message","\nRepeat Operation at the end: %1",None, QApplication.UnicodeUTF8).arg(mode[4]) + "\n"
+        string += QApplication.translate("Message","Start to run from PV value: %1",None).arg(mode[1]) + "\n"
+        string += QApplication.translate("Message","End output status at the end of ramp/soak: %1",None).arg(mode[2]) + "\n"
+        string += QApplication.translate("Message","Output status while ramp/soak operation set to OFF: %1",None).arg(mode[3]) + "\n"
+        string += QApplication.translate("Message","\nRepeat Operation at the end: %1",None).arg(mode[4]) + "\n"
         string += "-----------------------------------------------------------------------\n"
-        string += QApplication.translate("Message","Recomended Mode = 0",None, QApplication.UnicodeUTF8) + "\n\n"
-        string += QApplication.translate("Message","If you need to change it, change it now and come back later",None, QApplication.UnicodeUTF8) + "\n"
-        string += QApplication.translate("Message","Use the Parameter Loader Software by Fuji if you need to\n\n",None, QApplication.UnicodeUTF8) + "\n\n\n"
-        string += QApplication.translate("Message","Continue?",None, QApplication.UnicodeUTF8)
-#        QMessageBox.information(self,QApplication.translate("Message", "RampSoak Mode",None, QApplication.UnicodeUTF8),string)
-        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None,QApplication.UnicodeUTF8),string,
+        string += QApplication.translate("Message","Recomended Mode = 0",None) + "\n\n"
+        string += QApplication.translate("Message","If you need to change it, change it now and come back later",None) + "\n"
+        string += QApplication.translate("Message","Use the Parameter Loader Software by Fuji if you need to\n\n",None) + "\n\n\n"
+        string += QApplication.translate("Message","Continue?",None)
+#        QMessageBox.information(self,QApplication.translate("Message", "RampSoak Mode",None),string)
+        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             return 0
@@ -31794,12 +32202,12 @@ class PXRpidDlgControl(ArtisanDialog):
         if flag == 1:
             check = self.checkrampsoakmode()
             if check == 0:
-                self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak operation cancelled",None, QApplication.UnicodeUTF8), 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak operation cancelled",None), 5000)
                 return
             elif check == -1:
-                self.status.showMessage(QApplication.translate("StatusBar","No RX data",None, QApplication.UnicodeUTF8), 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","No RX data",None), 5000)
 
-            self.status.showMessage(QApplication.translate("StatusBar","RS ON",None, QApplication.UnicodeUTF8),500)
+            self.status.showMessage(QApplication.translate("StatusBar","RS ON",None),500)
             #0 = 1-4
             #1 = 5-8
             #2 = 1-8
@@ -31814,7 +32222,7 @@ class PXRpidDlgControl(ArtisanDialog):
                 aw.fujipid.PXR["rampsoakpattern"][0] = currentmode
                 if currentmode != selectedmode:
                     #set mode in pid to match the mode selected in the combobox
-                    self.status.showMessage(QApplication.translate("StatusBar","Need to change pattern mode...",None, QApplication.UnicodeUTF8),1000)
+                    self.status.showMessage(QApplication.translate("StatusBar","Need to change pattern mode...",None),1000)
                     if aw.ser.useModbusPort:
                         reg = aw.modbus.address2register(aw.fujipid.PXR["rampsoakpattern"][1],6)
                         aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,selectedmode)
@@ -31823,10 +32231,10 @@ class PXRpidDlgControl(ArtisanDialog):
                         command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["rampsoakpattern"][1],selectedmode)
                         r = aw.ser.sendFUJIcommand(command,8)
                     if len(r) == 8:
-                        self.status.showMessage(QApplication.translate("StatusBar","Pattern has been changed. Wait 5 secs.",None, QApplication.UnicodeUTF8), 500)
+                        self.status.showMessage(QApplication.translate("StatusBar","Pattern has been changed. Wait 5 secs.",None), 500)
                         aw.fujipid.PXR["rampsoakpattern"][0] = selectedmode
                     else:
-                        self.status.showMessage(QApplication.translate("StatusBar","Pattern could not be changed",None, QApplication.UnicodeUTF8), 5000)
+                        self.status.showMessage(QApplication.translate("StatusBar","Pattern could not be changed",None), 5000)
                         return
                 #combobox mode matches pid mode
                 #set ramp soak mode ON
@@ -31839,7 +32247,7 @@ class PXRpidDlgControl(ArtisanDialog):
                     r = aw.ser.sendFUJIcommand(command,8)
                 if r == command:
                     #record command as an Event if flag = 1
-                    self.status.showMessage(QApplication.translate("StatusBar","RS ON",None, QApplication.UnicodeUTF8), 5000)
+                    self.status.showMessage(QApplication.translate("StatusBar","RS ON",None), 5000)
                     #ramp soak pattern. 0=executes 1 to 4; 1=executes 5 to 8; 2=executes 1 to 8
                     pattern =[[1,4],[5,8],[1,8]]
                     start = pattern[aw.fujipid.PXR["rampsoakpattern"][0]][0]
@@ -31856,14 +32264,14 @@ class PXRpidDlgControl(ArtisanDialog):
                     result = result.strip("::")
                     aw.qmc.DeviceEventRecord(result)
                 else:
-                    self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None, QApplication.UnicodeUTF8), 5000)
+                    self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None), 5000)
             else:
-                mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setONOFFrampsoak()"
+                mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFrampsoak()"
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)
         #set ramp soak OFF
         elif flag == 0:
-            self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None, QApplication.UnicodeUTF8),500)
+            self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None),500)
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXR["rampsoak"][1],6)
                 aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
@@ -31872,10 +32280,10 @@ class PXRpidDlgControl(ArtisanDialog):
                 command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["rampsoak"][1],flag)
                 r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                self.status.showMessage(QApplication.translate("StatusBar","RS successfully turned OFF",None, QApplication.UnicodeUTF8), 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","RS successfully turned OFF",None), 5000)
                 aw.fujipid.PXR["rampsoak"][0] = flag
             else:
-                mssg = QApplication.translate("StatusBar","setONOFFrampsoak(): Ramp Soak could not be set OFF",None, QApplication.UnicodeUTF8)
+                mssg = QApplication.translate("StatusBar","setONOFFrampsoak(): Ramp Soak could not be set OFF",None)
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)
 
@@ -31888,7 +32296,7 @@ class PXRpidDlgControl(ArtisanDialog):
             svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[svkey][1],1)
             sv = aw.fujipid.readoneword(svcommand)
         if sv == -1:
-            mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " getsegment()"
+            mssg = QApplication.translate("Error Message","Exception:",None) + " getsegment()"
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
@@ -31901,7 +32309,7 @@ class PXRpidDlgControl(ArtisanDialog):
             rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[rampkey][1],1)
             ramp = aw.fujipid.readoneword(rampcommand)
         if ramp == -1:
-            mssg = QApplication.translate("StatusBar","getsegment(): problem reading ramp",None, QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("StatusBar","getsegment(): problem reading ramp",None)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
@@ -31914,7 +32322,7 @@ class PXRpidDlgControl(ArtisanDialog):
             soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[soakkey][1],1)
             soak = aw.fujipid.readoneword(soakcommand)
         if soak == -1:
-            mssg = QApplication.translate("StatusBar","getsegment(): problem reading soak",None, QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("StatusBar","getsegment(): problem reading soak",None)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
@@ -31923,15 +32331,15 @@ class PXRpidDlgControl(ArtisanDialog):
     #get all Ramp Soak values for all 8 segments
     def getallsegments(self):
         for i in range(8):
-            msg = QApplication.translate("StatusBar","Reading Ramp/Soak %1 ...",None, QApplication.UnicodeUTF8).arg(str(i+1))
+            msg = QApplication.translate("StatusBar","Reading Ramp/Soak %1 ...",None).arg(str(i+1))
             self.status.showMessage(msg,500)
             k = self.getsegment(i+1)
             libtime.sleep(0.03)
             if k == -1:
-                self.status.showMessage(QApplication.translate("StatusBar","problem reading Ramp/Soak",None, QApplication.UnicodeUTF8),5000)
+                self.status.showMessage(QApplication.translate("StatusBar","problem reading Ramp/Soak",None),5000)
                 return
             self.paintlabels()
-        self.status.showMessage(QApplication.translate("StatusBar","Finished reading Ramp/Soak val.",None, QApplication.UnicodeUTF8),5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Finished reading Ramp/Soak val.",None),5000)
         self.createsegmenttable()
 
     def getpid(self):
@@ -31970,7 +32378,7 @@ class PXRpidDlgControl(ArtisanDialog):
             self.dedit.setText(str(d))
             aw.fujipid.PXR["d"][0] = d
             
-        self.status.showMessage(QApplication.translate("StatusBar","Finished reading pid values",None, QApplication.UnicodeUTF8),5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Finished reading pid values",None),5000)
 
     def setpid(self,var):
         r = ""
@@ -32012,7 +32420,7 @@ class PXRpidDlgControl(ArtisanDialog):
                 return -1
 
         if len(r) == 8:
-            message = QApplication.translate("StatusBar","%1 successfully sent to pid ",None, QApplication.UnicodeUTF8).arg(var)
+            message = QApplication.translate("StatusBar","%1 successfully sent to pid ",None).arg(var)
             self.status.showMessage(message,5000)
             if var == "p":
                 aw.fujipid.PXR["p"][0] = p
@@ -32021,16 +32429,16 @@ class PXRpidDlgControl(ArtisanDialog):
             elif var == "d":
                 aw.fujipid.PXR["i"][0] = d
         else:
-            mssg = QApplication.translate("StatusBar","setpid(): There was a problem setting %1",None, QApplication.UnicodeUTF8).arg(var)
+            mssg = QApplication.translate("StatusBar","setpid(): There was a problem setting %1",None).arg(var)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
     def createsegmenttable(self):
         self.segmenttable.setRowCount(8)
         self.segmenttable.setColumnCount(4)
-        self.segmenttable.setHorizontalHeaderLabels([QApplication.translate("Table","SV",None, QApplication.UnicodeUTF8),
-                                                     QApplication.translate("Table","Ramp HH:MM",None, QApplication.UnicodeUTF8),
-                                                     QApplication.translate("Table","Soak HH:MM",None, QApplication.UnicodeUTF8),""])
+        self.segmenttable.setHorizontalHeaderLabels([QApplication.translate("Table","SV",None),
+                                                     QApplication.translate("Table","Ramp HH:MM",None),
+                                                     QApplication.translate("Table","Soak HH:MM",None),""])
         self.segmenttable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
@@ -32050,7 +32458,7 @@ class PXRpidDlgControl(ArtisanDialog):
             rampedit.setValidator(QRegExpValidator(regextime,self))
             soakedit  = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXR[soakkey][0])))
             soakedit.setValidator(QRegExpValidator(regextime,self))
-            setButton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+            setButton = QPushButton(QApplication.translate("Button","Set",None))
             self.connect(setButton,SIGNAL("clicked()"),lambda idn = i:self.setsegment(idn))
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
@@ -32095,9 +32503,9 @@ class PXRpidDlgControl(ArtisanDialog):
             aw.fujipid.PXR[rampkey][0] = ramp
             aw.fujipid.PXR[soakkey][0] = soak
             self.paintlabels()
-            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully written",None, QApplication.UnicodeUTF8),5000) 
+            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully written",None),5000) 
         else:
-            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None))
 
 ############################################################################
 ######################## FUJI PXG4 PID CONTROL DIALOG ######################
@@ -32108,21 +32516,21 @@ class PXG4pidDlgControl(ArtisanDialog):
         super(PXG4pidDlgControl,self).__init__(parent)
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXG PID Control",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXG PID Control",None))
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Ready",None),5000)
         #*************    TAB 1 WIDGETS
         labelrs1 = QLabel()
         labelrs1.setMargin(5)
         labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(1-7)",None, QApplication.UnicodeUTF8) + "</b></font>")
+        labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(1-7)",None) + "</b></font>")
         #labelrs1.setMaximumSize(90, 42)
         #labelrs1.setMinimumHeight(50)
         labelrs2 = QLabel()
         labelrs2.setMargin(5)
         labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(8-16)",None, QApplication.UnicodeUTF8) + "</b></font>")
+        labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(8-16)",None) + "</b></font>")
         #labelrs2.setMaximumSize(90, 42)
         #labelrs2.setMinimumHeight(50)
         self.label_rs1 =  QLabel()
@@ -32163,27 +32571,27 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.patternComboBox.setFocusPolicy(Qt.NoFocus)
         self.connect(self.patternComboBox,SIGNAL("currentIndexChanged(int)"),self.paintlabels)
         self.paintlabels()
-        button_load = QPushButton(QApplication.translate("Button","Load",None, QApplication.UnicodeUTF8))
+        button_load = QPushButton(QApplication.translate("Button","Load",None))
         button_load.setFocusPolicy(Qt.NoFocus)
-        button_save = QPushButton(QApplication.translate("Button","Save",None, QApplication.UnicodeUTF8))
+        button_save = QPushButton(QApplication.translate("Button","Save",None))
         button_save.setFocusPolicy(Qt.NoFocus)
-        button_writeall = QPushButton(QApplication.translate("Button","Write All",None, QApplication.UnicodeUTF8))
+        button_writeall = QPushButton(QApplication.translate("Button","Write All",None))
         button_writeall.setFocusPolicy(Qt.NoFocus)
-        patternlabel = QLabel(QApplication.translate("Label","Pattern",None, QApplication.UnicodeUTF8))
+        patternlabel = QLabel(QApplication.translate("Label","Pattern",None))
         patternlabel.setAlignment(Qt.AlignRight)
-        button_getall = QPushButton(QApplication.translate("Button","Read RS values",None, QApplication.UnicodeUTF8))
+        button_getall = QPushButton(QApplication.translate("Button","Read RS values",None))
         button_getall.setFocusPolicy(Qt.NoFocus)
-        button_writeallrs = QPushButton(QApplication.translate("Button","Write RS values",None, QApplication.UnicodeUTF8))
+        button_writeallrs = QPushButton(QApplication.translate("Button","Write RS values",None))
         button_writeallrs.setFocusPolicy(Qt.NoFocus)
-        button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None, QApplication.UnicodeUTF8)) 
+        button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None)) 
         button_rson.setFocusPolicy(Qt.NoFocus)
-        button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None, QApplication.UnicodeUTF8))
+        button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None))
         button_rsoff.setFocusPolicy(Qt.NoFocus)
-        button_exit = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-#        button_exit2 = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
-        button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None, QApplication.UnicodeUTF8))
+        button_exit = QPushButton(QApplication.translate("Button","OK",None))
+#        button_exit2 = QPushButton(QApplication.translate("Button","Close",None))
+        button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None))
         button_standbyON.setFocusPolicy(Qt.NoFocus)
-        button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None, QApplication.UnicodeUTF8))
+        button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None))
         button_standbyOFF.setFocusPolicy(Qt.NoFocus)
         self.connect(button_getall, SIGNAL("clicked()"), self.getallsegments)
         self.connect(button_writeallrs, SIGNAL("clicked()"), self.writeRSValues)
@@ -32225,28 +32633,28 @@ class PXG4pidDlgControl(ArtisanDialog):
         labelsv = QLabel()
         labelsv.setMargin(10)
         labelsv.setStyleSheet("background-color:'#CCCCCC';")
-        labelsv.setText("<font color='white'><b>" + QApplication.translate("Label", "SV (7-0)",None, QApplication.UnicodeUTF8) + "</b></font>")
+        labelsv.setText("<font color='white'><b>" + QApplication.translate("Label", "SV (7-0)",None) + "</b></font>")
         labelsv.setMaximumSize(100, 42)
         labelsv.setMinimumHeight(50)
         labelsvedit = QLabel()
         labelsvedit.setMargin(10)
         labelsvedit.setStyleSheet("background-color:'#CCCCCC';")
-        labelsvedit.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None, QApplication.UnicodeUTF8) + "</b></font>")
+        labelsvedit.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None) + "</b></font>")
         labelsvedit.setMaximumSize(100, 42)
         labelsvedit.setMinimumHeight(50)
-        button_sv1 =QPushButton(QApplication.translate("Button","Write SV1",None, QApplication.UnicodeUTF8))
+        button_sv1 =QPushButton(QApplication.translate("Button","Write SV1",None))
         button_sv1.setFocusPolicy(Qt.NoFocus)
-        button_sv2 =QPushButton(QApplication.translate("Button","Write SV2",None, QApplication.UnicodeUTF8))
+        button_sv2 =QPushButton(QApplication.translate("Button","Write SV2",None))
         button_sv2.setFocusPolicy(Qt.NoFocus)
-        button_sv3 =QPushButton(QApplication.translate("Button","Write SV3",None, QApplication.UnicodeUTF8))
+        button_sv3 =QPushButton(QApplication.translate("Button","Write SV3",None))
         button_sv3.setFocusPolicy(Qt.NoFocus)
-        button_sv4 =QPushButton(QApplication.translate("Button","Write SV4",None, QApplication.UnicodeUTF8))
+        button_sv4 =QPushButton(QApplication.translate("Button","Write SV4",None))
         button_sv4.setFocusPolicy(Qt.NoFocus)
-        button_sv5 =QPushButton(QApplication.translate("Button","Write SV5",None, QApplication.UnicodeUTF8))
+        button_sv5 =QPushButton(QApplication.translate("Button","Write SV5",None))
         button_sv5.setFocusPolicy(Qt.NoFocus)
-        button_sv6 =QPushButton(QApplication.translate("Button","Write SV6",None, QApplication.UnicodeUTF8))
+        button_sv6 =QPushButton(QApplication.translate("Button","Write SV6",None))
         button_sv6.setFocusPolicy(Qt.NoFocus)
-        button_sv7 =QPushButton(QApplication.translate("Button","Write SV7",None, QApplication.UnicodeUTF8))
+        button_sv7 =QPushButton(QApplication.translate("Button","Write SV7",None))
         button_sv7.setFocusPolicy(Qt.NoFocus)
         self.connect(button_sv1, SIGNAL("clicked()"), lambda v=1: self.setsv(v))
         self.connect(button_sv2, SIGNAL("clicked()"), lambda v=2: self.setsv(v))
@@ -32298,19 +32706,19 @@ class PXG4pidDlgControl(ArtisanDialog):
             self.radiosv6.setChecked(True)
         elif N == 7:
             self.radiosv7.setChecked(True)
-        tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None, QApplication.UnicodeUTF8))
+        tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None))
         tab2svbutton.setFocusPolicy(Qt.NoFocus)
-#        tab2cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+#        tab2cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None))
 #        tab2cancelbutton.setFocusPolicy(Qt.NoFocus)
-        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","ON SV buttons",None, QApplication.UnicodeUTF8))
+        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","ON SV buttons",None))
         tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: 'lightblue'}")
         tab2easyONsvbutton.setFocusPolicy(Qt.NoFocus)
-        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","OFF SV buttons",None, QApplication.UnicodeUTF8))
+        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","OFF SV buttons",None))
         tab2easyOFFsvbutton.setFocusPolicy(Qt.NoFocus)
         tab2easyOFFsvbutton.setStyleSheet("QPushButton { background-color:'#ffaaff' }")
-        tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV (7-0)",None, QApplication.UnicodeUTF8))
+        tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV (7-0)",None))
         tab2getsvbutton.setFocusPolicy(Qt.NoFocus)
-        tab2putsvbutton = QPushButton(QApplication.translate("Button","Write SV (7-0)",None, QApplication.UnicodeUTF8))
+        tab2putsvbutton = QPushButton(QApplication.translate("Button","Write SV (7-0)",None))
         tab2putsvbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(tab2svbutton, SIGNAL("clicked()"),self.setsv)
         self.connect(tab2getsvbutton, SIGNAL("clicked()"),self.getallsv)
@@ -32329,25 +32737,25 @@ class PXG4pidDlgControl(ArtisanDialog):
         plabel = QLabel()
         plabel.setMargin(10)
         plabel.setStyleSheet("background-color:'#CCCCCC';")
-        plabel.setText("<font color='white'><b>" + QApplication.translate("Label", "P",None, QApplication.UnicodeUTF8) + "</b></font>")
+        plabel.setText("<font color='white'><b>" + QApplication.translate("Label", "P",None) + "</b></font>")
         plabel.setMaximumSize(50, 42)
         plabel.setMinimumHeight(50)
         ilabel = QLabel()
         ilabel.setMargin(10)
         ilabel.setStyleSheet("background-color:'#CCCCCC';")
-        ilabel.setText("<font color='white'><b>" + QApplication.translate("Label", "I",None, QApplication.UnicodeUTF8) + "</b></font>")
+        ilabel.setText("<font color='white'><b>" + QApplication.translate("Label", "I",None) + "</b></font>")
         ilabel.setMaximumSize(50, 42)
         ilabel.setMinimumHeight(50)
         dlabel = QLabel()
         dlabel.setMargin(10)
         dlabel.setStyleSheet("background-color:'#CCCCCC';")
-        dlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "D",None, QApplication.UnicodeUTF8) + "</b></font>")
+        dlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "D",None) + "</b></font>")
         dlabel.setMaximumSize(50, 420)
         dlabel.setMinimumHeight(50)
         wlabel = QLabel()
         wlabel.setMargin(10)
         wlabel.setStyleSheet("background-color:'#CCCCCC';")
-        wlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None, QApplication.UnicodeUTF8) + "</b></font>")
+        wlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None) + "</b></font>")
         wlabel.setMaximumSize(100, 42)
         wlabel.setMinimumHeight(50)
         self.p1edit =  QLineEdit(QString(str(aw.fujipid.PXG4["p1"][0])))
@@ -32416,29 +32824,29 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.d5edit.setValidator(QDoubleValidator(0., 999., 1, self.d5edit))
         self.d6edit.setValidator(QDoubleValidator(0., 999., 1, self.d6edit))
         self.d7edit.setValidator(QDoubleValidator(0., 999., 1, self.d7edit))
-        pid1button = QPushButton(QApplication.translate("Button","pid 1",None, QApplication.UnicodeUTF8))
+        pid1button = QPushButton(QApplication.translate("Button","pid 1",None))
         pid1button.setFocusPolicy(Qt.NoFocus)
-        pid2button = QPushButton(QApplication.translate("Button","pid 2",None, QApplication.UnicodeUTF8))
+        pid2button = QPushButton(QApplication.translate("Button","pid 2",None))
         pid2button.setFocusPolicy(Qt.NoFocus)
-        pid3button = QPushButton(QApplication.translate("Button","pid 3",None, QApplication.UnicodeUTF8))
+        pid3button = QPushButton(QApplication.translate("Button","pid 3",None))
         pid3button.setFocusPolicy(Qt.NoFocus)
-        pid4button = QPushButton(QApplication.translate("Button","pid 4",None, QApplication.UnicodeUTF8))
+        pid4button = QPushButton(QApplication.translate("Button","pid 4",None))
         pid4button.setFocusPolicy(Qt.NoFocus)
-        pid5button = QPushButton(QApplication.translate("Button","pid 5",None, QApplication.UnicodeUTF8))
+        pid5button = QPushButton(QApplication.translate("Button","pid 5",None))
         pid5button.setFocusPolicy(Qt.NoFocus)
-        pid6button = QPushButton(QApplication.translate("Button","pid 6",None, QApplication.UnicodeUTF8))
+        pid6button = QPushButton(QApplication.translate("Button","pid 6",None))
         pid6button.setFocusPolicy(Qt.NoFocus)
-        pid7button = QPushButton(QApplication.translate("Button","pid 7",None, QApplication.UnicodeUTF8))
+        pid7button = QPushButton(QApplication.translate("Button","pid 7",None))
         pid7button.setFocusPolicy(Qt.NoFocus)
-        pidreadallbutton = QPushButton(QApplication.translate("Button","Read PIDs",None, QApplication.UnicodeUTF8))
+        pidreadallbutton = QPushButton(QApplication.translate("Button","Read PIDs",None))
         pidreadallbutton.setFocusPolicy(Qt.NoFocus)
-        pidwriteallbutton = QPushButton(QApplication.translate("Button","Write PIDs",None, QApplication.UnicodeUTF8))
+        pidwriteallbutton = QPushButton(QApplication.translate("Button","Write PIDs",None))
         pidwriteallbutton.setFocusPolicy(Qt.NoFocus)
-        autotuneONbutton = QPushButton(QApplication.translate("Button","Autotune ON",None, QApplication.UnicodeUTF8))
+        autotuneONbutton = QPushButton(QApplication.translate("Button","Autotune ON",None))
         autotuneONbutton.setFocusPolicy(Qt.NoFocus)
-        autotuneOFFbutton = QPushButton(QApplication.translate("Button","Autotune OFF",None, QApplication.UnicodeUTF8))
+        autotuneOFFbutton = QPushButton(QApplication.translate("Button","Autotune OFF",None))
         autotuneOFFbutton.setFocusPolicy(Qt.NoFocus)
-        cancel3button = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        cancel3button = QPushButton(QApplication.translate("Button","Cancel",None))
         cancel3button.setFocusPolicy(Qt.NoFocus)
         self.radiopid1 = QRadioButton()
         self.radiopid2 = QRadioButton()
@@ -32471,7 +32879,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.segmenttable = QTableWidget()
         self.createsegmenttable()
         #****************************   TAB5 WIDGETS
-        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None, QApplication.UnicodeUTF8))
+        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None))
         self.ETthermocombobox = QComboBox()
         self.ETthermocombobox.setFocusPolicy(Qt.NoFocus)
         self.BTthermocombobox = QComboBox()
@@ -32549,13 +32957,13 @@ class PXG4pidDlgControl(ArtisanDialog):
             self.BTthermocombobox.addItems(self.PXRthermotypes)
         if aw.fujipid.PXG4["pvinputtype"][0] in self.PXGconversiontoindex:
             self.ETthermocombobox.setCurrentIndex(self.PXGconversiontoindex.index(aw.fujipid.PXG4["pvinputtype"][0]))
-        setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+        setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
         setETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+        setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
         setBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
+        getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
         getETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
-        getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
+        getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
         getBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
         setETthermocouplebutton.setMaximumWidth(80)
         getETthermocouplebutton.setMaximumWidth(80)
@@ -32565,17 +32973,17 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.connect(setBTthermocouplebutton, SIGNAL("clicked()"), lambda PID="BT": self.setthermocoupletype(PID))
         self.connect(getETthermocouplebutton, SIGNAL("clicked()"), lambda PID="ET": self.readthermocoupletype(PID))
         self.connect(getBTthermocouplebutton, SIGNAL("clicked()"), lambda PID="BT": self.readthermocoupletype(PID))
-        PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None, QApplication.UnicodeUTF8))
+        PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None))
         PointButtonET.setFocusPolicy(Qt.NoFocus)
-        PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None, QApplication.UnicodeUTF8))
+        PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None))
         PointButtonBT.setFocusPolicy(Qt.NoFocus)
-        timeunitsbutton = QPushButton(QApplication.translate("Button","Set ET PID to MM:SS time units",None, QApplication.UnicodeUTF8))
+        timeunitsbutton = QPushButton(QApplication.translate("Button","Set ET PID to MM:SS time units",None))
         timeunitsbutton.setFocusPolicy(Qt.NoFocus)
 #        PointButtonET.setMaximumWidth(180)
 #        PointButtonBT.setMaximumWidth(180)
 #        timeunitsbutton.setMaximumWidth(180)
-        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None, QApplication.UnicodeUTF8))
-        timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None, QApplication.UnicodeUTF8))
+        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
+        timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None))
         self.connect(PointButtonET, SIGNAL("clicked()"), lambda PID="ET": self.setpoint(PID))
         self.connect(PointButtonBT, SIGNAL("clicked()"), lambda PID="BT": self.setpoint(PID))
         self.connect(timeunitsbutton, SIGNAL("clicked()"), self.settimeunits)
@@ -32681,14 +33089,14 @@ class PXG4pidDlgControl(ArtisanDialog):
         thermolayoutET.addStretch()
         thermolayoutET.addWidget(getETthermocouplebutton)
         thermolayoutET.addWidget(setETthermocouplebutton)
-        ETGroupBox = QGroupBox(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
+        ETGroupBox = QGroupBox(QApplication.translate("Label","ET Thermocouple type",None))
         ETGroupBox.setLayout(thermolayoutET)
         thermolayoutBT = QHBoxLayout()
         thermolayoutBT.addWidget(self.BTthermocombobox)
         thermolayoutBT.addStretch()
         thermolayoutBT.addWidget(getBTthermocouplebutton)
         thermolayoutBT.addWidget(setBTthermocouplebutton)
-        BTGroupBox = QGroupBox(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
+        BTGroupBox = QGroupBox(QApplication.translate("Label","BT Thermocouple type",None))
         BTGroupBox.setLayout(thermolayoutBT)
         tab5Layout = QVBoxLayout()
         tab5Layout.addStretch()
@@ -32715,19 +33123,19 @@ class PXG4pidDlgControl(ArtisanDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","RS",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","RS",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","SV",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","SV",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3MasterLayout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","PID",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","PID",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Set RS",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Set RS",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Extra",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Extra",None))
         #incorporate layouts
         layout = QVBoxLayout()
         layout.addWidget(self.status,0)
@@ -32736,7 +33144,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.setLayout(layout)
 
     def load(self):
-        aw.fileImport(QApplication.translate("Message", "Load PID Settings",None, QApplication.UnicodeUTF8),self.loadPIDJSON)
+        aw.fileImport(QApplication.translate("Message", "Load PID Settings",None),self.loadPIDJSON)
 
     def loadPIDJSON(self,filename):
         try:
@@ -32800,7 +33208,7 @@ class PXG4pidDlgControl(ArtisanDialog):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " loadPIDJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadPIDJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def writeSetValues(self):
         for i in range(7):
@@ -32820,7 +33228,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.writeRSValues()
 
     def save(self):
-        aw.fileExport(QApplication.translate("Message", "Save PID Settings",None, QApplication.UnicodeUTF8),"*.apid",self.savePIDJSON)
+        aw.fileExport(QApplication.translate("Message", "Save PID Settings",None),"*.apid",self.savePIDJSON)
 
     def savePIDJSON(self,filename):
         try:
@@ -32858,7 +33266,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             return True
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " savePIDJSON(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " savePIDJSON(): %1").arg(str(ex)),exc_tb.tb_lineno)
             return False
 
     def settimeunits(self):
@@ -32872,13 +33280,13 @@ class PXG4pidDlgControl(ArtisanDialog):
                 r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
-                message = QApplication.translate("StatusBar","Time Units successfully set to MM:SS",None,QApplication.UnicodeUTF8)
+                message = QApplication.translate("StatusBar","Time Units successfully set to MM:SS",None)
                 self.status.showMessage(message, 5000)
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","Problem setting time units",None,QApplication.UnicodeUTF8),5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Problem setting time units",None),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " settimeunits(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " settimeunits(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setpoint(self,PID):
         command = ""
@@ -32908,13 +33316,13 @@ class PXG4pidDlgControl(ArtisanDialog):
                 r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
-                message = QApplication.translate("StatusBar","Decimal position successfully set to 1",None,QApplication.UnicodeUTF8)
+                message = QApplication.translate("StatusBar","Decimal position successfully set to 1",None)
                 self.status.showMessage(message, 5000)
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None,QApplication.UnicodeUTF8),5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setpoint(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setpoint(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setthermocoupletype(self,PID):
         command = ""
@@ -32958,13 +33366,13 @@ class PXG4pidDlgControl(ArtisanDialog):
                     aw.fujipid.PXG4["pvinputtype"][0] = self.PXGconversiontoindex[self.ETthermocombobox.currentIndex()]
                 elif PID == "BT":
                     pass #this info is not stored
-                message = QApplication.translate("StatusBar","Thermocouple type successfully set",None,QApplication.UnicodeUTF8)
+                message = QApplication.translate("StatusBar","Thermocouple type successfully set",None)
                 self.status.showMessage(message, 5000)
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None,QApplication.UnicodeUTF8),5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def readthermocoupletype(self,PID):
         command = ""
@@ -33011,7 +33419,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                 self.status.showMessage(message,5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " readthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " readthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def paintlabels(self):
         #read values of computer variables (not the actual pid values) to place in buttons
@@ -33133,8 +33541,8 @@ class PXG4pidDlgControl(ArtisanDialog):
         # if current svN is different than requested svN
         if N != -1:
             if N != svn:
-                string = QApplication.translate("Message","Current sv = %1. Change now to sv = %2?",None,QApplication.UnicodeUTF8).arg(str(N)).arg(str(svn))
-                reply = QMessageBox.question(self,QApplication.translate("Message","Change svN",None,QApplication.UnicodeUTF8),string,
+                string = QApplication.translate("Message","Current sv = %1. Change now to sv = %2?",None).arg(str(N)).arg(str(svn))
+                reply = QMessageBox.question(self,QApplication.translate("Message","Change svN",None),string,
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     #change variable svN
@@ -33149,13 +33557,13 @@ class PXG4pidDlgControl(ArtisanDialog):
                     if r == command:
                         aw.fujipid.PXG4["selectsv"][0] = svn
                         key = "sv" + str(svn)
-                        message = QApplication.translate("StatusBar","SV%1 set to %2",None,QApplication.UnicodeUTF8).arg(str(svn)).arg(str(aw.fujipid.PXG4[key][0]))
+                        message = QApplication.translate("StatusBar","SV%1 set to %2",None).arg(str(svn)).arg(str(aw.fujipid.PXG4[key][0]))
                         aw.lcd6.display(str(aw.fujipid.PXG4[key][0]))
                         self.status.showMessage(message, 5000)
                     else:
-                        self.status.showMessage(QApplication.translate("StatusBar","Problem setting SV",None,QApplication.UnicodeUTF8),5000)
+                        self.status.showMessage(QApplication.translate("StatusBar","Problem setting SV",None),5000)
                 elif reply == QMessageBox.Cancel:
-                    self.status.showMessage(QApplication.translate("StatusBar","Cancelled svN change",None,QApplication.UnicodeUTF8),5000)
+                    self.status.showMessage(QApplication.translate("StatusBar","Cancelled svN change",None),5000)
                     #set radio button
                     if N == 1:
                         self.radiosv1.setChecked(True)
@@ -33173,10 +33581,10 @@ class PXG4pidDlgControl(ArtisanDialog):
                         self.radiosv7.setChecked(True)
                     return 
             else:
-                mssg = QApplication.translate("StatusBar","PID already using sv%1",None,QApplication.UnicodeUTF8).arg(str(N))
+                mssg = QApplication.translate("StatusBar","PID already using sv%1",None).arg(str(N))
                 self.status.showMessage(mssg,1000)
         else:
-            mssg = QApplication.translate("StatusBar","setNsv(): bad response",None,QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("StatusBar","setNsv(): bad response",None)
             self.status.showMessage(mssg,1000)
             aw.qmc.adderror(mssg)
 
@@ -33193,8 +33601,8 @@ class PXG4pidDlgControl(ArtisanDialog):
             aw.fujipid.PXG4["selectedpid"][0] = N
             # if current svN is different than requested svN
             if N != pidn:
-                string = QApplication.translate("Message","Current pid = %1. Change now to pid =%2?",None,QApplication.UnicodeUTF8).arg(str(N)).arg(str(pidn))
-                reply = QMessageBox.question(self,QApplication.translate("Message","Change svN",None,QApplication.UnicodeUTF8),string,
+                string = QApplication.translate("Message","Current pid = %1. Change now to pid =%2?",None).arg(str(N)).arg(str(pidn))
+                reply = QMessageBox.question(self,QApplication.translate("Message","Change svN",None),string,
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     #change variable svN
@@ -33209,14 +33617,14 @@ class PXG4pidDlgControl(ArtisanDialog):
                     if r == command:
                         aw.fujipid.PXG4["selectedpid"][0] = pidn
                         #key = "sv" + str(pidn)
-                        message = QApplication.translate("StatusBar","pid changed to %1",None,QApplication.UnicodeUTF8).arg(str(pidn))
+                        message = QApplication.translate("StatusBar","pid changed to %1",None).arg(str(pidn))
                         self.status.showMessage(message, 5000)
                     else:
-                        mssg = QApplication.translate("StatusBar","setNpid(): bad confirmation",None,QApplication.UnicodeUTF8)
+                        mssg = QApplication.translate("StatusBar","setNpid(): bad confirmation",None)
                         self.status.showMessage(mssg,1000)
                         aw.qmc.adderror(mssg)
                 elif reply == QMessageBox.Cancel:
-                    self.status.showMessage(QApplication.translate("StatusBar","Cancelled pid change",None,QApplication.UnicodeUTF8),5000)
+                    self.status.showMessage(QApplication.translate("StatusBar","Cancelled pid change",None),5000)
                     #put back radio button
                     if N == 1:
                         self.radiosv1.setChecked(True)
@@ -33234,10 +33642,10 @@ class PXG4pidDlgControl(ArtisanDialog):
                         self.radiosv7.setChecked(True)
                     return
             else:
-                mssg = QApplication.translate("StatusBar","PID was already using pid %1",None,QApplication.UnicodeUTF8).arg(str(N))
+                mssg = QApplication.translate("StatusBar","PID was already using pid %1",None).arg(str(N))
                 self.status.showMessage(mssg,1000)
         else:
-            mssg = QApplication.translate("StatusBar","setNpid(): Unable to set pid %1 ",None,QApplication.UnicodeUTF8).arg(str(N))
+            mssg = QApplication.translate("StatusBar","setNpid(): Unable to set pid %1 ",None).arg(str(N))
             self.status.showMessage(mssg,1000)
             aw.qmc.adderror(mssg)
 
@@ -33278,43 +33686,43 @@ class PXG4pidDlgControl(ArtisanDialog):
         if len(r) == 8:
             if i == 1:
                 aw.fujipid.PXG4[svkey][0] = float(str(self.sv1edit.text()))
-                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(str(i)).arg(str(self.sv1edit.text()))
+                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None).arg(str(i)).arg(str(self.sv1edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(1)
                 aw.lcd6.display(str(self.sv1edit.text()))
             elif i == 2:
                 aw.fujipid.PXG4[svkey][0] = float(str(self.sv2edit.text()))
-                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(str(i)).arg(str(self.sv2edit.text()))
+                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None).arg(str(i)).arg(str(self.sv2edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(2)
                 aw.lcd6.display(str(self.sv2edit.text()))
             elif i == 3:
                 aw.fujipid.PXG4[svkey][0] = float(str(self.sv3edit.text()))
-                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(str(i)).arg(str(self.sv3edit.text()))
+                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None).arg(str(i)).arg(str(self.sv3edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(3)
                 aw.lcd6.display(str(self.sv3edit.text()))
             elif i == 4:
                 aw.fujipid.PXG4[svkey][0] = float(str(self.sv4edit.text()))
-                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(str(i)).arg(str(self.sv4edit.text()))
+                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None).arg(str(i)).arg(str(self.sv4edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(4)
                 aw.lcd6.display(str(self.sv4edit.text()))
             elif i == 5:
                 aw.fujipid.PXG4[svkey][0] = float(str(self.sv5edit.text()))
-                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(str(i)).arg(str(self.sv5edit.text()))
+                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None).arg(str(i)).arg(str(self.sv5edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(5)
                 aw.lcd6.display(str(self.sv5edit.text()))
             elif i == 6:
                 aw.fujipid.PXG4[svkey][0] = float(str(self.sv6edit.text()))
-                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(str(i)).arg(str(self.sv6edit.text()))
+                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None).arg(str(i)).arg(str(self.sv6edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(6)
                 aw.lcd6.display(str(self.sv6edit.text()))
             elif i == 7:
                 aw.fujipid.PXG4[svkey][0] = float(str(self.sv7edit.text()))
-                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(str(i)).arg(str(self.sv7edit.text()))
+                message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None).arg(str(i)).arg(str(self.sv7edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(7)
                 aw.lcd6.display(str(self.sv7edit.text()))
@@ -33322,7 +33730,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             strcommand = "SETSV::" + str("%.1f"%(newSVvalue/10.))
             aw.qmc.DeviceEventRecord(strcommand)
         else:
-            mssg = QApplication.translate("StatusBar","setsv(): Unable to set SV",None,QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("StatusBar","setsv(): Unable to set SV",None)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
@@ -33392,64 +33800,64 @@ class PXG4pidDlgControl(ArtisanDialog):
                 aw.fujipid.PXG4[pkey][0] = float(str(self.p1edit.text()))
                 aw.fujipid.PXG4[ikey][0] = float(str(self.i1edit.text()))
                 aw.fujipid.PXG4[dkey][0] = float(str(self.d1edit.text()))
-                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
-                                                   QApplication.UnicodeUTF8)).arg(str(k)).arg(str(self.p1edit.text())).arg(str(self.i1edit.text())).arg(str(self.d1edit.text()))
+                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None
+                                                   )).arg(str(k)).arg(str(self.p1edit.text())).arg(str(self.i1edit.text())).arg(str(self.d1edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(1)
             elif k == 2:
                 aw.fujipid.PXG4[pkey][0] = float(str(self.p2edit.text()))
                 aw.fujipid.PXG4[ikey][0] = float(str(self.i2edit.text()))
                 aw.fujipid.PXG4[dkey][0] = float(str(self.d2edit.text()))
-                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
-                                                   QApplication.UnicodeUTF8)).arg(str(k)).arg(str(self.p2edit.text())).arg(str(self.i2edit.text())).arg(str(self.d2edit.text()))
+                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None
+                                                   )).arg(str(k)).arg(str(self.p2edit.text())).arg(str(self.i2edit.text())).arg(str(self.d2edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(2)
             elif k == 3:
                 aw.fujipid.PXG4[pkey][0] = float(str(self.p3edit.text()))
                 aw.fujipid.PXG4[ikey][0] = float(str(self.i3edit.text()))
                 aw.fujipid.PXG4[dkey][0] = float(str(self.d3edit.text()))
-                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
-                                                   QApplication.UnicodeUTF8)).arg(str(k)).arg(str(self.p3edit.text())).arg(str(self.i3edit.text())).arg(str(self.d3edit.text()))
+                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None
+                                                   )).arg(str(k)).arg(str(self.p3edit.text())).arg(str(self.i3edit.text())).arg(str(self.d3edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(3)
             elif k == 4:
                 aw.fujipid.PXG4[pkey][0] = float(str(self.p4edit.text()))
                 aw.fujipid.PXG4[ikey][0] = float(str(self.i4edit.text()))
                 aw.fujipid.PXG4[dkey][0] = float(str(self.d4edit.text()))
-                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
-                                                   QApplication.UnicodeUTF8)).arg(str(k)).arg(str(self.p4edit.text())).arg(str(self.i4edit.text())).arg(str(self.d4edit.text()))
+                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None
+                                                   )).arg(str(k)).arg(str(self.p4edit.text())).arg(str(self.i4edit.text())).arg(str(self.d4edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(4)
             elif k == 5:
                 aw.fujipid.PXG4[pkey][0] = float(str(self.p5edit.text()))
                 aw.fujipid.PXG4[ikey][0] = float(str(self.i5edit.text()))
                 aw.fujipid.PXG4[dkey][0] = float(str(self.d5edit.text()))
-                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
-                                                   QApplication.UnicodeUTF8)).arg(str(k)).arg(str(self.p5edit.text())).arg(str(self.i5edit.text())).arg(str(self.d5edit.text()))
+                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None
+                                                   )).arg(str(k)).arg(str(self.p5edit.text())).arg(str(self.i5edit.text())).arg(str(self.d5edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(5)
             elif k == 6:
                 aw.fujipid.PXG4[pkey][0] = float(str(self.p6edit.text()))
                 aw.fujipid.PXG4[ikey][0] = float(str(self.i6edit.text()))
                 aw.fujipid.PXG4[dkey][0] = float(str(self.d6edit.text()))
-                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
-                                                   QApplication.UnicodeUTF8)).arg(str(k)).arg(str(self.p6edit.text())).arg(str(self.i6edit.text())).arg(str(self.d6edit.text()))
+                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None
+                                                   )).arg(str(k)).arg(str(self.p6edit.text())).arg(str(self.i6edit.text())).arg(str(self.d6edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(6)
             elif k == 7:
                 aw.fujipid.PXG4[pkey][0] = float(str(self.p7edit.text()))
                 aw.fujipid.PXG4[ikey][0] = float(str(self.i7edit.text()))
                 aw.fujipid.PXG4[dkey][0] = float(str(self.d7edit.text()))
-                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
-                                                   QApplication.UnicodeUTF8)).arg(str(k)).arg(str(self.p7edit.text())).arg(str(self.i7edit.text())).arg(str(self.d7edit.text()))
+                message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None
+                                                   )).arg(str(k)).arg(str(self.p7edit.text())).arg(str(self.i7edit.text())).arg(str(self.d7edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(7) 
         else:
             lp = len(p)
             li = len(i)
             ld = len(d)
-            mssg = QApplication.translate("StatusBar","pid command failed. Bad data at pid%1 (8,8,8): (%2,%3,%4) ",None,
-                                                   QApplication.UnicodeUTF8).arg(str(k)).arg(str(lp)).arg(str(li)).arg(str(ld))
+            mssg = QApplication.translate("StatusBar","pid command failed. Bad data at pid%1 (8,8,8): (%2,%3,%4) ",None
+                                                   ).arg(str(k)).arg(str(lp)).arg(str(li)).arg(str(ld))
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             
@@ -33458,8 +33866,8 @@ class PXG4pidDlgControl(ArtisanDialog):
             pkey = "p" + str(k)
             ikey = "i" + str(k)
             dkey = "d" + str(k)
-            msg = QApplication.translate("StatusBar","sending commands for p%1 i%2 d%3",None,
-                                                   QApplication.UnicodeUTF8).arg(str(k)).arg(str(k)).arg(str(k))
+            msg = QApplication.translate("StatusBar","sending commands for p%1 i%2 d%3",None
+                                                   ).arg(str(k)).arg(str(k)).arg(str(k))
             self.status.showMessage(msg,1000)
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4[pkey][1],3)
@@ -33526,7 +33934,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                     mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(dd)
                     self.status.showMessage(mssg,1000)
             else:
-                mssg = QApplication.translate("StatusBar","getallpid(): Unable to read pid values",None,QApplication.UnicodeUTF8)
+                mssg = QApplication.translate("StatusBar","getallpid(): Unable to read pid values",None)
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)
                 return
@@ -33554,10 +33962,10 @@ class PXG4pidDlgControl(ArtisanDialog):
                 self.radiopid6.setChecked(True)
             elif N == 7:
                 self.radiopid7.setChecked(True)
-            mssg = QApplication.translate("StatusBar","PID is using pid = %1",None,QApplication.UnicodeUTF8).arg(str(N))
+            mssg = QApplication.translate("StatusBar","PID is using pid = %1",None).arg(str(N))
             self.status.showMessage(mssg,5000)
         else:
-            mssg = QApplication.translate("StatusBar","getallpid(): Unable to read current sv",None,QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("StatusBar","getallpid(): Unable to read current sv",None)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
@@ -33621,7 +34029,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             self.radiosv6.setChecked(True)
         elif N == 7:
             self.radiosv7.setChecked(True)
-        mssg = QApplication.translate("StatusBar","PID is using SV = %1",None,QApplication.UnicodeUTF8).arg(str(N))
+        mssg = QApplication.translate("StatusBar","PID is using SV = %1",None).arg(str(N))
         self.status.showMessage(mssg,5000)
 
     def checkrampsoakmode(self):
@@ -33634,100 +34042,100 @@ class PXG4pidDlgControl(ArtisanDialog):
         aw.fujipid.PXG4["rampsoakmode"][0] = currentmode
         if currentmode == 0:
             mode = ["0",
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 1:
             mode = ["1",
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 2:
             mode = ["2",
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 3:
             mode = ["3",
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 4:
             mode = ["4",
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 5:
             mode = ["5",
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 6:
             mode = ["6",
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 7:
             mode = ["7",
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","OFF",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 8:
             mode = ["8",
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 9:
             mode = ["9",
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 10:
             mode = ["10",
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 11:
             mode = ["11",
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 12:
             mode = ["12",
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 13:
             mode = ["13",
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","CONTINUOUS CONTROL",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","CONTINUOUS CONTROL",None),
+                    QApplication.translate("Message","ON",None)]
         elif currentmode == 14:
             mode = ["14",
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","OFF",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","OFF",None)]
         elif currentmode == 15:
             mode = ["15",
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","STANDBY MODE",None,QApplication.UnicodeUTF8),
-                    QApplication.translate("Message","ON",None,QApplication.UnicodeUTF8)]
+                    QApplication.translate("Message","ON",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","STANDBY MODE",None),
+                    QApplication.translate("Message","ON",None)]
         else:
             return -1
         string = "The rampsoak-mode tells how to start and end the ramp/soak\n\n"
@@ -33743,7 +34151,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         string += "\nIf you need to change it, change it now and come back later"
         string += "\nUse the Parameter Loader Software by Fuji if you need to\n\n"
         string += "\n\n\nContinue?" 
-        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None,QApplication.UnicodeUTF8),string,
+        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             return 0
@@ -33760,11 +34168,11 @@ class PXG4pidDlgControl(ArtisanDialog):
         if flag == 1:
             check = self.checkrampsoakmode()
             if check == 0:
-                self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak operation cancelled",None,QApplication.UnicodeUTF8), 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak operation cancelled",None), 5000)
                 return
             elif check == -1:
-                self.status.showMessage(QApplication.translate("StatusBar","No RX data",None,QApplication.UnicodeUTF8), 5000)
-            self.status.showMessage(QApplication.translate("StatusBar","RS ON",None,QApplication.UnicodeUTF8),500)
+                self.status.showMessage(QApplication.translate("StatusBar","No RX data",None), 5000)
+            self.status.showMessage(QApplication.translate("StatusBar","RS ON",None),500)
             selectedmode = self.patternComboBox.currentIndex()
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4["rampsoakpattern"][1],3)
@@ -33775,7 +34183,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             aw.fujipid.PXG4["rampsoakpattern"][0] = currentmode
             if currentmode != selectedmode:
                 #set mode in pid to match the mode selected in the combobox
-                self.status.showMessage(QApplication.translate("StatusBar","Need to change pattern mode...",None,QApplication.UnicodeUTF8),1000)
+                self.status.showMessage(QApplication.translate("StatusBar","Need to change pattern mode...",None),1000)
                 if aw.ser.useModbusPort:
                     reg = aw.modbus.address2register(aw.fujipid.PXG4["rampsoakpattern"][1],6)
                     aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,selectedmode)
@@ -33784,10 +34192,10 @@ class PXG4pidDlgControl(ArtisanDialog):
                     command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoakpattern"][1],selectedmode)
                     r = aw.ser.sendFUJIcommand(command,8)
                 if len(r) == 8:
-                    self.status.showMessage(QApplication.translate("StatusBar","Pattern has been changed. Wait 5 secs.",None,QApplication.UnicodeUTF8), 500)
+                    self.status.showMessage(QApplication.translate("StatusBar","Pattern has been changed. Wait 5 secs.",None), 500)
                     aw.fujipid.PXG4["rampsoakpattern"][0] = selectedmode
                 else:
-                    self.status.showMessage(QApplication.translate("StatusBar","Pattern could not be changed",None,QApplication.UnicodeUTF8), 5000)
+                    self.status.showMessage(QApplication.translate("StatusBar","Pattern could not be changed",None), 5000)
                     return
             #combobox mode matches pid mode
             #set ramp soak mode ON/OFF
@@ -33800,7 +34208,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                 r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
                 #record command as an Event if flag = 1
-                self.status.showMessage(QApplication.translate("StatusBar","RS ON",None,QApplication.UnicodeUTF8), 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","RS ON",None), 5000)
                 pattern =[[1,4],[5,8],[1,8],[9,12],[13,16],[9,16],[1,16]]
                 start = pattern[aw.fujipid.PXG4["rampsoakpattern"][0]][0]
                 end = pattern[aw.fujipid.PXG4["rampsoakpattern"][0]][1]+1
@@ -33816,10 +34224,10 @@ class PXG4pidDlgControl(ArtisanDialog):
                 result = result.strip("::")
                 aw.qmc.DeviceEventRecord(result)
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None,QApplication.UnicodeUTF8), 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None), 5000)
         #set ramp soak OFF
         elif flag == 0:
-            self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None,QApplication.UnicodeUTF8),500)
+            self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None),500)
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4["rampsoak"][1],6)
                 aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
@@ -33828,10 +34236,10 @@ class PXG4pidDlgControl(ArtisanDialog):
                 command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoak"][1],flag)
                 r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                self.status.showMessage(QApplication.translate("StatusBar","RS successfully turned OFF",None,QApplication.UnicodeUTF8), 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","RS successfully turned OFF",None), 5000)
                 aw.fujipid.PXG4["rampsoak"][0] = flag
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","Ramp Soak could not be set OFF",None,QApplication.UnicodeUTF8), 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Ramp Soak could not be set OFF",None), 5000)
 
     def setpattern(self):
         #Need to make sure that RampSoak is not ON in order to change pattern:
@@ -33849,19 +34257,19 @@ class PXG4pidDlgControl(ArtisanDialog):
             #check response from pid and update message on main window
             if r == command:
                 patterns = ["1-4","5-8","1-8","9-12","13-16","9-16","1-16"]
-                message = QApplication.translate("Message","Pattern changed to %1", None, QApplication.UnicodeUTF8).arg(patterns[aw.fujipid.PXG4["rampsoakpattern"][0]])
+                message = QApplication.translate("Message","Pattern changed to %1", None).arg(patterns[aw.fujipid.PXG4["rampsoakpattern"][0]])
             else:
-                message = QApplication.translate("Message","Pattern did not changed",None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Pattern did not changed",None)
             aw.sendmessage(message)
         elif onoff == 1:
-            aw.sendmessage(QApplication.translate("Message","Ramp/Soak was found ON! Turn it off before changing the pattern", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Ramp/Soak was found ON! Turn it off before changing the pattern", None))
         elif onoff == 2:
-            aw.sendmessage(QApplication.translate("Message","Ramp/Soak was found in Hold! Turn it off before changing the pattern", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Ramp/Soak was found in Hold! Turn it off before changing the pattern", None))
 
     def setONOFFstandby(self,flag):
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-        self.status.showMessage(QApplication.translate("StatusBar","wait...",None, QApplication.UnicodeUTF8),500)
+        self.status.showMessage(QApplication.translate("StatusBar","wait...",None),500)
         if aw.ser.useModbusPort:
             reg = aw.modbus.address2register(aw.fujipid.PXG4["runstandby"][1],6)
             aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
@@ -33871,17 +34279,17 @@ class PXG4pidDlgControl(ArtisanDialog):
             #TX and RX
             r = aw.ser.sendFUJIcommand(command,8)
         if r == command and flag == 1:
-            message = QApplication.translate("StatusBar","PID set to OFF",None, QApplication.UnicodeUTF8)     #put pid in standby 1 (pid on)
+            message = QApplication.translate("StatusBar","PID set to OFF",None)     #put pid in standby 1 (pid on)
             aw.fujipid.PXG4["runstandby"][0] = 1
         elif r == command and flag == 0:
-            message = QApplication.translate("StatusBar","PID set to ON",None, QApplication.UnicodeUTF8)      #put pid in standby 0 (pid off)
+            message = QApplication.translate("StatusBar","PID set to ON",None)      #put pid in standby 0 (pid off)
             aw.fujipid.PXG4["runstandby"][0] = 0
         else:
-            message = QApplication.translate("StatusBar","Unable",None, QApplication.UnicodeUTF8)
+            message = QApplication.translate("StatusBar","Unable",None)
         if r:
             self.status.showMessage(message,5000)
         else:
-            self.status.showMessage(QApplication.translate("StatusBar","No data received",None, QApplication.UnicodeUTF8),5000)
+            self.status.showMessage(QApplication.translate("StatusBar","No data received",None),5000)
 
     def getsegment(self, idn):
         svkey = "segment" + str(idn) + "sv"
@@ -33921,19 +34329,19 @@ class PXG4pidDlgControl(ArtisanDialog):
     #get all Ramp Soak values for all 8 segments
     def getallsegments(self):
         for i in range(1,17):
-            msg = QApplication.translate("StatusBar","Reading Ramp/Soak %1 ...",None, QApplication.UnicodeUTF8).arg(str(i))
+            msg = QApplication.translate("StatusBar","Reading Ramp/Soak %1 ...",None).arg(str(i))
             self.status.showMessage(msg,500)
             k = self.getsegment(i)
             libtime.sleep(0.035)
             if k == -1:
-                self.status.showMessage(QApplication.translate("StatusBar","problem reading Ramp/Soak",None, QApplication.UnicodeUTF8),5000)
+                self.status.showMessage(QApplication.translate("StatusBar","problem reading Ramp/Soak",None),5000)
                 return
             self.paintlabels()
-        self.status.showMessage(QApplication.translate("StatusBar","Finished reading Ramp/Soak val.",None, QApplication.UnicodeUTF8),5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Finished reading Ramp/Soak val.",None),5000)
         self.createsegmenttable()
 
     def setONOFFautotune(self,flag):
-        self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None, QApplication.UnicodeUTF8),500)
+        self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None),500)
         #read current pidN
         if aw.ser.useModbusPort:
             reg = aw.modbus.address2register(aw.fujipid.PXG4["selectedpid"][1],3)
@@ -33942,11 +34350,11 @@ class PXG4pidDlgControl(ArtisanDialog):
             command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
             N = aw.fujipid.readoneword(command)
         aw.fujipid.PXG4["selectedpid"][0] = N
-        string = QApplication.translate("StatusBar","Current pid = %1. Proceed with autotune command?",None, QApplication.UnicodeUTF8).arg(str(N))
-        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None, QApplication.UnicodeUTF8),string,
+        string = QApplication.translate("StatusBar","Current pid = %1. Proceed with autotune command?",None).arg(str(N))
+        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
-            self.status.showMessage(QApplication.translate("StatusBar","Autotune cancelled",None, QApplication.UnicodeUTF8),5000)
+            self.status.showMessage(QApplication.translate("StatusBar","Autotune cancelled",None),5000)
             return 0
         elif reply == QMessageBox.Yes:
             if aw.ser.useModbusPort:
@@ -33960,19 +34368,19 @@ class PXG4pidDlgControl(ArtisanDialog):
             if len(r) == 8:
                 if flag == 0:
                     aw.fujipid.PXG4["autotuning"][0] = 0
-                    self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned OFF",None, QApplication.UnicodeUTF8),5000)
+                    self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned OFF",None),5000)
                 if flag == 1:
                     aw.fujipid.PXG4["autotuning"][0] = 1
-                    self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned ON",None, QApplication.UnicodeUTF8),5000) 
+                    self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned ON",None),5000) 
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","UNABLE to set Autotune",None, QApplication.UnicodeUTF8),5000) 
+                self.status.showMessage(QApplication.translate("StatusBar","UNABLE to set Autotune",None),5000) 
 
     def createsegmenttable(self):
         self.segmenttable.setRowCount(16)
         self.segmenttable.setColumnCount(4)
-        self.segmenttable.setHorizontalHeaderLabels([QApplication.translate("StatusBar","SV",None, QApplication.UnicodeUTF8),
-                                                     QApplication.translate("StatusBar","Ramp (MM:SS)",None, QApplication.UnicodeUTF8),
-                                                     QApplication.translate("StatusBar","Soak (MM:SS)",None, QApplication.UnicodeUTF8),""])
+        self.segmenttable.setHorizontalHeaderLabels([QApplication.translate("StatusBar","SV",None),
+                                                     QApplication.translate("StatusBar","Ramp (MM:SS)",None),
+                                                     QApplication.translate("StatusBar","Soak (MM:SS)",None),""])
         self.segmenttable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
@@ -33991,7 +34399,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             rampedit.setValidator(QRegExpValidator(regextime,self))    
             soakedit  = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4[soakkey][0])))
             soakedit.setValidator(QRegExpValidator(regextime,self))    
-            setButton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+            setButton = QPushButton(QApplication.translate("Button","Set",None))
             setButton.setFocusPolicy(Qt.NoFocus)
             self.connect(setButton,SIGNAL("clicked()"),lambda kk=i: self.setsegment(kk))
             #add widgets to the table
@@ -34037,9 +34445,9 @@ class PXG4pidDlgControl(ArtisanDialog):
             aw.fujipid.PXG4[rampkey][0] = ramp
             aw.fujipid.PXG4[soakkey][0] = soak
             self.paintlabels()
-            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully written",None, QApplication.UnicodeUTF8),5000) 
+            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully written",None),5000) 
         else:
-            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None))
 
 ###################################################################################
 ##########################  FUJI PID CLASS DEFINITION  ############################
@@ -34197,8 +34605,8 @@ class FujiPID(object):
         #turn on
         elif flag == 1:
             A = QLabel()
-            reply = QMessageBox.question(A,QApplication.translate("Message","Activate PID front buttons",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("Message","Remember SV memory has a finite\nlife of ~10,000 writes.\n\nProceed?",None, QApplication.UnicodeUTF8),
+            reply = QMessageBox.question(A,QApplication.translate("Message","Activate PID front buttons",None),
+                                         QApplication.translate("Message","Remember SV memory has a finite\nlife of ~10,000 writes.\n\nProceed?",None),
                                          QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Cancel:
                 return 
@@ -34280,11 +34688,11 @@ class FujiPID(object):
             if reg != None:
                 aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
                 if flag == 1:
-                    aw.sendmessage(QApplication.translate("Message","RS ON", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","RS ON", None))
                 elif flag == 0:
-                    aw.sendmessage(QApplication.translate("Message","RS OFF", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","RS OFF", None))
                 else:
-                    aw.sendmessage(QApplication.translate("Message","RS on HOLD", None, QApplication.UnicodeUTF8))            
+                    aw.sendmessage(QApplication.translate("Message","RS on HOLD", None))            
         else:
             command = ""
             #Fuji PXG 
@@ -34297,13 +34705,13 @@ class FujiPID(object):
             #if OK
             if r == command:
                 if flag == 1:
-                    aw.sendmessage(QApplication.translate("Message","RS ON", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","RS ON", None))
                 elif flag == 0:
-                    aw.sendmessage(QApplication.translate("Message","RS OFF", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","RS OFF", None))
                 else:
-                    aw.sendmessage(QApplication.translate("Message","RS on HOLD", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","RS on HOLD", None))
             else:
-                aw.qmc.adderror(QApplication.translate("Error Message","RampSoak could not be changed",None, QApplication.UnicodeUTF8))
+                aw.qmc.adderror(QApplication.translate("Error Message","RampSoak could not be changed",None))
 
     #sets a new sv value
     def setsv(self,value):
@@ -34321,7 +34729,7 @@ class FujiPID(object):
             #check response
             if r == command or aw.ser.useModbusPort:
                 # [Not sure the following will translate or even format properly... Need testing!]
-                message = QApplication.translate("Message","PXG sv#%1 set to %2",None, QApplication.UnicodeUTF8).arg(self.PXG4["selectsv"][0]).arg("%.1f" % float(value))
+                message = QApplication.translate("Message","PXG sv#%1 set to %2",None).arg(self.PXG4["selectsv"][0]).arg("%.1f" % float(value))
                 aw.sendmessage(message)
                 self.PXG4[svkey][0] = value
                 #record command as an Event 
@@ -34329,7 +34737,7 @@ class FujiPID(object):
                 aw.qmc.DeviceEventRecord(strcommand)
                 aw.lcd6.display("%.1f"%float(value))
             else:
-                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setPXGsv()")
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setPXGsv()")
                 return -1
         #Fuji PXR
         elif aw.ser.controlETpid[0] == 1:  
@@ -34342,7 +34750,7 @@ class FujiPID(object):
             #check response
             if r == command or aw.ser.useModbusPort:
                 # [Not sure the following will translate or even format properly... Need testing!]
-                message = QApplication.translate("Message","PXR sv set to %1",None, QApplication.UnicodeUTF8).arg("%.1f" % float(value))
+                message = QApplication.translate("Message","PXR sv set to %1",None).arg("%.1f" % float(value))
                 aw.fujipid.PXR["sv0"][0] = value
                 aw.sendmessage(message)
                 #record command as an Event 
@@ -34350,7 +34758,7 @@ class FujiPID(object):
                 aw.qmc.DeviceEventRecord(strcommand)
                 aw.lcd6.display("%.1f"%float(value))
             else:
-                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setPXRsv()")
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setPXRsv()")
                 return -1
 
     #used to set up or down SV by diff degrees from current sv setting
@@ -34377,7 +34785,7 @@ class FujiPID(object):
                         command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],newsv)
                         r = aw.ser.sendFUJIcommand(command,8)
                     if len(r) == 8 or aw.ser.useModbusPort:
-                        message = QApplication.translate("Message","SV%1 changed from %2 to %3)",None, QApplication.UnicodeUTF8).arg(str(N)).arg(str(currentsv)).arg(str(newsv/10.))
+                        message = QApplication.translate("Message","SV%1 changed from %2 to %3)",None).arg(str(N)).arg(str(currentsv)).arg(str(newsv/10.))
                         aw.sendmessage(message)
                         self.PXG4[svkey][0] = newsv/10
                         #record command as an Event to replay (not binary as it needs to be stored in a text file)
@@ -34385,7 +34793,7 @@ class FujiPID(object):
                         aw.qmc.DeviceEventRecord(strcommand)
                         aw.lcd6.display("%.1f"%float(newsv/10.))
                     else:
-                        msg = QApplication.translate("Message","Unable to set sv%1",None, QApplication.UnicodeUTF8).arg(str(N))
+                        msg = QApplication.translate("Message","Unable to set sv%1",None).arg(str(N))
                         aw.sendmessage(msg)
             #   or if control pid is fuji PXR
             elif aw.ser.controlETpid[0] == 1:
@@ -34396,7 +34804,7 @@ class FujiPID(object):
                     command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
                     r = aw.ser.sendFUJIcommand(command,8)
                 if len(r) == 8 or aw.ser.useModbusPort:
-                    message = QApplication.translate("Message","SV changed from %1 to %2",None, QApplication.UnicodeUTF8).arg(str(currentsv)).arg(str(newsv/10.))                           
+                    message = QApplication.translate("Message","SV changed from %1 to %2",None).arg(str(currentsv)).arg(str(newsv/10.))                           
                     aw.sendmessage(message)
                     self.PXR["sv0"][0] = newsv/10
                     #record command as an Event to replay (not binary as it needs to be stored in a text file)
@@ -34404,9 +34812,9 @@ class FujiPID(object):
                     aw.qmc.DeviceEventRecord(strcommand)
                     aw.lcd6.display("%.1f"%float(newsv/10.))
                 else:
-                    aw.sendmessage(QApplication.translate("Message","Unable to set sv", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","Unable to set sv", None))
         else:
-            aw.sendmessage(QApplication.translate("Message","Unable to set new sv", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Unable to set new sv", None))
 
     #format of the input string Command: COMMAND::VALUE1::VALUE2::VALUE3::ETC
     def replay(self,CommandString):
@@ -34451,7 +34859,7 @@ class FujiPID(object):
                 soakkey = "segment" + str(i+1) + "soak"
                 if aw.ser.controlETpid[0] == 0:             #PXG4
                     if not n%4 or n > 16:
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PXG4 replaysetrs(): %1").arg(n))
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PXG4 replaysetrs(): %1").arg(n))
                         return
                     if self.PXG4[svkey][0] != float(rs[i][0]):
                         self.PXG4[svkey][0] = float(rs[i][0])
@@ -34467,7 +34875,7 @@ class FujiPID(object):
                         changeflag = 0
                 elif aw.ser.controlETpid[0] == 1:           #PXR
                     if not n%4 or n > 8:
-                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PXR replaysetrs(): %1").arg(n))
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PXR replaysetrs(): %1").arg(n))
                         return
                     if self.PXR[svkey][0] != float(rs[i][0]):
                         self.PXR[svkey][0] = float(rs[i][0])
@@ -34482,7 +34890,7 @@ class FujiPID(object):
                         self.setsegment((i+1), self.PXR[svkey][0], self.PXR[rampkey][0] ,self.PXR[soakkey][0])
                         changeflag = 0
             else:
-                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " replaysetrs()")
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " replaysetrs()")
                 return
         #start ramp soak ON
         self.setrampsoak(1)
@@ -34524,7 +34932,7 @@ class FujiPID(object):
             r3 = aw.ser.sendFUJIcommand(soakcommand,8)
         #check if OK
         if len(r1)!=8 or len(r2)!=8 or len(r3)!=8:
-            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None))
 
     def dec2HexRaw(self,decimal):
         # This method converts a decimal to a raw string appropiate for Fuji serial TX
@@ -34579,7 +34987,7 @@ class FujiPID(object):
             return s1
         else:
             #bad number of RX bytes 
-            errorcode = QApplication.translate("Error Message","pid.readoneword(): %1 RX bytes received (7 needed) for unit ID=%2",None, QApplication.UnicodeUTF8).arg(len(r)).arg(ord(command[0]))
+            errorcode = QApplication.translate("Error Message","pid.readoneword(): %1 RX bytes received (7 needed) for unit ID=%2",None).arg(len(r)).arg(ord(command[0]))
             aw.qmc.adderror(errorcode)
             return -1
 
@@ -34618,10 +35026,10 @@ class ArduinoDlgControl(ArtisanDialog):
         super(ArduinoDlgControl,self).__init__(parent)
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","Arduino Control",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Arduino Control",None))
         # PID tab
         tab1Layout = QVBoxLayout()
-        pidGrp = QGroupBox(QApplication.translate("GroupBox","p-i-d",None, QApplication.UnicodeUTF8))
+        pidGrp = QGroupBox(QApplication.translate("GroupBox","p-i-d",None))
         self.pidKp = QDoubleSpinBox()
         self.pidKp.setAlignment(Qt.AlignRight)
         self.pidKp.setRange(.0,999.)
@@ -34640,7 +35048,7 @@ class ArduinoDlgControl(ArtisanDialog):
         self.pidKd.setSingleStep(.1)
         self.pidKd.setValue(aw.arduino.pidKd)
         pidKdLabel = QLabel("kd")
-        pidSetPID = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+        pidSetPID = QPushButton(QApplication.translate("Button","Set",None))
         self.connect(pidSetPID, SIGNAL("clicked()"),self.pidConf)
         
         pidSourceItems = ["1","2","3","4"]
@@ -34648,7 +35056,7 @@ class ArduinoDlgControl(ArtisanDialog):
         self.pidSource.addItems(pidSourceItems)
         self.pidSource.setCurrentIndex(aw.arduino.pidSource - 1)        
         
-        pidSourceLabel = QLabel(QApplication.translate("Label","Source",None, QApplication.UnicodeUTF8))
+        pidSourceLabel = QLabel(QApplication.translate("Label","Source",None))
         
         pidGrid = QGridLayout()
         pidGrid.addWidget(pidKpLabel,0,0)
@@ -34664,7 +35072,7 @@ class ArduinoDlgControl(ArtisanDialog):
         self.pidCycle.setSingleStep(100)
         self.pidCycle.setValue(aw.arduino.pidCycle)
         self.pidCycle.setSuffix(" ms")
-        pidCycleLabel = QLabel(QApplication.translate("Label","Cycle",None, QApplication.UnicodeUTF8))
+        pidCycleLabel = QLabel(QApplication.translate("Label","Cycle",None))
         pidSourceBox = QHBoxLayout()
         pidSourceBox.addStretch()
         pidSourceBox.addWidget(pidSourceLabel)
@@ -34702,7 +35110,7 @@ class ArduinoDlgControl(ArtisanDialog):
         self.pidSV.setRange(0,999)
         self.pidSV.setSingleStep(10)
         self.pidSV.setValue(aw.arduino.svValue)
-        pidSVLabel = QLabel(QApplication.translate("Label","SV",None, QApplication.UnicodeUTF8))
+        pidSVLabel = QLabel(QApplication.translate("Label","SV",None))
         
         self.pidSVLookahead = QSpinBox()
         self.pidSVLookahead.setAlignment(Qt.AlignRight)
@@ -34710,24 +35118,24 @@ class ArduinoDlgControl(ArtisanDialog):
         self.pidSVLookahead.setSingleStep(1)
         self.pidSVLookahead.setValue(aw.arduino.svLookahead)  
         self.pidSVLookahead.setSuffix(" s")
-        pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None, QApplication.UnicodeUTF8))
+        pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))
         
-        pidSetSV = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+        pidSetSV = QPushButton(QApplication.translate("Button","Set",None))
         self.connect(pidSetSV, SIGNAL("clicked()"),self.setSV)
         
-        pidSVModeLabel = QLabel(QApplication.translate("Label","Mode",None, QApplication.UnicodeUTF8))
+        pidSVModeLabel = QLabel(QApplication.translate("Label","Mode",None))
         pidModeItems = [
-            QApplication.translate("Label", "Manual",None, QApplication.UnicodeUTF8),
-            QApplication.translate("Label", "Ramp/Soak",None, QApplication.UnicodeUTF8),
-            QApplication.translate("Label", "Background",None, QApplication.UnicodeUTF8)]
+            QApplication.translate("Label", "Manual",None),
+            QApplication.translate("Label", "Ramp/Soak",None),
+            QApplication.translate("Label", "Background",None)]
         self.pidMode = QComboBox()
         self.pidMode.addItems(pidModeItems)
         self.pidMode.setCurrentIndex(aw.arduino.svMode)
         
-        self.pidSVbuttonsFlag = QCheckBox(QApplication.translate("Label","SV Buttons",None, QApplication.UnicodeUTF8))
+        self.pidSVbuttonsFlag = QCheckBox(QApplication.translate("Label","SV Buttons",None))
         self.pidSVbuttonsFlag.setChecked(aw.arduino.svButtons)
         self.connect(self.pidSVbuttonsFlag, SIGNAL("stateChanged(int)"), lambda flag=1: aw.arduino.activateONOFFeasySV(flag))
-        self.pidSVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None, QApplication.UnicodeUTF8))
+        self.pidSVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None))
         self.pidSVsliderFlag.setChecked(aw.arduino.svSlider)
         self.connect(self.pidSVsliderFlag, SIGNAL("stateChanged(int)"), lambda flag=1: aw.arduino.activateSVSlider(flag))
         
@@ -34736,7 +35144,7 @@ class ArduinoDlgControl(ArtisanDialog):
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
         self.pidSVSliderMin.setValue(aw.arduino.svSliderMin)
-        pidSVSliderMinLabel = QLabel(QApplication.translate("Label","min",None, QApplication.UnicodeUTF8))
+        pidSVSliderMinLabel = QLabel(QApplication.translate("Label","min",None))
         self.connect(self.pidSVSliderMin, SIGNAL("valueChanged(int)"), aw.arduino.sliderMinValueChanged)
         
         self.pidSVSliderMax = QSpinBox()
@@ -34744,7 +35152,7 @@ class ArduinoDlgControl(ArtisanDialog):
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
         self.pidSVSliderMax.setValue(aw.arduino.svSliderMax)   
-        pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","max",None, QApplication.UnicodeUTF8))
+        pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","max",None))
         self.connect(self.pidSVSliderMax, SIGNAL("valueChanged(int)"), aw.arduino.sliderMaxValueChanged)
         
         if aw.qmc.mode == "F":
@@ -34784,7 +35192,7 @@ class ArduinoDlgControl(ArtisanDialog):
         svGrpBox.addLayout(sliderBox)
         svGrpBox.addLayout(svInputBox)
         svGrpBox.addStretch()
-        svGrp = QGroupBox(QApplication.translate("GroupBox","Set Value",None, QApplication.UnicodeUTF8))
+        svGrp = QGroupBox(QApplication.translate("GroupBox","Set Value",None))
         svGrp.setLayout(svGrpBox)
         
         pidBox = QHBoxLayout()
@@ -34793,7 +35201,7 @@ class ArduinoDlgControl(ArtisanDialog):
         svBox = QHBoxLayout()
         svBox.addWidget(svGrp)
                 
-        self.startPIDonCHARGE = QCheckBox(QApplication.translate("CheckBox", "Start PID on CHARGE",None, QApplication.UnicodeUTF8))
+        self.startPIDonCHARGE = QCheckBox(QApplication.translate("CheckBox", "Start PID on CHARGE",None))
         self.startPIDonCHARGE.setChecked(aw.arduino.pidOnCHARGE)
 
         tab1Layout.addLayout(pidBox)
@@ -34837,10 +35245,10 @@ class ArduinoDlgControl(ArtisanDialog):
             rsGrid.addWidget(self.RampWidgets[i],n,2)
             rsGrid.addWidget(self.SoakWidgets[i],n,3)
         self.setrampsoaks()
-        importButton = QPushButton(QApplication.translate("Button","Load",None, QApplication.UnicodeUTF8))
+        importButton = QPushButton(QApplication.translate("Button","Load",None))
         importButton.setMinimumWidth(80)
         self.connect(importButton, SIGNAL("clicked()"),self.importrampsoaks)
-        exportButton = QPushButton(QApplication.translate("Button","Save",None, QApplication.UnicodeUTF8))
+        exportButton = QPushButton(QApplication.translate("Button","Save",None))
         exportButton.setMinimumWidth(80)
         self.connect(exportButton, SIGNAL("clicked()"),self.exportrampsoaks)
         buttonLayout = QHBoxLayout()
@@ -34848,7 +35256,7 @@ class ArduinoDlgControl(ArtisanDialog):
         buttonLayout.addWidget(importButton)
         buttonLayout.addWidget(exportButton)
         buttonLayout.addStretch()
-        self.loadRampSoakFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load Ramp/Soak table from profile",None, QApplication.UnicodeUTF8))
+        self.loadRampSoakFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load Ramp/Soak table from profile",None))
         self.loadRampSoakFromProfile.setChecked(aw.arduino.loadRampSoakFromProfile)
         
         tab2InnerLayout.addStretch()
@@ -34860,11 +35268,11 @@ class ArduinoDlgControl(ArtisanDialog):
             
             
         ############################
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
         self.connect(okButton, SIGNAL("clicked()"),self.close)
-        onButton = QPushButton(QApplication.translate("Button","On",None, QApplication.UnicodeUTF8))
+        onButton = QPushButton(QApplication.translate("Button","On",None))
         self.connect(onButton, SIGNAL("clicked()"), aw.arduino.pidOn)
-        offButton = QPushButton(QApplication.translate("Button","Off",None, QApplication.UnicodeUTF8))
+        offButton = QPushButton(QApplication.translate("Button","Off",None))
         self.connect(offButton, SIGNAL("clicked()"), aw.arduino.pidOff)
         okButtonLayout = QHBoxLayout()
         okButtonLayout.addWidget(onButton)
@@ -34874,11 +35282,11 @@ class ArduinoDlgControl(ArtisanDialog):
         tabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        tabWidget.addTab(C1Widget,QApplication.translate("Tab","PID",None, QApplication.UnicodeUTF8))
+        tabWidget.addTab(C1Widget,QApplication.translate("Tab","PID",None))
         C1Widget.setTabOrder(self.pidCycle, self.pidSource)
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        tabWidget.addTab(C2Widget,QApplication.translate("Tab","Ramp/Soak",None, QApplication.UnicodeUTF8))
+        tabWidget.addTab(C2Widget,QApplication.translate("Tab","Ramp/Soak",None))
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(tabWidget)
         mainLayout.addLayout(okButtonLayout)
@@ -34886,7 +35294,7 @@ class ArduinoDlgControl(ArtisanDialog):
         okButton.setFocus()
                 
     def importrampsoaks(self):
-        aw.fileImport(QApplication.translate("Message", "Load Ramp/Soak Table",None, QApplication.UnicodeUTF8),self.importrampsoaksJSON)
+        aw.fileImport(QApplication.translate("Message", "Load Ramp/Soak Table",None),self.importrampsoaksJSON)
         
     def importrampsoaksJSON(self,filename):
         try:
@@ -34902,10 +35310,10 @@ class ArduinoDlgControl(ArtisanDialog):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importrampsoaksJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importrampsoaksJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
     
     def exportrampsoaks(self):
-        aw.fileExport(QApplication.translate("Message", "Save Ramp/Soak Table",None, QApplication.UnicodeUTF8),"*.ars",self.exportrampsoaksJSON)
+        aw.fileExport(QApplication.translate("Message", "Save Ramp/Soak Table",None),"*.ars",self.exportrampsoaksJSON)
         
     def exportrampsoaksJSON(self,filename):
         try:
@@ -34922,7 +35330,7 @@ class ArduinoDlgControl(ArtisanDialog):
             return True
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " exportrampsoaksJSON(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " exportrampsoaksJSON(): %1").arg(str(ex)),exc_tb.tb_lineno)
             return False
             
     def saverampsoaks(self):
@@ -34984,15 +35392,15 @@ class DTApidDlgControl(ArtisanDialog):
         super(DTApidDlgControl,self).__init__(parent)
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","Delta DTA PID Control",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Delta DTA PID Control",None))
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Work in Progress",None, QApplication.UnicodeUTF8),5000)
-        svlabel = QLabel(QApplication.translate("Label", "SV", None, QApplication.UnicodeUTF8))
+        self.status.showMessage(QApplication.translate("StatusBar","Work in Progress",None),5000)
+        svlabel = QLabel(QApplication.translate("Label", "SV", None))
         self.svedit = QLineEdit(str(aw.dtapid.dtamem["sv"][0]))
         self.svedit.setValidator(QDoubleValidator(0., 999.,1, self.svedit))
-        readsvbutton = QPushButton(QApplication.translate("Button","Read", None, QApplication.UnicodeUTF8))
-        writesvbutton = QPushButton(QApplication.translate("Button","Write", None, QApplication.UnicodeUTF8))
+        readsvbutton = QPushButton(QApplication.translate("Button","Read", None))
+        writesvbutton = QPushButton(QApplication.translate("Button","Write", None))
         self.connect(readsvbutton,SIGNAL("clicked()"),self.readsv)
         self.connect(writesvbutton,SIGNAL("clicked()"),self.writesv)
         tab1Layout = QGridLayout()
@@ -35004,7 +35412,7 @@ class DTApidDlgControl(ArtisanDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","General",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","General",None))
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.status,0)
         mainlayout.addWidget(TabWidget,1)
@@ -35022,7 +35430,7 @@ class DTApidDlgControl(ArtisanDialog):
         #update sv LCD
         aw.lcd6.display(sv)
         #update status
-        message = QApplication.translate("StatusBar","SV = %s"%(str(sv)),None, QApplication.UnicodeUTF8)
+        message = QApplication.translate("StatusBar","SV = %s"%(str(sv)),None)
         self.status.showMessage(message,5000)
 
     #write uses function = 6
@@ -35111,7 +35519,7 @@ class ArduinoTC4(object):
                     aw.ser.SP.write(str2cmd("PID;ON\n"))
                     self.pidActive = True
                     aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])                    
-                    aw.sendmessage(QApplication.translate("Message","PID turned on", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","PID turned on", None))
             finally:
                 if aw.ser.COMsemaphore.available() < 1:
                     aw.ser.COMsemaphore.release(1)
@@ -35125,7 +35533,7 @@ class ArduinoTC4(object):
                     aw.ser.SP.flushInput()
                     aw.ser.SP.flushOutput()
                     aw.ser.SP.write(str2cmd("PID;OFF\n"))
-                    aw.sendmessage(QApplication.translate("Message","PID turned off", None, QApplication.UnicodeUTF8))
+                    aw.sendmessage(QApplication.translate("Message","PID turned off", None))
             finally:
                 if aw.ser.COMsemaphore.available() < 1:
                     aw.ser.COMsemaphore.release(1)
