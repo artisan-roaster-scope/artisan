@@ -15274,7 +15274,7 @@ $cupping_notes
     def openRecentSetting(self):
         action = self.sender()
         if action:
-            self.loadSettings(file=action.data().toString())
+            self.loadSettings(fn=action.data().toString())
         
     def saveSettings(self):
         path = QDir()
@@ -18103,18 +18103,35 @@ class editGraphDlg(ArtisanDialog):
         dateedit.setStyleSheet("background-color:'lightgrey'")
         #Batch
         batchlabel = QLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
-        batch = u("")
-        if aw.qmc.roastbatchpos != 0:
-            roastpos = u" (" + u(aw.qmc.roastbatchpos) + u")"
+        if aw.superusermode and aw.qmc.batchcounter > -1:
+            self.batchprefixedit = QLineEdit(u(aw.qmc.roastbatchprefix))
+            self.batchcounterSpinBox = QSpinBox()
+            self.batchcounterSpinBox.setRange(0,999999)
+            self.batchcounterSpinBox.setSingleStep(1)
+            self.batchcounterSpinBox.setValue(aw.qmc.roastbatchnr)
+            self.batchcounterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter) 
+            self.batchposSpinBox = QSpinBox()
+            self.batchposSpinBox.setRange(0,99)
+            self.batchposSpinBox.setSingleStep(1)
+            self.batchposSpinBox.setValue(aw.qmc.roastbatchpos)
+            self.batchposSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter) 
+            batchLayout = QHBoxLayout()
+            batchLayout.addWidget(self.batchprefixedit)
+            batchLayout.addWidget(self.batchcounterSpinBox)
+            batchLayout.addWidget(self.batchposSpinBox)
         else:
-            roastpos = u("")
-        if aw.qmc.roastbatchnr == 0:
             batch = u("")
-        else:
-            batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + roastpos + u(" ")
-        batchedit = QLineEdit(batch)
-        batchedit.setReadOnly(True)
-        batchedit.setStyleSheet("background-color:'lightgrey'")
+            if aw.qmc.roastbatchpos != 0:
+                roastpos = u" (" + u(aw.qmc.roastbatchpos) + u")"
+            else:
+                roastpos = u("")
+            if aw.qmc.roastbatchnr == 0:
+                batch = u("")
+            else:
+                batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + roastpos + u(" ")
+            batchedit = QLineEdit(batch)
+            batchedit.setReadOnly(True)
+            batchedit.setStyleSheet("background-color:'lightgrey'")
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
         self.beansedit = QTextEdit()
@@ -18432,7 +18449,10 @@ class editGraphDlg(ArtisanDialog):
         textLayout.addWidget(datelabel1,0,0)
         textLayout.addWidget(dateedit,0,1)
         textLayout.addWidget(batchlabel,1,0)
-        textLayout.addWidget(batchedit,1,1)
+        if aw.superusermode and aw.qmc.batchcounter > -1:
+            textLayout.addLayout(batchLayout,1,1)
+        else:
+            textLayout.addWidget(batchedit,1,1)
         textLayout.addWidget(titlelabel,2,0)
         textLayout.addWidget(self.titleedit,2,1)
         textLayout.addWidget(beanslabel,3,0)
@@ -19409,7 +19429,11 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.roastertype = u(self.roaster.text())
         aw.qmc.operator = u(self.operator.text())
         aw.qmc.roastingnotes = u(self.roastingeditor.toPlainText())
-        aw.qmc.cuppingnotes = u(self.cuppingeditor.toPlainText())
+        aw.qmc.cuppingnotes = u(self.cuppingeditor.toPlainText())        
+        if aw.superusermode and aw.qmc.batchcounter > -1:
+            aw.qmc.roastbatchprefix = u(self.batchprefixedit.text())
+            aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
+            aw.qmc.roastbatchpos = self.batchposSpinBox.value()
         aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None))
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.close()
