@@ -23,6 +23,7 @@ cp -R /usr/local/lib/python2.7/site-packages/matplotlib/mpl-data/ dist
 cp artisan-alog.xml dist
 cp artisan-alrm.xml dist
 cp artisan-apal.xml dist
+cp artisan-aset.xml dist
 cp artisan-wg.xml dist
 cp includes/Humor-Sans.ttf dist
 cp /usr/local/lib/python2.7/site-packages/yoctopuce/cdll/* dist

@@ -49,6 +49,20 @@
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
+				<string>aset</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>artisanSettings.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Artisan Settings</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>PaletteConfigurations</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
 				<string>wg</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>

@@ -73,7 +73,7 @@ RequestExecutionLevel admin
 ; HM NIS Edit Wizard helper defines
 !define py2exeOutputDir 'dist'
 !define PRODUCT_NAME "Artisan"
-!define PRODUCT_VERSION "0.9.4.0"
+!define PRODUCT_VERSION "0.9.5.0"
 !define PRODUCT_PUBLISHER "The Artisan Team"
 !define PRODUCT_WEB_SITE "http://code.google.com/p/artisan/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\artisan.exe"
@@ -220,6 +220,9 @@ Section -Post
   !insertmacro APP_ASSOCIATE "apal" "Artisan.Palettes" "Artisan Palettes" \
      "$INSTDIR\artisanPalettes.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
      
+  !insertmacro APP_ASSOCIATE "aset" "Artisan.Settings" "Artisan Settings" \
+     "$INSTDIR\artisanSettings.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
+     
   !insertmacro APP_ASSOCIATE "wg" "Artisan.Wheel" "Artisan Wheel" \
      "$INSTDIR\artisanWheel.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
      
@@ -285,6 +288,7 @@ Section Uninstall
   !insertmacro APP_UNASSOCIATE "alog" "Artisan.Profile"
   !insertmacro APP_UNASSOCIATE "alrm" "Artisan.Alarms"
   !insertmacro APP_UNASSOCIATE "apal" "Artisan.Palettes"
+  !insertmacro APP_UNASSOCIATE "aset" "Artisan.Settings"
   !insertmacro APP_UNASSOCIATE "wg" "Artisan.Wheel"
   
   SetAutoClose true

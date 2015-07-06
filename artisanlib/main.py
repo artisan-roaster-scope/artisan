@@ -830,7 +830,7 @@ class tgraphcanvas(FigureCanvas):
         self.cuppingnotes = ""
         self.roastdate = QDateTime.currentDateTime()
         # system batch nr system
-        self.roastepoch = QDateTime.currentDateTime().toTime_t() # in seconds
+        self.roastepoch = self.roastdate.toTime_t() # in seconds
         self.lastroastepoch = self.roastepoch # the epoch of the last roast in seconds
         self.batchcounter = -1 # global batch counter; if batchcounter is -1, batchcounter system is inactive
         self.batchsequence = 0 # global counter of position in sequence of batches of one session
@@ -1859,6 +1859,14 @@ class tgraphcanvas(FigureCanvas):
                     #                # chmod +x say.sh
                     #
                     # alternatively use "say $@ &" as command and send text strings along
+                    # Voices:
+                    #  -v Alex (male english)
+                    #  -v Viki (female english)
+                    #  -v Victoria (female english)
+                    #  -v Yannick (male german)
+                    #  -v Anna (female german)
+                    #  -v Paolo (male italian)
+                    #  -v Silvia (female italian)
                     aw.call_prog_with_args(fname)
                     res = True
                 if res:
@@ -10288,9 +10296,9 @@ class ApplicationWindow(QMainWindow):
             else:
                 filename = prefix
             if filename != "":                
-                filename += "_" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
+                filename += "_" + str(aw.qmc.roastdate.toString(QString("yy-MM-dd_hhmm")))
             else:
-                filename += str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
+                filename += str(aw.qmc.roastdate.toString(QString("yy-MM-dd_hhmm")))
             filename += ".alog"
             #clean name
             filename = self.removeDisallowedFilenameChars(u(filename))
@@ -35819,6 +35827,9 @@ def main():
             elif file_suffix == "apal":
                 # load Artisan palettes on double-click on *.apal file
                 aw.loadPalettes(u(argv_file))
+            elif file_suffix == "aset":
+                # load Artisan setings on double-click on *.aset file
+                aw.loadSettings(fn=u(argv_file))
     except Exception:
         pass
         

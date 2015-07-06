@@ -80,6 +80,7 @@ DATA_FILES = [
     ("../Resources", [r"artisanProfile.icns"]),
     ("../Resources", [r"artisanAlarms.icns"]),
     ("../Resources", [r"artisanPalettes.icns"]),
+    ("../Resources", [r"artisanSettings.icns"]),
     ("../Resources", [r"artisanWheel.icns"]),
     ("../Resources", [r"includes/alarmclock.eot"]),
     ("../Resources", [r"includes/alarmclock.svg"]),
