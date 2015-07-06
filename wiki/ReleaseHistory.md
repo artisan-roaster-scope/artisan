@@ -1,6 +1,27 @@
 Detailed Release History
 ========================
 
+
+v0.9.5 (6.6.2015)
+------------------
+
+ * New Features
+   * adds timestamp to profiles
+   * adds batch counter
+   * adds exporting and importing of application settings (experimental!)
+   * restricts Hottop control to "super-user" mode
+   * adds Hottop BT=212C safety eject mechanism
+ * Changes
+   * more stable Hottop communication via parallel processing
+   * "call program" action on Mac OS X and Linux now calls the given script name instead of initiating an "open" action
+   * upgrade to Qt5 on Mac OS X
+   * performance improvements
+ * Bug Fixes
+   * fixed Yocto build issue on Mac OS X
+   * fixed a redraw bug introduced in v0.9.4
+   
+
+----
 v0.9.4 (6.6.2015)
 ------------------
 
@@ -15,7 +36,8 @@ v0.9.4 (6.6.2015)
    * fixed WebLCDs
    * fixes to Fuji PXR "RampSoak ON" mechanism
    
-   
+
+----
 v0.9.3 (15.1.2015)
 ------------------
 

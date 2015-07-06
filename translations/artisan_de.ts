@@ -709,7 +709,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="18483"/>
         <source>calc</source>
-        <translation>kalk</translation>
+        <translation>rechner</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17665"/>

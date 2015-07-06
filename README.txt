@@ -67,6 +67,7 @@ o spike filter and curve smoothing
 o color input from color meters
 o LargeLCDs and WebLCDs
 o volume calculator
+o batch counter
 
 
 INSTALLATION
@@ -154,7 +155,7 @@ Artisan uses the following libraries in unmodified forms:
 
 - Python 2.7.x and 3.4.x released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
-- QT 4.8.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
+- QT 4.8.x / 5.2.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
   http://qt-project.org/products/licensing
 - Numpy 1.9.x and Scipy 0.14.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
@@ -169,13 +170,19 @@ Artisan uses the following libraries in unmodified forms:
   http://www.py2exe.org/
 - bbfreeze, Copyright (c) 2007-2012 brainbot technologies AG. Distributed under the zlib/libpng license.
 - minimalmodbus 0.6 under the Apache License, Version 2.0 by Jonas Berg
-- pymodbus 1.3.x under the BSD License by Galen Collins
+- pymodbus 1.2.x under the BSD License by Galen Collins
 - arabic_reshaper.py under GPL by Abd Allah Diab (Mpcabd)
+
 
 
 VERSION HISTORY
 
-v0.9.3 (6.6.2015)
+v0.9.5 (6.7.2015)
+ - adds batch counter
+ - adds app settings export/import
+ - bug fixes
+
+v0.9.4 (6.6.2015)
 - bug fixes
 
 v0.9.3 (15.5.2015)
