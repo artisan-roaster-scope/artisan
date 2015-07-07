@@ -10705,9 +10705,14 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEStrings = profile["specialeventsStrings"]
                 self.qmc.backgroundFlavors = profile["flavors"]
                 self.qmc.titleB = profile["title"]
-                self.qmc.roastbatchnrB = profile["roastbatchnr"]
-                self.qmc.roastbatchprefixB = profile["roastbatchprefix"]
-                self.qmc.roastbatchposB = profile["roastbatchpos"]
+                if "roastbatchnr" in profile:
+                    self.qmc.roastbatchnrB = profile["roastbatchnr"]
+                    self.qmc.roastbatchprefixB = profile["roastbatchprefix"]
+                    self.qmc.roastbatchposB = profile["roastbatchpos"]
+                else:
+                    self.qmc.roastbatchnrB = 0
+                    self.qmc.roastbatchprefixB = u("")
+                    self.qmc.roastbatchposB = 0
                 
 # we don't load alarms from backgrounds as this would overload the one of the foreground profile that automatically loads this background
 #                # alarms

@@ -1,5 +1,5 @@
 #!/bin/sh
-export MACOSX_DEPLOYMENT_TARGET=10.6
+export MACOSX_DEPLOYMENT_TARGET=10.7
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
 
 # for PyQt4 running on Qt5
@@ -17,5 +17,5 @@ python setup-mac.py py2app
 
 # recreate the translations with PyQt4/Qt4 for the Windows releases that are behind
 
-$PATH = ORGPATH
+export PATH=$ORGPATH
 lrelease -verbose artisan.pro

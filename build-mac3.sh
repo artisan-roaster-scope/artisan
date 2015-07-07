@@ -1,5 +1,5 @@
 #!/bin/sh
-export MACOSX_DEPLOYMENT_TARGET=10.6
+export MACOSX_DEPLOYMENT_TARGET=10.7
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/site-packages"
 
 export PATH=/Library/Frameworks/Python.framework/Versions/3.4/bin/:$PATH
@@ -19,5 +19,5 @@ python3.4 setup-mac3.py py2app
 
 # recreate the translations with PyQt4/Qt4 for the Windows releases that are behind
 
-$PATH = ORGPATH
+export PATH=$ORGPATH
 lrelease -verbose artisan.pro

@@ -4,7 +4,7 @@ o XCode 4.5.2 + command line tools
 o Python 2.7.10 or 3.4.2 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial 2.7
 o QT 4.8.7
-o SIP 4.16.7
+o SIP 4.16.8
 o PyQt 4.11.4
 o numpy 1.9.1RC1
 o scipy 0.14.0
@@ -33,6 +33,7 @@ Upgrade History:
 
 - 2015-06-14
  . QT 5.4.2
+ . SIP 4.16.7 => 4.16.8
  . PyQt 4.11.3 trunk 31.5.2015 => 4.11.4
  . yoctopuce 1.10.20384 => 1.10.20773
 - 2015-05-31

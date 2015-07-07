@@ -32,7 +32,7 @@ Newer OS like Windows 7 come with this file.
 
 Installation Mac OS X
 ---------------------
-(>=10.6.x, 64bit processor only)
+(>=10.7.x, 64bit processor only)
 
 1. Install USB/serial driver
    + for Omega HH806AU and HH506RA meters download and run the [FTDI VCP OS X installer](http://www.ftdichip.com/Drivers/VCP.htm)

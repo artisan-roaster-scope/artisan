@@ -16,8 +16,8 @@ Developers: <https://lists.mokelbu.de/listinfo/artisan-devel>
 
 FEATURES
 
-o runs on Windows, Mac OS X 10.6/10.7/10.8 on Intel 64bit processor, and Linux
-(on OS X 10.8 Mountain Lion you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
+o runs on Windows, Mac OS X 10.7 on Intel 64bit processor, and Linux
+(on OS X 10.8 Mountain Lion and later you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
  - Delta DTA PID
@@ -85,7 +85,7 @@ http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A
 If artisan starts when clicking on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything. Newer OS like Windows 7 come with this file.
 
 
-o Mac OS X (>=10.6.x)
+o Mac OS X (>=10.7.x)
 
 - Install USB/serial driver for your meter
  . for Omega meters download and run the FTDI VCP OS X installer

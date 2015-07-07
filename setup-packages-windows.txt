@@ -16,7 +16,7 @@ o Phidgets Python 2.1.8
 o py2exe 0.6.9
 o NSIS 2.46
 o pymodbus 1.3.0
-o yoctopuce 1.10.16490
+o yoctopuce 1.10.20773
 o requests 2.3.0
 o bottle 0.13 trunk
 o gevent 1.0.1
@@ -34,6 +34,7 @@ Upgrade History:
  . numpy 1.9.1RC1 => 1.9.2
  . scipy 0.14.0 => 0.15.1
  . matplotlib 1.4.2 => 1.4.3
+ . yoctopuce 1.10.16490 => 1.10.20773
 - 2014-12-31
  . python-qrcode 5.1
  . Python 2.7.8 => 2.7.9

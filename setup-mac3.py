@@ -12,7 +12,7 @@ from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
 def my_parse_makefile(filename, g):
     their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.6'
+    g['MACOSX_DEPLOYMENT_TARGET'] = '10.7'
 sysconfig.parse_makefile = my_parse_makefile
 
 import sys, os
@@ -99,7 +99,7 @@ plist.update({ 'CFBundleDisplayName': 'Artisan',
                     'CFBundleIdentifier': 'com.google.code.p.Artisan',
                     'CFBundleShortVersionString': VERSION,
                     'CFBundleVersion': 'Artisan ' + VERSION,
-                    'LSMinimumSystemVersion': '10.6',
+                    'LSMinimumSystemVersion': '10.7',
                     'LSMultipleInstancesProhibited': 'false',
                     'LSPrefersPPC': False,
                     'LSArchitecturePriority': 'x86_64',
