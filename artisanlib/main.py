@@ -10683,8 +10683,8 @@ class ApplicationWindow(QMainWindow):
                 t2 = profile["temp2"]
                 t1x = profile["extratemp1"]
                 t2x = profile["extratemp2"]
-                names1x = profile["extraname1"]
-                names2x = profile["extraname2"]
+                names1x = [d(x) for x in profile["extraname1"]]
+                names2x = [d(x) for x in profile["extraname2"]]
                 timex = profile["extratimex"]
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.extratimexB = timex
