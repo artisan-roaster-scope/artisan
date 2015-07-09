@@ -31,6 +31,7 @@ v0.9.4 (6.6.2015)
    * improved custom event annotation rendering
    * roast report now lists additionally the ET temperature of events
    * updated underlying libs like Python/Qt/PyQt/Matplotlib/.. (Mac OS only)
+   * Hottop control mode is active only in super-user mode (right-click on the Timer LCDs)
  * Bug Fixes
    * fixed element order in legend
    * fixed WebLCDs
