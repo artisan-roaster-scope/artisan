@@ -9627,7 +9627,7 @@ class ApplicationWindow(QMainWindow):
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         followupCmd = 0 # contains the required sleep time
                         for c in cmds:
-                            cs = c.replace("_",str(aw.modbus.lastReadResult)) # the last read value can be accessed via the "_" symbol
+                            cs = c.strip().replace("_",str(aw.modbus.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             if followupCmd:
                                 libtime.sleep(followupCmd) #this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec)
                             if cs.startswith('write'):
@@ -9711,7 +9711,8 @@ class ApplicationWindow(QMainWindow):
                 elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer")
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
-                        for cs in cmds:
+                        for c in cmds:
+                            cs = c.strip()
                             if cs.startswith("heater"):
                                 try:
                                     cmds = eval(cs[len('heater'):])
