@@ -21,6 +21,9 @@ INCLUDES = [
             "sip",
             "serial",
             "scipy.special._ufuncs_cxx",
+            "scipy.sparse.csgraph._validation",
+            "scipy.integrate",
+            "scipy.interpolate",
             ]
 
 EXCLUDES = ['_tkagg',
@@ -102,20 +105,21 @@ os.system(r'copy Wheels\\Other\\* dist\\Wheels\\Other')
 os.system(r'copy Wheels\\Roasting\\* dist\\Wheels\\Roasting')
 os.system(r'mkdir dist\\translations')
 os.system(r'copy translations\\*.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_ar.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_de.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_es.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_fr.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_he.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_hu.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_ja.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_ko.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_ru.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_pl.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_pt.qm dist\\translations')
+os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_ru.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_sv.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_zh_CN.qm dist\\translations')
 os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_zh_TW.qm dist\\translations')
-os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_ko.qm dist\\translations')
-os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_pt.qm dist\\translations')
-os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_ru.qm dist\\translations')
-os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_ar.qm dist\\translations')
-os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_ja.qm dist\\translations')
-os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_hu.qm dist\\translations')
-os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_he.qm dist\\translations')
-os.system(r'copy c:\\Qt\\4.8.7\\translations\\qt_pl.qm dist\\translations')
 os.system(r'rmdir /q /s dist\\mpl-data\\sample_data')
 # YOCTO HACK BEGIN: manually copy over the dlls
 os.system(r'mkdir dist\\lib')

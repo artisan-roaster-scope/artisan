@@ -1,29 +1,44 @@
 Current Versions:
 
-o Python 2.7.9
+o Python 2.7.10
 o pyserial 2.7
-o QT 4.8.6
-o SIP 4.16.4
-o PyQt 4.11.3
-o numpy 1.9.1
-o scipy 0.14.1
-o matplotlib 1.4.2
-o MinimalModbus 0.5
+o QT 5.4.2
+o SIP 4.16.8
+o PyQt 4.11.4
+o numpy 1.9.2
+o scipy 0.15.1
+o matplotlib 1.4.3
+(o MinimalModbus 0.5)
 o pyemf 2.0.0
-o cx_freeze (tip from 2013-03-26)
+( o cx_freeze (tip from 2013-03-26) )
 o patchelf
-o bbfreeze 1.2.0
+o bbfreeze 1.1.3
 o pymodbus 1.3.0
-o yoctopuce 1.10.17849
-o requests 2.3.0
-o gevent-1.0.1
+o yoctopuce 1.10.20384
+o requests 2.7.0
+o gevent-1.0.2
 o bottle 0.12.7
-o gevent-websocket-0.9.3
+o gevent-websocket-0.9.5
 o python-qrcode 5.1
+o pip 7.1.0
 
 
 Upgrade History:
 
+- 2015-07-18
+ . Python 2.7.9 => 2.7.10
+ . QT 4.8.6 => 5.4.2
+ . SIP 4.16.4 => 4.16.8
+ . PyQt 4.11.3 => 4.11.4
+ . numpy 1.9.1 => 1.9.2
+ . scipy 0.14.1 => 0.15.1
+ . matplotlib 1.4.2 => 1.4.3
+ . yoctopuce 1.10.17849 => 1.10.20384
+ . requests 2.3.0 => 2.7.0
+ . gevent 1.0.1 => 1.0.2
+ . bbfreeze 1.1.2 => 1.1.3
+ . gevent-websocket 0.9.3 => 0.9.5
+ . pip 7.1.0
 - 2014-12-31
  . python-qrcode 5.1
  . Python 2.7.8 => 2.7.9
@@ -56,7 +71,7 @@ Upgrade History:
  . numpy 1.7.1 => 1.8.0
  . scipy 0.12.0 => 0.13.1
  . matplotlib 1.2.1 => 1.3.1
- . bbfreeze 1.1.0 => 1.2.0
+ . bbfreeze 1.1.1 => 1.1.2
 - 2013-05-14: Added pyemf 2.0.0
 - 2013-05-02: Started
 
@@ -125,6 +140,13 @@ Download and install distribute for Python 2.7
 # sudo python2.7 setup.py install
 
 
+NOTE: on Python update, bbfreeze needs to be reinstalled/updated. On this also all the subfolders related to bbfreeze need to be removed from /usr/local/lib/python2.7/site-packages before reinstalling bbfreeze
+
+
+Update Python Packages
+# pip list --outdated
+# pip install -U <package-to-be-upgraded>
+
 --
 
 
@@ -175,7 +197,7 @@ src/gui/styles/qgtkstyle_p.cpp Line 510-513
 
 Add path to your environment (eg. .bashrc)
 
-PATH=/usr/local/Trolltech/Qt-4.8.6/bin:usr/local/Trolltech/Qt-4.8.6/lib:$PATH
+PATH=/usr/local/Trolltech/Qt-4.8.6/bin:/usr/local/Trolltech/Qt-4.8.6/lib:$PATH
 export PATH
 
 test correct path
@@ -271,6 +293,16 @@ wget http://pypi.python.org/packages/source/b/bbfreeze-loader/bbfreeze-loader-1.
 
 on error copy the failing gcc line and add "-ldl -lutil" at the very end of the failing compile command (after the last object file)
 
+v1.1.3 of bbfreeze fails with
+ImportError: No module named matplotlib.numerix
+
+To fix this, one has to patch bbfreeze/recipes.py by putting the call to mf.import_hook("matplotlib.numerix.random_array", m)
+into a 
+try:
+  mf.import_hook("matplotlib.numerix.random_array", m)
+except:
+  pass
+
 
 13) alien
 
@@ -329,6 +361,17 @@ https://pypi.python.org/pypi/gevent-websocket/
 
 # python setup.py build
 # sudo python setup.py install
+
+20) python-qrcode
+
+https://github.com/lincolnloop/python-qrcode
+
+# python setup.py build
+# sudo python setup.py install
+
+21) pip
+
+# sudo yum install python-pip
 
 ====
 

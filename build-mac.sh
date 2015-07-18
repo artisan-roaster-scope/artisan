@@ -17,5 +17,5 @@ python setup-mac.py py2app
 
 # recreate the translations with PyQt4/Qt4 for the Windows releases that are behind
 
-export PATH=$ORGPATH
-lrelease -verbose artisan.pro
+#export PATH=$ORGPATH
+#lrelease -verbose artisan.pro

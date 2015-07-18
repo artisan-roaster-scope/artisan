@@ -185,6 +185,7 @@ def __dependencies_for_freezing():
     from scipy.interpolate import UnivariateSpline
     import PyQt4.QtSvg
     import PyQt4.QtXml
+    import PyQt4.QtDBus # needed for QT5 builds
     # for gevent bundling
     from gevent import core, resolver_thread, resolver_ares, socket,\
         threadpool, thread, threading, select, subprocess,\
@@ -8182,28 +8183,28 @@ class ApplicationWindow(QMainWindow):
         self.button_3.setFocusPolicy(Qt.NoFocus)
         self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
         self.button_3.setMinimumHeight(50)
-        self.button_3.setToolTip(QApplication.translate("Tooltip", "Marks the begining of First Crack (FCs)", None))
+        self.button_3.setToolTip(QApplication.translate("Tooltip", "First Crack Start", None))
         self.connect(self.button_3, SIGNAL("clicked()"), self.qmc.mark1Cstart)
 
         self.button_4 = QPushButton(QApplication.translate("Button", "FC\nEND", None))
         self.button_4.setFocusPolicy(Qt.NoFocus)
         self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
         self.button_4.setMinimumHeight(50)
-        self.button_4.setToolTip(QApplication.translate("Tooltip", "Marks the end of First Crack (FCs)", None))
+        self.button_4.setToolTip(QApplication.translate("Tooltip", "First Crack End", None))
         self.connect(self.button_4, SIGNAL("clicked()"), self.qmc.mark1Cend)
 
         self.button_5 = QPushButton(QApplication.translate("Button", "SC\nSTART", None))
         self.button_5.setFocusPolicy(Qt.NoFocus)
         self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
         self.button_5.setMinimumHeight(50)
-        self.button_5.setToolTip(QApplication.translate("Tooltip", "Marks the begining of Second Crack (SCs)", None))
+        self.button_5.setToolTip(QApplication.translate("Tooltip", "Second Crack Start", None))
         self.connect(self.button_5, SIGNAL("clicked()"), self.qmc.mark2Cstart)
 
         self.button_6 = QPushButton(QApplication.translate("Button", "SC\nEND", None))
         self.button_6.setFocusPolicy(Qt.NoFocus)
         self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
         self.button_6.setMinimumHeight(50)
-        self.button_6.setToolTip(QApplication.translate("Tooltip", "Marks the end of Second Crack (SCe)", None))
+        self.button_6.setToolTip(QApplication.translate("Tooltip", "Second Crack End", None))
         self.connect(self.button_6, SIGNAL("clicked()"), self.qmc.mark2Cend)
 
         #create RESET button
@@ -8224,7 +8225,7 @@ class ApplicationWindow(QMainWindow):
         self.button_8.setFocusPolicy(Qt.NoFocus)
         self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
         self.button_8.setMinimumHeight(50)
-        self.button_8.setToolTip(QApplication.translate("Tooltip", "Marks the begining of the roast (beans in)", None))
+        self.button_8.setToolTip(QApplication.translate("Tooltip", "Charge", None))
         self.connect(self.button_8, SIGNAL("clicked()"), self.qmc.markCharge)
 
         #create DROP button
@@ -8232,7 +8233,7 @@ class ApplicationWindow(QMainWindow):
         self.button_9.setFocusPolicy(Qt.NoFocus)
         self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
         self.button_9.setMinimumHeight(50)
-        self.button_9.setToolTip(QApplication.translate("Tooltip", "Marks the end of the roast (drop beans)", None))
+        self.button_9.setToolTip(QApplication.translate("Tooltip", "Drop", None))
         self.connect(self.button_9, SIGNAL("clicked()"), self.qmc.markDrop)
 
         #create PID control button
@@ -8247,7 +8248,7 @@ class ApplicationWindow(QMainWindow):
         self.button_11.setFocusPolicy(Qt.NoFocus)
         self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
         self.button_11.setMinimumHeight(50)
-        self.button_11.setToolTip(QApplication.translate("Tooltip", "Marks an Event", None))
+        self.button_11.setToolTip(QApplication.translate("Tooltip", "Event", None))
         self.connect(self.button_11, SIGNAL("clicked()"), self.qmc.EventRecord)
 
         #create PID+5 button
@@ -8319,7 +8320,7 @@ class ApplicationWindow(QMainWindow):
         self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
         #self.button_19.setMaximumSize(90, 50)
         self.button_19.setMinimumHeight(50)
-        self.button_19.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Drying phase (DRYEND)", None))
+        self.button_19.setToolTip(QApplication.translate("Tooltip", "Dry End", None))
         self.connect(self.button_19, SIGNAL("clicked()"), self.qmc.markDryEnd)
 
         #create COOLe button
@@ -8327,7 +8328,7 @@ class ApplicationWindow(QMainWindow):
         self.button_20.setFocusPolicy(Qt.NoFocus)
         self.button_20.setStyleSheet(self.pushbuttonstyles["COOL END"])
         self.button_20.setMinimumHeight(50)
-        self.button_20.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Cooling phase (COOLEND)", None))
+        self.button_20.setToolTip(QApplication.translate("Tooltip", "Cool End", None))
         self.connect(self.button_20, SIGNAL("clicked()"), self.qmc.markCoolEnd)
 
         #connect PID sv easy buttons
@@ -12219,7 +12220,7 @@ class ApplicationWindow(QMainWindow):
             # write roast time
             try:
                 profile["roasttime"] = encodeLocal(self.qmc.roastdate.time().toString())
-                profile["roastepoch"] = self.qmc.roastepoch
+                profile["roastepoch"] = self.qmc.roastdate.toTime_t()
                 profile["roasttzoffset"] = self.qmc.roasttzoffset
             except:
                 pass
@@ -12378,6 +12379,7 @@ class ApplicationWindow(QMainWindow):
 
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename=None):
+        res = False
         try: 
             if filename:
                 settings = QSettings(filename,QSettings.IniFormat)
@@ -13138,8 +13140,10 @@ class ApplicationWindow(QMainWindow):
                 self.realignbuttons()
                 self.update_extraeventbuttons_visibility()
             settings.endGroup()
+            res = True
 
         except Exception:
+            res = False
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
@@ -13168,10 +13172,12 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass
         except Exception:
+            res = False
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " settingsLoad()  @line " + str(exc_tb.tb_lineno))
+        return res
 
     def startWebLCDs(self,force=False):
         try:
@@ -15230,22 +15236,35 @@ $cupping_notes
                 filename = self.ArtisanOpenFileDialog()
             if filename:
                 try:
-                    aw.settingsLoad(filename)
-                    # update recentSettings menu
-                    settings = QSettings()
-                    files = settings.value('recentSettingList').toStringList()
-                    try:
-                        files.removeAll(filename)
-                    except ValueError:
-                        pass
-                    files.insert(0, filename)
-                    del files[self.MaxRecentFiles:]
-                    settings.setValue('recentSettingList', files)
-                    for widget in QApplication.topLevelWidgets():
-                        if isinstance(widget, ApplicationWindow):
-                            widget.updateRecentSettingActions()
-                    aw.qmc.reset(soundOn=False)
-                    self.sendmessage(QApplication.translate("Message","Settings loaded", None))
+                    res = aw.settingsLoad(filename)
+                    if res:
+                        # update recentSettings menu
+                        settings = QSettings()
+                        files = settings.value('recentSettingList').toStringList()
+                        try:
+                            files.removeAll(filename)
+                        except ValueError:
+                            pass
+                        files.insert(0, filename)
+                        del files[self.MaxRecentFiles:]
+                        settings.setValue('recentSettingList', files)
+                        for widget in QApplication.topLevelWidgets():
+                            if isinstance(widget, ApplicationWindow):
+                                widget.updateRecentSettingActions()
+                        aw.qmc.reset(soundOn=False)
+                        self.sendmessage(QApplication.translate("Message","Settings loaded", None))
+                    else:
+                        # remove file from the recent file list
+                        settings = QSettings()
+                        files = settings.value('recentSettingList').toStringList()
+                        try:
+                            files.removeAll(filename)
+                        except ValueError:
+                            pass
+                        settings.setValue('recentSettingList', files)
+                        for widget in QApplication.topLevelWidgets():
+                            if isinstance(widget, ApplicationWindow):
+                                widget.updateRecentSettingActions()                        
                 except:
                     # remove file from the recent file list
                     settings = QSettings()
@@ -16825,7 +16844,7 @@ class HUDDlg(ArtisanDialog):
             pass
         self.connect(self.styleComboBox,SIGNAL("currentIndexChanged(int)"),lambda i:self.setappearance())
         self.resolutionSpinBox = QSpinBox()
-        self.resolutionSpinBox.setRange(40,200)
+        self.resolutionSpinBox.setRange(40,300)
         self.resolutionSpinBox.setSingleStep(5)
         self.resolutionSpinBox.setValue(aw.dpi)
         self.resolutionSpinBox.setFocusPolicy(Qt.NoFocus)

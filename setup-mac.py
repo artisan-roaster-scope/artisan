@@ -52,6 +52,7 @@ DATA_FILES = [
     ("../translations", [QTDIR + r'/translations/qt_it.qm']),
     ("../translations", [QTDIR + r'/translations/qt_ja.qm']),
     ("../translations", [QTDIR + r'/translations/qt_ko.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_pl.qm']),
     ("../translations", [QTDIR + r'/translations/qt_pt.qm']),
     ("../translations", [QTDIR + r'/translations/qt_ru.qm']),
     ("../translations", [QTDIR + r'/translations/qt_sv.qm']),
@@ -68,6 +69,7 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_ja.qm"]),
     ("../translations", [r'translations/artisan_ko.qm']),
     ("../translations", [r'translations/artisan_pt.qm']),
+    ("../translations", [r'translations/artisan_pl.qm']),
     ("../translations", [r'translations/artisan_ru.qm']),
     ("../translations", [r"translations/artisan_sv.qm"]),
     ("../translations", [r'translations/artisan_zh_CN.qm']),
@@ -257,5 +259,7 @@ for root, dirs, files in os.walk('.'):
             
 os.chdir('..')
 os.system(r"rm artisan-mac-" + VERSION + r".dmg")
+# next line to avoid error: diskimages-helper: resize request is above maximum size allowed.
+os.system(r'touch dist/.Trash')
 os.system(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"')
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
