@@ -2,7 +2,20 @@ Detailed Release History
 ========================
 
 
-v0.9.5 (6.6.2015)
+----
+v0.9.6 (20.7.2015)
+------------------
+
+ * Bug Fixes
+   * fixed translations
+   * fixed accent processing in extra background profile names
+   * tolerate spaces in sequenced command actions
+   * a further fix to a redraw bug introduced in v0.9.4
+   * fixed Linux and Windows build setup
+
+
+----
+v0.9.5 (6.7.2015)
 ------------------
 
  * New Features

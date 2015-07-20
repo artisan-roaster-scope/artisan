@@ -244,18 +244,19 @@ def getHottop():
 # solenoid, drum_motor, cooling_motor : bool (will be converted to the internal 0 or 1)
 # all parameters are optional and default to None (meanging: don't change value)
 def setHottop(heater=None,fan=None,main_fan=None,solenoid=None,drum_motor=None,cooling_motor=None):
-    if heater != None:
-        xSET_HEATER.value = int(heater)
-    if fan != None:
-        xSET_FAN.value = int(round(fan / 10.))
-    if main_fan != None:
-        xSET_MAIN_FAN.value = int(round(main_fan / 10.))
-    if solenoid != None:
-        xSET_SOLENOID.value = int(solenoid)
-    if drum_motor != None:
-        xSET_DRUM_MOTOR.value = int(drum_motor)
-    if cooling_motor != None:
-        xSET_COOLING_MOTOR.value = int(cooling_motor)
+    if xCONTROL and xCONTROL.value:
+        if heater != None:
+            xSET_HEATER.value = int(heater)
+        if fan != None:
+            xSET_FAN.value = int(round(fan / 10.))
+        if main_fan != None:
+            xSET_MAIN_FAN.value = int(round(main_fan / 10.))
+        if solenoid != None:
+            xSET_SOLENOID.value = int(solenoid)
+        if drum_motor != None:
+            xSET_DRUM_MOTOR.value = int(drum_motor)
+        if cooling_motor != None:
+            xSET_COOLING_MOTOR.value = int(cooling_motor)
 
 
 # interval has to be smaller than 1 (= 1sec)

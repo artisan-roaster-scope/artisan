@@ -197,7 +197,7 @@ install QT4.x from source
 
 install QT5.x from source
 
-# ./configure -opensource -confirm-license -release -nomake tests -nomake examples —no-xcb
+# ./configure -opensource -confirm-license -release -nomake tests -nomake examples —qt-xcb
 # make -j3
 # sudo make install
 

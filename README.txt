@@ -155,7 +155,7 @@ Artisan uses the following libraries in unmodified forms:
 
 - Python 2.7.x and 3.4.x released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
-- QT 4.8.x / 5.2.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
+- QT 4.8.x / 5.4.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
   http://qt-project.org/products/licensing
 - Numpy 1.9.x and Scipy 0.14.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
@@ -176,6 +176,9 @@ Artisan uses the following libraries in unmodified forms:
 
 
 VERSION HISTORY
+
+v0.9.6 (20.7.2015)
+ - bug fixes
 
 v0.9.5 (6.7.2015)
  - adds batch counter

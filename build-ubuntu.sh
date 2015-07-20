@@ -58,18 +58,20 @@ patchelf --set-rpath '${ORIGIN}/../../..:${ORIGIN}/../../../../lib' dist/Resourc
 cp qt.conf dist
 mkdir dist/translations
 cp translations/*.qm dist/translations
+cp $QT/translations/qt_ar.qm dist/translations
 cp $QT/translations/qt_de.qm dist/translations
 cp $QT/translations/qt_es.qm dist/translations
+cp $QT/translations/qt_fi.qm dist/translations
 cp $QT/translations/qt_fr.qm dist/translations
+cp $QT/translations/qt_he.qm dist/translations
+cp $QT/translations/qt_hu.qm dist/translations
+cp $QT/translations/qt_it.qm dist/translations
+cp $QT/translations/qt_ja.qm dist/translations
+cp $QT/translations/qt_ko.qm dist/translations
+cp $QT/translations/qt_pl.qm dist/translations
+cp $QT/translations/qt_pt.qm dist/translations
+cp $QT/translations/qt_ru.qm dist/translations
 cp $QT/translations/qt_sv.qm dist/translations
 cp $QT/translations/qt_zh_CN.qm dist/translations
 cp $QT/translations/qt_zh_TW.qm dist/translations
-cp $QT/translations/qt_ko.qm dist/translations
-cp $QT/translations/qt_pt.qm dist/translations
-cp $QT/translations/qt_ru.qm dist/translations
-cp $QT/translations/qt_ar.qm dist/translations
-cp $QT/translations/qt_ja.qm dist/translations
-cp $QT/translations/qt_hu.qm dist/translations
-cp $QT/translations/qt_he.qm dist/translations
-cp $QT/translations/qt_pl.qm dist/translations
 tar -cf dist-ubuntu.tar dist

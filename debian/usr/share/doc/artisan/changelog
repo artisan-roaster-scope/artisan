@@ -1,3 +1,9 @@
+artisan (0.9.6-0) precise; urgency=low
+  * new upstream release
+  * changes since 0.9.5:
+   - bug fixes
+ --  <marko.luther@gmx.net>  Mon, 20 Jul 2015 19:32:14 +0200
+ 
 artisan (0.9.5-0) precise; urgency=low
   * new upstream release
   * changes since 0.9.4:
