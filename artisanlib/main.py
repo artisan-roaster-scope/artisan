@@ -182,7 +182,9 @@ elif os.name == 'posix':
 # to make py2exe happy with scipy >0.11
 def __dependencies_for_freezing():
     from scipy.sparse.csgraph import _validation
-    from scipy.interpolate import UnivariateSpline
+    from scipy.special import _ufuncs_cxx
+    from scipy import integrate
+    from scipy import interpolate
     import PyQt4.QtSvg
     import PyQt4.QtXml
     import PyQt4.QtDBus # needed for QT5 builds
@@ -4902,12 +4904,37 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
                                 #some times ET is not drawn (ET = 0) when using device NONE
+#                                if self.temp1[index] >= self.temp2[index]:
+#                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+#                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+#                                else:
+#                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+#                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                                
+                                fontprop_small = aw.mpl_fontproperties.copy()
+                                fontprop_small.set_size("xx-small")
                                 if self.temp1[index] >= self.temp2[index]:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                                    self.ax.annotate(firstletter + secondletter, 
+                                        xy=(self.timex[index], 
+                                        self.temp1[index]),xytext=(self.timex[index],row[firstletter]),
+                                        alpha=1.,
+                                        bbox=dict(boxstyle='square,pad=0.1', fc='yellow', ec='none'),
+                                        path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                        color=self.palette["text"],
+                                        arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),
+                                        fontsize="xx-small",
+                                        fontproperties=fontprop_small)
                                 else:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                                    self.ax.annotate(firstletter + secondletter, 
+                                            xy=(self.timex[index], 
+                                            self.temp2[index]),xytext=(self.timex[index],row[firstletter]),
+                                            alpha=1.,
+                                            bbox=dict(boxstyle='square,pad=0.1', fc='yellow', ec='none'),
+                                            path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                            color=self.palette["text"],
+                                            arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
+                                            fontsize="xx-small",
+                                            fontproperties=fontprop_small)
                             elif self.eventsGraphflag == 2 and etype < 4:
                                 # update lines data using the lists with new data
                                 if etype == 0:

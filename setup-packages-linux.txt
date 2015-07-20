@@ -189,10 +189,19 @@ src/gui/styles/qgtkstyle_p.cpp Line 510-513
 --
 
 
+install QT4.x from source
 
 # ./configure -opensource -confirm-license -release -nomake tests -nomake examples -nomake demos -gtkstyle
 # make -j3
 # sudo make install
+
+install QT5.x from source
+
+# ./configure -opensource -confirm-license -release -nomake tests -nomake examples —no-xcb
+# make -j3
+# sudo make install
+
+
 
 
 Add path to your environment (eg. .bashrc)
