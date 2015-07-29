@@ -73,6 +73,7 @@ Version History
 
 | Version | Date | Comment |
 |---------|------|---------|
+| v0.9.7 | 29.07.2015 | Bug fixes |
 | v0.9.6 | 20.07.2015 | Bug fixes |
 | v0.9.5 | 06.07.2015 | Batch counter, app settings export/import, bug fixes |
 | v0.9.4 | 06.06.2015 | Bug fixes |

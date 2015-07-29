@@ -3,6 +3,15 @@ Detailed Release History
 
 
 ----
+v0.9.7 (29.7.2015)
+------------------
+
+ * Bug Fixes
+   * fixes epoch rendering in profiles
+   * fixes non-modal dialog UI hangs (PID dialog, messages, error, largeLCDs, serial, platform, calculator)
+   * fixes Fuji PXR reading of times on "Read Ra/So values"
+
+----
 v0.9.6 (20.7.2015)
 ------------------
 
@@ -12,7 +21,6 @@ v0.9.6 (20.7.2015)
    * tolerate spaces in sequenced command actions
    * a further fix to a redraw bug introduced in v0.9.4
    * fixed Linux and Windows build setup
-
 
 ----
 v0.9.5 (6.7.2015)

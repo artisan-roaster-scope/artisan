@@ -34,12 +34,6 @@ APP = ['artisan.py']
 
 DATA_FILES = [
     "LICENSE.txt",
-    ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),
-    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated    
     ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
@@ -110,9 +104,18 @@ plist.update({ 'CFBundleDisplayName': 'Artisan',
 OPTIONS = {
     'strip':True,
     'argv_emulation': False, # this would confuses GUI processing
+    'qt_plugins': [
+                    'iconengines/libqsvgicon.dylib',
+                    'imageformats/libqsvg.dylib',
+                    'imageformats/libqjpeg.dylib',
+                    'imageformats/libqgif.dylib',
+                    'imageformats/libqtiff.dylib',
+                    'platforms/libqcocoa.dylib',  # qt5
+                    'platforms/libqminimal.dylib',  # qt5
+                    'platforms/libqoffscreen.dylib'],  # qt5
     'semi_standalone': False,
     'site_packages': True,
-    'dylib_excludes': ['phonon','QtDBus','QtDeclarative','QtDesigner',
+    'dylib_excludes': ['phonon','QtDeclarative','QtDesigner',
                     'QtHelp','QtMultimedia','QtNetwork',
                     'QtOpenGL','QtScript','QtScriptTools',
                     'QtSql','QtTest','QtXmlPatterns','QtWebKit'],

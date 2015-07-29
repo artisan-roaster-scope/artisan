@@ -28,19 +28,13 @@ VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
 #QTDIR = r'/Developer/Applications/Qt/' # qt4
-QTDIR = r'/Users/luther/Qt5.4.2/5.4/clang_64/' # qt5
+QTDIR = r'/Users/luther/Qt5.5.0/5.5/clang_64/' # qt5
 
 
 APP = ['artisan.py']
 
 DATA_FILES = [
     "LICENSE.txt",
-    ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),
-    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
     ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
@@ -111,19 +105,27 @@ plist.update({ 'CFBundleDisplayName': 'Artisan',
 OPTIONS = {
     'strip':True,
     'argv_emulation': False, # this would confuses GUI processing
+    'qt_plugins': [
+                    'iconengines/libqsvgicon.dylib',
+                    'imageformats/libqsvg.dylib',
+                    'imageformats/libqjpeg.dylib',
+                    'imageformats/libqgif.dylib',
+                    'imageformats/libqtiff.dylib',
+                    'platforms/libqcocoa.dylib',  # qt5
+                    'platforms/libqminimal.dylib',  # qt5
+                    'platforms/libqoffscreen.dylib'],  # qt5
     'semi_standalone': False,
     'site_packages': True,
-    'dylib_excludes': ['phonon','QtDBus','QtDeclarative','QtDesigner',
+    'dylib_excludes': ['phonon','QtDeclarative','QtDesigner',
                     'QtHelp','QtMultimedia','QtNetwork',
                     'QtOpenGL','QtScript','QtScriptTools',
                     'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
-#    'packages': ['matplotlib'], # with this the full pkg is copied to Resources/lib/python3.4
     'packages': ['yoctopuce','gevent'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
-    'matplotlib_backends': '-', # '-' for only-imported or explicit 'qt4agg'; without this the full pkg is copied to Resources/lib/python3.4
+    'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'
     'includes': ['serial',
                  'PyQt4',
                  'PyQt4.QtCore',

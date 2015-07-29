@@ -177,6 +177,9 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.9.7 (29.7.2015)
+ - bug fixes
+
 v0.9.6 (20.7.2015)
  - bug fixes
 
