@@ -12247,7 +12247,7 @@ class ApplicationWindow(QMainWindow):
             # write roast time
             try:
                 profile["roasttime"] = encodeLocal(self.qmc.roastdate.time().toString())
-                profile["roastepoch"] = self.qmc.roastdate.toTime_t()
+                profile["roastepoch"] = int(self.qmc.roastdate.toTime_t())
                 profile["roasttzoffset"] = self.qmc.roasttzoffset
             except:
                 pass
@@ -14970,15 +14970,15 @@ $cupping_notes
 
     def viewErrorLog(self):
         error = errorDlg(self)
+        error.setModal(False)
         error.show()
         QApplication.processEvents()
-        error.setModal(False)
 
     def viewSerialLog(self):
         serialDLG = serialLogDlg(self)
+        serialDLG.setModal(False)
         serialDLG.show()
         QApplication.processEvents()
-        serialDLG.setModal(False)
         
     def viewartisansettings(self):
         settingsDLG = artisansettingsDlg(self)
@@ -14986,15 +14986,15 @@ $cupping_notes
 
     def viewplatform(self):
         platformDLG = platformDlg(self)
+        platformDLG.setModal(False)
         platformDLG.show()
         QApplication.processEvents()
-        platformDLG.setModal(False)
 
     def viewMessageLog(self):
         message = messageDlg(self)
+        message.setModal(False)
         message.show()
         QApplication.processEvents()
-        message.setModal(False)
 
     def helpAbout(self):
         coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
@@ -15206,10 +15206,10 @@ $cupping_notes
             elif self.ser.controlETpid[0] == 2:
                 dialog = DTApidDlgControl(self)
             #modeless style dialog 
+            dialog.setModal(True)
             dialog.show()
             dialog.setFixedSize(dialog.size())
             QApplication.processEvents()
-            dialog.setModal(False)
         # Hottop
         elif self.qmc.device == 53: 
             self.toggleHottopControl()
@@ -15250,10 +15250,10 @@ $cupping_notes
 
     def calculator(self):
         dialog = calculatorDlg(self)
+        dialog.setModal(False)
         dialog.show()
         dialog.setFixedSize(dialog.size())
         QApplication.processEvents()
-        dialog.setModal(False)
         
     def loadSettings(self,fn=None):
         try:
@@ -15364,11 +15364,11 @@ $cupping_notes
         if not self.largeLCDs_dialog:
             self.largeLCDs_dialog = LargeLCDs(self)
             self.LargeLCDs = True
+        self.largeLCDs_dialog.setModal(False)
         self.largeLCDs_dialog.show()
         self.largeLCDs_dialog.raise_()
         self.largeLCDs_dialog.activateWindow()
         QApplication.processEvents()
-        self.largeLCDs_dialog.setModal(False)
 
     def graphwheel(self):
         if self.qmc.designerflag:
@@ -30308,6 +30308,8 @@ class LargeLCDs(ArtisanDialog):
                 self.setLayout(self.landscapeTightLayout())
             elif n == 2:
                 self.setLayout(self.portraitLayout())
+            self.raise_()
+            self.activateWindow()
         self.layoutNr = n
     
     def chooseLayout(self,w,h):
@@ -32397,7 +32399,7 @@ class PXRpidDlgControl(ArtisanDialog):
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
-        aw.fujipid.PXR[rampkey][0] = ramp/10.
+        aw.fujipid.PXR[rampkey][0] = ramp
         soakkey = "segment" + str(idn) + "soak"
         if aw.ser.useModbusPort:
             reg = aw.modbus.address2register(aw.fujipid.PXR[soakkey][1],3)
@@ -32410,7 +32412,7 @@ class PXRpidDlgControl(ArtisanDialog):
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
-        aw.fujipid.PXR[soakkey][0] = soak/10.
+        aw.fujipid.PXR[soakkey][0] = soak
 
     #get all Ramp Soak values for all 8 segments
     def getallsegments(self):
