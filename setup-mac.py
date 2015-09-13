@@ -28,7 +28,7 @@ VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
 #QTDIR = r'/Developer/Applications/Qt/' # qt4
-QTDIR = r'/Users/luther/Qt5.4.2/5.4/clang_64/' # qt5
+QTDIR = r'/Users/luther/Qt5.5.0/5.5/clang_64/' # qt5
 
 APP = ['artisan.py']
 
@@ -108,11 +108,21 @@ OPTIONS = {
                     'iconengines/libqsvgicon.dylib',
                     'imageformats/libqsvg.dylib',
                     'imageformats/libqjpeg.dylib',
-                    'imageformats/libqgif.dylib',
                     'imageformats/libqtiff.dylib',
+                    'imageformats/libqdds.dylib',
+#                    'imageformats/libqgif.dylib',
+#                    'imageformats/libqicns.dylib',                   
+#                    'imageformats/libqico.dylib',
+#                    'imageformats/libqjp2.dylib',
+#                    'imageformats/libqmng.dylib',
+#                    'imageformats/libqtga.dylib',
+#                    'imageformats/libqwbmp.dylib',
+#                    'imageformats/libqwebp.dylib',
                     'platforms/libqcocoa.dylib',  # qt5
-                    'platforms/libqminimal.dylib',  # qt5
-                    'platforms/libqoffscreen.dylib'],  # qt5
+#                    'platforms/libqminimal.dylib',  # qt5
+#                    'platforms/libqoffscreen.dylib' # qt5
+                    'printsupport/libcocoaprintersupport.dylib' # qt5
+                    ],  
     'semi_standalone': False,
     'site_packages': True,
     'dylib_excludes': ['phonon','QtDeclarative','QtDesigner',
@@ -194,10 +204,10 @@ for fw in [
             'QtScript.framework',
             'QtScriptTools.framework',
             'QtSql.framework',
-            'QtDBus.framework',
             'QtDesigner.framework',
             'QtTest.framework',
             'QtWebKit.framework',
+            'QtWebKitWidgets.framework',
             'QtXMLPatterns.framework',
             'QtCLucene.framework',
             'QtPositioning.framework',
@@ -220,7 +230,7 @@ for fw in [
 os.remove('./Artisan.app/Contents/Frameworks/libwx_osx_cocoau-3.0.0.0.0.dylib')
 
 
-print '*** Removing Qt debug libs ***'
+print '*** Removing unused files ***'
 for root, dirs, files in os.walk('.'):
     for file in files:
         if 'debug' in file:
@@ -231,7 +241,9 @@ for root, dirs, files in os.walk('.'):
             os.remove(os.path.join(root,file))
         elif '_tests' in file:
             print 'Deleting', file            
-            os.remove(os.path.join(root,file))            
+            os.remove(os.path.join(root,file)) 
+        # .pyo contains optimizations (from Python v3.5 on .pyc files also contain optimizations)
+        # so it is better to delete .pyo files and keep .pyc files from Python 3.5 on!           
         elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
             print 'Deleting', file
             os.remove(os.path.join(root,file))

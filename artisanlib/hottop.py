@@ -45,21 +45,21 @@ else:
         else:
             return int(h1)
         
-def openport(SP):
+def openport(p):
     try:
-        if not SP.isOpen():
-            SP.open()
+        if not p.isOpen():
+            p.open()
     except Exception:
         pass
         
-def closeport(SP):
+def closeport(p):
     try:
-        if SP == None and SP.isOpen():
-            SP.close()
+        if p == None and p.isOpen():
+            p.close()
     except Exception:
         pass
         
-def gettemperatures(SP,retry=True):
+def gettemperatures(p,retry=True):
     BT = -1
     ET = -1
     HEATER = -1
@@ -70,25 +70,25 @@ def gettemperatures(SP,retry=True):
     COOLING_MOTOR = -1
     CHAFF_TRAY = -1
     try:
-        openport(SP)
-        if SP.isOpen():
-            SP.flushInput()
-            SP.flushOutput()
-            r = SP.read(36)
+        openport(p)
+        if p.isOpen():
+            p.flushInput()
+            p.flushOutput()
+            r = p.read(36)
 #            print(len(r),"".join("\\x%02x" % ord(i) for i in r))
             if len(r) != 36:
-                closeport(SP)
+                closeport(p)
                 if retry: # we retry once
-                    return gettemperatures(SP,retry=False)
+                    return gettemperatures(p,retry=False)
             else:
                 P0 = hex2int(r[0])
                 P1 = hex2int(r[1])
                 chksum = sum([hex2int(c) for c in r[:35]]) & 0xFF 
                 P35 = hex2int(r[35])
                 if P0 != 165 or P1 != 150 or P35 != chksum:
-                    closeport(SP)
+                    closeport(p)
                     if retry: # we retry once
-                        return gettemperatures(SP,retry=False)
+                        return gettemperatures(p,retry=False)
                 else:
                     #VERSION = hex2int(r[4])
                     HEATER = hex2int(r[10]) # 0-100
@@ -164,17 +164,17 @@ def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
 
 # Control processing 
 
-def sendControl(SP,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
+def sendControl(p,aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR):
     try:
         openport(SP)
-        if SP.isOpen():
+        if p.isOpen():
             cmd = HOTTOPcontrol(aHEATER, aFAN, aMAIN_FAN, aSOLENOID, aDRUM_MOTOR, aCOOLING_MOTOR,
                     aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR)
 #            print("".join("\\x%02x" % ord(i) for i in cmd))
-            SP.flushInput()
-            SP.flushOutput()
-            SP.write(cmd) 
+            p.flushInput()
+            p.flushOutput()
+            p.write(cmd) 
     except Exception:
 #        import traceback
 #        import sys

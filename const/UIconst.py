@@ -13,8 +13,19 @@
 #
 # This file is part of Artisan.
 
-from PyQt4.QtGui import QApplication
-from PyQt4.QtCore import QT_VERSION_STR
+try:
+    from PyQt5.QtCore import QLibraryInfo
+    pyqtversion = 5
+except:
+    pyqtversion = 4
+
+if pyqtversion < 5:
+    from PyQt4.QtGui import QApplication
+    from PyQt4.QtCore import QT_VERSION_STR
+else:
+    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtCore import QT_VERSION_STR
+
 import platform
 
 import sys
@@ -35,12 +46,12 @@ platf = str(platform.system())
 
 #Fake entries to get translations for the Mac Application Menu
 _mac_services = QApplication.translate("MAC_APPLICATION_MENU", "Services", None)
-_mac_hide = QApplication.translate("MAC_APPLICATION_MENU", "Hide %1", None)
+_mac_hide = QApplication.translate("MAC_APPLICATION_MENU", "Hide {0}", None)
 _mac_hideothers = QApplication.translate("MAC_APPLICATION_MENU", "Hide Others", None)
 _mac_showall = QApplication.translate("MAC_APPLICATION_MENU", "Show All", None)
 _mac_preferences = QApplication.translate("MAC_APPLICATION_MENU", "Preferences...", None)
-_mac_quit = QApplication.translate("MAC_APPLICATION_MENU", "Quit %1", None)
-_mac_about = QApplication.translate("MAC_APPLICATION_MENU", "About %1", None)
+_mac_quit = QApplication.translate("MAC_APPLICATION_MENU", "Quit {0}", None)
+_mac_about = QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None)
 
 #File menu items
 FILE_MENU = QApplication.translate("Menu", "File", None)
@@ -60,7 +71,7 @@ FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None)
 if platf == 'Darwin':
     FILE_MENU_QUIT = "Quit"
 else:
-    FILE_MENU_QUIT = QApplication.translate("MAC_APPLICATION_MENU", "Quit %1", None).arg("Artisan")   
+    FILE_MENU_QUIT = QApplication.translate("MAC_APPLICATION_MENU", "Quit {0}", None).format("Artisan")   
 
 #Edit menu items
 EDIT_MENU = QApplication.translate("Menu", "Edit", None)
@@ -92,7 +103,10 @@ CONF_MENU_DEVICE = QApplication.translate("Menu", "Device...", None)
 CONF_MENU_SERIALPORT = QApplication.translate("Menu", "Serial Port...", None)
 CONF_MENU_SAMPLING = QApplication.translate("Menu", "Sampling Interval...", None)
 CONF_MENU_OVERSAMPLING = QApplication.translate("Menu", "Oversampling", None)
+CONF_MENU_OVERSAMPLING = QApplication.translate("Menu", "Oversampling", None)
 CONF_MENU_COLORS = QApplication.translate("Menu", "Colors...", None)
+CONF_MENU_BUTTONS = QApplication.translate("Menu", "Buttons", None)
+CONF_MENU_SLIDERS = QApplication.translate("Menu", "Sliders", None)
 CONF_MENU_PHASES = QApplication.translate("Menu", "Phases...", None)
 CONF_MENU_EVENTS = QApplication.translate("Menu", "Events...", None)
 CONF_MENU_STATISTICS = QApplication.translate("Menu", "Statistics...", None)
@@ -146,11 +160,7 @@ HELP_MENU = QApplication.translate("Menu", "Help", None)
 if platf != 'Darwin':
     HELP_MENU = "&" + HELP_MENU
 ##note that the "About" menu item is recognized only if it is named "About" on the Mac, but automatically translated by the Qt standard tranlators
-#if platf == 'Darwin':
-#    HELP_MENU_ABOUT = "About"
-#else:
-#    HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About %1", None).arg("Artisan") 
-HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About %1", None).arg("Artisan") 
+HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None).format("Artisan") 
 HELP_MENU_ABOUTQT = QApplication.translate("Menu", "About Qt", None)
 HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None)
 #HELP_MENU_BLOG = QApplication.translate("Menu", "Blog", None)

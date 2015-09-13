@@ -1,11 +1,11 @@
 Current Versions:
 
 o XCode 4.5.2 + command line tools
-o Python 2.7.10 or 3.4.2 (change "python3" to "python" in all commands below for python 2.x)
+o Python 2.7.10 or 3.4.3 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial 2.7
 o QT 5.4.2
 o SIP 4.16.8
-o PyQt 4.11.4
+o PyQt 4.11.4 / PyQt 5.5.0
 o numpy 1.9.2
 o scipy 0.15.1
 o matplotlib 1.4.3
@@ -31,6 +31,9 @@ o python-qrcode 5.1
 
 Upgrade History:
 
+- 2015-08-09
+ . Qt 5.4.2 => 5.50
+ . PyQt 5.5.0
 - 2015-06-14
  . QT 5.4.2
  . SIP 4.16.7 => 4.16.8
@@ -276,10 +279,12 @@ Note: PyQt needs to be re-installed after a qt update
 # tar xzf PyQt-mac-gpl-4.10.4.tar.gz 
 # cd PyQt-mac-gpl-4.10.4
 # python configure.py
-use: "python configure.py -q /Users/<username>/Qt5.0.1/5.0.1/clang_64/bin/qmake"
+use: "python configure.py -q /Users/<username>/Qt5.5.0/5.5/clang_64/bin/qmake"
 # make
 # sudo make install
 
+PATH=/Users/<username>/Qt5.5.0/5.5/clang_64/bin/:/Users/<username>/Qt5.5.0/5.5/clang_64/lib:$PATH
+export PATH
 
 7) Install Numpy
 
@@ -327,6 +332,8 @@ fix:
 
 9) Install matplotlib
 
+NOTE: matplotlib has to be reinstalled after an upgrade of PyQt or Qt!!
+
 
 9.1) install freetype and libpng dependencies
 
@@ -349,6 +356,22 @@ installed matplotlib dependencies before its compilation via
 # brew link freetype
 
 # brew install pkg-config
+
+
+====
+(better) alternative: install X11 and
+
+# sudo mkdir -p /usr/local/include
+# sudo ln -s /usr/X11/include/freetype2/freetype /usr/local/include/freetype
+# sudo ln -s /usr/X11/include/ft2build.h /usr/local/include/ft2build.h
+# sudo ln -s /usr/X11/include/png.h /usr/local/include/png.h
+# sudo ln -s /usr/X11/include/pngconf.h /usr/local/include/pngconf.h
+# sudo ln -s /usr/X11/include/pnglibconf.h /usr/local/include/pnglibconf.h
+# sudo mkdir -p /usr/local/lib
+# sudo ln -s /usr/X11/lib/libfreetype.dylib /usr/local/lib/libfreetype.dylib
+# sudo ln -s /usr/X11/lib/libpng.dylib /usr/local/lib/libpng.dylib
+
+
 
 9.2) Install matplotlib library
 

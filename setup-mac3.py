@@ -35,7 +35,23 @@ APP = ['artisan.py']
 
 DATA_FILES = [
     "LICENSE.txt",
-# standard QT translation needed to get the Application menu bar and 
+    ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqdds.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqicns.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqico.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjp2.dylib']),
+    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqmng.dylib']),
+    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtga.dylib']),
+    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqwbmp.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqwebp.dylib']),
+    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
+#    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
+#    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
+    ("../Resources/qt_plugins/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # qt5/# standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
     ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
     ("../translations", [QTDIR + r'/translations/qt_de.qm']),
@@ -105,15 +121,16 @@ plist.update({ 'CFBundleDisplayName': 'Artisan',
 OPTIONS = {
     'strip':True,
     'argv_emulation': False, # this would confuses GUI processing
-    'qt_plugins': [
-                    'iconengines/libqsvgicon.dylib',
-                    'imageformats/libqsvg.dylib',
-                    'imageformats/libqjpeg.dylib',
-                    'imageformats/libqgif.dylib',
-                    'imageformats/libqtiff.dylib',
-                    'platforms/libqcocoa.dylib',  # qt5
-                    'platforms/libqminimal.dylib',  # qt5
-                    'platforms/libqoffscreen.dylib'],  # qt5
+# this does not work on Python3.4/PyQt5 for unknown reasons
+#    'qt_plugins': [
+#                    'iconengines/libqsvgicon.dylib',
+#                    'imageformats/libqsvg.dylib',
+#                    'imageformats/libqjpeg.dylib',
+#                    'imageformats/libqgif.dylib',
+#                    'imageformats/libqtiff.dylib',
+#                    'platforms/libqcocoa.dylib',  # qt5
+#                    'platforms/libqminimal.dylib',  # qt5
+#                    'platforms/libqoffscreen.dylib'],  # qt5
     'semi_standalone': False,
     'site_packages': True,
     'dylib_excludes': ['phonon','QtDeclarative','QtDesigner',
@@ -127,11 +144,15 @@ OPTIONS = {
     'arch': 'x86_64',
     'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'
     'includes': ['serial',
-                 'PyQt4',
-                 'PyQt4.QtCore',
-                 'PyQt4.QtGui',
-                 'PyQt4.QtSvg',
-                 'PyQt4.QtXml'],
+#                 'PyQt5',
+#                 'PyQt5.QtCore',
+#                 'PyQt5.QtGui',
+#                 'PyQt5.QtWidgets',
+#                 'PyQt5.QtSvg',
+#                 'PyQt5.QtXml',
+#                 'PyQt5.QtDBus',
+#                 'PyQt5.QtPrintSupport',
+                 ],
     'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
                       '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
                       'bsddb','curses','tcl',
@@ -167,28 +188,57 @@ os.chdir('./dist')
 #os.system(r'cp /Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/config-3.3m/Makefile ./Artisan.app/Contents/Resources/lib/python3.3/config-3.3m/')
 
 # delete unused Qt.framework files (py2app exclude does not seem to work)
+# for Qt4
+#print('*** Removing unused Qt frameworks ***')
+#for fw in [
+#            'phonon',
+#            'QtDeclarative',
+#            'QtHelp',
+#            'QtMultimedia',
+#            'QtNetwork',
+#            'QtOpenGL',
+#            'QtScript',
+#            'QtScriptTools',
+#            'QtSql',
+#            'QtDBus',
+#            'QtDesigner',
+#            'QtTest',
+#            'QtWebKit',
+#            'QtXMLPatterns']:
+#    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw + ".framework"):
+#        for file in files:
+#            print('Deleting', file)
+#            os.remove(os.path.join(root,file))
+# for Qt5
 print('*** Removing unused Qt frameworks ***')
 for fw in [
-            'phonon',
-            'QtDeclarative',
-            'QtHelp',
-            'QtMultimedia',
-            'QtNetwork',
-            'QtOpenGL',
-            'QtScript',
-            'QtScriptTools',
-            'QtSql',
-            'QtDBus',
-            'QtDesigner',
-            'QtTest',
-            'QtWebKit',
-            'QtXMLPatterns']:
-    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw + ".framework"):
+            'QtDeclarative.framework',
+            'QtHelp.framework',
+            'QtMultimedia.framework',
+            'QtNetwork.framework',
+            'QtOpenGL.framework',
+            'QtScript.framework',
+            'QtScriptTools.framework',
+            'QtSql.framework',
+            'QtDesigner.framework',
+            'QtTest.framework',
+            'QtWebKit.framework',
+            'QtWebKitWidgets.framework',
+            'QtXMLPatterns.framework',
+            'QtCLucene.framework',
+            'QtPositioning.framework',
+            'QtQml.framework',
+            'QtSensors.framework',
+            'QtWebChannel.framework',
+            'QtQuick.framework',
+            'QtMultimediaWidgets.framework',]:
+    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw):
         for file in files:
             print('Deleting', file)
             os.remove(os.path.join(root,file))
 
-print('*** Removing Qt debug libs ***')
+
+print('*** Removing unused files ***')
 for root, dirs, files in os.walk('.'):
     for file in files:
         if 'debug' in file:

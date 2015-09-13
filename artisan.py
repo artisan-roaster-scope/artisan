@@ -3,12 +3,53 @@
 Start the application.
 """
 
-from artisanlib import main
-from multiprocessing import freeze_support
-from platform import system
-import imp
 import sys
+import imp
 import os
+from platform import system
+
+# needs to be done before any other PyQt import
+import sip
+sip.setapi('QString', 2)
+sip.setapi('QVariant', 2)
+
+# on Qt5, the platform plugin cocoa/windows is not found in the plugin directory (dispite the qt.conf file) if we do not
+# extend the libraryPath accordingly
+if system() == 'Darwin':
+    try:
+        if str(sys.frozen) == "macosx_app":
+            from PyQt5.QtWidgets import QApplication
+            QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath( __file__ ))) + "/qt_plugins/")
+    except:
+        try:
+            if str(sys.frozen) == "macosx_app":
+                from PyQt4.QtGui import QApplication
+                QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath( __file__ ))) + "/qt_plugins/")
+        except:
+            pass
+elif system().startswith("Windows"):
+    try:
+        ib = (hasattr(sys, "frozen") or # new py2exe
+            hasattr(sys, "importers") # old py2exe
+            or imp.is_frozen("__main__")) # tools/freeze
+        from PyQt5.QtWidgets import QApplication
+        if ib:
+            QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath( __file__ ))) + "\\qt_plugins\\")
+        else:
+            QApplication.addLibraryPath("c:\\Python34\\Lib\\site-packages\\PyQt5\\plugins")
+    except Exception as e:
+        try:
+            from PyQt4.QtGui import QApplication
+            if ib:
+                QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath( __file__ ))) + "\\qt_plugins\\")
+            else:
+                QApplication.addLibraryPath("c:\\Python34\\Lib\\site-packages\\PyQt5\\plugins\\")
+        except:
+            pass   
+        
+from artisanlib import main
+import numpy
+from multiprocessing import freeze_support
 
 if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
                             or hasattr(sys, "importers") # old py2exe
@@ -17,12 +58,11 @@ if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
     executable = os.path.join(os.path.dirname(sys.executable), 'artisan.exe')
     set_executable(executable)    
     del executable
-#    set_executable(os.path.join(sys.exec_prefix, 'artisan.exe'))
-
 
 if __name__ == '__main__':
     freeze_support()
-    main.main()
+    with numpy.errstate(invalid='ignore'):
+        main.app.exec_()
 
 
 # EOF

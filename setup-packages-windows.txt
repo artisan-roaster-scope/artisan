@@ -8,9 +8,9 @@ o numpy 1.9.2
 o scipy 0.15.1
 o matplotlib 1.4.3
 o pyparsing 2.0.1
-o dateutil 1.5
-o pytz 2013d
-o six 1.4.1
+o dateutil 2.2
+o pytz 2013.9
+o six 1.5.2
 o minimalmodbus 0.6
 o Phidgets Python 2.1.8
 o py2exe 0.6.9
@@ -68,6 +68,11 @@ Upgrade History:
  . minimalmodbus 0.4 => 0.5
 - 2014-03-17
  . scipy 0.13.1 => 0.13.3
+- 2014-02-04:
+  Python 2.7.5 => 2.7.6
+  dateutil 1.5 => 2.2
+  pytz 2013d => 2013.9
+  six 1.4.1 => 1.5.2
 - 2014-01-11:
  . Phidgets Python 2.1.8 6/2013 => 2.1.8 7/2013
 - 2013-11-12:
@@ -91,11 +96,11 @@ Installation Instructions:
 Install Microsoft Visual C++ 2008 SP1 Redistributable Package (x86)
 http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
 
-vcredist_x86.exe
+Desktop\vcredist_x86.exe
 
 1) Python 2.7
 
-install python-2.7.4.msi via "Python 3.3.1 Windows x86 MSI Installer" from http://www.python.org
+install python-2.7.10.msi via "Python 2.7.10 Windows x86 MSI Installer" from http://www.python.org
 
 2) pyserial
 
@@ -188,26 +193,41 @@ install dll's
 
 https://github.com/kennethreitz/requests/releases
 
-# python setup.py build
-# sudo python setup.py install
+# c:\Python27\python.exe setup.py build
+# c:\Python27\python.exe setup.py install
 
 16) bottle 0.12.7
 
 https://github.com/defnull/bottle/releases
 
-# python setup.py build
-# sudo python setup.py install
+# c:\Python27\python.exe setup.py build
+# c:\Python27\python.exe setup.py install
 
 17) gevent 1.0.1
 
 https://pypi.python.org/pypi/gevent
 
-# python setup.py build
-# sudo python setup.py install
+# c:\Python27\python.exe setup.py build
+# c:\Python27\python.exe setup.py install
 
 18) geventwebsocket 0.9.3
 
 https://pypi.python.org/pypi/gevent-websocket/
 
-# python setup.py build
-# sudo python setup.py install
+# c:\Python27\python.exe setup.py build
+# c:\Python27\python.exe setup.py install
+
+
+19) python-qrcode 5.1
+
+download qrcode-5.1.tar.gz
+
+# c:\Python27\python.exe setup.py build
+# c:\Python27\python.exe setup.py install
+
+20) win_inet_pton 1.0.1
+
+download win_inet_pton_1.0.1.tar.gz
+
+# c:\Python27\python.exe setup.py build
+# c:\Python27\python.exe setup.py install
