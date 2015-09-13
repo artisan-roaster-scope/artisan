@@ -17100,6 +17100,9 @@ class HUDDlg(ArtisanDialog):
                     aw.qmc.temp1 = y_range[:]
                     aw.qmc.temp2 = y_range2[:]
                     aw.qmc.redraw(recomputeAllDeltas=True)
+                    for x in range(len(aw.qmc.extradevices)):
+                        aw.qmc.extratemp1[x] = [-1]*len(x_range)
+                        aw.qmc.extratemp2[x] = [-1]*len(x_range)
                 else:
                     aw.qmc.timeB = x_range[:]
                     aw.qmc.temp1B = y_range[:]
