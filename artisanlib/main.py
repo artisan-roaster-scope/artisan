@@ -34244,7 +34244,7 @@ class FujiPID(object):
                     "sv?":[0,31002],
                     #rampsoak current running position (1-8)
                     "segment?":[0,31009],
-                    "mv1":[0,30004]   #duty cycle rx -300 to 10300  = -3.00% to 103.00% (divide by 100.)
+                    "mv1":[0,31004]   #duty cycle rx -300 to 10300  = -3.00% to 103.00% (divide by 100.)
                     }
 
     ##TX/RX FUNCTIONS
@@ -34330,11 +34330,15 @@ class FujiPID(object):
             #if control pid is fuji PXG4
             if aw.ser.controlETpid[0] == 0:
                 command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["mv1"][1],1)
+                val = self.readoneword(command)/100.
             #or if control pid is fuji PXR
             elif aw.ser.controlETpid[0] == 1:
+                #somehow, PXR returns a 2 places decimal here. Therefore, divide by 1000 instead of 100
                 command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
-            val = self.readoneword(command)/100.
-        if val >= 0 and val <= 110:
+                val = self.readoneword(command)/1000.
+            
+            #print val. 
+        if val >= -3:
             return val
         else:
             return -1
