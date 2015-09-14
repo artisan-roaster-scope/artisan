@@ -1762,7 +1762,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             # we do not have a background to bitblit, so do a full redraw
                             #self.fig.canvas.draw()
-                            self.updateBackground() # does the canvas draw, but also fills the ax_background cache
+                            self.delayedUpdateBackground() # does the canvas draw, but also fills the ax_background cache
                     #####
 
                     #update phase lcds
@@ -1885,10 +1885,8 @@ class tgraphcanvas(FigureCanvas):
                     if redraw:
                         self.redraw(recompute)
                 elif redraw and not FCs: # ensure that we at least redraw the canvas
-                    #self.updateBackground()
                     self.delayedUpdateBackground()
             elif redraw and not FCs: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
-                    #self.updateBackground()
                     self.delayedUpdateBackground()
         except Exception as ex:
 #            import traceback
@@ -2366,7 +2364,7 @@ class tgraphcanvas(FigureCanvas):
                 label.set_rotation(self.xrotation)
         # we have to update the canvas cache
         if redraw:
-            self.updateBackground()
+            self.delayedUpdateBackground()
         else:
             self.ax_background = None
 
@@ -3676,7 +3674,7 @@ class tgraphcanvas(FigureCanvas):
 
             ############  ready to plot ############
             #self.fig.canvas.draw() # done by updateBackground()
-            self.updateBackground() # update bitlblit backgrounds
+            self.delayedUpdateBackground() # update bitlblit backgrounds
             #######################################
 
             # if designer ON
@@ -4263,10 +4261,13 @@ class tgraphcanvas(FigureCanvas):
     def ToggleMonitor(self):
         #turn ON
         if not self.flagon:
-            aw.soundpop()
-            if self.timex != []:
-                aw.qmc.reset(True,False)
-            self.OnMonitor()
+            if not self.checkSaved():
+                return False
+            else:
+                aw.soundpop()
+                if self.timex != []:
+                    aw.qmc.reset(True,False)
+                self.OnMonitor()
         #turn OFF
         else:
             aw.soundpop()
@@ -4339,13 +4340,16 @@ class tgraphcanvas(FigureCanvas):
     def ToggleRecorder(self):
         #turn START
         if not self.flagstart:
-            aw.soundpop()
-            if self.flagon and len(self.timex) == 1:
-                # we are already in monitoring mode, we just clear this first measurement and go
-                aw.qmc.clearMeasurements(andLCDs=False)
-            elif self.timex != []: # there is a profile loaded, we have to reset
-                aw.qmc.reset(True,False)
-            self.OnRecorder()
+            if not self.checkSaved():
+                return False
+            else:
+                aw.soundpop()
+                if self.flagon and len(self.timex) == 1:
+                    # we are already in monitoring mode, we just clear this first measurement and go
+                    aw.qmc.clearMeasurements(andLCDs=False)
+                elif self.timex != []: # there is a profile loaded, we have to reset
+                    aw.qmc.reset(True,False)
+                self.OnRecorder()
         #turn STOP
         else:
             aw.soundpop()
@@ -4446,8 +4450,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
                     self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    #self.updateBackground() # but we need
-                    self.delayedUpdateBackground()
+                    self.delayedUpdateBackground() # but we need
                     st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
                     message = QApplication.translate("Message","[TP] recorded at {0} BT = {1}", None).format(st,st2)
                     #set message at bottom
@@ -4486,8 +4489,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
                     self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    #self.updateBackground() # but we need
-                    self.delayedUpdateBackground()
+                    self.delayedUpdateBackground() # but we need
 
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
@@ -4545,8 +4547,7 @@ class tgraphcanvas(FigureCanvas):
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
                     self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    #self.updateBackground() # but we need
-                    self.delayedUpdateBackground()
+                    self.delayedUpdateBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -4603,8 +4604,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                     self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    #self.updateBackground() # but we need
-                    self.delayedUpdateBackground()
+                    self.delayedUpdateBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -4660,8 +4660,7 @@ class tgraphcanvas(FigureCanvas):
                         self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
                     self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    #self.updateBackground() # but we need
-                    self.delayedUpdateBackground()
+                    self.delayedUpdateBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -4716,8 +4715,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                     self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    #self.updateBackground() # but we need
-                    self.delayedUpdatedBackground()
+                    self.delayedUpdatedBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -4788,8 +4786,7 @@ class tgraphcanvas(FigureCanvas):
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
                     self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    #self.updateBackground() # but we need
-                    self.delayedUpdateBackground()
+                    self.delayedUpdateBackground() # but we need
                     try:
                         # update ambient temperature if a ambient temperature source is configured and no value yet established
                         if aw.qmc.ambientTemp == 0.0:
@@ -4894,8 +4891,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
                     self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    #self.updateBackground() # but we need
-                    self.delayedUpdateBackground()
+                    self.delayedUpdateBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -5168,8 +5164,7 @@ class tgraphcanvas(FigureCanvas):
                             elif etype == 3:
                                 self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    #self.updateBackground() # but we need
-                    self.delayedUpdateBackground()
+                    self.delayedUpdateBackground() # but we need
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " DeviceEventRecord() {0}").format(str(e)),exc_tb.tb_lineno)
@@ -6738,7 +6733,7 @@ class tgraphcanvas(FigureCanvas):
             #turn ON
             self.l_horizontalcrossline = None
             self.l_verticalcrossline = None
-            self.updateBackground() # update bitlblit backgrounds
+            self.delayedUpdateBackground() # update bitlblit backgrounds
             self.crossmarker = True
             message = QApplication.translate("Message", "Mouse Cross ON: move mouse around",None)
             aw.sendmessage(message)
@@ -6751,7 +6746,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.resetlines()
             self.fig.canvas.draw()
-            self.updateBackground() # update bitlblit backgrounds
+            self.delayedUpdateBackground() # update bitlblit backgrounds
             message = QApplication.translate("Message", "Mouse cross OFF",None)
             aw.sendmessage(message)
             self.fig.canvas.mpl_disconnect(self.crossmouseid)
@@ -6826,12 +6821,12 @@ class VMToolbar(NavigationToolbar):
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def draw_new(self):
         self.draw_org()
-        aw.qmc.updateBackground()
+        aw.qmc.delayedUpdateBackground()
 
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def update_view_new(self):
         self.update_view_org()
-        aw.qmc.updateBackground()
+        aw.qmc.delayedUpdateBackground()
 
     def _icon(self, name):
         #dirty hack to prefer .svg over .png Toolbar icons
