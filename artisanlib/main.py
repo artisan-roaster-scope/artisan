@@ -11618,12 +11618,13 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.mode = str(profile["mode"])
             #convert modes only if needed comparing the new uploaded mode to the old one.
             #otherwise it would incorrectly convert the uploaded phases
-            if "phases" in profile and aw.qmc.phasesbuttonflag:
-                self.qmc.phases = profile["phases"]
             if self.qmc.mode == "F" and old_mode == "C":
                 self.qmc.fahrenheitMode()
             if self.qmc.mode == "C" and old_mode == "F":
-                self.qmc.celsiusMode()
+                self.qmc.celsiusMode()     
+            if "phases" in profile:
+                self.qmc.phases = profile["phases"]
+                print(self.qmc.phases)
             if "flavors" in profile:
                 self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
             #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
@@ -13901,7 +13902,7 @@ class ApplicationWindow(QMainWindow):
         device["arduinoBTChannel"] = str(self.ser.arduinoBTChannel)
         device["arduinoATChannel"] = str(self.ser.arduinoATChannel)
         phases["Phases"] = str(self.qmc.phases)
-        phases["PhasesEspress"] = str(self.qmc.phases_espresso)
+        phases["PhasesEspresso"] = str(self.qmc.phases_espresso)
         phases["PhasesFilter"] = str(self.qmc.phases_filter)
         phases["phasesbuttonflag"] = str(self.qmc.phasesbuttonflag)
         phases["watermarks"] = str(self.qmc.watermarksflag)
@@ -17079,7 +17080,6 @@ class HUDDlg(ArtisanDialog):
         try:
             equ = str(self.equedit1.text())
             equ2 = str(self.equedit2.text())
-            aw.qmc.plotcurves[0] = equ
             if len(equ):
                 aw.qmc.resetlines()
                 #create x range
@@ -17115,7 +17115,6 @@ class HUDDlg(ArtisanDialog):
             EQU = [str(self.equedit1.text()),str(self.equedit2.text()),
                    str(self.equedit3.text()),str(self.equedit4.text()),
                    str(self.equedit5.text()),str(self.equedit6.text())]
-            aw.qmc.plotcurves = EQU[:]
             aw.qmc.resetlines()
             for e in range(5):
                 #create x range
@@ -17580,6 +17579,12 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.hudETpid[0] = int(str(self.ETpidP.text()))
         aw.qmc.hudETpid[1] = int(str(self.ETpidI.text()))
         aw.qmc.hudETpid[2] = int(str(self.ETpidD.text()))
+        aw.qmc.plotcurves[0] = str(self.equedit1.text())
+        aw.qmc.plotcurves[1] = str(self.equedit2.text())
+        aw.qmc.plotcurves[2] = str(self.equedit3.text())
+        aw.qmc.plotcurves[3] = str(self.equedit4.text())
+        aw.qmc.plotcurves[4] = str(self.equedit5.text())
+        aw.qmc.plotcurves[5] = str(self.equedit6.text())
         string = u(QApplication.translate("Message","[ET target 1 = {0}] [BT target 1 = {1}] [ET target 2 = {2}] [BT target 2 = {3}]", None).format(str(aw.qmc.ETtarget),str(aw.qmc.BTtarget),str(aw.qmc.ET2target),str(aw.qmc.BT2target)))
         aw.sendmessage(string)
         aw.qmc.resetlinecountcaches()
