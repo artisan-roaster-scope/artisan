@@ -1379,13 +1379,13 @@ class tgraphcanvas(FigureCanvas):
     
     # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
     def draw(self):
-##        if True: #self.designerflag and self.ax and self.delta_ax:
-##            self.ax.set_zorder(0)
-##            self.delta_ax.set_zorder(0.1)
+        if self.ax and self.delta_ax: #self.designerflag and self.ax and self.delta_ax:
+            self.ax.set_zorder(0)
+            self.delta_ax.set_zorder(0.1)
         FigureCanvas.draw(self)
-##        if True: #self.designerflag and self.ax and self.delta_ax:
-##            self.ax.set_zorder(0.1)
-##            self.delta_ax.set_zorder(0)
+        if self.ax and self.delta_ax: #self.designerflag and self.ax and self.delta_ax:
+            self.ax.set_zorder(0.1)
+            self.delta_ax.set_zorder(0)
     
     # returns the prefix of length l of s and adds eclipse
     def abbrevString(self,s,l):
@@ -11624,7 +11624,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.celsiusMode()     
             if "phases" in profile:
                 self.qmc.phases = profile["phases"]
-                print(self.qmc.phases)
             if "flavors" in profile:
                 self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
             #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
@@ -18910,7 +18909,10 @@ class editGraphDlg(ArtisanDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SingleSelection)
         self.datatable.setShowGrid(True)
-        self.datatable.verticalHeader().setSectionResizeMode(2)
+        if pyqtversion < 5:
+            self.datatable.verticalHeader().setResizeMode(2)
+        else:
+            self.datatable.verticalHeader().setSectionResizeMode(2)
         for i in range(ndata):
             Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
@@ -18985,12 +18987,20 @@ class editGraphDlg(ArtisanDialog):
                     self.datatable.setItem(i,j,extra_qtw2)
                     j = j + 1
         header = self.datatable.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Fixed)
-        header.setSectionResizeMode(1, QHeaderView.Fixed)
-        header.setSectionResizeMode(2, QHeaderView.Fixed)
-        header.setSectionResizeMode(3, QHeaderView.Fixed)
-        header.setSectionResizeMode(4, QHeaderView.Fixed)
-        header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
+        if pyqtversion < 5:
+            header.setResizeMode(0, QHeaderView.Fixed)
+            header.setResizeMode(1, QHeaderView.Fixed)
+            header.setResizeMode(2, QHeaderView.Fixed)
+            header.setResizeMode(3, QHeaderView.Fixed)
+            header.setResizeMode(4, QHeaderView.Fixed)
+            header.setResizeMode(len(columns) - 1, QHeaderView.Stretch)
+        else:
+            header.setSectionResizeMode(0, QHeaderView.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.Fixed)
+            header.setSectionResizeMode(2, QHeaderView.Fixed)
+            header.setSectionResizeMode(3, QHeaderView.Fixed)
+            header.setSectionResizeMode(4, QHeaderView.Fixed)
+            header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
         self.datatable.resizeColumnsToContents()
 
     def createEventTable(self):
@@ -19009,7 +19019,10 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventtable.setSelectionMode(QTableWidget.ExtendedSelection)
         self.eventtable.setShowGrid(True)
-        self.eventtable.verticalHeader().setSectionResizeMode(2)
+        if pyqtversion < 5:
+            self.eventtable.verticalHeader().setResizeMode(2)
+        else:
+            self.eventtable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         regexvalue = QRegExp(r"^100|\d?\d?$")
         self.eventtable.setShowGrid(True) 
@@ -19057,12 +19070,20 @@ class editGraphDlg(ArtisanDialog):
             self.eventtable.setCellWidget(i,5,valueEdit)
         header = self.eventtable.horizontalHeader()
         #header.setStretchLastSection(True)
-        header.setSectionResizeMode(0, QHeaderView.Fixed)
-        header.setSectionResizeMode(1, QHeaderView.Fixed)
-        header.setSectionResizeMode(2, QHeaderView.Fixed)
-        header.setSectionResizeMode(3, QHeaderView.Stretch)
-        header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(5, QHeaderView.Fixed)
+        if pyqtversion < 5:
+            header.setResizeMode(0, QHeaderView.Fixed)
+            header.setResizeMode(1, QHeaderView.Fixed)
+            header.setResizeMode(2, QHeaderView.Fixed)
+            header.setResizeMode(3, QHeaderView.Stretch)
+            header.setResizeMode(4, QHeaderView.ResizeToContents)
+            header.setResizeMode(5, QHeaderView.Fixed)
+        else:
+            header.setSectionResizeMode(0, QHeaderView.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.Fixed)
+            header.setSectionResizeMode(2, QHeaderView.Fixed)
+            header.setSectionResizeMode(3, QHeaderView.Stretch)
+            header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(5, QHeaderView.Fixed)
         # improve width of Time column
         self.eventtable.setColumnWidth(0,60)
         self.eventtable.setColumnWidth(1,65)
@@ -19611,7 +19632,10 @@ class tareDlg(ArtisanDialog):
         self.taretable.setSelectionBehavior(QTableWidget.SelectRows)
         self.taretable.setSelectionMode(QTableWidget.SingleSelection)
         self.taretable.setShowGrid(True)
-        self.taretable.verticalHeader().setSectionResizeMode(2)
+        if pyqtversion < 5:
+            self.taretable.verticalHeader().setResizeMode(2)
+        else:
+            self.taretable.verticalHeader().setSectionResizeMode(2)
         for i in range(len(aw.qmc.container_names)):
             #add widgets to the table
             name = QLineEdit()
@@ -19625,8 +19649,12 @@ class tareDlg(ArtisanDialog):
             self.taretable.setCellWidget(i,0,name)
             self.taretable.setCellWidget(i,1,weight)
         header = self.taretable.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.Fixed)
+        if pyqtversion < 5:
+            header.setResizeMode(0, QHeaderView.Stretch)
+            header.setResizeMode(1, QHeaderView.Fixed)
+        else:
+            header.setSectionResizeMode(0, QHeaderView.Stretch)
+            header.setSectionResizeMode(1, QHeaderView.Fixed)
         self.taretable.setColumnWidth(1,65)
 
 
@@ -21672,7 +21700,10 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
         self.eventbuttontable.setShowGrid(True)
-        self.eventbuttontable.verticalHeader().setSectionResizeMode(2)
+        if pyqtversion < 5:
+            self.eventbuttontable.verticalHeader().setResizeMode(2)
+        else:
+            self.eventbuttontable.verticalHeader().setSectionResizeMode(2)
         visibility = [QApplication.translate("ComboBox","OFF",None),
                       QApplication.translate("ComboBox","ON",None)]
         for i in range(nbuttons):
@@ -22607,7 +22638,10 @@ class flavorDlg(ArtisanDialog):
             self.flavortable.setSelectionBehavior(QTableWidget.SelectRows)
             self.flavortable.setSelectionMode(QTableWidget.SingleSelection)
             self.flavortable.setShowGrid(True)
-            self.flavortable.verticalHeader().setSectionResizeMode(2)
+            if pyqtversion < 5:
+                self.flavortable.verticalHeader().setResizeMode(2)
+            else:
+                self.flavortable.verticalHeader().setSectionResizeMode(2)
             #populate table
             for i in range(nflavors):
                 labeledit = QLineEdit(u(aw.qmc.flavorlabels[i]))
@@ -22625,7 +22659,10 @@ class flavorDlg(ArtisanDialog):
                 self.flavortable.setCellWidget(i,1,valueSpinBox)
             self.flavortable.resizeColumnsToContents()
             header = self.flavortable.horizontalHeader()
-            header.setSectionResizeMode(0, QHeaderView.Stretch)
+            if pyqtversion < 5:
+                header.setResizeMode(0, QHeaderView.Stretch)
+            else:
+                header.setSectionResizeMode(0, QHeaderView.Stretch)
 
     def showbackground(self):
         if self.backgroundCheck.isChecked():
@@ -23124,7 +23161,10 @@ class backgroundDlg(ArtisanDialog):
             self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
             self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
             self.eventtable.setShowGrid(True)
-            self.eventtable.verticalHeader().setSectionResizeMode(2)
+            if pyqtversion < 5:
+                self.eventtable.verticalHeader().setResizeMode(2)
+            else:
+                self.eventtable.verticalHeader().setSectionResizeMode(2)
             if aw.qmc.timeindex[0] != -1:
                 start = aw.qmc.timex[aw.qmc.timeindex[0]]
             else:
@@ -23167,7 +23207,10 @@ class backgroundDlg(ArtisanDialog):
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
             self.datatable.setSelectionMode(QTableWidget.SingleSelection)
             self.datatable.setShowGrid(True)
-            self.datatable.verticalHeader().setSectionResizeMode(2)
+            if pyqtversion < 5:
+                self.datatable.verticalHeader().setResizeMode(2)
+            else:
+                self.datatable.verticalHeader().setSectionResizeMode(2)
             for i in range(ndata):
                 Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
                 Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
@@ -23229,12 +23272,20 @@ class backgroundDlg(ArtisanDialog):
                 self.datatable.setItem(i,3,deltaBT)
                 self.datatable.setItem(i,4,deltaET)
             header = self.datatable.horizontalHeader()
-            header.setSectionResizeMode(0, QHeaderView.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.Fixed)
-            header.setSectionResizeMode(2, QHeaderView.Fixed)
-            header.setSectionResizeMode(3, QHeaderView.Fixed)
-            header.setSectionResizeMode(4, QHeaderView.Fixed)
-            header.setSectionResizeMode(5, QHeaderView.Stretch)
+            if pyqtversion < 5:
+                header.setResizeMode(0, QHeaderView.Fixed)
+                header.setResizeMode(1, QHeaderView.Fixed)
+                header.setResizeMode(2, QHeaderView.Fixed)
+                header.setResizeMode(3, QHeaderView.Fixed)
+                header.setResizeMode(4, QHeaderView.Fixed)
+                header.setResizeMode(5, QHeaderView.Stretch)
+            else:
+                header.setSectionResizeMode(0, QHeaderView.Fixed)
+                header.setSectionResizeMode(1, QHeaderView.Fixed)
+                header.setSectionResizeMode(2, QHeaderView.Fixed)
+                header.setSectionResizeMode(3, QHeaderView.Fixed)
+                header.setSectionResizeMode(4, QHeaderView.Fixed)
+                header.setSectionResizeMode(5, QHeaderView.Stretch)
             self.datatable.resizeColumnsToContents()
 
 #############################################################################
@@ -27629,7 +27680,10 @@ class comportDlg(ArtisanDialog):
                 self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
                 self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
                 self.serialtable.setShowGrid(True)
-                self.serialtable.verticalHeader().setSectionResizeMode(2)
+                if pyqtversion < 5:
+                    self.serialtable.verticalHeader().setResizeMode(2)
+                else:
+                    self.serialtable.verticalHeader().setSectionResizeMode(2)
                 for i in range(nssdevices):
                     devid = aw.qmc.extradevices[i]
                     devicename = aw.qmc.devices[devid-1]
@@ -28433,7 +28487,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
             self.devicetable.setSelectionMode(QTableWidget.SingleSelection)
             self.devicetable.setShowGrid(True)
-            self.devicetable.verticalHeader().setSectionResizeMode(2)
+            if pyqtversion < 5:
+                self.devicetable.verticalHeader().setResizeMode(2)
+            else:
+                self.devicetable.verticalHeader().setSectionResizeMode(2)
             if nddevices:
                 dev = aw.qmc.devices[:]             #deep copy
                 limit = len(dev)
@@ -30158,7 +30215,10 @@ class WheelDlg(ArtisanDialog):
             self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
             self.labeltable.setSelectionMode(QTableWidget.SingleSelection)
             self.labeltable.setShowGrid(True)
-            self.labeltable.verticalHeader().setSectionResizeMode(2)
+            if pyqtversion < 5:
+                self.labeltable.verticalHeader().setResizeMode(2)
+            else:
+                self.labeltable.verticalHeader().setSectionResizeMode(2)
             #populate table
             for i in range(nlabels):
                 label = QTableWidgetItem(aw.qmc.wheelnames[x][i])
@@ -30327,7 +30387,10 @@ class WheelDlg(ArtisanDialog):
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
             self.datatable.setSelectionMode(QTableWidget.SingleSelection)
             self.datatable.setShowGrid(True)
-            self.datatable.verticalHeader().setSectionResizeMode(2)
+            if pyqtversion < 5:
+                self.datatable.verticalHeader().setResizeMode(2)
+            else:
+                self.datatable.verticalHeader().setSectionResizeMode(2)
             #populate table
             for i in range(ndata):
                 delButton = QPushButton(QApplication.translate("Button","Delete",None))
@@ -31142,7 +31205,10 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.setSelectionMode(QTableWidget.SingleSelection)
             self.alarmtable.setShowGrid(True)
             nalarms = len(aw.qmc.alarmtemperature)
-            self.alarmtable.verticalHeader().setSectionResizeMode(2)
+            if pyqtversion < 5:
+                self.alarmtable.verticalHeader().setResizeMode(2)
+            else:
+                self.alarmtable.verticalHeader().setSectionResizeMode(2)
             self.alarmtable.verticalHeader().setVisible(False)
             self.alarmtable.setSortingEnabled(False)
             if nalarms:
@@ -32117,7 +32183,10 @@ class PXRpidDlgControl(ArtisanDialog):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        self.segmenttable.verticalHeader().setSectionResizeMode(2)
+        if pyqtversion < 5:
+            self.segmenttable.verticalHeader().setResizeMode(2)
+        else:
+            self.segmenttable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(8):
@@ -34051,7 +34120,10 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        self.segmenttable.verticalHeader().setSectionResizeMode(2)
+        if pyqtversion < 5:
+            self.segmenttable.verticalHeader().setResizeMode(2)
+        else:
+            self.segmenttable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(16):
