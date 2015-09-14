@@ -1379,13 +1379,13 @@ class tgraphcanvas(FigureCanvas):
     
     # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
     def draw(self):
-        if True: #self.designerflag and self.ax and self.delta_ax:
-            self.ax.set_zorder(0)
-            self.delta_ax.set_zorder(0.1)
+##        if True: #self.designerflag and self.ax and self.delta_ax:
+##            self.ax.set_zorder(0)
+##            self.delta_ax.set_zorder(0.1)
         FigureCanvas.draw(self)
-        if True: #self.designerflag and self.ax and self.delta_ax:
-            self.ax.set_zorder(0.1)
-            self.delta_ax.set_zorder(0)
+##        if True: #self.designerflag and self.ax and self.delta_ax:
+##            self.ax.set_zorder(0.1)
+##            self.delta_ax.set_zorder(0)
     
     # returns the prefix of length l of s and adds eclipse
     def abbrevString(self,s,l):
@@ -34244,9 +34244,8 @@ class FujiPID(object):
                     "sv?":[0,31002],
                     #rampsoak current running position (1-8)
                     "segment?":[0,31009],
-                    "mv1":[0,31004]   #duty cycle rx -300 to 10300  = -3.00% to 103.00% (divide by 100.)
-                    }
-
+                    "mv1":[0,31004]   #duty cycle rx -300 to 10300  = -3.00% to 103.00%                     }
+                    }    
     ##TX/RX FUNCTIONS
     #This function reads read-only memory (with 3xxxx memory we need function=4)
     #both PXR3 and PXG4 use the same memory location 31001 (3xxxx = read only)
