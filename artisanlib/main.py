@@ -1362,7 +1362,7 @@ class tgraphcanvas(FigureCanvas):
         self.delayTimeout = 100
         
         # flag to toggle between Temp and RoR scale of xy-display
-        self.fmt_data_RoR = True #False
+        self.fmt_data_RoR = False
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -2386,13 +2386,15 @@ class tgraphcanvas(FigureCanvas):
         res = x
         if self.fmt_data_RoR and not aw.qmc.designerflag and self.delta_ax:
             try:
-                res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
-            except:
+                # depending on the z-order of ax vs delta_ax the one or the other one is correct
+                #res = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1])
+                res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
+            except Exception:
                 pass
         elif not self.fmt_data_RoR and aw.qmc.designerflag and self.delta_ax:
             try:
                 res = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,x))[1]))[1])
-            except:
+            except Exception:
                 pass
         if aw.qmc.LCDdecimalplaces:
             return aw.float2float(res)
@@ -12451,6 +12453,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("useModbusPort"):
                 self.ser.useModbusPort = bool(toBool(settings.value("useModbusPort")))
             settings.endGroup()
+            #restore x,y formating mode            
+            if settings.contains("fmt_data_RoR"):
+                self.qmc.fmt_data_RoR = bool(toBool(settings.value("fmt_data_RoR")))
             #restore phases
             if settings.contains("Phases"):
                 self.qmc.phases = [toInt(x) for x in toList(settings.value("Phases"))]
@@ -13464,6 +13469,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("useModbusPort",self.ser.useModbusPort)
             settings.setValue("PIDbuttonflag",self.qmc.PIDbuttonflag)
             settings.endGroup()
+            settings.setValue("fmt_data_RoR",self.qmc.fmt_data_RoR)
             settings.setValue("PhasesMode",self.qmc.phases_mode)
             settings.setValue("PhasesEspresso",self.qmc.phases_espresso)
             settings.setValue("PhasesFilter",self.qmc.phases_filter)
@@ -17079,7 +17085,7 @@ class HUDDlg(ArtisanDialog):
         try:
             equ = str(self.equedit1.text())
             equ2 = str(self.equedit2.text())
-            if len(equ):
+            if len(equ) or len(equ2):
                 aw.qmc.resetlines()
                 #create x range
                 x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
