@@ -2443,12 +2443,12 @@ class tgraphcanvas(FigureCanvas):
     # returns True if nothing to save, discard or save was selected and False if canceled by the user
     def checkSaved(self):
         #prevents deleting accidentally a finished roast
-        if self.safesaveflag == True:
+        if self.safesaveflag == True and len(aw.qmc.timex):
             string = QApplication.translate("Message","Save the profile, Discard the profile (Reset), or Cancel?", None)
             reply = QMessageBox.warning(self,QApplication.translate("Message","Profile unsaved", None),string,
                                 QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
             if reply == QMessageBox.Save:
-                aw.fileSave(None)  #if accepted, makes safesaveflag = False
+                aw.fileSave(aw.curFile)  #if accepted, makes safesaveflag = False
                 return True
             elif reply == QMessageBox.Discard:
                 self.safesaveflag = False
@@ -12311,6 +12311,7 @@ class ApplicationWindow(QMainWindow):
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
                     self.sendmessage(QApplication.translate("Message","Profile saved", None))
+                    aw.curFile = filename
                     self.qmc.safesaveflag = False
                 else:
                     self.sendmessage(QApplication.translate("Message","Cancelled", None))
@@ -14088,6 +14089,8 @@ class ApplicationWindow(QMainWindow):
         if aw.qmc.checkSaved(): # if not canceled
             self.stopActivities()
             self.closeEventSettings()
+            import gc
+            gc.collect()
             QApplication.exit()
 
     def closeserialports(self):
@@ -19343,7 +19346,6 @@ class editGraphDlg(ArtisanDialog):
     def accept(self):
         #check for graph
         if len(aw.qmc.timex):
-            
             #prevents accidentally deleting a modified profile.
             aw.qmc.safesaveflag = True
             if self.chargeeditcopy != str(self.chargeedit.text()):
