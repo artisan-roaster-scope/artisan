@@ -3681,7 +3681,7 @@ class tgraphcanvas(FigureCanvas):
 
             ############  ready to plot ############
             #self.fig.canvas.draw() # done by updateBackground()
-            self.delayedUpdateBackground() # update bitlblit backgrounds
+            self.updateBackground() # update bitlblit backgrounds
             #######################################
 
             # if designer ON
