@@ -20,12 +20,12 @@ if system() == 'Darwin':
         if str(sys.frozen) == "macosx_app":
             from PyQt5.QtWidgets import QApplication
             QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath( __file__ ))) + "/qt_plugins/")
-    except:
+    except Exception:
         try:
             if str(sys.frozen) == "macosx_app":
                 from PyQt4.QtGui import QApplication
-                QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath( __file__ ))) + "/qt_plugins/")
-        except:
+                QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath(__file__))) + "/qt_plugins/")
+        except Exception:
             pass
 elif system().startswith("Windows"):
     try:
@@ -34,17 +34,17 @@ elif system().startswith("Windows"):
             or imp.is_frozen("__main__")) # tools/freeze
         from PyQt5.QtWidgets import QApplication
         if ib:
-            QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath( __file__ ))) + "\\qt_plugins\\")
+            QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath(__file__))) + "\\qt_plugins\\")
         else:
             QApplication.addLibraryPath("c:\\Python34\\Lib\\site-packages\\PyQt5\\plugins")
-    except Exception as e:
+    except Exception:
         try:
             from PyQt4.QtGui import QApplication
             if ib:
-                QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath( __file__ ))) + "\\qt_plugins\\")
+                QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath(__file__))) + "\\qt_plugins\\")
             else:
                 QApplication.addLibraryPath("c:\\Python34\\Lib\\site-packages\\PyQt5\\plugins\\")
-        except:
+        except Exception:
             pass   
         
 from artisanlib import main

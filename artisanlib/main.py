@@ -943,13 +943,16 @@ class tgraphcanvas(FigureCanvas):
         self.graphfont = 0
 
         #variables to configure the 8 default buttons
-        # button = 0:CHARGE, 1:DRY_END, 2:FC_START, 3:FC_END, 4:SC_START, 5:SC_END, 6:DROP, 7:COOL_END
+        # button = 0:CHARGE, 1:DRY_END, 2:FC_START, 3:FC_END, 4:SC_START, 5:SC_END, 6:DROP, 7:COOL_END; 
         self.buttonvisibility = [True]*8
         self.buttonactions = [0]*8
         self.buttonactionstrings = [""]*8
-        #variables to configure the 0: ON, 1: OFF buttons and 2: SAMPLE action
+        #variables to configure the 0: ON, 1: OFF, 2: SAMPLE, 3:RESET, 4:START
         self.extrabuttonactions = [0]*3
         self.extrabuttonactionstrings = [""]*3
+        #variables to configure the 0:RESET, 1:START
+        self.xextrabuttonactions = [0]*2
+        self.xextrabuttonactionstrings = [""]*2
 
         #flag to activate the automatic marking of the CHARGE and DROP events
         #self.autoChargeDropFlag = False # has been replaced by the following two separate flags
@@ -2516,6 +2519,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagon:
                     self.OffMonitor()
+                    
+                aw.eventactionx(aw.qmc.xextrabuttonactions[0],aw.qmc.xextrabuttonactionstrings[0])
 
                 #reset time
                 aw.qmc.timeclock.start()
@@ -4083,8 +4088,7 @@ class tgraphcanvas(FigureCanvas):
             ###  lock resources ##
             aw.qmc.samplingsemaphore.acquire(1)
             if aw.qmc.extra_event_sampling_delay != 0:
-                a = aw.qmc.extrabuttonactions[2]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[2])
+                aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -4111,8 +4115,7 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.device == 53:
                 startHottop(0.8,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
-                a = aw.qmc.extrabuttonactions[0]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[0])
+                aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
             except:
                 pass
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
@@ -4193,11 +4196,7 @@ class tgraphcanvas(FigureCanvas):
             self.StopAsyncSamplingAction()
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
             #appnope.nap()
-            try:
-                a = aw.qmc.extrabuttonactions[1]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[1])
-            except:
-                pass
+            aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -4281,6 +4280,12 @@ class tgraphcanvas(FigureCanvas):
             if not self.flagon:
                 self.OnMonitor()
             self.flagstart = True
+            
+            try:
+                aw.eventactionx(aw.qmc.xextrabuttonactions[1],aw.qmc.xextrabuttonactionstrings[1])
+            except:
+                pass
+                    
             aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
             aw.qmc.roastbatchpos = 0 # initialized to 0, set to increased batchsequence on DROP
             aw.qmc.fig.suptitle("")
@@ -4421,11 +4426,7 @@ class tgraphcanvas(FigureCanvas):
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-            try:
-                a = aw.qmc.buttonactions[0]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[0])
-            except:
-                pass
+            aw.eventactionx(aw.qmc.buttonactions[0],aw.qmc.buttonactionstrings[0])
             aw.button_8.setDisabled(True)
             aw.button_8.setFlat(True)
             try:
@@ -4508,11 +4509,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_19.setFlat(True)
             aw.button_8.setDisabled(True) # also deactivate CHARGE button
             aw.button_8.setFlat(True)
-            try:
-                a = aw.qmc.buttonactions[1]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[1])
-            except:
-                pass
+            aw.eventactionx(aw.qmc.buttonactions[1],aw.qmc.buttonactionstrings[1])
             st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
             message = QApplication.translate("Message","[DRY END] recorded at {0} BT = {1}", None).format(st,st2)
@@ -4571,11 +4568,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_8.setFlat(True)
             aw.button_19.setDisabled(True) # also deactivate DRY button
             aw.button_19.setFlat(True)
-            try:
-                a = aw.qmc.buttonactions[2]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[2])
-            except:
-                pass
+            aw.eventactionx(aw.qmc.buttonactions[2],aw.qmc.buttonactionstrings[2])
             st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
             message = QApplication.translate("Message","[FC START] recorded at {0} BT = {1}", None).format(st1,st2)
@@ -4626,11 +4619,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_19.setFlat(True)
             aw.button_3.setDisabled(True) # also deactivate FCs button
             aw.button_3.setFlat(True)
-            try:
-                a = aw.qmc.buttonactions[3]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[3])
-            except:
-                pass
+            aw.eventactionx(aw.qmc.buttonactions[3],aw.qmc.buttonactionstrings[3])
             st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
             message = QApplication.translate("Message","[FC END] recorded at {0} BT = {1}", None).format(st1,st2)
@@ -4684,11 +4673,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_3.setFlat(True)
             aw.button_4.setDisabled(True) # also deactivate FCe button
             aw.button_4.setFlat(True)
-            try:
-                a = aw.qmc.buttonactions[4]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[4])
-            except:
-                pass
+            aw.eventactionx(aw.qmc.buttonactions[4],aw.qmc.buttonactionstrings[4])
             st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
             message = QApplication.translate("Message","[SC START] recorded at {0} BT = {1}", None).format(st1,st2)
@@ -4741,11 +4726,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_4.setFlat(True)
             aw.button_5.setDisabled(True) # also deactivate SCs button
             aw.button_5.setFlat(True)
-            try:
-                a = aw.qmc.buttonactions[5]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[5])
-            except:
-                pass
+            aw.eventactionx(aw.qmc.buttonactions[5],aw.qmc.buttonactionstrings[5])
             st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
             message = QApplication.translate("Message","[SC END] recorded at {0} BT = {1}", None).format(st1,st2)
@@ -4823,11 +4804,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_6.setFlat(True)
             except:
                 pass
-            try:
-                a = aw.qmc.buttonactions[6]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[6])
-            except:
-                pass
+            aw.eventactionx(aw.qmc.buttonactions[6],aw.qmc.buttonactionstrings[6])
             st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
             message = QApplication.translate("Message","Roast ended at {0} BT = {1}", None).format(st1,st2)
@@ -4921,11 +4898,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_6.setFlat(True)
             aw.button_9.setDisabled(True) # also deactivate DROP button
             aw.button_9.setFlat(True)
-            try:
-                a = aw.qmc.buttonactions[7]
-                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.buttonactionstrings[7])
-            except:
-                pass
+            aw.eventactionx(aw.qmc.buttonactions[7],aw.qmc.buttonactionstrings[7])
             st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
             st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
             message = QApplication.translate("Message","[COOL END] recorded at {0} BT = {1}", None).format(st1,st2)
@@ -7022,8 +6995,7 @@ class SampleThread(QThread):
                 # send sampling action if any interval is set to "sync" (extra_event_sampling_delay = 0)
                 try:
                     if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
-                        a = aw.qmc.extrabuttonactions[2]
-                        aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[2])
+                        aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
                 except:
                     pass
                     
@@ -7120,8 +7092,7 @@ class SampleThread(QThread):
                         # send another sampling action if any
                         try:
                             if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
-                                a = aw.qmc.extrabuttonactions[2]
-                                aw.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))),aw.qmc.extrabuttonactionstrings[2])
+                                aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
                         except:
                             pass
                         # let's do the oversampling thing and take a second reading from the main device
@@ -9635,6 +9606,13 @@ class ApplicationWindow(QMainWindow):
         if aw:
             self.fileSaveAction.setEnabled(False)
             self.fileSaveAsAction.setEnabled(False) 
+
+    # relocate event actions, by skippig 3=MultipleEvent and 7=SliderAction
+    def eventactionx(self,a,cmd):
+        try:
+            self.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))), cmd)
+        except:
+            pass
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan ; 10= HOTTOP Cooling Fan
@@ -12806,6 +12784,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extrabuttonactions = [toInt(x) for x in toList(settings.value("extrabuttonactions"))]
             if settings.contains("extrabuttonactionstrings"):
                 self.qmc.extrabuttonactionstrings = list(map(str,list(toStringList(settings.value("extrabuttonactionstrings",self.qmc.extrabuttonactionstrings)))))
+            if settings.contains("xextrabuttonactions"):
+                self.qmc.xextrabuttonactions = [toInt(x) for x in toList(settings.value("xextrabuttonactions"))]
+            if settings.contains("xextrabuttonactionstrings"):
+                self.qmc.xextrabuttonactionstrings = list(map(str,list(toStringList(settings.value("xextrabuttonactionstrings",self.qmc.xextrabuttonactionstrings)))))
             settings.endGroup()
             settings.beginGroup("HUD")
             self.qmc.projectFlag = bool(toBool(settings.value("Projection",self.qmc.projectFlag)))
@@ -13659,6 +13641,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("buttonactionstrings",self.qmc.buttonactionstrings)
             settings.setValue("extrabuttonactions",self.qmc.extrabuttonactions)
             settings.setValue("extrabuttonactionstrings",self.qmc.extrabuttonactionstrings)
+            settings.setValue("xextrabuttonactions",self.qmc.xextrabuttonactions)
+            settings.setValue("xextrabuttonactionstrings",self.qmc.xextrabuttonactionstrings)
             settings.endGroup()
             settings.beginGroup("HUD")
             settings.setValue("Projection",self.qmc.projectFlag)
@@ -21144,8 +21128,7 @@ class EventsDlg(ArtisanDialog):
         self.COOLbuttonActionType.addItems(self.buttonActionTypes)
         self.COOLbuttonActionType.setCurrentIndex(aw.qmc.buttonactions[7])
         self.COOLbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[7])
-        self.COOLbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))
-        
+        self.COOLbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))        
         self.ONbuttonLabel = QLabel(QApplication.translate("Label", "ON", None))
         self.ONbuttonActionType = QComboBox()
         self.ONbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
@@ -21179,37 +21162,59 @@ class EventsDlg(ArtisanDialog):
             self.SAMPLINGbuttonActionInterval.setCurrentIndex(self.sampling_delays.index(aw.qmc.extra_event_sampling_delay))
         except:
             pass
+        self.RESETbuttonLabel = QLabel(QApplication.translate("Label", "RESET", None))
+        self.RESETbuttonActionType = QComboBox()
+        self.RESETbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
+        self.RESETbuttonActionType.setFocusPolicy(Qt.NoFocus)
+        self.RESETbuttonActionType.addItems(self.buttonActionTypes)
+        self.RESETbuttonActionType.setCurrentIndex(aw.qmc.xextrabuttonactions[0])
+        self.RESETbuttonActionString = QLineEdit(aw.qmc.xextrabuttonactionstrings[0])
+        self.RESETbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))                
+        self.STARTbuttonLabel = QLabel(QApplication.translate("Label", "START", None))
+        self.STARTbuttonActionType = QComboBox()
+        self.STARTbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
+        self.STARTbuttonActionType.setFocusPolicy(Qt.NoFocus)
+        self.STARTbuttonActionType.addItems(self.buttonActionTypes)
+        self.STARTbuttonActionType.setCurrentIndex(aw.qmc.xextrabuttonactions[1])
+        self.STARTbuttonActionString = QLineEdit(aw.qmc.xextrabuttonactionstrings[1])
+        self.STARTbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))        
         defaultButtonsLayout = QGridLayout()
-        defaultButtonsLayout.addWidget(self.ONbuttonLabel,0,0,Qt.AlignCenter)
-        defaultButtonsLayout.addWidget(self.ONbuttonActionType,0,1)
-        defaultButtonsLayout.addWidget(self.ONbuttonActionString,0,2)
-        defaultButtonsLayout.addWidget(self.CHARGEbutton,1,0)
-        defaultButtonsLayout.addWidget(self.CHARGEbuttonActionType,1,1)
-        defaultButtonsLayout.addWidget(self.CHARGEbuttonActionString,1,2)
-        defaultButtonsLayout.addWidget(self.DRYbutton,2,0)
-        defaultButtonsLayout.addWidget(self.DRYbuttonActionType,2,1)
-        defaultButtonsLayout.addWidget(self.DRYbuttonActionString,2,2)
-        defaultButtonsLayout.addWidget(self.FCSbutton,3,0)
-        defaultButtonsLayout.addWidget(self.FCSbuttonActionType,3,1)
-        defaultButtonsLayout.addWidget(self.FCSbuttonActionString,3,2)
-        defaultButtonsLayout.addWidget(self.FCEbutton,4,0)
-        defaultButtonsLayout.addWidget(self.FCEbuttonActionType,4,1)
-        defaultButtonsLayout.addWidget(self.FCEbuttonActionString,4,2)
-        defaultButtonsLayout.addWidget(self.SCSbutton,5,0)
-        defaultButtonsLayout.addWidget(self.SCSbuttonActionType,5,1)
-        defaultButtonsLayout.addWidget(self.SCSbuttonActionString,5,2)
-        defaultButtonsLayout.addWidget(self.SCEbutton,6,0)
-        defaultButtonsLayout.addWidget(self.SCEbuttonActionType,6,1)
-        defaultButtonsLayout.addWidget(self.SCEbuttonActionString,6,2)
-        defaultButtonsLayout.addWidget(self.DROPbutton,7,0)
-        defaultButtonsLayout.addWidget(self.DROPbuttonActionType,7,1)
-        defaultButtonsLayout.addWidget(self.DROPbuttonActionString,7,2)
-        defaultButtonsLayout.addWidget(self.COOLbutton,8,0)
-        defaultButtonsLayout.addWidget(self.COOLbuttonActionType,8,1)
-        defaultButtonsLayout.addWidget(self.COOLbuttonActionString,8,2)
-        defaultButtonsLayout.addWidget(self.OFFbuttonLabel,9,0,Qt.AlignCenter)
-        defaultButtonsLayout.addWidget(self.OFFbuttonActionType,9,1)
-        defaultButtonsLayout.addWidget(self.OFFbuttonActionString,9,2)
+        defaultButtonsLayout.addWidget(self.RESETbuttonLabel,0,0,Qt.AlignCenter)
+        defaultButtonsLayout.addWidget(self.RESETbuttonActionType,0,1)
+        defaultButtonsLayout.addWidget(self.RESETbuttonActionString,0,2)        
+        defaultButtonsLayout.addWidget(self.ONbuttonLabel,1,0,Qt.AlignCenter)
+        defaultButtonsLayout.addWidget(self.ONbuttonActionType,1,1)
+        defaultButtonsLayout.addWidget(self.ONbuttonActionString,1,2)
+        defaultButtonsLayout.addWidget(self.STARTbuttonLabel,2,0,Qt.AlignCenter)
+        defaultButtonsLayout.addWidget(self.STARTbuttonActionType,2,1)
+        defaultButtonsLayout.addWidget(self.STARTbuttonActionString,2,2)        
+        defaultButtonsLayout.addWidget(self.CHARGEbutton,3,0)
+        defaultButtonsLayout.addWidget(self.CHARGEbuttonActionType,3,1)
+        defaultButtonsLayout.addWidget(self.CHARGEbuttonActionString,3,2)
+        defaultButtonsLayout.addWidget(self.DRYbutton,4,0)
+        defaultButtonsLayout.addWidget(self.DRYbuttonActionType,4,1)
+        defaultButtonsLayout.addWidget(self.DRYbuttonActionString,4,2)
+        defaultButtonsLayout.addWidget(self.FCSbutton,5,0)
+        defaultButtonsLayout.addWidget(self.FCSbuttonActionType,5,1)
+        defaultButtonsLayout.addWidget(self.FCSbuttonActionString,5,2)
+        defaultButtonsLayout.addWidget(self.FCEbutton,6,0)
+        defaultButtonsLayout.addWidget(self.FCEbuttonActionType,6,1)
+        defaultButtonsLayout.addWidget(self.FCEbuttonActionString,6,2)
+        defaultButtonsLayout.addWidget(self.SCSbutton,7,0)
+        defaultButtonsLayout.addWidget(self.SCSbuttonActionType,7,1)
+        defaultButtonsLayout.addWidget(self.SCSbuttonActionString,7,2)
+        defaultButtonsLayout.addWidget(self.SCEbutton,8,0)
+        defaultButtonsLayout.addWidget(self.SCEbuttonActionType,8,1)
+        defaultButtonsLayout.addWidget(self.SCEbuttonActionString,8,2)
+        defaultButtonsLayout.addWidget(self.DROPbutton,9,0)
+        defaultButtonsLayout.addWidget(self.DROPbuttonActionType,9,1)
+        defaultButtonsLayout.addWidget(self.DROPbuttonActionString,9,2)
+        defaultButtonsLayout.addWidget(self.COOLbutton,10,0)
+        defaultButtonsLayout.addWidget(self.COOLbuttonActionType,10,1)
+        defaultButtonsLayout.addWidget(self.COOLbuttonActionString,10,2)
+        defaultButtonsLayout.addWidget(self.OFFbuttonLabel,11,0,Qt.AlignCenter)
+        defaultButtonsLayout.addWidget(self.OFFbuttonActionType,11,1)
+        defaultButtonsLayout.addWidget(self.OFFbuttonActionString,11,2)
         defaultButtonsLayout.setContentsMargins(5,5,5,5)
         defaultButtonsLayout.setHorizontalSpacing(10)
         defaultButtonsLayout.setVerticalSpacing(7)
@@ -22140,6 +22145,8 @@ class EventsDlg(ArtisanDialog):
             aw.qmc.extrabuttonactions[0] = self.ONbuttonActionType.currentIndex()
             aw.qmc.extrabuttonactions[1] = self.OFFbuttonActionType.currentIndex()
             aw.qmc.extrabuttonactions[2] = self.SAMPLINGbuttonActionType.currentIndex()
+            aw.qmc.xextrabuttonactions[0] = self.RESETbuttonActionType.currentIndex()
+            aw.qmc.xextrabuttonactions[1] = self.STARTbuttonActionType.currentIndex()
             aw.qmc.buttonactionstrings[0] = u(self.CHARGEbuttonActionString.text())
             aw.qmc.buttonactionstrings[1] = u(self.DRYbuttonActionString.text())
             aw.qmc.buttonactionstrings[2] = u(self.FCSbuttonActionString.text())
@@ -22155,6 +22162,8 @@ class EventsDlg(ArtisanDialog):
                 aw.qmc.extra_event_sampling_delay = self.sampling_delays[self.SAMPLINGbuttonActionInterval.currentIndex()]
             except:
                 pass
+            aw.qmc.xextrabuttonactionstrings[0] = u(self.RESETbuttonActionString.text())
+            aw.qmc.xextrabuttonactionstrings[1] = u(self.STARTbuttonActionString.text())
             #save etypes
             if len(u(self.etype0.text())) and len(u(self.etype1.text())) and len(u(self.etype2.text())) and len(u(self.etype3.text())):
                 aw.qmc.etypes[0] = u(self.etype0.text())
