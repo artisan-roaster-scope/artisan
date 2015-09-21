@@ -17122,9 +17122,21 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def eval_curve_expression(self,mathexpression,x):
+        
         if len(mathexpression):
-            if mathexpression[0] == "#":
+            if mathexpression[0] == "#":        
                 return
+            
+            #get index from the time
+            index = aw.qmc.time2index(x)
+
+            #newtimeshift vars 
+            #deep copies for BT ET timeshift (copies will be modified)
+            Y1 = aw.qmc.temp1[:]
+            Y2 = aw.qmc.temp2[:]
+            timeshiftexpressions = []           #holds strings like "Y10040" as explained below
+            timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
+        
             #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
             mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
                               "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
@@ -17142,32 +17154,81 @@ class HUDDlg(ArtisanDialog):
                             #find Y number
                             if i+1 < mlen:                          #check for out of range
                                 if mathexpression[i+1].isdigit():
-                                    number = mathexpression[i+1]
-                                else:
-                                    number = "1"
-                            #check for double digit
+                                    #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" shift Y1 2 to the left
+                                    if i+5 < len(mathexpression) and mathexpression[i+1].isdigit() and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
+                                        nint = int(mathexpression[i+1])              #Ynumber int
+                                        Yshiftval = int(mathexpression[i+4])
+                                        sign = mathexpression[i+3]
+                                        if sign == "-": #  ie. original [1,2,3,4,5,6]
+                                            evalsign = "0"      # digit 0 = "-"
+                                            if nint == 1: #ET 
+                                                Y1 = Y1[Yshiftval:] + [Y1[-1]]*Yshiftval #result: shift 2 left = [3,4,5,6,6,6]
+                                                val = Y1[index]
+                                            elif nint == 2: #BT
+                                                Y2 = Y2[Yshiftval:] + [Y2[-1]]*Yshiftval 
+                                                val = Y2[index]
+
+##                                            #underwork  
+##                                            shiftedindex = index - Yshiftval  #substract
+##                                            if (index - shiftedindex) < 0:
+##                                                shiftedindex = 0
+##                                            evalsign = "0"                      # number 0 = "-"
+##                                            if nint == 1: #ET
+##                                                val =aw.qmc.temp1[shiftedindex]
+##                                            elif nint == 2: #BT
+##                                                val =aw.qmc.temp2[shiftedindex]
+                        
+                                        elif sign == "+": #"+" shift right twice original [1,2,3,4,5,6]
+                                            evalsign = "1"      #digit 1 = "+"
+                                            if nint == 1: #ET 
+                                                Y1 = [Y1[0]]*Yshiftval + Y1[:len(Y1)-Yshiftval] #result [1, 1, 1, 2, 3, 4]
+                                                val = Y1[index]
+                                            elif nint == 2: #BT
+                                                Y2 = [Y2[0]]*Yshiftval + Y2[:len(Y2)-Yshiftval]
+                                                val = Y2[index]
+                                                
+                                        #add expression and values found
+                                        evaltimeexpression = "Y" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
+                                        timeshiftexpressions.append(evaltimeexpression)
+                                        timeshiftexpressionsvalues.append(val)
+                                        #convert "Y2[+9]" to Ynumber compatible for python eval() to add to dictionary
+                                        #Method: replace all non digits chars with sign value.
+                                        #Example1 "Y2[-7]" = "Y20070"   Example2 "Y2[+9]" = "Y21191"
+                                        mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                #if mathexpression[i+1].isdigit():    #no timeshift
+                                    else:
+                                        Yval.append(mathexpression[i+1])
+                                        
+                            #check for double digit of Y (no timeshift)
                             if i+2 < mlen:
                                 if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
-                                    number += mathexpression[i+2]
-                            Yval.append(number)
+                                    Yval.append(mathexpression[i+2]+mathexpression[i+2])
 
-                    #build Ys float values
+                            
+
+                    #created Ys values 
                     if len(aw.qmc.timex) > 1:
-                        index = aw.qmc.time2index(x)
-                        Y = [aw.qmc.temp1[index],aw.qmc.temp2[index]]
+                        Y = [Y1[index],Y2[index]]
                         if len(aw.qmc.extratimex):
                             if len(aw.qmc.extratimex[0]):
                                 for i in range(len(aw.qmc.extradevices)):
-                                    Y.append(aw.qmc.extratemp1[i][index])
-                                    Y.append(aw.qmc.extratemp2[i][index])
+                                    Y.append(aw.qmc.extratemp1[i][index])  #ET
+                                    Y.append(aw.qmc.extratemp2[i][index])  #BT
                         #add Ys and their value to math dictionary
                         for i in range(len(Yval)):
                             mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
-                    else:
-                        for i in range(len(Yval)):
-                            mathdictionary["Y"+ Yval[i]] = 0
-                try:
+                        #add timeshifted Ys to the math dictionary
+                        for i in range(len(timeshiftexpressions)):
+                            mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
+                            
+##                    #not used  
+##                    else:
+##                        for i in range(len(Yval)):
+##                            mathdictionary["Y"+ Yval[i]] = 0
+                #evaluation
+                try:                            
                     res = eval(mathexpression,{"__builtins__":None},mathdictionary)
+
                 except ValueError:
                     res = -1
                 if res == None:
@@ -31574,7 +31635,10 @@ class PXRpidDlgControl(ArtisanDialog):
                 r = command
             else:
                 if PID == "ET":
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
+                    if aw.ser.readETpid[0] == 0:
+                        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
+                    elif aw.ser.readETpid[0] == 1:
+                        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
                 elif PID == "BT":
                     if aw.ser.readBTpid[0] == 0:
                         command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
@@ -34421,15 +34485,18 @@ class FujiPID(object):
                 val = self.readoneword(command)/100.
             #or if control pid is fuji PXR
             elif aw.ser.controlETpid[0] == 1:
-                #somehow, PXR returns a 2 places decimal here. Therefore, divide by 1000 instead of 100
                 command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
-                val = self.readoneword(command)/1000.
-            
-            #print val. 
-        if val >= -3:
-            return val
-        else:
-            return -1
+                val = self.readoneword(command)
+                #val range -3 to 103%. Check for possible decimal digit user settings
+                if val/100 <= 103 and val/100 >= -3:         
+                    val /= 100.
+                elif val/1000 <= 103 and val/1000 >= -3:
+                    val /= 1000.
+                elif val/10 <= 103 and val/10 >= -3:
+                    val /=10.
+                else:
+                    return -1
+        return val
 
     #turns ON turns OFF current ramp soak mode
     #flag =0 OFF, flag = 1 ON, flag = 2 hold
