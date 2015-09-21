@@ -370,13 +370,9 @@ if sys.platform.startswith("darwin"):
     # to establish a thread pool on OS X
     import objc
     import Foundation
-# not needed anymore if pyserial >v2.7 (from trunk) is used
-#    # on OS X load the Makerbot modified list_ports module patched for P3k
-#    from artisanlib.list_ports_osx import comports
-#    serial.tools.list_ports.comports = comports
-#    from artisanlib.list_ports_vid_pid_osx_posix import *
-elif os.name == 'posix':
-    from artisanlib.list_ports_vid_pid_osx_posix import *
+#   list_ports module patched for P3k from new pyserial GitHub repository
+    from artisanlib.list_ports_osx import comports
+    serial.tools.list_ports.comports = comports
 
 
 # to make py2exe happy with scipy >0.11
@@ -16674,7 +16670,7 @@ class HUDDlg(ArtisanDialog):
         equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None))
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         equbackgroundbutton.clicked.connect(lambda _:self.setbackgroundequ1())
-        equvdevicebutton = QPushButton(QApplication.translate("Button","BT/ET",None))
+        equvdevicebutton = QPushButton(QApplication.translate("Button","ET/BT",None))
         equvdevicebutton.setFocusPolicy(Qt.NoFocus)
         equvdevicebutton.clicked.connect(lambda _:self.setvdevice())
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
