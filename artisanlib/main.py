@@ -31619,7 +31619,10 @@ class PXRpidDlgControl(ArtisanDialog):
             if aw.ser.useModbusPort:
                 if PID == "ET":
                     slaveID = aw.ser.controlETpid[1]
-                    reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
+                    if aw.ser.readETpid[0] == 0:
+                    	reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                    elif aw.ser.readETpid[0] == 1:
+                    	reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
                 elif PID == "BT":
                     slaveID = aw.ser.readBTpid[1]
                     if aw.ser.readBTpid[0] == 0:
@@ -33107,7 +33110,10 @@ class PXG4pidDlgControl(ArtisanDialog):
             if aw.ser.useModbusPort:
                 if PID == "ET":
                     slaveID = aw.ser.controlETpid[1]
-                    reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                    if aw.ser.readETpid[0] == 0:
+                    	reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                    elif aw.ser.readETpid[0] == 1:
+                    	reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
                 elif PID == "BT":
                     slaveID = aw.ser.readBTpid[1]
                     if aw.ser.readBTpid[0] == 0:
@@ -33119,7 +33125,10 @@ class PXG4pidDlgControl(ArtisanDialog):
                 r = command
             else:
                 if PID == "ET":
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
+                    if aw.ser.readETpid[0] == 0:
+                    	command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
+                    elif aw.ser.readETpid[0] == 1:
+                    	command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
                 elif PID == "BT":
                     if aw.ser.readBTpid[0] == 0:
                         command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
