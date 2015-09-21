@@ -2364,8 +2364,8 @@ class tgraphcanvas(FigureCanvas):
         # we have to update the canvas cache
         if redraw:
             self.delayedUpdateBackground()
-        else:
-            self.ax_background = None
+#        else:
+#            self.ax_background = None
 
     def fmt_timedata(self,x):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -15749,22 +15749,32 @@ $cupping_notes
     #resizes and saves graph to a new width w 
     def resizeImg(self,w,transformationmode):
         try: 
-            if pyqtversion < 5:
-                self.image = QPixmap.grabWidget(aw.qmc)
-            else:
-                self.image = aw.qmc.grab()
-            
-            if w != 0:
-                self.image = self.image.scaledToWidth(w,transformationmode)
                 
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None),ext="*.png")
             if filename:
+                aw.qmc.fig.patch.set_facecolor("white")
+                aw.qmc.fig.patch.set_edgecolor("white")
+                aw.qmc.redraw()
+                
+                if pyqtversion < 5:
+                    self.image = QPixmap.grabWidget(aw.qmc)
+                else:
+                    self.image = aw.qmc.grab()
+                
+                if w != 0:
+                    self.image = self.image.scaledToWidth(w,transformationmode)
+                
                 if ".png" not in filename:
                     filename += ".png"
                 self.image.save(filename,"PNG")
+                
                 x = self.image.width()
                 y = self.image.height()
+                aw.qmc.fig.patch.set_facecolor(aw.qmc.backcolor)
+                aw.qmc.fig.patch.set_edgecolor(aw.qmc.backcolor)
+                aw.qmc.redraw()
                 self.sendmessage(QApplication.translate("Message","{0}  size({1},{2}) saved", None).format(str(filename),str(x),str(y)))
+            
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() {0}").format(str(ex)))
 
@@ -15777,7 +15787,9 @@ $cupping_notes
             if filename:
                 if extension not in filename:
                     filename += extension
-                aw.qmc.fig.savefig(filename)
+                aw.qmc.fig.savefig(filename,transparent=True,facecolor='none', edgecolor='none',frameon=True) # transparent=True is need to get the delta curves and legend drawn
+                aw.qmc.updateBackground() # that redraw is needed to avoid the "transparent flicker"
+                                
                 self.sendmessage(QApplication.translate("Message","{0} saved", None).format(str(filename)))
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " saveVectorGraph() {0}").format(str(ex)))
