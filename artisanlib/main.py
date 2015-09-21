@@ -17202,7 +17202,7 @@ class HUDDlg(ArtisanDialog):
                             #check for double digit of Y (no timeshift)
                             if i+2 < mlen:
                                 if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
-                                    Yval.append(mathexpression[i+2]+mathexpression[i+2])
+                                    Yval.append(mathexpression[i+1]+mathexpression[i+2])
 
                             
 
