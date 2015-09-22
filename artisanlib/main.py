@@ -17170,7 +17170,7 @@ class HUDDlg(ArtisanDialog):
                                         Yshiftval = int(mathexpression[i+4])
                                         sign = mathexpression[i+3]
                                         #ET,BT,Extras                  
-                                        if nint == 1 or nint <10:
+                                        if nint:
                                             if sign == "-": #  ie. original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
                                                 evalsign = "0"      # digit "0" = "-"
                                                 shiftedindex = index + Yshiftval   
