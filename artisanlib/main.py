@@ -16026,13 +16026,17 @@ $cupping_notes
         string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
         string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
         string1 += "</UL>"
-        string2 = "<UL><LI><b>x current curve value</b>"
+        string2 = "<UL><LI><b>x</b> Time"
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
         string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
         string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None))
         string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra #1 T2 value",None))
         string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra #2 T1 value",None))
         string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra #2 T2 value",None))
+        string2 += "<LI><b>Y1[-2]</b> " + u(QApplication.translate("Message", "ET index advanced in time twice",None))
+        string2 += "<LI><b>Y2[+1]</b> " + u(QApplication.translate("Message", "BT index delayed in time once",None))
+        string2 += "<LI><b>Y4[+1]</b> " + u(QApplication.translate("Message", "Extra #2 T2 delayed in time 5 samples",None))        
+        string2 += "<LI><b>Yx[+1]</b> " + u(QApplication.translate("Message", "Time when time index delayed in time once",None))        
         string2 += "<LI><b>...</b> "
         string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None))
         string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None))
@@ -17130,10 +17134,7 @@ class HUDDlg(ArtisanDialog):
             #get index from the time
             index = aw.qmc.time2index(x)
 
-            #newtimeshift vars 
-            #deep copies for BT ET timeshift (copies will be modified)
-            Y1 = aw.qmc.temp1[:]
-            Y2 = aw.qmc.temp2[:]
+            #timeshift vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
             timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
         
@@ -17147,73 +17148,93 @@ class HUDDlg(ArtisanDialog):
                 #if Ys in expression
                 if "Y" in mathexpression:
                     #extract Ys
-                    Yval = []                   #extract value number example Y9 = 9
+                    Yval = []                   #stores value number example Y9 = 9
                     mlen = len(mathexpression)
                     for i in range(mlen):
                         if mathexpression[i] == "Y":
-                            #find Y number
+                            #find Y number for ET,BT,Extras (upto 9)
                             if i+1 < mlen:                          #check for out of range
                                 if mathexpression[i+1].isdigit():
-                                    #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" shift Y1 2 to the left
-                                    if i+5 < len(mathexpression) and mathexpression[i+1].isdigit() and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
+                                    #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" shifts index signal twice
+                                    #SIGNAL(t - t1) or SIGNAL(x - timeshift) 
+                                    if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
                                         nint = int(mathexpression[i+1])              #Ynumber int
                                         Yshiftval = int(mathexpression[i+4])
                                         sign = mathexpression[i+3]
-                                        if sign == "-": #  ie. original [1,2,3,4,5,6]
-                                            evalsign = "0"      # digit 0 = "-"
-                                            if nint == 1: #ET 
-                                                Y1 = Y1[Yshiftval:] + [Y1[-1]]*Yshiftval #result: shift 2 left = [3,4,5,6,6,6]
-                                                val = Y1[index]
-                                            elif nint == 2: #BT
-                                                Y2 = Y2[Yshiftval:] + [Y2[-1]]*Yshiftval 
-                                                val = Y2[index]
+                                        #ET,BT,Extras                  
+                                        if nint == 1 or nint <10:
+                                            if sign == "-": #  ie. original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
+                                                evalsign = "0"      # digit "0" = "-"
+                                                shiftedindex = index + Yshiftval   
+                                                if shiftedindex >= len(aw.qmc.timex):
+                                                    shiftedindex = len(aw.qmc.timex)- 1
+                                                if nint == 1: #ET
+                                                    val =aw.qmc.temp1[shiftedindex]
+                                                elif nint == 2: #BT
+                                                    val =aw.qmc.temp2[shiftedindex]
+                                                elif nint > 2:
+                                                    if nint%2:  #odd 3,5,7,9
+                                                        val = aw.qmc.extratemp1[nint-2][shiftedindex]
+                                                    else:       #even 4,6,8
+                                                        val = aw.qmc.extratemp2[nint-2][shiftedindex]                                                    
+                            
+                                            elif sign == "+": #"+" original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
+                                                evalsign = "1"      #digit 1 = "+"
+                                                shiftedindex = index - Yshiftval   
+                                                if shiftedindex < 0:
+                                                    shiftedindex = 0
+                                                if nint == 1: #ET
+                                                    val =aw.qmc.temp1[shiftedindex]
+                                                elif nint == 2: #BT
+                                                    val =aw.qmc.temp2[shiftedindex]
+                                                elif nint > 2:
+                                                    if nint%2:
+                                                        val = aw.qmc.extratemp1[nint-2][shiftedindex]
+                                                    else:
+                                                        val = aw.qmc.extratemp2[nint-2][shiftedindex]
+                                                        
+                                            #add expression and values found
+                                            evaltimeexpression = "Y" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
+                                            timeshiftexpressions.append(evaltimeexpression)
+                                            timeshiftexpressionsvalues.append(val)
+                                            #convert "Y2[+9]" to Ynumber compatible for python eval() to add to dictionary
+                                            #METHOD USED: replace all non digits chars with sign value.
+                                            #Example1 "Y2[-7]" = "Y20070"   Example2 "Y2[+9]" = "Y21191"
+                                            mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                    # No timeshift
+                                    else:
+                                        Yval.append(mathexpression[i+1])
 
-##                                            #underwork  
-##                                            shiftedindex = index - Yshiftval  #substract
-##                                            if (index - shiftedindex) < 0:
-##                                                shiftedindex = 0
-##                                            evalsign = "0"                      # number 0 = "-"
-##                                            if nint == 1: #ET
-##                                                val =aw.qmc.temp1[shiftedindex]
-##                                            elif nint == 2: #BT
-##                                                val =aw.qmc.temp2[shiftedindex]
-                        
-                                        elif sign == "+": #"+" shift right twice original [1,2,3,4,5,6]
+                                # x timeshift                                         
+                                elif mathexpression[i+1] == "x":
+                                    if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
+                                        Yshiftval = int(mathexpression[i+4])
+                                        sign = mathexpression[i+3]
+                                        if sign == "-": #  ie. original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
+                                            evalsign = "0"      # digit "0" = "-"
+                                            shiftedindex = index + Yshiftval   
+                                            if shiftedindex >= len(aw.qmc.timex):
+                                                shiftedindex = len(aw.qmc.timex)- 1
+                                            val =aw.qmc.timex[shiftedindex]
+                                        elif sign == "+": #"+" original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
                                             evalsign = "1"      #digit 1 = "+"
-                                            if nint == 1: #ET 
-                                                Y1 = [Y1[0]]*Yshiftval + Y1[:len(Y1)-Yshiftval] #result [1, 1, 1, 2, 3, 4]
-                                                val = Y1[index]
-                                            elif nint == 2: #BT
-                                                Y2 = [Y2[0]]*Yshiftval + Y2[:len(Y2)-Yshiftval]
-                                                val = Y2[index]
-                                                
-                                        #add expression and values found
+                                            shiftedindex = index - Yshiftval   
+                                            if shiftedindex < 0:
+                                                shiftedindex = 0
+                                            val =aw.qmc.timex[shiftedindex]
                                         evaltimeexpression = "Y" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
                                         timeshiftexpressions.append(evaltimeexpression)
                                         timeshiftexpressionsvalues.append(val)
-                                        #convert "Y2[+9]" to Ynumber compatible for python eval() to add to dictionary
-                                        #Method: replace all non digits chars with sign value.
-                                        #Example1 "Y2[-7]" = "Y20070"   Example2 "Y2[+9]" = "Y21191"
                                         mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
-                                #if mathexpression[i+1].isdigit():    #no timeshift
-                                    else:
-                                        Yval.append(mathexpression[i+1])
-                                        
-                            #check for double digit of Y (no timeshift)
-                            if i+2 < mlen:
-                                if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
-                                    Yval.append(mathexpression[i+1]+mathexpression[i+2])
-
                             
-
                     #created Ys values 
                     if len(aw.qmc.timex) > 1:
-                        Y = [Y1[index],Y2[index]]
+                        Y = [aw.qmc.temp1[index],aw.qmc.temp2[index]]
                         if len(aw.qmc.extratimex):
                             if len(aw.qmc.extratimex[0]):
                                 for i in range(len(aw.qmc.extradevices)):
-                                    Y.append(aw.qmc.extratemp1[i][index])  #ET
-                                    Y.append(aw.qmc.extratemp2[i][index])  #BT
+                                    Y.append(aw.qmc.extratemp1[i][index])  
+                                    Y.append(aw.qmc.extratemp2[i][index])  
                         #add Ys and their value to math dictionary
                         for i in range(len(Yval)):
                             mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
