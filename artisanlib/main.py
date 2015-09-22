@@ -370,13 +370,9 @@ if sys.platform.startswith("darwin"):
     # to establish a thread pool on OS X
     import objc
     import Foundation
-# not needed anymore if pyserial >v2.7 (from trunk) is used
-#    # on OS X load the Makerbot modified list_ports module patched for P3k
-#    from artisanlib.list_ports_osx import comports
-#    serial.tools.list_ports.comports = comports
-#    from artisanlib.list_ports_vid_pid_osx_posix import *
-elif os.name == 'posix':
-    from artisanlib.list_ports_vid_pid_osx_posix import *
+#   list_ports module patched for P3k from new pyserial GitHub repository
+    from artisanlib.list_ports_osx import comports
+    serial.tools.list_ports.comports = comports
 
 
 # to make py2exe happy with scipy >0.11
@@ -2368,8 +2364,8 @@ class tgraphcanvas(FigureCanvas):
         # we have to update the canvas cache
         if redraw:
             self.delayedUpdateBackground()
-        else:
-            self.ax_background = None
+#        else:
+#            self.ax_background = None
 
     def fmt_timedata(self,x):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -15753,22 +15749,32 @@ $cupping_notes
     #resizes and saves graph to a new width w 
     def resizeImg(self,w,transformationmode):
         try: 
-            if pyqtversion < 5:
-                self.image = QPixmap.grabWidget(aw.qmc)
-            else:
-                self.image = aw.qmc.grab()
-            
-            if w != 0:
-                self.image = self.image.scaledToWidth(w,transformationmode)
                 
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None),ext="*.png")
             if filename:
+                aw.qmc.fig.patch.set_facecolor("white")
+                aw.qmc.fig.patch.set_edgecolor("white")
+                aw.qmc.redraw()
+                
+                if pyqtversion < 5:
+                    self.image = QPixmap.grabWidget(aw.qmc)
+                else:
+                    self.image = aw.qmc.grab()
+                
+                if w != 0:
+                    self.image = self.image.scaledToWidth(w,transformationmode)
+                
                 if ".png" not in filename:
                     filename += ".png"
                 self.image.save(filename,"PNG")
+                
                 x = self.image.width()
                 y = self.image.height()
+                aw.qmc.fig.patch.set_facecolor(aw.qmc.backcolor)
+                aw.qmc.fig.patch.set_edgecolor(aw.qmc.backcolor)
+                aw.qmc.redraw()
                 self.sendmessage(QApplication.translate("Message","{0}  size({1},{2}) saved", None).format(str(filename),str(x),str(y)))
+            
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() {0}").format(str(ex)))
 
@@ -15781,7 +15787,9 @@ $cupping_notes
             if filename:
                 if extension not in filename:
                     filename += extension
-                aw.qmc.fig.savefig(filename)
+                aw.qmc.fig.savefig(filename,transparent=True,facecolor='none', edgecolor='none',frameon=True) # transparent=True is need to get the delta curves and legend drawn
+                aw.qmc.updateBackground() # that redraw is needed to avoid the "transparent flicker"
+                                
                 self.sendmessage(QApplication.translate("Message","{0} saved", None).format(str(filename)))
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " saveVectorGraph() {0}").format(str(ex)))
@@ -16678,7 +16686,7 @@ class HUDDlg(ArtisanDialog):
         equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None))
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         equbackgroundbutton.clicked.connect(lambda _:self.setbackgroundequ1())
-        equvdevicebutton = QPushButton(QApplication.translate("Button","BT/ET",None))
+        equvdevicebutton = QPushButton(QApplication.translate("Button","ET/BT",None))
         equvdevicebutton.setFocusPolicy(Qt.NoFocus)
         equvdevicebutton.clicked.connect(lambda _:self.setvdevice())
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
@@ -31644,7 +31652,10 @@ class PXRpidDlgControl(ArtisanDialog):
             if aw.ser.useModbusPort:
                 if PID == "ET":
                     slaveID = aw.ser.controlETpid[1]
-                    reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
+                    if aw.ser.readETpid[0] == 0:
+                    	reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                    elif aw.ser.readETpid[0] == 1:
+                    	reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
                 elif PID == "BT":
                     slaveID = aw.ser.readBTpid[1]
                     if aw.ser.readBTpid[0] == 0:
@@ -33132,7 +33143,10 @@ class PXG4pidDlgControl(ArtisanDialog):
             if aw.ser.useModbusPort:
                 if PID == "ET":
                     slaveID = aw.ser.controlETpid[1]
-                    reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                    if aw.ser.readETpid[0] == 0:
+                    	reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                    elif aw.ser.readETpid[0] == 1:
+                    	reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
                 elif PID == "BT":
                     slaveID = aw.ser.readBTpid[1]
                     if aw.ser.readBTpid[0] == 0:
@@ -33144,7 +33158,10 @@ class PXG4pidDlgControl(ArtisanDialog):
                 r = command
             else:
                 if PID == "ET":
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
+                    if aw.ser.readETpid[0] == 0:
+                    	command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
+                    elif aw.ser.readETpid[0] == 1:
+                    	command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
                 elif PID == "BT":
                     if aw.ser.readBTpid[0] == 0:
                         command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
