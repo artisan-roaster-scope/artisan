@@ -1528,7 +1528,10 @@ class tgraphcanvas(FigureCanvas):
                 if self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
                     message += u(" (") + u(self.backgroundEStrings[i]) + u(")")
             if len(message) != 0:
-                message += u(" @ ") + self.stringfromseconds(event.artist.get_xdata()[event.ind][0])
+                tx = event.artist.get_xdata()[event.ind][0]
+                if aw.qmc.timeindexB[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindexB[0]:
+                    tx = tx - aw.qmc.timeB[aw.qmc.timeindexB[0]]                
+                message += u(" @ ") + self.stringfromseconds(tx)
                 aw.sendmessage(message,append=False)
         else:
             timex = self.time2index(event.artist.get_xdata()[event.ind][0])
@@ -1544,7 +1547,10 @@ class tgraphcanvas(FigureCanvas):
                 if self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
                     message += u(" (") + u(self.specialeventsStrings[i]) + u(")")
             if len(message) != 0:
-                message += u(" @ ") + self.stringfromseconds(event.artist.get_xdata()[event.ind][0])
+                tx = event.artist.get_xdata()[event.ind][0]
+                if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
+                    tx = tx - aw.qmc.timex[aw.qmc.timeindex[0]]  
+                message += u(" @ ") + self.stringfromseconds(tx)
                 aw.sendmessage(message,append=False)
 
     def onclick(self,event):
@@ -19138,7 +19144,10 @@ class editGraphDlg(ArtisanDialog):
             
             timeline = QLineEdit()
             timeline.setAlignment(Qt.AlignRight)
-            timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+            if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
+                timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+            else:
+                timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]))                
             self.eventtablecopy.append(str(timez)) 
             timeline.setText(timez)
             timeline.setValidator(QRegExpValidator(regextime,self))
