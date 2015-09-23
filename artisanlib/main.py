@@ -1531,7 +1531,10 @@ class tgraphcanvas(FigureCanvas):
                 if self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
                     message += u(" (") + u(self.backgroundEStrings[i]) + u(")")
             if len(message) != 0:
-                message += u(" @ ") + self.stringfromseconds(event.artist.get_xdata()[event.ind][0])
+                tx = event.artist.get_xdata()[event.ind][0]
+                if aw.qmc.timeindexB[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindexB[0]:
+                    tx = tx - aw.qmc.timeB[aw.qmc.timeindexB[0]]                
+                message += u(" @ ") + self.stringfromseconds(tx)
                 aw.sendmessage(message,append=False)
         else:
             timex = self.time2index(event.artist.get_xdata()[event.ind][0])
@@ -1547,7 +1550,10 @@ class tgraphcanvas(FigureCanvas):
                 if self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
                     message += u(" (") + u(self.specialeventsStrings[i]) + u(")")
             if len(message) != 0:
-                message += u(" @ ") + self.stringfromseconds(event.artist.get_xdata()[event.ind][0])
+                tx = event.artist.get_xdata()[event.ind][0]
+                if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
+                    tx = tx - aw.qmc.timex[aw.qmc.timeindex[0]]  
+                message += u(" @ ") + self.stringfromseconds(tx)
                 aw.sendmessage(message,append=False)
 
     def onclick(self,event):
@@ -19130,7 +19136,10 @@ class editGraphDlg(ArtisanDialog):
             
             timeline = QLineEdit()
             timeline.setAlignment(Qt.AlignRight)
-            timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+            if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
+                timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+            else:
+                timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]))                
             self.eventtablecopy.append(str(timez)) 
             timeline.setText(timez)
             timeline.setValidator(QRegExpValidator(regextime,self))
@@ -32446,7 +32455,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         button_rsoff.clicked.connect(lambda flag=0: self.setONOFFrampsoak(0))
         button_standbyON.clicked.connect(lambda flag=1: self.setONOFFstandby(1))
         button_standbyOFF.clicked.connect(lambda flag=0: self.setONOFFstandby(0))
-        button_exit.clicked.connect(self.reject)
+        button_exit.clicked.connect(self.accept)
         button_load.clicked.connect(lambda : self.load())
         button_save.clicked.connect(lambda : self.save())
         button_writeall.clicked.connect(lambda : self.writeAll())
@@ -34220,6 +34229,48 @@ class PXG4pidDlgControl(ArtisanDialog):
                     self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned ON",None),5000) 
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","UNABLE to set Autotune",None),5000) 
+                
+    def accept(self):
+        # store set values
+        aw.fujipid.PXG4["sv1"][0] = float(self.sv1edit.text())
+        aw.fujipid.PXG4["sv2"][0] = float(self.sv2edit.text())
+        aw.fujipid.PXG4["sv3"][0] = float(self.sv3edit.text())
+        aw.fujipid.PXG4["sv4"][0] = float(self.sv4edit.text())
+        aw.fujipid.PXG4["sv5"][0] = float(self.sv5edit.text())
+        aw.fujipid.PXG4["sv6"][0] = float(self.sv6edit.text())
+        aw.fujipid.PXG4["sv7"][0] = float(self.sv7edit.text())
+        # store set values
+        aw.fujipid.PXG4["p1"][0] = int(self.p1edit.text())
+        aw.fujipid.PXG4["p2"][0] = int(self.p2edit.text())
+        aw.fujipid.PXG4["p3"][0] = int(self.p3edit.text())
+        aw.fujipid.PXG4["p4"][0] = int(self.p4edit.text())
+        aw.fujipid.PXG4["p5"][0] = int(self.p5edit.text())
+        aw.fujipid.PXG4["p6"][0] = int(self.p6edit.text())
+        aw.fujipid.PXG4["p7"][0] = int(self.p7edit.text())
+        aw.fujipid.PXG4["i1"][0] = int(self.i1edit.text())
+        aw.fujipid.PXG4["i2"][0] = int(self.i2edit.text())
+        aw.fujipid.PXG4["i3"][0] = int(self.i3edit.text())
+        aw.fujipid.PXG4["i4"][0] = int(self.i4edit.text())
+        aw.fujipid.PXG4["i5"][0] = int(self.i5edit.text())
+        aw.fujipid.PXG4["i6"][0] = int(self.i6edit.text())
+        aw.fujipid.PXG4["i7"][0] = int(self.i7edit.text())
+        aw.fujipid.PXG4["d1"][0] = int(self.d1edit.text())
+        aw.fujipid.PXG4["d2"][0] = int(self.d2edit.text())
+        aw.fujipid.PXG4["d3"][0] = int(self.d3edit.text())
+        aw.fujipid.PXG4["d4"][0] = int(self.d4edit.text())
+        aw.fujipid.PXG4["d5"][0] = int(self.d5edit.text())
+        aw.fujipid.PXG4["d6"][0] = int(self.d6edit.text())
+        aw.fujipid.PXG4["d7"][0] = int(self.d7edit.text())
+        # store segment table
+        for i in range(16):
+            svkey = "segment" + str(i+1) + "sv"
+            rampkey = "segment" + str(i+1) + "ramp"
+            soakkey = "segment" + str(i+1) + "soak"
+            aw.fujipid.PXG4[svkey][0] = float(self.segmenttable.cellWidget(i,0).text())
+            aw.fujipid.PXG4[rampkey][0] = aw.qmc.stringtoseconds(self.segmenttable.cellWidget(i,0).text())
+            aw.fujipid.PXG4[soakkey][0] = aw.qmc.stringtoseconds(self.segmenttable.cellWidget(i,0).text())            
+        self.close()
+        
 
     def createsegmenttable(self):
         self.segmenttable.setRowCount(16)

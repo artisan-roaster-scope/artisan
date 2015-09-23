@@ -45,7 +45,7 @@ install python-3.4.3.msi via "Python 3.4.3 Windows x86 MSI Installer" from http:
 
 2) pyserial
 
-download pyserial-2.7.tar.gzfrom http://pyserial.sourceforge.net
+download pyserial-2.7.tar.gz from http://pyserial.sourceforge.net
 
 unpack and patch:
 
