@@ -2451,7 +2451,7 @@ class tgraphcanvas(FigureCanvas):
     # returns True if nothing to save, discard or save was selected and False if canceled by the user
     def checkSaved(self):
         #prevents deleting accidentally a finished roast
-        if self.safesaveflag == True and len(aw.qmc.timex):
+        if self.safesaveflag == True and len(aw.qmc.timex) > 3:
             string = QApplication.translate("Message","Save the profile, Discard the profile (Reset), or Cancel?", None)
             reply = QMessageBox.warning(self,QApplication.translate("Message","Profile unsaved", None),string,
                                 QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
@@ -2513,6 +2513,14 @@ class tgraphcanvas(FigureCanvas):
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
     def reset(self,redraw=True,soundOn=True):
+    
+        try:
+            focused_widget = QApplication.focusWidget()
+            if focused_widget:
+                focused_widget.clearFocus()
+        except:
+            pass
+    
         if not self.checkSaved():
             return False
         else:
@@ -4113,6 +4121,7 @@ class tgraphcanvas(FigureCanvas):
         
     def OnMonitor(self):
         try:
+            aw.qmc.reset(True,False)
             try:
                 appnope.nope()
             except:
@@ -4271,8 +4280,6 @@ class tgraphcanvas(FigureCanvas):
                 return False
             else:
                 aw.soundpop()
-                if self.timex != []:
-                    aw.qmc.reset(True,False)
                 self.OnMonitor()
         #turn OFF
         else:
@@ -5048,7 +5055,10 @@ class tgraphcanvas(FigureCanvas):
                         if aw.minieventsflag:
                             aw.eventlabel.setText(QApplication.translate("Label", "Event #<b>{0} </b>",None).format(Nevents+1))
                             aw.eNumberSpinBox.blockSignals(True)
-                            aw.eNumberSpinBox.setValue(Nevents+1)
+                            try:
+                                aw.eNumberSpinBox.setValue(Nevents+1)
+                            except:
+                                pass
                             aw.eNumberSpinBox.blockSignals(False)
                             if aw.qmc.timeindex[0] > -1:
                                 timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
@@ -10255,8 +10265,7 @@ class ApplicationWindow(QMainWindow):
                 self.setSliderFocusPolicy(Qt.NoFocus)
                 self.keyboardmoveindex = 2
                 self.sendmessage(QApplication.translate("Message","Keyboard moves turned ON", None))
-                self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
-                
+                self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])                
             elif self.keyboardmoveflag == 1:
                 # turn off 
                 self.keyboardmoveflag = 0
@@ -17392,13 +17401,15 @@ class HUDDlg(ArtisanDialog):
         self.startEdit.setDisabled(True)
         self.endEdit.blockSignals(True)
         self.endEdit.setDisabled(True)
-        if self.polyfitCheck.isChecked() and len(aw.qmc.timex) > 2:
-            aw.qmc.resetlines()
-            aw.qmc.redraw(recomputeAllDeltas=False)
-            self.doPolyfit()
-        else:
-            self.result.setText("")
-        self.polyfitdeg.setDisabled(False) #blockSignals(False)
+        try:
+            if self.polyfitCheck.isChecked() and len(aw.qmc.timex) > 2:
+                aw.qmc.resetlines()
+                aw.qmc.redraw(recomputeAllDeltas=False)
+                self.doPolyfit()
+            else:
+                self.result.setText("")
+        except:
+            pass
         self.startEdit.setDisabled(False)
         self.startEdit.blockSignals(False)
         self.endEdit.setDisabled(False)
@@ -17528,8 +17539,11 @@ class HUDDlg(ArtisanDialog):
             v = self.PathEffects.value()
             if v != aw.qmc.patheffects:
                 self.PathEffects.blockSignals(True)
-                aw.qmc.patheffects = v
-                aw.qmc.redraw(recomputeAllDeltas=False)
+                try:
+                    aw.qmc.patheffects = v
+                    aw.qmc.redraw(recomputeAllDeltas=False)
+                except:
+                    pass
                 self.PathEffects.blockSignals(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -17549,8 +17563,11 @@ class HUDDlg(ArtisanDialog):
             if v != aw.qmc.deltafilter:
                 self.DeltaFilter.setDisabled(True)
                 self.DeltaFilter.blockSignals(True)
-                aw.qmc.deltafilter = v
-                aw.qmc.redraw(recomputeAllDeltas=True)
+                try:
+                    aw.qmc.deltafilter = v
+                    aw.qmc.redraw(recomputeAllDeltas=True)
+                except:
+                    pass
                 self.DeltaFilter.setDisabled(False)
                 self.DeltaFilter.blockSignals(False)
         except Exception as e:
@@ -27222,18 +27239,21 @@ class PortComboBox(QComboBox):
 
     def updateMenu(self):
         self.blockSignals(True)
-        if platf == 'Darwin':
-            self.ports = list([p for p in serial.tools.list_ports.comports() if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync','/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem'])])
-        else:
-            self.ports = list(serial.tools.list_ports.comports())
-        if self.selection not in [p[0] for p in self.ports]:
-            self.ports.append([self.selection,"",""])
-        self.ports = sorted(self.ports,key=lambda p: p[0])
-        self.clear()
-        self.addItems([(p[1] if (p[1] and p[1]!="n/a") else p[0]) for p in self.ports])
         try:
-            pos = [p[0] for p in self.ports].index(self.selection)
-            self.setCurrentIndex(pos)
+            if platf == 'Darwin':
+                self.ports = list([p for p in serial.tools.list_ports.comports() if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync','/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem'])])
+            else:
+                self.ports = list(serial.tools.list_ports.comports())
+            if self.selection not in [p[0] for p in self.ports]:
+                self.ports.append([self.selection,"",""])
+            self.ports = sorted(self.ports,key=lambda p: p[0])
+            self.clear()
+            self.addItems([(p[1] if (p[1] and p[1]!="n/a") else p[0]) for p in self.ports])
+            try:
+                pos = [p[0] for p in self.ports].index(self.selection)
+                self.setCurrentIndex(pos)
+            except:
+                pass
         except:
             pass
         self.blockSignals(False)
