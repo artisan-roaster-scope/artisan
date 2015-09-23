@@ -601,7 +601,7 @@ class tgraphcanvas(FigureCanvas):
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
         self.statisticsflags = [1,1,0,1,1,0]
-        self.statisticsmode = 0 # one of 0: standard computed values, 1: roast properties
+        self.statisticsmode = 1 # one of 0: standard computed values, 1: roast properties
         #conditions to estimate bad flavor:dry[min,max],mid[min,max],finish[min,max] in seconds
         self.defaultstatisticsconditions = [180,360,180,600,180,360,180,300]
         self.statisticsconditions = self.defaultstatisticsconditions
@@ -12770,6 +12770,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("DeltaSpan"):
                 self.qmc.deltaspan = toInt(settings.value("DeltaSpan",self.qmc.deltaspan))
             self.qmc.LCDdecimalplaces = toInt(settings.value("LCDdecimalplaces",self.qmc.LCDdecimalplaces))
+            if settings.contains("statisticsmode"):
+                self.qmc.statisticsmode = toInt(settings.value("statisticsmode",self.qmc.statisticsmode))
             if settings.contains("DeltaETlcd"):
                 self.qmc.DeltaETlcdflag = bool(toBool(settings.value("DeltaETlcd",self.qmc.DeltaETlcdflag)))
             if settings.contains("DeltaBTlcd"):
@@ -13642,6 +13644,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("deltafilter",self.qmc.deltafilter)
             settings.setValue("DeltaSpan",self.qmc.deltaspan)
             settings.setValue("LCDdecimalplaces",self.qmc.LCDdecimalplaces)
+            settings.setValue("statisticsmode",self.qmc.statisticsmode)
             settings.endGroup()
             settings.setValue("curvefilter",self.qmc.curvefilter)
             settings.setValue("smoothingwindowsize",self.qmc.smoothingwindowsize)
