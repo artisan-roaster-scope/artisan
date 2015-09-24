@@ -31655,8 +31655,10 @@ class PXRpidDlgControl(ArtisanDialog):
         tab3layout.addWidget(button_autotuneOFF,3,2)
         tab3layout.addWidget(button_readpid,4,1)
         tab3layout.addWidget(tab3cancelbutton,4,2)
+        #tab4
         tab4layout = QVBoxLayout()
         tab4layout.addWidget(self.segmenttable)
+        
         #tab5
         thermolayoutET = QHBoxLayout()
         thermolayoutET.addWidget(self.ETthermocombobox)
@@ -34325,8 +34327,8 @@ class PXG4pidDlgControl(ArtisanDialog):
             rampkey = "segment" + str(i+1) + "ramp"
             soakkey = "segment" + str(i+1) + "soak"
             aw.fujipid.PXG4[svkey][0] = float(self.segmenttable.cellWidget(i,0).text())
-            aw.fujipid.PXG4[rampkey][0] = aw.qmc.stringtoseconds(self.segmenttable.cellWidget(i,0).text())
-            aw.fujipid.PXG4[soakkey][0] = aw.qmc.stringtoseconds(self.segmenttable.cellWidget(i,0).text())            
+            aw.fujipid.PXG4[rampkey][0] = aw.qmc.stringtoseconds(self.segmenttable.cellWidget(i,1).text())
+            aw.fujipid.PXG4[soakkey][0] = aw.qmc.stringtoseconds(self.segmenttable.cellWidget(i,2).text())            
         self.close()
         
 
