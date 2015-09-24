@@ -17306,7 +17306,8 @@ class HUDDlg(ArtisanDialog):
                 else:
                     aw.qmc.plotterstack.insert(10,res)
                     aw.qmc.plotterstack.pop(0)
-                    aw.qmc.plotterequationresults[equeditnumber].append(res)
+                    if equeditnumber:
+                        aw.qmc.plotterequationresults[equeditnumber].append(res)
                     return res
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
