@@ -1365,6 +1365,8 @@ class tgraphcanvas(FigureCanvas):
 
         #holds last values calculated from plotter
         self.plotterstack = [0]*10
+        #holds results for each equation (6 total)
+        self.plotterequationresults = [[],[],[],[],[],[]]
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -16043,20 +16045,27 @@ $cupping_notes
         string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
         string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
         string1 += "</UL>"
-        string2 = "<UL><LI><b>x</b> Time"
+        string2 = "<UL><LI><b>x</b> Time in seconds"
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
         string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
         string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None))
         string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra #1 T2 value",None))
         string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra #2 T1 value",None))
         string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra #2 T2 value",None))
-        string2 += "<LI><b>Y1[-2]</b> " + u(QApplication.translate("Message", "ET value delayed 2 index",None))
+        string2 += "<LI><b>Y1[-2]</b> " + u(QApplication.translate("Message", "ET value delayed by 2 index",None))
         string2 += "<LI><b>Y2[+1]</b> " + u(QApplication.translate("Message", "BT value index advanced once",None))
         string2 += "<LI><b>Y4[+1]</b> " + u(QApplication.translate("Message", "Extra #2 T2 advanced 1 index",None))        
-        string2 += "<LI><b>Yx[+1]</b> " + u(QApplication.translate("Message", "Time advanced one index",None))        
+        string2 += "<LI><b>Yt[+1]</b> " + u(QApplication.translate("Message", "Time one index ahead",None))
+        string2 += "<LI><b>Yt[-3]</b> " + u(QApplication.translate("Message", "Time three index delayed",None))
+        string2 += "<LI><b>Y0[-1]</b> " + u(QApplication.translate("Message", "Last formula result (feedback)",None))
+        string2 += "<LI><b>Y0[-3]</b> " + u(QApplication.translate("Message", "Third last formula result (feedback)",None))        
+        string2 += "<LI><b>R1</b> " + u(QApplication.translate("Message", "Results from window field #1",None))        
+        string2 += "<LI><b>R3</b> " + u(QApplication.translate("Message", "Results from window field #3",None))        
+        string2 += "<LI><b>#</b> " + u(QApplication.translate("Message", "Comments out window field",None))        
         string2 += "<LI><b>...</b> "
         string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None))
         string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None))
+        string2 += "<LI><b>Units</b> " + u(QApplication.translate("Message", "Plotter uses the left Y-coordinate only",None))
         string2 += "</UL>"
         string2 += "<br>"
         string2 += u(QApplication.translate("Message", "Yn holds values sampled in the actual interval if refering to ET/BT or extra channels from devices listed before, otherwise Yn hold values sampled in the previous interval",None))
@@ -17126,32 +17135,35 @@ class HUDDlg(ArtisanDialog):
     def plotequ(self):
         try:
             aw.qmc.plotterstack = [0]*10
+            aw.qmc.plotterequationresults = [[],[],[],[],[],[]]
             EQU = [str(self.equedit1.text()),str(self.equedit2.text()),
                    str(self.equedit3.text()),str(self.equedit4.text()),
                    str(self.equedit5.text()),str(self.equedit6.text())]
             aw.qmc.resetlines()
-            for e in range(5):
+            for e in range(6):
                 #create x range
-                x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
+                if len(aw.qmc.timex):
+                    x_range = aw.qmc.timex #list(range(int(aw.qmc.timex[0]),int(aw.qmc.timex[-1])))
+                else:
+                    x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
                 #create y range
                 y_range = []
                 for i in range(len(x_range)):
-                    y_range.append(self.eval_curve_expression(EQU[e],x_range[i]))
+                    y_range.append(self.eval_curve_expression(EQU[e],x_range[i],e)) #e = equeditnumber
                 aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
             aw.qmc.fig.canvas.draw()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): {0}").format(str(e)),exc_tb.tb_lineno)
 
-    def eval_curve_expression(self,mathexpression,x):
+    def eval_curve_expression(self,mathexpression,x,equeditnumber=None):
         
         if len(mathexpression):
             if mathexpression[0] == "#":        
-                return
+                return -1000
             
             #get index from the time
             index = aw.qmc.time2index(x)
-
             #timeshift vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
             timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
@@ -17164,7 +17176,7 @@ class HUDDlg(ArtisanDialog):
                 x = float(x)
                 mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
                 #if Ys in expression
-                if "Y" in mathexpression:
+                if "Y" in mathexpression or "R" in mathexpression:
                     #extract Ys
                     Yval = []                   #stores value number example Y9 = 9
                     mlen = len(mathexpression)
@@ -17173,15 +17185,14 @@ class HUDDlg(ArtisanDialog):
                             #find Y number for ET,BT,Extras (upto 9)
                             if i+1 < mlen:                          #check for out of range
                                 if mathexpression[i+1].isdigit():
-                                    #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" shifts index signal twice
-                                    #SIGNAL(t - t1) or SIGNAL(x - timeshift) 
+                                    #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" 
                                     if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
                                         nint = int(mathexpression[i+1])              #Ynumber int
                                         Yshiftval = int(mathexpression[i+4])
                                         sign = mathexpression[i+3]
                                         #ET,BT,Extras                  
                                         if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
-                                            evalsign = "0"      # digit "0" = "-"
+                                            evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
                                             shiftedindex = index - Yshiftval   
                                             if shiftedindex < 0:
                                                 shiftedindex = 0                                                   
@@ -17199,9 +17210,14 @@ class HUDDlg(ArtisanDialog):
                                                 val = aw.qmc.extratemp1[nint-2][shiftedindex]
                                             else:
                                                 val = aw.qmc.extratemp2[nint-2][shiftedindex]
+                                        # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
+                                        # holds the ten previous formula results in order.
+                                        # Y0[-1] is the last result. Y0[-5] is the past 5th result 
                                         elif nint == 0:
-                                            val = aw.qmc.plotterstack[Yshiftval]
-
+                                            if sign == "-":
+                                                val = aw.qmc.plotterstack[-1*Yshiftval]
+                                            else:
+                                                val = aw.qmc.plotterstack[9]  #if sign positive then val = Y0[-1] (last)
                                         #add expression and values found
                                         evaltimeexpression = "Y" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
                                         timeshiftexpressions.append(evaltimeexpression)
@@ -17215,7 +17231,7 @@ class HUDDlg(ArtisanDialog):
                                         Yval.append(mathexpression[i+1])
 
                                 # aw.qmc.timex var timeshift                                         
-                                elif mathexpression[i+1] == "x":
+                                elif mathexpression[i+1] == "t":
                                     if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
                                         Yshiftval = int(mathexpression[i+4])
                                         sign = mathexpression[i+3]
@@ -17235,7 +17251,21 @@ class HUDDlg(ArtisanDialog):
                                         timeshiftexpressions.append(evaltimeexpression)
                                         timeshiftexpressionsvalues.append(val)
                                         mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
-
+                        
+                        #Add to dict previous results from windows (1-6)
+                        elif mathexpression[i] == "R":
+                            mlen = len(mathexpression)
+                            for i in range(mlen):
+                                #find R number (up to 6)
+                                if i+1 < mlen:                          #check for out of range
+                                    if mathexpression[i+1].isdigit():
+                                        nint = int(mathexpression[i+1])
+                                        if index < len(aw.qmc.plotterequationresults[nint-1]):
+                                            val = aw.qmc.plotterequationresults[nint-1][index]
+                                        else:
+                                            val = -1000
+                                        mathdictionary["R"+mathexpression[i+1]] = val
+                        
                     #created Ys values 
                     if len(aw.qmc.timex) > 1:
                         Y = [aw.qmc.temp1[index],aw.qmc.temp2[index]]
@@ -17246,11 +17276,14 @@ class HUDDlg(ArtisanDialog):
                                     Y.append(aw.qmc.extratemp2[i][index])  
                         #add Ys and their value to math dictionary
                         for i in range(len(Yval)):
-                            mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
+                            if "Y"+ Yval[i] not in mathdictionary:
+                                mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
                         #add timeshifted Ys to the math dictionary
                         for i in range(len(timeshiftexpressions)):
-                            mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
-                            
+                            if timeshiftexpressions[i] not in mathdictionary:
+                                mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
+                                
+                                    
                 try:                            
                     res = eval(mathexpression,{"__builtins__":None},mathdictionary)
 
@@ -17261,6 +17294,7 @@ class HUDDlg(ArtisanDialog):
                 else:
                     aw.qmc.plotterstack.insert(10,res)
                     aw.qmc.plotterstack.pop(0)
+                    aw.qmc.plotterequationresults[equeditnumber].append(res)
                     return res
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
