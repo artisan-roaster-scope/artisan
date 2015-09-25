@@ -17203,11 +17203,20 @@ class HUDDlg(ArtisanDialog):
                     aw.qmc.temp1B = y_range[:]
                     aw.qmc.stemp1B = y_range[:] 
                     aw.qmc.temp2B = y_range2[:]               
-                    aw.qmc.stemp2B = aw.qmc.temp2B[:] 
+                    aw.qmc.stemp2B = aw.qmc.temp2B[:]
+                    for i in range(8):
+                        aw.qmc.timeindexB[i] = 0
+                    aw.qmc.timeindexB[0] = -1
                     if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
                         # we copy the CHARGE and DROP from the foreground to allow alignment
                         t1 = aw.qmc.timex[aw.qmc.timeindex[0]]
                         aw.qmc.timeindexB[0] = aw.qmc.backgroundtime2index(t1)
+                        if aw.qmc.timeindex[1]:
+                            t_DE = aw.qmc.timex[aw.qmc.timeindex[1]]
+                            aw.qmc.timeindexB[1] = aw.qmc.backgroundtime2index(t_DE)
+                        if aw.qmc.timeindex[2]:
+                            t_FCs = aw.qmc.timex[aw.qmc.timeindex[2]]
+                            aw.qmc.timeindexB[2] = aw.qmc.backgroundtime2index(t_FCs)
                         t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
                         aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
                     aw.qmc.background = True
