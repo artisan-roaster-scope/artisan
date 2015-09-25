@@ -5568,6 +5568,40 @@ class tgraphcanvas(FigureCanvas):
                 return None
         else:
             return None
+    
+    #ln() regression
+    def lnRegression(self,xx=False):
+        res = ""
+        try:
+            if self.timeindex[0] > -1 and self.timeindex[1] and self.timeindex[6]:
+                from scipy.optimize import curve_fit
+                if aw.qmc.mode == "F":
+                    roomTemp = 70.0
+                else:
+                    roomTemp = 21.0
+                a = [self.timex[self.timeindex[0]]] + self.timex[self.timeindex[1]:self.timeindex[6]]
+                n = [roomTemp] + self.temp2[self.timeindex[1]:self.timeindex[6]]
+                xa = numpy.array(a)
+                yn = numpy.array(n)
+                if xx:
+                    func = lambda x,a,b,c: a*x*x + b*x + c
+                else:
+                    func = lambda x,a,b,c: a * numpy.log(b*x+c)
+                popt, pcov = curve_fit(func, xa, yn)
+                perr = numpy.sqrt(numpy.diag(pcov))
+                xb = numpy.array(self.timex)
+                self.ax.plot(xb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
+                self.fig.canvas.draw()
+                if len(popt)>2:
+                    if xx:
+                        res = "Y = %.4f * x*x %s %.4f * x %s %.4f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                    else:
+                        res = "Y = %.4f * log(%.4f * x %s %.4f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
+        except Exception:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " univariate()")
+        return res
 
     #interpolation type
     def univariate(self):
@@ -5588,7 +5622,6 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError:
             aw.qmc.adderror(QApplication.translate("Error Message","Value Error:",None) + " univariate()")
-            return
 
         except Exception as e:
 #            import traceback
@@ -16778,7 +16811,19 @@ class HUDDlg(ArtisanDialog):
         univarButton = QPushButton(QApplication.translate("Button","Info",None))
         univarButton.setFocusPolicy(Qt.NoFocus)
         univarButton.setMaximumSize(univarButton.sizeHint())
-        univarButton.setMinimumSize(univarButton.minimumSizeHint()) 
+        univarButton.setMinimumSize(univarButton.minimumSizeHint())        
+        self.lnvarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
+        self.lnvarCheck.setFocusPolicy(Qt.NoFocus)
+        self.lnvarCheck.stateChanged.connect(lambda i=0:self.lnvar(i)) #toggle
+        self.lnresult = QLineEdit()
+        self.lnresult.setReadOnly(True)
+        self.lnresult.setStyleSheet("background-color:'lightgrey';")
+        self.xxvarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
+        self.xxvarCheck.setFocusPolicy(Qt.NoFocus)
+        self.xxvarCheck.stateChanged.connect(lambda i=0:self.xxvar(i)) #toggle
+        self.xxresult = QLineEdit()
+        self.xxresult.setReadOnly(True)
+        self.xxresult.setStyleSheet("background-color:'lightgrey';")
         polyfitdeglabel = QLabel("deg")
         self.polyfitdeg = QSpinBox()
         self.polyfitdeg.setFocusPolicy(Qt.NoFocus)
@@ -16794,7 +16839,8 @@ class HUDDlg(ArtisanDialog):
         self.polyfitCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
         self.polyfitCheck.setFocusPolicy(Qt.NoFocus)
         self.polyfitCheck.clicked.connect(lambda i=0:self.polyfit(i)) #toggle
-        self.result = QLabel()
+        self.result = QLineEdit()
+        self.result.setReadOnly(True)
         self.result.setStyleSheet("background-color:'lightgrey';")
         startlabel = QLabel(QApplication.translate("Label", "Start",None))
         endlabel = QLabel(QApplication.translate("Label", "End",None))
@@ -16835,6 +16881,16 @@ class HUDDlg(ArtisanDialog):
         uniLayout.addWidget(univarButton)
         univarGroupLayout = QGroupBox(QApplication.translate("GroupBox","Univariate",None))
         univarGroupLayout.setLayout(uniLayout)
+        lnLayout = QHBoxLayout()
+        lnLayout.addWidget(self.lnvarCheck)
+        lnLayout.addWidget(self.lnresult)
+        lnvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","ln()",None))
+        lnvarGroupLayout.setLayout(lnLayout)        
+        xxLayout = QHBoxLayout()
+        xxLayout.addWidget(self.xxvarCheck)
+        xxLayout.addWidget(self.xxresult)
+        xxvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","x^2",None))
+        xxvarGroupLayout.setLayout(xxLayout)
         polytimes = QHBoxLayout()
         polytimes.addWidget(startlabel)
         polytimes.addWidget(self.startEdit)
@@ -16864,6 +16920,8 @@ class HUDDlg(ArtisanDialog):
         polyfitGroupLayout.setLayout(polyVLayout)
         tab3Layout.addWidget(interGroupLayout)
         tab3Layout.addWidget(univarGroupLayout)
+        tab3Layout.addWidget(lnvarGroupLayout)
+        tab3Layout.addWidget(xxvarGroupLayout)
         tab3Layout.addWidget(polyfitGroupLayout)
         tab3Layout.addStretch()
         ##### TAB 4
@@ -17138,6 +17196,12 @@ class HUDDlg(ArtisanDialog):
                     aw.qmc.stemp1B = y_range[:] 
                     aw.qmc.temp2B = y_range2[:]               
                     aw.qmc.stemp2B = aw.qmc.temp2B[:] 
+                    if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
+                        # we copy the CHARGE and DROP from the foreground to allow alignment
+                        t1 = aw.qmc.timex[aw.qmc.timeindex[0]]
+                        aw.qmc.timeindexB[0] = aw.qmc.backgroundtime2index(t1)
+                        t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
+                        aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
                     aw.qmc.background = True
                     aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
@@ -17357,16 +17421,48 @@ class HUDDlg(ArtisanDialog):
         pass
 
     def showunivarinfo(self):
-        if aw.qmc.timeindex[6]:
+        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
             aw.qmc.univariateinfo()
         else:
             aw.sendmessage(QApplication.translate("Univariate: no profile data available", None))
+    
+    def lnvar(self,i):
+        if self.lnvarCheck.isChecked():
+            #check for finished roast
+            if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
+                res = aw.qmc.lnRegression()
+                self.lnresult.setText(res)
+            else:
+                aw.sendmessage(QApplication.translate("Error Message", "ln(): no profile data available", None))
+                self.univarCheck.setChecked(False)
+                self.lnresult.setText("")
+        else:
+            self.lnresult.setText("")
+            aw.qmc.resetlines()
+            aw.qmc.redraw(recomputeAllDeltas=False)
 
+    
+    def xxvar(self,i):
+        if self.xxvarCheck.isChecked():
+            #check for finished roast
+            if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
+                res = aw.qmc.lnRegression(xx=True)
+                self.xxresult.setText(res)
+            else:
+                aw.sendmessage(QApplication.translate("Error Message", "xxvar(): no profile data available", None))
+                self.univarCheck.setChecked(False)
+                self.xxresult.setText("")
+        else:
+            self.xxresult.setText("")
+            aw.qmc.resetlines()
+            aw.qmc.redraw(recomputeAllDeltas=False)
+                                    
     def univar(self,i):
         if self.univarCheck.isChecked():
             #check for finished roast
-            if aw.qmc.timeindex[6]:
+            if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
                 aw.qmc.univariate()
+                aw.qmc.lnRegression()
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "Univariate: no profile data available", None))
                 self.univarCheck.setChecked(False)
