@@ -17235,7 +17235,6 @@ class HUDDlg(ArtisanDialog):
                         EQU[e] = EQU[e][1:] #removes "h"
                     if EQU[e][0] == "#":
                         commentoutplot[e] = 1
-                    print EQU[e]
                 
                 #create x range
                 if len(aw.qmc.timex):
