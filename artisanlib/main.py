@@ -1522,7 +1522,7 @@ class tgraphcanvas(FigureCanvas):
             timex = self.backgroundtime2index(event.artist.get_xdata()[event.ind][0])
             idxs = []
             for i in range(len(self.backgroundEvents)):
-                if self.backgroundEvents[i] == timex:
+                if self.backgroundEvents[i] == timex or self.backgroundEvents[i] -1 == timex or self.backgroundEvents[i] + 1 == timex:
                     idxs.append(i)
             message = u("")
             for i in idxs:
@@ -1543,7 +1543,7 @@ class tgraphcanvas(FigureCanvas):
             timex = self.time2index(event.artist.get_xdata()[event.ind][0])
             idxs = []
             for i in range(len(self.specialevents)):
-                if self.specialevents[i] == timex:
+                if self.specialevents[i] == timex or self.specialevents[i] + 1 == timex or self.specialevents[i] -1 == timex:
                     idxs.append(i)
             message = u("")
             for i in idxs:
@@ -3301,13 +3301,13 @@ class tgraphcanvas(FigureCanvas):
                                 self.E4backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
 
                         self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                                        picker=3,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha)
+                                                                        picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha)
                         self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                                        picker=3,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha)
+                                                                        picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha)
                         self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                                        picker=3,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha)
+                                                                        picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha)
                         self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                                        picker=3,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha)                                                                        
+                                                                        picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha)                                                                        
                                                                           
                 #check backgroundDetails flag
                 if self.backgroundDetails:
@@ -3488,13 +3488,13 @@ class tgraphcanvas(FigureCanvas):
                             E4_nonempty = True
 
                     self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                          picker=3,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
+                                                          picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                     self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                          picker=3,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
+                                                          picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                     self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                          picker=3,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
+                                                          picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                     self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                          picker=3,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                                                          picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                         
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
