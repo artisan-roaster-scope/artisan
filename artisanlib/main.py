@@ -363,6 +363,7 @@ if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
 
 
+
 # platform dependent imports:
 if sys.platform.startswith("darwin"):
     # control app napping on OS X >= 10.9
@@ -3681,10 +3682,14 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     ncol = int(math.ceil(len(handles)))
                 if two_ax_mode:
-                    leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop)
+                    leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
                 else:
-                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop)
+                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)   
                 leg.draggable(state=True)
+                frame = leg.get_frame()
+                frame.set_facecolor('white')
+                #frame.set_edgecolor('darkgrey')
+                frame.set_linewidth(0.5)
                 if aw.qmc.graphstyle == 1:
                     leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
 
@@ -5579,8 +5584,16 @@ class tgraphcanvas(FigureCanvas):
                     roomTemp = 70.0
                 else:
                     roomTemp = 21.0
-                a = [self.timex[self.timeindex[0]]] + self.timex[self.timeindex[1]:self.timeindex[6]]
-                n = [roomTemp] + self.temp2[self.timeindex[1]:self.timeindex[6]]
+                #a = [self.timex[self.timeindex[0]]] + self.timex[self.timeindex[1]:self.timeindex[6]]
+                #n = [roomTemp] + self.temp2[self.timeindex[1]:self.timeindex[6]]
+                a = [self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]]
+                n = [roomTemp,self.temp2[self.timeindex[1]]]
+                if self.timeindex[2]:
+                    a = a + [self.timex[self.timeindex[2]]]
+                    n = n + [self.temp2[self.timeindex[2]]]
+                a = a + [self.timex[self.timeindex[6]]]
+                n = n + [self.temp2[self.timeindex[6]]]
+                
                 xa = numpy.array(a)
                 yn = numpy.array(n)
                 if xx:
@@ -5594,9 +5607,9 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.canvas.draw()
                 if len(popt)>2:
                     if xx:
-                        res = "Y = %.4f * x*x %s %.4f * x %s %.4f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                        res = "Y = %.4f * t*t %s %.4f * t %s %.4f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
                     else:
-                        res = "Y = %.4f * log(%.4f * x %s %.4f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                        res = "Y = %.4f * log(%.4f * t %s %.4f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
         except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -15808,10 +15821,7 @@ $cupping_notes
                 
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None),ext="*.png")
             if filename:
-                aw.qmc.fig.patch.set_facecolor("white")
-                aw.qmc.fig.patch.set_edgecolor("white")
-                aw.qmc.redraw()
-                
+
                 if pyqtversion < 5:
                     self.image = QPixmap.grabWidget(aw.qmc)
                 else:
@@ -15826,9 +15836,6 @@ $cupping_notes
                 
                 x = self.image.width()
                 y = self.image.height()
-                aw.qmc.fig.patch.set_facecolor(aw.qmc.backcolor)
-                aw.qmc.fig.patch.set_edgecolor(aw.qmc.backcolor)
-                aw.qmc.redraw()
                 self.sendmessage(QApplication.translate("Message","{0}  size({1},{2}) saved", None).format(str(filename),str(x),str(y)))
             
         except IOError as ex:
@@ -16756,7 +16763,7 @@ class HUDDlg(ArtisanDialog):
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
-        saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(x,i))
+        saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(0,1))
         helpcurveButton = QPushButton(QApplication.translate("Button","Help",None))
         helpcurveButton.setFocusPolicy(Qt.NoFocus)
         helpcurveButton.clicked.connect(lambda _:aw.showSymbolicHelp())
@@ -17055,7 +17062,7 @@ class HUDDlg(ArtisanDialog):
         self.polyfitdeg.valueChanged.connect(lambda i=0:self.polyfitcurveschanged(3))
         self.c1ComboBox.currentIndexChanged.connect(lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(4))
         self.c2ComboBox.currentIndexChanged.connect(lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))
-
+            
     def toggleWebLCDsAlerts(self):
         aw.WebLCDsAlerts = not aw.WebLCDsAlerts
         
@@ -22873,7 +22880,7 @@ class flavorDlg(ArtisanDialog):
         delButton.clicked.connect(self.poplabel)
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
-        saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(x,1))
+        saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(0,1))
         backButton = QPushButton(QApplication.translate("Button","OK",None))
         backButton.clicked.connect(self.close)
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Background", None))
@@ -30450,7 +30457,7 @@ class WheelDlg(ArtisanDialog):
         saveButton.setToolTip(QApplication.translate("Tooltip","Save graph to a text file.wg",None))
         saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None))
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
-        saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(x,1))
+        saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(0,1))
         viewModeButton = QPushButton(QApplication.translate("Button","View Mode",None))
         viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None))
         viewModeButton.clicked.connect(self.viewmode)
