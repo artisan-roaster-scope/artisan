@@ -5607,9 +5607,9 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.canvas.draw()
                 if len(popt)>2:
                     if xx:
-                        res = "Y = %.4f * x*x %s %.4f * x %s %.4f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                        res = "Y = %.4f * t*t %s %.4f * t %s %.4f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
                     else:
-                        res = "Y = %.4f * log(%.4f * x %s %.4f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                        res = "Y = %.4f * log(%.4f * t %s %.4f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
         except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
