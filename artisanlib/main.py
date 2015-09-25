@@ -5584,8 +5584,16 @@ class tgraphcanvas(FigureCanvas):
                     roomTemp = 70.0
                 else:
                     roomTemp = 21.0
-                a = [self.timex[self.timeindex[0]]] + self.timex[self.timeindex[1]:self.timeindex[6]]
-                n = [roomTemp] + self.temp2[self.timeindex[1]:self.timeindex[6]]
+                #a = [self.timex[self.timeindex[0]]] + self.timex[self.timeindex[1]:self.timeindex[6]]
+                #n = [roomTemp] + self.temp2[self.timeindex[1]:self.timeindex[6]]
+                a = [self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]]
+                n = [roomTemp,self.temp2[self.timeindex[1]]]
+                if self.timeindex[2]:
+                    a = a + [self.timex[self.timeindex[2]]]
+                    n = n + [self.temp2[self.timeindex[2]]]
+                a = a + [self.timex[self.timeindex[6]]]
+                n = n + [self.temp2[self.timeindex[6]]]
+                
                 xa = numpy.array(a)
                 yn = numpy.array(n)
                 if xx:
