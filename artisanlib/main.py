@@ -16090,7 +16090,7 @@ $cupping_notes
         string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
         string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
         string1 += "</UL>"
-        string2 = "<UL><LI><b>t</b> Time in seconds"
+        string2 = "<UL><LI><b>t</b> Time (seconds)"
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
         string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
         string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None))
@@ -16102,15 +16102,16 @@ $cupping_notes
         string2 += "<LI><b>Y4[+1]</b> " + u(QApplication.translate("Message", "Extra #2 T2 advanced 1 index",None))        
         string2 += "<LI><b>t[+1]</b> " + u(QApplication.translate("Message", "Time one index ahead",None))
         string2 += "<LI><b>t[-3]</b> " + u(QApplication.translate("Message", "Time three indexes delayed",None))
-        string2 += "<LI><b>F1</b> " + u(QApplication.translate("Message", "Last formula result (Feedback)",None))
-        string2 += "<LI><b>F3</b> " + u(QApplication.translate("Message", "Third last formula result (Feedback)",None))
-        string2 += "<LI><b>W1</b> " + u(QApplication.translate("Message", "Results from Window field #1",None))        
-        string2 += "<LI><b>W3</b> " + u(QApplication.translate("Message", "Results from Window field #3",None))        
-        string2 += "<LI><b>#</b> " + u(QApplication.translate("Message", "Comments out window field",None))        
+        string2 += "<LI><b>F1</b> " + u(QApplication.translate("Message", "Last expression result. Feedback of same expression",None))
+        string2 += "<LI><b>F3</b> " + u(QApplication.translate("Message", "Third last expression result (Feedback)",None))
+        string2 += "<LI><b>W1</b> " + u(QApplication.translate("Message", "Gets results from Window field #1",None))        
+        string2 += "<LI><b>W3[-2]</b> " + u(QApplication.translate("Message", "Gets results from Window field #3 delayed by 2 indexes",None))        
+        string2 += "<LI><b>#</b> " + u(QApplication.translate("Message", "Comments out window field. It does not evaluate",None))        
+        string2 += "<LI><b>h</b> " + u(QApplication.translate("Message", "Hides curve. It evaluates (ie. hides intermediate expressions)",None))        
         string2 += "<LI><b>...</b> "
         string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None))
         string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None))
-        string2 += "<LI><b>Units</b> " + u(QApplication.translate("Message", "Plotter uses the left Y-coordinate as units",None))
+        string2 += "<LI><b>Units</b> " + u(QApplication.translate("Message", "Plotter uses the left Y-coordinate as units. To use right, use multiplying factor: left-max/right-max",None))
         string2 += "</UL>"
         string2 += "<br>"
         string2 += u(QApplication.translate("Message", "Yn holds values sampled in the actual interval if refering to ET/BT or extra channels from devices listed before, otherwise Yn hold values sampled in the previous interval",None))
@@ -17216,18 +17217,35 @@ class HUDDlg(ArtisanDialog):
                    str(self.equedit3.text()),str(self.equedit4.text()),
                    str(self.equedit5.text()),str(self.equedit6.text())]
             aw.qmc.resetlines()
+
+            commentoutplot = [0]*6      # "#" as first char does not evaluate plot nor plot it. Allows to keep formula on window without eval (ie. long filters)
+            hideplot = [0]*6            # "h" as first char evaluates plot but does not show it. Useful to hide intermediate Window expressions of plot
+                        
             for e in range(6):
+                if EQU[e]:
+                    if EQU[e][0] == "h":
+                        hideplot[e] = 1
+                        EQU[e] = EQU[e][1:] #removes "h"
+                    if EQU[e][0] == "#":
+                        commentoutplot[e] = 1
+                    print EQU[e]
+                
                 #create x range
                 if len(aw.qmc.timex):
-                    x_range = aw.qmc.timex #list(range(int(aw.qmc.timex[0]),int(aw.qmc.timex[-1])))
+                    x_range = aw.qmc.timex 
                 else:
                     x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
                 #create y range
                 y_range = []
-                for i in range(len(x_range)):
-                    y_range.append(self.eval_curve_expression(EQU[e],x_range[i],e+1)) #e = equeditnumber(1-6)
-                aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
+
+                if not commentoutplot[e]:
+                    for i in range(len(x_range)):
+                            y_range.append(self.eval_curve_expression(EQU[e],x_range[i],e+1)) #e+1 = equeditnumber(1-6)
+                    if not hideplot[e]:
+                        aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
+                
             aw.qmc.fig.canvas.draw()
+            
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): {0}").format(str(e)),exc_tb.tb_lineno)
@@ -17235,8 +17253,6 @@ class HUDDlg(ArtisanDialog):
     def eval_curve_expression(self,mathexpression,t,equeditnumber=None):
         
         if len(mathexpression):
-            if mathexpression[0] == "#":        
-                return -1000
             
             #get index from the time
             index = aw.qmc.time2index(t)
