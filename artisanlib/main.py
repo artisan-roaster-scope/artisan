@@ -22069,11 +22069,12 @@ class EventsDlg(ArtisanDialog):
             #Color
             colorButton = QPushButton("Select")
             colorButton.setFocusPolicy(Qt.NoFocus)
-            colorButton.clicked.connect(lambda i=i: self.setbuttoncolor(i))
+            colorButton.clicked.connect(lambda _,x=i : self.setbuttoncolor(x))
             #Text Color
             colorTextButton = QPushButton("Select")
             colorTextButton.setFocusPolicy(Qt.NoFocus)
-            colorTextButton.clicked.connect(lambda i=i: self.setbuttontextcolor(i))
+            print(i)
+            colorTextButton.clicked.connect(lambda _,x=i : self.setbuttontextcolor(x))
             #Empty Cell
             emptyCell = QLabel("")
             #add widgets to the table
@@ -30718,12 +30719,12 @@ class WheelDlg(ArtisanDialog):
             #populate table
             for i in range(ndata):
                 delButton = QPushButton(QApplication.translate("Button","Delete",None))
-                delButton.clicked.connect(lambda x = i: self.popwheel(x))
+                delButton.clicked.connect(lambda _,x = i: self.popwheel(x))
                 labelsedit = QLineEdit(str(",".join(aw.qmc.wheelnames[i])))
                 updateButton = QPushButton(QApplication.translate("Button","Update",None))
-                updateButton.clicked.connect(lambda x = i: self.updatelabels(x))
+                updateButton.clicked.connect(lambda _,x = i: self.updatelabels(x))
                 setButton = QPushButton(QApplication.translate("Button","Select",None))
-                setButton.clicked.connect(lambda x = i: self.createlabeltable(x))
+                setButton.clicked.connect(lambda _,x = i: self.createlabeltable(x))
                 widthSpinBox = QDoubleSpinBox()
                 widthSpinBox.setRange(1.,100.)
                 widthSpinBox.setValue(aw.qmc.wradii[i])
@@ -30746,7 +30747,7 @@ class WheelDlg(ArtisanDialog):
                 txtSpinBox.setValue(aw.qmc.wheeltextsize[i])
                 txtSpinBox.valueChanged.connect(lambda z=1,x=i: self.setTextsizeX(z,x))
                 colorButton = QPushButton(QApplication.translate("Button","Set Color",None))
-                colorButton.clicked.connect(lambda x =i: self.setwheelcolor(x))
+                colorButton.clicked.connect(lambda _,x=i: self.setwheelcolor(x))
                 colorSpinBox = QSpinBox()
                 colorSpinBox.setRange(0,255)
                 colorSpinBox.setWrapping(True)
@@ -34519,7 +34520,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             soakedit.setValidator(QRegExpValidator(regextime,self))    
             setButton = QPushButton(QApplication.translate("Button","Set",None))
             setButton.setFocusPolicy(Qt.NoFocus)
-            setButton.clicked.connect(lambda kk=i: self.setsegment(i))
+            setButton.clicked.connect(lambda _,kk=i: self.setsegment(kk))
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
             self.segmenttable.setCellWidget(i,1,rampedit)
