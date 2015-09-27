@@ -5591,8 +5591,9 @@ class tgraphcanvas(FigureCanvas):
                 if self.timeindex[2]:
                     a = a + [self.timex[self.timeindex[2]]]
                     n = n + [self.temp2[self.timeindex[2]]]
-                a = a + [self.timex[self.timeindex[6]]]
-                n = n + [self.temp2[self.timeindex[6]]]
+                else: # we consider the DROP coordinate only if no FCs is available
+                    a = a + [self.timex[self.timeindex[6]]]
+                    n = n + [self.temp2[self.timeindex[6]]]
                 
                 xa = numpy.array(a)
                 yn = numpy.array(n)
@@ -5600,7 +5601,9 @@ class tgraphcanvas(FigureCanvas):
                     func = lambda x,a,b,c: a*x*x + b*x + c
                 else:
                     func = lambda x,a,b,c: a * numpy.log(b*x+c)
-                popt, pcov = curve_fit(func, xa, yn)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    popt, pcov = curve_fit(func, xa, yn)
                 perr = numpy.sqrt(numpy.diag(pcov))
                 xb = numpy.array(self.timex)
                 self.ax.plot(xb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
