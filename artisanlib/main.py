@@ -3014,6 +3014,11 @@ class tgraphcanvas(FigureCanvas):
                     title = self.title
                 else:
                     title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + self.title
+                if self.background and self.titleB and len(self.titleB) > 10:
+                    stl = 30
+                else:
+                    stl = 35
+                title = aw.qmc.abbrevString(title,stl)
                 self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                     fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
             
@@ -3036,7 +3041,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         titleB = self.roastbatchprefixB + u(self.roastbatchnrB) + u(" ") + self.titleB
                     if self.title == None or u(self.title).strip() == "":
-                        self.fig.suptitle(aw.qmc.abbrevString(titleB,stl),
+                        self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
                             horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
                     else:
                         self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
