@@ -1526,19 +1526,25 @@ class tgraphcanvas(FigureCanvas):
                 if self.backgroundEvents[i] == timex or self.backgroundEvents[i] -1 == timex or self.backgroundEvents[i] + 1 == timex:
                     idxs.append(i)
             message = u("")
+            event_times = []
             for i in idxs:
                 if len(message) != 0:
                     message += u(", ")
                 else:
                     message += u("Background: ")
-                message += u(self.Betypesf(self.backgroundEtypes[i])) + " = " + self.eventsvalues(self.backgroundEvalues[i]) 
+                message += u(self.Betypesf(self.backgroundEtypes[i])) + " = " + self.eventsvalues(self.backgroundEvalues[i])
+                event_times.append(self.timeB[self.backgroundEvents[i]])
                 if self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
                     message += u(" (") + u(self.backgroundEStrings[i]) + u(")")
             if len(message) != 0:
-                tx = event.artist.get_xdata()[event.ind][0]
-                if aw.qmc.timeindexB[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindexB[0]:
-                    tx = tx - aw.qmc.timeB[aw.qmc.timeindexB[0]]                
-                message += u(" @ ") + self.stringfromseconds(tx)
+                if aw.qmc.timeindex[0] != -1:
+                    start = aw.qmc.timex[aw.qmc.timeindex[0]]
+                else:
+                    start = 0
+                tx_string = ""
+                for et in event_times:
+                    tx_string += self.stringfromseconds(et - start) + ", "
+                message += u(" @ ") + tx_string[:-2]
                 aw.sendmessage(message,append=False)
         else:
             timex = self.time2index(event.artist.get_xdata()[event.ind][0])
@@ -1547,17 +1553,23 @@ class tgraphcanvas(FigureCanvas):
                 if self.specialevents[i] == timex or self.specialevents[i] + 1 == timex or self.specialevents[i] -1 == timex:
                     idxs.append(i)
             message = u("")
+            event_times = []
             for i in idxs:
                 if len(message) != 0:
                     message += u(", ")
                 message += u(self.etypesf(self.specialeventstype[i])) + " = " + self.eventsvalues(self.specialeventsvalue[i])
+                event_times.append(self.timex[self.specialevents[i]])
                 if self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
                     message += u(" (") + u(self.specialeventsStrings[i]) + u(")")
             if len(message) != 0:
-                tx = event.artist.get_xdata()[event.ind][0]
-                if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
-                    tx = tx - aw.qmc.timex[aw.qmc.timeindex[0]]  
-                message += u(" @ ") + self.stringfromseconds(tx)
+                if aw.qmc.timeindex[0] != -1:
+                    start = aw.qmc.timex[aw.qmc.timeindex[0]]
+                else:
+                    start = 0
+                tx_string = ""
+                for et in event_times:
+                    tx_string += self.stringfromseconds(et - start) + ", "
+                message += u(" @ ") + tx_string[:-2]
                 aw.sendmessage(message,append=False)
 
     def onclick(self,event):
@@ -2282,18 +2294,27 @@ class tgraphcanvas(FigureCanvas):
         try:
             x = float(x)
             mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
-            #add ETB and BTB (background ET and BT)
-            etb = btb = 0
+            #add ETB, BTB and XTB (background ET, BT and XT)
+            etb = btb = xtb = 0
             try:
-                if aw.qmc.background and ("ETB" in mathexpression or "BTB" in mathexpression):
+                if aw.qmc.background and ("ETB" in mathexpression or "BTB" in mathexpression or "XTB" in mathexpression):
                     #first compute closest index at that time point in the background data
                     j = aw.qmc.backgroundtime2index(tx)
                     etb = aw.qmc.temp1B[j]
                     btb = aw.qmc.temp2B[j]
-            except:
+                    if aw.qmc.xtcurveidx > 0:
+                        idx3 = aw.qmc.xtcurveidx - 1
+                        n3 = idx3 // 2
+                        if len(self.temp1BX) > n3 and len(self.temp2BX) > n3 and len(self.extratimexB) > n3:
+                            if aw.qmc.xtcurveidx % 2:
+                                xtb = self.temp1BX[n3][j]
+                            else:
+                                xtb = self.temp2BX[n3][j]
+            except Exception:
                 pass
             mathdictionary["ETB"] = etb
             mathdictionary["BTB"] = btb
+            mathdictionary["XTB"] = xtb
             #if Ys in expression
             if "Y" in mathexpression:
                 #extract Ys
@@ -3222,7 +3243,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.xtcurveidx > 0:
                     idx3 = aw.qmc.xtcurveidx - 1
                     n3 = idx3 // 2
-                    if len(self.stemp1BX) > n3 and len(self.extratimexB) > n3:
+                    if len(self.stemp1BX) > n3 and len(self.stemp2BX) > n3 and len(self.extratimexB) > n3:
                         if aw.qmc.xtcurveidx % 2:
                             stemp3B = self.stemp1BX[n3]
                         else:
@@ -10790,7 +10811,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extratimexB = timex
                 b1 = self.qmc.smooth_list(tb,t1,window_len=self.qmc.curvefilter)
                 b2 = self.qmc.smooth_list(tb,t2,window_len=self.qmc.curvefilter)
-                self.qmc.temp1BX,self.qmc.temp2BX = [],[]
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
                 b1x = []
                 b2x = []
