@@ -732,8 +732,8 @@ class tgraphcanvas(FigureCanvas):
         self.extramarkersizes1,self.extramarkersizes2 = [],[]       # list of extra curve marker size
 
         #holds math expressions to plot
-        self.plotcurves=["", "", "", "", "", ""]
-        self.plotcurvecolor = ["black","black","black","black","black","black"]
+        self.plotcurves=[""]*9
+        self.plotcurvecolor = ["black"]*9
 
         self.fig = Figure(tight_layout={"pad":.2},frameon=True) # ,"h_pad":0.0,"w_pad":0.0
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
@@ -1366,8 +1366,8 @@ class tgraphcanvas(FigureCanvas):
 
         #holds last values calculated from plotter
         self.plotterstack = [0]*10
-        #holds results for each equation (6 total)
-        self.plotterequationresults = [[],[],[],[],[],[]]
+        #holds results for each equation (9 total)
+        self.plotterequationresults = [[],[],[],[],[],[],[],[],[]]
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -13058,6 +13058,10 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(self.qmc.plotcurves)):
                     self.qmc.plotcurves[i] = str(self.qmc.plotcurves[i])
                     self.qmc.plotcurvecolor[i] = str(self.qmc.plotcurvecolor[i])
+                #convert to 9 
+                if len(self.qmc.plotcurves) == 6:
+                    self.qmc.plotcurves += ["","",""]
+                    self.qmc.plotcurvecolor += ["black","black","black"]
             settings.beginGroup("grid")
             if settings.contains("xgrid"):
                 self.qmc.xgrid = toInt(settings.value("xgrid",self.qmc.xgrid))
@@ -16097,7 +16101,7 @@ $cupping_notes
         string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
         string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
         string1 += "</UL>"
-        string2 = "<UL><LI><b>t</b> Time (seconds)"
+        string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
         string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
         string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None))
@@ -16111,10 +16115,11 @@ $cupping_notes
         string2 += "<LI><b>t[-3]</b> " + u(QApplication.translate("Message", "Time three indexes delayed",None))
         string2 += "<LI><b>F1</b> " + u(QApplication.translate("Message", "Last expression result. Feedback of same expression",None))
         string2 += "<LI><b>F3</b> " + u(QApplication.translate("Message", "Third last expression result (Feedback)",None))
-        string2 += "<LI><b>W1</b> " + u(QApplication.translate("Message", "Gets results from Window field #1",None))        
-        string2 += "<LI><b>W3[-2]</b> " + u(QApplication.translate("Message", "Gets results from Window field #3 delayed by 2 indexes",None))        
+        string2 += "<LI><b>P1</b> " + u(QApplication.translate("Message", "Gets results from Plot #1",None))        
+        string2 += "<LI><b>P3[-2]</b> " + u(QApplication.translate("Message", "Gets results from Plot #3 delayed by 2 indexes",None))        
         string2 += "<LI><b>#</b> " + u(QApplication.translate("Message", "Comments out window field. It does not evaluate",None))        
-        string2 += "<LI><b>h</b> " + u(QApplication.translate("Message", "Hides curve. It evaluates (ie. hides intermediate expressions)",None))        
+        string2 += "<LI><b>$</b> " + u(QApplication.translate("Message", "Hides curve. It evaluates. Hides intermediate results for cascading plots",None))        
+        string2 += "<LI><b>annotate(text,time,temperatue,fontsize)</b> " + u(QApplication.translate("Message", "Example: annotate(HELLO,03:00,200,10)",None))        
         string2 += "<LI><b>...</b> "
         string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None))
         string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None))
@@ -16419,7 +16424,7 @@ class QRImage(qrcode.image.base.BaseImage):
         pass
         
 ##########################################################################
-#####################     HUD  EDIT DLG     ##############################
+#####################     EXTRAS/HUD  EDIT DLG     #######################
 ##########################################################################
 
 class HUDDlg(ArtisanDialog):
@@ -16726,13 +16731,25 @@ class HUDDlg(ArtisanDialog):
         tab1Layout.addStretch()
         #tab2
         #Equation plotter
-        equlabel = QLabel(QApplication.translate("Label", "Y(x)",None))
+        self.equlabel = QLabel(QApplication.translate("Label", "Y(x)",None))
+        equc1label = QLabel(QApplication.translate("Label", "P1",None))
+        equc2label = QLabel(QApplication.translate("Label", "P2",None))
+        equc3label = QLabel(QApplication.translate("Label", "P3",None))
+        equc4label = QLabel(QApplication.translate("Label", "P4",None))
+        equc5label = QLabel(QApplication.translate("Label", "P5",None))
+        equc6label = QLabel(QApplication.translate("Label", "P6",None))
+        equc7label = QLabel(QApplication.translate("Label", "P7",None))
+        equc8label = QLabel(QApplication.translate("Label", "P8",None))
+        equc9label = QLabel(QApplication.translate("Label", "P9",None))
         self.equedit1 = QLineEdit(aw.qmc.plotcurves[0])
         self.equedit2 = QLineEdit(aw.qmc.plotcurves[1])
         self.equedit3 = QLineEdit(aw.qmc.plotcurves[2])
         self.equedit4 = QLineEdit(aw.qmc.plotcurves[3])
         self.equedit5 = QLineEdit(aw.qmc.plotcurves[4])
         self.equedit6 = QLineEdit(aw.qmc.plotcurves[5])
+        self.equedit7 = QLineEdit(aw.qmc.plotcurves[6])
+        self.equedit8 = QLineEdit(aw.qmc.plotcurves[7])
+        self.equedit9 = QLineEdit(aw.qmc.plotcurves[8])
         color1Button = QPushButton(QApplication.translate("Button","Color",None))
         color1Button.setFocusPolicy(Qt.NoFocus)
         color1Button.clicked.connect(lambda x=0: self.setcurvecolor(0))
@@ -16751,9 +16768,41 @@ class HUDDlg(ArtisanDialog):
         color6Button = QPushButton(QApplication.translate("Button","Color",None))
         color6Button.setFocusPolicy(Qt.NoFocus)
         color6Button.clicked.connect(lambda x=5: self.setcurvecolor(5))
+        color7Button = QPushButton(QApplication.translate("Button","Color",None))
+        color7Button.setFocusPolicy(Qt.NoFocus)
+        color7Button.clicked.connect(lambda x=6: self.setcurvecolor(6))
+        color8Button = QPushButton(QApplication.translate("Button","Color",None))
+        color8Button.setFocusPolicy(Qt.NoFocus)
+        color8Button.clicked.connect(lambda x=7: self.setcurvecolor(7))
+        color9Button = QPushButton(QApplication.translate("Button","Color",None))
+        color9Button.setFocusPolicy(Qt.NoFocus)
+        color9Button.clicked.connect(lambda x=8: self.setcurvecolor(8))
+        self.equc1colorlabel = QLabel("  ")
+        self.equc2colorlabel = QLabel("  ")
+        self.equc3colorlabel = QLabel("  ")
+        self.equc4colorlabel = QLabel("  ")
+        self.equc5colorlabel = QLabel("  ")
+        self.equc6colorlabel = QLabel("  ")
+        self.equc7colorlabel = QLabel("  ")
+        self.equc8colorlabel = QLabel("  ")
+        self.equc9colorlabel = QLabel("  ")
+        self.equc1colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[0])
+        self.equc2colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[1])
+        self.equc3colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[2])
+        self.equc4colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[3])
+        self.equc5colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[4])
+        self.equc6colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[5])
+        self.equc7colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[6])
+        self.equc8colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[7])
+        self.equc9colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[8])
+        
         equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None))
         equdrawbutton.setFocusPolicy(Qt.NoFocus)
         equdrawbutton.clicked.connect(lambda _:self.plotequ())
+        equshowtablebutton = QPushButton(QApplication.translate("Button","Data",None))
+        equshowtablebutton.setFocusPolicy(Qt.NoFocus)
+        equshowtablebutton.setToolTip(QApplication.translate("Tooltip","Shows data table of curves",None))
+        equshowtablebutton.clicked.connect(lambda _:self.equshowtable())
         equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None))
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         equbackgroundbutton.clicked.connect(lambda _:self.setbackgroundequ1())
@@ -16768,31 +16817,57 @@ class HUDDlg(ArtisanDialog):
         helpcurveButton.setFocusPolicy(Qt.NoFocus)
         helpcurveButton.clicked.connect(lambda _:aw.showSymbolicHelp())
         curve1Layout = QGridLayout()
-        curve1Layout.addWidget(self.equedit1,0,0)
-        curve1Layout.addWidget(color1Button,0,1)
-        curve1Layout.addWidget(equbackgroundbutton,0,2)
-        curve1Layout.addWidget(self.equedit2,1,0)
-        curve1Layout.addWidget(color2Button,1,1)
-        curve1Layout.addWidget(equvdevicebutton,1,2)
+        curve1Layout.addWidget(equc1label,0,0)
+        curve1Layout.addWidget(self.equedit1,0,1)
+        curve1Layout.addWidget(color1Button,0,2)
+        curve1Layout.addWidget(equbackgroundbutton,0,3)
+        curve1Layout.addWidget(self.equc1colorlabel,0,4)
+        curve1Layout.addWidget(equc2label,1,0)        
+        curve1Layout.addWidget(self.equedit2,1,1)
+        curve1Layout.addWidget(color2Button,1,2)
+        curve1Layout.addWidget(equvdevicebutton,1,3)
+        curve1Layout.addWidget(self.equc2colorlabel,1,4)        
         plot1GroupBox = QGroupBox()
         plot1GroupBox.setLayout(curve1Layout)
         curveLayout = QGridLayout()
-        curveLayout.addWidget(self.equedit3,0,0)
-        curveLayout.addWidget(color3Button,0,1)
-        curveLayout.addWidget(self.equedit4,1,0)
-        curveLayout.addWidget(color4Button,1,1)
-        curveLayout.addWidget(self.equedit5,2,0)
-        curveLayout.addWidget(color5Button,2,1)
-        curveLayout.addWidget(self.equedit6,3,0)
-        curveLayout.addWidget(color6Button,3,1)
+        curveLayout.addWidget(equc3label,0,0)
+        curveLayout.addWidget(self.equedit3,0,1)
+        curveLayout.addWidget(color3Button,0,2)
+        curveLayout.addWidget(self.equc3colorlabel,0,3)
+        curveLayout.addWidget(equc4label,1,0)
+        curveLayout.addWidget(self.equedit4,1,1)
+        curveLayout.addWidget(color4Button,1,2)
+        curveLayout.addWidget(self.equc4colorlabel,1,3)
+        curveLayout.addWidget(equc5label,2,0)
+        curveLayout.addWidget(self.equedit5,2,1)
+        curveLayout.addWidget(color5Button,2,2)
+        curveLayout.addWidget(self.equc5colorlabel,2,3)
+        curveLayout.addWidget(equc6label,3,0)
+        curveLayout.addWidget(self.equedit6,3,1)
+        curveLayout.addWidget(color6Button,3,2)
+        curveLayout.addWidget(self.equc6colorlabel,3,3)
+        curveLayout.addWidget(equc7label,4,0)
+        curveLayout.addWidget(self.equedit7,4,1)
+        curveLayout.addWidget(color7Button,4,2)
+        curveLayout.addWidget(self.equc7colorlabel,4,3)
+        curveLayout.addWidget(equc8label,5,0)
+        curveLayout.addWidget(self.equedit8,5,1)
+        curveLayout.addWidget(color8Button,5,2)
+        curveLayout.addWidget(self.equc8colorlabel,5,3)
+        curveLayout.addWidget(equc9label,6,0)
+        curveLayout.addWidget(self.equedit9,6,1)
+        curveLayout.addWidget(color9Button,6,2)
+        curveLayout.addWidget(self.equc9colorlabel,6,3)
         curvebuttonlayout = QHBoxLayout()
         curvebuttonlayout.addWidget(equdrawbutton)
         curvebuttonlayout.addStretch()
         curvebuttonlayout.addWidget(saveImgButton)
         curvebuttonlayout.addStretch()
+        curvebuttonlayout.addWidget(equshowtablebutton)
+        curvebuttonlayout.addStretch()
         curvebuttonlayout.addWidget(helpcurveButton)
         tab2Layout = QVBoxLayout()
-        tab2Layout.addWidget(equlabel)
+        tab2Layout.addWidget(self.equlabel)
         tab2Layout.addWidget(plot1GroupBox)
         tab2Layout.addLayout(curveLayout)
         tab2Layout.addLayout(curvebuttonlayout)
@@ -17138,6 +17213,16 @@ class HUDDlg(ArtisanDialog):
             if colorf.isValid():
                 colorname = str(colorf.name())
                 aw.qmc.plotcurvecolor[x] = colorname
+                #refresh right color labels
+                self.equc1colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[0])
+                self.equc2colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[1])
+                self.equc3colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[2])
+                self.equc4colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[3])
+                self.equc5colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[4])
+                self.equc6colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[5])
+                self.equc7colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[6])
+                self.equc8colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[7])
+                self.equc9colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[8])
             self.plotequ()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -17175,6 +17260,12 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.extratimex[-1] = aw.qmc.timex[:]
             # redraw
             aw.qmc.redraw(recomputeAllDeltas=False)
+
+    def equshowtable(self):
+        
+        equdataDlg = equDataDlg(self)
+        equdataDlg.show()
+        equdataDlg.setFixedSize(equdataDlg.size())
 
     def setbackgroundequ1(self,foreground=False):
         try:
@@ -17216,25 +17307,45 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ1(): {0}").format(str(e)),exc_tb.tb_lineno)
 
+    # format = annotate(text,time,temp,size)
+    def plotterannotation(self,annotation,cindex):
+        annotation = annotation.strip()
+        annotation = annotation[9:]                # annotate(
+        annotation = annotation[:len(annotation)-1] # )
+        annvars = [e.strip() for e in annotation.split(',')]
+        text = annvars[0]
+        time = float(aw.qmc.stringtoseconds(annvars[1]))
+        temp = float(annvars[2])
+        fsize = int(annvars[3])
+            
+        aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
+
     def plotequ(self):
         try:
             aw.qmc.plotterstack = [0]*10
-            aw.qmc.plotterequationresults = [[],[],[],[],[],[]]
+            aw.qmc.plotterequationresults = [[],[],[],[],[],[],[],[],[]]
             EQU = [str(self.equedit1.text()),str(self.equedit2.text()),
                    str(self.equedit3.text()),str(self.equedit4.text()),
-                   str(self.equedit5.text()),str(self.equedit6.text())]
+                   str(self.equedit5.text()),str(self.equedit6.text()),                   
+                   str(self.equedit7.text()),str(self.equedit8.text()),
+                   str(self.equedit9.text())]
             aw.qmc.resetlines()
 
-            commentoutplot = [0]*6      # "#" as first char does not evaluate plot nor plot it. Allows to keep formula on window without eval (ie. long filters)
-            hideplot = [0]*6            # "h" as first char evaluates plot but does not show it. Useful to hide intermediate Window expressions of plot
-                        
-            for e in range(6):
+            commentoutplot = [0]*9      # "#" as first char does not evaluate plot nor show it. Allows to keep formula on window without eval (ie. long filters)
+            hideplot = [0]*9            # "$" as first char evaluates plot but does not show it. Useful to hide intermediate results
+
+            # 9 plots
+            for e in range(9):
                 if EQU[e]:
-                    if EQU[e][0] == "h":
+                    if EQU[e][0] == "$":
                         hideplot[e] = 1
-                        EQU[e] = EQU[e][1:] #removes "h"
+                        EQU[e] = EQU[e][1:] #removes "$"
                     if EQU[e][0] == "#":
                         commentoutplot[e] = 1
+                    #commands
+                    if EQU[e][0] == "a":
+                        commentoutplot[e] = 1
+                        self.plotterannotation(EQU[e],e)
                 
                 #create x range
                 if len(aw.qmc.timex):
@@ -17246,7 +17357,7 @@ class HUDDlg(ArtisanDialog):
 
                 if not commentoutplot[e]:
                     for i in range(len(x_range)):
-                            y_range.append(self.eval_curve_expression(EQU[e],x_range[i],e+1)) #e+1 = equeditnumber(1-6)
+                            y_range.append(self.eval_curve_expression(EQU[e],x_range[i],e+1)) #pass e+1 = equeditnumber(1-9)
                     if not hideplot[e]:
                         aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
                 
@@ -17321,7 +17432,7 @@ class HUDDlg(ArtisanDialog):
                                 else:
                                     Yval.append(mathexpression[i+1])
                                     
-                    # time timeshift                                         
+                    # time timeshift of absolute time (not relative to CHARGE)                                        
                     elif mathexpression[i] == "t":
                         if i+4 < len(mathexpression) and mathexpression[i+1] == "[" and mathexpression[i+4] == "]":
                             Yshiftval = int(mathexpression[i+3])
@@ -17348,7 +17459,7 @@ class HUDDlg(ArtisanDialog):
                                 mathdictionary['t'] = t         #add t to the math dictionary
                                     
                     #Add to dict previous results from plotter field windows (1-6)
-                    elif mathexpression[i] == "W":
+                    elif mathexpression[i] == "P":
                         if i+1 < mlen:                          #check for out of range
                             if mathexpression[i+1].isdigit():
                                 nint = int(mathexpression[i+1])              #Ynumber int
@@ -17368,7 +17479,7 @@ class HUDDlg(ArtisanDialog):
                                         if shiftedindex >= len(aw.qmc.timex):
                                             shiftedindex = len(aw.qmc.timex)- 1
                                     val = aw.qmc.plotterequationresults[nint-1][shiftedindex]
-                                    evaltimeexpression = "W" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
+                                    evaltimeexpression = "P" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
@@ -17378,8 +17489,8 @@ class HUDDlg(ArtisanDialog):
                                         val = aw.qmc.plotterequationresults[nint-1][index]
                                     else:
                                         val = -1000                                        
-                                    if "W" + mathexpression[i+1] not in mathdictionary:    
-                                        mathdictionary["W"+mathexpression[i+1]] = val                                
+                                    if "P" + mathexpression[i+1] not in mathdictionary:    
+                                        mathdictionary["P"+mathexpression[i+1]] = val                                
                             
                     # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
                     # holds the ten previous formula results (same window) in order.
@@ -17427,8 +17538,11 @@ class HUDDlg(ArtisanDialog):
                         aw.qmc.plotterequationresults[equeditnumber-1].append(res)
                     return res
             except Exception as e:
+                if equeditnumber:
+                    e = str(e)
+                    e = "P" + str(equeditnumber) + ": index n=%i: "%(i+1) + e
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " Plotter: {0}").format(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " Plotter: {0}").format(e),exc_tb.tb_lineno)
                 return -1
         return -1
 
@@ -17835,6 +17949,7 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.graphstyle = self.org_graphstyle
         aw.qmc.graphfont = self.org_graphfont
         aw.qmc.redraw(recomputeAllDeltas=False)
+        aw.sendmessage("") #clears plotter possible exceptions if Cancel
         self.accept()
 
     #button OK
@@ -17869,6 +17984,9 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.plotcurves[3] = str(self.equedit4.text())
         aw.qmc.plotcurves[4] = str(self.equedit5.text())
         aw.qmc.plotcurves[5] = str(self.equedit6.text())
+        aw.qmc.plotcurves[6] = str(self.equedit7.text())
+        aw.qmc.plotcurves[7] = str(self.equedit8.text())
+        aw.qmc.plotcurves[8] = str(self.equedit9.text())
         string = u(QApplication.translate("Message","[ET target 1 = {0}] [BT target 1 = {1}] [ET target 2 = {2}] [BT target 2 = {3}]", None).format(str(aw.qmc.ETtarget),str(aw.qmc.BTtarget),str(aw.qmc.ET2target),str(aw.qmc.BT2target)))
         aw.sendmessage(string)
         aw.qmc.resetlinecountcaches()
@@ -18228,7 +18346,169 @@ class volumeCalculatorDlg(ArtisanDialog):
 
     def close(self):
         self.closeEvent(None)
-    
+
+########################################################################################
+#####################  PLOTTER DATA DLG  ###############################################
+########################################################################################
+
+        
+class equDataDlg(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(equDataDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Form Caption","Plotter Data",None)) 
+        self.setModal(True)
+
+        self.datalabel = QLabel(u(QApplication.translate("Label", "",None)))
+
+        #DATA Table
+        self.datatable = QTableWidget()
+        self.datatable.setTabKeyNavigation(True)
+        header = self.datatable.horizontalHeader()
+        header.setStretchLastSection(True)
+        self.datatable.setMinimumSize(self.datatable.minimumSizeHint())
+
+        self.createDataTable()
+        #layout
+        dataplotterLayout = QVBoxLayout()
+        dataplotterLayout.addWidget(self.datalabel)
+        dataplotterLayout.addWidget(self.datatable) 
+        dataplotterLayout.addWidget(self.datatable)
+        dataplotterLayout.addStretch()
+        self.setLayout(dataplotterLayout)
+
+    def createDataTable(self):
+        self.datatable.clear()
+        ndata = len(aw.qmc.timex)
+        self.datatable.setRowCount(ndata)
+        
+        mm = "" 
+        for i in range(len(aw.qmc.plotterequationresults)):
+            if len(aw.qmc.plotterequationresults[i]):
+                mm += "P"+str(i+1)+" "
+                ite = len(aw.qmc.plotterequationresults[i])
+        if not mm:
+            self.datalabel.setText(QApplication.translate("Label","No plotter data found.",None))
+        else:
+            self.datalabel.setText(mm)
+                            
+
+        columns = [ QApplication.translate("Table", "t",None),
+                    QApplication.translate("Table", "Time",None),
+                    QApplication.translate("Table", "P1",None),
+                    QApplication.translate("Table", "P2",None),
+                    QApplication.translate("Table", "P3",None),
+                    QApplication.translate("Table", "P4",None),
+                    QApplication.translate("Table", "P5",None),
+                    QApplication.translate("Table", "P6",None),
+                    QApplication.translate("Table", "P7",None),
+                    QApplication.translate("Table", "P8",None),
+                    QApplication.translate("Table", "P9",None),
+                    ""]
+
+        self.datatable.setColumnCount(len(columns))
+        self.datatable.setHorizontalHeaderLabels(columns)
+        self.datatable.setAlternatingRowColors(True)
+        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+        self.datatable.setShowGrid(True)
+        if pyqtversion < 5:
+            self.datatable.verticalHeader().setResizeMode(2)
+        else:
+            self.datatable.verticalHeader().setSectionResizeMode(2)
+        
+        for i in range(ndata): 
+
+            t = QTableWidgetItem("%.2f"%aw.qmc.timex[i])
+            t.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            
+            time = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
+            time.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+
+            if len(aw.qmc.plotterequationresults[0]) and len(aw.qmc.plotterequationresults[0]) > i:
+                P1 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[0][i])
+            else:
+                P1 = QTableWidgetItem("NA")
+                P1.setBackground(QColor('lightgrey'))
+            if len(aw.qmc.plotterequationresults[1]) and len(aw.qmc.plotterequationresults[1]) > i:
+                P2 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[1][i])
+            else:
+                P2 = QTableWidgetItem("NA")
+                P2.setBackground(QColor('lightgrey'))
+            if len(aw.qmc.plotterequationresults[2]) and len(aw.qmc.plotterequationresults[2]) > i:
+                P3 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[2][i])
+            else:
+                P3 = QTableWidgetItem("NA")
+                P3.setBackground(QColor('lightgrey'))
+            if len(aw.qmc.plotterequationresults[3]) and len(aw.qmc.plotterequationresults[3]) > i:
+                P4 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[3][i])
+            else:
+                P4 = QTableWidgetItem("NA")
+                P4.setBackground(QColor('lightgrey'))
+            if len(aw.qmc.plotterequationresults[4]) and len(aw.qmc.plotterequationresults[4]) > i:
+                P5 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[4][i])
+            else:
+                P5 = QTableWidgetItem("NA")
+                P5.setBackground(QColor('lightgrey'))
+            if len(aw.qmc.plotterequationresults[5]) and len(aw.qmc.plotterequationresults[5]) > i:
+                P6 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[5][i])
+            else:
+                P6 = QTableWidgetItem("NA")
+                P6.setBackground(QColor('lightgrey'))
+            if len(aw.qmc.plotterequationresults[6]) and len(aw.qmc.plotterequationresults[6]) > i:
+                P7 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[6][i])
+            else:
+                P7 = QTableWidgetItem("NA")
+                P7.setBackground(QColor('lightgrey'))
+            if len(aw.qmc.plotterequationresults[7]) and len(aw.qmc.plotterequationresults[7]) > i:
+                P8 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[7][i])
+            else:
+                P8 = QTableWidgetItem("NA")
+                P8.setBackground(QColor('lightgrey'))
+            if len(aw.qmc.plotterequationresults[8]) and len(aw.qmc.plotterequationresults[8]) > i:
+                P9 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[8][i])
+            else:
+                P9 = QTableWidgetItem("NA")
+                P9.setBackground(QColor('lightgrey'))
+                                
+            P1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            P2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            P3.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            P4.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            P5.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            P6.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            P7.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            P8.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            P9.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+
+            self.datatable.setItem(i,0,t)
+            self.datatable.setItem(i,1,time)
+            self.datatable.setItem(i,2,P1)
+            self.datatable.setItem(i,3,P2)
+            self.datatable.setItem(i,4,P3)
+            self.datatable.setItem(i,5,P4)
+            self.datatable.setItem(i,6,P5)
+            self.datatable.setItem(i,7,P6)
+            self.datatable.setItem(i,8,P7)
+            self.datatable.setItem(i,9,P8)
+            self.datatable.setItem(i,10,P9)
+
+        header = self.datatable.horizontalHeader()
+        if pyqtversion < 5:
+            header.setResizeMode(0, QHeaderView.Fixed)
+            header.setResizeMode(1, QHeaderView.Fixed)
+            header.setResizeMode(2, QHeaderView.Fixed)
+            header.setResizeMode(3, QHeaderView.Fixed)
+            header.setResizeMode(4, QHeaderView.Fixed)
+            header.setResizeMode(len(columns) - 1, QHeaderView.Stretch)
+        else:
+            header.setSectionResizeMode(0, QHeaderView.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.Fixed)
+            header.setSectionResizeMode(2, QHeaderView.Fixed)
+            header.setSectionResizeMode(3, QHeaderView.Fixed)
+            header.setSectionResizeMode(4, QHeaderView.Fixed)
+            header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
+        self.datatable.resizeColumnsToContents()
 
 ########################################################################################
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
@@ -19271,22 +19551,6 @@ class editGraphDlg(ArtisanDialog):
                     extra_qtw2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                     self.datatable.setItem(i,j,extra_qtw2)
                     j = j + 1
-        header = self.datatable.horizontalHeader()
-        if pyqtversion < 5:
-            header.setResizeMode(0, QHeaderView.Fixed)
-            header.setResizeMode(1, QHeaderView.Fixed)
-            header.setResizeMode(2, QHeaderView.Fixed)
-            header.setResizeMode(3, QHeaderView.Fixed)
-            header.setResizeMode(4, QHeaderView.Fixed)
-            header.setResizeMode(len(columns) - 1, QHeaderView.Stretch)
-        else:
-            header.setSectionResizeMode(0, QHeaderView.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.Fixed)
-            header.setSectionResizeMode(2, QHeaderView.Fixed)
-            header.setSectionResizeMode(3, QHeaderView.Fixed)
-            header.setSectionResizeMode(4, QHeaderView.Fixed)
-            header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
-        self.datatable.resizeColumnsToContents()
 
     def createEventTable(self):
         self.eventtable.clear()
