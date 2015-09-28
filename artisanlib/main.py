@@ -781,7 +781,8 @@ class tgraphcanvas(FigureCanvas):
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
         
-        self.flagalignFCs = False
+        #self.flagalignFCs = False
+        self.alignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP, 7:ALL
 
         self.roastpropertiesflag = 1  #resets roast properties if not zero
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None)
@@ -1872,15 +1873,30 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","HUD ON", None))
 
 
-    # redraws at least the canvas if redraw=True, if FCs=True align to FCs if set, otherwise CHARGE (if set)
-    def timealign(self,redraw=True,recompute=False,FCs=False):
+    # redraws at least the canvas if redraw=True and force=True
+    def timealign(self,redraw=True,recompute=False,force=False):
         try:
             ptime = None
             btime = None
-            if FCs and self.timeindexB[2] and self.timeindex[2]:
+            if aw.qmc.alignEvent in [6,7] and self.timeindexB[6] and self.timeindex[6]: # DROP
+                ptime = self.timex[self.timeindex[6]]
+                btime = self.timeB[self.timeindexB[6]]
+            elif aw.qmc.alignEvent in [5,7] and self.timeindexB[5] and self.timeindex[5]: # SCe
+                ptime = self.timex[self.timeindex[5]]
+                btime = self.timeB[self.timeindexB[5]]
+            elif aw.qmc.alignEvent in [4,7] and self.timeindexB[4] and self.timeindex[4]: # SCs
+                ptime = self.timex[self.timeindex[4]]
+                btime = self.timeB[self.timeindexB[4]]
+            elif aw.qmc.alignEvent in [3,7] and self.timeindexB[3] and self.timeindex[3]: # FCe
+                ptime = self.timex[self.timeindex[3]]
+                btime = self.timeB[self.timeindexB[3]]
+            elif aw.qmc.alignEvent in [2,7] and self.timeindexB[2] and self.timeindex[2]: # FCs
                 ptime = self.timex[self.timeindex[2]]
                 btime = self.timeB[self.timeindexB[2]]
-            elif self.timeindexB[0] != -1 and self.timeindex[0] != -1:
+            elif aw.qmc.alignEvent in [1,7] and self.timeindexB[1] and self.timeindex[1]: # DRY
+                ptime = self.timex[self.timeindex[1]]
+                btime = self.timeB[self.timeindexB[1]]
+            elif self.timeindexB[0] != -1 and self.timeindex[0] != -1: # CHARGE
                 ptime = self.timex[self.timeindex[0]]
                 btime = self.timeB[self.timeindexB[0]]
             if ptime and btime:
@@ -1895,9 +1911,9 @@ class tgraphcanvas(FigureCanvas):
                     self.backmoveflag = 0
                     if redraw:
                         self.redraw(recompute)
-                elif redraw and not FCs: # ensure that we at least redraw the canvas
+                elif redraw and force: # ensure that we at least redraw the canvas
                     self.delayedUpdateBackground()
-            elif redraw and not FCs: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
+            elif redraw and force: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
                     self.delayedUpdateBackground()
         except Exception as ex:
 #            import traceback
@@ -3014,6 +3030,11 @@ class tgraphcanvas(FigureCanvas):
                     title = self.title
                 else:
                     title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + self.title
+                if self.background and self.titleB and len(self.titleB) > 10:
+                    stl = 30
+                else:
+                    stl = 35
+                title = aw.qmc.abbrevString(title,stl)
                 self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                     fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
             
@@ -3036,7 +3057,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         titleB = self.roastbatchprefixB + u(self.roastbatchnrB) + u(" ") + self.titleB
                     if self.title == None or u(self.title).strip() == "":
-                        self.fig.suptitle(aw.qmc.abbrevString(titleB,stl),
+                        self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
                             horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
                     else:
                         self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
@@ -3195,7 +3216,7 @@ class tgraphcanvas(FigureCanvas):
             if self.background: 
                 #check to see if there is both a profile loaded and a background loaded
                 if self.backmoveflag:
-                    self.timealign(redraw=False,recompute=False,FCs=self.flagalignFCs)
+                    self.timealign(redraw=False,recompute=False)
                     
                 #draw one extra device on background stemp1BX
                 if aw.qmc.xtcurveidx > 0:
@@ -4578,8 +4599,8 @@ class tgraphcanvas(FigureCanvas):
         if self.flagstart:
             # redraw (within timealign) should not be called if semaphore is hold!
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
-            if aw.qmc.flagalignFCs:
-                aw.qmc.timealign(redraw=True,recompute=False,FCs=True) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+            if aw.qmc.alignEvent in [2,7]:
+                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_3.setDisabled(True) # deactivate FCs button
             aw.button_3.setFlat(True)
@@ -5591,8 +5612,9 @@ class tgraphcanvas(FigureCanvas):
                 if self.timeindex[2]:
                     a = a + [self.timex[self.timeindex[2]]]
                     n = n + [self.temp2[self.timeindex[2]]]
-                a = a + [self.timex[self.timeindex[6]]]
-                n = n + [self.temp2[self.timeindex[6]]]
+                else: # we consider the DROP coordinate only if no FCs is available
+                    a = a + [self.timex[self.timeindex[6]]]
+                    n = n + [self.temp2[self.timeindex[6]]]
                 
                 xa = numpy.array(a)
                 yn = numpy.array(n)
@@ -5600,7 +5622,9 @@ class tgraphcanvas(FigureCanvas):
                     func = lambda x,a,b,c: a*x*x + b*x + c
                 else:
                     func = lambda x,a,b,c: a * numpy.log(b*x+c)
-                popt, pcov = curve_fit(func, xa, yn)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    popt, pcov = curve_fit(func, xa, yn)
                 perr = numpy.sqrt(numpy.diag(pcov))
                 xb = numpy.array(self.timex)
                 self.ax.plot(xb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
@@ -13113,8 +13137,8 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.backgroundeventsflag = bool(toBool(settings.value("backgroundevents",aw.qmc.backgroundeventsflag)))
                 aw.qmc.DeltaETBflag = bool(toBool(settings.value("DeltaETB",aw.qmc.DeltaETBflag)))
                 aw.qmc.DeltaBTBflag = bool(toBool(settings.value("DeltaBTB",aw.qmc.DeltaBTBflag)))
-                if settings.contains("alignFCs"):
-                    aw.qmc.flagalignFCs = bool(toBool(settings.value("alignFCs",aw.qmc.flagalignFCs)))
+                if settings.contains("alignEvent"):
+                    aw.qmc.alignEvent = toInt(settings.value("alignEvent",aw.qmc.alignEvent))
             settings.endGroup()
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = toInt(settings.value("autosaveflag",self.qmc.autosaveflag))
@@ -13875,7 +13899,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("backgroundevents",aw.qmc.backgroundeventsflag)
             settings.setValue("DeltaETB",aw.qmc.DeltaETBflag)
             settings.setValue("DeltaBTB",aw.qmc.DeltaBTBflag)
-            settings.setValue("alignFCs",aw.qmc.flagalignFCs)
+            settings.setValue("alignEvent",aw.qmc.alignEvent)
             settings.endGroup()
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
             settings.setValue("autosaveprefix",self.qmc.autosaveprefix)
@@ -17294,11 +17318,20 @@ class HUDDlg(ArtisanDialog):
                     aw.qmc.temp1B = y_range[:]
                     aw.qmc.stemp1B = y_range[:] 
                     aw.qmc.temp2B = y_range2[:]               
-                    aw.qmc.stemp2B = aw.qmc.temp2B[:] 
+                    aw.qmc.stemp2B = aw.qmc.temp2B[:]
+                    for i in range(8):
+                        aw.qmc.timeindexB[i] = 0
+                    aw.qmc.timeindexB[0] = -1
                     if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
                         # we copy the CHARGE and DROP from the foreground to allow alignment
                         t1 = aw.qmc.timex[aw.qmc.timeindex[0]]
                         aw.qmc.timeindexB[0] = aw.qmc.backgroundtime2index(t1)
+                        if aw.qmc.timeindex[1]:
+                            t_DE = aw.qmc.timex[aw.qmc.timeindex[1]]
+                            aw.qmc.timeindexB[1] = aw.qmc.backgroundtime2index(t_DE)
+                        if aw.qmc.timeindex[2]:
+                            t_FCs = aw.qmc.timex[aw.qmc.timeindex[2]]
+                            aw.qmc.timeindexB[2] = aw.qmc.backgroundtime2index(t_FCs)
                         t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
                         aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
                     aw.qmc.background = True
@@ -22324,11 +22357,11 @@ class EventsDlg(ArtisanDialog):
             #Color
             colorButton = QPushButton("Select")
             colorButton.setFocusPolicy(Qt.NoFocus)
-            colorButton.clicked.connect(lambda i=i: self.setbuttoncolor(i))
+            colorButton.clicked.connect(lambda _,x=i : self.setbuttoncolor(x))
             #Text Color
             colorTextButton = QPushButton("Select")
             colorTextButton.setFocusPolicy(Qt.NoFocus)
-            colorTextButton.clicked.connect(lambda i=i: self.setbuttontextcolor(i))
+            colorTextButton.clicked.connect(lambda _,x=i : self.setbuttontextcolor(x))
             #Empty Cell
             emptyCell = QLabel("")
             #add widgets to the table
@@ -23364,14 +23397,12 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Text", None))
         self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None))
         self.backgroundDeltaETflag = QCheckBox(QApplication.translate("CheckBox","DeltaET", None))
-        self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None))
-        self.backgroundAlignFCsflag = QCheckBox(QApplication.translate("CheckBox","Align FCs", None))
+        self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None))        
         self.backgroundCheck.setChecked(aw.qmc.background)
         self.backgroundDetails.setChecked(aw.qmc.backgroundDetails)
         self.backgroundeventsflag.setChecked(aw.qmc.backgroundeventsflag)
         self.backgroundDeltaETflag.setChecked(aw.qmc.DeltaETBflag)
         self.backgroundDeltaBTflag.setChecked(aw.qmc.DeltaBTBflag)
-        self.backgroundAlignFCsflag.setChecked(aw.qmc.flagalignFCs)
         loadButton = QPushButton(QApplication.translate("Button","Load", None))
         loadButton.setFocusPolicy(Qt.NoFocus)
         delButton = QPushButton(QApplication.translate("Button","Delete", None))
@@ -23379,9 +23410,24 @@ class backgroundDlg(ArtisanDialog):
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         alignButton = QPushButton(QApplication.translate("Button","Align", None))
         alignButton.setFocusPolicy(Qt.NoFocus)
+        self.alignComboBox = QComboBox()
+        alignnames = [
+            QApplication.translate("Label","CHARGE", None),
+            QApplication.translate("Label","DRY", None),
+            QApplication.translate("Label","FCs", None),
+            QApplication.translate("Label","FCe", None),
+            QApplication.translate("Label","SCs", None),
+            QApplication.translate("Label","SCe", None),
+            QApplication.translate("Label","DROP", None),
+            QApplication.translate("Label","ALL", None),
+            ]
+        self.alignComboBox.addItems(alignnames)
+        self.alignComboBox.setCurrentIndex(aw.qmc.alignEvent)
+        self.alignComboBox.currentIndexChanged.connect(lambda i=self.alignComboBox.currentIndex() :self.changeAlignEventidx(i))        
         loadButton.clicked.connect(self.load)
         okButton.clicked.connect(self.reject)
-        alignButton.clicked.connect(lambda : aw.qmc.timealign(FCs=aw.qmc.flagalignFCs))
+        alignButton.clicked.connect(lambda : aw.qmc.timealign())
+        
         self.speedSpinBox = QSpinBox()
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
@@ -23461,7 +23507,6 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundeventsflag.clicked.connect(self.readChecks)
         self.backgroundDeltaETflag.clicked.connect(self.readChecks)
         self.backgroundDeltaBTflag.clicked.connect(self.readChecks)
-        self.backgroundAlignFCsflag.clicked.connect(self.readChecks)
         delButton.clicked.connect(self.delete)
         self.upButton.clicked.connect(lambda m= "up": self.move("up"))
         self.downButton.clicked.connect(lambda m="down": self.move("down"))
@@ -23506,13 +23551,9 @@ class backgroundDlg(ArtisanDialog):
         checkslayout1.addWidget(self.backgroundCheck)
         checkslayout1.addWidget(self.backgroundDetails)
         checkslayout1.addWidget(self.backgroundeventsflag)
-        checkslayout1.addWidget(self.backgroundAlignFCsflag)
+        checkslayout1.addWidget(self.backgroundDeltaETflag)
+        checkslayout1.addWidget(self.backgroundDeltaBTflag)
         checkslayout1.addStretch()
-        checkslayout2 = QHBoxLayout()
-        checkslayout2.addStretch()
-        checkslayout2.addWidget(self.backgroundDeltaETflag)
-        checkslayout2.addWidget(self.backgroundDeltaBTflag)
-        checkslayout2.addStretch()
         layout = QGridLayout()
         layout.addWidget(intensitylabel,0,2)
         layout.addWidget(self.intensitySpinBox,0,3)
@@ -23534,7 +23575,6 @@ class backgroundDlg(ArtisanDialog):
         upperlayout = QVBoxLayout()
         upperlayout.addLayout(movelayout)
         upperlayout.addLayout(checkslayout1)
-        upperlayout.addLayout(checkslayout2)
         upperlayout.addLayout(hlayout)
         layoutBoxed = QHBoxLayout()
         layoutBoxed.addStretch()
@@ -23545,6 +23585,7 @@ class backgroundDlg(ArtisanDialog):
         alignButtonBoxed.addWidget(delButton)
         alignButtonBoxed.addStretch()
         alignButtonBoxed.addWidget(alignButton)
+        alignButtonBoxed.addWidget(self.alignComboBox)
         tab4content = QHBoxLayout()
         tab4content.addWidget(self.backgroundReproduce)
         tab4content.addStretch()
@@ -23691,8 +23732,10 @@ class backgroundDlg(ArtisanDialog):
         aw.qmc.backgroundeventsflag = bool(self.backgroundeventsflag.isChecked())
         aw.qmc.DeltaETBflag = bool(self.backgroundDeltaETflag.isChecked())
         aw.qmc.DeltaBTBflag = bool(self.backgroundDeltaBTflag.isChecked())
-        aw.qmc.flagalignFCs = bool(self.backgroundAlignFCsflag.isChecked())
         aw.qmc.redraw(recomputeAllDeltas=False)
+        
+    def changeAlignEventidx(self,i):
+        aw.qmc.alignEvent = i
 
     def changeXTcurveidx(self,i):
         aw.qmc.xtcurveidx = i
@@ -30973,12 +31016,12 @@ class WheelDlg(ArtisanDialog):
             #populate table
             for i in range(ndata):
                 delButton = QPushButton(QApplication.translate("Button","Delete",None))
-                delButton.clicked.connect(lambda x = i: self.popwheel(x))
+                delButton.clicked.connect(lambda _,x = i: self.popwheel(x))
                 labelsedit = QLineEdit(str(",".join(aw.qmc.wheelnames[i])))
                 updateButton = QPushButton(QApplication.translate("Button","Update",None))
-                updateButton.clicked.connect(lambda x = i: self.updatelabels(x))
+                updateButton.clicked.connect(lambda _,x = i: self.updatelabels(x))
                 setButton = QPushButton(QApplication.translate("Button","Select",None))
-                setButton.clicked.connect(lambda x = i: self.createlabeltable(x))
+                setButton.clicked.connect(lambda _,x = i: self.createlabeltable(x))
                 widthSpinBox = QDoubleSpinBox()
                 widthSpinBox.setRange(1.,100.)
                 widthSpinBox.setValue(aw.qmc.wradii[i])
@@ -31001,7 +31044,7 @@ class WheelDlg(ArtisanDialog):
                 txtSpinBox.setValue(aw.qmc.wheeltextsize[i])
                 txtSpinBox.valueChanged.connect(lambda z=1,x=i: self.setTextsizeX(z,x))
                 colorButton = QPushButton(QApplication.translate("Button","Set Color",None))
-                colorButton.clicked.connect(lambda x =i: self.setwheelcolor(x))
+                colorButton.clicked.connect(lambda _,x=i: self.setwheelcolor(x))
                 colorSpinBox = QSpinBox()
                 colorSpinBox.setRange(0,255)
                 colorSpinBox.setWrapping(True)
@@ -34774,7 +34817,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             soakedit.setValidator(QRegExpValidator(regextime,self))    
             setButton = QPushButton(QApplication.translate("Button","Set",None))
             setButton.setFocusPolicy(Qt.NoFocus)
-            setButton.clicked.connect(lambda kk=i: self.setsegment(i))
+            setButton.clicked.connect(lambda _,kk=i: self.setsegment(kk))
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
             self.segmenttable.setCellWidget(i,1,rampedit)
