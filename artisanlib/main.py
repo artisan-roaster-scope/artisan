@@ -16128,57 +16128,11 @@ $cupping_notes
                 f.close()
 
     def showSymbolicHelp(self):
-        string1 = "<UL><LI><b>abs(x)</b> " + u(QApplication.translate("Message","Return the absolute value of x.",None))
-        string1 += "<LI><b>acos(x)</b> " + u(QApplication.translate("Message","Return the arc cosine (measured in radians) of x.",None))
-        string1 += "<LI><b>asin(x)</b> " + u(QApplication.translate("Message","Return the arc sine (measured in radians) of x.",None))
-        string1 += "<LI><b>atan(x)</b> " + u(QApplication.translate("Message","Return the arc tangent (measured in radians) of x.",None))
-        string1 += "<LI><b>cos(x)</b> " + u(QApplication.translate("Message","Return the cosine of x (measured in radians).",None))
-        string1 += "<LI><b>degrees(x)</b> " + u(QApplication.translate("Message", "Convert angle x from radians to degrees.",None))
-        string1 += "<LI><b>exp(x)</b> " + u(QApplication.translate("Message", "Return e raised to the power of x.",None))
-        string1 += "<LI><b>log(x[, base])</b> " + u(QApplication.translate("Message", "Return the logarithm of x to the given base. ",None))
-        string1 += "<LI><b>log10(x)</b> " + u(QApplication.translate("Message", "Return the base 10 logarithm of x.",None))
-        string1 += "<LI><b>min(x,y)</b> " + u(QApplication.translate("Message", "Return the minimum of x and y.",None))
-        string1 += "<LI><b>max(x,y)</b> " + u(QApplication.translate("Message", "Return the maximum of x and y.",None))
-        string1 += "<LI><b>pow(x, y)</b> " + u(QApplication.translate("Message", "Return x**y (x to the power of y).",None))
-        string1 += "<LI><b>radians(x)</b> " + u(QApplication.translate("Message", "Convert angle x from degrees to radians.",None))
-        string1 += "<LI><b>sin(x)</b> " + u(QApplication.translate("Message", "Return the sine of x (measured in radians).",None))
-        string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
-        string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
-        string1 += "</UL>"
-        string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
-        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
-        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
-        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None))
-        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra #1 T2 value",None))
-        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra #2 T1 value",None))
-        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra #2 T2 value",None))
-        string2 += "<LI><b>Y1[-2]</b> " + u(QApplication.translate("Message", "ET value delayed by 2 index",None))
-        string2 += "<LI><b>Y2[+1]</b> " + u(QApplication.translate("Message", "BT value index advanced once",None))
-        string2 += "<LI><b>Y4[+1]</b> " + u(QApplication.translate("Message", "Extra #2 T2 advanced 1 index",None))        
-        string2 += "<LI><b>t[+1]</b> " + u(QApplication.translate("Message", "Time one index ahead",None))
-        string2 += "<LI><b>t[-3]</b> " + u(QApplication.translate("Message", "Time three indexes delayed",None))
-        string2 += "<LI><b>F1</b> " + u(QApplication.translate("Message", "Last expression result. Feedback of same expression",None))
-        string2 += "<LI><b>F3</b> " + u(QApplication.translate("Message", "Third last expression result (Feedback)",None))
-        string2 += "<LI><b>P1</b> " + u(QApplication.translate("Message", "Gets results from Plot #1",None))        
-        string2 += "<LI><b>P3[-2]</b> " + u(QApplication.translate("Message", "Gets results from Plot #3 delayed by 2 indexes",None))        
-        string2 += "<LI><b>#</b> " + u(QApplication.translate("Message", "Comments out window field. It does not evaluate",None))        
-        string2 += "<LI><b>$</b> " + u(QApplication.translate("Message", "Hides curve. It evaluates. Hides intermediate results for cascading plots",None))        
-        string2 += "<LI><b>annotate(text,time,temperatue,fontsize)</b> " + u(QApplication.translate("Message", "Example: annotate(HELLO,03:00,200,10)",None))        
-        string2 += "<LI><b>...</b> "
-        string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None))
-        string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None))
-        string2 += "<LI><b>Units</b> " + u(QApplication.translate("Message", "Plotter uses the left Y-coordinate as units. To use right, use multiplying factor: left-max/right-max",None))
-        string2 += "</UL>"
-        string2 += "<br>"
-        string2 += u(QApplication.translate("Message", "Yn holds values sampled in the actual interval if refering to ET/BT or extra channels from devices listed before, otherwise Yn hold values sampled in the previous interval",None))
-        #format help
-        string3 = "<TABLE  WIDTH=550><TR><TH>"
-        string3 += QApplication.translate("Message",  "MATHEMATICAL FUNCTIONS",None)
-        string3 += "</TH><TH>"
-        string3 += QApplication.translate("Message",  "SYMBOLIC VARIABLES",None)
-        string3 += "</TH></TR><TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD></TR></TABLE>"
-        QMessageBox.information(self,QApplication.translate("Message", "Symbolic Functions",None),string3)
 
+        showHelpDlg = plotterHelpDlg(self)
+        #showHelpDlg.showMaximized()        #may only work on Windows
+        showHelpDlg.show()
+        
     def toggleextraeventrows(self):
         if aw.extrabuttondialogs.isVisible(): # self.extraeventsbuttonsflag:            
             aw.hideExtraButtons()
@@ -16776,15 +16730,15 @@ class HUDDlg(ArtisanDialog):
         #tab2
         #Equation plotter
         self.equlabel = QLabel(QApplication.translate("Label", "Y(x)",None))
-        equc1label = QLabel(QApplication.translate("Label", "P1",None))
-        equc2label = QLabel(QApplication.translate("Label", "P2",None))
-        equc3label = QLabel(QApplication.translate("Label", "P3",None))
-        equc4label = QLabel(QApplication.translate("Label", "P4",None))
-        equc5label = QLabel(QApplication.translate("Label", "P5",None))
-        equc6label = QLabel(QApplication.translate("Label", "P6",None))
-        equc7label = QLabel(QApplication.translate("Label", "P7",None))
-        equc8label = QLabel(QApplication.translate("Label", "P8",None))
-        equc9label = QLabel(QApplication.translate("Label", "P9",None))
+        self.equc1label = QLabel(QApplication.translate("Label", "P1",None))
+        self.equc2label = QLabel(QApplication.translate("Label", "P2",None))
+        self.equc3label = QLabel(QApplication.translate("Label", "P3",None))
+        self.equc4label = QLabel(QApplication.translate("Label", "P4",None))
+        self.equc5label = QLabel(QApplication.translate("Label", "P5",None))
+        self.equc6label = QLabel(QApplication.translate("Label", "P6",None))
+        self.equc7label = QLabel(QApplication.translate("Label", "P7",None))
+        self.equc8label = QLabel(QApplication.translate("Label", "P8",None))
+        self.equc9label = QLabel(QApplication.translate("Label", "P9",None))
         self.equedit1 = QLineEdit(aw.qmc.plotcurves[0])
         self.equedit2 = QLineEdit(aw.qmc.plotcurves[1])
         self.equedit3 = QLineEdit(aw.qmc.plotcurves[2])
@@ -16845,14 +16799,16 @@ class HUDDlg(ArtisanDialog):
         equdrawbutton.clicked.connect(lambda _:self.plotequ())
         equshowtablebutton = QPushButton(QApplication.translate("Button","Data",None))
         equshowtablebutton.setFocusPolicy(Qt.NoFocus)
-        equshowtablebutton.setToolTip(QApplication.translate("Tooltip","Shows data table of curves",None))
+        equshowtablebutton.setToolTip(QApplication.translate("Tooltip","Shows data table of plots",None))
         equshowtablebutton.clicked.connect(lambda _:self.equshowtable())
         equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None))
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         equbackgroundbutton.clicked.connect(lambda _:self.setbackgroundequ1())
+        equbackgroundbutton.setToolTip(QApplication.translate("Tooltip","Set P1 and P2 as ET and BT backgrounds",None))                
         equvdevicebutton = QPushButton(QApplication.translate("Button","ET/BT",None))
         equvdevicebutton.setFocusPolicy(Qt.NoFocus)
         equvdevicebutton.clicked.connect(lambda _:self.setvdevice())
+        equvdevicebutton.setToolTip(QApplication.translate("Tooltip","Set P1 and P2 to virtual device",None))        
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
@@ -16861,12 +16817,12 @@ class HUDDlg(ArtisanDialog):
         helpcurveButton.setFocusPolicy(Qt.NoFocus)
         helpcurveButton.clicked.connect(lambda _:aw.showSymbolicHelp())
         curve1Layout = QGridLayout()
-        curve1Layout.addWidget(equc1label,0,0)
+        curve1Layout.addWidget(self.equc1label,0,0)
         curve1Layout.addWidget(self.equedit1,0,1)
         curve1Layout.addWidget(color1Button,0,2)
         curve1Layout.addWidget(equbackgroundbutton,0,3)
         curve1Layout.addWidget(self.equc1colorlabel,0,4)
-        curve1Layout.addWidget(equc2label,1,0)        
+        curve1Layout.addWidget(self.equc2label,1,0)        
         curve1Layout.addWidget(self.equedit2,1,1)
         curve1Layout.addWidget(color2Button,1,2)
         curve1Layout.addWidget(equvdevicebutton,1,3)
@@ -16874,31 +16830,31 @@ class HUDDlg(ArtisanDialog):
         plot1GroupBox = QGroupBox()
         plot1GroupBox.setLayout(curve1Layout)
         curveLayout = QGridLayout()
-        curveLayout.addWidget(equc3label,0,0)
+        curveLayout.addWidget(self.equc3label,0,0)
         curveLayout.addWidget(self.equedit3,0,1)
         curveLayout.addWidget(color3Button,0,2)
         curveLayout.addWidget(self.equc3colorlabel,0,3)
-        curveLayout.addWidget(equc4label,1,0)
+        curveLayout.addWidget(self.equc4label,1,0)
         curveLayout.addWidget(self.equedit4,1,1)
         curveLayout.addWidget(color4Button,1,2)
         curveLayout.addWidget(self.equc4colorlabel,1,3)
-        curveLayout.addWidget(equc5label,2,0)
+        curveLayout.addWidget(self.equc5label,2,0)
         curveLayout.addWidget(self.equedit5,2,1)
         curveLayout.addWidget(color5Button,2,2)
         curveLayout.addWidget(self.equc5colorlabel,2,3)
-        curveLayout.addWidget(equc6label,3,0)
+        curveLayout.addWidget(self.equc6label,3,0)
         curveLayout.addWidget(self.equedit6,3,1)
         curveLayout.addWidget(color6Button,3,2)
         curveLayout.addWidget(self.equc6colorlabel,3,3)
-        curveLayout.addWidget(equc7label,4,0)
+        curveLayout.addWidget(self.equc7label,4,0)
         curveLayout.addWidget(self.equedit7,4,1)
         curveLayout.addWidget(color7Button,4,2)
         curveLayout.addWidget(self.equc7colorlabel,4,3)
-        curveLayout.addWidget(equc8label,5,0)
+        curveLayout.addWidget(self.equc8label,5,0)
         curveLayout.addWidget(self.equedit8,5,1)
         curveLayout.addWidget(color8Button,5,2)
         curveLayout.addWidget(self.equc8colorlabel,5,3)
-        curveLayout.addWidget(equc9label,6,0)
+        curveLayout.addWidget(self.equc9label,6,0)
         curveLayout.addWidget(self.equedit9,6,1)
         curveLayout.addWidget(color9Button,6,2)
         curveLayout.addWidget(self.equc9colorlabel,6,3)
@@ -17181,6 +17137,8 @@ class HUDDlg(ArtisanDialog):
         self.polyfitdeg.valueChanged.connect(lambda i=0:self.polyfitcurveschanged(3))
         self.c1ComboBox.currentIndexChanged.connect(lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(4))
         self.c2ComboBox.currentIndexChanged.connect(lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))
+
+        self.updatePlotterleftlabels()            
             
     def toggleWebLCDsAlerts(self):
         aw.WebLCDsAlerts = not aw.WebLCDsAlerts
@@ -17318,7 +17276,10 @@ class HUDDlg(ArtisanDialog):
             if len(equ) or len(equ2):
                 aw.qmc.resetlines()
                 #create x range
-                x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
+                if len(aw.qmc.timex):
+                    x_range = aw.qmc.timex[:]
+                else:
+                    x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
                 #create y range
                 y_range = []
                 y_range2 = []
@@ -17360,18 +17321,62 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ1(): {0}").format(str(e)),exc_tb.tb_lineno)
 
+    def updatePlotterleftlabels(self):
+        if len(aw.qmc.plotterequationresults[0]):
+            self.equc1label.setStyleSheet("background-color:'lightgrey';")
+        else:
+            self.equc1label.setStyleSheet("background-color:'transparent';")
+        if len(aw.qmc.plotterequationresults[1]):
+            self.equc2label.setStyleSheet("background-color:'lightgrey';")
+        else:
+            self.equc2label.setStyleSheet("background-color:'transparent';")
+        if len(aw.qmc.plotterequationresults[2]):
+            self.equc3label.setStyleSheet("background-color:'lightgrey';")
+        else:
+            self.equc3label.setStyleSheet("background-color:'transparent';")
+        if len(aw.qmc.plotterequationresults[3]):
+            self.equc4label.setStyleSheet("background-color:'lightgrey';")
+        else:
+            self.equc4label.setStyleSheet("background-color:'transparent';")
+        if len(aw.qmc.plotterequationresults[4]):
+            self.equc5label.setStyleSheet("background-color:'lightgrey';")
+        else:
+            self.equc5label.setStyleSheet("background-color:'transparent';")
+        if len(aw.qmc.plotterequationresults[5]):
+            self.equc6label.setStyleSheet("background-color:'lightgrey';")
+        else:
+            self.equc6label.setStyleSheet("background-color:'transparent';")
+        if len(aw.qmc.plotterequationresults[6]):
+            self.equc7label.setStyleSheet("background-color:'lightgrey';")
+        else:
+            self.equc7label.setStyleSheet("background-color:'transparent';")
+        if len(aw.qmc.plotterequationresults[7]):
+            self.equc8label.setStyleSheet("background-color:'lightgrey';")
+        else:
+            self.equc8label.setStyleSheet("background-color:'transparent';")
+        if len(aw.qmc.plotterequationresults[8]):
+            self.equc9label.setStyleSheet("background-color:'lightgrey';")
+        else:
+            self.equc9label.setStyleSheet("background-color:'transparent';")
+
     # format = annotate(text,time,temp,size)
     def plotterannotation(self,annotation,cindex):
-        annotation = annotation.strip()
-        annotation = annotation[9:]                # annotate(
-        annotation = annotation[:len(annotation)-1] # )
-        annvars = [e.strip() for e in annotation.split(',')]
-        text = annvars[0]
-        time = float(aw.qmc.stringtoseconds(annvars[1]))
-        temp = float(annvars[2])
-        fsize = int(annvars[3])
-            
-        aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
+        try:        
+            annotation = annotation.strip()
+            if len(annotation) > 27:
+                annotation = annotation[9:]                # annotate(
+                annotation = annotation[:len(annotation)-1] # )
+                annvars = [e.strip() for e in annotation.split(',')]
+                text = annvars[0]
+                time = float(aw.qmc.stringtoseconds(annvars[1]))
+                temp = float(annvars[2])
+                fsize = int(annvars[3])        
+                aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
+            else:
+                aw.sendmessage(QApplication.translate("Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None))
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " annotate() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
 
     def plotequ(self):
         try:
@@ -17396,13 +17401,15 @@ class HUDDlg(ArtisanDialog):
                     if EQU[e][0] == "#":
                         commentoutplot[e] = 1
                     #commands
-                    if EQU[e][0] == "a":
+                    if len(EQU[e]) > 10 and EQU[e][:9] == "annotate(":
                         commentoutplot[e] = 1
                         self.plotterannotation(EQU[e],e)
                 
                 #create x range
                 if len(aw.qmc.timex):
-                    x_range = aw.qmc.timex 
+                    x_range = aw.qmc.timex
+                elif len(aw.qmc.timeB):
+                    x_range = aw.qmc.timeB
                 else:
                     x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
                 #create y range
@@ -17415,7 +17422,7 @@ class HUDDlg(ArtisanDialog):
                         aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
                 
             aw.qmc.fig.canvas.draw()
-            
+            self.updatePlotterleftlabels()            
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): {0}").format(str(e)),exc_tb.tb_lineno)
@@ -17425,7 +17432,13 @@ class HUDDlg(ArtisanDialog):
         if len(mathexpression):
             
             #get index from the time
-            index = aw.qmc.time2index(t)
+            if len(aw.qmc.timex):
+                index = aw.qmc.time2index(t)
+            elif len(aw.qmc.timeB):
+                index = aw.qmc.backgroundtime2index(t)
+            else:
+                index = int(t)
+                
             #timeshift vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
             timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
@@ -17511,7 +17524,7 @@ class HUDDlg(ArtisanDialog):
                             if "t" not in mathdictionary:
                                 mathdictionary['t'] = t         #add t to the math dictionary
                                     
-                    #Add to dict previous results from plotter field windows (1-6)
+                    #Add to dict plotter Previous results (cascading) from plotter field windows (1-9)
                     elif mathexpression[i] == "P":
                         if i+1 < mlen:                          #check for out of range
                             if mathexpression[i+1].isdigit():
@@ -17544,7 +17557,48 @@ class HUDDlg(ArtisanDialog):
                                         val = -1000                                        
                                     if "P" + mathexpression[i+1] not in mathdictionary:    
                                         mathdictionary["P"+mathexpression[i+1]] = val                                
-                            
+
+                    #Background B1 = ETbackground; B2 = BTbackground
+                    elif mathexpression[i] == "B":
+                        if not len(aw.qmc.timeB):
+                            raise Exception("No background found")
+                        if i+1 < mlen:                          
+                            if mathexpression[i+1].isdigit():
+                                nint = int(mathexpression[i+1])              #Ynumber int
+                                #check for TIMESHIFT 0-9 (one digit). Example: "B1[-2]" 
+                                if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
+                                    Yshiftval = int(mathexpression[i+4])
+                                    sign = mathexpression[i+3]
+                                    #ET,BT, and Extras                  
+                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
+                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
+                                        shiftedindex = index - Yshiftval   
+                                        if shiftedindex < 0:
+                                            shiftedindex = 0                                                   
+                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
+                                        evalsign = "1"      #digit 1 = "+"
+                                        shiftedindex = index + Yshiftval
+                                        if shiftedindex >= len(aw.qmc.timeB):
+                                            shiftedindex = len(aw.qmc.timeB)- 1
+                                    if nint == 1: #ETbackground
+                                        val =aw.qmc.temp1B[shiftedindex]
+                                    elif nint == 2: #BTbackground
+                                        val =aw.qmc.temp2B[shiftedindex]
+                                    evaltimeexpression = "B" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
+                                    timeshiftexpressions.append(evaltimeexpression)
+                                    timeshiftexpressionsvalues.append(val)
+                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                #no shift
+                                else:
+                                    if nint == 1:
+                                        val = aw.qmc.temp1B[index]
+                                    elif nint == 2:
+                                        val = aw.qmc.temp2B[index]
+                                    else:
+                                        val = -1000                                        
+                                    if "B" + mathexpression[i+1] not in mathdictionary:    
+                                        mathdictionary["B"+mathexpression[i+1]] = val                                        
+                
                     # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
                     # holds the ten previous formula results (same window) in order.
                     # F1 is the last result. F5 is the past 5th result 
@@ -17570,10 +17624,17 @@ class HUDDlg(ArtisanDialog):
                     for i in range(len(Yval)):
                         if "Y"+ Yval[i] not in mathdictionary:
                             mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
-                    #add timeshifted Ys to the math dictionary
+                            
+                    #add other timeshifted expressions to the math dictionary: F,P
                     for i in range(len(timeshiftexpressions)):
                         if timeshiftexpressions[i] not in mathdictionary:
                             mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
+
+                #background symbols just in case there was no profile loaded but a background loaded.
+                if len(aw.qmc.timeB) > 1:
+                    for i in range(len(timeshiftexpressions)):
+                        if timeshiftexpressions[i] not in mathdictionary:   
+                            mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]                    
                                     
                 try:                            
                     res = eval(mathexpression,{"__builtins__":None},mathdictionary)
@@ -17586,14 +17647,14 @@ class HUDDlg(ArtisanDialog):
                     #stack (feedback in same forumla)
                     aw.qmc.plotterstack.insert(10,res)
                     aw.qmc.plotterstack.pop(0)
-                    #line results (R var in field windows)
+                    #Pnumber results storage
                     if equeditnumber:
                         aw.qmc.plotterequationresults[equeditnumber-1].append(res)
                     return res
             except Exception as e:
                 if equeditnumber:
                     e = str(e)
-                    e = "P" + str(equeditnumber) + ": index n=%i: "%(i+1) + e
+                    e = "P" + str(equeditnumber) + ": index %i: "%(i+1) + e
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " Plotter: {0}").format(e),exc_tb.tb_lineno)
                 return -1
@@ -18399,6 +18460,77 @@ class volumeCalculatorDlg(ArtisanDialog):
 
     def close(self):
         self.closeEvent(None)
+
+########################################################################################
+#####################  PLOTTER HELP DLG ################################################
+########################################################################################
+class plotterHelpDlg(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(plotterHelpDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Form Caption","Plotter Help",None)) 
+        self.setModal(True)
+
+        string1 = "<UL><LI><b>abs(x)</b> " + u(QApplication.translate("Message","Return the absolute value of x.",None))
+        string1 += "<LI><b>acos(x)</b> " + u(QApplication.translate("Message","Return the arc cosine (measured in radians) of x.",None))
+        string1 += "<LI><b>asin(x)</b> " + u(QApplication.translate("Message","Return the arc sine (measured in radians) of x.",None))
+        string1 += "<LI><b>atan(x)</b> " + u(QApplication.translate("Message","Return the arc tangent (measured in radians) of x.",None))
+        string1 += "<LI><b>cos(x)</b> " + u(QApplication.translate("Message","Return the cosine of x (measured in radians).",None))
+        string1 += "<LI><b>degrees(x)</b> " + u(QApplication.translate("Message", "Convert angle x from radians to degrees.",None))
+        string1 += "<LI><b>exp(x)</b> " + u(QApplication.translate("Message", "Return e raised to the power of x.",None))
+        string1 += "<LI><b>log(x[, base])</b> " + u(QApplication.translate("Message", "Return the logarithm of x to the given base. ",None))
+        string1 += "<LI><b>log10(x)</b> " + u(QApplication.translate("Message", "Return the base 10 logarithm of x.",None))
+        string1 += "<LI><b>min(x,y)</b> " + u(QApplication.translate("Message", "Return the minimum of x and y.",None))
+        string1 += "<LI><b>max(x,y)</b> " + u(QApplication.translate("Message", "Return the maximum of x and y.",None))
+        string1 += "<LI><b>pow(x, y)</b> " + u(QApplication.translate("Message", "Return x**y (x to the power of y).",None))
+        string1 += "<LI><b>radians(x)</b> " + u(QApplication.translate("Message", "Convert angle x from degrees to radians.",None))
+        string1 += "<LI><b>sin(x)</b> " + u(QApplication.translate("Message", "Return the sine of x (measured in radians).",None))
+        string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
+        string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
+        string1 += "</UL>"
+        string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
+        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
+        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
+        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None))
+        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra #1 T2 value",None))
+        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra #2 T1 value",None))
+        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra #2 T2 value",None))
+        string2 += "<LI><b>Y1[-2]</b> " + u(QApplication.translate("Message", "ET value delayed by 2 index",None))
+        string2 += "<LI><b>Y2[+1]</b> " + u(QApplication.translate("Message", "BT value index advanced once",None))
+        string2 += "<LI><b>Y4[+1]</b> " + u(QApplication.translate("Message", "Extra #2 T2 advanced 1 index",None))        
+        string2 += "<LI><b>t[+1]</b> " + u(QApplication.translate("Message", "Time one index ahead",None))
+        string2 += "<LI><b>t[-3]</b> " + u(QApplication.translate("Message", "Time three indexes delayed",None))
+        string2 += "<LI><b>F1</b> " + u(QApplication.translate("Message", "Last expression result. Feedback of same expression",None))
+        string2 += "<LI><b>F3</b> " + u(QApplication.translate("Message", "Third last expression result (Feedback)",None))
+        string2 += "<LI><b>P1</b> " + u(QApplication.translate("Message", "Gets results from Plot #1",None))        
+        string2 += "<LI><b>P3[-2]</b> " + u(QApplication.translate("Message", "Gets results from Plot #3 delayed by 2 indexes",None))                
+        string2 += "<LI><b>...</b> "
+        string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None))
+        string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None))
+        string2 += "<LI><b>Units</b> " + u(QApplication.translate("Message", "Plotter uses the left Y-coordinate as units. To use right, use multiplying factor: left-max/right-max",None))
+        string2 += "</UL>"
+        string2 += "<br>"
+        string2 += u(QApplication.translate("Message", "Yn holds values sampled in the actual interval if refering to ET/BT or extra channels from devices listed before, otherwise Yn hold values sampled in the previous interval",None))
+        string3 = "<UL><LI><b>#</b> " + u(QApplication.translate("Message", "Comments out plot. It does not evaluate",None))        
+        string3 += "<LI><b>$</b> " + u(QApplication.translate("Message", "Hides plot. It evaluates. Hides intermediate results for cascading plots",None)) 
+        string3 += "<LI><b>annotate</b> " + u(QApplication.translate("Message","Makes a nottation. annotate(text,time,temperatue,fontsize)",None))
+        string3 += "<br>" + u(QApplication.translate("Message","Example: annotate(HELLO,03:00,200,10)",None))
+        string3 += "</UL>"
+        #format help
+        string4 = "<TABLE><TR><TH bgcolor=lightgrey>"
+        string4 += QApplication.translate("Message",  "MATHEMATICAL FUNCTIONS",None)
+        string4 += "<br></TH><TH bgcolor=lightgrey>"
+        string4 += QApplication.translate("Message",  "SYMBOLIC VARIABLES",None)
+        string4 += "<br></TH><TH bgcolor=lightgrey>"
+        string4 += QApplication.translate("Message",  "COMMANDS",None)        
+        string4 += "</TH></TR><TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD><TD>" +string3 + "</TD></TR></TABLE>"
+
+        phelp = QTextEdit()
+        phelp.setHtml(string4)
+        phelp.setReadOnly(True)
+
+        hLayout = QVBoxLayout()
+        hLayout.addWidget(phelp)
+        self.setLayout(hLayout)        
 
 ########################################################################################
 #####################  PLOTTER DATA DLG  ###############################################
