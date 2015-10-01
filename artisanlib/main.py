@@ -2281,89 +2281,344 @@ class tgraphcanvas(FigureCanvas):
 
         return ETreachTime, BTreachTime, ET2reachTime, BT2reachTime
 
-    #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
-    #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
-    def eval_math_expression(self,mathexpression,x,tx):
-        if mathexpression == None or len(mathexpression) == 0 or (x == -1 and "x" in mathexpression):
-            return x
 
-        #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
-        mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
-                          "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
-                          "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
-        try:
-            x = float(x)
-            mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
-            #add ETB, BTB and XTB (background ET, BT and XT)
-            etb = btb = xtb = 0
+    # mathexpression = formula; t = a number to evaluate(usually time);
+    # equeditnumber option = plotter edit window number; RT option = Real Time recording;
+    def eval_math_expression(self,mathexpression,t,equeditnumber=None,RT=None):
+        
+        if len(mathexpression):
+            i =0
+            #get index from the time. 
+            if RT:
+                index = len(self.timex)-1  # If REAL TIME recording, get the last index of timex (present time)
+            else:
+                if len(self.timex):
+                    index = self.time2index(t)  # If using the plotter. Background index done bellow at "B"
+                else:
+                    index = 0      #if plotting but nothing loaded. Index will not be used anyway.
+                
+            #timeshift vars 
+            timeshiftexpressions = []           #holds strings like "Y10040" as explained below
+            timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
+        
+            #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
+            mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
+                              "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
+                              "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
             try:
-                if aw.qmc.background and ("ETB" in mathexpression or "BTB" in mathexpression or "XTB" in mathexpression):
-                    #first compute closest index at that time point in the background data
-                    j = aw.qmc.backgroundtime2index(tx)
-                    etb = aw.qmc.temp1B[j]
-                    btb = aw.qmc.temp2B[j]
-                    if aw.qmc.xtcurveidx > 0:
-                        idx3 = aw.qmc.xtcurveidx - 1
-                        n3 = idx3 // 2
-                        if len(self.temp1BX) > n3 and len(self.temp2BX) > n3 and len(self.extratimexB) > n3:
-                            if aw.qmc.xtcurveidx % 2:
-                                xtb = self.temp1BX[n3][j]
-                            else:
-                                xtb = self.temp2BX[n3][j]
-            except Exception:
-                pass
-            mathdictionary["ETB"] = etb
-            mathdictionary["BTB"] = btb
-            mathdictionary["XTB"] = xtb
-            #if Ys in expression
-            if "Y" in mathexpression:
+                t = float(t)
                 #extract Ys
-                Yval = []                   #extract value number example Y9 = 9
+                Yval = []                   #stores value number example Y9 = 9
                 mlen = len(mathexpression)
                 for i in range(mlen):
+                    #Start symbolic assignment
                     if mathexpression[i] == "Y":
-                        #find Y number
+                        #find Y number for ET,BT,Extras (upto 9)
                         if i+1 < mlen:                          #check for out of range
                             if mathexpression[i+1].isdigit():
-                                number = mathexpression[i+1]
-                            else:
-                                number = "1"
-                        #check for double digit
-                        if i+2 < mlen:
-                            if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
-                                number += mathexpression[i+2]
-                        Yval.append(number)
-                #build Ys float values
-                if len(self.timex) > 0:
-                    Y = [self.temp1[-1],self.temp2[-1]]
-                else:
-                    Y = [-1,-1]
-                for i in range(len(self.extradevices)):
-                    if len(self.extratimex[i]):
-                        try:
-                            Y.append(self.extratemp1[i][-1])
-                        except:
-                            Y.append(-1)
-                        try:
-                            Y.append(self.extratemp2[i][-1])
-                        except:
-                            Y.append(-1)
-                    else:
-                        Y.append(-1)
-                        Y.append(-1)
-                    #add Ys and their value to math dictionary 
-                    for i in range(len(Yval)):
-                        idx = int(Yval[i])-1
-                        if idx >= len(Y):
-                            mathdictionary["Y"+ Yval[i]] = 0
+                                #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" 
+                                if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
+                                    nint = int(mathexpression[i+1])              #Ynumber int
+                                    Yshiftval = int(mathexpression[i+4])
+                                    sign = mathexpression[i+3]
+                                    #ET,BT, and Extras                  
+                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
+                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
+                                        shiftedindex = index - Yshiftval   
+                                        if shiftedindex < 0:
+                                            shiftedindex = 0                                                   
+                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
+                                        evalsign = "1"      #digit 1 = "+"
+                                        shiftedindex = index + Yshiftval
+                                        if shiftedindex >= len(self.timex):
+                                            shiftedindex = len(self.timex)- 1
+                                    if nint == 1: #ET
+                                        val = self.temp1[shiftedindex]
+                                    elif nint == 2: #BT
+                                        val = self.temp2[shiftedindex]
+                                    elif nint > 2: 
+                                        #map the extra device
+                                        b = [0,0,1,1,2,2,3]
+                                        edindex = b[nint-3]
+                                        if nint%2:
+                                            val = self.extratemp1[edindex][shiftedindex]
+                                        else:
+                                            val = self.extratemp2[edindex][shiftedindex]
+                                    #add expression and values found
+                                    evaltimeexpression = "Y" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
+                                    timeshiftexpressions.append(evaltimeexpression)
+                                    timeshiftexpressionsvalues.append(val)
+                                    #convert "Y2[+9]" to Ynumber compatible for python eval() to add to dictionary
+                                    #METHOD USED: replace all non digits chars with sign value.
+                                    #Example1 "Y2[-7]" = "Y20070"   Example2 "Y2[+9]" = "Y21191"
+                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                # No timeshift Y1,Y2,Y3,etc.
+                                else:
+                                    Yval.append(mathexpression[i+1])
+                                    
+                    # time timeshift of absolute time (not relative to CHARGE)                                        
+                    elif mathexpression[i] == "t":
+                        if i+4 < len(mathexpression) and mathexpression[i+1] == "[" and mathexpression[i+4] == "]":
+                            Yshiftval = int(mathexpression[i+3])
+                            sign = mathexpression[i+2]
+                            if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
+                                evalsign = "0"      # digit "0" = "-"
+                                shiftedindex = index - Yshiftval   
+                                if shiftedindex < 0:
+                                    shiftedindex = 0
+                                val = self.timex[shiftedindex]
+                            elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
+                                evalsign = "1"      #digit 1 = "+"
+                                shiftedindex = index - Yshiftval
+                                if shiftedindex >= len(self.timex):
+                                    shiftedindex = len(self.timex)- 1
+                                val = self.timex[shiftedindex]
+                            evaltimeexpression = "Y" + mathexpression[i] + evalsign*2 + mathexpression[i+3] + evalsign
+                            timeshiftexpressions.append(evaltimeexpression)
+                            timeshiftexpressionsvalues.append(val)
+                            mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+5:]))
+                        #no timeshift
                         else:
-                            mathdictionary["Y"+ Yval[i]] = Y[idx]
-            return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
+                            if "t" not in mathdictionary:
+                                mathdictionary['t'] = t         #add t to the math dictionary
+                                    
+                    #Add to dict plotter Previous results (cascading) from plotter field windows (1-9)
+                    elif mathexpression[i] == "P":
+                        if i+1 < mlen:                          #check for out of range
+                            if mathexpression[i+1].isdigit():
+                                nint = int(mathexpression[i+1])              #Ynumber int
+                                #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" 
+                                if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
+                                    Yshiftval = int(mathexpression[i+4])
+                                    sign = mathexpression[i+3]
+                                    #ET,BT, and Extras                  
+                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
+                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
+                                        shiftedindex = index - Yshiftval   
+                                        if shiftedindex < 0:
+                                            shiftedindex = 0                                                   
+                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
+                                        evalsign = "1"      #digit 1 = "+"
+                                        shiftedindex = index + Yshiftval
+                                        if shiftedindex >= len(self.timex):
+                                            shiftedindex = len(self.timex)- 1
+                                    val = self.plotterequationresults[nint-1][shiftedindex]
+                                    evaltimeexpression = "P" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
+                                    timeshiftexpressions.append(evaltimeexpression)
+                                    timeshiftexpressionsvalues.append(val)
+                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                #no shift
+                                else:
+                                    if index < len(self.plotterequationresults[nint-1]):
+                                        val = self.plotterequationresults[nint-1][index]
+                                    else:
+                                        val = -1000                                        
+                                    if "P" + mathexpression[i+1] not in mathdictionary:    
+                                        mathdictionary["P"+mathexpression[i+1]] = val                                
 
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_math_expression() {0}").format(str(e)),exc_tb.tb_lineno)
-            return 0
+                    #Background B1 = ETbackground; B2 = BTbackground
+                    elif mathexpression[i] == "B":
+                        if not len(self.timeB):
+                            raise Exception("No background found")
+                        if i+1 < mlen:                          
+                            if mathexpression[i+1].isdigit():
+                                nint = int(mathexpression[i+1])              #Ynumber int
+                                if nint < 3:
+                                    index = self.backgroundtime2index(t)
+                                else:
+                                    index = self.extrabackgroundtime2index(t,(nint-3))
+                                #check for TIMESHIFT 0-9 (one digit). Example: "B1[-2]" 
+                                if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
+                                    Yshiftval = int(mathexpression[i+4])
+                                    sign = mathexpression[i+3]
+                                    #ET,BT, and Extras                  
+                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
+                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
+                                        shiftedindex = index - Yshiftval   
+                                        if shiftedindex < 0:
+                                            shiftedindex = 0                                                   
+                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
+                                        evalsign = "1"      #digit 1 = "+"
+                                        shiftedindex = index + Yshiftval
+                                        if shiftedindex >= len(self.timeB):
+                                            shiftedindex = len(self.timeB)- 1
+                                    if nint == 1: #ETbackground
+                                        val = self.temp1B[shiftedindex]
+                                    elif nint == 2: #BTbackground
+                                        val = self.temp2B[shiftedindex]
+                                    elif nint > 2:
+                                        #map the extra device
+                                        b = [0,0,1,1,2,2,3]
+                                        edindex = b[nint-3]
+                                        if nint%2:
+                                            val = self.temp1BX[edindex][shiftedindex]
+                                        else:
+                                            val = self.temp2BX[edindex][shiftedindex]                                        
+                                    evaltimeexpression = "B" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
+                                    timeshiftexpressions.append(evaltimeexpression)
+                                    timeshiftexpressionsvalues.append(val)
+                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                #no shift
+                                else:
+                                    if nint == 1:
+                                        val = self.temp1B[index]
+                                    elif nint == 2:
+                                        val = self.temp2B[index]
+                                    else:
+                                        b = [0,0,1,1,2,2,3]
+                                        edindex = b[nint-3]
+                                        if nint%2:
+                                            val = self.temp1BX[edindex][index]
+                                        else:
+                                            val = self.temp2BX[edindex][index]                                      
+                                    if "B" + mathexpression[i+1] not in mathdictionary:    
+                                        mathdictionary["B"+mathexpression[i+1]] = val                                        
+                
+                    # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
+                    # holds the ten previous formula results (same window) in order.
+                    # F1 is the last result. F5 is the past 5th result 
+                    elif mathexpression[i] == "F":
+                        if i+1 < mlen:
+                            if mathexpression[i+1].isdigit():
+                                nint = int(mathexpression[i+1])
+                                val = self.plotterstack[-1*nint]
+                                if "F"+mathexpression[i+1] not in mathdictionary:
+                                    mathdictionary["F"+mathexpression[i+1]] = val
+
+                    #############   end of mathexpression loop ##########################
+                    
+                #created Ys values 
+                if len(self.timex) > 1:
+                    Y = [self.temp1[index], self.temp2[index]]
+                    if len(self.extratimex):
+                        if len(self.extratimex[0]):
+                            for i in range(len(self.extradevices)):
+                                Y.append(self.extratemp1[i][index])  
+                                Y.append(self.extratemp2[i][index])  
+                    #add Ys and their value to math dictionary
+                    for i in range(len(Yval)):
+                        if "Y"+ Yval[i] not in mathdictionary:
+                            mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
+                            
+                    #add other timeshifted expressions to the math dictionary: F,P
+                    for i in range(len(timeshiftexpressions)):
+                        if timeshiftexpressions[i] not in mathdictionary:
+                            mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
+
+                #background symbols just in case there was no profile loaded but a background loaded.
+                if len(self.timeB) > 1:
+                    for i in range(len(timeshiftexpressions)):
+                        if timeshiftexpressions[i] not in mathdictionary:   
+                            mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]                    
+                                    
+                try:                            
+                    res = eval(mathexpression,{"__builtins__":None},mathdictionary)
+
+                except ValueError:
+                    res = -1
+                if res == None:
+                    return -1
+                else:
+                    #stack (feedback in same forumla)
+                    self.plotterstack.insert(10,res)
+                    self.plotterstack.pop(0)
+                    #Pnumber results storage
+                    if equeditnumber:
+                        self.plotterequationresults[equeditnumber-1].append(res)
+                    return res
+            except Exception as e:
+                if equeditnumber:
+                    e = str(e)
+                    e = "P" + str(equeditnumber) + ": index %i: "%(i+1) + e
+                _, _, exc_tb = sys.exc_info()
+                self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_math_expression(): {0}").format(e),exc_tb.tb_lineno)
+                return -1
+        return -1
+
+
+    #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
+    #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
+##    def eval_math_expression(self,mathexpression,x,tx):
+##        if mathexpression == None or len(mathexpression) == 0 or (x == -1 and "x" in mathexpression):
+##            return x
+##
+##        #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
+##        mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
+##                          "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
+##                          "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
+##        try:
+##            x = float(x)
+##            mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
+##            #add ETB, BTB and XTB (background ET, BT and XT)
+##            etb = btb = xtb = 0
+##            try:
+##                if aw.qmc.background and ("ETB" in mathexpression or "BTB" in mathexpression or "XTB" in mathexpression):
+##                    #first compute closest index at that time point in the background data
+##                    j = aw.qmc.backgroundtime2index(tx)
+##                    etb = aw.qmc.temp1B[j]
+##                    btb = aw.qmc.temp2B[j]
+##                    if aw.qmc.xtcurveidx > 0:
+##                        idx3 = aw.qmc.xtcurveidx - 1
+##                        n3 = idx3 // 2
+##                        if len(self.temp1BX) > n3 and len(self.temp2BX) > n3 and len(self.extratimexB) > n3:
+##                            if aw.qmc.xtcurveidx % 2:
+##                                xtb = self.temp1BX[n3][j]
+##                            else:
+##                                xtb = self.temp2BX[n3][j]
+##            except Exception:
+##                pass
+##            mathdictionary["ETB"] = etb
+##            mathdictionary["BTB"] = btb
+##            mathdictionary["XTB"] = xtb
+##            #if Ys in expression
+##            if "Y" in mathexpression:
+##                #extract Ys
+##                Yval = []                   #extract value number example Y9 = 9
+##                mlen = len(mathexpression)
+##                for i in range(mlen):
+##                    if mathexpression[i] == "Y":
+##                        #find Y number
+##                        if i+1 < mlen:                          #check for out of range
+##                            if mathexpression[i+1].isdigit():
+##                                number = mathexpression[i+1]
+##                            else:
+##                                number = "1"
+##                        #check for double digit
+##                        if i+2 < mlen:
+##                            if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
+##                                number += mathexpression[i+2]
+##                        Yval.append(number)
+##                #build Ys float values
+##                if len(self.timex) > 0:
+##                    Y = [self.temp1[-1],self.temp2[-1]]
+##                else:
+##                    Y = [-1,-1]
+##                for i in range(len(self.extradevices)):
+##                    if len(self.extratimex[i]):
+##                        try:
+##                            Y.append(self.extratemp1[i][-1])
+##                        except:
+##                            Y.append(-1)
+##                        try:
+##                            Y.append(self.extratemp2[i][-1])
+##                        except:
+##                            Y.append(-1)
+##                    else:
+##                        Y.append(-1)
+##                        Y.append(-1)
+##                    #add Ys and their value to math dictionary 
+##                    for i in range(len(Yval)):
+##                        idx = int(Yval[i])-1
+##                        if idx >= len(Y):
+##                            mathdictionary["Y"+ Yval[i]] = 0
+##                        else:
+##                            mathdictionary["Y"+ Yval[i]] = Y[idx]
+##            return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
+##
+##        except Exception as e:
+##            _, _, exc_tb = sys.exc_info()
+##            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_math_expression() {0}").format(str(e)),exc_tb.tb_lineno)
+##            return 0
 
     #format X axis labels
     def xaxistosm(self,redraw=True):
@@ -5733,13 +5988,18 @@ class tgraphcanvas(FigureCanvas):
 
     #selects closest time INDEX in self.timex from a given input float seconds
     def time2index(self,seconds):
-        #find where given seconds crosses aw.qmc.timex
+        #find where given seconds crosses self.timex
         return self.timearray2index(self.timex,seconds)
 
     #selects closest time INDEX in self.timeB from a given input float seconds
     def backgroundtime2index(self,seconds):
-        #find where given seconds crosses aw.qmc.timex
+        #find where given seconds crosses self.timeB
         return self.timearray2index(self.timeB,seconds)
+    
+    #selects closest time INDEX in self.extratimexB[?] from a given input float seconds
+    def extrabackgroundtime2index(self,seconds,bkindex):
+        #find where given seconds crosses self.extratimexB
+        return self.timearray2index(self.extratimexB[bkindex],seconds)
 
     #updates list self.timeindex when found an _OLD_ profile without self.timeindex (new version)
     def timeindexupdate(self,times):
@@ -6876,6 +7136,9 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     self.fig.canvas.draw()
 
+#######################################################################################
+#######################  END OF MAIN APPLICATION   ####################################
+#######################################################################################
 
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem with py2exe and svg
@@ -7125,9 +7388,9 @@ class SampleThread(QThread):
                             for i in range(nxdevices):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,extratx)
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,RT=True)
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2,extratx)
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2,RT=True)
                                 # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                                 # modbus channel 1+2, respect input temperature scale setting
                                 if aw.qmc.extradevices[i] == 29:
@@ -7218,9 +7481,9 @@ class SampleThread(QThread):
                             t1 = (t1 + t1_2) / 2.0
                     ####### all values retrieved
                     if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
-                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1,tx)
+                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1,RT=True) #RT = Real Time
                     if aw.qmc.BTfunction != None and len(aw.qmc.BTfunction):
-                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2,tx)
+                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2,RT=True) #RT = Real Time 
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
                     if aw.qmc.device == 29:
@@ -17241,7 +17504,7 @@ class HUDDlg(ArtisanDialog):
                 #create y range
                 y_range = []
                 for i in arange(len(aw.qmc.timex)):
-                    y_range.append(self.eval_curve_expression(EQU[e],aw.qmc.timex[i]))
+                    y_range.append(aw.qmc.eval_math_expression(EQU[e],aw.qmc.timex[i]))
                 if e:
                     extratemp2 = y_range
                 else:
@@ -17284,8 +17547,8 @@ class HUDDlg(ArtisanDialog):
                 y_range = []
                 y_range2 = []
                 for i in range(len(x_range)):
-                    y_range.append(self.eval_curve_expression(equ,x_range[i]))
-                    y_range2.append(self.eval_curve_expression(equ2,x_range[i]))
+                    y_range.append(aw.qmc.eval_math_expression(equ,x_range[i]))
+                    y_range2.append(aw.qmc.eval_math_expression(equ2,x_range[i]))
                 if foreground:
                     aw.qmc.timex = x_range[:]
                     aw.qmc.temp1 = y_range[:]
@@ -17378,6 +17641,22 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " annotate() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
 
+    def plotterb(self):
+        try:
+            aw.sendmessage("Charging beans...")
+            for i in range(9):
+                x = aw.qmc.endofx*numpy.random.rand(300)
+                y = aw.qmc.endofx*numpy.random.rand(300)                
+                colorb = ["#996633","#4d2600","#4b4219","black","#4b3219","#996633","#281a0d","#4d2600","green"]
+                aw.qmc.ax.plot(x,y,'o',color=colorb[int(7*numpy.random.rand(1)[0])])                    
+                aw.qmc.fig.canvas.draw()
+            libtime.sleep(0.3)
+            aw.sendmessage("")
+            aw.qmc.redraw(recomputeAllDeltas=False)            
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotterb() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
+
     def plotequ(self):
         try:
             aw.qmc.plotterstack = [0]*10
@@ -17404,7 +17683,10 @@ class HUDDlg(ArtisanDialog):
                     if len(EQU[e]) > 10 and EQU[e][:9] == "annotate(":
                         commentoutplot[e] = 1
                         self.plotterannotation(EQU[e],e)
-                
+                    if len(EQU[e]) > 4 and EQU[e][:5] == "beans":
+                        commentoutplot[e] = 1
+                        self.plotterb()
+                        
                 #create x range
                 if len(aw.qmc.timex):
                     x_range = aw.qmc.timex
@@ -17417,7 +17699,7 @@ class HUDDlg(ArtisanDialog):
 
                 if not commentoutplot[e]:
                     for i in range(len(x_range)):
-                            y_range.append(self.eval_curve_expression(EQU[e],x_range[i],e+1)) #pass e+1 = equeditnumber(1-9)
+                            y_range.append(aw.qmc.eval_math_expression(EQU[e],x_range[i],equeditnumber=e+1)) #pass e+1 = equeditnumber(1-9)
                     if not hideplot[e]:
                         aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
                 
@@ -17427,238 +17709,6 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): {0}").format(str(e)),exc_tb.tb_lineno)
 
-    def eval_curve_expression(self,mathexpression,t,equeditnumber=None):
-        
-        if len(mathexpression):
-            
-            #get index from the time
-            if len(aw.qmc.timex):
-                index = aw.qmc.time2index(t)
-            elif len(aw.qmc.timeB):
-                index = aw.qmc.backgroundtime2index(t)
-            else:
-                index = int(t)
-                
-            #timeshift vars 
-            timeshiftexpressions = []           #holds strings like "Y10040" as explained below
-            timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
-        
-            #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
-            mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
-                              "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
-                              "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
-            try:
-                t = float(t)
-                #extract Ys
-                Yval = []                   #stores value number example Y9 = 9
-                mlen = len(mathexpression)
-                for i in range(mlen):
-                    #Start symbolic assignment
-                    if mathexpression[i] == "Y":
-                        #find Y number for ET,BT,Extras (upto 9)
-                        if i+1 < mlen:                          #check for out of range
-                            if mathexpression[i+1].isdigit():
-                                #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" 
-                                if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
-                                    nint = int(mathexpression[i+1])              #Ynumber int
-                                    Yshiftval = int(mathexpression[i+4])
-                                    sign = mathexpression[i+3]
-                                    #ET,BT, and Extras                  
-                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
-                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
-                                        shiftedindex = index - Yshiftval   
-                                        if shiftedindex < 0:
-                                            shiftedindex = 0                                                   
-                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
-                                        evalsign = "1"      #digit 1 = "+"
-                                        shiftedindex = index + Yshiftval
-                                        if shiftedindex >= len(aw.qmc.timex):
-                                            shiftedindex = len(aw.qmc.timex)- 1
-                                    if nint == 1: #ET
-                                        val =aw.qmc.temp1[shiftedindex]
-                                    elif nint == 2: #BT
-                                        val =aw.qmc.temp2[shiftedindex]
-                                    elif nint > 2: 
-                                        #map the extra device
-                                        b = [0,0,1,1,2,2,3]
-                                        edindex = b[nint-3]
-                                        if nint%2:
-                                            val = aw.qmc.extratemp1[edindex][shiftedindex]
-                                        else:
-                                            val = aw.qmc.extratemp2[edindex][shiftedindex]
-                                    #add expression and values found
-                                    evaltimeexpression = "Y" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
-                                    timeshiftexpressions.append(evaltimeexpression)
-                                    timeshiftexpressionsvalues.append(val)
-                                    #convert "Y2[+9]" to Ynumber compatible for python eval() to add to dictionary
-                                    #METHOD USED: replace all non digits chars with sign value.
-                                    #Example1 "Y2[-7]" = "Y20070"   Example2 "Y2[+9]" = "Y21191"
-                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
-                                # No timeshift Y1,Y2,Y3,etc.
-                                else:
-                                    Yval.append(mathexpression[i+1])
-                                    
-                    # time timeshift of absolute time (not relative to CHARGE)                                        
-                    elif mathexpression[i] == "t":
-                        if i+4 < len(mathexpression) and mathexpression[i+1] == "[" and mathexpression[i+4] == "]":
-                            Yshiftval = int(mathexpression[i+3])
-                            sign = mathexpression[i+2]
-                            if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
-                                evalsign = "0"      # digit "0" = "-"
-                                shiftedindex = index - Yshiftval   
-                                if shiftedindex < 0:
-                                    shiftedindex = 0
-                                val =aw.qmc.timex[shiftedindex]
-                            elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
-                                evalsign = "1"      #digit 1 = "+"
-                                shiftedindex = index - Yshiftval
-                                if shiftedindex >= len(aw.qmc.timex):
-                                    shiftedindex = len(aw.qmc.timex)- 1
-                                val =aw.qmc.timex[shiftedindex]
-                            evaltimeexpression = "Y" + mathexpression[i] + evalsign*2 + mathexpression[i+3] + evalsign
-                            timeshiftexpressions.append(evaltimeexpression)
-                            timeshiftexpressionsvalues.append(val)
-                            mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+5:]))
-                        #no timeshift
-                        else:
-                            if "t" not in mathdictionary:
-                                mathdictionary['t'] = t         #add t to the math dictionary
-                                    
-                    #Add to dict plotter Previous results (cascading) from plotter field windows (1-9)
-                    elif mathexpression[i] == "P":
-                        if i+1 < mlen:                          #check for out of range
-                            if mathexpression[i+1].isdigit():
-                                nint = int(mathexpression[i+1])              #Ynumber int
-                                #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" 
-                                if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
-                                    Yshiftval = int(mathexpression[i+4])
-                                    sign = mathexpression[i+3]
-                                    #ET,BT, and Extras                  
-                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
-                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
-                                        shiftedindex = index - Yshiftval   
-                                        if shiftedindex < 0:
-                                            shiftedindex = 0                                                   
-                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
-                                        evalsign = "1"      #digit 1 = "+"
-                                        shiftedindex = index + Yshiftval
-                                        if shiftedindex >= len(aw.qmc.timex):
-                                            shiftedindex = len(aw.qmc.timex)- 1
-                                    val = aw.qmc.plotterequationresults[nint-1][shiftedindex]
-                                    evaltimeexpression = "P" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
-                                    timeshiftexpressions.append(evaltimeexpression)
-                                    timeshiftexpressionsvalues.append(val)
-                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
-                                #no shift
-                                else:
-                                    if index < len(aw.qmc.plotterequationresults[nint-1]):
-                                        val = aw.qmc.plotterequationresults[nint-1][index]
-                                    else:
-                                        val = -1000                                        
-                                    if "P" + mathexpression[i+1] not in mathdictionary:    
-                                        mathdictionary["P"+mathexpression[i+1]] = val                                
-
-                    #Background B1 = ETbackground; B2 = BTbackground
-                    elif mathexpression[i] == "B":
-                        if not len(aw.qmc.timeB):
-                            raise Exception("No background found")
-                        if i+1 < mlen:                          
-                            if mathexpression[i+1].isdigit():
-                                nint = int(mathexpression[i+1])              #Ynumber int
-                                #check for TIMESHIFT 0-9 (one digit). Example: "B1[-2]" 
-                                if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
-                                    Yshiftval = int(mathexpression[i+4])
-                                    sign = mathexpression[i+3]
-                                    #ET,BT, and Extras                  
-                                    if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
-                                        evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
-                                        shiftedindex = index - Yshiftval   
-                                        if shiftedindex < 0:
-                                            shiftedindex = 0                                                   
-                                    elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
-                                        evalsign = "1"      #digit 1 = "+"
-                                        shiftedindex = index + Yshiftval
-                                        if shiftedindex >= len(aw.qmc.timeB):
-                                            shiftedindex = len(aw.qmc.timeB)- 1
-                                    if nint == 1: #ETbackground
-                                        val =aw.qmc.temp1B[shiftedindex]
-                                    elif nint == 2: #BTbackground
-                                        val =aw.qmc.temp2B[shiftedindex]
-                                    evaltimeexpression = "B" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
-                                    timeshiftexpressions.append(evaltimeexpression)
-                                    timeshiftexpressionsvalues.append(val)
-                                    mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
-                                #no shift
-                                else:
-                                    if nint == 1:
-                                        val = aw.qmc.temp1B[index]
-                                    elif nint == 2:
-                                        val = aw.qmc.temp2B[index]
-                                    else:
-                                        val = -1000                                        
-                                    if "B" + mathexpression[i+1] not in mathdictionary:    
-                                        mathdictionary["B"+mathexpression[i+1]] = val                                        
-                
-                    # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
-                    # holds the ten previous formula results (same window) in order.
-                    # F1 is the last result. F5 is the past 5th result 
-                    elif mathexpression[i] == "F":
-                        if i+1 < mlen:
-                            if mathexpression[i+1].isdigit():
-                                nint = int(mathexpression[i+1])
-                                val = aw.qmc.plotterstack[-1*nint]
-                                if "F"+mathexpression[i+1] not in mathdictionary:
-                                    mathdictionary["F"+mathexpression[i+1]] = val
-
-                    #############   end of mathexpression loop ##########################
-                    
-                #created Ys values 
-                if len(aw.qmc.timex) > 1:
-                    Y = [aw.qmc.temp1[index],aw.qmc.temp2[index]]
-                    if len(aw.qmc.extratimex):
-                        if len(aw.qmc.extratimex[0]):
-                            for i in range(len(aw.qmc.extradevices)):
-                                Y.append(aw.qmc.extratemp1[i][index])  
-                                Y.append(aw.qmc.extratemp2[i][index])  
-                    #add Ys and their value to math dictionary
-                    for i in range(len(Yval)):
-                        if "Y"+ Yval[i] not in mathdictionary:
-                            mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
-                            
-                    #add other timeshifted expressions to the math dictionary: F,P
-                    for i in range(len(timeshiftexpressions)):
-                        if timeshiftexpressions[i] not in mathdictionary:
-                            mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
-
-                #background symbols just in case there was no profile loaded but a background loaded.
-                if len(aw.qmc.timeB) > 1:
-                    for i in range(len(timeshiftexpressions)):
-                        if timeshiftexpressions[i] not in mathdictionary:   
-                            mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]                    
-                                    
-                try:                            
-                    res = eval(mathexpression,{"__builtins__":None},mathdictionary)
-
-                except ValueError:
-                    res = -1
-                if res == None:
-                    return -1
-                else:
-                    #stack (feedback in same forumla)
-                    aw.qmc.plotterstack.insert(10,res)
-                    aw.qmc.plotterstack.pop(0)
-                    #Pnumber results storage
-                    if equeditnumber:
-                        aw.qmc.plotterequationresults[equeditnumber-1].append(res)
-                    return res
-            except Exception as e:
-                if equeditnumber:
-                    e = str(e)
-                    e = "P" + str(equeditnumber) + ": index %i: "%(i+1) + e
-                _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " Plotter: {0}").format(e),exc_tb.tb_lineno)
-                return -1
-        return -1
 
     def setappearance(self):
         try:
@@ -18487,6 +18537,7 @@ class plotterHelpDlg(ArtisanDialog):
         string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
         string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
         string1 += "</UL>"
+
         string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
         string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
@@ -18503,13 +18554,11 @@ class plotterHelpDlg(ArtisanDialog):
         string2 += "<LI><b>F3</b> " + u(QApplication.translate("Message", "Third last expression result (Feedback)",None))
         string2 += "<LI><b>P1</b> " + u(QApplication.translate("Message", "Gets results from Plot #1",None))        
         string2 += "<LI><b>P3[-2]</b> " + u(QApplication.translate("Message", "Gets results from Plot #3 delayed by 2 indexes",None))                
-        string2 += "<LI><b>...</b> "
-        string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None))
-        string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None))
+        string2 += "<LI><b>B1</b> " + u(QApplication.translate("Message", "ET background",None))
+        string2 += "<LI><b>B2</b> " + u(QApplication.translate("Message", "BT background",None))
         string2 += "<LI><b>Units</b> " + u(QApplication.translate("Message", "Plotter uses the left Y-coordinate as units. To use right, use multiplying factor: left-max/right-max",None))
         string2 += "</UL>"
-        string2 += "<br>"
-        string2 += u(QApplication.translate("Message", "Yn holds values sampled in the actual interval if refering to ET/BT or extra channels from devices listed before, otherwise Yn hold values sampled in the previous interval",None))
+        
         string3 = "<UL><LI><b>#</b> " + u(QApplication.translate("Message", "Comments out plot. It does not evaluate",None))        
         string3 += "<LI><b>$</b> " + u(QApplication.translate("Message", "Hides plot. It evaluates. Hides intermediate results for cascading plots",None)) 
         string3 += "<LI><b>annotate</b> " + u(QApplication.translate("Message","Makes a nottation. annotate(text,time,temperatue,fontsize)",None))
@@ -30182,119 +30231,119 @@ class graphColorDlg(ArtisanDialog):
         self.backgroundButton = QPushButton(QApplication.translate("Button","Background", None))
         self.backgroundButton.setFocusPolicy(Qt.NoFocus)
         self.backgroundLabel.setFrameStyle(frameStyle)
-        self.backgroundButton.clicked.connect(lambda var=self.backgroundLabel,color="background": self.setColor("Background",var,"background"))
+        self.backgroundButton.clicked.connect(lambda var=self.backgroundLabel,color="background": self.setColor("Background",self.backgroundLabel,"background"))
         self.gridLabel =QLabel(aw.qmc.palette["grid"])
         self.gridLabel.setPalette(QPalette(QColor(aw.qmc.palette["grid"])))
         self.gridLabel.setAutoFillBackground(True)
         self.gridButton = QPushButton(QApplication.translate("Button","Grid", None))
         self.gridButton.setFocusPolicy(Qt.NoFocus)
         self.gridLabel.setFrameStyle(frameStyle)
-        self.gridButton.clicked.connect(lambda var=self.gridLabel, color= "grid": self.setColor("Grid",var,"grid"))
+        self.gridButton.clicked.connect(lambda var=self.gridLabel, color= "grid": self.setColor("Grid",self.gridLabel,"grid"))
         self.titleLabel =QLabel(aw.qmc.palette["title"])
         self.titleLabel.setPalette(QPalette(QColor(aw.qmc.palette["title"])))
         self.titleLabel.setAutoFillBackground(True)
         self.titleButton = QPushButton(QApplication.translate("Button","Title", None))
         self.titleButton.setFocusPolicy(Qt.NoFocus)
         self.titleLabel.setFrameStyle(frameStyle)
-        self.titleButton.clicked.connect(lambda var=self.titleLabel,color="title": self.setColor("Title",var,"title"))
+        self.titleButton.clicked.connect(lambda var=self.titleLabel,color="title": self.setColor("Title",self.titleLabel,"title"))
         self.yLabel =QLabel(aw.qmc.palette["ylabel"])
         self.yLabel.setPalette(QPalette(QColor(aw.qmc.palette["ylabel"])))
         self.yLabel.setAutoFillBackground(True)
         self.yButton = QPushButton(QApplication.translate("Button","Y Label", None))
         self.yButton.setFocusPolicy(Qt.NoFocus)
         self.yLabel.setFrameStyle(frameStyle)
-        self.yButton.clicked.connect(lambda var=self.yLabel,color="ylabel": self.setColor("Y Label",var,"ylabel"))
+        self.yButton.clicked.connect(lambda var=self.yLabel,color="ylabel": self.setColor("Y Label",self.yLabel,"ylabel"))
         self.xLabel =QLabel(aw.qmc.palette["xlabel"])
         self.xLabel.setPalette(QPalette(QColor(aw.qmc.palette["xlabel"])))
         self.xLabel.setAutoFillBackground(True)
         self.xButton = QPushButton(QApplication.translate("Button","X Label", None))
         self.xButton.setFocusPolicy(Qt.NoFocus)
         self.xLabel.setFrameStyle(frameStyle)
-        self.xButton.clicked.connect(lambda var=self.xLabel,color="xlabel": self.setColor("X Label",var,"xlabel"))
+        self.xButton.clicked.connect(lambda var=self.xLabel,color="xlabel": self.setColor("X Label",self.xLabel,"xlabel"))
         self.rect1Label =QLabel(aw.qmc.palette["rect1"])
         self.rect1Label.setPalette(QPalette(QColor(aw.qmc.palette["rect1"])))
         self.rect1Label.setAutoFillBackground(True)
         self.rect1Button = QPushButton(QApplication.translate("Button","Drying Phase", None))
         self.rect1Button.setFocusPolicy(Qt.NoFocus)
         self.rect1Label.setFrameStyle(frameStyle)
-        self.rect1Button.clicked.connect(lambda var=self.rect1Label,color="rect1": self.setColor("Drying Phase",var,"rect1"))
+        self.rect1Button.clicked.connect(lambda var=self.rect1Label,color="rect1": self.setColor("Drying Phase",self.rect1Label,"rect1"))
         self.rect2Label =QLabel(aw.qmc.palette["rect2"])
         self.rect2Label.setPalette(QPalette(QColor(aw.qmc.palette["rect2"])))
         self.rect2Label.setAutoFillBackground(True)
         self.rect2Button = QPushButton(QApplication.translate("Button","Maillard Phase", None))
         self.rect2Button.setFocusPolicy(Qt.NoFocus)
         self.rect2Label.setFrameStyle(frameStyle)
-        self.rect2Button.clicked.connect(lambda var=self.rect2Label,color="rect2": self.setColor("Maillard Phase",var,"rect2"))
+        self.rect2Button.clicked.connect(lambda var=self.rect2Label,color="rect2": self.setColor("Maillard Phase",self.rect2Label,"rect2"))
         self.rect3Label =QLabel(aw.qmc.palette["rect3"])
         self.rect3Label.setPalette(QPalette(QColor(aw.qmc.palette["rect3"])))
         self.rect3Label.setAutoFillBackground(True)
         self.rect3Button = QPushButton(QApplication.translate("Button","Development Phase", None))
         self.rect3Button.setFocusPolicy(Qt.NoFocus)
         self.rect3Label.setFrameStyle(frameStyle)
-        self.rect3Button.clicked.connect(lambda var=self.rect3Label,color="rect3": self.setColor("Development Phase",var,"rect3"))
+        self.rect3Button.clicked.connect(lambda var=self.rect3Label,color="rect3": self.setColor("Development Phase",self.rect3Label,"rect3"))
         self.rect4Label =QLabel(aw.qmc.palette["rect4"])
         self.rect4Label.setPalette(QPalette(QColor(aw.qmc.palette["rect4"])))
         self.rect4Label.setAutoFillBackground(True)
         self.rect4Button = QPushButton(QApplication.translate("Button","Cooling Phase", None))
         self.rect4Button.setFocusPolicy(Qt.NoFocus)
         self.rect4Label.setFrameStyle(frameStyle)
-        self.rect4Button.clicked.connect(lambda var=self.rect4Label,color="rect4": self.setColor("Cooling Phase",var,"rect4"))
+        self.rect4Button.clicked.connect(lambda var=self.rect4Label,color="rect4": self.setColor("Cooling Phase",self.rect4Label,"rect4"))
         self.metLabel =QLabel(aw.qmc.palette["et"])
         self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["et"])))
         self.metLabel.setAutoFillBackground(True)
         self.metButton = QPushButton(QApplication.translate("Button","ET", None))
         self.metButton.setFocusPolicy(Qt.NoFocus)
         self.metLabel.setFrameStyle(frameStyle)
-        self.metButton.clicked.connect(lambda var=self.metLabel,color="et": self.setColor("ET",var,"et"))
+        self.metButton.clicked.connect(lambda var=self.metLabel,color="et": self.setColor("ET",self.metLabel,"et"))
         self.btLabel =QLabel(aw.qmc.palette["bt"])
         self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
         self.btLabel.setAutoFillBackground(True)
         self.btButton = QPushButton(QApplication.translate("Button","BT", None))
         self.btButton.setFocusPolicy(Qt.NoFocus)
         self.btLabel.setFrameStyle(frameStyle)
-        self.btButton.clicked.connect(lambda var=self.btLabel,color="bt": self.setColor("BT",var,"bt"))
+        self.btButton.clicked.connect(lambda var=self.btLabel,color="bt": self.setColor("BT",self.btLabel,"bt"))
         self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
         self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
         self.deltametLabel.setAutoFillBackground(True)
         self.deltametButton = QPushButton(QApplication.translate("Button","DeltaET", None))
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
-        self.deltametButton.clicked.connect(lambda var=self.deltametLabel,color="deltaet": self.setColor("DeltaET",var,"deltaet"))
+        self.deltametButton.clicked.connect(lambda var=self.deltametLabel,color="deltaet": self.setColor("DeltaET",self.deltametLabel,"deltaet"))
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
         self.deltabtLabel.setAutoFillBackground(True)
         self.deltabtButton = QPushButton(QApplication.translate("Button","DeltaBT", None))
         self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtLabel.setFrameStyle(frameStyle)
-        self.deltabtButton.clicked.connect(lambda var=self.deltabtLabel,color="deltabt": self.setColor("DeltaBT",var,"deltabt"))
+        self.deltabtButton.clicked.connect(lambda var=self.deltabtLabel,color="deltabt": self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
         self.markersLabel =QLabel(aw.qmc.palette["markers"])
         self.markersLabel.setPalette(QPalette(QColor(aw.qmc.palette["markers"])))
         self.markersLabel.setAutoFillBackground(True)
         self.markersButton = QPushButton(QApplication.translate("Button","Markers", None))
         self.markersButton.setFocusPolicy(Qt.NoFocus)
         self.markersLabel.setFrameStyle(frameStyle)
-        self.markersButton.clicked.connect(lambda var=self.markersLabel,color="markers": self.setColor("Markers",var,"markers"))
+        self.markersButton.clicked.connect(lambda var=self.markersLabel,color="markers": self.setColor("Markers",self.markersLabel,"markers"))
         self.textLabel =QLabel(aw.qmc.palette["text"])
         self.textLabel.setPalette(QPalette(QColor(aw.qmc.palette["text"])))
         self.textLabel.setAutoFillBackground(True)
         self.textButton = QPushButton(QApplication.translate("Button","Text", None))
         self.textButton.setFocusPolicy(Qt.NoFocus)
         self.textLabel.setFrameStyle(frameStyle)
-        self.textButton.clicked.connect(lambda var=self.textLabel,color="text": self.setColor("Text",var,"text"))
+        self.textButton.clicked.connect(lambda var=self.textLabel,color="text": self.setColor("Text",self.textLabel,"text"))
         self.watermarksLabel =QLabel(aw.qmc.palette["watermarks"])
         self.watermarksLabel.setPalette(QPalette(QColor(aw.qmc.palette["watermarks"])))
         self.watermarksLabel.setAutoFillBackground(True)
         self.watermarksButton = QPushButton(QApplication.translate("Button","Watermarks", None))
         self.watermarksButton.setFocusPolicy(Qt.NoFocus)
         self.watermarksLabel.setFrameStyle(frameStyle)
-        self.watermarksButton.clicked.connect(lambda var=self.watermarksLabel,color="watermarks": self.setColor("Watermarks",var,"watermarks"))
+        self.watermarksButton.clicked.connect(lambda var=self.watermarksLabel,color="watermarks": self.setColor("Watermarks",self.watermarksLabel,"watermarks"))
         self.ClineLabel =QLabel(aw.qmc.palette["Cline"])
         self.ClineLabel.setPalette(QPalette(QColor(aw.qmc.palette["Cline"])))
         self.ClineLabel.setAutoFillBackground(True)
         self.ClineButton = QPushButton(QApplication.translate("Button","C Lines", None))
         self.ClineButton.setFocusPolicy(Qt.NoFocus)
         self.ClineLabel.setFrameStyle(frameStyle)
-        self.ClineButton.clicked.connect(lambda var=self.ClineLabel,color="Cline": self.setColor("C Lines",var,"Cline"))
+        self.ClineButton.clicked.connect(lambda var=self.ClineLabel,color="Cline": self.setColor("C Lines",self.ClineLabel,"Cline"))
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         okButton.clicked.connect(self.accept)
         defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
