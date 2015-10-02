@@ -2283,19 +2283,16 @@ class tgraphcanvas(FigureCanvas):
 
 
     # mathexpression = formula; t = a number to evaluate(usually time);
-    # equeditnumber option = plotter edit window number; RT option = Real Time recording;
-    def eval_math_expression(self,mathexpression,t,equeditnumber=None,RT=None):
+    # equeditnumber option = plotter edit window number; 
+    def eval_curve_expression(self,mathexpression,t,equeditnumber=None):
         
         if len(mathexpression):
             i =0
             #get index from the time. 
-            if RT:
-                index = len(self.timex)-1  # If REAL TIME recording, get the last index of timex (present time)
+            if len(self.timex):
+                index = self.time2index(t)  # If using the plotter. Background index done bellow at "B"
             else:
-                if len(self.timex):
-                    index = self.time2index(t)  # If using the plotter. Background index done bellow at "B"
-                else:
-                    index = 0      #if plotting but nothing loaded. Index will not be used anyway.
+                index = 0      #if plotting but nothing loaded. Index will not be used anyway.
                 
             #timeshift vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
@@ -2422,11 +2419,8 @@ class tgraphcanvas(FigureCanvas):
                             raise Exception("No background found")
                         if i+1 < mlen:                          
                             if mathexpression[i+1].isdigit():
-                                nint = int(mathexpression[i+1])              #Ynumber int
-                                if nint < 3:
-                                    index = self.backgroundtime2index(t)
-                                else:
-                                    index = self.extrabackgroundtime2index(t,(nint-3))
+                                nint = int(mathexpression[i+1])              #Bnumber int
+                                bindex = self.backgroundtime2index(t)         #use background time
                                 #check for TIMESHIFT 0-9 (one digit). Example: "B1[-2]" 
                                 if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
                                     Yshiftval = int(mathexpression[i+4])
@@ -2434,12 +2428,12 @@ class tgraphcanvas(FigureCanvas):
                                     #ET,BT, and Extras                  
                                     if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
                                         evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
-                                        shiftedindex = index - Yshiftval   
+                                        shiftedindex = bindex - Yshiftval   
                                         if shiftedindex < 0:
                                             shiftedindex = 0                                                   
                                     elif sign == "+": #"+" original [1,2,3,4,5,6]; shift left 2  = [3,4,5,6,6,6]
                                         evalsign = "1"      #digit 1 = "+"
-                                        shiftedindex = index + Yshiftval
+                                        shiftedindex = bindex + Yshiftval
                                         if shiftedindex >= len(self.timeB):
                                             shiftedindex = len(self.timeB)- 1
                                     if nint == 1: #ETbackground
@@ -2447,13 +2441,12 @@ class tgraphcanvas(FigureCanvas):
                                     elif nint == 2: #BTbackground
                                         val = self.temp2B[shiftedindex]
                                     elif nint > 2:
-                                        #map the extra device
-                                        b = [0,0,1,1,2,2,3]
-                                        edindex = b[nint-3]
-                                        if nint%2:
-                                            val = self.temp1BX[edindex][shiftedindex]
+                                        idx3 = aw.qmc.xtcurveidx - 1
+                                        n3 = idx3//2
+                                        if aw.qmc.xtcurveidx%2:
+                                            val = self.temp1BX[n3][shiftedindex]
                                         else:
-                                            val = self.temp2BX[edindex][shiftedindex]                                        
+                                            val = self.temp2BX[n3][shiftedindex]                                        
                                     evaltimeexpression = "B" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + evalsign
                                     timeshiftexpressions.append(evaltimeexpression)
                                     timeshiftexpressionsvalues.append(val)
@@ -2461,19 +2454,19 @@ class tgraphcanvas(FigureCanvas):
                                 #no shift
                                 else:
                                     if nint == 1:
-                                        val = self.temp1B[index]
+                                        val = self.temp1B[bindex]
                                     elif nint == 2:
-                                        val = self.temp2B[index]
+                                        val = self.temp2B[bindex]
                                     else:
-                                        b = [0,0,1,1,2,2,3]
-                                        edindex = b[nint-3]
-                                        if nint%2:
-                                            val = self.temp1BX[edindex][index]
+                                        idx3 = aw.qmc.xtcurveidx - 1
+                                        n3 = idx3//2
+                                        if aw.qmc.xtcurveidx%2:
+                                            val = self.temp1BX[n3][bindex]
                                         else:
-                                            val = self.temp2BX[edindex][index]                                      
+                                            val = self.temp2BX[n3][bindex]                                      
                                     if "B" + mathexpression[i+1] not in mathdictionary:    
-                                        mathdictionary["B"+mathexpression[i+1]] = val                                        
-                
+                                        mathdictionary["B"+mathexpression[i+1]] = val
+
                     # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
                     # holds the ten previous formula results (same window) in order.
                     # F1 is the last result. F5 is the past 5th result 
@@ -2531,94 +2524,94 @@ class tgraphcanvas(FigureCanvas):
                     e = str(e)
                     e = "P" + str(equeditnumber) + ": index %i: "%(i+1) + e
                 _, _, exc_tb = sys.exc_info()
-                self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_math_expression(): {0}").format(e),exc_tb.tb_lineno)
+                self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): {0}").format(e),exc_tb.tb_lineno)
                 return -1
         return -1
 
-
+    #Use during during REALTIME in sample() thread. Limited.
     #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
     #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
-##    def eval_math_expression(self,mathexpression,x,tx):
-##        if mathexpression == None or len(mathexpression) == 0 or (x == -1 and "x" in mathexpression):
-##            return x
-##
-##        #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
-##        mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
-##                          "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
-##                          "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
-##        try:
-##            x = float(x)
-##            mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
-##            #add ETB, BTB and XTB (background ET, BT and XT)
-##            etb = btb = xtb = 0
-##            try:
-##                if aw.qmc.background and ("ETB" in mathexpression or "BTB" in mathexpression or "XTB" in mathexpression):
-##                    #first compute closest index at that time point in the background data
-##                    j = aw.qmc.backgroundtime2index(tx)
-##                    etb = aw.qmc.temp1B[j]
-##                    btb = aw.qmc.temp2B[j]
-##                    if aw.qmc.xtcurveidx > 0:
-##                        idx3 = aw.qmc.xtcurveidx - 1
-##                        n3 = idx3 // 2
-##                        if len(self.temp1BX) > n3 and len(self.temp2BX) > n3 and len(self.extratimexB) > n3:
-##                            if aw.qmc.xtcurveidx % 2:
-##                                xtb = self.temp1BX[n3][j]
-##                            else:
-##                                xtb = self.temp2BX[n3][j]
-##            except Exception:
-##                pass
-##            mathdictionary["ETB"] = etb
-##            mathdictionary["BTB"] = btb
-##            mathdictionary["XTB"] = xtb
-##            #if Ys in expression
-##            if "Y" in mathexpression:
-##                #extract Ys
-##                Yval = []                   #extract value number example Y9 = 9
-##                mlen = len(mathexpression)
-##                for i in range(mlen):
-##                    if mathexpression[i] == "Y":
-##                        #find Y number
-##                        if i+1 < mlen:                          #check for out of range
-##                            if mathexpression[i+1].isdigit():
-##                                number = mathexpression[i+1]
-##                            else:
-##                                number = "1"
-##                        #check for double digit
-##                        if i+2 < mlen:
-##                            if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
-##                                number += mathexpression[i+2]
-##                        Yval.append(number)
-##                #build Ys float values
-##                if len(self.timex) > 0:
-##                    Y = [self.temp1[-1],self.temp2[-1]]
-##                else:
-##                    Y = [-1,-1]
-##                for i in range(len(self.extradevices)):
-##                    if len(self.extratimex[i]):
-##                        try:
-##                            Y.append(self.extratemp1[i][-1])
-##                        except:
-##                            Y.append(-1)
-##                        try:
-##                            Y.append(self.extratemp2[i][-1])
-##                        except:
-##                            Y.append(-1)
-##                    else:
-##                        Y.append(-1)
-##                        Y.append(-1)
-##                    #add Ys and their value to math dictionary 
-##                    for i in range(len(Yval)):
-##                        idx = int(Yval[i])-1
-##                        if idx >= len(Y):
-##                            mathdictionary["Y"+ Yval[i]] = 0
-##                        else:
-##                            mathdictionary["Y"+ Yval[i]] = Y[idx]
-##            return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
-##
-##        except Exception as e:
-##            _, _, exc_tb = sys.exc_info()
-##            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_math_expression() {0}").format(str(e)),exc_tb.tb_lineno)
-##            return 0
+    def eval_math_expression(self,mathexpression,x,tx):
+        if mathexpression == None or len(mathexpression) == 0 or (x == -1 and "x" in mathexpression):
+            return x
+
+        #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
+        mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
+                          "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
+                          "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
+        try:
+            x = float(x)
+            mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
+            #add ETB, BTB and XTB (background ET, BT and XT)
+            etb = btb = xtb = 0
+            try:
+                if aw.qmc.background and ("B1" in mathexpression or "B2" in mathexpression or "B3" in mathexpression):
+                    #first compute closest index at that time point in the background data
+                    j = aw.qmc.backgroundtime2index(tx)
+                    etb = aw.qmc.temp1B[j]
+                    btb = aw.qmc.temp2B[j]
+                    if aw.qmc.xtcurveidx > 0:
+                        idx3 = aw.qmc.xtcurveidx - 1
+                        n3 = idx3 // 2
+                        if len(self.temp1BX) > n3 and len(self.temp2BX) > n3 and len(self.extratimexB) > n3:
+                            if aw.qmc.xtcurveidx % 2:
+                                xtb = self.temp1BX[n3][j]
+                            else:
+                                xtb = self.temp2BX[n3][j]
+            except Exception:
+                pass
+            mathdictionary["B1"] = etb
+            mathdictionary["B2"] = btb
+            mathdictionary["B3"] = xtb
+            #if Ys in expression
+            if "Y" in mathexpression:
+                #extract Ys
+                Yval = []                   #extract value number example Y9 = 9
+                mlen = len(mathexpression)
+                for i in range(mlen):
+                    if mathexpression[i] == "Y":
+                        #find Y number
+                        if i+1 < mlen:                          #check for out of range
+                            if mathexpression[i+1].isdigit():
+                                number = mathexpression[i+1]
+                            else:
+                                number = "1"
+                        #check for double digit
+                        if i+2 < mlen:
+                            if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
+                                number += mathexpression[i+2]
+                        Yval.append(number)
+                #build Ys float values
+                if len(self.timex) > 0:
+                    Y = [self.temp1[-1],self.temp2[-1]]
+                else:
+                    Y = [-1,-1]
+                for i in range(len(self.extradevices)):
+                    if len(self.extratimex[i]):
+                        try:
+                            Y.append(self.extratemp1[i][-1])
+                        except:
+                            Y.append(-1)
+                        try:
+                            Y.append(self.extratemp2[i][-1])
+                        except:
+                            Y.append(-1)
+                    else:
+                        Y.append(-1)
+                        Y.append(-1)
+                    #add Ys and their value to math dictionary 
+                    for i in range(len(Yval)):
+                        idx = int(Yval[i])-1
+                        if idx >= len(Y):
+                            mathdictionary["Y"+ Yval[i]] = 0
+                        else:
+                            mathdictionary["Y"+ Yval[i]] = Y[idx]
+            return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
+
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_math_expression() {0}").format(str(e)),exc_tb.tb_lineno)
+            return 0
 
     #format X axis labels
     def xaxistosm(self,redraw=True):
@@ -5995,11 +5988,6 @@ class tgraphcanvas(FigureCanvas):
     def backgroundtime2index(self,seconds):
         #find where given seconds crosses self.timeB
         return self.timearray2index(self.timeB,seconds)
-    
-    #selects closest time INDEX in self.extratimexB[?] from a given input float seconds
-    def extrabackgroundtime2index(self,seconds,bkindex):
-        #find where given seconds crosses self.extratimexB
-        return self.timearray2index(self.extratimexB[bkindex],seconds)
 
     #updates list self.timeindex when found an _OLD_ profile without self.timeindex (new version)
     def timeindexupdate(self,times):
@@ -7388,9 +7376,9 @@ class SampleThread(QThread):
                             for i in range(nxdevices):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,RT=True)
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,extratx)
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2,RT=True)
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2,extratx)
                                 # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                                 # modbus channel 1+2, respect input temperature scale setting
                                 if aw.qmc.extradevices[i] == 29:
@@ -7481,9 +7469,9 @@ class SampleThread(QThread):
                             t1 = (t1 + t1_2) / 2.0
                     ####### all values retrieved
                     if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
-                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1,RT=True) #RT = Real Time
+                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1,tx) 
                     if aw.qmc.BTfunction != None and len(aw.qmc.BTfunction):
-                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2,RT=True) #RT = Real Time 
+                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2,tx) 
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
                     if aw.qmc.device == 29:
@@ -16389,12 +16377,17 @@ $cupping_notes
         finally:
             if f:
                 f.close()
+                
+    def realtimeHelpDlg(self):
+
+        showHelpDlg = realtimeHelpDlg(self)
+        showHelpDlg.show()        
 
     def showSymbolicHelp(self):
 
         showHelpDlg = plotterHelpDlg(self)
-        #showHelpDlg.showMaximized()        #may only work on Windows
         showHelpDlg.show()
+        
         
     def toggleextraeventrows(self):
         if aw.extrabuttondialogs.isVisible(): # self.extraeventsbuttonsflag:            
@@ -17504,7 +17497,7 @@ class HUDDlg(ArtisanDialog):
                 #create y range
                 y_range = []
                 for i in arange(len(aw.qmc.timex)):
-                    y_range.append(aw.qmc.eval_math_expression(EQU[e],aw.qmc.timex[i]))
+                    y_range.append(aw.qmc.eval_curve_expression(EQU[e],aw.qmc.timex[i]))
                 if e:
                     extratemp2 = y_range
                 else:
@@ -17547,8 +17540,8 @@ class HUDDlg(ArtisanDialog):
                 y_range = []
                 y_range2 = []
                 for i in range(len(x_range)):
-                    y_range.append(aw.qmc.eval_math_expression(equ,x_range[i]))
-                    y_range2.append(aw.qmc.eval_math_expression(equ2,x_range[i]))
+                    y_range.append(aw.qmc.eval_curve_expression(equ,x_range[i]))
+                    y_range2.append(aw.qmc.eval_curve_expression(equ2,x_range[i]))
                 if foreground:
                     aw.qmc.timex = x_range[:]
                     aw.qmc.temp1 = y_range[:]
@@ -17643,11 +17636,11 @@ class HUDDlg(ArtisanDialog):
 
     def plotterb(self):
         try:
-            aw.sendmessage("Charging beans...")
-            for i in range(9):
-                x = aw.qmc.endofx*numpy.random.rand(300)
-                y = aw.qmc.endofx*numpy.random.rand(300)                
-                colorb = ["#996633","#4d2600","#4b4219","black","#4b3219","#996633","#281a0d","#4d2600","green"]
+            aw.sendmessage("Dropping beans...")
+            for i in range(6):
+                x = aw.qmc.endofx*numpy.random.rand(aw.qmc.endofx)
+                y = aw.qmc.endofx*numpy.random.rand(aw.qmc.endofx)                
+                colorb = ["#996633","#4d2600","#4b4219","black","#4b3219","#996633","#281a0d"]
                 aw.qmc.ax.plot(x,y,'o',color=colorb[int(7*numpy.random.rand(1)[0])])                    
                 aw.qmc.fig.canvas.draw()
             libtime.sleep(0.3)
@@ -17699,7 +17692,7 @@ class HUDDlg(ArtisanDialog):
 
                 if not commentoutplot[e]:
                     for i in range(len(x_range)):
-                            y_range.append(aw.qmc.eval_math_expression(EQU[e],x_range[i],equeditnumber=e+1)) #pass e+1 = equeditnumber(1-9)
+                            y_range.append(aw.qmc.eval_curve_expression(EQU[e],x_range[i],equeditnumber=e+1)) #pass e+1 = equeditnumber(1-9)
                     if not hideplot[e]:
                         aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
                 
@@ -18512,6 +18505,63 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.closeEvent(None)
 
 ########################################################################################
+#####################  SYMBOLIC DEVICE ASSIGNMENT HELP DLG #############################
+########################################################################################
+class realtimeHelpDlg(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(realtimeHelpDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Form Caption","Symbolic Device Assignment Help",None)) 
+        self.setModal(True)
+
+        string1 = "<UL><LI><b>abs(x)</b> " + u(QApplication.translate("Message","Return the absolute value of x.",None))
+        string1 += "<LI><b>acos(x)</b> " + u(QApplication.translate("Message","Return the arc cosine (measured in radians) of x.",None))
+        string1 += "<LI><b>asin(x)</b> " + u(QApplication.translate("Message","Return the arc sine (measured in radians) of x.",None))
+        string1 += "<LI><b>atan(x)</b> " + u(QApplication.translate("Message","Return the arc tangent (measured in radians) of x.",None))
+        string1 += "<LI><b>cos(x)</b> " + u(QApplication.translate("Message","Return the cosine of x (measured in radians).",None))
+        string1 += "<LI><b>degrees(x)</b> " + u(QApplication.translate("Message", "Convert angle x from radians to degrees.",None))
+        string1 += "<LI><b>exp(x)</b> " + u(QApplication.translate("Message", "Return e raised to the power of x.",None))
+        string1 += "<LI><b>log(x[, base])</b> " + u(QApplication.translate("Message", "Return the logarithm of x to the given base. ",None))
+        string1 += "<LI><b>log10(x)</b> " + u(QApplication.translate("Message", "Return the base 10 logarithm of x.",None))
+        string1 += "<LI><b>min(x,y)</b> " + u(QApplication.translate("Message", "Return the minimum of x and y.",None))
+        string1 += "<LI><b>max(x,y)</b> " + u(QApplication.translate("Message", "Return the maximum of x and y.",None))
+        string1 += "<LI><b>pow(x, y)</b> " + u(QApplication.translate("Message", "Return x**y (x to the power of y).",None))
+        string1 += "<LI><b>radians(x)</b> " + u(QApplication.translate("Message", "Convert angle x from degrees to radians.",None))
+        string1 += "<LI><b>sin(x)</b> " + u(QApplication.translate("Message", "Return the sine of x (measured in radians).",None))
+        string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
+        string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
+        string1 += "</UL>"
+
+        string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
+        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
+        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
+        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra Device #1 T1 value",None))
+        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra Device #1 T2 value",None))
+        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra Device #2 T1 value",None))
+        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra Device #2 T2 value",None))
+        string2 += "<LI><b>B1</b> " + u(QApplication.translate("Message", "ET background ",None))
+        string2 += "<LI><b>B2</b> " + u(QApplication.translate("Message", "BT background",None))
+        string2 += "<LI><b>B3</b> " + u(QApplication.translate("Message", "Extra background #1-A from a loaded background that has extra devices",None))        
+        string2 += "<LI><b>B4</b> " + u(QApplication.translate("Message", "Extra background #1-B from a loaded background that has extra devices",None))        
+        string2 += "<LI><b>B5</b> " + u(QApplication.translate("Message", "Extra background #2-A from a loaded background that has extra devices",None))        
+        string2 += "</UL>"
+
+        #format help
+        string4 = "<TABLE><TR><TH bgcolor=lightgrey>"
+        string4 += QApplication.translate("Message",  "MATHEMATICAL FUNCTIONS",None)
+        string4 += "<br></TH><TH bgcolor=lightgrey>"
+        string4 += QApplication.translate("Message",  "SYMBOLIC VARIABLES",None)        
+        string4 += "</TH></TR><TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD></TR></TABLE>"
+
+        phelp = QTextEdit()
+        phelp.setHtml(string4)
+        phelp.setReadOnly(True)
+
+        hLayout = QVBoxLayout()
+        hLayout.addWidget(phelp)
+        self.setLayout(hLayout)        
+
+
+########################################################################################
 #####################  PLOTTER HELP DLG ################################################
 ########################################################################################
 class plotterHelpDlg(ArtisanDialog):
@@ -18556,11 +18606,15 @@ class plotterHelpDlg(ArtisanDialog):
         string2 += "<LI><b>P3[-2]</b> " + u(QApplication.translate("Message", "Gets results from Plot #3 delayed by 2 indexes",None))                
         string2 += "<LI><b>B1</b> " + u(QApplication.translate("Message", "ET background",None))
         string2 += "<LI><b>B2</b> " + u(QApplication.translate("Message", "BT background",None))
-        string2 += "<LI><b>Units</b> " + u(QApplication.translate("Message", "Plotter uses the left Y-coordinate as units. To use right, use multiplying factor: left-max/right-max",None))
+        string2 += "<LI><b>B3</b> " + u(QApplication.translate("Message", "ExtraBackground #1-A",None))
+        string2 += "<LI><b>B4[-6]</b> " + u(QApplication.translate("Message", "ExtraBackground #1-B shifted 6 indexes",None))
+        string2 += "<LI><b>B5[+2]</b> " + u(QApplication.translate("Message", "ExtraBackground #2-A shifted 2 indexes",None))
         string2 += "</UL>"
         
-        string3 = "<UL><LI><b>#</b> " + u(QApplication.translate("Message", "Comments out plot. It does not evaluate",None))        
+        string3 = "<UL><LI><b>#</b> " + u(QApplication.translate("Message", "Comments out plot. It does not evaluate. Use as first character.",None))        
         string3 += "<LI><b>$</b> " + u(QApplication.translate("Message", "Hides plot. It evaluates. Hides intermediate results for cascading plots",None)) 
+        string3 += "<LI><b>Units</b> " + u(QApplication.translate("Message", "Plotter uses the left Y-coordinate as units. To use right, use multiplying factor: left-max/right-max",None))
+        string3 += "<br><br><br>" 
         string3 += "<LI><b>annotate</b> " + u(QApplication.translate("Message","Makes a nottation. annotate(text,time,temperatue,fontsize)",None))
         string3 += "<br>" + u(QApplication.translate("Message","Example: annotate(HELLO,03:00,200,10)",None))
         string3 += "</UL>"
@@ -18570,7 +18624,7 @@ class plotterHelpDlg(ArtisanDialog):
         string4 += "<br></TH><TH bgcolor=lightgrey>"
         string4 += QApplication.translate("Message",  "SYMBOLIC VARIABLES",None)
         string4 += "<br></TH><TH bgcolor=lightgrey>"
-        string4 += QApplication.translate("Message",  "COMMANDS",None)        
+        string4 += QApplication.translate("Message",  "MISC./COMMANDS",None)        
         string4 += "</TH></TR><TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD><TD>" +string3 + "</TD></TR></TABLE>"
 
         phelp = QTextEdit()
@@ -23660,21 +23714,24 @@ class backgroundDlg(ArtisanDialog):
         self.btcolorComboBox.insertSeparator(4)
         self.btcolorComboBox.addItems(self.colors)
         self.btcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundbtcolor))
-        xtcolorlabel = QLabel(QApplication.translate("Label", "XT Color",None))
+        xtcolorlabel = QLabel(QApplication.translate("Label", "Extra Color",None))
         xtcolorlabel.setAlignment(Qt.AlignRight)
         self.xtcolorComboBox = QComboBox()
         self.xtcolorComboBox.addItems(self.defaultcolors)
         self.xtcolorComboBox.insertSeparator(4)
         self.xtcolorComboBox.addItems(self.colors)
         self.xtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundxtcolor))
-        xtcurvelabel = QLabel(QApplication.translate("Label", "XT",None))
+        xtcurvelabel = QLabel(QApplication.translate("Label", "Extra",None))
+        xtcurvelabel.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
         xtcurvelabel.setAlignment(Qt.AlignRight)
         self.xtcurveComboBox = QComboBox()
         self.xtcurveComboBox.setMinimumWidth(120)
+        self.xtcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
+
         curvenames = [""] # first entry is the empty one, no extra curve displayed
         for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
-            curvenames.append(str(i) + "xT1: " + aw.qmc.extraname1B[i])
-            curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2B[i])        
+            curvenames.append("B" + str(2*i+3) + ": " + aw.qmc.extraname1B[i])
+            curvenames.append("B" + str(2*i+4) + ": " + aw.qmc.extraname2B[i])       
         self.xtcurveComboBox.addItems(curvenames)
         if aw.qmc.xtcurveidx < len(curvenames):
             self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
@@ -23714,11 +23771,11 @@ class backgroundDlg(ArtisanDialog):
         self.leftButton.clicked.connect(lambda m="left": self.move("left"))
         self.rightButton.clicked.connect(lambda m="right": self.move("right"))
         self.intensitySpinBox.valueChanged.connect(self.adjustintensity)
-        self.xtcolorComboBox.currentIndexChanged.connect(lambda color="", curve = "xt": self.adjustcolor(color,"xt"))
-        self.btcolorComboBox.currentIndexChanged.connect(lambda color="", curve = "bt": self.adjustcolor(color,"bt"))
-        self.metcolorComboBox.currentIndexChanged.connect(lambda color= "", curve = "et": self.adjustcolor(color,"et"))
-        self.deltabtcolorComboBox.currentIndexChanged.connect(lambda color="", curve = "deltabt": self.adjustcolor(color,"deltabt"))
-        self.deltaetcolorComboBox.currentIndexChanged.connect(lambda color= "", curve = "deltaet": self.adjustcolor(color,"deltaet"))
+        self.xtcolorComboBox.currentIndexChanged.connect(lambda curve = "xt": self.adjustcolor("xt"))
+        self.btcolorComboBox.currentIndexChanged.connect(lambda curve = "bt": self.adjustcolor("bt"))
+        self.metcolorComboBox.currentIndexChanged.connect(lambda curve = "et": self.adjustcolor("et"))
+        self.deltabtcolorComboBox.currentIndexChanged.connect(lambda curve = "deltabt": self.adjustcolor("deltabt"))
+        self.deltaetcolorComboBox.currentIndexChanged.connect(lambda curve = "deltaet": self.adjustcolor("deltaet"))
         #TAB 2 EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
@@ -23850,36 +23907,79 @@ class backgroundDlg(ArtisanDialog):
             self.backgroundReproduce.setChecked(False)
             aw.sendmessage(QApplication.translate("Message","No profile background found",None))
 
-    def adjustcolor(self,color,curve):
-        color = str(color)
-        self.btcolorComboBox.setDisabled(True)
-        self.metcolorComboBox.setDisabled(True)
-        self.deltabtcolorComboBox.setDisabled(True)
-        self.deltaetcolorComboBox.setDisabled(True)
-        if color == "ET":
-            c = aw.qmc.palette["et"]
-        elif color == "BT":
-            c = aw.qmc.palette["bt"]
-        elif color == "DeltaET":
-            c = aw.qmc.palette["deltaet"]
-        elif color == "DeltaBT":
-            c = aw.qmc.palette["deltabt"]
-        else:
-            c = color
-        if c != "":
-            if curve == "et":
-                aw.qmc.backgroundmetcolor = c
-            elif curve == "bt":
-                aw.qmc.backgroundbtcolor = c
-            elif curve == "deltaet":
-                aw.qmc.backgrounddeltaetcolor = c
-            elif curve == "deltabt":
-                aw.qmc.backgrounddeltabtcolor = c
-            aw.qmc.redraw(recomputeAllDeltas=False)
-        self.btcolorComboBox.setDisabled(False)
-        self.metcolorComboBox.setDisabled(False)
-        self.deltabtcolorComboBox.setDisabled(False)
-        self.deltaetcolorComboBox.setDisabled(False)
+    def adjustcolor(self,curve):
+        
+        curve = str(curve).lower()
+
+        etcolor = str(self.metcolorComboBox.currentText()).lower()
+        btcolor = str(self.btcolorComboBox.currentText()).lower()
+        deltabtcolor = str(self.deltabtcolorComboBox.currentText()).lower()
+        deltaetcolor = str(self.deltaetcolorComboBox.currentText()).lower()
+        xtcolor = str(self.xtcolorComboBox.currentText()).lower()
+
+        defaults =  ["et","bt","deltaet","deltabt"]
+        
+        if curve == "et":
+            if etcolor in defaults:
+                aw.qmc.backgroundmetcolor = aw.qmc.palette[etcolor]
+            else:
+                aw.qmc.backgroundmetcolor = etcolor
+                
+        elif curve == "bt":
+            if btcolor in defaults:
+                aw.qmc.backgroundbtcolor = aw.qmc.palette[btcolor]
+            else:
+                aw.qmc.backgroundbtcolor = btcolor
+
+        elif curve == "deltaet":
+            if deltaetcolor in defaults:
+                aw.qmc.backgrounddeltaetcolor = aw.qmc.palette[deltaetcolor]
+            else:
+                aw.qmc.backgrounddeltaetcolor = deltaetcolor
+            
+        elif curve == "deltabt":
+            if deltabtcolor in defaults:
+                aw.qmc.backgrounddeltabtcolor = aw.qmc.palette[deltabtcolor]
+            else:
+                aw.qmc.backgrounddeltabtcolor = deltabtcolor
+
+        elif curve == "xt":
+            if xtcolor in defaults:
+                aw.qmc.backgroundxtcolor = aw.qmc.palette[xtcolor]
+            else:
+                aw.qmc.backgroundxtcolor = xtcolor                
+                
+        aw.qmc.redraw(recomputeAllDeltas=False)
+
+##        color = str(color)
+##        self.btcolorComboBox.setDisabled(True)
+##        self.metcolorComboBox.setDisabled(True)
+##        self.deltabtcolorComboBox.setDisabled(True)
+##        self.deltaetcolorComboBox.setDisabled(True)
+##        if color == "ET":
+##            c = aw.qmc.palette["et"]
+##        elif color == "BT":
+##            c = aw.qmc.palette["bt"]
+##        elif color == "DeltaET":
+##            c = aw.qmc.palette["deltaet"]
+##        elif color == "DeltaBT":
+##            c = aw.qmc.palette["deltabt"]
+##        else:
+##            c = color
+##        if c != "":
+##            if curve == "et":
+##                aw.qmc.backgroundmetcolor = c
+##            elif curve == "bt":
+##                aw.qmc.backgroundbtcolor = c
+##            elif curve == "deltaet":
+##                aw.qmc.backgrounddeltaetcolor = c
+##            elif curve == "deltabt":
+##                aw.qmc.backgrounddeltabtcolor = c
+##            aw.qmc.redraw(recomputeAllDeltas=False)
+##        self.btcolorComboBox.setDisabled(False)
+##        self.metcolorComboBox.setDisabled(False)
+##        self.deltabtcolorComboBox.setDisabled(False)
+##        self.deltaetcolorComboBox.setDisabled(False)
 
     def adjustintensity(self):
         #block button
@@ -23953,8 +24053,11 @@ class backgroundDlg(ArtisanDialog):
         self.xtcurveComboBox.clear()
         curvenames = [""] # first entry is the empty one (no extra curve displayed)
         for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
-            curvenames.append(str(i) + "xT1: " + aw.qmc.extraname1B[i])
-            curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2B[i])
+            curvenames.append("B" + str(2*i+3) + ": " + aw.qmc.extraname1B[i])
+            curvenames.append("B" + str(2*i+4) + ": " + aw.qmc.extraname2B[i])
+            
+##            curvenames.append(str(i) + "xT1: " + aw.qmc.extraname1B[i])
+##            curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2B[i])
         self.xtcurveComboBox.addItems(curvenames)
         if aw.qmc.xtcurveidx < len(curvenames):
             self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
@@ -28784,7 +28887,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         symbolicHelpButton.setMaximumSize(symbolicHelpButton.sizeHint())
         symbolicHelpButton.setMinimumSize(symbolicHelpButton.minimumSizeHint())
         symbolicHelpButton.setFocusPolicy(Qt.NoFocus)
-        symbolicHelpButton.clicked.connect(aw.showSymbolicHelp)
+        symbolicHelpButton.clicked.connect(aw.realtimeHelpDlg)
         ##########################    TAB 2  WIDGETS   "EXTRA DEVICES"
         #table for showing data
         self.devicetable = QTableWidget()
