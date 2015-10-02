@@ -823,6 +823,9 @@ class tgraphcanvas(FigureCanvas):
         self.stemp1,self.stemp2 = [],[] # smoothed versions of temp1/temp2 usind in redraw()
         self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # used in sample()
 
+        self.actualtemp1 = 0
+        self.actualtemp2 = 0        
+
         #indexes for CHARGE[0],DRYe[1],FCs[2],FCe[3],SCs[4],SCe[5],DROP[6] and COOLe[7]
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryEnd
         #Example: Use self.temp2[self.timeindex[4]] to get the BT temperature of SCs
@@ -2531,25 +2534,24 @@ class tgraphcanvas(FigureCanvas):
     #Use during during REALTIME in sample() thread. Limited.
     #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
     #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
-    def eval_math_expression(self,mathexpression,x,tx):
-        if mathexpression == None or len(mathexpression) == 0 or (x == -1 and "x" in mathexpression):
-            return x
+    def eval_math_expression(self,mathexpression,sname,sval,time):
+        if mathexpression == None or len(mathexpression) == 0:
+            return sval
 
         #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
         mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
                           "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
                           "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
         try:
-            x = float(x)
-            mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
+            mathdictionary[sname] = sval
+            mathdictionary["t"] = time
             #add ETB, BTB and XTB (background ET, BT and XT)
             etb = btb = xtb = 0
             try:
                 if aw.qmc.background and ("B1" in mathexpression or "B2" in mathexpression or "B3" in mathexpression):
                     #first compute closest index at that time point in the background data
-                    j = aw.qmc.backgroundtime2index(tx)
-                    etb = aw.qmc.temp1B[j]
-                    btb = aw.qmc.temp2B[j]
+                    etb = aw.qmc.temp1B[-1]
+                    btb = aw.qmc.temp2B[-1]
                     if aw.qmc.xtcurveidx > 0:
                         idx3 = aw.qmc.xtcurveidx - 1
                         n3 = idx3 // 2
@@ -2583,7 +2585,7 @@ class tgraphcanvas(FigureCanvas):
                         Yval.append(number)
                 #build Ys float values
                 if len(self.timex) > 0:
-                    Y = [self.temp1[-1],self.temp2[-1]]
+                    Y = [self.temp1[-1],self.temp2[-1]]     #old
                 else:
                     Y = [-1,-1]
                 for i in range(len(self.extradevices)):
@@ -2600,12 +2602,11 @@ class tgraphcanvas(FigureCanvas):
                         Y.append(-1)
                         Y.append(-1)
                     #add Ys and their value to math dictionary 
-                    for i in range(len(Yval)):
-                        idx = int(Yval[i])-1
-                        if idx >= len(Y):
-                            mathdictionary["Y"+ Yval[i]] = 0
-                        else:
-                            mathdictionary["Y"+ Yval[i]] = Y[idx]
+                for i in range(len(Yval)):
+                    idx = int(Yval[i])-1
+                    if "Y"+ Yval[i] not in mathdictionary:
+                        mathdictionary["Y"+ Yval[i]] = Y[idx]
+                            
             return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
 
         except Exception as e:
@@ -7365,6 +7366,8 @@ class SampleThread(QThread):
                     timeBeforeETBT = libtime.time() # the time before sending the request to the main device
                     #read time, ET (t1) and BT (t2) TEMPERATURE
                     tx,t1,t2 = self.sample_main_device()
+                    self.actualtemp1 = t1
+                    self.actualtemp2 = t2
                     timeAfterETBT = libtime.time() # the time the data of the main device was received
                     ##############  if using Extra devices
                     nxdevices = len(aw.qmc.extradevices)
@@ -7376,9 +7379,9 @@ class SampleThread(QThread):
                             for i in range(nxdevices):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,extratx)
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],"Y"+str(2*i+3),extrat1,tx)
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2,extratx)
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],"Y"+str(2*i+4),extrat2,tx)
                                 # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                                 # modbus channel 1+2, respect input temperature scale setting
                                 if aw.qmc.extradevices[i] == 29:
@@ -7469,9 +7472,9 @@ class SampleThread(QThread):
                             t1 = (t1 + t1_2) / 2.0
                     ####### all values retrieved
                     if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
-                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1,tx) 
+                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,"Y1",t1,tx) 
                     if aw.qmc.BTfunction != None and len(aw.qmc.BTfunction):
-                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2,tx) 
+                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,"Y2",t2,tx) 
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
                     if aw.qmc.device == 29:
