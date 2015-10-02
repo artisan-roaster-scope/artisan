@@ -584,7 +584,7 @@ class tgraphcanvas(FigureCanvas):
         # extra event sampling interval in miliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
         self.extra_event_sampling_delay = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, ..
 
-        #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
+        #watermarks limits: dryphase1, dryphase2 (DRY), midphase (FCs), and finish phase Y limits
         self.phases_fahrenheit_defaults = [200,300,390,450]
         self.phases_celsius_defaults = [95,150,200,230]
         self.phases = list(self.phases_fahrenheit_defaults) # contains either the phases_filter or phases_espresso, depending on the mode
@@ -5869,22 +5869,28 @@ class tgraphcanvas(FigureCanvas):
     def lnRegression(self,xx=False):
         res = ""
         try:
-            if self.timeindex[0] > -1 and self.timeindex[1] and self.timeindex[6]:
+            if self.timeindex[0] > -1: # only if CHARGE is set
                 from scipy.optimize import curve_fit
+                a = [self.timex[self.timeindex[0]]]
                 if aw.qmc.mode == "F":
                     roomTemp = 70.0
                 else:
                     roomTemp = 21.0
-                #a = [self.timex[self.timeindex[0]]] + self.timex[self.timeindex[1]:self.timeindex[6]]
-                #n = [roomTemp] + self.temp2[self.timeindex[1]:self.timeindex[6]]
-                a = [self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]]
-                n = [roomTemp,self.temp2[self.timeindex[1]]]
-                if self.timeindex[2]:
+                n = [roomTemp]
+                if self.timeindex[1]: # take DRY if available
+                    a = a + [self.timex[self.timeindex[1]]]
+                    n = n + [self.temp2[self.timeindex[1]]]
+                else: # take DRY as specificed in phases
+                    i = aw.findDryEnd(phasesindex=1)
+                    a = a + [self.timex[i]]
+                    n = n + [self.temp2[i]]
+                if self.timeindex[2]: # take FCs if available
                     a = a + [self.timex[self.timeindex[2]]]
                     n = n + [self.temp2[self.timeindex[2]]]
-                else: # we consider the DROP coordinate only if no FCs is available
-                    a = a + [self.timex[self.timeindex[6]]]
-                    n = n + [self.temp2[self.timeindex[6]]]
+                else: # take FCs as defined in phases
+                    i = aw.findDryEnd(phasesindex=2)
+                    a = a + [self.timex[i]]
+                    n = n + [self.temp2[i]]
                 
                 xa = numpy.array(a)
                 yn = numpy.array(n)
@@ -5898,6 +5904,7 @@ class tgraphcanvas(FigureCanvas):
                 perr = numpy.sqrt(numpy.diag(pcov))
                 xb = numpy.array(self.timex)
                 self.ax.plot(xb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
+                self.ax.plot(xa, yn, "ro")
                 self.fig.canvas.draw()
                 if len(popt)>2:
                     if xx:
@@ -5907,7 +5914,8 @@ class tgraphcanvas(FigureCanvas):
         except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " univariate()")
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Error in lnRegression:",None) + " lnRegression() " + str(e),exc_tb.tb_lineno)
         return res
 
     #interpolation type
@@ -12444,8 +12452,8 @@ class ApplicationWindow(QMainWindow):
             # standardize unit of volume and weight to l and g
             if volumein != 0.0 and volumeout != 0.0:
                 if self.qmc.volume[2] == "ml":
-                    volumein = volumein / 1000.0
-                    volumeout = volumeout / 1000.0
+                    volumein = volumein / 1000.0 # in l
+                    volumeout = volumeout / 1000.0 # in l
             # store volume in l
             computedProfile["volumein"] = volumein
             computedProfile["volumeout"] = volumeout
@@ -12454,8 +12462,8 @@ class ApplicationWindow(QMainWindow):
                     weightin = weightin * 1000.0
                     weightout = weightout * 1000.0
             # store weight in Kg
-            computedProfile["weightin"] = weightin * 1000.
-            computedProfile["weightout"] = weightout * 1000.
+            computedProfile["weightin"] = weightin # in g
+            computedProfile["weightout"] = weightout # in g
             if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
                 din = (weightin / volumein) 
                 dout = (weightout / volumeout)
@@ -15158,7 +15166,9 @@ $cupping_notes
     #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
     #if given, starts at TP_index and looks forward, otherwise it looks backwards from end of roast (EoR)
     #find index with smallest abs() difference between aw.qmc.phases[1] and BT (temp2)
-    def findDryEnd(self,TP_index=None):
+    # phasesindex=1 => find DRY
+    # phasesindex=2 => find FCs
+    def findDryEnd(self,TP_index=None,phasesindex=1):
         sd = 1000
         nsd = 1000
         index = 0
@@ -15190,7 +15200,7 @@ $cupping_notes
         if TP > start and TP < end:
             start = TP
         for i in range(end -1, start -1, -1):
-            nsd = abs(self.qmc.temp2[i]- self.qmc.phases[1])
+            nsd = abs(self.qmc.temp2[i]- self.qmc.phases[phasesindex])
             if nsd < sd:
                 sd = nsd
                 index = i
@@ -17730,7 +17740,7 @@ class HUDDlg(ArtisanDialog):
                 self.lnresult.setText(res)
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "ln(): no profile data available", None))
-                self.univarCheck.setChecked(False)
+                self.lnvarCheck.setChecked(False)
                 self.lnresult.setText("")
         else:
             self.lnresult.setText("")
@@ -17746,7 +17756,7 @@ class HUDDlg(ArtisanDialog):
                 self.xxresult.setText(res)
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "xxvar(): no profile data available", None))
-                self.univarCheck.setChecked(False)
+                self.xxvarCheck.setChecked(False)
                 self.xxresult.setText("")
         else:
             self.xxresult.setText("")
@@ -17758,7 +17768,6 @@ class HUDDlg(ArtisanDialog):
             #check for finished roast
             if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
                 aw.qmc.univariate()
-                aw.qmc.lnRegression()
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "Univariate: no profile data available", None))
                 self.univarCheck.setChecked(False)
@@ -25806,7 +25815,7 @@ class serialport(object):
             res1 = -1
         if aw.modbus.input2slave:
             if just_send:
-                libtime.sleep(0.10)   #this garantees a minimum of 30 miliseconds between readings (according to the Modbus spec)
+                libtime.sleep(0.04)   #this garantees a minimum of 40 miliseconds between readings (according to the Modbus spec)
             if aw.modbus.input2float:
                 res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             else:
@@ -25818,7 +25827,7 @@ class serialport(object):
             res2 = -1
         if aw.modbus.input3slave:
             if just_send:
-                libtime.sleep(0.10)   #this garantees a minimum of 30 miliseconds between readings (according to the Modbus spec)
+                libtime.sleep(0.04)   #this garantees a minimum of 40 miliseconds between readings (according to the Modbus spec)
             if aw.modbus.input3float:
                 res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             else:
@@ -25830,7 +25839,7 @@ class serialport(object):
             res3 = -1
         if aw.modbus.input4slave:
             if just_send:
-                libtime.sleep(0.10)   #this garantees a minimum of 30 miliseconds between readings (according to the Modbus spec)
+                libtime.sleep(0.04)   #this garantees a minimum of 40 miliseconds between readings (according to the Modbus spec)
             if aw.modbus.input4float:
                 res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             else:

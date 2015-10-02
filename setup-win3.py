@@ -24,6 +24,7 @@ INCLUDES = [
             "scipy.sparse.csgraph._validation",
             "scipy.integrate",
             "scipy.interpolate",
+#            "urlparse",
             ]
 
 EXCLUDES = ['_tkagg',
@@ -43,10 +44,6 @@ EXCLUDES = ['_tkagg',
             '_gtagg',
             '_cocoaagg',
             '_wx',
-#            'six',
-#            'six,moves',
-#            'six,moves.urlliib',
-#            'six.moves.urllib.parse' # this one makes py2exe 0.9.2.2 fail on Python3 due to a infinite loop
             ]
 
 # current version of Artisan
@@ -77,6 +74,9 @@ DATAFILES = DATAFILES + \
             ]),
     ]
 
+
+
+
 setup(
     name ="Artisan",
     version=VERSION,
@@ -89,11 +89,12 @@ setup(
     data_files = DATAFILES,
     zipfile = "lib\library.zip",
     options={"py2exe" :{
-                        "packages": ['matplotlib','pytz'],
-                        "compressed": False, # faster
-                        "unbuffered": True,
-                        'optimize':  2,
-                        "bundle_files": 2, # default bundle_files: 3 breaks WebLCDs on Windows
+                       "packages": ['matplotlib','pytz'],
+                       "compressed": False, # faster
+                        "unbuffered": True, 
+#                        'optimize':  2, # breaks py2exe on py3
+#                        "bundle_files": 2, # default bundle_files: 3 breaks WebLCDs on Windows
+      # bundle_files 1 or 2 breaks py2exe on py3 in gevent._semahores
                         "dll_excludes":[
                             'MSVCP90.dll','tcl84.dll','tk84.dll','libgdk-win32-2.0-0.dll',
                             'libgdk_pixbuf-2.0-0.dll','libgobject-2.0-0.dll',
@@ -104,53 +105,58 @@ setup(
             }
     )
 
-os.system(r'copy README.txt dist')
-os.system(r'copy LICENSE.txt dist')
-os.system(r'copy qt-win.conf dist\\qt.conf')
-os.system(r'mkdir dist\\Wheels')
-os.system(r'mkdir dist\\Wheels\\Cupping')
-os.system(r'mkdir dist\\Wheels\\Other')
-os.system(r'mkdir dist\\Wheels\\Roasting')
-os.system(r'copy Wheels\\Cupping\\* dist\\Wheels\\Cupping')
-os.system(r'copy Wheels\\Other\\* dist\\Wheels\\Other')
-os.system(r'copy Wheels\\Roasting\\* dist\\Wheels\\Roasting')
-os.system(r'mkdir dist\\translations')
-os.system(r'copy translations\\*.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ar.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_de.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_es.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_fi.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_fr.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_he.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_hu.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_it.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ja.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ko.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_pt.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_pl.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ru.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ru.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_sv.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_zh_CN.qm dist\\translations')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_zh_TW.qm dist\\translations')
-os.system(r'rmdir /q /s dist\\mpl-data\\sample_data')
+os.system('mkdir dist')
+os.system('mkdir build')
+os.system('copy README.txt dist')
+os.system('copy LICENSE.txt dist')
+os.system('copy qt-win.conf dist\\qt.conf')
+os.system('mkdir dist\\Wheels')
+os.system('mkdir dist\\Wheels\\Cupping')
+os.system('mkdir dist\\Wheels\\Other')
+os.system('mkdir dist\\Wheels\\Roasting')
+os.system('copy Wheels\\Cupping\\* dist\\Wheels\\Cupping')
+os.system('copy Wheels\\Other\\* dist\\Wheels\\Other')
+os.system('copy Wheels\\Roasting\\* dist\\Wheels\\Roasting')
+os.system('mkdir dist\\translations')
+os.system('copy translations\\*.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ar.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_de.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_es.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_fi.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_fr.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_he.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_hu.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_it.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ja.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ko.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_pt.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_pl.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ru.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_ru.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_sv.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_zh_CN.qm dist\\translations')
+os.system('copy c:\\Python34\\Lib\\site-packages\\PyQt5\\translations\\qt_zh_TW.qm dist\\translations')
+os.system('rmdir /q /s dist\\mpl-data\\sample_data')
 # YOCTO HACK BEGIN: manually copy over the dlls
-os.system(r'mkdir dist\\lib')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\yoctopuce\\cdll\\yapi.dll dist\\lib')
-os.system(r'copy c:\\Python34\\Lib\\site-packages\\yoctopuce\\cdll\\yapi64.dll dist\\lib')
+os.system('mkdir dist\\lib')
+os.system('copy c:\\Python34\\Lib\\site-packages\\yoctopuce\\cdll\\yapi.dll dist\\lib')
+os.system('copy c:\\Python34\\Lib\\site-packages\\yoctopuce\\cdll\\yapi64.dll dist\\lib')
 # YOCTO HACK END
-os.system(r'copy artisan.png dist')
-os.system(r'copy artisanAlarms.ico dist')
-os.system(r'copy artisanProfile.ico dist')
-os.system(r'copy artisanPalettes.ico dist')
-os.system(r'copy artisanSettings.ico dist')
-os.system(r'copy artisanWheel.ico dist')
-os.system(r'copy includes\\Humor-Sans.ttf dist')
-os.system(r'copy includes\\alarmclock.eot dist')
-os.system(r'copy includes\\alarmclock.svg dist')
-os.system(r'copy includes\\alarmclock.ttf dist')
-os.system(r'copy includes\\alarmclock.woff dist')
-os.system(r'copy includes\\artisan.tpl dist')
-os.system(r'copy includes\\bigtext.js dist')
-os.system(r'copy includes\\jquery-1.11.1.min.js dist')
-os.system(r'copy ..\\Redistribution2012\\vcredist_x86.exe dist')
+os.system('copy artisan.png dist')
+os.system('copy artisanAlarms.ico dist')
+os.system('copy artisanProfile.ico dist')
+os.system('copy artisanPalettes.ico dist')
+os.system('copy artisanSettings.ico dist')
+os.system('copy artisanWheel.ico dist')
+os.system('copy includes\\Humor-Sans.ttf dist')
+os.system('copy includes\\alarmclock.eot dist')
+os.system('copy includes\\alarmclock.svg dist')
+os.system('copy includes\\alarmclock.ttf dist')
+os.system('copy includes\\alarmclock.woff dist')
+os.system('copy includes\\artisan.tpl dist')
+os.system('copy includes\\bigtext.js dist')
+os.system('copy includes\\jquery-1.11.1.min.js dist')
+os.system('copy ..\\Redistribution2010\\vcredist_x86.exe dist')
+
+
+

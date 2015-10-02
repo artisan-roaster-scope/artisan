@@ -13,19 +13,20 @@ import sip
 sip.setapi('QString', 2)
 sip.setapi('QVariant', 2)
 
+        
 # on Qt5, the platform plugin cocoa/windows is not found in the plugin directory (dispite the qt.conf file) if we do not
 # extend the libraryPath accordingly
 if system() == 'Darwin':
     try:
         if str(sys.frozen) == "macosx_app":
             from PyQt5.QtWidgets import QApplication
-            QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath( __file__ ))) + "/qt_plugins/")
-    except Exception:
+            QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
+    except:
         try:
             if str(sys.frozen) == "macosx_app":
                 from PyQt4.QtGui import QApplication
-                QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath(__file__))) + "/qt_plugins/")
-        except Exception:
+                QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
+        except:
             pass
 elif system().startswith("Windows"):
     try:
@@ -34,17 +35,17 @@ elif system().startswith("Windows"):
             or imp.is_frozen("__main__")) # tools/freeze
         from PyQt5.QtWidgets import QApplication
         if ib:
-            QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath(__file__))) + "\\qt_plugins\\")
+            QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
         else:
             QApplication.addLibraryPath("c:\\Python34\\Lib\\site-packages\\PyQt5\\plugins")
-    except Exception:
+    except Exception as e:
         try:
             from PyQt4.QtGui import QApplication
             if ib:
-                QApplication.addLibraryPath(str(os.path.dirname(os.path.abspath(__file__))) + "\\qt_plugins\\")
+                QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))
             else:
                 QApplication.addLibraryPath("c:\\Python34\\Lib\\site-packages\\PyQt5\\plugins\\")
-        except Exception:
+        except:
             pass   
         
 from artisanlib import main
