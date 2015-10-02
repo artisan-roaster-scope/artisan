@@ -7387,9 +7387,9 @@ class SampleThread(QThread):
                             for i in range(nxdevices):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],"Y"+str(2*i+3),extrat1,tx)
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],"Y"+str(2*i+3),extrat1,extratx)
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],"Y"+str(2*i+4),extrat2,tx)
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],"Y"+str(2*i+4),extrat2,extratx)
                                 # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                                 # modbus channel 1+2, respect input temperature scale setting
                                 if aw.qmc.extradevices[i] == 29:
