@@ -22692,7 +22692,6 @@ class EventsDlg(ArtisanDialog):
         aw.update_extraeventbuttons_visibility()
 
     def setlabeleventbutton(self,_,i):
-        print("setlabeleventbutton",i)
         labeledit = self.eventbuttontable.cellWidget(i,0)
         aw.extraeventslabels[i] = u(labeledit.text())
         aw.settooltip()
