@@ -2,8 +2,8 @@
 
 rem # set PY2EXE_VERBOSE=1
 
+
 C:\Python34\python setup-win3.py py2exe
-rem # C:\Python34\python -m py2exe.build_exe artisan.py
 
 rem #
 rem # Don't make assumptions as to where the 'makensis.exe' is - look in the obvious places
