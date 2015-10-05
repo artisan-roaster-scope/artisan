@@ -1382,9 +1382,8 @@ class tgraphcanvas(FigureCanvas):
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
         self.redrawEnabled = True
-        self._resizeTimer = QTimer()
-        self._resizeTimer.timeout.connect(self.updateBackground)
-        self.delayTimeout = 100
+        self.delayTimeout = 1
+        self.block_update = False
         
         # flag to toggle between Temp and RoR scale of xy-display
         self.fmt_data_RoR = False
@@ -1425,7 +1424,10 @@ class tgraphcanvas(FigureCanvas):
             return s
 
     def delayedUpdateBackground(self):
-        self._resizeTimer.start(self.delayTimeout) # triggeres the updateBackground after timeout
+        if not self.block_update:
+            self.block_update = True
+            self.redrawEnabled = False
+            QTimer.singleShot(0,self.doUpdate)
 
     def resizeEvent(self,event):
         self.redrawEnabled = False
@@ -1433,7 +1435,12 @@ class tgraphcanvas(FigureCanvas):
         self.delayedUpdateBackground()
 
     def updateBackground(self):
-        self._resizeTimer.stop()
+        if not self.block_update:
+            self.redrawEnabled = False
+            self.block_update = True
+            self.doUpdate()
+
+    def doUpdate(self):
         if not self.designerflag:
             self.redrawEnabled = False
             self.resetlinecountcaches() # ensure that the line counts are up to date
@@ -1441,7 +1448,8 @@ class tgraphcanvas(FigureCanvas):
             self.resetdeltalines() # just in case
             self.fig.canvas.draw()
             self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)
-            self.redrawEnabled = True
+        self.redrawEnabled = True
+        self.block_update = False
 
     def getetypes(self):
         if len(self.etypes) == 4:
@@ -4055,7 +4063,7 @@ class tgraphcanvas(FigureCanvas):
 
             ############  ready to plot ############
             #self.fig.canvas.draw() # done by updateBackground()
-            self.updateBackground() # update bitlblit backgrounds
+            self.delayedUpdateBackground() # update bitlblit backgrounds
             #######################################
 
             # if designer ON
@@ -10364,12 +10372,18 @@ class ApplicationWindow(QMainWindow):
         self.lowerbuttondialog.setVisible(True)
 
     def hideExtraButtons(self,changeDefault=True):
+        focused_widget = QApplication.focusWidget()
+        if focused_widget:
+            focused_widget.clearFocus()
         self.extrabuttondialogs.setVisible(False)
         if changeDefault:
             self.extraeventsbuttonsflag = 0
         aw.buttonsAction.setChecked(False)
 
     def showExtraButtons(self,changeDefault=True):
+        focused_widget = QApplication.focusWidget()
+        if focused_widget:
+            focused_widget.clearFocus()
         self.extrabuttondialogs.setVisible(True)
         if changeDefault:
             self.extraeventsbuttonsflag = 1
@@ -10389,12 +10403,18 @@ class ApplicationWindow(QMainWindow):
             self.hideSliders()
 
     def hideSliders(self,changeDefault=True):
+        focused_widget = QApplication.focusWidget()
+        if focused_widget:
+            focused_widget.clearFocus()
         self.sliderFrame.setVisible(False)
         if changeDefault:
             aw.eventslidersflag = 0
         aw.slidersAction.setChecked(False)
 
     def showSliders(self,changeDefault=True):
+        focused_widget = QApplication.focusWidget()
+        if focused_widget:
+            focused_widget.clearFocus()
         self.sliderFrame.setVisible(True)
         if changeDefault:
             aw.eventslidersflag = 1
@@ -26965,16 +26985,27 @@ class serialport(object):
                 errmsg=YRefParam()
 #                aw.sendmessage(str(errmsg))
                 ## WINDOWS/Linux DLL HACK BEGIN
+                arch = platform.architecture()[0]
+                machine = platform.machine()
+                libpath = os.path.dirname(sys.executable)
                 if platf == 'Windows' and aw.appFrozen():
-                    if platform.architecture()[0] == '32bit':
-                        YAPI._yApiCLibFile = os.path.dirname(sys.executable) + "\\lib\\yapi.dll"
+                    if arch == '32bit':
+                        YAPI._yApiCLibFile = libpath + "\\lib\\yapi.dll"
                     else:
-                        YAPI._yApiCLibFile = os.path.dirname(sys.executable) + "\\lib\\yapi-amd64.dll"
+                        YAPI._yApiCLibFile = libpath + "\\lib\\yapi-amd64.dll"
                 elif platf == "Linux" and aw.appFrozen():
-                    if platform.architecture()[0] == '32bit':
-                        YAPI._yApiCLibFile = u(QApplication.applicationDirPath() + "/libyapi-i386.so")
-                    else:                    
-                        YAPI._yApiCLibFile = u(QApplication.applicationDirPath() + "/libyapi-amd64.so")
+                    if machine.find("arm") >= 0: # Raspberry
+                        YAPI._yApiCLibFile = libpath + "/libyapi-armhf.so"
+                        YAPI._yApiCLibFileFallback = libpath + "/libyapi-armel.so"
+                    elif machine.find("mips") >= 0:
+                        YAPI._yApiCLibFile = libpath + "/libyapi-mips.so"
+                        YAPI._yApiCLibFileFallback = ""
+                    elif machine == 'x86_32' or (machine[0] == 'i' and machine[-2:] == '86'):
+                        YAPI._yApiCLibFile = libpath + "/libyapi-i386.so"
+                        YAPI._yApiCLibFileFallback = libpath + "/libyapi-amd64.so"  # just in case
+                    elif machine == 'x86_64':
+                        YAPI._yApiCLibFile = libpath + "/libyapi-amd64.so"
+                        YAPI._yApiCLibFileFallback = libpath + "/libyapi-i386.so"  # just in case                
                 ## WINDOWS/Linux DLL HACK END
                 # alt: PreregisterHub( )
 #                if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
