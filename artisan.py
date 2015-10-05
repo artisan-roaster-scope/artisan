@@ -21,12 +21,12 @@ if system() == 'Darwin':
         if str(sys.frozen) == "macosx_app":
             from PyQt5.QtWidgets import QApplication
             QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
-    except:
+    except Exception:
         try:
             if str(sys.frozen) == "macosx_app":
                 from PyQt4.QtGui import QApplication
                 QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
-        except:
+        except Exception:
             pass
 elif system().startswith("Windows"):
     try:
@@ -38,7 +38,7 @@ elif system().startswith("Windows"):
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
         else:
             QApplication.addLibraryPath("c:\\Python34\\Lib\\site-packages\\PyQt5\\plugins")
-    except Exception as e:
+    except Exception:
         try:
             from PyQt4.QtGui import QApplication
             if ib:

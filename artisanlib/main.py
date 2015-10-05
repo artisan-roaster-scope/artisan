@@ -1498,7 +1498,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.ambientTemp = aw.float2float(aw.qmc.fromCtoF(t))
                     else:
                         aw.qmc.ambientTemp = aw.float2float(t)
-            except:
+            except Exception:
                 pass
         else:
             res = aw.qmc.ambientTempSourceAvg()
@@ -1690,7 +1690,7 @@ class tgraphcanvas(FigureCanvas):
                 if alertTimeout:
                     payload['alert']['timeout'] = alertTimeout
             requests.post(url, data=json.dumps(payload),headers=headers,timeout=0.1)
-        except:
+        except Exception:
             pass
             
     def updateLargeLCDs(self,bt=None,et=None,time=None):
@@ -1701,7 +1701,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.largeLCDs_dialog.lcd2.display(et)
             if bt:
                 aw.largeLCDs_dialog.lcd3.display(bt)
-        except:
+        except Exception:
             pass
 
     # runs from GUI thread.
@@ -2065,7 +2065,7 @@ class tgraphcanvas(FigureCanvas):
                 button_number = None
                 try:
                     button_number = int(str(self.alarmstrings[alarmnumber])) - 1 # the event buttons presented to the user are numbered from 1 on
-                except:
+                except Exception:
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(u(self.alarmstrings[alarmnumber])))
                 if button_number != None:
                     if button_number > -1 and button_number < len(aw.buttonlist):
@@ -2878,7 +2878,7 @@ class tgraphcanvas(FigureCanvas):
             focused_widget = QApplication.focusWidget()
             if focused_widget:
                 focused_widget.clearFocus()
-        except:
+        except Exception:
             pass
     
         if not self.checkSaved():
@@ -3029,7 +3029,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.buttonlist[aw.lastbuttonpressed].setStyleSheet(normalstyle)
                     # reset lastbuttonpressed
                     aw.lastbuttonpressed = -1
-                except:
+                except Exception:
                     pass
 
                 # reset sliders
@@ -4250,7 +4250,7 @@ class tgraphcanvas(FigureCanvas):
                                     try:
                                         aw.qmc.extratemp1[e][i] = self.fromCtoF(aw.qmc.extratemp1[e][i])
                                         aw.qmc.extratemp2[e][i] = self.fromCtoF(aw.qmc.extratemp2[e][i])
-                                    except:
+                                    except Exception:
                                         pass
 
                         self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
@@ -4493,13 +4493,13 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.reset(True,False)
             try:
                 appnope.nope()
-            except:
+            except Exception:
                 pass
             if aw.qmc.device == 53:
                 startHottop(0.8,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
-            except:
+            except Exception:
                 pass
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             aw.qmc.clearMeasurements()
@@ -4589,7 +4589,7 @@ class tgraphcanvas(FigureCanvas):
         # close main serial port
         try:
             ser.closeport()
-        except:
+        except Exception:
             pass
         # disconnect phidgets
         if ser.PhidgetTemperatureSensor:
@@ -4597,28 +4597,28 @@ class tgraphcanvas(FigureCanvas):
                 ser.PhidgetTemperatureSensorAttached = False
                 ser.PhidgetTemperatureSensor.closePhidget()
                 ser.PhidgetTemperatureSensor = None
-            except:
+            except Exception:
                 pass
         if ser.PhidgetIRSensor:
             try:
                 ser.PhidgetIRSensorSensorAttached = False
                 ser.PhidgetIRSensor.closePhidget()
                 ser.PhidgetIRSensor = None
-            except:
+            except Exception:
                 pass
         if ser.PhidgetBridgeSensor:
             try:
                 ser.PhidgetBridgeSensorAttached = False
                 ser.PhidgetBridgeSensor.closePhidget()
                 ser.PhidgetBridgeSensor = None
-            except:
+            except Exception:
                 pass
         if ser.PhidgetIO:
             try:
                 ser.PhidgetIOAttached = False
                 ser.PhidgetIO.closePhidget()
                 ser.PhidgetIO = None
-            except:
+            except Exception:
                 pass
         if ser.PhidgetManager:
             ser.PhidgetManager.closeManager()
@@ -4629,7 +4629,7 @@ class tgraphcanvas(FigureCanvas):
                 ser.YOCTOsensor = None
                 ser.YOCTOchan1 = None
                 ser.YOCTOchan2 = None
-            except:
+            except Exception:
                 pass
 
     def disconnectProbes(self):
@@ -4664,7 +4664,7 @@ class tgraphcanvas(FigureCanvas):
             
             try:
                 aw.eventactionx(aw.qmc.xextrabuttonactions[1],aw.qmc.xextrabuttonactionstrings[1])
-            except:
+            except Exception:
                 pass
                     
             aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
@@ -4792,7 +4792,7 @@ class tgraphcanvas(FigureCanvas):
                             value = aw.float2float((slidervalue + 10.0) / 10.0)
                             # note that EventRecordAction avoids to generate events were type and value matches to the previously recorded one
                             aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
-                except:
+                except Exception:
                     pass
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
@@ -4818,7 +4818,7 @@ class tgraphcanvas(FigureCanvas):
                 bt = fmt%self.temp2[self.timeindex[0]] + aw.qmc.mode
                 message = QApplication.translate("Message","Roast time starts now 00:00 BT = {0}",None).format(bt)
                 aw.sendmessage(message) 
-            except:
+            except Exception:
                 pass
 
     # called from sample() and marks the autodetected TP visually on the graph
@@ -5171,7 +5171,7 @@ class tgraphcanvas(FigureCanvas):
                         # update ambient temperature if a ambient temperature source is configured and no value yet established
                         if aw.qmc.ambientTemp == 0.0:
                             aw.qmc.updateAmbientTemp()
-                    except:
+                    except Exception:
                         pass
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
@@ -5203,7 +5203,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_5.setFlat(True)
                 aw.button_6.setDisabled(True) # also deactivate SCe button
                 aw.button_6.setFlat(True)
-            except:
+            except Exception:
                 pass
             aw.eventactionx(aw.qmc.buttonactions[6],aw.qmc.buttonactionstrings[6])
             st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
@@ -5228,7 +5228,7 @@ class tgraphcanvas(FigureCanvas):
                         if bc > -1:
                             settings.setValue("batchcounter",bc + 1)
                     settings.endGroup()
-                except:
+                except Exception:
                     aw.settingspath = u("")
             # update batchsequence by estimating batch sequence (roastbatchpos) from lastroastepoch and roastepoch
             # if this roasts DROP is more than 1.5h after the last registered DROP, we assume a new session starts
@@ -5446,7 +5446,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.eNumberSpinBox.blockSignals(True)
                             try:
                                 aw.eNumberSpinBox.setValue(Nevents+1)
-                            except:
+                            except Exception:
                                 pass
                             aw.eNumberSpinBox.blockSignals(False)
                             if aw.qmc.timeindex[0] > -1:
@@ -5951,7 +5951,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 self.fig.canvas.draw()
                 return z
-            except:
+            except Exception:
                 return None
         else:
             return None
@@ -6133,7 +6133,7 @@ class tgraphcanvas(FigureCanvas):
                 error = error + "@line " + str(line)
             self.errorlog.append(timez + " " + error)
             aw.sendmessage(error)
-        except:
+        except Exception:
             pass
         finally:
             if aw.qmc.errorsemaphore.available() < 1:
@@ -7409,14 +7409,14 @@ class SampleThread(QThread):
                 return tx,t1,t2
             else:
                 return aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
-        except:
+        except Exception:
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1,-1
     
     def sample_extra_device(self,i):
         try:
             return aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-        except:
+        except Exception:
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1,-1
 
@@ -7466,7 +7466,7 @@ class SampleThread(QThread):
                 try:
                     if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
                         aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
-                except:
+                except Exception:
                     pass
                     
                 #if using a meter (thermocouple device)
@@ -7563,7 +7563,7 @@ class SampleThread(QThread):
                         try:
                             if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
                                 aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
-                        except:
+                        except Exception:
                             pass
                         # let's do the oversampling thing and take a second reading from the main device
                         sampling_interval = aw.qmc.delay/1000.
@@ -7904,11 +7904,11 @@ class SampleThread(QThread):
                         if aw.ser.SP.isOpen():
                             aw.ser.closeport()
                         QApplication.processEvents()
-                    except:
+                    except Exception:
                         pass
                     self.quit()
                     break  #thread ends
-        except:
+        except Exception:
             aw.qmc.flagsampling = False # we signal that we are done with sampling
         finally:
             aw.qmc.flagsamplingthreadrunning = False
@@ -9526,7 +9526,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 # no DROP event registered
                 return None, None
-        except:
+        except Exception:
             #import traceback
             #traceback.print_exc(file=sys.stdout)        
             return None, None
@@ -9610,7 +9610,7 @@ class ApplicationWindow(QMainWindow):
                 if getattr(sys, 'frozen', False):
                     # The application is frozen
                     ib = True
-        except:
+        except Exception:
             pass
         return ib
 
@@ -9682,7 +9682,7 @@ class ApplicationWindow(QMainWindow):
 #                    elif locale == "ar":
 #                        mpl.rcParams['font.family'] = "TraditionalArabic"
 #                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
-            except:
+            except Exception:
                 pass
         # no Comic on Linux!
         elif self.qmc.graphfont == 1 or platf == "Linux":
@@ -10045,7 +10045,7 @@ class ApplicationWindow(QMainWindow):
             if len(self.seriallog) > 999:
                 self.seriallog = self.seriallog[1:]
             self.seriallog.append(timez + " " + serialstring)
-        except:
+        except Exception:
             pass
         finally:
             if aw.qmc.serialsemaphore.available() < 1:
@@ -10082,7 +10082,7 @@ class ApplicationWindow(QMainWindow):
     def eventactionx(self,a,cmd):
         try:
             self.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))), cmd)
-        except:
+        except Exception:
             pass
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
@@ -10148,7 +10148,7 @@ class ApplicationWindow(QMainWindow):
                                         # cmd has format "write([s,r,v])"
                                         aw.modbus.writeRegister(*cmds)
                                         followupCmd = 0.08
-                                except:
+                                except Exception:
                                     pass
                             elif cs.startswith("wcoils"):
                                 try:
@@ -10158,7 +10158,7 @@ class ApplicationWindow(QMainWindow):
                                             # cmd has format "wcoils(s,r,[<b>,..<b>])"
                                             aw.modbus.writeCoils(*cmds)
                                             followupCmd = 0.08
-                                except:
+                                except Exception:
                                     pass
                             elif cs.startswith("wcoil"):
                                 try:
@@ -10167,7 +10167,7 @@ class ApplicationWindow(QMainWindow):
                                         # cmd has format "wcoil(s,r,<b>)"                    
                                         aw.modbus.writeCoil(*cmds)
                                         followupCmd = 0.08
-                                except:
+                                except Exception:
                                     pass
                             elif cs.startswith("read"):
                                 try:
@@ -10176,14 +10176,14 @@ class ApplicationWindow(QMainWindow):
                                         # cmd has format "read(s,r)"                    
                                         aw.modbus.lastReadResult = aw.modbus.readSingleRegister(*cmds)
                                         followupCmd = 0.03
-                                except:
+                                except Exception:
                                     pass
                 elif action == 5:
                     try:
                         DTAvalue=cmd_str.split(':')[1]
                         DTAaddress=cmd_str.split(':')[0]
                         aw.dtapid.writeDTE(DTAvalue,DTAaddress)
-                    except:
+                    except Exception:
                         pass
                 elif action == 6:
                     try:
@@ -10195,7 +10195,7 @@ class ApplicationWindow(QMainWindow):
                                 c = int(cmd_str[7:-1])
                                 state = bool(aw.ser.PhidgetIO.getOutputState(c))
                                 aw.ser.PhidgetIO.setOutputState(c,not(state))
-                    except:
+                    except Exception:
                         pass
                 elif action == 7: # slider call-program action
                     try:
@@ -10217,14 +10217,14 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('heater'):])
                                     if isinstance(cmds,int):
                                         setHottop(heater = min(max(cmds,0),100))
-                                except:
+                                except Exception:
                                     pass
                             elif cs.startswith("fan"):
                                 try:
                                     cmds = eval(cs[len('fan'):])
                                     if isinstance(cmds,int):
                                         setHottop(main_fan = int(min(max(cmds,0),10) * 10))
-                                except:
+                                except Exception:
                                     pass
                             elif cs.startswith("motor"):
                                 try:
@@ -10233,7 +10233,7 @@ class ApplicationWindow(QMainWindow):
                                         setHottop(drum_motor=True)
                                     else:
                                         setHottop(drum_motor=False)
-                                except:
+                                except Exception:
                                     pass
                             elif cs.startswith("solenoid"):
                                 try:
@@ -10242,7 +10242,7 @@ class ApplicationWindow(QMainWindow):
                                         setHottop(solenoid=True)
                                     else:
                                         setHottop(solenoid=False)
-                                except:
+                                except Exception:
                                     pass
                             elif cs.startswith("stirrer"):
                                 try:
@@ -10251,10 +10251,10 @@ class ApplicationWindow(QMainWindow):
                                         setHottop(cooling_motor=True)
                                     else:
                                         setHottop(cooling_motor=False)
-                                except:
+                                except Exception:
                                     pass
                     
-            except:
+            except Exception:
                 pass
                 
     def call_prog_with_args(self,cmd_str):
@@ -10301,7 +10301,7 @@ class ApplicationWindow(QMainWindow):
             self.buttonlist[ee].setStyleSheet(pressedstyle)
             # reset lastbuttonpressed
             self.lastbuttonpressed = ee
-        except:
+        except Exception:
             pass
         if eventtype < 4:  ## if eventtype == 4 we have an button event of type "--" that does not add an event
             if self.qmc.flagstart:
@@ -10332,19 +10332,19 @@ class ApplicationWindow(QMainWindow):
     def on_actionCut_triggered(self,checked=None):
         try:
             app.activeWindow().focusWidget().cut()
-        except:
+        except Exception:
             pass
 
     def on_actionCopy_triggered(self,checked=None):
         try:
             app.activeWindow().focusWidget().copy()
-        except:
+        except Exception:
             pass
 
     def on_actionPaste_triggered(self,checked=None):
         try:
             app.activeWindow().focusWidget().paste()
-        except:
+        except Exception:
             pass
 
     def sendmessage(self,message,append=True):
@@ -10359,7 +10359,7 @@ class ApplicationWindow(QMainWindow):
                 timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz ")))    #zzz = miliseconds
                 self.messagehist.append(timez + message)
             self.messagelabel.setText(message)
-        except:
+        except Exception:
             pass
         finally:
             if aw.qmc.messagesemaphore.available() < 1:
@@ -10480,7 +10480,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 aw.largeLCDs_dialog.lcd2.setVisible(aw.qmc.ETlcd)
                 aw.largeLCDs_dialog.lcd3.setVisible(aw.qmc.BTlcd)
-            except:
+            except Exception:
                 pass
         if aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid
             aw.LCD6frame.setVisible(True)
@@ -11289,7 +11289,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     tm = QTime.fromString(header[11].split('Time:')[1])
                     self.qmc.roastdate = QDateTime(date,tm)
-                except:
+                except Exception:
                     self.qmc.roastdate = QDateTime(date)
             else:
                 self.qmc.roastdate = QDateTime(date)
@@ -11562,7 +11562,7 @@ class ApplicationWindow(QMainWindow):
         try:
             try:
                 self.importRoastLoggerEnc(filename,'utf-8')
-            except:
+            except Exception:
                 self.importRoastLoggerEnc(filename,'latin1')
             aw.qmc.safesaveflag = True
         except Exception as ex:
@@ -11637,12 +11637,12 @@ class ApplicationWindow(QMainWindow):
                 timex.append(float(self.qmc.stringtoseconds(fields[0])))
                 try:
                     t1 = float(fields[1])
-                except:
+                except Exception:
                     t1 = -1
                 temp1.append(t1)
                 try:
                     t2 = float(fields[2])
-                except:
+                except Exception:
                     t2 = -1
                 temp2.append(t2)
                 event = fields[3]
@@ -11673,11 +11673,11 @@ class ApplicationWindow(QMainWindow):
                 slider_fan = -1
                 try:
                     slider_power=aw.qmc.etypes.index("Power")
-                except:
+                except Exception:
                     pass
                 try:
                     slider_fan=aw.qmc.etypes.index("Fan")
-                except:
+                except Exception:
                     pass
                 #load only "Power" and "Fan" events
                 if slider_power != -1 and slider_fan != -1:
@@ -12521,28 +12521,28 @@ class ApplicationWindow(QMainWindow):
             computedProfile["total_ts"] = self.float2float(ts,0)
             computedProfile["total_ts_ET"] = self.float2float(tse,0)
             computedProfile["total_ts_BT"] = self.float2float(tsb,0)
-        except:
+        except Exception:
             pass
         try:
             ts1,ts1e,ts1b = aw.ts(self.qmc.timeindex[0],DRY_time_idx)
             computedProfile["dry_phase_ts"] = self.float2float(ts1,0)
             computedProfile["dry_phase_ts_ET"] = self.float2float(ts1e,0)
             computedProfile["dry_phase_ts_BT"] = self.float2float(ts1b,0)
-        except:
+        except Exception:
             pass
         try:
             ts2,ts2e,ts2b = aw.ts(DRY_time_idx,self.qmc.timeindex[2])
             computedProfile["mid_phase_ts"] = self.float2float(ts2,0)
             computedProfile["mid_phase_ts_ET"] = self.float2float(ts2e,0)
             computedProfile["mid_phase_ts_BT"] = self.float2float(ts2b,0)
-        except:
+        except Exception:
             pass
         try:
             ts3,ts3e,ts3b = aw.ts(self.qmc.timeindex[2],self.qmc.timeindex[6])
             computedProfile["finish_phase_ts"] = self.float2float(ts3,0)
             computedProfile["finish_phase_ts_ET"] = self.float2float(ts3e,0)
             computedProfile["finish_phase_ts_BT"] = self.float2float(ts3b,0)
-        except:
+        except Exception:
             pass
         ######### Weight, Volume, Loss, Gain, Density #########
         try:
@@ -12614,7 +12614,7 @@ class ApplicationWindow(QMainWindow):
             if det != None:
                 computedProfile["det"] = det
                 computedProfile["dbt"] = dbt
-        except:
+        except Exception:
             pass
         ######### RETURN #########
         return computedProfile
@@ -12657,19 +12657,19 @@ class ApplicationWindow(QMainWindow):
             # write roastdate that respects locale and potential cannot be read in under a different locale (just for compatibility to older versions)
             try:
                 profile["roastdate"] = encodeLocal(self.qmc.roastdate.date().toString())
-            except:
+            except Exception:
                 pass
             # write ISO roast date
             try:
                 profile["roastisodate"] = encodeLocal(self.qmc.roastdate.date().toString(Qt.ISODate))
-            except:
+            except Exception:
                 pass
             # write roast time
             try:
                 profile["roasttime"] = encodeLocal(self.qmc.roastdate.time().toString())
                 profile["roastepoch"] = int(self.qmc.roastdate.toTime_t())
                 profile["roasttzoffset"] = self.qmc.roasttzoffset
-            except:
+            except Exception:
                 pass
             profile["roastbatchnr"] = self.qmc.roastbatchnr
             profile["roastbatchprefix"] = encodeLocal(u(self.qmc.roastbatchprefix))
@@ -13663,7 +13663,7 @@ class ApplicationWindow(QMainWindow):
                     available = list(map(str, list(QStyleFactory.keys())))
                     i = list(map(lambda x:x.lower(),available)).index(str(toString(settings.value("appearance"))))
                     app.setStyle(available[i])
-                except:
+                except Exception:
                     pass
             # set dpi
             if settings.contains("dpi"):
@@ -13671,7 +13671,7 @@ class ApplicationWindow(QMainWindow):
                     aw.dpi = toInt(settings.value("dpi",aw.dpi))
                     if aw.dpi != aw.defaultdpi:
                         aw.setdpi(aw.dpi,moveWindow=False)
-                except:
+                except Exception:
                     pass
         except Exception:
             res = False
@@ -13716,7 +13716,7 @@ class ApplicationWindow(QMainWindow):
         try:
             stopWeb()
             self.WebLCDs = False
-        except:
+        except Exception:
             pass
 
     def applyStandardButtonVisibility(self):
@@ -14389,7 +14389,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             try:
                 settings.setValue("appearance",str(aw.style().objectName()).lower())
-            except:
+            except Exception:
                 pass
             settings.setValue("dpi",aw.dpi)
 
@@ -14608,7 +14608,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 if aw.extraser[i].SP.isOpen():
                     aw.extraser[i].SP.close()
-            except:
+            except Exception:
                 pass
         # close modbus port
         aw.modbus.disconnect()
@@ -14616,13 +14616,13 @@ class ApplicationWindow(QMainWindow):
         try:
             if aw.scale:
                 aw.scale.closeport()
-        except:
+        except Exception:
             pass
         # close color meter port
         try:
             if aw.color:
                 aw.color.closeport()
-        except:
+        except Exception:
             pass
 
     def fileQuit(self):
@@ -15645,7 +15645,7 @@ $cupping_notes
             self.modbus.host = str(dialog.modbus_hostEdit.text())
             try:
                 self.modbus.port = int(str(dialog.modbus_portEdit.text()))
-            except:
+            except Exception:
                 pass
             # set scale port
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
@@ -15799,7 +15799,7 @@ $cupping_notes
                         for widget in QApplication.topLevelWidgets():
                             if isinstance(widget, ApplicationWindow):
                                 widget.updateRecentSettingActions()                        
-                except:
+                except Exception:
                     # remove file from the recent file list
                     settings = QSettings()
                     files = toStringList(settings.value('recentSettingList'))
@@ -16974,7 +16974,7 @@ class HUDDlg(ArtisanDialog):
         self.deltaSpan.addItems([str(i) + "s" for i in self.spanitems])
         try:
             self.deltaSpan.setCurrentIndex(self.spanitems.index(aw.qmc.deltaspan))
-        except:
+        except Exception:
             pass
         self.deltaSpan.currentIndexChanged.connect(lambda i=0:self.changeDeltaSpan(i))  #toggle
 
@@ -17441,7 +17441,7 @@ class HUDDlg(ArtisanDialog):
         try:
             #pylint: disable=E1102
             self.styleComboBox.setCurrentIndex(list(map(lambda x:x.lower(),available)).index(str(aw.style().objectName()).lower()))
-        except:
+        except Exception:
             pass
         self.styleComboBox.currentIndexChanged.connect(lambda i:self.setappearance())
         self.resolutionSpinBox = QSpinBox()
@@ -17666,8 +17666,12 @@ class HUDDlg(ArtisanDialog):
             for e in range(2):
                 #create y range
                 y_range = []
+                if aw.qmc.timeindex[0] > -1:
+                    toff = aw.qmc.timex[aw.qmc.timeindex[0]]
+                else:
+                    toff = 0
                 for i in arange(len(aw.qmc.timex)):
-                    y_range.append(aw.qmc.eval_math_expression(EQU[e],aw.qmc.timex[i]))
+                    y_range.append(aw.qmc.eval_math_expression(EQU[e],aw.qmc.timex[i],t_offset=toff))
                 if e:
                     extratemp2 = y_range
                 else:
@@ -17702,16 +17706,21 @@ class HUDDlg(ArtisanDialog):
             if len(equ) or len(equ2):
                 aw.qmc.resetlines()
                 #create x range
-                if len(aw.qmc.timex):
+                if len(aw.qmc.timex) > 1:
                     x_range = aw.qmc.timex[:]
+                    if not foreground and aw.qmc.timeindex[0] > -1:
+                        toff = aw.qmc.timex[aw.qmc.timeindex[0]]
+                    else:
+                        toff = 0
                 else:
                     x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
+                    toff = 0
                 #create y range
                 y_range = []
                 y_range2 = []
                 for i in range(len(x_range)):
-                    y_range.append(aw.qmc.eval_math_expression(equ,x_range[i]))
-                    y_range2.append(aw.qmc.eval_math_expression(equ2,x_range[i]))
+                    y_range.append(aw.qmc.eval_math_expression(equ,x_range[i],t_offset=toff))
+                    y_range2.append(aw.qmc.eval_math_expression(equ2,x_range[i],t_offset=toff))
                 if foreground:
                     aw.qmc.timex = x_range[:]
                     aw.qmc.temp1 = y_range[:]
@@ -18043,7 +18052,7 @@ class HUDDlg(ArtisanDialog):
                 self.doPolyfit()
             else:
                 self.result.setText("")
-        except:
+        except Exception:
             pass
         self.startEdit.setDisabled(False)
         self.startEdit.blockSignals(False)
@@ -18177,7 +18186,7 @@ class HUDDlg(ArtisanDialog):
                 try:
                     aw.qmc.patheffects = v
                     aw.qmc.redraw(recomputeAllDeltas=False)
-                except:
+                except Exception:
                     pass
                 self.PathEffects.blockSignals(False)
         except Exception as e:
@@ -18201,7 +18210,7 @@ class HUDDlg(ArtisanDialog):
                 try:
                     aw.qmc.deltafilter = v
                     aw.qmc.redraw(recomputeAllDeltas=True)
-                except:
+                except Exception:
                     pass
                 self.DeltaFilter.setDisabled(False)
                 self.DeltaFilter.blockSignals(False)
@@ -18630,7 +18639,7 @@ class volumeCalculatorDlg(ArtisanDialog):
                 else:
                     self.coffeeinvolume.setText(str(aw.float2float(res)))
                 self.inVolume = res
-        except:
+        except Exception:
             pass
 
     def resetOutVolume(self):
@@ -18654,7 +18663,7 @@ class volumeCalculatorDlg(ArtisanDialog):
                 else:
                     self.coffeeoutvolume.setText(str(aw.float2float(res)))
                 self.outVolume = res
-        except:
+        except Exception:
             pass
 
     def updateVolumes(self):
@@ -19743,7 +19752,7 @@ class editGraphDlg(ArtisanDialog):
                             self.volumeinedit.setText(str(aw.float2float(res,4)))
                         else:
                             self.volumeinedit.setText(str(aw.float2float(res)))
-                except:
+                except Exception:
                     pass
                         
     def tareChanged(self,i):
@@ -19833,11 +19842,11 @@ class editGraphDlg(ArtisanDialog):
         weightout = None
         try:
             weightin = float(self.weightinedit.text())
-        except:
+        except Exception:
             pass
         try:
             weightout = float(self.weightoutedit.text())
-        except:
+        except Exception:
             pass
         if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None):
             k = 1000.
@@ -19856,7 +19865,7 @@ class editGraphDlg(ArtisanDialog):
             tare_idx = self.tareComboBox.currentIndex() - 3
             if tare_idx > -1:
                 tare = aw.qmc.container_weights[tare_idx]
-        except:
+        except Exception:
             pass
         volumedialog = volumeCalculatorDlg(self,
             weightIn=weightin,
@@ -19875,7 +19884,7 @@ class editGraphDlg(ArtisanDialog):
             tare_idx = self.tareComboBox.currentIndex() - 3
             if tare_idx > -1:
                 tare = aw.qmc.container_weights[tare_idx]
-        except:
+        except Exception:
             pass
         previous_out = aw.qmc.weight[1]
         aw.retrieveWeightOut(tare)
@@ -19897,7 +19906,7 @@ class editGraphDlg(ArtisanDialog):
             tare_idx = self.tareComboBox.currentIndex() - 3
             if tare_idx > -1:
                 tare = aw.qmc.container_weights[tare_idx]
-        except:
+        except Exception:
             pass
         previous_in = aw.qmc.weight[0]
         aw.retrieveWeightIn(tare)
@@ -20247,7 +20256,7 @@ class editGraphDlg(ArtisanDialog):
         try:
             if self.weightoutedit.text() != "" and float(str(self.weightoutedit.text())) != 0.0:
                 percent = aw.weight_loss(float(str(self.weightinedit.text())),float(str(self.weightoutedit.text())))
-        except:
+        except Exception:
             pass
         percentstring =  "%.1f" %(percent) + "%"
         self.weightpercentlabel.setText(u(percentstring))    #weight percent loss
@@ -20262,7 +20271,7 @@ class editGraphDlg(ArtisanDialog):
         try:
             if self.volumeoutedit.text() != "" and float(str(self.volumeoutedit.text())) != 0.0:
                 percent = aw.weight_loss(float(str(self.volumeoutedit.text())),float(str(self.volumeinedit.text())))
-        except:
+        except Exception:
             pass
         percentstring =  "%.1f" %(percent) + "%"
         self.volumepercentlabel.setText(u(percentstring))    #volume percent gain
@@ -20309,7 +20318,7 @@ class editGraphDlg(ArtisanDialog):
         try:
             if self.weightpercentlabel.text() and self.weightpercentlabel.text() != "":
                 wloss = float(self.weightpercentlabel.text().split("%")[0])
-        except:
+        except Exception:
             pass
         try:
             if self.moisture_greens_edit.text() and self.moisture_greens_edit.text() != "" and self.moisture_roasted_edit.text() and self.moisture_roasted_edit.text() != "":
@@ -20317,7 +20326,7 @@ class editGraphDlg(ArtisanDialog):
                 m_out = float(self.moisture_roasted_edit.text())
                 if m_in > 0 and m_out > 0:
                     mloss = m_in - m_out
-        except:
+        except Exception:
             pass
         if mloss != 0. and wloss != 0.:
             return mloss, wloss - mloss
@@ -20448,38 +20457,38 @@ class editGraphDlg(ArtisanDialog):
         #update weight
         try:
             aw.qmc.weight[0] = float(str(self.weightinedit.text()))
-        except:
+        except Exception:
             aw.qmc.weight[0] = 0
         try:
             aw.qmc.weight[1] = float(str(self.weightoutedit.text()))
-        except:
+        except Exception:
             aw.qmc.weight[1] = 0
         aw.qmc.weight[2] =u(self.unitsComboBox.currentText())
         #update volume
         try:
             aw.qmc.volume[0] = float(str(self.volumeinedit.text()))
-        except:
+        except Exception:
             aw.qmc.volume[0] = 0
         try:
             aw.qmc.volume[1] = float(str(self.volumeoutedit.text()))
-        except:
+        except Exception:
             aw.qmc.volume[1] = 0
         aw.qmc.volume[2] = u(self.volumeUnitsComboBox.currentText())
         #update density
         try:
             aw.qmc.density[0] = float(str(self.bean_density_weight_edit.text()))
-        except:
+        except Exception:
             aw.qmc.density[0] = 0
         aw.qmc.density[1] = u(self.bean_density_weightUnitsComboBox.currentText())
         try:
             aw.qmc.density[2] = float(str(self.bean_density_volume_edit.text()))
-        except:
+        except Exception:
             aw.qmc.density[2] = 0
         aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
         #update bean size
         try:
             aw.qmc.beansize = float(str(self.bean_size_edit.text()))
-        except:
+        except Exception:
             aw.qmc.beansize = 0.0
         #update roastflags
         aw.qmc.heavyFC_flag = self.heavyFC.isChecked()
@@ -20499,24 +20508,24 @@ class editGraphDlg(ArtisanDialog):
         #update greens moisture
         try:
             aw.qmc.moisture_greens = float(str(self.moisture_greens_edit.text()))
-        except:
+        except Exception:
             aw.qmc.moisture_greens = 0.
         #update roasted moisture
         try:
             aw.qmc.moisture_roasted = float(str(self.moisture_roasted_edit.text()))
-        except:
+        except Exception:
             aw.qmc.moisture_roasted = 0.
         #update ambient temperature
         try:
             aw.qmc.ambientTemp = float(str(self.ambientedit.text()))
             if math.isnan(aw.qmc.ambientTemp):
                 aw.qmc.ambientTemp = 0.0
-        except:
+        except Exception:
             aw.qmc.ambientTemp = 0.0
         #update ambient humidity
         try:
             aw.qmc.ambient_humidity = float(str(self.ambient_humidity_edit.text()))
-        except:
+        except Exception:
             aw.qmc.ambient_humidity = 0
         #update notes
         aw.qmc.roastertype = u(self.roaster.text())
@@ -21101,7 +21110,7 @@ class WindowsDlg(ArtisanDialog):
         self.timeconversion = [60,120,180,240,300]
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(aw.qmc.xgrid))
-        except:
+        except Exception:
             self.xaxislencombobox.setCurrentIndex(0)
         self.xaxislencombobox.currentIndexChanged.connect(self.xaxislenloc)
         ygridlabel = QLabel(QApplication.translate("Label", "Step",None))
@@ -22184,7 +22193,7 @@ class EventsDlg(ArtisanDialog):
         self.SAMPLINGbuttonActionInterval.addItems(buttonActionIntervals)
         try:
             self.SAMPLINGbuttonActionInterval.setCurrentIndex(self.sampling_delays.index(aw.qmc.extra_event_sampling_delay))
-        except:
+        except Exception:
             pass
         self.RESETbuttonLabel = QLabel(QApplication.translate("Label", "RESET", None))
         self.RESETbuttonActionType = QComboBox()
@@ -23184,7 +23193,7 @@ class EventsDlg(ArtisanDialog):
             aw.qmc.extrabuttonactionstrings[2] = u(self.SAMPLINGbuttonActionString.text())
             try:
                 aw.qmc.extra_event_sampling_delay = self.sampling_delays[self.SAMPLINGbuttonActionInterval.currentIndex()]
-            except:
+            except Exception:
                 pass
             aw.qmc.xextrabuttonactionstrings[0] = u(self.RESETbuttonActionString.text())
             aw.qmc.xextrabuttonactionstrings[1] = u(self.STARTbuttonActionString.text())
@@ -24060,10 +24069,10 @@ class backgroundDlg(ArtisanDialog):
     def getColorIdx(self,c):
         try:
             return self.defaultcolorsmapped.index(c)
-        except:
+        except Exception:
             try:
                 return self.colors.index(c) + 5
-            except: 
+            except Exception: 
                 return 0       
 
     def setreproduce(self):
@@ -24707,7 +24716,7 @@ class modbusport(object):
             try:
                 self.master.close()
                 self.master = None
-            except:
+            except Exception:
                 pass
 
     def connect(self):
@@ -25083,7 +25092,7 @@ class colorport(extraserialport):
                     v = self.SP.readline()
                     n = int(v.decode('ascii').split(":")[1]) # response should have format "SCAN:128"
                     return n
-        except:
+        except Exception:
             return -1
 
 
@@ -25732,7 +25741,7 @@ class serialport(object):
         try:
             if self.SP and self.SP.isOpen():
                 self.SP.close()
-        except:
+        except Exception:
             pass
 
     def closeEvent(self,_):
@@ -26050,11 +26059,11 @@ class serialport(object):
         if dialogx.exec_():
             try:
                 ET = (int(str(dialogx.etEdit.text())) * 10)/10.
-            except:
+            except Exception:
                 ET = 0
             try:
                 BT = (int(str(dialogx.btEdit.text())) * 10)/10.
-            except:
+            except Exception:
                 BT = 0
             return ET, BT
         else:
@@ -26451,7 +26460,7 @@ class serialport(object):
                         d.closePhidget()
                     res = ser
                     break                    
-                except:
+                except Exception:
                     pass
             else:
                 res = 0
@@ -26502,7 +26511,7 @@ class serialport(object):
                         #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
                         try:
                             self.PhidgetIRSensor.closePhidget()
-                        except:
+                        except Exception:
                             pass
                         self.PhidgetIRSensor = None
             if self.PhidgetIRSensorSensorAttached:
@@ -26518,11 +26527,11 @@ class serialport(object):
                         if aw.qmc.mode == "F":
                             probe = aw.qmc.fromCtoF(probe)
                         res = probe
-                    except:
+                    except Exception:
                         pass
                     try:
                         ambient = self.PhidgetIRSensor.getAmbientTemperature()
-                    except:
+                    except Exception:
                         pass
                     return self.phidget1045temp(res,ambient),ambient
             else:
@@ -26532,7 +26541,7 @@ class serialport(object):
 #            traceback.print_exc(file=sys.stdout)
             try:
                 self.PhidgetIRSensor.closePhidget()
-            except:
+            except Exception:
                 pass
             self.PhidgetIRSensor = None
             _, _, exc_tb = sys.exc_info()
@@ -26597,7 +26606,7 @@ class serialport(object):
                     aw.ser.PhidgetBridgeSensorAttached = False
                     try:
                         aw.ser.PhidgetTemperatureSensor.closePhidget()
-                    except:
+                    except Exception:
                         pass
                     aw.ser.PhidgetTemperatureSensor = None
             if aw.ser.PhidgetTemperatureSensorAttached:
@@ -26608,14 +26617,14 @@ class serialport(object):
                             probe1 = self.phidget1048getSensorReading(0)
                             if aw.qmc.mode == "F":
                                 probe1 = aw.qmc.fromCtoF(probe1)
-                    except:
+                    except Exception:
                         pass
                     try:
                         if aw.ser.PhidgetTemperatureInputCount > 1:
                             probe2 = self.phidget1048getSensorReading(1)
                             if aw.qmc.mode == "F":
                                 probe2 = aw.qmc.fromCtoF(probe2)
-                    except:
+                    except Exception:
                         pass
                     return probe1, probe2
                 elif mode == 1:
@@ -26625,14 +26634,14 @@ class serialport(object):
                             probe3 = self.phidget1048getSensorReading(2)
                             if aw.qmc.mode == "F":
                                 probe3 = aw.qmc.fromCtoF(probe3)
-                    except:
+                    except Exception:
                         pass
                     try:
                         if aw.ser.PhidgetTemperatureInputCount > 2:
                             probe4 = self.phidget1048getSensorReading(3)
                             if aw.qmc.mode == "F":
                                 probe4 = aw.qmc.fromCtoF(probe4)
-                    except:
+                    except Exception:
                         pass
                     return probe3, probe4
                 elif mode == 2:
@@ -26641,7 +26650,7 @@ class serialport(object):
                         if aw.qmc.mode == "F":
                             at = aw.qmc.fromCtoF(at)
                         return at,-1
-                    except:
+                    except Exception:
                         return -1,-1
                 else:
                     return -1,-1
@@ -26652,7 +26661,7 @@ class serialport(object):
 #            traceback.print_exc(file=sys.stdout)
             try:
                 aw.ser.PhidgetTemperatureSensor.closePhidget()
-            except:
+            except Exception:
                 pass
             aw.ser.PhidgetTemperatureSensor = None
             aw.ser.PhidgetBridgeSensorAttached = False
@@ -26685,7 +26694,7 @@ class serialport(object):
         Z4 = -1.155e-06
         try:
             return (Z1 + math.sqrt(abs(Z2 + (Z3 * R_RTD))))/Z4
-        except:
+        except Exception:
             return -1
 
     # convert the BridgeValue given by the PhidgetBridge to a temperature value assuming a PT100 probe
@@ -26729,7 +26738,7 @@ class serialport(object):
             v = self.bridgeValue2Temperature(i,bv)
             if aw.qmc.mode == "F" and aw.qmc.phidget1046_formula[i] != 2:
                 v = aw.qmc.fromCtoF(v)
-        except:
+        except Exception:
             v = -1
         return v
                         
@@ -26749,23 +26758,23 @@ class serialport(object):
         for i in range(4):
             try:
                 aw.ser.PhidgetBridgeSensor.setGain(i, aw.qmc.phidget1046_gain[i])
-            except:
+            except Exception:
                 pass
         # set rate
         try:
             aw.ser.PhidgetBridgeSensor.setDataRate(aw.qmc.phidget1046_dataRate)
-        except:
+        except Exception:
             pass
         try:
             aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
             aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
-        except:
+        except Exception:
             pass
         try:
             if 38 in aw.qmc.extradevices:
                 aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
                 aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
-        except:
+        except Exception:
             pass
         if aw.qmc.phidget1046_async[0] or aw.qmc.phidget1046_async[1] or (38 in aw.qmc.extradevices and (aw.qmc.phidget1046_async[2] or aw.qmc.phidget1046_async[3])):
             aw.ser.PhidgetBridgeSensor.setOnBridgeDataHandler(lambda e=None:self.phidget1046TemperatureChanged(e))
@@ -26799,7 +26808,7 @@ class serialport(object):
                     aw.ser.PhidgetBridgeSensorAttached = False
                     try:
                         aw.ser.PhidgetBridgeSensor.closePhidget()
-                    except:
+                    except Exception:
                         pass
                     aw.ser.PhidgetBridgeSensor = None
             if aw.ser.PhidgetBridgeSensorAttached:
@@ -26807,22 +26816,22 @@ class serialport(object):
                     probe1 = probe2 = -1
                     try:
                         probe1 = self.phidget1046getSensorReading(0)
-                    except:
+                    except Exception:
                         pass
                     try:
                         probe2 = self.phidget1046getSensorReading(1)
-                    except:
+                    except Exception:
                         pass
                     return probe1, probe2
                 elif mode == 1:
                     probe3 = probe4 = -1
                     try:
                         probe3 = self.phidget1046getSensorReading(2)
-                    except:
+                    except Exception:
                         pass
                     try:
                         probe4 = self.phidget1046getSensorReading(3)
-                    except:
+                    except Exception:
                         pass
                     return probe3, probe4
                 else:
@@ -26834,7 +26843,7 @@ class serialport(object):
 #            traceback.print_exc(file=sys.stdout)
             try:
                 aw.ser.PhidgetBridgeSensor.closePhidget()
-            except:
+            except Exception:
                 pass
             aw.ser.Phidget1046values = [-1]*4
             aw.ser.PhidgetBridgeSensor = None
@@ -26876,7 +26885,7 @@ class serialport(object):
                         changeTrigger = True
                         aw.ser.PhidgetIO.setSensorChangeTrigger(i,aw.qmc.phidget1018_changeTriggers[i]) # force fixed data rate if 0 (default 10)
                         aw.ser.PhidgetIO.setDataRate(i, aw.qmc.phidget1018_dataRates[i])
-            except:
+            except Exception:
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 pass
@@ -26912,7 +26921,7 @@ class serialport(object):
                     aw.ser.PhidgetIOAttached = False
                     try:
                         aw.ser.PhidgetIO.closePhidget()
-                    except:
+                    except Exception:
                         pass
                     aw.ser.PhidgetIO = None
             if aw.ser.PhidgetIOAttached:
@@ -26922,12 +26931,12 @@ class serialport(object):
                     try:
                         if sensorCount > 0:
                             probe1 = self.phidget1018getSensorReading(0)
-                    except:
+                    except Exception:
                         pass
                     try:
                         if sensorCount > 1:
                             probe2 = self.phidget1018getSensorReading(1)
-                    except:
+                    except Exception:
                         pass
                     return probe1, probe2
                 elif mode == 1:
@@ -26935,12 +26944,12 @@ class serialport(object):
                     try:
                         if sensorCount > 3:
                             probe3 = self.phidget1018getSensorReading(2)
-                    except:
+                    except Exception:
                         pass
                     try:
                         if sensorCount > 4:
                             probe4 = self.phidget1018getSensorReading(3)
-                    except:
+                    except Exception:
                         pass
                     return probe3, probe4
                 elif mode == 2:
@@ -26948,12 +26957,12 @@ class serialport(object):
                     try:
                         if sensorCount > 5:
                             probe5 = self.phidget1018getSensorReading(4)
-                    except:
+                    except Exception:
                         pass
                     try:
                         if sensorCount > 6:
                             probe6 = self.phidget1018getSensorReading(5)
-                    except:
+                    except Exception:
                         pass
                     return probe5, probe6
                 elif mode == 3:
@@ -26961,12 +26970,12 @@ class serialport(object):
                     try:
                         if sensorCount > 7:
                             probe7 = self.phidget1018getSensorReading(6)
-                    except:
+                    except Exception:
                         pass
                     try:
                         if sensorCount > 8:
                             probe8 = self.phidget1018getSensorReading(7)
-                    except:
+                    except Exception:
                         pass
                     return probe7, probe8
                 else:
@@ -26979,7 +26988,7 @@ class serialport(object):
             aw.ser.PhidgetIOAttached = False
             try:
                 aw.ser.PhidgetIO.closePhidget()
-            except:
+            except Exception:
                 pass
             aw.ser.PhidgetIO = None
             _, _, exc_tb = sys.exc_info()
@@ -27034,7 +27043,7 @@ class serialport(object):
                         aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None))                       
                     elif mode == 1 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None))                       
-                except:
+                except Exception:
                     pass
             probe1 = -1
             probe2 = -1
@@ -27042,18 +27051,18 @@ class serialport(object):
                 try:
                     if self.YOCTOchan1 and self.YOCTOchan1.isOnline():
                         probe1 = self.YOCTOchan1.get_currentValue()
-                except:
+                except Exception:
                     pass
                 try:
                     if self.YOCTOchan2 and self.YOCTOchan2.isOnline():
                         probe2 = self.YOCTOchan2.get_currentValue()
-                except:
+                except Exception:
                     pass
             elif mode == 1:
                 try:
                     if self.YOCTOsensor and self.YOCTOsensor.isOnline():
                         probe1 = self.YOCTOsensor.get_currentValue()
-                except:
+                except Exception:
                     pass
             return probe1, probe2
         except Exception as ex:
@@ -27064,7 +27073,7 @@ class serialport(object):
                 self.YOCTOsensor = None
                 self.YOCTOchan1 = None
                 self.YOCTOchan2 = None
-            except:
+            except Exception:
                 pass
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " YOCTOtemperatures() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -27165,26 +27174,26 @@ class serialport(object):
                     try:
                         aw.qmc.extraArduinoT1 = float(res[3])
                         aw.qmc.extraArduinoT2 = float(res[4])
-                    except:
+                    except Exception:
                         aw.qmc.extraArduinoT1 = 0
                         aw.qmc.extraArduinoT2 = 0
                     if 32 in aw.qmc.extradevices: # +ArduinoTC4_56
                         try:
                             aw.qmc.extraArduinoT3 = float(res[5])
                             aw.qmc.extraArduinoT4 = float(res[6])
-                        except:
+                        except Exception:
                             aw.qmc.extraArduinoT3 = 0
                             aw.qmc.extraArduinoT4 = 0
                     if 44 in aw.qmc.extradevices: # +ArduinoTC4_78
                         # report SV as extraArduinoT5
                         try:
                             aw.qmc.extraArduinoT5 = float(res[7])
-                        except:
+                        except Exception:
                             aw.qmc.extraArduinoT5 = 0
                         # report Ambient Temperature as extraArduinoT6
                         try:
                             aw.qmc.extraArduinoT6 = float(res[0])
-                        except:
+                        except Exception:
                             aw.qmc.extraArduinoT6 = 0                    
                 else:
                     aw.qmc.extraArduinoT1 = -1.
@@ -27193,7 +27202,7 @@ class serialport(object):
                         try:
                             aw.qmc.extraArduinoT3 = float(res[3])
                             aw.qmc.extraArduinoT4 = float(res[4])
-                        except:
+                        except Exception:
                             aw.qmc.extraArduinoT3 = 0
                             aw.qmc.extraArduinoT4 = 0
                     else:
@@ -27203,12 +27212,12 @@ class serialport(object):
                         # report SV as extraArduinoT5
                         try:
                             aw.qmc.extraArduinoT5 = float(res[5])
-                        except:
+                        except Exception:
                             aw.qmc.extraArduinoT5 = 0
                         # report Ambient Temperature as extraArduinoT6
                         try:
                             aw.qmc.extraArduinoT6 = float(res[0])
-                        except:
+                        except Exception:
                             aw.qmc.extraArduinoT6 = 0                        
                 # overwrite temps by AT internal Ambient Temperature
                 if aw.ser.arduinoATChannel != "None":
@@ -28238,7 +28247,7 @@ class PortComboBox(QComboBox):
             try:
                 self.selection = u(self.ports[i][0])
                 self.edited = None # reset the user text editing
-            except:
+            except Exception:
                 pass
 
     def eventFilter(self, obj, event):
@@ -28264,9 +28273,9 @@ class PortComboBox(QComboBox):
             try:
                 pos = [p[0] for p in self.ports].index(self.selection)
                 self.setCurrentIndex(pos)
-            except:
+            except Exception:
                 pass
-        except:
+        except Exception:
             pass
         self.blockSignals(False)
 
@@ -28507,7 +28516,7 @@ class comportDlg(ArtisanDialog):
         self.scale_deviceEdit.addItems(supported_scales)
         try:
             self.scale_deviceEdit.setCurrentIndex(supported_scales.index(aw.scale.device))
-        except:
+        except Exception:
             self.scale_deviceEdit.setCurrentIndex(0)
         self.scale_deviceEdit.setEditable(False)
         scale_devicelabel.setBuddy(self.scale_deviceEdit)
@@ -28550,7 +28559,7 @@ class comportDlg(ArtisanDialog):
         self.color_deviceEdit.addItems(supported_color_meters)
         try:
             self.color_deviceEdit.setCurrentIndex(supported_color_meters.index(aw.color.device))
-        except:
+        except Exception:
             self.color_deviceEdit.setCurrentIndex(0)
         self.color_deviceEdit.setEditable(False)
         color_devicelabel.setBuddy(self.color_deviceEdit)
@@ -29138,7 +29147,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 model.appendRow(item)
             try:
                 changeTriggersCombo.setCurrentIndex(aw.qmc.phidget1048_changeTriggersValues.index(aw.qmc.phidget1048_changeTriggers[i-1]))
-            except:
+            except Exception:
                 pass
             changeTriggersCombo.setMaximumSize(65,100)
             self.changeTriggerCombos1048.append(changeTriggersCombo)
@@ -29158,7 +29167,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 model.appendRow(item)
             try:
                 probeTypeCombo.setCurrentIndex(aw.qmc.phidget1048_types[i-1]-1)
-            except:
+            except Exception:
                 pass
             probeTypeCombo.setMaximumSize(65,100)
             self.probeTypeCombos.append(probeTypeCombo)
@@ -29192,7 +29201,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             model.appendRow(item)
         try:
             self.changeTriggerCombos1045.setCurrentIndex(aw.qmc.phidget1045_changeTriggersValues.index(aw.qmc.phidget1045_changeTrigger))
-        except:
+        except Exception:
             pass
         self.changeTriggerCombos1045.setMaximumSize(65,100)
         phidgetBox1045.addWidget(self.changeTriggerCombos1045,3,1)
@@ -29237,7 +29246,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 model.appendRow(item)
             try:
                 gainCombo.setCurrentIndex(aw.qmc.phidget1046_gain[i-1] - 1)
-            except:
+            except Exception:
                 pass
             gainCombo.setMaximumSize(60,100)
             self.gainCombos1046.append(gainCombo)
@@ -29251,7 +29260,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 model.appendRow(item)
             try:
                 formulaCombo.setCurrentIndex(aw.qmc.phidget1046_formula[i-1])
-            except:
+            except Exception:
                 pass
             formulaCombo.setMaximumSize(60,100)
             self.formulaCombos1046.append(formulaCombo)
@@ -29274,7 +29283,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             model.appendRow(item)
         try:
             self.dataRateCombo1046.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1046_dataRate))
-        except:
+        except Exception:
             pass
         self.dataRateCombo1046.setMaximumSize(70,100)
         phidgetBox1046.addWidget(self.dataRateCombo1046,4,1)
@@ -29323,7 +29332,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 model.appendRow(item)
             try:
                 dataRatesCombo.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1018_dataRates[i-1]))
-            except:
+            except Exception:
                 pass
             dataRatesCombo.setMaximumSize(55,100)
             self.dataRateCombos.append(dataRatesCombo)
@@ -29337,7 +29346,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             changeTriggersCombo.currentIndexChanged.connect(lambda x,y=i-1 :self.changeTriggerIndexChanged(y,x))
             try:
                 changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1018_changeTriggersValues.index(aw.qmc.phidget1018_changeTriggers[i-1])))
-            except:
+            except Exception:
                 pass
             changeTriggersCombo.setMaximumSize(55,100)
             self.changeTriggerCombos.append(changeTriggersCombo)
@@ -29648,7 +29657,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                         if dev_name[0] == "+":
                             dev_name = dev_name[1:]
                         typeComboBox.setCurrentIndex(devices.index(dev_name))
-                    except:
+                    except Exception:
                         pass
                     color1Button = QPushButton(QApplication.translate("Button","Select",None))
                     color1Button.setFocusPolicy(Qt.NoFocus)
@@ -29848,10 +29857,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 mexpr2edit = self.devicetable.cellWidget(i,6)
                 try:
                     aw.qmc.extradevices[i] = aw.qmc.devices.index(str(typecombobox.currentText())) + 1
-                except:
+                except Exception:
                     try: # might be a +device
                         aw.qmc.extradevices[i] = aw.qmc.devices.index("+" + str(typecombobox.currentText())) + 1
-                    except:
+                    except Exception:
                         aw.qmc.extradevices[i] = 0
                 if name1edit:
                     aw.qmc.extraname1[i] = u(name1edit.text())
@@ -30460,14 +30469,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.PhidgetBridgeSensorAttached = False
                 try:
                     aw.ser.PhidgetBridgeSensor.closePhidget()
-                except:
+                except Exception:
                     pass
                 aw.ser.PhidgetBridgeSensor = None
             if aw.ser.PhidgetTemperatureSensor:
                 aw.ser.PhidgetTemperatureSensorAttached = False
                 try:
                     aw.ser.PhidgetTemperatureSensor.closePhidget()
-                except:
+                except Exception:
                     pass
                 aw.ser.PhidgetTemperatureSensor = None                
             aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
@@ -30477,7 +30486,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.PhidgetIRSensorSensorAttached = False
                 try:
                     aw.ser.PhidgetIRSensor.closePhidget()
-                except:
+                except Exception:
                     pass
                 aw.ser.PhidgetIRSensor = None
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
@@ -30502,13 +30511,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                                 if not aw.qmc.phidget1018_raws[i] and aw.qmc.phidget1018_async[i]:
                                     aw.ser.PhidgetIO.setSensorChangeTrigger(i,aw.qmc.phidget1018_changeTriggers[i]) # force fixed data rate if 0 (default 10)
                                     aw.ser.PhidgetIO.setDataRate(i, aw.qmc.phidget1018_dataRates[i])
-                    except:
+                    except Exception:
                         pass
                     if asyncMode:
                         aw.ser.PhidgetIO.setOnSensorChangeHandler(lambda e=None:aw.ser.phidget1018SensorChanged(e))
                     else:
                         aw.ser.PhidgetIO.setOnSensorChangeHandler(None)
-            except:
+            except Exception:
                 pass
             # LCD visibility
             aw.LCD2frame.setVisible(aw.qmc.ETlcd)
@@ -30517,7 +30526,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 try:
                     aw.largeLCDs_dialog.lcd2.setVisible(aw.qmc.ETlcd)
                     aw.largeLCDs_dialog.lcd3.setVisible(aw.qmc.BTlcd)
-                except:
+                except Exception:
                     pass
             aw.qmc.redraw(recomputeAllDeltas=False)
             aw.sendmessage(message)
@@ -32131,7 +32140,7 @@ class AlarmDlg(ArtisanDialog):
                 guard = self.alarmtable.cellWidget(i,2)
                 try:
                     guard_value = int(str(guard.text())) - 1
-                except:
+                except Exception:
                     guard_value = -1
                 if guard_value > -1 and guard_value < nalarms:
                     aw.qmc.alarmguard[i] = guard_value
@@ -32140,7 +32149,7 @@ class AlarmDlg(ArtisanDialog):
                 negguard = self.alarmtable.cellWidget(i,3)
                 try:
                     negguard_value = int(str(negguard.text())) - 1
-                except:
+                except Exception:
                     negguard_value = -1
                 if negguard_value > -1 and negguard_value < nalarms:
                     aw.qmc.alarmnegguard[i] = negguard_value
@@ -32158,7 +32167,7 @@ class AlarmDlg(ArtisanDialog):
                 temp = self.alarmtable.cellWidget(i,8)
                 try:
                     aw.qmc.alarmtemperature[i] = int(str(temp.text()))
-                except:
+                except Exception:
                     aw.qmc.alarmtemperature[i] = 0
                 action = self.alarmtable.cellWidget(i,9)
                 aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
@@ -36458,7 +36467,7 @@ class ArduinoTC4(object):
             self.pidKd = self.pidKd * (9/5.)
             for i in range(self.svValues):
                 self.svValues[i] = aw.qmc.fromFtoC(self.svValues[i])
-        except:
+        except Exception:
             pass
     
     def conv2fahrenheit(self):
@@ -36471,7 +36480,7 @@ class ArduinoTC4(object):
             self.pidKd = self.pidKd / (9/5.)
             for i in range(self.svValues):
                 self.svValues[i] = aw.qmc.fromCtoF(self.svValues[i])
-        except:
+        except Exception:
             pass
     
     # takes an "Arduino" float time in seconds and returns the corresponding QTime() object
@@ -36739,7 +36748,7 @@ try:
         # fix Mac OS X 10.9 (Mavericks) font issue
         # https://bugreports.qt-project.org/browse/QTBUG-32789
         QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")            
-except:
+except Exception:
     pass
 
 aw = ApplicationWindow()
@@ -36751,7 +36760,7 @@ else:
 
 try:
     aw.defaultAppearance = str(aw.style().objectName()).lower()
-except:
+except Exception:
     pass
 aw.settingsLoad()
 aw.setFonts()
@@ -36779,7 +36788,7 @@ except Exception:
 if platf == 'Windows' and aw.appFrozen():
     try:
         sys.stderr = sys.stdout
-    except:
+    except Exception:
         pass
 
 aw.show()
