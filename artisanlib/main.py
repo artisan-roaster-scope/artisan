@@ -253,17 +253,29 @@ else:
         
 if sip.getapi('QVariant') == 1:
     def toInt(x):
-        return x.toInt()[0]
+        if x == None:
+            return 0
+        else:
+            return x.toInt()[0]
     def toString(x):
         return x.toString()
     def toList(x):
         return x.toList()
     def toFloat(x):
-        return x.toFloat()
+        if x == None:
+            return 0.
+        else:
+            return x.toFloat()
     def toDouble(x):
-        return x.toDouble()
+        if x == None:
+            return 0.
+        else:
+            return x.toDouble()
     def toBool(x):
-        return x.toBool()
+        if x == None:
+            return False
+        else:
+            return x.toBool()
     def toStringList(x):
         return x.toStringList()
     def toMap(x):
@@ -274,7 +286,10 @@ if sip.getapi('QVariant') == 1:
         return x.toByteArray()
 else:
     def toInt(x):
-        return int(x)
+        if x == None:
+            return 0
+        else:
+            return int(x)
     def toString(x):
         return u(x)
     def toList(x):
@@ -283,26 +298,35 @@ else:
         else:
             return list(x)
     def toFloat(x):
-        return float(x)
-    def toDouble(x):
-        return float(x)
-    def toBool(x):
-        if sys.version < '3':
-            if isinstance(x,unicode):
-                if str(x) in ["false","False"]:
-                    return False
-                else:
-                    return True
-            else:
-                return bool(x)
+        if x == None:
+            return 0.
         else:
-            if isinstance(x,str):
-                if x in ["false","False"]:
-                    return False
+            return float(x)
+    def toDouble(x):
+        if x == None:
+            return 0.
+        else:
+            return float(x)
+    def toBool(x):
+        if x == None:
+            return False
+        else:
+            if sys.version < '3':
+                if isinstance(x,unicode):
+                    if str(x) in ["false","False"]:
+                        return False
+                    else:
+                        return True
                 else:
-                    return True
+                    return bool(x)
             else:
-                return bool(x)
+                if isinstance(x,str):
+                    if x in ["false","False"]:
+                        return False
+                    else:
+                        return True
+                else:
+                    return bool(x)
     def toStringList(x):
         if x:
             return [u(s) for s in x]
@@ -403,7 +427,7 @@ del __dependencies_for_freezing
 #Localization support
 global locale
 
-if not toInt(QSettings().value('resetqsettings')):
+if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
     locale = toString(QSettings().value('locale'))
     if locale == "en_US":
         locale = "en"
@@ -2538,8 +2562,9 @@ class tgraphcanvas(FigureCanvas):
                                     
                 try:                            
                     res = eval(mathexpression,{"__builtins__":None},mathdictionary)
-
                 except ValueError:
+                    res = -1
+                except ZeroDivisionError:
                     res = -1
                 if res == None:
                     return -1
@@ -4852,6 +4877,10 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:                
+            # redraw (within timealign) should not be called if semaphore is hold!
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            if aw.qmc.alignEvent in [1,7]:
+                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_19.setDisabled(True) # deactivate DRY button
             aw.button_19.setFlat(True)
@@ -4958,6 +4987,10 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
+            # redraw (within timealign) should not be called if semaphore is hold!
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            if aw.qmc.alignEvent in [3,7]:
+                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_4.setDisabled(True) # deactivate FCe button
             aw.button_4.setFlat(True)
@@ -5010,6 +5043,10 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
+            # redraw (within timealign) should not be called if semaphore is hold!
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            if aw.qmc.alignEvent in [4,7]:
+                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_5.setDisabled(True) # deactivate SCs button
             aw.button_5.setFlat(True)
@@ -5061,6 +5098,10 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)  
         if self.flagstart:                      
+            # redraw (within timealign) should not be called if semaphore is hold!
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            if aw.qmc.alignEvent in [5,7]:
+                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             aw.button_6.setDisabled(True) # deactivate SCe button
             aw.button_6.setFlat(True)
@@ -5134,6 +5175,10 @@ class tgraphcanvas(FigureCanvas):
             if takeLock and aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
         if self.flagstart:
+            # redraw (within timealign) should not be called if semaphore is hold!
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            if aw.qmc.alignEvent in [6,7]:
+                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             try:
                 aw.button_9.setDisabled(True) # deactivate DROP button
@@ -5909,27 +5954,36 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.timeindex[0] > -1: # only if CHARGE is set
                 from scipy.optimize import curve_fit
-                a = [self.timex[self.timeindex[0]]]
+                charge = self.timex[self.timeindex[0]]
+                a = [0]
                 if aw.qmc.mode == "F":
                     roomTemp = 70.0
                 else:
                     roomTemp = 21.0
                 n = [roomTemp]
                 if self.timeindex[1]: # take DRY if available
-                    a = a + [self.timex[self.timeindex[1]]]
+                    x = self.timex[self.timeindex[1]] - charge
+                    a = a + [x]
                     n = n + [self.temp2[self.timeindex[1]]]
                 else: # take DRY as specificed in phases
                     i = aw.findDryEnd(phasesindex=1)
-                    a = a + [self.timex[i]]
+                    x = self.timex[i] - charge
+                    a = a + [x]
                     n = n + [self.temp2[i]]
                 if self.timeindex[2]: # take FCs if available
-                    a = a + [self.timex[self.timeindex[2]]]
+                    x = self.timex[self.timeindex[2]] - charge
+                    a = a + [x]
                     n = n + [self.temp2[self.timeindex[2]]]
                 else: # take FCs as defined in phases
                     i = aw.findDryEnd(phasesindex=2)
-                    a = a + [self.timex[i]]
+                    x = self.timex[i] - charge
+                    a = a + [x]
                     n = n + [self.temp2[i]]
-                
+                if xx and self.timeindex[6]:
+                    x = self.timex[self.timeindex[6]] - charge
+                    a = a + [x]
+                    n = n + [self.temp2[self.timeindex[6]]]
+                    
                 xa = numpy.array(a)
                 yn = numpy.array(n)
                 if xx:
@@ -5941,15 +5995,17 @@ class tgraphcanvas(FigureCanvas):
                     popt, pcov = curve_fit(func, xa, yn)
                 perr = numpy.sqrt(numpy.diag(pcov))
                 xb = numpy.array(self.timex)
-                self.ax.plot(xb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
-                self.ax.plot(xa, yn, "ro")
+                xxb = xb + charge
+                xxa = xa + charge
+                self.ax.plot(xxb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
+                self.ax.plot(xxa, yn, "ro")
                 self.fig.canvas.draw()
                 if len(popt)>2:
                     if xx:
-                        res = "Y = %.4f * t*t %s %.4f * t %s %.4f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                        res = "%.4f * t*t %s %.4f * t %s %.4f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
                     else:
-                        res = "Y = %.4f * log(%.4f * t %s %.4f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
-        except Exception:
+                        res = "%.4f * log(%.4f * t %s %.4f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
+        except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
@@ -12781,7 +12837,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.celsiusMode()
             #restore device
             settings.beginGroup("Device")
-            self.qmc.device = toInt(settings.value("id",self.qmc.device))
+            if settings.contains("id"):
+                self.qmc.device = toInt(settings.value("id",self.qmc.device))
             # Phidget configurations
             if settings.contains("phidget1048_types"):
                 self.qmc.phidget1048_types = [toInt(x) for x in toList(settings.value("phidget1048_types",self.qmc.phidget1048_types))]
@@ -12790,8 +12847,11 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidget1048_changeTriggers = [aw.float2float(toFloat(x)) for x in toList(settings.value("phidget1048_changeTriggers",self.qmc.phidget1048_changeTriggers))]
             if settings.contains("phidget1046_gain"):
                 self.qmc.phidget1046_gain = [toInt(x) for x in toList(settings.value("phidget1046_gain",self.qmc.phidget1046_gain))]
+            if settings.contains("phidget1046_formula"):
                 self.qmc.phidget1046_formula = [toInt(x) for x in toList(settings.value("phidget1046_formula",self.qmc.phidget1046_formula))]
+            if settings.contains("phidget1046_async"):
                 self.qmc.phidget1046_async = [bool(toBool(x)) for x in toList(settings.value("phidget1046_async",self.qmc.phidget1046_async))]
+            if settings.contains("phidget1046_dataRate"):
                 self.qmc.phidget1046_dataRate = toInt(settings.value("phidget1046_dataRate",self.qmc.phidget1046_dataRate))
             if settings.contains("phidget1045_async"):
                 self.qmc.phidget1045_async = bool(toBool(settings.value("phidget1045_async",self.qmc.phidget1045_async)))
@@ -12844,8 +12904,10 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Phases"):
                 self.qmc.phases = [toInt(x) for x in toList(settings.value("Phases"))]
             if settings.contains("PhasesFilter"):
-                self.qmc.phases_mode = toInt(settings.value("PhasesMode",int(self.qmc.phases_mode)))
                 self.qmc.phases_filter = [toInt(x) for x in toList(settings.value("PhasesFilter"))]
+            if settings.contains("PhasesMode"):
+                self.qmc.phases_mode = toInt(settings.value("PhasesMode",int(self.qmc.phases_mode)))
+            if settings.contains("PhasesEspresso"):
                 self.qmc.phases_espresso = [toInt(x) for x in toList(settings.value("PhasesEspresso"))]
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = bool(toBool(settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag)))
@@ -12859,9 +12921,12 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.autoFCsFlag = bool(toBool(settings.value("autoFCs",self.qmc.autoFCsFlag)))
             #restore Events settings
             settings.beginGroup("events")
-            self.eventsbuttonflag = toInt(settings.value("eventsbuttonflag",int(self.eventsbuttonflag)))
-            self.minieventsflag = toInt(settings.value("minieventsflag",int(self.minieventsflag)))
-            self.qmc.eventsGraphflag = toInt(settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)))
+            if settings.contains("eventsbuttonflag"):
+                self.eventsbuttonflag = toInt(settings.value("eventsbuttonflag",int(self.eventsbuttonflag)))
+            if settings.contains("minieventsflag"):
+                self.minieventsflag = toInt(settings.value("minieventsflag",int(self.minieventsflag)))
+            if settings.contains("eventsGraphflag"):
+                self.qmc.eventsGraphflag = toInt(settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)))
             if settings.contains("etypes"):
                 self.qmc.etypes = toStringList(settings.value("etypes",self.qmc.etypes))
                 # update minieditor event type ComboBox
@@ -12916,16 +12981,17 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("ExtraEventSamplingDelay"):
                 self.qmc.extra_event_sampling_delay = toInt(settings.value("ExtraEventSamplingDelay",int(self.qmc.extra_event_sampling_delay)))
             #restore colors
-            for (k, v) in list(toMap(settings.value("Colors")).items()):
-                self.qmc.palette[str(k)] = str(toString(v))
-            if self.qmc.palette["et"]:
-                self.setLabelColor(aw.label2,QColor(self.qmc.palette["et"]))
-            if self.qmc.palette["bt"]:    
-                self.setLabelColor(aw.label3,QColor(self.qmc.palette["bt"]))
-            if self.qmc.palette["deltaet"]:    
-                self.setLabelColor(aw.label4,QColor(self.qmc.palette["deltaet"]))
-            if self.qmc.palette["deltabt"]:    
-                self.setLabelColor(aw.label5,QColor(self.qmc.palette["deltabt"]))
+            if settings.contains("Colors"):
+                for (k, v) in list(toMap(settings.value("Colors")).items()):
+                    self.qmc.palette[str(k)] = str(toString(v))
+                if self.qmc.palette["et"]:
+                    self.setLabelColor(aw.label2,QColor(self.qmc.palette["et"]))
+                if self.qmc.palette["bt"]:    
+                    self.setLabelColor(aw.label3,QColor(self.qmc.palette["bt"]))
+                if self.qmc.palette["deltaet"]:    
+                    self.setLabelColor(aw.label4,QColor(self.qmc.palette["deltaet"]))
+                if self.qmc.palette["deltabt"]:    
+                    self.setLabelColor(aw.label5,QColor(self.qmc.palette["deltabt"]))
             if settings.contains("ETBColor"):
                 self.qmc.backgroundmetcolor = str(toString(settings.value("ETBColor",self.qmc.backgroundmetcolor)))
             if settings.contains("BTBColor"):
@@ -12984,37 +13050,62 @@ class ApplicationWindow(QMainWindow):
             #restore serial port
             settings.beginGroup("SerialPort")
             self.ser.comport = str(toString(settings.value("comport",self.ser.comport)))
-            self.ser.baudrate = toInt(settings.value("baudrate",int(self.ser.baudrate)))
-            self.ser.bytesize = toInt(settings.value("bytesize",self.ser.bytesize))
-            self.ser.stopbits = toInt(settings.value("stopbits",self.ser.stopbits))
+            if settings.contains("baudrate"):
+                self.ser.baudrate = toInt(settings.value("baudrate",int(self.ser.baudrate)))
+            if settings.contains("bytesize"):
+                self.ser.bytesize = toInt(settings.value("bytesize",self.ser.bytesize))
+            if settings.contains("stopbits"):
+                self.ser.stopbits = toInt(settings.value("stopbits",self.ser.stopbits))
             self.ser.parity = str(toString(settings.value("parity",self.ser.parity)))
-            self.ser.timeout = toInt(settings.value("timeout",self.ser.timeout))
+            if settings.contains("timeout"):
+                self.ser.timeout = toInt(settings.value("timeout",self.ser.timeout))
             settings.endGroup()
             #restore modbus port
             settings.beginGroup("Modbus")
             self.modbus.comport = str(toString(settings.value("comport",self.modbus.comport)))
-            self.modbus.baudrate = toInt(settings.value("baudrate",int(self.modbus.baudrate)))
-            self.modbus.bytesize = toInt(settings.value("bytesize",self.modbus.bytesize))
-            self.modbus.stopbits = toInt(settings.value("stopbits",self.modbus.stopbits))
-            self.modbus.parity = str(toString(settings.value("parity",self.modbus.parity)))
-            self.modbus.timeout = toInt(settings.value("timeout",self.modbus.timeout))
-            self.modbus.input1slave = toInt(settings.value("input1slave",self.modbus.input1slave))
-            self.modbus.input1register = toInt(settings.value("input1register",self.modbus.input1register))
-            self.modbus.input2slave = toInt(settings.value("input2slave",self.modbus.input2slave))
-            self.modbus.input2register = toInt(settings.value("input2register",self.modbus.input2register))
-            self.modbus.input3slave = toInt(settings.value("input3slave",self.modbus.input3slave))
-            self.modbus.input3register = toInt(settings.value("input3register",self.modbus.input3register))
-            self.modbus.input4slave = toInt(settings.value("input4slave",self.modbus.input4slave))
-            self.modbus.input4register = toInt(settings.value("input4register",self.modbus.input4register))
+            if settings.contains("baudrate"):
+                self.modbus.baudrate = toInt(settings.value("baudrate",int(self.modbus.baudrate)))
+            if settings.contains("bytesize"):
+                self.modbus.bytesize = toInt(settings.value("bytesize",self.modbus.bytesize))
+            if settings.contains("stopbits"):
+                self.modbus.stopbits = toInt(settings.value("stopbits",self.modbus.stopbits))
+            if settings.contains("parity"):
+                self.modbus.parity = str(toString(settings.value("parity",self.modbus.parity)))
+            if settings.contains("timeout"):
+                self.modbus.timeout = toInt(settings.value("timeout",self.modbus.timeout))
+            if settings.contains("input1slave"):
+                self.modbus.input1slave = toInt(settings.value("input1slave",self.modbus.input1slave))
+            if settings.contains("input1register"):
+                self.modbus.input1register = toInt(settings.value("input1register",self.modbus.input1register))
+            if settings.contains("input2slave"):
+                self.modbus.input2slave = toInt(settings.value("input2slave",self.modbus.input2slave))
+            if settings.contains("input2register"):
+                self.modbus.input2register = toInt(settings.value("input2register",self.modbus.input2register))
+            if settings.contains("input3slave"):
+                self.modbus.input3slave = toInt(settings.value("input3slave",self.modbus.input3slave))
+            if settings.contains("input3register"):
+                self.modbus.input3register = toInt(settings.value("input3register",self.modbus.input3register))
+            if settings.contains("input4slave"):
+                self.modbus.input4slave = toInt(settings.value("input4slave",self.modbus.input4slave))
+            if settings.contains("input4register"):
+                self.modbus.input4register = toInt(settings.value("input4register",self.modbus.input4register))
             if settings.contains("input1float"):
                 self.modbus.input1float = bool(toBool(settings.value("input1float",self.modbus.input1float)))
+            if settings.contains("input1code"):
                 self.modbus.input1code = toInt(settings.value("input1code",self.modbus.input1code))
+            if settings.contains("input2float"):
                 self.modbus.input2float = bool(toBool(settings.value("input2float",self.modbus.input2float)))
+            if settings.contains("input2code"):
                 self.modbus.input2code = toInt(settings.value("input2code",self.modbus.input2code))
+            if settings.contains("input3float"):
                 self.modbus.input3float = bool(toBool(settings.value("input3float",self.modbus.input3float)))
+            if settings.contains("input3code"):
                 self.modbus.input3code = toInt(settings.value("input3code",self.modbus.input3code))
+            if settings.contains("input4float"):
                 self.modbus.input4float = bool(toBool(settings.value("input4float",self.modbus.input4float)))
+            if settings.contains("input4code"):
                 self.modbus.input4code = toInt(settings.value("input4code",self.modbus.input4code))
+            if settings.contains("littleEndianFloats"):
                 self.modbus.littleEndianFloats = bool(toBool(settings.value("littleEndianFloats",self.modbus.littleEndianFloats)))
             if settings.contains("input1mode"):
                 self.modbus.input1mode = str(toString(settings.value("input1mode",self.modbus.input1mode)))
@@ -14518,7 +14609,10 @@ class ApplicationWindow(QMainWindow):
         self.closeApp()
 
     def filePrint(self):
-        image = aw.qmc.grab().toImage()
+        if pyqtversion < 5:
+            image = QPixmap().grabWidget(aw.qmc).toImage()
+        else:
+            image = aw.qmc.grab().toImage()
 
         if image.isNull():
             return
@@ -14770,7 +14864,10 @@ $cupping_notes
                     pass
                 self.qmc.fig.savefig(graph_image)
             else:
-                image = aw.qmc.grab().toImage()
+                if pyqtversion < 5:
+                    image = QPixmap().grabWidget(aw.qmc).toImage()
+                else:
+                    image = aw.qmc.grab().toImage()
                 #save GRAPH image
                 graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
                 try:
@@ -14791,7 +14888,10 @@ $cupping_notes
                     pass
                 self.qmc.fig.savefig(flavor_image)
             else:
-                image = aw.qmc.grab().toImage()
+                if pyqtversion < 5:
+                    image = QPixmap().grabWidget(aw.qmc).toImage()
+                else:
+                    image = aw.qmc.grab().toImage()
                 #resize FLAVOR image to 550 pixels width
                 #save GRAPH image
                 flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".png"))
@@ -17690,14 +17790,11 @@ class HUDDlg(ArtisanDialog):
     def plotterb(self):
         try:
             aw.sendmessage("Dropping beans...")
-            for i in range(6):
+            colorb = ["#996633","#4d2600","#4b4219","black","#4b3219","#996633","#281a0d"]
+            for i in range(4):
                 x = aw.qmc.endofx*numpy.random.rand(aw.qmc.endofx)
-                y = aw.qmc.endofx*numpy.random.rand(aw.qmc.endofx)                
-                colorb = ["#996633","#4d2600","#4b4219","black","#4b3219","#996633","#281a0d"]
+                y = aw.qmc.endofx*numpy.random.rand(aw.qmc.endofx)
                 aw.qmc.ax.plot(x,y,'o',color=colorb[int(7*numpy.random.rand(1)[0])])                    
-                aw.qmc.fig.canvas.draw()
-            libtime.sleep(0.3)
-            aw.sendmessage("")
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotterb() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
@@ -17884,15 +17981,15 @@ class HUDDlg(ArtisanDialog):
                 v = abs(z[i])
                 if round(v,3) != 0.0:
                     if i == 0:
-                        s = "%.3f" % v
+                        s = "%.4f" % v
                     elif i == 1:
                         if s != "":
                             s = " " + sign + " " + s
-                        s = "%.3fx" % v + s
+                        s = "%.4ft" % v + s
                     else:
                         if s != "":
                             s = " " + sign + " " + s
-                        s = "%.3fx^%i" % (v,i) + s
+                        s = "%.4ft^%i" % (v,i) + s
                     if z[i] < 0:
                         sign = "-"
                     else:
@@ -23778,7 +23875,6 @@ class backgroundDlg(ArtisanDialog):
         self.xtcurveComboBox = QComboBox()
         self.xtcurveComboBox.setMinimumWidth(120)
         self.xtcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
-
         curvenames = [""] # first entry is the empty one, no extra curve displayed
         for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
             curvenames.append("B" + str(2*i+3) + ": " + aw.qmc.extraname1B[i])
@@ -23787,8 +23883,6 @@ class backgroundDlg(ArtisanDialog):
         if aw.qmc.xtcurveidx < len(curvenames):
             self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
         self.xtcurveComboBox.currentIndexChanged.connect(lambda i=self.xtcurveComboBox.currentIndex() :self.changeXTcurveidx(i))
-
-        
         deltaetcolorlabel = QLabel(QApplication.translate("Label", "DeltaET Color",None))
         deltaetcolorlabel.setAlignment(Qt.AlignRight)
         self.deltaetcolorComboBox = QComboBox()
@@ -24091,6 +24185,7 @@ class backgroundDlg(ArtisanDialog):
 
     def changeXTcurveidx(self,i):
         aw.qmc.xtcurveidx = i
+        self.createDataTable()
         aw.qmc.redraw(recomputeAllDeltas=False)
 
     def load(self):
@@ -24168,14 +24263,24 @@ class backgroundDlg(ArtisanDialog):
             start = 0
         if ndata:
             self.datatable.setRowCount(ndata)
-            self.datatable.setColumnCount(6)
-            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None),
+            headers = [QApplication.translate("Table","Time",None),
                                                       QApplication.translate("Table","ET",None),
                                                       QApplication.translate("Table","BT",None),
                                                       QApplication.translate("Table","DeltaBT",None),
-                                                      QApplication.translate("Table","DeltaET",None),
-                                                      ""], # dummy column that stretches
-                                                      )
+                                                      QApplication.translate("Table","DeltaET",None)]
+            xtcurve = False # no XT curve
+            if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
+                idx3 = aw.qmc.xtcurveidx - 1
+                n3 = idx3 // 2
+                if len(aw.qmc.temp1BX) > n3 and len(aw.qmc.extratimexB) > n3:
+                    xtcurve = True
+                    if aw.qmc.xtcurveidx % 2:
+                        headers.append(aw.qmc.extraname1B[n3])
+                    else:
+                        headers.append(aw.qmc.extraname2B[n3])            
+            headers.append("") # dummy column that stretches
+            self.datatable.setColumnCount(len(headers))
+            self.datatable.setHorizontalHeaderLabels(headers)
             self.datatable.setAlternatingRowColors(True)
             self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -24208,6 +24313,7 @@ class backgroundDlg(ArtisanDialog):
                 deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                 deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                 self.datatable.setItem(i,0,Rtime)
+                        
                 if i:
                     #identify by color and add notation
                     if i == aw.qmc.timeindexB[0] != -1:
@@ -24245,6 +24351,15 @@ class backgroundDlg(ArtisanDialog):
                 self.datatable.setItem(i,2,BT)
                 self.datatable.setItem(i,3,deltaBT)
                 self.datatable.setItem(i,4,deltaET)
+                
+                if xtcurve: # an XT column is availble, fill it with data
+                    if aw.qmc.xtcurveidx % 2:
+                        XT = QTableWidgetItem("%.0f"%aw.qmc.temp1BX[n3][i])
+                    else:
+                        XT = QTableWidgetItem("%.0f"%aw.qmc.temp2BX[n3][i])
+                    XT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                    self.datatable.setItem(i,5,XT)
+                    
             header = self.datatable.horizontalHeader()
             if pyqtversion < 5:
                 header.setResizeMode(0, QHeaderView.Fixed)
@@ -24252,14 +24367,22 @@ class backgroundDlg(ArtisanDialog):
                 header.setResizeMode(2, QHeaderView.Fixed)
                 header.setResizeMode(3, QHeaderView.Fixed)
                 header.setResizeMode(4, QHeaderView.Fixed)
-                header.setResizeMode(5, QHeaderView.Stretch)
+                if xtcurve:
+                    header.setResizeMode(5, QHeaderView.Fixed)
+                    header.setResizeMode(6, QHeaderView.Stretch)
+                else:
+                    header.setResizeMode(5, QHeaderView.Stretch)
             else:
                 header.setSectionResizeMode(0, QHeaderView.Fixed)
                 header.setSectionResizeMode(1, QHeaderView.Fixed)
                 header.setSectionResizeMode(2, QHeaderView.Fixed)
                 header.setSectionResizeMode(3, QHeaderView.Fixed)
                 header.setSectionResizeMode(4, QHeaderView.Fixed)
-                header.setSectionResizeMode(5, QHeaderView.Stretch)
+                if xtcurve:
+                    header.setSectionResizeMode(5, QHeaderView.Fixed)
+                    header.setSectionResizeMode(6, QHeaderView.Stretch)
+                else:
+                    header.setSectionResizeMode(5, QHeaderView.Stretch)
             self.datatable.resizeColumnsToContents()
 
 #############################################################################
