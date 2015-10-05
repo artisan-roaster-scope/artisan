@@ -5953,11 +5953,13 @@ class tgraphcanvas(FigureCanvas):
                 x = p(xarray[startindex:endindex])
                 pad = max(0,len(self.timex) - startindex - len(x))
                 xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
+                aw.qmc.resetlines()
                 if deltacurvep:
                     self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 else:
                     self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 self.fig.canvas.draw()
+                libtime.sleep(1)
                 return z
             except Exception:
                 return None
@@ -11121,25 +11123,24 @@ class ApplicationWindow(QMainWindow):
             f = QFile(u(filename))
             if not f.open(QFile.ReadOnly):
                 raise IOError(u(f.errorString()))
-            stream = QTextStream(f)
-            if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
-                firstChar = stream.read(1)
-                if firstChar == "{":
-                    f.close()
-                    res = self.setProfile(filename,self.deserialize(filename))
-                else:
-                    self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
-                    res = False
-                if res:
-                    self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-                    #update etypes combo box
-                    self.etypeComboBox.clear()
-                    self.etypeComboBox.addItems(self.qmc.etypes)
-                    #Plot everything
-                    self.qmc.redraw()
-                    message = u(QApplication.translate("Message","{0}  loaded ", None).format(u(filename)))
-                    self.sendmessage(message)
-                    self.setCurrentFile(filename)
+            stream = QTextStream(f)            
+            firstChar = stream.read(1)
+            if firstChar == "{":
+                f.close()
+                res = self.setProfile(filename,self.deserialize(filename))
+            else:
+                self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
+                res = False
+            if res:
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                #update etypes combo box
+                self.etypeComboBox.clear()
+                self.etypeComboBox.addItems(self.qmc.etypes)
+                #Plot everything
+                self.qmc.redraw()
+                message = u(QApplication.translate("Message","{0}  loaded ", None).format(u(filename)))
+                self.sendmessage(message)
+                self.setCurrentFile(filename)
         except IOError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -12002,8 +12003,11 @@ class ApplicationWindow(QMainWindow):
                         string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
                         reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                         if reply == QMessageBox.Yes:
-                            aw.qmc.resetlinecountcaches()
-                            self.qmc.extradevices = profile["extradevices"]
+                            if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
+                                aw.qmc.resetlinecountcaches()
+                                self.qmc.extradevices = profile["extradevices"]
+                            else:
+                                return False
                         else:
                             return False
                 # adjust extra serial device table
@@ -17254,13 +17258,13 @@ class HUDDlg(ArtisanDialog):
         curve1Layout.addWidget(self.equc1label,0,0)
         curve1Layout.addWidget(self.equedit1,0,1)
         curve1Layout.addWidget(color1Button,0,2)
-        curve1Layout.addWidget(equbackgroundbutton,0,3)
-        curve1Layout.addWidget(self.equc1colorlabel,0,4)
+        curve1Layout.addWidget(self.equc1colorlabel,0,3)
+        curve1Layout.addWidget(equbackgroundbutton,0,4)
         curve1Layout.addWidget(self.equc2label,1,0)        
         curve1Layout.addWidget(self.equedit2,1,1)
         curve1Layout.addWidget(color2Button,1,2)
-        curve1Layout.addWidget(equvdevicebutton,1,3)
-        curve1Layout.addWidget(self.equc2colorlabel,1,4)        
+        curve1Layout.addWidget(self.equc2colorlabel,1,3)
+        curve1Layout.addWidget(equvdevicebutton,1,4)
         plot1GroupBox = QGroupBox()
         plot1GroupBox.setLayout(curve1Layout)
         curveLayout = QGridLayout()
@@ -17566,13 +17570,14 @@ class HUDDlg(ArtisanDialog):
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
         TabWidget.currentChanged.connect(lambda i=0:self.tabSwitched(i))
         self.setLayout(Slayout)
+
+        self.updatePlotterleftlabels()  
+         
         self.startEdit.editingFinished.connect(lambda i=0:self.polyfitcurveschanged(1))
         self.endEdit.editingFinished.connect(lambda i=0:self.polyfitcurveschanged(2))
         self.polyfitdeg.valueChanged.connect(lambda i=0:self.polyfitcurveschanged(3))
         self.c1ComboBox.currentIndexChanged.connect(lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(4))
-        self.c2ComboBox.currentIndexChanged.connect(lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))
-
-        self.updatePlotterleftlabels()            
+        self.c2ComboBox.currentIndexChanged.connect(lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))      
             
     def toggleWebLCDsAlerts(self):
         aw.WebLCDsAlerts = not aw.WebLCDsAlerts
@@ -17852,17 +17857,18 @@ class HUDDlg(ArtisanDialog):
 
             # 9 plots
             for e in range(9):
-                if EQU[e]:
-                    if EQU[e][0] == "$":
+                eqs = EQU[e].strip()
+                if eqs:
+                    if eqs == "$":
                         hideplot[e] = 1
-                        EQU[e] = EQU[e][1:] #removes "$"
-                    if EQU[e][0] == "#":
+                        eqs = eqs[1:] #removes "$"
+                    if eqs[0] == "#":
                         commentoutplot[e] = 1
                     #commands
-                    if len(EQU[e]) > 10 and EQU[e][:9] == "annotate(":
+                    if len(eqs) > 10 and eqs[:9] == "annotate(":
                         commentoutplot[e] = 1
-                        self.plotterannotation(EQU[e],e)
-                    if len(EQU[e]) > 4 and EQU[e][:5] == "beans":
+                        self.plotterannotation(eqs,e)
+                    if len(eqs) > 4 and eqs[:5] == "beans":
                         commentoutplot[e] = 1
                         self.plotterb()
                         
@@ -17887,12 +17893,12 @@ class HUDDlg(ArtisanDialog):
 
                     if not commentoutplot[e]:
                         for i in range(len(x_range)):
-                            y_range.append(aw.qmc.eval_math_expression(EQU[e],x_range[i],equeditnumber=e+1,t_offset=toff)) #pass e+1 = equeditnumber(1-9)
+                            y_range.append(aw.qmc.eval_math_expression(eqs,x_range[i],equeditnumber=e+1,t_offset=toff)) #pass e+1 = equeditnumber(1-9)
                         if not hideplot[e]:
                             aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
                     
-                aw.qmc.fig.canvas.draw()
-                self.updatePlotterleftlabels()            
+            aw.qmc.fig.canvas.draw()
+            self.updatePlotterleftlabels()            
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): {0}").format(str(e)),exc_tb.tb_lineno)
@@ -18031,11 +18037,11 @@ class HUDDlg(ArtisanDialog):
                     elif i == 1:
                         if s != "":
                             s = " " + sign + " " + s
-                        s = "%.4ft" % v + s
+                        s = "%.4f*x" % v + s
                     else:
                         if s != "":
                             s = " " + sign + " " + s
-                        s = "%.4ft^%i" % (v,i) + s
+                        s = "%.4f*x^%i" % (v,i) + s
                     if z[i] < 0:
                         sign = "-"
                     else:
@@ -18057,7 +18063,9 @@ class HUDDlg(ArtisanDialog):
             if self.polyfitCheck.isChecked() and len(aw.qmc.timex) > 2:
                 aw.qmc.resetlines()
                 aw.qmc.redraw(recomputeAllDeltas=False)
+                QApplication.processEvents()
                 self.doPolyfit()
+                QApplication.processEvents()
             else:
                 self.result.setText("")
         except Exception:
