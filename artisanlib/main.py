@@ -12883,32 +12883,32 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.button_10.setVisible(False) #CONTROL BUTTON
             if settings.contains("controlETpid"):
-                self.ser.controlETpid = [toInt(x) for x in toList(settings.value("controlETpid"))]
+                self.ser.controlETpid = [toInt(x) for x in toList(settings.value("controlETpid",self.ser.controlETpid))]
             if settings.contains("readBTpid"):
-                self.ser.readBTpid = [toInt(x) for x in toList(settings.value("readBTpid"))]
+                self.ser.readBTpid = [toInt(x) for x in toList(settings.value("readBTpid",self.ser.readBTpid))]
             if settings.contains("arduinoETChannel"):
-                self.ser.arduinoETChannel = str(toString(settings.value("arduinoETChannel")))
+                self.ser.arduinoETChannel = str(toString(settings.value("arduinoETChannel",self.ser.arduinoETChannel)))
             if settings.contains("arduinoBTChannel"):
-                self.ser.arduinoBTChannel = str(toString(settings.value("arduinoBTChannel")))
+                self.ser.arduinoBTChannel = str(toString(settings.value("arduinoBTChannel",self.ser.arduinoBTChannel)))
             if settings.contains("arduinoATChannel"):
-                self.ser.arduinoATChannel = str(toString(settings.value("arduinoATChannel")))
+                self.ser.arduinoATChannel = str(toString(settings.value("arduinoATChannel",self.ser.arduinoATChannel)))
             if settings.contains("ArduinoFILT"):
-                self.ser.ArduinoFILT = [toInt(x) for x in toList(settings.value("ArduinoFILT"))]
+                self.ser.ArduinoFILT = [toInt(x) for x in toList(settings.value("ArduinoFILT",self.ser.ArduinoFILT))]
             if settings.contains("useModbusPort"):
-                self.ser.useModbusPort = bool(toBool(settings.value("useModbusPort")))
+                self.ser.useModbusPort = bool(toBool(settings.value("useModbusPort",self.ser.useModbusPort)))
             settings.endGroup()
             #restore x,y formating mode            
             if settings.contains("fmt_data_RoR"):
-                self.qmc.fmt_data_RoR = bool(toBool(settings.value("fmt_data_RoR")))
+                self.qmc.fmt_data_RoR = bool(toBool(settings.value("fmt_data_RoR",self.qmc.fmt_data_RoR)))
             #restore phases
             if settings.contains("Phases"):
-                self.qmc.phases = [toInt(x) for x in toList(settings.value("Phases"))]
+                self.qmc.phases = [toInt(x) for x in toList(settings.value("Phases",self.qmc.phases))]
             if settings.contains("PhasesFilter"):
-                self.qmc.phases_filter = [toInt(x) for x in toList(settings.value("PhasesFilter"))]
+                self.qmc.phases_filter = [toInt(x) for x in toList(settings.value("PhasesFilter",self.qmc.phases_filter))]
             if settings.contains("PhasesMode"):
                 self.qmc.phases_mode = toInt(settings.value("PhasesMode",int(self.qmc.phases_mode)))
             if settings.contains("PhasesEspresso"):
-                self.qmc.phases_espresso = [toInt(x) for x in toList(settings.value("PhasesEspresso"))]
+                self.qmc.phases_espresso = [toInt(x) for x in toList(settings.value("PhasesEspresso",self.qmc.phases_espresso))]
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = bool(toBool(settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag)))
             if settings.contains("watermarks"):
@@ -12949,19 +12949,19 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.EvalueColor = list(map(str,list(toStringList(settings.value("EvalueColor",self.qmc.EvalueColor)))))
                 self.qmc.EvalueMarker = list(map(str,list(toStringList(settings.value("EvalueMarker",self.qmc.EvalueMarker)))))
             if settings.contains("Evaluelinethickness"):
-                self.qmc.Evaluelinethickness = [toInt(x) for x in toList(settings.value("Evaluelinethickness"))]
-                self.qmc.Evaluealpha = [toDouble(x) for x in toList(settings.value("Evaluealpha"))]
+                self.qmc.Evaluelinethickness = [toInt(x) for x in toList(settings.value("Evaluelinethickness",self.qmc.Evaluelinethickness))]
+                self.qmc.Evaluealpha = [toDouble(x) for x in toList(settings.value("Evaluealpha",self.qmc.Evaluealpha))]
             if settings.contains("EvalueMarkerSize"):
-                self.qmc.EvalueMarkerSize = [toInt(x) for x in toList(settings.value("EvalueMarkerSize"))]
+                self.qmc.EvalueMarkerSize = [toInt(x) for x in toList(settings.value("EvalueMarkerSize",self.qmc.EvalueMarkerSize))]
             settings.endGroup()
             #restore statistics
             if settings.contains("Statistics"):
-                self.qmc.statisticsflags = [toInt(x) for x in toList(settings.value("Statistics"))]
+                self.qmc.statisticsflags = [toInt(x) for x in toList(settings.value("Statistics",self.qmc.statisticsflags))]
                 # extend statisticsflag len to the full size (for backward compatibility)
                 for i in range(6 - len(self.qmc.statisticsflags)):
                     self.qmc.statisticsflags.append(0)
             if settings.contains("StatisticsConds"):
-                tmpconds = [toInt(x) for x in toList(settings.value("StatisticsConds"))]
+                tmpconds = [toInt(x) for x in toList(settings.value("StatisticsConds",self.qmc.statisticsconditions))]
                 for i in range(len(tmpconds),len(self.qmc.statisticsconditions)):
                     tmpconds.append(self.qmc.statisticsconditions[i])
                 self.qmc.statisticsconditions = tmpconds
@@ -13043,7 +13043,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("names"):
                 self.qmc.container_names = list(map(u,list(toStringList(settings.value("names",self.qmc.container_names)))))
             if settings.contains("weights"):
-                self.qmc.container_weights = [toInt(x) for x in toList(settings.value("weights"))]
+                self.qmc.container_weights = [toInt(x) for x in toList(settings.value("weights",self.qmc.container_weights))]
             if settings.contains("idx"):
                 self.qmc.container_idx = toInt(settings.value("idx",int(self.qmc.container_idx)))
             settings.endGroup()
@@ -13141,41 +13141,41 @@ class ApplicationWindow(QMainWindow):
             #restore alarms
             settings.beginGroup("Alarms")
             if settings.contains("alarmtime"):
-                self.qmc.alarmflag = [toInt(x) for x in toList(settings.value("alarmflag"))]
+                self.qmc.alarmflag = [toInt(x) for x in toList(settings.value("alarmflag",self.qmc.alarmflag))]
                 if settings.contains("alarmguard"):
-                    self.qmc.alarmguard = [toInt(x) for x in toList(settings.value("alarmguard"))]
+                    self.qmc.alarmguard = [toInt(x) for x in toList(settings.value("alarmguard",self.qmc.alarmguard))]
                 else:
                     self.qmc.alarmguard = [-1]*len(self.qmc.alarmflag)
                 if settings.contains("alarmnegguard"):
-                    self.qmc.alarmnegguard = [toInt(x) for x in toList(settings.value("alarmnegguard"))]
+                    self.qmc.alarmnegguard = [toInt(x) for x in toList(settings.value("alarmnegguard",self.qmc.alarmnegguard))]
                 else:
                     self.qmc.alarmnegguard = [-1]*len(self.qmc.alarmflag)
                 if settings.contains("alarmtime"):
-                    self.qmc.alarmtime = [toInt(x) for x in toList(settings.value("alarmtime"))]
+                    self.qmc.alarmtime = [toInt(x) for x in toList(settings.value("alarmtime",self.qmc.alarmtime))]
                 else:
                     self.qmc.alarmtime = [-1]*len(self.qmc.alarmflag)
                 if settings.contains("alarmoffset"):
-                    self.qmc.alarmoffset = [max(0,toInt(x)) for x in toList(settings.value("alarmoffset"))]
+                    self.qmc.alarmoffset = [max(0,toInt(x)) for x in toList(settings.value("alarmoffset",self.qmc.alarmoffset))]
                 else:
                     self.qmc.alarmoffset = [0]*len(self.qmc.alarmflag)
                 if settings.contains("alarmcond"):
-                    self.qmc.alarmcond = [toInt(x) for x in toList(settings.value("alarmcond"))]
+                    self.qmc.alarmcond = [toInt(x) for x in toList(settings.value("alarmcond",self.qmc.alarmcond))]
                 else:
                     self.qmc.alarmcond = [1]*len(self.qmc.alarmflag)
                 if settings.contains("alarmsource"):
-                    self.qmc.alarmsource = [toInt(x) for x in toList(settings.value("alarmsource"))]
+                    self.qmc.alarmsource = [toInt(x) for x in toList(settings.value("alarmsource",self.qmc.alarmsource))]
                 else:
                     self.qmc.alarmsource = [1]*len(self.qmc.alarmflag)
                 if settings.contains("alarmtemperature"):
-                    self.qmc.alarmtemperature = [toInt(x) for x in toList(settings.value("alarmtemperature"))]
+                    self.qmc.alarmtemperature = [toInt(x) for x in toList(settings.value("alarmtemperature",self.qmc.alarmtemperature))]
                 else:
                     self.qmc.alarmtemperature = [500]*len(self.qmc.alarmflag)
                 if settings.contains("alarmaction"):
-                    self.qmc.alarmaction = [toInt(x) for x in toList(settings.value("alarmaction"))]
+                    self.qmc.alarmaction = [toInt(x) for x in toList(settings.value("alarmaction",self.qmc.alarmaction))]
                 else:
                     self.qmc.alarmaction = [0]*len(self.qmc.alarmflag)
                 if settings.contains("alarmbeep"):
-                    self.qmc.alarmbeep = [toInt(x) for x in toList(settings.value("alarmbeep"))]
+                    self.qmc.alarmbeep = [toInt(x) for x in toList(settings.value("alarmbeep",self.qmc.alarmbeep))]
                 else:
                     self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
                 if settings.contains("alarmstrings"):
@@ -13214,9 +13214,9 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("PXR")
             for key in list(self.fujipid.PXR.keys()):
                 if type(self.fujipid.PXR[key][0]) == type(float()):
-                    self.fujipid.PXR[key][0] = toDouble(settings.value(key,self.fujipid.PXR[key]))
+                    self.fujipid.PXR[key][0] = toDouble(settings.value(key,self.fujipid.PXR[key][0]))
                 elif type(self.fujipid.PXR[key][0]) == type(int()):
-                    self.fujipid.PXR[key][0] = toInt(settings.value(key,self.fujipid.PXR[key]))
+                    self.fujipid.PXR[key][0] = toInt(settings.value(key,self.fujipid.PXR[key][0]))
             settings.endGroup()
             settings.beginGroup("PXG4")
             for key in list(self.fujipid.PXG4.keys()):
@@ -13353,7 +13353,7 @@ class ApplicationWindow(QMainWindow):
                 self.ser.externalprogram = u(toString(settings.value("externalprogram",self.ser.externalprogram)))
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
-                self.qmc.extradevices = [toInt(x) for x in toList(settings.value("extradevices"))]
+                self.qmc.extradevices = [toInt(x) for x in toList(settings.value("extradevices",self.qmc.extradevices))]
                 self.qmc.extraname1 = list(map(u,list(toStringList(settings.value("extraname1",self.qmc.extraname1)))))
                 self.qmc.extraname2 = list(map(u,list(toStringList(settings.value("extraname2",self.qmc.extraname2)))))
                 self.qmc.extramathexpression1 = list(map(str,list(toStringList(settings.value("extramathexpression1",self.qmc.extramathexpression1)))))
@@ -13361,13 +13361,13 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extradevicecolor1 = list(map(str,list(toStringList(settings.value("extradevicecolor1",self.qmc.extradevicecolor1)))))
                 self.qmc.extradevicecolor2 = list(map(str,list(toStringList(settings.value("extradevicecolor2",self.qmc.extradevicecolor2)))))
                 if settings.contains("extraLCDvisibility1"):
-                    self.extraLCDvisibility1 = [toBool(x) for x in toList(settings.value("extraLCDvisibility1"))]
+                    self.extraLCDvisibility1 = [toBool(x) for x in toList(settings.value("extraLCDvisibility1",self.extraLCDvisibility1))]
                 if settings.contains("extraLCDvisibility2"):
-                    self.extraLCDvisibility2 = [toBool(x) for x in toList(settings.value("extraLCDvisibility2"))]
+                    self.extraLCDvisibility2 = [toBool(x) for x in toList(settings.value("extraLCDvisibility2",self.extraLCDvisibility2))]
                 if settings.contains("extraCurveVisibility1"):
-                    self.extraCurveVisibility1 = [toBool(x) for x in toList(settings.value("extraCurveVisibility1"))]
+                    self.extraCurveVisibility1 = [toBool(x) for x in toList(settings.value("extraCurveVisibility1",self.extraCurveVisibility1))]
                 if settings.contains("extraCurveVisibility2"):
-                    self.extraCurveVisibility2 = [toBool(x) for x in toList(settings.value("extraCurveVisibility2"))]
+                    self.extraCurveVisibility2 = [toBool(x) for x in toList(settings.value("extraCurveVisibility2",self.extraCurveVisibility2))]
             #create empty containers
             settings.endGroup()
             #restore curve styles
@@ -13466,11 +13466,11 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ExtraComm")
             if settings.contains("extracomport"):
                 self.extracomport = list(map(str,list(toStringList(settings.value("extracomport",self.extracomport)))))
-                self.extrabaudrate = [toInt(x) for x in toList(settings.value("extrabaudrate"))]
-                self.extrabytesize = [toInt(x) for x in toList(settings.value("extrabytesize"))]
+                self.extrabaudrate = [toInt(x) for x in toList(settings.value("extrabaudrate",self.extrabaudrate))]
+                self.extrabytesize = [toInt(x) for x in toList(settings.value("extrabytesize",self.extrabytesize))]
                 self.extraparity = list(map(str,list(toStringList(settings.value("extraparity",self.extraparity)))))
-                self.extrastopbits = [toInt(x) for x in toList(settings.value("extrastopbits"))]
-                self.extratimeout = [toInt(x) for x in toList(settings.value("extratimeout"))]
+                self.extrastopbits = [toInt(x) for x in toList(settings.value("extrastopbits",self.extrastopbits))]
+                self.extratimeout = [toInt(x) for x in toList(settings.value("extratimeout",self.extratimeout))]
                 lenextraports = len(self.extracomport)
                 self.extraser = [None]*lenextraports
                 #populate aw.extraser
@@ -13513,23 +13513,23 @@ class ApplicationWindow(QMainWindow):
             #restore sliders
             settings.beginGroup("Sliders")
             if settings.contains("slidervisibilities"):
-                self.eventslidervisibilities = [toInt(x) for x in toList(settings.value("slidervisibilities"))]
-                self.eventslideractions = [toInt(x) for x in toList(settings.value("slideractions"))]
+                self.eventslidervisibilities = [toInt(x) for x in toList(settings.value("slidervisibilities",self.eventslidervisibilities))]
+                self.eventslideractions = [toInt(x) for x in toList(settings.value("slideractions",self.eventslideractions))]
                 self.eventslidercommands = list(map(str,list(toStringList(settings.value("slidercommands",self.eventslidercommands)))))
-                self.eventslideroffsets = [toInt(x) for x in toList(settings.value("slideroffsets"))]
-                self.eventsliderfactors = [toDouble(x) for x in toList(settings.value("sliderfactors"))]
+                self.eventslideroffsets = [toInt(x) for x in toList(settings.value("slideroffsets",self.eventslideroffsets))]
+                self.eventsliderfactors = [toDouble(x) for x in toList(settings.value("sliderfactors",self.eventsliderfactors))]
             if settings.contains("eventslidersflag"):
                 self.eventslidersflag = toInt(settings.value("eventslidersflag",self.eventslidersflag))
             settings.endGroup()
             #restore quantifier
             settings.beginGroup("Quantifiers")
             if settings.contains("quantifieractive"):
-                self.eventquantifieractive = [toInt(x) for x in toList(settings.value("quantifieractive"))]
-                self.eventquantifiersource = [toInt(x) for x in toList(settings.value("quantifiersource"))]
-                self.eventquantifiermin = [toInt(x) for x in toList(settings.value("quantifiermin"))]
-                self.eventquantifiermax = [toInt(x) for x in toList(settings.value("quantifiermax"))]
+                self.eventquantifieractive = [toInt(x) for x in toList(settings.value("quantifieractive",self.eventquantifieractive))]
+                self.eventquantifiersource = [toInt(x) for x in toList(settings.value("quantifiersource",self.eventquantifiersource))]
+                self.eventquantifiermin = [toInt(x) for x in toList(settings.value("quantifiermin",self.eventquantifiermin))]
+                self.eventquantifiermax = [toInt(x) for x in toList(settings.value("quantifiermax",self.eventquantifiermax))]
                 if settings.contains("quantifiercoarse"):
-                    self.eventquantifiercoarse = [toInt(x) for x in toList(settings.value("quantifiercoarse"))]
+                    self.eventquantifiercoarse = [toInt(x) for x in toList(settings.value("quantifiercoarse",self.eventquantifiercoarse))]
             settings.endGroup()
             settings.beginGroup("Batch")
             if settings.contains("batchcounter"):
@@ -13575,10 +13575,10 @@ class ApplicationWindow(QMainWindow):
                     self.buttonlistmaxlen = toInt(settings.value("buttonlistmaxlen",self.buttonlistmaxlen))
                 if settings.contains("extraeventsbuttonsflag"):
                     self.extraeventsbuttonsflag = toInt(settings.value("extraeventsbuttonsflag",self.extraeventsbuttonsflag))
-                self.extraeventstypes = [toInt(x) for x in toList(settings.value("extraeventstypes"))]
-                self.extraeventsvalues = [toFloat(x) for x in toList(settings.value("extraeventsvalues"))]
-                self.extraeventsactions = [toInt(x) for x in toList(settings.value("extraeventsactions"))]
-                self.extraeventsvisibility = [toInt(x) for x in toList(settings.value("extraeventsvisibility"))]
+                self.extraeventstypes = [toInt(x) for x in toList(settings.value("extraeventstypes",self.extraeventstypes))]
+                self.extraeventsvalues = [toFloat(x) for x in toList(settings.value("extraeventsvalues",self.extraeventsvalues))]
+                self.extraeventsactions = [toInt(x) for x in toList(settings.value("extraeventsactions",self.extraeventsactions))]
+                self.extraeventsvisibility = [toInt(x) for x in toList(settings.value("extraeventsvisibility",self.extraeventsvisibility))]
                 self.extraeventsactionstrings = list(toStringList(settings.value("extraeventsactionstrings",self.extraeventsactionstrings)))
                 self.extraeventslabels = list(toStringList(settings.value("extraeventslabels",self.extraeventslabels)))
                 self.extraeventsdescriptions= list(toStringList(settings.value("extraeventsdescriptions",self.extraeventsdescriptions)))
@@ -13589,8 +13589,8 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventbuttoncolor = ["yellow"]*len(self.extraeventstypes)
                     self.extraeventbuttontextcolor = ["black"]*len(self.extraeventstypes)
                 if settings.contains("buttonpalette"):
-                    self.buttonpalettemaxlen = [max(9,toInt(x)) for x in toList(settings.value("buttonpalettemaxlen"))]
-                    mlist = [toList(x) for x in toList(settings.value("buttonpalette"))]
+                    self.buttonpalettemaxlen = [max(9,toInt(x)) for x in toList(settings.value("buttonpalettemaxlen",self.buttonpalettemaxlen))]
+                    mlist = [toList(x) for x in toList(settings.value("buttonpalette",self.buttonpalette))]
                     for i in range(len(mlist)):
                         if len(mlist[i]) in [9,13,14]:
                             self.buttonpalette[i].append([toInt(x) for x in toList(mlist[i][0])])              #types
@@ -17791,10 +17791,10 @@ class HUDDlg(ArtisanDialog):
         try:
             aw.sendmessage("Dropping beans...")
             colorb = ["#996633","#4d2600","#4b4219","black","#4b3219","#996633","#281a0d"]
-            for i in range(4):
-                x = aw.qmc.endofx*numpy.random.rand(aw.qmc.endofx)
-                y = aw.qmc.endofx*numpy.random.rand(aw.qmc.endofx)
-                aw.qmc.ax.plot(x,y,'o',color=colorb[int(7*numpy.random.rand(1)[0])])                    
+            for i in range(3): # number of bean layers (each a randomly different color)
+                x = aw.qmc.endofx*numpy.random.rand(aw.qmc.endofx/6)
+                y = aw.qmc.ylimit*numpy.random.rand(aw.qmc.endofx/6)
+                aw.qmc.ax.plot(x,y,'o',color=colorb[int(round(6*numpy.random.rand(1)[0]))])
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotterb() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
