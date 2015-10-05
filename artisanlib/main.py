@@ -2316,8 +2316,7 @@ class tgraphcanvas(FigureCanvas):
 
     # mathexpression = formula; t = a number to evaluate(usually time);
     # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTval = RealTime var val
-    def eval_math_expression(self,mathexpression,t,equeditnumber=None, RTsname=None,RTsval=None):
-        
+    def eval_math_expression(self,mathexpression,t,equeditnumber=None, RTsname=None,RTsval=None,t_offset=0):
         if len(mathexpression):            
             i =0
             #get index from the time. 
@@ -2425,6 +2424,7 @@ class tgraphcanvas(FigureCanvas):
                                 if shiftedindex >= len(self.timex):
                                     shiftedindex = len(self.timex)- 1
                                 val = self.timex[shiftedindex]
+                            val = val - t_offset
                             evaltimeexpression = "Y" + mathexpression[i] + evalsign*2 + mathexpression[i+3] + seconddigitstr + evalsign
                             timeshiftexpressions.append(evaltimeexpression)
                             timeshiftexpressionsvalues.append(val)
@@ -2432,7 +2432,7 @@ class tgraphcanvas(FigureCanvas):
                         #no timeshift
                         else:
                             if "t" not in mathdictionary:
-                                mathdictionary['t'] = t         #add t to the math dictionary
+                                mathdictionary['t'] = t - t_offset         #add t to the math dictionary
                                     
                     #Add to dict plotter Previous results (cascading) from plotter field windows (1-9)
                     elif mathexpression[i] == "P":
@@ -17852,16 +17852,25 @@ class HUDDlg(ArtisanDialog):
                     #create x range
                     if len(aw.qmc.timex):
                         x_range = aw.qmc.timex
+                        if aw.qmc.timeindex[0] > -1:
+                            toff = aw.qmc.timex[aw.qmc.timeindex[0]]
+                        else:
+                            toff = 0
                     elif len(aw.qmc.timeB):
                         x_range = aw.qmc.timeB
+                        if aw.qmc.timeindexB[0] > -1:
+                            toff = aw.qmc.timeB[aw.qmc.timeindexB[0]]
+                        else:
+                            toff = 0
                     else:
                         x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
+                        toff = int(aw.qmc.startofx)
                     #create y range
                     y_range = []
 
                     if not commentoutplot[e]:
                         for i in range(len(x_range)):
-                                y_range.append(aw.qmc.eval_math_expression(EQU[e],x_range[i],equeditnumber=e+1)) #pass e+1 = equeditnumber(1-9)
+                            y_range.append(aw.qmc.eval_math_expression(EQU[e],x_range[i],equeditnumber=e+1,t_offset=toff)) #pass e+1 = equeditnumber(1-9)
                         if not hideplot[e]:
                             aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
                     
