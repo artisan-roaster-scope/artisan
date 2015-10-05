@@ -2398,7 +2398,15 @@ class tgraphcanvas(FigureCanvas):
                                 # No timeshift Y1,Y2,Y3,etc.
                                 else:
                                     Yval.append(mathexpression[i+1])
-                                    
+                     
+                    # the actual value
+                    elif mathexpression[i] == "x":
+                        if "x" not in mathdictionary:
+                            if RTsval:
+                                mathdictionary['x'] = RTsval         #add x to the math dictionary
+                            else:
+                                mathdictionary['x'] = -1
+                            
                     # time timeshift of absolute time (not relative to CHARGE)                                        
                     elif mathexpression[i] == "t":
                         seconddigitstr = ""
