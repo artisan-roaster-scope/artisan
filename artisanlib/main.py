@@ -1392,6 +1392,8 @@ class tgraphcanvas(FigureCanvas):
         self.plotterstack = [0]*10
         #holds results for each equation (9 total)
         self.plotterequationresults = [[],[],[],[],[],[],[],[],[]]
+        #message string for plotter 
+        self.plottermessage = ""
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -2319,6 +2321,7 @@ class tgraphcanvas(FigureCanvas):
     def eval_math_expression(self,mathexpression,t,equeditnumber=None, RTsname=None,RTsval=None,t_offset=0):
         if len(mathexpression):            
             i =0
+
             #get index from the time. 
             if len(self.timex):
                 if RTsname:
@@ -2327,7 +2330,7 @@ class tgraphcanvas(FigureCanvas):
                     index = self.time2index(t)  # If using the plotter. Background index done bellow at "B"
             else:
                 index = 0      #if plotting but nothing loaded. Index will not be used anyway.
-                
+                    
             #timeshift vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
             timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
@@ -2399,7 +2402,7 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     Yval.append(mathexpression[i+1])
                      
-                    # the actual value
+                    #the actual value
                     elif mathexpression[i] == "x":
                         if "x" not in mathdictionary:
                             if RTsval:
@@ -2582,116 +2585,37 @@ class tgraphcanvas(FigureCanvas):
                     res = -1
                 except ZeroDivisionError:
                     res = -1
+                except IndexError:
+                    res = -1
                 if res == None:
                     return -1
+                
                 else:
-                    #stack (feedback in same forumla)
+                    #stack (use in feedback "F" in same formula)
                     self.plotterstack.insert(10,res)
                     self.plotterstack.pop(0)
                     #Pnumber results storage
                     if equeditnumber:
                         self.plotterequationresults[equeditnumber-1].append(res)
                     return res
-                
-            except ZeroDivisionError:
-                return 0
-            except IndexError:
-                return 0
 
             except Exception as e:
+                #if plotter
                 if equeditnumber:
                     e = str(e)
                     e = "P" + str(equeditnumber) + ": index %i: "%(i+1) + e
-                _, _, exc_tb = sys.exc_info()
-                self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): {0}").format(e),exc_tb.tb_lineno)
-                return -1
+                    self.plottermessage = e
+                    return -1
+                #if sample()
+                else:
+                ## complains in first sample of symbolic devices
+                ##                    e = str(e)
+                ##                    _, _, exc_tb = sys.exc_info()
+                ##                    self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): {0}").format(e),exc_tb.tb_lineno)
+                    return -1
 
         return -1
 
-##    #Use during during REALTIME in sample() thread. Limited.
-##    #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
-##    #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
-##    def eval_math_expression(self,mathexpression,sname,sval,time):
-##        if mathexpression == None or len(mathexpression) == 0:
-##            return sval
-##
-##        #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
-##        mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
-##                          "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
-##                          "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
-##        try:
-##            mathdictionary[sname] = sval
-##            mathdictionary["t"] = time
-##            #add ETB, BTB and XTB (background ET, BT and XT)
-##            etb = btb = xtb = 0
-##            try:
-##                if aw.qmc.background and ("B"):
-##                    bindex = self.backgroundtime2index(time)
-##                    #first compute closest index at that time point in the background data
-##                    etb = aw.qmc.temp1B[bindex]
-##                    btb = aw.qmc.temp2B[bindex]
-##                    if aw.qmc.xtcurveidx > 0:
-##                        idx3 = aw.qmc.xtcurveidx - 1
-##                        n3 = idx3 // 2
-##                        if len(self.temp1BX) > n3 and len(self.temp2BX) > n3 and len(self.extratimexB) > n3:
-##                            bindex = self.backgroundtime2index(time)
-##                            if aw.qmc.xtcurveidx % 2:
-##                                xtb = self.temp1BX[n3][bindex]
-##                            else:
-##                                xtb = self.temp2BX[n3][bindex]
-##            except Exception:
-##                pass
-##            mathdictionary["B1"] = etb
-##            mathdictionary["B2"] = btb
-##            mathdictionary["B3"] = xtb
-##            #if Ys in expression
-##            if "Y" in mathexpression:
-##                #extract Ys
-##                Yval = []                   #extract value number example Y9 = 9
-##                mlen = len(mathexpression)
-##                for i in range(mlen):
-##                    if mathexpression[i] == "Y":
-##                        #find Y number
-##                        if i+1 < mlen:                          #check for out of range
-##                            if mathexpression[i+1].isdigit():
-##                                number = mathexpression[i+1]
-##                            else:
-##                                number = "1"
-##                        #check for double digit
-##                        if i+2 < mlen:
-##                            if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
-##                                number += mathexpression[i+2]
-##                        Yval.append(number)
-##                #build Ys float values
-##                if len(self.timex) > 0:
-##                    Y = [self.temp1[-1],self.temp2[-1]]     #old
-##                else:
-##                    Y = [-1,-1]
-##                for i in range(len(self.extradevices)):
-##                    if len(self.extratimex[i]):
-##                        try:
-##                            Y.append(self.extratemp1[i][-1])
-##                        except:
-##                            Y.append(-1)
-##                        try:
-##                            Y.append(self.extratemp2[i][-1])
-##                        except:
-##                            Y.append(-1)
-##                    else:
-##                        Y.append(-1)
-##                        Y.append(-1)
-##                    #add Ys and their value to math dictionary 
-##                for i in range(len(Yval)):
-##                    idx = int(Yval[i])-1
-##                    if "Y"+ Yval[i] not in mathdictionary:
-##                        mathdictionary["Y"+ Yval[i]] = Y[idx]
-##                            
-##            return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
-##
-##        except Exception as e:
-##            _, _, exc_tb = sys.exc_info()
-##            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_math_expression() {0}").format(str(e)),exc_tb.tb_lineno)
-##            return 0
 
     #format X axis labels
     def xaxistosm(self,redraw=True):
@@ -17186,6 +17110,16 @@ class HUDDlg(ArtisanDialog):
         self.equedit7 = QLineEdit(aw.qmc.plotcurves[6])
         self.equedit8 = QLineEdit(aw.qmc.plotcurves[7])
         self.equedit9 = QLineEdit(aw.qmc.plotcurves[8])
+        self.equedit1.setSelection (0,0)
+        self.equedit2.setSelection (0,0)
+        self.equedit3.setSelection (0,0)
+        self.equedit4.setSelection (0,0)
+        self.equedit5.setSelection (0,0)
+        self.equedit6.setSelection (0,0)
+        self.equedit7.setSelection (0,0)
+        self.equedit8.setSelection (0,0)
+        self.equedit9.setSelection (0,0)
+
         color1Button = QPushButton(QApplication.translate("Button","Color",None))
         color1Button.setFocusPolicy(Qt.NoFocus)
         color1Button.clicked.connect(lambda x=0: self.setcurvecolor(0))
@@ -17231,7 +17165,7 @@ class HUDDlg(ArtisanDialog):
         self.equc7colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[6])
         self.equc8colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[7])
         self.equc9colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[8])
-        
+
         equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None))
         equdrawbutton.setFocusPolicy(Qt.NoFocus)
         equdrawbutton.clicked.connect(lambda _:self.plotequ())
@@ -17257,14 +17191,14 @@ class HUDDlg(ArtisanDialog):
         curve1Layout = QGridLayout()
         curve1Layout.addWidget(self.equc1label,0,0)
         curve1Layout.addWidget(self.equedit1,0,1)
-        curve1Layout.addWidget(color1Button,0,2)
-        curve1Layout.addWidget(self.equc1colorlabel,0,3)
-        curve1Layout.addWidget(equbackgroundbutton,0,4)
+        curve1Layout.addWidget(equbackgroundbutton,0,2)
+        curve1Layout.addWidget(color1Button,0,3)
+        curve1Layout.addWidget(self.equc1colorlabel,0,4)
         curve1Layout.addWidget(self.equc2label,1,0)        
         curve1Layout.addWidget(self.equedit2,1,1)
-        curve1Layout.addWidget(color2Button,1,2)
-        curve1Layout.addWidget(self.equc2colorlabel,1,3)
-        curve1Layout.addWidget(equvdevicebutton,1,4)
+        curve1Layout.addWidget(equvdevicebutton,1,2)
+        curve1Layout.addWidget(color2Button,1,3)
+        curve1Layout.addWidget(self.equc2colorlabel,1,4)
         plot1GroupBox = QGroupBox()
         plot1GroupBox.setLayout(curve1Layout)
         curveLayout = QGridLayout()
@@ -17664,6 +17598,7 @@ class HUDDlg(ArtisanDialog):
                 self.equc7colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[6])
                 self.equc8colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[7])
                 self.equc9colorlabel.setStyleSheet("background-color:'%s';"%aw.qmc.plotcurvecolor[8])
+
             self.plotequ()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -17807,6 +17742,7 @@ class HUDDlg(ArtisanDialog):
         else:
             self.equc9label.setStyleSheet("background-color:'transparent';")
 
+
     # format = annotate(text,time,temp,size)
     def plotterannotation(self,annotation,cindex):
         try:        
@@ -17824,7 +17760,7 @@ class HUDDlg(ArtisanDialog):
                 fsize = int(annvars[3])        
                 aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
             else:
-                aw.sendmessage(QApplication.translate("Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None))
+                self.equlabel.setText(QApplication.translate("Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None))
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " annotate() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
@@ -17844,6 +17780,9 @@ class HUDDlg(ArtisanDialog):
     def plotequ(self):
         try:
             aw.qmc.plotterstack = [0]*10
+            aw.qmc.plottermessage = ""
+            aw.sendmessage("",append=False)
+
             aw.qmc.plotterequationresults = [[],[],[],[],[],[],[],[],[]]
             EQU = [str(self.equedit1.text()),str(self.equedit2.text()),
                    str(self.equedit3.text()),str(self.equedit4.text()),
@@ -17898,7 +17837,9 @@ class HUDDlg(ArtisanDialog):
                             aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
                     
             aw.qmc.fig.canvas.draw()
-            self.updatePlotterleftlabels()            
+            self.updatePlotterleftlabels()
+            self.equlabel.setText(aw.qmc.plottermessage)
+
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " plotequ(): {0}").format(str(e)),exc_tb.tb_lineno)
@@ -18848,8 +18789,9 @@ class equDataDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Plotter Data",None)) 
         self.setModal(True)
 
-        self.datalabel = QLabel(u(QApplication.translate("Label", "",None)))
-
+        self.datalabel = QLabel(u"")
+        self.dataprecisionlabel = QLabel(u(QApplication.translate("Label", "Data precision",None)))
+        
         #DATA Table
         self.datatable = QTableWidget()
         self.datatable.setTabKeyNavigation(True)
@@ -18857,14 +18799,33 @@ class equDataDlg(ArtisanDialog):
         header.setStretchLastSection(True)
         self.datatable.setMinimumSize(self.datatable.minimumSizeHint())
 
+        self.dataprecision = ["%.1f","%.2f","%.3f","%.4f","%.5f","%.6f"]
+        self.dataprecisionval = 1
+        self.precisionSpinBox = QSpinBox()
+        self.precisionSpinBox.setRange(1,6)
+        self.precisionSpinBox.setSingleStep(1)
+        self.precisionSpinBox.setValue(self.dataprecisionval)
+        self.precisionSpinBox.setAlignment(Qt.AlignLeft)
+        self.precisionSpinBox.setMaximumWidth(50)
+        self.precisionSpinBox.valueChanged.connect(self.changeprecision)
+
+        self.changeprecision()
         self.createDataTable()
+
         #layout
         dataplotterLayout = QVBoxLayout()
         dataplotterLayout.addWidget(self.datalabel)
         dataplotterLayout.addWidget(self.datatable) 
         dataplotterLayout.addWidget(self.datatable)
-        dataplotterLayout.addStretch()
+        dataplotterLayout.addWidget(self.dataprecisionlabel)
+        dataplotterLayout.addWidget(self.precisionSpinBox)
+        dataplotterLayout.addStretch() 
+            
         self.setLayout(dataplotterLayout)
+
+    def changeprecision(self):
+        self.dataprecisionval = int(self.precisionSpinBox.value())-1
+        self.createDataTable()        
 
     def createDataTable(self):
         self.datatable.clear()
@@ -18909,54 +18870,54 @@ class equDataDlg(ArtisanDialog):
         
         for i in range(ndata): 
 
-            t = QTableWidgetItem("%.2f"%aw.qmc.timex[i])
+            t = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.timex[i])
             t.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             
             time = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
             time.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
 
             if len(aw.qmc.plotterequationresults[0]) and len(aw.qmc.plotterequationresults[0]) > i:
-                P1 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[0][i])
+                P1 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[0][i])
             else:
                 P1 = QTableWidgetItem("NA")
                 P1.setBackground(QColor('lightgrey'))
             if len(aw.qmc.plotterequationresults[1]) and len(aw.qmc.plotterequationresults[1]) > i:
-                P2 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[1][i])
+                P2 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[1][i])
             else:
                 P2 = QTableWidgetItem("NA")
                 P2.setBackground(QColor('lightgrey'))
             if len(aw.qmc.plotterequationresults[2]) and len(aw.qmc.plotterequationresults[2]) > i:
-                P3 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[2][i])
+                P3 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[2][i])
             else:
                 P3 = QTableWidgetItem("NA")
                 P3.setBackground(QColor('lightgrey'))
             if len(aw.qmc.plotterequationresults[3]) and len(aw.qmc.plotterequationresults[3]) > i:
-                P4 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[3][i])
+                P4 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[3][i])
             else:
                 P4 = QTableWidgetItem("NA")
                 P4.setBackground(QColor('lightgrey'))
             if len(aw.qmc.plotterequationresults[4]) and len(aw.qmc.plotterequationresults[4]) > i:
-                P5 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[4][i])
+                P5 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[4][i])
             else:
                 P5 = QTableWidgetItem("NA")
                 P5.setBackground(QColor('lightgrey'))
             if len(aw.qmc.plotterequationresults[5]) and len(aw.qmc.plotterequationresults[5]) > i:
-                P6 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[5][i])
+                P6 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[5][i])
             else:
                 P6 = QTableWidgetItem("NA")
                 P6.setBackground(QColor('lightgrey'))
             if len(aw.qmc.plotterequationresults[6]) and len(aw.qmc.plotterequationresults[6]) > i:
-                P7 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[6][i])
+                P7 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[6][i])
             else:
                 P7 = QTableWidgetItem("NA")
                 P7.setBackground(QColor('lightgrey'))
             if len(aw.qmc.plotterequationresults[7]) and len(aw.qmc.plotterequationresults[7]) > i:
-                P8 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[7][i])
+                P8 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[7][i])
             else:
                 P8 = QTableWidgetItem("NA")
                 P8.setBackground(QColor('lightgrey'))
             if len(aw.qmc.plotterequationresults[8]) and len(aw.qmc.plotterequationresults[8]) > i:
-                P9 = QTableWidgetItem("%.2f"%aw.qmc.plotterequationresults[8][i])
+                P9 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[8][i])
             else:
                 P9 = QTableWidgetItem("NA")
                 P9.setBackground(QColor('lightgrey'))
