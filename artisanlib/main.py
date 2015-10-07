@@ -2349,10 +2349,11 @@ class tgraphcanvas(FigureCanvas):
                 mlen = len(mathexpression)
                 for i in range(mlen):                    
                     #Start symbolic assignment
+                    #Y + one digit
                     if mathexpression[i] == "Y":
                         #find Y number for ET,BT,Extras (upto 9)
                         if i+1 < mlen:                          #check for out of range
-                            if mathexpression[i+1].isdigit():
+                            if mathexpression[i+1].isdigit():                                
                                 seconddigitstr = ""
                                 #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]" 
                                 if i+5 < len(mathexpression) and mathexpression[i+2] == "[":
@@ -2360,6 +2361,7 @@ class tgraphcanvas(FigureCanvas):
                                     Yshiftval = int(mathexpression[i+4])
                                     sign = mathexpression[i+3]
 
+                                    #timeshift with two digits
                                     if mathexpression[i+5].isdigit():
                                         seconddigit = int(mathexpression[i+5])
                                         seconddigitstr = mathexpression[i+5]
@@ -2398,15 +2400,20 @@ class tgraphcanvas(FigureCanvas):
                                     #METHOD USED: replace all non digits chars with sign value.
                                     #Example1 "Y2[-7]" = "Y20070"   Example2 "Y2[+9]" = "Y21191"
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
+                                    
+                                # Y + TWO digits. Y10-Y99 . 4+ extra devices. No timeshift
+                                elif i+2 < mlen and mathexpression[i+2].isdigit():
+                                    Yval.append(mathexpression[i+1]+mathexpression[i+2])
                                 # No timeshift Y1,Y2,Y3,etc.
                                 else:
                                     Yval.append(mathexpression[i+1])
-                     
+                                    
+
                     #the actual value
                     elif mathexpression[i] == "x":
                         if "x" not in mathdictionary:
-                            if RTsval:
-                                mathdictionary['x'] = RTsval         #add x to the math dictionary
+                            if RTsval != None:                       # zero could be a valid value
+                                mathdictionary['x'] = RTsval         # add x to the math dictionary
                             else:
                                 mathdictionary['x'] = -1
                             
@@ -2608,10 +2615,11 @@ class tgraphcanvas(FigureCanvas):
                     return -1
                 #if sample()
                 else:
-                ## complains in first sample of symbolic devices
-                ##                    e = str(e)
-                ##                    _, _, exc_tb = sys.exc_info()
-                ##                    self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): {0}").format(e),exc_tb.tb_lineno)
+                    #may complain in first 2 samples of symbolic devices (like virtual)
+                    if len(self.timex)>2:
+                        e = str(e)
+                        _, _, exc_tb = sys.exc_info()
+                        self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): {0}").format(e),exc_tb.tb_lineno)
                     return -1
 
         return -1
@@ -17176,11 +17184,11 @@ class HUDDlg(ArtisanDialog):
         equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None))
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         equbackgroundbutton.clicked.connect(lambda _:self.setbackgroundequ1())
-        equbackgroundbutton.setToolTip(QApplication.translate("Tooltip","Set P1 and P2 as ET and BT backgrounds",None))                
+        equbackgroundbutton.setToolTip(QApplication.translate("Tooltip","Set P1 as ET background B1\nSet P2 as BT background B2",None))                
         equvdevicebutton = QPushButton(QApplication.translate("Button","ET/BT",None))
         equvdevicebutton.setFocusPolicy(Qt.NoFocus)
         equvdevicebutton.clicked.connect(lambda _:self.setvdevice())
-        equvdevicebutton.setToolTip(QApplication.translate("Tooltip","Set P1 and P2 to virtual device",None))        
+        equvdevicebutton.setToolTip(QApplication.translate("Tooltip","Add P1 and P2 as:\n\n1 to Extra device virtual if a profile is loaded\n2 or set to ET and BT if profile is not loaded\n",None))        
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
@@ -17607,39 +17615,56 @@ class HUDDlg(ArtisanDialog):
     def setvdevice(self):
         # compute values
         if len(aw.qmc.timex) < 2: # empty profile
-            # we use the background printer, but order it to print in the foreground
+            # we use the background function to set it to ET/BT
             self.setbackgroundequ1(foreground=True)
         else:
+            # Check for incompatible vars from in the equations
             EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
-            for e in range(2):
-                #create y range
-                y_range = []
-                if aw.qmc.timeindex[0] > -1:
-                    toff = aw.qmc.timex[aw.qmc.timeindex[0]]
-                else:
-                    toff = 0
-                for i in arange(len(aw.qmc.timex)):
-                    y_range.append(aw.qmc.eval_math_expression(EQU[e],aw.qmc.timex[i],t_offset=toff))
-                if e:
-                    extratemp2 = y_range
-                else:
-                    extratemp1 = y_range
-            # add device
-            aw.addDevice() 
-            aw.qmc.extradevices[-1] = 25
-            
-            # set colors
-            aw.qmc.extradevicecolor1[-1] = aw.qmc.plotcurvecolor[0]
-            aw.qmc.extradevicecolor2[-1] = aw.qmc.plotcurvecolor[1]
-            # set expressions
-            aw.qmc.extramathexpression1[-1] = str(self.equedit1.text())
-            aw.qmc.extramathexpression2[-1] = str(self.equedit2.text())
-            # set values
-            aw.qmc.extratemp1[-1] = extratemp1
-            aw.qmc.extratemp2[-1] = extratemp2
-            aw.qmc.extratimex[-1] = aw.qmc.timex[:]
-            # redraw
-            aw.qmc.redraw(recomputeAllDeltas=False)
+            incompatiblevars = ["P","F"]
+            error = ""
+            for i in range(len(incompatiblevars)):
+                if incompatiblevars[i] in EQU[0]:
+                    error = "P1: \n-%s\n\n[%s]"%(incompatiblevars[i],EQU[0])
+                elif incompatiblevars[i] in EQU[1]:
+                    error = "P2: \n%-s\n\n[%s]"%(incompatiblevars[i],EQU[1])
+                    
+            if error:
+                string = QApplication.translate("Message","Incompatible variables found in %s"%error, None)
+                reply = QMessageBox.warning(self,QApplication.translate("Message","Assignment problem", None),string,
+                                    QMessageBox.Discard)
+                
+            else:
+                for e in range(2):
+                    #create y range
+                    y_range = []
+                    if aw.qmc.timeindex[0] > -1:
+                        toff = aw.qmc.timex[aw.qmc.timeindex[0]]
+                    else:
+                        toff = 0
+                    for i in arange(len(aw.qmc.timex)):
+                        y_range.append(aw.qmc.eval_math_expression(EQU[e],aw.qmc.timex[i],t_offset=toff))
+                    if e:
+                        extratemp2 = y_range
+                    else:
+                        extratemp1 = y_range
+                # add device
+                aw.addDevice() 
+                aw.qmc.extradevices[-1] = 25
+                
+                # set colors
+                aw.qmc.extradevicecolor1[-1] = aw.qmc.plotcurvecolor[0]
+                aw.qmc.extradevicecolor2[-1] = aw.qmc.plotcurvecolor[1]
+                # set expressions
+                aw.qmc.extramathexpression1[-1] = str(self.equedit1.text())
+                aw.qmc.extramathexpression2[-1] = str(self.equedit2.text())
+                # set values
+                aw.qmc.extratemp1[-1] = extratemp1
+                aw.qmc.extratemp2[-1] = extratemp2
+                aw.qmc.extratimex[-1] = aw.qmc.timex[:]
+                # redraw
+                aw.qmc.redraw(recomputeAllDeltas=False)
+
+                aw.sendmessage(QApplication.translate("Message","New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]"%(EQU[0],EQU[1]), None))
 
     def equshowtable(self):
         
@@ -17648,61 +17673,86 @@ class HUDDlg(ArtisanDialog):
         equdataDlg.setFixedSize(equdataDlg.size())
 
     def setbackgroundequ1(self,foreground=False):
-        try:
-            equ = str(self.equedit1.text())
-            equ2 = str(self.equedit2.text())
-            if len(equ) or len(equ2):
-                aw.qmc.resetlines()
-                #create x range
-                if len(aw.qmc.timex) > 1:
-                    x_range = aw.qmc.timex[:]
-                    if not foreground and aw.qmc.timeindex[0] > -1:
-                        toff = aw.qmc.timex[aw.qmc.timeindex[0]]
+
+        # Check for incompatible vars from in the equations
+        EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
+        incompatiblevars = ["P","F"]
+        error = ""
+        for i in range(len(incompatiblevars)):
+            if incompatiblevars[i] in EQU[0]:
+                error = "P1: \n-%s\n\n[%s]"%(incompatiblevars[i],EQU[0])
+            elif incompatiblevars[i] in EQU[1]:
+                error = "P2: \n-%s\n\n[%s]"%(incompatiblevars[i],EQU[1])
+                
+        if error:
+            string = QApplication.translate("Message","Incompatible variables found in %s"%error, None)
+            reply = QMessageBox.warning(self,QApplication.translate("Message","Assignment problem", None),string,
+                                QMessageBox.Discard)
+            
+        else:
+            try:
+                equ = EQU[0]
+                equ2 = EQU[1]
+                if len(equ) or len(equ2):
+                    aw.qmc.resetlines()
+                    #create x range
+                    if len(aw.qmc.timex) > 1:
+                        x_range = aw.qmc.timex[:]
+                        if not foreground and aw.qmc.timeindex[0] > -1:
+                            toff = aw.qmc.timex[aw.qmc.timeindex[0]]
+                        else:
+                            toff = 0
                     else:
+                        x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
                         toff = 0
-                else:
-                    x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
-                    toff = 0
-                #create y range
-                y_range = []
-                y_range2 = []
-                for i in range(len(x_range)):
-                    y_range.append(aw.qmc.eval_math_expression(equ,x_range[i],t_offset=toff))
-                    y_range2.append(aw.qmc.eval_math_expression(equ2,x_range[i],t_offset=toff))
-                if foreground:
-                    aw.qmc.timex = x_range[:]
-                    aw.qmc.temp1 = y_range[:]
-                    aw.qmc.temp2 = y_range2[:]
-                    aw.qmc.redraw(recomputeAllDeltas=True)
-                    for x in range(len(aw.qmc.extradevices)):
-                        aw.qmc.extratemp1[x] = [-1]*len(x_range)
-                        aw.qmc.extratemp2[x] = [-1]*len(x_range)
-                else:
-                    aw.qmc.timeB = x_range[:]
-                    aw.qmc.temp1B = y_range[:]
-                    aw.qmc.stemp1B = y_range[:] 
-                    aw.qmc.temp2B = y_range2[:]               
-                    aw.qmc.stemp2B = aw.qmc.temp2B[:]
-                    for i in range(8):
-                        aw.qmc.timeindexB[i] = 0
-                    aw.qmc.timeindexB[0] = -1
-                    if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
-                        # we copy the CHARGE and DROP from the foreground to allow alignment
-                        t1 = aw.qmc.timex[aw.qmc.timeindex[0]]
-                        aw.qmc.timeindexB[0] = aw.qmc.backgroundtime2index(t1)
-                        if aw.qmc.timeindex[1]:
-                            t_DE = aw.qmc.timex[aw.qmc.timeindex[1]]
-                            aw.qmc.timeindexB[1] = aw.qmc.backgroundtime2index(t_DE)
-                        if aw.qmc.timeindex[2]:
-                            t_FCs = aw.qmc.timex[aw.qmc.timeindex[2]]
-                            aw.qmc.timeindexB[2] = aw.qmc.backgroundtime2index(t_FCs)
-                        t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
-                        aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
-                    aw.qmc.background = True
-                    aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ1(): {0}").format(str(e)),exc_tb.tb_lineno)
+                    #create y range
+                    y_range = []
+                    y_range2 = []
+                    for i in range(len(x_range)):
+                        y_range.append(aw.qmc.eval_math_expression(equ,x_range[i],t_offset=toff))
+                        y_range2.append(aw.qmc.eval_math_expression(equ2,x_range[i],t_offset=toff))
+                        
+                    #if foreground flag passed, set EQUs as ET BT instead of background
+                    if foreground:
+                        aw.qmc.timex = x_range[:]
+                        aw.qmc.temp1 = y_range[:]
+                        aw.qmc.temp2 = y_range2[:]
+                        aw.qmc.redraw(recomputeAllDeltas=True)
+                        #make extra devices not visible 
+                        for x in range(len(aw.qmc.extradevices)):
+                            aw.qmc.extratemp1[x] = [-1]*len(x_range)
+                            aw.qmc.extratemp2[x] = [-1]*len(x_range)
+                        aw.sendmessage(QApplication.translate("Message","Y1 = [%s] ; Y2 = [%s]"%(EQU[0],EQU[1]), None))
+
+                    else:
+                        aw.qmc.timeB = x_range[:]
+                        aw.qmc.temp1B = y_range[:]
+                        aw.qmc.stemp1B = y_range[:] 
+                        aw.qmc.temp2B = y_range2[:]               
+                        aw.qmc.stemp2B = aw.qmc.temp2B[:]
+                        for i in range(8):
+                            aw.qmc.timeindexB[i] = 0
+                        aw.qmc.timeindexB[0] = -1
+                        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
+                            # we copy the CHARGE and DROP from the foreground to allow alignment
+                            t1 = aw.qmc.timex[aw.qmc.timeindex[0]]
+                            aw.qmc.timeindexB[0] = aw.qmc.backgroundtime2index(t1)
+                            if aw.qmc.timeindex[1]:
+                                t_DE = aw.qmc.timex[aw.qmc.timeindex[1]]
+                                aw.qmc.timeindexB[1] = aw.qmc.backgroundtime2index(t_DE)
+                            if aw.qmc.timeindex[2]:
+                                t_FCs = aw.qmc.timex[aw.qmc.timeindex[2]]
+                                aw.qmc.timeindexB[2] = aw.qmc.backgroundtime2index(t_FCs)
+                            t2 = aw.qmc.timex[aw.qmc.timeindex[6]]
+                            aw.qmc.timeindexB[6] = aw.qmc.backgroundtime2index(t2)
+                        aw.qmc.background = True
+                        aw.qmc.redraw(recomputeAllDeltas=False)
+                        aw.sendmessage(QApplication.translate("Message","B1 = [%s] ; B2 = [%s]"%(EQU[0],EQU[1]), None))
+
+                        
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setbackgroundequ1(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def updatePlotterleftlabels(self):
         if len(aw.qmc.plotterequationresults[0]):
