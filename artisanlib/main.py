@@ -2317,7 +2317,7 @@ class tgraphcanvas(FigureCanvas):
 
 
     # mathexpression = formula; t = a number to evaluate(usually time);
-    # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTval = RealTime var val
+    # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTsval = RealTime var val
     def eval_math_expression(self,mathexpression,t,equeditnumber=None, RTsname=None,RTsval=None,t_offset=0):
         if len(mathexpression):            
             i =0
@@ -2347,7 +2347,7 @@ class tgraphcanvas(FigureCanvas):
                 #extract Ys
                 Yval = []                   #stores value number example Y9 = 9
                 mlen = len(mathexpression)
-                for i in range(mlen):                    
+                for i in range(mlen): 
                     #Start symbolic assignment
                     #Y + one digit
                     if mathexpression[i] == "Y":
@@ -2563,13 +2563,21 @@ class tgraphcanvas(FigureCanvas):
                     #############   end of mathexpression loop ##########################
                     
                 #created Ys values 
-                if len(self.timex) > 1:
-                    Y = [self.temp1[index], self.temp2[index]]
+                if len(self.timex)>0:
+                    if RTsname:
+                        Y = [self.temp1[-1], self.temp2[-1]] # in realtime mode we take the last value
+                    else:
+                        Y = [self.temp1[index], self.temp2[index]]
                     if len(self.extratimex):
                         if len(self.extratimex[0]):
                             for i in range(len(self.extradevices)):
-                                Y.append(self.extratemp1[i][index])  
-                                Y.append(self.extratemp2[i][index])  
+                                if RTsname:
+                                    Y.append(self.extratemp1[i][-1])
+                                    Y.append(self.extratemp2[i][-1])
+                                else:
+                                    Y.append(self.extratemp1[i][index])  
+                                    Y.append(self.extratemp2[i][index])
+                                
                     #add Ys and their value to math dictionary
                     for i in range(len(Yval)):
                         if "Y"+ Yval[i] not in mathdictionary:
@@ -2579,20 +2587,21 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(len(timeshiftexpressions)):
                         if timeshiftexpressions[i] not in mathdictionary:
                             mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
+                       
 
                 #background symbols just in case there was no profile loaded but a background loaded.
-                if len(self.timeB) > 1:
+                if len(self.timeB) > 0:
                     for i in range(len(timeshiftexpressions)):
                         if timeshiftexpressions[i] not in mathdictionary:   
                             mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]                    
                                     
                 try:                            
                     res = eval(mathexpression,{"__builtins__":None},mathdictionary)
-                except ValueError:
+                except ValueError as e:
                     res = -1
-                except ZeroDivisionError:
+                except ZeroDivisionError as e:
                     res = -1
-                except IndexError:
+                except IndexError as e:
                     res = -1
                 if res == None:
                     return -1
