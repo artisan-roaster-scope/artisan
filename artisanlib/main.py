@@ -1382,7 +1382,7 @@ class tgraphcanvas(FigureCanvas):
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
         self.redrawEnabled = True
-        self.delayTimeout = 1
+        self.delayTimeout = 10
         self.block_update = False
         
         # flag to toggle between Temp and RoR scale of xy-display
@@ -1436,7 +1436,7 @@ class tgraphcanvas(FigureCanvas):
         if not self.block_update:
             self.block_update = True
             self.redrawEnabled = False
-            QTimer.singleShot(0,self.doUpdate)
+            QTimer.singleShot(self.delayTimeout,self.doUpdate)
 
     def resizeEvent(self,event):
         self.redrawEnabled = False
@@ -9375,7 +9375,33 @@ class ApplicationWindow(QMainWindow):
         mainlayout.setSpacing(0)
 
 
-###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
+###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
+
+    # i/o: 0:g, 1:Kg, 2:lb (pound), 3:oz (ounce)
+    def convertWeight(self,v,i,o):
+        #                g,            kg,         lb,             oz,
+        convtable = [
+                        [1.,           0.001,      0.00220462262,  0.035274],  # g
+                        [1000,         1.,         2.205,          35.274],    # Kg
+                        [453.591999,   0.45359237, 1.,             16.],       # lb
+                        [28.3495,      0.0283495,  0.0625,         1.]         # oz
+                    ]
+        return v*convtable[i][o]
+
+    # i/o: 0:l (liter), 1:gal (gallons US), 2:qt, 3:pt, 4:cup, 5:cm^3/ml
+    def convertVolume(self,v,i,o):
+                        #liter          gal             qt              pt              cup             cm^3
+        convtable = [
+                        [1.,            0.26417205,     1.05668821,     2.11337643,     4.22675284,     1000.                ],    # liter
+                        [3.78541181,    1.,             4.,             8.,             16,             3785.4117884         ],    # gallon
+                        [0.94635294,    0.25,           1.,             2.,             4.,             946.352946           ],    # quart
+                        [0.47317647,    0.125,          0.5,            1.,             2.,             473.176473           ],    # pint
+                        [0.23658823,    0.0625,         0.25,           0.5,            1.,             236.5882365          ],    # cup
+                        [0.001,         2.6417205e-4,   1.05668821e-3,  2.11337641e-3,  4.2267528e-3,   1.                   ]     # cm^3
+                    ]
+        return v*convtable[i][o]
+            
+            
     def superusermodeClicked(self,_):
         self.superusermode = not self.superusermode
         if self.superusermode:
@@ -19819,6 +19845,7 @@ class editGraphDlg(ArtisanDialog):
             # reset index and popup
             self.tareComboBox.setCurrentIndex(aw.qmc.container_idx + 3)
 
+
     def changeUnit(self,i,lineedits):
         for le in lineedits:
             if le.text() and le.text() != "":
@@ -21425,7 +21452,8 @@ class calculatorDlg(ArtisanDialog):
         self.WinComboBox = QComboBox()
         weightunits = [QApplication.translate("ComboBox","g",None),
                        QApplication.translate("ComboBox","Kg",None),
-                       QApplication.translate("ComboBox","lb",None)]
+                       QApplication.translate("ComboBox","lb",None),
+                       QApplication.translate("ComboBox","oz",None)]
         self.WinComboBox.addItems(weightunits)
         self.WinComboBox.setMaximumWidth(80)
         self.WinComboBox.setMinimumWidth(80)
@@ -21581,40 +21609,25 @@ class calculatorDlg(ArtisanDialog):
             self.faEdit.setText(result)
 
     def convertWeight(self,x):
-        #                g,            kg,         lb
-        convtable = [
-                        [1.,           0.001,      0.00220462262     ],    # g
-                        [1000,         1.,         2.205             ],    # Kg
-                        [453.591999,   0.45359237, 1.                ]     # lb
-                    ]
         if x == "ItoO":
             inx = float(str(self.WinEdit.text()))
-            outx = inx*convtable[self.WinComboBox.currentIndex()][self.WoutComboBox.currentIndex()]
+            outx = aw.convertWeight(inx,self.WinComboBox.currentIndex(),self.WoutComboBox.currentIndex())
             self.WoutEdit.setText("%.2f"%outx)
             
         elif x == "OtoI":
             outx = float(str(self.WoutEdit.text()))
-            inx = outx*convtable[self.WoutComboBox.currentIndex()][self.WinComboBox.currentIndex()]
+            inx = aw.convertWeight(outx,self.WoutComboBox.currentIndex(),self.WinComboBox.currentIndex())
             self.WinEdit.setText("%.2f"%inx)
 
     def convertVolume(self,x):
-                        #liter          gal             qt              pt              cup             cm^3
-        convtable = [
-                        [1.,            0.26417205,     1.05668821,     2.11337643,     4.22675284,     1000.                ],    # liter
-                        [3.78541181,    1.,             4.,             8.,             16,             3785.4117884         ],    # gallon
-                        [0.94635294,    0.25,           1.,             2.,             4.,             946.352946           ],    # quart
-                        [0.47317647,    0.125,          0.5,            1.,             2.,             473.176473           ],    # pint
-                        [0.23658823,    0.0625,         0.25,           0.5,            1.,             236.5882365          ],    # cup
-                        [0.001,         2.6417205e-4,   1.05668821e-3,  2.11337641e-3,  4.2267528e-3,   1.                   ]     # cm^3
-                    ]
         if x == "ItoO":
             inx = float(str(self.VinEdit.text()))
-            outx = inx*convtable[self.VinComboBox.currentIndex()][self.VoutComboBox.currentIndex()]
+            outx = aw.convertVolume(inx,self.VinComboBox.currentIndex(),self.VoutComboBox.currentIndex())
             self.VoutEdit.setText("%.3f"%outx)
             
         elif x == "OtoI":
             outx = float(str(self.VoutEdit.text()))
-            inx = outx*convtable[self.VoutComboBox.currentIndex()][self.VinComboBox.currentIndex()]
+            inx = aw.convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
             self.VinEdit.setText("%.3f"%inx)
 
 ##########################################################################
@@ -29814,6 +29827,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
 
     def deldevice(self):
         try:
+            self.savedevicetable()
             bindex = len(aw.qmc.extradevices)-1
             selected = self.devicetable.selectedRanges()
             if len(selected) > 0:
