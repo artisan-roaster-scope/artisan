@@ -1395,6 +1395,13 @@ class tgraphcanvas(FigureCanvas):
         #message string for plotter 
         self.plottermessage = ""
 
+        #buffers for real time symbolic evalualtion
+        self.RTtemp1=0.
+        self.RTtemp2=0.        
+        self.RTextratemp1=[]
+        self.RTextratemp2=[]
+        self.RTextratx=[]
+        
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
@@ -2321,24 +2328,29 @@ class tgraphcanvas(FigureCanvas):
     def eval_math_expression(self,mathexpression,t,equeditnumber=None, RTsname=None,RTsval=None,t_offset=0):
         if len(mathexpression):            
             i =0
+            mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
+                              "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
+                              "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
 
-            #get index from the time. 
-            if len(self.timex):
-                if RTsname:
-                    index = len(self.timex)-1
-                else:
-                    index = self.time2index(t)  # If using the plotter. Background index done bellow at "B"
-            else:
-                index = 0      #if plotting but nothing loaded. Index will not be used anyway.
+            if RTsname:
+                index = len(self.timex)-1
+                #load real time buffers acquired at sample() to the dictionary                  
+                mathdictionary["Y1"] = self.RTtemp1
+                mathdictionary["Y2"] = self.RTtemp2
+                for d in range(len(self.RTextratemp1)):
+                    mathdictionary["Y%i"%(d*2+3)] = self.RTextratemp1[d]
+                    mathdictionary["Y%i"%(d*2+4)] = self.RTextratemp2[d]
                     
+            else:#get index from the time. 
+                if len(self.timex):
+                    index = self.time2index(t)  # If using the plotter with loaded profile. Background index done bellow at "B"
+                else:
+                    index = 0      #if plotting but nothing loaded. Index will not be used anyway.
+                        
             #timeshift vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
             timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
         
-            #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
-            mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
-                              "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
-                              "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
             if RTsname:
                 mathdictionary[str(RTsname)] = float(RTsval)
                 
@@ -2624,11 +2636,9 @@ class tgraphcanvas(FigureCanvas):
                     return -1
                 #if sample()
                 else:
-                    #may complain in first 2 samples of symbolic devices (like virtual)
-                    if len(self.timex)>2:
-                        e = str(e)
-                        _, _, exc_tb = sys.exc_info()
-                        self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): {0}").format(e),exc_tb.tb_lineno)
+                    e = str(e)
+                    _, _, exc_tb = sys.exc_info()
+                    self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): {0}").format(e),exc_tb.tb_lineno)
                     return -1
 
         return -1
@@ -7426,7 +7436,7 @@ class SampleThread(QThread):
                     #### first retrieve readings from the main device
                     timeBeforeETBT = libtime.time() # the time before sending the request to the main device
                     #read time, ET (t1) and BT (t2) TEMPERATURE
-                    tx,t1,t2 = self.sample_main_device()
+                    tx,t1,t2 = self.sample_main_device()                    
                     timeAfterETBT = libtime.time() # the time the data of the main device was received
                     ##############  if using Extra devices
                     nxdevices = len(aw.qmc.extradevices)
@@ -7435,12 +7445,22 @@ class SampleThread(QThread):
                         if les == led == let:
                             xtra_dev_lines1 = 0
                             xtra_dev_lines2 = 0
+                            #1 clear extra device buffers
+                            aw.qmc.RTextratemp1,aw.qmc.RTextratemp2,aw.qmc.RTextratx = [],[],[]
+                            #2 load RT buffers
+                            aw.qmc.RTtemp1 = t1
+                            aw.qmc.RTtemp2 = t2
                             for i in range(nxdevices):
-                                extratx,extrat2,extrat1 = self.sample_extra_device(i)
+                                extratx,extrat1,extrat2 = self.sample_extra_device(i)
+                                aw.qmc.RTextratemp1.append(extrat1)
+                                aw.qmc.RTextratemp2.append(extrat2)
+                                aw.qmc.RTextratx.append(extratx)              
+                            #3 evaluate symbolic expressions
+                            for i in range(nxdevices):   
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extratx,RTsname="Y"+str(2*i+3),RTsval=extrat1)
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extratx,RTsname="Y"+str(2*i+4),RTsval=extrat2)
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
                                 # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                                 # modbus channel 1+2, respect input temperature scale setting
                                 if aw.qmc.extradevices[i] == 29:
@@ -17629,7 +17649,7 @@ class HUDDlg(ArtisanDialog):
         else:
             # Check for incompatible vars from in the equations
             EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
-            incompatiblevars = ["P","F"]
+            incompatiblevars = ["P","F","$","#"]
             error = ""
             for i in range(len(incompatiblevars)):
                 if incompatiblevars[i] in EQU[0]:
@@ -17685,7 +17705,7 @@ class HUDDlg(ArtisanDialog):
 
         # Check for incompatible vars from in the equations
         EQU = [str(self.equedit1.text()),str(self.equedit2.text())]
-        incompatiblevars = ["P","F"]
+        incompatiblevars = ["P","F","$","#"]
         error = ""
         for i in range(len(incompatiblevars)):
             if incompatiblevars[i] in EQU[0]:
