@@ -997,12 +997,15 @@ class tgraphcanvas(FigureCanvas):
         self.projectionconstant = 1
         self.projectionmode = 0     # 0 = linear; 1 = newton
 
+        self.weight_units = ["g","Kg","lb","oz"]
         #[0]weight in, [1]weight out, [2]units (string)
-        self.weight = [0,0,"g"]
+        self.weight = [0,0,self.weight_units[0]]
+
+        self.volume_units = ["l","gal","qt","pt","cup","ml"]
         #[0]volume in, [1]volume out, [2]units (string)
-        self.volume = [0,0,"l"]
+        self.volume = [0,0,self.volume_units[0]]
         #[0]probe weight, [1]weight unit, [2]probe volume, [3]volume unit
-        self.density = [0.,"g",1.,"l"]
+        self.density = [0.,self.weight_units[0],1.,self.volume_units[0]]
         
         self.volumeCalcUnit = 0
         self.volumeCalcWeightInStr = ""
@@ -7451,7 +7454,7 @@ class SampleThread(QThread):
                             aw.qmc.RTtemp1 = t1
                             aw.qmc.RTtemp2 = t2
                             for i in range(nxdevices):
-                                extratx,extrat1,extrat2 = self.sample_extra_device(i)
+                                extratx,extrat2,extrat1 = self.sample_extra_device(i)
                                 aw.qmc.RTextratemp1.append(extrat1)
                                 aw.qmc.RTextratemp2.append(extrat2)
                                 aw.qmc.RTextratx.append(extratx)              
@@ -9390,7 +9393,7 @@ class ApplicationWindow(QMainWindow):
 
     # i/o: 0:l (liter), 1:gal (gallons US), 2:qt, 3:pt, 4:cup, 5:cm^3/ml
     def convertVolume(self,v,i,o):
-                        #liter          gal             qt              pt              cup             cm^3
+                        #liter          gal             qt              pt              cup             ml/cm^3
         convtable = [
                         [1.,            0.26417205,     1.05668821,     2.11337643,     4.22675284,     1000.                ],    # liter
                         [3.78541181,    1.,             4.,             8.,             16,             3785.4117884         ],    # gallon
@@ -18441,8 +18444,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         unitvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit", None)) + "</b>")
         self.unitvolumeEdit = QLineEdit(str(aw.qmc.volumeCalcUnit))
         self.unitvolumeEdit.setValidator(QIntValidator(0, 9999,self.unitvolumeEdit))
-        self.unitvolumeEdit.setMinimumWidth(60)
-        self.unitvolumeEdit.setMaximumWidth(60)
+        self.unitvolumeEdit.setMinimumWidth(70)
+        self.unitvolumeEdit.setMaximumWidth(70)
         self.unitvolumeEdit.setAlignment(Qt.AlignRight)
         unitvolumeUnit = QLabel(QApplication.translate("Label","ml", None))
         
@@ -18465,8 +18468,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         # In Group
         coffeeinunitweightLabel = QLabel("<b>" + u(QApplication.translate("Label","Unit Weight", None)) + "</b>")
         self.coffeeinweightEdit = QLineEdit(aw.qmc.volumeCalcWeightInStr)
-        self.coffeeinweightEdit.setMinimumWidth(60)
-        self.coffeeinweightEdit.setMaximumWidth(60)
+        self.coffeeinweightEdit.setMinimumWidth(70)
+        self.coffeeinweightEdit.setMaximumWidth(70)
         self.coffeeinweightEdit.setAlignment(Qt.AlignRight)
         coffeeinunitweightUnit = QLabel(QApplication.translate("Label","g", None))
 
@@ -18474,20 +18477,17 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeinweight = QLineEdit()
         if self.weightIn:
             self.coffeeinweight.setText(str(aw.float2float(self.weightIn)))
-        self.coffeeinweight.setMinimumWidth(60)
-        self.coffeeinweight.setMaximumWidth(60)
+        self.coffeeinweight.setMinimumWidth(70)
+        self.coffeeinweight.setMaximumWidth(70)
         self.coffeeinweight.setAlignment(Qt.AlignRight)
         self.coffeeinweight.setReadOnly(True)
         self.coffeeinweight.setFocusPolicy(Qt.NoFocus)
-        if weightunit:
-            coffeeinweightUnit = QLabel(QApplication.translate("Label","Kg", None))
-        else:
-            coffeeinweightUnit = QLabel(QApplication.translate("Label","g", None))
+        coffeeinweightUnit = QLabel(aw.qmc.weight_units[weightunit])
         
         coffeeinvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None)) + "</b>")
         self.coffeeinvolume = QLineEdit()
-        self.coffeeinvolume.setMinimumWidth(60)
-        self.coffeeinvolume.setMaximumWidth(60)
+        self.coffeeinvolume.setMinimumWidth(70)
+        self.coffeeinvolume.setMaximumWidth(70)
         
         palette = QPalette()
         palette.setColor(self.coffeeinvolume.foregroundRole(), QColor('red'))
@@ -18496,10 +18496,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeinvolume.setAlignment(Qt.AlignRight)
         self.coffeeinvolume.setReadOnly(True)
         self.coffeeinvolume.setFocusPolicy(Qt.NoFocus)
-        if volumeunit:
-            coffeeinvolumeUnit = QLabel(QApplication.translate("Label","l", None))
-        else:
-            coffeeinvolumeUnit = QLabel(QApplication.translate("Label","ml", None))
+        coffeeinvolumeUnit = QLabel(aw.qmc.volume_units[volumeunit])
             
         # in button
         inButton = QPushButton(QApplication.translate("Button", "in",None))
@@ -18554,10 +18551,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeoutweight.setAlignment(Qt.AlignRight)
         self.coffeeoutweight.setReadOnly(True)
         self.coffeeoutweight.setFocusPolicy(Qt.NoFocus)
-        if weightunit:
-            coffeeoutweightUnit = QLabel(QApplication.translate("Label","Kg", None))
-        else:
-            coffeeoutweightUnit = QLabel(QApplication.translate("Label","g", None))
+        coffeeoutweightUnit = QLabel(aw.qmc.weight_units[weightunit])
 
         coffeeoutvolumeLabel = QLabel("<b>" + u(QApplication.translate("Label","Volume", None)) + "</b>")
         self.coffeeoutvolume = QLineEdit()
@@ -18571,10 +18565,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeoutvolume.setAlignment(Qt.AlignRight)
         self.coffeeoutvolume.setReadOnly(True)
         self.coffeeoutvolume.setFocusPolicy(Qt.NoFocus)
-        if volumeunit:
-            coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","l", None))
-        else:
-            coffeeoutvolumeUnit = QLabel(QApplication.translate("Label","ml", None))
+        coffeeoutvolumeUnit = QLabel(aw.qmc.volume_units[volumeunit])
 
         # out button
         outButton = QPushButton(QApplication.translate("Button", "out",None))
@@ -18682,49 +18673,25 @@ class volumeCalculatorDlg(ArtisanDialog):
 
     def resetInVolume(self):
         try:
-            if self.volumeunit:
-                k = 1000.
-            else:
-                k = 1.
-            if self.weightunit:
-                j = 1000.
-            else:
-                j = 1.
             line = self.coffeeinweightEdit.text()
             if line == None or str(line).strip() == "":
                 self.coffeeinvolume.setText("")
                 self.inVolume = None
             else:
-                res = self.weightIn / (k * (float(str(self.coffeeinweightEdit.text())) / (j * float(self.unitvolumeEdit.text()))))
-                if self.volumeunit:
-                    self.coffeeinvolume.setText(str(aw.float2float(res,4)))
-                else:
-                    self.coffeeinvolume.setText(str(aw.float2float(res)))
-                self.inVolume = res
+                self.inVolume = aw.convertVolume(aw.convertWeight(self.weightIn,self.weightunit,0) * float(str(self.unitvolumeEdit.text())) / float(str(self.coffeeinweightEdit.text())),5,self.volumeunit)
+                self.coffeeinvolume.setText(str(aw.float2float(self.inVolume)))
         except Exception:
             pass
 
     def resetOutVolume(self):
         try:
-            if self.volumeunit:
-                k = 1000.
-            else:
-                k = 1.
-            if self.weightunit:
-                j = 1000.
-            else:
-                j = 1.
             line = self.coffeeoutweightEdit.text()
             if line == None or str(line).strip() == "":
                 self.coffeeoutvolume.setText("")
                 self.outVolume = None
             else:
-                res = self.weightOut / (k * (float(str(self.coffeeoutweightEdit.text())) / (j * float(self.unitvolumeEdit.text()))))
-                if self.volumeunit:
-                    self.coffeeoutvolume.setText(str(aw.float2float(res,4)))
-                else:
-                    self.coffeeoutvolume.setText(str(aw.float2float(res)))
-                self.outVolume = res
+                self.outVolume = aw.convertVolume(aw.convertWeight(self.weightOut,self.weightunit,0) * float(str(self.unitvolumeEdit.text())) / float(str(self.coffeeoutweightEdit.text())),5,self.volumeunit)
+                self.coffeeoutvolume.setText(str(aw.float2float(self.outVolume)))
         except Exception:
             pass
 
@@ -19298,13 +19265,13 @@ class editGraphDlg(ArtisanDialog):
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
         self.weightinedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightinedit))
-        self.weightinedit.setMinimumWidth(60)
-        self.weightinedit.setMaximumWidth(60)
+        self.weightinedit.setMinimumWidth(70)
+        self.weightinedit.setMaximumWidth(70)
         self.weightinedit.setAlignment(Qt.AlignRight)
         self.weightoutedit = QLineEdit(outw)
         self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
-        self.weightoutedit.setMinimumWidth(60)
-        self.weightoutedit.setMaximumWidth(60)
+        self.weightoutedit.setMinimumWidth(70)
+        self.weightoutedit.setMaximumWidth(70)
         self.weightoutedit.setAlignment(Qt.AlignRight)
         self.weightpercentlabel = QLabel(QApplication.translate("Label", " %",None))
         self.weightpercentlabel.setMinimumWidth(45)
@@ -19316,14 +19283,10 @@ class editGraphDlg(ArtisanDialog):
         self.weightoutedit.editingFinished.connect(self.weightouteditChanged)
         self.weightinedit.editingFinished.connect(self.weightineditChanged)
         self.unitsComboBox = QComboBox()
-        self.unitsComboBox.setMaximumWidth(60)
-        self.unitsComboBox.setMinimumWidth(60)
-        self.unitsComboBox.addItems([QApplication.translate("ComboBox", "g", None),
-                                     QApplication.translate("ComboBox", "Kg", None)])
-        if aw.qmc.weight[2] == QApplication.translate("ComboBox", "g", None):
-            self.unitsComboBox.setCurrentIndex(0)
-        else:
-            self.unitsComboBox.setCurrentIndex(1)
+        self.unitsComboBox.setMaximumWidth(70)
+        self.unitsComboBox.setMinimumWidth(70)
+        self.unitsComboBox.addItems(aw.qmc.weight_units)
+        self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(aw.qmc.weight[2]))
         self.unitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeWeightUnit(i))
         #volume
         volumelabel = QLabel("<b>" + u(QApplication.translate("Label", "Volume",None)) + "</b>")
@@ -19333,13 +19296,13 @@ class editGraphDlg(ArtisanDialog):
         outv = str(aw.qmc.volume[1])
         self.volumeinedit = QLineEdit(inv)
         self.volumeinedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeinedit))
-        self.volumeinedit.setMinimumWidth(60)
-        self.volumeinedit.setMaximumWidth(60)
+        self.volumeinedit.setMinimumWidth(70)
+        self.volumeinedit.setMaximumWidth(70)
         self.volumeinedit.setAlignment(Qt.AlignRight)
         self.volumeoutedit = QLineEdit(outv)
         self.volumeoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeoutedit))
-        self.volumeoutedit.setMinimumWidth(60)
-        self.volumeoutedit.setMaximumWidth(60)
+        self.volumeoutedit.setMinimumWidth(70)
+        self.volumeoutedit.setMaximumWidth(70)
         self.volumeoutedit.setAlignment(Qt.AlignRight)
         self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None))
         self.volumepercentlabel.setMinimumWidth(45)
@@ -19349,12 +19312,8 @@ class editGraphDlg(ArtisanDialog):
         self.volumeUnitsComboBox = QComboBox()
         self.volumeUnitsComboBox.setMaximumWidth(60)
         self.volumeUnitsComboBox.setMinimumWidth(60)
-        self.volumeUnitsComboBox.addItems([QApplication.translate("ComboBox", "ml",None),
-                                           QApplication.translate("ComboBox", "l",None)])
-        if aw.qmc.volume[2] == QApplication.translate("ComboBox", "ml",None):
-            self.volumeUnitsComboBox.setCurrentIndex(0)
-        else:
-            self.volumeUnitsComboBox.setCurrentIndex(1)
+        self.volumeUnitsComboBox.addItems(aw.qmc.volume_units)
+        self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(aw.qmc.volume[2]))
         self.volumeUnitsComboBox.currentIndexChanged.connect(lambda i=self.volumeUnitsComboBox.currentIndex() :self.changeVolumeUnit(i))
         self.calculateddensitylabel = QLabel("")
         self.unitsComboBox.currentIndexChanged.connect(self.calculated_density)
@@ -19368,12 +19327,8 @@ class editGraphDlg(ArtisanDialog):
         self.bean_density_weightUnitsComboBox = QComboBox()
         self.bean_density_weightUnitsComboBox.setMaximumWidth(60)
         self.bean_density_weightUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_weightUnitsComboBox.addItems([QApplication.translate("ComboBox", "g",None),
-                                                        QApplication.translate("ComboBox", "Kg",None)])
-        if aw.qmc.density[1] == QApplication.translate("ComboBox", "g",None):
-            self.bean_density_weightUnitsComboBox.setCurrentIndex(0)
-        else:
-            self.bean_density_weightUnitsComboBox.setCurrentIndex(1)
+        self.bean_density_weightUnitsComboBox.addItems(aw.qmc.weight_units)
+        self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(aw.qmc.density[1]))
         bean_density_per_label = QLabel(QApplication.translate("Label", "per",None))
         self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
         self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
@@ -19383,12 +19338,8 @@ class editGraphDlg(ArtisanDialog):
         self.bean_density_volumeUnitsComboBox = QComboBox()
         self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
         self.bean_density_volumeUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_volumeUnitsComboBox.addItems([QApplication.translate("ComboBox", "ml",None),
-                                                        QApplication.translate("ComboBox", "l",None)])
-        if aw.qmc.density[3] == QApplication.translate("ComboBox", "ml",None):
-            self.bean_density_volumeUnitsComboBox.setCurrentIndex(0)
-        else:
-            self.bean_density_volumeUnitsComboBox.setCurrentIndex(1)
+        self.bean_density_volumeUnitsComboBox.addItems(aw.qmc.volume_units)
+        self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(aw.qmc.density[3]))
         self.standarddensitylabel = QLabel("")
         self.standard_density()
         self.bean_density_volume_edit.editingFinished.connect(self.standard_density)
@@ -19844,34 +19795,42 @@ class editGraphDlg(ArtisanDialog):
             QApplication.processEvents()
             # reset index and popup
             self.tareComboBox.setCurrentIndex(aw.qmc.container_idx + 3)
-
-
-    def changeUnit(self,i,lineedits):
-        for le in lineedits:
+                        
+    def changeWeightUnit(self,i):
+        o = aw.qmc.weight_units.index(aw.qmc.weight[2]) # previous unit index
+        aw.qmc.weight[2] = u(self.unitsComboBox.currentText())
+        for le in [self.weightinedit,self.weightoutedit]:
             if le.text() and le.text() != "":
                 wi = float(le.text())
                 if wi != 0.0:
-                    if i == 0:
-                        le.setText(str(wi*1000.))
-                    else:
-                        le.setText(str(wi/1000.))
+                    le.setText(str(aw.float2float(aw.convertWeight(wi,o,i),4)))
+        self.calculated_density()
 
-    def changeWeightUnit(self,i):
-        aw.qmc.weight[2] = u(self.unitsComboBox.currentText())
-        self.changeUnit(i,[self.weightinedit,self.weightoutedit])
-        
     def changeVolumeUnit(self,i):
+        o = aw.qmc.volume_units.index(aw.qmc.volume[2]) # previous unit index
         aw.qmc.volume[2] = u(self.volumeUnitsComboBox.currentText())
-        self.changeUnit(i,[self.volumeinedit,self.volumeoutedit])
+        for le in [self.volumeinedit,self.volumeoutedit]:
+            if le.text() and le.text() != "":
+                wi = float(le.text())
+                if wi != 0.0:
+                    le.setText(str(aw.float2float(aw.convertVolume(wi,o,i),4)))
         self.calculated_density()
         
     def changeDensityWeightUnit(self,i):
-        aw.qmc.density[1] = u(self.bean_density_volumeUnitsComboBox.currentText())
-        self.changeUnit(i,[self.bean_density_weight_edit])
+        o = aw.qmc.weight_units.index(aw.qmc.density[1]) # previous unit index        
+        aw.qmc.density[1] = u(self.bean_density_weightUnitsComboBox.currentText())
+        if self.bean_density_weight_edit.text() and self.bean_density_weight_edit.text() != "":
+            wi = float(self.bean_density_weight_edit.text())
+            if wi != 0.0:
+                self.bean_density_weight_edit.setText(str(aw.float2float(aw.convertWeight(wi,o,i),4)))
 
     def changeDensityVolumeUnit(self,i):
+        o = aw.qmc.volume_units.index(aw.qmc.density[3]) # previous unit index        
         aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
-        self.changeUnit(i,[self.bean_density_volume_edit])
+        if self.bean_density_volume_edit.text() and self.bean_density_volume_edit.text() != "":
+            wi = float(self.bean_density_volume_edit.text())
+            if wi != 0.0:
+                self.bean_density_volume_edit.setText(str(aw.float2float(aw.convertVolume(wi,o,i),4)))
 
     def tabSwitched(self,i):
         if i == 3:
@@ -20360,6 +20319,7 @@ class editGraphDlg(ArtisanDialog):
         self.volumepercentlabel.setText(u(percentstring))    #volume percent gain
         self.calculated_density()
         
+    # calculates density in g/l
     def calc_density(self):
         din = dout = 0.0
         if self.volumeinedit.text() != "" and self.volumeoutedit.text() != "" and self.weightinedit.text() != "" and self.weightoutedit.text() != "":
@@ -20368,12 +20328,12 @@ class editGraphDlg(ArtisanDialog):
             weightin = float(str(self.weightinedit.text()))
             weightout = float(str(self.weightoutedit.text()))
             if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
-                if self.volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None) :
-                    volumein = volumein / 1000.0
-                    volumeout = volumeout / 1000.0
-                if self.unitsComboBox.currentText() != QApplication.translate("ComboBox","g", None) :
-                    weightin = weightin * 1000.0
-                    weightout = weightout * 1000.0
+                vol_idx = aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
+                volumein = aw.convertVolume(volumein,vol_idx,0)
+                volumeout = aw.convertVolume(volumeout,vol_idx,0)
+                weight_idx = aw.qmc.weight_units.index(self.unitsComboBox.currentText())
+                weightin = aw.convertWeight(weightin,weight_idx,0)
+                weightout = aw.convertWeight(weightout,weight_idx,0)
                 din = (weightin / volumein) 
                 dout = (weightout / volumeout)
         return din,dout
@@ -20435,11 +20395,9 @@ class editGraphDlg(ArtisanDialog):
             self.bean_density_weightUnitsComboBox.currentIndex() == 0):
             volume = float(str(self.bean_density_volume_edit.text()))
             weight = float(str(self.bean_density_weight_edit.text()))
-            if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None) :
-                volume = volume / 1000.0
-            if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None) :
-                weight = weight * 1000.0
-            self.standarddensitylabel.setText(QApplication.translate("Label","({0} g/l)", None).format((weight / volume)))
+            volume = aw.convertVolume(volume,self.bean_density_volumeUnitsComboBox.currentIndex(),0)
+            weight = aw.convertWeight(weight,self.bean_density_weightUnitsComboBox.currentIndex(),0)            
+            self.standarddensitylabel.setText(QApplication.translate("Label","({0} g/l)", None).format(aw.float2float(weight / volume,2)))
         else:
             self.standarddensitylabel.setText("")
 
@@ -21450,11 +21408,7 @@ class calculatorDlg(ArtisanDialog):
         self.ceEdit.editingFinished.connect(lambda x="CtoF":self.convertTemp(x))
         #WEIGHT CONVERSION
         self.WinComboBox = QComboBox()
-        weightunits = [QApplication.translate("ComboBox","g",None),
-                       QApplication.translate("ComboBox","Kg",None),
-                       QApplication.translate("ComboBox","lb",None),
-                       QApplication.translate("ComboBox","oz",None)]
-        self.WinComboBox.addItems(weightunits)
+        self.WinComboBox.addItems(aw.qmc.weight_units)
         self.WinComboBox.setMaximumWidth(80)
         self.WinComboBox.setMinimumWidth(80)
         self.WoutComboBox = QComboBox()
