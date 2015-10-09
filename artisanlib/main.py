@@ -5585,7 +5585,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.beans and aw.qmc.beans != "":
                         msg += sep + aw.qmc.abbrevString(u(aw.qmc.beans),25)
                     if aw.qmc.weight[0]:
-                        msg += sep + str(int(round(aw.qmc.weight[0]))) + aw.qmc.weight[2]
+                        msg += sep + str(aw.float2float(aw.qmc.weight[0],2)) + aw.qmc.weight[2]
                         if aw.qmc.weight[1]:
                             msg += sep + str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
                     if aw.qmc.volume[0] and aw.qmc.volume[1]:
@@ -15559,14 +15559,14 @@ $cupping_notes
         v = aw.scale.readWeight() # read value from scale in 'g'
         if v != None and v > -1:
             v = v - tare
-            v = aw.convertWeight(v,0,weightin,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
+            v = aw.convertWeight(v,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
             aw.qmc.weight[0] = v
 
     def retrieveWeightOut(self,tare=0):
         v = aw.scale.readWeight() # read value from scale in 'g'
         if v != None and v > -1:
             v = v - tare
-            v = aw.convertWeight(v,0,weightin,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
+            v = aw.convertWeight(v,0,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
             if aw.qmc.weight[2] != 'g':
                 v = v / 1000.0
             aw.qmc.weight[1] = v
@@ -19965,7 +19965,7 @@ class editGraphDlg(ArtisanDialog):
             # convert to 'g'
             text_in = aw.convertWeight(text_in,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
             # substract tare
-            text_in = text_out - tare
+            text_in = text_in - tare
             self.weightinedit.setText(str(aw.float2float(text_in)))
         elif previous_in != aw.qmc.weight[0]:
             self.weightinedit.setText(str(aw.float2float(aw.qmc.weight[0])))
@@ -21420,7 +21420,7 @@ class calculatorDlg(ArtisanDialog):
         self.WoutComboBox = QComboBox()
         self.WoutComboBox.setMaximumWidth(80)
         self.WoutComboBox.setMinimumWidth(80)
-        self.WoutComboBox.addItems(weightunits)
+        self.WoutComboBox.addItems(aw.qmc.weight_units)
         self.WoutComboBox.setCurrentIndex(2)
         self.WinEdit = QLineEdit()
         self.WoutEdit = QLineEdit()
