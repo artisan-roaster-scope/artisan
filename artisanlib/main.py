@@ -12574,19 +12574,17 @@ class ApplicationWindow(QMainWindow):
             din = dout = 0
             # standardize unit of volume and weight to l and g
             if volumein != 0.0 and volumeout != 0.0:
-                if self.qmc.volume[2] == "ml":
-                    volumein = volumein / 1000.0 # in l
-                    volumeout = volumeout / 1000.0 # in l
+                volumein = self.float2float(aw.convertVolume(volumein,aw.qmc.weight_units.index(aw.qmc.volume[2]),0),4)
+                volumeout = self.float2float(aw.convertVolume(volumeout,aw.qmc.weight_units.index(aw.qmc.volume[2]),0),4)
             # store volume in l
             computedProfile["volumein"] = volumein
             computedProfile["volumeout"] = volumeout
-            if weightin != 0.0 and weightout != 0.0:
-                if self.qmc.weight[2] != "g":
-                    weightin = weightin * 1000.0
-                    weightout = weightout * 1000.0
-            # store weight in Kg
-            computedProfile["weightin"] = weightin # in g
-            computedProfile["weightout"] = weightout # in g
+            # store weight in kg
+            if volumein != 0.0 and volumeout != 0.0:
+                weightin = self.float2float(aw.convertWeight(weightin,aw.qmc.weight_units.index(aw.qmc.weight[2]),1),4) # in kg
+                weightout = self.float2float(aw.convertWeight(weightout,aw.qmc.weight_units.index(aw.qmc.weight[2]),1),4) # in kg
+            computedProfile["weightin"] = weightin
+            computedProfile["weightout"] = weightout
             if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
                 din = (weightin / volumein) 
                 dout = (weightout / volumeout)
@@ -15561,14 +15559,14 @@ $cupping_notes
         v = aw.scale.readWeight() # read value from scale in 'g'
         if v != None and v > -1:
             v = v - tare
-            if aw.qmc.weight[2] != 'g':
-                v = v / 1000.0
+            v = aw.convertWeight(v,0,weightin,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
             aw.qmc.weight[0] = v
 
     def retrieveWeightOut(self,tare=0):
         v = aw.scale.readWeight() # read value from scale in 'g'
         if v != None and v > -1:
             v = v - tare
+            v = aw.convertWeight(v,0,weightin,aw.qmc.weight_units.index(aw.qmc.weight[2])) # convert to weight units
             if aw.qmc.weight[2] != 'g':
                 v = v / 1000.0
             aw.qmc.weight[1] = v
@@ -19942,10 +19940,10 @@ class editGraphDlg(ArtisanDialog):
             # no value received from scale:
             # we reduce the tare from the outWeight
             text_out = self.weightoutedit.text().toFloat()[0]
-            if aw.qmc.weight[2] != 'g':
-                text_out = ((text_out*1000.) - tare) / 1000.
-            else:
-                text_out = text_out - tare
+            # convert to 'g'
+            text_out = aw.convertWeight(text_out,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
+            # substract tare
+            text_out = text_out - tare
             self.weightoutedit.setText(str(aw.float2float(text_out)))
         elif previous_out != aw.qmc.weight[1]:
             self.weightoutedit.setText(str(aw.float2float(aw.qmc.weight[1])))
@@ -19964,10 +19962,10 @@ class editGraphDlg(ArtisanDialog):
             # no value received from scale:
             # we reduce the tare from the inWeight
             text_in = self.weightinedit.text().toFloat()[0]
-            if aw.qmc.weight[2] != 'g':
-                text_in = ((text_in*1000.) - tare) / 1000.
-            else:
-                text_in = text_in - tare
+            # convert to 'g'
+            text_in = aw.convertWeight(text_in,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
+            # substract tare
+            text_in = text_out - tare
             self.weightinedit.setText(str(aw.float2float(text_in)))
         elif previous_in != aw.qmc.weight[0]:
             self.weightinedit.setText(str(aw.float2float(aw.qmc.weight[0])))
