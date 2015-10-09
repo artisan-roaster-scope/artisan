@@ -2326,34 +2326,40 @@ class tgraphcanvas(FigureCanvas):
     # mathexpression = formula; t = a number to evaluate(usually time);
     # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTsval = RealTime var val
     def eval_math_expression(self,mathexpression,t,equeditnumber=None, RTsname=None,RTsval=None,t_offset=0):
-        if len(mathexpression):            
-            i =0
+        if len(mathexpression):              
             mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
                               "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
                               "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
-
+            #if sampling 
             if RTsname:
-                index = len(self.timex)-1
+                if len(self.timex):
+                    index = len(self.timex)-1
+                else:
+                    index = 0
                 #load real time buffers acquired at sample() to the dictionary                  
                 mathdictionary["Y1"] = self.RTtemp1
                 mathdictionary["Y2"] = self.RTtemp2
                 for d in range(len(self.RTextratemp1)):
                     mathdictionary["Y%i"%(d*2+3)] = self.RTextratemp1[d]
                     mathdictionary["Y%i"%(d*2+4)] = self.RTextratemp2[d]
-                    
+                if str(RTsname) not in mathdictionary:
+                    mathdictionary[str(RTsname)] = float(RTsval)
+            #if plotting 
             else:#get index from the time. 
-                if len(self.timex):
+                if len(self.timex):            
                     index = self.time2index(t)  # If using the plotter with loaded profile. Background index done bellow at "B"
                 else:
-                    index = 0      #if plotting but nothing loaded. Index will not be used anyway.
+                    index = 0      #if plotting but nothing loaded.
+            #if background
+            if self.background and "B" in mathexpression:
+                bindex = self.backgroundtime2index(t)         #use background time
+
+            #under work: index for: self.extratimex, self.extratimexB, and mixP#
                         
-            #timeshift vars 
+            #timeshift working vars 
             timeshiftexpressions = []           #holds strings like "Y10040" as explained below
             timeshiftexpressionsvalues = []     #holds the evaluated values (float) for the above
-        
-            if RTsname:
-                mathdictionary[str(RTsname)] = float(RTsval)
-                
+                        
             try:
                 t = float(t)
                 #extract Ys
@@ -2473,7 +2479,7 @@ class tgraphcanvas(FigureCanvas):
                                 if i+5 < len(mathexpression) and mathexpression[i+2] == "[" and mathexpression[i+5] == "]":
                                     Yshiftval = int(mathexpression[i+4])
                                     sign = mathexpression[i+3]
-                                    #ET,BT, and Extras                  
+                                    #ET,BT, and Extrasy
                                     if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
                                         evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
                                         shiftedindex = index - Yshiftval   
@@ -2506,19 +2512,18 @@ class tgraphcanvas(FigureCanvas):
                             seconddigitstr = ""
                             if mathexpression[i+1].isdigit():
                                 nint = int(mathexpression[i+1])              #Bnumber int
-                                bindex = self.backgroundtime2index(t)         #use background time
                                 #check for TIMESHIFT 0-9 (one digit). Example: "B1[-2]" 
                                 if i+5 < len(mathexpression) and mathexpression[i+2] == "[":
                                     Yshiftval = int(mathexpression[i+4])
                                     sign = mathexpression[i+3]
-                                    
+
+                                    # TWO digits shifting
                                     if mathexpression[i+5].isdigit():
                                         seconddigit = int(mathexpression[i+5])
                                         seconddigitstr = mathexpression[i+5]
                                         mathexpression = mathexpression[:i+5]+mathexpression[i+6:]
                                         Yshiftval = 10*Yshiftval + seconddigit
-                                    
-                                    #ET,BT, and Extras                  
+                                                      
                                     if sign == "-": #  ie. original [1,2,3,4,5,6]; shift right 2 = [1,1,1,2,3,4]
                                         evalsign = "0"      # "-" becomes digit "0" for python eval compatibility
                                         shiftedindex = bindex - Yshiftval   
@@ -2533,6 +2538,7 @@ class tgraphcanvas(FigureCanvas):
                                         val = self.temp1B[shiftedindex]
                                     elif nint == 2: #BTbackground
                                         val = self.temp2B[shiftedindex]
+                                    #B3, B4, B5, ...
                                     elif nint > 2:
                                         idx3 = aw.qmc.xtcurveidx - 1
                                         n3 = idx3//2
@@ -2631,14 +2637,16 @@ class tgraphcanvas(FigureCanvas):
                 #if plotter
                 if equeditnumber:
                     e = str(e)
-                    e = "P" + str(equeditnumber) + ": index %i: "%(i+1) + e
+                    e = "P" + str(equeditnumber) + ": " + e
                     self.plottermessage = e
                     return -1
                 #if sample()
                 else:
-                    e = str(e)
-                    _, _, exc_tb = sys.exc_info()
-                    self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): {0}").format(e),exc_tb.tb_lineno)
+                    #virtual devices with symbolic may need 2 samples min.
+                    if len(self.timex) > 2:
+                        e = str(e)
+                        _, _, exc_tb = sys.exc_info()
+                        self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): %s {0} "%mathexpression).format(e),exc_tb.tb_lineno)
                     return -1
 
         return -1
