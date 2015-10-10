@@ -2437,6 +2437,14 @@ class tgraphcanvas(FigureCanvas):
                                 mathdictionary['x'] = RTsval         # add x to the math dictionary
                             else:
                                 mathdictionary['x'] = -1
+                                
+                    #the factor to plot C/min delta_ax values on the standard temperature axis
+                    elif mathexpression[i] == "k":
+                        if "k" not in mathdictionary:
+                            try:
+                                mathdictionary['k'] = (aw.qmc.ylimit - aw.qmc.ylimit_min) / (aw.qmc.zlimit - aw.qmc.zlimit_min)
+                            except Exception:
+                                mathdictionary['k'] = 1
                             
                     # time timeshift of absolute time (not relative to CHARGE)                                        
                     elif mathexpression[i] == "t":
@@ -2464,7 +2472,7 @@ class tgraphcanvas(FigureCanvas):
                                     shiftedindex = len(self.timex)- 1
                                 val = self.timex[shiftedindex]
                             val = val - t_offset
-                            evaltimeexpression = "Y" + mathexpression[i] + evalsign*2 + mathexpression[i+3] + seconddigitstr + evalsign
+                            evaltimeexpression = mathexpression[i] + evalsign*2 + mathexpression[i+3] + seconddigitstr + evalsign
                             timeshiftexpressions.append(evaltimeexpression)
                             timeshiftexpressionsvalues.append(val)
                             mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+5:]))
@@ -13950,7 +13958,6 @@ class ApplicationWindow(QMainWindow):
             else:
                 settings.setValue("Geometry",self.saveGeometry())
             #save mode
-            previous_mode = str(settings.value("Mode",self.qmc.mode))
             settings.setValue("Mode",self.qmc.mode)
             #save device
             settings.beginGroup("Device")
@@ -13986,12 +13993,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("PhasesMode",self.qmc.phases_mode)
             settings.setValue("PhasesEspresso",self.qmc.phases_espresso)
             settings.setValue("PhasesFilter",self.qmc.phases_filter)
-            #save of phases is done in the phases dialog
-            #only if mode was changed (and therefore the phases values have been converted)
-            #we update the defaults here
-            if previous_mode != self.qmc.mode:
-                #save phases
-                settings.setValue("Phases",self.qmc.phases)
+            settings.setValue("Phases",self.qmc.phases)
             #save phasesbuttonflag
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
             #save phases watermarks flag
@@ -17912,7 +17914,7 @@ class HUDDlg(ArtisanDialog):
             for e in range(9):
                 eqs = EQU[e].strip()
                 if eqs:
-                    if eqs == "$":
+                    if eqs[0] == "$":
                         hideplot[e] = 1
                         eqs = eqs[1:] #removes "$"
                     if eqs[0] == "#":

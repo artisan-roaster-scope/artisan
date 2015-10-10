@@ -61,10 +61,12 @@ Features
 Documentation and Support
 ------------------------
 - [Installation](wiki/Installation.md)
-- [Documentation](http://coffeetroupe.com/artisandocs/)
+- Documentation (written by users)
+  * [Documentation on v0.5.x](http://coffeetroupe.com/artisandocs/)
+  * [aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon
+  * [Controlling a Hottop Roaster with Artisan: The Basics v6 (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit?usp=sharing) by Barrie Fairley
+  * [Artisan - Basic Setup and Tuning Guide (GoogleDocs)](https://docs.google.com/document/d/1eGtztr56t3GFYafTaMvQUDU3YQXK5nOFNcECM-q_WQ8/edit)
 - [Artisan Blog](http://artisan-roasterscope.blogspot.de/)
-- [aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon
-- [Controlling a Hottop Roaster with Artisan: The Basics v6 (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit?usp=sharing) by Barrie Fairley
 - [User Mailing List](https://lists.mokelbu.de/listinfo/artisan-user)
 
 
@@ -73,9 +75,10 @@ Version History
 
 | Version | Date | Comment |
 |---------|------|---------|
+| v0.9.8 | xx.10.2015 | US weight and volume units, extended symbolic formulas and plotter, ln()/x^2 approximations, bug fixes |
 | v0.9.7 | 29.07.2015 | Bug fixes |
 | v0.9.6 | 20.07.2015 | Bug fixes |
-| v0.9.5 | 06.07.2015 | Batch counter, app settings export/import, bug fixes |
+| v0.9.5 | 06.07.2015 | Batch counter, app settings export/import, bug fixes (last Windows Celeron and Mac OS X 10.6 version)|
 | v0.9.4 | 06.06.2015 | Bug fixes |
 | v0.9.3 | 15.05.2015 | Phidget 1051, [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html), one extra background curve, bug fixes |
 | v0.9.2 | 16.01.2015 | Bug fixes |
@@ -89,7 +92,7 @@ Version History
 | v0.7.1 | 02.12.2013 | Bug fixes |
 | v0.7.0 | 30.11.2013 | Phidget 1046/1048, phases LCDs, xkcd style, extended alarms, [Tonino](http://my-tonino.com/) support |
 | v0.6.0 | 14.06.2013 | Monitoring-only mode, sliders, extended alarms, Modbus RTU, Amprobe TMD-56, spike filter, additional localizations |
-| v0.5.6 | 08.11.2012 | Bug fixes |
+| v0.5.6 | 08.11.2012 | Bug fixes  (last Mac OS X 10.4/10.5 version) |
 | v0.5.2 | 23.07.2011 | Delta DTA PID support, automatic CHARGE/DROP |
 | v0.5.0 | 10.06.2011 | HHM28, wheel graph, math plotter, multiple and virtual devices, symbolic expressions, custom buttons |
 | v0.4.0 | 10.04.2011 | Localization, events replay, alarms, profile designer |

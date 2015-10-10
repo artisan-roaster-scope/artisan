@@ -1,6 +1,38 @@
 Detailed Release History
 ========================
 
+----
+v0.9.8 (xx.10.2015)
+------------------
+
+ * New Features
+   * adds menu entries to hide/show extra buttons and sliders
+   * support of multiple selection in events table (event dialog)
+   * adds events to alarm conversion (event dialog)
+   * click on Control button in PID mode toggles PID standby mode
+   * adds "Annotations" flag to hide annotations on BT (CHARGE, FCs, ..) (event dialog)
+   * click on event items in events-by-value mode shows details in the message line
+   * initial support for building Artisan on Windows/Python3/Qt5/PyQt5 platform
+   * initial support for running on Raspberry Pi (Jessy)
+   * adds event actions for RESET und START buttons (event dialog)
+   * adds alarm actions CHARGE, RampSoak ON/OFF, PID ON/OFF (alarm dialog)
+   * adds ln() and x^2 math approximations
+   * enhanced symbolic formula evaluator and plotter adding time shifting among others
+   * adds support for US weight and volume units
+   * adds XTB data to the background dialog if selected in the table of the background dialog
+ * Changes
+   * custom event buttons and sliders remembers visibility status
+   * plotter "Virtual Device" action renamed into "BT/ET", now adds plot data to BT/ET if no profile is loaded, otherwise it creates an additional Virtual Device
+   * the symbolic variables ETB and BTB to access data from the background curves have been generalized and renamed into B1 and B2
+   * default state of the statistic line on the bottom of the main window changed (right-click still toggles) and setting made persistent
+   * time align of background profiles now possible per all major events possible (always aligns to CHARGE first, and if set to ALL, it aligns to all events in sequence of their occurence)
+ * Bug Fixes
+   * fixed port name support in serial port popup on OS X
+   * fixed printing on OS X
+   * fixed sorting of alarm list of numbers larger than 9
+   * fixed temperature conversion issues (phases / background profile interactions)
+   * fixed Yocotopuce reconnect handling
+   * fixed Fuji PRX duty signal
 
 ----
 v0.9.7 (29.7.2015)
@@ -41,6 +73,9 @@ v0.9.5 (6.7.2015)
    * fixed Yocto build issue on Mac OS X
    * fixed a redraw bug introduced in v0.9.4
    
+   
+**Note**
+_This is the latest version supporting the Windows Celeron platform and Mac OS X 10.6 (Intel only)_
 
 ----
 v0.9.4 (6.6.2015)
@@ -438,6 +473,9 @@ v0.5.6 (8.11.2012)
  * based on r787 (with modbus support removed)
  * added support for Voltcraft K201 and fixed CENTER 301
  * bug fixes
+
+**Note**
+_This is the latest version supporting Mac OS X 10.4 and 10.5 (on Intel and PCC)_
 
 ----
 v0.5.5 (28.9.2011)
