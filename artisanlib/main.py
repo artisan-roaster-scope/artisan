@@ -7618,7 +7618,6 @@ class SampleThread(QThread):
                             aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
                     #we need a minimum of two readings to calculate rate of change
                     if local_flagstart and length_of_qmc_timex > 1:                        
-                        # replaced above by taking the last and the butbutlast measurements to ensure a higher temperature resolution, reducing fluctuation
                         if aw.qmc.altsmoothing:
                             # Use numpy to compute a linear approximation for deltas:
                             aw.qmc.rateofchange1 = self.compute_delta(aw.qmc.timex, aw.qmc.temp1, aw.qmc.smoothingwindowsize)
@@ -7639,7 +7638,7 @@ class SampleThread(QThread):
                         #######   filter deltaBT deltaET
                         # decay smoothing
                         if aw.qmc.deltafilter and not aw.qmc.altsmoothing:
-                            user_filter = int(round(aw.qmc.deltafilter/2))                            
+                            user_filter = int(round(aw.qmc.deltafilter/2))
                             if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
                                 if self.decay_weights == None or len(self.decay_weights) != user_filter: # recompute only on changes
                                     self.decay_weights = numpy.arange(1,user_filter+1)
@@ -18755,6 +18754,7 @@ class realtimeHelpDlg(ArtisanDialog):
         string1 += "</UL>"
 
         string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
+        string2 += "<LI><b>x</b> " + u(QApplication.translate("Message", "Actual value",None))
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
         string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
         string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra Device #1 T1 value",None))
@@ -18812,6 +18812,7 @@ class plotterHelpDlg(ArtisanDialog):
         string1 += "</UL>"
 
         string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
+        string2 += "<LI><b>k</b> " + u(QApplication.translate("Message", "Factor to scale from C/min to C axis"))
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
         string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
         string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None))
