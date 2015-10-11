@@ -252,6 +252,7 @@ Section Uninstall
   Delete "$INSTDIR\artisanProfile.ico"
   Delete "$INSTDIR\artisanPalettes.ico"
   Delete "$INSTDIR\artisanWheel.ico"
+  Delete "$INSTDIR\artisanSettings.ico"
   Delete "$INSTDIR\Humor-Sans.ttf"
   Delete "$INSTDIR\alarmclock.eot"
   Delete "$INSTDIR\alarmclock.svg"
