@@ -16,8 +16,8 @@ v0.9.8 (xx.10.2015)
    * initial support for running on Raspberry Pi (Jessy)
    * adds event actions for RESET und START buttons (event dialog)
    * adds alarm actions CHARGE, RampSoak ON/OFF, PID ON/OFF (alarm dialog)
-   * adds ln() and x^2 math approximations
-   * enhanced symbolic formula evaluator and plotter adding time shifting among others
+   * adds [ln() and x^2 math approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html)
+   * enhanced [symbolic formula evaluator and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html) adding time shifting among others
    * adds support for US weight and volume units
    * adds XTB data to the background dialog if selected in the table of the background dialog
  * Changes

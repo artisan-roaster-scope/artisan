@@ -177,6 +177,12 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.9.8 (18.10.2015)
+ - US weight and volume units
+ - extended symbolic formulas and plotter
+ - ln()/x^2 approximations
+ - bug fixes
+ 
 v0.9.7 (29.7.2015)
  - bug fixes
 

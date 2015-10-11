@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="de" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.0" language="de">
 <context>
     <name>About</name>
     <message>
@@ -734,12 +735,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="17309"/>
         <source>ET/BT</source>
-        <translation type="unfinished">ET/BT</translation>
+        <translation>ET/BT</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17301"/>
         <source>Data</source>
-        <translation type="unfinished">Daten</translation>
+        <translation>Daten</translation>
     </message>
 </context>
 <context>
@@ -1839,17 +1840,17 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="6033"/>
         <source>Error in lnRegression:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler in lnRegression:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18045"/>
         <source>ln(): no profile data available</source>
-        <translation type="unfinished"></translation>
+        <translation>ln(): kein Profil verfügbar</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18061"/>
         <source>xxvar(): no profile data available</source>
-        <translation type="unfinished"></translation>
+        <translation>xxvar(): kein Profil verfügbar</translation>
     </message>
 </context>
 <context>
@@ -2060,17 +2061,17 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="18930"/>
         <source>Plotter Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurvenschreiber Daten</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18795"/>
         <source>Symbolic Device Assignment Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbolische Verknüfpungen Hilfe</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18853"/>
         <source>Plotter Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurvenschreiber Hilfe</translation>
     </message>
 </context>
 <context>
@@ -2343,12 +2344,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="17471"/>
         <source>ln()</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17476"/>
         <source>x^2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3764,97 +3765,97 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22294"/>
         <source>RESET</source>
-        <translation type="unfinished">RESET</translation>
+        <translation>RESET</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22302"/>
         <source>START</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17224"/>
         <source>P1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17225"/>
         <source>P2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17226"/>
         <source>P3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17227"/>
         <source>P4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17228"/>
         <source>P5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17229"/>
         <source>P6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17230"/>
         <source>P7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17231"/>
         <source>P8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17232"/>
         <source>P9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18982"/>
         <source>No plotter data found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine daten gefunden.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23958"/>
         <source>FCe</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23959"/>
         <source>SCs</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23960"/>
         <source>SCe</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23962"/>
         <source>ALL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24002"/>
         <source>Extra Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra Farbe</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24009"/>
         <source>Extra</source>
-        <translation type="unfinished">Extras</translation>
+        <translation>Extras</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18934"/>
         <source>Data precision</source>
-        <translation type="unfinished"></translation>
+        <translation>Datengenauigkeit</translation>
     </message>
 </context>
 <context>
@@ -6034,22 +6035,22 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="18882"/>
         <source>ET value delayed by 2 index</source>
-        <translation type="unfinished"></translation>
+        <translation>ET um 2 Zeiteinheiten verzögert</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18883"/>
         <source>BT value index advanced once</source>
-        <translation type="unfinished"></translation>
+        <translation>BT um eine Zeiteinheiten verzögert</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18884"/>
         <source>Extra #2 T2 advanced 1 index</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra #2 T2 um 1 Zeiteinheiten weiter</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18885"/>
         <source>Time one index ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeit um eine Zeiteinheit weiter</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18886"/>
@@ -6089,32 +6090,32 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="18820"/>
         <source>Extra Device #1 T1 value</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra Gerät #1 T1 wert</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18821"/>
         <source>Extra Device #1 T2 value</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra Gerät #1 T2 wert</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18822"/>
         <source>Extra Device #2 T1 value</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra Gerät #2 T1 wert</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18823"/>
         <source>Extra Device #2 T2 value</source>
-        <translation type="unfinished"></translation>
+        <translation>Extra Gerät #2 T2 wert</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18824"/>
         <source>ET background </source>
-        <translation type="unfinished"></translation>
+        <translation>ET Vorlage</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18892"/>
         <source>BT background</source>
-        <translation type="unfinished"></translation>
+        <translation>BT Vorlage</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18826"/>
@@ -6179,12 +6180,12 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="18817"/>
         <source>Actual value</source>
-        <translation type="unfinished"></translation>
+        <translation>Momentaner Wert</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18875"/>
         <source>Factor to scale from C/min to C axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Skalierungsfaktor von C/min nach C</translation>
     </message>
 </context>
 <context>
@@ -7132,52 +7133,52 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="18987"/>
         <source>t</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18989"/>
         <source>P1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18990"/>
         <source>P2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18991"/>
         <source>P3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18992"/>
         <source>P4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18993"/>
         <source>P5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18994"/>
         <source>P6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18995"/>
         <source>P7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18996"/>
         <source>P8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="18997"/>
         <source>P9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -7812,18 +7813,18 @@ nearest: y-Wert des nächstliegenden Punkt</translation>
     <message>
         <location filename="../artisanlib/main.py" line="17303"/>
         <source>Shows data table of plots</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt graph daten</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24014"/>
         <source>For loaded backgrounds with extra devices only</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur für Profilvorlage mit Zusatztgeräten</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17308"/>
         <source>Set P1 as ET background B1
 Set P2 as BT background B2</source>
-        <translation type="unfinished"></translation>
+        <translation>P1 als ET Vorlage und B2 als BT Vorlage setzen</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17312"/>
@@ -7832,7 +7833,7 @@ Set P2 as BT background B2</source>
 1 to Extra device virtual if a profile is loaded
 2 or set to ET and BT if profile is not loaded
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Zusatzgerät mit P1 und P2 generieren oder falls kein Profile geladen ist ein ET/BT profile generieren</translation>
     </message>
 </context>
 </TS>
