@@ -171,6 +171,11 @@ os.system(r'cp Wheels/Other/* dist/Wheels/Other')
 os.system(r'cp Wheels/Roasting/* dist/Wheels/Roasting')
 os.chdir('./dist')
 
+# (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
+os.system(r'mkdir Artisan.app/Contents/Resources/lib/python2.7/lib-dynload/matplotlib/.dylibs')
+os.system(r'cp -R /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python2.7/lib-dynload/matplotlib/.dylibs')
+os.system(r'cp /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
+
 # delete unused Qt.framework files (py2app exclude does not seem to work)
 # for Qt4
 #print '*** Removing unused Qt frameworks ***'

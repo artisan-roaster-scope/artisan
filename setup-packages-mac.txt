@@ -14,9 +14,9 @@ o minimalmodbus 0.6
 o Phidgets Python 2.1.8.20150326
 o pyobjc 2.5.1
 o modulegraph >0.10.4 trunk (21.4.2013)
-o distribute 0.6.36
+o setuptools 18.4
 o altgraph 0.10.2
-o macholib 1.5.1
+o macholib 1.7
 o py2app 0.9
 o pymodbus 1.3.x master 31.5.2015
 o yoctopuce 1.10.20773
@@ -31,6 +31,11 @@ o python-qrcode 5.1
 
 Upgrade History:
 
+- 2015-10-11
+ . setuptools 18.4
+ . macholib 1.5.1 => 1.7
+ . altgraph 0.10.2 => 0.12
+ . modulegraph >0.10.4 trunk (21.4.2013) => 0.12.1
 - 2015-08-09
  . Qt 5.4.2 => 5.50
  . PyQt 5.5.0
@@ -372,6 +377,17 @@ installed matplotlib dependencies before its compilation via
 # sudo ln -s /usr/X11/lib/libpng.dylib /usr/local/lib/libpng.dylib
 
 
+====
+(best) alternative: install matplotlib via pip to make the installation independent of any X11 installation and avoid error messages like
+
+10/11/15 9:22:16.761 PM Artisan[2280]: ImportError: dlopen(/Applications/Artisan.app/Contents/Resources/lib/python2.7/lib-dynload/matplotlib/ft2font.so, 2): Library not loaded: /usr/X11/lib/libfreetype.6.dylib
+
+
+# sudo pip install --upgrade pip
+# sudo pip install matplotlib
+
+
+
 
 9.2) Install matplotlib library
 
@@ -487,7 +503,9 @@ from source (not needed):
 # sudo python setup.py install
 
 
-14) Install distribute 0.6.36
+14) Install setuptools (replacing distribute 0.6.36)
+
+# curl https://bootstrap.pypa.io/ez_setup.py -o - | python
 
 http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
 
@@ -496,6 +514,7 @@ http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
 # cd distribute-0.6.36
 # python setup.py build
 # sudo python setup.py install
+
 
 
 15) Install altgraph
@@ -510,10 +529,13 @@ http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
 
 16) Install macholib
 
-# mkdir macholib-1.5
-# cd macholib-1.5
-# hg clone https://bitbucket.org/ronaldoussoren/macholib
-# cd macholib
+# tar xzf macholib-1.7.tar.gz
+
+patch a typo in macholib v1.7 line 49 of macholib-1.7/macholib/MachOGraph.py
+  loader=loader.filename
+=>
+  loader_path=loader.filename
+
 # python setup.py build
 # sudo python setup.py install
 

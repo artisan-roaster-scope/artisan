@@ -2445,6 +2445,14 @@ class tgraphcanvas(FigureCanvas):
                                 mathdictionary['k'] = (aw.qmc.ylimit - aw.qmc.ylimit_min) / (aw.qmc.zlimit - aw.qmc.zlimit_min)
                             except Exception:
                                 mathdictionary['k'] = 1
+                                
+                    #the offset to plot C/min delta_ax values on the standard temperature axis 
+                    elif mathexpression[i] == "o":
+                        if "o" not in mathdictionary:
+                            try:
+                                mathdictionary['o'] = aw.qmc.ylimit_min - (aw.qmc.zlimit_min * (aw.qmc.ylimit - aw.qmc.ylimit_min) / (aw.qmc.zlimit - aw.qmc.zlimit_min))
+                            except Exception:
+                                mathdictionary['o'] = 0
                             
                     # time timeshift of absolute time (not relative to CHARGE)                                        
                     elif mathexpression[i] == "t":
@@ -5923,13 +5931,12 @@ class tgraphcanvas(FigureCanvas):
                 x = p(xarray[startindex:endindex])
                 pad = max(0,len(self.timex) - startindex - len(x))
                 xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
-                aw.qmc.resetlines()
+#                aw.qmc.resetlines()
                 if deltacurvep:
                     self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 else:
                     self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 self.fig.canvas.draw()
-                libtime.sleep(1)
                 return z
             except Exception:
                 return None
@@ -10143,7 +10150,11 @@ class ApplicationWindow(QMainWindow):
                         for c in cmds:
                             cs = c.strip().replace("_",str(aw.modbus.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             if followupCmd:
-                                libtime.sleep(followupCmd) #this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec)
+                                if followupCmd == 0.08:
+                                    aw.modbus.sleepBetween(write=True)
+                                else:
+                                    aw.modbus.sleepBetween(write=False)
+                                #libtime.sleep(followupCmd) #this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec)
                             if cs.startswith('write'):
                                 try:
                                     cmds = eval(cs[len('write'):])
@@ -12581,32 +12592,29 @@ class ApplicationWindow(QMainWindow):
             din = dout = 0
             # standardize unit of volume and weight to l and g
             if volumein != 0.0 and volumeout != 0.0:
-                volumein = self.float2float(aw.convertVolume(volumein,aw.qmc.weight_units.index(aw.qmc.volume[2]),0),4)
-                volumeout = self.float2float(aw.convertVolume(volumeout,aw.qmc.weight_units.index(aw.qmc.volume[2]),0),4)
+                volumein = self.float2float(aw.convertVolume(volumein,aw.qmc.volume_units.index(aw.qmc.volume[2]),0),4) # in l
+                volumeout = self.float2float(aw.convertVolume(volumeout,aw.qmc.volume_units.index(aw.qmc.volume[2]),0),4) # in l
             # store volume in l
             computedProfile["volumein"] = volumein
             computedProfile["volumeout"] = volumeout
             # store weight in kg
-            if volumein != 0.0 and volumeout != 0.0:
-                weightin = self.float2float(aw.convertWeight(weightin,aw.qmc.weight_units.index(aw.qmc.weight[2]),1),4) # in kg
-                weightout = self.float2float(aw.convertWeight(weightout,aw.qmc.weight_units.index(aw.qmc.weight[2]),1),4) # in kg
+            if weightin != 0.0 and weightout != 0.0:
+                weightin = self.float2float(aw.convertWeight(weightin,aw.qmc.weight_units.index(aw.qmc.weight[2]),0),1) # in g
+                weightout = self.float2float(aw.convertWeight(weightout,aw.qmc.weight_units.index(aw.qmc.weight[2]),0),1) # in g
             computedProfile["weightin"] = weightin
             computedProfile["weightout"] = weightout
             if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
                 din = (weightin / volumein) 
                 dout = (weightout / volumeout)
             if din > 0.:
-                computedProfile["green_density"] = self.float2float(din)
+                computedProfile["green_density"] = self.float2float(din,1)
             if dout > 0.:
-                computedProfile["roasted_density"] = self.float2float(dout)
+                computedProfile["roasted_density"] = self.float2float(dout,1)
                 
             if (aw.qmc.density[0] != 0.0 and aw.qmc.density[2] != 0.0):
                 setdensity = aw.qmc.density[0] /  aw.qmc.density[2]
-                if aw.qmc.density[1] != "g":
-                    setdensity = setdensity / 1000.0
-                if aw.qmc.density[3] != "l":
-                    setdensity = setdensity * 1000.0
-                computedProfile["set_density"] = self.float2float(setdensity)
+                setdensity = aw.convertWeight(aw.qmc.density[0],aw.qmc.weight_units.index(aw.qmc.density[1]),0) / aw.convertVolume(aw.qmc.density[2],aw.qmc.volume_units.index(aw.qmc.density[3]),0)
+                computedProfile["set_density"] = self.float2float(setdensity,1)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)                
@@ -15501,7 +15509,7 @@ $cupping_notes
         contributors += u("Barrie Fairley, Ziv Sade, Nicholas Seckar, ")
         contributors += u("Morten M") + uchr(252) + u("nchow")
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
-        contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce")
+        contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter")
         box = QMessageBox(self)
         
         #create a html QString
@@ -16558,13 +16566,13 @@ $cupping_notes
                 f.close()
                 
     def realtimeHelpDlg(self):
-
         showHelpDlg = realtimeHelpDlg(self)
+        showHelpDlg.resize(700, 500)
         showHelpDlg.show()        
 
     def showSymbolicHelp(self):
-
         showHelpDlg = plotterHelpDlg(self)
+        showHelpDlg.resize(700, 500)
         showHelpDlg.show()
         
         
@@ -17446,8 +17454,10 @@ class HUDDlg(ArtisanDialog):
         polyVLayout.addWidget(self.result)
         polyfitGroupLayout = QGroupBox(QApplication.translate("GroupBox","Polyfit",None))
         polyfitGroupLayout.setLayout(polyVLayout)
-        tab3Layout.addWidget(interGroupLayout)
-        tab3Layout.addWidget(univarGroupLayout)
+        interUniLayout = QHBoxLayout()
+        interUniLayout.addWidget(interGroupLayout)
+        interUniLayout.addWidget(univarGroupLayout)
+        tab3Layout.addLayout(interUniLayout)
         tab3Layout.addWidget(lnvarGroupLayout)
         tab3Layout.addWidget(xxvarGroupLayout)
         tab3Layout.addWidget(polyfitGroupLayout)
@@ -17731,11 +17741,10 @@ class HUDDlg(ArtisanDialog):
 
                 aw.sendmessage(QApplication.translate("Message","New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]"%(EQU[0],EQU[1]), None))
 
-    def equshowtable(self):
-        
+    def equshowtable(self):        
         equdataDlg = equDataDlg(self)
+        equdataDlg.resize(500, 500)
         equdataDlg.show()
-        equdataDlg.setFixedSize(equdataDlg.size())
 
     def setbackgroundequ1(self,foreground=False):
 
@@ -17859,10 +17868,11 @@ class HUDDlg(ArtisanDialog):
 
 
     # format = annotate(text,time,temp,size)
-    def plotterannotation(self,annotation,cindex):
+    # eg annotation = 'annotate(H,03:00,200,10)'
+    def plotterannotation(self,annotation,cindex):      
         try:        
             annotation = annotation.strip()
-            if len(annotation) > 27:
+            if len(annotation) > 20:
                 annotation = annotation[9:]                # annotate(
                 annotation = annotation[:len(annotation)-1] # )
                 annvars = [e.strip() for e in annotation.split(',')]
@@ -17872,10 +17882,14 @@ class HUDDlg(ArtisanDialog):
                 else:
                     time = float(aw.qmc.stringtoseconds(annvars[1]))
                 temp = float(annvars[2])
-                fsize = int(annvars[3])        
+                fsize = 12
+                try:
+                    fsize = int(annvars[3])
+                except:
+                    pass
                 aw.qmc.ax.annotate(text, xy=(time,temp),xytext=(time,temp),alpha=5.,color=aw.qmc.plotcurvecolor[cindex],fontsize=fsize)
             else:
-                self.equlabel.setText(QApplication.translate("Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None))
+                aw.qmc.plottermessage = QApplication.translate("Error Message","Plotter: incorrect syntax: annotate(text,time,temperature,fontsize)", None)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " annotate() syntax: {0}").format(str(e)),exc_tb.tb_lineno)
@@ -17967,9 +17981,6 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setappearance(): {0}").format(str(e)),exc_tb.tb_lineno)
 
-    def saveinterp(self):
-        pass
-
     def showunivarinfo(self):
         if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
             aw.qmc.univariateinfo()
@@ -17989,7 +18000,7 @@ class HUDDlg(ArtisanDialog):
         else:
             self.lnresult.setText("")
             aw.qmc.resetlines()
-            aw.qmc.redraw(recomputeAllDeltas=False)
+            self.redraw_enabled_math_curves()
 
     
     def xxvar(self,i):
@@ -18005,7 +18016,7 @@ class HUDDlg(ArtisanDialog):
         else:
             self.xxresult.setText("")
             aw.qmc.resetlines()
-            aw.qmc.redraw(recomputeAllDeltas=False)
+            self.redraw_enabled_math_curves()
                                     
     def univar(self,i):
         if self.univarCheck.isChecked():
@@ -18017,7 +18028,23 @@ class HUDDlg(ArtisanDialog):
                 self.univarCheck.setChecked(False)
         else:
             aw.qmc.resetlines()
+            self.redraw_enabled_math_curves()
+            
+    def redraw_enabled_math_curves(self):
+        if self.interpCheck.isChecked():
+            aw.qmc.drawinterp(str(self.interpComboBox.currentText()))
+        if self.univarCheck.isChecked():
+            aw.qmc.univariate()
+        if self.lnvarCheck.isChecked():
+            aw.qmc.lnRegression()
+        if self.xxvarCheck.isChecked():
+            aw.qmc.lnRegression(xx=True)
+        if self.polyfitCheck.isChecked():
+            self.doPolyfit()
+        if not self.polyfitCheck.isChecked() and not self.xxvarCheck.isChecked() and not self.lnvarCheck.isChecked() and not self.univarCheck.isChecked() and not self.interpCheck.isChecked():
+            aw.qmc.resetlines()
             aw.qmc.redraw(recomputeAllDeltas=False)
+            
             
     def calcEventRC(self):
         if aw.qmc.timeindex[0] != -1:
@@ -18117,13 +18144,13 @@ class HUDDlg(ArtisanDialog):
         self.endEdit.setDisabled(True)
         try:
             if self.polyfitCheck.isChecked() and len(aw.qmc.timex) > 2:
-                aw.qmc.resetlines()
-                aw.qmc.redraw(recomputeAllDeltas=False)
                 QApplication.processEvents()
                 self.doPolyfit()
                 QApplication.processEvents()
             else:
+                self.polyfitCheck.setChecked(False)
                 self.result.setText("")
+                aw.qmc.resetlines()
         except Exception:
             pass
         self.startEdit.setDisabled(False)
@@ -18192,7 +18219,7 @@ class HUDDlg(ArtisanDialog):
         else:
             self.result.setText("")
             aw.qmc.resetlines()
-            aw.qmc.redraw(recomputeAllDeltas=False)
+            self.redraw_enabled_math_curves()
 
     def interpolation(self,i):
         mode = str(self.interpComboBox.currentText())
@@ -18205,7 +18232,7 @@ class HUDDlg(ArtisanDialog):
                 self.interpCheck.setChecked(False)
         else:
             aw.qmc.resetlines()
-            aw.qmc.redraw(recomputeAllDeltas=False)
+            self.redraw_enabled_math_curves()
 
     def soundset(self,i):
         if aw.soundflag == 0:
@@ -18813,6 +18840,7 @@ class plotterHelpDlg(ArtisanDialog):
 
         string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
         string2 += "<LI><b>k</b> " + u(QApplication.translate("Message", "Factor to scale from C/min to C axis"))
+        string2 += "<LI><b>o</b> " + u(QApplication.translate("Message", "Offset to align from C/min to C axis"))
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
         string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
         string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra #1 T1 value",None))
@@ -18896,11 +18924,9 @@ class equDataDlg(ArtisanDialog):
         #layout
         dataplotterLayout = QVBoxLayout()
         dataplotterLayout.addWidget(self.datalabel)
-        dataplotterLayout.addWidget(self.datatable) 
         dataplotterLayout.addWidget(self.datatable)
         dataplotterLayout.addWidget(self.dataprecisionlabel)
         dataplotterLayout.addWidget(self.precisionSpinBox)
-        dataplotterLayout.addStretch() 
             
         self.setLayout(dataplotterLayout)
 
@@ -24733,6 +24759,16 @@ class modbusport(object):
         #    3: TCP
         #    4: UDP
         self.lastReadResult = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
+        
+    # this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
+    def sleepBetween(self,write=False):
+        if write:
+            libtime.sleep(0.085)
+        else:
+            if self.type in [3,4]: # delay between writes only on serial connections
+                pass
+            else:
+                libtime.sleep(0.035)
     
     def address2register(self,addr,code=3):
         if code == 3 or code == 6:
@@ -26047,7 +26083,7 @@ class serialport(object):
             res1 = -1
         if aw.modbus.input2slave:
             if just_send:
-                libtime.sleep(0.04)   #this garantees a minimum of 40 miliseconds between readings (according to the Modbus spec)
+                aw.modbus.sleepBetween()
             if aw.modbus.input2float:
                 res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             else:
@@ -26059,7 +26095,7 @@ class serialport(object):
             res2 = -1
         if aw.modbus.input3slave:
             if just_send:
-                libtime.sleep(0.04)   #this garantees a minimum of 40 miliseconds between readings (according to the Modbus spec)
+                aw.modbus.sleepBetween()
             if aw.modbus.input3float:
                 res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             else:
@@ -26071,7 +26107,7 @@ class serialport(object):
             res3 = -1
         if aw.modbus.input4slave:
             if just_send:
-                libtime.sleep(0.04)   #this garantees a minimum of 40 miliseconds between readings (according to the Modbus spec)
+                aw.modbus.sleepBetween()
             if aw.modbus.input4float:
                 res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             else:
