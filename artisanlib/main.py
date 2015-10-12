@@ -7773,7 +7773,6 @@ class SampleThread(QThread):
 
                     #check for each alarm that was not yet triggered
                     for i in range(len(aw.qmc.alarmflag)):
-                        print("guard",i,aw.qmc.alarmguard[i])
                         #if alarm on, and not triggered, and time is after set time:
                         # menu: 0:ON, 1:START, 2:CHARGE, 3:TP, 4:DRY, 5:FCs, 6:FCe, 7:SCs, 8:SCe, 9:DROP, 10:COOL
                         # qmc.alarmtime = -1 (None == START)
