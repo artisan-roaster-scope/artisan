@@ -1844,17 +1844,19 @@ class tgraphcanvas(FigureCanvas):
                     #auto mark CHARGE/TP/DRY/FCs/DROP
                     if self.autoChargeIdx and aw.qmc.timeindex[0] < 0:
                         self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
+                        self.autoChargeIdx = 0
                     if self.autoTPIdx != 0:
-                        self.autoTPIdx = 0
                         self.markTP()
+                        self.autoTPIdx = 0
                     if self.autoDryIdx != 0:
-                        self.autoDryIdx = 0
                         self.markDryEnd()
+                        self.autoDryIdx = 0
                     if self.autoFCsIdx != 0:
-                        self.autoFCsIdx = 0
                         self.mark1Cstart()
+                        self.autoFCsIdx = 0
                     if self.autoDropIdx != 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
+                        self.autoDropIdx = 0
 
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
@@ -2114,12 +2116,14 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.ToggleRecorder()
             elif self.alarmaction[alarmnumber] == 8:
                 # DRY
-                if aw.button_19.isEnabled():
-                    aw.qmc.markDryEnd()
+                #if aw.button_19.isEnabled():
+                #    aw.qmc.markDryEnd()
+                aw.qmc.autoDryIdx = len(aw.qmc.timex)
             elif self.alarmaction[alarmnumber] == 9:
                 # FCs
-                if aw.button_3.isEnabled():
-                    aw.qmc.mark1Cstart()
+                #if aw.button_3.isEnabled():
+                #    aw.qmc.mark1Cstart()
+                aw.qmc.autoFCsIdx = len(aw.qmc.timex)
             elif self.alarmaction[alarmnumber] == 10:
                 # FCe
                 if aw.button_4.isEnabled():
@@ -2134,8 +2138,9 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.mark2Cend()
             elif self.alarmaction[alarmnumber] == 13:
                 # DROP
-                if aw.button_9.isEnabled():
-                    aw.qmc.markDrop()
+                #if aw.button_9.isEnabled():
+                #    aw.qmc.markDrop()
+                aw.qmc.autoDropIdx = len(aw.qmc.timex)
             elif self.alarmaction[alarmnumber] == 14:
                 # COOL
                 if aw.button_20.isEnabled():
@@ -2146,8 +2151,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.ToggleMonitor()
             elif self.alarmaction[alarmnumber] == 16:
                 # CHARGE
-                if aw.qmc.timeindex[0] > -1:
-                    aw.qmc.autoChargeIdx = len(aw.qmc.timex)
+                aw.qmc.autoChargeIdx = len(aw.qmc.timex)
             elif self.alarmaction[alarmnumber] == 17:
                 # RampSoak ON
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
@@ -7769,6 +7773,7 @@ class SampleThread(QThread):
 
                     #check for each alarm that was not yet triggered
                     for i in range(len(aw.qmc.alarmflag)):
+                        print("guard",i,aw.qmc.alarmguard[i])
                         #if alarm on, and not triggered, and time is after set time:
                         # menu: 0:ON, 1:START, 2:CHARGE, 3:TP, 4:DRY, 5:FCs, 6:FCe, 7:SCs, 8:SCe, 9:DROP, 10:COOL
                         # qmc.alarmtime = -1 (None == START)
@@ -32379,7 +32384,7 @@ class AlarmDlg(ArtisanDialog):
         #text description
         descriptionedit = QLineEdit(u(aw.qmc.alarmstrings[i]))
         descriptionedit.setCursorPosition(0)
-        self.alarmtable.setItem (i, 0, MyTableWidgetItemInt(str(i),i))
+        self.alarmtable.setItem (i, 0, MyTableWidgetItemInt(str(i+1),i))
         self.alarmtable.setCellWidget(i,1,flagComboBox)
         self.alarmtable.setItem (i, 1, MyTableWidgetItemQCheckBox(flagComboBox))
         self.alarmtable.setCellWidget(i,2,guardedit)
