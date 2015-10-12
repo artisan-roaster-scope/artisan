@@ -18378,6 +18378,10 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.interpolation(i)
 
+    
+    def closeEvent(self,_):
+        self.close()
+        
     #cancel button
     def close(self):
         #restore settings
@@ -18394,6 +18398,9 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.patheffects = self.org_patheffects
         aw.qmc.graphstyle = self.org_graphstyle
         aw.qmc.graphfont = self.org_graphfont
+        aw.qmc.resetlinecountcaches()
+        aw.qmc.resetdeltalines()
+        aw.qmc.resetlines()        
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.sendmessage("") #clears plotter possible exceptions if Cancel
         self.accept()
