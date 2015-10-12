@@ -7482,11 +7482,15 @@ class SampleThread(QThread):
                                 aw.qmc.RTextratemp2.append(extrat2)
                                 aw.qmc.RTextratx.append(extratx)              
                             #3 evaluate symbolic expressions
-                            for i in range(nxdevices):   
+                            for i in range(nxdevices):
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
+                                else:
+                                    extrat1 = aw.qmc.RTextratemp1[i]
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
+                                else:
+                                    extrat2 = aw.qmc.RTextratemp2[i]
                                 # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                                 # modbus channel 1+2, respect input temperature scale setting
                                 if aw.qmc.extradevices[i] == 29:
