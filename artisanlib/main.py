@@ -188,7 +188,6 @@ from artisanlib.weblcds import startWeb, stopWeb
 from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopControl, releaseHottopControl, setHottop
 
 
-
 if sys.version < '3':
     def arange(x):
         return xrange(x)
@@ -482,6 +481,9 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
     app.installTranslator(appTranslator)
 
 from const import UIconst
+
+
+
 
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
@@ -3395,7 +3397,7 @@ class tgraphcanvas(FigureCanvas):
                             horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
             
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
-            #self.ax.spines['top'].set_color('none')
+#            self.ax.spines['top'].set_color('none')
             self.ax.tick_params(\
                 axis='x',           # changes apply to the x-axis
                 which='both',       # both major and minor ticks are affected
@@ -7586,9 +7588,9 @@ class SampleThread(QThread):
                     ####### all values retrieved                
 
                     if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
-                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,tx,RTsname="Y1",RTsval=t1) 
+                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,tx,RTsname="Y1",RTsval=t1)
                     if aw.qmc.BTfunction != None and len(aw.qmc.BTfunction):
-                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,tx,RTsname="Y2",RTsval=t2) 
+                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,tx,RTsname="Y2",RTsval=t2)
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
                     if aw.qmc.device == 29:
@@ -11417,26 +11419,41 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importCSV() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     def addSerialPort(self):
-        self.extraser.append(serialport()) 
+        n = len(self.qmc.extradevices) - 1
+        self.extraser = self.extraser[:n]
+        self.extraser.append(serialport())
+        self.extracomport = self.extracomport[:n]
         self.extracomport.append("COM1")
+        self.extrabaudrate = self.extrabaudrate[:n]
         self.extrabaudrate.append(9600)
+        self.extrabytesize = self.extrabytesize[:n]
         self.extrabytesize.append(8)
+        self.extraparity = self.extraparity[:n]
         self.extraparity.append("E")
+        self.extrastopbits = self.extrastopbits[:n]
         self.extrastopbits.append(1)
+        self.extratimeout = self.extratimeout[:n]
         self.extratimeout.append(1)
+
 
     def addDevice(self):
         try:
             self.qmc.extradevices.append(1)
+            n = len(self.qmc.extradevices)
+            self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:n-1]
             self.qmc.extradevicecolor1.append("black") #init color to black
+            self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:n-1]
             self.qmc.extradevicecolor2.append("black")
+            self.qmc.extraname1 = self.qmc.extraname1[:n-1]
             self.qmc.extraname1.append(u"Extra 1")
+            self.qmc.extraname2 = self.qmc.extraname2[:n-1]
             self.qmc.extraname2.append(u"Extra 2")
+            self.qmc.extramathexpression1 = self.qmc.extramathexpression1[:n-1]
             self.qmc.extramathexpression1.append("")
+            self.qmc.extramathexpression2 = self.qmc.extramathexpression2[:n-1]
             self.qmc.extramathexpression2.append("")
             
             # ensure that the curves and LCDs of the new device are visible:
-            n = len(self.qmc.extradevices)
             self.extraLCDvisibility1[n-1] = True
             self.extraLCDvisibility2[n-1] = True
             self.extraCurveVisibility1[n-1] = True
@@ -11446,22 +11463,37 @@ class ApplicationWindow(QMainWindow):
             self.addSerialPort()
 
             #add new line variables
+            self.qmc.extratimex = self.qmc.extratimex[:n-1]
             self.qmc.extratimex.append([])
+            self.qmc.extratemp1 = self.qmc.extratemp1[:n-1]
             self.qmc.extratemp1.append([])
+            self.qmc.extratemp2 = self.qmc.extratemp2[:n-1]
             self.qmc.extratemp2.append([])
+            self.qmc.extrastemp1 = self.qmc.extrastemp1[:n-1]
             self.qmc.extrastemp1.append([])
+            self.qmc.extrastemp2 = self.qmc.extrastemp2[:n-1]
             self.qmc.extrastemp2.append([])
 
             #add new style variables
+            self.qmc.extralinestyles1 = self.qmc.extralinestyles1[:n-1]
             self.qmc.extralinestyles1.append(self.qmc.linestyle_default)
+            self.qmc.extralinestyles2 = self.qmc.extralinestyles2[:n-1]
             self.qmc.extralinestyles2.append(self.qmc.linestyle_default)
+            self.qmc.extradrawstyles1 = self.qmc.extradrawstyles1[:n-1]
             self.qmc.extradrawstyles1.append(self.qmc.drawstyle_default)
+            self.qmc.extradrawstyles2 = self.qmc.extradrawstyles2[:n-1]
             self.qmc.extradrawstyles2.append(self.qmc.drawstyle_default)
+            self.qmc.extralinewidths1 = self.qmc.extralinewidths1[:n-1]
             self.qmc.extralinewidths1.append(self.qmc.linewidth_default)
+            self.qmc.extralinewidths2 = self.qmc.extralinewidths2[:n-1]
             self.qmc.extralinewidths2.append(self.qmc.linewidth_default)
+            self.qmc.extramarkers1 = self.qmc.extramarkers1[:n-1]
             self.qmc.extramarkers1.append(self.qmc.marker_default)
+            self.qmc.extramarkers2 = self.qmc.extramarkers2[:n-1]
             self.qmc.extramarkers2.append(self.qmc.marker_default)
+            self.qmc.extramarkersizes1 = self.qmc.extramarkersizes1[:n-1]
             self.qmc.extramarkersizes1.append(self.qmc.markersize_default)
+            self.qmc.extramarkersizes2 = self.qmc.extramarkersizes2[:n-1]
             self.qmc.extramarkersizes2.append(self.qmc.markersize_default)
 
             #add two extra lines in figure for extra ET and extra BT
@@ -12871,12 +12903,6 @@ class ApplicationWindow(QMainWindow):
                     self.resetqsettings = 0
                     self.qmc.redraw()
                     return  #don't load any more settings. They could be bad (corrupted). Stop here.
-            #restore geometry
-            if settings.contains("Geometry"):
-                if sip.getapi('QVariant') == 1:
-                    self.restoreGeometry(settings.value("Geometry"))
-                else:
-                    self.restoreGeometry(settings.value("Geometry"))
             #restore mode
             old_mode = self.qmc.mode
             self.qmc.mode = str(settings.value("Mode",self.qmc.mode))
@@ -13677,8 +13703,8 @@ class ApplicationWindow(QMainWindow):
 
         except Exception:
             res = False
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + "  settingsLoad()  @line " + str(exc_tb.tb_lineno))
 
@@ -13687,7 +13713,6 @@ class ApplicationWindow(QMainWindow):
             #update visibility of main event button
             self.applyStandardButtonVisibility()
             
-            #self.qmc.redraw()
             # set window appearances (style)
             if settings.contains("appearance"):
                 try:
@@ -13704,6 +13729,9 @@ class ApplicationWindow(QMainWindow):
                         aw.setdpi(aw.dpi,moveWindow=False)
                 except Exception:
                     pass
+            #restore geometry
+            if settings.contains("Geometry"):
+                self.restoreGeometry(settings.value("Geometry"))
         except Exception:
             res = False
 #            import traceback
@@ -15796,6 +15824,7 @@ $cupping_notes
                 try:
                     aw.stopActivities()
                     res = aw.settingsLoad(filename)
+                    aw.qmc.reset(soundOn=False)
                     if res:
                         # update recentSettings menu
                         settings = QSettings()
@@ -15810,7 +15839,6 @@ $cupping_notes
                         for widget in QApplication.topLevelWidgets():
                             if isinstance(widget, ApplicationWindow):
                                 widget.updateRecentSettingActions()
-                        aw.qmc.reset(soundOn=False)
                         self.sendmessage(QApplication.translate("Message","Settings loaded", None))
                     else:
                         # remove file from the recent file list
@@ -15823,7 +15851,7 @@ $cupping_notes
                         settings.setValue('recentSettingList', files)
                         for widget in QApplication.topLevelWidgets():
                             if isinstance(widget, ApplicationWindow):
-                                widget.updateRecentSettingActions()                        
+                                widget.updateRecentSettingActions()
                 except Exception:
                     # remove file from the recent file list
                     settings = QSettings()
@@ -17738,8 +17766,8 @@ class HUDDlg(ArtisanDialog):
                 aw.qmc.extradevicecolor1[-1] = aw.qmc.plotcurvecolor[0]
                 aw.qmc.extradevicecolor2[-1] = aw.qmc.plotcurvecolor[1]
                 # set expressions
-                aw.qmc.extramathexpression1[-1] = str(self.equedit1.text())
-                aw.qmc.extramathexpression2[-1] = str(self.equedit2.text())
+                #aw.qmc.extramathexpression1[-1] = str(self.equedit1.text())
+                #aw.qmc.extramathexpression2[-1] = str(self.equedit2.text())
                 # set values
                 aw.qmc.extratemp1[-1] = extratemp1
                 aw.qmc.extratemp2[-1] = extratemp2
@@ -24781,7 +24809,10 @@ class modbusport(object):
     # this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     def sleepBetween(self,write=False):
         if write:
-            libtime.sleep(0.085)
+            if self.type in [3,4]:
+                libtime.sleep(0.040)
+            else:
+                libtime.sleep(0.085)
         else:
             if self.type in [3,4]: # delay between writes only on serial connections
                 pass
