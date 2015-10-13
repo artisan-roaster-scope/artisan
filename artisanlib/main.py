@@ -2448,7 +2448,7 @@ class tgraphcanvas(FigureCanvas):
                     elif mathexpression[i] == "k":
                         if "k" not in mathdictionary:
                             try:
-                                mathdictionary['k'] = (aw.qmc.ylimit - aw.qmc.ylimit_min) / (aw.qmc.zlimit - aw.qmc.zlimit_min)
+                                mathdictionary['k'] = (aw.qmc.ylimit - aw.qmc.ylimit_min) / float(aw.qmc.zlimit - aw.qmc.zlimit_min)
                             except Exception:
                                 mathdictionary['k'] = 1
                                 
@@ -2456,7 +2456,7 @@ class tgraphcanvas(FigureCanvas):
                     elif mathexpression[i] == "o":
                         if "o" not in mathdictionary:
                             try:
-                                mathdictionary['o'] = aw.qmc.ylimit_min - (aw.qmc.zlimit_min * (aw.qmc.ylimit - aw.qmc.ylimit_min) / (aw.qmc.zlimit - aw.qmc.zlimit_min))
+                                mathdictionary['o'] = aw.qmc.ylimit_min - (aw.qmc.zlimit_min * (aw.qmc.ylimit - aw.qmc.ylimit_min) / float(aw.qmc.zlimit - aw.qmc.zlimit_min))
                             except Exception:
                                 mathdictionary['o'] = 0
                             
@@ -28616,7 +28616,7 @@ class comportDlg(ArtisanDialog):
         modbus_help_text += QApplication.translate("Message", " are from 30000-39999. Most devices hold data in",None) + "<br>"
         modbus_help_text += QApplication.translate("Message", "2 byte integer registers. A temperature of 145.2C",None) + "<br>"
         modbus_help_text += QApplication.translate("Message", "is often sent as 1452. In that case you have to",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "use the symbolic assignment 'x/10'. Few devices",None) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "use the symbolic assignment 'x/10.0'. Few devices",None) + "<br>"
         modbus_help_text += QApplication.translate("Message", "hold data as 4 byte floats in two registers.",None) + "<br>"
         modbus_help_text += QApplication.translate("Message", "Tick the Float flag in this case.",None)
         modbus_help_label = QLabel(modbus_help_text)
@@ -31878,7 +31878,18 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem):
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     def __lt__(self, other):
-        return self.sortKey.text() < other.sortKey.text()
+        a = self.sortKey.text()
+        b = other.sortKey.text()
+        if len(a) == 5 and len(b) == 5 and a[2] == ":" and b[2] == ":":
+            # we compare times
+            return aw.qmc.stringtoseconds(a) < aw.qmc.stringtoseconds(b)
+        else:
+            try:
+                # if those are numbers
+                return int(a) < int(b)
+            except:
+                # else we do a string compare
+                return a < b
       
 class MyTableWidgetItemInt(QTableWidgetItem):
     def __init__(self, text, sortKey):
@@ -32239,6 +32250,7 @@ class AlarmDlg(ArtisanDialog):
 
     def savealarms(self):
         try:
+            self.alarmtable.sortItems(0)
             nalarms = self.alarmtable.rowCount()
             aw.qmc.loadalarmsfromprofile = self.loadAlarmsFromProfile.isChecked()
             aw.qmc.alarmflag = [1]*nalarms
