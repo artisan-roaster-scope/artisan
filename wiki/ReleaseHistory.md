@@ -33,6 +33,7 @@ v0.9.8 (xx.10.2015)
    * fixed temperature conversion issues (phases / background profile interactions)
    * fixed Yocotopuce reconnect handling
    * fixed Fuji PRX duty signal
+   * fixes a build issue on Mac OS X to prevent a startup crash related to X11 libraries
 
 ----
 v0.9.7 (29.7.2015)
