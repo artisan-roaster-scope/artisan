@@ -13711,6 +13711,7 @@ class ApplicationWindow(QMainWindow):
         try:
             #update visibility of main event button
             self.applyStandardButtonVisibility()
+            aw.setFonts()
             
             # set window appearances (style)
             if settings.contains("appearance"):
@@ -24864,13 +24865,19 @@ class modbusport(object):
                         host=self.host, 
                         port=self.port)
                 elif self.type == 4: # UDP
-                    self.master = ArtisanModbusUdpClient(
-                        host=self.host, 
-                        port=self.port,
-                        retry_on_empty=False,
-                        retries=1,
-                        timeout=0.5, #self.timeout
-                        )
+                    try:
+                        self.master = ArtisanModbusUdpClient(
+                            host=self.host, 
+                            port=self.port,
+                            retry_on_empty=False,
+                            retries=1,
+                            timeout=0.5, #self.timeout
+                            )
+                    except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
+                        self.master = ArtisanModbusUdpClient(
+                            host=self.host, 
+                            port=self.port,
+                            )
                 else: # Serial RTU
                     self.master = ModbusSerialClient(
                         method='rtu',
@@ -24879,7 +24886,7 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        timeout=self.timeout)                    
+                        timeout=self.timeout)          
                 self.master.connect()
                 libtime.sleep(.3) # avoid possible hickups on startup
             except Exception as ex:
@@ -28378,7 +28385,8 @@ class PortComboBox(QComboBox):
         self.blockSignals(True)
         try:
             if platf == 'Darwin':
-                self.ports = list([p for p in serial.tools.list_ports.comports() if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync','/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem'])])
+                self.ports = list([p for p in serial.tools.list_ports.comports() if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
+                    '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])])
             else:
                 self.ports = list(serial.tools.list_ports.comports())
             if self.selection not in [p[0] for p in self.ports]:
