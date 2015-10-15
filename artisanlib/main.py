@@ -483,6 +483,38 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 from const import UIconst
 
 
+# results in a three digits resolution (eg. 1.234)
+#class ArtisanTime():
+#    def __init__(self):
+#        self.clock = QTime()
+#
+#    def setHMS(self,a,b,c,d):
+#        self.clock.setHMS(a,b,c,d)
+#        
+#    def start(self):
+#        print("start")
+#        self.clock.start()
+#        
+#    def elapsed(self):
+#        print(self.clock.elapsed())
+#        return self.clock.elapsed()
+  
+
+# higher resultion time signal (at least on Mac OS X)
+class ArtisanTime():
+    def __init__(self):
+        self.clock = libtime.time()
+
+    def setHMS(self,a,b,c,d):
+        self.start()
+        
+    def start(self):
+        self.clock = libtime.time()
+        
+    def elapsed(self):
+        return (libtime.time() - self.clock)*1000.
+
+    
 
 
 #######################################################################################
@@ -1237,7 +1269,7 @@ class tgraphcanvas(FigureCanvas):
         ###########################  TIME  CLOCK     ##########################
         # create an object time to measure and record time (in miliseconds)
 
-        self.timeclock = QTime()
+        self.timeclock = ArtisanTime() #QTime()
         self.timeclock.setHMS(0,0,0,0)
 
         ############################  Thread Server #################################################
@@ -12744,9 +12776,9 @@ class ApplicationWindow(QMainWindow):
             profile["etypes"] = [encodeLocal(et) for et in self.qmc.etypes]
             profile["roastingnotes"] = encodeLocal(self.qmc.roastingnotes)
             profile["cuppingnotes"] = encodeLocal(self.qmc.cuppingnotes)
-            profile["timex"] = [self.float2float(x,6) for x in self.qmc.timex]
-            profile["temp1"] = [self.float2float(x,3) for x in self.qmc.temp1]
-            profile["temp2"] = [self.float2float(x,3) for x in self.qmc.temp2]
+            profile["timex"] = [self.float2float(x,5) for x in self.qmc.timex]
+            profile["temp1"] = [self.float2float(x,4) for x in self.qmc.temp1]
+            profile["temp2"] = [self.float2float(x,4) for x in self.qmc.temp2]
             profile["phases"] = self.qmc.phases
             profile["zmax"] = int(self.qmc.zlimit)
             profile["zmin"] = int(self.qmc.zlimit_min)
