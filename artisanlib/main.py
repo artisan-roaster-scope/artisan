@@ -1405,7 +1405,7 @@ class tgraphcanvas(FigureCanvas):
         self.RTtemp2=0.        
         self.RTextratemp1=[]
         self.RTextratemp2=[]
-        
+        self.RTextratx=[]
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
@@ -2348,12 +2348,11 @@ class tgraphcanvas(FigureCanvas):
                 mathdictionary["Y1"] = self.RTtemp1
                 mathdictionary["Y2"] = self.RTtemp2
                 for d in range(len(self.RTextratemp1)):
-                    if self.RTextratemp1[d] != -111111:
-                        mathdictionary["Y%i"%(d*2+3)] = self.RTextratemp1[d]
-                    if self.RTextratemp2[d] != -111111:
-                        mathdictionary["Y%i"%(d*2+4)] = self.RTextratemp2[d]
+                    mathdictionary["Y%i"%(d*2+3)] = self.RTextratemp1[d]
+                    mathdictionary["Y%i"%(d*2+4)] = self.RTextratemp2[d]
                 if str(RTsname) not in mathdictionary:
-                    mathdictionary[str(RTsname)] = float(RTsval)            #if plotting 
+                    mathdictionary[str(RTsname)] = float(RTsval)
+                    
             else:#get index from the time. 
                 if len(self.timex):            
                     index = self.time2index(t)  # If using the plotter with loaded profile. Background index done bellow at "B"
@@ -7479,17 +7478,21 @@ class SampleThread(QThread):
                         if les == led == let:
                             xtra_dev_lines1 = 0
                             xtra_dev_lines2 = 0
-                            #clear extra device buffers
-                            aw.qmc.RTextratemp1,aw.qmc.RTextratemp2 = [-111111]*nxdevices,[-111111]*nxdevices
+                            #1 clear extra device buffers
+                            aw.qmc.RTextratemp1,aw.qmc.RTextratemp2,aw.qmc.RTextratx = [],[],[]
+                            #2 load RT buffers
                             for i in range(nxdevices):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)
-                                aw.qmc.RTextratemp1[i] = extrat1
-                                aw.qmc.RTextratemp2[i] = extrat2
+                                aw.qmc.RTextratemp1.append(extrat1)
+                                aw.qmc.RTextratemp2.append(extrat2)
+                                aw.qmc.RTextratx.append(extratx)              
+                            #3 evaluate symbolic expressions
+                            for i in range(nxdevices):
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extratx,RTsname="Y"+str(2*i+3),RTsval=extrat1)
-                                    aw.qmc.RTextratemp1[i] = extrat1
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
+                                    aw.qmc.RTextratemp1[i] = extrat1 
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extratx,RTsname="Y"+str(2*i+4),RTsval=extrat2)
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
                                     aw.qmc.RTextratemp2[i] = extrat2
                                 # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                                 # modbus channel 1+2, respect input temperature scale setting
@@ -7583,8 +7586,10 @@ class SampleThread(QThread):
 
                     if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
                         t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,tx,RTsname="Y1",RTsval=t1)
+                        aw.qmc.RTtemp1 = t1
                     if aw.qmc.BTfunction != None and len(aw.qmc.BTfunction):
                         t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,tx,RTsname="Y2",RTsval=t2)
+                        aw.qmc.RTtemp2 = t2
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
                     if aw.qmc.device == 29:
