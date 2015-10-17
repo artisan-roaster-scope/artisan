@@ -637,7 +637,7 @@ class tgraphcanvas(FigureCanvas):
         
         # oversampling flag
         self.oversampling = False
-        self.oversampling_min_delay = 3000
+        self.oversampling_min_delay = 2000 # in contrast to what the user dialog says (3000) we enable oversampling already with 2s
         
         # extra event sampling interval in miliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
         self.extra_event_sampling_delay = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, ..
@@ -1371,6 +1371,7 @@ class tgraphcanvas(FigureCanvas):
         self.messagesemaphore = QSemaphore(1)
         self.errorsemaphore = QSemaphore(1)
         self.serialsemaphore = QSemaphore(1)
+        self.redrawsemaphore = QSemaphore(1)
 
         #flag to plot cross lines from mouse
         self.crossmarker = False
@@ -1419,7 +1420,7 @@ class tgraphcanvas(FigureCanvas):
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
         self.redrawEnabled = True
-        self.delayTimeout = 10
+        self.delayTimeout = 0
         self.block_update = False
         
         # flag to toggle between Temp and RoR scale of xy-display
@@ -1467,32 +1468,39 @@ class tgraphcanvas(FigureCanvas):
             return s[:l-1] + "..."
         else:
             return s
+            
+    def resizeEvent(self,event):
+        #self.redrawEnabled = False
+        super(tgraphcanvas,self).resizeEvent(event)
+        self.delayedUpdateBackground()
 
     def delayedUpdateBackground(self):
         if not self.block_update:
             self.block_update = True
-            self.redrawEnabled = False
+            #self.redrawEnabled = False
             QTimer.singleShot(self.delayTimeout,self.doUpdate)
-
-    def resizeEvent(self,event):
-        self.redrawEnabled = False
-        super(tgraphcanvas,self).resizeEvent(event)
-        self.delayedUpdateBackground()
 
     def updateBackground(self):
         if not self.block_update:
-            self.redrawEnabled = False
+            #self.redrawEnabled = False
             self.block_update = True
             self.doUpdate()
 
     def doUpdate(self):
         if not self.designerflag:
-            self.redrawEnabled = False
-            self.resetlinecountcaches() # ensure that the line counts are up to date
-            self.resetlines() # get rid of HUD, projection and cross lines
-            self.resetdeltalines() # just in case
-            self.fig.canvas.draw()
-            self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)
+            try:
+                #### lock shared resources #####
+                aw.qmc.redrawsemaphore.acquire(1)
+                self.redrawEnabled = False
+                self.resetlinecountcaches() # ensure that the line counts are up to date
+                self.resetlines() # get rid of HUD, projection and cross lines
+                self.resetdeltalines() # just in case
+                self.fig.canvas.draw()
+                #self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)  # causes randomly a black border where the axis should be drawn
+                self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
+            finally:
+                if aw.qmc.redrawsemaphore.available() < 1:
+                    aw.qmc.redrawsemaphore.release(1)                
         self.redrawEnabled = True
         self.block_update = False
 
@@ -1504,7 +1512,10 @@ class tgraphcanvas(FigureCanvas):
     def etypesf(self, i):
         if len(self.etypes) == 4:
             self.etypes.append("--")
-        return self.etypes[i]
+        if i > 4:
+        	return self.etypes[i-5]
+        else:
+        	return self.etypes[i]
 
     def Betypesf(self, i):
         if len(self.Betypes) == 4:
@@ -1550,16 +1561,38 @@ class tgraphcanvas(FigureCanvas):
             if res != None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
                 aw.qmc.ambientTemp = aw.float2float(float(res))
 
-    # eventsvalues maps the given number v to a string to be displayed to the user as special event value
-    # v is expected to be float value of range [0.0-10.0]
-    # negative values are mapped to -1
+    # eventsvalues maps the given internal event value v to an external event int value as displayed to the user as special event value
+    # v is expected to be float value of range [-11.0,11.0]
+    # negative values are not used as event values, but as step arguments in extra button definitions
+    #   11.0 => 100
+    #   10.1 => 91
+    #   10.0 => 90
+    #   1.1 => 1
+    #   1.0 => 0
+    #     0 => 0
+    #  -1.0 => 0
+    #  -1.1 => -1
+    # -10.0 => -90
+    # -10.1 => -91
+    # -11.0 => -100
     def eventsInternal2ExternalValue(self,v):
         if v == None:
-            return -1
+            return 0
+        elif v < -1.0:
+            return -(int(round(abs(v)*10)) - 10)
+        elif (v <= 1.0) and (v >= -1.0):
+            return 0
         else:
-            if v < 1:
-                return -1
-        return int(round(v*10)) - 10
+            return int(round(v*10)) - 10
+            
+    # the inverse of eventsInternal2ExternalValue, converting an external to an internal event value
+    def eventsExternal2InternalValue(self,v):
+        if v<= 1.0 and v >= -1.0:
+            return 0.0
+        elif v>1.0:
+            return v/10. + 1.
+        else:
+            return v/10. - 1.
 
     # eventsvalues maps the given number v to a string to be displayed to the user as special event value
     # v is expected to be float value of range [0-10]
@@ -1570,12 +1603,8 @@ class tgraphcanvas(FigureCanvas):
     # .. 
     # 10.0 to "100"
     def eventsvalues(self,v):
-        value = self.eventsInternal2ExternalValue(v)
-        if value < 0:
-            return ""
-        else:
-            return u(value)
-
+        return u(self.eventsInternal2ExternalValue(v))
+            
     # 100.0 to "10" and 10.1 to "1"
     def eventsvaluesShort(self,v):
         value = v*10. - 10.
@@ -1585,7 +1614,7 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.LCDdecimalplaces:
                 return u(int(round(value)))
             else:
-                return u(int(round(value / 10)))
+                return u(int(round(value / 10.)))
 
     # the inverse to eventsvalues above (string -> value)
     def str2eventsvalue(self,s):
@@ -1593,7 +1622,7 @@ class tgraphcanvas(FigureCanvas):
         if st == None or len(st) == 0:
             return -1
         else:
-            return aw.float2float(float(st)/10. + 1.0)
+            return self.eventsExternal2InternalValue(float(st))
 
     def onpick(self,event):
         if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
@@ -1814,7 +1843,10 @@ class tgraphcanvas(FigureCanvas):
                         rcParams['path.effects'] = []
 
                     ##### updated canvas
-                    if self.redrawEnabled:
+                    try:
+                        #### lock shared resources #####
+                        aw.qmc.redrawsemaphore.acquire(1)
+
                         if self.ax_background:
                             self.fig.canvas.restore_region(self.ax_background)
                             # draw eventtypes
@@ -1840,14 +1872,9 @@ class tgraphcanvas(FigureCanvas):
                             if aw.qmc.BTcurve:
                                 aw.qmc.ax.draw_artist(self.l_temp2)
                              
-#                            for l in aw.qmc.ax.get_lines():
-#                                # we do not redraw the background curves nor the projection (drawn separately)
-#                                if not l in [self.l_BTprojection,self.l_ETprojection,self.l_back1,self.l_back2,self.l_delta1B,self.l_delta2B,self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
-#                                    aw.qmc.ax.draw_artist(l)
-
                             if aw.qmc.device == 18 and aw.qmc.l_timeline != None: # not NONE device
                                 aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
-
+                            
                             if aw.qmc.projectFlag:
                                 if self.l_BTprojection != None:
                                     aw.qmc.ax.draw_artist(self.l_BTprojection)
@@ -1858,12 +1885,26 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.delta_ax.draw_artist(self.l_delta1)
                             if self.DeltaBTflag and self.l_delta2 != None:
                                 aw.qmc.delta_ax.draw_artist(self.l_delta2)
-
-                            self.fig.canvas.blit(aw.qmc.ax.bbox)
+                            
+                            if aw.qmc.ax.clipbox:
+                                self.fig.canvas.blit(aw.qmc.ax.clipbox) # .clipbox is None in matplotlib <1.5
+                            else:
+                                self.fig.canvas.blit(aw.qmc.ax.bbox) # causes randomly a black border where the axis should be drawn
                         else:
                             # we do not have a background to bitblit, so do a full redraw
-                            #self.fig.canvas.draw()
-                            self.delayedUpdateBackground() # does the canvas draw, but also fills the ax_background cache
+                            self.updateBackground() # does the canvas draw, but also fills the ax_background cache
+                            if aw.qmc.projectFlag:
+                                if self.l_BTprojection != None:
+                                    aw.qmc.ax.draw_artist(self.l_BTprojection)
+                                if self.l_ETprojection != None:
+                                    aw.qmc.ax.draw_artist(self.l_ETprojection)
+                    except Exception as e:
+                        pass
+#                        import traceback
+#                        traceback.print_exc(file=sys.stdout)
+                    finally:
+                        if aw.qmc.redrawsemaphore.available() < 1:
+                            aw.qmc.redrawsemaphore.release(1)  
                     #####
 
                     #update phase lcds
@@ -2003,9 +2044,9 @@ class tgraphcanvas(FigureCanvas):
                     if redraw:
                         self.redraw(recompute)
                 elif redraw and force: # ensure that we at least redraw the canvas
-                    self.delayedUpdateBackground()
+                    self.updateBackground()
             elif redraw and force: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
-                    self.delayedUpdateBackground()
+                    self.updateBackground()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -2755,7 +2796,7 @@ class tgraphcanvas(FigureCanvas):
                 label.set_rotation(self.xrotation)
         # we have to update the canvas cache
         if redraw:
-            self.delayedUpdateBackground()
+            self.updateBackground()
 #        else:
 #            self.ax_background = None
 
@@ -2954,6 +2995,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
 
                 aw.setWindowTitle(aw.windowTitle)
+                
+                aw.extraeventsactionslastvalue = [0,0,0,0]
 
                 if self.roastpropertiesflag:
                     self.title = QApplication.translate("Scope Title", "Roaster Scope",None)
@@ -2986,7 +3029,8 @@ class tgraphcanvas(FigureCanvas):
                 self.specialevents = []
                 self.specialeventstype = []
                 self.specialeventsStrings = []
-                self.specialeventsvalue = []
+                self.specialeventsvalue = []                
+                
                 self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                 self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                 aw.eNumberSpinBox.setValue(0)
@@ -3342,7 +3386,7 @@ class tgraphcanvas(FigureCanvas):
     def redraw(self, recomputeAllDeltas=True, smooth=False):
         try:
             #### lock shared resources   ####
-            aw.qmc.samplingsemaphore.acquire(1)
+            aw.qmc.samplingsemaphore.acquire(1)            
 
             rcParams['path.effects'] = []
             if aw.qmc.graphstyle == 1:
@@ -3425,7 +3469,7 @@ class tgraphcanvas(FigureCanvas):
                             horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
                     else:
                         self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
-                            horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
+                            horizontalalignment="right",fontsize="xx-small",fontproperties=fontprop_small,x=suptitleX,y=1)
             
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
 #            self.ax.spines['top'].set_color('none')
@@ -4086,7 +4130,7 @@ class tgraphcanvas(FigureCanvas):
 
             ############  ready to plot ############
             #self.fig.canvas.draw() # done by updateBackground()
-            self.delayedUpdateBackground() # update bitlblit backgrounds
+            self.updateBackground() # update bitlblit backgrounds
             #######################################
 
             # if designer ON
@@ -4684,7 +4728,6 @@ class tgraphcanvas(FigureCanvas):
             if not self.flagon:
                 self.OnMonitor()
             self.flagstart = True
-            
             try:
                 aw.eventactionx(aw.qmc.xextrabuttonactions[1],aw.qmc.xextrabuttonactionstrings[1])
             except Exception:
@@ -4857,7 +4900,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
                     self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.delayedUpdateBackground() # but we need
+                    self.updateBackground() # but we need
                     st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
                     message = QApplication.translate("Message","[TP] recorded at {0} BT = {1}", None).format(st,st2)
                     #set message at bottom
@@ -4896,7 +4939,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
                     self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.delayedUpdateBackground() # but we need
+                    self.updateBackground() # but we need
 
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
@@ -4954,7 +4997,7 @@ class tgraphcanvas(FigureCanvas):
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
                     self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.delayedUpdateBackground() # but we need
+                    self.updateBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -5007,7 +5050,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                     self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.delayedUpdateBackground() # but we need
+                    self.updateBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -5063,7 +5106,7 @@ class tgraphcanvas(FigureCanvas):
                         self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
                     self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.delayedUpdateBackground() # but we need
+                    self.updateBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -5118,7 +5161,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                     self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.delayedUpdatedBackground() # but we need
+                    self.updatedBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -5189,7 +5232,7 @@ class tgraphcanvas(FigureCanvas):
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
                     self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.delayedUpdateBackground() # but we need
+                    self.updateBackground() # but we need
                     try:
                         # update ambient temperature if a ambient temperature source is configured and no value yet established
                         if aw.qmc.ambientTemp == 0.0:
@@ -5294,7 +5337,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
                     self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.delayedUpdateBackground() # but we need
+                    self.updateBackground() # but we need
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -5332,11 +5375,18 @@ class tgraphcanvas(FigureCanvas):
     def EventRecord(self,extraevent=None):
         try:
             if extraevent!=None:
-                self.EventRecordAction(
-                    extraevent=extraevent,
-                    eventtype=aw.extraeventstypes[extraevent],
-                    eventvalue=aw.extraeventsvalues[extraevent],
-                    eventdescription=aw.extraeventsdescriptions[extraevent])
+                if aw.extraeventstypes[extraevent] <=4:
+                    self.EventRecordAction(
+                        extraevent=extraevent,
+                        eventtype=aw.extraeventstypes[extraevent],
+                        eventvalue=aw.extraeventsvalues[extraevent],
+                        eventdescription=aw.extraeventsdescriptions[extraevent])
+                else: # on "relative" event values, we take the last value set per event via the recordextraevent call before
+                    self.EventRecordAction(
+                        extraevent=extraevent,
+                        eventtype=aw.extraeventstypes[extraevent]-5,
+                        eventvalue=aw.qmc.eventsExternal2InternalValue(aw.extraeventsactionslastvalue[aw.extraeventstypes[extraevent]-5]),
+                        eventdescription=aw.extraeventsdescriptions[extraevent])
             else:
                 self.EventRecordAction(extraevent=extraevent)
         except Exception as e:
@@ -5454,7 +5504,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
                                 elif etype == 3:
                                     self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
-                        self.delayedUpdateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBacground() needed
+                        self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBacground() needed
                         temp = "%.1f "%self.temp2[i]            
                         if aw.qmc.timeindex[0] != -1:
                             start = aw.qmc.timex[aw.qmc.timeindex[0]]
@@ -5566,7 +5616,7 @@ class tgraphcanvas(FigureCanvas):
                             elif etype == 3:
                                 self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                    self.delayedUpdateBackground() # but we need
+                    self.updateBackground() # but we need
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " DeviceEventRecord() {0}").format(str(e)),exc_tb.tb_lineno)
@@ -7199,7 +7249,7 @@ class tgraphcanvas(FigureCanvas):
             #turn ON
             self.l_horizontalcrossline = None
             self.l_verticalcrossline = None
-            self.delayedUpdateBackground() # update bitlblit backgrounds
+            self.updateBackground() # update bitlblit backgrounds
             self.crossmarker = True
             message = QApplication.translate("Message", "Mouse Cross ON: move mouse around",None)
             aw.sendmessage(message)
@@ -7212,7 +7262,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.resetlines()
             self.fig.canvas.draw()
-            self.delayedUpdateBackground() # update bitlblit backgrounds
+            self.updateBackground() # update bitlblit backgrounds
             message = QApplication.translate("Message", "Mouse cross OFF",None)
             aw.sendmessage(message)
             self.fig.canvas.mpl_disconnect(self.crossmouseid)
@@ -7290,12 +7340,12 @@ class VMToolbar(NavigationToolbar):
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def draw_new(self):
         self.draw_org()
-        aw.qmc.delayedUpdateBackground()
+        aw.qmc.updateBackground()
 
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def update_view_new(self):
         self.update_view_org()
-        aw.qmc.delayedUpdateBackground()
+        aw.qmc.updateBackground()
 
     def _icon(self, name):
         #dirty hack to prefer .svg over .png Toolbar icons
@@ -8046,6 +8096,7 @@ class ApplicationWindow(QMainWindow):
         self.defaultdpi = 100
         self.dpi = self.defaultdpi
         self.qmc = tgraphcanvas(self.main_widget)
+        
         #self.qmc.setAttribute(Qt.WA_NoSystemBackground)
         
         #### Hottop Control
@@ -8101,8 +8152,15 @@ class ApplicationWindow(QMainWindow):
         #user defined event buttons
         self.extraeventsbuttonsflag = 1  #shows/hides rows of buttons  1/0; records the user choice, not the actual state!
         self.extraeventslabels,self.extraeventsdescriptions, self.extraeventstypes,self.extraeventsvalues = [],[],[],[]  #hold string,string,index,index
+        # extraeventtypes: 
+        #  0-3: custom event types (absolute value assignments)
+        #  4: no event type assigned
+        #  5-8: custom event types (relative value assignments; +/- steps)
         self.extraeventbuttoncolor,self.extraeventbuttontextcolor = [],[]
         self.extraeventsactionstrings,self.extraeventsactions,self.extraeventsvisibility = [],[],[] #hold string,index,index
+
+        # the last value set per custom event, initialized to 0%
+        self.extraeventsactionslastvalue = [0,0,0,0]
 
         #event sliders
         self.eventslidervalues = [0,0,0,0]
@@ -9709,7 +9767,7 @@ class ApplicationWindow(QMainWindow):
             res = QApplication.applicationDirPath() + "/"
         return res
 
-    def setFonts(self):
+    def setFonts(self,redraw=True):
         # try to select the right font for matplotlib according to the given locale and plattform
         if self.qmc.graphfont == 0:     
             try:                    
@@ -9761,7 +9819,8 @@ class ApplicationWindow(QMainWindow):
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Comic Sans MS','Humor Sans']
             self.mpl_fontproperties = mpl.font_manager.FontProperties()
-        self.qmc.redraw(recomputeAllDeltas=False)
+        if redraw:
+        	self.qmc.redraw(recomputeAllDeltas=False)
 
     def set_mpl_fontproperties(self,fontpath):
         if os.path.exists(fontpath):
@@ -10064,6 +10123,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fireslideraction() {0}").format(str(e)),exc_tb.tb_lineno)
 
     def recordsliderevent(self,n):
+        self.extraeventsactionslastvalue[n] = self.eventslidervalues[n]
         if self.qmc.flagstart:
             value = aw.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value)
@@ -10355,7 +10415,7 @@ class ApplicationWindow(QMainWindow):
                 self.slider4.setValue(v)
                 self.updateSliderLCD(3,v)
 
-    #call from user configured event buttons
+    #called from user configured event buttons
     def recordextraevent(self,ee):
         eventtype = self.extraeventstypes[ee]
         try:
@@ -10370,17 +10430,26 @@ class ApplicationWindow(QMainWindow):
             self.lastbuttonpressed = ee
         except Exception:
             pass
-        if eventtype < 4:  ## if eventtype == 4 we have an button event of type "--" that does not add an event
-            if self.qmc.flagstart:
-                self.qmc.EventRecord(extraevent = ee)
-            value = (self.extraeventsvalues[ee] - 1) # TODO: why "-1" here??
-            cmdvalue = int(round((self.eventsliderfactors[eventtype] * value) + self.eventslideroffsets[eventtype]))
+        if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type "--" that does not add an event
+            cmdvalue = self.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee])
+            if eventtype < 4: # absolute values
+                etype = eventtype
+                new_value = cmdvalue
+            elif eventtype > 4: # relative values for +/- actions
+                etype = eventtype-5 # the real event type has a offset of 5 in this case
+                new_value = min(100,max(0,self.extraeventsactionslastvalue[etype] + cmdvalue))
+            # the new_value is combined with the event factor and offset as specified in the slider definition
+            actionvalue = int(round((self.eventsliderfactors[etype] * new_value) + self.eventslideroffsets[etype]))
             if self.extraeventsactions[ee] in [8,9]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
-                self.eventaction(self.extraeventsactions[ee],u(int((self.extraeventsvalues[ee] - 1) * 10.0)))
+                self.eventaction(self.extraeventsactions[ee],u(int(new_value)))
             else:
-                self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
+                self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(actionvalue))
+            # remember the new value as the last value set for this event
+            self.extraeventsactionslastvalue[etype] = new_value
             # move corresponding slider to new value:
-            self.moveslider(eventtype,aw.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee]))
+            self.moveslider(etype,new_value)
+            if self.qmc.flagstart:
+                self.qmc.EventRecord(extraevent = ee)                 
         else:
             # just issue the eventaction (no cmd substitution here)
             self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]))
@@ -16695,8 +16764,8 @@ $cupping_notes
         for i in range(len(self.buttonlist)):
             tip = u(QApplication.translate("Tooltip","<b>Label</b>= ", None)) + u(self.extraeventslabels[i]) + "<br>"
             tip += u(QApplication.translate("Tooltip","<b>Description </b>= ", None)) + u(self.extraeventsdescriptions[i]) + "<br>"
-            if self.extraeventstypes[i] < 4:
-                tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None)) + u(self.qmc.etypesf(self.extraeventstypes[i])) + "<br>"
+            tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None)) + u(self.qmc.etypesf(self.extraeventstypes[i])) + "<br>"            
+            if self.extraeventstypes[i] != 4: # no tips for 4: no event type set
                 tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None)) + u(int(round((self.extraeventsvalues[i]-1)*10.))) + "<br>" 
             tip += u(QApplication.translate("Tooltip","<b>Documentation </b>= ", None)) + u(self.extraeventsactionstrings[i]) + "<br>"
             tip += u(QApplication.translate("Tooltip","<b>Button# </b>= ", None)) + str(i+1)
@@ -18008,22 +18077,18 @@ class HUDDlg(ArtisanDialog):
                         commentoutplot[e] = 1
                         self.plotterb()
                         
-                    #create x range
+                    toff = 0                        
+                    #create x range and set the time offset generated by CHARGE
                     if len(aw.qmc.timex):
                         x_range = aw.qmc.timex
                         if aw.qmc.timeindex[0] > -1:
                             toff = aw.qmc.timex[aw.qmc.timeindex[0]]
-                        else:
-                            toff = 0
                     elif len(aw.qmc.timeB):
                         x_range = aw.qmc.timeB
                         if aw.qmc.timeindexB[0] > -1:
                             toff = aw.qmc.timeB[aw.qmc.timeindexB[0]]
-                        else:
-                            toff = 0
                     else:
                         x_range = list(range(int(aw.qmc.startofx),int(aw.qmc.endofx)))
-                        toff = int(aw.qmc.startofx)
                     #create y range
                     y_range = []
 
@@ -21933,7 +21998,7 @@ class EventsDlg(ArtisanDialog):
         self.nbuttonsSpinBox = QSpinBox()
         self.nbuttonsSpinBox.setMaximumWidth(100)
         self.nbuttonsSpinBox.setAlignment(Qt.AlignCenter)
-        self.nbuttonsSpinBox.setRange(9,30)
+        self.nbuttonsSpinBox.setRange(6,30)
         self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
         self.nbuttonsSpinBox.valueChanged.connect(self.realignbuttons)        
         #table for showing events
@@ -22897,12 +22962,14 @@ class EventsDlg(ArtisanDialog):
             descriptionedit.editingFinished.connect(lambda z=1,i=i:self.setdescriptioneventbutton(z,i))
             #type
             typeComboBox = QComboBox()
-            typeComboBox.addItems([self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),"--"])
+            std_extra_events = [self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),""]
+            std_extra_events += [unichr(177) + e for e in std_extra_events[:-1]] # chr(241)
+            typeComboBox.addItems(std_extra_events)
             typeComboBox.setCurrentIndex(aw.extraeventstypes[i])
             typeComboBox.currentIndexChanged.connect(lambda z=1,i=i:self.settypeeventbutton(z,i))
             #value
             valueEdit = QLineEdit()
-            valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\d?\d?$"),self))
+            valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\-?\d?\d?$"),self)) # QRegExp(r"^100|\d?\d?$"),self))
             valueEdit.setText(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
             valueEdit.setAlignment(Qt.AlignRight)
             valueEdit.editingFinished.connect(lambda z=1,i=i:self.setvalueeventbutton(z,i))
@@ -23039,7 +23106,7 @@ class EventsDlg(ArtisanDialog):
         typecombobox = self.eventbuttontable.cellWidget(i,2)
         aw.extraeventstypes[i] = typecombobox.currentIndex()
         etype_char = ""
-        if aw.extraeventstypes[i] < 4:
+        if aw.extraeventstypes[i] < 4 or aw.extraeventstypes[i] > 4:
             etype_char = str(aw.qmc.etypesf(aw.extraeventstypes[i])[0])
         aw.buttonlist[i].setText(etype_char+str(aw.qmc.eventsvalues(aw.extraeventsvalues[i])))
         aw.settooltip()
@@ -24336,6 +24403,7 @@ class backgroundDlg(ArtisanDialog):
         self.createEventTable()
         self.createDataTable()
         aw.qmc.redraw(recomputeAllDeltas=False)
+        aw.qmc.delayedUpdateBackground()
         #activate button
         if m == "up":
             self.upButton.setDisabled(False)
@@ -24894,8 +24962,9 @@ class modbusport(object):
                         timeout=self.timeout)  
                 elif self.type == 3: # TCP
                     self.master = ModbusTcpClient(
-                        host=self.host, 
-                        port=self.port)
+                            host=self.host, 
+                            port=self.port,
+                            )
                 elif self.type == 4: # UDP
                     try:
                         self.master = ArtisanModbusUdpClient(
@@ -26322,8 +26391,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                #self.SP.flush()
-                libtime.sleep(.1)
+                self.SP.flush()
+                libtime.sleep(.05)
                 r = self.SP.read(7)                                   #NOTE: different
                 if len(r) == 7:
                     #DECIMAL POINT
@@ -26378,8 +26447,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                #self.SP.flush()
-                libtime.sleep(.1)
+                self.SP.flush()
+                libtime.sleep(.05)
                 r = self.SP.read(8) #NOTE: different to CENTER306
                 if len(r) == 8:
                     #DECIMAL POINT
@@ -26448,8 +26517,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                #self.SP.flush()
-                libtime.sleep(.1)
+                self.SP.flush()
+                libtime.sleep(.05)
                 r = self.SP.read(10) #NOTE: different to CENTER303
                 if len(r) == 10:
                     #DECIMAL POINT
@@ -26538,8 +26607,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                #self.SP.flush()
-                libtime.sleep(.5)
+                self.SP.flush()
+                libtime.sleep(.05)
                 r = self.SP.read(45)
                 if len(r) == 45:
                     T1 = T2 = T3 = T3 = -1
@@ -36932,7 +37001,7 @@ try:
 except Exception:
     pass
 aw.settingsLoad()
-aw.setFonts()
+aw.setFonts(redraw=False)
 
 try:
     if sys.argv and len(sys.argv) > 1:

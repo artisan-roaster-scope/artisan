@@ -20,12 +20,14 @@ v0.9.8 (xx.10.2015)
    * enhanced [symbolic formula evaluator and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html) adding time shifting among others
    * adds support for US weight and volume units
    * adds XTB data to the background dialog if selected in the table of the background dialog
+   * adds support for event actions that change event values by a specified offset instead of an absolute value
  * Changes
    * custom event buttons and sliders remembers visibility status
    * plotter "Virtual Device" action renamed into "BT/ET", now adds plot data to BT/ET if no profile is loaded, otherwise it creates an additional Virtual Device
    * the symbolic variables ETB and BTB to access data from the background curves have been generalized and renamed into B1 and B2
    * default state of the statistic line on the bottom of the main window changed (right-click still toggles) and setting made persistent
    * time align of background profiles now possible per all major events possible (always aligns to CHARGE first, and if set to ALL, it aligns to all events in sequence of their occurence)
+   * increases the time and temperature resolution
  * Bug Fixes
    * fixed port name support in serial port popup on OS X
    * fixed printing on OS X

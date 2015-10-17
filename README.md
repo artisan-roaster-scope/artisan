@@ -66,6 +66,7 @@ Documentation and Support
   * [aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon
   * [Controlling a Hottop Roaster with Artisan: The Basics v6 (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit?usp=sharing) by Barrie Fairley
   * [Artisan - Basic Setup and Tuning Guide (GoogleDocs)](https://docs.google.com/document/d/1eGtztr56t3GFYafTaMvQUDU3YQXK5nOFNcECM-q_WQ8/edit)
+  * [Artisan Documentation on the Huky Forum](http://www.hukyforum.com/index.php?action=downloads;cat=1)
 - [Artisan Blog](http://artisan-roasterscope.blogspot.de/)
 - [User Mailing List](https://lists.mokelbu.de/listinfo/artisan-user)
 
