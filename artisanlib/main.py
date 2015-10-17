@@ -10730,7 +10730,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
         elif key == 83:                     #letter S (sliders)
             self.toggleSlidersVisibility()
-        elif key == 84:                     #letter T (mouse cross)
+        elif key == 84 and not self.qmc.flagstart:  #letter T (mouse cross)
             self.qmc.togglecrosslines()
         elif key == 81 and aw.qmc.flagon:  #letter q (quick entry of custom event 1)
             self.quickEventShortCut = (0,"")
