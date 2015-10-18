@@ -1419,7 +1419,7 @@ class tgraphcanvas(FigureCanvas):
 
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
-        self.delayTimeout = 10
+        self.delayTimeout = 5
         self.block_update = False
         
         # flag to toggle between Temp and RoR scale of xy-display
@@ -5796,9 +5796,13 @@ class tgraphcanvas(FigureCanvas):
                                               color = self.palette["rect1"],alpha=0.5)
                     self.ax.add_patch(rect)
 
-                dryphaseP = int(round(dryphasetime*100/totaltime))
-                midphaseP = int(round(midphasetime*100/totaltime))
-                finishphaseP = int(round(finishphasetime*100/totaltime))
+                if aw.qmc.LCDdecimalplaces:
+                    fmtstr = "%.1f"
+                else:
+                    fmtstr = "%.0f" 
+                dryphaseP = fmtstr%(dryphasetime*100./totaltime)
+                midphaseP = fmtstr%(midphasetime*100./totaltime)
+                finishphaseP = fmtstr%(finishphasetime*100./totaltime)
                             
                 #find Lowest Point in BT
                 LP = 1000 
@@ -5808,10 +5812,10 @@ class tgraphcanvas(FigureCanvas):
                 if self.statisticsflags[0]:
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(13)
-                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ str(dryphaseP)+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
                     if self.timeindex[2]: # only if FCs exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + str(midphaseP)+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + str(finishphaseP)+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
+                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + finishphaseP+ "%",color=self.palette["text"],ha="center",fontproperties=statsprop)
                     if self.timeindex[7]: # only if COOL exists
                         self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+coolphasetime/2.,statisticsupper,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
 
@@ -9920,7 +9924,7 @@ class ApplicationWindow(QMainWindow):
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
                     if self.qmc.timeindex[1]: # after DRY
                         ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
-                        dryphaseP = fmtstr%(ts*100/totaltime)
+                        dryphaseP = fmtstr%(ts*100./totaltime)
                         if not aw.qmc.LCDdecimalplaces:
                             dryphaseP += " "
                         self.TPlcd.display(u(dryphaseP))
@@ -9951,7 +9955,7 @@ class ApplicationWindow(QMainWindow):
                     elif aw.qmc.phasesLCDmode == 1: # percentage mode
                         if self.qmc.timeindex[2]:
                             ts = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
-                        midphaseP = fmtstr%(ts*100/totaltime)
+                        midphaseP = fmtstr%(ts*100./totaltime)
                         if not aw.qmc.LCDdecimalplaces:
                             midphaseP += " "
                         self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "RAMP%",None)) + "</b></small>")
@@ -9999,7 +10003,7 @@ class ApplicationWindow(QMainWindow):
                         self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
                         self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
                     elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                        finishphaseP = fmtstr%(ts*100/totaltime)
+                        finishphaseP = fmtstr%(ts*100./totaltime)
                         if not aw.qmc.LCDdecimalplaces:
                             finishphaseP += " "
                         self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "DEV%",None)) + "</b></small>")
