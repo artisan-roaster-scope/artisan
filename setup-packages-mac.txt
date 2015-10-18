@@ -3,9 +3,9 @@ Current Versions:
 o XCode 4.5.2 + command line tools
 o Python 2.7.10 or 3.4.3 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial 2.7
-o QT 5.4.2
+o QT 5.1.1
 o SIP 4.16.8
-o PyQt 4.11.4 / PyQt 5.5.0
+o PyQt 5.5.1-trunk-18.10.2015
 o numpy 1.9.2
 o scipy 0.15.1
 o matplotlib 1.4.3
@@ -31,6 +31,9 @@ o python-qrcode 5.1
 
 Upgrade History:
 
+- 2015-10-18
+ . QT 5.4.2 => Q T5.1.1
+ . PyQt 5.5.0 => PyQt 5.5.1-trunk-18.10.2015
 - 2015-10-11
  . setuptools 18.4
  . macholib 1.5.1 => 1.7
@@ -285,6 +288,11 @@ Note: PyQt needs to be re-installed after a qt update
 # cd PyQt-mac-gpl-4.10.4
 # python configure.py
 use: "python configure.py -q /Users/<username>/Qt5.5.0/5.5/clang_64/bin/qmake"
+
+on Qt5.5.1/PyQt5.5.1-trunk one needs to
+use "python configure.py -q /Users/luther/Qt5.5.1/5.5/clang_64/bin/qmake --disable QtPositioning"
+as the QtPositioning misses a .h file on compilation
+
 # make
 # sudo make install
 

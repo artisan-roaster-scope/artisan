@@ -71,7 +71,7 @@ sip.setapi('QVariant', 2)
 try:
     from PyQt5.QtCore import QLibraryInfo
     pyqtversion = 5
-except:
+except Exception as e:
     pyqtversion = 4   
 
 
@@ -819,6 +819,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         self.fig.canvas.mpl_connect('pick_event', self.onpick)
+        self.fig.canvas.mpl_connect('draw_event', self._draw_event)
 
         # set the parent widget
         self.setParent(parent)
@@ -1371,7 +1372,6 @@ class tgraphcanvas(FigureCanvas):
         self.messagesemaphore = QSemaphore(1)
         self.errorsemaphore = QSemaphore(1)
         self.serialsemaphore = QSemaphore(1)
-        self.redrawsemaphore = QSemaphore(1)
 
         #flag to plot cross lines from mouse
         self.crossmarker = False
@@ -1419,8 +1419,7 @@ class tgraphcanvas(FigureCanvas):
 
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
-        self.redrawEnabled = True
-        self.delayTimeout = 0
+        self.delayTimeout = 10
         self.block_update = False
         
         # flag to toggle between Temp and RoR scale of xy-display
@@ -1470,38 +1469,40 @@ class tgraphcanvas(FigureCanvas):
             return s
             
     def resizeEvent(self,event):
-        #self.redrawEnabled = False
+        self.block_update = True # we block updating the canvas for calls during the resize
         super(tgraphcanvas,self).resizeEvent(event)
-        self.delayedUpdateBackground()
+        self.block_update = False
+        self.updateBackground() # and only update after the resize explicitly
 
     def delayedUpdateBackground(self):
         if not self.block_update:
             self.block_update = True
-            #self.redrawEnabled = False
             QTimer.singleShot(self.delayTimeout,self.doUpdate)
 
     def updateBackground(self):
         if not self.block_update:
-            #self.redrawEnabled = False
             self.block_update = True
             self.doUpdate()
 
     def doUpdate(self):
         if not self.designerflag:
-            try:
-                #### lock shared resources #####
-                aw.qmc.redrawsemaphore.acquire(1)
-                self.redrawEnabled = False
-                self.resetlinecountcaches() # ensure that the line counts are up to date
-                self.resetlines() # get rid of HUD, projection and cross lines
-                self.resetdeltalines() # just in case
-                self.fig.canvas.draw()
-                #self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)  # causes randomly a black border where the axis should be drawn
-                self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
-            finally:
-                if aw.qmc.redrawsemaphore.available() < 1:
-                    aw.qmc.redrawsemaphore.release(1)                
-        self.redrawEnabled = True
+            self.resetlinecountcaches() # ensure that the line counts are up to date
+            self.resetlines() # get rid of HUD, projection and cross lines
+            self.resetdeltalines() # just in case
+            
+            # ask the canvas to kindly draw it self some time in the future
+            # when Qt thinks it is convenient
+            self.fig.canvas.draw_idle()
+            #self.fig.canvas.draw()
+            
+            # self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
+            # canvas is automatically blitted to self.ax_background after full redraw by _draw_event(self, evt)
+            
+            #aw.qmc.ax.draw_artist(aw.qmc.ax.xaxis)
+            #aw.qmc.ax.draw_artist(aw.qmc.ax.yaxis)
+            #self.fig.canvas.update()
+            #self.fig.canvas.flush_events() # this makes it worse
+            
         self.block_update = False
 
     def getetypes(self):
@@ -1624,6 +1625,12 @@ class tgraphcanvas(FigureCanvas):
         else:
             return self.eventsExternal2InternalValue(float(st))
 
+    # hook up to mpls event handling framework for draw events
+    # this is emitted after the canvas has finished a full redraw
+    def _draw_event(self, evt):
+        #self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)  # causes randomly a black border where the axis should be drawn
+        self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
+
     def onpick(self,event):
         if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
             timex = self.backgroundtime2index(event.artist.get_xdata()[event.ind][0])
@@ -1683,7 +1690,7 @@ class tgraphcanvas(FigureCanvas):
             if event.inaxes == None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==3:
                 aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
                 aw.qmc.writecharacteristics()
-                aw.qmc.fig.canvas.draw()
+                aw.qmc.fig.canvas.draw_idle()
             elif event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag:# and not self.flagon:
                 timex = self.time2index(event.xdata)
                 if timex > 0:
@@ -1844,9 +1851,6 @@ class tgraphcanvas(FigureCanvas):
 
                     ##### updated canvas
                     try:
-                        #### lock shared resources #####
-                        aw.qmc.redrawsemaphore.acquire(1)
-
                         if self.ax_background:
                             self.fig.canvas.restore_region(self.ax_background)
                             # draw eventtypes
@@ -1898,13 +1902,10 @@ class tgraphcanvas(FigureCanvas):
                                     aw.qmc.ax.draw_artist(self.l_BTprojection)
                                 if self.l_ETprojection != None:
                                     aw.qmc.ax.draw_artist(self.l_ETprojection)
-                    except Exception as e:
+                    except Exception:
                         pass
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
-                    finally:
-                        if aw.qmc.redrawsemaphore.available() < 1:
-                            aw.qmc.redrawsemaphore.release(1)  
                     #####
 
                     #update phase lcds
@@ -2797,8 +2798,6 @@ class tgraphcanvas(FigureCanvas):
         # we have to update the canvas cache
         if redraw:
             self.updateBackground()
-#        else:
-#            self.ax_background = None
 
     def fmt_timedata(self,x):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -10730,7 +10729,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
         elif key == 83:                     #letter S (sliders)
             self.toggleSlidersVisibility()
-        elif key == 84 and not self.qmc.flagstart:  #letter T (mouse cross)
+        elif key == 84 and not self.qmc.flagon:  #letter T (mouse cross)
             self.qmc.togglecrosslines()
         elif key == 81 and aw.qmc.flagon:  #letter q (quick entry of custom event 1)
             self.quickEventShortCut = (0,"")
@@ -24403,7 +24402,7 @@ class backgroundDlg(ArtisanDialog):
         self.createEventTable()
         self.createDataTable()
         aw.qmc.redraw(recomputeAllDeltas=False)
-        aw.qmc.delayedUpdateBackground()
+#        aw.qmc.delayedUpdateBackground() # done by the above redraw and should not be needed here
         #activate button
         if m == "up":
             self.upButton.setDisabled(False)

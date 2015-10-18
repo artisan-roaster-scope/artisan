@@ -4,9 +4,9 @@ export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2
 
 # for PyQt4 running on Qt5
 export ORGPATH=$PATH
-export PATH=/Users/luther/Qt5.5.0/5.5/clang_64/bin:$PATH
+export PATH=/Users/luther/Qt5.5.1/5.5/clang_64/bin:$PATH
 
-export DYLD_FRAMEWORK_PATH=/Users/luther//Qt5.5.0/5.5/clang_64/lib/
+export DYLD_FRAMEWORK_PATH=/Users/luther//Qt5.5.1/5.5/clang_64/lib/
 
 # translations
 pylupdate5 artisan.pro # we need to use pylupdate4 for Qt4 and pylupdate5 for Qt5
