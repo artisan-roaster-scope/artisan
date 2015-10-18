@@ -3052,6 +3052,9 @@ class tgraphcanvas(FigureCanvas):
                 if self.endofx < 1:
                     self.endofx = 60
 
+                #clear PhasesLCDs
+                aw.updatePhasesLCDs()
+                
                 #roast flags
                 aw.qmc.heavyFC_flag = False
                 aw.qmc.lowFC_flag = False
@@ -3063,7 +3066,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.tipping_flag = False
                 aw.qmc.scorching_flag = False
                 aw.qmc.divots_flag = False
-
+                
                 #color variables
                 aw.qmc.whole_color = 0
                 aw.qmc.ground_color = 0
@@ -9985,7 +9988,6 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.DRYlcd.display(u("--:--"))
                     self.TP2DRYlabel.setText("")
-
                 # FCs phase LCD  
                 if self.qmc.timeindex[2]:
                     # after FCs
@@ -10036,7 +10038,23 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.FCslcd.display(u("--:--"))
                     self.DRY2FCslabel.setText("")
-        except Exception as e:            
+            else:
+                if aw.qmc.phasesLCDmode == 0: # time mode
+                    self.TPlcd.display("--:--")                
+                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
+                elif aw.qmc.phasesLCDmode == 1: # percentage mode
+                    self.TPlcd.display(u(" --- "))
+                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
+                elif aw.qmc.phasesLCDmode == 2: # temp mode
+                    self.TPlcd.display(u(" --- "))
+                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")                
+                self.TP2DRYlabel.setText("")
+                self.DRYlcd.display("--:--")
+                self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
+                self.DRY2FCslabel.setText("")
+                self.FCslcd.display("--:--")
+                self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
+        except Exception as e:        
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
