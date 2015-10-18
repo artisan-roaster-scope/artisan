@@ -10740,7 +10740,7 @@ class ApplicationWindow(QMainWindow):
         elif key == 69 and aw.qmc.flagon:  #letter e (quick entry of custom event 3)
             self.quickEventShortCut = (2,"")
             aw.sendmessage("%s"%aw.qmc.etypes[2])
-        elif key == 82 and aw.qmc.flagson:  #letter r (quick entry of custom event 4)
+        elif key == 82 and aw.qmc.flagon:  #letter r (quick entry of custom event 4)
             self.quickEventShortCut = (3,"")
             aw.sendmessage("%s"%aw.qmc.etypes[3])
         elif key == 66:  #letter b hides/shows extra rows of event buttons
