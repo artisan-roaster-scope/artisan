@@ -7564,17 +7564,7 @@ class SampleThread(QThread):
                             #2 load RT buffers
                             for i in range(nxdevices):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)
-                                aw.qmc.RTextratemp1.append(extrat1)
-                                aw.qmc.RTextratemp2.append(extrat2)
-                                aw.qmc.RTextratx.append(extratx)              
-                            #3 evaluate symbolic expressions
-                            for i in range(nxdevices):
-                                if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
-                                    aw.qmc.RTextratemp1[i] = extrat1 
-                                if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
-                                    aw.qmc.RTextratemp2[i] = extrat2
+                                
                                 # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                                 # modbus channel 1+2, respect input temperature scale setting
                                 if aw.qmc.extradevices[i] == 29:
@@ -7595,7 +7585,22 @@ class SampleThread(QThread):
                                     if aw.modbus.input4mode == "C" and aw.qmc.mode == "F":
                                         extrat2 = aw.qmc.fromCtoF(extrat2)
                                     elif aw.modbus.input4mode == "F" and aw.qmc.mode == "C":
-                                        extrat2 = aw.qmc.fromFtoC(extrat2)                                
+                                        extrat2 = aw.qmc.fromFtoC(extrat2) 
+                                                                        
+                                aw.qmc.RTextratemp1.append(extrat1)
+                                aw.qmc.RTextratemp2.append(extrat2)
+                                aw.qmc.RTextratx.append(extratx)
+                            #3 evaluate symbolic expressions
+                            for i in range(nxdevices):
+                                extrat1 = aw.qmc.RTextratemp1[i]
+                                extrat2 = aw.qmc.RTextratemp2[i]
+                                if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
+                                    aw.qmc.RTextratemp1[i] = extrat1
+                                if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
+                                    aw.qmc.RTextratemp2[i] = extrat2
+                               
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
                                     extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
                                     extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)                                    
@@ -7620,7 +7625,9 @@ class SampleThread(QThread):
                                         aw.qmc.extratemp2[i][-1] = float(extrat2)
                                     else:
                                         aw.qmc.extratemp2[i].append(float(extrat2))
-                                    if len(aw.qmc.extratimex[i]) <= 0:
+                                    if len(aw.qmc.extratimex[i]) > 0:
+                                        aw.qmc.extratimex[i][-1] = extratx
+                                    else:
                                         aw.qmc.extratimex[i].append(extratx)
                         #ERROR FOUND
                         else:
