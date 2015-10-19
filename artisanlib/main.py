@@ -1418,7 +1418,7 @@ class tgraphcanvas(FigureCanvas):
 
         #variables to organize the delayed update of the backgrounds for bitblitting
         self.ax_background = None
-        self.delayTimeout = 5
+        self.delayTimeout = 10
         self.block_update = False
         
         # flag to toggle between Temp and RoR scale of xy-display
@@ -1468,10 +1468,12 @@ class tgraphcanvas(FigureCanvas):
             return s
             
     def resizeEvent(self,event):
+        block_state = self.block_update
         self.block_update = True # we block updating the canvas for calls during the resize
         super(tgraphcanvas,self).resizeEvent(event)
-        self.block_update = False
-        self.updateBackground() # and only update after the resize explicitly
+        if not block_state: # if updates where not blocked anyhow, unblock
+            self.block_update = False
+        self.delayedUpdateBackground() # and only update after the resize explicitly
 
     def delayedUpdateBackground(self):
         if not self.block_update:
@@ -4141,7 +4143,7 @@ class tgraphcanvas(FigureCanvas):
 
             ############  ready to plot ############
             #self.fig.canvas.draw() # done by updateBackground()
-            self.updateBackground() # update bitlblit backgrounds
+            self.delayedUpdateBackground() # update bitlblit backgrounds
             #######################################
 
             # if designer ON
@@ -4568,7 +4570,8 @@ class tgraphcanvas(FigureCanvas):
         
     def OnMonitor(self):
         try:
-            aw.qmc.reset(True,False)
+            self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
+            aw.qmc.reset(True,False)            
             try:
                 appnope.nope()
             except Exception:
@@ -4599,7 +4602,6 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setText(QApplication.translate("Button", "OFF",None)) # text means click to turn OFF (it is ON)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None))
             aw.button_2.setEnabled(True) # ensure that the START button is enabled
-            aw.showLCDs()
             if aw.eventslidersflag:
                 aw.showSliders()
             aw.disableEditMenus()
@@ -4608,6 +4610,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.showExtraButtons()
             aw.arduino.activateONOFFeasySV(aw.arduino.svButtons)
             aw.arduino.activateSVSlider(aw.arduino.svSlider)
+            self.block_update = False # unblock the updating of the bitblit canvas            
+            aw.showLCDs() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
             self.StartAsyncSamplingAction()
         except Exception as ex:
@@ -4791,7 +4795,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_18.setEnabled(False)
             self.updateLCDtime()
             self.redraw(smooth=True)
-            #prevents accidentally deleting a modified profile.
+            #prevents accidentally deleting a modified profile:
             if len(self.timex) > 2:
                 self.safesaveflag = True
             aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None))
@@ -7268,7 +7272,7 @@ class tgraphcanvas(FigureCanvas):
             #turn ON
             self.l_horizontalcrossline = None
             self.l_verticalcrossline = None
-            self.updateBackground() # update bitlblit backgrounds
+            self.delayedUpdateBackground() # update bitlblit backgrounds
             self.crossmarker = True
             message = QApplication.translate("Message", "Mouse Cross ON: move mouse around",None)
             aw.sendmessage(message)
@@ -7280,8 +7284,7 @@ class tgraphcanvas(FigureCanvas):
                 self.resetdeltalines()
             else:
                 self.resetlines()
-            self.fig.canvas.draw()
-            self.updateBackground() # update bitlblit backgrounds
+            self.delayedUpdateBackground() # update bitlblit backgrounds
             message = QApplication.translate("Message", "Mouse cross OFF",None)
             aw.sendmessage(message)
             self.fig.canvas.mpl_disconnect(self.crossmouseid)
@@ -7610,16 +7613,17 @@ class SampleThread(QThread):
                                 aw.qmc.RTextratemp1.append(extrat1)
                                 aw.qmc.RTextratemp2.append(extrat2)
                                 aw.qmc.RTextratx.append(extratx)
+                                
                             #3 evaluate symbolic expressions
                             for i in range(nxdevices):
                                 extrat1 = aw.qmc.RTextratemp1[i]
                                 extrat2 = aw.qmc.RTextratemp2[i]
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
-                                    aw.qmc.RTextratemp1[i] = extrat1
+                                    #aw.qmc.RTextratemp1[i] = extrat1
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
-                                    aw.qmc.RTextratemp2[i] = extrat2
+                                    #aw.qmc.RTextratemp2[i] = extrat2
                                
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
                                     extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
@@ -18963,12 +18967,12 @@ class realtimeHelpDlg(ArtisanDialog):
 
         string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
         string2 += "<LI><b>x</b> " + u(QApplication.translate("Message", "Actual value",None))
-        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
-        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
-        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra Device #1 T1 value",None))
-        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra Device #1 T2 value",None))
-        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra Device #2 T1 value",None))
-        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra Device #2 T2 value",None))
+        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET raw value",None))
+        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT raw value",None))
+        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra Device #1 T1 raw value",None))
+        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra Device #1 T2 raw value",None))
+        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra Device #2 T1 raw value",None))
+        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra Device #2 T2 raw value",None))
         string2 += "<LI><b>B1</b> " + u(QApplication.translate("Message", "ET background ",None))
         string2 += "<LI><b>B2</b> " + u(QApplication.translate("Message", "BT background",None))
         string2 += "<LI><b>B3</b> " + u(QApplication.translate("Message", "Extra background #1-A from a loaded background that has extra devices",None))        
