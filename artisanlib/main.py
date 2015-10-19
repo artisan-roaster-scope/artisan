@@ -2603,8 +2603,6 @@ class tgraphcanvas(FigureCanvas):
 
                     #Background B1 = ETbackground; B2 = BTbackground
                     elif mathexpression[i] == "B":
-                        if not len(self.timeB):
-                            raise Exception("No background found")
                         if i+1 < mlen:
                             seconddigitstr = ""
                             if mathexpression[i+1].isdigit():
@@ -2631,18 +2629,22 @@ class tgraphcanvas(FigureCanvas):
                                         shiftedindex = bindex + Yshiftval
                                         if shiftedindex >= len(self.timeB):
                                             shiftedindex = len(self.timeB)- 1
-                                    if nint == 1: #ETbackground
-                                        val = self.temp1B[shiftedindex]
-                                    elif nint == 2: #BTbackground
-                                        val = self.temp2B[shiftedindex]
-                                    #B3, B4, B5, ...
-                                    elif nint > 2:
-                                        idx3 = aw.qmc.xtcurveidx - 1
-                                        n3 = idx3//2
-                                        if aw.qmc.xtcurveidx%2:
-                                            val = self.temp1BX[n3][shiftedindex]
-                                        else:
-                                            val = self.temp2BX[n3][shiftedindex]
+                                    if not len(self.timeB):
+                                        # no background, set to 0
+                                        val = 0
+                                    else:
+                                        if nint == 1: #ETbackground
+                                            val = self.temp1B[shiftedindex]
+                                        elif nint == 2: #BTbackground
+                                            val = self.temp2B[shiftedindex]
+                                        #B3, B4, B5, ...
+                                        elif nint > 2:
+                                            idx3 = aw.qmc.xtcurveidx - 1
+                                            n3 = idx3//2
+                                            if aw.qmc.xtcurveidx%2:
+                                                val = self.temp1BX[n3][shiftedindex]
+                                            else:
+                                                val = self.temp2BX[n3][shiftedindex]
                                             
                                     evaltimeexpression = "B" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + seconddigitstr+ evalsign
                                     timeshiftexpressions.append(evaltimeexpression)
@@ -2650,19 +2652,23 @@ class tgraphcanvas(FigureCanvas):
                                     mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[i+6:]))
                                 #no shift
                                 else:
-                                    if nint == 1:
-                                        val = self.temp1B[bindex]
-                                    elif nint == 2:
-                                        val = self.temp2B[bindex]
+                                    if not len(self.timeB):
+                                        # no background, set to 0
+                                        mathdictionary["B"+mathexpression[i+1]] = 0
                                     else:
-                                        idx3 = aw.qmc.xtcurveidx - 1
-                                        n3 = idx3//2
-                                        if aw.qmc.xtcurveidx%2:
-                                            val = self.temp1BX[n3][bindex]
+                                        if nint == 1:
+                                            val = self.temp1B[bindex]
+                                        elif nint == 2:
+                                            val = self.temp2B[bindex]
                                         else:
-                                            val = self.temp2BX[n3][bindex]                                      
-                                       
-                                    mathdictionary["B"+mathexpression[i+1]] = val
+                                            idx3 = aw.qmc.xtcurveidx - 1
+                                            n3 = idx3//2
+                                            if aw.qmc.xtcurveidx%2:
+                                                val = self.temp1BX[n3][bindex]
+                                            else:
+                                                val = self.temp2BX[n3][bindex]                                      
+                                           
+                                        mathdictionary["B"+mathexpression[i+1]] = val
 
                     # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
                     # holds the ten previous formula results (same window) in order.
