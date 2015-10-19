@@ -72,8 +72,7 @@ try:
     from PyQt5.QtCore import QLibraryInfo
     pyqtversion = 5
 except Exception as e:
-    pyqtversion = 4   
-
+    pyqtversion = 4
 
 if pyqtversion < 5:
     from PyQt4.QtGui import (QImageReader,
@@ -16767,7 +16766,7 @@ $cupping_notes
             p.setMinimumHeight(50)
             p.setText(self.extraeventslabels[i])
             p.setFocusPolicy(Qt.NoFocus)
-            p.clicked.connect(lambda y=_,x=i:self.recordextraevent(x))
+            p.clicked.connect(lambda _,x=i:self.recordextraevent(x))
             self.buttonlist.append(p)
             #add button to row (CHANGED: now never add extra buttons to default button set)
             if False: #lowerbuttonvisiblebuttons < self.buttonlistmaxlen:
@@ -24431,7 +24430,6 @@ class backgroundDlg(ArtisanDialog):
         self.createEventTable()
         self.createDataTable()
         aw.qmc.redraw(recomputeAllDeltas=False)
-#        aw.qmc.delayedUpdateBackground() # done by the above redraw and should not be needed here
         #activate button
         if m == "up":
             self.upButton.setDisabled(False)
@@ -36993,71 +36991,75 @@ class DtaPID(object):
 ###########################################################################################################################################
 
 
-# suppress all warnings
-warnings.filterwarnings('ignore')
-
-global aw
-aw = None # this is to ensure that the variable aw is already defined during application initialization
-
-# font fix for OS X 10.9
-try:
-    v, _, _ = platform.mac_ver()
-    #v = float('.'.join(v.split('.')[:2]))
-    v = v.split('.')[:2]
-    major = int(v[0])
-    minor = int(v[1])
-    if major >= 10 and minor >= 10: #v >= 10.10:
-        # fix Mac OS X 10.10 (Yosemite) font issue [seems not to have any effect!?]
-        # https://bugreports.qt-project.org/browse/QTBUG-40833
-        QFont.insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue")  
-    if major >= 10 and minor >= 9: #v >= 10.9:
-        # fix Mac OS X 10.9 (Mavericks) font issue
-        # https://bugreports.qt-project.org/browse/QTBUG-32789
-        QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")            
-except Exception:
-    pass
-
-aw = ApplicationWindow()
-
-if locale == "ar":
-    QApplication.setLayoutDirection(Qt.RightToLeft)
-else:
-    QApplication.setLayoutDirection(Qt.LeftToRight)
-
-try:
-    aw.defaultAppearance = str(aw.style().objectName()).lower()
-except Exception:
-    pass
-aw.settingsLoad()
-aw.setFonts(redraw=False)
-
-try:
-    if sys.argv and len(sys.argv) > 1:
-        argv_file = sys.argv[1]
-        qfile = QFileInfo(u(argv_file))
-        file_suffix = u(qfile.suffix())
-        if file_suffix == "alog":
-            # load Artisan profile on double-click on *.alog file
-            aw.loadFile(u(argv_file))
-        elif file_suffix == "alrm":
-            # load Artisan alarms on double-click on *.alrm file
-            aw.loadAlarms(u(argv_file))
-        elif file_suffix == "apal":
-            # load Artisan palettes on double-click on *.apal file
-            aw.loadPalettes(u(argv_file))
-        elif file_suffix == "aset":
-            # load Artisan setings on double-click on *.aset file
-            aw.loadSettings(fn=u(argv_file))
-except Exception:
-    pass
+def main():
+    # suppress all warnings
+    warnings.filterwarnings('ignore')
     
-if platf == 'Windows' and aw.appFrozen():
+    global aw
+    aw = None # this is to ensure that the variable aw is already defined during application initialization
+    
+    # font fix for OS X 10.9
     try:
-        sys.stderr = sys.stdout
-    except Exception:
+        v, _, _ = platform.mac_ver()
+        #v = float('.'.join(v.split('.')[:2]))
+        v = v.split('.')[:2]
+        major = int(v[0])
+        minor = int(v[1])
+        if major >= 10 and minor >= 10: #v >= 10.10:
+            # fix Mac OS X 10.10 (Yosemite) font issue [seems not to have any effect!?]
+            # https://bugreports.qt-project.org/browse/QTBUG-40833
+            QFont.insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue")  
+        if major >= 10 and minor >= 9: #v >= 10.9:
+            # fix Mac OS X 10.9 (Mavericks) font issue
+            # https://bugreports.qt-project.org/browse/QTBUG-32789
+            QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")            
+    except:
         pass
 
-aw.show()
+    aw = ApplicationWindow()
+
+    if locale == "ar":
+        QApplication.setLayoutDirection(Qt.RightToLeft)
+    else:
+        QApplication.setLayoutDirection(Qt.LeftToRight)
+
+    try:
+        aw.defaultAppearance = str(aw.style().objectName()).lower()
+    except:
+        pass
+    aw.settingsLoad()
+    aw.setFonts()
+
+    try:
+        if sys.argv and len(sys.argv) > 1:
+            argv_file = sys.argv[1]
+            qfile = QFileInfo(u(argv_file))
+            file_suffix = u(qfile.suffix())
+            if file_suffix == "alog":
+                # load Artisan profile on double-click on *.alog file
+                aw.loadFile(u(argv_file))
+            elif file_suffix == "alrm":
+                # load Artisan alarms on double-click on *.alrm file
+                aw.loadAlarms(u(argv_file))
+            elif file_suffix == "apal":
+                # load Artisan palettes on double-click on *.apal file
+                aw.loadPalettes(u(argv_file))
+            elif file_suffix == "aset":
+                # load Artisan setings on double-click on *.aset file
+                aw.loadSettings(fn=u(argv_file))
+    except Exception:
+        pass
+        
+    if platf == 'Windows' and aw.appFrozen():
+        try:
+            sys.stderr = sys.stdout
+        except:
+            pass
+
+    aw.show()
+    #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
+    with numpy.errstate(invalid='ignore'):
+        app.exec_()
 
 ##############################################################################################################################################
 ##############################################################################################################################################

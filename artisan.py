@@ -62,8 +62,7 @@ if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
 
 if __name__ == '__main__':
     freeze_support()
-    with numpy.errstate(invalid='ignore'):
-        main.app.exec_()
+    main.main()
 
 
 # EOF

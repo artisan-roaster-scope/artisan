@@ -28,7 +28,7 @@ VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
 #QTDIR = r'/Developer/Applications/Qt/' # qt4
-QTDIR = r'/Users/luther/Qt5.5.1/5.5/clang_64/' # qt5
+QTDIR = r'/Users/luther/Qt5.4.2/5.4/clang_64/' # qt5
 
 APP = ['artisan.py']
 
