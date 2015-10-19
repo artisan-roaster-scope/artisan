@@ -3112,6 +3112,10 @@ class tgraphcanvas(FigureCanvas):
                 aw.moveslider(2,0)
                 aw.moveslider(3,0)
                 
+                # if on turn mouse crosslines off
+                if aw.qmc.crossmarker:
+                    aw.qmc.togglecrosslines()
+                
                 # reset Arduino/TC4 PID SV
                 aw.moveSVslider(0)
                 aw.arduino.sv = 0
@@ -4731,6 +4735,10 @@ class tgraphcanvas(FigureCanvas):
 
     def OnRecorder(self):
         try:
+            # if on turn mouse crosslines off
+            if aw.qmc.crossmarker:
+                aw.qmc.togglecrosslines()
+                    
             # start Monitor if not yet running
             if not self.flagon:
                 self.OnMonitor()
