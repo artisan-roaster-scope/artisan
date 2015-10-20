@@ -3252,7 +3252,6 @@ class tgraphcanvas(FigureCanvas):
                 ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
                 if startB != None:
                     st1 = str(self.stringfromseconds(t0 - startB))
-                    t0 = startB
                     e = 40
                     a = aw.qmc.backgroundalpha
                 else:
@@ -7620,10 +7619,10 @@ class SampleThread(QThread):
                                 extrat2 = aw.qmc.RTextratemp2[i]
                                 if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
-                                    #aw.qmc.RTextratemp1[i] = extrat1
+                                    aw.qmc.RTextratemp1[i] = extrat1
                                 if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
-                                    #aw.qmc.RTextratemp2[i] = extrat2
+                                    aw.qmc.RTextratemp2[i] = extrat2
                                
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
                                     extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
@@ -18967,17 +18966,19 @@ class realtimeHelpDlg(ArtisanDialog):
 
         string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
         string2 += "<LI><b>x</b> " + u(QApplication.translate("Message", "Actual value",None))
-        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET raw value",None))
-        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT raw value",None))
-        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra Device #1 T1 raw value",None))
-        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra Device #1 T2 raw value",None))
-        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra Device #2 T1 raw value",None))
-        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra Device #2 T2 raw value",None))
+        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
+        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "BT value",None))
+        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "Extra Device #1 T1 value",None))
+        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra Device #1 T2 value",None))
+        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra Device #2 T1 value",None))
+        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra Device #2 T2 value",None))
         string2 += "<LI><b>B1</b> " + u(QApplication.translate("Message", "ET background ",None))
         string2 += "<LI><b>B2</b> " + u(QApplication.translate("Message", "BT background",None))
         string2 += "<LI><b>B3</b> " + u(QApplication.translate("Message", "Extra background #1-A from a loaded background that has extra devices",None))        
         string2 += "<LI><b>B4</b> " + u(QApplication.translate("Message", "Extra background #1-B from a loaded background that has extra devices",None))        
-        string2 += "<LI><b>B5</b> " + u(QApplication.translate("Message", "Extra background #2-A from a loaded background that has extra devices",None))        
+        string2 += "<LI><b>B5</b> " + u(QApplication.translate("Message", "Extra background #2-A from a loaded background that has extra devices",None)) 
+        string2 += "<BR><BR> " +  u(QApplication.translate("Message", "Math formulas are evaluated in order",None))   
+        string2 += "<BR> " +  u(QApplication.translate("Message", "(extra devices before the main device)",None))
         string2 += "</UL>"
 
         #format help
