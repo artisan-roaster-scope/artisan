@@ -9,7 +9,8 @@ export PATH=/Users/luther/Qt5.4.2/5.4/clang_64/bin:$PATH
 export DYLD_FRAMEWORK_PATH=/Users/luther//Qt5.4.2/5.4/clang_64/lib/
 
 # translations
-pylupdate5 artisan.pro # we need to use pylupdate4 for Qt4 and pylupdate5 for Qt5
+#pylupdate5 artisan.pro # we need to use pylupdate4 for Qt4 and pylupdate5 for Qt5
+pylupdate4 artisan.pro
 lrelease -verbose artisan.pro
 
 # distribution

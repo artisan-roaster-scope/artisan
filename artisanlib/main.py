@@ -1471,8 +1471,7 @@ class tgraphcanvas(FigureCanvas):
         block_state = self.block_update
         self.block_update = True # we block updating the canvas for calls during the resize
         super(tgraphcanvas,self).resizeEvent(event)
-        if not block_state: # if updates where not blocked anyhow, unblock
-            self.block_update = False
+        self.block_update = False
         self.delayedUpdateBackground() # and only update after the resize explicitly
 
     def delayedUpdateBackground(self):
@@ -2942,7 +2941,7 @@ class tgraphcanvas(FigureCanvas):
 
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
-    def reset(self,redraw=True,soundOn=True):
+    def reset(self,redraw=True,soundOn=True,sampling=False):
     
         try:
             focused_widget = QApplication.focusWidget()
@@ -3154,7 +3153,7 @@ class tgraphcanvas(FigureCanvas):
             self.clearMeasurements()
             ### REDRAW  ##
             if redraw:
-                self.redraw(False)
+                self.redraw(False,sampling=sampling)
             return True
 
     def medfilt(self, x, k):
@@ -3395,7 +3394,7 @@ class tgraphcanvas(FigureCanvas):
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
-    def redraw(self, recomputeAllDeltas=True, smooth=False):
+    def redraw(self, recomputeAllDeltas=True, smooth=False,sampling=False):
         try:
             #### lock shared resources   ####
             aw.qmc.samplingsemaphore.acquire(1)            
@@ -4114,7 +4113,7 @@ class tgraphcanvas(FigureCanvas):
                     label.set_color(self.palette["ylabel"])
 
             #write legend
-            if self.legendloc:
+            if self.legendloc and not sampling:
                 rcParams['path.effects'] = []
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("x-small")
@@ -4570,7 +4569,7 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         try:
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            aw.qmc.reset(True,False)            
+            aw.qmc.reset(True,False,sampling=True)            
             try:
                 appnope.nope()
             except Exception:
@@ -11582,7 +11581,7 @@ class ApplicationWindow(QMainWindow):
 
     def addDevice(self):
         try:
-            self.qmc.extradevices.append(1)
+            self.qmc.extradevices.append(25)
             n = len(self.qmc.extradevices)
             self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:n-1]
             self.qmc.extradevicecolor1.append("black") #init color to black
