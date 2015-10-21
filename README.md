@@ -76,7 +76,7 @@ Version History
 
 | Version | Date | Comment |
 |---------|------|---------|
-| v0.9.8 | 18.10.2015 | US weight and volume units, extended [symbolic formulas and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html), [ln()/x^2 approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html), bug fixes |
+| v0.9.8 | 21.10.2015 | US weight and volume units, extended [symbolic formulas and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html), [ln()/x^2 approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html), bug fixes |
 | v0.9.7 | 29.07.2015 | Bug fixes |
 | v0.9.6 | 20.07.2015 | Bug fixes |
 | v0.9.5 | 06.07.2015 | Batch counter, app settings export/import, bug fixes (last Windows Celeron and Mac OS X 10.6 version)|

@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v0.9.8 (xx.10.2015)
+v0.9.8 (21.10.2015)
 ------------------
 
  * New Features
@@ -20,7 +20,7 @@ v0.9.8 (xx.10.2015)
    * enhanced [symbolic formula evaluator and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html) adding time shifting among others
    * adds support for US weight and volume units
    * adds XTB data to the background dialog if selected in the table of the background dialog
-   * adds support for event actions that change event values by a specified offset instead of an absolute value
+   * adds support for [event actions that change event values by a specified offset](http://artisan-roasterscope.blogspot.de/2015/10/increasing-heat.html) instead of an absolute value
  * Changes
    * custom event buttons and sliders remembers visibility status
    * plotter "Virtual Device" action renamed into "BT/ET", now adds plot data to BT/ET if no profile is loaded, otherwise it creates an additional Virtual Device
