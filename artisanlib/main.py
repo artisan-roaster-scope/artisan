@@ -1468,10 +1468,9 @@ class tgraphcanvas(FigureCanvas):
             return s
             
     def resizeEvent(self,event):
-        block_state = self.block_update
-        self.block_update = True # we block updating the canvas for calls during the resize
+        #self.block_update = True # we block updating the canvas for calls during the resize
         super(tgraphcanvas,self).resizeEvent(event)
-        self.block_update = False
+        #self.block_update = False
         self.delayedUpdateBackground() # and only update after the resize explicitly
 
     def delayedUpdateBackground(self):
@@ -3014,15 +3013,15 @@ class tgraphcanvas(FigureCanvas):
                     self.ambientTemp = 0.
                     self.ambient_humidity = 0.
                     self.beansize = 0.
-                    self.whole_color = 0
-                    self.ground_color = 0
                     self.moisture_greens = 0.
-                    self.moisture_roasted = 0.
                     self.volumeCalcWeightInStr = ""
                     self.volumeCalcWeightOutStr = ""
                 else:
                     self.weight = [self.weight[0],0,self.weight[2]]
                     self.volume = [self.volume[0],0,self.volume[2]]
+                self.whole_color = 0
+                self.ground_color = 0
+                self.moisture_roasted = 0.
                     
 
                 self.roastdate = QDateTime.currentDateTime()
@@ -3072,10 +3071,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.tipping_flag = False
                 aw.qmc.scorching_flag = False
                 aw.qmc.divots_flag = False
-                
-                #color variables
-                aw.qmc.whole_color = 0
-                aw.qmc.ground_color = 0
 
                 #Designer variables
                 self.indexpoint = 0
@@ -4141,7 +4136,7 @@ class tgraphcanvas(FigureCanvas):
 
             ############  ready to plot ############
             #self.fig.canvas.draw() # done by updateBackground()
-            self.delayedUpdateBackground() # update bitlblit backgrounds
+            self.updateBackground() # update bitlblit backgrounds
             #######################################
 
             # if designer ON
@@ -4569,7 +4564,7 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         try:
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            aw.qmc.reset(True,False,sampling=True)            
+            aw.qmc.reset(True,False,sampling=True)                     
             try:
                 appnope.nope()
             except Exception:
@@ -10232,6 +10227,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.fig.canvas.draw()
                 aw.qmc.fig.canvas.update()
                 aw.stack.adjustSize()
+                FigureCanvas.updateGeometry(aw.stack)
                 QApplication.processEvents()
 
     def enableSaveActions(self):
@@ -10569,7 +10565,7 @@ class ApplicationWindow(QMainWindow):
         aw.buttonsAction.setChecked(True)
         
     def toggleExtraButtons(self):
-        if self.extraeventsbuttonsflag:
+        if self.extrabuttondialogs.isVisible():
             self.hideExtraButtons()
         else:
             self.showExtraButtons()
@@ -10600,7 +10596,7 @@ class ApplicationWindow(QMainWindow):
         aw.slidersAction.setChecked(True)
         
     def toggleSliders(self):
-        if aw.eventslidersflag:
+        if self.sliderFrame.isVisible():
             self.hideSliders()
         else:
             self.showSliders()
@@ -13870,12 +13866,13 @@ class ApplicationWindow(QMainWindow):
                 try:
                     aw.dpi = toInt(settings.value("dpi",aw.dpi))
                     if aw.dpi != aw.defaultdpi:
-                        aw.setdpi(aw.dpi,moveWindow=False)
+                        aw.setdpi(aw.dpi)
                 except Exception:
                     pass
             #restore geometry
             if settings.contains("Geometry"):
                 self.restoreGeometry(settings.value("Geometry"))
+            FigureCanvas.updateGeometry(aw.stack)
         except Exception:
             res = False
 #            import traceback
@@ -36741,9 +36738,9 @@ class ArduinoTC4(object):
         
     def conv2celsius(self):
         try:
-            self.svValue = aw.qmc.fromFtoC(self.svValue)
-            self.svSliderMin = aw.qmc.fromFtoC(self.svSliderMin)
-            self.svSliderMax = aw.qmc.fromFtoC(self.svSliderMax)
+            self.svValue = int(round(aw.qmc.fromFtoC(self.svValue)))
+            self.svSliderMin = int(round(aw.qmc.fromFtoC(self.svSliderMin)))
+            self.svSliderMax = int(round(aw.qmc.fromFtoC(self.svSliderMax)))
             self.pidKp = self.pidKp * (9/5.)
             self.pidKi = self.pidKi * (9/5.)
             self.pidKd = self.pidKd * (9/5.)
