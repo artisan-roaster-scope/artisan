@@ -68,7 +68,7 @@ Documentation and Support
   * [Artisan - Basic Setup and Tuning Guide (GoogleDocs)](https://docs.google.com/document/d/1eGtztr56t3GFYafTaMvQUDU3YQXK5nOFNcECM-q_WQ8/edit)
   * [Artisan Documentation on the Huky Forum](http://www.hukyforum.com/index.php?action=downloads;cat=1)
 - [Artisan Blog](http://artisan-roasterscope.blogspot.de/)
-- [User Mailing List](https://lists.mokelbu.de/listinfo/artisan-user)
+- [User Mailing List](https://lists.mokelbu.de/listinfo/artisan-user) (you need to subscribe to send and receive messages)
 
 
 Version History

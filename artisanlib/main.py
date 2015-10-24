@@ -2940,7 +2940,7 @@ class tgraphcanvas(FigureCanvas):
 
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
-    def reset(self,redraw=True,soundOn=True,sampling=False):
+    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):
     
         try:
             focused_widget = QApplication.focusWidget()
@@ -3002,7 +3002,7 @@ class tgraphcanvas(FigureCanvas):
                 
                 aw.extraeventsactionslastvalue = [0,0,0,0]
 
-                if self.roastpropertiesflag:
+                if self.roastpropertiesflag and not keepProperties:
                     self.title = QApplication.translate("Scope Title", "Roaster Scope",None)
                     self.roastingnotes = ""
                     self.cuppingnotes = ""
@@ -4564,7 +4564,7 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         try:
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            aw.qmc.reset(True,False,sampling=True)                     
+            aw.qmc.reset(True,False,sampling=True,keepProperties=True)                     
             try:
                 appnope.nope()
             except Exception:
