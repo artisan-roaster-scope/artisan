@@ -13029,6 +13029,7 @@ class ApplicationWindow(QMainWindow):
 
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename=None):
+
         res = False
         try: 
             if filename:
@@ -13042,6 +13043,7 @@ class ApplicationWindow(QMainWindow):
                     self.resetqsettings = 0
                     self.qmc.redraw()
                     return  #don't load any more settings. They could be bad (corrupted). Stop here.
+                    
             #restore mode
             old_mode = self.qmc.mode
             self.qmc.mode = str(settings.value("Mode",self.qmc.mode))
@@ -13839,7 +13841,7 @@ class ApplicationWindow(QMainWindow):
                 # self.update_extraeventbuttons_visibility() # already called within realignbuttons()
             settings.endGroup()
             res = True
-
+            
         except Exception:
             res = False
 #            import traceback
@@ -13866,13 +13868,14 @@ class ApplicationWindow(QMainWindow):
                 try:
                     aw.dpi = toInt(settings.value("dpi",aw.dpi))
                     if aw.dpi != aw.defaultdpi:
-                        aw.setdpi(aw.dpi)
-                except Exception:
+                        aw.setdpi(aw.dpi,moveWindow=False) # with moveWindow=True, Mac builds fail on startup!
+                except Exception as e:
                     pass
             #restore geometry
             if settings.contains("Geometry"):
                 self.restoreGeometry(settings.value("Geometry"))
-            FigureCanvas.updateGeometry(aw.stack)
+            if filename: # only if an external settings file is loaded
+                FigureCanvas.updateGeometry(aw.stack)
         except Exception:
             res = False
 #            import traceback
@@ -37042,8 +37045,10 @@ def main():
         aw.defaultAppearance = str(aw.style().objectName()).lower()
     except:
         pass
+
     aw.settingsLoad()
-    aw.setFonts()
+    
+    #aw.setFonts()
 
     try:
         if sys.argv and len(sys.argv) > 1:
