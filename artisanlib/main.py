@@ -1468,9 +1468,9 @@ class tgraphcanvas(FigureCanvas):
             return s
             
     def resizeEvent(self,event):
-        #self.block_update = True # we block updating the canvas for calls during the resize
+        self.block_update = True # we block updating the canvas for calls during the resize
         super(tgraphcanvas,self).resizeEvent(event)
-        #self.block_update = False
+        self.block_update = False
         self.delayedUpdateBackground() # and only update after the resize explicitly
 
     def delayedUpdateBackground(self):
@@ -2803,6 +2803,8 @@ class tgraphcanvas(FigureCanvas):
         # we have to update the canvas cache
         if redraw:
             self.updateBackground()
+        else:
+            self.ax_background = None
 
     def fmt_timedata(self,x):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -20508,7 +20510,7 @@ class editGraphDlg(ArtisanDialog):
             message = QApplication.translate("Message","No events found", None)
             aw.sendmessage(message)
 
-    def weightouteditChanged(self):        
+    def weightouteditChanged(self):
         self.percent()
         self.calculated_density()
 
