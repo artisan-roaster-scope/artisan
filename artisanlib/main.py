@@ -1587,9 +1587,9 @@ class tgraphcanvas(FigureCanvas):
             
     # the inverse of eventsInternal2ExternalValue, converting an external to an internal event value
     def eventsExternal2InternalValue(self,v):
-        if v<= 1.0 and v >= -1.0:
+        if v< 1.0 and v >= -1.0:
             return 0.0
-        elif v>1.0:
+        elif v>=1.0:
             return v/10. + 1.
         else:
             return v/10. - 1.
@@ -1608,7 +1608,9 @@ class tgraphcanvas(FigureCanvas):
     # 100.0 to "10" and 10.1 to "1"
     def eventsvaluesShort(self,v):
         value = v*10. - 10.
-        if value < 0:
+        if value == -10:
+            return "0"
+        elif value < 0:
             return ""
         else:
             if aw.qmc.LCDdecimalplaces:
@@ -4110,7 +4112,7 @@ class tgraphcanvas(FigureCanvas):
                     label.set_color(self.palette["ylabel"])
 
             #write legend
-            if self.legendloc and not sampling:
+            if self.legendloc and not sampling and len(self.timex) > 2:
                 rcParams['path.effects'] = []
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("x-small")
@@ -4118,7 +4120,7 @@ class tgraphcanvas(FigureCanvas):
                     ncol = int(math.ceil(len(handles)/2.))
                 else:
                     ncol = int(math.ceil(len(handles)))
-                if two_ax_mode:
+                if False: # two_ax_mode:
                     leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
                 else:
                     leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)   
@@ -5780,8 +5782,12 @@ class tgraphcanvas(FigureCanvas):
                     # legend not on top
                     statisticsheight = self.ylimit - (0.08 * ydist)
 
-                statisticsupper = statisticsheight + statisticsbarheight + 4
-                statisticslower = statisticsheight - 3.5*statisticsbarheight
+                if aw.qmc.mode == "C":
+                    statisticsupper = statisticsheight + statisticsbarheight + 4
+                    statisticslower = statisticsheight - 3.5*statisticsbarheight
+                else:
+                    statisticsupper = statisticsheight + statisticsbarheight + 10
+                    statisticslower = statisticsheight - 2.5*statisticsbarheight
 
                 if self.statisticsflags[1]:
 
@@ -11294,6 +11300,7 @@ class ApplicationWindow(QMainWindow):
             firstChar = stream.read(1)
             if firstChar == "{":
                 f.close()
+                aw.qmc.reset()
                 res = self.setProfile(filename,self.deserialize(filename))
             else:
                 self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
@@ -12291,7 +12298,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.mode == "F" and old_mode == "C":
                 self.qmc.fahrenheitMode()
             if self.qmc.mode == "C" and old_mode == "F":
-                self.qmc.celsiusMode()     
+                self.qmc.celsiusMode()
             if "phases" in profile:
                 self.qmc.phases = profile["phases"]
             if "flavors" in profile:
@@ -12440,15 +12447,16 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.temp1 = profile["temp1"]
             if "temp2" in profile:
                 self.qmc.temp2 = profile["temp2"]
-    # don't let the users y/z min/max axis limits be overwritten by loading a profile
-    #        if "zmax" in profile:
-    #            self.qmc.zlimit = min(int(profile["zmax"]),500)
-    #        if "zmin" in profile:
-    #            self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),-200)
-    #        if "ymax" in profile:
-    #            self.qmc.ylimit = min(int(profile["ymax"]),850)
-    #        if "ymin" in profile:
-    #            self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),-150)
+            if self.qmc.mode != old_mode:
+                if "zmax" in profile:
+                    self.qmc.zlimit = min(int(profile["zmax"]),500)
+                if "zmin" in profile:
+                    self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),-200)
+                if "ymax" in profile:
+                    self.qmc.ylimit = min(int(profile["ymax"]),850)
+                if "ymin" in profile:
+                    self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),-150)
+            # otherwise don't let the users y/z min/max axis limits be overwritten by loading a profile
             if "xmin" in profile:
                 self.qmc.startofx = float(profile["xmin"])
             if  not self.qmc.locktimex:
@@ -19440,7 +19448,7 @@ class editGraphDlg(ArtisanDialog):
         dateedit.setStyleSheet("background-color:'lightgrey'")
         #Batch
         batchlabel = QLabel("<b>" + u(QApplication.translate("Label", "Batch",None)) + "</b>")
-        if aw.superusermode: # and aw.qmc.batchcounter > -1:
+        if aw.superusermode and aw.qmc.batchcounter > -1:
             self.batchprefixedit = QLineEdit(u(aw.qmc.roastbatchprefix))
             self.batchcounterSpinBox = QSpinBox()
             self.batchcounterSpinBox.setRange(0,999999)
@@ -37049,8 +37057,6 @@ def main():
         pass
 
     aw.settingsLoad()
-    
-    #aw.setFonts()
 
     try:
         if sys.argv and len(sys.argv) > 1:
