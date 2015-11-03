@@ -2531,7 +2531,25 @@ class tgraphcanvas(FigureCanvas):
                                 mathdictionary['o'] = aw.qmc.ylimit_min - (aw.qmc.zlimit_min * (aw.qmc.ylimit - aw.qmc.ylimit_min) / float(aw.qmc.zlimit - aw.qmc.zlimit_min))
                             except Exception:
                                 mathdictionary['o'] = 0
-                            
+
+                    #Add to dict Event (1-4)
+                    elif mathexpression[i] == "E":
+                        if i+1 < mlen:                          #check for out of range
+                            if mathexpression[i+1].isdigit():
+                                nint = int(mathexpression[i+1])-1              #Enumber int                                
+                                #find right most occurrence before index of given event type
+                                if nint in self.specialeventstype: 
+                                    spevtylen = len(self.specialeventstype)-1
+                                    for eee in range(spevtylen):
+                                        iii = spevtylen - eee
+                                        if self.specialeventstype[iii] == nint and index >= self.specialevents[iii]:
+                                            break  #index found
+                                    val = self.specialeventsvalue[iii]  
+                                else:
+                                    val = 0                                      
+                                if "E" + mathexpression[i+1] not in mathdictionary:    
+                                    mathdictionary["E"+mathexpression[i+1]] = val
+                                    
                     # time timeshift of absolute time (not relative to CHARGE)                                        
                     elif mathexpression[i] == "t":
                         seconddigitstr = ""
@@ -19048,6 +19066,8 @@ class plotterHelpDlg(ArtisanDialog):
         string2 += "<LI><b>B3</b> " + u(QApplication.translate("Message", "ExtraBackground #1-A",None))
         string2 += "<LI><b>B4[-6]</b> " + u(QApplication.translate("Message", "ExtraBackground #1-B shifted 6 indexes",None))
         string2 += "<LI><b>B5[+2]</b> " + u(QApplication.translate("Message", "ExtraBackground #2-A shifted 2 indexes",None))
+        string2 += "<LI><b>E1</b> " + u(QApplication.translate("Message", "Event type 1 last value",None))
+        string2 += "<LI><b>E2</b> " + u(QApplication.translate("Message", "Event type 2 last value",None))
         string2 += "</UL>"
         
         string3 = "<UL><LI><b>#</b> " + u(QApplication.translate("Message", "Comments out plot. It does not evaluate. Use as first character.",None))        
