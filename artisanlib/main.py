@@ -2962,6 +2962,7 @@ class tgraphcanvas(FigureCanvas):
 
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
+    # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
     def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):
     
         try:
@@ -3019,8 +3020,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
                 aw.button_2.setText(QApplication.translate("Button", "START",None))
                 aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
-
-                aw.setWindowTitle(aw.windowTitle)
                 
                 aw.extraeventsactionslastvalue = [0,0,0,0]
 
@@ -3063,7 +3062,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.lineEvent.setText("")
                 aw.etypeComboBox.setCurrentIndex(0)
                 aw.valueEdit.setText("")
-                aw.curFile = None                 #current file name
                 #used to find length of arms in annotations
                 self.ystep_down = 0
                 self.ystep_up = 0
@@ -3124,19 +3122,27 @@ class tgraphcanvas(FigureCanvas):
                 except Exception:
                     pass
 
-                # reset sliders
-                aw.moveslider(0,0)
-                aw.moveslider(1,0)
-                aw.moveslider(2,0)
-                aw.moveslider(3,0)
+                if not keepProperties:
+                    # reset sliders
+                    aw.moveslider(0,0)
+                    aw.moveslider(1,0)
+                    aw.moveslider(2,0)
+                    aw.moveslider(3,0)
+                    # reset Arduino/TC4 PID SV
+                    aw.moveSVslider(0)
+                    aw.arduino.sv = 0
+                
+                # if there is already some data recorded, we remove the filename to force writing a new file
+                # and avoid accidential overwriting of existing data
+                if len(self.timex) > 2:
+                    #current file name
+                    aw.curFile = None
+                    aw.setWindowTitle(aw.windowTitle)
                 
                 # if on turn mouse crosslines off
                 if aw.qmc.crossmarker:
                     aw.qmc.togglecrosslines()
                 
-                # reset Arduino/TC4 PID SV
-                aw.moveSVslider(0)
-                aw.arduino.sv = 0
 
                 #autodetected CHARGE and DROP index
                 self.autoChargeIdx = 0
@@ -6073,6 +6079,7 @@ class tgraphcanvas(FigureCanvas):
             return None
     
     #ln() regression
+    # if xx=True the quadratic approximation instead of the ln() one is applied
     def lnRegression(self,xx=False):
         res = ""
         try:
@@ -6126,9 +6133,9 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.canvas.draw()
                 if len(popt)>2:
                     if xx:
-                        res = "%.4f * t*t %s %.4f * t %s %.4f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                        res = "%.8f * t*t %s %.8f * t %s %.8f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
                     else:
-                        res = "%.4f * log(%.4f * t %s %.4f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                        res = "%.8f * log(%.8f * t %s %.8f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
