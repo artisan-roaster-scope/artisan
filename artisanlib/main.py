@@ -256,7 +256,7 @@ if sip.getapi('QVariant') == 1:
         else:
             return x.toInt()[0]
     def toString(x):
-        return x.toString()
+        return u(x.toString())
     def toList(x):
         return x.toList()
     def toFloat(x):
@@ -287,7 +287,10 @@ else:
         if x == None:
             return 0
         else:
-            return int(x)
+            try:
+                return int(x)
+            except:
+                return 0
     def toString(x):
         return u(x)
     def toList(x):
@@ -13113,8 +13116,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidget1045_emissivity = toDouble(settings.value("phidget1045_emissivity",self.qmc.phidget1045_emissivity))
             if settings.contains("phidgetRemoteFlag"):
                 self.qmc.phidgetRemoteFlag = bool(toBool(settings.value("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)))
-                self.qmc.phidgetServerID = u(toString(settings.value("phidgetServerID",self.qmc.phidgetServerID)))
-                self.qmc.phidgetPassword = u(toString(settings.value("phidgetPassword",self.qmc.phidgetPassword)))
+                self.qmc.phidgetServerID = toString(settings.value("phidgetServerID",self.qmc.phidgetServerID))
+                self.qmc.phidgetPassword = toString(settings.value("phidgetPassword",self.qmc.phidgetPassword))
             if settings.contains("phidget1018Ratiometric"):
                 self.qmc.phidget1018Ratiometric = bool(toBool(settings.value("phidget1018Ratiometric",self.qmc.phidget1018Ratiometric)))
                 self.qmc.phidget1018_async = [bool(toBool(x)) for x in toList(settings.value("phidget1018_async",self.qmc.phidget1018_async))]
@@ -13373,7 +13376,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #restore scale port
             settings.beginGroup("Scale")
-            self.scale.device = u(toString(settings.value("device",self.scale.device)))
+            self.scale.device = toString(settings.value("device",self.scale.device))
             self.scale.comport = str(toString(settings.value("comport",self.scale.comport)))
             self.scale.baudrate = toInt(settings.value("baudrate",int(self.scale.baudrate)))
             self.scale.bytesize = toInt(settings.value("bytesize",self.scale.bytesize))
@@ -13383,7 +13386,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #restore color port
             settings.beginGroup("Color")
-            self.color.device = u(toString(settings.value("device",self.color.device)))
+            self.color.device = toString(settings.value("device",self.color.device))
             self.color.comport = str(toString(settings.value("comport",self.color.comport)))
             self.color.baudrate = toInt(settings.value("baudrate",int(self.color.baudrate)))
             self.color.bytesize = toInt(settings.value("bytesize",self.color.bytesize))
@@ -13590,20 +13593,19 @@ class ApplicationWindow(QMainWindow):
             self.qmc.legendloc = toInt(settings.value("legendloc",self.qmc.legendloc))
             settings.endGroup()
             settings.beginGroup("RoastProperties")
-            self.qmc.operator = u(toString(settings.value("operator",self.qmc.operator)))
-            self.qmc.roastertype = u(toString(settings.value("roastertype",self.qmc.roastertype)))
-            self.qmc.density[2] = toInt(settings.value("densitySampleVolume",self.qmc.density[2]))
-            self.qmc.density[3] = u(toString(settings.value("densitySampleVolumeUnit",self.qmc.density[3])))
+            self.qmc.operator = toString(settings.value("operator",self.qmc.operator))
+            self.qmc.roastertype = toString(settings.value("roastertype",self.qmc.roastertype))
+            self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2]))
             if settings.contains("beansize"):
                 self.qmc.beansize = toDouble(settings.value("beansize",self.qmc.beansize))
             settings.endGroup()
-            self.userprofilepath = u(toString(settings.value("profilepath",self.userprofilepath)))
+            self.userprofilepath = toString(settings.value("profilepath",self.userprofilepath))
             if settings.contains("settingspath"):            
-                self.settingspath = u(toString(settings.value("settingspath",self.settingspath)))
+                self.settingspath = toString(settings.value("settingspath",self.settingspath))
             if settings.contains("autosavepath"):
-                self.qmc.autosavepath = u(toString(settings.value("autosavepath",self.qmc.autosavepath)))
+                self.qmc.autosavepath = toString(settings.value("autosavepath",self.qmc.autosavepath))
             if settings.contains("externalprogram"):
-                self.ser.externalprogram = u(toString(settings.value("externalprogram",self.ser.externalprogram)))
+                self.ser.externalprogram = toString(settings.value("externalprogram",self.ser.externalprogram))
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
                 self.qmc.extradevices = [toInt(x) for x in toList(settings.value("extradevices",self.qmc.extradevices))]
@@ -13788,7 +13790,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("batchcounter"):
                 aw.qmc.batchcounter = toInt(settings.value("batchcounter",aw.qmc.batchcounter))
                 aw.qmc.batchsequence = toInt(settings.value("batchsequence",aw.qmc.batchsequence))
-                aw.qmc.batchprefix = u(toString(settings.value("batchprefix",aw.qmc.batchprefix)))
+                aw.qmc.batchprefix = toString(settings.value("batchprefix",aw.qmc.batchprefix))
                 aw.qmc.lastroastepoch = toInt(settings.value("lastroastepoch",aw.qmc.lastroastepoch))
             settings.endGroup()
             self.computeLinespaces()
@@ -14434,9 +14436,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoastProperties")
             settings.setValue("operator",self.qmc.operator)
             settings.setValue("roastertype",self.qmc.roastertype)
-            settings.setValue("beansize",self.qmc.beansize)
             settings.setValue("densitySampleVolume",self.qmc.density[2])
-            settings.setValue("densitySampleVolumeUnit",self.qmc.density[3])
+            settings.setValue("beansize",self.qmc.beansize)
             settings.endGroup()
             settings.beginGroup("XT")
             settings.setValue("color",self.qmc.backgroundxtcolor)
@@ -27431,8 +27432,10 @@ class serialport(object):
                     #If extra device +ArduinoTC4_XX present. read all 4 Ts
                     if 28 in aw.qmc.extradevices: # +ArduinoTC4_34
                         vals = ["1","2","3","4"]
-                        vals.pop(vals.index(self.arduinoETChannel))
-                        vals.pop(vals.index(self.arduinoBTChannel))
+                        if self.arduinoETChannel != "None":
+                            vals.pop(vals.index(self.arduinoETChannel))
+                        if self.arduinoBTChannel != "None":
+                            vals.pop(vals.index(self.arduinoBTChannel))
                         command = "CHAN;" + et_channel + bt_channel + vals[0] + vals[1]
                     else:
                     #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
