@@ -86,7 +86,7 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         libtime.sleep(4)
         
         # check successful start
-        url = "http://127.0.0.1:" + str(port) + "/artisan/status"
+        url = "http://127.0.0.1:" + str(port) + "/status"
         r = rget(url,timeout=2)
         
         if r.status_code == 200:
@@ -152,7 +152,7 @@ def handle_websocket():
             wsocks.remove(wsock)
             break
             
-@route('/artisan/status')
+@route('/status')
 def status():
     return "1"
     
@@ -171,7 +171,7 @@ def index():
         showet_str = "inline"
     else:
         showet_str = "none"
-    return template('artisan',
+    return template('artisan.tpl',
         port=str(port),
         nonesymbol=nonesymbol,
         timecolor=timecolor,

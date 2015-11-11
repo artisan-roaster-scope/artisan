@@ -117,9 +117,9 @@ svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg
 
 from functools import reduce as freduce
 if pyqtversion < 5:
-    mpl.use('qt4agg')
+    mpl.use('Qt4Agg')
 else:
-    mpl.use('qt5agg')
+    mpl.use('Qt5Agg')
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
@@ -7908,7 +7908,11 @@ class SampleThread(QThread):
                     #update SV on Arduino/TC4 if in Ramp/Soak or Background Follow mode and PID is active
                     if aw.qmc.device == 19 and aw.arduino.pidActive and aw.arduino.svMode in [1,2]:
                         # calculate actual SV
-                        sv = aw.arduino.calcSV(tx)
+                        if aw.qmc.timeindex[0] != -1:
+                            # we set time=0 to CHARGE
+                            sv = aw.arduino.calcSV(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
+                        else:
+                            sv = aw.arduino.calcSV(tx)
                         # update SV (if needed)
                         if sv != None and sv != aw.arduino.sv:
                             aw.arduino.setSV(sv)
@@ -9812,9 +9816,14 @@ class ApplicationWindow(QMainWindow):
 
     def getResourcePath(self):
         res = ""
-        if platf in ['Darwin','Linux']:
+        if platf == 'Darwin':
             if self.appFrozen():
                 res = QApplication.applicationDirPath() + "/../Resources/"
+            else:
+                res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
+        elif platf == 'Linux':
+            if self.appFrozen():
+                res = QApplication.applicationDirPath() + "/"
             else:
                 res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
         elif platf == "Windows":
@@ -9825,7 +9834,7 @@ class ApplicationWindow(QMainWindow):
         else:
             res = QApplication.applicationDirPath() + "/"
         return res
-
+       
     def setFonts(self,redraw=True):
         # try to select the right font for matplotlib according to the given locale and plattform
         if self.qmc.graphfont == 0:     
