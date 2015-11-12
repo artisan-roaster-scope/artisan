@@ -139,9 +139,9 @@ Serial Configuration
 --------------------
 
 The serial settings for the meters (devices) are already configured by the artisan software automatically when you select a device for the first time (or when you change devices). Once you have chosen a device, the correct serial configuration is loaded and it will remain in memory. The only setting that is not configured is the serial port number being used. 
-To find out your serial port, you can press the scan button and select the correct comm port from the options found by the Scan button.
+To find out your serial port, select the correct comm port from the ports popup.
 
-You can test to see if you have the correct comm port by clicking the green button "ON" on the lower left corner. If you see the two temperatures from the meter come up on the LCDs, you have completed all the configuration steps. You can now start using artisan.
+You can test to see if you have the correct comm port by clicking the green button "ON" on the top of the main window. If you see the two temperatures from the meter come up on the LCDs, you have completed all the configuration steps. You can now start using artisan.
 
 Report problems on the [Artisan user mailing list](https://lists.mokelbu.de/listinfo/artisan-user)
     

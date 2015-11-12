@@ -1847,7 +1847,24 @@ class tgraphcanvas(FigureCanvas):
                     if aw.largeLCDs_dialog:
                         self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
 
-                if self.flagstart:          
+                if self.flagstart:
+                    if aw.ntb._active == 'ZOOM':
+                        # center current BT reading on canvas
+                        bt = aw.qmc.temp2[-1]
+                        tx = aw.qmc.timex[-1]
+                        # get current limits
+                        xlim = aw.qmc.ax.get_xlim()
+                        xlim_offset = (xlim[1] - xlim[0]) / 2.
+                        xlim_new = (tx - xlim_offset, tx + xlim_offset)
+                        ylim = aw.qmc.ax.get_ylim()
+                        ylim_offset = (ylim[1] - ylim[0]) / 2.
+                        ylim_new = (bt - ylim_offset, bt + ylim_offset)
+                        # set new limits to center current BT on canvas
+                        aw.qmc.ax.set_xlim(xlim_new)
+                        aw.qmc.ax.set_ylim(ylim_new)
+                        if ylim != ylim_new or xlim != xlim_new :
+                            self.ax_background = None
+                    
                     if aw.qmc.patheffects:
                         rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
                     else:
