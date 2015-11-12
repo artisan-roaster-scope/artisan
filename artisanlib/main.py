@@ -639,7 +639,7 @@ class tgraphcanvas(FigureCanvas):
         
         # oversampling flag
         self.oversampling = False
-        self.oversampling_min_delay = 2000 # in contrast to what the user dialog says (3000) we enable oversampling already with 2s
+        self.oversampling_min_delay = 1000 # in contrast to what the user dialog says (3000) we enable oversampling already with 1s
         
         # extra event sampling interval in miliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
         self.extra_event_sampling_delay = 0 # sync, 0.5s, 1.0s, 1.5s,.., 5s => 0, 500, 1000, 1500, ..
@@ -1448,7 +1448,7 @@ class tgraphcanvas(FigureCanvas):
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
     def updateDeltaSamples(self):
         if self.flagstart or self.profile_sampling_interval == None:
-            interval = self.delay
+            interval = self.delay / 1000.
         else:
             interval = self.profile_sampling_interval
         self.deltasamples = max(1,self.deltaspan / int(interval))
@@ -1494,8 +1494,8 @@ class tgraphcanvas(FigureCanvas):
             
             # ask the canvas to kindly draw it self some time in the future
             # when Qt thinks it is convenient
-            self.fig.canvas.draw_idle()
-            #self.fig.canvas.draw()
+            #self.fig.canvas.draw_idle() # this blocks (overwrites) drawing of the projections in updategraphics
+            self.fig.canvas.draw()
             
             # self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
             # canvas is automatically blitted to self.ax_background after full redraw by _draw_event(self, evt)
@@ -1917,8 +1917,8 @@ class tgraphcanvas(FigureCanvas):
                                 self.fig.canvas.blit(aw.qmc.ax.bbox) # causes randomly a black border where the axis should be drawn
                         else:
                             # we do not have a background to bitblit, so do a full redraw
-                            self.updateBackground() # does the canvas draw, but also fills the ax_background cache
-                            if aw.qmc.projectFlag:
+                            self.updateBackground() # does the canvas draw, but also fills the ax_background cache                            
+                            if aw.qmc.projectFlag and (self.l_BTprojection != None or self.l_ETprojection != None):
                                 if self.l_BTprojection != None:
                                     aw.qmc.ax.draw_artist(self.l_BTprojection)
                                 if self.l_ETprojection != None:
@@ -7798,7 +7798,7 @@ class SampleThread(QThread):
                             aw.qmc.rateofchange2 = self.compute_delta(aw.qmc.timex, aw.qmc.temp2, aw.qmc.smoothingwindowsize)
                         else:
                             # Compute delta using the last two data points with:
-                            left_index = max(2,(aw.qmc.deltasamples + 1))
+                            left_index = min(length_of_qmc_timex,max(2,(aw.qmc.deltasamples + 1)))
                             timed = aw.qmc.timex[-1] - aw.qmc.timex[-left_index]   #time difference between last aw.qmc.deltasamples readings
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-left_index])/timed)*60.  #delta ET (degress/minute)
@@ -7840,8 +7840,13 @@ class SampleThread(QThread):
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
                     # append new data to the rateofchange
                     if local_flagstart:
-                        aw.qmc.delta1.append(rateofchange1plot)
-                        aw.qmc.delta2.append(rateofchange2plot)
+                        # only if we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
+                        if length_of_qmc_timex > int(round(aw.qmc.deltafilter/2)) + max(2,(aw.qmc.deltasamples + 1)):
+                            aw.qmc.delta1.append(rateofchange1plot)
+                            aw.qmc.delta2.append(rateofchange2plot)
+                        else:
+                            aw.qmc.delta1.append(None)
+                            aw.qmc.delta2.append(None)
                     else:
                         if len(aw.qmc.delta1) > 0:
                             aw.qmc.delta1[-1] = rateofchange1plot
