@@ -18423,6 +18423,14 @@ class HUDDlg(ArtisanDialog):
         if i != 3:
             if self.polyfitCheck.isChecked():
                 self.polyfitCheck.setChecked(False)
+            if self.xxvarCheck.isChecked():
+                self.xxvarCheck.setChecked(False)
+            if self.lnvarCheck.isChecked():
+                self.lnvarCheck.setChecked(False)
+            if self.interpCheck.isChecked():
+                self.interpCheck.setChecked(False)
+            if self.univarCheck.isChecked():
+                self.univarCheck.setChecked(False)
         else:
             self.collectCurves()
 
