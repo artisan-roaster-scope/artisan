@@ -5961,6 +5961,8 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(lt):
                     self.temp1B[i] += step
                     self.temp2B[i] += step
+                    self.stemp1B[i] += step
+                    self.stemp2B[i] += step
 
             elif direction == "left":
                 for i in range(lt):
@@ -5974,6 +5976,8 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(lt):
                     self.temp1B[i] -= step
                     self.temp2B[i] -= step
+                    self.stemp1B[i] -= step
+                    self.stemp2B[i] -= step
         else:
             aw.sendmessage(QApplication.translate("Message","Unable to move background", None))
             return
@@ -7549,19 +7553,19 @@ class SampleThread(QThread):
         try:
             if aw.qmc.swapETBT:
                 tx,t2,t1 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
-                return tx,t1,t2
+                return tx,float(t1),float(t2)
             else:
                 return aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
         except Exception:
             tx = aw.qmc.timeclock.elapsed()/1000.
-            return tx,-1,-1
+            return tx,-1.0,-1.0
     
     def sample_extra_device(self,i):
         try:
-            return aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+            return float(aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]())
         except Exception:
             tx = aw.qmc.timeclock.elapsed()/1000.
-            return tx,-1,-1
+            return tx,-1.0,-1.0
 
     def compute_delta(self, times, temps, n):
         """Compute a tempurature delta using numpy's polyfit with degree 1.
