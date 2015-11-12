@@ -5771,6 +5771,7 @@ class tgraphcanvas(FigureCanvas):
     # TP_index is the TP index calculated by findTP and might be -1 if no TP could be detected
     def writestatistics(self,TP_index):
         try:
+            LP = None
             if self.timeindex[1] and self.phasesbuttonflag:
                 #manual dryend available
                 dryEndIndex = self.timeindex[1]
@@ -5930,7 +5931,7 @@ class tgraphcanvas(FigureCanvas):
                         self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontproperties=statsprop)
                     if self.timeindex[7]: # only if COOL exists
                         self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontproperties=statsprop)
-                self.writecharacteristics(TP_index,LP)
+            self.writecharacteristics(TP_index,LP)
         except Exception as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
