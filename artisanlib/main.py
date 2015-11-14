@@ -3428,7 +3428,7 @@ class tgraphcanvas(FigureCanvas):
                     tidx = timeindex[7]
                     endidx = self.ax.get_xlim()[1] # or timex[-1]
                     if timex[tidx] < endidx:
-                        self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None,lod=False)
+                        self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None)#,lod=False)
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -3438,772 +3438,775 @@ class tgraphcanvas(FigureCanvas):
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
     def redraw(self, recomputeAllDeltas=True, smooth=False,sampling=False):
-        try:
-            #### lock shared resources   ####
-            aw.qmc.samplingsemaphore.acquire(1)            
-
-            rcParams['path.effects'] = []
-            if aw.qmc.graphstyle == 1:
-                scale = 1
-            else:
-                scale = 0            
-            length = 700 # 100 (128 the default)
-            randomness = 12 # 2 (16 default)
-            rcParams['path.sketch'] = (scale, length, randomness)
-
-            rcParams['axes.linewidth'] = 1.5
-            rcParams['xtick.major.size'] = 8
-            rcParams['xtick.major.width'] = 1.5
-            rcParams['xtick.minor.width'] = 1
-            rcParams['ytick.major.size'] = 8
-            rcParams['ytick.major.width'] = 1.5
-            rcParams['ytick.minor.width'] = 1
-            rcParams['xtick.color'] = self.palette["xlabel"]
-            rcParams['ytick.color'] = self.palette["ylabel"]
-
-            self.fig.clf()   #wipe out figure. keep_observers=False
-
-            self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
-
-            #Set axes same as in __init__
-            if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
-                self.endofx = 60
-            self.ax.set_ylim(self.ylimit_min, self.ylimit)
-            self.ax.set_autoscale_on(False)
-            
-            fontprop_small = aw.mpl_fontproperties.copy()
-            fontprop_small.set_size("xx-small")
-            fontprop_medium = aw.mpl_fontproperties.copy()
-            fontprop_medium.set_size("medium")
-            fontprop_large = aw.mpl_fontproperties.copy()
-            fontprop_large.set_size("large")
-            fontprop_xlarge = aw.mpl_fontproperties.copy()
-            fontprop_xlarge.set_size("x-large")
-            self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
-            if aw.qmc.flagstart:
-                self.ax.set_ylabel("")
-                self.ax.set_xlabel("")
-                self.ax.set_title("")
-                self.fig.suptitle("")
-            else:
-                self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
-                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
-                if self.roastbatchnr == 0:
-                    title = self.title
+        if aw.qmc.designerflag:
+            aw.qmc.redrawdesigner()
+        else:
+            try:
+                #### lock shared resources   ####
+                aw.qmc.samplingsemaphore.acquire(1)            
+    
+                rcParams['path.effects'] = []
+                if aw.qmc.graphstyle == 1:
+                    scale = 1
                 else:
-                    title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + self.title
-                if self.background and self.titleB and len(self.titleB) > 10:
-                    stl = 30
-                else:
-                    stl = 35
-                title = aw.qmc.abbrevString(title,stl)
-                self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
-                    fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
-            
-            two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag)))
-
-            if self.background:
-                if len(self.title) > 20:
-                    stl = 25
-                else:
-                    stl = 30
-                if two_ax_mode:
-                    suptitleX = 0.93
-                else:
-                    suptitleX = 1
+                    scale = 0            
+                length = 700 # 100 (128 the default)
+                randomness = 12 # 2 (16 default)
+                rcParams['path.sketch'] = (scale, length, randomness)
+    
+                rcParams['axes.linewidth'] = 1.5
+                rcParams['xtick.major.size'] = 8
+                rcParams['xtick.major.width'] = 1.5
+                rcParams['xtick.minor.width'] = 1
+                rcParams['ytick.major.size'] = 8
+                rcParams['ytick.major.width'] = 1.5
+                rcParams['ytick.minor.width'] = 1
+                rcParams['xtick.color'] = self.palette["xlabel"]
+                rcParams['ytick.color'] = self.palette["ylabel"]
+    
+                self.fig.clf()   #wipe out figure. keep_observers=False
+    
+                self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
+    
+                #Set axes same as in __init__
+                if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
+                    self.endofx = 60
+                self.ax.set_ylim(self.ylimit_min, self.ylimit)
+                self.ax.set_autoscale_on(False)
+                
+                fontprop_small = aw.mpl_fontproperties.copy()
+                fontprop_small.set_size("xx-small")
+                fontprop_medium = aw.mpl_fontproperties.copy()
+                fontprop_medium.set_size("medium")
+                fontprop_large = aw.mpl_fontproperties.copy()
+                fontprop_large.set_size("large")
+                fontprop_xlarge = aw.mpl_fontproperties.copy()
+                fontprop_xlarge.set_size("x-large")
+                self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
                 if aw.qmc.flagstart:
+                    self.ax.set_ylabel("")
+                    self.ax.set_xlabel("")
+                    self.ax.set_title("")
                     self.fig.suptitle("")
                 else:
-                    if self.roastbatchnrB == 0:
-                        titleB = self.titleB
+                    self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
+                    self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
+                    if self.roastbatchnr == 0:
+                        title = self.title
                     else:
-                        titleB = self.roastbatchprefixB + u(self.roastbatchnrB) + u(" ") + self.titleB
-                    if self.title == None or u(self.title).strip() == "":
-                        self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
-                            horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
+                        title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + self.title
+                    if self.background and self.titleB and len(self.titleB) > 10:
+                        stl = 30
                     else:
-                        self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
-                            horizontalalignment="right",fontsize="xx-small",fontproperties=fontprop_small,x=suptitleX,y=1)
-            
-#            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
-#            self.ax.spines['top'].set_color('none')
-            self.ax.tick_params(\
-                axis='x',           # changes apply to the x-axis
-                which='both',       # both major and minor ticks are affected
-                bottom='on',        # ticks along the bottom edge are on
-                top='off',          # ticks along the top edge are off
-                direction='out',
-                labelbottom='on')   # labels along the bottom edge are on
-            self.ax.tick_params(\
-                axis='y',           # changes apply to the x-axis
-                which='both',       # both major and minor ticks are affected
-                bottom='on',        # ticks along the bottom edge are on
-                top='off',          # ticks along the top edge are off
-                direction='out',
-                labelbottom='on')   # labels along the bottom edge are on
-
-            prop = aw.mpl_fontproperties.copy()
-            prop.set_size("medium")
-            for label in self.ax.get_xticklabels() :
-                label.set_fontproperties(prop)
-            for label in self.ax.get_yticklabels() :
-                label.set_fontproperties(prop)
-
-            # format temperature as int, not float in the cursor position coordinate indicator
-            self.ax.fmt_ydata = self.fmt_data
-            self.ax.fmt_xdata = self.fmt_timedata
-
-            if two_ax_mode:
-                #create a second set of axes in the same position as self.ax
-                self.delta_ax = self.ax.twinx()
-                self.delta_ax.tick_params(\
+                        stl = 35
+                    title = aw.qmc.abbrevString(title,stl)
+                    self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
+                        fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
+                
+                two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag)))
+    
+                if self.background:
+                    if len(self.title) > 20:
+                        stl = 25
+                    else:
+                        stl = 30
+                    if two_ax_mode:
+                        suptitleX = 0.93
+                    else:
+                        suptitleX = 1
+                    if aw.qmc.flagstart:
+                        self.fig.suptitle("")
+                    else:
+                        if self.roastbatchnrB == 0:
+                            titleB = self.titleB
+                        else:
+                            titleB = self.roastbatchprefixB + u(self.roastbatchnrB) + u(" ") + self.titleB
+                        if self.title == None or u(self.title).strip() == "":
+                            self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
+                                horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
+                        else:
+                            self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
+                                horizontalalignment="right",fontsize="xx-small",fontproperties=fontprop_small,x=suptitleX,y=1)
+                
+    #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
+    #            self.ax.spines['top'].set_color('none')
+                self.ax.tick_params(\
+                    axis='x',           # changes apply to the x-axis
+                    which='both',       # both major and minor ticks are affected
+                    bottom='on',        # ticks along the bottom edge are on
+                    top='off',          # ticks along the top edge are off
+                    direction='out',
+                    labelbottom='on')   # labels along the bottom edge are on
+                self.ax.tick_params(\
                     axis='y',           # changes apply to the x-axis
                     which='both',       # both major and minor ticks are affected
                     bottom='on',        # ticks along the bottom edge are on
                     top='off',          # ticks along the top edge are off
                     direction='out',
                     labelbottom='on')   # labels along the bottom edge are on
-                self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put delta_ax in front of ax
-                self.ax.patch.set_visible(True)
-                if aw.qmc.flagstart:
-                    self.delta_ax.set_ylabel("")
-                else:
-                    self.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)),color = self.palette["ylabel"],fontproperties=fontprop_large)
-                self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
-                self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
-                self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                for i in self.delta_ax.get_yticklines():
-                    i.set_markersize(10)
-                for i in self.delta_ax.yaxis.get_minorticklines():
-                    i.set_markersize(5)
-                for label in self.delta_ax.get_yticklabels() :
+    
+                prop = aw.mpl_fontproperties.copy()
+                prop.set_size("medium")
+                for label in self.ax.get_xticklabels() :
                     label.set_fontproperties(prop)
-
-                # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
-                self.delta_ax.fmt_ydata = self.fmt_data
-                self.delta_ax.fmt_xdata = self.fmt_timedata
-            #put a right tick on the graph
-            else:
-                self.delta_ax = None
-#                if aw.qmc.graphstyle:
-#                    self.ax.spines['right'].set_color('none')
-#                    self.ax.spines['top'].set_color('none')
-##                for tick in self.ax.yaxis.get_major_ticks():
-##                    tick.label2On = True
-                self.ax.tick_params(\
-                    axis='y', 
-                    which='both',
-                    right='off',
-                    labelright='off') 
-
-            self.ax.spines['top'].set_color("0.40")
-            self.ax.spines['bottom'].set_color("0.40")
-            self.ax.spines['left'].set_color("0.40")
-            self.ax.spines['right'].set_color("0.40")
-
-            self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
-            self.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-            for i in self.ax.get_yticklines():
-                i.set_markersize(10)
-            for i in self.ax.yaxis.get_minorticklines():
-                i.set_markersize(5)
-
-            #update X ticks, labels, and colors
-            self.xaxistosm(redraw=False)
-
-            rcParams['path.sketch'] = (0,0,0)
-            trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
-
-            #draw water marks for dry phase region, mid phase region, and finish phase region
-            if aw.qmc.watermarksflag:
-                rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
-                                          transform=trans, color=self.palette["rect1"],alpha=0.15)
-                rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2]-self.phases[1]),
-                                          transform=trans, color=self.palette["rect2"],alpha=0.15)
-                rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
-                                          transform=trans, color=self.palette["rect3"],alpha=0.15)
-                self.ax.add_patch(rect1)
-                self.ax.add_patch(rect2)
-                self.ax.add_patch(rect3)
-
-            #if self.eventsGraphflag == 0 then that means don't plot event bars
-
-            if self.eventsGraphflag == 1: #plot event bars by type
-                # make blended transformations to help identify EVENT types
-                if self.mode == "C":
-                    step = 5
-                    start = 20
+                for label in self.ax.get_yticklabels() :
+                    label.set_fontproperties(prop)
+    
+                # format temperature as int, not float in the cursor position coordinate indicator
+                self.ax.fmt_ydata = self.fmt_data
+                self.ax.fmt_xdata = self.fmt_timedata
+    
+                if two_ax_mode:
+                    #create a second set of axes in the same position as self.ax
+                    self.delta_ax = self.ax.twinx()
+                    self.delta_ax.tick_params(\
+                        axis='y',           # changes apply to the x-axis
+                        which='both',       # both major and minor ticks are affected
+                        bottom='on',        # ticks along the bottom edge are on
+                        top='off',          # ticks along the top edge are off
+                        direction='out',
+                        labelbottom='on')   # labels along the bottom edge are on
+                    self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put delta_ax in front of ax
+                    self.ax.patch.set_visible(True)
+                    if aw.qmc.flagstart:
+                        self.delta_ax.set_ylabel("")
+                    else:
+                        self.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)),color = self.palette["ylabel"],fontproperties=fontprop_large)
+                    self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+                    self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
+                    self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                    for i in self.delta_ax.get_yticklines():
+                        i.set_markersize(10)
+                    for i in self.delta_ax.yaxis.get_minorticklines():
+                        i.set_markersize(5)
+                    for label in self.delta_ax.get_yticklabels() :
+                        label.set_fontproperties(prop)
+    
+                    # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
+                    self.delta_ax.fmt_ydata = self.fmt_data
+                    self.delta_ax.fmt_xdata = self.fmt_timedata
+                #put a right tick on the graph
                 else:
-                    step = 10
-                    start = 60
-                jump = 20
-                for i in range(4):
-                    rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.15)
-                    self.ax.add_patch(rectEvent)
+                    self.delta_ax = None
+    #                if aw.qmc.graphstyle:
+    #                    self.ax.spines['right'].set_color('none')
+    #                    self.ax.spines['top'].set_color('none')
+    ##                for tick in self.ax.yaxis.get_major_ticks():
+    ##                    tick.label2On = True
+                    self.ax.tick_params(\
+                        axis='y', 
+                        which='both',
+                        right='off',
+                        labelright='off') 
+    
+                self.ax.spines['top'].set_color("0.40")
+                self.ax.spines['bottom'].set_color("0.40")
+                self.ax.spines['left'].set_color("0.40")
+                self.ax.spines['right'].set_color("0.40")
+    
+                self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
+                self.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                for i in self.ax.get_yticklines():
+                    i.set_markersize(10)
+                for i in self.ax.yaxis.get_minorticklines():
+                    i.set_markersize(5)
+    
+                #update X ticks, labels, and colors
+                self.xaxistosm(redraw=False)
+    
+                rcParams['path.sketch'] = (0,0,0)
+                trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
+    
+                #draw water marks for dry phase region, mid phase region, and finish phase region
+                if aw.qmc.watermarksflag:
+                    rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
+                                              transform=trans, color=self.palette["rect1"],alpha=0.15)
+                    rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2]-self.phases[1]),
+                                              transform=trans, color=self.palette["rect2"],alpha=0.15)
+                    rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
+                                              transform=trans, color=self.palette["rect3"],alpha=0.15)
+                    self.ax.add_patch(rect1)
+                    self.ax.add_patch(rect2)
+                    self.ax.add_patch(rect3)
+    
+                #if self.eventsGraphflag == 0 then that means don't plot event bars
+    
+                if self.eventsGraphflag == 1: #plot event bars by type
+                    # make blended transformations to help identify EVENT types
                     if self.mode == "C":
-                        jump -= 10
+                        step = 5
+                        start = 20
                     else:
-                        jump -= 20
-
-            #plot events bars by value
-            elif self.eventsGraphflag == 2:
-                # make blended transformations to help identify EVENT types
-                if self.mode == "C":
-                    step = 2
-                    start = 40
-                else:
-                    step = 5
-                    start = 100
-                jump = 20
-
-                for i in range(12):
-                    if i == 0:
-                        color = self.palette["rect3"]
-                    elif i%2:
-                        color = self.palette["rect2"]
-                    else:
-                        color = self.palette["rect1"]
-                    barposition = self.phases[0]-start-jump    
-                    rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.15)
-                    self.ax.add_patch(rectEvent)
-                    self.eventpositionbars[i] = barposition
+                        step = 10
+                        start = 60
+                    jump = 20
+                    for i in range(4):
+                        rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.15)
+                        self.ax.add_patch(rectEvent)
+                        if self.mode == "C":
+                            jump -= 10
+                        else:
+                            jump -= 20
+    
+                #plot events bars by value
+                elif self.eventsGraphflag == 2:
+                    # make blended transformations to help identify EVENT types
                     if self.mode == "C":
-                        jump -= 5
+                        step = 2
+                        start = 40
                     else:
-                        jump -= 10
-
-            rcParams['path.sketch'] = (scale, length, randomness)
-
-            #check BACKGROUND flag
-            if self.background: 
-                #check to see if there is both a profile loaded and a background loaded
-                if self.backmoveflag:
-                    self.timealign(redraw=False,recompute=False)
-                    
-                #draw one extra device on background stemp1BX
-                if aw.qmc.xtcurveidx > 0:
-                    idx3 = aw.qmc.xtcurveidx - 1
-                    n3 = idx3 // 2
-                    if len(self.stemp1BX) > n3 and len(self.stemp2BX) > n3 and len(self.extratimexB) > n3:
-                        if aw.qmc.xtcurveidx % 2:
-                            stemp3B = self.stemp1BX[n3]
+                        step = 5
+                        start = 100
+                    jump = 20
+    
+                    for i in range(12):
+                        if i == 0:
+                            color = self.palette["rect3"]
+                        elif i%2:
+                            color = self.palette["rect2"]
                         else:
-                            stemp3B = self.stemp2BX[n3]
-                        self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
-                                                    sketch_params=None,path_effects=[],
-                                                    linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
-                                                    alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None)))                                    
-
-                #draw background
-                self.l_back1, = self.ax.plot(self.timeB, self.stemp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
-                                            sketch_params=None,path_effects=[],
-                                            linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
-                                            alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None)))
-                self.l_back2, = self.ax.plot(self.timeB, self.stemp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker, 
-                                            linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
-                                            sketch_params=None,path_effects=[],
-                                            alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None)))
-
-                #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
-                if self.DeltaETBflag or self.DeltaBTBflag:
-                    if True: # recomputeAllDeltas:
-                        tx = numpy.array(self.timeB)
-                        with numpy.errstate(divide='ignore'):
-                            nt1 = numpy.array(self.stemp1B)
-                            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)                            
-                        with numpy.errstate(divide='ignore'):
-                            nt2 = numpy.array(self.stemp2B)
-                            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                        lt,ld1,ld2 = len(self.timeB),len(z1),len(z2)
-                        if lt > ld1:
-                            z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
-                        if lt > ld2:
-                            z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=self.timeindexB[0]) # CHARGE is the charge for the foreground, so we have to disable this here
-                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=self.timeindexB[0])
-                        # cut out the part after DROP
-                        if aw.qmc.timeindexB[6]:
-                            self.delta1B = numpy.append(self.delta1B[:self.timeindexB[6]+1],[None]*(len(self.delta1B)-self.timeindexB[6]-1))
-                            self.delta2B = numpy.append(self.delta2B[:self.timeindexB[6]+1],[None]*(len(self.delta2B)-self.timeindexB[6]-1))
-                        # cut out the part before CHARGE
-                        if aw.qmc.timeindexB[0] > -1 and aw.qmc.timeindexB[0] < aw.qmc.timeindexB[6]:
-                            self.delta1B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta1B[aw.qmc.timeindexB[0]:])
-                            self.delta2B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta2B[aw.qmc.timeindexB[0]:])
-                        # filter out values beyond the delta limits
-                        if aw.qmc.mode == "C":
-                            rorlimit = aw.qmc.RoRlimitC
+                            color = self.palette["rect1"]
+                        barposition = self.phases[0]-start-jump    
+                        rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.15)
+                        self.ax.add_patch(rectEvent)
+                        self.eventpositionbars[i] = barposition
+                        if self.mode == "C":
+                            jump -= 5
                         else:
-                            rorlimit = aw.qmc.RoRlimitF
-                        self.delta1B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1B]
-                        self.delta2B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2B]
-                    
-                    ##### DeltaETB,DeltaBTB curves
-                    if self.DeltaETBflag:
-                        self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,
-                        sketch_params=None,path_effects=[],
-                        marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None)))
-                    if self.DeltaBTBflag:
-                        self.l_delta2B, = self.delta_ax.plot(self.timeB, self.delta2B,markersize=self.BTBdeltamarkersize,
-                        sketch_params=None,path_effects=[],
-                        marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
-
-                #check backgroundevents flag
-                if self.backgroundeventsflag:
-                    if self.eventsGraphflag != 2:
-                        if self.mode == "F":
-                            height = 50
-                        else:
-                            height = 20
-
-                        for p in range(len(self.backgroundEvents)):
-                            st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
-                            if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
-                                temp = self.temp1B[self.backgroundEvents[p]]
+                            jump -= 10
+    
+                rcParams['path.sketch'] = (scale, length, randomness)
+    
+                #check BACKGROUND flag
+                if self.background: 
+                    #check to see if there is both a profile loaded and a background loaded
+                    if self.backmoveflag:
+                        self.timealign(redraw=False,recompute=False)
+                        
+                    #draw one extra device on background stemp1BX
+                    if aw.qmc.xtcurveidx > 0:
+                        idx3 = aw.qmc.xtcurveidx - 1
+                        n3 = idx3 // 2
+                        if len(self.stemp1BX) > n3 and len(self.stemp2BX) > n3 and len(self.extratimexB) > n3:
+                            if aw.qmc.xtcurveidx % 2:
+                                stemp3B = self.stemp1BX[n3]
                             else:
-                                temp = self.temp2B[self.backgroundEvents[p]]
-                            self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),path_effects=[],
-                                                xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
-                                                fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
-                                                alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)
-                    #background events by value
-                    else:
-                        self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
-                        self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
-                        for i in range(len(self.backgroundEvents)):
-                            if self.backgroundEtypes[i] == 0:
-                                self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                self.E1backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
-                            elif self.backgroundEtypes[i] == 1:
-                                self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                self.E2backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
-                            elif self.backgroundEtypes[i] == 2:
-                                self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                self.E3backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
-                            elif self.backgroundEtypes[i] == 3:
-                                self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                self.E4backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
-
-                        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                                        picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha)
-                        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                                        picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha)
-                        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                                        picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha)
-                        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                                        picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha)                                                                        
-                                                                          
-                #check backgroundDetails flag
-                if self.backgroundDetails:
-                    d = aw.qmc.ylimit - aw.qmc.ylimit_min 
-                    d = d - d/5
-                    #if there is a profile loaded with CHARGE, then save time to get the relative time
-                    if self.timeindex[0] != -1:   #verify it exists before loading it, otherwise the list could go out of index
-                        startB = self.timex[self.timeindex[0]]
-                    else:
-                        if self.timeindexB[0] > 0:
-                            startB = self.timeB[self.timeindexB[0]]
-                        else:
-                            startB = 0
-                    self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex)
-                    
-                #END of Background
-                
-            if aw.qmc.patheffects:
-                rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
-                
-                
-            handles = []
-            labels = []
-            
-            if smooth or len(self.stemp1) != len(self.timex):
-                self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
-            if smooth or len(self.stemp2) != len(self.timex):
-                self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
-
-            if self.eventsshowflag:
-                Nevents = len(self.specialevents)
-                #three modes of drawing events.
-                # the first mode just places annotations. They are text annotations.
-                # The second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
-                # the third mode plots the events by value. They are not annotations but actual lines.
-
-                if Nevents:
-                    for i in range(Nevents):
-                        if self.specialeventstype[i] == 4 or self.eventsGraphflag == 0:
-                            if self.specialeventstype[i] < 4:
-                                etype = self.etypesf(self.specialeventstype[i])
-                                firstletter = u(etype[0])
-                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
+                                stemp3B = self.stemp2BX[n3]
+                            self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
+                                                        sketch_params=None,path_effects=[],
+                                                        linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
+                                                        alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None)))                                    
+    
+                    #draw background
+                    self.l_back1, = self.ax.plot(self.timeB, self.stemp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
+                                                sketch_params=None,path_effects=[],
+                                                linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
+                                                alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None)))
+                    self.l_back2, = self.ax.plot(self.timeB, self.stemp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker, 
+                                                linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
+                                                sketch_params=None,path_effects=[],
+                                                alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None)))
+    
+                    #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
+                    if self.DeltaETBflag or self.DeltaBTBflag:
+                        if True: # recomputeAllDeltas:
+                            tx = numpy.array(self.timeB)
+                            with numpy.errstate(divide='ignore'):
+                                nt1 = numpy.array(self.stemp1B)
+                                z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)                            
+                            with numpy.errstate(divide='ignore'):
+                                nt2 = numpy.array(self.stemp2B)
+                                z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                            lt,ld1,ld2 = len(self.timeB),len(z1),len(z2)
+                            if lt > ld1:
+                                z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+                            if lt > ld2:
+                                z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
+                            self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=self.timeindexB[0]) # CHARGE is the charge for the foreground, so we have to disable this here
+                            self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=self.timeindexB[0])
+                            # cut out the part after DROP
+                            if aw.qmc.timeindexB[6]:
+                                self.delta1B = numpy.append(self.delta1B[:self.timeindexB[6]+1],[None]*(len(self.delta1B)-self.timeindexB[6]-1))
+                                self.delta2B = numpy.append(self.delta2B[:self.timeindexB[6]+1],[None]*(len(self.delta2B)-self.timeindexB[6]-1))
+                            # cut out the part before CHARGE
+                            if aw.qmc.timeindexB[0] > -1 and aw.qmc.timeindexB[0] < aw.qmc.timeindexB[6]:
+                                self.delta1B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta1B[aw.qmc.timeindexB[0]:])
+                                self.delta2B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta2B[aw.qmc.timeindexB[0]:])
+                            # filter out values beyond the delta limits
+                            if aw.qmc.mode == "C":
+                                rorlimit = aw.qmc.RoRlimitC
                             else:
-                                firstletter = "E"
-                                secondletter = ""
+                                rorlimit = aw.qmc.RoRlimitF
+                            self.delta1B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1B]
+                            self.delta2B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2B]
+                        
+                        ##### DeltaETB,DeltaBTB curves
+                        if self.DeltaETBflag:
+                            self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,
+                            sketch_params=None,path_effects=[],
+                            marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None)))
+                        if self.DeltaBTBflag:
+                            self.l_delta2B, = self.delta_ax.plot(self.timeB, self.delta2B,markersize=self.BTBdeltamarkersize,
+                            sketch_params=None,path_effects=[],
+                            marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
+    
+                    #check backgroundevents flag
+                    if self.backgroundeventsflag:
+                        if self.eventsGraphflag != 2:
                             if self.mode == "F":
                                 height = 50
                             else:
                                 height = 20
-                            #some times ET is not drawn (ET = 0) when using device NONE
-                            if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
-                                if aw.qmc.flagon:
-                                    temp = self.temp1[int(self.specialevents[i])]
+    
+                            for p in range(len(self.backgroundEvents)):
+                                st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
+                                if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
+                                    temp = self.temp1B[self.backgroundEvents[p]]
                                 else:
-                                    temp = self.stemp1[int(self.specialevents[i])]
-                            elif aw.qmc.BTcurve:
-                                if aw.qmc.flagon:
-                                    temp = self.temp2[int(self.specialevents[i])]
-                                else:
-                                    temp = self.stemp2[int(self.specialevents[i])]
-                            else:
-                                temp = None
-                            if temp:
-                                if self.specialeventstype[i] == 0:
-                                    boxstyle = 'square,pad=0.2'
-                                    boxcolor = self.EvalueColor[0]
-                                    textcolor = 'white'
-                                elif self.specialeventstype[i] == 1:
-                                    boxstyle = 'circle,pad=0.1'
-                                    boxcolor = self.EvalueColor[1]
-                                    textcolor = 'white'
-                                elif self.specialeventstype[i] == 2:
-                                    boxstyle = 'sawtooth,pad=0.4,tooth_size=0.8'
-                                    boxcolor = self.EvalueColor[2]
-                                    textcolor = 'white'
-                                elif self.specialeventstype[i] == 3:
-                                    boxstyle = 'round4,pad=0.3,rounding_size=0.15'
-                                    boxcolor = self.EvalueColor[3]
-                                    textcolor = 'white'
-                                elif self.specialeventstype[i] == 4:
-                                    boxstyle = 'square,pad=0.2'
-                                    boxcolor = 'yellow'
-                                    textcolor = self.palette["text"]
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                             xytext=(self.timex[int(self.specialevents[i])],temp+height),
-                                             alpha=0.9,
-                                             color=textcolor,
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
-                                             bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
-                                             fontproperties=fontprop_small,
-                                             path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
-                                             )
-
-                if self.eventsGraphflag == 1 and Nevents:
-                    char1 = self.etypes[0][0]
-                    char2 = self.etypes[1][0]
-                    char3 = self.etypes[2][0]
-                    char4 = self.etypes[3][0]
-
-                    if self.mode == "F":
-                        row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
-                    else:
-                        row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-
-                    #draw lines of color between events of the same type to help identify areas of events.
-                    #count (as length of the list) and collect their times for each different type. Each type will have a different plot heigh
-                    netypes=[[],[],[],[]]
-                    for i in range(Nevents):
-                        if self.specialeventstype[i] == 0:
-                            netypes[0].append(self.timex[self.specialevents[i]])
-                        elif self.specialeventstype[i] == 1:
-                            netypes[1].append(self.timex[self.specialevents[i]])
-                        elif self.specialeventstype[i] == 2:
-                            netypes[2].append(self.timex[self.specialevents[i]])
-                        elif self.specialeventstype[i] == 3:
-                            netypes[3].append(self.timex[self.specialevents[i]])
-                            
-                    letters = char1+char2+char3+char4   #"NPDF" first letter for each type (None, Power, Damper, Fan)
-                    colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
-                    for p in range(len(letters)):
-                        if len(netypes[p]) > 1:
-                            for i in range(len(netypes[p])-1):
-                                #draw differentiating color bars between events and place then in a different height acording with type
-                                rect = patches.Rectangle((netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step, color = colors[i%2],alpha=0.5)
-                                self.ax.add_patch(rect)
-
-                    # annotate event
-                    for i in range(Nevents):
-                        if self.specialeventstype[i] > 3:
-                            # a special event of type "--"
-                            pass
+                                    temp = self.temp2B[self.backgroundEvents[p]]
+                                self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),path_effects=[],
+                                                    xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
+                                                    fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
+                                                    alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)
+                        #background events by value
                         else:
-                            firstletter = self.etypes[self.specialeventstype[i]][0]
-                            secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
-                            #some times ET is not drawn (ET = 0) when using device NONE
-                            if aw.qmc.ETcurve or aw.qmc.BTcurve:
-                                if (aw.qmc.ETcurve and self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]) or (not aw.qmc.BTcurve):
-                                    col = self.palette["et"]
-                                    if aw.qmc.flagon:
-                                        temps = self.temp1
-                                    else:
-                                        temps = self.stemp1
-                                else:
-                                    col = self.palette["bt"]
-                                    if aw.qmc.flagon:
-                                        temps = self.temp2
-                                    else:
-                                        temps = self.stemp2
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temps[int(self.specialevents[i])]),
-                                                 xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                                 bbox=dict(boxstyle='square,pad=0.1', fc='yellow', ec='none'),
-                                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
-                                                 fontsize="xx-small",
-                                                 fontproperties=fontprop_small)
-
-                elif self.eventsGraphflag == 2: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
-                    self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
-                    self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
-                    E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
-                    for i in range(Nevents):
-                        if self.specialeventstype[i] == 0:           
-                            self.E1timex.append(self.timex[self.specialevents[i]])
-                            self.E1values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
-                            E1_nonempty = True
-                        elif self.specialeventstype[i] == 1:
-                            self.E2timex.append(self.timex[self.specialevents[i]])
-                            self.E2values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
-                            E2_nonempty = True
-                        elif self.specialeventstype[i] == 2:
-                            self.E3timex.append(self.timex[self.specialevents[i]])
-                            self.E3values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
-                            E3_nonempty = True
-                        elif self.specialeventstype[i] == 3:
-                            self.E4timex.append(self.timex[self.specialevents[i]])
-                            self.E4values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
-                            E4_nonempty = True
-
-                    self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                          picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
-                    self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                          picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
-                    self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                          picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
-                    self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                          picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                            self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
+                            self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
+                            for i in range(len(self.backgroundEvents)):
+                                if self.backgroundEtypes[i] == 0:
+                                    self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
+                                    self.E1backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
+                                elif self.backgroundEtypes[i] == 1:
+                                    self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
+                                    self.E2backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
+                                elif self.backgroundEtypes[i] == 2:
+                                    self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
+                                    self.E3backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
+                                elif self.backgroundEtypes[i] == 3:
+                                    self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
+                                    self.E4backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
+    
+                            self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
+                                                                            picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha)
+                            self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
+                                                                            picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha)
+                            self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
+                                                                            picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha)
+                            self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
+                                                                            picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha)                                                                        
+                                                                              
+                    #check backgroundDetails flag
+                    if self.backgroundDetails:
+                        d = aw.qmc.ylimit - aw.qmc.ylimit_min 
+                        d = d - d/5
+                        #if there is a profile loaded with CHARGE, then save time to get the relative time
+                        if self.timeindex[0] != -1:   #verify it exists before loading it, otherwise the list could go out of index
+                            startB = self.timex[self.timeindex[0]]
+                        else:
+                            if self.timeindexB[0] > 0:
+                                startB = self.timeB[self.timeindexB[0]]
+                            else:
+                                startB = 0
+                        self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex)
                         
-            ##### Extra devices-curves
-            self.extratemp1lines,self.extratemp2lines = [],[]
-            for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                if aw.extraCurveVisibility1[i]:
-                    if aw.qmc.flagon:
-                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
-                        markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
-                    else:
-                        if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
-                            self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
-                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
-                        markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
-                if aw.extraCurveVisibility2[i]:
-                    if aw.qmc.flagon:
-                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
-                        markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
-                    else:
-                        if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
-                            self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
-                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
-                        markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
-
-            #populate delta ET (self.delta1) and delta BT (self.delta2)
-            if self.DeltaETflag or self.DeltaBTflag:
-                if recomputeAllDeltas:
-                    tx = numpy.array(self.timex)
-                    if aw.qmc.flagon or len(tx) != len(self.stemp1):
-                        t1 = self.temp1
-                    else:
-                        t1 = self.stemp1
-                    with numpy.errstate(divide='ignore'):
-                        nt1 = numpy.array(t1)
-                        z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                    if aw.qmc.flagon or len(tx) != len(self.stemp2):
-                        t2 = self.temp2
-                    else:
-                        t2 = self.stemp2
-                    with numpy.errstate(divide='ignore'):
-                        nt2 = numpy.array(t2)
-                        z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                    lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
-                    # make lists equal in length
-                    if lt > ld1:
-                        z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
-                    if lt > ld2:
-                        z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
-                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
-                    # filter out values beyond the delta limits
-                    # cut out the part after DROP
-                    if aw.qmc.timeindex[6]:
-                        self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
-                        self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
-                    # cut out the part before CHARGE
-                    if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
-                        self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
-                        self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
-                    # remove values beyond the RoRlimit
-                    if aw.qmc.mode == "C":
-                        rorlimit = aw.qmc.RoRlimitC
-                    else:
-                        rorlimit = aw.qmc.RoRlimitF
-                    self.delta1 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1]
-                    self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
+                    #END of Background
                     
-                ##### DeltaET,DeltaBT curves
-                if self.DeltaETflag: 
-                    self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
-                if self.DeltaBTflag:
-                    self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
-
-            ##### ET,BT curves
-            if aw.qmc.ETcurve:
-                if aw.qmc.flagon:
-                    self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
-                else:
-                    self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
-            if aw.qmc.BTcurve:
-                if aw.qmc.flagon:
-                    self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
-                else:
-                    self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
-                    linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
-
-            if aw.qmc.ETcurve:
-                handles.append(self.l_temp1)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None)))
-            if aw.qmc.BTcurve:
-                handles.append(self.l_temp2)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None)))
-
-            if self.DeltaETflag: 
-                handles.append(self.l_delta1)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))
-            if self.DeltaBTflag:
-                handles.append(self.l_delta2)
-                labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
-
-
-            nrdevices = len(self.extradevices)
-            
-            if nrdevices and not self.designerflag:
-                xtmpl1idx = 0
-                xtmpl2idx = 0
-                for i in range(nrdevices):
-                    if aw.extraCurveVisibility1[i]:
-                        handles.append(self.extratemp1lines[xtmpl1idx])
-                        xtmpl1idx = xtmpl1idx + 1
-                        labels.append(aw.arabicReshape(self.extraname1[i]))
-                    if aw.extraCurveVisibility2[i]:
-                        handles.append(self.extratemp2lines[xtmpl2idx])
-                        xtmpl2idx = xtmpl2idx + 1
-                        labels.append(aw.arabicReshape(self.extraname2[i]))
-
-            if self.eventsshowflag and self.eventsGraphflag == 2 and Nevents:
-                if E1_nonempty:
-                    handles.append(self.l_eventtype1dots)
-                    labels.append(aw.arabicReshape(self.etypesf(0)))
-                if E2_nonempty:
-                    handles.append(self.l_eventtype2dots)
-                    labels.append(aw.arabicReshape(self.etypesf(1)))
-                if E3_nonempty:
-                    handles.append(self.l_eventtype3dots)
-                    labels.append(aw.arabicReshape(self.etypesf(2)))
-                if E4_nonempty:
-                    handles.append(self.l_eventtype4dots)
-                    labels.append(aw.arabicReshape(self.etypesf(3)))                        
-                        
-            if not self.designerflag and aw.qmc.BTcurve:
-                if self.flagon: # no smoothed lines in this case, pass normal BT
-                    self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
-                else:
-                    TP_index = aw.findTP()
-                    if aw.qmc.annotationsflag:
-                        self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
-                    if self.timeindex[6]:
-                        self.writestatistics(TP_index)
-
-
-                #if recorder on
-                if self.flagon and self.eventsshowflag:
-                    if not self.eventsshowflag:
-                        Nevents = len(self.specialevents)
-                    #update to last event
+                if aw.qmc.patheffects:
+                    rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
+                    
+                    
+                handles = []
+                labels = []
+                
+                if smooth or len(self.stemp1) != len(self.timex):
+                    self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
+                if smooth or len(self.stemp2) != len(self.timex):
+                    self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
+    
+                if self.eventsshowflag:
+                    Nevents = len(self.specialevents)
+                    #three modes of drawing events.
+                    # the first mode just places annotations. They are text annotations.
+                    # The second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
+                    # the third mode plots the events by value. They are not annotations but actual lines.
+    
                     if Nevents:
-                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                        aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
+                        for i in range(Nevents):
+                            if self.specialeventstype[i] == 4 or self.eventsGraphflag == 0:
+                                if self.specialeventstype[i] < 4:
+                                    etype = self.etypesf(self.specialeventstype[i])
+                                    firstletter = u(etype[0])
+                                    secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
+                                else:
+                                    firstletter = "E"
+                                    secondletter = ""
+                                if self.mode == "F":
+                                    height = 50
+                                else:
+                                    height = 20
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
+                                    if aw.qmc.flagon:
+                                        temp = self.temp1[int(self.specialevents[i])]
+                                    else:
+                                        temp = self.stemp1[int(self.specialevents[i])]
+                                elif aw.qmc.BTcurve:
+                                    if aw.qmc.flagon:
+                                        temp = self.temp2[int(self.specialevents[i])]
+                                    else:
+                                        temp = self.stemp2[int(self.specialevents[i])]
+                                else:
+                                    temp = None
+                                if temp:
+                                    if self.specialeventstype[i] == 0:
+                                        boxstyle = 'square,pad=0.2'
+                                        boxcolor = self.EvalueColor[0]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[i] == 1:
+                                        boxstyle = 'circle,pad=0.1'
+                                        boxcolor = self.EvalueColor[1]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[i] == 2:
+                                        boxstyle = 'sawtooth,pad=0.4,tooth_size=0.8'
+                                        boxcolor = self.EvalueColor[2]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[i] == 3:
+                                        boxstyle = 'round4,pad=0.3,rounding_size=0.15'
+                                        boxcolor = self.EvalueColor[3]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[i] == 4:
+                                        boxstyle = 'square,pad=0.2'
+                                        boxcolor = 'yellow'
+                                        textcolor = self.palette["text"]
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                                 xytext=(self.timex[int(self.specialevents[i])],temp+height),
+                                                 alpha=0.9,
+                                                 color=textcolor,
+                                                 arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
+                                                 bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                                 fontproperties=fontprop_small,
+                                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                 )
+    
+                    if self.eventsGraphflag == 1 and Nevents:
+                        char1 = self.etypes[0][0]
+                        char2 = self.etypes[1][0]
+                        char3 = self.etypes[2][0]
+                        char4 = self.etypes[3][0]
+    
+                        if self.mode == "F":
+                            row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                        else:
+                            row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+    
+                        #draw lines of color between events of the same type to help identify areas of events.
+                        #count (as length of the list) and collect their times for each different type. Each type will have a different plot heigh
+                        netypes=[[],[],[],[]]
+                        for i in range(Nevents):
+                            if self.specialeventstype[i] == 0:
+                                netypes[0].append(self.timex[self.specialevents[i]])
+                            elif self.specialeventstype[i] == 1:
+                                netypes[1].append(self.timex[self.specialevents[i]])
+                            elif self.specialeventstype[i] == 2:
+                                netypes[2].append(self.timex[self.specialevents[i]])
+                            elif self.specialeventstype[i] == 3:
+                                netypes[3].append(self.timex[self.specialevents[i]])
+                                
+                        letters = char1+char2+char3+char4   #"NPDF" first letter for each type (None, Power, Damper, Fan)
+                        colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
+                        for p in range(len(letters)):
+                            if len(netypes[p]) > 1:
+                                for i in range(len(netypes[p])-1):
+                                    #draw differentiating color bars between events and place then in a different height acording with type
+                                    rect = patches.Rectangle((netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step, color = colors[i%2],alpha=0.5)
+                                    self.ax.add_patch(rect)
+    
+                        # annotate event
+                        for i in range(Nevents):
+                            if self.specialeventstype[i] > 3:
+                                # a special event of type "--"
+                                pass
+                            else:
+                                firstletter = self.etypes[self.specialeventstype[i]][0]
+                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                if aw.qmc.ETcurve or aw.qmc.BTcurve:
+                                    if (aw.qmc.ETcurve and self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]) or (not aw.qmc.BTcurve):
+                                        col = self.palette["et"]
+                                        if aw.qmc.flagon:
+                                            temps = self.temp1
+                                        else:
+                                            temps = self.stemp1
+                                    else:
+                                        col = self.palette["bt"]
+                                        if aw.qmc.flagon:
+                                            temps = self.temp2
+                                        else:
+                                            temps = self.stemp2
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temps[int(self.specialevents[i])]),
+                                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                                     bbox=dict(boxstyle='square,pad=0.1', fc='yellow', ec='none'),
+                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
+                                                     fontsize="xx-small",
+                                                     fontproperties=fontprop_small)
+    
+                    elif self.eventsGraphflag == 2: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
+                        self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
+                        self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
+                        E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
+                        for i in range(Nevents):
+                            if self.specialeventstype[i] == 0:           
+                                self.E1timex.append(self.timex[self.specialevents[i]])
+                                self.E1values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
+                                E1_nonempty = True
+                            elif self.specialeventstype[i] == 1:
+                                self.E2timex.append(self.timex[self.specialevents[i]])
+                                self.E2values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
+                                E2_nonempty = True
+                            elif self.specialeventstype[i] == 2:
+                                self.E3timex.append(self.timex[self.specialevents[i]])
+                                self.E3values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
+                                E3_nonempty = True
+                            elif self.specialeventstype[i] == 3:
+                                self.E4timex.append(self.timex[self.specialevents[i]])
+                                self.E4values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
+                                E4_nonempty = True
+    
+                        self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
+                                                              picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
+                        self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
+                                                              picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
+                        self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
+                                                              picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
+                        self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
+                                                              picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                            
+                ##### Extra devices-curves
+                self.extratemp1lines,self.extratemp2lines = [],[]
+                for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                    if aw.extraCurveVisibility1[i]:
+                        if aw.qmc.flagon:
+                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
+                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
+                        else:
+                            if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
+                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
+                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
+                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
+                    if aw.extraCurveVisibility2[i]:
+                        if aw.qmc.flagon:
+                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
+                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+                        else:
+                            if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
+                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
+                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
+                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+    
+                #populate delta ET (self.delta1) and delta BT (self.delta2)
+                if self.DeltaETflag or self.DeltaBTflag:
+                    if recomputeAllDeltas:
+                        tx = numpy.array(self.timex)
+                        if aw.qmc.flagon or len(tx) != len(self.stemp1):
+                            t1 = self.temp1
+                        else:
+                            t1 = self.stemp1
+                        with numpy.errstate(divide='ignore'):
+                            nt1 = numpy.array(t1)
+                            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                        if aw.qmc.flagon or len(tx) != len(self.stemp2):
+                            t2 = self.temp2
+                        else:
+                            t2 = self.stemp2
+                        with numpy.errstate(divide='ignore'):
+                            nt2 = numpy.array(t2)
+                            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                        lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
+                        # make lists equal in length
+                        if lt > ld1:
+                            z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+                        if lt > ld2:
+                            z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
+                        self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
+                        self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
+                        # filter out values beyond the delta limits
+                        # cut out the part after DROP
+                        if aw.qmc.timeindex[6]:
+                            self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
+                            self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
+                        # cut out the part before CHARGE
+                        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
+                            self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
+                            self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
+                        # remove values beyond the RoRlimit
+                        if aw.qmc.mode == "C":
+                            rorlimit = aw.qmc.RoRlimitC
+                        else:
+                            rorlimit = aw.qmc.RoRlimitF
+                        self.delta1 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1]
+                        self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
+                        
+                    ##### DeltaET,DeltaBT curves
+                    if self.DeltaETflag: 
+                        self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                        linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
+                    if self.DeltaBTflag:
+                        self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
+    
+                ##### ET,BT curves
+                if aw.qmc.ETcurve:
+                    if aw.qmc.flagon:
+                        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
+                        linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
                     else:
-                        aw.etypeComboBox.setCurrentIndex(0)
-                        aw.valueEdit.setText("")
-                    aw.eNumberSpinBox.setValue(Nevents)
-
-            #update label colors
-            for label in self.ax.xaxis.get_ticklabels():
-                label.set_color(self.palette["xlabel"])
-            for label in self.ax.yaxis.get_ticklabels():
-                label.set_color(self.palette["ylabel"])
-            if two_ax_mode:
-                for label in self.delta_ax.yaxis.get_ticklabels():
+                        self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
+                        linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
+                if aw.qmc.BTcurve:
+                    if aw.qmc.flagon:
+                        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
+                        linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
+                    else:
+                        self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
+                        linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
+    
+                if aw.qmc.ETcurve:
+                    handles.append(self.l_temp1)
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None)))
+                if aw.qmc.BTcurve:
+                    handles.append(self.l_temp2)
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None)))
+    
+                if self.DeltaETflag: 
+                    handles.append(self.l_delta1)
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))
+                if self.DeltaBTflag:
+                    handles.append(self.l_delta2)
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
+    
+    
+                nrdevices = len(self.extradevices)
+                
+                if nrdevices and not self.designerflag:
+                    xtmpl1idx = 0
+                    xtmpl2idx = 0
+                    for i in range(nrdevices):
+                        if aw.extraCurveVisibility1[i]:
+                            handles.append(self.extratemp1lines[xtmpl1idx])
+                            xtmpl1idx = xtmpl1idx + 1
+                            labels.append(aw.arabicReshape(self.extraname1[i]))
+                        if aw.extraCurveVisibility2[i]:
+                            handles.append(self.extratemp2lines[xtmpl2idx])
+                            xtmpl2idx = xtmpl2idx + 1
+                            labels.append(aw.arabicReshape(self.extraname2[i]))
+    
+                if self.eventsshowflag and self.eventsGraphflag == 2 and Nevents:
+                    if E1_nonempty:
+                        handles.append(self.l_eventtype1dots)
+                        labels.append(aw.arabicReshape(self.etypesf(0)))
+                    if E2_nonempty:
+                        handles.append(self.l_eventtype2dots)
+                        labels.append(aw.arabicReshape(self.etypesf(1)))
+                    if E3_nonempty:
+                        handles.append(self.l_eventtype3dots)
+                        labels.append(aw.arabicReshape(self.etypesf(2)))
+                    if E4_nonempty:
+                        handles.append(self.l_eventtype4dots)
+                        labels.append(aw.arabicReshape(self.etypesf(3)))                        
+                            
+                if not self.designerflag and aw.qmc.BTcurve:
+                    if self.flagon: # no smoothed lines in this case, pass normal BT
+                        self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
+                    else:
+                        TP_index = aw.findTP()
+                        if aw.qmc.annotationsflag:
+                            self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
+                        if self.timeindex[6]:
+                            self.writestatistics(TP_index)
+    
+    
+                    #if recorder on
+                    if self.flagon and self.eventsshowflag:
+                        if not self.eventsshowflag:
+                            Nevents = len(self.specialevents)
+                        #update to last event
+                        if Nevents:
+                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
+                        else:
+                            aw.etypeComboBox.setCurrentIndex(0)
+                            aw.valueEdit.setText("")
+                        aw.eNumberSpinBox.setValue(Nevents)
+    
+                #update label colors
+                for label in self.ax.xaxis.get_ticklabels():
+                    label.set_color(self.palette["xlabel"])
+                for label in self.ax.yaxis.get_ticklabels():
                     label.set_color(self.palette["ylabel"])
-
-            #write legend
-            if self.legendloc and not sampling and len(self.timex) > 2:
-                rcParams['path.effects'] = []
-                prop = aw.mpl_fontproperties.copy()
-                prop.set_size("x-small")
-                if len(handles) > 3:
-                    ncol = int(math.ceil(len(handles)/2.))
-                else:
-                    ncol = int(math.ceil(len(handles)))
-                if False: # two_ax_mode:
-                    leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
-                else:
-                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)   
-                leg.draggable(state=True)
-                frame = leg.get_frame()
-                frame.set_facecolor('white')
-                #frame.set_edgecolor('darkgrey')
-                frame.set_linewidth(0.5)
-                if aw.qmc.graphstyle == 1:
-                    leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
-
-            # we create here the project line plots to have the accurate time axis after CHARGE
-            self.l_BTprojection, = self.ax.plot([], [],color = self.palette["bt"],
-                                            linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
-            self.l_ETprojection, = self.ax.plot([], [],color = self.palette["et"],
-                                            linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
-
-            ############  ready to plot ############
-            #self.fig.canvas.draw() # done by updateBackground()
-            self.updateBackground() # update bitlblit backgrounds
-            #######################################
-
-            # if designer ON
-            if self.designerflag:
-                if self.background:
-                    self.ax.lines = self.ax.lines[2:]
-                if len(self.timex):
-                    self.xaxistosm()
-                    self.redrawdesigner()
-
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()    
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-
+                if two_ax_mode:
+                    for label in self.delta_ax.yaxis.get_ticklabels():
+                        label.set_color(self.palette["ylabel"])
+    
+                #write legend
+                if self.legendloc and not sampling and len(self.timex) > 2:
+                    rcParams['path.effects'] = []
+                    prop = aw.mpl_fontproperties.copy()
+                    prop.set_size("x-small")
+                    if len(handles) > 3:
+                        ncol = int(math.ceil(len(handles)/2.))
+                    else:
+                        ncol = int(math.ceil(len(handles)))
+                    if False: # two_ax_mode:
+                        leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
+                    else:
+                        leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)   
+                    leg.draggable(state=True)
+                    frame = leg.get_frame()
+                    frame.set_facecolor('white')
+                    #frame.set_edgecolor('darkgrey')
+                    frame.set_linewidth(0.5)
+                    if aw.qmc.graphstyle == 1:
+                        leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
+    
+                # we create here the project line plots to have the accurate time axis after CHARGE
+                self.l_BTprojection, = self.ax.plot([], [],color = self.palette["bt"],
+                                                linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+                self.l_ETprojection, = self.ax.plot([], [],color = self.palette["et"],
+                                                linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+    
+                ############  ready to plot ############
+                #self.fig.canvas.draw() # done by updateBackground()
+                self.updateBackground() # update bitlblit backgrounds
+                #######################################
+    
+                # if designer ON
+                if self.designerflag:
+                    if self.background:
+                        self.ax.lines = self.ax.lines[2:]
+                    if len(self.timex):
+                        self.xaxistosm()
+                        self.redrawdesigner()
+    
+            except Exception as ex:
+    #            import traceback
+    #            traceback.print_exc(file=sys.stdout)
+                _, _, exc_tb = sys.exc_info()    
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+    
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
     def findtextgap(self,ystep_down,ystep_up,height1,height2,dd=0):
@@ -6143,7 +6146,7 @@ class tgraphcanvas(FigureCanvas):
                 xa = numpy.array(a)
                 yn = numpy.array(n)
                 if xx:
-                    func = lambda x,a,b,c: a*x*x + b*x + c
+                    func = lambda x,a,b,c,d: a*x*x*x + b*x*x + c*x + d
                 else:
                     func = lambda x,a,b,c: a * numpy.log(b*x+c)
                 with warnings.catch_warnings():
@@ -6158,7 +6161,7 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.canvas.draw()
                 if len(popt)>2:
                     if xx:
-                        res = "%.8f * t*t %s %.8f * t %s %.8f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2])
+                        res = "%.8f * t*t*t %s %.8f * t*t %s %.8f * t %s %.8f" % (popt[0],("+" if popt[1] > 0 else ""),popt[1],("+" if popt[2] > 0 else ""),popt[2],("+" if popt[3] > 0 else ""),popt[3])
                     else:
                         res = "%.8f * log(%.8f * t %s %.8f, e)" % (popt[0],popt[1],("+" if popt[2] > 0 else ""),popt[2])
         except Exception as e:
@@ -6391,13 +6394,26 @@ class tgraphcanvas(FigureCanvas):
             #pylint: disable=E0611
             from scipy.interpolate import UnivariateSpline
             #reset (clear) plot
-            if self.DeltaBTflag or self.DeltaETflag:
-                self.delta_ax.lines = []
-            if self.background:
-                self.ax.lines = self.ax.lines[0:4]
-            else:
-                self.ax.lines = []
-                
+#            if self.DeltaBTflag or self.DeltaETflag:
+#                self.delta_ax.lines = []
+#            if self.background:
+#                self.ax.lines = self.ax.lines[0:4]
+#            else:
+#                self.ax.lines = []
+            self.delta_ax.lines = []
+            self.ax.lines = []
+            
+            #draw background
+            if self.background: 
+                self.ax.plot(self.timeB, self.stemp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
+                                                sketch_params=None,path_effects=[],
+                                                linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
+                                                alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None)))
+                self.ax.plot(self.timeB, self.stemp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker, 
+                                                linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
+                                                sketch_params=None,path_effects=[],
+                                                alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None)))
+            
             #create statistics bar
             #calculate the positions for the statistics elements
             ydist = self.ylimit - self.ylimit_min
@@ -6483,17 +6499,13 @@ class tgraphcanvas(FigureCanvas):
 
         designermenu = QMenu(self)
 
-        createAction = QAction(QApplication.translate("Contextual Menu", "Create",None),self)
-        createAction.triggered.connect(self.convert_designer)
-        designermenu.addAction(createAction)
+#        createAction = QAction(QApplication.translate("Contextual Menu", "Create",None),self)
+#        createAction.triggered.connect(self.convert_designer)
+#        designermenu.addAction(createAction)
 
-        configAction = QAction(QApplication.translate("Contextual Menu", "Config...",None),self)
-        configAction.triggered.connect(self.desconfig)
-        designermenu.addAction(configAction)
-
-        backgroundAction = QAction(UIconst.ROAST_MENU_BACKGROUND,self)
-        backgroundAction.triggered.connect(aw.background)
-        designermenu.addAction(backgroundAction)
+#        backgroundAction = QAction(UIconst.ROAST_MENU_BACKGROUND,self)
+#        backgroundAction.triggered.connect(aw.background)
+#        designermenu.addAction(backgroundAction)
 
         designermenu.addSeparator()
 
@@ -6511,9 +6523,13 @@ class tgraphcanvas(FigureCanvas):
         resetAction.triggered.connect(self.reset_designer)
         designermenu.addAction(resetAction)
 
-        exitAction = QAction(QApplication.translate("Contextual Menu", "Exit Designer",None),self)
-        exitAction.triggered.connect(aw.stopdesigner)
-        designermenu.addAction(exitAction)
+        configAction = QAction(QApplication.translate("Contextual Menu", "Config...",None),self)
+        configAction.triggered.connect(self.desconfig)
+        designermenu.addAction(configAction)
+
+#        exitAction = QAction(QApplication.translate("Contextual Menu", "Exit Designer",None),self)
+#        exitAction.triggered.connect(aw.stopdesigner)
+#        designermenu.addAction(exitAction)
 
         designermenu.exec_(QCursor.pos())
 
@@ -8737,9 +8753,9 @@ class ApplicationWindow(QMainWindow):
 
         self.ToolkitMenu.addSeparator()
 
-        hudAction = QAction(UIconst.TOOLKIT_MENU_EXTRAS,self)
-        hudAction.triggered.connect(self.hudset)
-        self.ToolkitMenu.addAction(hudAction)
+        self.hudAction = QAction(UIconst.TOOLKIT_MENU_EXTRAS,self)
+        self.hudAction.triggered.connect(self.hudset)
+        self.ToolkitMenu.addAction(self.hudAction)
         
 
         # HELP menu
@@ -10653,6 +10669,12 @@ class ApplicationWindow(QMainWindow):
         focused_widget = QApplication.focusWidget()
         if focused_widget:
             focused_widget.clearFocus()
+        self.setSliderFocusPolicy(Qt.NoFocus)    
+        self.slider1.setVisible(False)
+        self.slider2.setVisible(False)
+        self.slider3.setVisible(False)
+        self.slider4.setVisible(False)
+        self.sliderSV.setVisible(False)
         self.sliderFrame.setVisible(False)
         if changeDefault:
             aw.eventslidersflag = 0
@@ -10663,6 +10685,12 @@ class ApplicationWindow(QMainWindow):
         if focused_widget:
             focused_widget.clearFocus()
         self.sliderFrame.setVisible(True)
+        self.slider1.setVisible(True)
+        self.slider2.setVisible(True)
+        self.slider3.setVisible(True)
+        self.slider4.setVisible(True)
+        self.sliderSV.setVisible(True)
+        self.setSliderFocusPolicy(Qt.StrongFocus)
         if changeDefault:
             aw.eventslidersflag = 1
         aw.slidersAction.setChecked(True)
@@ -10740,7 +10768,9 @@ class ApplicationWindow(QMainWindow):
         else:
             self.setLCDsDigitCount(3)
 
-    def enableEditMenus(self):
+    def enableEditMenus(self,designer=False):
+        if designer:
+            self.newRoastAction.setEnabled(True)
         self.fileLoadAction.setEnabled(True) # open
         self.openRecentMenu.setEnabled(True) # open recent
         self.importMenu.setEnabled(True) # import
@@ -10755,15 +10785,20 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.setEnabled(True)
         self.deviceAction.setEnabled(True)
         self.commportAction.setEnabled(True)
-        self.designerAction.setEnabled(True)
+        if not designer:
+            self.designerAction.setEnabled(True)
         self.wheeleditorAction.setEnabled(True)
+        if designer:
+            self.hudAction.setEnabled(True)            
         self.loadSettingsAction.setEnabled(True)
         self.openRecentSettingMenu.setEnabled(True)
         self.saveAsSettingsAction.setEnabled(True)
         self.resetAction.setEnabled(True)
         self.switchAction.setEnabled(True)
 
-    def disableEditMenus(self):
+    def disableEditMenus(self,designer=False):
+        if designer:
+            self.newRoastAction.setEnabled(False)
         self.fileLoadAction.setEnabled(False) # open
         self.openRecentMenu.setEnabled(False) # open recent
         self.importMenu.setEnabled(False) # import
@@ -10778,8 +10813,11 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.setEnabled(False)
         self.deviceAction.setEnabled(False)
         self.commportAction.setEnabled(False)
-        self.designerAction.setEnabled(False)
+        if not designer:
+            self.designerAction.setEnabled(False)
         self.wheeleditorAction.setEnabled(False)
+        if designer:
+            self.hudAction.setEnabled(False)
         self.loadSettingsAction.setEnabled(False)
         self.openRecentSettingMenu.setEnabled(False)
         self.saveAsSettingsAction.setEnabled(False)
@@ -16210,10 +16248,13 @@ $cupping_notes
             self.startdesigner()
 
     def startdesigner(self):
+        aw.disableEditMenus(designer=True)
         self.qmc.designer()
 
     def stopdesigner(self):
-        self.qmc.reset()
+        aw.enableEditMenus(designer=True)
+        #self.qmc.reset()
+        self.qmc.convert_designer()
 
     def editgraph(self):
         editgraphdialog = editGraphDlg(self)
@@ -17677,7 +17718,7 @@ class HUDDlg(ArtisanDialog):
         xxLayout = QHBoxLayout()
         xxLayout.addWidget(self.xxvarCheck)
         xxLayout.addWidget(self.xxresult)
-        xxvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","x^2",None))
+        xxvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","x^3",None))
         xxvarGroupLayout.setLayout(xxLayout)
         polytimes = QHBoxLayout()
         polytimes.addWidget(startlabel)
@@ -24525,12 +24566,14 @@ class backgroundDlg(ArtisanDialog):
 # we should not overwrite the users app settings here, right:
 # but we have to deactivate the show flag
         self.backgroundCheck.setChecked(False)
-        aw.qmc.background = False        
+        aw.qmc.background = False
+        self.xtcurveComboBox.blockSignals(True)
         self.xtcurveComboBox.clear()
         aw.deleteBackground()
         self.eventtable.clear()
         self.datatable.clear()
         aw.qmc.resetlinecountcaches()
+        self.xtcurveComboBox.blockSignals(False)
         aw.qmc.redraw(recomputeAllDeltas=False)
 
     def move(self,m):
@@ -24564,7 +24607,6 @@ class backgroundDlg(ArtisanDialog):
         aw.qmc.backgroundeventsflag = bool(self.backgroundeventsflag.isChecked())
         aw.qmc.DeltaETBflag = bool(self.backgroundDeltaETflag.isChecked())
         aw.qmc.DeltaBTBflag = bool(self.backgroundDeltaBTflag.isChecked())
-        aw.qmc.redraw(recomputeAllDeltas=False)
         
     def changeAlignEventidx(self,i):
         aw.qmc.alignEvent = i
@@ -24581,6 +24623,7 @@ class backgroundDlg(ArtisanDialog):
         aw.sendmessage(QApplication.translate("Message","Reading background profile...",None))
         aw.qmc.resetlinecountcaches()
         aw.loadbackground(u(self.filename))
+        self.xtcurveComboBox.blockSignals(True)
         # reset XT curve popup
         self.xtcurveComboBox.clear()
         curvenames = [""] # first entry is the empty one (no extra curve displayed)
@@ -24593,6 +24636,7 @@ class backgroundDlg(ArtisanDialog):
         self.xtcurveComboBox.addItems(curvenames)
         if aw.qmc.xtcurveidx < len(curvenames):
             self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
+        self.xtcurveComboBox.blockSignals(False)
         self.pathedit.setText(u(self.filename))
         self.backgroundCheck.setChecked(True)
         self.readChecks()
@@ -28203,11 +28247,11 @@ class designerconfigDlg(ArtisanDialog):
         closeButton = QPushButton(QApplication.translate("Button","Close",None))
         closeButton.setFocusPolicy(Qt.NoFocus)
         closeButton.clicked.connect(self.accept)
-        convertButton = QPushButton(QApplication.translate("Button","Create",None))
-        convertButton.clicked.connect(self.create)
+#        convertButton = QPushButton(QApplication.translate("Button","Create",None))
+#        convertButton.clicked.connect(self.create)
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(closeButton)
-        buttonLayout.addWidget(convertButton)
+#        buttonLayout.addWidget(convertButton)
         marksLayout = QGridLayout()
         marksLayout.addWidget(markersettinglabel,0,0)
         marksLayout.addWidget(timesettinglabel,0,1)
