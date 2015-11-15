@@ -4785,11 +4785,16 @@ class tgraphcanvas(FigureCanvas):
             # if on turn mouse crosslines off
             if aw.qmc.crossmarker:
                 aw.qmc.togglecrosslines()
+            aw.qmc.ax.set_xlabel("")
+            aw.qmc.ax.set_ylabel("")
+            aw.qmc.ax.set_title("")
+            if aw.qmc.delta_ax:
+                aw.qmc.delta_ax.set_ylabel("")
                     
+            self.flagstart = True
             # start Monitor if not yet running
             if not self.flagon:
                 self.OnMonitor()
-            self.flagstart = True
             try:
                 aw.eventactionx(aw.qmc.xextrabuttonactions[1],aw.qmc.xextrabuttonactionstrings[1])
             except Exception:
@@ -4816,11 +4821,6 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.phasesLCDflag:
                 aw.phasesLCDs.show()
             aw.update_minieventline_visibility()
-            aw.qmc.ax.set_xlabel("")
-            aw.qmc.ax.set_ylabel("")
-            aw.qmc.ax.set_title("")
-            if aw.qmc.delta_ax:
-                aw.qmc.delta_ax.set_ylabel("")
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -4837,7 +4837,6 @@ class tgraphcanvas(FigureCanvas):
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
             aw.button_18.setEnabled(False)
             self.updateLCDtime()
-            self.redraw(smooth=True)
             #prevents accidentally deleting a modified profile:
             if len(self.timex) > 2:
                 self.safesaveflag = True
@@ -6746,19 +6745,19 @@ class tgraphcanvas(FigureCanvas):
                 #find closest line
                 d1 = abs(self.temp1[i] - self.currenty)
                 d2 = abs(self.temp2[i] - self.currenty)
-                if d2 < d1:
+                if (d2 < d1 or self.temp1[i] == -1) and self.temp2[i] != -1:
                     self.temp2.insert(i,self.currenty)
                     self.temp1.insert(i,self.temp1[i])
-                else:
+                elif self.temp1[i] != -1:
                     self.temp2.insert(i,self.temp2[i])
                     self.temp1.insert(i,self.currenty)
+                if not (self.temp1[i] == -1 and self.temp2[i] == -1):
+                    self.timex.insert(i,self.currentx)
 
-                self.timex.insert(i,self.currentx)
-
-                #update timeindex
-                for x in range(len(self.timeindex)):
-                    if self.timeindex[x] >= i:
-                        self.timeindex[x] += 1
+                    #update timeindex
+                    for x in range(len(self.timeindex)):
+                        if self.timeindex[x] >= i:
+                            self.timeindex[x] += 1
 
                 self.redrawdesigner()
                 return i
@@ -7577,8 +7576,9 @@ class SampleThread(QThread):
     
     def sample_extra_device(self,i):
         try:
-            return float(aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]())
-        except Exception:
+            tx,t1,t2 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+            return tx,float(t1),float(t2)
+        except Exception as ex:
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1.0,-1.0
 
@@ -20710,7 +20710,7 @@ class editGraphDlg(ArtisanDialog):
             if (str(self.bean_density_weight_edit.text()) == "" or float(str(self.bean_density_weight_edit.text())) == 0.) and \
                 (str(self.bean_density_volume_edit.text()) == "" or float(str(self.bean_density_volume_edit.text())) in [0.,1.]):
                 self.bean_density_weightUnitsComboBox.setCurrentIndex(0) # "g"
-                self.bean_density_volumeUnitsComboBox.setCurrentIndex(1) # "l"
+                self.bean_density_volumeUnitsComboBox.setCurrentIndex(0) # "l"
                 self.bean_density_weight_edit.setText(str(aw.float2float(din)))
                 self.bean_density_volume_edit.setText("1.0")
         else:
@@ -23148,7 +23148,7 @@ class EventsDlg(ArtisanDialog):
             #type
             typeComboBox = QComboBox()
             std_extra_events = [self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),""]
-            std_extra_events += [unichr(177) + e for e in std_extra_events[:-1]] # chr(241)
+            std_extra_events += [uchr(177) + e for e in std_extra_events[:-1]] # chr(241)
             typeComboBox.addItems(std_extra_events)
             typeComboBox.setCurrentIndex(aw.extraeventstypes[i])
             typeComboBox.currentIndexChanged.connect(lambda z=1,i=i:self.settypeeventbutton(z,i))
@@ -24641,7 +24641,8 @@ class backgroundDlg(ArtisanDialog):
         self.readChecks()
         self.createEventTable()
         self.createDataTable()
-        aw.qmc.timealign(redraw=True)
+        aw.qmc.timealign(redraw=aw.qmc.flagon)
+        aw.qmc.redraw()
         aw.qmc.safesaveflag = True
 
     def createEventTable(self):
@@ -25189,6 +25190,8 @@ class modbusport(object):
             self.connect()
             self.master.write_coils(int(register),list(values),unit=int(slave))
         except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoils() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -25288,7 +25291,7 @@ class modbusport(object):
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()            
+            self.connect()         
             if code==3:
                 res = self.master.read_holding_registers(int(register),1,unit=int(slave))
             else:
@@ -25299,6 +25302,9 @@ class modbusport(object):
             r = decoder.decode_16bit_uint()
             return r
         except Exception as ex:
+#            print(ex)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:

@@ -616,6 +616,20 @@ download from https://github.com/bashwork/pymodbus
 # python setup.py build
 # sudo python setup.py install
 
+
+for Python3, first run the 2to3 on the pymodbus-master source to generate a python3 version in pymodbus-master3
+
+# 2to3 -f all --output-dir=pymodbus-master3 -W -n pymodbus-master
+
+then remove the following from pymodbus-master3/pymodbus/__init__.py
+
+try:
+    True, False
+except NameError:
+    True, False = (1 == 1), (0 == 1)
+
+
+
 22) yoctopuce 1.10.16490
 
 download lastest package from here: 
