@@ -2984,7 +2984,6 @@ class tgraphcanvas(FigureCanvas):
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
     def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):
-    
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget:
@@ -11402,7 +11401,7 @@ class ApplicationWindow(QMainWindow):
             firstChar = stream.read(1)
             if firstChar == "{":
                 f.close()
-                aw.qmc.reset()
+                aw.qmc.reset(redraw=False)
                 res = self.setProfile(filename,self.deserialize(filename))
             else:
                 self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
@@ -30262,7 +30261,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "delextradevice(): {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    def savedevicetable(self):
+    def savedevicetable(self,redraw=True):
         try:
             for i in range(len(aw.qmc.extradevices)):
                 typecombobox = self.devicetable.cellWidget(i,0)
@@ -30297,7 +30296,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 else:
                     aw.qmc.extramathexpression2[i] = u("")
             #update legend with new curves
-            aw.qmc.redraw(recomputeAllDeltas=False)
+            if redraw:
+                aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "savedevicetable(): {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -30349,7 +30349,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
     def okEvent(self):
         try:
             #save any extra devices here
-            self.savedevicetable()
+            self.savedevicetable(redraw=False)
             message = QApplication.translate("Message","Device not set", None)
             # by default switch PID buttons/LCDs off
             aw.button_10.setVisible(False)
