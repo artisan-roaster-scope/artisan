@@ -26913,7 +26913,7 @@ class serialport(object):
         aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR detached",None))
         self.PhidgetIRSensorSensorAttached = False
 
-    def PHIDGET1045temperature(self):
+    def PHIDGET1045temperature(self,retry=True):
         try:
             if self.PhidgetIRSensor == None:
                 ser = self.getFirstMatchingPhidgetsSerialNum('Phidget Temperature Sensor IR')
@@ -26926,6 +26926,7 @@ class serialport(object):
                             self.PhidgetIRSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
                         else:
                             self.PhidgetIRSensor.openPhidget(serial=ser)
+                        libtime.sleep(0.1)
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
                         #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -26954,6 +26955,9 @@ class serialport(object):
                     except Exception:
                         pass
                     return self.phidget1045temp(res,ambient),ambient
+            elif retry:
+                libtime.sleep(0.1)
+                return self.PHIDGET1045temperature(retry=False)
             else:
                 return -1,-1
         except Exception as ex:
@@ -27009,7 +27013,7 @@ class serialport(object):
         aw.ser.PhidgetTemperatureSensorAttached = False
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
-    def PHIDGET1048temperature(self,mode=0):
+    def PHIDGET1048temperature(self,mode=0,retry=True):
         try:
             if aw.ser.PhidgetTemperatureSensor == None:
                 aw.ser.PhidgetTemperatureSensor = PhidgetTemperatureSensor()
@@ -27020,6 +27024,7 @@ class serialport(object):
                         aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
                     else:
                         aw.ser.PhidgetTemperatureSensor.openPhidget()
+                    libtime.sleep(0.1)
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
                     #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -27074,6 +27079,9 @@ class serialport(object):
                         return -1,-1
                 else:
                     return -1,-1
+            elif retry:
+                libtime.sleep(0.1)
+                return self.PHIDGET1048temperature(mode,False)
             else:
                 return -1,-1
         except Exception as ex:
@@ -27211,7 +27219,7 @@ class serialport(object):
         aw.ser.PhidgetBridgeSensorAttached = False
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
-    def PHIDGET1046temperature(self,mode=0):
+    def PHIDGET1046temperature(self,mode=0,retry=True):
         try:
             if aw.ser.PhidgetBridgeSensor == None:
                 aw.ser.PhidgetBridgeSensor = Phidget1046TemperatureSensor()
@@ -27222,6 +27230,7 @@ class serialport(object):
                         aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
                     else:
                         aw.ser.PhidgetBridgeSensor.openPhidget()
+                    libtime.sleep(0.1)
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
                     #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1046temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -27256,6 +27265,9 @@ class serialport(object):
                     return probe3, probe4
                 else:
                     return -1,-1
+            elif retry:
+                libtime.sleep(0.1)
+                return self.PHIDGET1046temperature(mode,False)                
             else:
                 return -1,-1
         except Exception as ex:
@@ -27324,7 +27336,7 @@ class serialport(object):
         aw.ser.PhidgetIOAttached = False
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for probe 5 and 6; mode 3 for probe 7 and 8
-    def PHIDGET1018values(self,mode=0):
+    def PHIDGET1018values(self,mode=0,retry=True):
         try:
             if aw.ser.PhidgetIO == None:
                 aw.ser.PhidgetIO = Phidget1018IO()
@@ -27335,6 +27347,7 @@ class serialport(object):
                         aw.ser.PhidgetIO.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
                     else:
                         aw.ser.PhidgetIO.openPhidget()
+                    libtime.sleep(0.1)
                 except Exception as ex:
                     #_, _, exc_tb = sys.exc_info()
                     #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1018values() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -27400,6 +27413,9 @@ class serialport(object):
                     return probe7, probe8
                 else:
                     return -1,-1
+            elif retry:
+                libtime.sleep(0.1)
+                self.PHIDGET1018values(mode,False)
             else:
                 return -1,-1
         except Exception as ex:
