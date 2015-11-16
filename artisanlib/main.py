@@ -6321,19 +6321,19 @@ class tgraphcanvas(FigureCanvas):
         elif self.mode == "F":
             self.designertemp1init = [500.,500.,500.,500.,500.,500.,500.,500.]
             self.designertemp2init = [440.,300.,385.,410.,430.,445.,460.,460.]
-            
+        
         #check x limits
-        if self.endofx < 960:
-            self.endofx = 960
-            self.redraw()
-
+        #if self.endofx < 960:
+        #    self.endofx = 960
+        #    self.redraw()
+    
         self.timex,self.temp1,self.temp2 = [],[],[]
         for i in arange(len(self.timeindex)):
             self.timex.append(self.designertimeinit[i])
             self.temp1.append(self.designertemp1init[i])
             self.temp2.append(self.designertemp2init[i])
             self.timeindex[i] = i
-
+    
         self.xaxistosm(redraw=False)
         self.redrawdesigner()
 
@@ -6400,6 +6400,10 @@ class tgraphcanvas(FigureCanvas):
 #                self.ax.lines = []
             self.delta_ax.lines = []
             self.ax.lines = []
+            
+            fontprop_medium = aw.mpl_fontproperties.copy()
+            fontprop_medium.set_size("medium")
+            self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Designer",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
             
             #draw background
             if self.background: 
@@ -19624,12 +19628,12 @@ class editGraphDlg(ArtisanDialog):
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
-        self.weightinedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightinedit))
+        self.weightinedit.setValidator(QDoubleValidator(0., 99999., 1, self.weightinedit))
         self.weightinedit.setMinimumWidth(70)
         self.weightinedit.setMaximumWidth(70)
         self.weightinedit.setAlignment(Qt.AlignRight)
         self.weightoutedit = QLineEdit(outw)
-        self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
+        self.weightoutedit.setValidator(QDoubleValidator(0., 99999., 1, self.weightoutedit))
         self.weightoutedit.setMinimumWidth(70)
         self.weightoutedit.setMaximumWidth(70)
         self.weightoutedit.setAlignment(Qt.AlignRight)
@@ -20647,7 +20651,6 @@ class editGraphDlg(ArtisanDialog):
         else:
             message = QApplication.translate("Message","No events found", None)
             aw.sendmessage(message)
-
     def weightouteditChanged(self):
         self.percent()
         self.calculated_density()
