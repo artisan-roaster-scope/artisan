@@ -1454,6 +1454,7 @@ class tgraphcanvas(FigureCanvas):
         self.deltasamples = max(1,self.deltaspan / int(interval))
     
     # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
+    # NOTE: this hack slows down redraw!
     def draw(self):
         if self.ax and self.delta_ax: #self.designerflag and self.ax and self.delta_ax:
             self.ax.set_zorder(0)
@@ -4051,7 +4052,14 @@ class tgraphcanvas(FigureCanvas):
                         self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
                         
                     ##### DeltaET,DeltaBT curves
-                    if self.DeltaETflag: 
+
+#                    trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
+#                    if self.DeltaBTflag:           
+#                        self.l_delta3, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+#                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+#                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
+
+                    if self.DeltaETflag:
                         self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                         sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                         linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
@@ -7656,34 +7664,10 @@ class SampleThread(QThread):
                             aw.qmc.RTextratemp1,aw.qmc.RTextratemp2,aw.qmc.RTextratx = [],[],[]
                             #2 load RT buffers
                             for i in range(nxdevices):
-                                extratx,extrat2,extrat1 = self.sample_extra_device(i)
-                                
-                                # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
-                                # modbus channel 1+2, respect input temperature scale setting
-                                if aw.qmc.extradevices[i] == 29:
-                                    if aw.modbus.input1mode == "C" and aw.qmc.mode == "F":
-                                        extrat1 = aw.qmc.fromCtoF(extrat1)
-                                    elif aw.modbus.input1mode == "F" and aw.qmc.mode == "C":
-                                        extrat1 = aw.qmc.fromFtoC(extrat1)
-                                    if aw.modbus.input2mode == "C" and aw.qmc.mode == "F":
-                                        extrat2 = aw.qmc.fromCtoF(extrat2)
-                                    elif aw.modbus.input2mode == "F" and aw.qmc.mode == "C":
-                                        extrat2 = aw.qmc.fromFtoC(extrat2) 
-                                # modbus channel 3+4, respect input temperature scale setting
-                                if aw.qmc.extradevices[i] == 33:
-                                    if aw.modbus.input3mode == "C" and aw.qmc.mode == "F":
-                                        extrat1 = aw.qmc.fromCtoF(extrat1)
-                                    elif aw.modbus.input3mode == "F" and aw.qmc.mode == "C":
-                                        extrat1 = aw.qmc.fromFtoC(extrat1)
-                                    if aw.modbus.input4mode == "C" and aw.qmc.mode == "F":
-                                        extrat2 = aw.qmc.fromCtoF(extrat2)
-                                    elif aw.modbus.input4mode == "F" and aw.qmc.mode == "C":
-                                        extrat2 = aw.qmc.fromFtoC(extrat2) 
-                                                                        
+                                extratx,extrat2,extrat1 = self.sample_extra_device(i) 
                                 aw.qmc.RTextratemp1.append(extrat1)
                                 aw.qmc.RTextratemp2.append(extrat2)
-                                aw.qmc.RTextratx.append(extratx)
-                                
+                                aw.qmc.RTextratx.append(extratx)                                
                             #3 evaluate symbolic expressions
                             for i in range(nxdevices):
                                 extrat1 = aw.qmc.RTextratemp1[i]
@@ -7774,19 +7758,6 @@ class SampleThread(QThread):
                         aw.qmc.RTtemp2 = t2
                     # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
                     # modbus channel 1+2, respect input temperature scale setting
-                    if aw.qmc.device == 29:
-                        # BT:
-                        if t2 != -1:
-                            if aw.modbus.input1mode == "C" and aw.qmc.mode == "F":
-                                t2 = aw.qmc.fromCtoF(t2)
-                            elif aw.modbus.input1mode == "F" and aw.qmc.mode == "C":
-                                t2 = aw.qmc.fromFtoC(t1)
-                        # ET
-                        if t1 != -1:
-                            if aw.modbus.input2mode == "C" and aw.qmc.mode == "F":
-                                t1 = aw.qmc.fromCtoF(t1)
-                            elif aw.modbus.input2mode == "F" and aw.qmc.mode == "C":
-                                t1 = aw.qmc.fromFtoC(t1)
                     t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
                     t2 = self.inputFilter(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
                     length_of_qmc_timex = len(aw.qmc.timex)
@@ -26440,6 +26411,23 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("H806Wtemperature: " + settings + " || Rx = " + binascii.hexlify(r))
 
+    # input: value x; divider d; mode m
+    # returns processed value
+    def processChannelData(self,x,d,m):
+        # apply divider
+        if x is None:
+            res = -1
+        elif d==1: # apply divider
+            res = x / 10.
+        elif d==2: # apply divider
+            res = x / 100.
+        # convert temperature scale
+        if m == "C" and aw.qmc.mode == "F":
+            res = aw.qmc.fromCtoF(res)
+        elif m == "F" and aw.qmc.mode == "C":
+            res = aw.qmc.fromFtoC(res)
+        return res
+
     #returns v1,v2 from a connected MODBUS device
     def MODBUSread(self):
         # slave, register
@@ -26449,12 +26437,7 @@ class serialport(object):
                 res1 = aw.modbus.readFloat(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
             else:
                 res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
-            if res1 is None:
-                res1 = -1
-            elif aw.modbus.input1div==1: # apply divider
-                res1 = res1 / 10.
-            elif aw.modbus.input1div==2: # apply divider
-                res1 = res1 / 100.
+            res1 = self.processChannelData(res1,aw.modbus.input1div,aw.modbus.input1mode)
             just_send = True
         else:
             res1 = -1
@@ -26465,12 +26448,7 @@ class serialport(object):
                 res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             else:
                 res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
-            if res2 is None:
-                res2 = -1
-            elif aw.modbus.input2div==1: # apply divider
-                res2 = res2 / 10.
-            elif aw.modbus.input2div==2: # apply divider
-                res2 = res2 / 100.
+            res2 = self.processChannelData(res2,aw.modbus.input2div,aw.modbus.input2mode)
             just_send = True
         else:
             res2 = -1
@@ -26481,12 +26459,7 @@ class serialport(object):
                 res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             else:
                 res3 = aw.modbus.readSingleRegister(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
-            if res3 is None:
-                res3 = -1
-            elif aw.modbus.input3div==1: # apply divider
-                res3 = res3 / 10.
-            elif aw.modbus.input3div==2: # apply divider
-                res3 = res3 / 100.
+            res3 = self.processChannelData(res3,aw.modbus.input3div,aw.modbus.input3mode)
             just_send = True
         else:
             res3 = -1
@@ -26497,12 +26470,7 @@ class serialport(object):
                 res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             else:
                 res4 = aw.modbus.readSingleRegister(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
-            if res4 is None:
-                res4 = -1
-            elif aw.modbus.input4div==1: # apply divider
-                res4 = res4 / 10.
-            elif aw.modbus.input4div==2: # apply divider
-                res4 = res4 / 100.
+            res4 = self.processChannelData(res4,aw.modbus.input4div,aw.modbus.input4mode)
             just_send = True
         else:
             res4 = -1
