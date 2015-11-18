@@ -1664,7 +1664,7 @@ class tgraphcanvas(FigureCanvas):
                     tx_string += self.stringfromseconds(et - start) + ", "
                 message += u(" @ ") + tx_string[:-2]
                 aw.sendmessage(message,append=False)
-        else:
+        elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
             timex = self.time2index(event.artist.get_xdata()[event.ind][0])
             idxs = []
             for i in range(len(self.specialevents)):
@@ -4195,10 +4195,7 @@ class tgraphcanvas(FigureCanvas):
                         ncol = int(math.ceil(len(handles)/2.))
                     else:
                         ncol = int(math.ceil(len(handles)))
-                    if False: # two_ax_mode:
-                        leg = self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
-                    else:
-                        leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)   
+                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)   
                     leg.draggable(state=True)
                     frame = leg.get_frame()
                     frame.set_facecolor('white')
