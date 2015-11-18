@@ -3838,70 +3838,6 @@ class tgraphcanvas(FigureCanvas):
                 if smooth or len(self.stemp2) != len(self.timex):
                     self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
 
-                #populate delta ET (self.delta1) and delta BT (self.delta2)
-                if self.DeltaETflag or self.DeltaBTflag:
-                    if recomputeAllDeltas:
-                        tx = numpy.array(self.timex)
-                        if aw.qmc.flagon or len(tx) != len(self.stemp1):
-                            t1 = self.temp1
-                        else:
-                            t1 = self.stemp1
-                        with numpy.errstate(divide='ignore'):
-                            nt1 = numpy.array(t1)
-                            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                        if aw.qmc.flagon or len(tx) != len(self.stemp2):
-                            t2 = self.temp2
-                        else:
-                            t2 = self.stemp2
-                        with numpy.errstate(divide='ignore'):
-                            nt2 = numpy.array(t2)
-                            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                        lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
-                        # make lists equal in length
-                        if lt > ld1:
-                            z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
-                        if lt > ld2:
-                            z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                        self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
-                        self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
-                        # filter out values beyond the delta limits
-                        # cut out the part after DROP
-                        if aw.qmc.timeindex[6]:
-                            self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
-                            self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
-                        # cut out the part before CHARGE
-                        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
-                            self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
-                            self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
-                        # remove values beyond the RoRlimit
-                        if aw.qmc.mode == "C":
-                            rorlimit = aw.qmc.RoRlimitC
-                        else:
-                            rorlimit = aw.qmc.RoRlimitF
-                        self.delta1 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1]
-                        self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
-                        
-                    ##### DeltaET,DeltaBT curves
-
-                    trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
-                    if self.DeltaETflag:
-                        self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                        linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
-                    if self.DeltaBTflag:           
-                        self.l_delta3, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
-
-#                    if self.DeltaETflag:
-#                        self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-#                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-#                        linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
-#                    if self.DeltaBTflag:
-#                        self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-#                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-#                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
-    
     
                 if self.eventsshowflag:
                     Nevents = len(self.specialevents)
@@ -4063,6 +3999,71 @@ class tgraphcanvas(FigureCanvas):
                                                               picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                             
 
+                #populate delta ET (self.delta1) and delta BT (self.delta2)
+                if self.DeltaETflag or self.DeltaBTflag:
+                    if recomputeAllDeltas:
+                        tx = numpy.array(self.timex)
+                        if aw.qmc.flagon or len(tx) != len(self.stemp1):
+                            t1 = self.temp1
+                        else:
+                            t1 = self.stemp1
+                        with numpy.errstate(divide='ignore'):
+                            nt1 = numpy.array(t1)
+                            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                        if aw.qmc.flagon or len(tx) != len(self.stemp2):
+                            t2 = self.temp2
+                        else:
+                            t2 = self.stemp2
+                        with numpy.errstate(divide='ignore'):
+                            nt2 = numpy.array(t2)
+                            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                        lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
+                        # make lists equal in length
+                        if lt > ld1:
+                            z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+                        if lt > ld2:
+                            z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
+                        self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
+                        self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
+                        # filter out values beyond the delta limits
+                        # cut out the part after DROP
+                        if aw.qmc.timeindex[6]:
+                            self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
+                            self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
+                        # cut out the part before CHARGE
+                        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
+                            self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
+                            self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
+                        # remove values beyond the RoRlimit
+                        if aw.qmc.mode == "C":
+                            rorlimit = aw.qmc.RoRlimitC
+                        else:
+                            rorlimit = aw.qmc.RoRlimitF
+                        self.delta1 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1]
+                        self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
+                        
+                    ##### DeltaET,DeltaBT curves
+
+                    trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
+                    if self.DeltaETflag:
+                        self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                        linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
+                    if self.DeltaBTflag:           
+                        self.l_delta3, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
+
+#                    if self.DeltaETflag:
+#                        self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+#                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+#                        linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
+#                    if self.DeltaBTflag:
+#                        self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+#                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+#                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
+    
+    
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
                 for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
@@ -7485,11 +7486,11 @@ class VMToolbar(NavigationToolbar):
             axes = allaxes[0]
         else:
             titles = []
-            two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
             if aw.qmc.flagstart:
                 # temporary set the axis to get proper menu items (same code as in redraw)
                 aw.qmc.ax.set_ylabel(aw.qmc.mode)
                 aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None)))
+                two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
                 if two_ax_mode:
                     aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
             for axes in allaxes:
