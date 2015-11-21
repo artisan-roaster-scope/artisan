@@ -397,8 +397,9 @@ if sys.platform.startswith("darwin"):
     import objc
     import Foundation
 #   list_ports module patched for P3k from new pyserial GitHub repository
-    from artisanlib.list_ports_osx import comports
-    serial.tools.list_ports.comports = comports
+    if serial.VERSION.split(".")[0].strip() == "2":
+        from artisanlib.list_ports_osx import comports
+        serial.tools.list_ports.comports = comports
 
 
 # to make py2exe happy with scipy >0.11
@@ -4196,14 +4197,14 @@ class tgraphcanvas(FigureCanvas):
                         ncol = int(math.ceil(len(handles)/2.))
                     else:
                         ncol = int(math.ceil(len(handles)))
-                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)   
+                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
                     leg.draggable(state=True)
                     frame = leg.get_frame()
                     frame.set_facecolor('white')
                     #frame.set_edgecolor('darkgrey')
                     frame.set_linewidth(0.5)
-                    if aw.qmc.graphstyle == 1:
-                        leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
+#                    if aw.qmc.graphstyle == 1:
+#                        leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
     
                 # we create here the project line plots to have the accurate time axis after CHARGE
                 self.l_BTprojection, = self.ax.plot([], [],color = self.palette["bt"],
@@ -25348,12 +25349,20 @@ class extraserialport(object):
         self.SP = None
 
     def confport(self):
-        self.SP.setPort(self.comport)
-        self.SP.setBaudrate(self.baudrate)
-        self.SP.setByteSize(self.bytesize)
-        self.SP.setParity(self.parity)
-        self.SP.setStopbits(self.stopbits)
-        self.SP.setTimeout(self.timeout)
+        if serial.VERSION.split(".")[0].strip() == "2":
+            self.SP.setPort(self.comport)
+            self.SP.setBaudrate(self.baudrate)
+            self.SP.setByteSize(self.bytesize)
+            self.SP.setParity(self.parity)
+            self.SP.setStopbits(self.stopbits)
+            self.SP.setTimeout(self.timeout)
+        else:
+            self.SP.port = self.comport
+            self.SP.baudrate = self.baudrate
+            self.SP.bytesize = self.bytesize
+            self.SP.parity = self.parity
+            self.SP.stopbits = self.stopbits
+            self.SP.timeout = self.timeout
 
     def openport(self):
         try:
@@ -26159,18 +26168,28 @@ class serialport(object):
                 self.SP.open()
                 libtime.sleep(.2) # avoid possible hickups on startup
         except Exception: #serial.SerialException:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             self.SP.close()
             error = QApplication.translate("Error Message","Serial Exception:",None) + QApplication.translate("Error Message","Unable to open serial port",None)
             aw.qmc.adderror(error)
 
     #loads configuration to ports
     def confport(self):
-        self.SP.setPort(self.comport)
-        self.SP.setBaudrate(self.baudrate)
-        self.SP.setByteSize(self.bytesize)
-        self.SP.setParity(self.parity)
-        self.SP.setStopbits(self.stopbits)
-        self.SP.setTimeout(self.timeout)
+        if serial.VERSION.split(".")[0].strip() == "2":
+            self.SP.setPort(self.comport)
+            self.SP.setBaudrate(self.baudrate)
+            self.SP.setByteSize(self.bytesize)
+            self.SP.setParity(self.parity)
+            self.SP.setStopbits(self.stopbits)
+            self.SP.setTimeout(self.timeout)
+        else:
+            self.SP.port = self.comport
+            self.SP.baudrate = self.baudrate
+            self.SP.bytesize = self.bytesize
+            self.SP.parity = self.parity
+            self.SP.stopbits = self.stopbits
+            self.SP.timeout = self.timeout
 
     def closeport(self):
         try:
@@ -28727,11 +28746,12 @@ class PortComboBox(QComboBox):
     def updateMenu(self):
         self.blockSignals(True)
         try:
+            comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
             if platf == 'Darwin':
-                self.ports = list([p for p in serial.tools.list_ports.comports() if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
+                self.ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
                     '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])])
             else:
-                self.ports = list(serial.tools.list_ports.comports())
+                self.ports = list(comports)
             if self.selection not in [p[0] for p in self.ports]:
                 self.ports.append([self.selection,"",""])
             self.ports = sorted(self.ports,key=lambda p: p[0])
@@ -31049,6 +31069,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
 class graphColorDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(graphColorDlg,self).__init__(parent)
+        self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Colors", None))
         frameStyle = QFrame.Sunken | QFrame.Panel
         #TAB1
@@ -31397,9 +31418,9 @@ class graphColorDlg(ArtisanDialog):
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(okLayout)
         Mlayout.setContentsMargins(10,10,10,10)
-        Mlayout.setSizeConstraint(QLayout.SetFixedSize)
+#        Mlayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(Mlayout)
-
+        
     def setLCDdefaults(self):
         aw.lcdpaletteB["timer"] = "black"
         aw.lcdpaletteF["timer"] = "white"
