@@ -1823,9 +1823,9 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         aw.lcd5.display("--")
                     
-                    if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid  
-                        aw.lcd6.display(self.currentpidsv)
-                        aw.lcd7.display(self.dutycycle)
+                    if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
+                        aw.lcd6.display(lcdformat%self.currentpidsv)
+                        aw.lcd7.display(lcdformat%self.dutycycle)
 
                     ndev = len(self.extradevices)
                     for i in range(ndev):
@@ -1913,9 +1913,9 @@ class tgraphcanvas(FigureCanvas):
                                     aw.qmc.ax.draw_artist(self.l_ETprojection)
                             # draw delta lines
                             if self.DeltaETflag and self.l_delta1 != None:
-                                aw.qmc.delta_ax.draw_artist(self.l_delta1)
+                                aw.qmc.ax.draw_artist(self.l_delta1)
                             if self.DeltaBTflag and self.l_delta2 != None:
-                                aw.qmc.delta_ax.draw_artist(self.l_delta2)
+                                aw.qmc.ax.draw_artist(self.l_delta2)
                             
                             if aw.qmc.ax.clipbox:
                                 self.fig.canvas.blit(aw.qmc.ax.clipbox) # .clipbox is None in matplotlib <1.5
@@ -3548,20 +3548,22 @@ class tgraphcanvas(FigureCanvas):
                 
     #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
     #            self.ax.spines['top'].set_color('none')
+                tick_dir = 'inout'
                 self.ax.tick_params(\
                     axis='x',           # changes apply to the x-axis
                     which='both',       # both major and minor ticks are affected
                     bottom='on',        # ticks along the bottom edge are on
                     top='off',          # ticks along the top edge are off
-                    direction='out',
+                    direction=tick_dir,
                     labelbottom='on')   # labels along the bottom edge are on
                 self.ax.tick_params(\
-                    axis='y',           # changes apply to the x-axis
+                    axis='y',           # changes apply to the y-axis
                     which='both',       # both major and minor ticks are affected
+                    right='off',
                     bottom='on',        # ticks along the bottom edge are on
                     top='off',          # ticks along the top edge are off
-                    direction='out',
-                    labelbottom='on')   # labels along the bottom edge are on
+                    direction=tick_dir,
+                    labelbottom='on')   # labels along the bottom edge are on                 
     
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("medium")
@@ -3580,10 +3582,14 @@ class tgraphcanvas(FigureCanvas):
                     self.delta_ax.tick_params(\
                         axis='y',           # changes apply to the x-axis
                         which='both',       # both major and minor ticks are affected
-                        bottom='on',        # ticks along the bottom edge are on
+                        left='off',         # ticks along the left edge are off                        
+                        bottom='off',       # ticks along the bottom edge are off
                         top='off',          # ticks along the top edge are off
-                        direction='out',
-                        labelbottom='on')   # labels along the bottom edge are on
+                        direction="inout",
+                        labelright='on',
+                        labelleft='off',
+                        labelbottom='off')   # labels along the bottom edge are on                      
+                        
                     self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
                                     
                     self.ax.patch.set_visible(True)
@@ -3616,7 +3622,7 @@ class tgraphcanvas(FigureCanvas):
                         axis='y', 
                         which='both',
                         right='off',
-                        labelright='off') 
+                        labelright='off')
     
                 self.ax.spines['top'].set_color("0.40")
                 self.ax.spines['bottom'].set_color("0.40")
@@ -4055,19 +4061,9 @@ class tgraphcanvas(FigureCanvas):
                         sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                         linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
                     if self.DeltaBTflag:           
-                        self.l_delta3, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+                        self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                         sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
-
-#                    if self.DeltaETflag:
-#                        self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-#                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-#                        linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
-#                    if self.DeltaBTflag:
-#                        self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-#                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-#                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
-    
+                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))    
     
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
@@ -6126,7 +6122,7 @@ class tgraphcanvas(FigureCanvas):
                 pad = max(0,len(self.timex) - startindex - len(x))
                 xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
 #                aw.qmc.resetlines()
-                if deltacurvep:
+                if False: # deltacurvep:
                     self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 else:
                     self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
@@ -25763,7 +25759,7 @@ class serialport(object):
             t2 = -1
         #get current duty cycle and update LCD 7
         try:
-            aw.qmc.dutycycle = aw.fujipid.readdutycycle()
+            aw.qmc.dutycycle = max(0,min(100,aw.fujipid.readdutycycle()))
             aw.qmc.dutycycleTX = aw.qmc.timeclock.elapsed()/1000.
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
