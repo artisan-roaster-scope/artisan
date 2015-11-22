@@ -188,6 +188,8 @@ from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopCont
 
 
 if sys.version < '3':
+    def decs2string(x):
+        return "".join(chr(b) for b in x)
     def arange(x):
         return xrange(x)
     def stringp(x):
@@ -218,6 +220,8 @@ if sys.version < '3':
     def cmd2str(c):
         return c
 else:
+    def decs2string(x):
+        return bytes(x)
     def arange(x):
         return range(x)
     def stringp(x):
@@ -15516,7 +15520,7 @@ $cupping_notes
     def note2html(self,notes):
         notes_html = u("")
         for i in range(len(notes)):
-            if ord(u(notes[i])) == 9:
+            if o(u(notes[i])) == 9:
                 notes_html += u(" &nbsp&nbsp&nbsp&nbsp ")
             elif u(notes[i]) == "\n":
                 notes_html += u("<br>\n")
@@ -25694,23 +25698,23 @@ class serialport(object):
                 lenstring = len(r)
                 if lenstring:
                     # CHECK FOR RECEIVED ERROR CODES
-                    if ord(r[1]) == 128:
-                        if ord(r[2]) == 1:
+                    if o(r[1]) == 128:
+                        if o(r[2]) == 1:
                             errorcode = QApplication.translate("Error Message","F80h Error",None) + u(" 1: A nonexistent function code was specified. Please check the function code.")
                             errorcode += (QApplication.translate("Error Message","Exception:",None) + u(" SendFUJIcommand() 1: Illegal Function in unit {0}")).format(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
-                        if ord(r[2]) == 2:
+                        if o(r[2]) == 2:
                             errorcode = QApplication.translate("Error Message","F80h Error",None) + u(" 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code.")
                             errorcode += (QApplication.translate("Error Message","Exception:",None) + u(" SendFUJIcommand() 2 Illegal Address for unit {0}")).format(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
-                        if ord(r[2]) == 3:
+                        if o(r[2]) == 3:
                             errorcode = QApplication.translate("Error Message","F80h Error",None) + u(" 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers.")
                             errorcode += (QApplication.translate("Error Message","Exception:",None) + u(" SendFUJIcommand() 3 Illegal Data Value for unit {0}")).format(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                     else:
                         #Check crc16
                         crcRx =  hex2int(r[-1],r[-2])
-                        crcCal1 = aw.fujipid.fujiCrc16(r[:-2]) 
+                        crcCal1 = aw.fujipid.fujiCrc16(r[:-2])
                         if crcCal1 == crcRx:
                             return r           #OK. Return r after it has been checked for errors
                         else:
@@ -27943,19 +27947,19 @@ class serialport(object):
             for i in range(28):  #any number > 14 will be OK
                 r = self.SP.read(1)
                 if r:
-                    fb = (ord(r[0]) & 0xf0) >> 4
+                    fb = (o(r[0]) & 0xf0) >> 4
                     if fb == 1:
                         r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
                         break
                 else:
                     raise ValueError(str("No Data received"))
-##                if (ord(r[0]) & 0xf0) >> 4 == 1:
+##                if (o(r[0]) & 0xf0) >> 4 == 1:
 ##                    r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
 ##                    break
             frame = r + r2
             #check bytes
             for i in range(14):
-                number = fb = (ord(frame[i]) & 0xf0) >> 4
+                number = fb = (o(frame[i]) & 0xf0) >> 4
                 if number != i+1:
                     #find device index
                     raise ValueError(str("Data corruption"))
@@ -27963,7 +27967,7 @@ class serialport(object):
                 #extract data from frame in to a list containing the hex string values of the data
                 data = []
                 for i in range(14):
-                    data.append(hex((ord(frame[i]) & 0x0f))[2:])
+                    data.append(hex((o(frame[i]) & 0x0f))[2:])
                 #The four LCD digits are BC + DE + FG + HI   
                 digits = [data[1]+data[2],data[3]+data[4],data[5]+data[6],data[7]+data[8]]
                 #find sign 
@@ -35303,22 +35307,25 @@ class PXG4pidDlgControl(ArtisanDialog):
             self.status.showMessage(msg,1000)
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4[pkey][1],3)
-                p = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+                p = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10
             else:
                 commandp = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[pkey][1],1)
-                p = aw.fujipid.readoneword(commandp)/10.
+                p = aw.fujipid.readoneword(commandp)/10
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4[ikey][1],3)
-                i = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+                i = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10
             else:
                 commandi = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[ikey][1],1)
-                i = aw.fujipid.readoneword(commandi)/10.
+                i = aw.fujipid.readoneword(commandi)/10
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4[dkey][1],3)
-                dd = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
+                dd = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10
             else:
                 commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[dkey][1],1)
-                dd = aw.fujipid.readoneword(commandd)/10.
+                dd = aw.fujipid.readoneword(commandd)/10
+            p = int(p)
+            i = int(i)
+            dd = int(dd)
             if p != -1 and i != -1 and dd != -1:
                 aw.fujipid.PXG4[pkey][0] = p
                 aw.fujipid.PXG4[ikey][0] = i
@@ -36467,7 +36474,7 @@ class FujiPID(object):
         Nbytes.reverse()
         if not Nbytes:
             Nbytes.append(0)
-        return  "".join(chr(b) for b in Nbytes)
+        return decs2string(Nbytes)
 
     def message2send(self, stationNo, FunctionCode, memory, Nword):
         # This method takes the arguments to compose a Fuji serial command and returns the complete raw string with crc16 included
@@ -36510,7 +36517,7 @@ class FujiPID(object):
             return s1
         else:
             #bad number of RX bytes 
-            errorcode = QApplication.translate("Error Message","pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}",None).format(len(r),ord(command[0]))
+            errorcode = QApplication.translate("Error Message","pid.readoneword(): {0} RX bytes received (7 needed) for unit ID={1}",None).format(len(r),o(command[0]))
             aw.qmc.adderror(errorcode)
             return -1
 
@@ -36536,7 +36543,7 @@ class FujiPID(object):
                     0x84C1, 0x8581, 0x4540, 0x8701, 0x47C0, 0x4680, 0x8641, 0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040)
         cr=0xFFFF 
         for j in string:
-            tmp = cr ^(ord(j))
+            tmp = cr ^(o(j))
             cr =(cr >> 8)^crc16tab[(tmp & 0xff)]
         return cr
 
