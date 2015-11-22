@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
-  <mime-type type="application/x-artisan-aset">
-    <comment>Artisan settings</comment>
-    <glob pattern="*.aset"/>
-  </mime-type>
-</mime-info>
