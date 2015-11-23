@@ -1204,8 +1204,8 @@ class tgraphcanvas(FigureCanvas):
         self.ylimit_min = 0
         self.zlimit = 100
         self.zlimit_min = 0
-        self.RoRlimitF = 80
-        self.RoRlimitC = 45
+        self.RoRlimitF = 122
+        self.RoRlimitC = 50
         self.endofx = 60
         self.startofx = 0
         self.resetmaxtime = 60  #time when pressing reset
