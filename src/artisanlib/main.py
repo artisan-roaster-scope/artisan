@@ -3009,7 +3009,6 @@ class tgraphcanvas(FigureCanvas):
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
     def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):
-        print("beginofreset",self.startofx,self.endofx)
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget:
@@ -20145,10 +20144,12 @@ class editGraphDlg(ArtisanDialog):
 #       roastpropertiesLayout.addWidget(self.roastproperties)
 #        roastpropertiesLayout.addStretch()
         tab1Layout = QVBoxLayout()
+        tab1Layout.addStretch()
         tab1Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         tab1Layout.addLayout(self.tab1aLayout)
         tab1Layout.addLayout(self.tab1bLayout)
 #        tab1Layout.addLayout(roastpropertiesLayout)
+        tab1Layout.addStretch()
         self.calculated_density()
         #tab 2
         tab2Layout = QVBoxLayout()
