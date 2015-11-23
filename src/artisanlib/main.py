@@ -3009,6 +3009,7 @@ class tgraphcanvas(FigureCanvas):
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
     def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):
+        print("beginofreset",self.startofx,self.endofx)
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget:
@@ -3118,6 +3119,8 @@ class tgraphcanvas(FigureCanvas):
                 if not self.locktimex:
                     self.startofx = 0
                     self.endofx = self.resetmaxtime
+                else:
+                    self.startofx = self.locktimex_start
                 if self.endofx < 1:
                     self.endofx = 60
 
@@ -12653,14 +12656,18 @@ class ApplicationWindow(QMainWindow):
             if "timeindex" in profile:
                 self.qmc.timeindex = profile["timeindex"]
                 if self.qmc.locktimex:
-                    if self.qmc.locktimex_start >= 0 and self.qmc.timeindex[0] != -1:
+#                    if self.qmc.locktimex_start >= 0 and self.qmc.timeindex[0] != -1:
+#                        self.qmc.startofx = self.qmc.timex[aw.qmc.timeindex[0]] + self.qmc.locktimex_start
+#                    elif self.qmc.locktimex_start >= 0 and self.qmc.timeindex[0] == -1:
+#                        self.qmc.startofx = self.qmc.locktimex_start
+#                    elif self.qmc.locktimex_start < 0 and self.qmc.timeindex[0] != -1:
+#                        self.qmc.startofx = self.qmc.timex[self.qmc.timeindex[0]]-abs(self.qmc.locktimex_start)
+#                    else:
+#                        self.qmc.startofx = self.qmc.locktimex_start                    
+                    if self.qmc.timeindex[0] != -1:
                         self.qmc.startofx = self.qmc.timex[aw.qmc.timeindex[0]] + self.qmc.locktimex_start
-                    elif self.qmc.locktimex_start >= 0 and self.qmc.timeindex[0] == -1:
-                        self.qmc.startofx = self.qmc.locktimex_start
-                    elif self.qmc.locktimex_start < 0 and self.qmc.timeindex[0] != -1:
-                        self.qmc.startofx = self.qmc.timex[self.qmc.timeindex[0]]-abs(self.qmc.locktimex_start)
                     else:
-                        self.qmc.startofx = self.qmc.locktimex
+                        self.qmc.startofx = self.qmc.locktimex_start
             else:
                 ###########      OLD PROFILE FORMAT
                 if "startend" in profile:
