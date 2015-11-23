@@ -306,12 +306,18 @@ else:
         if x == None:
             return 0.
         else:
-            return float(x)
+            try:
+                return float(x)
+            except:
+                return 0.
     def toDouble(x):
         if x == None:
             return 0.
         else:
-            return float(x)
+            try:
+                return float(x)
+            except:
+                return 0.
     def toBool(x):
         if x == None:
             return False
@@ -1522,9 +1528,9 @@ class tgraphcanvas(FigureCanvas):
         if len(self.etypes) == 4:
             self.etypes.append("--")
         if i > 4:
-        	return self.etypes[i-5]
+            return self.etypes[i-5]
         else:
-        	return self.etypes[i]
+            return self.etypes[i]
 
     def Betypesf(self, i):
         if len(self.Betypes) == 4:
@@ -1823,7 +1829,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         aw.lcd5.display("--")
                     
-                    if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
+                    if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
                         aw.lcd6.display(lcdformat%self.currentpidsv)
                         aw.lcd7.display(lcdformat%self.dutycycle)
 
@@ -9933,7 +9939,7 @@ class ApplicationWindow(QMainWindow):
             rcParams['font.family'] = ['Comic Sans MS','Humor Sans']
             self.mpl_fontproperties = mpl.font_manager.FontProperties()
         if redraw:
-        	self.qmc.redraw(recomputeAllDeltas=False)
+            self.qmc.redraw(recomputeAllDeltas=False)
 
     def set_mpl_fontproperties(self,fontpath):
         if os.path.exists(fontpath):
@@ -10759,7 +10765,7 @@ class ApplicationWindow(QMainWindow):
                 aw.largeLCDs_dialog.lcd3.setVisible(aw.qmc.BTlcd)
             except Exception:
                 pass
-        if aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid
+        if aw.ser.showFujiLCDs and aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid
             aw.LCD6frame.setVisible(True)
             aw.LCD7frame.setVisible(True)
         else:
@@ -13143,7 +13149,6 @@ class ApplicationWindow(QMainWindow):
 
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename=None):
-
         res = False
         try: 
             if filename:
@@ -13205,8 +13210,9 @@ class ApplicationWindow(QMainWindow):
             # activate CONTROL BUTTON
             if self.qmc.device == 0: # Fuji
                 self.button_10.setVisible(True) #CONTROL BUTTON
-                self.LCD6frame.setVisible(True)
-                self.LCD7frame.setVisible(True)
+                if aw.ser.showFujiLCDs:
+                    self.LCD6frame.setVisible(True)
+                    self.LCD7frame.setVisible(True)
             elif self.qmc.device in [26,53]:   #DEVICE 26 = DTA or DEVICE 53 = HOTTOP
                 self.button_10.setVisible(True) #CONTROL BUTTON
             elif self.qmc.device == 19: #DEVICE 19 = ARDUINOTC4
@@ -13219,15 +13225,17 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("readBTpid"):
                 self.ser.readBTpid = [toInt(x) for x in toList(settings.value("readBTpid",self.ser.readBTpid))]
             if settings.contains("arduinoETChannel"):
-                self.ser.arduinoETChannel = str(toString(settings.value("arduinoETChannel",self.ser.arduinoETChannel)))
+                self.ser.arduinoETChannel = toString(settings.value("arduinoETChannel",self.ser.arduinoETChannel))
             if settings.contains("arduinoBTChannel"):
-                self.ser.arduinoBTChannel = str(toString(settings.value("arduinoBTChannel",self.ser.arduinoBTChannel)))
+                self.ser.arduinoBTChannel = toString(settings.value("arduinoBTChannel",self.ser.arduinoBTChannel))
             if settings.contains("arduinoATChannel"):
-                self.ser.arduinoATChannel = str(toString(settings.value("arduinoATChannel",self.ser.arduinoATChannel)))
+                self.ser.arduinoATChannel = toString(settings.value("arduinoATChannel",self.ser.arduinoATChannel))
             if settings.contains("ArduinoFILT"):
                 self.ser.ArduinoFILT = [toInt(x) for x in toList(settings.value("ArduinoFILT",self.ser.ArduinoFILT))]
             if settings.contains("useModbusPort"):
                 self.ser.useModbusPort = bool(toBool(settings.value("useModbusPort",self.ser.useModbusPort)))
+            if settings.contains("showFujiLCDs"):
+                self.ser.showFujiLCDs = bool(toBool(settings.value("showFujiLCDs",self.ser.showFujiLCDs)))
             settings.endGroup()
             #restore x,y formating mode            
             if settings.contains("fmt_data_RoR"):
@@ -13315,7 +13323,7 @@ class ApplicationWindow(QMainWindow):
             #restore colors
             if settings.contains("Colors"):
                 for (k, v) in list(toMap(settings.value("Colors")).items()):
-                    self.qmc.palette[str(k)] = str(toString(v))
+                    self.qmc.palette[str(k)] = toString(v)
                 if self.qmc.palette["et"]:
                     self.setLabelColor(aw.label2,QColor(self.qmc.palette["et"]))
                 if self.qmc.palette["bt"]:    
@@ -13325,19 +13333,19 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.palette["deltabt"]:    
                     self.setLabelColor(aw.label5,QColor(self.qmc.palette["deltabt"]))
             if settings.contains("ETBColor"):
-                self.qmc.backgroundmetcolor = str(toString(settings.value("ETBColor",self.qmc.backgroundmetcolor)))
+                self.qmc.backgroundmetcolor = toString(settings.value("ETBColor",self.qmc.backgroundmetcolor))
             if settings.contains("BTBColor"):
-                self.qmc.backgroundbtcolor = str(toString(settings.value("BTBColor",self.qmc.backgroundbtcolor)))
+                self.qmc.backgroundbtcolor = toString(settings.value("BTBColor",self.qmc.backgroundbtcolor))
             if settings.contains("ETBdeltaColor"):
-                self.qmc.backgrounddeltaetcolor = str(toString(settings.value("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)))
+                self.qmc.backgrounddeltaetcolor = toString(settings.value("ETBdeltaColor",self.qmc.backgrounddeltaetcolor))
             if settings.contains("BTBdeltaColor"):
-                self.qmc.backgrounddeltabtcolor = str(toString(settings.value("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)))
+                self.qmc.backgrounddeltabtcolor = toString(settings.value("BTBdeltaColor",self.qmc.backgrounddeltabtcolor))
             if settings.contains("LCDColors"):
                 for (k, v) in list(toMap(settings.value("LCDColors")).items()):
-                    self.lcdpaletteB[str(k)] = str(toString(v))
+                    self.lcdpaletteB[str(k)] = toString(v)
             if settings.contains("LEDColors"):
                 for (k, v) in list(toMap(settings.value("LEDColors")).items()):
-                    self.lcdpaletteF[str(k)] = str(toString(v))
+                    self.lcdpaletteF[str(k)] = toString(v)
             #restore colors
             self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
             self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
@@ -13357,17 +13365,17 @@ class ApplicationWindow(QMainWindow):
             #restore extra background curve color and index
             settings.beginGroup("XT")
             if settings.contains("color"):
-                self.qmc.backgroundxtcolor = str(toString(settings.value("color",self.qmc.backgroundxtcolor)))
+                self.qmc.backgroundxtcolor = toString(settings.value("color",self.qmc.backgroundxtcolor))
             if settings.contains("index"):
                 self.qmc.xtcurveidx = toInt(settings.value("index",int(self.qmc.xtcurveidx)))
             settings.endGroup()
             #restore units
             settings.beginGroup("Units")
             if settings.contains("weight"):
-                self.qmc.weight[2] = str(toString(settings.value("weight",self.qmc.weight[2])))
-                self.qmc.volume[2] = str(toString(settings.value("volume",self.qmc.volume[2])))
-                self.qmc.density[1] = str(toString(settings.value("densityweight",self.qmc.density[1])))
-                self.qmc.density[3] = str(toString(settings.value("densityvolume",self.qmc.density[3])))
+                self.qmc.weight[2] = toString(settings.value("weight",self.qmc.weight[2]))
+                self.qmc.volume[2] = toString(settings.value("volume",self.qmc.volume[2]))
+                self.qmc.density[1] = toString(settings.value("densityweight",self.qmc.density[1]))
+                self.qmc.density[3] = toString(settings.value("densityvolume",self.qmc.density[3]))
             if settings.contains("volumeCalcUnit"):
                 self.qmc.volumeCalcUnit = toInt(settings.value("volumeCalcUnit",int(self.qmc.volumeCalcUnit)))
             settings.endGroup()
@@ -13381,20 +13389,20 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #restore serial port
             settings.beginGroup("SerialPort")
-            self.ser.comport = str(toString(settings.value("comport",self.ser.comport)))
+            self.ser.comport = toString(settings.value("comport",self.ser.comport))
             if settings.contains("baudrate"):
                 self.ser.baudrate = toInt(settings.value("baudrate",int(self.ser.baudrate)))
             if settings.contains("bytesize"):
                 self.ser.bytesize = toInt(settings.value("bytesize",self.ser.bytesize))
             if settings.contains("stopbits"):
                 self.ser.stopbits = toInt(settings.value("stopbits",self.ser.stopbits))
-            self.ser.parity = str(toString(settings.value("parity",self.ser.parity)))
+            self.ser.parity = toString(settings.value("parity",self.ser.parity))
             if settings.contains("timeout"):
                 self.ser.timeout = toInt(settings.value("timeout",self.ser.timeout))
             settings.endGroup()
             #restore modbus port
             settings.beginGroup("Modbus")
-            self.modbus.comport = str(toString(settings.value("comport",self.modbus.comport)))
+            self.modbus.comport = toString(settings.value("comport",self.modbus.comport))
             if settings.contains("baudrate"):
                 self.modbus.baudrate = toInt(settings.value("baudrate",int(self.modbus.baudrate)))
             if settings.contains("bytesize"):
@@ -13402,7 +13410,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("stopbits"):
                 self.modbus.stopbits = toInt(settings.value("stopbits",self.modbus.stopbits))
             if settings.contains("parity"):
-                self.modbus.parity = str(toString(settings.value("parity",self.modbus.parity)))
+                self.modbus.parity = toString(settings.value("parity",self.modbus.parity))
             if settings.contains("timeout"):
                 self.modbus.timeout = toInt(settings.value("timeout",self.modbus.timeout))
             if settings.contains("input1slave"):
@@ -13440,10 +13448,10 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("littleEndianFloats"):
                 self.modbus.littleEndianFloats = bool(toBool(settings.value("littleEndianFloats",self.modbus.littleEndianFloats)))
             if settings.contains("input1mode"):
-                self.modbus.input1mode = str(toString(settings.value("input1mode",self.modbus.input1mode)))
-                self.modbus.input2mode = str(toString(settings.value("input2mode",self.modbus.input2mode)))
-                self.modbus.input3mode = str(toString(settings.value("input3mode",self.modbus.input3mode)))
-                self.modbus.input4mode = str(toString(settings.value("input4mode",self.modbus.input4mode))) 
+                self.modbus.input1mode = toString(settings.value("input1mode",self.modbus.input1mode))
+                self.modbus.input2mode = toString(settings.value("input2mode",self.modbus.input2mode))
+                self.modbus.input3mode = toString(settings.value("input3mode",self.modbus.input3mode))
+                self.modbus.input4mode = toString(settings.value("input4mode",self.modbus.input4mode)) 
             if settings.contains("input1div"):
                 self.modbus.input1div = toInt(settings.value("input1div",self.modbus.input1div))
                 self.modbus.input2div = toInt(settings.value("input2div",self.modbus.input2div))
@@ -13452,27 +13460,27 @@ class ApplicationWindow(QMainWindow):
             #restore MODBUS TCP/UDP settings
             if settings.contains("host"):
                 self.modbus.type = toInt(settings.value("type",self.modbus.type))
-                self.modbus.host = str(toString(settings.value("host",self.modbus.host)))
+                self.modbus.host = toString(settings.value("host",self.modbus.host))
                 self.modbus.port = toInt(settings.value("port",self.modbus.port))
             settings.endGroup()
             #restore scale port
             settings.beginGroup("Scale")
             self.scale.device = toString(settings.value("device",self.scale.device))
-            self.scale.comport = str(toString(settings.value("comport",self.scale.comport)))
+            self.scale.comport = toString(settings.value("comport",self.scale.comport))
             self.scale.baudrate = toInt(settings.value("baudrate",int(self.scale.baudrate)))
             self.scale.bytesize = toInt(settings.value("bytesize",self.scale.bytesize))
             self.scale.stopbits = toInt(settings.value("stopbits",self.scale.stopbits))
-            self.scale.parity = str(toString(settings.value("parity",self.scale.parity)))
+            self.scale.parity = toString(settings.value("parity",self.scale.parity))
             self.scale.timeout = toInt(settings.value("timeout",self.scale.timeout))
             settings.endGroup()
             #restore color port
             settings.beginGroup("Color")
             self.color.device = toString(settings.value("device",self.color.device))
-            self.color.comport = str(toString(settings.value("comport",self.color.comport)))
+            self.color.comport = toString(settings.value("comport",self.color.comport))
             self.color.baudrate = toInt(settings.value("baudrate",int(self.color.baudrate)))
             self.color.bytesize = toInt(settings.value("bytesize",self.color.bytesize))
             self.color.stopbits = toInt(settings.value("stopbits",self.color.stopbits))
-            self.color.parity = str(toString(settings.value("parity",self.color.parity)))
+            self.color.parity = toString(settings.value("parity",self.color.parity))
             self.color.timeout = toInt(settings.value("timeout",self.color.timeout))
             settings.endGroup()
             #restore alarms
@@ -13654,11 +13662,14 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #saves max-min temp limits of graph
             settings.beginGroup("Axis")
-            self.qmc.startofx = toFloat(settings.value("xmin",self.qmc.startofx))
-            self.qmc.endofx = toFloat(settings.value("xmax",self.qmc.endofx))
-            #fixes Windows OS sometimes saving endofx as 0 
-            if self.qmc.endofx < 60 or self.qmc.endofx > 1800:
-                self.qmc.endofx = 60
+            try: # prevents some random exceptions in Windows!?
+                self.qmc.startofx = toFloat(settings.value("xmin",self.qmc.startofx))
+                self.qmc.endofx = toFloat(settings.value("xmax",self.qmc.endofx))
+                #fixes Windows OS sometimes saving endofx as 0 
+                if self.qmc.endofx < 60 or self.qmc.endofx > 1800:
+                    self.qmc.endofx = 60
+            except:
+                pass
             self.qmc.ylimit = min(toInt(settings.value("ymax",self.qmc.ylimit)),850)
             self.qmc.ylimit_min = max(min(toInt(settings.value("ymin",self.qmc.ylimit_min)),self.qmc.ylimit),-150)
             self.qmc.zlimit = min(toInt(settings.value("zmax",self.qmc.zlimit)),500)
@@ -13709,40 +13720,40 @@ class ApplicationWindow(QMainWindow):
             #restore curve styles
             settings.beginGroup("CurveStyles")
             if settings.contains("BTlinestyle"):
-                self.qmc.BTlinestyle = str(toString(settings.value("BTlinestyle",self.qmc.BTlinestyle)))
-                self.qmc.BTdrawstyle = str(toString(settings.value("BTdrawstyle",self.qmc.BTdrawstyle)))
+                self.qmc.BTlinestyle = toString(settings.value("BTlinestyle",self.qmc.BTlinestyle))
+                self.qmc.BTdrawstyle = toString(settings.value("BTdrawstyle",self.qmc.BTdrawstyle))
                 self.qmc.BTlinewidth = toInt(settings.value("BTlinewidth",self.qmc.BTlinewidth))
-                self.qmc.BTmarker = str(toString(settings.value("BTmarker",self.qmc.BTmarker)))
+                self.qmc.BTmarker = toString(settings.value("BTmarker",self.qmc.BTmarker))
                 self.qmc.BTmarkersize = toInt(settings.value("BTmarkersize",self.qmc.BTmarkersize))
-                self.qmc.ETlinestyle = str(toString(settings.value("ETlinestyle",self.qmc.ETlinestyle)))
-                self.qmc.ETdrawstyle = str(toString(settings.value("ETdrawstyle",self.qmc.ETdrawstyle)))
+                self.qmc.ETlinestyle = toString(settings.value("ETlinestyle",self.qmc.ETlinestyle))
+                self.qmc.ETdrawstyle = toString(settings.value("ETdrawstyle",self.qmc.ETdrawstyle))
                 self.qmc.ETlinewidth = toInt(settings.value("ETlinewidth",self.qmc.ETlinewidth))
-                self.qmc.ETmarker = str(toString(settings.value("ETmarker",self.qmc.ETmarker)))
+                self.qmc.ETmarker = toString(settings.value("ETmarker",self.qmc.ETmarker))
                 self.qmc.ETmarkersize = toInt(settings.value("ETmarkersize",self.qmc.ETmarkersize))
-                self.qmc.BTdeltalinestyle = str(toString(settings.value("BTdeltalinestyle",self.qmc.BTdeltalinestyle)))
-                self.qmc.BTdeltadrawstyle = str(toString(settings.value("BTdeltadrawstyle",self.qmc.BTdeltadrawstyle)))
+                self.qmc.BTdeltalinestyle = toString(settings.value("BTdeltalinestyle",self.qmc.BTdeltalinestyle))
+                self.qmc.BTdeltadrawstyle = toString(settings.value("BTdeltadrawstyle",self.qmc.BTdeltadrawstyle))
                 self.qmc.BTdeltalinewidth = toInt(settings.value("BTdeltalinewidth",self.qmc.BTdeltalinewidth))
-                self.qmc.BTdeltamarker = str(toString(settings.value("BTdeltamarker",self.qmc.BTdeltamarker)))
+                self.qmc.BTdeltamarker = toString(settings.value("BTdeltamarker",self.qmc.BTdeltamarker))
                 self.qmc.BTdeltamarkersize = toInt(settings.value("BTdeltamarkersize",self.qmc.BTdeltamarkersize))
-                self.qmc.ETdeltalinestyle = str(toString(settings.value("ETdeltalinestyle",self.qmc.ETdeltalinestyle)))
-                self.qmc.ETdeltadrawstyle = str(toString(settings.value("ETdeltadrawstyle",self.qmc.ETdeltadrawstyle)))
+                self.qmc.ETdeltalinestyle = toString(settings.value("ETdeltalinestyle",self.qmc.ETdeltalinestyle))
+                self.qmc.ETdeltadrawstyle = toString(settings.value("ETdeltadrawstyle",self.qmc.ETdeltadrawstyle))
                 self.qmc.ETdeltalinewidth = toInt(settings.value("ETdeltalinewidth",self.qmc.ETdeltalinewidth))
-                self.qmc.ETdeltamarker = str(toString(settings.value("ETdeltamarker",self.qmc.ETdeltamarker)))
+                self.qmc.ETdeltamarker = toString(settings.value("ETdeltamarker",self.qmc.ETdeltamarker))
                 self.qmc.ETdeltamarkersize = toInt(settings.value("ETdeltamarkersize",self.qmc.ETdeltamarkersize))
-                self.qmc.BTbacklinestyle = str(toString(settings.value("BTbacklinestyle",self.qmc.BTbacklinestyle)))
-                self.qmc.BTbackdrawstyle = str(toString(settings.value("BTbackdrawstyle",self.qmc.BTbackdrawstyle)))
+                self.qmc.BTbacklinestyle = toString(settings.value("BTbacklinestyle",self.qmc.BTbacklinestyle))
+                self.qmc.BTbackdrawstyle = toString(settings.value("BTbackdrawstyle",self.qmc.BTbackdrawstyle))
                 self.qmc.BTbacklinewidth = toInt(settings.value("BTbacklinewidth",self.qmc.BTbacklinewidth))
-                self.qmc.BTbackmarker = str(toString(settings.value("BTbackmarker",self.qmc.BTbackmarker)))
+                self.qmc.BTbackmarker = toString(settings.value("BTbackmarker",self.qmc.BTbackmarker))
                 self.qmc.BTbackmarkersize = toInt(settings.value("BTbackmarkersize",self.qmc.BTbackmarkersize))
-                self.qmc.ETbacklinestyle = str(toString(settings.value("ETbacklinestyle",self.qmc.ETbacklinestyle)))
-                self.qmc.ETbackdrawstyle = str(toString(settings.value("ETbackdrawstyle",self.qmc.ETbackdrawstyle)))
+                self.qmc.ETbacklinestyle = toString(settings.value("ETbacklinestyle",self.qmc.ETbacklinestyle))
+                self.qmc.ETbackdrawstyle = toString(settings.value("ETbackdrawstyle",self.qmc.ETbackdrawstyle))
                 self.qmc.ETbacklinewidth = toInt(settings.value("ETbacklinewidth",self.qmc.ETbacklinewidth))
-                self.qmc.ETbackmarker = str(toString(settings.value("ETbackmarker",self.qmc.ETbackmarker)))
+                self.qmc.ETbackmarker = toString(settings.value("ETbackmarker",self.qmc.ETbackmarker))
                 self.qmc.ETbackmarkersize = toInt(settings.value("ETbackmarkersize",self.qmc.ETbackmarkersize))
-                self.qmc.XTbacklinestyle = str(toString(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle)))
-                self.qmc.XTbackdrawstyle = str(toString(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle)))
+                self.qmc.XTbacklinestyle = toString(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle))
+                self.qmc.XTbackdrawstyle = toString(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle))
                 self.qmc.XTbacklinewidth = toInt(settings.value("XTbacklinewidth",self.qmc.XTbacklinewidth))
-                self.qmc.XTbackmarker = str(toString(settings.value("XTbackmarker",self.qmc.XTbackmarker)))
+                self.qmc.XTbackmarker = toString(settings.value("XTbackmarker",self.qmc.XTbackmarker))
                 self.qmc.XTbackmarkersize = toInt(settings.value("XTbackmarkersize",self.qmc.ETbackmarkersize))
                 self.qmc.extralinestyles1 = list(map(str,list(toStringList(settings.value("extralinestyles1",self.qmc.extralinestyles1)))))
                 self.qmc.extralinestyles2 = list(map(str,list(toStringList(settings.value("extralinestyles2",self.qmc.extralinestyles2)))))
@@ -13754,15 +13765,15 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extramarkers2 = list(map(str,list(toStringList(settings.value("extramarkers2",self.qmc.extramarkers2)))))
                 self.qmc.extramarkersizes1 = [toInt(x) for x in toList(settings.value("extramarkersizes1"))]
                 self.qmc.extramarkersizes2 = [toInt(x) for x in toList(settings.value("extramarkersizes2"))]
-                self.qmc.BTBdeltalinestyle = str(toString(settings.value("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle)))
-                self.qmc.BTBdeltadrawstyle = str(toString(settings.value("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle)))
+                self.qmc.BTBdeltalinestyle = toString(settings.value("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle))
+                self.qmc.BTBdeltadrawstyle = toString(settings.value("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle))
                 self.qmc.BTBdeltalinewidth = toInt(settings.value("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth))
-                self.qmc.BTBdeltamarker = str(toString(settings.value("BTBdeltamarker",self.qmc.BTBdeltamarker)))
+                self.qmc.BTBdeltamarker = toString(settings.value("BTBdeltamarker",self.qmc.BTBdeltamarker))
                 self.qmc.BTBdeltamarkersize = toInt(settings.value("BTBdeltamarkersize",self.qmc.BTBdeltamarkersize))
-                self.qmc.ETBdeltalinestyle = str(toString(settings.value("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle)))
-                self.qmc.ETBdeltadrawstyle = str(toString(settings.value("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle)))
+                self.qmc.ETBdeltalinestyle = toString(settings.value("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle))
+                self.qmc.ETBdeltadrawstyle = toString(settings.value("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle))
                 self.qmc.ETBdeltalinewidth = toInt(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))
-                self.qmc.ETBdeltamarker = str(toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker)))
+                self.qmc.ETBdeltamarker = toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker))
                 self.qmc.ETBdeltamarkersize = toInt(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))
             settings.endGroup()
             ndevices = len(self.qmc.extradevices)
@@ -13820,8 +13831,8 @@ class ApplicationWindow(QMainWindow):
                     self.extraser[i].timeout = self.extratimeout[i]
             settings.endGroup()
             if settings.contains("BTfunction"):
-                self.qmc.BTfunction = str(toString(settings.value("BTfunction",self.qmc.BTfunction)))
-                self.qmc.ETfunction = str(toString(settings.value("ETfunction",self.qmc.ETfunction)))
+                self.qmc.BTfunction = toString(settings.value("BTfunction",self.qmc.BTfunction))
+                self.qmc.ETfunction = toString(settings.value("ETfunction",self.qmc.ETfunction))
             if settings.contains("plotcurves"):
                 self.qmc.plotcurves = list(toStringList(settings.value("plotcurves",self.qmc.plotcurves)))
                 self.qmc.plotcurvecolor = list(toStringList(settings.value("plotcurvecolor",self.qmc.plotcurvecolor)))
@@ -13977,7 +13988,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("appearance"):
                 try:
                     available = list(map(str, list(QStyleFactory.keys())))
-                    i = list(map(lambda x:x.lower(),available)).index(str(toString(settings.value("appearance"))))
+                    i = list(map(lambda x:x.lower(),available)).index(toString(settings.value("appearance")))
                     app.setStyle(available[i])
                 except Exception:
                     pass
@@ -14292,6 +14303,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("arduinoATChannel",self.ser.arduinoATChannel)
             settings.setValue("ArduinoFILT",self.ser.ArduinoFILT)
             settings.setValue("useModbusPort",self.ser.useModbusPort)
+            settings.setValue("showFujiLCDs",self.ser.showFujiLCDs)
             settings.setValue("PIDbuttonflag",self.qmc.PIDbuttonflag)
             settings.endGroup()
             settings.setValue("fmt_data_RoR",self.qmc.fmt_data_RoR)
@@ -19625,10 +19637,11 @@ class editGraphDlg(ArtisanDialog):
             batchedit.setStyleSheet("background-color:'lightgrey'")
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
-        self.beansedit = QTextEdit()
-        self.beansedit.setMaximumHeight(45)
-        if aw.qmc.beans is not None:
-            self.beansedit.setPlainText(u(aw.qmc.beans))
+#        self.beansedit = QTextEdit()
+#        self.beansedit.setMaximumHeight(22)
+#        if aw.qmc.beans is not None:
+#            self.beansedit.setPlainText(u(aw.qmc.beans))
+        self.beansedit = QLineEdit(u(aw.qmc.beans))
         #roaster
         self.roaster = QLineEdit(aw.qmc.roastertype)
         #operator
@@ -19764,7 +19777,7 @@ class editGraphDlg(ArtisanDialog):
         self.moisture_greens_edit.setAlignment(Qt.AlignRight)
         #Moisture Roasted
         #bag humidity
-        moisture_roasted_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Roasted",None)) + "</b>")
+        moisture_roasted_label = QLabel("<b>" + u(QApplication.translate("Label", "Roasted",None)) + "</b>")
         moisture_roasted_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.moisture_roasted_edit = QLineEdit()
         self.moisture_roasted_edit.setText(str(aw.qmc.moisture_roasted))
@@ -19773,6 +19786,11 @@ class editGraphDlg(ArtisanDialog):
         self.moisture_roasted_edit.setAlignment(Qt.AlignRight)
         self.moisture_greens_edit.editingFinished.connect(self.calculated_organic_loss)        
         self.moisture_roasted_edit.editingFinished.connect(self.calculated_organic_loss)
+        moisture_roasted = QHBoxLayout()
+        moisture_roasted.addWidget(moisture_roasted_label)
+        moisture_roasted.addWidget(self.moisture_roasted_edit)
+        moisture_roasted.addWidget(moisture_roasted_unit_label)
+        moisture_roasted.addStretch()
         #Ambient temperature (uses display mode as unit (F or C)
         ambientlabel = QLabel("<b>" + u(QApplication.translate("Label", "Ambient Conditions",None)) + "</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
@@ -19791,18 +19809,25 @@ class editGraphDlg(ArtisanDialog):
         self.ambientedit_tempUnitsComboBox = QComboBox()
         self.ambientedit_tempUnitsComboBox.setMaximumWidth(60)
         self.ambientedit_tempUnitsComboBox.setMinimumWidth(60)
+        ambient = QHBoxLayout()
+        ambient.addWidget(ambient_humidity_at_label)
+        ambient.addWidget(self.ambientedit)
+        ambient.addWidget(ambientunitslabel)
+        ambient.addStretch()
         self.calculateorganiclosslabel = QLabel("")
         # NOTES
         roastertypelabel = QLabel()
         roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Roaster",None)) + "</b>")
         operatorlabel = QLabel()
-        operatorlabel.setText("<b>" + u(QApplication.translate("Label", "Operator",None)) + "</b>")
+        operatorlabel.setText("<b> " + u(QApplication.translate("Label", "Operator",None)) + "</b>")
         roastinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Roasting Notes",None)) + "</b>")
         self.roastingeditor = QTextEdit()
+        self.roastingeditor.setMaximumHeight(125)
         if aw.qmc.roastingnotes is not None:
             self.roastingeditor.setPlainText(u(aw.qmc.roastingnotes))
         cuppinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Cupping Notes",None)) + "</b>")
         self.cuppingeditor =  QTextEdit()
+        self.cuppingeditor.setMaximumHeight(125)
         if aw.qmc.cuppingnotes is not None:
             self.cuppingeditor.setPlainText(u(aw.qmc.cuppingnotes))
         # Flags
@@ -19889,6 +19914,7 @@ class editGraphDlg(ArtisanDialog):
         ##### LAYOUTS
         timeLayout = QGridLayout()
         timeLayout.setVerticalSpacing(3)
+        timeLayout.setHorizontalSpacing(3)
         timeLayout.addWidget(chargelabel,0,0)
         timeLayout.addWidget(drylabel,0,1)
         timeLayout.addWidget(Cstartlabel,0,2)
@@ -19910,20 +19936,31 @@ class editGraphDlg(ArtisanDialog):
             timeLayout.addWidget(self.dropestimate,2,6,Qt.AlignHCenter)
         textLayout = QGridLayout()
         textLayout.addWidget(datelabel1,0,0)
-        textLayout.addWidget(dateedit,0,1)
-        textLayout.addWidget(batchlabel,1,0)
+#        textLayout.addWidget(dateedit,0,1)
+        datebatch = QHBoxLayout()
+        datebatch.addWidget(dateedit)
+#        textLayout.addWidget(batchlabel,1,0)
+#        if aw.superusermode and aw.qmc.batchcounter > -1:
+#            textLayout.addLayout(batchLayout,1,1)
+#        else:
+#            textLayout.addWidget(batchedit,1,1)
+        datebatch.addWidget(batchlabel)
         if aw.superusermode and aw.qmc.batchcounter > -1:
-            textLayout.addLayout(batchLayout,1,1)
+            datebatch.addLayout(batchLayout)
         else:
-            textLayout.addWidget(batchedit,1,1)
+            datebatch.addWidget(batchedit)
+        textLayout.addLayout(datebatch,0,1)
+
         textLayout.addWidget(titlelabel,2,0)
         textLayout.addWidget(self.titleedit,2,1)
         textLayout.addWidget(beanslabel,3,0)
-        textLayout.addWidget(self.beansedit,3,1)
-        textLayout.addWidget(roastertypelabel,4,0)
-        textLayout.addWidget(self.roaster,4,1)
-        textLayout.addWidget(operatorlabel,5,0)
-        textLayout.addWidget(self.operator,5,1)
+        textLayout.addWidget(self.beansedit,3,1)        
+        textLayout.addWidget(operatorlabel,4,0)
+        roasteroperator = QHBoxLayout()
+        roasteroperator.addWidget(self.operator)
+        roasteroperator.addWidget(roastertypelabel)
+        roasteroperator.addWidget(self.roaster)
+        textLayout.addLayout(roasteroperator,4,1)        
         weightLayout = QHBoxLayout()
         weightLayout.setSpacing(0)
         weightLayout.addWidget(weightlabel)
@@ -19963,10 +20000,11 @@ class editGraphDlg(ArtisanDialog):
         volumeLayout.addWidget(self.volumepercentlabel)
         volumeLayout.addStretch()
         volumeLayout.addWidget(volumeCalcButton)
+        
         densityLayout = QHBoxLayout()
         densityLayout.setContentsMargins(0,0,0,0)
         densityLayout.setSpacing(0)
-        densityLayout.addWidget(bean_density_label)
+        densityLayout.addWidget(bean_density_label)        
         densityLayout.addSpacing(13)
         densityLayout.addWidget(self.bean_density_weightUnitsComboBox)
         densityLayout.addSpacing(15)
@@ -19980,15 +20018,25 @@ class editGraphDlg(ArtisanDialog):
         densityLayout.addSpacing(20)
         densityLayout.addWidget(self.standarddensitylabel)
         densityLayout.addStretch()
-        beansizeLayout = QHBoxLayout()
-        beansizeLayout.setContentsMargins(0,0,0,0)
-        beansizeLayout.setSpacing(0)
-        beansizeLayout.addWidget(bean_size_label)
-        beansizeLayout.addSpacing(15)
-        beansizeLayout.addWidget(self.bean_size_edit)
-        beansizeLayout.addSpacing(5)
-        beansizeLayout.addWidget(bean_size_unit_label)
-        beansizeLayout.addStretch()
+        
+        densityLayout.addWidget(bean_size_label)
+        densityLayout.addSpacing(15)
+        densityLayout.addWidget(self.bean_size_edit)
+        densityLayout.addSpacing(5)
+        densityLayout.addWidget(bean_size_unit_label)
+
+        
+#        beansizeLayout = QHBoxLayout()
+#        beansizeLayout.setContentsMargins(0,0,0,0)
+#        beansizeLayout.setSpacing(0)
+#        beansizeLayout.addWidget(bean_size_label)
+#        beansizeLayout.addSpacing(15)
+#        beansizeLayout.addWidget(self.bean_size_edit)
+#        beansizeLayout.addSpacing(5)
+#        beansizeLayout.addWidget(bean_size_unit_label)
+#        beansizeLayout.addStretch()
+
+        
         colorLayout = QHBoxLayout()
         colorLayout.setSpacing(0)
         colorLayout.addWidget(whole_color_label)
@@ -20010,16 +20058,18 @@ class editGraphDlg(ArtisanDialog):
         humidityGrid.addWidget(moisture_greens_label,0,0)
         humidityGrid.addWidget(self.moisture_greens_edit,0,1)
         humidityGrid.addWidget(moisture_greens_unit_label,0,2)
-        humidityGrid.addWidget(moisture_roasted_label,1,0)
-        humidityGrid.addWidget(self.moisture_roasted_edit,1,1)
-        humidityGrid.addWidget(moisture_roasted_unit_label,1,2)
-        humidityGrid.addWidget(ambientSourceLabel,1,10,Qt.AlignRight)
+        humidityGrid.addLayout(moisture_roasted,0,6)
+#        humidityGrid.addWidget(moisture_roasted_label,1,0)
+#        humidityGrid.addWidget(self.moisture_roasted_edit,1,1)
+#        humidityGrid.addWidget(moisture_roasted_unit_label,1,2)
+        humidityGrid.addWidget(ambientSourceLabel,0,10,Qt.AlignRight)
         humidityGrid.addWidget(ambientlabel,2,0)
         humidityGrid.addWidget(self.ambient_humidity_edit,2,1)
         humidityGrid.addWidget(ambient_humidity_unit_label,2,2)
-        humidityGrid.addWidget(ambient_humidity_at_label,2,4)
-        humidityGrid.addWidget(self.ambientedit,2,6)
-        humidityGrid.addWidget(ambientunitslabel,2,7)
+#        humidityGrid.addWidget(ambient_humidity_at_label,2,4)
+#        humidityGrid.addWidget(self.ambientedit,2,6)
+#        humidityGrid.addWidget(ambientunitslabel,2,7)
+        humidityGrid.addLayout(ambient,2,6)
         humidityGrid.addWidget(updateAmbientTemp,2,9)
         humidityGrid.addWidget(self.ambientComboBox,2,10,Qt.AlignRight)
         humidityGrid.setColumnMinimumWidth(3, 10)
@@ -20046,6 +20096,7 @@ class editGraphDlg(ArtisanDialog):
         anotationLayout.addWidget(cuppinglabel)
         anotationLayout.addWidget(self.cuppingeditor)
         okLayout = QHBoxLayout()
+        okLayout.addWidget(self.roastproperties)
         okLayout.addStretch()
         okLayout.addWidget(cancelButton,0)
         okLayout.addWidget(saveButton,1)
@@ -20057,8 +20108,8 @@ class editGraphDlg(ArtisanDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(timeLayoutBox)
         mainLayout.setContentsMargins(3, 3, 3, 3)
-        timeGroupLayout = QGroupBox(QApplication.translate("GroupBox", "Times",None))
-        timeGroupLayout.setLayout(mainLayout)
+#        timeGroupLayout = QGroupBox(QApplication.translate("GroupBox", "Times",None))
+#        timeGroupLayout.setLayout(mainLayout)
         eventbuttonLayout = QHBoxLayout()
         eventbuttonLayout.addWidget(self.createalarmTableButton)
         eventbuttonLayout.addStretch()
@@ -20068,8 +20119,9 @@ class editGraphDlg(ArtisanDialog):
         #tab 1
         self.tab1aLayout = QVBoxLayout()
         self.tab1aLayout.setContentsMargins(0,0,0,0)
-        self.tab1aLayout.setSpacing(2)
-        self.tab1aLayout.addWidget(timeGroupLayout)
+        self.tab1aLayout.setSpacing(1)
+        #self.tab1aLayout.addWidget(timeGroupLayout)
+        self.tab1aLayout.addLayout(mainLayout)
         self.tab1aLayout.addStretch()
         self.tab1aLayout.addLayout(textLayout)
         self.tab1aLayout.addStretch()
@@ -20077,19 +20129,19 @@ class editGraphDlg(ArtisanDialog):
         self.tab1aLayout.addLayout(volumeLayout)
         self.tab1bLayout = QVBoxLayout()
         self.tab1bLayout.setContentsMargins(0,0,0,0)
-        self.tab1bLayout.setSpacing(2)
+        self.tab1bLayout.setSpacing(1)
         self.tab1bLayout.addLayout(densityLayout)
-        self.tab1bLayout.addLayout(beansizeLayout)
+#        self.tab1bLayout.addLayout(beansizeLayout)
         self.tab1bLayout.addLayout(colorLayout)
         self.tab1bLayout.addLayout(humidityGrid)
-        roastpropertiesLayout = QHBoxLayout()
-        roastpropertiesLayout.addWidget(self.roastproperties)
-        roastpropertiesLayout.addStretch()
+#        roastpropertiesLayout = QHBoxLayout()
+#       roastpropertiesLayout.addWidget(self.roastproperties)
+#        roastpropertiesLayout.addStretch()
         tab1Layout = QVBoxLayout()
         tab1Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         tab1Layout.addLayout(self.tab1aLayout)
         tab1Layout.addLayout(self.tab1bLayout)
-        tab1Layout.addLayout(roastpropertiesLayout)
+#        tab1Layout.addLayout(roastpropertiesLayout)
         self.calculated_density()
         #tab 2
         tab2Layout = QVBoxLayout()
@@ -20870,7 +20922,7 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.title = u(self.titleedit.text())
         aw.qmc.container_idx = self.tareComboBox.currentIndex() - 3
         # Update beans
-        aw.qmc.beans = u(self.beansedit.toPlainText())
+        aw.qmc.beans = u(self.beansedit.text()) # u(self.beansedit.toPlainText())
         #update ambient temperature source
         aw.qmc.ambientTempSource = self.ambientComboBox.currentIndex()
         #update weight
@@ -25598,6 +25650,7 @@ class serialport(object):
 #                                        # index 1: RS485 unitID. Can be changed in device menu. 
         # Reuse Modbus-meter port
         self.useModbusPort = False
+        self.showFujiLCDs = True
         #Initialization for ARDUINO and TC4 meter
         self.arduinoETChannel = "1"
         self.arduinoBTChannel = "2"
@@ -29568,6 +29621,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         # index 1 = unitID of the rs485 network
         self.controlpidunitidComboBox.setCurrentIndex(unitids.index(str(aw.ser.controlETpid[1])))
         self.btpidunitidComboBox.setCurrentIndex(unitids.index(str(aw.ser.readBTpid[1])))
+        #Show Fuji PID SV/% LCDs
+        self.showFujiLCDs = QCheckBox(QApplication.translate("CheckBox", "PID Duty/Power LCDs",None))
+        self.showFujiLCDs.setChecked(aw.ser.showFujiLCDs)
         #Reuse Modbus port
         self.useModbusPort = QCheckBox(QApplication.translate("CheckBox", "Modbus Port",None))
         self.useModbusPort.setChecked(aw.ser.useModbusPort)
@@ -29945,6 +30001,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         PIDgrid.addWidget(controllabel,1,0)
         PIDgrid.addWidget(self.controlpidtypeComboBox,1,1)
         PIDgrid.addWidget(self.controlpidunitidComboBox,1,2)
+        PIDgrid.addWidget(self.showFujiLCDs,1,3)
         PIDgrid.addWidget(btlabel,2,0,Qt.AlignRight)
         PIDgrid.addWidget(self.btpidtypeComboBox,2,1)
         PIDgrid.addWidget(self.btpidunitidComboBox,2,2)
@@ -30490,6 +30547,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.readBTpid[0] = 3
                     str2 = "Delta DTA"
                 aw.ser.readBTpid[1] =  int(str(self.btpidunitidComboBox.currentText()))
+                if self.showFujiLCDs.isChecked():
+                    aw.ser.showFujiLCDs = True
+                else:
+                    aw.ser.showFujiLCDs = False
                 if self.useModbusPort.isChecked():
                     aw.ser.useModbusPort = True
                 else:
@@ -30515,8 +30576,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 message = QApplication.translate("Message","PID to control ET set to {0} {1}" + \
                                                  " ; PID to read BT set to {2} {3}", None).format(str1,str(aw.ser.controlETpid[1]),str2,str(aw.ser.readBTpid[1]))
                 aw.button_10.setVisible(True)
-                aw.LCD6frame.setVisible(True)
-                aw.LCD7frame.setVisible(True)
+                if aw.ser.showFujiLCDs:
+                    aw.LCD6frame.setVisible(True)
+                    aw.LCD7frame.setVisible(True)
             elif self.arduinoButton.isChecked():
                 meter = "Arduino (TC4)"
                 aw.qmc.device = 19
@@ -33231,9 +33293,9 @@ class PXRpidDlgControl(ArtisanDialog):
                 if PID == "ET":
                     slaveID = aw.ser.controlETpid[1]
                     if aw.ser.controlETpid[0] == 0:
-                    	reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
                     elif aw.ser.controlETpid[0] == 1:
-                    	reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
+                        reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
                 elif PID == "BT":
                     slaveID = aw.ser.readBTpid[1]
                     if aw.ser.readBTpid[0] == 0:
@@ -34722,9 +34784,9 @@ class PXG4pidDlgControl(ArtisanDialog):
                 if PID == "ET":
                     slaveID = aw.ser.controlETpid[1]
                     if aw.ser.controlETpid[0] == 0:
-                    	reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
+                        reg = aw.modbus.address2register(aw.fujipid.PXG4["decimalposition"][1],6)
                     elif aw.ser.controlETpid[0] == 1:
-                    	reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
+                        reg = aw.modbus.address2register(aw.fujipid.PXR["decimalposition"][1],6)
                 elif PID == "BT":
                     slaveID = aw.ser.readBTpid[1]
                     if aw.ser.readBTpid[0] == 0:
@@ -34737,9 +34799,9 @@ class PXG4pidDlgControl(ArtisanDialog):
             else:
                 if PID == "ET":
                     if aw.ser.controlETpid[0] == 0:
-                    	command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
+                        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
                     elif aw.ser.controlETpid[0] == 1:
-                    	command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
+                        command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["decimalposition"][1],1)
                 elif PID == "BT":
                     if aw.ser.readBTpid[0] == 0:
                         command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["decimalposition"][1],1)
