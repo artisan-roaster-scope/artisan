@@ -38,7 +38,12 @@ elif system().startswith("Windows"):
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
         else:
             import site
-            QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "\\PyQt5\\plugins")
+            #gives error in python 3.4: could not find or load the Qt platform plugin "windows"
+            if sys.version < '3':
+                QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "\\PyQt5\\plugins")
+            else:
+                QApplication.addLibraryPath(site.getsitepackages()[1] + "\\PyQt5\\plugins")
+
     except Exception:
         try:
             from PyQt4.QtGui import QApplication
