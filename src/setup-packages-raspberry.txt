@@ -1,0 +1,392 @@
+originally installed:
+- Python 2.7.3
+- Python 3.2.3
+
+
+#sudo apt-get install python
+ => already newest
+
+sudo apt-get install python-dev-all
+#sudo apt-get install libjpeg-dev
+#sudo apt-get install libfreetype6-dev
+sudo apt-get install python-setuptools
+sudo apt-get install python-pip
+
+sudo easy_install -U distribute
+sudo pip install -IU pip # update pip
+
+sudo pip install RPi.GPIO
+sudo pip install pySerial # v2.5
+
+sudo apt-get install python-numpy # v1.6.2
+sudo apt-get install python-scipy # 0.10.1
+sudo apt-get install python-matplotlib # 1.1.1rc2
+sudo apt-get install python-qt4 # Qt4.8.1, PyQt 4.9.3
+sudo apt-get install pyqt4-dev-tools
+
+sudo apt-get install git
+
+
+
+Nach update to Jessy:
+- Python 2.7.9
+ . pyserial v2.6
+ . numpy 1.8.2
+ . Qt 4.8.6
+ . PyQt 4.11.2
+ . pip 7.1.2
+- Python 3.4.2
+ . pyserial v2.6
+ . numpy 1.8.2
+
+
+
+==
+0) both platforms
+
+for scipy installation:
+# sudo apt-get install libblas-dev
+# sudo apt-get install liblapack-dev
+# sudo apt-get install libatlas-base-dev
+# sudo apt-get install gfortran
+
+
+
+1) installing/updating libs for Python2
+
+upgrade pip
+# sudo pip install -IU pip
+# sudo pip install -IU pyserial  # 2.7
+# sudo pip install -IU numpy # 1.9.3
+# sudo pip install -IU scipy # 0.16.0
+# sudo pip install -IU matplotlib # 1.4.3
+# sudo pip install -IU qrcode # 5.1
+# sudo pip install -IU yoctopuce # 1.10.21486
+# sudo pip install -IU requests # 2.7.0
+# sudo pip install -IU gevent # 1.0.2
+# sudo pip install -IU bottle # 0.12.8
+# sudo pip install -IU gevent-websocket # 0.9.5
+
+pymodbus (from py3 trunk)
+# cd /tmp
+# wget https://github.com/bashwork/pymodbus/archive/python3.zip
+# unzip python3.zip
+# cd pymodbus-python3
+# vi setup.py
+ => remove dependency to twisted (2x)
+# python setup.py build
+# sudo python setup.py install
+
+
+Phidgets (from Web)
+# cd /tmp
+# wget http://www.phidgets.com/downloads/libraries/PhidgetsPython.zip
+# unzip PhidgetsPython.zip
+# cd PhidgetsPython
+# python setup.py build
+# sudo python setup.py install
+
+install Phidgets lib on Raspberry
+install Yocto lib on Raspberry
+
+
+Artisan
+# cd ~/Documents
+# wget https://github.com/artisan-roaster-scope/artisan/archive/master.zip
+# unzip master
+# cd artisan-master
+# 
+
+
+
+
+2) installing/updating libs for Python3
+
+# sudo apt-get install python-pip
+# sudo pip3 install -IU pyserial # 2.7
+# sudo pip3 install -IU numpy # 1.9.3
+# sudo pip3 install -IU scipy # 
+# sudo pip3 install -IU matplotlib # 
+
+
+# sudo apt-get install qt5-default
+
+# wget https://www.riverbankcomputing.com/static/Downloads/sip4/sip-4.17-snapshot-9102d6c3daf0.tar.gz
+# python3 configure.py
+# make
+# sudo make install
+
+# wget https://www.riverbankcomputing.com/static/Downloads/PyQt4/PyQt-x11-gpl-4.11.5-snapshot-cc708df12d26.tar.gz
+# python3 configure.py -q /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake
+# make
+# sudo make install
+
+
+upgrade pip
+# sudo pip3 install -IU pip
+# sudo pip3 install -IU pyserial  # 2.7
+# sudo pip3 install -IU numpy # 1.10.0
+## # sudo pip3 install -IU scipy # 0.16.0
+##   => fails
+#  sudo apt-get install python3-scipy
+# sudo pip3 install -IU matplotlib # 1.4.3
+ (+ nose-1.3.7 pyparsing-2.0.3 python-dateutil-2.4.2 pytz-2015.6 six-1.10.0)
+# sudo pip3 install -IU qrcode # 5.1
+# sudo pip3 install -IU yoctopuce # 1.10.21486
+# sudo pip3 install -IU requests # 2.7.0
+## # sudo pip3 install -IU gevent # 1.0.2
+##  => not py3 compatible!
+# sudo pip3 install cython git+git://github.com/gevent/gevent.git#egg=gevent
+  (installs cython 0.23.4 and gevent-1.1b6.dev0)
+
+# sudo pip3 install -IU bottle # 0.12.8
+# sudo pip3 install -IU gevent-websocket # 0.9.5
+
+
+pymodbus (from py3 trunk)
+# cd /tmp
+# wget https://github.com/bashwork/pymodbus/archive/python3.zip
+# unzip python3.zip
+# cd pymodbus-python3
+# vi setup.py
+ => remove dependency to twisted (2x)
+# python3.4 setup.py build
+# sudo python3.4 setup.py install
+
+
+Phidgets (from Web)
+# cd /tmp
+# wget http://www.phidgets.com/downloads/libraries/PhidgetsPython.zip
+# unzip PhidgetsPython.zip
+# cd PhidgetsPython
+# python3.4 setup.py build
+# sudo python3.4 setup.py install
+
+
+
+
+
+
+
+
+
+python-pyqt5
+
+python3-serial
+python3-pyqt4
+(python3-pyqt5)
+
+
+
+to search for packages:
+sudo apt-cache search pyqt4
+pip search PyQt4
+
+
+=====
+
+
+Current Versions:
+
+o Python 3.4.3
+o pyserial 2.7
+o QT 5.5.0
+o PyQt 5.5.5
+o numpy 1.9.2
+o scipy 0.16.0
+o matplotlib 1.4.3
+
+o pyparsing 2.0.3
+o dateutil 2.4.2
+
+o Phidgets Python 2.1.8
+o py2exe 0.9.2.2
+o NSIS 2.46
+o pymodbus (py3 trunk)
+o yoctopuce 1.10.20773
+o requests 2.7.0
+o bottle 0.13 trunk
+o gevent 1.1b3
+o geventwebsocket 0.9.5
+o python-qrcode 5.1
+o win_inet_pton 1.0.1
+o pytz 2015.6
+
+
+Upgrade History:
+
+- 2015-09-13 (initialized)
+
+
+Installation Instructions:
+
+0) Preparation
+
+Install Microsoft Visual C++ 2010 SP1 Redistributable Package (x86)
+http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
+
+Desktop\\RedistributablePackage2010\vcredist_x86.exe
+
+1) Python 3.4.3
+
+install python-3.4.3.msi via "Python 3.4.3 Windows x86 MSI Installer" from http://www.python.org
+=> deactivate pip installation as it conflicts with the Python 2.7 version on installation
+
+2) pyserial
+
+download pyserial-2.7.tar.gz from http://pyserial.sourceforge.net
+
+unpack and patch:
+
+
+(1) Remove trailing L from integers in win32.py (i.e. PEP 237)
+#192 GENERIC_READ
+#196 MAXDWORD
+#216 INFINITE
+(2) Converted ',' syntax to 'as' syntax (required in Python 3.x, I believe) in serialutil.py
+#535 except TypeError, err --> except TypeError as err
+(3) Added hack as per https://github.com/oxplot/fysom/issues/1 to the top of serialutil.py to get round the use of 'basestring' (which is deprecated in Python 3.x)
+
+try:
+   unicode = unicode
+except NameError:
+   # 'unicode' is undefined, must be Python 3
+   str = str
+   unicode = str
+   bytes = bytes
+   basestring = (str,bytes)
+else:
+   # 'unicode' exists, must be Python 2
+   str = str
+   unicode = unicode
+   bytes = str
+   basestring = basestring
+
+
+then
+
+# py -3 setup.py build
+# py -3 setup.py install
+
+
+3) PyQT
+
+download and install PyQt5-5.5-gpl-Py3.4-Qt5.5.0-x32.exe
+=> contains Qt 5.5.0 for Windows 32-bit (VS 2010)
+
+4) numpy
+
+download numpy-1.9.2-win32-superpack-python3.4.exe from http://www.scipy.org/Download
+
+5) scipy
+
+download scipy-0.16.0-win32-superpack-python3.4.exe from http://www.scipy.org/Download
+
+6) matplotlib
+
+download matplotlib-1.4.3.win32-py3.4.exe from http://matplotlib.org/downloads.html
+
+7) Install matplotlib utility libs
+
+download and install from http://www.lfd.uci.edu/~gohlke/pythonlibs/
+ - pyparsing-2.0.3.win32-py3.4.exe
+ - python-dateutil-2.4.2.tar.gz
+  # py -3 setup.py build
+  # py -3 setup.py install
+
+8) py2exe
+
+download and install py2exe-0.9.2.2.win32.exe
+
+9) NSIS 2.46
+
+download and install from http://nsis.sourceforge.net/Download
+
+10) Install Phidgets Python
+
+# unzip PhidgetsPython_2.1.8.20150326.zip
+# cd PhidgetsPython
+# py -3 setup.py build
+# py -3 setup.py install
+
+
+11) pymodbus
+
+download the py3 branch from https://github.com/bashwork/pymodbus/tree/python3
+
+
+remove all references to twisted (py2exe 0.9.2.2 will struggle with) from setup.py
+
+
+# cd pymodbus
+# py -3 setup.py build
+# py -3 setup.py install
+# py -3 setup.py install_lib
+
+12) yoctopuce 1.10.16490
+
+download lastest package from here: 
+https://pypi.python.org/pypi/yoctopuce/
+
+# cd yoctopuce-1.10.20773
+# py -3 setup.py build
+# py -3 setup.py install
+
+install dll's
+# mkdir c:\Python34\Lib\site-packages\yoctopuce\cdll
+# copy yoctopuce\cdll\*.* c:\Python34\Lib\site-packages\yoctopuce\cdll
+
+13) requests 2.7.0
+
+https://github.com/kennethreitz/requests/releases
+
+# python setup.py build
+# sudo python setup.py install
+
+14) bottle 0.13.x (trunk)
+
+https://github.com/defnull/bottle/
+
+download trunk
+
+remove all references to twisted (py2exe 0.9.2.2 will struggle with) from bottle.py
+
+# py -3 setup.py build
+# py -3 setup.py install
+
+15) gevent 1.1.b3
+
+https://pypi.python.org/pypi/gevent
+
+download gevent-1.1b3-cp34-none-win32.whl
+
+# py -3 -m pip install gevent-1.1b3-cp34-none-win32.whl 
+
+16) geventwebsocket 0.9.5
+
+https://pypi.python.org/pypi/gevent-websocket/
+
+# py -3 setup.py build
+# py -3 setup.py install
+
+
+17) python-qrcode 5.1
+
+download qrcode-5.1.tar.gz
+
+# py -3 setup.py build
+# py -3 setup.py install
+
+18) win_inet_pton 1.0.1
+
+download win_inet_pton_1.0.1.tar.gz
+
+# py -3 setup.py build
+# py -3 setup.py install
+
+19 pytz 2015.6
+
+download and extract pytz-2015.6.tar.gz
+
+# py -3 setup.py build
+# py -3 setup.py install
