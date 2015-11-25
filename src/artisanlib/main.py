@@ -10100,7 +10100,7 @@ class ApplicationWindow(QMainWindow):
                     self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
                     if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         # display expected time to reach DRY as defined in the background profile or the phases dialog
-                        if self.qmc.background and self.qmc.timeindexB[1]:
+                        if self.qmc.background and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
                             drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
                         else:
                             drytarget = self.qmc.phases[1] # Drying max phases definition
