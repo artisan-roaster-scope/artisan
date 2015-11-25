@@ -1462,7 +1462,7 @@ class tgraphcanvas(FigureCanvas):
             interval = self.delay / 1000.
         else:
             interval = self.profile_sampling_interval
-        self.deltasamples = max(1,self.deltaspan / int(interval))
+        self.deltasamples = int(max(1,self.deltaspan / int(interval)))
     
     # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
     # NOTE: this hack slows down redraw!
@@ -1860,7 +1860,7 @@ class tgraphcanvas(FigureCanvas):
                         self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
 
                 if self.flagstart:
-                    if aw.ntb._active == 'ZOOM':
+                    if aw.ntb._active == 'ZOOM' and aw.qmc.temp2 and len(aw.qmc.temp2)>0 and aw.qmc.temp1 and len(aw.qmc.temp1)>0:
                         # center current BT reading on canvas
                         bt = aw.qmc.temp2[-1]
                         tx = aw.qmc.timex[-1]
@@ -2865,6 +2865,11 @@ class tgraphcanvas(FigureCanvas):
         if self.xrotation:     
             for label in self.ax.xaxis.get_ticklabels():
                 label.set_rotation(self.xrotation)
+                
+        if not aw.qmc.LCDdecimalplaces:
+            self.ax.minorticks_off()
+            self.delta_ax.minorticks_off()
+                    
         # we have to update the canvas cache
         if redraw:
             self.updateBackground()
@@ -3522,9 +3527,9 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + self.title
                     if self.background and self.titleB and len(self.titleB) > 10:
-                        stl = 30
+                        stl = 33
                     else:
-                        stl = 35
+                        stl = 38
                     title = aw.qmc.abbrevString(title,stl)
                     self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                         fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
@@ -3571,8 +3576,15 @@ class tgraphcanvas(FigureCanvas):
                     bottom='on',        # ticks along the bottom edge are on
                     top='off',          # ticks along the top edge are off
                     direction=tick_dir,
-                    labelbottom='on')   # labels along the bottom edge are on                 
-    
+                    labelbottom='on')   # labels along the bottom edge are on    
+#                    self.ax.tick_params(\
+#                        axis='both',
+#                        which='minor',
+#                        left='off',
+#                        right='off',
+#                        bottom='off',        # ticks along the bottom edge are on
+#                        top='off',          # ticks along the top edge are off
+#                    )  
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("medium")
                 for label in self.ax.get_xticklabels() :
@@ -3646,6 +3658,7 @@ class tgraphcanvas(FigureCanvas):
     
                 #update X ticks, labels, and colors
                 self.xaxistosm(redraw=False)
+            
     
                 rcParams['path.sketch'] = (0,0,0)
                 trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
@@ -16258,7 +16271,7 @@ $cupping_notes
                     # load foreground into background
                     aw.loadbackground(u(foreground_profile_path))
                     aw.qmc.background = True
-                    aw.qmc.timealign(redraw=False)
+                    aw.qmc.timealign(redraw=True,recompute=True)
                 else:
                     # delete background
                     self.deleteBackground()
@@ -19643,11 +19656,11 @@ class editGraphDlg(ArtisanDialog):
             batchedit.setStyleSheet("background-color:'lightgrey'")
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
-#        self.beansedit = QTextEdit()
-#        self.beansedit.setMaximumHeight(22)
-#        if aw.qmc.beans is not None:
-#            self.beansedit.setPlainText(u(aw.qmc.beans))
-        self.beansedit = QLineEdit(u(aw.qmc.beans))
+        self.beansedit = QTextEdit()
+        self.beansedit.setMaximumHeight(40)
+        if aw.qmc.beans is not None:
+            self.beansedit.setPlainText(u(aw.qmc.beans))
+#        self.beansedit = QLineEdit(u(aw.qmc.beans))
         #roaster
         self.roaster = QLineEdit(aw.qmc.roastertype)
         #operator
@@ -19678,8 +19691,8 @@ class editGraphDlg(ArtisanDialog):
         self.weightoutedit.editingFinished.connect(self.weightouteditChanged)
         self.weightinedit.editingFinished.connect(self.weightineditChanged)
         self.unitsComboBox = QComboBox()
-        self.unitsComboBox.setMaximumWidth(70)
-        self.unitsComboBox.setMinimumWidth(70)
+        self.unitsComboBox.setMaximumWidth(60)
+        self.unitsComboBox.setMinimumWidth(60)
         self.unitsComboBox.addItems(aw.qmc.weight_units)
         self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(aw.qmc.weight[2]))
         self.unitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeWeightUnit(i))
@@ -19727,8 +19740,8 @@ class editGraphDlg(ArtisanDialog):
         bean_density_per_label = QLabel(QApplication.translate("Label", "per",None))
         self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
         self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
-        self.bean_density_volume_edit.setMinimumWidth(60)
-        self.bean_density_volume_edit.setMaximumWidth(60)
+        self.bean_density_volume_edit.setMinimumWidth(70)
+        self.bean_density_volume_edit.setMaximumWidth(70)
         self.bean_density_volume_edit.setAlignment(Qt.AlignRight)
         self.bean_density_volumeUnitsComboBox = QComboBox()
         self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
@@ -20112,8 +20125,10 @@ class editGraphDlg(ArtisanDialog):
         timeLayoutBox.addLayout(timeLayout)
         timeLayoutBox.addStretch()
         mainLayout = QVBoxLayout()
-        mainLayout.addLayout(timeLayoutBox)
         mainLayout.setContentsMargins(3, 3, 3, 3)
+        mainLayout.addStretch()
+        mainLayout.addLayout(timeLayoutBox)
+        mainLayout.addStretch()
 #        timeGroupLayout = QGroupBox(QApplication.translate("GroupBox", "Times",None))
 #        timeGroupLayout.setLayout(mainLayout)
         eventbuttonLayout = QHBoxLayout()
@@ -20930,7 +20945,8 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.title = u(self.titleedit.text())
         aw.qmc.container_idx = self.tareComboBox.currentIndex() - 3
         # Update beans
-        aw.qmc.beans = u(self.beansedit.text()) # u(self.beansedit.toPlainText())
+        aw.qmc.beans = u(self.beansedit.toPlainText())
+#        aw.qmc.beans = u(self.beansedit.text())
         #update ambient temperature source
         aw.qmc.ambientTempSource = self.ambientComboBox.currentIndex()
         #update weight
