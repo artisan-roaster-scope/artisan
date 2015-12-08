@@ -9,8 +9,8 @@ o PyQt 4.11.4
 o numpy 1.9.2
 o scipy 0.15.1
 o matplotlib 1.4.3
-o pyaudio 0.2.8
-o minimalmodbus 0.6
+(o pyaudio 0.2.8)
+(o minimalmodbus 0.6)
 o Phidgets Python 2.1.8.20150326
 o pyobjc 2.5.1
 o modulegraph >0.10.4 trunk (21.4.2013)
@@ -465,6 +465,7 @@ all: lib/$(PALIB) all-recursive examples selftests
 # mkdir pyaudio-0.2.8
 # cd pyaudio-0.2.8
 # git clone https://github.com/bastibe/PyAudio.git
+ or # git clone https://github.com/jleb/pyaudio
 # cd PyAudio
 
 Download and extract PortAudio pa_stable_v19_20140130.tgz from http://www.portaudio.com/download.html
@@ -657,7 +658,7 @@ https://github.com/defnull/bottle/releases
 # python setup.py build
 # sudo python setup.py install
 
-25) gevent 1.0.1
+25) gevent 1.0.2
 
 https://pypi.python.org/pypi/gevent
 

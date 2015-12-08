@@ -6,6 +6,26 @@
 !include FileFunc.nsh
 !insertmacro GetParameters
 
+; HM NIS Edit Wizard helper defines
+!define py2exeOutputDir 'dist'
+!define PRODUCT_NAME "Artisan"
+!define PRODUCT_VERSION "0.9.9.0"
+!define PRODUCT_PUBLISHER "The Artisan Team"
+!define PRODUCT_WEB_SITE "http://code.google.com/p/artisan/"
+!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\artisan.exe"
+!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+!define PRODUCT_UNINST_ROOT_KEY "HKLM"
+
+Caption "${PRODUCT_NAME}"
+VIProductVersion ${PRODUCT_VERSION}
+VIAddVersionKey ProductName "${PRODUCT_NAME}"
+VIAddVersionKey Comments "Artisan App"
+VIAddVersionKey CompanyName ""
+VIAddVersionKey LegalCopyright Artisan.org
+VIAddVersionKey FileVersion "${PRODUCT_VERSION}"
+VIAddVersionKey FileDescription "${PRODUCT_NAME} ${PRODUCT_VERSION} Installer"
+VIAddVersionKey ProductVersion "${PRODUCT_VERSION}"
+
 ; - - - - do not edit below this line, normaly - - - -
 !ifdef compressor
     SetCompressor ${compressor}

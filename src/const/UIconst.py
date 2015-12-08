@@ -115,12 +115,13 @@ CONF_MENU_AUTOSAVE = QApplication.translate("Menu", "Autosave...", None)
 CONF_MENU_BATCH = QApplication.translate("Menu", "Batch...", None)
 CONF_MENU_ALARMS = QApplication.translate("Menu", "Alarms...", None)
 CONF_MENU_LANGUAGE = QApplication.translate("Menu", "Language", None)
+
+#Languages
 CONF_MENU_ENGLISH = u("English") # Do not translate
 CONF_MENU_GERMAN = u("Deutsch")  # Do not translate
 CONF_MENU_SPANISH = u("Espa\u00f1ol") # Do not translate
 CONF_MENU_FRENCH = u("Fran\u00e7ais") # Do not translate
 CONF_MENU_SWEDISH = u("Svenska") # Do not translate
-
 CONF_MENU_ITALIAN = u("Italiano") # Do not translate
 CONF_MENU_CHINESE_CN = u("\u7b80\u4f53\u4e2d\u6587\u7248") # Do not translate
 CONF_MENU_CHINESE_TW = u("\u4e2d\u570b\u50b3\u7d71") # Do not translate

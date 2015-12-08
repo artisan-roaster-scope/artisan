@@ -27,8 +27,11 @@ import artisanlib
 VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
-#QTDIR = r'/Developer/Applications/Qt/' # qt4
-QTDIR = r'/Users/luther/Qt5.4.2/5.4/clang_64/' # qt5
+try:
+    QTDIR = os.environ["QT_PATH"] + r'/'
+except:
+    QTDIR = r'/Users/luther/Qt5.4.2/5.4/clang_64/' # qt5
+    #QTDIR = r'/Developer/Applications/Qt/' # qt4
 
 APP = ['artisan.py']
 
@@ -232,7 +235,7 @@ for fw in [
             print 'Deleting', file
             os.remove(os.path.join(root,file))
             
-os.remove('./Artisan.app/Contents/Frameworks/libwx_osx_cocoau-3.0.0.0.0.dylib')
+#os.remove('./Artisan.app/Contents/Frameworks/libwx_osx_cocoau-3.0.0.0.0.dylib')
 
 
 print '*** Removing unused files ***'

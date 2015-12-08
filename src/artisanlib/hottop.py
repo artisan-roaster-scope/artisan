@@ -15,7 +15,7 @@ control = False # Hottop under control?
 SP = None
 
 # safety cut-off BT temperature
-BTcutoff = 212
+BTcutoff = 220 # 220C = 428F
 
 xCONTROL = None # False: just logging; True: logging+control
 xBT = None
@@ -147,7 +147,7 @@ def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
 
         # control part
         if aCONTROL.value:
-            # safety cut at BT=212C
+            # safety cut at BT=212C (413F)
             if BT >= BTcutoff:
                 # set main fan to maximum (set to 10), turn off heater (set to 0), open solenoid for eject, turn on drum and stirrer (all set to 1)
                 aSET_HEATER.value = 0

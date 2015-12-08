@@ -505,11 +505,9 @@ from const import UIconst
 #        self.clock.setHMS(a,b,c,d)
 #        
 #    def start(self):
-#        print("start")
 #        self.clock.start()
 #        
 #    def elapsed(self):
-#        print(self.clock.elapsed())
 #        return self.clock.elapsed()
   
 
@@ -934,7 +932,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundxtcolor = self.palette["xt"]
         self.backgrounddeltaetcolor = self.palette["deltaet"]
         self.backgrounddeltabtcolor = self.palette["deltabt"]
-        self.backmoveflag = 1
+        self.backmoveflag = 1 # aligns background on redraw if 1
         self.detectBackgroundEventTime = 20 #seconds
         self.backgroundReproduce = False
         self.Betypes = [QApplication.translate("Scope Annotation", "Speed",None),
@@ -2065,7 +2063,10 @@ class tgraphcanvas(FigureCanvas):
             elif self.timeindexB[0] != -1 and self.timeindex[0] != -1: # CHARGE
                 ptime = self.timex[self.timeindex[0]]
                 btime = self.timeB[self.timeindexB[0]]
-            if ptime and btime:
+            elif self.timeindexB[0] != -1:
+                ptime = 0
+                btime = self.timeB[self.timeindexB[0]]
+            if ptime != None and btime != None:
                 difference = ptime - btime
                 if difference > 0:
                     self.movebackground("right",abs(difference))
@@ -3122,9 +3123,9 @@ class tgraphcanvas(FigureCanvas):
                 
                 if not self.locktimex:
                     self.startofx = 0
-                    self.endofx = self.resetmaxtime
                 else:
                     self.startofx = self.locktimex_start
+                    self.endofx = self.resetmaxtime
                 if self.endofx < 1:
                     self.endofx = 60
 
@@ -3206,6 +3207,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.hideExtraButtons(changeDefault=False)
                 aw.hideLCDs()
                 aw.hideSliders(changeDefault=False)
+                aw.enableEditMenus()
                 
                 aw.arduino.pidActive = False
 
@@ -3499,9 +3501,7 @@ class tgraphcanvas(FigureCanvas):
     
                 self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
     
-                #Set axes same as in __init__
-                if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
-                    self.endofx = 60
+
                 self.ax.set_ylim(self.ylimit_min, self.ylimit)
                 self.ax.set_autoscale_on(False)
                 
@@ -3561,7 +3561,10 @@ class tgraphcanvas(FigureCanvas):
                 
     #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
     #            self.ax.spines['top'].set_color('none')
-                tick_dir = 'inout'
+                if aw.qmc.flagon or sampling:
+                    tick_dir = 'in'
+                else:
+                    tick_dir = 'inout'
                 self.ax.tick_params(\
                     axis='x',           # changes apply to the x-axis
                     which='both',       # both major and minor ticks are affected
@@ -3576,15 +3579,7 @@ class tgraphcanvas(FigureCanvas):
                     bottom='on',        # ticks along the bottom edge are on
                     top='off',          # ticks along the top edge are off
                     direction=tick_dir,
-                    labelbottom='on')   # labels along the bottom edge are on    
-#                    self.ax.tick_params(\
-#                        axis='both',
-#                        which='minor',
-#                        left='off',
-#                        right='off',
-#                        bottom='off',        # ticks along the bottom edge are on
-#                        top='off',          # ticks along the top edge are off
-#                    )  
+                    labelbottom='on')   # labels along the bottom edge are on 
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("medium")
                 for label in self.ax.get_xticklabels() :
@@ -4749,9 +4744,9 @@ class tgraphcanvas(FigureCanvas):
             if not aw.HottopControlActive:
                 aw.hideSliders(changeDefault=False)
                 aw.hideExtraButtons(changeDefault=False)
-            aw.enableEditMenus()
             aw.arduino.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
+            aw.enableEditMenus()
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
             #appnope.nap()
             aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
@@ -4893,6 +4888,7 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None))
             aw.button_2.setText(QApplication.translate("Button", "START",None))
             aw.lowerbuttondialog.setVisible(False)
+            aw.messagelabel.setVisible(True)
             aw.phasesLCDs.hide()
             aw.hideEventsMinieditor()
             if aw.qmc.autosaveflag and aw.qmc.autosavepath:
@@ -6360,6 +6356,7 @@ class tgraphcanvas(FigureCanvas):
             self.reset(redraw=False,soundOn=False)
             self.connect_designer()
             self.designerinit()
+        aw.disableEditMenus(designer=True)
 
     #used to start designer from scratch (not from a loaded profile)
     def designerinit(self):
@@ -6409,6 +6406,9 @@ class tgraphcanvas(FigureCanvas):
         if lpindex != -1 and not lpindex in self.timeindex:
             lptime = self.timex[lpindex]
             lptemp2 = self.temp2[lpindex]
+            # we only consider TP if its BT is at least 20 degrees lower than the CHARGE temperature
+            if self.temp2[self.timeindex[0]] < (lptemp2 + 20):
+                lpindex = -1                
         else:
             lpindex = -1
 
@@ -6448,7 +6448,8 @@ class tgraphcanvas(FigureCanvas):
 #                self.ax.lines = self.ax.lines[0:4]
 #            else:
 #                self.ax.lines = []
-            self.delta_ax.lines = []
+            if self.delta_ax != None:
+                self.delta_ax.lines = []
             self.ax.lines = []
             
             fontprop_medium = aw.mpl_fontproperties.copy()
@@ -6503,7 +6504,8 @@ class tgraphcanvas(FigureCanvas):
 
             rcParams['path.sketch'] = (0,0,0)
             
-            trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
+            if (self.DeltaBTflag or self.DeltaETflag) and self.delta_ax != None:
+                trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
             if self.DeltaBTflag:
                 funcDelta = func.derivative()
                 deltabtvals = [x*60 for x in funcDelta(timez).tolist()]
@@ -8828,6 +8830,7 @@ class ApplicationWindow(QMainWindow):
         
         self.loadSettingsAction = QAction(UIconst.SETTINGS_MENU_LOAD,self)
         self.loadSettingsAction.triggered.connect(self.loadSettings)
+        self.loadSettingsAction.setMenuRole(QAction.NoRole) # avoid specific handling of settings menu
         self.helpMenu.addAction(self.loadSettingsAction)
                 
         self.openRecentSettingMenu = self.helpMenu.addMenu(UIconst.SETTINGS_MENU_LOADRECENT)
@@ -8837,6 +8840,7 @@ class ApplicationWindow(QMainWindow):
         
         self.saveAsSettingsAction = QAction(UIconst.SETTINGS_MENU_SAVEAS,self)
         self.saveAsSettingsAction.triggered.connect(self.saveSettings)
+        self.saveAsSettingsAction.setMenuRole(QAction.NoRole)  # avoid specific handling of settings menu
         self.helpMenu.addAction(self.saveAsSettingsAction)
 
         self.helpMenu.addSeparator()
@@ -10791,9 +10795,8 @@ class ApplicationWindow(QMainWindow):
         else:
             self.setLCDsDigitCount(3)
 
-    def enableEditMenus(self,designer=False):
-        if designer:
-            self.newRoastAction.setEnabled(True)
+    def enableEditMenus(self):
+        self.newRoastAction.setEnabled(True)
         self.fileLoadAction.setEnabled(True) # open
         self.openRecentMenu.setEnabled(True) # open recent
         self.importMenu.setEnabled(True) # import
@@ -10808,11 +10811,9 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.setEnabled(True)
         self.deviceAction.setEnabled(True)
         self.commportAction.setEnabled(True)
-        if not designer:
-            self.designerAction.setEnabled(True)
+        self.designerAction.setEnabled(True)
         self.wheeleditorAction.setEnabled(True)
-        if designer:
-            self.hudAction.setEnabled(True)            
+        self.hudAction.setEnabled(True)            
         self.loadSettingsAction.setEnabled(True)
         self.openRecentSettingMenu.setEnabled(True)
         self.saveAsSettingsAction.setEnabled(True)
@@ -10822,6 +10823,8 @@ class ApplicationWindow(QMainWindow):
     def disableEditMenus(self,designer=False):
         if designer:
             self.newRoastAction.setEnabled(False)
+        else:
+            self.newRoastAction.setEnabled(True)
         self.fileLoadAction.setEnabled(False) # open
         self.openRecentMenu.setEnabled(False) # open recent
         self.importMenu.setEnabled(False) # import
@@ -10838,9 +10841,13 @@ class ApplicationWindow(QMainWindow):
         self.commportAction.setEnabled(False)
         if not designer:
             self.designerAction.setEnabled(False)
+        else:
+            self.designerAction.setEnabled(True)
         self.wheeleditorAction.setEnabled(False)
         if designer:
             self.hudAction.setEnabled(False)
+        else:
+            self.hudAction.setEnabled(True)
         self.loadSettingsAction.setEnabled(False)
         self.openRecentSettingMenu.setEnabled(False)
         self.saveAsSettingsAction.setEnabled(False)
@@ -10918,6 +10925,9 @@ class ApplicationWindow(QMainWindow):
             aw.sendmessage("%s"%aw.qmc.etypes[3])
         elif key == 66:  #letter b hides/shows extra rows of event buttons
             self.toggleextraeventrows()
+        elif key == 77:  #letter m hides/shows standard buttons row
+            if aw.qmc.flagstart:
+                self.standardButtonsVisibility()
         #Extra event buttons palette. Numerical keys [0,1,2,3,4,5,6,7,8,9]
         elif key > 47 and key < 58:
             button = [48,49,50,51,52,53,54,55,56,57] 
@@ -11156,22 +11166,23 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Error:",None) + " automaticsave() {0}").format(str(e)),exc_tb.tb_lineno)
 
     def viewKshortcuts(self):
-        string = u(QApplication.translate("Message", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[SPACE]</b> = Choses current button",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[LEFT]</b> = Move to the left",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[RIGHT]</b> = Move to the right",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[a]</b> = Autosave",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + START",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[d]</b> = Toggle xy scale (T/Delta)",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[:]</b> = Desktop ScreenShot",None)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[q,w,e,r + <i>nn</i>]</b> = Quick Custom Event",None)) + "<br><br>"
+        string = u(QApplication.translate("Message", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[SPACE]</b> = Choses current button",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[LEFT]</b> = Move to the left",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[RIGHT]</b> = Move to the right",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[a]</b> = Autosave",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + START",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[d]</b> = Toggle xy scale (T/Delta)",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[m]</b> = Shows/Hides Event Buttons",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[:]</b> = Desktop ScreenShot",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[q,w,e,r + <i>nn</i>]</b> = Quick Custom Event",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[f]</b> = Full Screen Mode",None))
 
         QMessageBox.information(self,QApplication.translate("Message", "Keyboard Shotcuts",None),string)
@@ -13988,6 +13999,16 @@ class ApplicationWindow(QMainWindow):
                 self.realignbuttons()
                 # self.update_extraeventbuttons_visibility() # already called within realignbuttons()
             settings.endGroup()
+            
+            #update axis limits
+            if not self.qmc.locktimex:
+                self.qmc.startofx = 0
+            else:
+                self.qmc.startofx = self.qmc.locktimex_start
+                self.qmc.endofx = self.qmc.resetmaxtime
+            if self.qmc.endofx < 1:
+                self.qmc.endofx = 60
+                                
             res = True
             
         except Exception:
@@ -16294,12 +16315,10 @@ $cupping_notes
             self.startdesigner()
 
     def startdesigner(self):
-        aw.disableEditMenus(designer=True)
         self.qmc.designer()
 
     def stopdesigner(self):
-        aw.enableEditMenus(designer=True)
-        #self.qmc.reset()
+        aw.enableEditMenus()
         self.qmc.convert_designer()
 
     def editgraph(self):
@@ -16915,6 +16934,14 @@ $cupping_notes
         showHelpDlg.show()
         
         
+    def standardButtonsVisibility(self):
+        if aw.lowerbuttondialog.isVisible():
+            aw.lowerbuttondialog.setVisible(False)
+            aw.messagelabel.setVisible(False)
+        else:
+            aw.lowerbuttondialog.setVisible(True)
+            aw.messagelabel.setVisible(True)
+
     def toggleextraeventrows(self):
         if aw.extrabuttondialogs.isVisible(): # self.extraeventsbuttonsflag:            
             aw.hideExtraButtons()
@@ -19958,12 +19985,14 @@ class editGraphDlg(ArtisanDialog):
 #        textLayout.addWidget(dateedit,0,1)
         datebatch = QHBoxLayout()
         datebatch.addWidget(dateedit)
+        datebatch.addSpacing(15)
 #        textLayout.addWidget(batchlabel,1,0)
 #        if aw.superusermode and aw.qmc.batchcounter > -1:
 #            textLayout.addLayout(batchLayout,1,1)
 #        else:
 #            textLayout.addWidget(batchedit,1,1)
         datebatch.addWidget(batchlabel)
+        datebatch.addSpacing(7)
         if aw.superusermode and aw.qmc.batchcounter > -1:
             datebatch.addLayout(batchLayout)
         else:
@@ -19977,7 +20006,9 @@ class editGraphDlg(ArtisanDialog):
         textLayout.addWidget(operatorlabel,4,0)
         roasteroperator = QHBoxLayout()
         roasteroperator.addWidget(self.operator)
-        roasteroperator.addWidget(roastertypelabel)
+        roasteroperator.addSpacing(15)
+        roasteroperator.addWidget(roastertypelabel)        
+        roasteroperator.addSpacing(7)
         roasteroperator.addWidget(self.roaster)
         textLayout.addLayout(roasteroperator,4,1)        
         weightLayout = QHBoxLayout()
@@ -24697,6 +24728,7 @@ class backgroundDlg(ArtisanDialog):
         aw.qmc.backgroundeventsflag = bool(self.backgroundeventsflag.isChecked())
         aw.qmc.DeltaETBflag = bool(self.backgroundDeltaETflag.isChecked())
         aw.qmc.DeltaBTBflag = bool(self.backgroundDeltaBTflag.isChecked())
+        aw.qmc.redraw(recomputeAllDeltas=True)
         
     def changeAlignEventidx(self,i):
         aw.qmc.alignEvent = i
@@ -24729,12 +24761,11 @@ class backgroundDlg(ArtisanDialog):
         self.xtcurveComboBox.blockSignals(False)
         self.pathedit.setText(u(self.filename))
         self.backgroundCheck.setChecked(True)
+        aw.qmc.timealign(redraw=False)
         self.readChecks()
         self.createEventTable()
         self.createDataTable()
-        aw.qmc.timealign(redraw=aw.qmc.flagon)
-        aw.qmc.redraw()
-        aw.qmc.safesaveflag = True
+        #aw.qmc.safesaveflag = True
 
     def createEventTable(self):
         self.eventtable.clear()
@@ -26533,18 +26564,21 @@ class serialport(object):
     # input: value x; divider d; mode m
     # returns processed value
     def processChannelData(self,x,d,m):
-        # apply divider
         if x is None:
             res = -1
-        elif d==1: # apply divider
-            res = x / 10.
-        elif d==2: # apply divider
-            res = x / 100.
-        # convert temperature scale
-        if m == "C" and aw.qmc.mode == "F":
-            res = aw.qmc.fromCtoF(res)
-        elif m == "F" and aw.qmc.mode == "C":
-            res = aw.qmc.fromFtoC(res)
+        else:            
+            # apply divider
+            if d==1: # apply divider
+                res = x / 10.
+            elif d==2: # apply divider
+                res = x / 100.
+            else:
+                res = x
+            # convert temperature scale
+            if m == "C" and aw.qmc.mode == "F":
+                res = aw.qmc.fromCtoF(res)
+            elif m == "F" and aw.qmc.mode == "C":
+                res = aw.qmc.fromFtoC(res)
         return res
 
     #returns v1,v2 from a connected MODBUS device
@@ -32996,6 +33030,7 @@ class AlarmDlg(ArtisanDialog):
                 header.setStretchLastSection(True)
                 self.markNotEnabledAlarmRows()
                 self.alarmtable.setSortingEnabled(True)
+            self.alarmtable.sortItems(0)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " createalarmtable() {0}").format(str(ex)),exc_tb.tb_lineno)
