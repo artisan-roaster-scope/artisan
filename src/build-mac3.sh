@@ -6,13 +6,17 @@ export PATH=/Library/Frameworks/Python.framework/Versions/3.4/bin/:$PATH
 
 # for PyQt4 running on Qt5
 export ORGPATH=$PATH
-export PATH=/Users/luther/Qt5.4.2/5.4/clang_64/bin:/Users/luther/Qt5.4.2/5.4/clang_64/lib:$PATH
 
-export DYLD_FRAMEWORK_PATH=/Users/luther/Qt5.4.2/5.4/clang_64/lib/
+# add the following two lines to your ~/.bash_profile (without the commenting)
+#  QT_PATH="/Users/<shortname>/Qt5.4.2/5.4/clang_64"
+#  export QT_PATH
+export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
+
+export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 
 # translations
-pylupdate5 artisan.pro
-lrelease -verbose artisan.pro
+$PYTHON/bin/pylupdate5 artisan.pro
+$QT_PATH/bin/lrelease -verbose artisan.pro
 
 # distribution
 rm -rf build dist
@@ -22,4 +26,4 @@ python3.4 setup-mac3.py py2app
 # recreate the translations with PyQt4/Qt4 for the Windows releases that are behind
 
 export PATH=$ORGPATH
-lrelease -verbose artisan.pro
+$QT_PATH/bin/lrelease -verbose artisan.pro
