@@ -99,7 +99,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>PyMainFileNames</key>
+    <key>NSHighResolutionCapable</key>
+    <string>True</string>	
+    <key>PyMainFileNames</key>
 	<array>
 		<string>__boot__</string>
 	</array>
