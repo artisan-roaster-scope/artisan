@@ -7645,7 +7645,7 @@ class VMToolbar(NavigationToolbar):
 
     def _icon(self, name):
         #dirty hack to prefer .svg over .png Toolbar icons
-        if not svgsupport or (platf == 'Windows'):
+        if not svgsupport:
             p = os.path.join(self.basedir, name.replace('.svg','.png'))
         else:
             p = os.path.join(self.basedir, name.replace('.png','.svg'))
@@ -7869,10 +7869,10 @@ class SampleThread(QThread):
                             for i in range(nxdevices):
                                 extrat1 = aw.qmc.RTextratemp1[i]
                                 extrat2 = aw.qmc.RTextratemp2[i]
-                                if aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
+                                if len(aw.qmc.extramathexpression1) > i and aw.qmc.extramathexpression1[i] != None and len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+3),RTsval=aw.qmc.RTextratemp1[i])
                                     aw.qmc.RTextratemp1[i] = extrat1
-                                if aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
+                                if len(aw.qmc.extramathexpression2) > i and aw.qmc.extramathexpression2[i] != None and len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],aw.qmc.RTextratx[i],RTsname="Y"+str(2*i+4),RTsval=aw.qmc.RTextratemp2[i])
                                     aw.qmc.RTextratemp2[i] = extrat2
                                
@@ -16770,7 +16770,7 @@ class ApplicationWindow(QMainWindow):
                     e1 = self.qmc.temp1[i]
                     if e1 > 500:
                         e1 = 0
-                    e2 = self.qmc.temp1[i]
+                    e2 = self.qmc.temp1[i+1]
                     if e2 > 500:
                         e2 = 0
                     e = (max(0,e1) + max(0,e2)) / 2.0
@@ -28579,7 +28579,7 @@ class serialport(object):
             aw.ser.PhidgetIOAttached = False
             try:
                 aw.ser.PhidgetIO.closePhidget()
-            except Exception:
+            except:
                 pass
             aw.ser.PhidgetIO = None
             _, _, exc_tb = sys.exc_info()

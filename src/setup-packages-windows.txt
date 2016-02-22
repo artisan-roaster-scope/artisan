@@ -1,10 +1,10 @@
 Current Versions:
 
-o Python 2.7.10
+o Python 2.7.11
 o pyserial 2.7
 o QT 4.8.7
 o PyQt 4.11.4
-o numpy 1.9.2
+o numpy 1.10.4
 o scipy 0.15.1
 o matplotlib 1.4.3
 o pyparsing 2.0.1
@@ -27,6 +27,10 @@ o win_inet_pton 1.0.1
 
 Upgrade History:
 
+- 2016-02-23
+ . Python 2.7.10 => 2.7.11
+ . matplotlib 1.4.3 => 1.5.1
+ . numpy 1.9.2 => 1.10.4
 - 2015-06-14
  . Python 2.7.9 => 2.7.10
  . QT 4.8.6 => 4.8.7

@@ -57,6 +57,8 @@ Features
 - LargeLCDs and WebLCDs
 - volume calculator
 - batch counter
+- roast, production (for tax reporting) and ranking reports
+- PID-based roast reproduction (follow background mode)
 
 Documentation and Support
 ------------------------
