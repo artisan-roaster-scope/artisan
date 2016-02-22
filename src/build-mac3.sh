@@ -1,5 +1,6 @@
 #!/bin/sh
 export MACOSX_DEPLOYMENT_TARGET=10.7
+export PYTHON="/Library/Frameworks/Python.framework/Versions/3.4"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/site-packages"
 
 export PATH=/Library/Frameworks/Python.framework/Versions/3.4/bin/:$PATH

@@ -33,6 +33,10 @@ cp includes/alarmclock.ttf dist
 cp includes/alarmclock.woff dist
 cp includes/artisan.tpl dist
 cp includes/bigtext.js dist
+cp includes/sorttable.js dist
+cp includes/report-template.htm dist
+cp includes/roast-template.htm dist
+cp includes/ranking-template.htm dist
 cp includes/jquery-1.11.1.min.js dist
 cp -R icons dist
 cp -R Wheels dist

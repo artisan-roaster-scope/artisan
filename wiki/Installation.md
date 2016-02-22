@@ -36,6 +36,7 @@ Installation Mac OS X
 
 1. Install USB/serial driver
    + for Omega HH806AU and HH506RA meters download and run the [FTDI VCP OS X installer](http://www.ftdichip.com/Drivers/VCP.htm)
+   NOTE: OS X 10.9 and later contain already support for the FTDI hardware and therefore no additional driver needs to be installed on those systems
    + for Omega HH309A meters (with USB cable) download and run the VCP OS X installer to install the [CP210x CP210x driver from Silicon Labs](http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx)
    + for the original Voltkraft USB cable it is the [CP210x driver from Silicon Labs](http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx)
    + some other serial2USB dongles use the [http://prolificusa.com/pl-2303hx-drivers/](Prolific PL2303 driver) (on Mac OS X 10.8 and higher some reported that the org. Profilic driver failed to work, but the [NoZAP driver](http://sourceforge.net/projects/osx-pl2303/) did work)
@@ -49,7 +50,13 @@ Installation Mac OS X
 Installation Linux
 ------------------
 
-The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually. This can be done by either double clicking the package icon from your file viewer or by entering the following commands in a shell.
+1. Install USB/serial driver4
+
+Note that the FTDI serial driver is built-in for most Linux kernels after 3.5. 
+
+2. Download and install the Artisan Linux installer for your platform
+
+The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually. This can be done by either double clicking the package icon from your file viewer or by entering the following commands in a shell. 
 
 **Ubuntu/Debian**
 
@@ -96,6 +103,26 @@ After this command you might need to logout and login again. Try
 that your account was successful added to the dialout group.
 
 
+
+### Consistent USB names on Debian (by Rob Gardner)
+
+On some Debian-based systems the USB device names are different, once /dev/tty/USB0 another time /dev/tty/USB1, on each connect of the same device. The solution is to add a udev rule that creates a symbolic link with a constant name to point to the actual device. In my situation, I added a file called 
+
+```
+  /etc/udev/rules.d/datalogger.rules
+```
+
+that contains this
+
+```
+  ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", GROUP="plugdev", SYMLINK="tmd-56"
+```
+
+This tells udev to create a symbolic link "tmd-56" to point to the real device file. You can use the 'lsusb' command to easily find the vendor and product ID for your device. Then I just simply tell Artisan that my serial port is /dev/tmd-56 and it always finds it, no matter
+if the probe is plugged in before or after starting Artisan. You may need to customize the plugdev group also for your distro and add
+yourself to the plugdev group. On some systems the "dialout" group is used for serial devices (see above).
+
+
 Device Configuration
 --------------------
 
@@ -107,9 +134,9 @@ Once Artisan is up, chose your device using the menu *Conf* and then select the 
 
 To install a USB driver. Plug the meter in USB port. Let Windows find (for Mac setup see above) and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one, or thorugh the manufacturer webpage
 
-### Omega HH806AU / Amprobe TMD-56
+### Omega HH806AU / Omega HH802U / Amprobe TMD-56
 
-The Omega HH806AU as well as the Amprobe TMD-56 device are supported by Artisan only if they are communicating on channel 0.
+The Omega HH806AU, HH802U as well as the Amprobe TMD-56 device are supported by Artisan only if they are communicating on channel 0.
 
 + How to check the channel number
 
@@ -122,8 +149,9 @@ the second display will show ID number.
 + How RESET the meter to channel zero
 
 ```
-To SET CH/ID to 00,00, by pressing "T1-T2" key and
-" " power key for more than 6 seconds with the meter
+To SET CH/ID to 00,00, by pressing the "T1-T2" key
+(labeled "Hi/Lo Limits" on the HH802U) and
+the power key for more than 6 seconds with the meter
 powered down. The meter will set channel and ID
 to 00,00 status. The second display will show 00,
 which means that the channel and ID has been set to

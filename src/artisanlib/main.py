@@ -42,6 +42,7 @@ import serial.tools.list_ports
 import math
 import binascii
 import time as libtime
+import datetime
 import warnings
 import string as libstring
 import cgi
@@ -104,13 +105,13 @@ else:
                               QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)
 
 import matplotlib as mpl
+from matplotlib import cm
 
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
 # (see Mac OS X specific notes in the PyQt5 documentation)
 #print(QImageReader.supportedImageFormats())
 #print(QLibraryInfo.location(QLibraryInfo.PluginsPath))
-
 
 svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
 
@@ -221,7 +222,10 @@ if sys.version < '3':
         return c
 else:
     def decs2string(x):
-        return bytes(x)
+        if len(x) > 0:
+            return bytes(x)
+        else:
+            return b""
     def arange(x):
         return range(x)
     def stringp(x):
@@ -611,7 +615,6 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Aftertaste",None),
                                             QApplication.translate("Textbox", "Balance",None)]
 
-
         self.Intelligentsiaflavordefaultlabels = [QApplication.translate("Textbox", "Sweetness",None),
                                             QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Body",None),
@@ -628,6 +631,16 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Aroma Intensity",None),
                                             QApplication.translate("Textbox", "Aroma Persistence",None),
                                             QApplication.translate("Textbox", "Balance",None)]
+
+        self.WorldCoffeeRoastingChampionship = [QApplication.translate("Textbox", "Aroma",None),
+                                            QApplication.translate("Textbox", "Flavour",None),
+                                            QApplication.translate("Textbox", "Flavour",None),
+                                            QApplication.translate("Textbox", "Aftertaste",None),
+                                            QApplication.translate("Textbox", "Acidity",None),
+                                            QApplication.translate("Textbox", "Body",None),
+                                            QApplication.translate("Textbox", "Balance",None),
+                                            QApplication.translate("Textbox", "Balance",None),
+                                            QApplication.translate("Textbox", "Overall",None)]
 
         self.ax1 = self.ax2 = None
 
@@ -3182,7 +3195,8 @@ class tgraphcanvas(FigureCanvas):
                     aw.moveslider(3,0)
                     # reset Arduino/TC4 PID SV
                     aw.moveSVslider(0)
-                    aw.arduino.sv = 0
+                aw.arduino.sv = None
+                aw.fujipid.sv = None
                 
                 # if there is already some data recorded, we remove the filename to force writing a new file
                 # and avoid accidential overwriting of existing data
@@ -3285,16 +3299,20 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " smooth() {0}").format(str(ex)),exc_tb.tb_lineno)
             return x
 
-    def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1):  # default 'hanning'
+    def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1,toIndex=0):  # default 'hanning'
         #pylint: disable=E1103        
         win_len = max(0,window_len)
         if win_len != 1: # at the lowest level we turn smoothing completely off
             if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
+                if toIndex==0: # no limit
+                    toIndex=len(a)
                 return numpy.concatenate(([None]*(fromIndex),
-                    self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[fromIndex:])).tolist()
-            elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
-                return numpy.concatenate((b[:aw.qmc.timeindex[0]+1],
-                    self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()[aw.qmc.timeindex[0]+1:])).tolist()            
+                        self.smooth(numpy.array(a)[fromIndex:toIndex],numpy.array(b)[fromIndex:toIndex],window_len,window).tolist(),
+                        [None]*(len(a)-toIndex)
+                         )).tolist()
+#            elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
+#                return numpy.concatenate((b[:aw.qmc.timeindex[0]+1],
+#                    self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()[aw.qmc.timeindex[0]+1:])).tolist()            
             else:
                 return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
         else:
@@ -3752,34 +3770,52 @@ class tgraphcanvas(FigureCanvas):
                     if self.DeltaETBflag or self.DeltaBTBflag:
                         if recomputeAllDeltas:
                             tx = numpy.array(self.timeB)
+                            if aw.qmc.timeindexB[0] > -1:
+                                roast_start_idx = aw.qmc.timeindexB[0]
+                            else:
+                                roast_start_idx = 0
+                            if aw.qmc.timeindexB[6] > 0:
+                                roast_end_idx = aw.qmc.timeindexB[6]
+                            else:
+                                roast_end_idx = len(tx)
+                            tx_roast = numpy.array(self.timeB[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
                             with numpy.errstate(divide='ignore'):
-                                nt1 = numpy.array(self.stemp1B)
-                                z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)                            
+                                #nt1 = numpy.array(self.stemp1B)
+                                nt1 = numpy.array(self.stemp1B[roast_start_idx:roast_end_idx])
+                                #z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)                            
+                                z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)                            
                             with numpy.errstate(divide='ignore'):
-                                nt2 = numpy.array(self.stemp2B)
-                                z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                            lt,ld1,ld2 = len(self.timeB),len(z1),len(z2)
+                                #nt2 = numpy.array(self.stemp2B)
+                                nt2 = numpy.array(self.stemp2B[roast_start_idx:roast_end_idx])
+                                #z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                                z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+                            lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
                             if lt > ld1:
                                 z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                             if lt > ld2:
                                 z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                            self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=self.timeindexB[0]) # CHARGE is the charge for the foreground, so we have to disable this here
-                            self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=self.timeindexB[0])
-                            # cut out the part after DROP
-                            if aw.qmc.timeindexB[6]:
-                                self.delta1B = numpy.append(self.delta1B[:self.timeindexB[6]+1],[None]*(len(self.delta1B)-self.timeindexB[6]-1))
-                                self.delta2B = numpy.append(self.delta2B[:self.timeindexB[6]+1],[None]*(len(self.delta2B)-self.timeindexB[6]-1))
-                            # cut out the part before CHARGE
-                            if aw.qmc.timeindexB[0] > -1 and aw.qmc.timeindexB[0] < aw.qmc.timeindexB[6]:
-                                self.delta1B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta1B[aw.qmc.timeindexB[0]:])
-                                self.delta2B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta2B[aw.qmc.timeindexB[0]:])
+#                            self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=self.timeindexB[0],toIndex=self.timeindexB[6])
+#                            self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=self.timeindexB[0],toIndex=self.timeindexB[6])
+                            self.delta1B = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
+                            self.delta2B = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
+                            # add None for parts before and after CHARGE/DROP
+                            self.delta1B = numpy.concatenate(([None]*(roast_start_idx),self.delta1B,[None]*(len(tx)-roast_end_idx)))
+                            self.delta2B = numpy.concatenate(([None]*(roast_start_idx),self.delta2B,[None]*(len(tx)-roast_end_idx)))
+#                            # cut out the part after DROP
+#                            if aw.qmc.timeindexB[6]:
+#                                self.delta1B = numpy.append(self.delta1B[:self.timeindexB[6]+1],[None]*(len(self.delta1B)-self.timeindexB[6]-1))
+#                                self.delta2B = numpy.append(self.delta2B[:self.timeindexB[6]+1],[None]*(len(self.delta2B)-self.timeindexB[6]-1))
+#                            # cut out the part before CHARGE
+#                            if aw.qmc.timeindexB[0] > -1 and aw.qmc.timeindexB[0] < aw.qmc.timeindexB[6]:
+#                                self.delta1B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta1B[aw.qmc.timeindexB[0]:])
+#                                self.delta2B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta2B[aw.qmc.timeindexB[0]:])
                             # filter out values beyond the delta limits
-                            if aw.qmc.mode == "C":
-                                rorlimit = aw.qmc.RoRlimitC
-                            else:
-                                rorlimit = aw.qmc.RoRlimitF
-                            self.delta1B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1B]
-                            self.delta2B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2B]
+#                            if aw.qmc.mode == "C":
+#                                rorlimit = aw.qmc.RoRlimitC
+#                            else:
+#                                rorlimit = aw.qmc.RoRlimitF
+#                            self.delta1B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1B]
+#                            self.delta2B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2B]
                         
                         ##### DeltaETB,DeltaBTB curves
                         trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
@@ -4030,37 +4066,57 @@ class tgraphcanvas(FigureCanvas):
                 if self.DeltaETflag or self.DeltaBTflag:
                     if recomputeAllDeltas:
                         tx = numpy.array(self.timex)
+                        if aw.qmc.timeindex[0] > -1:
+                            roast_start_idx = aw.qmc.timeindex[0]
+                        else:
+                            roast_start_idx = 0
+                        if aw.qmc.timeindex[6] > 0:
+                            roast_end_idx = aw.qmc.timeindex[6]
+                        else:
+                            roast_end_idx = len(tx)
+                        tx_roast = numpy.array(self.timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
                         if aw.qmc.flagon or len(tx) != len(self.stemp1):
                             t1 = self.temp1
                         else:
                             t1 = self.stemp1
                         with numpy.errstate(divide='ignore'):
-                            nt1 = numpy.array(t1)
-                            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                            #nt1 = numpy.array(t1)
+                            nt1 = numpy.array(t1[roast_start_idx:roast_end_idx])
+                            #z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+                            #z1 = numpy.concatenate(([None]*(aw.qmc.timeindex[0]),z1,[None]*(len(t1)-aw.qmc.timeindex[6])))
                         if aw.qmc.flagon or len(tx) != len(self.stemp2):
                             t2 = self.temp2
                         else:
                             t2 = self.stemp2
                         with numpy.errstate(divide='ignore'):
-                            nt2 = numpy.array(t2)
-                            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                        lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
+                            #nt2 = numpy.array(t2)
+                            nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
+                            #z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
+                            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+                            #z2 = numpy.concatenate(([None]*(aw.qmc.timeindex[0]),z2,[None]*(len(t2)-aw.qmc.timeindex[6])))
+                        lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
                         # make lists equal in length
                         if lt > ld1:
                             z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                         if lt > ld2:
                             z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                        self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
-                        self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
+                        #self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0],toIndex=aw.qmc.timeindex[6])
+                        #self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0],toIndex=aw.qmc.timeindex[6])
+                        self.delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
+                        self.delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
+                        # add None for parts before and after CHARGE/DROP
+                        self.delta1 = numpy.concatenate(([None]*(roast_start_idx),self.delta1,[None]*(len(tx)-roast_end_idx)))
+                        self.delta2 = numpy.concatenate(([None]*(roast_start_idx),self.delta2,[None]*(len(tx)-roast_end_idx)))
                         # filter out values beyond the delta limits
-                        # cut out the part after DROP
-                        if aw.qmc.timeindex[6]:
-                            self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
-                            self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
-                        # cut out the part before CHARGE
-                        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
-                            self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
-                            self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
+#                        # cut out the part after DROP
+#                        if aw.qmc.timeindex[6]:
+#                            self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
+#                            self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
+#                        # cut out the part before CHARGE
+#                        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
+#                            self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
+#                            self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
                         # remove values beyond the RoRlimit
                         if aw.qmc.mode == "C":
                             rorlimit = aw.qmc.RoRlimitC
@@ -4181,19 +4237,19 @@ class tgraphcanvas(FigureCanvas):
                         if self.timeindex[6]:
                             self.writestatistics(TP_index)
     
-    
-                    #if recorder on
-                    if self.flagon and self.eventsshowflag:
-                        if not self.eventsshowflag:
-                            Nevents = len(self.specialevents)
-                        #update to last event
-                        if Nevents:
-                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
-                        else:
-                            aw.etypeComboBox.setCurrentIndex(0)
-                            aw.valueEdit.setText("")
-                        aw.eNumberSpinBox.setValue(Nevents)
+# this seems to mess up the focus if sliders are shown, but mini editor not
+#                    #if recorder on
+#                    if self.flagon and self.eventsshowflag:
+#                        #if not self.eventsshowflag:
+#                        #    Nevents = len(self.specialevents)
+#                        #update to last event
+#                        if Nevents:
+#                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+#                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
+#                        else:
+#                            aw.etypeComboBox.setCurrentIndex(0)
+#                            aw.valueEdit.setText("")
+#                        aw.eNumberSpinBox.setValue(Nevents)
     
                 #update label colors
                 for label in self.ax.xaxis.get_ticklabels():
@@ -4310,6 +4366,18 @@ class tgraphcanvas(FigureCanvas):
             return (CFloat*9.0/5.0)+32.0
         else:
             return None
+            
+    def convertTemp(self,t,source_unit,target_unit):
+        if source_unit == "C":
+            if target_unit == "C":
+                return t
+            else:
+                return self.fromFtoC(t)
+        else:
+            if target_unit == "F":
+                return t
+            else:
+                return self.fromCtoF(t)
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
@@ -4722,6 +4790,12 @@ class tgraphcanvas(FigureCanvas):
             if len(self.timex) == 1:
                 aw.qmc.clearMeasurements()
             aw.arduino.pidOff()
+            # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
+            if self.qmc.device == 0 and aw.fujipid.followBackground:
+                aw.fujipid.followBackground = False
+                if aw.fujipid.sv > 0:
+                    aw.fujipid.setsv(0,silent=True)
+                    aw.fujipid.sv = 0
             self.disconnectProbes()
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
@@ -5376,6 +5450,14 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_5.setFlat(True)
                 aw.button_6.setDisabled(True) # also deactivate SCe button
                 aw.button_6.setFlat(True)
+                
+                # at DROP we stop the follow background on FujiPIDs and set the SV to 0
+                if self.qmc.device == 0 and aw.fujipid.followBackground:
+                    aw.fujipid.followBackground = False
+                    if aw.fujipid.sv > 0:
+                        aw.fujipid.setsv(0,silent=True)
+                        aw.fujipid.sv = 0
+                
             except Exception:
                 pass
             aw.eventactionx(aw.qmc.buttonactions[6],aw.qmc.buttonactionstrings[6])
@@ -6196,10 +6278,10 @@ class tgraphcanvas(FigureCanvas):
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
                     popt, pcov = curve_fit(func, xa, yn)
-                perr = numpy.sqrt(numpy.diag(pcov))
+                #perr = numpy.sqrt(numpy.diag(pcov))
                 xb = numpy.array(self.timex)
                 xxb = xb + charge
-                xxa = xa + charge
+                xxa = xa + charge                                    
                 self.ax.plot(xxb, func(xb, *popt),  color="black", linestyle = '-.', linewidth=3)
                 self.ax.plot(xxa, yn, "ro")
                 self.fig.canvas.draw()
@@ -6263,6 +6345,68 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " drawinterp() {0}").format(str(e)),exc_tb.tb_lineno)
             return
+            
+    # calculates the (interpolated) temperature from the given time/temp arrays at timepoint "seconds"
+    def timetemparray2temp(self,timearray,temparray,seconds):
+        if timearray and temparray and len(timearray) and len(temparray) and len(timearray) == len(temparray):
+            if seconds > timearray[-1] or seconds < timearray[0]:
+                # requested timepoint out of bonds
+                return -1
+            else:
+                # compute the closest index (left sided)
+                i = numpy.searchsorted(timearray,seconds,side='left')
+                ti = timearray[i]
+                tempi = temparray[i]
+                if i < len(timearray) - 1:
+                    j = i - 1
+                    tj = timearray[j]
+                    tempj = temparray[j]
+                    s =  (tempi - tempj) / (ti - tj)
+                    return tempj + s*(seconds - tj)
+                else:
+                    # should not be reached (guarded by the outer if)
+                    return ti
+        else:
+            return -1
+            
+    # if smoothed=True, the smoothed data is taken if available
+    # if relative=True, the given time in seconds is interpreted relative to CHARGE, otherwise absolute from the first mesasurement
+    def BTat(self,seconds,smoothed=True,relative=False):
+        if smoothed and self.stemp2 and self.stemp2 != []:
+            temp = self.stemp2
+        else:
+            temp = self.temp2
+        if self.timeindex[0] > -1 and relative:
+            offset = self.timex[self.timeindex[0]]
+        else:
+            offset = 0
+        return self.timetemparray2temp(self.timex,temp,seconds + offset)
+        
+    def ETat(self,seconds,smoothed=True,relative=False):
+        if smoothed and self.stemp1 and self.stemp1 != []:
+            temp = self.stemp1
+        else:
+            temp = self.temp1
+        if self.timeindex[0] > -1 and relative:
+            offset = self.timex[self.timeindex[0]]
+        else:
+            offset = 0
+        return self.timetemparray2temp(self.timex,temp,seconds + offset)
+        
+    def backgroundBTat(self,seconds, relative=False):
+        if self.timeindexB[0] > -1 and relative:
+            offset = self.timeB[self.timeindexB[0]]
+        else:
+            offset = 0
+        return self.timetemparray2temp(self.timeB,self.temp2B,seconds + offset)
+        
+    def backgroundETat(self,seconds,relative=False):
+        if self.timeindexB[0] > -1 and relative:
+            offset = self.timeB[self.timeindexB[0]]
+        else:
+            offset = 0
+        return self.timetemparray2temp(self.timeB,self.temp1B,seconds + offset)
+    
 
     def timearray2index(self,timearray,seconds):
         #find where given seconds crosses timearray
@@ -6274,10 +6418,10 @@ class tgraphcanvas(FigureCanvas):
             if seconds < timearray[0]:
                 return 0
             i = numpy.searchsorted(timearray,seconds,side='left')
-            if i < len(self.timex) - 1:
+            if i < len(timearray) - 1:
                 #look around (check if the value of the next index is closer
-                choice1 = abs(self.timex[i] - seconds)
-                choice2 = abs(self.timex[i-1] - seconds)
+                choice1 = abs(timearray[i] - seconds)
+                choice2 = abs(timearray[i-1] - seconds)
                 #return closest (smallest) index
                 if choice2 < choice1:
                     i = i - 1
@@ -7983,7 +8127,20 @@ class SampleThread(QThread):
                             sv = aw.arduino.calcSV(tx)
                         # update SV (if needed)
                         if sv != None and sv != aw.arduino.sv:
+                            sv = max(0,sv) # we don't send SV < 0
                             aw.arduino.setSV(sv)
+                    #update SV on FujiPIDs
+                    elif aw.qmc.device == 0 and aw.fujipid.followBackground:
+                        # calculate actual SV
+                        if aw.qmc.timeindex[0] != -1:
+                            # we set time=0 to CHARGE
+                            sv = aw.fujipid.calcSV(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
+                        else:
+                            sv = aw.fujipid.calcSV(tx)
+                        # update SV (if needed)
+                        if sv != None and sv != aw.fujipid.sv:
+                            sv = max(0,sv) # we don't send SV < 0
+                            aw.fujipid.setsv(sv,silent=True)
 
                     #check for each alarm that was not yet triggered
                     for i in range(len(aw.qmc.alarmflag)):
@@ -8455,11 +8612,43 @@ class ApplicationWindow(QMainWindow):
         PDFAction = QAction("PDF...",self)
         PDFAction.triggered.connect(lambda _=None : self.saveVectorGraph(".pdf"))
         self.saveGraphMenu.addAction(PDFAction)
+        
+        
+        self.reportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_REPORT)
 
         self.htmlAction = QAction(UIconst.FILE_MENU_HTMLREPORT,self)
         self.htmlAction.triggered.connect(self.htmlReport)
         self.htmlAction.setShortcut("Ctrl+R")
-        self.fileMenu.addAction(self.htmlAction)
+        self.reportMenu.addAction(self.htmlAction)
+
+        self.productionMenu = self.reportMenu.addMenu(UIconst.FILE_MENU_PRODUCTIONREPORT)
+        
+        self.productionWebAction = QAction(UIconst.FILE_MENU_REPORT_WEB,self)
+        self.productionWebAction.triggered.connect(self.productionReport)        
+        self.productionMenu.addAction(self.productionWebAction)
+        
+        self.productionCsvAction = QAction(UIconst.FILE_MENU_REPORT_CSV,self)
+        self.productionCsvAction.triggered.connect(self.productionCSVReport)        
+        self.productionMenu.addAction(self.productionCsvAction)
+        
+        self.productionSylkAction = QAction(UIconst.FILE_MENU_REPORT_SYLK,self)
+        self.productionSylkAction.triggered.connect(self.productionSYLKReport)
+        self.productionMenu.addAction(self.productionSylkAction)
+        
+        self.rankingMenu = self.reportMenu.addMenu(UIconst.FILE_MENU_RANKINGREPORT)
+        
+        self.rankingWebAction = QAction(UIconst.FILE_MENU_REPORT_WEB,self)
+        self.rankingWebAction.triggered.connect(self.rankingReport)        
+        self.rankingMenu.addAction(self.rankingWebAction)
+        
+        self.rankingCsvAction = QAction(UIconst.FILE_MENU_REPORT_CSV,self)
+        self.rankingCsvAction.triggered.connect(self.rankingCSVReport)        
+        self.rankingMenu.addAction(self.rankingCsvAction)        
+        
+        self.rankingSylkAction = QAction(UIconst.FILE_MENU_REPORT_SYLK,self)
+        self.rankingSylkAction.triggered.connect(self.rankingSYLKReport)
+        self.rankingMenu.addAction(self.rankingSylkAction)
+
 
         self.fileMenu.addSeparator()
 
@@ -8911,10 +9100,9 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
         if locale in ["el", "no"]:
             self.button_1.setMinimumWidth(120)
-            self.button_1.setMaximumSize(120, 45)
         else:
             self.button_1.setMinimumWidth(100)
-            self.button_1.setMaximumSize(100, 45)
+        self.button_1.setMinimumHeight(45)
         self.button_1.clicked.connect(lambda _:self.qmc.ToggleMonitor())
 
         #create START/STOP buttons
@@ -8924,10 +9112,9 @@ class ApplicationWindow(QMainWindow):
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
         if locale in ["el", "no"]:
             self.button_2.setMinimumWidth(120)
-            self.button_2.setMaximumSize(120, 45)
         else:
             self.button_2.setMinimumWidth(100)
-            self.button_2.setMaximumSize(100, 45)
+        self.button_2.setMinimumHeight(45)            
         self.button_2.clicked.connect(lambda _:self.qmc.ToggleRecorder())
 
         #create 1C START, 1C END, 2C START and 2C END buttons
@@ -8965,10 +9152,9 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
         if locale in ["el", "no"]:
             self.button_7.setMinimumWidth(120)
-            self.button_7.setMaximumSize(120, 45)
         else:
             self.button_7.setMinimumWidth(100)
-            self.button_7.setMaximumSize(100, 45)
+        self.button_7.setMinimumHeight(45)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
         self.button_7.clicked.connect(lambda _: self.qmc.reset())
 
@@ -8992,7 +9178,7 @@ class ApplicationWindow(QMainWindow):
         self.button_10 = QPushButton(QApplication.translate("Button", "Control", None))
         self.button_10.setFocusPolicy(Qt.NoFocus)
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
-        self.button_10.setMaximumSize(90, 45)
+        self.button_10.setMinimumSize(90, 45)
         self.button_10.clicked.connect(lambda _:self.PIDcontrol())
 
         #create EVENT record button
@@ -9007,7 +9193,7 @@ class ApplicationWindow(QMainWindow):
         self.button_12 = QPushButton(QApplication.translate("Button", "SV +5", None))
         self.button_12.setFocusPolicy(Qt.NoFocus)
         self.button_12.setStyleSheet(self.pushbuttonstyles["SV +"])
-        self.button_12.setMaximumSize(90, 50)
+        self.button_12.setMinimumWidth(90)
         self.button_12.setMinimumHeight(50)
         self.button_12.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 5", None))
 
@@ -9015,7 +9201,7 @@ class ApplicationWindow(QMainWindow):
         self.button_13 = QPushButton(QApplication.translate("Button", "SV +10", None))
         self.button_13.setFocusPolicy(Qt.NoFocus)
         self.button_13.setStyleSheet(self.pushbuttonstyles["SV +"])
-        self.button_13.setMaximumSize(90, 50)
+        self.button_13.setMinimumWidth(90)
         self.button_13.setMinimumHeight(50)
         self.button_13.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 10", None))
 
@@ -9023,7 +9209,7 @@ class ApplicationWindow(QMainWindow):
         self.button_14 = QPushButton(QApplication.translate("Button", "SV +20", None))
         self.button_14.setFocusPolicy(Qt.NoFocus)
         self.button_14.setStyleSheet(self.pushbuttonstyles["SV +"])
-        self.button_14.setMaximumSize(90, 50)
+        self.button_14.setMinimumWidth(90)
         self.button_14.setMinimumHeight(50)
         self.button_14.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 20", None))
 
@@ -9031,7 +9217,7 @@ class ApplicationWindow(QMainWindow):
         self.button_15 = QPushButton(QApplication.translate("Button", "SV -20", None))
         self.button_15.setFocusPolicy(Qt.NoFocus)
         self.button_15.setStyleSheet(self.pushbuttonstyles["SV -"])
-        self.button_15.setMaximumSize(90, 50)
+        self.button_15.setMinimumWidth(90)
         self.button_15.setMinimumHeight(50)
         self.button_15.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 20", None))
 
@@ -9039,7 +9225,7 @@ class ApplicationWindow(QMainWindow):
         self.button_16 = QPushButton(QApplication.translate("Button", "SV -10", None))
         self.button_16.setFocusPolicy(Qt.NoFocus)
         self.button_16.setStyleSheet(self.pushbuttonstyles["SV -"])
-        self.button_16.setMaximumSize(90, 50)
+        self.button_16.setMinimumWidth(90)
         self.button_16.setMinimumHeight(50)
         self.button_16.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 10", None))
 
@@ -9047,7 +9233,7 @@ class ApplicationWindow(QMainWindow):
         self.button_17 = QPushButton(QApplication.translate("Button", "SV -5", None))
         self.button_17.setFocusPolicy(Qt.NoFocus)
         self.button_17.setStyleSheet(self.pushbuttonstyles["SV -"])
-        self.button_17.setMaximumSize(90, 50)
+        self.button_17.setMinimumWidth(90)
         self.button_17.setMinimumHeight(50)
         self.button_17.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 5", None))
 
@@ -9057,10 +9243,9 @@ class ApplicationWindow(QMainWindow):
         self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
         if locale in ["el", "no"]:
             self.button_18.setMinimumWidth(100)
-            self.button_18.setMaximumSize(100, 45)
         else:
             self.button_18.setMinimumWidth(80)
-            self.button_18.setMaximumSize(80, 45)
+        self.button_18.setMinimumHeight(45)
         self.button_18.setContentsMargins(0,0,0,0)
         self.button_18.clicked.connect(lambda _:self.qmc.toggleHUD())
         self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None))
@@ -9070,7 +9255,6 @@ class ApplicationWindow(QMainWindow):
         self.button_19 = QPushButton(QApplication.translate("Button", "DRY\nEND", None))
         self.button_19.setFocusPolicy(Qt.NoFocus)
         self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
-        #self.button_19.setMaximumSize(90, 50)
         self.button_19.setMinimumHeight(50)
         self.button_19.setToolTip(QApplication.translate("Tooltip", "Dry End", None))
         self.button_19.clicked.connect(lambda _:self.qmc.markDryEnd())
@@ -9766,14 +9950,16 @@ class ApplicationWindow(QMainWindow):
                         # still above the limit
                         # retrieve corresponding values from the background (is always smoothed)
                         # first compute closest index at that time point in the background data
-                        j = aw.qmc.backgroundtime2index((aw.qmc.timex[i] - dropTimeDelta))
+                        j = aw.qmc.backgroundtime2index((aw.qmc.timex[i] - dropTimeDelta))                                                                        
                         etb = aw.qmc.temp1B[j]
-                        btb = aw.qmc.temp2B[j]
+                        etb = aw.qmc.backgroundETat(aw.qmc.timex[i] - dropTimeDelta)
+                        #btb = aw.qmc.temp2B[j]
+                        btb = aw.qmc.backgroundBTat(aw.qmc.timex[i] - dropTimeDelta)
                         det = (et - etb)
                         totalQuadraticDeltaET += det * det
                         dbt = (bt - btb)
                         totalQuadraticDeltaBT += dbt * dbt
-                        count += 1
+                        count += 1                        
                     else:
                         break
                 return math.sqrt(totalQuadraticDeltaET/float(count)), math.sqrt(totalQuadraticDeltaBT/float(count))
@@ -9781,36 +9967,37 @@ class ApplicationWindow(QMainWindow):
                 # no DROP event registered
                 return None, None
         except Exception:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)        
+            import traceback
+            traceback.print_exc(file=sys.stdout)        
             return None, None
             
     def setLCDsDigitCount(self,n):
         self.lcd2.setDigitCount(n)
         self.lcd2.setMinimumWidth(n*16)
-        self.lcd2.setMaximumWidth(n*16)
+        #self.lcd2.setMaximumWidth(n*16)
+        #self.lcd2.setMaximumWidth(self.lcd2.maxiumumSizeHint())
         self.lcd3.setDigitCount(n)
         self.lcd3.setMinimumWidth(n*16)
-        self.lcd3.setMaximumWidth(n*16)
+        #self.lcd3.setMaximumWidth(n*16)
         self.lcd4.setDigitCount(n)
         self.lcd4.setMinimumWidth(n*16)
-        self.lcd4.setMaximumWidth(n*16)
+        #self.lcd4.setMaximumWidth(n*16)
         self.lcd5.setDigitCount(n)
         self.lcd5.setMinimumWidth(n*16)
-        self.lcd5.setMaximumWidth(n*16)
+        #self.lcd5.setMaximumWidth(n*16)
         self.lcd6.setDigitCount(n)
         self.lcd6.setMinimumWidth(n*16)
-        self.lcd6.setMaximumWidth(n*16)
+        #self.lcd6.setMaximumWidth(n*16)
         self.lcd7.setDigitCount(n)
         self.lcd7.setMinimumWidth(n*16)
-        self.lcd7.setMaximumWidth(n*16)
+        #self.lcd7.setMaximumWidth(n*16)
         for i in range(self.nLCDS):
             self.extraLCD1[i].setDigitCount(n)
             self.extraLCD1[i].setMinimumWidth(n*16)
-            self.extraLCD1[i].setMaximumWidth(n*16)
+            #self.extraLCD1[i].setMaximumWidth(n*16)
             self.extraLCD2[i].setDigitCount(n)
             self.extraLCD2[i].setMinimumWidth(n*16)
-            self.extraLCD2[i].setMaximumWidth(n*16)
+            #self.extraLCD2[i].setMaximumWidth(n*16)
         if aw.largeLCDs_dialog:
             aw.largeLCDs_dialog.lcd2.setDigitCount(n+1)
             aw.largeLCDs_dialog.lcd3.setDigitCount(n+1)
@@ -9840,13 +10027,25 @@ class ApplicationWindow(QMainWindow):
     # set slider focus to Qt.StrongFocus to allow keyboard control and
     # Qt.NoFocus to deactivate it
     def setSliderFocusPolicy(self,focus):
-        self.slider1.setFocusPolicy(focus)
+        if bool(aw.eventslidervisibilities[0]):
+            self.slider1.setFocusPolicy(focus)
+        else:
+            self.slider1.setFocusPolicy(Qt.NoFocus)
         self.slider1.clearFocus()
-        self.slider2.setFocusPolicy(focus)
+        if bool(aw.eventslidervisibilities[1]):
+            self.slider2.setFocusPolicy(focus)
+        else:
+            self.slider2.setFocusPolicy(Qt.NoFocus)
         self.slider2.clearFocus()
-        self.slider3.setFocusPolicy(focus)
+        if bool(aw.eventslidervisibilities[2]):
+            self.slider3.setFocusPolicy(focus)
+        else:
+            self.slider3.setFocusPolicy(Qt.NoFocus)
         self.slider3.clearFocus()
-        self.slider4.setFocusPolicy(focus)
+        if bool(aw.eventslidervisibilities[3]):
+            self.slider4.setFocusPolicy(focus)
+        else:
+            self.slider4.setFocusPolicy(Qt.NoFocus)
         self.slider4.clearFocus()
 
     def appFrozen(self):
@@ -10804,7 +11003,11 @@ class ApplicationWindow(QMainWindow):
         self.fileSaveAsAction.setEnabled(True)
         self.exportMenu.setEnabled(True)
         self.saveGraphMenu.setEnabled(True)
+        self.importMenu.setEnabled(True) # roast
         self.htmlAction.setEnabled(True)
+        self.reportMenu.setEnabled(True)
+        self.productionMenu.setEnabled(True)
+        self.rankingMenu.setEnabled(True)
         self.printAction.setEnabled(True)
         self.flavorAction.setEnabled(True)
         self.temperatureMenu.setEnabled(True)
@@ -10833,6 +11036,9 @@ class ApplicationWindow(QMainWindow):
         self.exportMenu.setEnabled(False)
         self.saveGraphMenu.setEnabled(False)
         self.htmlAction.setEnabled(False)
+        self.reportMenu.setEnabled(False)
+        self.productionMenu.setEnabled(False)
+        self.rankingMenu.setEnabled(False)
         self.printAction.setEnabled(False)
         self.flavorAction.setEnabled(False)
         self.temperatureMenu.setEnabled(False)
@@ -10962,15 +11168,15 @@ class ApplicationWindow(QMainWindow):
 
     def releaseminieditor(self):
         if self.minieventsflag:
-            self.eNumberSpinBox.releaseKeyboard()
             self.lineEvent.releaseKeyboard()
+            self.valueEdit.releaseKeyboard()
             self.etimeline.releaseKeyboard()
             self.etypeComboBox.releaseKeyboard()
-            self.valueEdit.releaseKeyboard()
             self.eNumberSpinBox.releaseKeyboard()
             self.lineEvent.clearFocus()
             self.valueEdit.clearFocus()
             self.etimeline.clearFocus()
+            self.etypeComboBox.clearFocus()
             self.eNumberSpinBox.clearFocus()
 
     # this function respects the button visibility via aw.qmc.buttonvisibility and if button.isDisabled()
@@ -11242,7 +11448,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
             self.qmc.specialeventsvalue[lenevents-1] = aw.qmc.str2eventsvalue(str(self.valueEdit.text()))
             self.qmc.specialeventsStrings[lenevents-1] = u(self.lineEvent.text())
-            self.qmc.specialevents[lenevents-1] = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ self.qmc.stringtoseconds(str(self.etimeline.text())))
+            if aw.qmc.timeindex[0] > -1:
+                self.qmc.specialevents[lenevents-1] = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ self.qmc.stringtoseconds(str(self.etimeline.text())))
 
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
@@ -11328,6 +11535,18 @@ class ApplicationWindow(QMainWindow):
             filepath_elements = filepath_dir.absolutePath().split("/")[:-1] # directories as QStrings (without the filename)
             self.userprofilepath = u(freduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
 
+    def ArtisanOpenFilesDialog(self,msg="Select",ext="*",path=None):
+        if path == None:   
+            path = self.getDefaultPath()
+        if pyqtversion < 5:
+            res = QFileDialog.getOpenFileNames(self,msg,path,ext)
+        else:
+            res = QFileDialog.getOpenFileNames(self,msg,path,ext)[0]
+        for f in res:
+            self.setDefaultPath(u(f))
+        return res
+        
+        
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanOpenFileDialog(self,msg="Open",ext="*",path=None):
@@ -11520,9 +11739,15 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundFlavors = profile["flavors"]
                 self.qmc.titleB = profile["title"]
                 if "roastbatchnr" in profile:
-                    self.qmc.roastbatchnrB = profile["roastbatchnr"]
+                    try:
+                        self.qmc.roastbatchnrB = int(profile["roastbatchnr"])
+                    except:
+                        pass
                     self.qmc.roastbatchprefixB = profile["roastbatchprefix"]
-                    self.qmc.roastbatchposB = profile["roastbatchpos"]
+                    try:
+                        self.qmc.roastbatchposB = profile["roastbatchpos"]
+                    except:
+                        pass
                 else:
                     self.qmc.roastbatchnrB = 0
                     self.qmc.roastbatchprefixB = u("")
@@ -12376,10 +12601,17 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extraname1 = [d(x) for x in profile["extraname1"] + self.qmc.extraname1[len(profile["extraname1"]):]]
                 if "extraname2" in profile:
                     self.qmc.extraname2 = [d(x) for x in profile["extraname2"] + self.qmc.extraname2[len(profile["extraname2"]):]]
+                    
+                # we keep the mathexpressions and don't overwrite them from those of the profile to be loaded
                 if "extramathexpression1" in profile:
-                    self.qmc.extramathexpression1 = [d(x) for x in profile["extramathexpression1"]] + self.qmc.extramathexpression1[len(profile["extramathexpression1"]):]
+                    self.qmc.extramathexpression1 = self.qmc.extramathexpression1 + [d(x) for x in profile["extramathexpression1"][len(profile["extramathexpression1"]):]]
                 if "extramathexpression2" in profile:
-                    self.qmc.extramathexpression2 = [d(x) for x in profile["extramathexpression2"]] + self.qmc.extramathexpression2[len(profile["extramathexpression2"]):]
+                    self.qmc.extramathexpression2 = self.qmc.extramathexpression2 + [d(x) for x in profile["extramathexpression2"][len(profile["extramathexpression2"]):]] 
+#                if "extramathexpression1" in profile:
+#                    self.qmc.extramathexpression1 = [d(x) for x in profile["extramathexpression1"]] + self.qmc.extramathexpression1[len(profile["extramathexpression1"]):]
+#                if "extramathexpression2" in profile:
+#                    self.qmc.extramathexpression2 = [d(x) for x in profile["extramathexpression2"]] + self.qmc.extramathexpression2[len(profile["extramathexpression2"]):]
+                    
                 if "extradevicecolor1" in profile:
                     self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]] + self.qmc.extradevicecolor1[len(profile["extradevicecolor1"]):]
                 if "extradevicecolor2" in profile:
@@ -12547,9 +12779,15 @@ class ApplicationWindow(QMainWindow):
                 except Exception:
                     pass
             if "roastbatchnr" in profile:
-                self.qmc.roastbatchnr = profile["roastbatchnr"]
+                try:
+                    self.qmc.roastbatchnr = int(profile["roastbatchnr"])
+                except:
+                    pass
                 self.qmc.roastbatchprefix = d(profile["roastbatchprefix"])
-                self.qmc.roastbatchpos = profile["roastbatchpos"]
+                try:
+                    self.qmc.roastbatchpos = int(profile["roastbatchpos"])
+                except:
+                    pass
             if "specialevents" in profile:
                 self.qmc.specialevents = profile["specialevents"]
             else:
@@ -13599,6 +13837,13 @@ class ApplicationWindow(QMainWindow):
                     self.fujipid.PXG4[key][0] = toDouble(settings.value(key,self.fujipid.PXG4[key][0]))
                 elif type(self.fujipid.PXG4[key][0]) == type(int()):
                     self.fujipid.PXG4[key][0] = toInt(settings.value(key,self.fujipid.PXG4[key][0]))
+            
+            if self.fujipid.PXG4["selectsv"][0] < 1:
+                self.fujipid.PXG4["selectsv"][0] = 1
+            if settings.contains("followBackground"):
+                self.fujipid.followBackground = bool(toBool(settings.value("followBackground",self.fujipid.followBackground)))
+            if settings.contains("lookahead"):
+                self.fujipid.lookahead = toInt(settings.value("lookahead",self.fujipid.lookahead))
             settings.endGroup()
             if settings.contains("deltaDTA"):
                 settings.beginGroup("deltaDTA")
@@ -13634,6 +13879,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("DeltaBTlcd"):
                 self.qmc.DeltaBTlcdflag = bool(toBool(settings.value("DeltaBTlcd",self.qmc.DeltaBTlcdflag)))
             settings.endGroup()
+            settings.beginGroup("GraphOthers")
+            settings.endGroup()    
             if settings.contains("curvefilter"):
                 self.qmc.curvefilter = toInt(settings.value("curvefilter",self.qmc.curvefilter))
             if settings.contains("smoothingwindowsize"):
@@ -14501,6 +14748,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("PXG4")
             for key in list(self.fujipid.PXG4.keys()):
                 settings.setValue(key,self.fujipid.PXG4[key][0])
+            settings.setValue("followBackground",self.fujipid.followBackground)
+            settings.setValue("lookahead",self.fujipid.lookahead)
             settings.endGroup()
             settings.beginGroup("deltaDTA")
             for key in list(self.dtapid.dtamem.keys()):
@@ -14522,6 +14771,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaSpan",self.qmc.deltaspan)
             settings.setValue("LCDdecimalplaces",self.qmc.LCDdecimalplaces)
             settings.setValue("statisticsmode",self.qmc.statisticsmode)
+            settings.endGroup()
+            settings.beginGroup("GraphOthers")
             settings.endGroup()
             settings.setValue("curvefilter",self.qmc.curvefilter)
             settings.setValue("smoothingwindowsize",self.qmc.smoothingwindowsize)
@@ -15021,210 +15272,907 @@ class ApplicationWindow(QMainWindow):
                 painter.drawPixmap(0,0,image)
             else:
                 painter.drawImage(0, 0, image)
+                
+    # takes a production data generated by profileProductionData(profile) and extracts the following as keyed string values in a dict:
+    #  . "id"
+    #  . "time"
+    #  . "datetime"
+    #  . "title"
+    #  . "beans"
+    #  . "weight_in"
+    #  . "weight_out"
+    #  . "weight_loss"
+    #  . "weight_in_num" (numberic in g)
+    #  . "weight_out_num" (numeric in g)
+    #  . "weight_loss_num" (numeric in %)
+    def productionData2string(self,data,units=True):
+        res = {}        
+        # id (prefix+nr)
+        res["nr"] = data["batchnr"]
+        res["id"] = u(data["batchprefix"]) + u(data["batchnr"])
+        # title
+        res["title"] = data["title"]
+        # date and time
+        res["time"] = ""
+        if data["roastdate"]:
+            res["datetime"] = data["roastdate"].toPyDateTime() # toMSecsSinceEpoch()
+            date = data["roastdate"].date()
+            time = data["roastdate"].time()
+            if date:
+                res["time"] = u(date.toString("yyyy-MM-dd")) # Qt.SystemLocaleShortDate, Qt.ISODate
+            if time:
+                res["time"] += u(" " + time.toString("HH:mm")) # Qt.SystemLocaleShortDate, Qt.ISODate
+        # beans
+        res["beans"] = data["beans"]
+        # weight
+        if "weight" in data:
+            w = data["weight"]
+            if w[2] == "g":
+                # convert to Kg
+                wi = aw.convertWeight(w[0],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("Kg"))
+                wo = aw.convertWeight(w[1],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("Kg"))
+                un = "kg"
+            elif w[2] == "Kg":
+                wi = w[0]
+                wo = w[1]
+                un = "kg"
+            elif w[2] == "oz":
+                # convert to lb
+                wi = aw.convertWeight(w[0],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("lb"))
+                wo = aw.convertWeight(w[1],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("lb"))
+                un = "lb"
+            elif w[2] == "lb":
+                wi = w[0]
+                wo = w[1]
+                un = "lb"
+            if wi > 0:
+                res["weight_in"] = '{0:.2f}'.format(wi)
+            else:
+                res["weight_in"] = ""
+            if wo > 0:
+                res["weight_out"] = '{0:.2f}'.format(wo)
+            else:
+                res["weight_out"] = ""
+            loss = aw.weight_loss(w[0],w[1])
+            if loss < 100:
+                res["weight_loss"] = '{0:.1f}'.format(loss)
+            else:
+                res["weight_loss"] = ""
+            res["weight_in_num"] = aw.convertWeight(w[0],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("g"))
+            res["weight_out_num"] = aw.convertWeight(w[1],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("g"))
+            res["weight_loss_num"] = loss
+            if units:
+                if wi > 0:
+                    res["weight_in"] += un
+                if wo > 0:
+                    res["weight_out"] += un
+                if loss < 100:
+                    res["weight_loss"] += "%"
+        else:
+            res["weight_in"] = ""
+            res["weight_out"] = ""
+            res["weight_loss"] = ""
+            res["weight_in_num"] = 0
+            res["weight_out_num"] = 0
+            res["weight_loss_num"] = 0
+        return res
+        
+    def productionData2htmlentry(self,data):
+        HTML_REPORT_TEMPLATE = u("""<tr>
+<td sorttable_customkey=\"$batch_num\">$batch</td>
+<td>$time</td>
+<td>$title</td>
+<td>$beans</td>
+<td sorttable_customkey=\"$in_num\">$weightin</td>
+<td sorttable_customkey=\"$out_num\">$weightout</td>
+<td sorttable_customkey=\"$loss_num\">$weightloss</td>
+</tr>""")
+        ds = self.productionData2string(data)
+        return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
+            batch_num = ds["nr"],
+            batch = ds["id"],
+            time = ds["time"],
+            title = ds["title"],
+            beans = ds["beans"],
+            weightin = ds["weight_in"],
+            weightout = ds["weight_out"],
+            weightloss = ds["weight_loss"],
+            in_num = '{0:.0f}'.format(ds["weight_in_num"]),
+            out_num = '{0:.0f}'.format(ds["weight_out_num"]),
+            loss_num = '{0:.2f}'.format(ds["weight_loss_num"]),
+        )
+        
+    # extracts the following from a give profile dict in a new dict:
+    #  . "batchprefix": string
+    #  . "batchnr": int
+    #  . "title": string
+    #  . "roastdate": QDateTime
+    #  . "beans": string
+    #  . "weight": [<weight-in>:float,<weight-out>:float,<units>: string] or None
+    def profileProductionData(self,profile,c):
+        res = {}
+        # id (prefix+nr)
+        if "roastbatchprefix" in profile:
+            res["batchprefix"] = d(profile["roastbatchprefix"])
+        else:
+            res["batchprefix"] = ""
+        # batch number
+        batchnr = ""
+        if "roastbatchnr" in profile:
+            res["batchnr"] = int(profile["roastbatchnr"])
+        else:
+            res["batchnr"] = c
+        # title
+        if "title" in profile:
+            res["title"] = d(profile["title"])
+        else:
+            res["title"] = ""
+        # date and time
+        res["roastdate"] = None
+        if "roastisodate" in profile:
+            try:
+                date = QDate.fromString(d(profile["roastisodate"]), Qt.ISODate)
+                if "roasttime" in profile:
+                    try:
+                        time = QTime.fromString(d(profile["roasttime"]))
+                        res["roastdate"] = QDateTime(date,time)
+                    except Exception:
+                        res["roastdate"] = QDateTime(date)
+                else:
+                    res["roastdate"] = QDateTime(date)
+            except Exception:
+                pass
+        # beans
+        if "beans" in profile:
+            res["beans"] = d(profile["beans"])
+        else:
+            res["beans"] = ""
+        # weight
+        if "weight" in profile:
+            res["weight"] = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
+        return res
+
+    def productionReport(self):
+        # get profile filenames
+        files = self.ArtisanOpenFilesDialog(ext="*.alog")
+        try:
+            if files and len(files) > 0:
+                profiles = [self.deserialize(f) for f in files]
+                # let's sort by isodate
+                profiles = sorted(profiles, 
+                    key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
+                         if "roastisodate" in p and "roasttime" in p else 0))
+                with open(u(self.getResourcePath() + 'report-template.htm'), 'r') as myfile:
+                    HTML_REPORT_TEMPLATE=myfile.read()
+                entries = ""
+                total_in = 0 # in g
+                total_out = 0 # in g
+                last_unit = "Kg"
+                # collect data
+                c = 1
+                for p in profiles:
+                    d = self.profileProductionData(p,c)
+                    last_unit = d["weight"][2]
+                    total_in += aw.convertWeight(d["weight"][0],aw.qmc.weight_units.index(last_unit),aw.qmc.weight_units.index("g"))
+                    total_out += aw.convertWeight(d["weight"][1],aw.qmc.weight_units.index(last_unit),aw.qmc.weight_units.index("g"))
+                    entries += self.productionData2htmlentry(d) + "\n"                
+                    c += 1
+                if (last_unit == "Kg" or last_unit == "g"):
+                    un = "Kg"
+                else:
+                    un = "lb"
+                total_in = aw.convertWeight(total_in,aw.qmc.weight_units.index("g"),aw.qmc.weight_units.index(un))
+                total_out = aw.convertWeight(total_out,aw.qmc.weight_units.index("g"),aw.qmc.weight_units.index(un))
+                
+                html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
+                    title = u(QApplication.translate("HTML Report Template", "Roast Batches", None)),
+                    entries = entries,
+                    total_in = '{0:.2f}'.format(total_in),
+                    total_out = '{0:.2f}'.format(total_out),
+                    total_loss = '{0:.1f}'.format(aw.weight_loss(total_in,total_out)),
+                    resources = u(self.getResourcePath()),
+                    batch = u(QApplication.translate("HTML Report Template", "Batch", None)),
+                    time = u(QApplication.translate("HTML Report Template", "Time", None)),
+                    profile = u(QApplication.translate("HTML Report Template", "Profile", None)),
+                    beans = u(QApplication.translate("HTML Report Template", "Beans", None)),
+                    weightin = u(QApplication.translate("HTML Report Template", "In", None)),
+                    weightout = u(QApplication.translate("HTML Report Template", "Out", None)),
+                    loss = u(QApplication.translate("HTML Report Template", "Loss", None)),
+                    sum = u(QApplication.translate("HTML Report Template", "SUM", None)),
+                    unit = un.lower()
+                )
+                    
+                f = None
+                try:
+                    tmpdir = u(QDir.tempPath() + "/")
+                    filename = u(QDir(tmpdir).filePath("ProductionReport.html"))
+                    try:
+                        os.remove(filename)
+                    except OSError:
+                        pass
+                    f = codecs.open(filename, 'w', encoding='utf-8')
+                    for i in range(len(html)):
+                        f.write(html[i])
+                    f.close()
+                    full_path = "file:///" + filename
+                    QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
+                    
+                except IOError as e:
+                    aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " productionReport() {0}").format(str(e)))
+                finally:
+                    if f:
+                        f.close()
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                
+    def productionCSVReport(self):
+        # get profile filenames
+        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if profiles and len(profiles) > 0:
+            # select file
+            filename = self.ArtisanSaveFileDialog(msg="Export CSV",ext="*.csv")
+            if filename:
+                try:
+                    # write header
+                    import csv
+                    if sys.version < '3':
+                        outfile = open(filename, 'wb')
+                    else:
+                        outfile = open(filename, 'w',newline="")
+                    writer= csv.writer(outfile,delimiter='\t')
+                    writer.writerow(["batch","time","profile","beans","in (g)","out (g)"])
+                    # write data
+                    c = 1
+                    for p in profiles:
+                        try:
+                            d = self.productionData2string(self.profileProductionData(self.deserialize(p),c),units=False)
+                            writer.writerow([
+                                d["id"].encode('ascii','ignore'),
+                                d["time"].encode('ascii','ignore'),
+                                d["title"].encode('ascii','ignore'),
+                                d["beans"].encode('ascii','ignore'),
+                                str(d["weight_in_num"]),
+                                str(d["weight_out_num"]),
+                                ])
+                            c += 1
+                        except:
+                            pass
+                    # close file
+                    outfile.close()
+                except:
+                    pass
+                    
+    def excel_date(self,date_time):
+        delta = date_time - datetime.datetime(1899, 12, 30)
+        return float(delta.days  - 1462) + (float(delta.seconds) / 86400)                    
+
+    def productionSYLKReport(self):
+        # get profile filenames
+        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if profiles and len(profiles) > 0:
+            # select file
+            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.slk")
+            if filename:
+                try:
+                    # open file
+                    if sys.version < '3':
+                        out = open(filename, 'wb')
+                    else:
+                        out = open(filename, 'w',newline="")
+                    # write header
+                    out.write("ID;PArtisan\n")
+                    out.write("P;PGeneral\n")
+                    out.write("P;PT.M.JJJJ\ h:mm;;@\n")
+                    out.write("C;Y1;X1;K\"Batch\"\n")
+                    out.write("C;Y1;X2;K\"Time\"\n")
+                    out.write("C;Y1;X3;K\"Profile\"\n")
+                    out.write("C;Y1;X4;K\"Beans\"\n")
+                    out.write("C;Y1;X7;K\"Loss\"\n")
+                    # write data
+                    row = 2
+                    unit = ""
+                    c = 1
+                    for p in profiles:
+                        try:
+                            raw_data = self.profileProductionData(self.deserialize(p),c)
+                            c += 1
+                            if unit == "":
+                                if raw_data["weight"][2] == "g" or raw_data["weight"][2] == "Kg":
+                                    unit = "Kg"
+                                else:
+                                    unit = "lb"
+                            d = self.productionData2string(raw_data,units=False)
+                            out.write("C;Y" + str(row) + ";X1;K\"" + d["id"].encode('ascii','ignore') + "\"\n")
+                            out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X3;K\"" + d["title"].encode('ascii','ignore') + "\"\n")
+                            out.write("C;Y" + str(row) + ";X4;K\"" + d["beans"].encode('ascii','ignore') + "\"\n")
+                            w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+                            w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+                            out.write("C;Y" + str(row) + ";X5;K" + str(w_in).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X6;K" + str(w_out).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X7;E((R" + str(row) + "C5 - R" + str(row) + "C6) / R" + str(row) + "C5)\n")   
+                            row += 1               
+                        except Exception as e:
+                            pass
+                    # write trailer
+                    out.write("C;Y1;X5;K\"In (" + unit.lower() + ")\"\n")
+                    out.write("C;Y1;X6;K\"Out (" + unit.lower() + ")\"\n")
+                    if row > 0:
+                        out.write("C;Y" + str(row) + ";X1;K\"" + u(QApplication.translate("HTML Report Template", "SUM", None)) +"\"\n")
+#                        out.write("F;P0;Y" + str(row) + ";X1\n")
+                        out.write("C;Y" + str(row) + ";X5;K0;Esum(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X6;K0;Esum(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X7;E((R" + str(row) + "C5 - R" + str(row) + "C6) / R" + str(row) + "C5)\n")
+                    #
+#                    out.write("F;P0;R1\n")
+                    out.write("F;P1;C2\n")
+                    out.write("F;W2 2 15\n")
+                    out.write("F;W3 3 20\n")
+                    out.write("F;W4 4 30\n")
+                    out.write("F;C5;FF2D\n")
+                    out.write("F;C6;FF2D\n")
+                    out.write("F;C7;F%2D\n")
+                    out.write("F;SDM4;R1\n")
+                    out.write("F;SDM4;R" + str(row) + "\n")
+                    out.write("E\n")                     
+                    # close file
+                    out.close()
+                except:
+                    pass
+                    
+                    
+    # extracts the following from a give profile dict in a new dict:
+    #  . "temp_unit": string (temperature unit, F or C)
+    #  . "timex" : [] array of sample times
+    #  . "temp2" : [] array of temperatures
+    #  . "charge_temp": int
+    #  . "FCs_time": int (in seconds)
+    #  . "FCs_temp": string
+    #  . "DROP_time": int (in seconds)
+    #  . "DROP_temp": string
+    #  . "DRY_time": int (first phase time in seconds)
+    #  . "MAI_time": int (second phase time in seconds)
+    #  . "DEV_time": int (third phase time in seconds)
+    #  . "DEV_percent": float (third phase percentage)
+    #  . "color": int
+    #  . "cup": int
+    def profileRankingData(self,profile):
+        res = {}
+        # temp_unit
+        res["temp_unit"] = profile["mode"]
+        timex = profile["timex"]
+        res["timex"] = timex
+        timeindex = profile["timeindex"]
+        res["charge_idx"] = (timeindex[0] if timeindex[0] > -1 else 0)
+        res["drop_idx"] = (timeindex[6] if timeindex[6] > 0 else len(timex))
+        bt = profile["temp2"]        
+        res["temp"] = bt
+        # charge_temp
+        if timeindex[0] > -1:
+            start = timex[timeindex[0]]
+            res["charge_temp"] = bt[timeindex[0]]
+        else:
+            start = 0
+        if timeindex[2] > 0:
+            # FCs_time
+            res["FCs_time"] = timex[timeindex[2]] - start
+            # FCs_temp
+            res["FCs_temp"] = bt[timeindex[2]]
+        if timeindex[2] > 0:
+            # DROP_time
+            res["DROP_time"] = timex[timeindex[6]] - start
+            # DROP_temp
+            res["DROP_temp"] = bt[timeindex[6]]
+        # DRY_time
+        if timeindex[1] > 0:
+            res["DRY_time"] = timex[timeindex[1]] - start
+        # MAI_time
+        if timeindex[1] > 0 and timeindex[2] > 0:
+            res["MAI_time"] = timex[timeindex[2]] - timex[timeindex[1]]
+        if timeindex[2] > 0 and timeindex[6] > 0:
+            # DEV_time
+            res["DEV_time"] = timex[timeindex[6]] - timex[timeindex[2]]
+            # DEV_percent
+            res["DEV_percent"] = (res["DEV_time"]/(timex[timeindex[6]] - start)) * 100.
+        # color
+        res["color"] = profile["ground_color"]
+        # cup
+        res["cupping"] = self.cuppingSum(profile["flavors"])
+        return res
+        
+        
+    # takes ranking data generated by profileRankingData(profile) and extracts the following as keyed string values in a dict:
+    #  . "charge_temp"
+    #  . "FCs_time"
+    #  . "FCs_temp"
+    #  . "DROP_time"
+    #  . "DROP_temp"
+    #  . "DRY_time"
+    #  . "MAI_time"
+    #  . "DEV_time"
+    #  . "DEV_percent"
+    #  . "color"
+    #  . "cupping"
+    def rankingData2string(self,data,units=True):
+        res = {}
+        res["charge_temp_num"] = (data["charge_temp"] if "charge_temp" in data else 0)
+        res["charge_temp"] = self.formatTemp(data,"charge_temp",(data["temp_unit"] if units else ""))
+        res["FCs_time_num"] = (data["FCs_time"] if "FCs_time" in data else 0)
+        res["FCs_time"] = (self.eventtime2string(data["FCs_time"]) if "FCs_time" in data else "")
+        res["FCs_temp_num"] = (data["FCs_temp"] if "FCs_temp" in data else 0)
+        res["FCs_temp"] = self.formatTemp(data,"FCs_temp",(data["temp_unit"] if units else ""))
+        res["DROP_time_num"] = (data["DROP_time"] if "DROP_time" in data else 0)
+        res["DROP_time"] = (self.eventtime2string(data["DROP_time"]) if "DROP_time" in data else "")
+        res["DROP_temp_num"] = (data["DROP_temp"] if "DROP_temp" in data else 0)
+        res["DROP_temp"] = self.formatTemp(data,"DROP_temp",(data["temp_unit"] if units else ""))
+        res["color_num"] = (data["color"] if "color" in data else 0)
+        res["color"] = (("#" if units else "" ) + str(data["color"]) if "color" in data and data["color"] != 0 else "")
+        res["cupping"] = '{0:.2f}'.format(data["cupping"])
+        res["DRY_time_num"] = (data["DRY_time"] if "DRY_time" in data else 0)
+        res["DRY_time"] = (self.eventtime2string(data["DRY_time"]) if "DRY_time" in data else "")
+        res["MAI_time_num"] = (data["MAI_time"] if "MAI_time" in data else 0)
+        res["MAI_time"] = (self.eventtime2string(data["MAI_time"]) if "MAI_time" in data else "")
+        res["DEV_time_num"] = (data["DEV_time"] if "DEV_time" in data else 0)
+        res["DEV_time"] = (self.eventtime2string(data["DEV_time"]) if "DEV_time" in data else "")
+        res["DEV_percent_num"] = (data["DEV_percent"] if "DEV_percent" in data else 0)
+        res["DEV_percent"] = ('{0:.1f}'.format(data["DEV_percent"]) + ("%" if units else "") if data.has_key("DEV_percent") else "")
+        return res
+        
+    def formatTemp(self,data,key,unit):
+        return ('{0:.0f}'.format(data[key]) + unit if data.has_key(key) else "")
+    
+            
+    def rankingData2htmlentry(self,production_data,ranking_data):
+        HTML_REPORT_TEMPLATE = u("""<tr>
+<td>$batch</td>
+<td>$time</td>
+<td>$title</td>
+<td sorttable_customkey=\"$in_num\">$weightin</td>
+<td sorttable_customkey=\"$charge_temp_num\">$charge_temp</td>
+<td sorttable_customkey=\"$FCs_time_num\">$FCs_time</td>
+<td sorttable_customkey=\"$FCs_temp_num\">$FCs_temp</td>
+<td sorttable_customkey=\"$DROP_time_num\">$DROP_time</td>
+<td sorttable_customkey=\"$DROP_temp_num\">$DROP_temp</td>
+<td sorttable_customkey=\"$DRY_time_num\">$DRY_time</td>
+<td sorttable_customkey=\"$MAI_time_num\">$MAI_time</td>
+<td sorttable_customkey=\"$DEV_time_num\">$DEV_time</td>
+<td sorttable_customkey=\"$DEV_percent_num\">$DEV_percent</td>
+<td sorttable_customkey=\"$loss_num\">$weightloss</td>
+<td sorttable_customkey=\"$color_num\">$color</td>
+<td>$cupping</td>
+</tr>""")
+        pd = self.productionData2string(production_data)
+        rd = self.rankingData2string(ranking_data)
+        return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
+            batch = pd["id"],
+            time = pd["time"],
+            title = pd["title"],
+            in_num = '{0:.0f}'.format(pd["weight_in_num"]),
+            weightin = pd["weight_in"],
+            charge_temp_num = rd["charge_temp_num"],
+            charge_temp = rd["charge_temp"],
+            FCs_time_num = rd["FCs_time_num"],
+            FCs_time = rd["FCs_time"],
+            FCs_temp_num = rd["FCs_temp_num"],
+            FCs_temp = rd["FCs_temp"],
+            DROP_time_num = rd["DROP_time_num"],
+            DROP_time = rd["DROP_time"],
+            DROP_temp_num = rd["DROP_temp_num"],
+            DROP_temp = rd["DROP_temp"],
+            DRY_time_num = rd["DRY_time_num"],
+            DRY_time = rd["DRY_time"],
+            MAI_time_num = rd["MAI_time_num"],
+            MAI_time = rd["MAI_time"],
+            DEV_time_num = rd["DEV_time_num"],
+            DEV_time = rd["DEV_time"],
+            DEV_percent_num = rd["DEV_percent_num"],
+            DEV_percent = rd["DEV_percent"],
+            loss_num = '{0:.2f}'.format(pd["weight_loss_num"]),
+            weightloss = pd["weight_loss"],
+            color_num = str(rd["color_num"]),
+            color = rd["color"],
+            cupping = rd["cupping"],
+        )
+
+                
+    def rankingReport(self):
+        # get profile filenames
+        files = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if files and len(files) > 0:
+            profiles = [self.deserialize(f) for f in files]
+            # let's sort by isodate
+            profiles = sorted(profiles, 
+                key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
+                     if p.has_key("roastisodate") and p.has_key("roasttime") else 0))
+            with open(u(self.getResourcePath() + 'ranking-template.htm'), 'r') as myfile:
+                HTML_REPORT_TEMPLATE=myfile.read()
+            entries = ""
+            charges = 0
+            charges_count = 0  
+            charges_temp = 0
+            charges_temp_count = 0           
+            FCs_time = 0
+            FCs_time_count = 0
+            FCs_temp = 0
+            FCs_temp_count = 0            
+            DROP_time = 0
+            DROP_time_count = 0
+            DROP_temp = 0
+            DROP_temp_count = 0
+            DRY_time = 0
+            DRY_time_count = 0
+            MAI_time = 0
+            MAI_time_count = 0
+            DEV_time = 0
+            DEV_time_count = 0
+            DEV_percent = 0
+            DEV_percent_count = 0  
+            loss = 0
+            loss_count = 0          
+            colors = 0
+            colors_count = 0
+            cuppings = 0
+            cuppings_count = 0
+            first_temp_unit = ""
+            first_weight_unit = ""
+            handles = []
+            labels = []
+            color=iter(cm.Set1(numpy.linspace(0,1,len(profiles))))            
+            # collect data
+            c = 1
+            foreground_profile_path = aw.curFile
+            background_profile_path = aw.qmc.backgroundpath
+            # clear graph
+            self.qmc.reset()
+#            self.qmc.ax.lines = []
+#            self.qmc.delta_ax.lines = []
+#            print(self.qmc.ax.artists)
+#            print(self.qmc.ax.patches)
+#            # erase annotations
+#            # erase statistics
+            for p in profiles:
+                pd = self.profileProductionData(p,c)
+                c += 1
+                rd = self.profileRankingData(p)
+                entries += self.rankingData2htmlentry(pd,rd) + "\n"
+                if first_temp_unit == "":
+                    first_temp_unit = rd["temp_unit"]
+                if first_weight_unit == "":
+                    if pd["weight"][2] == "g" or pd["weight"][2] == "Kg":
+                        first_weight_unit = "Kg"
+                    else:
+                        first_weight_unit = "lb"
+                i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(first_weight_unit))
+                o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(first_weight_unit))
+                if i > 0:
+                    charges += i
+                    charges_count += 1
+                if rd.has_key("charge_temp"):
+                    charges_temp += aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],first_temp_unit)
+                    charges_temp_count += 1
+                if rd.has_key("FCs_time"):
+                    FCs_time += rd["FCs_time"]
+                    FCs_time_count += 1
+                if rd.has_key("FCs_temp"):
+                    FCs_temp += aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],first_temp_unit)
+                    FCs_temp_count += 1
+                if rd.has_key("DROP_time"):
+                    DROP_time += rd["DROP_time"]
+                    DROP_time_count += 1
+                if rd.has_key("DROP_temp"):
+                    DROP_temp += aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],first_temp_unit)
+                    DROP_temp_count += 1
+                if rd.has_key("DRY_time"):
+                    DRY_time += rd["DRY_time"]
+                    DRY_time_count += 1
+                if rd.has_key("MAI_time"):
+                    MAI_time += rd["MAI_time"]
+                    MAI_time_count += 1
+                if rd.has_key("DEV_time"):
+                    DEV_time += rd["DEV_time"]
+                    DEV_time_count += 1
+                if rd.has_key("DEV_percent"):
+                    DEV_percent += rd["DEV_percent"]
+                    DEV_percent_count += 1
+                if i > 0 and o > 0:
+                    loss += aw.weight_loss(i,o)
+                    colors_count += 1
+                if rd["color"] > 0:
+                    colors += rd["color"]
+                    colors_count += 1
+                if rd["cupping"] > 0:
+                    cuppings += rd["cupping"]
+                    cuppings_count += 1
+                # add BT curve to graph
+                if len(profiles) < 7:
+                    label = u(pd["batchprefix"]) + u(pd["batchnr"])
+                    temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
+                    timex = rd["timex"]
+                    stemp = self.qmc.smooth_list(timex,temp,window_len=self.qmc.curvefilter)
+                    charge = rd["charge_idx"]
+                    drop = rd["drop_idx"]
+                    stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
+                    # align with CHARGE
+                    delta = timex[charge]
+                    timex = [t-delta for t in timex]
+                    # cut-out only CHARGE to DROP
+                    cl = next(color)
+                    self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground="w")],
+                            linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
+                    handles.append(self.l_temp)
+                    labels.append(label)
+                    if self.qmc.DeltaBTflag:
+                        tx = numpy.array(timex)
+                        tx_roast = numpy.array(timex[charge:drop]) # just the part from CHARGE TO DROP
+                        with numpy.errstate(divide='ignore'):
+                            nt = numpy.array(stemp[charge:drop])
+                            z = (nt[aw.qmc.deltasamples:] - nt[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)                        
+                            lt,ld = len(tx_roast),len(z)
+                            if lt > ld:
+                                z = numpy.append(z,[z[-1] if ld else 0.]*(lt - ld))
+                            s = self.qmc.smooth_list(tx_roast,z,window_len=self.qmc.deltafilter)
+                            delta = numpy.concatenate(([None]*(charge),s,[None]*(len(tx)-drop)))
+                            trans = self.qmc.delta_ax.transData
+                            self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                            linewidth=self.qmc.BTdeltalinewidth,linestyle=self.qmc.BTdeltalinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl)    
+                        
+                
+            tmpdir = u(QDir.tempPath() + "/")
+            graph_image = ""
+
+            if len(profiles) < 7:
+                graph_image = "roastlog-graph"
+                self.qmc.ax.set_title("")
+                self.qmc.fig.suptitle("")           
+                rcParams['path.effects'] = []
+                prop = aw.mpl_fontproperties.copy()
+                prop.set_size("x-small")
+                if len(handles) > 3:
+                    ncol = int(math.ceil(len(handles)/2.))
+                else:
+                    ncol = int(math.ceil(len(handles)))
+                leg = self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
+                        
+                # generate graph                
+                if platf == 'Darwin':
+                    graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
+                    try:
+                        os.remove(graph_image)
+                    except OSError:
+                        pass
+                    self.qmc.fig.savefig(graph_image)
+                else:
+                    if pyqtversion < 5:
+                        image = QPixmap().grabWidget(aw.qmc).toImage()
+                    else:
+                        image = aw.qmc.grab().toImage()
+                    #save GRAPH image
+                    graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
+                    try:
+                        os.remove(graph_image)
+                    except OSError:
+                        pass
+                    image.save(graph_image)
+                #add some random number to force HTML reloading
+                graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
+                # redraw original graph
+                self.qmc.redraw(recomputeAllDeltas=False)
+                if foreground_profile_path:
+                    aw.loadFile(foreground_profile_path)
+                if aw.qmc.backgroundpath:
+                    aw.loadbackground(aw.qmc.backgroundpath)
+                graph_image = "<img alt='roast graph' width=\"100%\" src='file:///" + graph_image + "'>"
+                
+            
+            
+            html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
+                resources = u(self.getResourcePath()),
+                title = u(QApplication.translate("HTML Report Template", "Roast Ranking", None)),
+                entries = entries,
+                charges_avg = '{0:.2f}'.format(charges / charges_count) + first_weight_unit.lower(),
+                charges_temp_avg = ('{0:.0f}'.format(charges_temp / charges_temp_count) + first_temp_unit if charges_temp > 0 else ""),
+                FCs_time_avg = (self.eventtime2string(FCs_time / FCs_time_count) if FCs_time > 0 else ""),
+                FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) + first_temp_unit if FCs_temp > 0 else ""),
+                DROP_time_avg = (self.eventtime2string(DROP_time / DROP_time_count) if DROP_time > 0 else ""),
+                DROP_temp_avg = ('{0:.0f}'.format(DROP_temp / DROP_temp_count) + first_temp_unit if DROP_temp > 0 else ""),
+                DRY_time_avg = (self.eventtime2string(DRY_time / DRY_time_count) if DRY_time > 0 else ""),
+                MAI_time_avg = (self.eventtime2string(MAI_time / MAI_time_count) if MAI_time > 0 else ""),
+                DEV_time_avg = (self.eventtime2string(DEV_time / DEV_time_count) if DEV_time > 0 else ""),
+                DEV_percent_avg = ('{0:.1f}%'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 else ""),
+                colors_avg = ("#" + '{0:.0f}'.format(colors / colors_count) if colors_count > 0 else ""),
+                cup_avg = '{0:.2f}'.format(cuppings / cuppings_count),
+                graph_image=graph_image,
+            )
+                
+            f = None
+            try:
+                filename = u(QDir(tmpdir).filePath("RankingReport.html"))
+                try:
+                    os.remove(filename)
+                except OSError:
+                    pass
+                f = codecs.open(filename, 'w', encoding='utf-8')
+                for i in range(len(html)):
+                    f.write(html[i])
+                f.close()
+                full_path = "file:///" + filename
+                QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
+                
+            except IOError as e:
+                aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " rankingReport() {0}").format(str(e)))
+            finally:
+                if f:
+                    f.close()
+
+
+    def rankingCSVReport(self):
+        # get profile filenames
+        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if profiles and len(profiles) > 0:
+            # select file
+            filename = self.ArtisanSaveFileDialog(msg="Export CSV",ext="*.csv")
+            if filename:
+                try:
+                    # write header
+                    import csv
+                    if sys.version < '3':
+                        outfile = open(filename, 'wb')
+                    else:
+                        outfile = open(filename, 'w',newline="")
+                    writer= csv.writer(outfile,delimiter='\t')
+                    writer.writerow(["batch","time","profile","load (g)","charge (C)","FCs","FCs (C)","DROP","DROP (C)","DRY","MAI","DEV","DEV (%)","loss","color","cup"])
+                    # write data
+                    c = 1
+                    for p in profiles:
+                        try:
+                            pd = self.productionData2string(self.profileProductionData(self.deserialize(p),c),units=False)
+                            c += 1
+                            d = self.profileRankingData(self.deserialize(p))
+                            rd = self.rankingData2string(d,units=False)
+                            writer.writerow([
+                                pd["id"].encode('ascii','ignore'),
+                                pd["time"].encode('ascii','ignore'),
+                                str(pd["weight_in_num"]),
+                                aw.qmc.convertTemp(rd["charge_temp"],d["temp_unit"],"C"),
+                                rd["FCs_time"],
+                                aw.qmc.convertTemp(rd["FCs_temp"],d["temp_unit"],"C"),
+                                rd["DROP_time"],
+                                aw.qmc.convertTemp(rd["DROP_temp"],d["temp_unit"],"C"),
+                                rd["DRY_time"],
+                                rd["MAI_time"],
+                                rd["DEV_time"],
+                                rd["DEV_percent"],
+                                str(pd["weight_loss"]),
+                                rd["color"],
+                                rd["cupping"],
+                                ])
+                        except:
+                            pass
+                    # close file
+                    outfile.close()
+                except:
+                    pass
+                    
+    def rankingSYLKReport(self):
+        # get profile filenames
+        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if profiles and len(profiles) > 0:
+            # select file
+            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.slk")
+            if filename:
+                try:
+                    # open file
+                    if sys.version < '3':
+                        out = open(filename, 'wb')
+                    else:
+                        out = open(filename, 'w',newline="")
+                    # write header
+                    out.write("ID;PArtisan\n")
+                    out.write("P;PGeneral\n")
+                    out.write("P;PT.M.JJJJ\ h:mm;;@\n")
+                    out.write("P;Pm:ss;;@\n")
+                    out.write("C;Y1;X1;K\"Batch\"\n")
+                    out.write("C;Y1;X2;K\"Time\"\n")
+                    out.write("C;Y1;X3;K\"Profile\"\n") 
+                    out.write("C;Y1;X4;K\"Load\"\n")                    
+                    out.write("C;Y1;X5;K\"Charge\"\n")
+                    out.write("C;Y1;X6;K\"FCs\"\n")
+                    out.write("C;Y1;X7;K\"FCs (C)\"\n")
+                    out.write("C;Y1;X8;K\"DROP\"\n")
+                    out.write("C;Y1;X9;K\"DROP (C)\"\n")
+                    out.write("C;Y1;X10;K\"DRY\"\n")
+                    out.write("C;Y1;X11;K\"MAI\"\n")
+                    out.write("C;Y1;X12;K\"DEV\"\n")
+                    out.write("C;Y1;X13;K\"DEV (%)\"\n")
+                    out.write("C;Y1;X14;K\"Loss (%)\"\n")
+                    out.write("C;Y1;X15;K\"Color\"\n")
+                    out.write("C;Y1;X16;K\"Cup\"\n")
+                    # write data
+                    row = 2
+                    unit = ""
+                    c = 1
+                    for p in profiles:
+                        try:
+                            raw_data = self.profileProductionData(self.deserialize(p),c)
+                            c += 1
+                            rd = self.profileRankingData(self.deserialize(p))
+                            if unit == "":
+                                if raw_data["weight"][2] == "g" or raw_data["weight"][2] == "Kg":
+                                    unit = "Kg"
+                                else:
+                                    unit = "lb"
+                            d = self.productionData2string(raw_data,units=False)
+                            out.write("C;Y" + str(row) + ";X1;K\"" + d["id"].encode('ascii','ignore') + "\"\n")
+                            out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X3;K\"" + d["title"].encode('ascii','ignore') + "\"\n")
+                            w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+                            w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+                            out.write("C;Y" + str(row) + ";X4;K" + str(w_in).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X5;K" + str(aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),                            
+                            out.write("C;Y" + str(row) + ";X6;K" + str(rd["FCs_time"]/86400.).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X7;K" + str(aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),                            
+                            out.write("C;Y" + str(row) + ";X8;K" + str(rd["DROP_time"]/86400.).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X9;K" + str(aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),
+                            out.write("C;Y" + str(row) + ";X10;K" + str(rd["DRY_time"]/86400.).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X11;K" + str(rd["MAI_time"]/86400.).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X12;K" + str(rd["DEV_time"]/86400.).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X13;K" + str(rd["DEV_percent"]).replace('.', ',') + "\n")
+                            if w_in > 0 and w_out > 0:
+                                out.write("C;Y" + str(row) + ";X14;K" + str(aw.weight_loss(w_in,w_out)).replace('.', ',') + "\n")
+                            if rd["color"] and rd["color"] > 0:
+                                out.write("C;Y" + str(row) + ";X15;K" + str(rd["color"]).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X16;K" + str(rd["cupping"]).replace('.', ',') + "\n")
+                            row += 1               
+                        except Exception as e:
+                            pass
+                    # write trailer
+                    if row > 0:
+                        out.write("C;Y" + str(row) + ";X1;K\"" + u(QApplication.translate("HTML Report Template", "AVG", None)) +"\"\n")
+                        out.write("C;Y" + str(row) + ";X4;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X5;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X6;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X7;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X8;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X9;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X10;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X11;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X12;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X13;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X14;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X15;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+                        out.write("C;Y" + str(row) + ";X16;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+
+                    #
+                    out.write("F;P1;C2\n")
+                    out.write("F;P2;C6\n")
+                    out.write("F;P2;C8\n")
+                    out.write("F;P2;C10\n")
+                    out.write("F;P2;C11\n")
+                    out.write("F;P2;C12\n")
+                    out.write("F;W2 2 15\n")
+                    out.write("F;W3 3 20\n")
+                    out.write("F;C4;FF2D\n")
+                    out.write("F;C7;FF1D\n")
+                    out.write("F;C9;FF1D\n")
+                    out.write("F;C13;FF1D\n")
+                    out.write("F;C14;FF1D\n")
+                    out.write("F;C15;FF1D\n")
+                    out.write("F;C16;FF2D\n")
+                    out.write("F;SDM4;R" + str(row) + "\n")
+                    out.write("E\n")                     
+                    # close file
+                    out.close()
+                except:
+                    pass
 
     def htmlReport(self):
         try:
             rcParams['path.effects'] = []
-            HTML_REPORT_TEMPLATE = u("""<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<title>""") + u(QApplication.translate("HTML Report Template", "Roasting Report", None)) + u("""</title>
-<style type="text/css">
-td { 
-  vertical-align: top;
-  padding: 0px 0px 0px 5px;
-}
-th {
-  text-align: right;
-  vertical-align: top;
-}
-</style>
-</head>
-<body>
-<center>
-<h1>$title</h1>
-
-<table border="1" cellpadding="10" width="80%">
-<tr>
-<td>
-<center>
-<table>
-<tr>
-<td>
-<table width="230">
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Date:", None)) + u("""</th>
-<td>$datetime</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Beans:", None)) + u("""</th>
-<td>$beans</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Size:", None)) + u("""</th>
-<td>$size</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Weight:", None)) + u("""</th>
-<td>$weight</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Degree:", None)) + u("""</th>
-<td>$degree</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Volume:", None)) + u("""</th>
-<td>$volume</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Density:", None)) + u("""</th>
-<td>$density</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Moisture:", None)) + u("""</th>
-<td>$moisture</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Ambient:", None)) + u("""</th>
-<td>$humidity</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Roaster:", None)) + u("""</th>
-<td>$roaster</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Operator:", None)) + u("""</th>
-<td>$operator</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Cupping:", None)) + u("""</th>
-<td>$cup</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Color:", None)) + u("""</th>
-<td>$color</td>
-</tr>
-</table>
-</td>
-<td>
-<table width="230">
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "CHARGE:", None)) + u("""</th>
-<td>$charge</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "TP:", None)) + u("""</th>
-<td>$TP</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "DRY:", None)) + u("""</th>
-<td>$DRY</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "FCs:", None)) + u("""</th>
-<td>$FCs</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "FCe:", None)) + u("""</th>
-<td>$FCe</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "SCs:", None)) + u("""</th>
-<td>$SCs</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "SCe:", None)) + u("""</th>
-<td>$SCe</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "DROP:", None)) + u("""</th>
-<td>$drop</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "COOL:", None)) + u("""</th>
-<td>$cool</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "MET:", None)) + u("""</th>
-<td>$met</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "RoR:", None)) + u("""</th>
-<td>$ror</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "ETBTa:", None)) + u("""</th>
-<td>$etbta</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "CM:", None)) + u("""</th>
-<td>$cm</td>
-</tr>
-</table>
-</td>
-<td>
-<table width="250">
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Drying:", None)) + u("""</th>
-<td>$dry_phase</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Maillard:", None)) + u("""</th>
-<td>$mid_phase</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Development:", None)) + u("""</th>
-<td>$finish_phase</td>
-</tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Cooling:", None)) + u("""</th>
-<td>$cool_phase</td>
-</tr>
-<tr><th></th><td></td></tr>
-<tr><th></th><td></td></tr>
-<tr>
-<th>""") + u(QApplication.translate("HTML Report Template", "Background:", None)) + u("""</th>
-<td>$background</td>
-</tr>
-</table>
-</td>
-</tr>
-</table>
-</center>
-</td>
-</tr>
-<tr>
-<td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='file:///$graph_image'></td>
-</tr>
-<tr>
-<td><center><b>""" + u(QApplication.translate("HTML Report Template", "Events", None)) + """</b></center><br>
-$specialevents
-</td>
-</tr>
-<tr>
-<td>
-<center><b>""") + u(QApplication.translate("HTML Report Template", "Roasting Notes", None)) + u("""</b></center>
-$roasting_notes$roast_attributes
-</td>
-</tr>
-</table>
-<table border="1" cellpadding="10" style="page-break-inside:avoid"  width="80%">
-<tr>
-<td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='file:///$flavor_image'></td>
-</tr>
-<tr>
-<td><center><b>""") + u(QApplication.translate("HTML Report Template", "Cupping Notes", None)) + u("""</b></center>
-$cupping_notes
-</td>
-</tr>
-</table>
-</center>
-</body>
-</html>
-        """)
+            with open(u(self.getResourcePath() + 'roast-template.htm'), 'r') as myfile:
+                HTML_REPORT_TEMPLATE=myfile.read()
             beans = u(cgi.escape(self.qmc.beans))
             if len(beans) > 43:
                 beans = u(beans[:41] + "&hellip;")
@@ -15373,42 +16321,77 @@ $cupping_notes
                 batch = u(aw.qmc.roastbatchprefix) + u(aw.qmc.roastbatchnr) + u(" ")
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                 title=u(cgi.escape(batch)) + u(cgi.escape(self.qmc.title)),
+                doc=u(QApplication.translate("HTML Report Template", "Roasting Report", None)),                
+                datatime_label=u(QApplication.translate("HTML Report Template", "Date:", None)),
                 datetime=u(self.qmc.roastdate.date().toString()) + ", " + u(self.qmc.roastdate.time().toString()[:-3]), 
+                beans_label=u(QApplication.translate("HTML Report Template", "Beans:", None)),
                 beans=beans,
+                weight_label=u(QApplication.translate("HTML Report Template", "Weight:", None)),
                 weight=weight,
+                degree_label=u(QApplication.translate("HTML Report Template", "Degree:", None)),
                 degree=degree,
+                volume_label=u(QApplication.translate("HTML Report Template", "Volume:", None)),
                 volume=volume,
+                roaster_label=u(QApplication.translate("HTML Report Template", "Roaster:", None)),
                 roaster=u(cgi.escape(self.qmc.roastertype)),
+                operator_label=u(QApplication.translate("HTML Report Template", "Operator:", None)),
                 operator=u(cgi.escape(self.qmc.operator)),
-                cup=u(str(aw.float2float(self.cuppingSum()))),
+                cup_label=u(QApplication.translate("HTML Report Template", "Cupping:", None)),
+                cup=u(str(aw.float2float(self.cuppingSum(self.qmc.flavors)))),
+                color_label=u(QApplication.translate("HTML Report Template", "Color:", None)),
                 color=color,
+                charge_label=u(QApplication.translate("HTML Report Template", "CHARGE:", None)),
                 charge=charge,
+                size_label=u(QApplication.translate("HTML Report Template", "Size:", None)),
                 size=u("--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm"),
+                density_label=u(QApplication.translate("HTML Report Template", "Density:", None)),
                 density=density,
+                moisture_label=u(QApplication.translate("HTML Report Template", "Moisture:", None)),
                 moisture=moisture,
+                humidity_label=u(QApplication.translate("HTML Report Template", "Ambient:", None)),
                 humidity=humidity,
+                TP_label=u(QApplication.translate("HTML Report Template", "TP:", None)),
                 TP=self.event2html(cp,"TP_time","TP_BT"),
+                DRY_label=u(QApplication.translate("HTML Report Template", "DRY:", None)),
                 DRY=self.event2html(cp,"DRY_time","DRY_BT"),
+                FCs_label=u(QApplication.translate("HTML Report Template", "FCs:", None)),
                 FCs=self.event2html(cp,"FCs_time","FCs_BT"),
+                FCe_label=u(QApplication.translate("HTML Report Template", "FCe:", None)),
                 FCe=self.event2html(cp,"FCe_time","FCe_BT"),
+                SCs_label=u(QApplication.translate("HTML Report Template", "SCs:", None)),
                 SCs=self.event2html(cp,"SCs_time","SCs_BT"),
+                SCe_label=u(QApplication.translate("HTML Report Template", "SCe:", None)),
                 SCe=self.event2html(cp,"SCe_time","SCe_BT"),
+                drop_label=u(QApplication.translate("HTML Report Template", "DROP:", None)),
                 drop=self.event2html(cp,"DROP_time","DROP_BT"),
+                cool_label=u(QApplication.translate("HTML Report Template", "COOL:", None)),
                 cool=self.event2html(cp,"COOL_time",None,"DROP_time"),
+                met_label=u(QApplication.translate("HTML Report Template", "MET:", None)),
                 met=met,
+                cm_label=u(QApplication.translate("HTML Report Template", "CM:", None)),
                 cm=cm,
+                dry_phase_label=u(QApplication.translate("HTML Report Template", "Drying:", None)),
                 dry_phase=dryphase,
+                mid_phase_label=u(QApplication.translate("HTML Report Template", "Maillard:", None)),
                 mid_phase=midphase,
+                finish_phase_label=u(QApplication.translate("HTML Report Template", "Development:", None)),
                 finish_phase=finishphase,
+                cool_phase_label=u(QApplication.translate("HTML Report Template", "Cooling:", None)),
                 cool_phase=coolphase,
+                background_label=u(QApplication.translate("HTML Report Template", "Background:", None)),
                 background=background,
+                ror_label=u(QApplication.translate("HTML Report Template", "RoR:", None)),
                 ror= ror,
+                etbta_label=u(QApplication.translate("HTML Report Template", "ETBTa:", None)),
                 etbta=etbta,
+                roasting_notes_label=u(QApplication.translate("HTML Report Template", "Roasting Notes", None)),
                 roasting_notes=self.note2html(self.qmc.roastingnotes),
                 roast_attributes=self.roastattributes(),
                 graph_image=graph_image,
                 flavor_image=flavor_image,
+                specialevents_label=u(QApplication.translate("HTML Report Template", "Events", None)),
                 specialevents=self.specialevents2html(),
+                cupping_notes_label=u(QApplication.translate("HTML Report Template", "Cupping Notes", None)),
                 cupping_notes=self.note2html(self.qmc.cuppingnotes))
             f = None
             try:
@@ -15463,11 +16446,11 @@ $cupping_notes
         else:
             return u("")
 
-    def cuppingSum(self):
+    def cuppingSum(self,flavors):
         score = 0.
-        nflavors = len(self.qmc.flavors)
+        nflavors = len(flavors)
         for i in range(nflavors):   
-            score += self.qmc.flavors[i]
+            score += flavors[i]
         score /= (nflavors)
         score *= 10.
         return score
@@ -18661,7 +19644,7 @@ class HUDDlg(ArtisanDialog):
     def changeDeltaBTlcd(self,i):
         aw.qmc.DeltaBTlcdflag = not aw.qmc.DeltaBTlcdflag
         aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
-
+        
     def changePathEffects(self):
         try:
             v = self.PathEffects.value()
@@ -19123,15 +20106,16 @@ class volumeCalculatorDlg(ArtisanDialog):
 
     def updateVolumes(self):
         if self.inVolume and self.inVolume != "":
-            if self.volumeunit:
+            if self.volumeunit == 0:
                 self.inlineedit.setText(str(aw.float2float(self.inVolume,4)))
             else:
                 self.inlineedit.setText(str(aw.float2float(self.inVolume)))
         if self.outVolume and self.outVolume != "":
-            if self.volumeunit:
+            if self.volumeunit == 0:
                 self.outlineedit.setText(str(aw.float2float(self.outVolume,4)))
             else:
                 self.outlineedit.setText(str(aw.float2float(self.outVolume)))
+        self.parent_dialog.volume_percent()
         self.closeEvent(None)
         
     def closeEvent(self,_):
@@ -19776,6 +20760,7 @@ class editGraphDlg(ArtisanDialog):
         self.bean_density_volumeUnitsComboBox.addItems(aw.qmc.volume_units)
         self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(aw.qmc.density[3]))
         self.standarddensitylabel = QLabel("")
+        self.standarddensitylabel.setMinimumWidth(50)
         self.standard_density()
         self.bean_density_volume_edit.editingFinished.connect(self.standard_density)
         self.bean_density_weight_edit.editingFinished.connect(self.standard_density)
@@ -20069,8 +21054,9 @@ class editGraphDlg(ArtisanDialog):
         densityLayout.addWidget(self.standarddensitylabel)
         densityLayout.addStretch()
         
-        densityLayout.addWidget(bean_size_label)
         densityLayout.addSpacing(15)
+        densityLayout.addWidget(bean_size_label)
+        densityLayout.addSpacing(10)
         densityLayout.addWidget(self.bean_size_edit)
         densityLayout.addSpacing(5)
         densityLayout.addWidget(bean_size_unit_label)
@@ -20248,30 +21234,30 @@ class editGraphDlg(ArtisanDialog):
                 self.inWeight()
             elif self.weightoutedit.hasFocus():
                 self.outWeight()
-            elif self.volumeinedit.hasFocus() and (str(self.volumeinedit.text()) == "" or float(self.volumeinedit.text()) == 0.):
-                try:
-                    dw = float(str(self.bean_density_weight_edit.text()))
-                    dv = float(str(self.bean_density_volume_edit.text()))                    
-                    if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None) :
-                        dw = dw * 1000.0
-                    if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None) :
-                        dv = dv / 1000.0
-                    d = dw / dv
-                    w = self.weightinedit.text()
-                    if self.unitsComboBox.currentIndex() == 1:
-                        w = w * 1000.0
-                    if d and d != "" and w and w != "":
-                        # calculate in-volume from density and weight
-                        d = float(d)
-                        w = float(w)
-                        res = self.calc_volume(d,w)
-                        if self.volumeUnitsComboBox.currentIndex() == 1:
-                            res = res / 1000.0
-                            self.volumeinedit.setText(str(aw.float2float(res,4)))
-                        else:
-                            self.volumeinedit.setText(str(aw.float2float(res)))
-                except Exception:
-                    pass
+        elif key == 16777220 and self.volumeinedit.hasFocus() and (str(self.volumeinedit.text()) == "" or float(self.volumeinedit.text()) == 0.):
+            try:
+                dw = float(str(self.bean_density_weight_edit.text()))
+                dv = float(str(self.bean_density_volume_edit.text()))                    
+                if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None) :
+                    dw = dw * 1000.0
+                if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None) :
+                    dv = dv / 1000.0
+                d = dw / dv
+                w = self.weightinedit.text()
+                if self.unitsComboBox.currentIndex() == 1:
+                    w = w * 1000.0
+                if d and d != "" and w and w != "":
+                    # calculate in-volume from density and weight
+                    d = float(d)
+                    w = float(w)
+                    res = self.calc_volume(d,w)
+                    if self.volumeUnitsComboBox.currentIndex() == 1:
+                        res = res / 1000.0
+                        self.volumeinedit.setText(str(aw.float2float(res,4)))
+                    else:
+                        self.volumeinedit.setText(str(aw.float2float(res)))
+            except Exception:
+                pass
                         
     def tareChanged(self,i):
         if i == 0 and self.tarePopupEnabled:
@@ -23474,7 +24460,7 @@ class EventsDlg(ArtisanDialog):
         bindex = len(aw.buttonlist)-1
         aw.buttonlist[bindex].setFocusPolicy(Qt.NoFocus)
         aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ")
-        aw.buttonlist[bindex].setMaximumSize(90, 50)
+        aw.buttonlist[bindex].setMinimumWidth(90)
         aw.buttonlist[bindex].setMinimumHeight(50)
         aw.buttonlist[bindex].setText(initialtext)
         aw.buttonlist[bindex].clicked.connect(lambda ee=bindex:aw.recordextraevent(bindex))
@@ -24106,7 +25092,7 @@ class flavorDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None))
         defaultlabel = QLabel(QApplication.translate("Label","Default",None))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","*CUSTOM*"])
+        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","WCRC","*CUSTOM*"])
         self.defaultcombobox.setCurrentIndex(0)
         self.lastcomboboxIndex = 0
         self.defaultcombobox.currentIndexChanged.connect(self.setdefault)
@@ -24208,6 +25194,7 @@ class flavorDlg(ArtisanDialog):
                 labeledit.textChanged.connect(lambda z=1,x=i: self.setlabel(x))
                 valueSpinBox = QDoubleSpinBox()
                 valueSpinBox.setRange(0.,10.)
+                valueSpinBox.setSingleStep(.25)
                 valueSpinBox.setAlignment(Qt.AlignRight)
                 val = aw.qmc.flavors[i]
                 if aw.qmc.flavors[0] < 1. and aw.qmc.flavors[-1] < 1.: # < 0.5.0 version style compatibility
@@ -24278,7 +25265,7 @@ class flavorDlg(ArtisanDialog):
             # store the current labels as *CUSTOM*
             aw.qmc.customflavorlabels = aw.qmc.flavorlabels
         dindex =  self.defaultcombobox.currentIndex()
-        #["","Artisan","SCCA","CQI","SweetMarias","C","E",coffeegeek,Intelligentsia]
+        #["","Artisan","SCCA","CQI","SweetMarias","C","E","coffeegeek","Intelligentsia","WCRC"]
         if dindex > 0 or dindex < 11:
             aw.qmc.flavorstartangle = 90
         if dindex == 1:
@@ -24300,6 +25287,8 @@ class flavorDlg(ArtisanDialog):
         elif dindex == 9:
             aw.qmc.flavorlabels = list(aw.qmc.IstitutoInternazionaleAssaggiatoriCaffe)
         elif dindex == 10:
+            aw.qmc.flavorlabels = list(aw.qmc.WorldCoffeeRoastingChampionship)
+        elif dindex == 11:
             aw.qmc.flavorlabels = list(aw.qmc.customflavorlabels)
         else:
             return
@@ -25528,7 +26517,11 @@ class scaleport(extraserialport):
     # returns weight as int in g or -1 if something went wrong
     def readWeight(self):
         if self.device != None and self.device != "None" and self.device != "":
-            return aw.float2float(self.devicefunctionlist[u(self.device)]())
+            res = self.devicefunctionlist[u(self.device)]()
+            if res != None:
+                return aw.float2float(res)
+            else:
+                return -1
         else:
             return -1
             
@@ -25664,7 +26657,7 @@ class serialport(object):
         self.timeout=1
         #serial port for ET/BT
         self.SP = serial.Serial()
-        #semaphore (used by TC4 communication)
+        #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1) 
         #list of comm ports available after Scan
         self.commavailable = []
@@ -25777,8 +26770,6 @@ class serialport(object):
                                    self.HOTTOP_HF,          #54
                                    self.HH806W              #55
                                    ]
-        #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
-        self.COMsemaphore = QSemaphore(1)
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
 
@@ -29752,7 +30743,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.addButton = QPushButton(QApplication.translate("Button","Add",None))
         self.addButton.setFocusPolicy(Qt.NoFocus)
         self.addButton.setMinimumWidth(100)
-        self.addButton.setMaximumWidth(100)
+        #self.addButton.setMaximumWidth(100)
         self.addButton.clicked.connect(self.adddevice)
         resetButton = QPushButton(QApplication.translate("Button","Reset",None))
         resetButton.setFocusPolicy(Qt.NoFocus)
@@ -29761,7 +30752,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.delButton = QPushButton(QApplication.translate("Button","Delete",None))
         self.delButton.setFocusPolicy(Qt.NoFocus)
         self.delButton.setMinimumWidth(100)
-        self.delButton.setMaximumWidth(100)
+        #self.delButton.setMaximumWidth(100)
         self.delButton.clicked.connect(self.deldevice) 
         self.enableDisableAddDeleteButtons()
         ##########     LAYOUTS
@@ -32983,7 +33974,7 @@ class AlarmDlg(ArtisanDialog):
             for j in range(11):
                 if aw.qmc.alarmstate[i]:
                     #self.alarmtable.setItem(i,j,QTableWidgetItem())
-                    self.alarmtable.item(i,j).setBackgroundColor(QColor(191, 191, 191))
+                    self.alarmtable.item(i,j).setBackground(QColor(191, 191, 191))
 
     def createalarmtable(self):
         try:
@@ -33566,17 +34557,16 @@ class PXRpidDlgControl(ArtisanDialog):
         if aw.ser.useModbusPort:
             reg = aw.modbus.address2register(aw.fujipid.PXR["runstandby"][1],6)
             aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
-            r = "00000000"
         else:
             command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["runstandby"][1],flag)
             #TX and RX
             r = aw.ser.sendFUJIcommand(command,8)
-        if r == command:
+        if aw.ser.useModbusPort or r == command:
             if flag == 1:
-                message = QApplication.translate("StatusBar","PID OFF",None)     #put pid in standby 1 (pid on)
+                message = QApplication.translate("StatusBar","PID OFF",None)     #put pid in standby 1 (pid off)
                 aw.fujipid.PXR["runstandby"][0] = 1
             elif flag == 0:
-                message = QApplication.translate("StatusBar","PID ON",None)      #put pid in standby 0 (pid off)
+                message = QApplication.translate("StatusBar","PID ON",None)      #put pid in standby 0 (pid on)
                 aw.fujipid.PXR["runstandby"][0] = 0
             self.status.showMessage(message,5000)
         else:
@@ -33612,6 +34602,7 @@ class PXRpidDlgControl(ArtisanDialog):
                     aw.qmc.adderror(mssg)
         else:
             self.status.showMessage(QApplication.translate("StatusBar","Empty SV box",None),5000)
+            
 
     def getsv(self):
         temp = aw.fujipid.readcurrentsv()
@@ -34183,6 +35174,23 @@ class PXG4pidDlgControl(ArtisanDialog):
         buttonRampSoakLayout2.addWidget(self.label_rs14)
         buttonRampSoakLayout2.addWidget(self.label_rs15)
         buttonRampSoakLayout2.addWidget(self.label_rs16)
+        
+        # Follow Background 
+        self.followBackground = QCheckBox(QApplication.translate("CheckBox", "Follow Background",None))
+        self.followBackground.setChecked(aw.fujipid.followBackground)
+        self.followBackground.setFocusPolicy(Qt.NoFocus)
+        self.followBackground.stateChanged.connect(lambda i=0:self.changeFollowBackground(i))         #toggle
+        # Follow Background Lookahead
+        self.pidSVLookahead = QSpinBox()
+        self.pidSVLookahead.setAlignment(Qt.AlignRight)
+        self.pidSVLookahead.setRange(0,999)
+        self.pidSVLookahead.setSingleStep(1)
+        self.pidSVLookahead.setValue(aw.fujipid.lookahead)  
+        self.pidSVLookahead.setSuffix(" s")
+        self.pidSVLookahead.setFocusPolicy(Qt.NoFocus)
+        self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
+        pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))        
+        
         # *************** TAB 2 WIDGETS
         labelsv = QLabel()
         labelsv.setContentsMargins(10,10,10,10)
@@ -34659,6 +35667,14 @@ class PXG4pidDlgControl(ArtisanDialog):
         tab5Layout.addWidget(timeunitsbutton)
         tab5Layout.addStretch()
         ############################
+        followLayout = QHBoxLayout()
+        followLayout.addStretch()
+        followLayout.addWidget(self.followBackground)
+        followLayout.addStretch()
+        followLayout.addWidget(pidSVLookaheadLabel)
+        followLayout.addWidget(self.pidSVLookahead)
+        followLayout.addStretch()
+        ############################
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(button_load)
         buttonLayout.addWidget(button_save)
@@ -34687,9 +35703,16 @@ class PXG4pidDlgControl(ArtisanDialog):
         layout = QVBoxLayout()
         layout.addWidget(self.status,0)
         layout.addWidget(TabWidget,1)
-        layout.addLayout(buttonLayout,2)
+        layout.addLayout(followLayout,2)
+        layout.addLayout(buttonLayout,3)
         self.setLayout(layout)
 
+    def changeLookAhead(self):
+        aw.fujipid.lookahead = int(self.pidSVLookahead.value())     
+        
+    def changeFollowBackground(self,i):
+        aw.fujipid.followBackground = not aw.fujipid.followBackground
+        
     def load(self):
         aw.fileImport(QApplication.translate("Message", "Load PID Settings",None),self.loadPIDJSON)
 
@@ -35108,11 +36131,12 @@ class PXG4pidDlgControl(ArtisanDialog):
                         r = aw.ser.sendFUJIcommand(command,8)
                     #check response from pid and update message on main window
                     if r == command:
-                        aw.fujipid.PXG4["selectsv"][0] = svn
-                        key = "sv" + str(svn)
-                        message = QApplication.translate("StatusBar","SV{0} set to {1}",None).format(str(svn),str(aw.fujipid.PXG4[key][0]))
-                        aw.lcd6.display(str(aw.fujipid.PXG4[key][0]))
-                        self.status.showMessage(message, 5000)
+                        if svn > 0:
+                            aw.fujipid.PXG4["selectsv"][0] = svn
+                            key = "sv" + str(svn)
+                            message = QApplication.translate("StatusBar","SV{0} set to {1}",None).format(str(svn),str(aw.fujipid.PXG4[key][0]))
+                            aw.lcd6.display(str(aw.fujipid.PXG4[key][0]))
+                            self.status.showMessage(message, 5000)
                     else:
                         self.status.showMessage(QApplication.translate("StatusBar","Problem setting SV",None),5000)
                 elif reply == QMessageBox.Cancel:
@@ -35570,7 +36594,8 @@ class PXG4pidDlgControl(ArtisanDialog):
         else:
             command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectsv"][1],1)
             N = aw.fujipid.readoneword(command)
-        aw.fujipid.PXG4["selectsv"][0] = N
+        if N > 0:
+            aw.fujipid.PXG4["selectsv"][0] = N
         if N == 1:
             self.radiosv1.setChecked(True)
         elif N == 2:
@@ -36062,6 +37087,11 @@ class PXG4pidDlgControl(ArtisanDialog):
 
 class FujiPID(object):
     def __init__(self):
+    
+        # follow background: if True, Artisan sends SV values taken from the current background profile if any
+        self.followBackground = False
+        self.lookahead = 0 # the lookahead in seconds
+        self.sv = None # the last sv send to the Fuji PID
         
         #refer to Fuji PID instruction manual for more information about the parameters and channels
         #dictionary "KEY": [VALUE,MEMORY_ADDRESS]
@@ -36143,6 +37173,7 @@ class FujiPID(object):
                   ################# READ ONLY MEMORY (address starts with digit 3)
                   "pv?":[31001],"sv?":[0,31002],"alarm?":[31007],"fault?":[31008],"stat?":[31041],"mv1":[0,31042]
                   }
+        
         # "KEY": [VALUE,MEMORY_ADDRESS]
         self.PXR = {"autotuning":[0,41005],
                     "segment1sv":[100.0,41057],"segment1ramp":[3,41065],"segment1soak":[0,41066], #PXR uses only HH:MM time format but stored as minutes in artisan
@@ -36180,7 +37211,19 @@ class FujiPID(object):
                     #rampsoak current running position (1-8)
                     "segment?":[0,31009],
                     "mv1":[0,31004]   #duty cycle rx -300 to 10300  = -3.00% to 103.00%                     }
-                    }    
+                    }
+                    
+    def calcSV(self,tx):
+        if aw.qmc.background:
+            # Follow Background mode
+            j = aw.qmc.backgroundtime2index(tx + self.lookahead)
+            if aw.qmc.swapETBT: # we observe the BT
+                return aw.qmc.temp2B[j]
+            else: # we observe the ET
+                return aw.qmc.temp1B[j]
+        else:
+            return None
+    
     ##TX/RX FUNCTIONS
     #This function reads read-only memory (with 3xxxx memory we need function=4)
     #both PXR3 and PXG4 use the same memory location 31001 (3xxxx = read only)
@@ -36360,8 +37403,8 @@ class FujiPID(object):
                 mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
                 aw.qmc.adderror(mssg)
                 
-    #sets a new sv value
-    def setsv(self,value):
+    #sets a new sv value (if slient=False, no output nor event recording is done)
+    def setsv(self,value,silent=False):
         command = ""
         #Fuji PXG 
         if aw.ser.controlETpid[0] == 0: 
@@ -36374,15 +37417,17 @@ class FujiPID(object):
                 command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(value*10))
                 r = aw.ser.sendFUJIcommand(command,8)
             #check response
-            if r == command or aw.ser.useModbusPort:
-                # [Not sure the following will translate or even format properly... Need testing!]
-                message = QApplication.translate("Message","PXG sv#{0} set to {1}",None).format(self.PXG4["selectsv"][0],"%.1f" % float(value))
-                aw.sendmessage(message)
-                self.PXG4[svkey][0] = value
-                #record command as an Event 
-                strcommand = "SETSV::" + str("%.1f"%float(value))
-                aw.qmc.DeviceEventRecord(strcommand)
-                aw.lcd6.display("%.1f"%float(value))
+            if aw.ser.useModbusPort or r == command:
+                if not silent:
+                    # [Not sure the following will translate or even format properly... Need testing!]
+                    message = QApplication.translate("Message","PXG sv#{0} set to {1}",None).format(self.PXG4["selectsv"][0],"%.1f" % float(value))
+                    aw.sendmessage(message)
+                    self.PXG4[svkey][0] = value
+                    #record command as an Event 
+                    strcommand = "SETSV::" + str("%.1f"%float(value))
+                    aw.qmc.DeviceEventRecord(strcommand)
+                #aw.lcd6.display("%.1f"%float(value))
+                self.sv = value
             else:
                 aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setPXGsv()")
                 return -1
@@ -36395,15 +37440,17 @@ class FujiPID(object):
                 command = self.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["sv0"][1],int(value*10))
                 r = aw.ser.sendFUJIcommand(command,8)
             #check response
-            if r == command or aw.ser.useModbusPort:
-                # [Not sure the following will translate or even format properly... Need testing!]
-                message = QApplication.translate("Message","PXR sv set to {0}",None).format("%.1f" % float(value))
-                aw.fujipid.PXR["sv0"][0] = value
-                aw.sendmessage(message)
-                #record command as an Event 
-                strcommand = "SETSV::" + str("%.1f"%float(value))
-                aw.qmc.DeviceEventRecord(strcommand)
-                aw.lcd6.display("%.1f"%float(value))
+            if aw.ser.useModbusPort or r == command:
+                if not silent:
+                    # [Not sure the following will translate or even format properly... Need testing!]
+                    message = QApplication.translate("Message","PXR sv set to {0}",None).format("%.1f" % float(value))
+                    aw.fujipid.PXR["sv0"][0] = value
+                    aw.sendmessage(message)
+                    #record command as an Event 
+                    strcommand = "SETSV::" + str("%.1f"%float(value))
+                    aw.qmc.DeviceEventRecord(strcommand)
+                #aw.lcd6.display("%.1f"%float(value))
+                self.sv = value
             else:
                 aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setPXRsv()")
                 return -1
@@ -36417,12 +37464,12 @@ class FujiPID(object):
             if aw.ser.controlETpid[0] == 0:
                 # read the current svN (1-7) being used
                 if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(aw.fujipid.PXR["sv0"][1],3)
+                    reg = aw.modbus.address2register(aw.fujipid.PXG4["sv0"][1],3)
                     N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
                 else:
                     command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,self.PXG4["selectsv"][1],1)
                     N = aw.fujipid.readoneword(command)
-                if N != -1:
+                if N > 0:
                     self.PXG4["selectsv"][0] = N
                     svkey = "sv" + str(N)
                     if aw.ser.useModbusPort:
@@ -36431,7 +37478,7 @@ class FujiPID(object):
                     else:
                         command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],newsv)
                         r = aw.ser.sendFUJIcommand(command,8)
-                    if len(r) == 8 or aw.ser.useModbusPort:
+                    if aw.ser.useModbusPort or len(r) == 8:
                         message = QApplication.translate("Message","SV{0} changed from {1} to {2})",None).format(str(N),str(currentsv),str(newsv/10.))
                         aw.sendmessage(message)
                         self.PXG4[svkey][0] = newsv/10
@@ -36450,7 +37497,7 @@ class FujiPID(object):
                 else:
                     command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
                     r = aw.ser.sendFUJIcommand(command,8)
-                if len(r) == 8 or aw.ser.useModbusPort:
+                if aw.ser.useModbusPort or len(r) == 8:
                     message = QApplication.translate("Message","SV changed from {0} to {1}",None).format(str(currentsv),str(newsv/10.))                           
                     aw.sendmessage(message)
                     self.PXR["sv0"][0] = newsv/10
@@ -36600,7 +37647,7 @@ class FujiPID(object):
         if Nword < 257:
             pad1 = self.dec2HexRaw(0)
         else:
-            pad1 = ""
+            pad1 = decs2string("")
         part1 = self.dec2HexRaw(stationNo)
         part2 = self.dec2HexRaw(FunctionCode)
         _,r = divmod(memory,10000)
@@ -37095,7 +38142,7 @@ class DTApidDlgControl(ArtisanDialog):
 class ArduinoTC4(object):
     def __init__(self):
         self.pidActive = False
-        self.sv = 0 # the last sv send to the Arduino
+        self.sv = None # the last sv send to the Arduino
         #
         self.pidOnCHARGE = False
         self.loadRampSoakFromProfile = False
@@ -37390,6 +38437,7 @@ def main():
     warnings.filterwarnings('ignore')
     
     global aw
+    global app
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
     # font fix for OS X 10.9
@@ -37454,6 +38502,9 @@ def main():
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore'):
         app.exec_()
+    del aw
+    del app   
+    sys.exit(0)
 
 ##############################################################################################################################################
 ##############################################################################################################################################
