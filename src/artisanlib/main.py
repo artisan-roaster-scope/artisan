@@ -34042,12 +34042,12 @@ class PXRpidDlgControl(ArtisanDialog):
         self.labelrs1 = QLabel()
         self.labelrs1.setContentsMargins(5,5,5,5)
         self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(1-4)",None) + "</b></font>")
+        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<BR>(1-4)",None) + "</b></font>")
         self.labelrs1.setMaximumSize(120, 62)
         self.labelrs2 = QLabel()
         self.labelrs2.setContentsMargins(5,5,5,5)
         self.labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(5-8)",None) + "</b></font>")
+        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<BR>(5-8)",None) + "</b></font>")
         self.labelrs2.setMaximumSize(120, 62)
         labelpattern = QLabel(QApplication.translate("Label", "Ramp/Soak Pattern",None))
         self.patternComboBox =  QComboBox()
@@ -34231,6 +34231,30 @@ class PXRpidDlgControl(ArtisanDialog):
         pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
         PointButtonET.clicked.connect(lambda PID="ET": self.setpoint(PID))
         PointButtonBT.clicked.connect(lambda PID="BT": self.setpoint(PID))
+        
+                
+        # Follow Background 
+        self.followBackground = QCheckBox(QApplication.translate("CheckBox", "Follow Background",None))
+        self.followBackground.setChecked(aw.fujipid.followBackground)
+        self.followBackground.setFocusPolicy(Qt.NoFocus)
+        self.followBackground.stateChanged.connect(lambda i=0:self.changeFollowBackground(i))         #toggle
+        # Follow Background Lookahead
+        self.pidSVLookahead = QSpinBox()
+        self.pidSVLookahead.setAlignment(Qt.AlignRight)
+        self.pidSVLookahead.setRange(0,999)
+        self.pidSVLookahead.setSingleStep(1)
+        self.pidSVLookahead.setValue(aw.fujipid.lookahead)  
+        self.pidSVLookahead.setSuffix(" s")
+        self.pidSVLookahead.setFocusPolicy(Qt.NoFocus)
+        self.pidSVLookahead.valueChanged.connect(self.changeLookAhead)
+        pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))  
+        followLayout = QHBoxLayout()
+        followLayout.addStretch()
+        followLayout.addWidget(pidSVLookaheadLabel)
+        followLayout.addWidget(self.pidSVLookahead)
+        followLayout.addStretch() 
+        
+        
         #create layouts
         buttonMasterLayout = QGridLayout()
         buttonRampSoakLayout1 = QVBoxLayout()
@@ -34258,8 +34282,13 @@ class PXRpidDlgControl(ArtisanDialog):
         buttonMasterLayout.addWidget(button_autotuneON,3,0)
         buttonMasterLayout.addWidget(button_standbyOFF,4,0)
         buttonMasterLayout.addWidget(button_standbyON,4,1)
-        buttonMasterLayout.addWidget(button_getall,5,0)
-        buttonMasterLayout.addWidget(button_exit,5,1)
+        buttonMasterLayout.addWidget(self.followBackground,5,0)
+        buttonMasterLayout.addLayout(followLayout,5,1)
+        buttonMasterLayout.addWidget(button_getall,6,0)
+        buttonMasterLayout.addWidget(button_exit,6,1)
+
+        
+                
         #tab 2
         svlayout.addWidget(svwarning2,0,0)
         svlayout.addWidget(svwarning1,0,1)
@@ -34334,6 +34363,12 @@ class PXRpidDlgControl(ArtisanDialog):
         Mlayout.addWidget(self.status,0)
         Mlayout.addWidget(TabWidget,1)
         self.setLayout(Mlayout)
+
+    def changeLookAhead(self):
+        aw.fujipid.lookahead = int(self.pidSVLookahead.value())     
+        
+    def changeFollowBackground(self,i):
+        aw.fujipid.followBackground = not aw.fujipid.followBackground
 
     def setpoint(self,PID):
         command = ""
@@ -34551,28 +34586,34 @@ class PXRpidDlgControl(ArtisanDialog):
             aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setONOFFautotune()")
 
     def setONOFFstandby(self,flag):
-        #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
-        #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-        self.status.showMessage(QApplication.translate("StatusBar","wait...",None),500)
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(aw.fujipid.PXR["runstandby"][1],6)
-            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
-        else:
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["runstandby"][1],flag)
-            #TX and RX
-            r = aw.ser.sendFUJIcommand(command,8)
-        if aw.ser.useModbusPort or r == command:
-            if flag == 1:
-                message = QApplication.translate("StatusBar","PID OFF",None)     #put pid in standby 1 (pid off)
-                aw.fujipid.PXR["runstandby"][0] = 1
-            elif flag == 0:
-                message = QApplication.translate("StatusBar","PID ON",None)      #put pid in standby 0 (pid on)
-                aw.fujipid.PXR["runstandby"][0] = 0
-            self.status.showMessage(message,5000)
-        else:
-            mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
-            self.status.showMessage(mssg,5000)
-            aw.qmc.adderror(mssg)
+        try:
+            #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
+            #flag = 0 standby OFF, flag = 1 standby ON (pid off)
+            self.status.showMessage(QApplication.translate("StatusBar","wait...",None),500)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXR["runstandby"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["runstandby"][1],flag)
+                #TX and RX
+                r = aw.ser.sendFUJIcommand(command,8)
+            if aw.ser.useModbusPort or r == command:
+                if flag == 1:
+                    message = QApplication.translate("StatusBar","PID OFF",None)     #put pid in standby 1 (pid off)
+                    aw.fujipid.PXR["runstandby"][0] = 1
+                elif flag == 0:
+                    message = QApplication.translate("StatusBar","PID ON",None)      #put pid in standby 0 (pid on)
+                    aw.fujipid.PXR["runstandby"][0] = 0
+                self.status.showMessage(message,5000)
+            else:
+                mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
+                self.status.showMessage(mssg,5000)
+                aw.qmc.adderror(mssg)
+        except Exception as e:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby() {0}").format(str(e)),exc_tb.tb_lineno)
 
     def setsv(self):
         if self.svedit.text() != "":
@@ -36848,29 +36889,35 @@ class PXG4pidDlgControl(ArtisanDialog):
             aw.sendmessage(QApplication.translate("Message","Ramp/Soak was found in Hold! Turn it off before changing the pattern", None))
 
     def setONOFFstandby(self,flag):
-        #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
-        #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-        self.status.showMessage(QApplication.translate("StatusBar","wait...",None),500)
-        if aw.ser.useModbusPort:
-            reg = aw.modbus.address2register(aw.fujipid.PXG4["runstandby"][1],6)
-            aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
-            r = "00000000"
-        else:
-            command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["runstandby"][1],flag)
-            #TX and RX
-            r = aw.ser.sendFUJIcommand(command,8)
-        if r == command and flag == 1:
-            message = QApplication.translate("StatusBar","PID set to OFF",None)     #put pid in standby 1 (pid on)
-            aw.fujipid.PXG4["runstandby"][0] = 1
-        elif r == command and flag == 0:
-            message = QApplication.translate("StatusBar","PID set to ON",None)      #put pid in standby 0 (pid off)
-            aw.fujipid.PXG4["runstandby"][0] = 0
-        else:
-            message = QApplication.translate("StatusBar","Unable",None)
-        if r:
-            self.status.showMessage(message,5000)
-        else:
-            self.status.showMessage(QApplication.translate("StatusBar","No data received",None),5000)
+        try:
+            #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
+            #flag = 0 standby OFF, flag = 1 standby ON (pid off)
+            self.status.showMessage(QApplication.translate("StatusBar","wait...",None),500)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4["runstandby"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+                r = "00000000"
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["runstandby"][1],flag)
+                #TX and RX
+                r = aw.ser.sendFUJIcommand(command,8)
+            if r == command and flag == 1:
+                message = QApplication.translate("StatusBar","PID set to OFF",None)     #put pid in standby 1 (pid on)
+                aw.fujipid.PXG4["runstandby"][0] = 1
+            elif r == command and flag == 0:
+                message = QApplication.translate("StatusBar","PID set to ON",None)      #put pid in standby 0 (pid off)
+                aw.fujipid.PXG4["runstandby"][0] = 0
+            else:
+                message = QApplication.translate("StatusBar","Unable",None)
+            if r:
+                self.status.showMessage(message,5000)
+            else:
+                self.status.showMessage(QApplication.translate("StatusBar","No data received",None),5000)
+        except Exception as e:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby() {0}").format(str(e)),exc_tb.tb_lineno)
 
     def getsegment(self, idn):
         svkey = "segment" + str(idn) + "sv"

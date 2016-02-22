@@ -1,6 +1,31 @@
 Detailed Release History
 ========================
 
+
+----
+v0.9.9 (xx.xx.2016)
+------------------
+
+ * New Features
+    * adds zoom-and-follow function (while the zoom icon is activated the graph is centered on the latest BT value)
+    * adds MODBUS dividers
+    * adds a flag to hide the "SV/% LCDs" (default on)
+    * adds World Coffee Roasting Championship (WCRC) cupping profile
+    * adds batch and ranking reports in HTML/CSV/Excel format
+    * adds follow background for Fuji PIDs
+    * adds high-res app icon for OS X
+    * adds "File version" and "Product version" to Windows app installer
+ * Changes
+    * The existing extra device mathexpression formulas are no longer changed if extra devices have to be extended to load a profile
+ * Bug Fixes
+    * better initial Phidgets attach handling
+    * improved RoR calculation
+    * improved temperature and RoR curve drawing
+    * fixes regression on moving the background up and down
+    * minor improvements
+    * fixed rare slider selection visual artifact on OS X
+    * ensures that alarms are sorted based on alarm numbers on opening the dialog
+
 ----
 v0.9.8 (21.10.2015)
 ------------------
