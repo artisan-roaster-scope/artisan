@@ -4791,10 +4791,13 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.clearMeasurements()
             aw.arduino.pidOff()
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
-            if self.qmc.device == 0 and aw.fujipid.followBackground:
+            if aw.device == 0 and aw.fujipid.followBackground:
                 aw.fujipid.followBackground = False
                 if aw.fujipid.sv > 0:
-                    aw.fujipid.setsv(0,silent=True)
+                    try:
+                        aw.fujipid.setsv(0,silent=True)
+                    except:
+                        pass
                     aw.fujipid.sv = 0
             self.disconnectProbes()
             #enable RESET button:
@@ -5452,11 +5455,14 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_6.setFlat(True)
                 
                 # at DROP we stop the follow background on FujiPIDs and set the SV to 0
-                if self.qmc.device == 0 and aw.fujipid.followBackground:
+                if aw.device == 0 and aw.fujipid.followBackground:
                     aw.fujipid.followBackground = False
                     if aw.fujipid.sv > 0:
-                        aw.fujipid.setsv(0,silent=True)
-                        aw.fujipid.sv = 0
+                        try:
+                            aw.fujipid.setsv(0,silent=True)
+                            aw.fujipid.sv = 0
+                        except:
+                            pass
                 
             except Exception:
                 pass
@@ -7639,7 +7645,7 @@ class VMToolbar(NavigationToolbar):
 
     def _icon(self, name):
         #dirty hack to prefer .svg over .png Toolbar icons
-        if platf == 'Windows' or not svgsupport:
+        if not svgsupport: # or (platf == 'Windows'):
             p = os.path.join(self.basedir, name.replace('.svg','.png'))
         else:
             p = os.path.join(self.basedir, name.replace('.png','.svg'))
@@ -36901,10 +36907,10 @@ class PXG4pidDlgControl(ArtisanDialog):
                 command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["runstandby"][1],flag)
                 #TX and RX
                 r = aw.ser.sendFUJIcommand(command,8)
-            if r == command and flag == 1:
+            if (aw.ser.useModbusPort or r == command) and flag == 1:
                 message = QApplication.translate("StatusBar","PID set to OFF",None)     #put pid in standby 1 (pid on)
                 aw.fujipid.PXG4["runstandby"][0] = 1
-            elif r == command and flag == 0:
+            elif (aw.ser.useModbusPort or r == command) and flag == 0:
                 message = QApplication.translate("StatusBar","PID set to ON",None)      #put pid in standby 0 (pid off)
                 aw.fujipid.PXG4["runstandby"][0] = 0
             else:
