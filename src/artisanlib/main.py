@@ -4791,7 +4791,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.clearMeasurements()
             aw.arduino.pidOff()
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
-            if aw.device == 0 and aw.fujipid.followBackground:
+            if aw.qmc.device == 0 and aw.fujipid.followBackground:
                 aw.fujipid.followBackground = False
                 if aw.fujipid.sv > 0:
                     try:
@@ -5455,7 +5455,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_6.setFlat(True)
                 
                 # at DROP we stop the follow background on FujiPIDs and set the SV to 0
-                if aw.device == 0 and aw.fujipid.followBackground:
+                if aw.qmc.device == 0 and aw.fujipid.followBackground:
                     aw.fujipid.followBackground = False
                     if aw.fujipid.sv > 0:
                         try:
@@ -7645,7 +7645,7 @@ class VMToolbar(NavigationToolbar):
 
     def _icon(self, name):
         #dirty hack to prefer .svg over .png Toolbar icons
-        if not svgsupport: # or (platf == 'Windows'):
+        if not svgsupport or (platf == 'Windows'):
             p = os.path.join(self.basedir, name.replace('.svg','.png'))
         else:
             p = os.path.join(self.basedir, name.replace('.png','.svg'))
