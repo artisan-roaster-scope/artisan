@@ -25,6 +25,7 @@ v0.9.9 (xx.xx.2016)
     * minor improvements
     * fixed rare slider selection visual artifact on OS X
     * ensures that alarms are sorted based on alarm numbers on opening the dialog
+    * fixed volume increase calculation
 
 ----
 v0.9.8 (21.10.2015)

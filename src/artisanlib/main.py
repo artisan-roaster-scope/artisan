@@ -927,7 +927,7 @@ class tgraphcanvas(FigureCanvas):
         self.titleB = ""
         self.roastbatchnrB = 0
         self.roastbatchprefixB = u("")
-        self.roastbatchposB = 0
+        self.roastbatchposB = 1
         self.temp1B,self.temp2B,self.temp1BX,self.temp2BX,self.timeB = [],[],[],[],[]
         self.stemp1B,self.stemp2B,self.stemp1BX,self.stemp2BX = [],[],[],[] # smoothed versions of the background courves
         self.extraname1B,self.extraname2B = [],[]
@@ -986,12 +986,12 @@ class tgraphcanvas(FigureCanvas):
         self.roastepoch = self.roastdate.toTime_t() # in seconds
         self.lastroastepoch = self.roastepoch # the epoch of the last roast in seconds
         self.batchcounter = -1 # global batch counter; if batchcounter is -1, batchcounter system is inactive
-        self.batchsequence = 0 # global counter of position in sequence of batches of one session
+        self.batchsequence = 1 # global counter of position in sequence of batches of one session
         self.batchprefix = u("")
         # profile batch nr
         self.roastbatchnr = 0 # batch number of the roast; if roastbatchnr=0, prefix/counter is hidden/inactiv (initialized to 0 on roast START)
         self.roastbatchprefix = self.batchprefix # batch prefix of the roast
-        self.roastbatchpos = 0 # position of the roast in the roast session (first batch, second batch,..)
+        self.roastbatchpos = 1 # position of the roast in the roast session (first batch, second batch,..)
         self.roasttzoffset = libtime.timezone # timezone offset to be added to roastepoch to get time in local timezone
         self.beans = ""
 
@@ -3053,7 +3053,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.timeclock.start()
                 
                 aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
-                aw.qmc.roastbatchpos = 0 # initialized to 0, set to increased batchsequence on DROP
+                aw.qmc.roastbatchpos = 1 # initialized to 0, set to increased batchsequence on DROP
                 aw.qmc.roastbatchprefix = aw.qmc.batchprefix
 
                 if self.HUDflag:
@@ -4923,7 +4923,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
                     
             aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
-            aw.qmc.roastbatchpos = 0 # initialized to 0, set to increased batchsequence on DROP
+            aw.qmc.roastbatchpos = 1 # initialized to 1, set to increased batchsequence on DROP
             aw.qmc.fig.suptitle("")
             aw.qmc.updateDeltaSamples()
             aw.disableSaveActions()
@@ -5495,16 +5495,16 @@ class tgraphcanvas(FigureCanvas):
             # if this roasts DROP is more than 1.5h after the last registered DROP, we assume a new session starts
             if aw.qmc.lastroastepoch + 5400 < aw.qmc.roastepoch:
                 # reset the sequence counter
-                aw.qmc.batchsequence = 0
+                aw.qmc.batchsequence = 1
             else:
                 aw.qmc.batchsequence += 1
             # set roastbatchpos
             aw.qmc.roastbatchpos = aw.qmc.batchsequence
         else: # batch counter system inactive
             # set the batchcounter of the current profile
-            aw.qmc.batchsequence = 0
+            aw.qmc.batchsequence = 1
             aw.qmc.roastbatchnr = 0
-            aw.qmc.roastbatchpos = 0
+            aw.qmc.roastbatchpos = 1
         # update lastroastepoch to time of roastdate
         aw.qmc.lastroastepoch = aw.qmc.roastepoch
         
@@ -5887,7 +5887,7 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.weight[1]:
                             msg += sep + str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
                     if aw.qmc.volume[0] and aw.qmc.volume[1]:
-                            msg += sep + str(aw.float2float(aw.weight_loss(aw.qmc.volume[1],aw.qmc.volume[0]),1)) + "%"
+                            msg += sep + str(aw.float2float(aw.volume_increase(aw.qmc.volume[0],aw.qmc.volume[1]),1)) + "%"
                     if aw.qmc.whole_color and aw.qmc.ground_color:
                         msg += sep + u"#" + str(aw.qmc.whole_color) + u"/" +  str(aw.qmc.ground_color)
                     elif aw.qmc.ground_color:
@@ -11757,7 +11757,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.roastbatchnrB = 0
                     self.qmc.roastbatchprefixB = u("")
-                    self.qmc.roastbatchposB = 0
+                    self.qmc.roastbatchposB = 1
                 
 # we don't load alarms from backgrounds as this would overload the one of the foreground profile that automatically loads this background
 
@@ -12982,7 +12982,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.titleB = ""
                     self.qmc.roastbatchnrB = 0
                     self.qmc.roastbatchprefixB = u("")
-                    self.qmc.roastbatchposB = 0
+                    self.qmc.roastbatchposB = 1
             return True
         except Exception as ex:
 #            import traceback
@@ -13152,7 +13152,7 @@ class ApplicationWindow(QMainWindow):
             weightin = self.qmc.weight[0]
             weightout = self.qmc.weight[1]
             weight_loss = self.weight_loss(weightin,weightout)
-            volume_gain = self.weight_loss(volumeout,volumein)
+            volume_gain = self.volume_increase(volumein,volumeout)
             if weight_loss:
                 computedProfile["weight_loss"] = self.float2float(weight_loss)
             if volume_gain:
@@ -17257,7 +17257,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.titleB = ""
         self.qmc.roastbatchnrB = 0
         self.qmc.roastbatchprefixB = u("")
-        self.qmc.roastbatchposB = 0
+        self.qmc.roastbatchposB = 1
         self.qmc.temp1B, self.qmc.temp2B, self.qmc.temp1BX, self.qmc.temp2BX, self.qmc.timeB = [],[],[],[],[]
         self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = [],[],[],[] # smoothed versions of the background courves
         self.qmc.extraname1B,self.qmc.extraname2B = [],[]
@@ -17396,6 +17396,14 @@ class ApplicationWindow(QMainWindow):
             return 0.
         else:
             return 100. * ((float(green) - float(roasted)) / float(green))
+            
+    # takes the weight of the green and roasted coffee as floats and
+    # returns the weight loss in percentage as float
+    def volume_increase(self,green, roasted):
+        if float(roasted) == 0.0 or float(green) > float(roasted):
+            return 0.
+        else:
+            return 100. * ((float(roasted) - float(green)) / float(green))
 
     # from RoastMagazine (corrected by substracting 1% based on experience)
     # http://www.roastmagazine.com/resources/Roasting101_Articles/Roast_SeptOct05_LightRoasting.pdf
@@ -20650,7 +20658,7 @@ class editGraphDlg(ArtisanDialog):
             self.batchcounterSpinBox.setValue(aw.qmc.roastbatchnr)
             self.batchcounterSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter) 
             self.batchposSpinBox = QSpinBox()
-            self.batchposSpinBox.setRange(0,99)
+            self.batchposSpinBox.setRange(1,99)
             self.batchposSpinBox.setSingleStep(1)
             self.batchposSpinBox.setValue(aw.qmc.roastbatchpos)
             self.batchposSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter) 
@@ -20660,7 +20668,7 @@ class editGraphDlg(ArtisanDialog):
             batchLayout.addWidget(self.batchposSpinBox)
         else:
             batch = u("")
-            if aw.qmc.roastbatchpos != 0:
+            if aw.qmc.roastbatchnr != 0:
                 roastpos = u" (" + u(aw.qmc.roastbatchpos) + u")"
             else:
                 roastpos = u("")
@@ -21788,7 +21796,7 @@ class editGraphDlg(ArtisanDialog):
         percent = 0.
         try:
             if self.volumeoutedit.text() != "" and float(str(self.volumeoutedit.text())) != 0.0:
-                percent = aw.weight_loss(float(str(self.volumeoutedit.text())),float(str(self.volumeinedit.text())))
+                percent = aw.volume_increase(float(str(self.volumeinedit.text())),float(str(self.volumeoutedit.text())))
         except Exception:
             pass
         percentstring =  "%.1f" %(percent) + "%"
