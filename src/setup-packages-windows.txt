@@ -16,17 +16,30 @@ o Phidgets Python 2.1.8
 o py2exe 0.6.9
 o NSIS 2.46
 o pymodbus 1.3.0
-o yoctopuce 1.10.20773
-o requests 2.3.0
+o yoctopuce 1.10.22936
+o requests 2.9.1
 o bottle 0.13 trunk
-o gevent 1.0.1
-o geventwebsocket 0.9.3
+o gevent 1.0.2
+o geventwebsocket 0.9.5
 o python-qrcode 5.1
 o win_inet_pton 1.0.1
+o python-qrcode 5.2.2
+
+
+CHECK FOR UPDATES
+# pip install pip-review
+# pip-review --local --interactive
 
 
 Upgrade History:
 
+- 2016-02-24
+ . scipy 0.15.1 => 0.16.1
+ . gevent 1.0.1 => 1.0.2
+ . gevent-websocket 0.9.3 => 0.9.5
+ . qrcode 5.2.2
+ . requests 2.3.0 => 2.9.1
+ . yoctopuce 1.10.20773 => 1.10.22936
 - 2016-02-23
  . Python 2.7.10 => 2.7.11
  . matplotlib 1.4.3 => 1.5.1
@@ -235,3 +248,11 @@ download win_inet_pton_1.0.1.tar.gz
 
 # c:\Python27\python.exe setup.py build
 # c:\Python27\python.exe setup.py install
+
+
+21) python-qrcode
+
+https://github.com/lincolnloop/python-qrcode
+
+# python setup.py build
+# sudo python setup.py install

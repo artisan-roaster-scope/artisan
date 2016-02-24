@@ -422,6 +422,9 @@ def __dependencies_for_freezing():
     from scipy.special import _ufuncs_cxx
     from scipy import integrate
     from scipy import interpolate
+    # to make bbfreeze on Linux happy with scipy > 0.17.0
+    import scipy.linalg.cython_blas
+    import scipy.linalg.cython_lapack
     if pyqtversion < 5:
         import PyQt4.QtSvg
         import PyQt4.QtXml
@@ -11891,13 +11894,14 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.extratemp1[int(j/2)].append(float(item[extra_fields[j]]))
                 last_time = timez
             csvFile.close()
-            #swap temperature curves if needed such that BT is the lower and ET the upper one
-            sumTemp2 = freduce(lambda x,y:x + y, self.qmc.temp2)
-            sumTemp1 = freduce(lambda x,y:x + y, self.qmc.temp1)
-            if len(self.qmc.temp2) > 0 and len(self.qmc.temp1) > 0 and sumTemp2 > 0 and sumTemp1 > 0 and sumTemp2 > sumTemp1:
-                tmp = self.qmc.temp1
-                self.qmc.temp1 = self.qmc.temp2
-                self.qmc.temp2 = tmp
+# deactivated in v0.9.9 as it is quite unintuitive (see issue #85)
+#            #swap temperature curves if needed such that BT is the lower and ET the upper one
+#            sumTemp2 = freduce(lambda x,y:x + y, self.qmc.temp2)
+#            sumTemp1 = freduce(lambda x,y:x + y, self.qmc.temp1)
+#            if len(self.qmc.temp2) > 0 and len(self.qmc.temp1) > 0 and sumTemp2 > 0 and sumTemp1 > 0 and sumTemp2 > sumTemp1:
+#                tmp = self.qmc.temp1
+#                self.qmc.temp1 = self.qmc.temp2
+#                self.qmc.temp2 = tmp
             #set events
             CHARGE = self.qmc.stringtoseconds(header[2].split('CHARGE:')[1],False)
             if CHARGE > 0:
@@ -15833,8 +15837,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.reset()
 #            self.qmc.ax.lines = []
 #            self.qmc.delta_ax.lines = []
-#            print(self.qmc.ax.artists)
-#            print(self.qmc.ax.patches)
 #            # erase annotations
 #            # erase statistics
             for p in profiles:
@@ -15892,85 +15894,103 @@ class ApplicationWindow(QMainWindow):
                     cuppings_count += 1
                 # add BT curve to graph
                 if len(profiles) < 7:
-                    label = u(pd["batchprefix"]) + u(pd["batchnr"])
-                    temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
-                    timex = rd["timex"]
-                    stemp = self.qmc.smooth_list(timex,temp,window_len=self.qmc.curvefilter)
-                    charge = rd["charge_idx"]
-                    drop = rd["drop_idx"]
-                    stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
-                    # align with CHARGE
-                    delta = timex[charge]
-                    timex = [t-delta for t in timex]
-                    # cut-out only CHARGE to DROP
-                    cl = next(color)
-                    self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground="w")],
-                            linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
-                    handles.append(self.l_temp)
-                    labels.append(label)
-                    if self.qmc.DeltaBTflag:
-                        tx = numpy.array(timex)
-                        tx_roast = numpy.array(timex[charge:drop]) # just the part from CHARGE TO DROP
-                        with numpy.errstate(divide='ignore'):
-                            nt = numpy.array(stemp[charge:drop])
-                            z = (nt[aw.qmc.deltasamples:] - nt[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)                        
-                            lt,ld = len(tx_roast),len(z)
-                            if lt > ld:
-                                z = numpy.append(z,[z[-1] if ld else 0.]*(lt - ld))
-                            s = self.qmc.smooth_list(tx_roast,z,window_len=self.qmc.deltafilter)
-                            delta = numpy.concatenate(([None]*(charge),s,[None]*(len(tx)-drop)))
-                            trans = self.qmc.delta_ax.transData
-                            self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                            linewidth=self.qmc.BTdeltalinewidth,linestyle=self.qmc.BTdeltalinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl)    
-                        
+                    try:
+                        label = u(pd["batchprefix"]) + u(pd["batchnr"])
+                        temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
+                        timex = rd["timex"]
+                        stemp = self.qmc.smooth_list(timex,temp,window_len=self.qmc.curvefilter)
+                        charge = rd["charge_idx"]
+                        drop = rd["drop_idx"]
+                        stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
+                        # align with CHARGE
+                        delta = timex[charge]
+                        timex = [t-delta for t in timex]
+                        # cut-out only CHARGE to DROP
+                        cl = next(color)
+                        self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground="w")],
+                                linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
+                        handles.append(self.l_temp)
+                        labels.append(label)
+                        if self.qmc.DeltaBTflag:
+                            tx = numpy.array(timex)
+                            tx_roast = numpy.array(timex[charge:drop]) # just the part from CHARGE TO DROP
+                            with numpy.errstate(divide='ignore'):
+                                nt = numpy.array(stemp[charge:drop])
+                                z = (nt[aw.qmc.deltasamples:] - nt[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)                        
+                                lt,ld = len(tx_roast),len(z)
+                                if lt > ld:
+                                    z = numpy.append(z,[z[-1] if ld else 0.]*(lt - ld))
+                                s = self.qmc.smooth_list(tx_roast,z,window_len=self.qmc.deltafilter)
+                                delta = numpy.concatenate(([None]*(charge),s,[None]*(len(tx)-drop)))
+                                trans = self.qmc.delta_ax.transData
+                                self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                                linewidth=self.qmc.BTdeltalinewidth,linestyle=self.qmc.BTdeltalinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl)
+                    except Exception as e:
+#                        import traceback
+#                        traceback.print_exc(file=sys.stdout)
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+
+                            
                 
             tmpdir = u(QDir.tempPath() + "/")
             graph_image = ""
 
             if len(profiles) < 7:
-                graph_image = "roastlog-graph"
-                self.qmc.ax.set_title("")
-                self.qmc.fig.suptitle("")           
-                rcParams['path.effects'] = []
-                prop = aw.mpl_fontproperties.copy()
-                prop.set_size("x-small")
-                if len(handles) > 3:
-                    ncol = int(math.ceil(len(handles)/2.))
-                else:
-                    ncol = int(math.ceil(len(handles)))
-                leg = self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
-                        
-                # generate graph                
-                if platf == 'Darwin':
-                    graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
-                    try:
-                        os.remove(graph_image)
-                    except OSError:
-                        pass
-                    self.qmc.fig.savefig(graph_image)
-                else:
-                    if pyqtversion < 5:
-                        image = QPixmap().grabWidget(aw.qmc).toImage()
+                try:                
+                    graph_image = "roastlog-graph"
+                    self.qmc.ax.set_title("")
+                    self.qmc.fig.suptitle("")           
+                    rcParams['path.effects'] = []
+                    prop = aw.mpl_fontproperties.copy()
+                    prop.set_size("x-small")
+                    if len(handles) > 3:
+                        ncol = int(math.ceil(len(handles)/2.))
                     else:
-                        image = aw.qmc.grab().toImage()
-                    #save GRAPH image
-                    graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
-                    try:
-                        os.remove(graph_image)
-                    except OSError:
-                        pass
-                    image.save(graph_image)
-                #add some random number to force HTML reloading
-                graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
-                # redraw original graph
-                self.qmc.redraw(recomputeAllDeltas=False)
-                if foreground_profile_path:
-                    aw.loadFile(foreground_profile_path)
-                if aw.qmc.backgroundpath:
-                    aw.loadbackground(aw.qmc.backgroundpath)
-                graph_image = "<img alt='roast graph' width=\"100%\" src='file:///" + graph_image + "'>"
+                        ncol = int(math.ceil(len(handles)))
+                    leg = self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
+                            
+                    # generate graph
+                    self.qmc.fig.canvas.draw()
+                    
+                    # save graph                
+                    if platf == 'Darwin':
+                        graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
+                        try:
+                            os.remove(graph_image)
+                        except OSError:
+                            pass
+                        self.qmc.fig.savefig(graph_image)
+                    else:
+                        if pyqtversion < 5:
+                            image = QPixmap().grabWidget(aw.qmc).toImage()
+                        else:
+                            image = aw.qmc.grab().toImage()
+                        #save GRAPH image
+                        graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
+                        try:
+                            os.remove(graph_image)
+                        except OSError:
+                            pass
+                        image.save(graph_image)
+                    #add some random number to force HTML reloading
+                    graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
+                    graph_image = "<img alt='roast graph' width=\"100%\" src='file:///" + graph_image + "'>"
+                    # redraw original graph
+                    if not foreground_profile_path and not aw.qmc.backgroundpath:
+                        self.qmc.redraw(recomputeAllDeltas=False)
+                    else:
+                        if foreground_profile_path:
+                            aw.loadFile(foreground_profile_path)
+                        if aw.qmc.backgroundpath:
+                            aw.loadbackground(aw.qmc.backgroundpath)
+                except Exception as e:
+#                    import traceback
+#                    traceback.print_exc(file=sys.stdout)
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
                 
             
             
@@ -26431,7 +26451,6 @@ class modbusport(object):
             r = decoder.decode_16bit_uint()
             return r
         except Exception as ex:
-#            print(ex)
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()

@@ -60,6 +60,7 @@ Features
 - roast, production (for tax reporting) and ranking reports
 - PID-based roast reproduction (follow background mode)
 
+
 Documentation and Support
 ------------------------
 - [Installation](wiki/Installation.md)
@@ -71,6 +72,16 @@ Documentation and Support
   * [Artisan Documentation on the Huky Forum](http://www.hukyforum.com/index.php?action=downloads;cat=1)
 - [Artisan Blog](http://artisan-roasterscope.blogspot.de/)
 - [User Mailing List](https://lists.mokelbu.de/listinfo/artisan-user) (you need to subscribe to send and receive messages)
+
+
+Donations
+---------
+
+This software is open-source and absolutely free, even for commercial use.
+
+If you think Artisan is worth of some money and you are willing to contribute financially to its further development, feel free to send any amount through PayPal.
+
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BJ5HQ6SL48V8Q)
 
 
 Version History

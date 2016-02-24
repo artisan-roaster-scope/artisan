@@ -15,12 +15,14 @@ v0.9.9 (xx.xx.2016)
     * adds follow background for Fuji PIDs
     * adds high-res app icon for OS X
     * adds "File version" and "Product version" to Windows app installer
+    * availability on Arch Linux
  * Changes
-    * The existing extra device mathexpression formulas are no longer changed if extra devices have to be extended to load a profile
+    * existing extra device mathexpression formulas are no longer changed if extra devices have to be extended on loading a profile
+    * deactivates the auto-swap of ET/BT on CSV import (issue #85)
  * Bug Fixes
     * better initial Phidgets attach handling
     * improved RoR calculation
-    * improved temperature and RoR curve drawing
+    * improved temperature and RoR curve drawing, fixes among others the issue of the delta curves missing from the roasting report (issue #84)
     * fixes regression on moving the background up and down
     * minor improvements
     * fixed rare slider selection visual artifact on OS X
