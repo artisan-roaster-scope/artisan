@@ -102,6 +102,10 @@ After this command you might need to logout and login again. Try
 
 that your account was successful added to the dialout group.
 
+**Arch Linux**
+
+Artisan is available via the [Arch User Repository (AUR)](https://aur.archlinux.org/packages/artisan-roaster-scope/).
+
 
 
 ### Consistent USB names on Debian (by Rob Gardner)
