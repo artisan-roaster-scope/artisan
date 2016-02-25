@@ -9125,33 +9125,41 @@ class ApplicationWindow(QMainWindow):
             self.button_2.setMinimumWidth(100)
         self.button_2.setMinimumHeight(45)            
         self.button_2.clicked.connect(lambda _:self.qmc.ToggleRecorder())
+        
+        # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
+        self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.5
+
 
         #create 1C START, 1C END, 2C START and 2C END buttons
         self.button_3 = QPushButton(QApplication.translate("Button", "FC\nSTART", None))
         self.button_3.setFocusPolicy(Qt.NoFocus)
         self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
-        self.button_3.setMinimumHeight(50)
+#        self.button_3.setMinimumHeight(50)        
+        self.button_3.setMinimumHeight(self.standard_button_height)
         self.button_3.setToolTip(QApplication.translate("Tooltip", "First Crack Start", None))
         self.button_3.clicked.connect(lambda _:self.qmc.mark1Cstart())
 
         self.button_4 = QPushButton(QApplication.translate("Button", "FC\nEND", None))
         self.button_4.setFocusPolicy(Qt.NoFocus)
         self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
-        self.button_4.setMinimumHeight(50)
+#        self.button_4.setMinimumHeight(50)
+        self.button_4.setMinimumHeight(self.standard_button_height)
         self.button_4.setToolTip(QApplication.translate("Tooltip", "First Crack End", None))
         self.button_4.clicked.connect(lambda _:self.qmc.mark1Cend())
 
         self.button_5 = QPushButton(QApplication.translate("Button", "SC\nSTART", None))
         self.button_5.setFocusPolicy(Qt.NoFocus)
         self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
-        self.button_5.setMinimumHeight(50)
+#        self.button_5.setMinimumHeight(50)
+        self.button_5.setMinimumHeight(self.standard_button_height)
         self.button_5.setToolTip(QApplication.translate("Tooltip", "Second Crack Start", None))
         self.button_5.clicked.connect(lambda _:self.qmc.mark2Cstart())
 
         self.button_6 = QPushButton(QApplication.translate("Button", "SC\nEND", None))
         self.button_6.setFocusPolicy(Qt.NoFocus)
         self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
-        self.button_6.setMinimumHeight(50)
+#        self.button_6.setMinimumHeight(50)
+        self.button_6.setMinimumHeight(self.standard_button_height)
         self.button_6.setToolTip(QApplication.translate("Tooltip", "Second Crack End", None))
         self.button_6.clicked.connect(lambda _:self.qmc.mark2Cend())
 
@@ -9171,7 +9179,8 @@ class ApplicationWindow(QMainWindow):
         self.button_8 = QPushButton(QApplication.translate("Button", "CHARGE", None))
         self.button_8.setFocusPolicy(Qt.NoFocus)
         self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
-        self.button_8.setMinimumHeight(50)
+#        self.button_8.setMinimumHeight(50)
+        self.button_8.setMinimumHeight(self.standard_button_height)
         self.button_8.setToolTip(QApplication.translate("Tooltip", "Charge", None))
         self.button_8.clicked.connect(lambda _:self.qmc.markCharge())
 
@@ -9179,7 +9188,8 @@ class ApplicationWindow(QMainWindow):
         self.button_9 = QPushButton(QApplication.translate("Button", "DROP", None))
         self.button_9.setFocusPolicy(Qt.NoFocus)
         self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
-        self.button_9.setMinimumHeight(50)
+#        self.button_9.setMinimumHeight(50)
+        self.button_9.setMinimumHeight(self.standard_button_height)
         self.button_9.setToolTip(QApplication.translate("Tooltip", "Drop", None))
         self.button_9.clicked.connect(lambda _:self.qmc.markDrop())
 
@@ -9194,7 +9204,8 @@ class ApplicationWindow(QMainWindow):
         self.button_11 = QPushButton(QApplication.translate("Button", "EVENT", None))
         self.button_11.setFocusPolicy(Qt.NoFocus)
         self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
-        self.button_11.setMinimumHeight(50)
+#        self.button_11.setMinimumHeight(50)
+        self.button_11.setMinimumHeight(self.standard_button_height)
         self.button_11.setToolTip(QApplication.translate("Tooltip", "Event", None))
         self.button_11.clicked.connect(lambda _:self.qmc.EventRecord())
 
@@ -9203,7 +9214,8 @@ class ApplicationWindow(QMainWindow):
         self.button_12.setFocusPolicy(Qt.NoFocus)
         self.button_12.setStyleSheet(self.pushbuttonstyles["SV +"])
         self.button_12.setMinimumWidth(90)
-        self.button_12.setMinimumHeight(50)
+#        self.button_12.setMinimumHeight(50)
+        self.button_12.setMinimumHeight(self.standard_button_height)
         self.button_12.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 5", None))
 
         #create PID+10 button
@@ -9211,7 +9223,8 @@ class ApplicationWindow(QMainWindow):
         self.button_13.setFocusPolicy(Qt.NoFocus)
         self.button_13.setStyleSheet(self.pushbuttonstyles["SV +"])
         self.button_13.setMinimumWidth(90)
-        self.button_13.setMinimumHeight(50)
+#        self.button_13.setMinimumHeight(50)
+        self.button_13.setMinimumHeight(self.standard_button_height)
         self.button_13.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 10", None))
 
         #create PID+20 button
@@ -9219,7 +9232,8 @@ class ApplicationWindow(QMainWindow):
         self.button_14.setFocusPolicy(Qt.NoFocus)
         self.button_14.setStyleSheet(self.pushbuttonstyles["SV +"])
         self.button_14.setMinimumWidth(90)
-        self.button_14.setMinimumHeight(50)
+#        self.button_14.setMinimumHeight(50)
+        self.button_14.setMinimumHeight(self.standard_button_height)
         self.button_14.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 20", None))
 
         #create PID-20 button
@@ -9227,7 +9241,8 @@ class ApplicationWindow(QMainWindow):
         self.button_15.setFocusPolicy(Qt.NoFocus)
         self.button_15.setStyleSheet(self.pushbuttonstyles["SV -"])
         self.button_15.setMinimumWidth(90)
-        self.button_15.setMinimumHeight(50)
+#        self.button_15.setMinimumHeight(50)
+        self.button_15.setMinimumHeight(self.standard_button_height)
         self.button_15.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 20", None))
 
         #create PID-10 button
@@ -9235,7 +9250,8 @@ class ApplicationWindow(QMainWindow):
         self.button_16.setFocusPolicy(Qt.NoFocus)
         self.button_16.setStyleSheet(self.pushbuttonstyles["SV -"])
         self.button_16.setMinimumWidth(90)
-        self.button_16.setMinimumHeight(50)
+#        self.button_16.setMinimumHeight(50)
+        self.button_16.setMinimumHeight(self.standard_button_height)
         self.button_16.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 10", None))
 
         #create PID-5 button
@@ -9243,7 +9259,8 @@ class ApplicationWindow(QMainWindow):
         self.button_17.setFocusPolicy(Qt.NoFocus)
         self.button_17.setStyleSheet(self.pushbuttonstyles["SV -"])
         self.button_17.setMinimumWidth(90)
-        self.button_17.setMinimumHeight(50)
+#        self.button_17.setMinimumHeight(50)
+        self.button_17.setMinimumHeight(self.standard_button_height)
         self.button_17.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 5", None))
 
         #create HUD button
@@ -9264,7 +9281,8 @@ class ApplicationWindow(QMainWindow):
         self.button_19 = QPushButton(QApplication.translate("Button", "DRY\nEND", None))
         self.button_19.setFocusPolicy(Qt.NoFocus)
         self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
-        self.button_19.setMinimumHeight(50)
+#        self.button_19.setMinimumHeight(50)
+        self.button_19.setMinimumHeight(self.standard_button_height)
         self.button_19.setToolTip(QApplication.translate("Tooltip", "Dry End", None))
         self.button_19.clicked.connect(lambda _:self.qmc.markDryEnd())
 
@@ -9272,7 +9290,8 @@ class ApplicationWindow(QMainWindow):
         self.button_20 = QPushButton(QApplication.translate("Button", "COOL\nEND", None))
         self.button_20.setFocusPolicy(Qt.NoFocus)
         self.button_20.setStyleSheet(self.pushbuttonstyles["COOL END"])
-        self.button_20.setMinimumHeight(50)
+#        self.button_20.setMinimumHeight(50)
+        self.button_20.setMinimumHeight(self.standard_button_height)
         self.button_20.setToolTip(QApplication.translate("Tooltip", "Cool End", None))
         self.button_20.clicked.connect(lambda _:self.qmc.markCoolEnd())
 
@@ -17982,7 +18001,8 @@ class ApplicationWindow(QMainWindow):
             p = QPushButton()
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttontextcolor[i],self.extraeventbuttoncolor[i])
             p.setStyleSheet(style)
-            p.setMinimumHeight(50)
+#            p.setMinimumHeight(50)
+            p.setMinimumHeight(aw.standard_button_height)
             p.setText(self.extraeventslabels[i])
             p.setFocusPolicy(Qt.NoFocus)
             p.clicked.connect(lambda _,x=i:self.recordextraevent(x))
@@ -18060,15 +18080,15 @@ class ApplicationWindow(QMainWindow):
             self.extraeventbuttoncolor = copy[7][:]
             self.extraeventbuttontextcolor = copy[8][:]
             # added slider settings
-            if len(copy[9]) == 4:
+            if len(copy)>9 and len(copy[9]) == 4:
                 self.eventslidervisibilities = copy[9][:]
-            if len(copy[10]) == 4:
+            if len(copy)>10 and len(copy[10]) == 4:
                 self.eventslideractions = copy[10][:]
-            if len(copy[11]) == 4:
+            if len(copy)>11 and len(copy[11]) == 4:
                 self.eventslidercommands = copy[11][:]
-            if len(copy[12]) == 4:
+            if len(copy)>12 and len(copy[12]) == 4:
                 self.eventslideroffsets = copy[12][:]
-            if len(copy[13]) == 4:
+            if len(copy)>13 and len(copy[13]) == 4:
                 self.eventsliderfactors = copy[13][:]
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
@@ -24495,7 +24515,8 @@ class EventsDlg(ArtisanDialog):
         aw.buttonlist[bindex].setFocusPolicy(Qt.NoFocus)
         aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ")
         aw.buttonlist[bindex].setMinimumWidth(90)
-        aw.buttonlist[bindex].setMinimumHeight(50)
+#        aw.buttonlist[bindex].setMinimumHeight(50)
+        aw.buttonlist[bindex].setMinimumHeight(aw.standard_button_height)
         aw.buttonlist[bindex].setText(initialtext)
         aw.buttonlist[bindex].clicked.connect(lambda ee=bindex:aw.recordextraevent(bindex))
         if False: # lowerbuttonvisiblebuttons < aw.buttonlistmaxlen:
