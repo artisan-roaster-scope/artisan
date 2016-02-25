@@ -418,6 +418,7 @@ if sys.platform.startswith("darwin"):
 
 # to make py2exe happy with scipy >0.11
 def __dependencies_for_freezing():
+    import matplotlib.numerix # not to break bbfreeze 1.1.3 on Linux
     from scipy.sparse.csgraph import _validation
     from scipy.special import _ufuncs_cxx
     from scipy import integrate
@@ -866,6 +867,8 @@ class tgraphcanvas(FigureCanvas):
         self.flagsamplingthreadrunning = False
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
+        
+        self.zoom_follow = False # if True, Artisan "follows" BT in the center by panning during recording. Activated via a click on the ZOOM icon while ZOOM is active
         
         #self.flagalignFCs = False
         self.alignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP, 7:ALL
@@ -1874,7 +1877,7 @@ class tgraphcanvas(FigureCanvas):
                         self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
 
                 if self.flagstart:
-                    if aw.ntb._active == 'ZOOM' and aw.qmc.temp2 and len(aw.qmc.temp2)>0 and aw.qmc.temp1 and len(aw.qmc.temp1)>0:
+                    if  aw.qmc.zoom_follow and aw.qmc.temp2 and len(aw.qmc.temp2)>0 and aw.qmc.temp1 and len(aw.qmc.temp1)>0: # aw.ntb._active == 'ZOOM'
                         # center current BT reading on canvas
                         bt = aw.qmc.temp2[-1]
                         tx = aw.qmc.timex[-1]
@@ -1888,7 +1891,15 @@ class tgraphcanvas(FigureCanvas):
                         # set new limits to center current BT on canvas
                         aw.qmc.ax.set_xlim(xlim_new)
                         aw.qmc.ax.set_ylim(ylim_new)
-                        if ylim != ylim_new or xlim != xlim_new :
+                        two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag)))
+                        if two_ax_mode:
+                            zlim = aw.qmc.delta_ax.set_ylim()
+                            zlim_offset = (zlim[1] - zlim[0]) / 2.
+                            btd = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,bt))[1]))[1])                            
+                            zlim_new = (btd - zlim_offset, btd + zlim_offset)
+                            aw.qmc.delta_ax.set_ylim(zlim_new)
+            
+                        if ylim != ylim_new or xlim != xlim_new or (two_ax_mode and zlim != zlim_new):
                             self.ax_background = None
                     
                     if aw.qmc.patheffects:
@@ -3117,6 +3128,8 @@ class tgraphcanvas(FigureCanvas):
                 self.errorlog = []
                 aw.seriallog = []
 
+                aw.qmc.zoom_follow = False # reset the zoom follow feature
+                
                 self.specialevents = []
                 self.specialeventstype = []
                 self.specialeventsStrings = []
@@ -7645,6 +7658,24 @@ class VMToolbar(NavigationToolbar):
     def update_view_new(self):
         self.update_view_org()
         aw.qmc.updateBackground()
+
+            # Artisan specific: push_current settting on the stack to be able to return via HOME
+#            if aw.qmc.flagon:
+#                self.push_current()
+
+    def home(self, *args):
+        """Restore the original view"""
+        self._views.home()
+        self._positions.home()
+        self.set_history_buttons()
+        self._update_view()
+        # toggle zoom_follow if recording
+        if aw.qmc.flagstart:
+            aw.qmc.zoom_follow = not aw.qmc.zoom_follow
+        else:
+            aw.qmc.zoom_follow = False
+        if aw.qmc.zoom_follow:
+            self.push_current()
 
     def _icon(self, name):
         #dirty hack to prefer .svg over .png Toolbar icons

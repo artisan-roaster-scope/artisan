@@ -7,7 +7,7 @@ v0.9.9 (xx.xx.2016)
 ------------------
 
  * New Features
-    * adds zoom-and-follow function (while the zoom icon is activated the graph is centered on the latest BT value)
+    * adds zoom-and-follow function (toggled by a click on the HOME icon; keeps the current BT in the center)
     * adds MODBUS dividers
     * adds a flag to hide the "SV/% LCDs" (default on)
     * adds World Coffee Roasting Championship (WCRC) cupping profile
