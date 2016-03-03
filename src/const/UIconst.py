@@ -64,6 +64,7 @@ FILE_MENU_IMPORT = QApplication.translate("Menu", "Import", None)
 FILE_MENU_SAVE = QApplication.translate("Menu", "Save", None)
 FILE_MENU_SAVEAS = QApplication.translate("Menu", "Save As...", None)
 FILE_MENU_EXPORT = QApplication.translate("Menu", "Export", None)
+FILE_MENU_CONVERT = QApplication.translate("Menu", "Convert To", None)
 FILE_MENU_SAVEGRAPH = QApplication.translate("Menu", "Save Graph", None)
 FILE_MENU_SAVEGRAPH_FULL_SIZE = QApplication.translate("Menu", "Full Size...", None)
 FILE_MENU_REPORT = QApplication.translate("Menu", "Report", None)
@@ -100,6 +101,7 @@ ROAST_MENU_CONVERT_TO_CELSIUS = QApplication.translate("Menu", "Convert to Celsi
 ROAST_MENU_FAHRENHEIT_MODE = QApplication.translate("Menu", "Fahrenheit Mode", None)
 ROAST_MENU_CELSIUS_MODE = QApplication.translate("Menu", "Celsius Mode", None)
 ROAST_MENU_SWITCH = QApplication.translate("Menu", "Switch Profiles", None)
+ROAST_MENU_SWITCH_ETBT = QApplication.translate("Menu", "Switch ET<->BT", None)
 
 #Conf menu items
 CONF_MENU = QApplication.translate("Menu", "Config", None)

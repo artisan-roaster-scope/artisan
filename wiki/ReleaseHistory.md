@@ -15,7 +15,16 @@ v0.9.9 (xx.xx.2016)
     * adds follow background for Fuji PIDs
     * adds high-res app icon for OS X
     * adds "File version" and "Product version" to Windows app installer
+    * adds flag to let x^3 math regression start from TP instead of room temperature
+    * adds background moving by using the cursor keys
+    * adds PID keyboard shortcuts to toggle mode and (p key) and to incr/decr lookahead (+/- key)
+    * designer: adds save/load of points
+    * designer: adds keyboard entry on adding points    
     * availability on Arch Linux
+    * adds batch conversion to various formats (CSV, JSON, PDF, PNG,..)
+    * adds switch ET<->BT action
+    * adds canvas click as short cut to load background profile
+    * adds a function to call a program on sampling with the temperatures ET, BT, ET-Background, and BT-Background as arguments
  * Changes
     * existing extra device mathexpression formulas are no longer changed if extra devices have to be extended on loading a profile
     * deactivates the auto-swap of ET/BT on CSV import (issue #85)

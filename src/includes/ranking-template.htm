@@ -45,6 +45,7 @@ th, td {
     text-align: right;
     padding: 8px;
     white-space:nowrap;
+    -webkit-print-color-adjust: exact;
     border: 1px solid #808080;
 }
 td:nth-child(1) {
@@ -75,7 +76,6 @@ th {
     text-align: center;
     background-color: #4CAF50 !important;
     color: white !important;
-    -webkit-print-color-adjust: exact; 
 }
 </style>
 </head>
@@ -94,7 +94,6 @@ th {
     <col class="green" span="3" />
     <col class="darkgreen" />
     <col class="grey" span="3" />
-    <col />
 </colgroup>
 <thead>
 <tr>
@@ -110,7 +109,7 @@ th {
 <th>DRY</th>
 <th>MAI</th>
 <th>DEV</th>
-<th>DEV</th>
+<th>BTa</th>
 <th>Loss</th>
 <th>Color</th>
 <th>Cup</th>
@@ -130,11 +129,11 @@ $entries
 <td class="darkblue">${FCs_temp_avg}</td>
 <td class="red">${DROP_time_avg}</td>
 <td class="darkred">${DROP_temp_avg}</td>
-<td class="green">${DRY_time_avg}</td>
-<td class="green">${MAI_time_avg}</td>
-<td class="green">${DEV_time_avg}</td>
-<td class="darkgreen">${DEV_percent_avg}</td>
-<td>13.6%</td>
+<td class="green">${DRY_percent_avg}</td>
+<td class="green">${MAI_percent_avg}</td>
+<td class="green">${DEV_percent_avg}</td>
+<td class="darkgreen">${BTa_avg}</td>
+<td>${loss_avg}</td>
 <td>${colors_avg}</td>
 <td>${cup_avg}</td>
 </tr>

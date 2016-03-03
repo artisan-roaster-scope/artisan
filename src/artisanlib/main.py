@@ -423,7 +423,7 @@ def __dependencies_for_freezing():
     from scipy.special import _ufuncs_cxx
     from scipy import integrate
     from scipy import interpolate
-    # to make bbfreeze on Linux happy with scipy > 0.17.0
+    # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
     import scipy.linalg.cython_blas
     import scipy.linalg.cython_lapack
     if pyqtversion < 5:
@@ -930,6 +930,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundDetails = False
         self.backgroundeventsflag = False
         self.backgroundpath = ""
+        self.backgroundmovespeed = 30
         self.titleB = ""
         self.roastbatchnrB = 0
         self.roastbatchprefixB = u("")
@@ -1221,8 +1222,8 @@ class tgraphcanvas(FigureCanvas):
         self.ylimit_min = 0
         self.zlimit = 100
         self.zlimit_min = 0
-        self.RoRlimitF = 122
-        self.RoRlimitC = 50
+        self.RoRlimitF = 170
+        self.RoRlimitC = 75
         self.endofx = 60
         self.startofx = 0
         self.resetmaxtime = 60  #time when pressing reset
@@ -1724,6 +1725,18 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
+            elif event.inaxes and not event.button==3 and aw.ntb._active == None and not aw.qmc.flagstart and not aw.qmc.flagon: # event.inaxes == None and not aw.qmc.flagstart and not aw.qmc.flagon:
+                self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None))
+                if len(u(self.filename)) == 0:
+                    return
+                try:
+                    aw.qmc.resetlinecountcaches()
+                    aw.loadbackground(u(self.filename))           
+                except:
+                    pass
+                aw.qmc.background = True
+                aw.qmc.timealign(redraw=False)
+                aw.qmc.redraw() 
             elif event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag:# and not self.flagon:
                 timex = self.time2index(event.xdata)
                 if timex > 0:
@@ -3835,11 +3848,11 @@ class tgraphcanvas(FigureCanvas):
                         
                         ##### DeltaETB,DeltaBTB curves
                         trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
-                        if self.DeltaETBflag:
+                        if self.DeltaETBflag and len(self.timeB) == len(self.delta2B):
                             self.l_delta1B, = self.ax.plot(self.timeB, self.delta1B,transform=trans,markersize=self.ETBdeltamarkersize,
                             sketch_params=None,path_effects=[],
                             marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None)))
-                        if self.DeltaBTBflag:
+                        if self.DeltaBTBflag and len(self.timeB) == len(self.delta2B):
                             self.l_delta2B, = self.ax.plot(self.timeB, self.delta2B,transform=trans,markersize=self.BTBdeltamarkersize,
                             sketch_params=None,path_effects=[],
                             marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
@@ -4808,7 +4821,6 @@ class tgraphcanvas(FigureCanvas):
             aw.arduino.pidOff()
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
             if aw.qmc.device == 0 and aw.fujipid.followBackground:
-                aw.fujipid.followBackground = False
                 if aw.fujipid.sv > 0:
                     try:
                         aw.fujipid.setsv(0,silent=True)
@@ -5472,7 +5484,6 @@ class tgraphcanvas(FigureCanvas):
                 
                 # at DROP we stop the follow background on FujiPIDs and set the SV to 0
                 if aw.qmc.device == 0 and aw.fujipid.followBackground:
-                    aw.fujipid.followBackground = False
                     if aw.fujipid.sv > 0:
                         try:
                             aw.fujipid.setsv(0,silent=True)
@@ -5910,7 +5921,9 @@ class tgraphcanvas(FigureCanvas):
                         msg += sep + u"#" + str(aw.qmc.ground_color)
                     self.ax.set_xlabel(msg,color = aw.qmc.palette["text"],fontproperties=statsprop)
             else:
-                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
+                fontprop_medium = aw.mpl_fontproperties.copy()
+                fontprop_medium.set_size("medium")
+                self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -6256,18 +6269,24 @@ class tgraphcanvas(FigureCanvas):
     
     #ln() regression
     # if xx=True the quadratic approximation instead of the ln() one is applied
-    def lnRegression(self,xx=False):
+    # start from room temperature if TP=False, else from TP
+    def lnRegression(self,xx=False,TP=False):
         res = ""
         try:
             if self.timeindex[0] > -1: # only if CHARGE is set
                 from scipy.optimize import curve_fit
                 charge = self.timex[self.timeindex[0]]
-                a = [0]
-                if aw.qmc.mode == "F":
-                    roomTemp = 70.0
+                if TP:
+                    TP_index = aw.findTP()
+                    a = [self.timex[TP_index]-charge]
+                    n = [self.temp2[TP_index]]
                 else:
-                    roomTemp = 21.0
-                n = [roomTemp]
+                    a = [0]
+                    if aw.qmc.mode == "F":
+                        roomTemp = 70.0
+                    else:
+                        roomTemp = 21.0
+                    n = [roomTemp]
                 if self.timeindex[1]: # take DRY if available
                     x = self.timex[self.timeindex[1]] - charge
                     a = a + [x]
@@ -6523,6 +6542,46 @@ class tgraphcanvas(FigureCanvas):
             self.connect_designer()
             self.designerinit()
         aw.disableEditMenus(designer=True)
+        
+    def savepoints(self):
+        try:
+            filename = aw.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Points",None),ext="*.adsg")
+            if filename:
+                obj = {}
+                obj["timex"] = self.timex
+                obj["temp1"] = self.temp1
+                obj["temp2"] = self.temp2
+                f = codecs.open(u(filename), 'w+', encoding='utf-8')
+                f.write(repr(obj))
+                f.close()
+                aw.sendmessage(QApplication.translate("Message","Points saved", None))
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " savepoints() {0}").format(str(e)),exc_tb.tb_lineno)
+        
+    def loadpoints(self):
+        try:
+            filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message", "Load Points",None),ext="*.adsg")
+            obj = None
+            if os.path.exists(u(filename)):
+                f = codecs.open(u(filename), 'rb', encoding='utf-8')
+                obj=ast.literal_eval(f.read())
+                f.close()
+            if obj and "timex" in obj and "temp1" in obj and "temp2" in obj:
+                self.timex = obj["timex"]
+                self.temp1 = obj["temp1"]
+                self.temp2 = obj["temp2"]
+                self.xaxistosm(redraw=False)
+                self.redrawdesigner()
+                aw.sendmessage(QApplication.translate("Message","Points loaded", None))
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadpoints() {0}").format(str(e)),exc_tb.tb_lineno)
+            
 
     #used to start designer from scratch (not from a loaded profile)
     def designerinit(self):
@@ -6597,7 +6656,7 @@ class tgraphcanvas(FigureCanvas):
         if lpindex != -1:
             self.currentx = lptime
             self.currenty = lptemp2
-            self.addpoint()
+            self.addpoint(manual=False)
 
         self.xaxistosm(redraw=False)
         self.redrawdesigner()                                   #redraw the designer screen
@@ -6740,6 +6799,16 @@ class tgraphcanvas(FigureCanvas):
         removepointAction.triggered.connect(self.removepoint)
         designermenu.addAction(removepointAction)
 
+        designermenu.addSeparator()
+
+        loadpointsAction = QAction(QApplication.translate("Contextual Menu", "Load points",None),self)
+        loadpointsAction.triggered.connect(self.loadpoints)
+        designermenu.addAction(loadpointsAction)
+        
+        savepointsAction = QAction(QApplication.translate("Contextual Menu", "Save points",None),self)
+        savepointsAction.triggered.connect(self.savepoints)
+        designermenu.addAction(savepointsAction)
+        
         designermenu.addSeparator()
 
         resetAction = QAction(QApplication.translate("Contextual Menu", "Reset Designer",None),self)
@@ -6918,11 +6987,24 @@ class tgraphcanvas(FigureCanvas):
             self.disconnect_designer()
             self.connect_designer()
 
-    def addpoint(self):
+    def addpoint(self,_,manual=True):
         try:
-            #current x, and y is obtained when doing right click in mouse: on_press()
+            #current x, and y is obtained when doing right click in mouse: on_press()  
+            if manual:
+                # open a dialog to let the user correct the input
+                offset = 0
+                if self.timeindex[0] > -1:
+                    offset = self.timex[self.timeindex[0]]
+                dlg = pointDlg(x=self.currentx-offset,y=self.currenty)
+                if dlg.exec_():
+                    self.currentx = dlg.getX() + offset
+                    self.currenty = dlg.getY()
+                else:
+                    return
+
 
             if self.currentx > self.timex[-1]:       #if point is beyond max timex (all the way to the right)
+            
                 #find closest line
                 d1 = abs(self.temp1[-1] - self.currenty)
                 d2 = abs(self.temp2[-1] - self.currenty)
@@ -7659,10 +7741,6 @@ class VMToolbar(NavigationToolbar):
         self.update_view_org()
         aw.qmc.updateBackground()
 
-            # Artisan specific: push_current settting on the stack to be able to return via HOME
-#            if aw.qmc.flagon:
-#                self.push_current()
-
     def home(self, *args):
         """Restore the original view"""
         self._views.home()
@@ -7672,6 +7750,10 @@ class VMToolbar(NavigationToolbar):
         # toggle zoom_follow if recording
         if aw.qmc.flagstart:
             aw.qmc.zoom_follow = not aw.qmc.zoom_follow
+            if aw.qmc.zoom_follow:
+                aw.sendmessage(QApplication.translate("Message","follow on", None))
+            else:
+                aw.sendmessage(QApplication.translate("Message","follow off", None))
         else:
             aw.qmc.zoom_follow = False
         if aw.qmc.zoom_follow:
@@ -8158,29 +8240,52 @@ class SampleThread(QThread):
                         pass
                         
                     #update SV on Arduino/TC4 if in Ramp/Soak or Background Follow mode and PID is active
-                    if aw.qmc.device == 19 and aw.arduino.pidActive and aw.arduino.svMode in [1,2]:
-                        # calculate actual SV
-                        if aw.qmc.timeindex[0] != -1:
-                            # we set time=0 to CHARGE
-                            sv = aw.arduino.calcSV(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
-                        else:
-                            sv = aw.arduino.calcSV(tx)
-                        # update SV (if needed)
-                        if sv != None and sv != aw.arduino.sv:
-                            sv = max(0,sv) # we don't send SV < 0
-                            aw.arduino.setSV(sv)
-                    #update SV on FujiPIDs
-                    elif aw.qmc.device == 0 and aw.fujipid.followBackground:
-                        # calculate actual SV
-                        if aw.qmc.timeindex[0] != -1:
-                            # we set time=0 to CHARGE
-                            sv = aw.fujipid.calcSV(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
-                        else:
-                            sv = aw.fujipid.calcSV(tx)
-                        # update SV (if needed)
-                        if sv != None and sv != aw.fujipid.sv:
-                            sv = max(0,sv) # we don't send SV < 0
-                            aw.fujipid.setsv(sv,silent=True)
+                    if aw.qmc.flagon and aw.qmc.timeindex[6] == 0: # only during sampling and before DROP
+                        if aw.qmc.device == 19 and aw.arduino.pidActive and aw.arduino.svMode in [1,2]:
+                            # calculate actual SV
+                            if aw.qmc.timeindex[0] != -1:
+                                # we set time=0 to CHARGE
+                                sv = aw.arduino.calcSV(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
+                            else:
+                                sv = aw.arduino.calcSV(tx)
+                            # update SV (if needed)
+                            if sv != None and sv != aw.arduino.sv:
+                                sv = max(0,sv) # we don't send SV < 0
+                                aw.arduino.setSV(sv)
+                        #update SV on FujiPIDs
+                        elif aw.qmc.device == 0 and aw.fujipid.followBackground:
+                            # calculate actual SV
+                            if aw.qmc.timeindex[0] != -1:
+                                # we set time=0 to CHARGE
+                                sv = aw.fujipid.calcSV(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
+                            else:
+                                sv = aw.fujipid.calcSV(tx)
+                            # update SV (if needed)
+                            if sv != None and sv != aw.fujipid.sv:
+                                sv = max(0,sv) # we don't send SV < 0
+                                aw.fujipid.setsv(sv,silent=True)
+                                
+                    #output ET, BT, ETB, BTB to output program
+                    if aw.ser.externaloutprogramFlag:
+                        try:
+                            if aw.qmc.background:
+                                if aw.qmc.timeindex[0] != -1:
+                                    j = aw.qmc.backgroundtime2index(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
+                                else:
+                                    j = aw.qmc.backgroundtime2index(tx)
+                                ETB = aw.qmc.temp1B[j]
+                                BTB = aw.qmc.temp2B[j]
+                            else:
+                                ETB = -1
+                                BTB = -1
+                            subprocess.call([aw.ser.externaloutprogram,
+                                '{0:.1f}'.format(aw.qmc.temp1[-1]),
+                                '{0:.1f}'.format(aw.qmc.temp2[-1]),
+                                '{0:.1f}'.format(ETB),
+                                '{0:.1f}'.format(BTB)])
+                        except:
+                            pass
+                    
 
                     #check for each alarm that was not yet triggered
                     for i in range(len(aw.qmc.alarmflag)):
@@ -8421,7 +8526,7 @@ class ApplicationWindow(QMainWindow):
 
         ####      create Matplotlib canvas widget
         #resolution
-        self.defaultdpi = 100
+        self.defaultdpi = 120
         self.dpi = self.defaultdpi
         self.qmc = tgraphcanvas(self.main_widget)
         
@@ -8612,6 +8717,34 @@ class ApplicationWindow(QMainWindow):
         fileExportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
         fileExportRoastLoggerAction.triggered.connect(self.fileExportRoastLogger)
         self.exportMenu.addAction(fileExportRoastLoggerAction)
+        
+        
+        self.exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_CONVERT)
+
+        fileConvertCSVAction = QAction(QApplication.translate("Menu", "CSV...",None),self)
+        fileConvertCSVAction.triggered.connect(self.fileConvertCSV)
+        self.exportMenu.addAction(fileConvertCSVAction)
+
+        fileConvertJSONAction = QAction(QApplication.translate("Menu", "JSON...",None),self)
+        fileConvertJSONAction.triggered.connect(self.fileConvertJSON)
+        self.exportMenu.addAction(fileConvertJSONAction)
+
+        fileConvertRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
+        fileConvertRoastLoggerAction.triggered.connect(self.fileConvertRoastLogger)
+        self.exportMenu.addAction(fileConvertRoastLoggerAction)
+        
+        fileConvertPNGAction = QAction(QApplication.translate("Menu", "PNG...",None),self)
+        fileConvertPNGAction.triggered.connect(self.fileConvertPNG)
+        self.exportMenu.addAction(fileConvertPNGAction)
+        
+        fileConvertSVGAction = QAction(QApplication.translate("Menu", "SVG...",None),self)
+        fileConvertSVGAction.triggered.connect(self.fileConvertSVG)
+        self.exportMenu.addAction(fileConvertSVGAction)
+        
+        fileConvertPDFAction = QAction(QApplication.translate("Menu", "PDF...",None),self)
+        fileConvertPDFAction.triggered.connect(self.fileConvertPDF)
+        self.exportMenu.addAction(fileConvertPDFAction)
+        
 
         self.fileMenu.addSeparator()
 
@@ -8762,7 +8895,11 @@ class ApplicationWindow(QMainWindow):
         self.switchAction = QAction(UIconst.ROAST_MENU_SWITCH,self)
         self.switchAction.setShortcut(QKeySequence.Close)
         self.switchAction.triggered.connect(self.switch)
-        self.GraphMenu.addAction(self.switchAction)  
+        self.GraphMenu.addAction(self.switchAction)
+        
+        self.switchETBTAction = QAction(UIconst.ROAST_MENU_SWITCH_ETBT,self)
+        self.switchETBTAction.triggered.connect(self.switchETBT)
+        self.GraphMenu.addAction(self.switchETBTAction)
 
         # CONFIGURATION menu
         self.deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
@@ -9905,9 +10042,9 @@ class ApplicationWindow(QMainWindow):
     def superusermodeClicked(self,_):
         self.superusermode = not self.superusermode
         if self.superusermode:
-            aw.sendmessage("super on")
+            aw.sendmessage(QApplication.translate("Message","super on",None))
         else:
-            aw.sendmessage("super off")
+            aw.sendmessage(QApplication.translate("Message","super off",None))
 
     def PhaseslcdClicked(self,_):
         aw.qmc.phasesLCDmode = (aw.qmc.phasesLCDmode + 1)%3
@@ -11138,6 +11275,47 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.full_screen_mode_active = True
                 self.showFullScreen()
+        elif key == 80:                       #P
+            # switch PID mode
+            if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                # toggle mode: manual => RS => background
+                if not aw.fujipid.rampsoak and not aw.fujipid.followBackground: # => RS
+                    aw.fujipid.setrampsoak(1)
+                    aw.fujipid.rampsoak = True # even if activation failed to allow to further toggle arround
+                    aw.fujipid.followBackground = False
+                    aw.sendmessage(QApplication.translate("Message","PID Mode: Ramp/Soak", None))
+                elif aw.fujipid.rampsoak: # => background
+                    aw.fujipid.setrampsoak(0)
+                    aw.fujipid.rampsoak = False # even if activation failed to allow to further toggle arround
+                    aw.fujipid.followBackground = True
+                    aw.sendmessage(QApplication.translate("Message","PID Mode: Background", None))
+                else: # => manual
+                    aw.fujipid.setrampsoak(0)
+                    aw.fujipid.followBackground = False
+                    aw.sendmessage(QApplication.translate("Message","PID Mode: Manual", None))
+            elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
+                aw.arduino.svMode = (aw.arduino.svMode+1) %3
+                # 0: manual, 1: Ramp/Soak, 2: Follow (background profile)        
+                if aw.arduino.svMode == 0:
+                    aw.sendmessage(QApplication.translate("Message","PID Mode: Manual", None))
+                elif  aw.arduino.svMode == 1:
+                    aw.sendmessage(QApplication.translate("Message","PID Mode: Ramp/Soak", None))
+                elif  aw.arduino.svMode == 2:
+                    aw.sendmessage(QApplication.translate("Message","PID Mode: Background", None))
+        elif key == 45:                       #-
+            if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                aw.fujipid.lookahead = max(0,aw.fujipid.lookahead-1)
+                aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
+            elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
+                aw.arduino.svLookahead = max(0,aw.arduino.svLookahead-1)
+                aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.arduino.svLookahead))
+        elif key == 43:                       #+
+            if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                aw.fujipid.lookahead = aw.fujipid.lookahead+1
+                aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
+            elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
+                aw.arduino.svLookahead = aw.arduino.svLookahead+1
+                aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.arduino.svLookahead))
         elif key == 32:                       #SELECTS ACTIVE BUTTON
             self.moveKbutton("space")
         elif key == 16777220:                 #TURN ON/OFF KEYBOARD MOVES
@@ -11165,9 +11343,25 @@ class ApplicationWindow(QMainWindow):
                 if self.minieventsflag:
                     self.releaseminieditor()
         elif key == 16777234:               #MOVES CURRENT BUTTON LEFT
-            self.moveKbutton("left")
+            if self.keyboardmoveflag:
+                self.moveKbutton("left")
+            elif aw.qmc.background:
+                aw.qmc.movebackground("left",aw.qmc.backgroundmovespeed)
+                aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
         elif key == 16777236:               #MOVES CURRENT BUTTON RIGHT
-            self.moveKbutton("right")
+            if self.keyboardmoveflag:
+                self.moveKbutton("right")
+            elif aw.qmc.background:
+                aw.qmc.movebackground("right",aw.qmc.backgroundmovespeed)
+                aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
+        elif key == 16777235:               #UP
+            if aw.qmc.background:
+                aw.qmc.movebackground("up",aw.qmc.backgroundmovespeed)
+                aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
+        elif key == 16777237:               #DOWN
+            if aw.qmc.background:
+                aw.qmc.movebackground("down",aw.qmc.backgroundmovespeed)
+                aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
         elif key == 65:                     #letter A (automatic save)
             self.automaticsave()
         elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
@@ -11433,17 +11627,18 @@ class ApplicationWindow(QMainWindow):
     def viewKshortcuts(self):
         string = u(QApplication.translate("Message", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[SPACE]</b> = Choses current button",None)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>[LEFT]</b> = Move to the left",None)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>[RIGHT]</b> = Move to the right",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[LEFT,RIGHT,UP,DOWN]</b> = Move background or key focus",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[a]</b> = Autosave",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + START",None)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[t]</b> = Toggle mouse cross lines",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[d]</b> = Toggle xy scale (T/Delta)",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[m]</b> = Shows/Hides Event Buttons",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[p]</b> = Toggle PID mode",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[+,-]</b> = Inc/dec PID lookahead",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[:]</b> = Desktop ScreenShot",None)) + "<br>"
@@ -11608,7 +11803,7 @@ class ApplicationWindow(QMainWindow):
         
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanOpenFileDialog(self,msg="Open",ext="*",path=None):
+    def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
         if path == None:   
             path = self.getDefaultPath()        
         if pyqtversion < 5:
@@ -11714,7 +11909,7 @@ class ApplicationWindow(QMainWindow):
             firstChar = stream.read(1)
             if firstChar == "{":
                 f.close()
-                aw.qmc.reset(redraw=False)
+                aw.qmc.reset(redraw=False,soundOn=False)
                 res = self.setProfile(filename,self.deserialize(filename))
             else:
                 self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
@@ -12619,14 +12814,17 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
 
     #called by fileLoad()
-    def setProfile(self,filename,profile):
+    def setProfile(self,filename,profile,quiet=False):
         try:
             #extra devices load and check
             if "extratimex" in profile and len(profile["extratimex"]) > 0:
                 if "extradevices" in profile:
                     if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
                         string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
-                        reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
+                        if quiet:
+                            reply = QMessageBox.Yes
+                        else:
+                            reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                         if reply == QMessageBox.Yes:
                             if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
                                 aw.qmc.resetlinecountcaches()
@@ -12664,9 +12862,13 @@ class ApplicationWindow(QMainWindow):
                     
                 # we keep the mathexpressions and don't overwrite them from those of the profile to be loaded
                 if "extramathexpression1" in profile:
-                    self.qmc.extramathexpression1 = self.qmc.extramathexpression1 + [d(x) for x in profile["extramathexpression1"][len(profile["extramathexpression1"]):]]
+                    old = self.qmc.extramathexpression1
+                    new = [d(x) for x in profile["extramathexpression1"]]
+                    self.qmc.extramathexpression1 = (old + new[len(old):])[:len(new)]
                 if "extramathexpression2" in profile:
-                    self.qmc.extramathexpression2 = self.qmc.extramathexpression2 + [d(x) for x in profile["extramathexpression2"][len(profile["extramathexpression2"]):]] 
+                    old = self.qmc.extramathexpression2
+                    new = [d(x) for x in profile["extramathexpression2"]]
+                    self.qmc.extramathexpression2 = (old + new[len(old):])[:len(new)]
 #                if "extramathexpression1" in profile:
 #                    self.qmc.extramathexpression1 = [d(x) for x in profile["extramathexpression1"]] + self.qmc.extramathexpression1[len(profile["extramathexpression1"]):]
 #                if "extramathexpression2" in profile:
@@ -12912,8 +13114,11 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.moisture_roasted = profile["moisture_roasted"]
             else:
                 self.qmc.moisture_roasted = 0.
-            if "externalprogram" in profile:
-                self.ser.externalprogram = d(profile["externalprogram"])
+# we load external programs only from app settings
+#            if "externalprogram" in profile:
+#                self.ser.externalprogram = d(profile["externalprogram"])
+#            if "externaloutprogram" in profile:
+#                self.ser.externaloutprogram = d(profile["externaloutprogram"])
             if "samplinginterval" in profile:
                 # derive aw.qmc.deltasamples from aw.qmc.deltaspan and the sampling interval of the profile
                 self.qmc.profile_sampling_interval = profile["samplinginterval"]
@@ -13025,7 +13230,7 @@ class ApplicationWindow(QMainWindow):
             # reset linecount caches
             aw.qmc.resetlinecountcaches()
             # try to reload background profile
-            if "backgroundpath" in profile:
+            if (not quiet) and "backgroundpath" in profile:
                 self.qmc.backgroundpath = d(profile["backgroundpath"])
                 if os.path.isfile(self.qmc.backgroundpath):
                     aw.loadbackground(u(self.qmc.backgroundpath))
@@ -13365,8 +13570,9 @@ class ApplicationWindow(QMainWindow):
             profile["extralinestyles1"] = [encodeLocal(x) for x in self.qmc.extralinestyles1]
             profile["extralinestyles2"] = [encodeLocal(x) for x in self.qmc.extralinestyles2]
             profile["extradrawstyles1"] = [encodeLocal(x) for x in self.qmc.extradrawstyles1]
-            profile["extradrawstyles2"] = [encodeLocal(x) for x in self.qmc.extradrawstyles2]
+            profile["extradrawstyles2"] = [encodeLocal(x) for x in self.qmc.extradrawstyles2]            
             profile["externalprogram"] = encodeLocal(self.ser.externalprogram)
+            profile["externaloutprogram"] = encodeLocal(self.ser.externaloutprogram)
             #alarms
             profile["alarmflag"] = self.qmc.alarmflag
             profile["alarmguard"] = self.qmc.alarmguard
@@ -13451,6 +13657,70 @@ class ApplicationWindow(QMainWindow):
 
     def fileExportRoastLogger(self):
         self.fileExport(QApplication.translate("Message", "Export RoastLogger",None),"*.csv",self.exportRoastLogger)
+        
+        
+    def fileConvert(self,ext,dumper):
+        files = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if files and len(files) > 0:
+            for f in files:
+                try:
+                    fconv = f + u(ext)
+                    if not os.path.exists(fconv):
+                        dumper(fconv)
+                        aw.qmc.reset(redraw=False,soundOn=False)
+                        self.setProfile(f,self.deserialize(f),quiet=True)
+                except:
+                    pass
+                aw.qmc.reset(soundOn=False)
+        
+    def fileConvertCSV(self):
+        self.fileConvert(".csv",self.exportCSV)
+
+    def fileConvertJSON(self):
+        self.fileConvert(".json",self.exportJSON)
+                        
+    def fileConvertRoastLogger(self):
+        self.fileConvert(".csv",self.exportRoastLogger)
+
+    def fileConvertPNG(self):
+        files = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if files and len(files) > 0:
+            for f in files:
+                try:
+                    fconv = f + u(".png")
+                    if not os.path.exists(fconv):
+                        aw.qmc.reset(redraw=False,soundOn=False)
+                        self.setProfile(f,self.deserialize(f),quiet=True)
+                        self.qmc.redraw()
+                        if pyqtversion < 5:
+                            self.image = QPixmap.grabWidget(aw.qmc)
+                        else:
+                            self.image = aw.qmc.grab()
+                        self.image.save(fconv,"PNG")
+                except:
+                    pass
+                aw.qmc.reset(soundOn=False)
+            
+    def fileConvertSVG(self):
+        self.fileConvertIMG(".svg")
+
+    def fileConvertPDF(self):
+        self.fileConvertIMG(".pdf")
+    
+    def fileConvertIMG(self,ext):
+        files = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if files and len(files) > 0:
+            for f in files:
+                try:
+                    fconv = f + u(ext)
+                    if not os.path.exists(fconv):
+                        aw.qmc.reset(redraw=False,soundOn=False)
+                        self.setProfile(f,self.deserialize(f),quiet=True)
+                        self.qmc.redraw()
+                        aw.qmc.fig.savefig(fconv,transparent=True,facecolor='none', edgecolor='none',frameon=True) # transparent=True is need to get the delta curves and legend drawn
+                except:
+                    pass
+                aw.qmc.reset(soundOn=False)
 
     def fileImport(self,msg,loader,reset=False):
         try:
@@ -14035,6 +14305,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.autosavepath = toString(settings.value("autosavepath",self.qmc.autosavepath))
             if settings.contains("externalprogram"):
                 self.ser.externalprogram = toString(settings.value("externalprogram",self.ser.externalprogram))
+            if settings.contains("externaloutprogram"):
+                self.ser.externaloutprogram = toString(settings.value("externaloutprogram",self.ser.externaloutprogram))
+            if settings.contains("externaloutprogramFlag"):
+                self.ser.externaloutprogramFlag = bool(toBool(settings.value("externaloutprogramFlag",self.ser.externaloutprogramFlag)))
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
                 self.qmc.extradevices = [toInt(x) for x in toList(settings.value("extradevices",self.qmc.extradevices))]
@@ -14233,6 +14507,8 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.DeltaBTBflag = bool(toBool(settings.value("DeltaBTB",aw.qmc.DeltaBTBflag)))
                 if settings.contains("alignEvent"):
                     aw.qmc.alignEvent = toInt(settings.value("alignEvent",aw.qmc.alignEvent))
+                if settings.contains("movespeed"):
+                    aw.qmc.backgroundmovespeed = toInt(settings.value("movespeed",aw.qmc.backgroundmovespeed))
             settings.endGroup()
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = toInt(settings.value("autosaveflag",self.qmc.autosaveflag))
@@ -14918,6 +15194,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("settingspath",self.settingspath)
             settings.setValue("autosavepath",self.qmc.autosavepath)
             settings.setValue("externalprogram",self.ser.externalprogram)
+            settings.setValue("externaloutprogram",self.ser.externaloutprogram)
+            settings.setValue("externaloutprogramFlag",self.ser.externaloutprogramFlag)
             #save extra devices
             settings.beginGroup("ExtraDev")
             settings.setValue("extradevices",self.qmc.extradevices)
@@ -15008,6 +15286,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("background")
             settings.setValue("backgrounddetails",aw.qmc.backgroundDetails)
             settings.setValue("backgroundevents",aw.qmc.backgroundeventsflag)
+            settings.setValue("movespeed",aw.qmc.backgroundmovespeed)
             settings.setValue("DeltaETB",aw.qmc.DeltaETBflag)
             settings.setValue("DeltaBTB",aw.qmc.DeltaBTBflag)
             settings.setValue("alignEvent",aw.qmc.alignEvent)
@@ -15451,17 +15730,16 @@ class ApplicationWindow(QMainWindow):
     #  . "weight": [<weight-in>:float,<weight-out>:float,<units>: string] or None
     def profileProductionData(self,profile,c):
         res = {}
-        # id (prefix+nr)
+        # id ("prefix+nr (sequence)")
         if "roastbatchprefix" in profile:
             res["batchprefix"] = d(profile["roastbatchprefix"])
         else:
             res["batchprefix"] = ""
         # batch number
-        batchnr = ""
         if "roastbatchnr" in profile:
             res["batchnr"] = int(profile["roastbatchnr"])
         else:
-            res["batchnr"] = c
+            res["batchnr"] = 0
         # title
         if "title" in profile:
             res["title"] = d(profile["title"])
@@ -15691,10 +15969,10 @@ class ApplicationWindow(QMainWindow):
     #  . "FCs_temp": string
     #  . "DROP_time": int (in seconds)
     #  . "DROP_temp": string
-    #  . "DRY_time": int (first phase time in seconds)
-    #  . "MAI_time": int (second phase time in seconds)
-    #  . "DEV_time": int (third phase time in seconds)
+    #  . "DRY_percent": float (first phase percentage)
+    #  . "MAI_percent": float (second phase percentage)
     #  . "DEV_percent": float (third phase percentage)
+    #  . "BTa": int
     #  . "color": int
     #  . "cup": int
     def profileRankingData(self,profile):
@@ -15724,21 +16002,35 @@ class ApplicationWindow(QMainWindow):
             res["DROP_time"] = timex[timeindex[6]] - start
             # DROP_temp
             res["DROP_temp"] = bt[timeindex[6]]
+        total_time = (timex[timeindex[6]] - start)
         # DRY_time
         if timeindex[1] > 0:
-            res["DRY_time"] = timex[timeindex[1]] - start
+            # DRY_time
+            dry_time = timex[timeindex[1]] - start
+            # DRY_percent
+            res["DRY_percent"] = (dry_time/total_time) * 100.
         # MAI_time
         if timeindex[1] > 0 and timeindex[2] > 0:
-            res["MAI_time"] = timex[timeindex[2]] - timex[timeindex[1]]
+            # MAI_time
+            mai_time = timex[timeindex[2]] - timex[timeindex[1]]
+            # MAI_percent
+            res["MAI_percent"] = (mai_time/total_time) * 100.
         if timeindex[2] > 0 and timeindex[6] > 0:
             # DEV_time
-            res["DEV_time"] = timex[timeindex[6]] - timex[timeindex[2]]
+            dev_time = timex[timeindex[6]] - timex[timeindex[2]]
             # DEV_percent
-            res["DEV_percent"] = (res["DEV_time"]/(timex[timeindex[6]] - start)) * 100.
+            res["DEV_percent"] = (dev_time/total_time) * 100.
+        # BTa
+        if "computed" in profile:
+            comp = profile["computed"]
+            if "total_ts_BT" in comp:
+                res["BTa"] = comp["total_ts_BT"]
         # color
-        res["color"] = profile["ground_color"]
+        if "ground_color" in profile:
+            res["color"] = profile["ground_color"]
         # cup
-        res["cupping"] = self.cuppingSum(profile["flavors"])
+        if "flavors" in profile:
+            res["cupping"] = self.cuppingSum(profile["flavors"])
         return res
         
         
@@ -15748,10 +16040,10 @@ class ApplicationWindow(QMainWindow):
     #  . "FCs_temp"
     #  . "DROP_time"
     #  . "DROP_temp"
-    #  . "DRY_time"
-    #  . "MAI_time"
-    #  . "DEV_time"
+    #  . "DRY_percent"
+    #  . "MAI_percent"
     #  . "DEV_percent"
+    #  . "BTa"
     #  . "color"
     #  . "cupping"
     def rankingData2string(self,data,units=True):
@@ -15769,14 +16061,14 @@ class ApplicationWindow(QMainWindow):
         res["color_num"] = (data["color"] if "color" in data else 0)
         res["color"] = (("#" if units else "" ) + str(data["color"]) if "color" in data and data["color"] != 0 else "")
         res["cupping"] = '{0:.2f}'.format(data["cupping"])
-        res["DRY_time_num"] = (data["DRY_time"] if "DRY_time" in data else 0)
-        res["DRY_time"] = (self.eventtime2string(data["DRY_time"]) if "DRY_time" in data else "")
-        res["MAI_time_num"] = (data["MAI_time"] if "MAI_time" in data else 0)
-        res["MAI_time"] = (self.eventtime2string(data["MAI_time"]) if "MAI_time" in data else "")
-        res["DEV_time_num"] = (data["DEV_time"] if "DEV_time" in data else 0)
-        res["DEV_time"] = (self.eventtime2string(data["DEV_time"]) if "DEV_time" in data else "")
+        res["DRY_percent_num"] = (data["DRY_percent"] if "DRY_percent" in data else 0)
+        res["DRY_percent"] = ('{0:.1f}'.format(data["DRY_percent"]) + ("%" if units else "") if data.has_key("DRY_percent") else "")
+        res["MAI_percent_num"] = (data["MAI_percent"] if "MAI_percent" in data else 0)
+        res["MAI_percent"] = ('{0:.1f}'.format(data["MAI_percent"]) + ("%" if units else "") if data.has_key("MAI_percent") else "")
         res["DEV_percent_num"] = (data["DEV_percent"] if "DEV_percent" in data else 0)
         res["DEV_percent"] = ('{0:.1f}'.format(data["DEV_percent"]) + ("%" if units else "") if data.has_key("DEV_percent") else "")
+        res["BTa_num"] = (data["BTa"] if "BTa" in data else 0)
+        res["BTa"] = (data["BTa"] if data.has_key("BTa") else "")
         return res
         
     def formatTemp(self,data,key,unit):
@@ -15794,10 +16086,10 @@ class ApplicationWindow(QMainWindow):
 <td sorttable_customkey=\"$FCs_temp_num\">$FCs_temp</td>
 <td sorttable_customkey=\"$DROP_time_num\">$DROP_time</td>
 <td sorttable_customkey=\"$DROP_temp_num\">$DROP_temp</td>
-<td sorttable_customkey=\"$DRY_time_num\">$DRY_time</td>
-<td sorttable_customkey=\"$MAI_time_num\">$MAI_time</td>
-<td sorttable_customkey=\"$DEV_time_num\">$DEV_time</td>
+<td sorttable_customkey=\"$DRY_percent_num\">$DRY_percent</td>
+<td sorttable_customkey=\"$MAI_percent_num\">$MAI_percent</td>
 <td sorttable_customkey=\"$DEV_percent_num\">$DEV_percent</td>
+<td sorttable_customkey=\"$BTa_num\">$BTa</td>
 <td sorttable_customkey=\"$loss_num\">$weightloss</td>
 <td sorttable_customkey=\"$color_num\">$color</td>
 <td>$cupping</td>
@@ -15820,14 +16112,14 @@ class ApplicationWindow(QMainWindow):
             DROP_time = rd["DROP_time"],
             DROP_temp_num = rd["DROP_temp_num"],
             DROP_temp = rd["DROP_temp"],
-            DRY_time_num = rd["DRY_time_num"],
-            DRY_time = rd["DRY_time"],
-            MAI_time_num = rd["MAI_time_num"],
-            MAI_time = rd["MAI_time"],
-            DEV_time_num = rd["DEV_time_num"],
-            DEV_time = rd["DEV_time"],
+            DRY_percent_num = rd["DRY_percent_num"],
+            DRY_percent = rd["DRY_percent"],
+            MAI_percent_num = rd["MAI_percent_num"],
+            MAI_percent = rd["MAI_percent"],
             DEV_percent_num = rd["DEV_percent_num"],
             DEV_percent = rd["DEV_percent"],
+            BTa_num = rd["BTa_num"],
+            BTa = rd["BTa"],
             loss_num = '{0:.2f}'.format(pd["weight_loss_num"]),
             weightloss = pd["weight_loss"],
             color_num = str(rd["color_num"]),
@@ -15860,16 +16152,16 @@ class ApplicationWindow(QMainWindow):
             DROP_time_count = 0
             DROP_temp = 0
             DROP_temp_count = 0
-            DRY_time = 0
-            DRY_time_count = 0
-            MAI_time = 0
-            MAI_time_count = 0
-            DEV_time = 0
-            DEV_time_count = 0
+            DRY_percent = 0
+            DRY_percent_count = 0
+            MAI_percent = 0
+            MAI_percent_count = 0
             DEV_percent = 0
-            DEV_percent_count = 0  
+            DEV_percent_count = 0
+            BTa = 0
+            BTa_count = 0
             loss = 0
-            loss_count = 0          
+            loss_count = 0   
             colors = 0
             colors_count = 0
             cuppings = 0
@@ -15921,21 +16213,21 @@ class ApplicationWindow(QMainWindow):
                 if rd.has_key("DROP_temp"):
                     DROP_temp += aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],first_temp_unit)
                     DROP_temp_count += 1
-                if rd.has_key("DRY_time"):
-                    DRY_time += rd["DRY_time"]
-                    DRY_time_count += 1
-                if rd.has_key("MAI_time"):
-                    MAI_time += rd["MAI_time"]
-                    MAI_time_count += 1
-                if rd.has_key("DEV_time"):
-                    DEV_time += rd["DEV_time"]
-                    DEV_time_count += 1
+                if rd.has_key("DRY_percent"):
+                    DRY_percent += rd["DRY_percent"]
+                    DRY_percent_count += 1
+                if rd.has_key("MAI_percent"):
+                    MAI_percent += rd["MAI_percent"]
+                    MAI_percent_count += 1
                 if rd.has_key("DEV_percent"):
                     DEV_percent += rd["DEV_percent"]
                     DEV_percent_count += 1
+                if rd.has_key("BTa"):
+                    BTa += rd["BTa"]
+                    BTa_count += 1
                 if i > 0 and o > 0:
                     loss += aw.weight_loss(i,o)
-                    colors_count += 1
+                    loss_count += 1
                 if rd["color"] > 0:
                     colors += rd["color"]
                     colors_count += 1
@@ -16054,10 +16346,11 @@ class ApplicationWindow(QMainWindow):
                 FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) + first_temp_unit if FCs_temp > 0 else ""),
                 DROP_time_avg = (self.eventtime2string(DROP_time / DROP_time_count) if DROP_time > 0 else ""),
                 DROP_temp_avg = ('{0:.0f}'.format(DROP_temp / DROP_temp_count) + first_temp_unit if DROP_temp > 0 else ""),
-                DRY_time_avg = (self.eventtime2string(DRY_time / DRY_time_count) if DRY_time > 0 else ""),
-                MAI_time_avg = (self.eventtime2string(MAI_time / MAI_time_count) if MAI_time > 0 else ""),
-                DEV_time_avg = (self.eventtime2string(DEV_time / DEV_time_count) if DEV_time > 0 else ""),
+                DRY_percent_avg = ('{0:.1f}%'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 else ""),
+                MAI_percent_avg = ('{0:.1f}%'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 else ""),
                 DEV_percent_avg = ('{0:.1f}%'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 else ""),
+                BTa_avg = ('{0:.0f}'.format(BTa / BTa_count) if BTa > 0 else ""),
+                loss_avg = ('{0:.1f}'.format(loss / loss_count) + "%" if loss_count > 0 else ""),
                 colors_avg = ("#" + '{0:.0f}'.format(colors / colors_count) if colors_count > 0 else ""),
                 cup_avg = '{0:.2f}'.format(cuppings / cuppings_count),
                 graph_image=graph_image,
@@ -16099,7 +16392,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         outfile = open(filename, 'w',newline="")
                     writer= csv.writer(outfile,delimiter='\t')
-                    writer.writerow(["batch","time","profile","load (g)","charge (C)","FCs","FCs (C)","DROP","DROP (C)","DRY","MAI","DEV","DEV (%)","loss","color","cup"])
+                    writer.writerow(["batch","time","profile","load (g)","charge (C)","FCs","FCs (C)","DROP","DROP (C)","DRY (%)","MAI (%)","DEV (%)","BTa","loss (%)","color","cup"])
                     # write data
                     c = 1
                     for p in profiles:
@@ -16111,16 +16404,17 @@ class ApplicationWindow(QMainWindow):
                             writer.writerow([
                                 pd["id"].encode('ascii','ignore'),
                                 pd["time"].encode('ascii','ignore'),
+                                pd["title"].encode('ascii','ignore'),
                                 str(pd["weight_in_num"]),
                                 aw.qmc.convertTemp(rd["charge_temp"],d["temp_unit"],"C"),
                                 rd["FCs_time"],
                                 aw.qmc.convertTemp(rd["FCs_temp"],d["temp_unit"],"C"),
                                 rd["DROP_time"],
                                 aw.qmc.convertTemp(rd["DROP_temp"],d["temp_unit"],"C"),
-                                rd["DRY_time"],
-                                rd["MAI_time"],
-                                rd["DEV_time"],
+                                rd["DRY_percent"],
+                                rd["MAI_percent"],
                                 rd["DEV_percent"],
+                                rd["BTa"],
                                 str(pd["weight_loss"]),
                                 rd["color"],
                                 rd["cupping"],
@@ -16154,15 +16448,15 @@ class ApplicationWindow(QMainWindow):
                     out.write("C;Y1;X2;K\"Time\"\n")
                     out.write("C;Y1;X3;K\"Profile\"\n") 
                     out.write("C;Y1;X4;K\"Load\"\n")                    
-                    out.write("C;Y1;X5;K\"Charge\"\n")
+                    out.write("C;Y1;X5;K\"Charge (C)\"\n")
                     out.write("C;Y1;X6;K\"FCs\"\n")
                     out.write("C;Y1;X7;K\"FCs (C)\"\n")
                     out.write("C;Y1;X8;K\"DROP\"\n")
                     out.write("C;Y1;X9;K\"DROP (C)\"\n")
-                    out.write("C;Y1;X10;K\"DRY\"\n")
-                    out.write("C;Y1;X11;K\"MAI\"\n")
-                    out.write("C;Y1;X12;K\"DEV\"\n")
-                    out.write("C;Y1;X13;K\"DEV (%)\"\n")
+                    out.write("C;Y1;X10;K\"DRY (%)\"\n")
+                    out.write("C;Y1;X11;K\"MAI (%)\"\n")
+                    out.write("C;Y1;X12;K\"DEV (%)\"\n")
+                    out.write("C;Y1;X13;K\"BTa\"\n")
                     out.write("C;Y1;X14;K\"Loss (%)\"\n")
                     out.write("C;Y1;X15;K\"Color\"\n")
                     out.write("C;Y1;X16;K\"Cup\"\n")
@@ -16192,12 +16486,12 @@ class ApplicationWindow(QMainWindow):
                             out.write("C;Y" + str(row) + ";X7;K" + str(aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),                            
                             out.write("C;Y" + str(row) + ";X8;K" + str(rd["DROP_time"]/86400.).replace('.', ',') + "\n")
                             out.write("C;Y" + str(row) + ";X9;K" + str(aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),
-                            out.write("C;Y" + str(row) + ";X10;K" + str(rd["DRY_time"]/86400.).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X11;K" + str(rd["MAI_time"]/86400.).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X12;K" + str(rd["DEV_time"]/86400.).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X13;K" + str(rd["DEV_percent"]).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X10;K" + str(rd["DRY_percent"]/100.).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X11;K" + str(rd["MAI_percent"]/100.).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X12;K" + str(rd["DEV_percent"]/100.).replace('.', ',') + "\n")
+                            out.write("C;Y" + str(row) + ";X13;K" + str(rd["BTa"]) + "\n")
                             if w_in > 0 and w_out > 0:
-                                out.write("C;Y" + str(row) + ";X14;K" + str(aw.weight_loss(w_in,w_out)).replace('.', ',') + "\n")
+                                out.write("C;Y" + str(row) + ";X14;K" + str(aw.weight_loss(w_in,w_out)/100.).replace('.', ',') + "\n")
                             if rd["color"] and rd["color"] > 0:
                                 out.write("C;Y" + str(row) + ";X15;K" + str(rd["color"]).replace('.', ',') + "\n")
                             out.write("C;Y" + str(row) + ";X16;K" + str(rd["cupping"]).replace('.', ',') + "\n")
@@ -16225,17 +16519,18 @@ class ApplicationWindow(QMainWindow):
                     out.write("F;P1;C2\n")
                     out.write("F;P2;C6\n")
                     out.write("F;P2;C8\n")
-                    out.write("F;P2;C10\n")
-                    out.write("F;P2;C11\n")
-                    out.write("F;P2;C12\n")
                     out.write("F;W2 2 15\n")
                     out.write("F;W3 3 20\n")
                     out.write("F;C4;FF2D\n")
+                    out.write("F;C5;FF1D\n")
                     out.write("F;C7;FF1D\n")
                     out.write("F;C9;FF1D\n")
-                    out.write("F;C13;FF1D\n")
-                    out.write("F;C14;FF1D\n")
-                    out.write("F;C15;FF1D\n")
+                    out.write("F;C10;F%1D\n")
+                    out.write("F;C11;F%1D\n")
+                    out.write("F;C12;F%1D\n")
+                    out.write("F;C13;FF0D\n")
+                    out.write("F;C14;F%1D\n")
+                    out.write("F;C15;FF0D\n")
                     out.write("F;C16;FF2D\n")
                     out.write("F;SDM4;R" + str(row) + "\n")
                     out.write("E\n")                     
@@ -17336,6 +17631,13 @@ class ApplicationWindow(QMainWindow):
         self.qmc.timeindexB = [-1,0,0,0,0,0,0,0]
         self.qmc.backmoveflag = 1
 
+    def switchETBT(self):
+        t2 = aw.qmc.temp2
+        aw.qmc.temp2 = aw.qmc.temp1
+        aw.qmc.temp1 = t2
+        aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+        aw.qmc.safesaveflag = True
+        
     def switch(self):
         try:
             if aw.qmc.checkSaved():
@@ -18794,6 +19096,8 @@ class HUDDlg(ArtisanDialog):
         self.xxresult = QLineEdit()
         self.xxresult.setReadOnly(True)
         self.xxresult.setStyleSheet("background-color:'lightgrey';")
+        self.TPCheck = QCheckBox(QApplication.translate("CheckBox", "TP",None))
+        self.TPCheck.setFocusPolicy(Qt.NoFocus)
         polyfitdeglabel = QLabel("deg")
         self.polyfitdeg = QSpinBox()
         self.polyfitdeg.setFocusPolicy(Qt.NoFocus)
@@ -18859,6 +19163,7 @@ class HUDDlg(ArtisanDialog):
         xxLayout = QHBoxLayout()
         xxLayout.addWidget(self.xxvarCheck)
         xxLayout.addWidget(self.xxresult)
+        xxLayout.addWidget(self.TPCheck)
         xxvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","x^3",None))
         xxvarGroupLayout.setLayout(xxLayout)
         polytimes = QHBoxLayout()
@@ -19452,7 +19757,7 @@ class HUDDlg(ArtisanDialog):
         if self.xxvarCheck.isChecked():
             #check for finished roast
             if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
-                res = aw.qmc.lnRegression(xx=True)
+                res = aw.qmc.lnRegression(xx=True,TP=self.TPCheck.isChecked())
                 self.xxresult.setText(res)
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "xxvar(): no profile data available", None))
@@ -22602,7 +22907,7 @@ class batchDlg(ArtisanDialog):
             aw.qmc.batchcounter = self.counterSpinBox.value()
         else:
             aw.qmc.batchcounter = -1
-            aw.qmc.batchsequence = 0
+            aw.qmc.batchsequence = 1
         self.close()
         
 ##########################################################################
@@ -25451,13 +25756,14 @@ class backgroundDlg(ArtisanDialog):
         self.alignComboBox.setCurrentIndex(aw.qmc.alignEvent)
         self.alignComboBox.currentIndexChanged.connect(lambda i=self.alignComboBox.currentIndex() :self.changeAlignEventidx(i))        
         loadButton.clicked.connect(self.load)
-        okButton.clicked.connect(self.reject)
+        okButton.clicked.connect(self.accept)
         alignButton.clicked.connect(lambda : aw.qmc.timealign())
         
         self.speedSpinBox = QSpinBox()
+        self.speedSpinBox.setAlignment(Qt.AlignRight)
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
-        self.speedSpinBox.setValue(30)
+        self.speedSpinBox.setValue(aw.qmc.backgroundmovespeed)
         intensitylabel =QLabel(QApplication.translate("Label", "Opaqueness",None))
         intensitylabel.setAlignment(Qt.AlignRight)
         self.intensitySpinBox = QSpinBox()
@@ -25650,6 +25956,10 @@ class backgroundDlg(ArtisanDialog):
         mainLayout.addLayout(buttonLayout)
         mainLayout.setContentsMargins(5, 15, 5, 10) # left, top, right, bottom 
         self.setLayout(mainLayout)
+        
+    def accept(self):
+        aw.qmc.backgroundmovespeed = self.speedSpinBox.value()
+        self.close()
         
     def getColorIdx(self,c):
         try:
@@ -26857,6 +27167,8 @@ class serialport(object):
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
+        self.externaloutprogram = "out.py" # this program is called with arguments <ET>,<BT>,<ETB>,<BTB> values on each sampling
+        self.externaloutprogramFlag = False # if true the externaloutprogram will be called on each sample()
 
 #####################  FUNCTIONS  ############################
     ######### functions used by Fuji PIDs
@@ -29823,12 +30135,53 @@ class designerconfigDlg(ArtisanDialog):
                 et = float(str(self.Edit5et.text()))
             aw.qmc.currentx = timez 
             aw.qmc.currenty = bt
-            newindex = aw.qmc.addpoint()
+            newindex = aw.qmc.addpoint(manual=False)
             aw.qmc.timeindex[idi] = newindex
             aw.qmc.temp2[aw.qmc.timeindex[idi]] = bt
             aw.qmc.temp1[aw.qmc.timeindex[idi]] = et
             aw.qmc.xaxistosm(redraw=False)
             aw.qmc.redrawdesigner()
+
+class pointDlg(QDialog):
+    def __init__(self,parent = None,x=0,y=0):
+        super(pointDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Form Caption","Add Point",None))
+        self.tempEdit = QLineEdit(str(int(round(y))))
+        self.tempEdit.setValidator(QIntValidator(0, 999, self.tempEdit))
+        self.tempEdit.setFocus()
+        self.tempEdit.setAlignment(Qt.AlignRight)
+        templabel = QLabel(QApplication.translate("Label", "temp",None))
+        regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
+        self.timeEdit = QLineEdit(aw.qmc.stringfromseconds(x,leadingzero=False)) # 
+        self.timeEdit.setAlignment(Qt.AlignRight)
+        self.timeEdit.setValidator(QRegExpValidator(regextime,self))
+        timelabel = QLabel(QApplication.translate("Label", "time",None))
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
+        cancelButton.setFocusPolicy(Qt.NoFocus)
+        okButton.clicked.connect(self.accept)
+        cancelButton.clicked.connect(self.reject)
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
+        grid = QGridLayout()
+        grid.addWidget(timelabel,0,0)
+        grid.addWidget(self.timeEdit,0,1)
+        grid.addWidget(templabel,1,0)
+        grid.addWidget(self.tempEdit,1,1)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(grid)
+        mainLayout.addStretch()  
+        mainLayout.addLayout(buttonLayout)
+        self.setLayout(mainLayout)
+        
+    def getX(self):
+        return aw.qmc.stringtoseconds(str(self.timeEdit.text()))
+        
+    def getY(self):
+        return float(self.tempEdit.text())
+
 
 #########################################################################
 #############  NONE DEVICE DIALOG #######################################
@@ -30728,12 +31081,19 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.devicetypeComboBox = QComboBox()
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(aw.ser.externalprogram)
+        self.outprogramedit = QLineEdit(aw.ser.externaloutprogram)
+        self.outprogramFlag = QCheckBox(QApplication.translate("CheckBox", "Output",None))
+        self.outprogramFlag.setChecked(aw.ser.externaloutprogramFlag)
+        self.outprogramFlag.stateChanged.connect(lambda i=0:self.changeOutprogramFlag(i))         #toggle
         selectprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
         selectprogrambutton.setFocusPolicy(Qt.NoFocus)
         selectprogrambutton.clicked.connect(self.loadprogramname)
         helpprogrambutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpprogrambutton.setFocusPolicy(Qt.NoFocus)
         helpprogrambutton.clicked.connect(self.showhelpprogram)
+        selectoutprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
+        selectoutprogrambutton.setFocusPolicy(Qt.NoFocus)
+        selectoutprogrambutton.clicked.connect(self.loadoutprogramname)
         ###################################################
         # PID
         controllabel =QLabel(QApplication.translate("Label", "Control ET",None))
@@ -31174,10 +31534,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
         arduinoGroupBox = QGroupBox(QApplication.translate("GroupBox","Arduino TC4",None))
         arduinoGroupBox.setLayout(arduinoBox)
         #create program Box
-        programlayout = QHBoxLayout()
-        programlayout.addWidget(helpprogrambutton)
-        programlayout.addWidget(selectprogrambutton)
-        programlayout.addWidget(self.programedit)
+        programlayout = QGridLayout()
+        programlayout.addWidget(helpprogrambutton,0,0)
+        programlayout.addWidget(selectprogrambutton,0,1)
+        programlayout.addWidget(self.programedit,0,2)
+        programlayout.addWidget(self.outprogramFlag,1,0)
+        programlayout.addWidget(selectoutprogrambutton,1,1)
+        programlayout.addWidget(self.outprogramedit,1,2)
         programGroupBox = QGroupBox(QApplication.translate("GroupBox","External Program",None))
         programGroupBox.setLayout(programlayout)
         #ET BT symbolic adjustments/assignments Box
@@ -31254,6 +31617,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout.addLayout(buttonLayout)
         Mlayout.setContentsMargins(10,10,10,10)
         self.setLayout(Mlayout)
+        
+    def changeOutprogramFlag(self,i):
+        aw.ser.externaloutprogramFlag = not aw.ser.externaloutprogramFlag
 
     def asyncFlagStateChanged1048(self,i,x):
         if x == 0:
@@ -31441,6 +31807,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
         fileName = aw.ArtisanOpenFileDialog()
         if fileName:
             self.programedit.setText(fileName)
+            
+    def loadoutprogramname(self):
+        fileName = aw.ArtisanOpenFileDialog()
+        if fileName:
+            self.outprogramedit.setText(fileName)
+            aw.ser.externaloutprogram = str(self.outprogramedit.text())
 
     def enableDisableAddDeleteButtons(self):
         if len(aw.qmc.extradevices) >= aw.nLCDS:
@@ -37223,6 +37595,7 @@ class FujiPID(object):
         # follow background: if True, Artisan sends SV values taken from the current background profile if any
         self.followBackground = False
         self.lookahead = 0 # the lookahead in seconds
+        self.rampsoak = False # True if RS is active
         self.sv = None # the last sv send to the Fuji PID
         
         #refer to Fuji PID instruction manual for more information about the parameters and channels
@@ -37470,8 +37843,10 @@ class FujiPID(object):
             if reg != None:
                 aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
                 if flag == 1:
+                    aw.fujipid.rampsoak = True
                     aw.sendmessage(QApplication.translate("Message","RS ON", None))
                 elif flag == 0:
+                    aw.fujipid.rampsoak = False
                     aw.sendmessage(QApplication.translate("Message","RS OFF", None))
                 else:
                     aw.sendmessage(QApplication.translate("Message","RS on HOLD", None))            
@@ -37487,8 +37862,10 @@ class FujiPID(object):
             #if OK
             if r == command:
                 if flag == 1:
+                    aw.fujipid.rampsoak = True
                     aw.sendmessage(QApplication.translate("Message","RS ON", None))
                 elif flag == 0:
+                    aw.fujipid.rampsoak = False
                     aw.sendmessage(QApplication.translate("Message","RS OFF", None))
                 else:
                     aw.sendmessage(QApplication.translate("Message","RS on HOLD", None))
