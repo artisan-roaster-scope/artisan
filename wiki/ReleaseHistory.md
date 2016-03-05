@@ -23,8 +23,9 @@ v0.9.9 (xx.xx.2016)
     * availability on Arch Linux
     * adds batch conversion to various formats (CSV, JSON, PDF, PNG,..)
     * adds switch ET<->BT action
-    * adds canvas click as short cut to load background profile
+    * adds key shortcut (H key) to load background profile
     * adds a function to call a program on sampling with the temperatures ET, BT, ET-Background, and BT-Background as arguments
+    * adds movable legend
  * Changes
     * existing extra device mathexpression formulas are no longer changed if extra devices have to be extended on loading a profile
     * deactivates the auto-swap of ET/BT on CSV import (issue #85)

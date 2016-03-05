@@ -76,7 +76,7 @@ except Exception as e:
     pyqtversion = 4
 
 if pyqtversion < 5:
-    from PyQt4.QtGui import (QImageReader,
+    from PyQt4.QtGui import (QImageReader,QProgressDialog,
                              QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
                              QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange,
                              QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
@@ -94,7 +94,7 @@ else:
                              QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
                              QLCDNumber, QSpinBox, QComboBox, QHeaderView,
                              QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton,
-                             QColorDialog, QFrame, QCheckBox,QStatusBar, 
+                             QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog,
                              QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox)
     from PyQt5.QtGui import (QImageReader, 
                                 QKeySequence,QStandardItem,QImage,QPixmap,QColor,QPalette,QDesktopServices,QIcon,
@@ -220,6 +220,8 @@ if sys.version < '3':
         return s
     def cmd2str(c):
         return c
+    def s2a(s):
+        return u(s).encode('ascii','ignore')
 else:
     def decs2string(x):
         if len(x) > 0:
@@ -255,6 +257,8 @@ else:
         return bytes(s,"ascii")
     def cmd2str(c):
         return str(c,"latin1")
+    def s2a(s):
+        return s.encode('ascii','ignore').decode("ascii")
         
         
 if sip.getapi('QVariant') == 1:
@@ -1502,7 +1506,10 @@ class tgraphcanvas(FigureCanvas):
             
     def resizeEvent(self,event):
         self.block_update = True # we block updating the canvas for calls during the resize
-        super(tgraphcanvas,self).resizeEvent(event)
+        try:
+            super(tgraphcanvas,self).resizeEvent(event)
+        except:
+            pass
         self.block_update = False
         self.delayedUpdateBackground() # and only update after the resize explicitly
 
@@ -1525,7 +1532,10 @@ class tgraphcanvas(FigureCanvas):
             # ask the canvas to kindly draw it self some time in the future
             # when Qt thinks it is convenient
             #self.fig.canvas.draw_idle() # this blocks (overwrites) drawing of the projections in updategraphics
-            self.fig.canvas.draw()
+            try:
+                self.fig.canvas.draw()
+            except:
+                pass
             
             # self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
             # canvas is automatically blitted to self.ax_background after full redraw by _draw_event(self, evt)
@@ -1721,22 +1731,10 @@ class tgraphcanvas(FigureCanvas):
 
     def onclick(self,event):
         try:
-            if event.inaxes == None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==3:
+            if not self.designerflag and event.inaxes == None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==3:
                 aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
-            elif event.inaxes and not event.button==3 and aw.ntb._active == None and not aw.qmc.flagstart and not aw.qmc.flagon: # event.inaxes == None and not aw.qmc.flagstart and not aw.qmc.flagon:
-                self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None))
-                if len(u(self.filename)) == 0:
-                    return
-                try:
-                    aw.qmc.resetlinecountcaches()
-                    aw.loadbackground(u(self.filename))           
-                except:
-                    pass
-                aw.qmc.background = True
-                aw.qmc.timealign(redraw=False)
-                aw.qmc.redraw() 
             elif event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag:# and not self.flagon:
                 timex = self.time2index(event.xdata)
                 if timex > 0:
@@ -11275,6 +11273,19 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.full_screen_mode_active = True
                 self.showFullScreen()
+        elif key == 72:                       #H
+            if not aw.qmc.designerflag:
+                self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None))
+                if len(u(self.filename)) == 0:
+                    return
+                try:
+                    aw.qmc.resetlinecountcaches()
+                    aw.loadbackground(u(self.filename))           
+                except:
+                    pass
+                aw.qmc.background = True
+                aw.qmc.timealign(redraw=False)
+                aw.qmc.redraw()             
         elif key == 80:                       #P
             # switch PID mode
             if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
@@ -11571,7 +11582,7 @@ class ApplicationWindow(QMainWindow):
 
     def removeDisallowedFilenameChars(self,filename):
         validFilenameChars = "-_.() %s%s" % (libstring.ascii_letters, libstring.digits)
-        cleanedFilename = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore')
+        cleanedFilename = s2a(unicodedata.normalize('NFKD', filename))
         return ''.join(c for c in d(cleanedFilename) if c in validFilenameChars)
     
     
@@ -11638,6 +11649,7 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[p]</b> = Toggle PID mode",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[h]</b> = Load background profile",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[+,-]</b> = Inc/dec PID lookahead",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None)) + "<br>"
@@ -11831,10 +11843,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None),path=None):
         if path == None:
             path = self.getDefaultPath()
-        if pyqtversion < 5:
-            f = u(QFileDialog.getExistingDirectory(self,msg,path))
-        else:
-            f = u(QFileDialog.getExistingDirectory(self,msg,path)[0])
+        f = u(QFileDialog.getExistingDirectory(self,msg,path))
         self.setDefaultPath(f)
         return f
 
@@ -13662,16 +13671,29 @@ class ApplicationWindow(QMainWindow):
     def fileConvert(self,ext,dumper):
         files = self.ArtisanOpenFilesDialog(ext="*.alog")
         if files and len(files) > 0:
+            outdir = self.ArtisanExistingDirectoryDialog()
+            progress = QProgressDialog(QApplication.translate("Message", "Converting...",None), None, 0, len(files), self)
+            progress.setCancelButton(None)
+            progress.setWindowModality(Qt.WindowModal)
+            progress.setAutoClose(True)
+            progress.show()
+            i = 1
             for f in files:
                 try:
-                    fconv = f + u(ext)
+                    progress.setValue(i)
+                    QApplication.processEvents()
+                    fname = u(QFileInfo(f).fileName())
+                    fconv = u(QDir(outdir).filePath(fname + u(ext)))
                     if not os.path.exists(fconv):
-                        dumper(fconv)
                         aw.qmc.reset(redraw=False,soundOn=False)
                         self.setProfile(f,self.deserialize(f),quiet=True)
-                except:
+                        dumper(fconv)
+                except Exception as e:
                     pass
+                i += 1
                 aw.qmc.reset(soundOn=False)
+            progress.cancel()
+            progress = None
         
     def fileConvertCSV(self):
         self.fileConvert(".csv",self.exportCSV)
@@ -13685,9 +13707,19 @@ class ApplicationWindow(QMainWindow):
     def fileConvertPNG(self):
         files = self.ArtisanOpenFilesDialog(ext="*.alog")
         if files and len(files) > 0:
+            outdir = self.ArtisanExistingDirectoryDialog()
+            progress = QProgressDialog(QApplication.translate("Message", "Converting...",None), None, 0, len(files), self)
+            progress.setCancelButton(None)
+            progress.setWindowModality(Qt.WindowModal)
+            progress.setAutoClose(True)
+            progress.show()
+            i = 1
             for f in files:
                 try:
-                    fconv = f + u(".png")
+                    progress.setValue(i)
+                    QApplication.processEvents()
+                    fname = u(QFileInfo(f).fileName())
+                    fconv = u(QDir(outdir).filePath(fname + u(".png")))
                     if not os.path.exists(fconv):
                         aw.qmc.reset(redraw=False,soundOn=False)
                         self.setProfile(f,self.deserialize(f),quiet=True)
@@ -13699,7 +13731,10 @@ class ApplicationWindow(QMainWindow):
                         self.image.save(fconv,"PNG")
                 except:
                     pass
+                i += 1
                 aw.qmc.reset(soundOn=False)
+            progress.cancel()
+            progress = None
             
     def fileConvertSVG(self):
         self.fileConvertIMG(".svg")
@@ -13710,9 +13745,19 @@ class ApplicationWindow(QMainWindow):
     def fileConvertIMG(self,ext):
         files = self.ArtisanOpenFilesDialog(ext="*.alog")
         if files and len(files) > 0:
+            outdir = self.ArtisanExistingDirectoryDialog()
+            progress = QProgressDialog(QApplication.translate("Message", "Converting...",None), None, 0, len(files), self)
+            progress.setCancelButton(None)
+            progress.setWindowModality(Qt.WindowModal)
+            progress.setAutoClose(True)
+            progress.show()
+            i = 1
             for f in files:
                 try:
-                    fconv = f + u(ext)
+                    progress.setValue(i)
+                    QApplication.processEvents()
+                    fname = u(QFileInfo(f).fileName())
+                    fconv = u(QDir(outdir).filePath(fname + u(ext)))
                     if not os.path.exists(fconv):
                         aw.qmc.reset(redraw=False,soundOn=False)
                         self.setProfile(f,self.deserialize(f),quiet=True)
@@ -13720,7 +13765,10 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.fig.savefig(fconv,transparent=True,facecolor='none', edgecolor='none',frameon=True) # transparent=True is need to get the delta curves and legend drawn
                 except:
                     pass
+                i += 1
                 aw.qmc.reset(soundOn=False)
+            progress.cancel()
+            progress = None
 
     def fileImport(self,msg,loader,reset=False):
         try:
@@ -14457,8 +14505,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("grid")
             if settings.contains("xgrid"):
                 self.qmc.xgrid = toInt(settings.value("xgrid",self.qmc.xgrid))
-                self.qmc.ygrid = toInt(settings.value("ygrid",self.qmc.ygrid))
-                self.qmc.zgrid = toInt(settings.value("zgrid",self.qmc.zgrid))
+                self.qmc.ygrid = max(10,toInt(settings.value("ygrid",self.qmc.ygrid)))
+                self.qmc.zgrid = max(10,toInt(settings.value("zgrid",self.qmc.zgrid)))
                 self.qmc.gridthickness = toInt(settings.value("gridthickness",self.qmc.gridthickness))
                 self.qmc.xrotation = toInt(settings.value("xrotation",self.qmc.xrotation))
                 self.qmc.gridlinestyle = toInt(settings.value("gridlinestyle",self.qmc.gridlinestyle))
@@ -15615,7 +15663,7 @@ class ApplicationWindow(QMainWindow):
     # takes a production data generated by profileProductionData(profile) and extracts the following as keyed string values in a dict:
     #  . "id"
     #  . "time"
-    #  . "datetime"
+    #  . "datetime" (epoch, not a string!)
     #  . "title"
     #  . "beans"
     #  . "weight_in"
@@ -15627,20 +15675,22 @@ class ApplicationWindow(QMainWindow):
     def productionData2string(self,data,units=True):
         res = {}        
         # id (prefix+nr)
-        res["nr"] = data["batchnr"]
+        res["nr"] = u(data["batchnr"])
         res["id"] = u(data["batchprefix"]) + u(data["batchnr"])
         # title
         res["title"] = data["title"]
         # date and time
         res["time"] = ""
-        if data["roastdate"]:
-            res["datetime"] = data["roastdate"].toPyDateTime() # toMSecsSinceEpoch()
-            date = data["roastdate"].date()
-            time = data["roastdate"].time()
-            if date:
-                res["time"] = u(date.toString("yyyy-MM-dd")) # Qt.SystemLocaleShortDate, Qt.ISODate
-            if time:
-                res["time"] += u(" " + time.toString("HH:mm")) # Qt.SystemLocaleShortDate, Qt.ISODate
+        res["date"] = ""
+        if not "roastdate" in data or not data["roastdate"]:            
+            data["roastdate"] = QDateTime(QDate.currentDate()) # we just take the local time
+        res["datetime"] = data["roastdate"].toPyDateTime() # toMSecsSinceEpoch()
+        date = data["roastdate"].date()
+        time = data["roastdate"].time()
+        if date:
+            res["date"] = u(date.toString("yyyy-MM-dd")) # Qt.SystemLocaleShortDate, Qt.ISODate
+        if time:
+            res["time"] += u(" " + time.toString("HH:mm")) # Qt.SystemLocaleShortDate, Qt.ISODate
         # beans
         res["beans"] = data["beans"]
         # weight
@@ -15673,7 +15723,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 res["weight_out"] = ""
             loss = aw.weight_loss(w[0],w[1])
-            if loss < 100:
+            if loss < 100 and loss > 0:
                 res["weight_loss"] = '{0:.1f}'.format(loss)
             else:
                 res["weight_loss"] = ""
@@ -15685,7 +15735,7 @@ class ApplicationWindow(QMainWindow):
                     res["weight_in"] += un
                 if wo > 0:
                     res["weight_out"] += un
-                if loss < 100:
+                if loss < 100 and loss > 0:
                     res["weight_loss"] += "%"
         else:
             res["weight_in"] = ""
@@ -15747,6 +15797,19 @@ class ApplicationWindow(QMainWindow):
             res["title"] = ""
         # date and time
         res["roastdate"] = None
+        if "roastdate" in profile:
+            try:
+                date = QDate.fromString(d(profile["roastdate"]))
+                if "roasttime" in profile:
+                    try:
+                        time = QTime.fromString(d(profile["roasttime"]))
+                        res["roastdate"] = QDateTime(date,time)
+                    except Exception:
+                        res["roastdate"] = QDateTime(date)
+                else:
+                    res["roastdate"] = QDateTime(date)
+            except Exception:
+                pass
         if "roastisodate" in profile:
             try:
                 date = QDate.fromString(d(profile["roastisodate"]), Qt.ISODate)
@@ -15866,10 +15929,10 @@ class ApplicationWindow(QMainWindow):
                         try:
                             d = self.productionData2string(self.profileProductionData(self.deserialize(p),c),units=False)
                             writer.writerow([
-                                d["id"].encode('ascii','ignore'),
-                                d["time"].encode('ascii','ignore'),
-                                d["title"].encode('ascii','ignore'),
-                                d["beans"].encode('ascii','ignore'),
+                                s2a(d["id"]),
+                                s2a(d["time"]),
+                                s2a(d["title"]),
+                                s2a(d["beans"]),
                                 str(d["weight_in_num"]),
                                 str(d["weight_out_num"]),
                                 ])
@@ -15921,10 +15984,10 @@ class ApplicationWindow(QMainWindow):
                                 else:
                                     unit = "lb"
                             d = self.productionData2string(raw_data,units=False)
-                            out.write("C;Y" + str(row) + ";X1;K\"" + d["id"].encode('ascii','ignore') + "\"\n")
+                            out.write("C;Y" + str(row) + ";X1;K\"" + s2a(d["id"]) + "\"\n")
                             out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X3;K\"" + d["title"].encode('ascii','ignore') + "\"\n")
-                            out.write("C;Y" + str(row) + ";X4;K\"" + d["beans"].encode('ascii','ignore') + "\"\n")
+                            out.write("C;Y" + str(row) + ";X3;K\"" + s2a(d["title"]) + "\"\n")
+                            out.write("C;Y" + str(row) + ";X4;K\"" + s2a(d["beans"]) + "\"\n")
                             w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
                             w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
                             out.write("C;Y" + str(row) + ";X5;K" + str(w_in).replace('.', ',') + "\n")
@@ -16062,17 +16125,17 @@ class ApplicationWindow(QMainWindow):
         res["color"] = (("#" if units else "" ) + str(data["color"]) if "color" in data and data["color"] != 0 else "")
         res["cupping"] = '{0:.2f}'.format(data["cupping"])
         res["DRY_percent_num"] = (data["DRY_percent"] if "DRY_percent" in data else 0)
-        res["DRY_percent"] = ('{0:.1f}'.format(data["DRY_percent"]) + ("%" if units else "") if data.has_key("DRY_percent") else "")
+        res["DRY_percent"] = ('{0:.1f}'.format(data["DRY_percent"]) + ("%" if units else "") if "DRY_percent" in data else "")
         res["MAI_percent_num"] = (data["MAI_percent"] if "MAI_percent" in data else 0)
-        res["MAI_percent"] = ('{0:.1f}'.format(data["MAI_percent"]) + ("%" if units else "") if data.has_key("MAI_percent") else "")
+        res["MAI_percent"] = ('{0:.1f}'.format(data["MAI_percent"]) + ("%" if units else "") if "MAI_percent" in data else "")
         res["DEV_percent_num"] = (data["DEV_percent"] if "DEV_percent" in data else 0)
-        res["DEV_percent"] = ('{0:.1f}'.format(data["DEV_percent"]) + ("%" if units else "") if data.has_key("DEV_percent") else "")
+        res["DEV_percent"] = ('{0:.1f}'.format(data["DEV_percent"]) + ("%" if units else "") if "DEV_percent" in data else "")
         res["BTa_num"] = (data["BTa"] if "BTa" in data else 0)
-        res["BTa"] = (data["BTa"] if data.has_key("BTa") else "")
+        res["BTa"] = (data["BTa"] if "BTa" in data else "")
         return res
         
     def formatTemp(self,data,key,unit):
-        return ('{0:.0f}'.format(data[key]) + unit if data.has_key(key) else "")
+        return ('{0:.0f}'.format(data[key]) + unit if key in data else "")
     
             
     def rankingData2htmlentry(self,production_data,ranking_data):
@@ -16136,7 +16199,7 @@ class ApplicationWindow(QMainWindow):
             # let's sort by isodate
             profiles = sorted(profiles, 
                 key=lambda p: (QDateTime(QDate.fromString(p["roastisodate"], Qt.ISODate),QTime.fromString(p["roasttime"])).toMSecsSinceEpoch()
-                     if p.has_key("roastisodate") and p.has_key("roasttime") else 0))
+                     if "roastisodate" in p and "roasttime" in p else 0))
             with open(u(self.getResourcePath() + 'ranking-template.htm'), 'r') as myfile:
                 HTML_REPORT_TEMPLATE=myfile.read()
             entries = ""
@@ -16198,37 +16261,37 @@ class ApplicationWindow(QMainWindow):
                 if i > 0:
                     charges += i
                     charges_count += 1
-                if rd.has_key("charge_temp"):
+                if "charge_temp" in rd:
                     charges_temp += aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],first_temp_unit)
                     charges_temp_count += 1
-                if rd.has_key("FCs_time"):
+                if "FCs_time" in rd:
                     FCs_time += rd["FCs_time"]
                     FCs_time_count += 1
-                if rd.has_key("FCs_temp"):
+                if "FCs_temp" in rd:
                     FCs_temp += aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],first_temp_unit)
                     FCs_temp_count += 1
-                if rd.has_key("DROP_time"):
+                if "DROP_time" in rd:
                     DROP_time += rd["DROP_time"]
                     DROP_time_count += 1
-                if rd.has_key("DROP_temp"):
+                if "DROP_temp" in rd:
                     DROP_temp += aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],first_temp_unit)
                     DROP_temp_count += 1
-                if rd.has_key("DRY_percent"):
+                if "DRY_percent" in rd:
                     DRY_percent += rd["DRY_percent"]
                     DRY_percent_count += 1
-                if rd.has_key("MAI_percent"):
+                if "MAI_percent" in rd:
                     MAI_percent += rd["MAI_percent"]
                     MAI_percent_count += 1
-                if rd.has_key("DEV_percent"):
+                if "DEV_percent" in rd:
                     DEV_percent += rd["DEV_percent"]
                     DEV_percent_count += 1
-                if rd.has_key("BTa"):
+                if "BTa" in rd:
                     BTa += rd["BTa"]
                     BTa_count += 1
                 if i > 0 and o > 0:
                     loss += aw.weight_loss(i,o)
                     loss_count += 1
-                if rd["color"] > 0:
+                if "color" in rd and rd["color"] > 0:
                     colors += rd["color"]
                     colors_count += 1
                 if rd["cupping"] > 0:
@@ -16340,19 +16403,19 @@ class ApplicationWindow(QMainWindow):
                 resources = u(self.getResourcePath()),
                 title = u(QApplication.translate("HTML Report Template", "Roast Ranking", None)),
                 entries = entries,
-                charges_avg = '{0:.2f}'.format(charges / charges_count) + first_weight_unit.lower(),
-                charges_temp_avg = ('{0:.0f}'.format(charges_temp / charges_temp_count) + first_temp_unit if charges_temp > 0 else ""),
-                FCs_time_avg = (self.eventtime2string(FCs_time / FCs_time_count) if FCs_time > 0 else ""),
-                FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) + first_temp_unit if FCs_temp > 0 else ""),
-                DROP_time_avg = (self.eventtime2string(DROP_time / DROP_time_count) if DROP_time > 0 else ""),
-                DROP_temp_avg = ('{0:.0f}'.format(DROP_temp / DROP_temp_count) + first_temp_unit if DROP_temp > 0 else ""),
-                DRY_percent_avg = ('{0:.1f}%'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 else ""),
-                MAI_percent_avg = ('{0:.1f}%'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 else ""),
-                DEV_percent_avg = ('{0:.1f}%'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 else ""),
-                BTa_avg = ('{0:.0f}'.format(BTa / BTa_count) if BTa > 0 else ""),
-                loss_avg = ('{0:.1f}'.format(loss / loss_count) + "%" if loss_count > 0 else ""),
-                colors_avg = ("#" + '{0:.0f}'.format(colors / colors_count) if colors_count > 0 else ""),
-                cup_avg = '{0:.2f}'.format(cuppings / cuppings_count),
+                charges_avg = ('{0:.2f}'.format(charges / charges_count) + first_weight_unit.lower() if charges_count > 0 and charges > 0 else ""),
+                charges_temp_avg = ('{0:.0f}'.format(charges_temp / charges_temp_count) + first_temp_unit if charges_temp > 0 and charges_temp_count > 0 else ""),
+                FCs_time_avg = (self.eventtime2string(FCs_time / FCs_time_count) if FCs_time > 0 and FCs_time_count > 0 else ""),
+                FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) + first_temp_unit if FCs_temp > 0 and FCs_temp_count > 0 else ""),
+                DROP_time_avg = (self.eventtime2string(DROP_time / DROP_time_count) if DROP_time > 0 and DROP_time_count > 0 else ""),
+                DROP_temp_avg = ('{0:.0f}'.format(DROP_temp / DROP_temp_count) + first_temp_unit if DROP_temp > 0 and DROP_temp_count > 0 else ""),
+                DRY_percent_avg = ('{0:.1f}%'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 and DRY_percent_count > 0 else ""),
+                MAI_percent_avg = ('{0:.1f}%'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 and MAI_percent_count > 0 else ""),
+                DEV_percent_avg = ('{0:.1f}%'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 and DEV_percent_count > 0 else ""),
+                BTa_avg = ('{0:.0f}'.format(BTa / BTa_count) if BTa > 0 and BTa_count > 0 else ""),
+                loss_avg = ('{0:.1f}'.format(loss / loss_count) + "%" if loss_count > 0 and loss > 0 else ""),
+                colors_avg = ("#" + '{0:.0f}'.format(colors / colors_count) if colors > 0 and colors_count > 0 else ""),
+                cup_avg = ('{0:.2f}'.format(cuppings / cuppings_count) if cuppings > 0 and cuppings_count > 0 else ""),
                 graph_image=graph_image,
             )
                 
@@ -16377,8 +16440,7 @@ class ApplicationWindow(QMainWindow):
                     f.close()
 
 
-    def rankingCSVReport(self):
-        # get profile filenames
+    def rankingCSVReport(self):        # get profile filenames
         profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
         if profiles and len(profiles) > 0:
             # select file
@@ -16399,18 +16461,18 @@ class ApplicationWindow(QMainWindow):
                         try:
                             pd = self.productionData2string(self.profileProductionData(self.deserialize(p),c),units=False)
                             c += 1
-                            d = self.profileRankingData(self.deserialize(p))
-                            rd = self.rankingData2string(d,units=False)
+                            dct = self.profileRankingData(self.deserialize(p))
+                            rd = self.rankingData2string(dct,units=False)
                             writer.writerow([
-                                pd["id"].encode('ascii','ignore'),
-                                pd["time"].encode('ascii','ignore'),
-                                pd["title"].encode('ascii','ignore'),
+                                s2a(pd["id"]),
+                                s2a(pd["time"]),
+                                s2a(pd["title"]),
                                 str(pd["weight_in_num"]),
-                                aw.qmc.convertTemp(rd["charge_temp"],d["temp_unit"],"C"),
+                                aw.qmc.convertTemp(rd["charge_temp"],dct["temp_unit"],"C"),
                                 rd["FCs_time"],
-                                aw.qmc.convertTemp(rd["FCs_temp"],d["temp_unit"],"C"),
+                                aw.qmc.convertTemp(rd["FCs_temp"],dct["temp_unit"],"C"),
                                 rd["DROP_time"],
-                                aw.qmc.convertTemp(rd["DROP_temp"],d["temp_unit"],"C"),
+                                aw.qmc.convertTemp(rd["DROP_temp"],dct["temp_unit"],"C"),
                                 rd["DRY_percent"],
                                 rd["MAI_percent"],
                                 rd["DEV_percent"],
@@ -16419,11 +16481,13 @@ class ApplicationWindow(QMainWindow):
                                 rd["color"],
                                 rd["cupping"],
                                 ])
-                        except:
+                        except Exception as e:
+#                            import traceback
+#                            traceback.print_exc(file=sys.stdout)
                             pass
                     # close file
                     outfile.close()
-                except:
+                except Exception as e:
                     pass
                     
     def rankingSYLKReport(self):
@@ -16475,28 +16539,47 @@ class ApplicationWindow(QMainWindow):
                                 else:
                                     unit = "lb"
                             d = self.productionData2string(raw_data,units=False)
-                            out.write("C;Y" + str(row) + ";X1;K\"" + d["id"].encode('ascii','ignore') + "\"\n")
-                            out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X3;K\"" + d["title"].encode('ascii','ignore') + "\"\n")
-                            w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-                            w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-                            out.write("C;Y" + str(row) + ";X4;K" + str(w_in).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X5;K" + str(aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),                            
-                            out.write("C;Y" + str(row) + ";X6;K" + str(rd["FCs_time"]/86400.).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X7;K" + str(aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),                            
-                            out.write("C;Y" + str(row) + ";X8;K" + str(rd["DROP_time"]/86400.).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X9;K" + str(aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),
-                            out.write("C;Y" + str(row) + ";X10;K" + str(rd["DRY_percent"]/100.).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X11;K" + str(rd["MAI_percent"]/100.).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X12;K" + str(rd["DEV_percent"]/100.).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X13;K" + str(rd["BTa"]) + "\n")
+                            if "id" in d:
+                                out.write("C;Y" + str(row) + ";X1;K\"" + s2a(d["id"]) + "\"\n")
+                            if "datetime" in d:
+                                out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', ',') + "\n")
+                            if "title" in d:
+                                out.write("C;Y" + str(row) + ";X3;K\"" + s2a(d["title"]) + "\"\n")
+                            if "weight" in raw_data:
+                                w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+                                w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+                                out.write("C;Y" + str(row) + ";X4;K" + str(w_in).replace('.', ',') + "\n")
+                            else:
+                                w_in = 0
+                                w_out = 0
+                            if "charge_temp" in rd and "temp_unit" in rd:
+                                out.write("C;Y" + str(row) + ";X5;K" + str(aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),                            
+                            if "FCs_time" in rd:
+                                out.write("C;Y" + str(row) + ";X6;K" + str(rd["FCs_time"]/86400.).replace('.', ',') + "\n")
+                            if "FCs_temp" in rd and "temp_unit" in rd:
+                                out.write("C;Y" + str(row) + ";X7;K" + str(aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),
+                            if "DROP_time" in rd:
+                                out.write("C;Y" + str(row) + ";X8;K" + str(rd["DROP_time"]/86400.).replace('.', ',') + "\n")
+                            if "DROP_temp" in rd and "temp_unit" in rd:
+                                out.write("C;Y" + str(row) + ";X9;K" + str(aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),
+                            if "DRY_percent" in rd:
+                                out.write("C;Y" + str(row) + ";X10;K" + str(rd["DRY_percent"]/100.).replace('.', ',') + "\n")
+                            if "MAI_percent" in rd:
+                                out.write("C;Y" + str(row) + ";X11;K" + str(rd["MAI_percent"]/100.).replace('.', ',') + "\n")
+                            if "DEV_percent" in rd:
+                                out.write("C;Y" + str(row) + ";X12;K" + str(rd["DEV_percent"]/100.).replace('.', ',') + "\n")
+                            if "BTa" in rd:
+                                out.write("C;Y" + str(row) + ";X13;K" + str(rd["BTa"]) + "\n")
                             if w_in > 0 and w_out > 0:
                                 out.write("C;Y" + str(row) + ";X14;K" + str(aw.weight_loss(w_in,w_out)/100.).replace('.', ',') + "\n")
-                            if rd["color"] and rd["color"] > 0:
+                            if "color" in rd and rd["color"] and rd["color"] > 0:
                                 out.write("C;Y" + str(row) + ";X15;K" + str(rd["color"]).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X16;K" + str(rd["cupping"]).replace('.', ',') + "\n")
+                            if "cupping" in rd:
+                                out.write("C;Y" + str(row) + ";X16;K" + str(rd["cupping"]).replace('.', ',') + "\n")
                             row += 1               
                         except Exception as e:
+#                            import traceback
+#                            traceback.print_exc(file=sys.stdout)
                             pass
                     # write trailer
                     if row > 0:
@@ -16536,7 +16619,7 @@ class ApplicationWindow(QMainWindow):
                     out.write("E\n")                     
                     # close file
                     out.close()
-                except:
+                except Exception as e:
                     pass
 
     def htmlReport(self):
@@ -23017,7 +23100,7 @@ class WindowsDlg(ArtisanDialog):
         self.xaxislencombobox.currentIndexChanged.connect(self.xaxislenloc)
         ygridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.ygridSpinBox = QSpinBox()
-        self.ygridSpinBox.setRange(1,100)
+        self.ygridSpinBox.setRange(10,100)
         self.ygridSpinBox.setSingleStep(5)
         self.ygridSpinBox.setValue(aw.qmc.ygrid)
         self.ygridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
@@ -23025,7 +23108,7 @@ class WindowsDlg(ArtisanDialog):
         self.ygridSpinBox.setMaximumWidth(60)
         zgridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.zgridSpinBox = QSpinBox()
-        self.zgridSpinBox.setRange(1,100)
+        self.zgridSpinBox.setRange(10,100)
         self.zgridSpinBox.setSingleStep(5)
         self.zgridSpinBox.setValue(aw.qmc.zgrid)
         self.zgridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
