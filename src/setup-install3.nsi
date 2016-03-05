@@ -142,6 +142,29 @@ done:
 
 FunctionEnd
 
+
+Function CheckRedistributableInstalled
+
+  ;{F0C3E5D1-1ADE-321E-8167-68EF0DE699A5} - msvs2010 sp1
+  
+  Push $R0
+  ClearErrors
+   
+  ;try to read Version subkey to R0
+  ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{F0C3E5D1-1ADE-321E-8167-68EF0DE699A5}" "Version"
+
+  ;was there error or not?
+  IfErrors 0 NoErrors
+   
+  ;error occured, copy "Error" to R0
+  StrCpy $R0 "Error"
+
+  NoErrors:
+  
+    Exch $R0 
+FunctionEnd
+
+
 Section "MainSection" SEC01
   SetShellVarContext all
   SetOutPath "$INSTDIR"
@@ -188,8 +211,15 @@ SectionEnd
 ;  end:
 ;SectionEnd
 
-Section "Microsoft Visual C++ 2008 Redistributable Package (x86)" SEC02
-ExecWait '$INSTDIR\vcredist_x86.exe /q:a /c:"VCREDI~3.EXE /q:a /c:""msiexec /i vcredist.msi /qn"" "'
+Section "Microsoft Visual C++ 2010 Redistributable Package (x86)" SEC02
+
+Call  CheckRedistributableInstalled
+Pop $R0
+
+${If} $R0 == "Error"
+  ExecWait '$INSTDIR\vcredist_x86.exe /q:a /c:"VCREDI~3.EXE /q:a /c:""msiexec /i vcredist.msi /qn"" "'	
+${EndIf}
+
 SectionEnd
 
 Section -AdditionalIcons
