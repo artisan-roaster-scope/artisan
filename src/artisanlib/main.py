@@ -188,6 +188,7 @@ from artisanlib.weblcds import startWeb, stopWeb
 from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopControl, releaseHottopControl, setHottop
 
 
+
 if sys.version < '3':
     def decs2string(x):
         return "".join(chr(b) for b in x)
@@ -1012,6 +1013,7 @@ class tgraphcanvas(FigureCanvas):
         self.BTcurve = True
         self.ETlcd = True
         self.BTlcd = True
+        self.swaplcds = False
         self.LCDdecimalplaces = 1
         self.DeltaETflag = False
         self.DeltaBTflag = False
@@ -4399,12 +4401,12 @@ class tgraphcanvas(FigureCanvas):
             if target_unit == "C":
                 return t
             else:
-                return self.fromFtoC(t)
+                return self.fromCtoF(t)
         else:
             if target_unit == "F":
                 return t
             else:
-                return self.fromCtoF(t)
+                return self.fromFtoC(t)
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
@@ -6654,7 +6656,7 @@ class tgraphcanvas(FigureCanvas):
         if lpindex != -1:
             self.currentx = lptime
             self.currenty = lptemp2
-            self.addpoint(manual=False)
+            self.addpoint(0,manual=False)
 
         self.xaxistosm(redraw=False)
         self.redrawdesigner()                                   #redraw the designer screen
@@ -8752,9 +8754,9 @@ class ApplicationWindow(QMainWindow):
         fullsizeAction.triggered.connect(lambda x=0,y=1:self.resizeImg(0,1))
         self.saveGraphMenu.addAction(fullsizeAction)
 
-        HukyForumAction = QAction("HukyForum.com (1200x?)...",self)
-        HukyForumAction.triggered.connect(lambda x=1200,y=1:self.resizeImg(1200,1))
-        self.saveGraphMenu.addAction(HukyForumAction)
+#        HukyForumAction = QAction("HukyForum.com (1200x?)...",self)
+#        HukyForumAction.triggered.connect(lambda x=1200,y=1:self.resizeImg(1200,1))
+#        self.saveGraphMenu.addAction(HukyForumAction)
 
         KaffeeNetzAction = QAction("Kaffee-Netz.de (800x?)...",self)
         KaffeeNetzAction.triggered.connect(lambda x=800,y=1:self.resizeImg(800,1))
@@ -8802,9 +8804,9 @@ class ApplicationWindow(QMainWindow):
         self.productionCsvAction.triggered.connect(self.productionCSVReport)        
         self.productionMenu.addAction(self.productionCsvAction)
         
-        self.productionSylkAction = QAction(UIconst.FILE_MENU_REPORT_SYLK,self)
-        self.productionSylkAction.triggered.connect(self.productionSYLKReport)
-        self.productionMenu.addAction(self.productionSylkAction)
+        self.productionExcelAction = QAction(UIconst.FILE_MENU_REPORT_EXCEL,self)
+        self.productionExcelAction.triggered.connect(self.productionExcelReport)
+        self.productionMenu.addAction(self.productionExcelAction)
         
         self.rankingMenu = self.reportMenu.addMenu(UIconst.FILE_MENU_RANKINGREPORT)
         
@@ -8816,9 +8818,9 @@ class ApplicationWindow(QMainWindow):
         self.rankingCsvAction.triggered.connect(self.rankingCSVReport)        
         self.rankingMenu.addAction(self.rankingCsvAction)        
         
-        self.rankingSylkAction = QAction(UIconst.FILE_MENU_REPORT_SYLK,self)
-        self.rankingSylkAction.triggered.connect(self.rankingSYLKReport)
-        self.rankingMenu.addAction(self.rankingSylkAction)
+        self.rankingExcelAction = QAction(UIconst.FILE_MENU_REPORT_EXCEL,self)
+        self.rankingExcelAction.triggered.connect(self.rankingExcelReport)
+        self.rankingMenu.addAction(self.rankingExcelAction)
 
 
         self.fileMenu.addSeparator()
@@ -13678,6 +13680,7 @@ class ApplicationWindow(QMainWindow):
             progress.setAutoClose(True)
             progress.show()
             i = 1
+            flag_temp = aw.qmc.roastpropertiesflag
             for f in files:
                 try:
                     progress.setValue(i)
@@ -13688,10 +13691,13 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.reset(redraw=False,soundOn=False)
                         self.setProfile(f,self.deserialize(f),quiet=True)
                         dumper(fconv)
+                    else:
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {} not converted.", None).format(fconv,fname + u(ext)))
                 except Exception as e:
                     pass
                 i += 1
                 aw.qmc.reset(soundOn=False)
+            aw.qmc.roastpropertiesflag = flag_temp
             progress.cancel()
             progress = None
         
@@ -13714,6 +13720,7 @@ class ApplicationWindow(QMainWindow):
             progress.setAutoClose(True)
             progress.show()
             i = 1
+            flag_temp = aw.qmc.roastpropertiesflag
             for f in files:
                 try:
                     progress.setValue(i)
@@ -13729,10 +13736,13 @@ class ApplicationWindow(QMainWindow):
                         else:
                             self.image = aw.qmc.grab()
                         self.image.save(fconv,"PNG")
+                    else:
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {} not converted.", None).format(fconv,fname + u(".png")))                        
                 except:
                     pass
                 i += 1
                 aw.qmc.reset(soundOn=False)
+            aw.qmc.roastpropertiesflag = flag_temp
             progress.cancel()
             progress = None
             
@@ -13752,6 +13762,7 @@ class ApplicationWindow(QMainWindow):
             progress.setAutoClose(True)
             progress.show()
             i = 1
+            flag_temp = aw.qmc.roastpropertiesflag
             for f in files:
                 try:
                     progress.setValue(i)
@@ -13763,10 +13774,13 @@ class ApplicationWindow(QMainWindow):
                         self.setProfile(f,self.deserialize(f),quiet=True)
                         self.qmc.redraw()
                         aw.qmc.fig.savefig(fconv,transparent=True,facecolor='none', edgecolor='none',frameon=True) # transparent=True is need to get the delta curves and legend drawn
+                    else:
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {} not converted.", None).format(fconv,fname + u(ext)))
                 except:
                     pass
                 i += 1
                 aw.qmc.reset(soundOn=False)
+            aw.qmc.roastpropertiesflag = flag_temp
             progress.cancel()
             progress = None
 
@@ -14271,6 +14285,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ETlcd = bool(toBool(settings.value("ETlcd",self.qmc.ETlcd)))
             if settings.contains("BTlcd"):
                 self.qmc.BTlcd = bool(toBool(settings.value("BTlcd",self.qmc.BTlcd)))
+            if settings.contains("swaplcds"):
+                self.qmc.swaplcds = bool(toBool(settings.value("swaplcds",self.qmc.swaplcds)))
             settings.beginGroup("DefaultButtons")
             if settings.contains("buttonvisibility"):
                 self.qmc.buttonvisibility = [toBool(x) for x in toList(settings.value("buttonvisibility"))]
@@ -15164,6 +15180,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("BTcurve",self.qmc.BTcurve)
             settings.setValue("ETlcd",self.qmc.ETlcd)
             settings.setValue("BTlcd",self.qmc.BTlcd)
+            settings.setValue("swaplcds",self.qmc.swaplcds)
             settings.beginGroup("DefaultButtons")
             settings.setValue("buttonvisibility",self.qmc.buttonvisibility)
             settings.setValue("buttonactions",self.qmc.buttonactions)
@@ -15669,7 +15686,7 @@ class ApplicationWindow(QMainWindow):
     #  . "weight_in"
     #  . "weight_out"
     #  . "weight_loss"
-    #  . "weight_in_num" (numberic in g)
+    #  . "weight_in_num" (numeric in g)
     #  . "weight_out_num" (numeric in g)
     #  . "weight_loss_num" (numeric in %)
     def productionData2string(self,data,units=True):
@@ -15696,32 +15713,16 @@ class ApplicationWindow(QMainWindow):
         # weight
         if "weight" in data:
             w = data["weight"]
-            if w[2] == "g":
-                # convert to Kg
-                wi = aw.convertWeight(w[0],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("Kg"))
-                wo = aw.convertWeight(w[1],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("Kg"))
-                un = "kg"
-            elif w[2] == "Kg":
-                wi = w[0]
-                wo = w[1]
-                un = "kg"
-            elif w[2] == "oz":
-                # convert to lb
-                wi = aw.convertWeight(w[0],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("lb"))
-                wo = aw.convertWeight(w[1],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index("lb"))
-                un = "lb"
-            elif w[2] == "lb":
-                wi = w[0]
-                wo = w[1]
-                un = "lb"
-            if wi > 0:
+            unit = aw.qmc.weight[2]
+            wi = aw.convertWeight(w[0],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index(unit))
+            wo = aw.convertWeight(w[1],aw.qmc.weight_units.index(w[2]),aw.qmc.weight_units.index(unit))
+            if unit == "Kg" or unit == "lb":
                 res["weight_in"] = '{0:.2f}'.format(wi)
-            else:
-                res["weight_in"] = ""
-            if wo > 0:
                 res["weight_out"] = '{0:.2f}'.format(wo)
             else:
-                res["weight_out"] = ""
+                res["weight_in"] = '{0:.0f}'.format(wi)
+                res["weight_out"] = '{0:.0f}'.format(wo)
+            un = aw.qmc.weight[2].lower()
             loss = aw.weight_loss(w[0],w[1])
             if loss < 100 and loss > 0:
                 res["weight_loss"] = '{0:.1f}'.format(loss)
@@ -15846,30 +15847,24 @@ class ApplicationWindow(QMainWindow):
                 with open(u(self.getResourcePath() + 'report-template.htm'), 'r') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ""
-                total_in = 0 # in g
-                total_out = 0 # in g
-                last_unit = "Kg"
+                total_in = 0 
+                total_out = 0
+                unit = aw.qmc.weight[2]
                 # collect data
                 c = 1
                 for p in profiles:
                     d = self.profileProductionData(p,c)
                     last_unit = d["weight"][2]
-                    total_in += aw.convertWeight(d["weight"][0],aw.qmc.weight_units.index(last_unit),aw.qmc.weight_units.index("g"))
-                    total_out += aw.convertWeight(d["weight"][1],aw.qmc.weight_units.index(last_unit),aw.qmc.weight_units.index("g"))
+                    total_in += aw.convertWeight(d["weight"][0],aw.qmc.weight_units.index(last_unit),aw.qmc.weight_units.index(unit))
+                    total_out += aw.convertWeight(d["weight"][1],aw.qmc.weight_units.index(last_unit),aw.qmc.weight_units.index(unit))
                     entries += self.productionData2htmlentry(d) + "\n"                
                     c += 1
-                if (last_unit == "Kg" or last_unit == "g"):
-                    un = "Kg"
-                else:
-                    un = "lb"
-                total_in = aw.convertWeight(total_in,aw.qmc.weight_units.index("g"),aw.qmc.weight_units.index(un))
-                total_out = aw.convertWeight(total_out,aw.qmc.weight_units.index("g"),aw.qmc.weight_units.index(un))
                 
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                     title = u(QApplication.translate("HTML Report Template", "Roast Batches", None)),
                     entries = entries,
-                    total_in = '{0:.2f}'.format(total_in),
-                    total_out = '{0:.2f}'.format(total_out),
+                    total_in = ('{0:.2f}'.format(total_in) if unit in ["Kg","lb"] else '{0:.0f}'.format(total_in)),
+                    total_out = ('{0:.2f}'.format(total_out) if unit in ["Kg","lb"] else '{0:.0f}'.format(total_in)),
                     total_loss = '{0:.1f}'.format(aw.weight_loss(total_in,total_out)),
                     resources = u(self.getResourcePath()),
                     batch = u(QApplication.translate("HTML Report Template", "Batch", None)),
@@ -15880,7 +15875,7 @@ class ApplicationWindow(QMainWindow):
                     weightout = u(QApplication.translate("HTML Report Template", "Out", None)),
                     loss = u(QApplication.translate("HTML Report Template", "Loss", None)),
                     sum = u(QApplication.translate("HTML Report Template", "SUM", None)),
-                    unit = un.lower()
+                    unit = unit.lower()
                 )
                     
                 f = None
@@ -15895,7 +15890,7 @@ class ApplicationWindow(QMainWindow):
                     for i in range(len(html)):
                         f.write(html[i])
                     f.close()
-                    full_path = "file:///" + filename
+                    full_path = "file://" + filename
                     QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
                     
                 except IOError as e:
@@ -15925,6 +15920,7 @@ class ApplicationWindow(QMainWindow):
                     writer.writerow(["batch","time","profile","beans","in (g)","out (g)"])
                     # write data
                     c = 1
+                    unit = aw.qmc.weight[2]
                     for p in profiles:
                         try:
                             d = self.productionData2string(self.profileProductionData(self.deserialize(p),c),units=False)
@@ -15948,79 +15944,172 @@ class ApplicationWindow(QMainWindow):
         delta = date_time - datetime.datetime(1899, 12, 30)
         return float(delta.days  - 1462) + (float(delta.seconds) / 86400)                    
 
-    def productionSYLKReport(self):
+    def productionExcelReport(self):
         # get profile filenames
         profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
         if profiles and len(profiles) > 0:
             # select file
-            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.slk")
+            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.xlsx")
             if filename:
                 try:
                     # open file
-                    if sys.version < '3':
-                        out = open(filename, 'wb')
-                    else:
-                        out = open(filename, 'w',newline="")
+                    from openpyxl import Workbook
+                    from openpyxl.compat import range
+                    from openpyxl.cell import get_column_letter
+                    from openpyxl.styles import Font, Fill
+                    wb = Workbook()
+                    ws = wb.active # wb.create_sheet()
+                    ws.title = u(QApplication.translate("HTML Report Template", "Production Report",None)) 
+                    
+                    bf = Font(bold=True)                    
+                    unit = aw.qmc.weight[2]
+                    
                     # write header
-                    out.write("ID;PArtisan\n")
-                    out.write("P;PGeneral\n")
-                    out.write("P;PT.M.JJJJ\ h:mm;;@\n")
-                    out.write("C;Y1;X1;K\"Batch\"\n")
-                    out.write("C;Y1;X2;K\"Time\"\n")
-                    out.write("C;Y1;X3;K\"Profile\"\n")
-                    out.write("C;Y1;X4;K\"Beans\"\n")
-                    out.write("C;Y1;X7;K\"Loss\"\n")
+                    ws['A1'] = u(QApplication.translate("HTML Report Template", "Batch",None))
+                    ws['A1'].font = bf
+                    ws['B1'] = u(QApplication.translate("HTML Report Template", "Time",None)) 
+                    ws['B1'].font = bf
+                    ws.column_dimensions['B'].width = 18
+                    ws['C1'] = u(QApplication.translate("HTML Report Template", "Profile",None)) 
+                    ws['C1'].font = bf 
+                    ws.column_dimensions['C'].width = 25
+                    ws['D1'] = u(QApplication.translate("HTML Report Template", "Beans",None)) 
+                    ws['D1'].font = bf 
+                    ws.column_dimensions['D'].width = 25
+                    ws['E1'] = u(QApplication.translate("HTML Report Template", "In",None)) + u" (" + u(unit.lower()) + u")"
+                    ws['E1'].font = bf 
+                    ws['F1'] = u(QApplication.translate("HTML Report Template", "Out",None)) + u" (" + u(unit.lower()) + u")"
+                    ws['F1'].font = bf
+                    ws['G1'] = u(QApplication.translate("HTML Report Template", "Loss",None)) 
+                    ws['G1'].font = bf 
+
                     # write data
-                    row = 2
-                    unit = ""
                     c = 1
                     for p in profiles:
                         try:
                             raw_data = self.profileProductionData(self.deserialize(p),c)
                             c += 1
-                            if unit == "":
-                                if raw_data["weight"][2] == "g" or raw_data["weight"][2] == "Kg":
-                                    unit = "Kg"
-                                else:
-                                    unit = "lb"
                             d = self.productionData2string(raw_data,units=False)
-                            out.write("C;Y" + str(row) + ";X1;K\"" + s2a(d["id"]) + "\"\n")
-                            out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X3;K\"" + s2a(d["title"]) + "\"\n")
-                            out.write("C;Y" + str(row) + ";X4;K\"" + s2a(d["beans"]) + "\"\n")
+                            ws['A{0}'.format(c)] = d["id"]
+                            ws['B{0}'.format(c)] = QDateTime(d["datetime"]).toPyDateTime()
+                            ws['B{0}'.format(c)].number_format = 'YYYY-MM-DD HH:MM'
+                            ws['C{0}'.format(c)] = d["title"]
+                            ws['D{0}'.format(c)] = d["beans"]
                             w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-                            w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-                            out.write("C;Y" + str(row) + ";X5;K" + str(w_in).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X6;K" + str(w_out).replace('.', ',') + "\n")
-                            out.write("C;Y" + str(row) + ";X7;E((R" + str(row) + "C5 - R" + str(row) + "C6) / R" + str(row) + "C5)\n")   
-                            row += 1               
+                            w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))                            
+                            ws['E{0}'.format(c)] = w_in
+                            if unit == "Kg" or unit == "lb":
+                                num_format = '0.00'
+                            else:
+                                num_format = '0'
+                            ws['E{0}'.format(c)].number_format = num_format
+                            ws['F{0}'.format(c)] = w_out
+                            ws['F{0}'.format(c)].number_format = num_format
+                            ws['G{0}'.format(c)] = "=(E{0} - F{0}) / E{0}".format(c)
+                            ws['G{0}'.format(c)].number_format = '0.0%'
                         except Exception as e:
+#                            import traceback
+#                            traceback.print_exc(file=sys.stdout)
                             pass
                     # write trailer
-                    out.write("C;Y1;X5;K\"In (" + unit.lower() + ")\"\n")
-                    out.write("C;Y1;X6;K\"Out (" + unit.lower() + ")\"\n")
-                    if row > 0:
-                        out.write("C;Y" + str(row) + ";X1;K\"" + u(QApplication.translate("HTML Report Template", "SUM", None)) +"\"\n")
-#                        out.write("F;P0;Y" + str(row) + ";X1\n")
-                        out.write("C;Y" + str(row) + ";X5;K0;Esum(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X6;K0;Esum(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X7;E((R" + str(row) + "C5 - R" + str(row) + "C6) / R" + str(row) + "C5)\n")
-                    #
-#                    out.write("F;P0;R1\n")
-                    out.write("F;P1;C2\n")
-                    out.write("F;W2 2 15\n")
-                    out.write("F;W3 3 20\n")
-                    out.write("F;W4 4 30\n")
-                    out.write("F;C5;FF2D\n")
-                    out.write("F;C6;FF2D\n")
-                    out.write("F;C7;F%2D\n")
-                    out.write("F;SDM4;R1\n")
-                    out.write("F;SDM4;R" + str(row) + "\n")
-                    out.write("E\n")                     
-                    # close file
-                    out.close()
-                except:
+                    if c > 1:
+                        ws['A{0}'.format(c+1)] = u(QApplication.translate("HTML Report Template", "SUM", None))
+                        ws['A{0}'.format(c+1)].font = bf 
+                        ws['E{0}'.format(c+1)] = "=SUM(E2:E{0})".format(c)
+                        ws['E{0}'.format(c+1)].font = bf 
+                        ws['E{0}'.format(c+1)].number_format = num_format
+                        ws['F{0}'.format(c+1)] = "=SUM(F2:F{0})".format(c)
+                        ws['F{0}'.format(c+1)].font = bf 
+                        ws['F{0}'.format(c+1)].number_format = num_format
+                        ws['G{0}'.format(c+1)] = "=(E{0} - F{0}) / E{0}".format(c+1)
+                        ws['G{0}'.format(c+1)].font = bf 
+                        ws['G{0}'.format(c+1)].number_format = '0.0%'
+                    wb.save(filename)
+                except Exception as e:
+#                    import traceback
+#                    traceback.print_exc(file=sys.stdout)
                     pass
+                    
+                    
+#    def productionSYLKReport(self):
+#        # get profile filenames
+#        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+#        if profiles and len(profiles) > 0:
+#            # select file
+#            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.slk")
+#            if filename:
+#                try:
+#                    # open file
+#                    if sys.version < '3':
+#                        out = open(filename, 'wb')
+#                    else:
+#                        out = open(filename, 'w',newline="")
+#                    # write header
+#                    out.write("ID;PArtisan\n")
+#                    out.write("P;PGeneral\n")
+#                    out.write("P;PT.M.JJJJ\ h:mm;;@\n")
+#                    out.write("C;Y1;X1;K\"Batch\"\n")
+#                    out.write("C;Y1;X2;K\"Time\"\n")
+#                    out.write("C;Y1;X3;K\"Profile\"\n")
+#                    out.write("C;Y1;X4;K\"Beans\"\n")
+#                    out.write("C;Y1;X7;K\"Loss\"\n")
+#                    # write data
+#                    row = 2
+#                    unit = ""
+#                    c = 1
+#                    decimalPoint = QLocale().decimalPoint()
+#                    for p in profiles:
+#                        try:
+#                            raw_data = self.profileProductionData(self.deserialize(p),c)
+#                            c += 1
+#                            if unit == "":
+#                                if raw_data["weight"][2] == "g" or raw_data["weight"][2] == "Kg":
+#                                    unit = "Kg"
+#                                else:
+#                                    unit = "lb"
+#                            d = self.productionData2string(raw_data,units=False)
+#                            out.write("C;Y" + str(row) + ";X1;K\"" + s2a(d["id"]) + "\"\n")
+#                            # date formats in SYLK don't translate between locales: JJJJ on a German system does not load on an English system, YYYY would
+#                            # therefore we write out the datetime as string
+#                            #out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', decimalPoint) + "\n")
+#                            out.write("C;Y" + str(row) + ";X2;K" + s2a("\"" + QDateTime(d["datetime"]).toString("yyyy-MM-dd hh:mm") + "\"") + "\n")
+#                            out.write("C;Y" + str(row) + ";X3;K\"" + s2a(d["title"]) + "\"\n")
+#                            out.write("C;Y" + str(row) + ";X4;K\"" + s2a(d["beans"]) + "\"\n")
+#                            w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+#                            w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+#                            out.write("C;Y" + str(row) + ";X5;K" + str(w_in).replace('.', decimalPoint) + "\n")
+#                            out.write("C;Y" + str(row) + ";X6;K" + str(w_out).replace('.', decimalPoint) + "\n")
+#                            out.write("C;Y" + str(row) + ";X7;E((R" + str(row) + "C5 - R" + str(row) + "C6) / R" + str(row) + "C5)\n")   
+#                            row += 1               
+#                        except Exception as e:
+#                            pass
+#                    # write trailer
+#                    out.write("C;Y1;X5;K\"In (" + unit.lower() + ")\"\n")
+#                    out.write("C;Y1;X6;K\"Out (" + unit.lower() + ")\"\n")
+#                    if row > 0:
+#                        out.write("C;Y" + str(row) + ";X1;K\"" + u(QApplication.translate("HTML Report Template", "SUM", None)) +"\"\n")
+##                        out.write("F;P0;Y" + str(row) + ";X1\n")
+#                        out.write("C;Y" + str(row) + ";X5;K0;Esum(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X6;K0;Esum(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X7;E((R" + str(row) + "C5 - R" + str(row) + "C6) / R" + str(row) + "C5)\n")
+#                    #
+##                    out.write("F;P0;R1\n")
+#                    # date formats in SYLK don't translate between locales: JJJJ on a German system does not load on an English system, YYYY would
+#                    # therefore we write out the datetime as string
+#                    #out.write("F;P1;C2\n")
+#                    out.write("F;W2 2 15\n")
+#                    out.write("F;W3 3 20\n")
+#                    out.write("F;W4 4 30\n")
+#                    out.write("F;C5;FF2D\n")
+#                    out.write("F;C6;FF2D\n")
+#                    out.write("F;C7;F%2D\n")
+#                    out.write("F;SDM4;R1\n")
+#                    out.write("F;SDM4;R" + str(row) + "\n")
+#                    out.write("E\n")                     
+#                    # close file
+#                    out.close()
+#                except:
+#                    pass
                     
                     
     # extracts the following from a give profile dict in a new dict:
@@ -16135,7 +16224,7 @@ class ApplicationWindow(QMainWindow):
         return res
         
     def formatTemp(self,data,key,unit):
-        return ('{0:.0f}'.format(data[key]) + unit if key in data else "")
+        return ('{0:.0f}'.format(aw.qmc.convertTemp(data[key],unit,aw.qmc.mode)) + aw.qmc.mode if key in data else "")
     
             
     def rankingData2htmlentry(self,production_data,ranking_data):
@@ -16229,8 +16318,6 @@ class ApplicationWindow(QMainWindow):
             colors_count = 0
             cuppings = 0
             cuppings_count = 0
-            first_temp_unit = ""
-            first_weight_unit = ""
             handles = []
             labels = []
             color=iter(cm.Set1(numpy.linspace(0,1,len(profiles))))            
@@ -16244,37 +16331,34 @@ class ApplicationWindow(QMainWindow):
 #            self.qmc.delta_ax.lines = []
 #            # erase annotations
 #            # erase statistics
+            min_start_time = aw.qmc.startofx
+            max_end_time = aw.qmc.endofx
+            first_profile = True
+            first_profile_event_time = 0
             for p in profiles:
                 pd = self.profileProductionData(p,c)
                 c += 1
                 rd = self.profileRankingData(p)
                 entries += self.rankingData2htmlentry(pd,rd) + "\n"
-                if first_temp_unit == "":
-                    first_temp_unit = rd["temp_unit"]
-                if first_weight_unit == "":
-                    if pd["weight"][2] == "g" or pd["weight"][2] == "Kg":
-                        first_weight_unit = "Kg"
-                    else:
-                        first_weight_unit = "lb"
-                i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(first_weight_unit))
-                o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(first_weight_unit))
+                i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
+                o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
                 if i > 0:
                     charges += i
                     charges_count += 1
                 if "charge_temp" in rd:
-                    charges_temp += aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],first_temp_unit)
+                    charges_temp += aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],aw.qmc.mode)
                     charges_temp_count += 1
                 if "FCs_time" in rd:
                     FCs_time += rd["FCs_time"]
                     FCs_time_count += 1
                 if "FCs_temp" in rd:
-                    FCs_temp += aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],first_temp_unit)
+                    FCs_temp += aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],aw.qmc.mode)
                     FCs_temp_count += 1
                 if "DROP_time" in rd:
                     DROP_time += rd["DROP_time"]
                     DROP_time_count += 1
                 if "DROP_temp" in rd:
-                    DROP_temp += aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],first_temp_unit)
+                    DROP_temp += aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],aw.qmc.mode)
                     DROP_temp_count += 1
                 if "DRY_percent" in rd:
                     DRY_percent += rd["DRY_percent"]
@@ -16298,18 +16382,35 @@ class ApplicationWindow(QMainWindow):
                     cuppings += rd["cupping"]
                     cuppings_count += 1
                 # add BT curve to graph
-                if len(profiles) < 7:
+                if len(profiles) < 11:
                     try:
                         label = u(pd["batchprefix"]) + u(pd["batchnr"])
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]
                         stemp = self.qmc.smooth_list(timex,temp,window_len=self.qmc.curvefilter)
-                        charge = rd["charge_idx"]
-                        drop = rd["drop_idx"]
+                        charge = max(0,rd["charge_idx"]-15) # start of visible data
+                        drop = rd["drop_idx"] # end of visible data
                         stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
+                        timeindex = p["timeindex"]
+                        if first_profile:
                         # align with CHARGE
-                        delta = timex[charge]
+                            delta = timex[rd["charge_idx"]]
+                            # store relative time of align event of first profile
+                            # CHARGE, DRY, FCs, FCe, SCs, SCe, DROP
+                            first_profile_event_time = delta # CHARGE
+                            for j in range(6,0,-1):
+                                if aw.qmc.alignEvent in [j] and timeindex[j]:
+                                    first_profile_event_time = timex[timeindex[j]] - timex[rd["charge_idx"]]
+                                    break
+                        else:
+                            delta = timex[rd["charge_idx"]]
+                            for j in range(6,0,-1):
+                                if aw.qmc.alignEvent in [j] and timeindex[j]:
+                                    delta = delta + (timex[timeindex[j]] - timex[rd["charge_idx"]] - first_profile_event_time)
+                                    break
                         timex = [t-delta for t in timex]
+                        min_start_time = min(min_start_time,timex[charge])
+                        max_end_time = max(max_end_time,timex[-1])
                         # cut-out only CHARGE to DROP
                         cl = next(color)
                         self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
@@ -16332,6 +16433,7 @@ class ApplicationWindow(QMainWindow):
                                 self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                                 linewidth=self.qmc.BTdeltalinewidth,linestyle=self.qmc.BTdeltalinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl)
+                        first_profile = False
                     except Exception as e:
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
@@ -16343,8 +16445,9 @@ class ApplicationWindow(QMainWindow):
             tmpdir = u(QDir.tempPath() + "/")
             graph_image = ""
 
-            if len(profiles) < 7:
-                try:                
+            if len(profiles) < 11:
+                try:              
+                    aw.qmc.ax.set_xlim(min_start_time,max_end_time) # we adjust the min, max time scale to ensure all data is visible
                     graph_image = "roastlog-graph"
                     self.qmc.ax.set_title("")
                     self.qmc.fig.suptitle("")           
@@ -16403,12 +16506,12 @@ class ApplicationWindow(QMainWindow):
                 resources = u(self.getResourcePath()),
                 title = u(QApplication.translate("HTML Report Template", "Roast Ranking", None)),
                 entries = entries,
-                charges_avg = ('{0:.2f}'.format(charges / charges_count) + first_weight_unit.lower() if charges_count > 0 and charges > 0 else ""),
-                charges_temp_avg = ('{0:.0f}'.format(charges_temp / charges_temp_count) + first_temp_unit if charges_temp > 0 and charges_temp_count > 0 else ""),
+                charges_avg = ('{0:.2f}'.format(charges / charges_count) + aw.qmc.weight[2].lower() if charges_count > 0 and charges > 0 else ""),
+                charges_temp_avg = ('{0:.0f}'.format(charges_temp / charges_temp_count) + aw.qmc.mode if charges_temp > 0 and charges_temp_count > 0 else ""),
                 FCs_time_avg = (self.eventtime2string(FCs_time / FCs_time_count) if FCs_time > 0 and FCs_time_count > 0 else ""),
-                FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) + first_temp_unit if FCs_temp > 0 and FCs_temp_count > 0 else ""),
+                FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) + aw.qmc.mode if FCs_temp > 0 and FCs_temp_count > 0 else ""),
                 DROP_time_avg = (self.eventtime2string(DROP_time / DROP_time_count) if DROP_time > 0 and DROP_time_count > 0 else ""),
-                DROP_temp_avg = ('{0:.0f}'.format(DROP_temp / DROP_temp_count) + first_temp_unit if DROP_temp > 0 and DROP_temp_count > 0 else ""),
+                DROP_temp_avg = ('{0:.0f}'.format(DROP_temp / DROP_temp_count) + aw.qmc.mode if DROP_temp > 0 and DROP_temp_count > 0 else ""),
                 DRY_percent_avg = ('{0:.1f}%'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 and DRY_percent_count > 0 else ""),
                 MAI_percent_avg = ('{0:.1f}%'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 and MAI_percent_count > 0 else ""),
                 DEV_percent_avg = ('{0:.1f}%'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 and DEV_percent_count > 0 else ""),
@@ -16430,7 +16533,7 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(html)):
                     f.write(html[i])
                 f.close()
-                full_path = "file:///" + filename
+                full_path = "file://" + filename
                 QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
                 
             except IOError as e:
@@ -16454,7 +16557,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         outfile = open(filename, 'w',newline="")
                     writer= csv.writer(outfile,delimiter='\t')
-                    writer.writerow(["batch","time","profile","load (g)","charge (C)","FCs","FCs (C)","DROP","DROP (C)","DRY (%)","MAI (%)","DEV (%)","BTa","loss (%)","color","cup"])
+                    writer.writerow(["batch","time","profile","load (g)","charge (" + aw.qmc.mode + ")","FCs","FCs (" + aw.qmc.mode + ")","DROP","DROP (" + aw.qmc.mode + ")","DRY (%)","MAI (%)","DEV (%)","BTa","loss (%)","color","cup"])
                     # write data
                     c = 1
                     for p in profiles:
@@ -16468,11 +16571,11 @@ class ApplicationWindow(QMainWindow):
                                 s2a(pd["time"]),
                                 s2a(pd["title"]),
                                 str(pd["weight_in_num"]),
-                                aw.qmc.convertTemp(rd["charge_temp"],dct["temp_unit"],"C"),
+                                ('{0:.1f}'.format(aw.qmc.convertTemp(dct["charge_temp"],dct["temp_unit"],aw.qmc.mode)) if "charge_temp" in dct else ""),
                                 rd["FCs_time"],
-                                aw.qmc.convertTemp(rd["FCs_temp"],dct["temp_unit"],"C"),
+                                ('{0:.1f}'.format(aw.qmc.convertTemp(dct["FCs_temp"],dct["temp_unit"],aw.qmc.mode)) if "FCs_temp" in dct else ""),
                                 rd["DROP_time"],
-                                aw.qmc.convertTemp(rd["DROP_temp"],dct["temp_unit"],"C"),
+                                ('{0:.1f}'.format(aw.qmc.convertTemp(dct["DROP_temp"],dct["temp_unit"],aw.qmc.mode)) if "DROP_temp" in dct else ""),
                                 rd["DRY_percent"],
                                 rd["MAI_percent"],
                                 rd["DEV_percent"],
@@ -16490,138 +16593,322 @@ class ApplicationWindow(QMainWindow):
                 except Exception as e:
                     pass
                     
-    def rankingSYLKReport(self):
+                    
+    def rankingExcelReport(self):
         # get profile filenames
         profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
         if profiles and len(profiles) > 0:
             # select file
-            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.slk")
+            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.xlsx")
             if filename:
                 try:
                     # open file
-                    if sys.version < '3':
-                        out = open(filename, 'wb')
-                    else:
-                        out = open(filename, 'w',newline="")
+                    from openpyxl import Workbook
+                    from openpyxl.compat import range
+                    from openpyxl.cell import get_column_letter
+                    from openpyxl.styles import Font, Fill
+                    wb = Workbook()
+                    ws = wb.active # wb.create_sheet()
+                    ws.title = u(QApplication.translate("HTML Report Template", "Production Report",None)) 
+                    
+                    bf = Font(bold=True)
+                    unit = aw.qmc.weight[2]
+                    
                     # write header
-                    out.write("ID;PArtisan\n")
-                    out.write("P;PGeneral\n")
-                    out.write("P;PT.M.JJJJ\ h:mm;;@\n")
-                    out.write("P;Pm:ss;;@\n")
-                    out.write("C;Y1;X1;K\"Batch\"\n")
-                    out.write("C;Y1;X2;K\"Time\"\n")
-                    out.write("C;Y1;X3;K\"Profile\"\n") 
-                    out.write("C;Y1;X4;K\"Load\"\n")                    
-                    out.write("C;Y1;X5;K\"Charge (C)\"\n")
-                    out.write("C;Y1;X6;K\"FCs\"\n")
-                    out.write("C;Y1;X7;K\"FCs (C)\"\n")
-                    out.write("C;Y1;X8;K\"DROP\"\n")
-                    out.write("C;Y1;X9;K\"DROP (C)\"\n")
-                    out.write("C;Y1;X10;K\"DRY (%)\"\n")
-                    out.write("C;Y1;X11;K\"MAI (%)\"\n")
-                    out.write("C;Y1;X12;K\"DEV (%)\"\n")
-                    out.write("C;Y1;X13;K\"BTa\"\n")
-                    out.write("C;Y1;X14;K\"Loss (%)\"\n")
-                    out.write("C;Y1;X15;K\"Color\"\n")
-                    out.write("C;Y1;X16;K\"Cup\"\n")
+                    ws['A1'] = u(QApplication.translate("HTML Report Template", "Batch",None))
+                    ws['A1'].font = bf
+                    ws['B1'] = u(QApplication.translate("HTML Report Template", "Time",None)) 
+                    ws['B1'].font = bf
+                    ws.column_dimensions['B'].width = 18
+                    ws['C1'] = u(QApplication.translate("HTML Report Template", "Profile",None)) 
+                    ws['C1'].font = bf 
+                    ws.column_dimensions['C'].width = 25
+                    ws['D1'] = u(QApplication.translate("HTML Report Template", "Load",None)) + u" (" + u(unit.lower()) + u")"
+                    ws['D1'].font = bf
+                    ws['E1'] = u(QApplication.translate("HTML Report Template", "Charge",None)) + u" (" + u(aw.qmc.mode) + u")"
+                    ws['E1'].font = bf 
+                    ws['F1'] = u(QApplication.translate("HTML Report Template", "FCs",None)) 
+                    ws['F1'].font = bf 
+                    ws['G1'] = u(QApplication.translate("HTML Report Template", "FCs",None)) + u" (" + u(aw.qmc.mode) + u")"
+                    ws['G1'].font = bf
+                    ws['H1'] = u(QApplication.translate("HTML Report Template", "DROP",None)) 
+                    ws['H1'].font = bf
+                    ws['I1'] = u(QApplication.translate("HTML Report Template", "DROP",None)) + u" (" + u(aw.qmc.mode) + u")"
+                    ws['I1'].font = bf
+                    ws['J1'] = u(QApplication.translate("HTML Report Template", "DRY",None)) 
+                    ws['J1'].font = bf
+                    ws['K1'] = u(QApplication.translate("HTML Report Template", "MAI",None)) 
+                    ws['K1'].font = bf
+                    ws['L1'] = u(QApplication.translate("HTML Report Template", "DEV",None)) 
+                    ws['L1'].font = bf
+                    ws['M1'] = u(QApplication.translate("HTML Report Template", "BTa",None)) 
+                    ws['M1'].font = bf
+                    ws['N1'] = u(QApplication.translate("HTML Report Template", "Loss",None)) 
+                    ws['N1'].font = bf
+                    ws['O1'] = u(QApplication.translate("HTML Report Template", "Color",None)) 
+                    ws['o1'].font = bf
+                    ws['P1'] = u(QApplication.translate("HTML Report Template", "Cup",None)) 
+                    ws['P1'].font = bf
+                    
                     # write data
-                    row = 2
-                    unit = ""
                     c = 1
                     for p in profiles:
                         try:
                             raw_data = self.profileProductionData(self.deserialize(p),c)
                             c += 1
                             rd = self.profileRankingData(self.deserialize(p))
-                            if unit == "":
-                                if raw_data["weight"][2] == "g" or raw_data["weight"][2] == "Kg":
-                                    unit = "Kg"
-                                else:
-                                    unit = "lb"
                             d = self.productionData2string(raw_data,units=False)
+                            
                             if "id" in d:
-                                out.write("C;Y" + str(row) + ";X1;K\"" + s2a(d["id"]) + "\"\n")
+                                ws['A{0}'.format(c)] = d["id"]
                             if "datetime" in d:
-                                out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', ',') + "\n")
+                                ws['B{0}'.format(c)] = QDateTime(d["datetime"]).toPyDateTime()
+                                ws['B{0}'.format(c)].number_format = 'YYYY-MM-DD HH:MM'
                             if "title" in d:
-                                out.write("C;Y" + str(row) + ";X3;K\"" + s2a(d["title"]) + "\"\n")
+                                ws['C{0}'.format(c)] = d["title"]
+                            if unit == "Kg" or unit == "lb":
+                                num_format = '0.00'
+                            else:
+                                num_format = '0'
                             if "weight" in raw_data:
                                 w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
                                 w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-                                out.write("C;Y" + str(row) + ";X4;K" + str(w_in).replace('.', ',') + "\n")
+                                ws['D{0}'.format(c)] = w_in
+                                ws['D{0}'.format(c)].number_format = num_format
                             else:
                                 w_in = 0
-                                w_out = 0
+                                w_out = 0                                
                             if "charge_temp" in rd and "temp_unit" in rd:
-                                out.write("C;Y" + str(row) + ";X5;K" + str(aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),                            
+                                ws['E{0}'.format(c)] = aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],aw.qmc.mode)
+                                ws['E{0}'.format(c)].number_format = "0"
                             if "FCs_time" in rd:
-                                out.write("C;Y" + str(row) + ";X6;K" + str(rd["FCs_time"]/86400.).replace('.', ',') + "\n")
+                                h,m = divmod(rd["FCs_time"],60)
+                                dt = datetime.time(int(round(h)),int(round(m)),0)
+                                ws['F{0}'.format(c)] = dt
+                                ws['F{0}'.format(c)].number_format = 'H:MM'
                             if "FCs_temp" in rd and "temp_unit" in rd:
-                                out.write("C;Y" + str(row) + ";X7;K" + str(aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),
+                                ws['G{0}'.format(c)] = aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],aw.qmc.mode)
+                                ws['G{0}'.format(c)].number_format = "0"
                             if "DROP_time" in rd:
-                                out.write("C;Y" + str(row) + ";X8;K" + str(rd["DROP_time"]/86400.).replace('.', ',') + "\n")
+                                h,m = divmod(rd["DROP_time"],60)
+                                dt = datetime.time(int(round(h)),int(round(m)),0)
+                                ws['H{0}'.format(c)] = dt
+                                ws['H{0}'.format(c)].number_format = 'H:MM'
                             if "DROP_temp" in rd and "temp_unit" in rd:
-                                out.write("C;Y" + str(row) + ";X9;K" + str(aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],"C")).replace('.', ',') + "\n"),
+                                ws['I{0}'.format(c)] = aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],aw.qmc.mode)
+                                ws['I{0}'.format(c)].number_format = "0"
                             if "DRY_percent" in rd:
-                                out.write("C;Y" + str(row) + ";X10;K" + str(rd["DRY_percent"]/100.).replace('.', ',') + "\n")
+                                ws['J{0}'.format(c)] = rd["DRY_percent"]/100.
+                                ws['J{0}'.format(c)].number_format = "0.0%"
                             if "MAI_percent" in rd:
-                                out.write("C;Y" + str(row) + ";X11;K" + str(rd["MAI_percent"]/100.).replace('.', ',') + "\n")
+                                ws['K{0}'.format(c)] = rd["MAI_percent"]/100.
+                                ws['K{0}'.format(c)].number_format = "0.0%"
                             if "DEV_percent" in rd:
-                                out.write("C;Y" + str(row) + ";X12;K" + str(rd["DEV_percent"]/100.).replace('.', ',') + "\n")
+                                ws['L{0}'.format(c)] = rd["DEV_percent"]/100.
+                                ws['L{0}'.format(c)].number_format = "0.0%"
                             if "BTa" in rd:
-                                out.write("C;Y" + str(row) + ";X13;K" + str(rd["BTa"]) + "\n")
+                                ws['M{0}'.format(c)] = rd["BTa"]
+                                ws['M{0}'.format(c)].number_format = "0"
                             if w_in > 0 and w_out > 0:
-                                out.write("C;Y" + str(row) + ";X14;K" + str(aw.weight_loss(w_in,w_out)/100.).replace('.', ',') + "\n")
+                                ws['N{0}'.format(c)] = aw.weight_loss(w_in,w_out)/100.
+                                ws['N{0}'.format(c)].number_format = "0.0%"                                
                             if "color" in rd and rd["color"] and rd["color"] > 0:
-                                out.write("C;Y" + str(row) + ";X15;K" + str(rd["color"]).replace('.', ',') + "\n")
+                                ws['O{0}'.format(c)] = rd["color"]
+                                #ws['O{0}'.format(c)].number_format = "0"
                             if "cupping" in rd:
-                                out.write("C;Y" + str(row) + ";X16;K" + str(rd["cupping"]).replace('.', ',') + "\n")
-                            row += 1               
+                                ws['P{0}'.format(c)] = rd["cupping"]
+                                ws['P{0}'.format(c)].number_format = "0.00"          
                         except Exception as e:
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
                             pass
                     # write trailer
-                    if row > 0:
-                        out.write("C;Y" + str(row) + ";X1;K\"" + u(QApplication.translate("HTML Report Template", "AVG", None)) +"\"\n")
-                        out.write("C;Y" + str(row) + ";X4;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X5;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X6;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X7;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X8;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X9;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X10;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X11;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X12;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X13;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X14;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X15;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-                        out.write("C;Y" + str(row) + ";X16;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-
-                    #
-                    out.write("F;P1;C2\n")
-                    out.write("F;P2;C6\n")
-                    out.write("F;P2;C8\n")
-                    out.write("F;W2 2 15\n")
-                    out.write("F;W3 3 20\n")
-                    out.write("F;C4;FF2D\n")
-                    out.write("F;C5;FF1D\n")
-                    out.write("F;C7;FF1D\n")
-                    out.write("F;C9;FF1D\n")
-                    out.write("F;C10;F%1D\n")
-                    out.write("F;C11;F%1D\n")
-                    out.write("F;C12;F%1D\n")
-                    out.write("F;C13;FF0D\n")
-                    out.write("F;C14;F%1D\n")
-                    out.write("F;C15;FF0D\n")
-                    out.write("F;C16;FF2D\n")
-                    out.write("F;SDM4;R" + str(row) + "\n")
-                    out.write("E\n")                     
+                    if c > 1:
+                        ws['A{0}'.format(c+1)] = u(QApplication.translate("HTML Report Template", "AVG", None))
+                        ws['A{0}'.format(c+1)].font = bf 
+                        ws['D{0}'.format(c+1)] = "=AVERAGE(D2:D{0})".format(c)
+                        ws['D{0}'.format(c+1)].font = bf
+                        ws['D{0}'.format(c+1)].number_format = num_format
+                        ws['E{0}'.format(c+1)] = "=AVERAGE(E2:E{0})".format(c)
+                        ws['E{0}'.format(c+1)].font = bf
+                        ws['E{0}'.format(c+1)].number_format = "0"
+                        ws['F{0}'.format(c+1)] = "=AVERAGE(F2:F{0})".format(c)
+                        ws['F{0}'.format(c+1)].font = bf
+                        ws['F{0}'.format(c+1)].number_format = 'H:MM'
+                        ws['G{0}'.format(c+1)] = "=AVERAGE(G2:G{0})".format(c)
+                        ws['G{0}'.format(c+1)].font = bf
+                        ws['G{0}'.format(c+1)].number_format = "0"
+                        ws['H{0}'.format(c+1)] = "=AVERAGE(H2:H{0})".format(c)
+                        ws['H{0}'.format(c+1)].font = bf
+                        ws['H{0}'.format(c+1)].number_format = 'H:MM'
+                        ws['I{0}'.format(c+1)] = "=AVERAGE(I2:I{0})".format(c)
+                        ws['I{0}'.format(c+1)].font = bf
+                        ws['I{0}'.format(c+1)].number_format = "0"
+                        ws['J{0}'.format(c+1)] = "=AVERAGE(J2:J{0})".format(c)
+                        ws['J{0}'.format(c+1)].font = bf
+                        ws['J{0}'.format(c+1)].number_format = "0.0%"
+                        ws['K{0}'.format(c+1)] = "=AVERAGE(K2:K{0})".format(c)
+                        ws['K{0}'.format(c+1)].font = bf
+                        ws['K{0}'.format(c+1)].number_format = "0.0%"
+                        ws['L{0}'.format(c+1)] = "=AVERAGE(L2:L{0})".format(c)
+                        ws['L{0}'.format(c+1)].font = bf
+                        ws['L{0}'.format(c+1)].number_format = "0.0%"
+                        ws['M{0}'.format(c+1)] = "=AVERAGE(M2:M{0})".format(c)
+                        ws['M{0}'.format(c+1)].font = bf
+                        ws['M{0}'.format(c+1)].number_format = "0"
+                        ws['N{0}'.format(c+1)] = "=AVERAGE(N2:N{0})".format(c)
+                        ws['N{0}'.format(c+1)].font = bf
+                        ws['N{0}'.format(c+1)].number_format = "0.0%"   
+                        ws['O{0}'.format(c+1)] = "=AVERAGE(O2:O{0})".format(c)
+                        ws['O{0}'.format(c+1)].font = bf
+                        ws['O{0}'.format(c+1)].number_format = "0"
+                        ws['P{0}'.format(c+1)] = "=AVERAGE(P2:P{0})".format(c)
+                        ws['P{0}'.format(c+1)].font = bf   
+                        ws['P{0}'.format(c+1)].number_format = "0.00"                                      
                     # close file
-                    out.close()
+                    wb.save(filename)
                 except Exception as e:
                     pass
 
+                    
+#    def rankingSYLKReport(self):
+#        # get profile filenames
+#        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+#        if profiles and len(profiles) > 0:
+#            # select file
+#            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.slk")
+#            if filename:
+#                try:
+#                    # open file
+#                    if sys.version < '3':
+#                        out = open(filename, 'wb')
+#                    else:
+#                        out = open(filename, 'w',newline="")
+#                    # write header
+#                    out.write("ID;PArtisan\n")
+#                    out.write("P;PGeneral\n")
+#                    out.write("P;PT.M.JJJJ\ h:mm;;@\n")
+#                    out.write("P;Pm:ss;;@\n")
+#                    out.write("C;Y1;X1;K\"Batch\"\n")
+#                    out.write("C;Y1;X2;K\"Time\"\n")
+#                    out.write("C;Y1;X3;K\"Profile\"\n") 
+#                    out.write("C;Y1;X4;K\"Load\"\n")                    
+#                    out.write("C;Y1;X5;K\"Charge (" + aw.qmc.mode + ")\"\n")
+#                    out.write("C;Y1;X6;K\"FCs\"\n")
+#                    out.write("C;Y1;X7;K\"FCs (" + aw.qmc.mode + ")\"\n")
+#                    out.write("C;Y1;X8;K\"DROP\"\n")
+#                    out.write("C;Y1;X9;K\"DROP (" + aw.qmc.mode + ")\"\n")
+#                    out.write("C;Y1;X10;K\"DRY (%)\"\n")
+#                    out.write("C;Y1;X11;K\"MAI (%)\"\n")
+#                    out.write("C;Y1;X12;K\"DEV (%)\"\n")
+#                    out.write("C;Y1;X13;K\"BTa\"\n")
+#                    out.write("C;Y1;X14;K\"Loss (%)\"\n")
+#                    out.write("C;Y1;X15;K\"Color\"\n")
+#                    out.write("C;Y1;X16;K\"Cup\"\n")
+#                    # write data
+#                    row = 2
+#                    unit = ""
+#                    c = 1
+#                    decimalPoint = QLocale().decimalPoint()
+#                    for p in profiles:
+#                        try:
+#                            raw_data = self.profileProductionData(self.deserialize(p),c)
+#                            c += 1
+#                            rd = self.profileRankingData(self.deserialize(p))
+#                            if unit == "":
+#                                if raw_data["weight"][2] == "g" or raw_data["weight"][2] == "Kg":
+#                                    unit = "Kg"
+#                                else:
+#                                    unit = "lb"
+#                            d = self.productionData2string(raw_data,units=False)
+#                            if "id" in d:
+#                                out.write("C;Y" + str(row) + ";X1;K\"" + s2a(d["id"]) + "\"\n")
+#                            if "datetime" in d:
+#                                # date formats in SYLK don't translate between locales: JJJJ on a German system does not load on an English system, YYYY would
+#                                # therefore we write out the datetime as string
+#                                #out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', decimalPoint) + "\n")
+#                                out.write("C;Y" + str(row) + ";X2;K" + s2a("\"" + QDateTime(d["datetime"]).toString("yyyy-MM-dd hh:mm") + "\"") + "\n")
+#                            if "title" in d:
+#                                out.write("C;Y" + str(row) + ";X3;K\"" + s2a(d["title"]) + "\"\n")
+#                            if "weight" in raw_data:
+#                                w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+#                                w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
+#                                out.write("C;Y" + str(row) + ";X4;K" + str(w_in).replace('.', decimalPoint) + "\n")
+#                            else:
+#                                w_in = 0
+#                                w_out = 0
+#                            if "charge_temp" in rd and "temp_unit" in rd:
+#                                out.write("C;Y" + str(row) + ";X5;K" + str(aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],aw.qmc.mode)).replace('.', decimalPoint) + "\n"),                            
+#                            if "FCs_time" in rd:
+#                                out.write("C;Y" + str(row) + ";X6;K" + str(rd["FCs_time"]/86400.).replace('.', decimalPoint) + "\n")
+#                            if "FCs_temp" in rd and "temp_unit" in rd:
+#                                out.write("C;Y" + str(row) + ";X7;K" + str(aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],aw.qmc.mode)).replace('.', decimalPoint) + "\n"),
+#                            if "DROP_time" in rd:
+#                                out.write("C;Y" + str(row) + ";X8;K" + str(rd["DROP_time"]/86400.).replace('.', decimalPoint) + "\n")
+#                            if "DROP_temp" in rd and "temp_unit" in rd:
+#                                out.write("C;Y" + str(row) + ";X9;K" + str(aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],aw.qmc.mode)).replace('.', decimalPoint) + "\n"),
+#                            if "DRY_percent" in rd:
+#                                out.write("C;Y" + str(row) + ";X10;K" + str(rd["DRY_percent"]/100.).replace('.', decimalPoint) + "\n")
+#                            if "MAI_percent" in rd:
+#                                out.write("C;Y" + str(row) + ";X11;K" + str(rd["MAI_percent"]/100.).replace('.', decimalPoint) + "\n")
+#                            if "DEV_percent" in rd:
+#                                out.write("C;Y" + str(row) + ";X12;K" + str(rd["DEV_percent"]/100.).replace('.', decimalPoint) + "\n")
+#                            if "BTa" in rd:
+#                                out.write("C;Y" + str(row) + ";X13;K" + str(rd["BTa"]) + "\n")
+#                            if w_in > 0 and w_out > 0:
+#                                out.write("C;Y" + str(row) + ";X14;K" + str(aw.weight_loss(w_in,w_out)/100.).replace('.', decimalPoint) + "\n")
+#                            if "color" in rd and rd["color"] and rd["color"] > 0:
+#                                out.write("C;Y" + str(row) + ";X15;K" + str(rd["color"]).replace('.', decimalPoint) + "\n")
+#                            if "cupping" in rd:
+#                                out.write("C;Y" + str(row) + ";X16;K" + str(rd["cupping"]).replace('.', decimalPoint) + "\n")
+#                            row += 1               
+#                        except Exception as e:
+##                            import traceback
+##                            traceback.print_exc(file=sys.stdout)
+#                            pass
+#                    # write trailer
+#                    if row > 0:
+#                        out.write("C;Y" + str(row) + ";X1;K\"" + u(QApplication.translate("HTML Report Template", "AVG", None)) +"\"\n")
+#                        out.write("C;Y" + str(row) + ";X4;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X5;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X6;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X7;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X8;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X9;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X10;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X11;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X12;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X13;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X14;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X15;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#                        out.write("C;Y" + str(row) + ";X16;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
+#
+#                    #
+#                    # date formats in SYLK don't translate between locales: JJJJ on a German system does not load on an English system, YYYY would
+#                    # therefore we write out the datetime as string
+#                    #out.write("F;P1;C2\n")
+#                    out.write("F;P2;C6\n")
+#                    out.write("F;P2;C8\n")
+#                    out.write("F;W2 2 15\n")
+#                    out.write("F;W3 3 20\n")
+#                    out.write("F;C4;FF2D\n")
+#                    out.write("F;C5;FF1D\n")
+#                    out.write("F;C7;FF1D\n")
+#                    out.write("F;C9;FF1D\n")
+#                    out.write("F;C10;F%1D\n")
+#                    out.write("F;C11;F%1D\n")
+#                    out.write("F;C12;F%1D\n")
+#                    out.write("F;C13;FF0D\n")
+#                    out.write("F;C14;F%1D\n")
+#                    out.write("F;C15;FF0D\n")
+#                    out.write("F;C16;FF2D\n")
+#                    out.write("F;SDM4;R" + str(row) + "\n")
+#                    out.write("E\n")                     
+#                    # close file
+#                    out.close()
+#                except Exception as e:
+#                    pass
+#
     def htmlReport(self):
         try:
             rcParams['path.effects'] = []
@@ -16858,7 +17145,7 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(html)):
                     f.write(html[i])
                 f.close()
-                full_path = "file:///" + filename
+                full_path = "file://" + filename
                 QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
                 
             except IOError as e:
@@ -30218,7 +30505,7 @@ class designerconfigDlg(ArtisanDialog):
                 et = float(str(self.Edit5et.text()))
             aw.qmc.currentx = timez 
             aw.qmc.currenty = bt
-            newindex = aw.qmc.addpoint(manual=False)
+            newindex = aw.qmc.addpoint(0,manual=False)
             aw.qmc.timeindex[idi] = newindex
             aw.qmc.temp2[aw.qmc.timeindex[idi]] = bt
             aw.qmc.temp1[aw.qmc.timeindex[idi]] = et
@@ -31124,6 +31411,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         #BTlcd
         self.BTlcd = QCheckBox(QApplication.translate("CheckBox", "BT",None))
         self.BTlcd.setChecked(aw.qmc.BTlcd)
+        #swaplcd
+        self.swaplcds = QCheckBox(QApplication.translate("CheckBox", "Swap",None))
+        self.swaplcds.setChecked(aw.qmc.swaplcds)
         self.curveHBox = QHBoxLayout()
         self.curveHBox.setContentsMargins(10,5,10,5)
         self.curveHBox.setSpacing(5)
@@ -31140,6 +31430,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.lcdHBox.addSpacing(10)
         self.lcdHBox.addWidget(self.BTlcd)
         self.lcdHBox.addStretch()
+        self.lcdHBox.addWidget(self.swaplcds)
         self.lcds = QGroupBox(QApplication.translate("GroupBox","LCDs",None))
         self.lcds.setLayout(self.lcdHBox)
         self.curveBox = QHBoxLayout()
@@ -32628,6 +32919,16 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.BTcurve = self.BTcurve.isChecked()
             aw.qmc.ETlcd = self.ETlcd.isChecked()
             aw.qmc.BTlcd = self.BTlcd.isChecked()
+            
+            swap = self.swaplcds.isChecked()            
+            # swap BT/ET lcds on startup
+            if aw.qmc.swaplcds != swap:
+                tmp = QWidget()
+                tmp.setLayout(aw.LCD2frame.layout())
+                aw.LCD2frame.setLayout(aw.LCD3frame.layout())
+                aw.LCD3frame.setLayout(tmp.layout())        
+            aw.qmc.swaplcds = swap
+            
             # Phidget configurations
             for i in range(4):
                 aw.qmc.phidget1048_types[i] = self.probeTypeCombos[i].currentIndex()+1
@@ -39063,6 +39364,13 @@ def main():
         pass
 
     aw.settingsLoad()
+    
+    # swap BT/ET lcds on startup
+    if aw.qmc.swaplcds:
+        tmp = QWidget()
+        tmp.setLayout(aw.LCD2frame.layout())
+        aw.LCD2frame.setLayout(aw.LCD3frame.layout())
+        aw.LCD3frame.setLayout(tmp.layout())
 
     try:
         if sys.argv and len(sys.argv) > 1:
