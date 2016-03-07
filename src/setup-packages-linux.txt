@@ -22,10 +22,17 @@ o gevent-websocket-0.9.5
 o python-qrcode 5.1
 o pip 7.1.0
 o Phidgets 2.1.8 7/2013
+o openpyxl 2.3.3
+
+CHECK FOR UPDATES
+# pip install pip-review
+# pip-review --local --interactive
 
 
 Upgrade History:
 
+- 2016-03-07
+ . openpyxl 2.3.3
 - 2016-02-26
  . python 2.7.10 => 2.7.11
  . numpy 1.9.2 => 1.10.4

@@ -24,6 +24,7 @@ o geventwebsocket 0.9.5
 o python-qrcode 5.1
 o win_inet_pton 1.0.1
 o python-qrcode 5.2.2
+o openpyxl 2.3.3
 
 
 CHECK FOR UPDATES
@@ -33,6 +34,8 @@ CHECK FOR UPDATES
 
 Upgrade History:
 
+- 2016-03-07
+ . openpyxl 2.3.3
 - 2016-02-24
  . scipy 0.15.1 => 0.16.1
  . gevent 1.0.1 => 1.0.2
@@ -256,3 +259,7 @@ https://github.com/lincolnloop/python-qrcode
 
 # python setup.py build
 # sudo python setup.py install
+
+22)
+
+# pip install openpyxl

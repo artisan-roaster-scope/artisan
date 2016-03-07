@@ -15890,7 +15890,10 @@ class ApplicationWindow(QMainWindow):
                     for i in range(len(html)):
                         f.write(html[i])
                     f.close()
-                    full_path = "file://" + filename
+                    if platf == 'Darwin':
+                        full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
+                    else:
+                        full_path = "file:///" + filename # Explorer refuses to start otherwise
                     QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
                     
                 except IOError as e:
@@ -16501,12 +16504,12 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
                 
             
-            
+            weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb"] else '{0:.0f}')
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                 resources = u(self.getResourcePath()),
                 title = u(QApplication.translate("HTML Report Template", "Roast Ranking", None)),
                 entries = entries,
-                charges_avg = ('{0:.2f}'.format(charges / charges_count) + aw.qmc.weight[2].lower() if charges_count > 0 and charges > 0 else ""),
+                charges_avg = (weight_fmt.format(charges / charges_count) + aw.qmc.weight[2].lower() if charges_count > 0 and charges > 0 else ""),
                 charges_temp_avg = ('{0:.0f}'.format(charges_temp / charges_temp_count) + aw.qmc.mode if charges_temp > 0 and charges_temp_count > 0 else ""),
                 FCs_time_avg = (self.eventtime2string(FCs_time / FCs_time_count) if FCs_time > 0 and FCs_time_count > 0 else ""),
                 FCs_temp_avg = ('{0:.0f}'.format(FCs_temp / FCs_temp_count) + aw.qmc.mode if FCs_temp > 0 and FCs_temp_count > 0 else ""),
@@ -16533,7 +16536,10 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(html)):
                     f.write(html[i])
                 f.close()
-                full_path = "file://" + filename
+                if platf == 'Darwin':
+                    full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
+                else:
+                    full_path = "file:///" + filename # Explorer refuses to start otherwise
                 QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
                 
             except IOError as e:
@@ -17145,7 +17151,10 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(html)):
                     f.write(html[i])
                 f.close()
-                full_path = "file://" + filename
+                if platf == 'Darwin':
+                    full_path = "file://" + filename # Safari refuses to load the javascript lib (sorttable) otherwise
+                else:
+                    full_path = "file:///" + filename # Explorer refuses to start otherwise
                 QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
                 
             except IOError as e:
