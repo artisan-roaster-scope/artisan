@@ -6551,6 +6551,7 @@ class tgraphcanvas(FigureCanvas):
                 obj["timex"] = self.timex
                 obj["temp1"] = self.temp1
                 obj["temp2"] = self.temp2
+                obj["timeindex"] = self.timeindex
                 f = codecs.open(u(filename), 'w+', encoding='utf-8')
                 f.write(repr(obj))
                 f.close()
@@ -6573,6 +6574,7 @@ class tgraphcanvas(FigureCanvas):
                 self.timex = obj["timex"]
                 self.temp1 = obj["temp1"]
                 self.temp2 = obj["temp2"]
+                self.timeindex = obj["timeindex"]
                 self.xaxistosm(redraw=False)
                 self.redrawdesigner()
                 aw.sendmessage(QApplication.translate("Message","Points loaded", None))
@@ -15705,7 +15707,7 @@ class ApplicationWindow(QMainWindow):
         date = data["roastdate"].date()
         time = data["roastdate"].time()
         if date:
-            res["date"] = u(date.toString("yyyy-MM-dd")) # Qt.SystemLocaleShortDate, Qt.ISODate
+            res["time"] = u(date.toString("yyyy-MM-dd")) # Qt.SystemLocaleShortDate, Qt.ISODate
         if time:
             res["time"] += u(" " + time.toString("HH:mm")) # Qt.SystemLocaleShortDate, Qt.ISODate
         # beans
