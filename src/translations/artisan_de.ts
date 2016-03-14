@@ -2591,7 +2591,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="15934"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="16700"/>
@@ -4039,12 +4039,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="35027"/>
         <source>Ramp Soak HH:MM&lt;BR&gt;(1-4)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="35032"/>
         <source>Ramp Soak HH:MM&lt;BR&gt;(5-8)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="30662"/>

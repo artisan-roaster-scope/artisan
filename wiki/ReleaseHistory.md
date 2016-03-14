@@ -3,7 +3,7 @@ Detailed Release History
 
 
 ----
-v0.9.9 (xx.xx.2016)
+v0.9.9 (14.03.2016)
 ------------------
 
  * New Features

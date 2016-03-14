@@ -16,7 +16,7 @@ Developers: <https://lists.mokelbu.de/listinfo/artisan-devel>
 
 FEATURES
 
-o runs on Windows, Mac OS X 10.7 on Intel 64bit processor, and Linux
+o runs on Windows, Mac OS X (>=10.7) on Intel 64bit processor, and Linux
 (on OS X 10.8 Mountain Lion and later you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
@@ -68,6 +68,8 @@ o color input from color meters
 o LargeLCDs and WebLCDs
 o volume calculator
 o batch counter
+o roast, production (for tax reporting) and ranking reports
+o PID-based roast reproduction (follow background mode)
 
 
 INSTALLATION
@@ -159,9 +161,9 @@ Artisan uses the following libraries in unmodified forms:
   http://qt-project.org/products/licensing
 - Numpy 1.9.x and Scipy 0.14.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
-- PyQt 4.11.x and SIP 4.16.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
+- PyQt 5.x and SIP 4.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
-- matplotlib 1.4.x, Copyright (c) 2002-2013 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
+- matplotlib 1.5.x, Copyright (c) 2002-2015 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
   http://matplotlib.sourceforge.net
 - py2app 0.9.x under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
   Copyright (c) 2010-2012 Ronald Oussoren <ronaldoussoren at mac.com>.
@@ -169,13 +171,19 @@ Artisan uses the following libraries in unmodified forms:
 - py2exe, Copyright (c) 2000-2005 Thomas Heller, Mark Hammond, Jimmy Retzlaff
   http://www.py2exe.org/
 - bbfreeze, Copyright (c) 2007-2012 brainbot technologies AG. Distributed under the zlib/libpng license.
-- minimalmodbus 0.6 under the Apache License, Version 2.0 by Jonas Berg
-- pymodbus 1.2.x under the BSD License by Galen Collins
+- pymodbus 1.3.x under the BSD License by Galen Collins
 - arabic_reshaper.py under GPL by Abd Allah Diab (Mpcabd)
 
 
 
 VERSION HISTORY
+
+v0.9.9 (14.3.2016)
+ - adds batch and ranking reports as well as batch conversions
+ - adds follow-background for Fuji PIDs
+ - adds additional keyboard short cuts
+ - designer improvements
+ - bug fixes
 
 v0.9.8 (18.10.2015)
  - US weight and volume units
