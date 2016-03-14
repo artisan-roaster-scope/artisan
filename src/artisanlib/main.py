@@ -1905,7 +1905,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.ax.set_xlim(xlim_new)
                         aw.qmc.ax.set_ylim(ylim_new)
                         two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag)))
-                        if two_ax_mode:
+                        if two_ax_mode and aw.qmc.delta_ax:
                             zlim = aw.qmc.delta_ax.set_ylim()
                             zlim_offset = (zlim[1] - zlim[0]) / 2.
                             btd = (self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,bt))[1]))[1])                            
@@ -2908,8 +2908,10 @@ class tgraphcanvas(FigureCanvas):
                 label.set_rotation(self.xrotation)
                 
         if not aw.qmc.LCDdecimalplaces:
-            self.ax.minorticks_off()
-            self.delta_ax.minorticks_off()
+            if self.ax:
+                self.ax.minorticks_off()
+            if self.delta_ax:
+                self.delta_ax.minorticks_off()
                     
         # we have to update the canvas cache
         if redraw:
@@ -3847,15 +3849,16 @@ class tgraphcanvas(FigureCanvas):
 #                            self.delta2B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2B]
                         
                         ##### DeltaETB,DeltaBTB curves
-                        trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
-                        if self.DeltaETBflag and len(self.timeB) == len(self.delta2B):
-                            self.l_delta1B, = self.ax.plot(self.timeB, self.delta1B,transform=trans,markersize=self.ETBdeltamarkersize,
-                            sketch_params=None,path_effects=[],
-                            marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None)))
-                        if self.DeltaBTBflag and len(self.timeB) == len(self.delta2B):
-                            self.l_delta2B, = self.ax.plot(self.timeB, self.delta2B,transform=trans,markersize=self.BTBdeltamarkersize,
-                            sketch_params=None,path_effects=[],
-                            marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
+                        if self.delta_ax:
+                            trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
+                            if self.DeltaETBflag and len(self.timeB) == len(self.delta2B):
+                                self.l_delta1B, = self.ax.plot(self.timeB, self.delta1B,transform=trans,markersize=self.ETBdeltamarkersize,
+                                sketch_params=None,path_effects=[],
+                                marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None)))
+                            if self.DeltaBTBflag and len(self.timeB) == len(self.delta2B):
+                                self.l_delta2B, = self.ax.plot(self.timeB, self.delta2B,transform=trans,markersize=self.BTBdeltamarkersize,
+                                sketch_params=None,path_effects=[],
+                                marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None)))
     
                     #check backgroundevents flag
                     if self.backgroundeventsflag:
@@ -4155,16 +4158,16 @@ class tgraphcanvas(FigureCanvas):
                         self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
                         
                     ##### DeltaET,DeltaBT curves
-
-                    trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
-                    if self.DeltaETflag:
-                        self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                        linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
-                    if self.DeltaBTflag:           
-                        self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                        linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))    
+                    if self.delta_ax:
+                        trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
+                        if self.DeltaETflag:
+                            self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                            linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
+                        if self.DeltaBTflag:           
+                            self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                            linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))    
     
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
@@ -4285,7 +4288,7 @@ class tgraphcanvas(FigureCanvas):
                     label.set_color(self.palette["xlabel"])
                 for label in self.ax.yaxis.get_ticklabels():
                     label.set_color(self.palette["ylabel"])
-                if two_ax_mode:
+                if two_ax_mode and self.delta_ax:
                     for label in self.delta_ax.yaxis.get_ticklabels():
                         label.set_color(self.palette["ylabel"])
     
@@ -6256,7 +6259,7 @@ class tgraphcanvas(FigureCanvas):
                 pad = max(0,len(self.timex) - startindex - len(x))
                 xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
 #                aw.qmc.resetlines()
-                if False: # deltacurvep:
+                if False: # deltacurvep and self.delta_ax:
                     self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 else:
                     self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
@@ -6997,7 +7000,7 @@ class tgraphcanvas(FigureCanvas):
                 offset = 0
                 if self.timeindex[0] > -1:
                     offset = self.timex[self.timeindex[0]]
-                dlg = pointDlg(x=self.currentx-offset,y=self.currenty)
+                dlg = pointDlg(parent=self,x=self.currentx-offset,y=self.currenty)
                 if dlg.exec_():
                     self.currentx = dlg.getX() + offset
                     self.currenty = dlg.getY()
@@ -7688,7 +7691,7 @@ class tgraphcanvas(FigureCanvas):
         elif event.inaxes == self.delta_ax:
             x = event.xdata 
             y = event.ydata
-            if x and y:
+            if x and y and self.delta_ax:
                 if self.l_horizontalcrossline == None:
                     self.l_horizontalcrossline, = self.delta_ax.plot([self.startofx,self.endofx*2], [y,y], color = self.palette["text"], linestyle = '-', linewidth = .5, alpha = 1.0,sketch_params=None,path_effects=[])
                 else:
@@ -7783,7 +7786,7 @@ class VMToolbar(NavigationToolbar):
                 aw.qmc.ax.set_ylabel(aw.qmc.mode)
                 aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None)))
                 two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
-                if two_ax_mode:
+                if two_ax_mode and aw.qmc.delta_ax:
                     aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
             for axes in allaxes:
                 title = axes.get_title()
@@ -8060,9 +8063,14 @@ class SampleThread(QThread):
                             # place the second ET/BT sampling in the middle of the sampling interval
                             libtime.sleep((sampling_interval / 2.0) - gone)
                             tx_2,t1_2,t2_2 = self.sample_main_device()
-                            tx = tx + (tx_2 - tx) / 2.0
-                            t2 = (t2 + t2_2) / 2.0
-                            t1 = (t1 + t1_2) / 2.0
+                            if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
+                                tx = tx + (tx_2 - tx) / 2.0
+                                t2 = (t2 + t2_2) / 2.0
+                                t1 = (t1 + t1_2) / 2.0
+                            elif t1 == -1 or t2 == -1:
+                                t1 = t1_2
+                                t2 = t2_2
+                                tx = tx_2 
                     ####### all values retrieved                
 
                     if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
@@ -10165,8 +10173,8 @@ class ApplicationWindow(QMainWindow):
                 # no DROP event registered
                 return None, None
         except Exception:
-            import traceback
-            traceback.print_exc(file=sys.stdout)        
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)        
             return None, None
             
     def setLCDsDigitCount(self,n):
@@ -15866,11 +15874,11 @@ class ApplicationWindow(QMainWindow):
                     title = u(QApplication.translate("HTML Report Template", "Roast Batches", None)),
                     entries = entries,
                     total_in = ('{0:.2f}'.format(total_in) if unit in ["Kg","lb"] else '{0:.0f}'.format(total_in)),
-                    total_out = ('{0:.2f}'.format(total_out) if unit in ["Kg","lb"] else '{0:.0f}'.format(total_in)),
+                    total_out = ('{0:.2f}'.format(total_out) if unit in ["Kg","lb"] else '{0:.0f}'.format(total_out)),
                     total_loss = '{0:.1f}'.format(aw.weight_loss(total_in,total_out)),
                     resources = u(self.getResourcePath()),
                     batch = u(QApplication.translate("HTML Report Template", "Batch", None)),
-                    time = u(QApplication.translate("HTML Report Template", "Time", None)),
+                    time = u(QApplication.translate("HTML Report Template", "Date", None)),
                     profile = u(QApplication.translate("HTML Report Template", "Profile", None)),
                     beans = u(QApplication.translate("HTML Report Template", "Beans", None)),
                     weightin = u(QApplication.translate("HTML Report Template", "In", None)),
@@ -16333,7 +16341,8 @@ class ApplicationWindow(QMainWindow):
             # clear graph
             self.qmc.reset()
 #            self.qmc.ax.lines = []
-#            self.qmc.delta_ax.lines = []
+#            if self.qmc.delta_ax:
+#                self.qmc.delta_ax.lines = []
 #            # erase annotations
 #            # erase statistics
             min_start_time = aw.qmc.startofx
@@ -16423,7 +16432,7 @@ class ApplicationWindow(QMainWindow):
                                 linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
                         handles.append(self.l_temp)
                         labels.append(label)
-                        if self.qmc.DeltaBTflag:
+                        if self.qmc.DeltaBTflag and self.qmc.delta_ax:
                             tx = numpy.array(timex)
                             tx_roast = numpy.array(timex[charge:drop]) # just the part from CHARGE TO DROP
                             with numpy.errstate(divide='ignore'):
@@ -18923,7 +18932,17 @@ class ApplicationWindow(QMainWindow):
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None):
         super(ArtisanDialog,self).__init__(parent)
-
+        #self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        windowFlags = self.windowFlags()
+        #windowFlags &= ~Qt.WindowContextHelpButtonHint # remove help button
+        #windowFlags &= ~Qt.WindowMaximizeButtonHint # remove maximise button
+        #windowFlags &= ~Qt.WindowMinMaxButtonsHint  # remove min/max combo
+        #windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
+        windowFlags |= Qt.WindowSystemMenuHint  # Adds a window system menu, and possibly a close button
+        windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
+        self.setWindowFlags(windowFlags)
+    
+                              
     def keyPressEvent(self,event):
         key = int(event.key())
         #uncomment next line to find the integer value of a key
@@ -21089,138 +21108,144 @@ class equDataDlg(ArtisanDialog):
         self.createDataTable()        
 
     def createDataTable(self):
-        self.datatable.clear()
-        ndata = len(aw.qmc.timex)
-        self.datatable.setRowCount(ndata)
-        
-        mm = "" 
-        for i in range(len(aw.qmc.plotterequationresults)):
-            if len(aw.qmc.plotterequationresults[i]):
-                mm += "P"+str(i+1)+" "
-                ite = len(aw.qmc.plotterequationresults[i])
-        if not mm:
-            self.datalabel.setText(QApplication.translate("Label","No plotter data found.",None))
-        else:
-            self.datalabel.setText(mm)
-                            
-
-        columns = [ QApplication.translate("Table", "t",None),
-                    QApplication.translate("Table", "Time",None),
-                    QApplication.translate("Table", "P1",None),
-                    QApplication.translate("Table", "P2",None),
-                    QApplication.translate("Table", "P3",None),
-                    QApplication.translate("Table", "P4",None),
-                    QApplication.translate("Table", "P5",None),
-                    QApplication.translate("Table", "P6",None),
-                    QApplication.translate("Table", "P7",None),
-                    QApplication.translate("Table", "P8",None),
-                    QApplication.translate("Table", "P9",None),
-                    ""]
-
-        self.datatable.setColumnCount(len(columns))
-        self.datatable.setHorizontalHeaderLabels(columns)
-        self.datatable.setAlternatingRowColors(True)
-        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
-        self.datatable.setShowGrid(True)
-        if pyqtversion < 5:
-            self.datatable.verticalHeader().setResizeMode(2)
-        else:
-            self.datatable.verticalHeader().setSectionResizeMode(2)
-        
-        for i in range(ndata): 
-
-            t = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.timex[i])
-            t.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+        try:
+            self.datatable.clear()
+            ndata = len(aw.qmc.timex)
+            self.datatable.setRowCount(ndata)
             
-            time = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
-            time.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-
-            if len(aw.qmc.plotterequationresults[0]) and len(aw.qmc.plotterequationresults[0]) > i:
-                P1 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[0][i])
+            mm = "" 
+            for i in range(len(aw.qmc.plotterequationresults)):
+                if len(aw.qmc.plotterequationresults[i]):
+                    mm += "P"+str(i+1)+" "
+                    ite = len(aw.qmc.plotterequationresults[i])
+            if not mm:
+                self.datalabel.setText(QApplication.translate("Label","No plotter data found.",None))
             else:
-                P1 = QTableWidgetItem("NA")
-                P1.setBackground(QColor('lightgrey'))
-            if len(aw.qmc.plotterequationresults[1]) and len(aw.qmc.plotterequationresults[1]) > i:
-                P2 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[1][i])
-            else:
-                P2 = QTableWidgetItem("NA")
-                P2.setBackground(QColor('lightgrey'))
-            if len(aw.qmc.plotterequationresults[2]) and len(aw.qmc.plotterequationresults[2]) > i:
-                P3 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[2][i])
-            else:
-                P3 = QTableWidgetItem("NA")
-                P3.setBackground(QColor('lightgrey'))
-            if len(aw.qmc.plotterequationresults[3]) and len(aw.qmc.plotterequationresults[3]) > i:
-                P4 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[3][i])
-            else:
-                P4 = QTableWidgetItem("NA")
-                P4.setBackground(QColor('lightgrey'))
-            if len(aw.qmc.plotterequationresults[4]) and len(aw.qmc.plotterequationresults[4]) > i:
-                P5 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[4][i])
-            else:
-                P5 = QTableWidgetItem("NA")
-                P5.setBackground(QColor('lightgrey'))
-            if len(aw.qmc.plotterequationresults[5]) and len(aw.qmc.plotterequationresults[5]) > i:
-                P6 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[5][i])
-            else:
-                P6 = QTableWidgetItem("NA")
-                P6.setBackground(QColor('lightgrey'))
-            if len(aw.qmc.plotterequationresults[6]) and len(aw.qmc.plotterequationresults[6]) > i:
-                P7 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[6][i])
-            else:
-                P7 = QTableWidgetItem("NA")
-                P7.setBackground(QColor('lightgrey'))
-            if len(aw.qmc.plotterequationresults[7]) and len(aw.qmc.plotterequationresults[7]) > i:
-                P8 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[7][i])
-            else:
-                P8 = QTableWidgetItem("NA")
-                P8.setBackground(QColor('lightgrey'))
-            if len(aw.qmc.plotterequationresults[8]) and len(aw.qmc.plotterequationresults[8]) > i:
-                P9 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[8][i])
-            else:
-                P9 = QTableWidgetItem("NA")
-                P9.setBackground(QColor('lightgrey'))
+                self.datalabel.setText(mm)
                                 
-            P1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            P2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            P3.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            P4.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            P5.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            P6.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            P7.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            P8.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-            P9.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-
-            self.datatable.setItem(i,0,t)
-            self.datatable.setItem(i,1,time)
-            self.datatable.setItem(i,2,P1)
-            self.datatable.setItem(i,3,P2)
-            self.datatable.setItem(i,4,P3)
-            self.datatable.setItem(i,5,P4)
-            self.datatable.setItem(i,6,P5)
-            self.datatable.setItem(i,7,P6)
-            self.datatable.setItem(i,8,P7)
-            self.datatable.setItem(i,9,P8)
-            self.datatable.setItem(i,10,P9)
-
-        header = self.datatable.horizontalHeader()
-        if pyqtversion < 5:
-            header.setResizeMode(0, QHeaderView.Fixed)
-            header.setResizeMode(1, QHeaderView.Fixed)
-            header.setResizeMode(2, QHeaderView.Fixed)
-            header.setResizeMode(3, QHeaderView.Fixed)
-            header.setResizeMode(4, QHeaderView.Fixed)
-            header.setResizeMode(len(columns) - 1, QHeaderView.Stretch)
-        else:
-            header.setSectionResizeMode(0, QHeaderView.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.Fixed)
-            header.setSectionResizeMode(2, QHeaderView.Fixed)
-            header.setSectionResizeMode(3, QHeaderView.Fixed)
-            header.setSectionResizeMode(4, QHeaderView.Fixed)
-            header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
-        self.datatable.resizeColumnsToContents()
+    
+            columns = [ QApplication.translate("Table", "t",None),
+                        QApplication.translate("Table", "Time",None),
+                        QApplication.translate("Table", "P1",None),
+                        QApplication.translate("Table", "P2",None),
+                        QApplication.translate("Table", "P3",None),
+                        QApplication.translate("Table", "P4",None),
+                        QApplication.translate("Table", "P5",None),
+                        QApplication.translate("Table", "P6",None),
+                        QApplication.translate("Table", "P7",None),
+                        QApplication.translate("Table", "P8",None),
+                        QApplication.translate("Table", "P9",None),
+                        ""]
+    
+            self.datatable.setColumnCount(len(columns))
+            self.datatable.setHorizontalHeaderLabels(columns)
+            self.datatable.setAlternatingRowColors(True)
+            self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+            self.datatable.setShowGrid(True)
+            if pyqtversion < 5:
+                self.datatable.verticalHeader().setResizeMode(2)
+            else:
+                self.datatable.verticalHeader().setSectionResizeMode(2)
+            
+            for i in range(ndata): 
+    
+                t = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.timex[i])
+                t.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                
+                time = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
+                time.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+    
+                if len(aw.qmc.plotterequationresults[0]) and len(aw.qmc.plotterequationresults[0]) > i:
+                    P1 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[0][i])
+                else:
+                    P1 = QTableWidgetItem("NA")
+                    P1.setBackground(QColor('lightgrey'))
+                if len(aw.qmc.plotterequationresults[1]) and len(aw.qmc.plotterequationresults[1]) > i:
+                    P2 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[1][i])
+                else:
+                    P2 = QTableWidgetItem("NA")
+                    P2.setBackground(QColor('lightgrey'))
+                if len(aw.qmc.plotterequationresults[2]) and len(aw.qmc.plotterequationresults[2]) > i:
+                    P3 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[2][i])
+                else:
+                    P3 = QTableWidgetItem("NA")
+                    P3.setBackground(QColor('lightgrey'))
+                if len(aw.qmc.plotterequationresults[3]) and len(aw.qmc.plotterequationresults[3]) > i:
+                    P4 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[3][i])
+                else:
+                    P4 = QTableWidgetItem("NA")
+                    P4.setBackground(QColor('lightgrey'))
+                if len(aw.qmc.plotterequationresults[4]) and len(aw.qmc.plotterequationresults[4]) > i:
+                    P5 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[4][i])
+                else:
+                    P5 = QTableWidgetItem("NA")
+                    P5.setBackground(QColor('lightgrey'))
+                if len(aw.qmc.plotterequationresults[5]) and len(aw.qmc.plotterequationresults[5]) > i:
+                    P6 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[5][i])
+                else:
+                    P6 = QTableWidgetItem("NA")
+                    P6.setBackground(QColor('lightgrey'))
+                if len(aw.qmc.plotterequationresults[6]) and len(aw.qmc.plotterequationresults[6]) > i:
+                    P7 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[6][i])
+                else:
+                    P7 = QTableWidgetItem("NA")
+                    P7.setBackground(QColor('lightgrey'))
+                if len(aw.qmc.plotterequationresults[7]) and len(aw.qmc.plotterequationresults[7]) > i:
+                    P8 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[7][i])
+                else:
+                    P8 = QTableWidgetItem("NA")
+                    P8.setBackground(QColor('lightgrey'))
+                if len(aw.qmc.plotterequationresults[8]) and len(aw.qmc.plotterequationresults[8]) > i:
+                    P9 = QTableWidgetItem(self.dataprecision[self.dataprecisionval]%aw.qmc.plotterequationresults[8][i])
+                else:
+                    P9 = QTableWidgetItem("NA")
+                    P9.setBackground(QColor('lightgrey'))
+                                    
+                P1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                P2.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                P3.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                P4.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                P5.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                P6.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                P7.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                P8.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                P9.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+    
+                self.datatable.setItem(i,0,t)
+                self.datatable.setItem(i,1,time)
+                self.datatable.setItem(i,2,P1)
+                self.datatable.setItem(i,3,P2)
+                self.datatable.setItem(i,4,P3)
+                self.datatable.setItem(i,5,P4)
+                self.datatable.setItem(i,6,P5)
+                self.datatable.setItem(i,7,P6)
+                self.datatable.setItem(i,8,P7)
+                self.datatable.setItem(i,9,P8)
+                self.datatable.setItem(i,10,P9)
+    
+            header = self.datatable.horizontalHeader()
+            if pyqtversion < 5:
+                header.setResizeMode(0, QHeaderView.Fixed)
+                header.setResizeMode(1, QHeaderView.Fixed)
+                header.setResizeMode(2, QHeaderView.Fixed)
+                header.setResizeMode(3, QHeaderView.Fixed)
+                header.setResizeMode(4, QHeaderView.Fixed)
+                header.setResizeMode(len(columns) - 1, QHeaderView.Stretch)
+            else:
+                header.setSectionResizeMode(0, QHeaderView.Fixed)
+                header.setSectionResizeMode(1, QHeaderView.Fixed)
+                header.setSectionResizeMode(2, QHeaderView.Fixed)
+                header.setSectionResizeMode(3, QHeaderView.Fixed)
+                header.setSectionResizeMode(4, QHeaderView.Fixed)
+                header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
+            self.datatable.resizeColumnsToContents()
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            pass
+            
 
 ########################################################################################
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
@@ -21522,8 +21547,8 @@ class editGraphDlg(ArtisanDialog):
         bean_density_per_label = QLabel(QApplication.translate("Label", "per",None))
         self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
         self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
-        self.bean_density_volume_edit.setMinimumWidth(70)
-        self.bean_density_volume_edit.setMaximumWidth(70)
+        self.bean_density_volume_edit.setMinimumWidth(60)
+        self.bean_density_volume_edit.setMaximumWidth(60)
         self.bean_density_volume_edit.setAlignment(Qt.AlignRight)
         self.bean_density_volumeUnitsComboBox = QComboBox()
         self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
@@ -21545,7 +21570,7 @@ class editGraphDlg(ArtisanDialog):
         volumeCalcButton.setFocusPolicy(Qt.NoFocus)
         
         #bean size
-        bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Bean Size",None)) + "</b>")
+        bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Size",None)) + "</b>")
         self.bean_size_edit = QLineEdit(str(aw.qmc.beansize))
         self.bean_size_edit.setValidator(QDoubleValidator(0., 10., 1,self.bean_density_weight_edit))
         self.bean_size_edit.setMinimumWidth(45)
@@ -22638,7 +22663,7 @@ class editGraphDlg(ArtisanDialog):
             weight = float(str(self.bean_density_weight_edit.text()))
             volume = aw.convertVolume(volume,self.bean_density_volumeUnitsComboBox.currentIndex(),0)
             weight = aw.convertWeight(weight,self.bean_density_weightUnitsComboBox.currentIndex(),0)            
-            self.standarddensitylabel.setText(QApplication.translate("Label","({0} g/l)", None).format(aw.float2float(weight / volume,2)))
+            self.standarddensitylabel.setText(QApplication.translate("Label","({0}g/l)", None).format(aw.float2float(weight / volume,0)))
         else:
             self.standarddensitylabel.setText("")
 
@@ -27082,6 +27107,7 @@ class modbusport(object):
             self.connect()
             self.master.write_coils(int(register),list(values),unit=int(slave))
         except Exception as ex:
+            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
@@ -27098,6 +27124,7 @@ class modbusport(object):
             self.connect()
             self.master.write_coil(int(register),value,unit=int(slave))
         except Exception as ex:
+            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoil() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -27124,6 +27151,7 @@ class modbusport(object):
             self.connect()
             self.master.write_register(int(register),int(value),unit=int(slave))
         except Exception as ex:
+            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -27145,6 +27173,7 @@ class modbusport(object):
             payload = builder.build() # .tolist()
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
         except Exception as ex:
+            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -27169,6 +27198,7 @@ class modbusport(object):
             r = decoder.decode_32bit_float()
             return r
         except Exception as ex:
+            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -27194,6 +27224,7 @@ class modbusport(object):
             r = decoder.decode_16bit_uint()
             return r
         except Exception as ex:
+            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()

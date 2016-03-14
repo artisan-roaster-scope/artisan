@@ -15,7 +15,8 @@ control = False # Hottop under control?
 SP = None
 
 # safety cut-off BT temperature
-BTcutoff = 220 # 220C = 428F
+BTcutoff = 220 # 220C = 428F (was 212C/413F before)
+BTleaveControl = 180 # 180C = 350F; the BT below which the control can be released; above the control cannot be released to avoid sudden stop at high temperatures
 
 xCONTROL = None # False: just logging; True: logging+control
 xBT = None
@@ -90,7 +91,7 @@ def gettemperatures(p,retry=True):
                     if retry: # we retry once
                         return gettemperatures(p,retry=False)
                 else:
-                    #VERSION = hex2int(r[4])
+                    #VERSION = hex2int(r[4]) # => 1 (first released version)
                     HEATER = hex2int(r[10]) # 0-100
                     FAN = hex2int(r[11])
                     MAIN_FAN = hex2int(r[12]) # 0-10
@@ -109,12 +110,20 @@ def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
         aSET_HEATER, aSET_FAN, aSET_MAIN_FAN, aSET_SOLENOID, aSET_DRUM_MOTOR, aSET_COOLING_MOTOR, aCONTROL):
     SP = serial.Serial()
     # configure serial port
-    SP.setPort(comport)
-    SP.setBaudrate(baudrate)
-    SP.setByteSize(bytesize)
-    SP.setParity(parity)
-    SP.setStopbits(stopbits)
-    SP.setTimeout(timeout)
+    if serial.VERSION.split(".")[0].strip() == "2":
+        SP.setPort(comport)
+        SP.setBaudrate(baudrate)
+        SP.setByteSize(bytesize)
+        SP.setParity(parity)
+        SP.setStopbits(stopbits)
+        SP.setTimeout(timeout)
+    else:
+        SP.port = comport
+        SP.baudrate = baudrate
+        SP.bytesize = bytesize
+        SP.parity = parity
+        SP.stopbits = stopbits
+        SP.timeout = timeout    
     while True:
         # logging part
         BT, ET, HEATER, FAN, MAIN_FAN, SOLENOID, DRUM_MOTOR, COOLING_MOTOR, CHAFF_TRAY = gettemperatures(SP)
@@ -147,7 +156,7 @@ def doWork(interval, comport, baudrate, bytesize, parity, stopbits, timeout,
 
         # control part
         if aCONTROL.value:
-            # safety cut at BT=212C (413F)
+            # safety cut at BT=220C/428F (was 212C/413F before)
             if BT >= BTcutoff:
                 # set main fan to maximum (set to 10), turn off heater (set to 0), open solenoid for eject, turn on drum and stirrer (all set to 1)
                 aSET_HEATER.value = 0
@@ -222,7 +231,7 @@ def takeHottopControl():
         return False
     
 def releaseHottopControl():
-    if xCONTROL and xBT.value < BTcutoff:
+    if xCONTROL and xBT.value < BTleaveControl:
         xCONTROL.value = False
         return True
     else:

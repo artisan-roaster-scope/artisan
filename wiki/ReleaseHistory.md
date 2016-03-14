@@ -25,10 +25,13 @@ v0.9.9 (xx.xx.2016)
     * adds switch ET<->BT action
     * adds key shortcut (H key) to load background profile
     * adds a function to call a program on sampling with the temperatures ET, BT, ET-Background, and BT-Background as arguments
-    * adds movable legend
+    * adds draggable legend
+    * adds compatibility to Python3.4, pyserial3.x, Qt5, PyQt5, matplotlib 1.5 on all platforms
+    * adds windows maximizing decoration to all dialogs on Windows and Linux
  * Changes
     * existing extra device mathexpression formulas are no longer changed if extra devices have to be extended on loading a profile
     * deactivates the auto-swap of ET/BT on CSV import (issue #85)
+    * increased Hottop safety BT limit from 212C/413F to 220C/428F
  * Bug Fixes
     * better initial Phidgets attach handling
     * improved RoR calculation
