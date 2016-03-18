@@ -1,4 +1,4 @@
-artisan (0.9.9-1) precise; urgency=low
+artisan (0.9.9-2) precise; urgency=low
   * new upstream release
   * changes since 0.9.8:
    - adds batch and ranking reports as well as batch conversions

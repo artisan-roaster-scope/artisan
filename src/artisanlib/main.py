@@ -14532,7 +14532,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("xgrid"):
                 self.qmc.xgrid = toInt(settings.value("xgrid",self.qmc.xgrid))
                 self.qmc.ygrid = max(10,toInt(settings.value("ygrid",self.qmc.ygrid)))
-                self.qmc.zgrid = max(10,toInt(settings.value("zgrid",self.qmc.zgrid)))
+                self.qmc.zgrid = max(1,toInt(settings.value("zgrid",self.qmc.zgrid)))
                 self.qmc.gridthickness = toInt(settings.value("gridthickness",self.qmc.gridthickness))
                 self.qmc.xrotation = toInt(settings.value("xrotation",self.qmc.xrotation))
                 self.qmc.gridlinestyle = toInt(settings.value("gridlinestyle",self.qmc.gridlinestyle))
@@ -23431,7 +23431,7 @@ class WindowsDlg(ArtisanDialog):
         self.ygridSpinBox.setMaximumWidth(60)
         zgridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.zgridSpinBox = QSpinBox()
-        self.zgridSpinBox.setRange(10,100)
+        self.zgridSpinBox.setRange(1,100)
         self.zgridSpinBox.setSingleStep(5)
         self.zgridSpinBox.setValue(aw.qmc.zgrid)
         self.zgridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)

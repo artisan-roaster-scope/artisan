@@ -242,7 +242,7 @@ for fw in [
             'QtMultimediaWidgets.framework',]:
     for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw):
         for file in files:
-            print('Deleting', file)
+#            print('Deleting', file)
             os.remove(os.path.join(root,file))
 
 
@@ -250,29 +250,29 @@ print('*** Removing unused files ***')
 for root, dirs, files in os.walk('.'):
     for file in files:
         if 'debug' in file:
-            print('Deleting', file)
+#            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif file.startswith('test_'):
-            print('Deleting', file)
+#            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif '_tests' in file:
-            print('Deleting', file)            
+#            print('Deleting', file)            
             os.remove(os.path.join(root,file))               
         elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
-            print('Deleting', file)
+#            print('Deleting', file)
             os.remove(os.path.join(root,file))
         # remove also all .h .in .cpp .cc .html files 
         elif file.endswith('.h') and file != "pyconfig.h":
-            print('Deleting', file)
+#            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif file.endswith('.in'):
-            print('Deleting', file)
+#            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif file.endswith('.cpp'):
-            print('Deleting', file)
+#            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif file.endswith('.cc'):
-            print('Deleting', file)
+#            print('Deleting', file)
             os.remove(os.path.join(root,file))
 # .afm files should not be removed as without matplotlib will fail on startup            
 #        elif file.endswith('.afm'):
@@ -283,7 +283,7 @@ for root, dirs, files in os.walk('.'):
         if 'tests' in dir:
             for r,d,f in os.walk(os.path.join(root,dir)):
                 for fl in f:
-                    print('Deleting', os.path.join(r,fl))
+#                    print('Deleting', os.path.join(r,fl))
                     os.remove(os.path.join(r,fl))                
             
 os.chdir('..')
