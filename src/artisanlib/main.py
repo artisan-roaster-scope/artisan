@@ -6321,7 +6321,7 @@ class tgraphcanvas(FigureCanvas):
                     func = lambda x,a,b,c: a * numpy.log(b*x+c)
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    popt, pcov = curve_fit(func, xa, yn)
+                    popt,_ = curve_fit(func, xa, yn)
                 #perr = numpy.sqrt(numpy.diag(pcov))
                 xb = numpy.array(self.timex)
                 xxb = xb + charge
@@ -8539,6 +8539,7 @@ class ApplicationWindow(QMainWindow):
         self.defaultdpi = 120
         self.dpi = self.defaultdpi
         self.qmc = tgraphcanvas(self.main_widget)
+        self.qmc.fig.set_dpi(self.defaultdpi)
         
         #self.qmc.setAttribute(Qt.WA_NoSystemBackground)
         
@@ -15933,7 +15934,6 @@ class ApplicationWindow(QMainWindow):
                     writer.writerow(["batch","time","profile","beans","in (g)","out (g)"])
                     # write data
                     c = 1
-                    unit = aw.qmc.weight[2]
                     for p in profiles:
                         try:
                             d = self.productionData2string(self.profileProductionData(self.deserialize(p),c),units=False)
@@ -16337,7 +16337,6 @@ class ApplicationWindow(QMainWindow):
             # collect data
             c = 1
             foreground_profile_path = aw.curFile
-            background_profile_path = aw.qmc.backgroundpath
             # clear graph
             self.qmc.reset()
 #            self.qmc.ax.lines = []
@@ -16472,7 +16471,7 @@ class ApplicationWindow(QMainWindow):
                         ncol = int(math.ceil(len(handles)/2.))
                     else:
                         ncol = int(math.ceil(len(handles)))
-                    leg = self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
+                    self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
                             
                     # generate graph
                     self.qmc.fig.canvas.draw()
@@ -19844,7 +19843,7 @@ class HUDDlg(ArtisanDialog):
                     
             if error:
                 string = QApplication.translate("Message","Incompatible variables found in %s"%error, None)
-                reply = QMessageBox.warning(self,QApplication.translate("Message","Assignment problem", None),string,
+                QMessageBox.warning(self,QApplication.translate("Message","Assignment problem", None),string,
                                     QMessageBox.Discard)
                 
             else:
@@ -19899,7 +19898,7 @@ class HUDDlg(ArtisanDialog):
                 
         if error:
             string = QApplication.translate("Message","Incompatible variables found in %s"%error, None)
-            reply = QMessageBox.warning(self,QApplication.translate("Message","Assignment problem", None),string,
+            QMessageBox.warning(self,QApplication.translate("Message","Assignment problem", None),string,
                                 QMessageBox.Discard)
             
         else:
@@ -21117,7 +21116,7 @@ class equDataDlg(ArtisanDialog):
             for i in range(len(aw.qmc.plotterequationresults)):
                 if len(aw.qmc.plotterequationresults[i]):
                     mm += "P"+str(i+1)+" "
-                    ite = len(aw.qmc.plotterequationresults[i])
+                    #ite = len(aw.qmc.plotterequationresults[i])
             if not mm:
                 self.datalabel.setText(QApplication.translate("Label","No plotter data found.",None))
             else:
