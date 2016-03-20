@@ -1623,10 +1623,10 @@ class tgraphcanvas(FigureCanvas):
     def eventsInternal2ExternalValue(self,v):
         if v == None:
             return 0
-        elif v < -1.0:
-            return -(int(round(abs(v)*10)) - 10)
         elif (v <= 1.0) and (v >= -1.0):
             return 0
+        elif v < -1.0:
+            return -(int(round(abs(v)*10)) - 10)
         else:
             return int(round(v*10)) - 10
             
@@ -4405,11 +4405,13 @@ class tgraphcanvas(FigureCanvas):
                 return t
             else:
                 return self.fromCtoF(t)
-        else:
+        elif source_unit == "F":
             if target_unit == "F":
                 return t
             else:
                 return self.fromFtoC(t)
+        else:
+            return t
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
@@ -12288,9 +12290,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp2[l],color=self.qmc.extradevicecolor2[l],markersize=self.qmc.extramarkersizes2[l],marker=self.qmc.extramarkers2[l],linewidth=self.qmc.extralinewidths2[l],linestyle=self.qmc.extralinestyles2[l],drawstyle=self.qmc.extradrawstyles2[l],label=self.qmc.extraname2[l])[0])
 
             self.updateExtraLCDvisibility()
-        except Exception:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             pass
 
     #Write readings to Artisan JSON file
@@ -15704,7 +15706,7 @@ class ApplicationWindow(QMainWindow):
         res = {}        
         # id (prefix+nr)
         res["nr"] = u(data["batchnr"])
-        res["id"] = u(data["batchprefix"]) + u(data["batchnr"])
+        res["id"] = u(data["batchprefix"]) + (u(data["batchnr"]) if (data["batchnr"] != 0) else u(""))
         # title
         res["title"] = data["title"]
         # date and time
@@ -16213,24 +16215,24 @@ class ApplicationWindow(QMainWindow):
     #  . "cupping"
     def rankingData2string(self,data,units=True):
         res = {}
-        res["charge_temp_num"] = (data["charge_temp"] if "charge_temp" in data else 0)
+        res["charge_temp_num"] = (aw.qmc.convertTemp(data["charge_temp"],(data["temp_unit"] if units else ""),aw.qmc.mode) if "charge_temp" in data else 0)
         res["charge_temp"] = self.formatTemp(data,"charge_temp",(data["temp_unit"] if units else ""))
         res["FCs_time_num"] = (data["FCs_time"] if "FCs_time" in data else 0)
         res["FCs_time"] = (self.eventtime2string(data["FCs_time"]) if "FCs_time" in data else "")
-        res["FCs_temp_num"] = (data["FCs_temp"] if "FCs_temp" in data else 0)
+        res["FCs_temp_num"] = (aw.qmc.convertTemp(data["FCs_temp"],(data["temp_unit"] if units else ""),aw.qmc.mode) if "FCs_temp" in data else 0)
         res["FCs_temp"] = self.formatTemp(data,"FCs_temp",(data["temp_unit"] if units else ""))
         res["DROP_time_num"] = (data["DROP_time"] if "DROP_time" in data else 0)
         res["DROP_time"] = (self.eventtime2string(data["DROP_time"]) if "DROP_time" in data else "")
-        res["DROP_temp_num"] = (data["DROP_temp"] if "DROP_temp" in data else 0)
+        res["DROP_temp_num"] = (aw.qmc.convertTemp(data["DROP_temp"],(data["temp_unit"] if units else ""),aw.qmc.mode) if "DROP_temp" in data else 0)
         res["DROP_temp"] = self.formatTemp(data,"DROP_temp",(data["temp_unit"] if units else ""))
         res["color_num"] = (data["color"] if "color" in data else 0)
         res["color"] = (("#" if units else "" ) + str(data["color"]) if "color" in data and data["color"] != 0 else "")
         res["cupping"] = '{0:.2f}'.format(data["cupping"])
-        res["DRY_percent_num"] = (data["DRY_percent"] if "DRY_percent" in data else 0)
+        res["DRY_percent_num"] = ('{0:.1f}'.format(data["DRY_percent"]) if "DRY_percent" in data else 0)
         res["DRY_percent"] = ('{0:.1f}'.format(data["DRY_percent"]) + ("%" if units else "") if "DRY_percent" in data else "")
-        res["MAI_percent_num"] = (data["MAI_percent"] if "MAI_percent" in data else 0)
+        res["MAI_percent_num"] = ('{0:.1f}'.format(data["MAI_percent"]) if "MAI_percent" in data else 0)
         res["MAI_percent"] = ('{0:.1f}'.format(data["MAI_percent"]) + ("%" if units else "") if "MAI_percent" in data else "")
-        res["DEV_percent_num"] = (data["DEV_percent"] if "DEV_percent" in data else 0)
+        res["DEV_percent_num"] = ('{0:.1f}'.format(data["DEV_percent"]) if "DEV_percent" in data else 0)
         res["DEV_percent"] = ('{0:.1f}'.format(data["DEV_percent"]) + ("%" if units else "") if "DEV_percent" in data else "")
         res["BTa_num"] = (data["BTa"] if "BTa" in data else 0)
         res["BTa"] = (data["BTa"] if "BTa" in data else "")
@@ -16267,15 +16269,15 @@ class ApplicationWindow(QMainWindow):
             title = pd["title"],
             in_num = '{0:.0f}'.format(pd["weight_in_num"]),
             weightin = pd["weight_in"],
-            charge_temp_num = rd["charge_temp_num"],
+            charge_temp_num = '{0:.1f}'.format(rd["charge_temp_num"]),
             charge_temp = rd["charge_temp"],
             FCs_time_num = rd["FCs_time_num"],
             FCs_time = rd["FCs_time"],
-            FCs_temp_num = rd["FCs_temp_num"],
+            FCs_temp_num = '{0:.1f}'.format(rd["FCs_temp_num"]),
             FCs_temp = rd["FCs_temp"],
             DROP_time_num = rd["DROP_time_num"],
             DROP_time = rd["DROP_time"],
-            DROP_temp_num = rd["DROP_temp_num"],
+            DROP_temp_num = '{0:.1f}'.format(rd["DROP_temp_num"]),
             DROP_temp = rd["DROP_temp"],
             DRY_percent_num = rd["DRY_percent_num"],
             DRY_percent = rd["DRY_percent"],
@@ -16397,7 +16399,7 @@ class ApplicationWindow(QMainWindow):
                 # add BT curve to graph
                 if len(profiles) < 11:
                     try:
-                        label = u(pd["batchprefix"]) + u(pd["batchnr"])
+                        label = u(pd["batchprefix"]) + (u(pd["batchnr"]) if pd["batchnr"] > 0 else u(""))
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]
                         stemp = self.qmc.smooth_list(timex,temp,window_len=self.qmc.curvefilter)
@@ -16423,7 +16425,7 @@ class ApplicationWindow(QMainWindow):
                                     break
                         timex = [t-delta for t in timex]
                         min_start_time = min(min_start_time,timex[charge])
-                        max_end_time = max(max_end_time,timex[-1])
+                        max_end_time = max(max_end_time,timex[drop])
                         # cut-out only CHARGE to DROP
                         cl = next(color)
                         self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
@@ -16433,15 +16435,16 @@ class ApplicationWindow(QMainWindow):
                         labels.append(label)
                         if self.qmc.DeltaBTflag and self.qmc.delta_ax:
                             tx = numpy.array(timex)
-                            tx_roast = numpy.array(timex[charge:drop]) # just the part from CHARGE TO DROP
+                            ch = max(0,rd["charge_idx"])
+                            tx_roast = numpy.array(timex[ch:drop]) # just the part from CHARGE TO DROP
                             with numpy.errstate(divide='ignore'):
-                                nt = numpy.array(stemp[charge:drop])
+                                nt = numpy.array(stemp[ch:drop])
                                 z = (nt[aw.qmc.deltasamples:] - nt[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)                        
                                 lt,ld = len(tx_roast),len(z)
                                 if lt > ld:
                                     z = numpy.append(z,[z[-1] if ld else 0.]*(lt - ld))
                                 s = self.qmc.smooth_list(tx_roast,z,window_len=self.qmc.deltafilter)
-                                delta = numpy.concatenate(([None]*(charge),s,[None]*(len(tx)-drop)))
+                                delta = numpy.concatenate(([None]*(ch),s,[None]*(len(tx)-drop)))
                                 trans = self.qmc.delta_ax.transData
                                 self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
@@ -16498,7 +16501,7 @@ class ApplicationWindow(QMainWindow):
                         image.save(graph_image)
                     #add some random number to force HTML reloading
                     graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
-                    graph_image = "<img alt='roast graph' width=\"100%\" src='file:///" + graph_image + "'>"
+                    graph_image = "<img alt='roast graph' style=\"width:100%;\" src='file:///" + graph_image + "'>"
                     # redraw original graph
                     if not foreground_profile_path and not aw.qmc.backgroundpath:
                         self.qmc.redraw(recomputeAllDeltas=False)
@@ -17512,7 +17515,7 @@ class ApplicationWindow(QMainWindow):
                     break
         return result
 
-    #calculate the AREA under BT and ET
+    #calculate the AREA under BT and ET (always in C!)
     def ts(self,start=None,end=None):
         delta = ET = BT = 0.0
         if (start == 0 and end == 0) or (start and (start < 0 or (start == 0 and self.qmc.timeindex[0] < 0))):
@@ -17521,14 +17524,20 @@ class ApplicationWindow(QMainWindow):
             try:
                 for i in range((start or self.qmc.timeindex[0]),min(len(self.qmc.timex)-1,(end or self.qmc.timeindex[6]))):
                     # eliminate wrong readings
-                    e1 = self.qmc.temp1[i]
+                    e1 = aw.qmc.convertTemp(self.qmc.temp1[i],aw.qmc.mode,"C")
                     if e1 > 500:
                         e1 = 0
-                    e2 = self.qmc.temp1[i+1]
+                    e2 = aw.qmc.convertTemp(self.qmc.temp1[i+1],aw.qmc.mode,"C")
                     if e2 > 500:
                         e2 = 0
                     e = (max(0,e1) + max(0,e2)) / 2.0
-                    b = (max(0,self.qmc.temp2[i]) + max(0,self.qmc.temp2[i+1])) / 2.0
+                    b1 = aw.qmc.convertTemp(self.qmc.temp2[i],aw.qmc.mode,"C")
+                    if b1 > 500:
+                        b1 = 0
+                    b2 = aw.qmc.convertTemp(self.qmc.temp2[i+1],aw.qmc.mode,"C")
+                    if b2 > 500:
+                        b2 = 0
+                    b = (max(0,b1) + max(0,b2)) / 2.0
                     dt = (self.qmc.timex[i+1] - self.qmc.timex[i])
                     delta += (e - b) * dt
                     ET += e * dt
@@ -18754,7 +18763,8 @@ class ApplicationWindow(QMainWindow):
             tip += u(QApplication.translate("Tooltip","<b>Description </b>= ", None)) + u(self.extraeventsdescriptions[i]) + "<br>"
             tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None)) + u(self.qmc.etypesf(self.extraeventstypes[i])) + "<br>"            
             if self.extraeventstypes[i] != 4: # no tips for 4: no event type set
-                tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None)) + u(int(round((self.extraeventsvalues[i]-1)*10.))) + "<br>" 
+                tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None)) + u(aw.qmc.eventsvalues(self.extraeventsvalues[i])) + "<br>"
+                #+ u(int(round((self.extraeventsvalues[i]-1)*10.)))  + "<br>"
             tip += u(QApplication.translate("Tooltip","<b>Documentation </b>= ", None)) + u(self.extraeventsactionstrings[i]) + "<br>"
             tip += u(QApplication.translate("Tooltip","<b>Button# </b>= ", None)) + str(i+1)
             self.buttonlist[i].setToolTip(tip)
@@ -20185,9 +20195,9 @@ class HUDDlg(ArtisanDialog):
         if self.univarCheck.isChecked():
             aw.qmc.univariate()
         if self.lnvarCheck.isChecked():
-            aw.qmc.lnRegression()
+            aw.qmc.lnRegression(TP=self.TPCheck.isChecked())
         if self.xxvarCheck.isChecked():
-            aw.qmc.lnRegression(xx=True)
+            aw.qmc.lnRegression(xx=True,TP=self.TPCheck.isChecked())
         if self.polyfitCheck.isChecked():
             self.doPolyfit()
         if not self.polyfitCheck.isChecked() and not self.xxvarCheck.isChecked() and not self.lnvarCheck.isChecked() and not self.univarCheck.isChecked() and not self.interpCheck.isChecked():
@@ -31283,7 +31293,7 @@ class comportDlg(ArtisanDialog):
     def createserialTable(self):
         try:
             self.serialtable.clear()
-            nssdevices = len(aw.extracomport)
+            nssdevices = min(len(aw.extracomport),len(aw.qmc.extradevices))
             if nssdevices:
                 self.serialtable.setRowCount(nssdevices)
                 self.serialtable.setColumnCount(7)
@@ -31304,47 +31314,48 @@ class comportDlg(ArtisanDialog):
                 else:
                     self.serialtable.verticalHeader().setSectionResizeMode(2)
                 for i in range(nssdevices):
-                    devid = aw.qmc.extradevices[i]
-                    devicename = aw.qmc.devices[devid-1]
-                    if devicename[0] == "+":
-                        devname = devicename[1:]
-                    else:
-                        devname = devicename
-                    device = QTableWidgetItem(devname)    #type identification of the device. Non editable
-                    self.serialtable.setItem(i,0,device)
-                    # "ADD DEVICE:"
-                    if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
-                        comportComboBox = PortComboBox(selection = aw.extracomport[i])
-                        comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
-                        comportComboBox.setFixedWidth(200)
-                        baudComboBox =  QComboBox()
-                        baudComboBox.addItems(self.bauds)
-                        if str(aw.extrabaudrate[i]) in self.bauds:
-                            baudComboBox.setCurrentIndex(self.bauds.index(str(aw.extrabaudrate[i])))
-                        byteComboBox =  QComboBox()
-                        byteComboBox.addItems(self.bytesizes)
-                        if str(aw.extrabytesize[i]) in self.bytesizes:
-                            byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.extrabytesize[i])))
-                        parityComboBox =  QComboBox()
-                        parityComboBox.addItems(self.parity)
-                        if aw.extraparity[i] in self.parity:
-                            parityComboBox.setCurrentIndex(self.parity.index(aw.extraparity[i]))
-                        #self.connect(baudComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
-                        stopbitsComboBox = QComboBox()
-                        stopbitsComboBox.addItems(self.stopbits)
-                        if str(aw.extrastopbits[i]) in self.stopbits:
-                            stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.extrastopbits[i])))
-                        timeoutEdit = QLineEdit(str(aw.extratimeout[i]))
-                        timeoutEdit.setValidator(QIntValidator(1,5,timeoutEdit))
-                        timeoutEdit.setFixedWidth(65)
-                        timeoutEdit.setAlignment(Qt.AlignRight)
-                        #add widgets to the table
-                        self.serialtable.setCellWidget(i,1,comportComboBox)
-                        self.serialtable.setCellWidget(i,2,baudComboBox)
-                        self.serialtable.setCellWidget(i,3,byteComboBox)
-                        self.serialtable.setCellWidget(i,4,parityComboBox)
-                        self.serialtable.setCellWidget(i,5,stopbitsComboBox)
-                        self.serialtable.setCellWidget(i,6,timeoutEdit)
+                    if len(aw.qmc.extradevices) > i:
+                        devid = aw.qmc.extradevices[i]
+                        devicename = aw.qmc.devices[devid-1]
+                        if devicename[0] == "+":
+                            devname = devicename[1:]
+                        else:
+                            devname = devicename
+                        device = QTableWidgetItem(devname)    #type identification of the device. Non editable
+                        self.serialtable.setItem(i,0,device)
+                        # "ADD DEVICE:"
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                            comportComboBox = PortComboBox(selection = aw.extracomport[i])
+                            comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
+                            comportComboBox.setFixedWidth(200)
+                            baudComboBox =  QComboBox()
+                            baudComboBox.addItems(self.bauds)
+                            if str(aw.extrabaudrate[i]) in self.bauds:
+                                baudComboBox.setCurrentIndex(self.bauds.index(str(aw.extrabaudrate[i])))
+                            byteComboBox =  QComboBox()
+                            byteComboBox.addItems(self.bytesizes)
+                            if str(aw.extrabytesize[i]) in self.bytesizes:
+                                byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.extrabytesize[i])))
+                            parityComboBox =  QComboBox()
+                            parityComboBox.addItems(self.parity)
+                            if aw.extraparity[i] in self.parity:
+                                parityComboBox.setCurrentIndex(self.parity.index(aw.extraparity[i]))
+                            #self.connect(baudComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
+                            stopbitsComboBox = QComboBox()
+                            stopbitsComboBox.addItems(self.stopbits)
+                            if str(aw.extrastopbits[i]) in self.stopbits:
+                                stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.extrastopbits[i])))
+                            timeoutEdit = QLineEdit(str(aw.extratimeout[i]))
+                            timeoutEdit.setValidator(QIntValidator(1,5,timeoutEdit))
+                            timeoutEdit.setFixedWidth(65)
+                            timeoutEdit.setAlignment(Qt.AlignRight)
+                            #add widgets to the table
+                            self.serialtable.setCellWidget(i,1,comportComboBox)
+                            self.serialtable.setCellWidget(i,2,baudComboBox)
+                            self.serialtable.setCellWidget(i,3,byteComboBox)
+                            self.serialtable.setCellWidget(i,4,parityComboBox)
+                            self.serialtable.setCellWidget(i,5,stopbitsComboBox)
+                            self.serialtable.setCellWidget(i,6,timeoutEdit)
                 self.serialtable.resizeColumnsToContents()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -31353,30 +31364,31 @@ class comportDlg(ArtisanDialog):
     def saveserialtable(self):
         try:
             #aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
-            ser_ports = len(aw.extracomport)
+            ser_ports = min(len(aw.extracomport),len(aw.qmc.extradevices))
             self.closeserialports()
             for i in range(ser_ports):
-                devid = aw.qmc.extradevices[i]
-                devicename = aw.qmc.devices[devid-1]    #type identification of the device. Non editable
-                if devid != 29 and devid != 33 and devicename[0] != "+": # hide serial confs for MODBUS and "+XX" extra devices
-                    comportComboBox =  self.serialtable.cellWidget(i,1)
-                    if comportComboBox:
-                        aw.extracomport[i] = str(comportComboBox.getSelection())
-                    baudComboBox =  self.serialtable.cellWidget(i,2)
-                    if baudComboBox:
-                        aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
-                    byteComboBox =  self.serialtable.cellWidget(i,3)
-                    if byteComboBox:
-                        aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
-                    parityComboBox =  self.serialtable.cellWidget(i,4)
-                    if parityComboBox:
-                        aw.extraparity[i] = str(parityComboBox.currentText())
-                    stopbitsComboBox =  self.serialtable.cellWidget(i,5)
-                    if stopbitsComboBox:
-                        aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
-                    timeoutEdit = self.serialtable.cellWidget(i,6)
-                    if timeoutEdit:
-                        aw.extratimeout[i] = int(str(timeoutEdit.text()))
+                if len(aw.qmc.extradevices) > i:
+                    devid = aw.qmc.extradevices[i]
+                    devicename = aw.qmc.devices[devid-1]    #type identification of the device. Non editable
+                    if devid != 29 and devid != 33 and devicename[0] != "+": # hide serial confs for MODBUS and "+XX" extra devices
+                        comportComboBox =  self.serialtable.cellWidget(i,1)
+                        if comportComboBox:
+                            aw.extracomport[i] = str(comportComboBox.getSelection())
+                        baudComboBox =  self.serialtable.cellWidget(i,2)
+                        if baudComboBox:
+                            aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
+                        byteComboBox =  self.serialtable.cellWidget(i,3)
+                        if byteComboBox:
+                            aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
+                        parityComboBox =  self.serialtable.cellWidget(i,4)
+                        if parityComboBox:
+                            aw.extraparity[i] = str(parityComboBox.currentText())
+                        stopbitsComboBox =  self.serialtable.cellWidget(i,5)
+                        if stopbitsComboBox:
+                            aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
+                        timeoutEdit = self.serialtable.cellWidget(i,6)
+                        if timeoutEdit:
+                            aw.extratimeout[i] = int(str(timeoutEdit.text()))
             #create serial ports for each extra device
             aw.extraser = [None]*ser_ports
             #load the settings for the extra serial ports found
