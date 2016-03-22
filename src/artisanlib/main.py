@@ -4293,7 +4293,7 @@ class tgraphcanvas(FigureCanvas):
                         label.set_color(self.palette["ylabel"])
     
                 #write legend
-                if self.legendloc and not sampling and len(self.timex) > 2:
+                if self.legendloc and not sampling and not aw.qmc.flagstart and len(self.timex) > 2:
                     rcParams['path.effects'] = []
                     prop = aw.mpl_fontproperties.copy()
                     prop.set_size("x-small")
@@ -4826,7 +4826,7 @@ class tgraphcanvas(FigureCanvas):
             aw.arduino.pidOff()
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
             if aw.qmc.device == 0 and aw.fujipid.followBackground:
-                if aw.fujipid.sv > 0:
+                if aw.fujipid.sv and aw.fujipid.sv > 0:
                     try:
                         aw.fujipid.setsv(0,silent=True)
                     except:
@@ -5489,7 +5489,7 @@ class tgraphcanvas(FigureCanvas):
                 
                 # at DROP we stop the follow background on FujiPIDs and set the SV to 0
                 if aw.qmc.device == 0 and aw.fujipid.followBackground:
-                    if aw.fujipid.sv > 0:
+                    if aw.fujipid.sv and aw.fujipid.sv > 0:
                         try:
                             aw.fujipid.setsv(0,silent=True)
                             aw.fujipid.sv = 0
@@ -11913,7 +11913,7 @@ class ApplicationWindow(QMainWindow):
         
     def fileLoad(self):
         try:
-            fileName = self.ArtisanOpenFileDialog()
+            fileName = self.ArtisanOpenFileDialog(ext="*.alog")
             if fileName:
                 self.loadFile(fileName)
         except Exception as ex:
@@ -17614,7 +17614,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u("Barrie Fairley, Ziv Sade, Nicholas Seckar, ")
         contributors += u("Morten M") + uchr(252) + u("nchow")
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
-        contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter")
+        contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
         box = QMessageBox(self)
         
         #create a html QString
