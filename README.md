@@ -81,7 +81,7 @@ This software is open-source and absolutely free, even for commercial use.
 
 If you think Artisan is worth of some money and you are willing to contribute financially to its further development, feel free to send any amount through PayPal.
 
-[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BJ5HQ6SL48V8Q)
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TUYXQP8873466)
 
 
 Version History
