@@ -69,6 +69,12 @@ Documentation and Support
   * [aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon
   * [Controlling a Hottop Roaster with Artisan: The Basics v6 (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit?usp=sharing) by Barrie Fairley
   * [Artisan - Basic Setup and Tuning Guide (GoogleDocs)](https://docs.google.com/document/d/1eGtztr56t3GFYafTaMvQUDU3YQXK5nOFNcECM-q_WQ8/edit)
+  * Artisan Config. for a Huky and Phidgets 1048 by Susan
+    - [All things Phidget (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2OWd4bmtMNVpQSWc/view?usp=sharing)
+    - [ARTISAN #1 Configure the Device (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2MnRyQ1Z2NmdBWTg/view?usp=sharing)
+    - [ARTISAN #2 Configure the Events (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2cnNaMDVFbmZqVVk/view?usp=sharing)
+    - [ARTISAN #3 Configure the Axes (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2X3h4MjE4X3Z3RFE/view?usp=sharing)
+    - [ARTISAN #4 Configure Tools Extras (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SmZua2VSd2FjZFE/view?usp=sharing)
   * [Artisan Documentation on the Huky Forum](http://www.hukyforum.com/index.php?action=downloads;cat=1)
 - [Artisan Blog](http://artisan-roasterscope.blogspot.de/)
 - [User Mailing List](https://lists.mokelbu.de/listinfo/artisan-user) (you need to subscribe to send and receive messages)
