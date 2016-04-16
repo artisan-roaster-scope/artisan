@@ -64,6 +64,8 @@ Features
 Documentation and Support
 ------------------------
 - [Installation](wiki/Installation.md)
+- [Artisan Blog](http://artisan-roasterscope.blogspot.de/)
+- [User Mailing List](https://lists.mokelbu.de/listinfo/artisan-user) (you need to subscribe to send and receive messages)
 - Documentation (written by users)
   * [Documentation on v0.5.x](http://coffeetroupe.com/artisandocs/)
   * [aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon
@@ -75,8 +77,6 @@ Documentation and Support
     - [ARTISAN #2 Configure the Events (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2cnNaMDVFbmZqVVk/view?usp=sharing)
     - [ARTISAN #3 Configure the Axes (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2X3h4MjE4X3Z3RFE/view?usp=sharing)
     - [ARTISAN #4 Configure Tools Extras (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SmZua2VSd2FjZFE/view?usp=sharing)
-- [Artisan Blog](http://artisan-roasterscope.blogspot.de/)
-- [User Mailing List](https://lists.mokelbu.de/listinfo/artisan-user) (you need to subscribe to send and receive messages)
 
 
 Donations
