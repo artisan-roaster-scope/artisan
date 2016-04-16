@@ -69,7 +69,7 @@ Documentation and Support
   * [aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon
   * [Controlling a Hottop Roaster with Artisan: The Basics v6 (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit?usp=sharing) by Barrie Fairley
   * [Artisan - Basic Setup and Tuning Guide (GoogleDocs)](https://docs.google.com/document/d/1eGtztr56t3GFYafTaMvQUDU3YQXK5nOFNcECM-q_WQ8/edit)
-  * Artisan Configurations for Huky and Phidgets 1048 by Susan
+  * [Artisan Configurations for Huky and Phidgets 1048 by Susan](https://drive.google.com/folderview?id=0B4HTX5wS3NB2TFVid0h2TGxBWG8&usp=sharing)
     - [What We Know about PHIDGETS (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2OWd4bmtMNVpQSWc/view?usp=sharing)
     - [ARTISAN #1 Configure Your Device (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2MnRyQ1Z2NmdBWTg/view?usp=sharing)
     - [ARTISAN #2 Configure the Events (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2cnNaMDVFbmZqVVk/view?usp=sharing)
