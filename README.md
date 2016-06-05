@@ -66,6 +66,7 @@ Documentation and Support
 - [Installation](wiki/Installation.md)
 - [Artisan Blog](http://artisan-roasterscope.blogspot.de/)
 - [User Mailing List](https://lists.mokelbu.de/listinfo/artisan-user) (you need to subscribe to send and receive messages)
+  * NOTE: you will receive a warning on sign up that "the site is not secure". This is technically because the SSL-certificate to sign up for this list has expired. Just ignore this warning. The sign up an the use of the list is secure. We currently don't have a way to fix that on the server. Sorry.
 - Documentation (written by users)
   * [Documentation on v0.5.x](http://coffeetroupe.com/artisandocs/)
   * [aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon
