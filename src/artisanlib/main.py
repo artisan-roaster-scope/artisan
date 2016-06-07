@@ -52,6 +52,12 @@ import requests
 import subprocess
 
 
+if sys.version < '3':
+    import urlparse, urllib
+else:
+    import urllib.parse as urlparse
+    import urllib.request as urllib
+
 import artisanlib.arabic_reshaper
 
 # needs to be done before any other PyQt import
@@ -80,7 +86,7 @@ if pyqtversion < 5:
                              QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
                              QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange,
                              QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
-                             QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView, QStandardItem,
+                             QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView, QStandardItem, QButtonGroup,
                              QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton,
                              QPixmap, QImage, QColor, QColorDialog, QPalette, QFrame, QCheckBox, QDesktopServices, QIcon,
                              QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QBrush, QRadialGradient,
@@ -92,7 +98,7 @@ else:
     from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
                              QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange,
                              QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
-                             QLCDNumber, QSpinBox, QComboBox, QHeaderView,
+                             QLCDNumber, QSpinBox, QComboBox, QHeaderView,QButtonGroup,
                              QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton,
                              QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog,
                              QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox)
@@ -217,12 +223,12 @@ if sys.version < '3':
             return None
     def hex2int(h1,h2=""):
         return int(binascii.hexlify(h1+h2),16)
-    def str2cmd(s):
-        return s
-    def cmd2str(c):
-        return c
     def s2a(s):
         return u(s).encode('ascii','ignore')
+    def cmd2str(c):
+        return c
+    def str2cmd(s):
+        return s2a(s)
 else:
     def decs2string(x):
         if len(x) > 0:
@@ -259,8 +265,11 @@ else:
     def cmd2str(c):
         return str(c,"latin1")
     def s2a(s):
-        return s.encode('ascii','ignore').decode("ascii")
+        return s.encode('ascii','ignore').decode("ascii")   
         
+def path2url(path):
+    return urlparse.urljoin(
+      'file:', urllib.pathname2url(path))        
         
 if sip.getapi('QVariant') == 1:
     def toInt(x):
@@ -507,6 +516,7 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
     app.installTranslator(appTranslator)
 
 from const import UIconst
+from artisanlib import pid
 
 
 # results in a three digits resolution (eg. 1.234)
@@ -770,7 +780,7 @@ class tgraphcanvas(FigureCanvas):
                        "-ARDUINOTC4",           #19
                        "TE VA18B",              #20
                        "+CENTER 309_34",        #21
-                       "+FUJI DUTY %/SV",       #22
+                       "+PID SV/DUTY %",        #22
                        "Omega HHM28[6]",        #23
                        "+VOLTCRAFT K204_34",    #24
                        "+Virtual",              #25
@@ -802,8 +812,9 @@ class tgraphcanvas(FigureCanvas):
                        "+CENTER 304_34",        #51
                        "Phidget 1051",          #52
                        "Hottop BT/ET",          #53
-                       "+Hottop Heater/Fan",     #54
-                       "-Omega HH806W"          #55 NOT WORKING 
+                       "+Hottop Heater/Fan",    #54
+                       "+MODBUS_56",            #55
+                       "-Omega HH806W"          #56 NOT WORKING 
                        ]
 
         #extra devices
@@ -837,7 +848,11 @@ class tgraphcanvas(FigureCanvas):
         self.fig.patch.set_facecolor(self.backcolor)
         self.fig.patch.set_edgecolor(self.backcolor)
 
-        self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
+
+        if mpl.__version__.split()[0] == 2:
+            self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
+        else:
+            self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
         self.delta_ax = self.ax.twinx()
 
         #legend location
@@ -929,6 +944,8 @@ class tgraphcanvas(FigureCanvas):
         #put a "aw.qmc.safesaveflag = True" whenever there is a change of a profile like at [DROP], edit properties Dialog, etc
         #prevents accidentally deleting a modified profile.
         self.safesaveflag = False
+        
+        self.pid = pid.PID()
 
         #background profile
         self.background = False
@@ -1020,7 +1037,8 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaETlcdflag = True
         self.DeltaBTlcdflag = True
         self.HUDbuttonflag = False
-        self.PIDbuttonflag = True
+        self.PIDbuttonflag = True # TC4 PID firmware available?
+        self.Controlbuttonflag = False
         # user filter values x are translated as follows to internal filter values: y = x*2 + 1 (to go the other direction: x = y/2)
         # this is to ensure, that only uneven window values are used and no wrong shift is happening through smoothing
         self.deltafilter = 5 # => corresponds to 2 on the user interface
@@ -1282,7 +1300,7 @@ class tgraphcanvas(FigureCanvas):
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
         self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None)))
-        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTlinestyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None)))
+        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None)))
         self.l_delta1, = self.ax.plot(self.timex,self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=u(QApplication.translate("Label", "DeltaET", None)))
         self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=u(QApplication.translate("Label", "DeltaBT", None)))
         self.l_back1 = None
@@ -1427,9 +1445,11 @@ class tgraphcanvas(FigureCanvas):
         self.hottop_MAIN_FAN = 0 # 0-10 (!)
         self.hottop_TX = 0.
         
-        #temporary storage to pass values. Holds extra T3 and T4 values for MODBUS connected devices
+        #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for MODBUS connected devices
         self.extraMODBUSt3 = -1
         self.extraMODBUSt4 = -1
+        self.extraMODBUSt5 = -1
+        self.extraMODBUSt6 = -1
         self.extraMODBUStx = 0.
 
         #used by extra device +ArduinoTC4_XX to pass values
@@ -1506,14 +1526,15 @@ class tgraphcanvas(FigureCanvas):
         else:
             return s
             
-    def resizeEvent(self,event):
-        self.block_update = True # we block updating the canvas for calls during the resize
-        try:
-            super(tgraphcanvas,self).resizeEvent(event)
-        except:
-            pass
-        self.block_update = False
-        self.delayedUpdateBackground() # and only update after the resize explicitly
+# this seems to make things worse            
+#    def resizeEvent(self,event):
+#        self.block_update = True # we block updating the canvas for calls during the resize
+#        try:
+#            super(tgraphcanvas,self).resizeEvent(event)
+#        except:
+#            pass
+#        self.block_update = False
+#        self.delayedUpdateBackground() # and only update after the resize explicitly
 
     def delayedUpdateBackground(self):
         if not self.block_update:
@@ -1535,12 +1556,12 @@ class tgraphcanvas(FigureCanvas):
             # when Qt thinks it is convenient
             #self.fig.canvas.draw_idle() # this blocks (overwrites) drawing of the projections in updategraphics
             try:
-                self.fig.canvas.draw()
+                self.fig.canvas.draw() # the triggered _draw_event(self,evt) function resets the self.in_draw_event if done
             except:
                 pass
             
-            # self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
-            # canvas is automatically blitted to self.ax_background after full redraw by _draw_event(self, evt)
+            self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)  # causes randomly a black border where the axis should be drawn
+            self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
             
             #aw.qmc.ax.draw_artist(aw.qmc.ax.xaxis)
             #aw.qmc.ax.draw_artist(aw.qmc.ax.yaxis)
@@ -1572,9 +1593,9 @@ class tgraphcanvas(FigureCanvas):
         if self.ambientTempSource:
             start = 0
             end = len(aw.qmc.temp1) - 1
-            if self.timeindex[1] > -1: # CHARGE
-                start = self.timeindex[1]
-            if self.timeindex[6] > -1: # DROP
+            if self.timeindex[0] > -1: # CHARGE
+                start = self.timeindex[0]
+            if self.timeindex[6] > 0: # DROP
                 end = self.timeindex[6]
             if self.ambientTempSource == 1: # from ET
                 res = numpy.mean(aw.qmc.temp1[start:end])
@@ -1632,7 +1653,7 @@ class tgraphcanvas(FigureCanvas):
             
     # the inverse of eventsInternal2ExternalValue, converting an external to an internal event value
     def eventsExternal2InternalValue(self,v):
-        if v< 1.0 and v >= -1.0:
+        if v< 1.0 and v > -1.0:
             return 0.0
         elif v>=1.0:
             return v/10. + 1.
@@ -1674,8 +1695,9 @@ class tgraphcanvas(FigureCanvas):
     # hook up to mpls event handling framework for draw events
     # this is emitted after the canvas has finished a full redraw
     def _draw_event(self, evt):
-        #self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)  # causes randomly a black border where the axis should be drawn
-        self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
+        #self.fig.canvas.flush_events() # THIS prevents the black border on >Qt5.5, but slows down things on redraw otherwise!!!
+        self.ax_background = None
+        
 
     def onpick(self,event):
         if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
@@ -1940,6 +1962,11 @@ class tgraphcanvas(FigureCanvas):
                                 if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
                                     aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
                                     xtra_dev_lines2 = xtra_dev_lines2 + 1
+                            # draw delta lines
+                            if self.DeltaETflag and self.l_delta1 != None:
+                                aw.qmc.ax.draw_artist(self.l_delta1)
+                            if self.DeltaBTflag and self.l_delta2 != None:
+                                aw.qmc.ax.draw_artist(self.l_delta2)
                             # draw ET
                             if aw.qmc.ETcurve:
                                 aw.qmc.ax.draw_artist(self.l_temp1)
@@ -1955,16 +1982,13 @@ class tgraphcanvas(FigureCanvas):
                                     aw.qmc.ax.draw_artist(self.l_BTprojection)
                                 if self.l_ETprojection != None:
                                     aw.qmc.ax.draw_artist(self.l_ETprojection)
-                            # draw delta lines
-                            if self.DeltaETflag and self.l_delta1 != None:
-                                aw.qmc.ax.draw_artist(self.l_delta1)
-                            if self.DeltaBTflag and self.l_delta2 != None:
-                                aw.qmc.ax.draw_artist(self.l_delta2)
                             
                             if aw.qmc.ax.clipbox:
                                 self.fig.canvas.blit(aw.qmc.ax.clipbox) # .clipbox is None in matplotlib <1.5
                             else:
                                 self.fig.canvas.blit(aw.qmc.ax.bbox) # causes randomly a black border where the axis should be drawn
+                                
+                                
                         else:
                             # we do not have a background to bitblit, so do a full redraw
                             self.updateBackground() # does the canvas draw, but also fills the ax_background cache                            
@@ -2103,9 +2127,10 @@ class tgraphcanvas(FigureCanvas):
             elif self.timeindexB[0] != -1 and self.timeindex[0] != -1: # CHARGE
                 ptime = self.timex[self.timeindex[0]]
                 btime = self.timeB[self.timeindexB[0]]
-            elif self.timeindexB[0] != -1:
-                ptime = 0
-                btime = self.timeB[self.timeindexB[0]]
+# this one would align according to the background profiles CHARGE even if there is no foreground profile loaded                
+#            elif self.timeindexB[0] != -1:
+#                ptime = 0
+#                btime = self.timeB[self.timeindexB[0]]
             if ptime != None and btime != None:
                 difference = ptime - btime
                 if difference > 0:
@@ -2319,27 +2344,27 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setrampsoak(1)
                 elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
-                    aw.arduino.svMode = 1
-                    aw.arduino.pidOn()
+                    aw.pidcontrol.svMode = 1
+                    aw.pidcontrol.pidOn()
             elif self.alarmaction[alarmnumber] == 18:
                 # RampSoak OFF
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setrampsoak(0)
                 elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
-                    aw.arduino.svMode = 0
-                    aw.arduino.pidOff()
+                    aw.pidcontrol.svMode = 0
+                    aw.pidcontrol.pidOff()
             elif self.alarmaction[alarmnumber] == 19:
                 # PID ON
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setONOFFstandby(0)
                 elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
-                    aw.arduino.pidOn()
+                    aw.pidcontrol.pidOn()
             elif self.alarmaction[alarmnumber] == 20:
                 # PID OFF
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setONOFFstandby(1)
                 elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
-                    aw.arduino.pidOff()
+                    aw.pidcontrol.pidOff()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -2357,11 +2382,11 @@ class tgraphcanvas(FigureCanvas):
                         message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " + self.backgroundEStrings[i]
                         #rotate colors to get attention
                         if timed%2:
-                            aw.messagelabel.setStyleSheet("background-color:'transparent';")
+                            style = "background-color:'transparent';"
                         else:
-                            aw.messagelabel.setStyleSheet("background-color:'yellow';")
+                            style = "background-color:'yellow';"
                             
-                        aw.sendmessage(message)
+                        aw.sendmessage(message,style)
                         break
 
                     elif timed == 0:
@@ -2402,11 +2427,11 @@ class tgraphcanvas(FigureCanvas):
 
                     #delete message
                     else:
-                        text = str(aw.messagelabel.text())
-                        if len(text):
-                            if text[0] == ">":
-                                aw.sendmessage("")
-                                aw.messagelabel.setStyleSheet("background-color:'transparent';")
+#                        text = str(aw.messagelabel.text())
+#                        if len(text):
+#                            if text[0] == ">":
+#                                aw.sendmessage("",style="background-color:'transparent';")
+                        aw.sendmessage("",style="background-color:'transparent';")
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackevent() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -3226,7 +3251,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.moveslider(3,0)
                     # reset Arduino/TC4 PID SV
                     aw.moveSVslider(0)
-                aw.arduino.sv = None
+                aw.pidcontrol.sv = None
                 aw.fujipid.sv = None
                 
                 # if there is already some data recorded, we remove the filename to force writing a new file
@@ -3254,7 +3279,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.hideSliders(changeDefault=False)
                 aw.enableEditMenus()
                 
-                aw.arduino.pidActive = False
+                aw.pidcontrol.pidActive = False
 
                 self.wheelflag = False
                 self.designerflag = False
@@ -3314,7 +3339,8 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         w = eval('numpy.'+window+'(window_len)')
                     ys = numpy.convolve(w/w.sum(),s,mode='valid')
-                    res = ys[(window_len/2):-(window_len/2)]
+                    hwl = int((window_len/2))
+                    res = ys[hwl:-hwl]
                     if len(res) != len(y):
                         return y
                     else:
@@ -3548,7 +3574,10 @@ class tgraphcanvas(FigureCanvas):
     
                 self.fig.clf()   #wipe out figure. keep_observers=False
     
-                self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
+                if mpl.__version__.split()[0] == 2:
+                    self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
+                else:
+                    self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
     
 
                 self.ax.set_ylim(self.ylimit_min, self.ylimit)
@@ -4311,9 +4340,16 @@ class tgraphcanvas(FigureCanvas):
 #                        leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
     
                 # we create here the project line plots to have the accurate time axis after CHARGE
+                if mpl.__version__.split()[0] == 2:
+                    dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0
+                else:
+                    dashes_setup = [3,4,1,4] # matplot 1.5 default
+                    #dashes_setup = [0.5,1,0.1,1] # very fine
                 self.l_BTprojection, = self.ax.plot([], [],color = self.palette["bt"],
+                                                dashes=dashes_setup,
                                                 linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                 self.l_ETprojection, = self.ax.plot([], [],color = self.palette["et"],
+                                                dashes=dashes_setup,
                                                 linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
     
 
@@ -4434,7 +4470,7 @@ class tgraphcanvas(FigureCanvas):
             self.BT2target = int(round(self.fromCtoF(self.BT2target)))
             # conv Arduino mode
             if aw:
-                aw.arduino.conv2fahrenheit()
+                aw.pidcontrol.conv2fahrenheit()
         self.ax.set_ylabel("F",size=16,color = self.palette["ylabel"]) #Write "F" on Y axis
         self.mode = "F"
         if aw: # during initialization aw is still None!
@@ -4468,7 +4504,7 @@ class tgraphcanvas(FigureCanvas):
             
             # conv Arduino mode
             if aw:
-                aw.arduino.conv2celsius()
+                aw.pidcontrol.conv2celsius()
         self.ax.set_ylabel("C",size=16,color = self.palette["ylabel"]) #Write "C" on Y axis
         self.mode = "C"
         if aw: # during initialization aw is still None
@@ -4648,7 +4684,10 @@ class tgraphcanvas(FigureCanvas):
         self.fig.clf()
         #create a new name ax1 instead of ax (ax is used when plotting profiles)
 
-        self.ax1 = self.fig.add_subplot(111,projection='polar', axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
+        if mpl.__version__.split()[0] == 2:
+            self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor=self.backcolor) #) radar green facecolor='#d5de9c'
+        else:
+            self.ax1 = self.fig.add_subplot(111,projection='polar',axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
         self.ax1.set_aspect(self.flavoraspect)
 
         #find number of divisions
@@ -4798,8 +4837,8 @@ class tgraphcanvas(FigureCanvas):
             if aw.extraeventsbuttonsflag:
                 aw.update_extraeventbuttons_visibility()
                 aw.showExtraButtons()
-            aw.arduino.activateONOFFeasySV(aw.arduino.svButtons)
-            aw.arduino.activateSVSlider(aw.arduino.svSlider)
+            aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons)
+            aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
             self.block_update = False # unblock the updating of the bitblit canvas            
             aw.showLCDs() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
@@ -4823,7 +4862,7 @@ class tgraphcanvas(FigureCanvas):
             # clear data from monitoring-only mode
             if len(self.timex) == 1:
                 aw.qmc.clearMeasurements()
-            aw.arduino.pidOff()
+            aw.pidcontrol.pidOff()
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
             if aw.qmc.device == 0 and aw.fujipid.followBackground:
                 if aw.fujipid.sv and aw.fujipid.sv > 0:
@@ -4854,7 +4893,7 @@ class tgraphcanvas(FigureCanvas):
             if not aw.HottopControlActive:
                 aw.hideSliders(changeDefault=False)
                 aw.hideExtraButtons(changeDefault=False)
-            aw.arduino.activateONOFFeasySV(False)
+            aw.pidcontrol.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
             aw.enableEditMenus()
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
@@ -5050,8 +5089,8 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[0] = len(self.timex)-1
                             else:
                                 message = QApplication.translate("Message","Not enough variables collected yet. Try again in a few seconds", None)
-                        if self.device == 19 and aw.arduino.pidOnCHARGE and not aw.arduino.pidActive: # Arduino/TC4
-                            aw.arduino.pidOn()
+                        if self.device == 19 and aw.pidcontrol.pidOnCHARGE and not aw.pidcontrol.pidActive: # Arduino/TC4
+                            aw.pidcontrol.pidOn()
                     self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE 00:00", None))
@@ -6132,14 +6171,24 @@ class tgraphcanvas(FigureCanvas):
                     self.temp2B[i] += step
                     self.stemp1B[i] += step
                     self.stemp2B[i] += step
+                for i in range(len(self.extratimexB)):
+                    for j in range(len(self.extratimexB[i])):
+                        self.stemp1BX[i][j] += step
+                        self.stemp2BX[i][j] += step
 
             elif direction == "left":
                 for i in range(lt):
-                    self.timeB[i] -= step
+                    self.timeB[i] -= step                    
+                for i in range(len(self.extratimexB)):
+                    for j in range(len(self.extratimexB[i])):
+                        self.extratimexB[i][j] -= step
                                    
             elif direction == "right":
                 for i in range(lt):
-                    self.timeB[i] += step
+                    self.timeB[i] += step             
+                for i in range(len(self.extratimexB)):
+                    for j in range(len(self.extratimexB[i])):
+                        self.extratimexB[i][j] += step
 
             elif direction == "down":
                 for i in range(lt):
@@ -6147,6 +6196,11 @@ class tgraphcanvas(FigureCanvas):
                     self.temp2B[i] -= step
                     self.stemp1B[i] -= step
                     self.stemp2B[i] -= step
+                    
+                for i in range(len(self.extratimexB)):
+                    for j in range(len(self.extratimexB[i])):
+                        self.stemp1BX[i][j] -= step
+                        self.stemp2BX[i][j] -= step
         else:
             aw.sendmessage(QApplication.translate("Message","Unable to move background", None))
             return
@@ -6900,25 +6954,25 @@ class tgraphcanvas(FigureCanvas):
                             index = self.timeindex.index(i)
                             if index == 0:
                                 timez = self.stringfromseconds(0)
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + u(QApplication.translate("Message", "[ CHARGE ]",None)) + "</font> " + timez)
+                                aw.sendmessage(u(QApplication.translate("Message", "[ CHARGE ]",None)) + " " + timez, style="background-color:'#f07800';")
                             elif index == 1:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ DRY END ]",None)) + "</font> " + timez)
+                                aw.sendmessage(u(QApplication.translate("Message", "[ DRY END ]",None)) + " " + timez, style="background-color:'orange';")
                             elif index == 2:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ FC START ]",None)) + "</font> " + timez)
+                                aw.sendmessage(u(QApplication.translate("Message", "[ FC START ]",None)) + " " + timez, style="background-color:'orange';")
                             elif index == 3:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ FC END ]",None)) + "</font> " + timez)
+                                aw.sendmessage(u(QApplication.translate("Message", "[ FC END ]",None)) + " " + timez, style="background-color:'orange';")
                             elif index == 4:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ SC START ]",None)) + "</font> " + timez)
+                                aw.sendmessage(u(QApplication.translate("Message", "[ SC START ]",None)) + " " + timez, style="background-color:'orange';")
                             elif index == 5:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ SC END ]",None)) + "</font> " + timez)
+                                aw.sendmessage(u(QApplication.translate("Message", "[ SC END ]",None)) + " " + timez, style="background-color:'orange';")
                             elif index == 6:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + u(QApplication.translate("Message", "[ DROP ]",None)) + "</font> " + timez)
+                                aw.sendmessage(u(QApplication.translate("Message", "[ DROP ]",None)) + " " + timez, style="background-color:'#f07800';")
                             break
                         else:
                             if abs(self.temp2[i] - ydata) < 10:
@@ -6930,7 +6984,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
                             timez = self.stringfromseconds(self.timex[i] - self.timex[self.timeindex[0]])
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: lightblue\">%s</font> "%timez)
+                            aw.sendmessage(timez,style="background-color:'lightblue';")
                             break
                     else:
                         totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
@@ -6978,7 +7032,7 @@ class tgraphcanvas(FigureCanvas):
                                   margin,self.stringfromseconds(midphasetime),margin,midphaseP,margin,midroc,margin,etbt2,margin)
                         string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s %s %s</font>"%(self.palette["rect3"],
                                   margin,self.stringfromseconds(finishphasetime),margin,finishphaseP,margin,finishroc,margin,etbt3,margin)
-                        aw.messagelabel.setText(string1+string2+string3)
+                        aw.sendmessage(string1+string2+string3)
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -7479,7 +7533,10 @@ class tgraphcanvas(FigureCanvas):
             # same as redraw but using different axes
             self.fig.clf()
             #create a new name ax1 instead of ax
-            self.ax2 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor)
+            if mpl.__version__.split()[0] == 2:
+                self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor=self.backcolor)            
+            else:
+                self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg=self.backcolor)
             self.ax2.set_rmax(1.)
             self.ax2.set_aspect(self.wheelaspect)
             self.ax2.set_autoscale_on(True)
@@ -7732,6 +7789,7 @@ class VMToolbar(NavigationToolbar):
         )
 
         NavigationToolbar.__init__(self, plotCanvas, parent)
+#        super(NavigationToolbar,self).__init__(plotCanvas,parent)
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
@@ -7780,9 +7838,10 @@ class VMToolbar(NavigationToolbar):
     def edit_parameters(self):
         allaxes = self.canvas.figure.get_axes()
         if len(allaxes) == 1:
-            axes = allaxes[0]
+#            axes = allaxes[0]
+            pass
         else:
-            titles = []
+#            titles = []
             if aw.qmc.flagstart:
                 # temporary set the axis to get proper menu items (same code as in redraw)
                 aw.qmc.ax.set_ylabel(aw.qmc.mode)
@@ -7790,33 +7849,36 @@ class VMToolbar(NavigationToolbar):
                 two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
                 if two_ax_mode and aw.qmc.delta_ax:
                     aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
-            for axes in allaxes:
-                title = axes.get_title()
-                ylabel = axes.get_ylabel()
-                if title:
-                    fmt = u(QApplication.translate("Label","Curves",None))
-                    if ylabel:
-                        fmt += " (%(ylabel)s)"
-                elif ylabel:
-                    fmt = u(QApplication.translate("Label","Delta Curves",None)) + u(" (%(ylabel)s)")
-                else:
-                    fmt = "%(axes_repr)s"
-                titles.append(fmt % dict(title = title,
-                                     ylabel = ylabel,
-                                     axes_repr = repr(axes)))
-            if aw.qmc.flagstart:
-                aw.qmc.ax.set_ylabel("")
-                aw.qmc.ax.set_xlabel("")
-                aw.qmc.ax.set_title("")
-                if aw.qmc.delta_ax:
-                    aw.qmc.delta_ax.set_ylabel("")
-            item, ok = QInputDialog.getItem(self, 'Customize',
-                                                  'Select axes:', titles,
-                                                  0, False)
-            if ok:
-                axes = allaxes[titles.index(u(item))]
-            else:
-                return
+#            for axes in allaxes:
+#                title = axes.get_title()
+#                ylabel = axes.get_ylabel()
+#                fmt = None
+#                if title:
+#                    fmt = u(QApplication.translate("Label","Curves",None))
+#                    if ylabel:
+#                        fmt += " (%(ylabel)s)"
+#                elif ylabel:
+#                    fmt = u(QApplication.translate("Label","Delta Curves",None)) + u(" (%(ylabel)s)")
+#                else:
+#                    fmt = "%(axes_repr)s"
+#                if fmt:
+#                    titles.append(fmt % dict(title = title,
+#                                     ylabel = ylabel,
+#                                     axes_repr = repr(axes)))
+#            if aw.qmc.flagstart:
+#                aw.qmc.ax.set_ylabel("")
+#                aw.qmc.ax.set_xlabel("")
+#                aw.qmc.ax.set_title("")
+#                if aw.qmc.delta_ax:
+#                    aw.qmc.delta_ax.set_ylabel("")
+#            item, ok = QInputDialog.getItem(self, 'Customize',
+#                                                  'Select axes:', titles,
+#                                                  0, False)
+#            if ok:
+#                axes = allaxes[titles.index(u(item))]
+#            else:
+#                return
+        axes = allaxes[0]
         figureoptions.figure_edit(axes, self)
         aw.fetchCurveStyles()
         # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
@@ -7910,7 +7972,7 @@ class SampleThread(QThread):
         try:
             tx,t1,t2 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
             return tx,float(t1),float(t2)
-        except Exception as ex:
+        except Exception:
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1.0,-1.0
 
@@ -8107,7 +8169,15 @@ class SampleThread(QThread):
                             length_of_qmc_timex += 1
                         else:
                             aw.qmc.timex[-1] = tx
-
+                            
+                    if aw.pidcontrol.pidActive and \
+                        (aw.qmc.device == 53 or # Hottop
+                        (aw.qmc.device in [19,29] and not aw.pidcontrol.externalPIDControl())): # MODBUS or TC4 + Artisan Software PID lib
+                        if aw.pidcontrol.pidSource == 1:
+                            aw.qmc.pid.update(t2_final) # BT
+                        else:
+                            aw.qmc.pid.update(t1_final) # ET
+                            
                     # update lines data using the lists with new data
                     if local_flagstart:
                         if aw.qmc.ETcurve:
@@ -8191,7 +8261,7 @@ class SampleThread(QThread):
                             aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
                         if aw.qmc.projectFlag:
                             aw.qmc.updateProjection()
-                        if aw.qmc.background and aw.qmc.backgroundReproduce:
+                        if aw.qmc.background and aw.qmc.backgroundReproduce and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
                             aw.qmc.playbackevent()
                         # autodetect CHARGE event
                         # only if BT > 203F/95C
@@ -8251,27 +8321,19 @@ class SampleThread(QThread):
                     except Exception:
                         pass
                         
-                    #update SV on Arduino/TC4 if in Ramp/Soak or Background Follow mode and PID is active
+                    #update SV on Arduino/TC4, Hottop, or MODBUS if in Ramp/Soak or Background Follow mode and PID is active
                     if aw.qmc.flagon and aw.qmc.timeindex[6] == 0: # only during sampling and before DROP
-                        if aw.qmc.device == 19 and aw.arduino.pidActive and aw.arduino.svMode in [1,2]:
+                        if aw.qmc.device in [19,29,53] and aw.pidcontrol.pidActive and aw.pidcontrol.svMode in [1,2]:
                             # calculate actual SV
-                            if aw.qmc.timeindex[0] != -1:
-                                # we set time=0 to CHARGE
-                                sv = aw.arduino.calcSV(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
-                            else:
-                                sv = aw.arduino.calcSV(tx)
+                            sv = aw.pidcontrol.calcSV(tx)
                             # update SV (if needed)
-                            if sv != None and sv != aw.arduino.sv:
+                            if sv != None and sv != aw.pidcontrol.sv:
                                 sv = max(0,sv) # we don't send SV < 0
-                                aw.arduino.setSV(sv)
+                                aw.pidcontrol.setSV(sv,init=False)
                         #update SV on FujiPIDs
                         elif aw.qmc.device == 0 and aw.fujipid.followBackground:
                             # calculate actual SV
-                            if aw.qmc.timeindex[0] != -1:
-                                # we set time=0 to CHARGE
-                                sv = aw.fujipid.calcSV(tx - aw.qmc.timex[aw.qmc.timeindex[0]])
-                            else:
-                                sv = aw.fujipid.calcSV(tx)
+                            sv = aw.fujipid.calcSV(tx)
                             # update SV (if needed)
                             if sv != None and sv != aw.fujipid.sv:
                                 sv = max(0,sv) # we don't send SV < 0
@@ -8587,8 +8649,9 @@ class ApplicationWindow(QMainWindow):
         # create a ET control objects
         self.fujipid = FujiPID()
         self.dtapid = DtaPID()
-        self.arduino = ArduinoTC4()
-
+        # PID control for Arduino, Hottop and generic MODBUS devices
+        self.pidcontrol = PIDcontrol()
+        
         self.soundflag = 0
 
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv seetings)
@@ -8767,9 +8830,9 @@ class ApplicationWindow(QMainWindow):
         fullsizeAction.triggered.connect(lambda x=0,y=1:self.resizeImg(0,1))
         self.saveGraphMenu.addAction(fullsizeAction)
 
-#        HukyForumAction = QAction("HukyForum.com (1200x?)...",self)
-#        HukyForumAction.triggered.connect(lambda x=1200,y=1:self.resizeImg(1200,1))
-#        self.saveGraphMenu.addAction(HukyForumAction)
+        largeSizeAction = QAction(UIconst.FILE_MENU_SAVEGRAPH_Large,self)
+        largeSizeAction.triggered.connect(lambda x=1200,y=1:self.resizeImg(1200,1))
+        self.saveGraphMenu.addAction(largeSizeAction)
 
         KaffeeNetzAction = QAction("Kaffee-Netz.de (800x?)...",self)
         KaffeeNetzAction.triggered.connect(lambda x=800,y=1:self.resizeImg(800,1))
@@ -9960,7 +10023,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCDSV = self.sliderLCD()
         self.sliderLCDSV.setNumDigits(3)
         self.sliderLCDSV.setStyleSheet("font-weight: bold;")
-        self.sliderLCDSV.display(self.arduino.svValue)
+        self.sliderLCDSV.display(self.pidcontrol.svValue)
         sliderGrpSV = QVBoxLayout()
         sliderGrpSV.addWidget(self.sliderLCDSV)
         sliderGrpSV.addWidget(self.sliderSV)
@@ -10027,6 +10090,24 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
+
+
+    # decides on visibility of the Control button based on the selected devices and configuration
+    def showControlButton(self):
+        res = False
+        lcds = False
+        if aw.qmc.device in [0,26]: # FUJI, DTA
+            res = True
+            if aw.ser.showFujiLCDs:
+                lcds = True
+        elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ARDUINOTC4
+            res = True
+        elif aw.qmc.Controlbuttonflag:
+            res = True
+        aw.button_10.setVisible(res)
+        self.LCD6frame.setVisible(lcds)
+        self.LCD7frame.setVisible(lcds)
+            
     # i/o: 0:g, 1:Kg, 2:lb (pound), 3:oz (ounce)
     def convertWeight(self,v,i,o):
         #                g,            kg,         lb,             oz,
@@ -10084,7 +10165,7 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.device == 0: # Fuji PID
             self.fujipid.adjustsv(x)
         elif self.qmc.device == 19: # Arduino TC4
-            self.arduino.adjustsv(x)
+            self.pidcontrol.adjustsv(x)
 
     # compute the 12 or 102 event quantifier linespace for type n in [0,3]
     def computeLinespace(self,n):
@@ -10626,10 +10707,10 @@ class ApplicationWindow(QMainWindow):
             self.sliderLCD4.display(v)
             
     def updateSVSliderLCD(self,v):
-        if v > aw.arduino.svSliderMax:
-            v = aw.arduino.svSliderMax
-        if v < aw.arduino.svSliderMin:
-            v = aw.arduino.svSliderMin
+        if v > aw.pidcontrol.svSliderMax:
+            v = aw.pidcontrol.svSliderMax
+        if v < aw.pidcontrol.svSliderMin:
+            v = aw.pidcontrol.svSliderMin
         self.sliderLCDSV.display(v)
 
     def sliderSVreleased(self):
@@ -10638,10 +10719,10 @@ class ApplicationWindow(QMainWindow):
         else:
             s = "%.0f"%self.sliderSV.value()
         aw.sendmessage(QApplication.translate("Message","SV set to %s"%s, None))
-        aw.arduino.setSV(self.sliderSV.value(),False)
+        aw.pidcontrol.setSV(self.sliderSV.value(),False)
 
     def moveSVslider(self,v):
-        if aw.arduino.svSlider:
+        if aw.pidcontrol.svSlider:
             self.sliderSV.setValue(v)
 
     def sliderReleased(self,n):
@@ -11045,10 +11126,14 @@ class ApplicationWindow(QMainWindow):
         except Exception:
             pass
 
-    def sendmessage(self,message,append=True):
+    def sendmessage(self,message,append=True,style=None):
         try:
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
+            if style:
+                aw.messagelabel.setStyleSheet(style)
+            else:
+                aw.messagelabel.setStyleSheet("background-color:'transparent';")
             message = aw.arabicReshape(message)
             #keep a max of 100 messages
             if append:
@@ -11290,7 +11375,7 @@ class ApplicationWindow(QMainWindow):
                 self.showFullScreen()
         elif key == 72:                       #H
             if not aw.qmc.designerflag:
-                self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None))
+                self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
                 if len(u(self.filename)) == 0:
                     return
                 try:
@@ -11320,28 +11405,28 @@ class ApplicationWindow(QMainWindow):
                     aw.fujipid.followBackground = False
                     aw.sendmessage(QApplication.translate("Message","PID Mode: Manual", None))
             elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
-                aw.arduino.svMode = (aw.arduino.svMode+1) %3
+                aw.pidcontrol.svMode = (aw.pidcontrol.svMode+1) %3
                 # 0: manual, 1: Ramp/Soak, 2: Follow (background profile)        
-                if aw.arduino.svMode == 0:
+                if aw.pidcontrol.svMode == 0:
                     aw.sendmessage(QApplication.translate("Message","PID Mode: Manual", None))
-                elif  aw.arduino.svMode == 1:
+                elif  aw.pidcontrol.svMode == 1:
                     aw.sendmessage(QApplication.translate("Message","PID Mode: Ramp/Soak", None))
-                elif  aw.arduino.svMode == 2:
+                elif  aw.pidcontrol.svMode == 2:
                     aw.sendmessage(QApplication.translate("Message","PID Mode: Background", None))
         elif key == 45:                       #-
             if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                 aw.fujipid.lookahead = max(0,aw.fujipid.lookahead-1)
                 aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
             elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
-                aw.arduino.svLookahead = max(0,aw.arduino.svLookahead-1)
-                aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.arduino.svLookahead))
+                aw.pidcontrol.svLookahead = max(0,aw.pidcontrol.svLookahead-1)
+                aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
         elif key == 43:                       #+
             if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                 aw.fujipid.lookahead = aw.fujipid.lookahead+1
                 aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
             elif aw.qmc.device == 19 and aw.arduino: # Arduino TC4
-                aw.arduino.svLookahead = aw.arduino.svLookahead+1
-                aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.arduino.svLookahead))
+                aw.pidcontrol.svLookahead = aw.pidcontrol.svLookahead+1
+                aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
         elif key == 32:                       #SELECTS ACTIVE BUTTON
             self.moveKbutton("space")
         elif key == 16777220:                 #TURN ON/OFF KEYBOARD MOVES
@@ -11408,6 +11493,9 @@ class ApplicationWindow(QMainWindow):
         elif key == 82 and aw.qmc.flagon:  #letter r (quick entry of custom event 4)
             self.quickEventShortCut = (3,"")
             aw.sendmessage("%s"%aw.qmc.etypes[3])
+        elif key == 86: #letter v (Set SV)
+            self.quickEventShortCut = (4,"")
+            aw.sendmessage("SV")
         elif key == 66:  #letter b hides/shows extra rows of event buttons
             self.toggleextraeventrows()
         elif key == 77:  #letter m hides/shows standard buttons row
@@ -11420,18 +11508,32 @@ class ApplicationWindow(QMainWindow):
                 # quick custom event entry
                 eventNr = self.quickEventShortCut[0]
                 eventValueStr = self.quickEventShortCut[1] + str(button.index(key))
-                aw.sendmessage("%s %s"%(aw.qmc.etypes[eventNr],eventValueStr))
-                if len(eventValueStr) == 2:
-                    # both digits entered, create the event
-                    self.quickEventShortCut = None
-                    value = int(eventValueStr)
-                    aw.moveslider(eventNr,value)
-                    if aw.qmc.flagstart:
-                        aw.qmc.EventRecordAction(extraevent = 1,eventtype=eventNr,eventvalue=(value + 10)/10.)
-                    aw.fireslideraction(eventNr)
+                if eventNr == 4:
+                    aw.sendmessage("SV %s"%(eventValueStr))
                 else:
-                    # keep on looking for digits
-                    self.quickEventShortCut = (eventNr,eventValueStr)
+                    aw.sendmessage("%s %s"%(aw.qmc.etypes[eventNr],eventValueStr))
+                if eventNr == 4: # SV
+                    if len(eventValueStr) == 3:
+                        # three digits entered, set the SV
+                        self.quickEventShortCut = None
+                        value = int(eventValueStr)
+                        aw.sendmessage("")
+                        aw.pidcontrol.setSV(value)
+                    else:
+                        # keep on looking for digits
+                        self.quickEventShortCut = (eventNr,eventValueStr)
+                else:
+                    if len(eventValueStr) == 2:
+                        # both digits entered, create the event
+                        self.quickEventShortCut = None
+                        value = int(eventValueStr)
+                        aw.moveslider(eventNr,value)
+                        if aw.qmc.flagstart:
+                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=eventNr,eventvalue=(value + 10)/10.)
+                        aw.fireslideraction(eventNr)
+                    else:
+                        # keep on looking for digits
+                        self.quickEventShortCut = (eventNr,eventValueStr)
             else:
                 self.setbuttonsfrom(button.index(key))
         elif key == 58 and not aw.qmc.flagon: # screenshots only if not sampling!
@@ -11670,6 +11772,7 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[:]</b> = Desktop ScreenShot",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[q,w,e,r + <i>nn</i>]</b> = Quick Custom Event",None)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>[v + <i>nnn</i>]</b> = Quick PID SV",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>[f]</b> = Full Screen Mode",None))
 
         QMessageBox.information(self,QApplication.translate("Message", "Keyboard Shotcuts",None),string)
@@ -13196,13 +13299,13 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
                 self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered
             # Ramp/Soak Profiles
-            if aw.arduino.loadRampSoakFromProfile:
+            if aw.pidcontrol.loadRampSoakFromProfile:
                 if "svValues" in profile:
-                    aw.arduino.svValues = [int(x) for x in profile["svValues"]]
+                    aw.pidcontrol.svValues = [int(x) for x in profile["svValues"]]
                 if "svRamps" in profile:
-                    aw.arduino.svRamps = [int(x) for x in profile["svRamps"]]
+                    aw.pidcontrol.svRamps = [int(x) for x in profile["svRamps"]]
                 if "svSoaks" in profile:
-                    aw.arduino.svSoaks = [int(x) for x in profile["svSoaks"]]
+                    aw.pidcontrol.svSoaks = [int(x) for x in profile["svSoaks"]]
             if "timeindex" in profile:
                 self.qmc.timeindex = profile["timeindex"]
                 if self.qmc.locktimex:
@@ -13614,9 +13717,9 @@ class ApplicationWindow(QMainWindow):
             #write only:
             profile["samplinginterval"] = self.qmc.delay / 1000.
             profile["oversampling"] = self.qmc.oversampling
-            profile["svValues"] = aw.arduino.svValues
-            profile["svRamps"] = aw.arduino.svRamps
-            profile["svSoaks"] = aw.arduino.svSoaks
+            profile["svValues"] = aw.pidcontrol.svValues
+            profile["svRamps"] = aw.pidcontrol.svRamps
+            profile["svSoaks"] = aw.pidcontrol.svSoaks
             try:
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
@@ -13880,29 +13983,20 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidget1018_changeTriggers = [toInt(x) for x in toList(settings.value("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers))]
             if settings.contains("PIDbuttonflag"):
                 self.qmc.PIDbuttonflag = bool(toBool(settings.value("PIDbuttonflag",self.qmc.PIDbuttonflag)))
+            if settings.contains("Controlbuttonflag"):
+                self.qmc.Controlbuttonflag = bool(toBool(settings.value("Controlbuttonflag",self.qmc.Controlbuttonflag)))
             # activate CONTROL BUTTON
-            if self.qmc.device == 0: # Fuji
-                self.button_10.setVisible(True) #CONTROL BUTTON
-                if aw.ser.showFujiLCDs:
-                    self.LCD6frame.setVisible(True)
-                    self.LCD7frame.setVisible(True)
-            elif self.qmc.device in [26,53]:   #DEVICE 26 = DTA or DEVICE 53 = HOTTOP
-                self.button_10.setVisible(True) #CONTROL BUTTON
-            elif self.qmc.device == 19: #DEVICE 19 = ARDUINOTC4
-                if aw.qmc.PIDbuttonflag:
-                    self.button_10.setVisible(True) #CONTROL BUTTON
-                else:
-                    self.button_10.setVisible(False) #CONTROL BUTTON
+            aw.showControlButton()
             if settings.contains("controlETpid"):
                 self.ser.controlETpid = [toInt(x) for x in toList(settings.value("controlETpid",self.ser.controlETpid))]
             if settings.contains("readBTpid"):
                 self.ser.readBTpid = [toInt(x) for x in toList(settings.value("readBTpid",self.ser.readBTpid))]
             if settings.contains("arduinoETChannel"):
-                self.ser.arduinoETChannel = toString(settings.value("arduinoETChannel",self.ser.arduinoETChannel))
+                self.ser.arduinoETChannel = s2a(toString(settings.value("arduinoETChannel",self.ser.arduinoETChannel)))
             if settings.contains("arduinoBTChannel"):
-                self.ser.arduinoBTChannel = toString(settings.value("arduinoBTChannel",self.ser.arduinoBTChannel))
+                self.ser.arduinoBTChannel = s2a(toString(settings.value("arduinoBTChannel",self.ser.arduinoBTChannel)))
             if settings.contains("arduinoATChannel"):
-                self.ser.arduinoATChannel = toString(settings.value("arduinoATChannel",self.ser.arduinoATChannel))
+                self.ser.arduinoATChannel = s2a(toString(settings.value("arduinoATChannel",self.ser.arduinoATChannel)))
             if settings.contains("ArduinoFILT"):
                 self.ser.ArduinoFILT = [toInt(x) for x in toList(settings.value("ArduinoFILT",self.ser.ArduinoFILT))]
             if settings.contains("useModbusPort"):
@@ -13996,7 +14090,7 @@ class ApplicationWindow(QMainWindow):
             #restore colors
             if settings.contains("Colors"):
                 for (k, v) in list(toMap(settings.value("Colors")).items()):
-                    self.qmc.palette[str(k)] = toString(v)
+                    self.qmc.palette[str(k)] = s2a(toString(v))
                 if self.qmc.palette["et"]:
                     self.setLabelColor(aw.label2,QColor(self.qmc.palette["et"]))
                 if self.qmc.palette["bt"]:    
@@ -14006,19 +14100,19 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.palette["deltabt"]:    
                     self.setLabelColor(aw.label5,QColor(self.qmc.palette["deltabt"]))
             if settings.contains("ETBColor"):
-                self.qmc.backgroundmetcolor = toString(settings.value("ETBColor",self.qmc.backgroundmetcolor))
+                self.qmc.backgroundmetcolor = s2a(toString(settings.value("ETBColor",self.qmc.backgroundmetcolor)))
             if settings.contains("BTBColor"):
-                self.qmc.backgroundbtcolor = toString(settings.value("BTBColor",self.qmc.backgroundbtcolor))
+                self.qmc.backgroundbtcolor = s2a(toString(settings.value("BTBColor",self.qmc.backgroundbtcolor)))
             if settings.contains("ETBdeltaColor"):
-                self.qmc.backgrounddeltaetcolor = toString(settings.value("ETBdeltaColor",self.qmc.backgrounddeltaetcolor))
+                self.qmc.backgrounddeltaetcolor = s2a(toString(settings.value("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)))
             if settings.contains("BTBdeltaColor"):
-                self.qmc.backgrounddeltabtcolor = toString(settings.value("BTBdeltaColor",self.qmc.backgrounddeltabtcolor))
+                self.qmc.backgrounddeltabtcolor = s2a(toString(settings.value("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)))
             if settings.contains("LCDColors"):
                 for (k, v) in list(toMap(settings.value("LCDColors")).items()):
-                    self.lcdpaletteB[str(k)] = toString(v)
+                    self.lcdpaletteB[str(k)] = s2a(toString(v))
             if settings.contains("LEDColors"):
                 for (k, v) in list(toMap(settings.value("LEDColors")).items()):
-                    self.lcdpaletteF[str(k)] = toString(v)
+                    self.lcdpaletteF[str(k)] = s2a(toString(v))
             #restore colors
             self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
             self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
@@ -14038,17 +14132,17 @@ class ApplicationWindow(QMainWindow):
             #restore extra background curve color and index
             settings.beginGroup("XT")
             if settings.contains("color"):
-                self.qmc.backgroundxtcolor = toString(settings.value("color",self.qmc.backgroundxtcolor))
+                self.qmc.backgroundxtcolor = s2a(toString(settings.value("color",self.qmc.backgroundxtcolor)))
             if settings.contains("index"):
                 self.qmc.xtcurveidx = toInt(settings.value("index",int(self.qmc.xtcurveidx)))
             settings.endGroup()
             #restore units
             settings.beginGroup("Units")
             if settings.contains("weight"):
-                self.qmc.weight[2] = toString(settings.value("weight",self.qmc.weight[2]))
-                self.qmc.volume[2] = toString(settings.value("volume",self.qmc.volume[2]))
-                self.qmc.density[1] = toString(settings.value("densityweight",self.qmc.density[1]))
-                self.qmc.density[3] = toString(settings.value("densityvolume",self.qmc.density[3]))
+                self.qmc.weight[2] = s2a(toString(settings.value("weight",self.qmc.weight[2])))
+                self.qmc.volume[2] = s2a(toString(settings.value("volume",self.qmc.volume[2])))
+                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
+                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
             if settings.contains("volumeCalcUnit"):
                 self.qmc.volumeCalcUnit = toInt(settings.value("volumeCalcUnit",int(self.qmc.volumeCalcUnit)))
             settings.endGroup()
@@ -14062,20 +14156,20 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #restore serial port
             settings.beginGroup("SerialPort")
-            self.ser.comport = toString(settings.value("comport",self.ser.comport))
+            self.ser.comport = s2a(toString(settings.value("comport",self.ser.comport)))
             if settings.contains("baudrate"):
                 self.ser.baudrate = toInt(settings.value("baudrate",int(self.ser.baudrate)))
             if settings.contains("bytesize"):
                 self.ser.bytesize = toInt(settings.value("bytesize",self.ser.bytesize))
             if settings.contains("stopbits"):
                 self.ser.stopbits = toInt(settings.value("stopbits",self.ser.stopbits))
-            self.ser.parity = toString(settings.value("parity",self.ser.parity))
+            self.ser.parity = s2a(toString(settings.value("parity",self.ser.parity)))
             if settings.contains("timeout"):
                 self.ser.timeout = toInt(settings.value("timeout",self.ser.timeout))
             settings.endGroup()
             #restore modbus port
             settings.beginGroup("Modbus")
-            self.modbus.comport = toString(settings.value("comport",self.modbus.comport))
+            self.modbus.comport = s2a(toString(settings.value("comport",self.modbus.comport)))
             if settings.contains("baudrate"):
                 self.modbus.baudrate = toInt(settings.value("baudrate",int(self.modbus.baudrate)))
             if settings.contains("bytesize"):
@@ -14083,7 +14177,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("stopbits"):
                 self.modbus.stopbits = toInt(settings.value("stopbits",self.modbus.stopbits))
             if settings.contains("parity"):
-                self.modbus.parity = toString(settings.value("parity",self.modbus.parity))
+                self.modbus.parity = s2a(toString(settings.value("parity",self.modbus.parity)))
             if settings.contains("timeout"):
                 self.modbus.timeout = toInt(settings.value("timeout",self.modbus.timeout))
             if settings.contains("input1slave"):
@@ -14102,6 +14196,14 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.input4slave = toInt(settings.value("input4slave",self.modbus.input4slave))
             if settings.contains("input4register"):
                 self.modbus.input4register = toInt(settings.value("input4register",self.modbus.input4register))
+            if settings.contains("input5slave"):
+                self.modbus.input5slave = toInt(settings.value("input5slave",self.modbus.input5slave))
+            if settings.contains("input5register"):
+                self.modbus.input5register = toInt(settings.value("input5register",self.modbus.input5register))
+            if settings.contains("input6slave"):
+                self.modbus.input6slave = toInt(settings.value("input6slave",self.modbus.input6slave))
+            if settings.contains("input6register"):
+                self.modbus.input6register = toInt(settings.value("input6register",self.modbus.input6register))
             if settings.contains("input1float"):
                 self.modbus.input1float = bool(toBool(settings.value("input1float",self.modbus.input1float)))
             if settings.contains("input1code"):
@@ -14118,18 +14220,36 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.input4float = bool(toBool(settings.value("input4float",self.modbus.input4float)))
             if settings.contains("input4code"):
                 self.modbus.input4code = toInt(settings.value("input4code",self.modbus.input4code))
+            if settings.contains("input5float"):
+                self.modbus.input5float = bool(toBool(settings.value("input5float",self.modbus.input5float)))
+            if settings.contains("input6code"):
+                self.modbus.input6code = toInt(settings.value("input6code",self.modbus.input6code))
             if settings.contains("littleEndianFloats"):
                 self.modbus.littleEndianFloats = bool(toBool(settings.value("littleEndianFloats",self.modbus.littleEndianFloats)))
             if settings.contains("input1mode"):
-                self.modbus.input1mode = toString(settings.value("input1mode",self.modbus.input1mode))
-                self.modbus.input2mode = toString(settings.value("input2mode",self.modbus.input2mode))
-                self.modbus.input3mode = toString(settings.value("input3mode",self.modbus.input3mode))
-                self.modbus.input4mode = toString(settings.value("input4mode",self.modbus.input4mode)) 
+                self.modbus.input1mode = s2a(toString(settings.value("input1mode",self.modbus.input1mode)))
+                self.modbus.input2mode = s2a(toString(settings.value("input2mode",self.modbus.input2mode)))
+                self.modbus.input3mode = s2a(toString(settings.value("input3mode",self.modbus.input3mode)))
+                self.modbus.input4mode = s2a(toString(settings.value("input4mode",self.modbus.input4mode)))
+                self.modbus.input5mode = s2a(toString(settings.value("input5mode",self.modbus.input5mode)))
+                self.modbus.input6mode = s2a(toString(settings.value("input6mode",self.modbus.input6mode)))
             if settings.contains("input1div"):
                 self.modbus.input1div = toInt(settings.value("input1div",self.modbus.input1div))
                 self.modbus.input2div = toInt(settings.value("input2div",self.modbus.input2div))
                 self.modbus.input3div = toInt(settings.value("input3div",self.modbus.input3div))
                 self.modbus.input4div = toInt(settings.value("input4div",self.modbus.input4div))
+                self.modbus.input5div = toInt(settings.value("input5div",self.modbus.input5div))
+                self.modbus.input6div = toInt(settings.value("input6div",self.modbus.input6div))
+            if settings.contains("PID_slave_ID"):
+                self.modbus.PID_slave_ID = toInt(settings.value("PID_slave_ID",self.modbus.PID_slave_ID))
+                self.modbus.PID_SV_register = toInt(settings.value("PID_SV_register",self.modbus.PID_SV_register))
+                self.modbus.PID_p_register = toInt(settings.value("PID_p_register",self.modbus.PID_p_register))
+                self.modbus.PID_i_register = toInt(settings.value("input4div",self.modbus.PID_i_register))
+                self.modbus.PID_d_register = toInt(settings.value("input4div",self.modbus.PID_d_register))
+            if settings.contains("PID_OFF_action"):
+                self.modbus.PID_OFF_action = s2a(toString(settings.value("PID_OFF_action",self.modbus.PID_OFF_action)))
+            if settings.contains("PID_ON_action"):
+                self.modbus.PID_ON_action = s2a(toString(settings.value("PID_ON_action",self.modbus.PID_ON_action)))
             #restore MODBUS TCP/UDP settings
             if settings.contains("host"):
                 self.modbus.type = toInt(settings.value("type",self.modbus.type))
@@ -14139,21 +14259,21 @@ class ApplicationWindow(QMainWindow):
             #restore scale port
             settings.beginGroup("Scale")
             self.scale.device = toString(settings.value("device",self.scale.device))
-            self.scale.comport = toString(settings.value("comport",self.scale.comport))
+            self.scale.comport = s2a(toString(settings.value("comport",self.scale.comport)))
             self.scale.baudrate = toInt(settings.value("baudrate",int(self.scale.baudrate)))
             self.scale.bytesize = toInt(settings.value("bytesize",self.scale.bytesize))
             self.scale.stopbits = toInt(settings.value("stopbits",self.scale.stopbits))
-            self.scale.parity = toString(settings.value("parity",self.scale.parity))
+            self.scale.parity = s2a(toString(settings.value("parity",self.scale.parity)))
             self.scale.timeout = toInt(settings.value("timeout",self.scale.timeout))
             settings.endGroup()
             #restore color port
             settings.beginGroup("Color")
             self.color.device = toString(settings.value("device",self.color.device))
-            self.color.comport = toString(settings.value("comport",self.color.comport))
+            self.color.comport = s2a(toString(settings.value("comport",self.color.comport)))
             self.color.baudrate = toInt(settings.value("baudrate",int(self.color.baudrate)))
             self.color.bytesize = toInt(settings.value("bytesize",self.color.bytesize))
             self.color.stopbits = toInt(settings.value("stopbits",self.color.stopbits))
-            self.color.parity = toString(settings.value("parity",self.color.parity))
+            self.color.parity = s2a(toString(settings.value("parity",self.color.parity)))
             self.color.timeout = toInt(settings.value("timeout",self.color.timeout))
             settings.endGroup()
             #restore alarms
@@ -14209,23 +14329,28 @@ class ApplicationWindow(QMainWindow):
             #restore TC4/Arduino PID settings
             settings.beginGroup("ArduinoPID")
             if settings.contains("pidOnCHARGE"):
-                aw.arduino.pidOnCHARGE = bool(toBool(settings.value("pidOnCHARGE",aw.arduino.pidOnCHARGE)))
-                aw.arduino.loadRampSoakFromProfile = bool(toBool(settings.value("loadRampSoakFromProfile",aw.arduino.loadRampSoakFromProfile)))
-                aw.arduino.svValues = [toInt(x) for x in toList(settings.value("svValues",aw.arduino.svValues))]
-                aw.arduino.svRamps = [toInt(x) for x in toList(settings.value("svRamps",aw.arduino.svRamps))]
-                aw.arduino.svSoaks = [toInt(x) for x in toList(settings.value("svSoaks",aw.arduino.svSoaks))]
-                aw.arduino.svSlider = bool(toBool(settings.value("svSlider",aw.arduino.svSlider)))
-                aw.arduino.svButtons = bool(toBool(settings.value("svButtons",aw.arduino.svButtons)))
-                aw.arduino.svMode = toInt(settings.value("svMode",aw.arduino.svMode))
-                aw.arduino.svLookahead = toInt(settings.value("svLookahead",aw.arduino.svLookahead))
-                aw.arduino.svSliderMin = toInt(settings.value("svSliderMin",aw.arduino.svSliderMin))
-                aw.arduino.svSliderMax = toInt(settings.value("svSliderMax",aw.arduino.svSliderMax))
-                aw.arduino.svValue = toInt(settings.value("svValue",aw.arduino.svValue))
-                aw.arduino.pidKp = toDouble(settings.value("pidKp",aw.arduino.pidKp))
-                aw.arduino.pidKi = toDouble(settings.value("pidKi",aw.arduino.pidKi))
-                aw.arduino.pidKd = toDouble(settings.value("pidKd",aw.arduino.pidKd))
-                aw.arduino.pidSource = toInt(settings.value("pidSource",aw.arduino.pidSource))
-                aw.arduino.pidCycle = toInt(settings.value("pidCycle",aw.arduino.pidCycle))
+                aw.pidcontrol.pidOnCHARGE = bool(toBool(settings.value("pidOnCHARGE",aw.pidcontrol.pidOnCHARGE)))
+                aw.pidcontrol.loadRampSoakFromProfile = bool(toBool(settings.value("loadRampSoakFromProfile",aw.pidcontrol.loadRampSoakFromProfile)))
+                aw.pidcontrol.svValues = [toInt(x) for x in toList(settings.value("svValues",aw.pidcontrol.svValues))]
+                aw.pidcontrol.svRamps = [toInt(x) for x in toList(settings.value("svRamps",aw.pidcontrol.svRamps))]
+                aw.pidcontrol.svSoaks = [toInt(x) for x in toList(settings.value("svSoaks",aw.pidcontrol.svSoaks))]
+                aw.pidcontrol.svSlider = bool(toBool(settings.value("svSlider",aw.pidcontrol.svSlider)))
+                aw.pidcontrol.svButtons = bool(toBool(settings.value("svButtons",aw.pidcontrol.svButtons)))
+                aw.pidcontrol.svMode = toInt(settings.value("svMode",aw.pidcontrol.svMode))
+                aw.pidcontrol.svLookahead = toInt(settings.value("svLookahead",aw.pidcontrol.svLookahead))
+                aw.pidcontrol.svSliderMin = toInt(settings.value("svSliderMin",aw.pidcontrol.svSliderMin))
+                aw.pidcontrol.svSliderMax = toInt(settings.value("svSliderMax",aw.pidcontrol.svSliderMax))
+                aw.pidcontrol.svValue = toInt(settings.value("svValue",aw.pidcontrol.svValue))
+                aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
+                aw.pidcontrol.pidKp = toDouble(settings.value("pidKp",aw.pidcontrol.pidKp))
+                aw.pidcontrol.pidKi = toDouble(settings.value("pidKi",aw.pidcontrol.pidKi))
+                aw.pidcontrol.pidKd = toDouble(settings.value("pidKd",aw.pidcontrol.pidKd))
+                aw.pidcontrol.pidSource = toInt(settings.value("pidSource",aw.pidcontrol.pidSource))
+                aw.pidcontrol.pidCycle = toInt(settings.value("pidCycle",aw.pidcontrol.pidCycle))
+                if settings.contains("pidPositiveTarget"):
+                    aw.pidcontrol.pidPositiveTarget = toInt(settings.value("pidPositiveTarget",aw.pidcontrol.pidPositiveTarget))
+                    aw.pidcontrol.pidNegativeTarget = toInt(settings.value("pidNegativeTarget",aw.pidcontrol.pidNegativeTarget))
+                    aw.pidcontrol.invertControl = bool(toBool(settings.value("invertControl",aw.pidcontrol.invertControl)))         
             settings.endGroup()
             
             #restore pid settings
@@ -14408,40 +14533,40 @@ class ApplicationWindow(QMainWindow):
             #restore curve styles
             settings.beginGroup("CurveStyles")
             if settings.contains("BTlinestyle"):
-                self.qmc.BTlinestyle = toString(settings.value("BTlinestyle",self.qmc.BTlinestyle))
-                self.qmc.BTdrawstyle = toString(settings.value("BTdrawstyle",self.qmc.BTdrawstyle))
+                self.qmc.BTlinestyle = s2a(toString(settings.value("BTlinestyle",self.qmc.BTlinestyle)))
+                self.qmc.BTdrawstyle = s2a(toString(settings.value("BTdrawstyle",self.qmc.BTdrawstyle)))
                 self.qmc.BTlinewidth = toInt(settings.value("BTlinewidth",self.qmc.BTlinewidth))
-                self.qmc.BTmarker = toString(settings.value("BTmarker",self.qmc.BTmarker))
+                self.qmc.BTmarker = s2a(toString(settings.value("BTmarker",self.qmc.BTmarker)))
                 self.qmc.BTmarkersize = toInt(settings.value("BTmarkersize",self.qmc.BTmarkersize))
-                self.qmc.ETlinestyle = toString(settings.value("ETlinestyle",self.qmc.ETlinestyle))
-                self.qmc.ETdrawstyle = toString(settings.value("ETdrawstyle",self.qmc.ETdrawstyle))
+                self.qmc.ETlinestyle = s2a(toString(settings.value("ETlinestyle",self.qmc.ETlinestyle)))
+                self.qmc.ETdrawstyle = s2a(toString(settings.value("ETdrawstyle",self.qmc.ETdrawstyle)))
                 self.qmc.ETlinewidth = toInt(settings.value("ETlinewidth",self.qmc.ETlinewidth))
-                self.qmc.ETmarker = toString(settings.value("ETmarker",self.qmc.ETmarker))
+                self.qmc.ETmarker = s2a(toString(settings.value("ETmarker",self.qmc.ETmarker)))
                 self.qmc.ETmarkersize = toInt(settings.value("ETmarkersize",self.qmc.ETmarkersize))
-                self.qmc.BTdeltalinestyle = toString(settings.value("BTdeltalinestyle",self.qmc.BTdeltalinestyle))
-                self.qmc.BTdeltadrawstyle = toString(settings.value("BTdeltadrawstyle",self.qmc.BTdeltadrawstyle))
+                self.qmc.BTdeltalinestyle = s2a(toString(settings.value("BTdeltalinestyle",self.qmc.BTdeltalinestyle)))
+                self.qmc.BTdeltadrawstyle = s2a(toString(settings.value("BTdeltadrawstyle",self.qmc.BTdeltadrawstyle)))
                 self.qmc.BTdeltalinewidth = toInt(settings.value("BTdeltalinewidth",self.qmc.BTdeltalinewidth))
-                self.qmc.BTdeltamarker = toString(settings.value("BTdeltamarker",self.qmc.BTdeltamarker))
+                self.qmc.BTdeltamarker = s2a(toString(settings.value("BTdeltamarker",self.qmc.BTdeltamarker)))
                 self.qmc.BTdeltamarkersize = toInt(settings.value("BTdeltamarkersize",self.qmc.BTdeltamarkersize))
-                self.qmc.ETdeltalinestyle = toString(settings.value("ETdeltalinestyle",self.qmc.ETdeltalinestyle))
-                self.qmc.ETdeltadrawstyle = toString(settings.value("ETdeltadrawstyle",self.qmc.ETdeltadrawstyle))
+                self.qmc.ETdeltalinestyle = s2a(toString(settings.value("ETdeltalinestyle",self.qmc.ETdeltalinestyle)))
+                self.qmc.ETdeltadrawstyle = s2a(toString(settings.value("ETdeltadrawstyle",self.qmc.ETdeltadrawstyle)))
                 self.qmc.ETdeltalinewidth = toInt(settings.value("ETdeltalinewidth",self.qmc.ETdeltalinewidth))
-                self.qmc.ETdeltamarker = toString(settings.value("ETdeltamarker",self.qmc.ETdeltamarker))
+                self.qmc.ETdeltamarker = s2a(toString(settings.value("ETdeltamarker",self.qmc.ETdeltamarker)))
                 self.qmc.ETdeltamarkersize = toInt(settings.value("ETdeltamarkersize",self.qmc.ETdeltamarkersize))
-                self.qmc.BTbacklinestyle = toString(settings.value("BTbacklinestyle",self.qmc.BTbacklinestyle))
-                self.qmc.BTbackdrawstyle = toString(settings.value("BTbackdrawstyle",self.qmc.BTbackdrawstyle))
+                self.qmc.BTbacklinestyle = s2a(toString(settings.value("BTbacklinestyle",self.qmc.BTbacklinestyle)))
+                self.qmc.BTbackdrawstyle = s2a(toString(settings.value("BTbackdrawstyle",self.qmc.BTbackdrawstyle)))
                 self.qmc.BTbacklinewidth = toInt(settings.value("BTbacklinewidth",self.qmc.BTbacklinewidth))
-                self.qmc.BTbackmarker = toString(settings.value("BTbackmarker",self.qmc.BTbackmarker))
+                self.qmc.BTbackmarker = s2a(toString(settings.value("BTbackmarker",self.qmc.BTbackmarker)))
                 self.qmc.BTbackmarkersize = toInt(settings.value("BTbackmarkersize",self.qmc.BTbackmarkersize))
-                self.qmc.ETbacklinestyle = toString(settings.value("ETbacklinestyle",self.qmc.ETbacklinestyle))
-                self.qmc.ETbackdrawstyle = toString(settings.value("ETbackdrawstyle",self.qmc.ETbackdrawstyle))
+                self.qmc.ETbacklinestyle = s2a(toString(settings.value("ETbacklinestyle",self.qmc.ETbacklinestyle)))
+                self.qmc.ETbackdrawstyle = s2a(toString(settings.value("ETbackdrawstyle",self.qmc.ETbackdrawstyle)))
                 self.qmc.ETbacklinewidth = toInt(settings.value("ETbacklinewidth",self.qmc.ETbacklinewidth))
-                self.qmc.ETbackmarker = toString(settings.value("ETbackmarker",self.qmc.ETbackmarker))
+                self.qmc.ETbackmarker = s2a(toString(settings.value("ETbackmarker",self.qmc.ETbackmarker)))
                 self.qmc.ETbackmarkersize = toInt(settings.value("ETbackmarkersize",self.qmc.ETbackmarkersize))
-                self.qmc.XTbacklinestyle = toString(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle))
-                self.qmc.XTbackdrawstyle = toString(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle))
+                self.qmc.XTbacklinestyle = s2a(toString(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle)))
+                self.qmc.XTbackdrawstyle = s2a(toString(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle)))
                 self.qmc.XTbacklinewidth = toInt(settings.value("XTbacklinewidth",self.qmc.XTbacklinewidth))
-                self.qmc.XTbackmarker = toString(settings.value("XTbackmarker",self.qmc.XTbackmarker))
+                self.qmc.XTbackmarker = s2a(toString(settings.value("XTbackmarker",self.qmc.XTbackmarker)))
                 self.qmc.XTbackmarkersize = toInt(settings.value("XTbackmarkersize",self.qmc.ETbackmarkersize))
                 self.qmc.extralinestyles1 = list(map(str,list(toStringList(settings.value("extralinestyles1",self.qmc.extralinestyles1)))))
                 self.qmc.extralinestyles2 = list(map(str,list(toStringList(settings.value("extralinestyles2",self.qmc.extralinestyles2)))))
@@ -14453,15 +14578,15 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extramarkers2 = list(map(str,list(toStringList(settings.value("extramarkers2",self.qmc.extramarkers2)))))
                 self.qmc.extramarkersizes1 = [toInt(x) for x in toList(settings.value("extramarkersizes1"))]
                 self.qmc.extramarkersizes2 = [toInt(x) for x in toList(settings.value("extramarkersizes2"))]
-                self.qmc.BTBdeltalinestyle = toString(settings.value("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle))
-                self.qmc.BTBdeltadrawstyle = toString(settings.value("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle))
+                self.qmc.BTBdeltalinestyle = s2a(toString(settings.value("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle)))
+                self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle)))
                 self.qmc.BTBdeltalinewidth = toInt(settings.value("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth))
-                self.qmc.BTBdeltamarker = toString(settings.value("BTBdeltamarker",self.qmc.BTBdeltamarker))
+                self.qmc.BTBdeltamarker = s2a(toString(settings.value("BTBdeltamarker",self.qmc.BTBdeltamarker)))
                 self.qmc.BTBdeltamarkersize = toInt(settings.value("BTBdeltamarkersize",self.qmc.BTBdeltamarkersize))
-                self.qmc.ETBdeltalinestyle = toString(settings.value("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle))
-                self.qmc.ETBdeltadrawstyle = toString(settings.value("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle))
+                self.qmc.ETBdeltalinestyle = s2a(toString(settings.value("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle)))
+                self.qmc.ETBdeltadrawstyle = s2a(toString(settings.value("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle)))
                 self.qmc.ETBdeltalinewidth = toInt(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))
-                self.qmc.ETBdeltamarker = toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker))
+                self.qmc.ETBdeltamarker = s2a(toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker)))
                 self.qmc.ETBdeltamarkersize = toInt(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))
             settings.endGroup()
             ndevices = len(self.qmc.extradevices)
@@ -14519,8 +14644,8 @@ class ApplicationWindow(QMainWindow):
                     self.extraser[i].timeout = self.extratimeout[i]
             settings.endGroup()
             if settings.contains("BTfunction"):
-                self.qmc.BTfunction = toString(settings.value("BTfunction",self.qmc.BTfunction))
-                self.qmc.ETfunction = toString(settings.value("ETfunction",self.qmc.ETfunction))
+                self.qmc.BTfunction = s2a(toString(settings.value("BTfunction",self.qmc.BTfunction)))
+                self.qmc.ETfunction = s2a(toString(settings.value("ETfunction",self.qmc.ETfunction)))
             if settings.contains("plotcurves"):
                 self.qmc.plotcurves = list(toStringList(settings.value("plotcurves",self.qmc.plotcurves)))
                 self.qmc.plotcurvecolor = list(toStringList(settings.value("plotcurvecolor",self.qmc.plotcurvecolor)))
@@ -15005,6 +15130,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("useModbusPort",self.ser.useModbusPort)
             settings.setValue("showFujiLCDs",self.ser.showFujiLCDs)
             settings.setValue("PIDbuttonflag",self.qmc.PIDbuttonflag)
+            settings.setValue("Controlbuttonflag",self.qmc.Controlbuttonflag)
             settings.endGroup()
             settings.setValue("fmt_data_RoR",self.qmc.fmt_data_RoR)
             settings.setValue("PhasesMode",self.qmc.phases_mode)
@@ -15085,6 +15211,13 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("stopbits",self.modbus.stopbits)
             settings.setValue("parity",self.modbus.parity)
             settings.setValue("timeout",self.modbus.timeout)
+            settings.setValue("PID_slave_ID",self.modbus.PID_slave_ID)
+            settings.setValue("PID_SV_register",self.modbus.PID_SV_register)
+            settings.setValue("PID_p_register",self.modbus.PID_p_register)
+            settings.setValue("PID_i_register",self.modbus.PID_i_register)
+            settings.setValue("PID_d_register",self.modbus.PID_d_register)
+            settings.setValue("PID_OFF_action",self.modbus.PID_OFF_action)
+            settings.setValue("PID_ON_action",self.modbus.PID_ON_action)
             settings.setValue("input1slave",self.modbus.input1slave)
             settings.setValue("input1register",self.modbus.input1register)
             settings.setValue("input1float",self.modbus.input1float)
@@ -15108,7 +15241,19 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input4float",self.modbus.input4float)
             settings.setValue("input4code",self.modbus.input4code)
             settings.setValue("input4div",self.modbus.input4div)
-            settings.setValue("input4mode",self.modbus.input4mode)
+            settings.setValue("input4mode",self.modbus.input4mode)            
+            settings.setValue("input5slave",self.modbus.input5slave)
+            settings.setValue("input5register",self.modbus.input5register)
+            settings.setValue("input5float",self.modbus.input5float)
+            settings.setValue("input5code",self.modbus.input5code)
+            settings.setValue("input5div",self.modbus.input5div)
+            settings.setValue("input5mode",self.modbus.input5mode)
+            settings.setValue("input6slave",self.modbus.input6slave)
+            settings.setValue("input6register",self.modbus.input6register)
+            settings.setValue("input6float",self.modbus.input6float)
+            settings.setValue("input6code",self.modbus.input6code)
+            settings.setValue("input6div",self.modbus.input6div)
+            settings.setValue("input6mode",self.modbus.input6mode)
             settings.setValue("littleEndianFloats",self.modbus.littleEndianFloats)
             settings.setValue("type",self.modbus.type)
             settings.setValue("host",self.modbus.host)
@@ -15136,23 +15281,26 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #save pid settings (only key and value[0])
             settings.beginGroup("ArduinoPID")
-            settings.setValue("pidOnCHARGE",aw.arduino.pidOnCHARGE)
-            settings.setValue("loadRampSoakFromProfile",aw.arduino.loadRampSoakFromProfile)
-            settings.setValue("svValues",aw.arduino.svValues)
-            settings.setValue("svRamps",aw.arduino.svRamps)
-            settings.setValue("svSoaks",aw.arduino.svSoaks)
-            settings.setValue("svSlider",aw.arduino.svSlider)
-            settings.setValue("svButtons",aw.arduino.svButtons)
-            settings.setValue("svMode",aw.arduino.svMode)
-            settings.setValue("svLookahead",aw.arduino.svLookahead)
-            settings.setValue("svSliderMin",aw.arduino.svSliderMin)
-            settings.setValue("svSliderMax",aw.arduino.svSliderMax)
-            settings.setValue("svValue",aw.arduino.svValue)
-            settings.setValue("pidKp",aw.arduino.pidKp)
-            settings.setValue("pidKi",aw.arduino.pidKi)
-            settings.setValue("pidKd",aw.arduino.pidKd)
-            settings.setValue("pidSource",aw.arduino.pidSource)
-            settings.setValue("pidCycle",aw.arduino.pidCycle)
+            settings.setValue("pidOnCHARGE",aw.pidcontrol.pidOnCHARGE)
+            settings.setValue("loadRampSoakFromProfile",aw.pidcontrol.loadRampSoakFromProfile)
+            settings.setValue("svValues",aw.pidcontrol.svValues)
+            settings.setValue("svRamps",aw.pidcontrol.svRamps)
+            settings.setValue("svSoaks",aw.pidcontrol.svSoaks)
+            settings.setValue("svSlider",aw.pidcontrol.svSlider)
+            settings.setValue("svButtons",aw.pidcontrol.svButtons)
+            settings.setValue("svMode",aw.pidcontrol.svMode)
+            settings.setValue("svLookahead",aw.pidcontrol.svLookahead)
+            settings.setValue("svSliderMin",aw.pidcontrol.svSliderMin)
+            settings.setValue("svSliderMax",aw.pidcontrol.svSliderMax)
+            settings.setValue("svValue",aw.pidcontrol.svValue)
+            settings.setValue("pidKp",aw.pidcontrol.pidKp)
+            settings.setValue("pidKi",aw.pidcontrol.pidKi)
+            settings.setValue("pidKd",aw.pidcontrol.pidKd)
+            settings.setValue("pidSource",aw.pidcontrol.pidSource)
+            settings.setValue("pidCycle",aw.pidcontrol.pidCycle)
+            settings.setValue("pidPositiveTarget",aw.pidcontrol.pidPositiveTarget)
+            settings.setValue("pidNegativeTarget",aw.pidcontrol.pidNegativeTarget)
+            settings.setValue("invertControl",aw.pidcontrol.invertControl)
             settings.endGroup()
             settings.beginGroup("PXR")
             for key in list(self.fujipid.PXR.keys()):
@@ -16481,7 +16629,8 @@ class ApplicationWindow(QMainWindow):
                     
                     # save graph                
                     if platf == 'Darwin':
-                        graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
+#                        graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
+                        graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
                         try:
                             os.remove(graph_image)
                         except OSError:
@@ -16493,15 +16642,17 @@ class ApplicationWindow(QMainWindow):
                         else:
                             image = aw.qmc.grab().toImage()
                         #save GRAPH image
-                        graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
+#                        graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
+                        graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".png")))
                         try:
                             os.remove(graph_image)
                         except OSError:
                             pass
                         image.save(graph_image)
                     #add some random number to force HTML reloading
+                    graph_image = path2url(graph_image)
                     graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
-                    graph_image = "<img alt='roast graph' style=\"width:100%;\" src='file:///" + graph_image + "'>"
+                    graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
                     # redraw original graph
                     if not foreground_profile_path and not aw.qmc.backgroundpath:
                         self.qmc.redraw(recomputeAllDeltas=False)
@@ -16955,7 +17106,8 @@ class ApplicationWindow(QMainWindow):
             tmpdir = u(QDir.tempPath() + "/")
             graph_image = "roastlog-graph"
             if platf == 'Darwin':
-                graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
+#                graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
+                graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
                 try:
                     os.remove(graph_image)
                 except OSError:
@@ -16967,19 +17119,22 @@ class ApplicationWindow(QMainWindow):
                 else:
                     image = aw.qmc.grab().toImage()
                 #save GRAPH image
-                graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
+#                graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
+                graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".png")))
                 try:
                     os.remove(graph_image)
                 except OSError:
                     pass
                 image.save(graph_image)
             #add some random number to force HTML reloading
+            graph_image = path2url(graph_image)
             graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
             #obtain flavor chart image
             self.qmc.flavorchart()
             flavor_image = "roastlog-flavor"
             if platf == 'Darwin':
-                flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".svg"))
+#                flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".svg"))
+                flavor_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + ".svg")))
                 try:
                     os.remove(flavor_image)
                 except OSError:
@@ -16992,12 +17147,14 @@ class ApplicationWindow(QMainWindow):
                     image = aw.qmc.grab().toImage()
                 #resize FLAVOR image to 550 pixels width
                 #save GRAPH image
-                flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".png"))
+#                flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".png"))
+                flavor_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + ".png")))
                 try:
                     os.remove(flavor_image)
                 except OSError:
                     pass
                 image.save(flavor_image)
+            flavor_image = path2url(flavor_image)
             flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
             #return screen to GRAPH profile mode
             self.qmc.redraw(recomputeAllDeltas=False)
@@ -17615,22 +17772,20 @@ class ApplicationWindow(QMainWindow):
         contributors += u("Morten M") + uchr(252) + u("nchow")
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
+        contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner<br>")
         box = QMessageBox(self)
         
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
         box.about(self,
                 QApplication.translate("About", "About",None),
-                u("""<big><b>{0}</b> {1}</big> ({2})
+                u("""<h2>{0} {1} ({2})</h2>
                 <p>
-                <b>Based on:</b><br>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}
+                <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}</small>
                 </p>
-                <p>
-                <b>{9}</b> {10}
-                </p>
-                <p>
-                <b>{11}</b> {12}
-                </p>""").format(
+                <p><b>{9}</b><small>{10}</small></p>
+                <p><b>{11}</b><small>{12}</small></p>
+                """).format(
                 "Artisan",
                 str(__version__),
                 str(__revision__),
@@ -17640,9 +17795,9 @@ class ApplicationWindow(QMainWindow):
                 mpl.__version__,
                 numpy.__version__,
                 SCIPY_VERSION_STR,
-                QApplication.translate("About", "Core developers:",None),
+                QApplication.translate("About", "Core Developers",None),
                 coredevelopers,
-                QApplication.translate("About", "Contributors:",None),
+                QApplication.translate("About", "Contributors",None),
                 contributors))
 
     def showAboutQt(self):
@@ -17742,6 +17897,13 @@ class ApplicationWindow(QMainWindow):
             self.modbus.stopbits = int(str(dialog.modbus_stopbitsComboBox.currentText()))
             self.modbus.parity = str(dialog.modbus_parityComboBox.currentText())
             self.modbus.timeout = int(str(dialog.modbus_timeoutEdit.text()))
+            self.modbus.PID_slave_ID = int(str(dialog.modbus_PIDslave_Edit.text()))
+            self.modbus.PID_SV_register = int(str(dialog.modbus_SVregister_Edit.text()))
+            self.modbus.PID_p_register = int(str(dialog.modbus_Pregister_Edit.text()))
+            self.modbus.PID_i_register = int(str(dialog.modbus_Iregister_Edit.text()))
+            self.modbus.PID_d_register = int(str(dialog.modbus_Dregister_Edit.text()))
+            self.modbus.PID_OFF_action = s2a(toString(dialog.modbus_pid_off.text()))
+            self.modbus.PID_ON_action = s2a(toString(dialog.modbus_pid_on.text()))
             self.modbus.input1slave = int(str(dialog.modbus_input1slaveEdit.text()))
             self.modbus.input1register = int(str(dialog.modbus_input1registerEdit.text()))
             self.modbus.input1code = int(str(dialog.modbus_input1code.currentText()))
@@ -17766,6 +17928,18 @@ class ApplicationWindow(QMainWindow):
             self.modbus.input4float = bool(dialog.modbus_input4float.isChecked())
             self.modbus.input4div = dialog.modbus_input4div.currentIndex()
             self.modbus.input4mode = str(dialog.modbus_input4mode.currentText())
+            self.modbus.input5slave = int(str(dialog.modbus_input5slaveEdit.text()))
+            self.modbus.input5register = int(str(dialog.modbus_input5registerEdit.text()))
+            self.modbus.input5code = int(str(dialog.modbus_input5code.currentText()))
+            self.modbus.input5float = bool(dialog.modbus_input5float.isChecked())
+            self.modbus.input5div = dialog.modbus_input5div.currentIndex()
+            self.modbus.input5mode = str(dialog.modbus_input5mode.currentText())
+            self.modbus.input6slave = int(str(dialog.modbus_input6slaveEdit.text()))
+            self.modbus.input6register = int(str(dialog.modbus_input6registerEdit.text()))
+            self.modbus.input6code = int(str(dialog.modbus_input6code.currentText()))
+            self.modbus.input6float = bool(dialog.modbus_input6float.isChecked())
+            self.modbus.input6div = dialog.modbus_input6div.currentIndex()
+            self.modbus.input6mode = str(dialog.modbus_input6mode.currentText())
             self.modbus.littleEndianFloats = bool(dialog.modbus_littleEndianFloats.isChecked())
             self.modbus.type = int(dialog.modbus_type.currentIndex())
             self.modbus.host = str(dialog.modbus_hostEdit.text())
@@ -17815,7 +17989,7 @@ class ApplicationWindow(QMainWindow):
                 self.HottopControlActive = True
 
     def PIDcontrol(self):
-        #pid
+        #FUJI/DELTA pid
         if self.qmc.device == 0 or self.qmc.device == 26:
             modifiers = QApplication.keyboardModifiers()
             if modifiers == Qt.ControlModifier and self.qmc.device == 0:
@@ -17844,17 +18018,25 @@ class ApplicationWindow(QMainWindow):
                 QApplication.processEvents()
         # Hottop
         elif self.qmc.device == 53: 
-            self.toggleHottopControl()
-        #arduino
-        elif self.qmc.device == 19:
             modifiers = QApplication.keyboardModifiers()
             if modifiers == Qt.ControlModifier:
-                self.arduino.togglePID()
-            else:
-                dialog = ArduinoDlgControl(self)
+                dialog = PID_DlgControl(self)
                 #modeless style dialog 
                 dialog.show()
-                dialog.setFixedSize(dialog.size());
+                dialog.setFixedSize(dialog.size())
+            else:
+                #self.pidcontrol.togglePID()
+                self.toggleHottopControl()
+        # all other devices
+        else:
+            modifiers = QApplication.keyboardModifiers()
+            if modifiers == Qt.ControlModifier:
+                self.pidcontrol.togglePID()
+            else:
+                dialog = PID_DlgControl(self)
+                #modeless style dialog 
+                dialog.show()
+                dialog.setFixedSize(dialog.size())
 
     def deviceassigment(self):
         dialog = DeviceAssignmentDlg(self)
@@ -20046,7 +20228,7 @@ class HUDDlg(ArtisanDialog):
         try:
             aw.sendmessage("Dropping beans...")
             colorb = ["#996633","#4d2600","#4b4219","black","#4b3219","#996633","#281a0d"]
-            for i in range(3): # number of bean layers (each a randomly different color)
+            for _ in range(3): # number of bean layers (each a randomly different color)
                 x = aw.qmc.endofx*numpy.random.rand(aw.qmc.endofx/6)
                 y = aw.qmc.ylimit*numpy.random.rand(aw.qmc.endofx/6)
                 aw.qmc.ax.plot(x,y,'o',color=colorb[int(round(6*numpy.random.rand(1)[0]))])
@@ -22039,7 +22221,7 @@ class editGraphDlg(ArtisanDialog):
                 self.inWeight()
             elif self.weightoutedit.hasFocus():
                 self.outWeight()
-        elif key == 16777220 and self.volumeinedit.hasFocus() and (str(self.volumeinedit.text()) == "" or float(self.volumeinedit.text()) == 0.):
+        elif key == 16777220 and self.volumeinedit.hasFocus() and (str(self.volumeinedit.text()) == "" or float(self.volumeinedit.text().replace(",",".")) == 0.):
             try:
                 dw = float(str(self.bean_density_weight_edit.text()))
                 dv = float(str(self.bean_density_volume_edit.text()))                    
@@ -22471,7 +22653,6 @@ class editGraphDlg(ArtisanDialog):
         
     def createAlarmEventTable(self):
         if len(aw.qmc.specialevents):
-            self.saveEventTable()
             # check for selection
             selected = self.eventtable.selectedRanges()
             if selected and len(selected) > 0:
@@ -22486,6 +22667,10 @@ class editGraphDlg(ArtisanDialog):
             aw.sendmessage(message)
         
     def orderEventTable(self):
+        self.saveEventTable()
+        self.orderEventTableLoop()
+        
+    def orderEventTableLoop(self):
         nevents = len(aw.qmc.specialevents)
         if nevents:
             for i in range(nevents-1):
@@ -22502,7 +22687,7 @@ class editGraphDlg(ArtisanDialog):
                     aw.qmc.specialeventstype[i+1] = itype
                     aw.qmc.specialeventsStrings[i+1] = istring
                     aw.qmc.specialeventsvalue[i+1] = ivalue
-                    self.orderEventTable()
+                    self.orderEventTableLoop()
                     return
             self.createEventTable()
             aw.qmc.redraw(recomputeAllDeltas=False)
@@ -22587,7 +22772,7 @@ class editGraphDlg(ArtisanDialog):
         percent = 0.
         try:
             if self.volumeoutedit.text() != "" and float(str(self.volumeoutedit.text())) != 0.0:
-                percent = aw.volume_increase(float(str(self.volumeinedit.text())),float(str(self.volumeoutedit.text())))
+                percent = aw.volume_increase(float(str(self.volumeinedit.text()).replace(",",".")),float(str(self.volumeoutedit.text().replace(",","."))))
         except Exception:
             pass
         percentstring =  "%.1f" %(percent) + "%"
@@ -22597,20 +22782,23 @@ class editGraphDlg(ArtisanDialog):
     # calculates density in g/l
     def calc_density(self):
         din = dout = 0.0
-        if self.volumeinedit.text() != "" and self.volumeoutedit.text() != "" and self.weightinedit.text() != "" and self.weightoutedit.text() != "":
-            volumein = float(str(self.volumeinedit.text()))
-            volumeout = float(str(self.volumeoutedit.text()))
-            weightin = float(str(self.weightinedit.text()))
-            weightout = float(str(self.weightoutedit.text()))
-            if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
-                vol_idx = aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
-                volumein = aw.convertVolume(volumein,vol_idx,0)
-                volumeout = aw.convertVolume(volumeout,vol_idx,0)
-                weight_idx = aw.qmc.weight_units.index(self.unitsComboBox.currentText())
-                weightin = aw.convertWeight(weightin,weight_idx,0)
-                weightout = aw.convertWeight(weightout,weight_idx,0)
-                din = (weightin / volumein) 
-                dout = (weightout / volumeout)
+        try:
+            if self.volumeinedit.text() != "" and self.volumeoutedit.text() != "" and self.weightinedit.text() != "" and self.weightoutedit.text() != "":
+                volumein = float(str(self.volumeinedit.text()).replace(",","."))
+                volumeout = float(str(self.volumeoutedit.text()).replace(",","."))
+                weightin = float(str(self.weightinedit.text()).replace(",","."))
+                weightout = float(str(self.weightoutedit.text()).replace(",","."))
+                if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
+                    vol_idx = aw.qmc.volume_units.index(self.volumeUnitsComboBox.currentText())
+                    volumein = aw.convertVolume(volumein,vol_idx,0)
+                    volumeout = aw.convertVolume(volumeout,vol_idx,0)
+                    weight_idx = aw.qmc.weight_units.index(self.unitsComboBox.currentText())
+                    weightin = aw.convertWeight(weightin,weight_idx,0)
+                    weightout = aw.convertWeight(weightout,weight_idx,0)
+                    din = (weightin / volumein) 
+                    dout = (weightout / volumeout)
+        except:
+            pass
         return din,dout
 
     def calculated_density(self):
@@ -22773,32 +22961,32 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.ambientTempSource = self.ambientComboBox.currentIndex()
         #update weight
         try:
-            aw.qmc.weight[0] = float(str(self.weightinedit.text()))
+            aw.qmc.weight[0] = float(str(self.weightinedit.text()).replace(",","."))
         except Exception:
             aw.qmc.weight[0] = 0
         try:
-            aw.qmc.weight[1] = float(str(self.weightoutedit.text()))
+            aw.qmc.weight[1] = float(str(self.weightoutedit.text()).replace(",","."))
         except Exception:
             aw.qmc.weight[1] = 0
         aw.qmc.weight[2] =u(self.unitsComboBox.currentText())
         #update volume
         try:
-            aw.qmc.volume[0] = float(str(self.volumeinedit.text()))
+            aw.qmc.volume[0] = float(str(self.volumeinedit.text()).replace(",","."))
         except Exception:
             aw.qmc.volume[0] = 0
         try:
-            aw.qmc.volume[1] = float(str(self.volumeoutedit.text()))
+            aw.qmc.volume[1] = float(str(self.volumeoutedit.text()).replace(",","."))
         except Exception:
             aw.qmc.volume[1] = 0
         aw.qmc.volume[2] = u(self.volumeUnitsComboBox.currentText())
         #update density
         try:
-            aw.qmc.density[0] = float(str(self.bean_density_weight_edit.text()))
+            aw.qmc.density[0] = float(str(self.bean_density_weight_edit.text()).replace(",","."))
         except Exception:
             aw.qmc.density[0] = 0
         aw.qmc.density[1] = u(self.bean_density_weightUnitsComboBox.currentText())
         try:
-            aw.qmc.density[2] = float(str(self.bean_density_volume_edit.text()))
+            aw.qmc.density[2] = float(str(self.bean_density_volume_edit.text()).replace(",","."))
         except Exception:
             aw.qmc.density[2] = 0
         aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
@@ -26388,14 +26576,15 @@ class backgroundDlg(ArtisanDialog):
     def setreproduce(self):
         if aw.qmc.background:
             aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
+            s = None
             if self.backgroundReproduce.isChecked():
                 aw.qmc.backgroundReproduce = True
                 msg = QApplication.translate("Message","Playback Aid set ON at {0} secs",None).format(str(aw.qmc.detectBackgroundEventTime))
             else:
                 aw.qmc.backgroundReproduce = False
                 msg = QApplication.translate("StatusBar","Playback Aid set OFF",None)
-                aw.messagelabel.setStyleSheet("background-color:'transparent';")
-            aw.sendmessage(msg)
+                s = "background-color:'transparent';"
+            aw.sendmessage(msg, style=s)
         else:
             self.backgroundReproduce.setChecked(False)
             aw.sendmessage(QApplication.translate("Message","No profile background found",None))
@@ -26938,7 +27127,7 @@ class StatisticsDlg(ArtisanDialog):
 ###########################################################################################
 
 
-# hack to allow retry count and timeout to be configured on pymodbus UDP, without it blocks on connection failures
+# hack to allow retry count and timeout to be configured on pymodbus UDP, without blocking on connection failures
 class ArtisanModbusUdpClient(ModbusUdpClient):
     ''' Adds timeout to UDP client
     '''
@@ -26954,7 +27143,8 @@ class ArtisanModbusUdpClient(ModbusUdpClient):
         self.port = port
         self.socket = None
         self.timeout  = kwargs.get('timeout',  Defaults.Timeout)
-        BaseModbusClient.__init__(self, framer(ClientDecoder()),**kwargs)
+        #BaseModbusClient.__init__(self, framer(ClientDecoder()),**kwargs)
+        super(BaseModbusClient,self).__init__(framer(ClientDecoder()),**kwargs)
     
     def connect(self):
         ''' Connect to the modbus tcp server
@@ -26975,6 +27165,8 @@ class ArtisanModbusUdpClient(ModbusUdpClient):
 class modbusport(object):
     """ this class handles the communications with all the modbus devices"""
     def __init__(self):
+        # retries
+        self.readRetries = 2
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = "COM5"      #NOTE: this string should not be translated.
         self.baudrate = 115200
@@ -26982,6 +27174,13 @@ class modbusport(object):
         self.parity= 'N'
         self.stopbits = 1
         self.timeout = 1
+        self.PID_slave_ID = 0
+        self.PID_SV_register = 0
+        self.PID_p_register = 0
+        self.PID_i_register = 0
+        self.PID_d_register = 0
+        self.PID_ON_action = ""
+        self.PID_OFF_action = ""
         self.input1slave = 0
         self.input1register = 0
         self.input1float = False
@@ -27006,6 +27205,18 @@ class modbusport(object):
         self.input4code = 3
         self.input4div = 0
         self.input4mode = "C"
+        self.input5slave = 0
+        self.input5register = 0
+        self.input5float = False
+        self.input5code = 3
+        self.input5div = 0
+        self.input5mode = "C"
+        self.input6slave = 0
+        self.input6register = 0
+        self.input6float = False
+        self.input6code = 3
+        self.input6div = 0
+        self.input6mode = "C"
         self.littleEndianFloats = False
         self.master = None
         self.COMsemaphore = QSemaphore(1)
@@ -27023,7 +27234,7 @@ class modbusport(object):
     # this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     def sleepBetween(self,write=False):
         if write:
-            if self.type in [3,4]:
+            if self.type in [3,4]: # TCP or UDP
                 libtime.sleep(0.040)
             else:
                 libtime.sleep(0.085)
@@ -27160,6 +27371,8 @@ class modbusport(object):
             self.connect()
             self.master.write_register(int(register),int(value),unit=int(slave))
         except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -27194,12 +27407,19 @@ class modbusport(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if code==3:
-                res = self.master.read_holding_registers(int(register),2,unit=int(slave))
-            else:
-                res = self.master.read_input_registers(int(register),2,unit=int(slave))
-            if res == None or isinstance(res,ExceptionResponse):
-                raise Exception("Exception response")
+            retry = self.readRetries
+            while True:
+                if code==3:
+                    res = self.master.read_holding_registers(int(register),2,unit=int(slave))
+                else:
+                    res = self.master.read_input_registers(int(register),2,unit=int(slave))
+                if res == None or isinstance(res,ExceptionResponse):
+                    if retry > 0:
+                        retry = retry - 1
+                    else:
+                        raise Exception("Exception response")
+                else:
+                    break
             if self.littleEndianFloats:
                 decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Little)
             else:
@@ -27219,16 +27439,30 @@ class modbusport(object):
                 aw.addserial("MODBUS readFloat :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
 
     def readSingleRegister(self,slave,register,code=3):
+#        import logging
+#        logging.basicConfig()
+#        log = logging.getLogger()
+#        log.setLevel(logging.DEBUG)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
-            self.connect()         
-            if code==3:
-                res = self.master.read_holding_registers(int(register),1,unit=int(slave))
-            else:
-                res = self.master.read_input_registers(int(register),1,unit=int(slave))
-            if res == None or isinstance(res,ExceptionResponse):
-                raise Exception("Exception response")          
+            self.connect()
+            retry = self.readRetries
+            while True:
+                try:
+                    if code==3:
+                        res = self.master.read_holding_registers(int(register),1,unit=int(slave))
+                    else:
+                        res = self.master.read_input_registers(int(register),1,unit=int(slave))
+                except:
+                    res = None
+                if res == None or isinstance(res,ExceptionResponse):
+                    if retry > 0:
+                        retry = retry - 1
+                    else:
+                        raise Exception("Exception response")
+                else:
+                    break                    
             decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
             r = decoder.decode_16bit_uint()
             return r
@@ -27245,6 +27479,18 @@ class modbusport(object):
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
+
+
+    def setTarget(self,sv,init=None):
+        if self.PID_slave_ID:
+            self.writeSingleRegister(self.PID_slave_ID,self.PID_SV_register,sv*10)
+        
+    def setPID(self,p,i,d):
+        if self.PID_slave_ID and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
+            self.writeSingleRegister(self.PID_slave_ID,self.PID_p_register,p*10.)
+            self.writeSingleRegister(self.PID_slave_ID,self.PID_i_register,i*10.)
+            self.writeSingleRegister(self.PID_slave_ID,self.PID_d_register,d*10.)
+        
 
 
 class extraserialport(object):
@@ -27551,7 +27797,7 @@ class serialport(object):
                                    self.ARDUINOTC4,         #19
                                    self.TEVA18B,            #20
                                    self.CENTER309_34,       #21
-                                   self.fujidutycycle,      #22
+                                   self.piddutycycle,       #22
                                    self.HHM28,              #23
                                    self.K204_34,            #24
                                    self.virtual,            #25
@@ -27584,7 +27830,8 @@ class serialport(object):
                                    self.PHIDGET1048,        #52
                                    self.HOTTOP_BTET,        #53
                                    self.HOTTOP_HF,          #54
-                                   self.HH806W              #55
+                                   self.MODBUS_56,          #55
+                                   self.HH806W              #56
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -27683,10 +27930,18 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","",None) + " fujitemperature() {0}").format(str(ex)),exc_tb.tb_lineno)
         return tx,t1,t2
 
-    #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
-    def fujidutycycle(self):
-        #return saved readings from device 0
-        return aw.qmc.dutycycleTX, aw.qmc.dutycycle, aw.qmc.currentpidsv
+    #especial function that collects extra duty cycle % and SV
+    def piddutycycle(self):
+        if aw.qmc.device == 0: # FUJI
+            #return saved readings from device 0
+            return aw.qmc.dutycycleTX, aw.qmc.dutycycle, aw.qmc.currentpidsv
+        elif (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or \
+                (aw.qmc.device == 53) or \
+                (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl()):
+                # TC4, HOTTOP or MODBUS with Artisan Software PID
+            return aw.qmc.timeclock.elapsed()/1000., aw.qmc.pid.lastOutput, aw.qmc.pid.target
+        else:
+            return aw.qmc.timeclock.elapsed()/1000.,-1,-1
 
     def DTAtemperature(self):
         ###########################################################
@@ -27781,7 +28036,7 @@ class serialport(object):
 
     def callprogram(self):
         try:
-            output = os.popen(self.externalprogram,"r").readline()
+            output = os.popen(aw.ser.externalprogram,"r").readline()
             tx = aw.qmc.timeclock.elapsed()/1000.
             if "," in output:
                 parts = output.split(",")
@@ -27913,6 +28168,9 @@ class serialport(object):
 
     def MODBUS_34(self):
         return aw.qmc.extraMODBUStx,aw.qmc.extraMODBUSt4,aw.qmc.extraMODBUSt3
+        
+    def MODBUS_56(self):
+        return aw.qmc.extraMODBUStx,aw.qmc.extraMODBUSt6,aw.qmc.extraMODBUSt5
 
     def HH802U(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -28125,7 +28383,7 @@ class serialport(object):
         return "{0:0>{1}}".format(bin(n)[2:], digits)
 
     #similar to Omega HH806
-    def MS6514temperature(self):
+    def MS6514temperature(self, retry=3):
         try:
 #            command = str2cmd("#0A0000NA2\r\n")  #"#0A0101NA4\r\n"
             r = ""
@@ -28203,18 +28461,24 @@ class serialport(object):
                         self.MS6514PrevTemp2 = s2
                         return s1,s2
                 
-                # error but return previous temperature
-                if(self.MS6514PrevTemp1 != -1 or self.MS6514PrevTemp2 != -1):
-                    s1 = self.MS6514PrevTemp1
-                    s2 = self.MS6514PrevTemp2
-                    self.MS6514PrevTemp1 = -1
-                    self.MS6514PrevTemp2 = -1
-                    return s1,s2
-                    
-                # error
-                nbytes = len(r)
-                aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): {0} bytes received but 16 needed",None).format(nbytes))
-                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+                if retry:
+                    self.closeport()
+                    libtime.sleep(.05)
+                    a,b = self.MS6514temperature(retry=retry-1)
+                    return a,b                    
+                else:
+                    # error but return previous temperature
+                    if(self.MS6514PrevTemp1 != -1 or self.MS6514PrevTemp2 != -1):
+                        s1 = self.MS6514PrevTemp1
+                        s2 = self.MS6514PrevTemp2
+                        self.MS6514PrevTemp1 = -1
+                        self.MS6514PrevTemp2 = -1
+                        return s1,s2
+                        
+                    # error
+                    nbytes = len(r)
+                    aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): {0} bytes received but 16 needed",None).format(nbytes))
+                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
         except serial.SerialException:
@@ -28228,6 +28492,7 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.MS6514temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
+            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -28251,11 +28516,10 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HOTTOPtemperatures() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
-    #t2 and t1 from Omega HH806 or HH802 meter 
-    def HH806AUtemperature(self, retry=True):
-        #init command = "#0A0000RA6\r\n"
+    #t2 and t1 from Omega HH806, HH802 or Amprobe TMD56 meter 
+    def HH806AUtemperature(self, retry=3):
         try:
-            command = str2cmd("#0A0000NA2\r\n")  #"#0A0101NA4\r\n"
+            command = str2cmd("#0A0000NA2\r\n")
             r = ""
             if not self.SP.isOpen():
                 self.openport()
@@ -28266,21 +28530,28 @@ class serialport(object):
                 self.SP.write(command)
                 libtime.sleep(.05)
                 r = self.SP.read(16)
-                if len(r) == 16:
+                if len(r) == 16 and hex2int(r[0])==62 and hex2int(r[1])==15:
                     #convert to binary to hex string
                     s1 = hex2int(r[5],r[6])/10.
                     s2 = hex2int(r[10],r[11])/10.
                     #we convert the strings to integers. Divide by 10.0 (decimal position)
                     return s1,s2
                 else:
-                    nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","HH806AUtemperature(): {0} bytes received but 16 needed",None).format(nbytes))
+                    # first try to resync data (shift to right assuming some extra bytes were appended):
+                    for i in range(4):
+                        if hex2int(r[1+i])==62 and hex2int(r[2+i])==15:
+                            s1 = hex2int(r[6+1],r[7+i])/10.
+                            s2 = hex2int(r[11+i],r[12+i])/10.
+                            return s1,s2                            
                     if retry:
                         self.closeport()
                         libtime.sleep(.05)
-                        a,b = self.HH806AUtemperature(retry=False)
+                        a,b = self.HH806AUtemperature(retry=retry-1)
                         return a,b
-                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+                    else:
+                        nbytes = len(r)
+                        aw.qmc.adderror(QApplication.translate("Error Message","HH806AUtemperature(): {0} bytes received",None).format(nbytes))
+                        return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
         except serial.SerialException:
@@ -28294,6 +28565,7 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806AUtemperature() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
+            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -28395,6 +28667,7 @@ class serialport(object):
         # slave, register
         just_send = False
         if aw.modbus.input1slave:
+            aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happend before the semaphore was catched
             if aw.modbus.input1float:
                 res1 = aw.modbus.readFloat(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
             else:
@@ -28436,8 +28709,32 @@ class serialport(object):
             just_send = True
         else:
             res4 = -1
+        if aw.modbus.input5slave:
+            if just_send:
+                aw.modbus.sleepBetween()
+            if aw.modbus.input5float:
+                res5 = aw.modbus.readFloat(aw.modbus.input5slave,aw.modbus.input5register,aw.modbus.input5code)
+            else:
+                res5 = aw.modbus.readSingleRegister(aw.modbus.input5slave,aw.modbus.input5register,aw.modbus.input5code)
+            res5 = self.processChannelData(res5,aw.modbus.input5div,aw.modbus.input5mode)
+            just_send = True
+        else:
+            res5 = -1
+        if aw.modbus.input6slave:
+            if just_send:
+                aw.modbus.sleepBetween()
+            if aw.modbus.input6float:
+                res6 = aw.modbus.readFloat(aw.modbus.input6slave,aw.modbus.input6register,aw.modbus.input6code)
+            else:
+                res6 = aw.modbus.readSingleRegister(aw.modbus.input6slave,aw.modbus.input6register,aw.modbus.input6code)
+            res6 = self.processChannelData(res6,aw.modbus.input6div,aw.modbus.input6mode)
+            just_send = True
+        else:
+            res6 = -1
         aw.qmc.extraMODBUSt3 = res3
         aw.qmc.extraMODBUSt4 = res4
+        aw.qmc.extraMODBUSt5 = res5
+        aw.qmc.extraMODBUSt6 = res6
         aw.qmc.extraMODBUStx = aw.qmc.timeclock.elapsed()/1000.
         return res2, res1
 
@@ -28498,7 +28795,7 @@ class serialport(object):
 
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
-    def HH506RAtemperature(self):
+    def HH506RAtemperature(self, retry=3):
         #if initial id "X" has not changed then get a new one;
         if self.HH506RAid == "X":
             self.HH506RAGetID()                       # obtain new id one time; self.HH506RAid should not be "X" any more
@@ -28520,31 +28817,33 @@ class serialport(object):
                     #we convert the hex strings to integers. Divide by 10.0 (decimal position)
                     r = r.replace(str2cmd(' '),str2cmd('0'))
                     return int(r[1:5],16)/10., int(r[7:11],16)/10.
-                else:
-                    nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","HH506RAtemperature(): {0} bytes received but 14 needed",None).format(nbytes))               
-                    return -1,-1
+                else:                     
+                    if retry:
+                        return self.HH506RAtemperature(retry=retry-1)
+                    else:
+                        nbytes = len(r)
+                        aw.qmc.adderror(QApplication.translate("Error Message","HH506RAtemperature(): {0} bytes received but 14 needed",None).format(nbytes))               
+                        return -1,-1
             else:
                 return -1,-1
         except serial.SerialException:
-            #self.closeport()
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH506RAtemperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH506RAtemperature() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
+            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("H506 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
-    def CENTER302temperature(self):
+    def CENTER302temperature(self,retry=3):
         try:
             command = str2cmd("\x41")
             r = ""
@@ -28575,32 +28874,34 @@ class serialport(object):
                         T1 /= 10.
                     return T1,0
                 else:
-                    nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER302temperature(): {0} bytes received but 7 needed",None).format(nbytes)
-                    timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-                    aw.qmc.adderror(timez + " " + error)
-                    return -1,-1 
+                    if retry:
+                        return self.CENTER302temperature(retry=retry-1)
+                    else:
+                        nbytes = len(r)
+                        error = QApplication.translate("Error Message","CENTER302temperature(): {0} bytes received but 7 needed",None).format(nbytes)
+                        timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
+                        aw.qmc.adderror(timez + " " + error)
+                        return -1,-1 
             else:
                 return -1,-1 
         except serial.SerialException:
-            #self.closeport()
             error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER302temperature()"
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER302temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
+            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER302 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
-    def CENTER303temperature(self):
+    def CENTER303temperature(self,retry=3):
         try:
             command = str2cmd("\x41")
             r = ""
@@ -28642,17 +28943,19 @@ class serialport(object):
                         T2 /= 10.
                     return T1,T2
                 else:
-                    _, _, exc_tb = sys.exc_info()
-                    nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER303temperature(): {0} bytes received but 8 needed",None).format(nbytes)
-                    timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-                    return -1,-1
+                    if retry:
+                        return self.CENTER303temperature(retry=retry-1)
+                    else:
+                        _, _, exc_tb = sys.exc_info()
+                        nbytes = len(r)
+                        error = QApplication.translate("Error Message","CENTER303temperature(): {0} bytes received but 8 needed",None).format(nbytes)
+                        timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+                        return -1,-1
             else:
                 return -1,-1 
         except serial.SerialException:
-            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER303temperature()"
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -28660,17 +28963,17 @@ class serialport(object):
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER303temperature() {0}").format(str(ex)),exc_tb.tb_lineno)            
             return -1,-1
         finally:
+            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER303 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
-    def CENTER306temperature(self):
+    def CENTER306temperature(self,retry=3):
         try:
             command = str2cmd("\x41")
             r = ""
@@ -28712,32 +29015,34 @@ class serialport(object):
                         T2 /= 10.
                     return T1,T2
                 else:
-                    nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER306temperature(): {0} bytes received but 10 needed",None).format(nbytes)
-                    timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-                    return -1,-1
+                    if retry:
+                        return self.CENTER306temperature(retry=retry-1)
+                    else:
+                        nbytes = len(r)
+                        error = QApplication.translate("Error Message","CENTER306temperature(): {0} bytes received but 10 needed",None).format(nbytes)
+                        timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
+                        _,_, exc_tb = sys.exc_info()
+                        aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+                        return -1,-1
             else:
                 return -1,-1
         except serial.SerialException:
-            #self.closeport()
             error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER306temperature()"
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER306temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
+            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER306 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
-    def CENTER309temperature(self):
+    def CENTER309temperature(self, retry=3):
         ##    command = "\x4B" returns 4 bytes . Model number.
         ##    command = "\x48" simulates HOLD button
         ##    command = "\x4D" simulates MAX/MIN button
@@ -28797,24 +29102,26 @@ class serialport(object):
                     aw.qmc.extra309TX = aw.qmc.timeclock.elapsed()/1000.
                     return T1,T2
                 else:
-                    nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","CENTER309temperature(): {0} bytes received but 45 needed",None).format(nbytes))            
-                    return -1,-1 
+                    if retry:
+                        return self.CENTER309temperature(retry=retry-1)
+                    else:
+                        nbytes = len(r)
+                        aw.qmc.adderror(QApplication.translate("Error Message","CENTER309temperature(): {0} bytes received but 45 needed",None).format(nbytes))            
+                        return -1,-1 
             else:
                 return -1,-1
         except serial.SerialException:
-            #self.closeport()
             error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER309temperature()"
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER309temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
+            self.closeport()
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -29493,7 +29800,7 @@ class serialport(object):
             t1,t2 = 0.,0.
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(2)
+                #libtime.sleep(1)
                 #Reinitialize Arduino in case communication was interupted
                 self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
@@ -29501,7 +29808,7 @@ class serialport(object):
                 if not self.ArduinoIsInitialized:
                     self.SP.flushInput()
                     self.SP.flushOutput()
-                    #build initialization command 
+                    #build initialization command
                     et_channel = self.arduinoETChannel
                     if et_channel == "None":
                         et_channel = "0"
@@ -29511,19 +29818,21 @@ class serialport(object):
                     #If extra device +ArduinoTC4_XX present. read all 4 Ts
                     if 28 in aw.qmc.extradevices: # +ArduinoTC4_34
                         vals = ["1","2","3","4"]
-                        if self.arduinoETChannel != "None":
-                            vals.pop(vals.index(self.arduinoETChannel))
-                        if self.arduinoBTChannel != "None":
-                            vals.pop(vals.index(self.arduinoBTChannel))
+                        try:
+                            if self.arduinoETChannel and self.arduinoETChannel != "None" and self.arduinoETChannel in vals:
+                                vals.pop(vals.index(self.arduinoETChannel))
+                            if self.arduinoBTChannel and self.arduinoBTChannel != "None" and self.arduinoBTChannel in vals:
+                                vals.pop(vals.index(self.arduinoBTChannel))
+                        except:
+                            pass
                         command = "CHAN;" + et_channel + bt_channel + vals[0] + vals[1]
                     else:
                     #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
                         command = "CHAN;" + et_channel + bt_channel + "00"
-                    #self.SP.flush()
-                    libtime.sleep(0.3)
+                    #libtime.sleep(0.3)
                     self.SP.write(str2cmd(command + "\n"))       #send command
                     #self.SP.flush()
-                    libtime.sleep(.1)
+                    #libtime.sleep(.1)
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
                         raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None))
@@ -29534,7 +29843,7 @@ class serialport(object):
                         command = "UNITS;" + aw.qmc.mode + "\n"   #Set units
                         self.SP.write(str2cmd(command))
                         #self.SP.flush()
-                        libtime.sleep(.1)
+                        #libtime.sleep(.1)
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
                             raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None))
@@ -29546,7 +29855,7 @@ class serialport(object):
                             command = "FILT;" + filt + "\n"   #Set filters
                             self.SP.write(str2cmd(command))
                             #self.SP.flush()
-                            libtime.sleep(.1)
+                            #libtime.sleep(.1)
                             result = self.SP.readline().decode('utf-8')[:-2]
                             if (not len(result) == 0 and not result.startswith("#")):
                                 raise Exception(QApplication.translate("Error Message","Arduino could not set filters",None))
@@ -29559,7 +29868,7 @@ class serialport(object):
                 self.SP.flushOutput()
                 self.SP.write(str2cmd(command))
                 #self.SP.flush()
-                libtime.sleep(.1)
+                #libtime.sleep(.1)
                 rl = self.SP.readline().decode('utf-8')[:-2]
                 res = rl.rsplit(',')  
                 #response: list ["t0","t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT on "CHAN;1200" 
@@ -30142,27 +30451,28 @@ class designerconfigDlg(ArtisanDialog):
         self.Edit6.setAlignment(Qt.AlignRight)
         self.Edit6bt.setAlignment(Qt.AlignRight)
         self.Edit6et.setAlignment(Qt.AlignRight)
-        self.Edit0.setMaximumWidth(50)
-        self.Edit1.setMaximumWidth(50)
-        self.Edit2.setMaximumWidth(50)
-        self.Edit3.setMaximumWidth(50)
-        self.Edit4.setMaximumWidth(50)
-        self.Edit5.setMaximumWidth(50)
-        self.Edit6.setMaximumWidth(50)
-        self.Edit0bt.setMaximumWidth(50)
-        self.Edit1bt.setMaximumWidth(50)
-        self.Edit2bt.setMaximumWidth(50)
-        self.Edit3bt.setMaximumWidth(50)
-        self.Edit4bt.setMaximumWidth(50)
-        self.Edit5bt.setMaximumWidth(50)
-        self.Edit6bt.setMaximumWidth(50)
-        self.Edit0et.setMaximumWidth(50)
-        self.Edit1et.setMaximumWidth(50)
-        self.Edit2et.setMaximumWidth(50)
-        self.Edit3et.setMaximumWidth(50)
-        self.Edit4et.setMaximumWidth(50)
-        self.Edit5et.setMaximumWidth(50)
-        self.Edit6et.setMaximumWidth(50)
+        maxwidth = 70
+        self.Edit0.setMaximumWidth(maxwidth)
+        self.Edit1.setMaximumWidth(maxwidth)
+        self.Edit2.setMaximumWidth(maxwidth)
+        self.Edit3.setMaximumWidth(maxwidth)
+        self.Edit4.setMaximumWidth(maxwidth)
+        self.Edit5.setMaximumWidth(maxwidth)
+        self.Edit6.setMaximumWidth(maxwidth)
+        self.Edit0bt.setMaximumWidth(maxwidth)
+        self.Edit1bt.setMaximumWidth(maxwidth)
+        self.Edit2bt.setMaximumWidth(maxwidth)
+        self.Edit3bt.setMaximumWidth(maxwidth)
+        self.Edit4bt.setMaximumWidth(maxwidth)
+        self.Edit5bt.setMaximumWidth(maxwidth)
+        self.Edit6bt.setMaximumWidth(maxwidth)
+        self.Edit0et.setMaximumWidth(maxwidth)
+        self.Edit1et.setMaximumWidth(maxwidth)
+        self.Edit2et.setMaximumWidth(maxwidth)
+        self.Edit3et.setMaximumWidth(maxwidth)
+        self.Edit4et.setMaximumWidth(maxwidth)
+        self.Edit5et.setMaximumWidth(maxwidth)
+        self.Edit6et.setMaximumWidth(maxwidth)
         self.Edit1copy = self.Edit1.text()
         self.Edit2copy = self.Edit2.text()
         self.Edit3copy = self.Edit3.text()
@@ -30727,7 +31037,6 @@ class PortComboBox(QComboBox):
             pass
         self.blockSignals(False)
 
-
 class comportDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(comportDlg,self).__init__(parent)
@@ -30741,7 +31050,7 @@ class comportDlg(ArtisanDialog):
         baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None))
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
-        self.bauds = ["2400","9600","19200","38400","57600","115200"]
+        self.bauds = ["1200", "2400","4800","9600","19200","38400","57600","115200"]
         self.baudrateComboBox.addItems(self.bauds)
         self.baudrateComboBox.setCurrentIndex(self.bauds.index(str(aw.ser.baudrate)))
         bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None))
@@ -30774,12 +31083,13 @@ class comportDlg(ArtisanDialog):
         ##########################    TAB 3 WIDGETS   MODBUS
         modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None))
         self.modbus_comportEdit = PortComboBox(selection = aw.modbus.comport)
+        self.modbus_comportEdit.setFixedWidth(150)
         self.modbus_comportEdit.activated.connect(lambda i=0:self.portComboBoxIndexChanged(self.modbus_comportEdit,i))
         modbus_comportlabel.setBuddy(self.modbus_comportEdit)
         modbus_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None))
         self.modbus_baudrateComboBox = QComboBox()
         modbus_baudratelabel.setBuddy(self.modbus_baudrateComboBox)
-        self.modbus_bauds = ["2400","9600","19200","38400","57600","115200"]
+        self.modbus_bauds = ["1200","2400","4800","9600","19200","38400","57600","115200"]
         self.modbus_baudrateComboBox.addItems(self.modbus_bauds)
         self.modbus_baudrateComboBox.setCurrentIndex(self.modbus_bauds.index(str(aw.modbus.baudrate)))
         modbus_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None))
@@ -30804,21 +31114,26 @@ class comportDlg(ArtisanDialog):
         modbus_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.modbus_timeoutEdit = QLineEdit(str(aw.modbus.timeout))
         self.modbus_timeoutEdit.setValidator(QIntValidator(1,5,self.modbus_timeoutEdit))
-        modbus_input1slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
-        self.modbus_input1slaveEdit = QLineEdit(str(aw.modbus.input1slave))
-        self.modbus_input1slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input1slaveEdit))
-        self.modbus_input1slaveEdit.setFixedWidth(50)
-        self.modbus_input1slaveEdit.setAlignment(Qt.AlignRight)
-        modbus_input1registerlabel = QLabel(QApplication.translate("Label", "Register",None))
-        self.modbus_input1registerEdit = QLineEdit(str(aw.modbus.input1register))
-        self.modbus_input1registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input1registerEdit))
-        self.modbus_input1registerEdit.setFixedWidth(50)
-        self.modbus_input1registerEdit.setAlignment(Qt.AlignRight)
+
         modbus_function_codes = ["3","4"]
         modbus_modes = ["", "C","F"]
         modbus_divs = ["", "1/10","1/100"]
+        
+        modbus_input1slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
+        modbus_input1registerlabel = QLabel(QApplication.translate("Label", "Register",None))
         modbus_input1floatlabel = QLabel(QApplication.translate("Label", "Float",None))
         modbus_input1codelabel = QLabel(QApplication.translate("Label", "Function",None))
+        modbus_input1divlabel = QLabel(QApplication.translate("Label", "Divider",None))        
+        modbus_input1modelabel = QLabel(QApplication.translate("Label", "Mode",None))  
+        
+        self.modbus_input1slaveEdit = QLineEdit(str(aw.modbus.input1slave))
+        self.modbus_input1slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input1slaveEdit))
+        self.modbus_input1slaveEdit.setFixedWidth(65)
+        self.modbus_input1slaveEdit.setAlignment(Qt.AlignRight)
+        self.modbus_input1registerEdit = QLineEdit(str(aw.modbus.input1register))
+        self.modbus_input1registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input1registerEdit))
+        self.modbus_input1registerEdit.setFixedWidth(65)
+        self.modbus_input1registerEdit.setAlignment(Qt.AlignRight)
         self.modbus_input1float = QCheckBox()
         self.modbus_input1float.setChecked(aw.modbus.input1float)
         self.modbus_input1float.setFocusPolicy(Qt.NoFocus) 
@@ -30826,31 +31141,26 @@ class comportDlg(ArtisanDialog):
         self.modbus_input1code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input1code.addItems(modbus_function_codes)
         self.modbus_input1code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input1code)))
-        self.modbus_input1code.setFixedWidth(50)
-        modbus_input1divlabel = QLabel(QApplication.translate("Label", "Divider",None))        
+        self.modbus_input1code.setFixedWidth(70)
         self.modbus_input1div = QComboBox()
         self.modbus_input1div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input1div.addItems(modbus_divs)
         self.modbus_input1div.setCurrentIndex(aw.modbus.input1div)
-        self.modbus_input1div.setFixedWidth(75)
-        modbus_input1modelabel = QLabel(QApplication.translate("Label", "Mode",None))  
+        self.modbus_input1div.setFixedWidth(70)
         self.modbus_input1mode = QComboBox()
         self.modbus_input1mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input1mode.addItems(modbus_modes)
         self.modbus_input1mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input1mode)))
-        self.modbus_input1mode.setFixedWidth(50)
-        modbus_input2slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
+        self.modbus_input1mode.setFixedWidth(70)
+        
         self.modbus_input2slaveEdit = QLineEdit(str(aw.modbus.input2slave))
         self.modbus_input2slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input2slaveEdit))
-        self.modbus_input2slaveEdit.setFixedWidth(50)
+        self.modbus_input2slaveEdit.setFixedWidth(65)
         self.modbus_input2slaveEdit.setAlignment(Qt.AlignRight)
-        modbus_input2registerlabel = QLabel(QApplication.translate("Label", "Register",None))
         self.modbus_input2registerEdit = QLineEdit(str(aw.modbus.input2register))
         self.modbus_input2registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input2registerEdit))
-        self.modbus_input2registerEdit.setFixedWidth(50)
+        self.modbus_input2registerEdit.setFixedWidth(65)
         self.modbus_input2registerEdit.setAlignment(Qt.AlignRight)
-        modbus_input2floatlabel = QLabel(QApplication.translate("Label", "Float",None))
-        modbus_input2codelabel = QLabel(QApplication.translate("Label", "Function",None))
         self.modbus_input2float = QCheckBox()
         self.modbus_input2float.setChecked(aw.modbus.input2float)
         self.modbus_input2float.setFocusPolicy(Qt.NoFocus)  
@@ -30858,31 +31168,26 @@ class comportDlg(ArtisanDialog):
         self.modbus_input2code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input2code.addItems(modbus_function_codes)
         self.modbus_input2code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input2code)))
-        self.modbus_input2code.setFixedWidth(50)  
-        modbus_input2divlabel = QLabel(QApplication.translate("Label", "Divider",None))         
+        self.modbus_input2code.setFixedWidth(70)  
         self.modbus_input2div = QComboBox()
         self.modbus_input2div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input2div.addItems(modbus_divs)
         self.modbus_input2div.setCurrentIndex(aw.modbus.input2div)
-        self.modbus_input2div.setFixedWidth(75)
-        modbus_input2modelabel = QLabel(QApplication.translate("Label", "Mode",None))
+        self.modbus_input2div.setFixedWidth(70)
         self.modbus_input2mode = QComboBox()
         self.modbus_input2mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input2mode.addItems(modbus_modes)
         self.modbus_input2mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input2mode)))
-        self.modbus_input2mode.setFixedWidth(50)
-        modbus_input3slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
+        self.modbus_input2mode.setFixedWidth(70)
+        
         self.modbus_input3slaveEdit = QLineEdit(str(aw.modbus.input3slave))
         self.modbus_input3slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input3slaveEdit))
-        self.modbus_input3slaveEdit.setFixedWidth(50)
+        self.modbus_input3slaveEdit.setFixedWidth(65)
         self.modbus_input3slaveEdit.setAlignment(Qt.AlignRight)
-        modbus_input3registerlabel = QLabel(QApplication.translate("Label", "Register",None))
         self.modbus_input3registerEdit = QLineEdit(str(aw.modbus.input3register))
         self.modbus_input3registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input3registerEdit))
-        self.modbus_input3registerEdit.setFixedWidth(50)
+        self.modbus_input3registerEdit.setFixedWidth(65)
         self.modbus_input3registerEdit.setAlignment(Qt.AlignRight)
-        modbus_input3floatlabel = QLabel(QApplication.translate("Label", "Float",None))
-        modbus_input3codelabel = QLabel(QApplication.translate("Label", "Function",None))
         self.modbus_input3float = QCheckBox()
         self.modbus_input3float.setChecked(aw.modbus.input3float)
         self.modbus_input3float.setFocusPolicy(Qt.NoFocus) 
@@ -30890,31 +31195,26 @@ class comportDlg(ArtisanDialog):
         self.modbus_input3code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input3code.addItems(modbus_function_codes)
         self.modbus_input3code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input3code)))
-        self.modbus_input3code.setFixedWidth(50)
-        modbus_input3divlabel = QLabel(QApplication.translate("Label", "Divider",None))         
+        self.modbus_input3code.setFixedWidth(70)
         self.modbus_input3div = QComboBox()
         self.modbus_input3div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input3div.addItems(modbus_divs)
         self.modbus_input3div.setCurrentIndex(aw.modbus.input3div)
-        self.modbus_input3div.setFixedWidth(75)
-        modbus_input3modelabel = QLabel(QApplication.translate("Label", "Mode",None))
+        self.modbus_input3div.setFixedWidth(70)
         self.modbus_input3mode = QComboBox()
         self.modbus_input3mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input3mode.addItems(modbus_modes)
         self.modbus_input3mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input3mode)))
-        self.modbus_input3mode.setFixedWidth(50)
-        modbus_input4slavelabel = QLabel(QApplication.translate("Label", "Slave",None))
+        self.modbus_input3mode.setFixedWidth(70)
+        
         self.modbus_input4slaveEdit = QLineEdit(str(aw.modbus.input4slave))
         self.modbus_input4slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input4slaveEdit))
-        self.modbus_input4slaveEdit.setFixedWidth(50)
+        self.modbus_input4slaveEdit.setFixedWidth(65)
         self.modbus_input4slaveEdit.setAlignment(Qt.AlignRight)
-        modbus_input4registerlabel = QLabel(QApplication.translate("Label", "Register",None))
         self.modbus_input4registerEdit = QLineEdit(str(aw.modbus.input4register))
         self.modbus_input4registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input4registerEdit))
-        self.modbus_input4registerEdit.setFixedWidth(50)
+        self.modbus_input4registerEdit.setFixedWidth(65)
         self.modbus_input4registerEdit.setAlignment(Qt.AlignRight)
-        modbus_input4floatlabel = QLabel(QApplication.translate("Label", "Float",None))
-        modbus_input4codelabel = QLabel(QApplication.translate("Label", "Function",None))
         self.modbus_input4float = QCheckBox()
         self.modbus_input4float.setChecked(aw.modbus.input4float)
         self.modbus_input4float.setFocusPolicy(Qt.NoFocus)
@@ -30922,27 +31222,76 @@ class comportDlg(ArtisanDialog):
         self.modbus_input4code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input4code.addItems(modbus_function_codes)
         self.modbus_input4code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input4code)))
-        self.modbus_input4code.setFixedWidth(50)
-        modbus_input4divlabel = QLabel(QApplication.translate("Label", "Divider",None))         
+        self.modbus_input4code.setFixedWidth(70)
         self.modbus_input4div = QComboBox()
         self.modbus_input4div.setFocusPolicy(Qt.NoFocus)
         self.modbus_input4div.addItems(modbus_divs)
         self.modbus_input4div.setCurrentIndex(aw.modbus.input4div)
-        self.modbus_input4div.setFixedWidth(75)
-        modbus_input4modelabel = QLabel(QApplication.translate("Label", "Mode",None))
+        self.modbus_input4div.setFixedWidth(70)
         self.modbus_input4mode = QComboBox()
         self.modbus_input4mode.setFocusPolicy(Qt.NoFocus)
         self.modbus_input4mode.addItems(modbus_modes)
         self.modbus_input4mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input4mode)))
-        self.modbus_input4mode.setFixedWidth(50)
+        self.modbus_input4mode.setFixedWidth(70)
+
+        self.modbus_input5slaveEdit = QLineEdit(str(aw.modbus.input5slave))
+        self.modbus_input5slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input5slaveEdit))
+        self.modbus_input5slaveEdit.setFixedWidth(65)
+        self.modbus_input5slaveEdit.setAlignment(Qt.AlignRight)
+        self.modbus_input5registerEdit = QLineEdit(str(aw.modbus.input5register))
+        self.modbus_input5registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input5registerEdit))
+        self.modbus_input5registerEdit.setFixedWidth(65)
+        self.modbus_input5registerEdit.setAlignment(Qt.AlignRight)
+        self.modbus_input5float = QCheckBox()
+        self.modbus_input5float.setChecked(aw.modbus.input5float)
+        self.modbus_input5float.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input5code = QComboBox()
+        self.modbus_input5code.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input5code.addItems(modbus_function_codes)
+        self.modbus_input5code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input5code)))
+        self.modbus_input5code.setFixedWidth(70)
+        self.modbus_input5div = QComboBox()
+        self.modbus_input5div.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input5div.addItems(modbus_divs)
+        self.modbus_input5div.setCurrentIndex(aw.modbus.input5div)
+        self.modbus_input5div.setFixedWidth(70)
+        self.modbus_input5mode = QComboBox()
+        self.modbus_input5mode.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input5mode.addItems(modbus_modes)
+        self.modbus_input5mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input5mode)))
+        self.modbus_input5mode.setFixedWidth(70)
+        
+        self.modbus_input6slaveEdit = QLineEdit(str(aw.modbus.input6slave))
+        self.modbus_input6slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input6slaveEdit))
+        self.modbus_input6slaveEdit.setFixedWidth(65)
+        self.modbus_input6slaveEdit.setAlignment(Qt.AlignRight)
+        self.modbus_input6registerEdit = QLineEdit(str(aw.modbus.input6register))
+        self.modbus_input6registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input6registerEdit))
+        self.modbus_input6registerEdit.setFixedWidth(65)
+        self.modbus_input6registerEdit.setAlignment(Qt.AlignRight)
+        self.modbus_input6float = QCheckBox()
+        self.modbus_input6float.setChecked(aw.modbus.input6float)
+        self.modbus_input6float.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input6code = QComboBox()
+        self.modbus_input6code.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input6code.addItems(modbus_function_codes)
+        self.modbus_input6code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input6code)))
+        self.modbus_input6code.setFixedWidth(70)
+        self.modbus_input6div = QComboBox()
+        self.modbus_input6div.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input6div.addItems(modbus_divs)
+        self.modbus_input6div.setCurrentIndex(aw.modbus.input6div)
+        self.modbus_input6div.setFixedWidth(70)
+        self.modbus_input6mode = QComboBox()
+        self.modbus_input6mode.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input6mode.addItems(modbus_modes)
+        self.modbus_input6mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input6mode)))
+        self.modbus_input6mode.setFixedWidth(70)
+                        
         self.modbus_littleEndianFloats = QCheckBox(QApplication.translate("ComboBox","little-endian",None))
         self.modbus_littleEndianFloats.setChecked(aw.modbus.littleEndianFloats)
         self.modbus_littleEndianFloats.setFocusPolicy(Qt.NoFocus)
-# always enabled, because also MODBUS write commands now support floats and respect little vs big endian mode
-#        if self.modbus_input1float.isChecked() or self.modbus_input2float.isChecked() or self.modbus_input3float.isChecked() or self.modbus_input4float.isChecked():
-#            self.modbus_littleEndianFloats.setEnabled(True)
-#        else:
-#            self.modbus_littleEndianFloats.setEnabled(False)
+
         # type
         self.modbus_type = QComboBox()
         modbus_typelabel = QLabel(QApplication.translate("Label", "Type",None))
@@ -30961,27 +31310,94 @@ class comportDlg(ArtisanDialog):
         self.modbus_portEdit.setValidator(QIntValidator(1,65535,self.modbus_input4slaveEdit))        
         self.modbus_portEdit.setFixedWidth(60)
         self.modbus_portEdit.setAlignment(Qt.AlignRight)
-        # modbus help dialog text
-        modbus_help_text = QApplication.translate("Message", "The MODBUS device corresponds to input channels",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "1 and 2.. The MODBUS_34 extra device adds",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "input channels 3 and 4. Inputs with slave",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "id set to 0 are turned off. Modbus function 3",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "'read holding register' is the standard.",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Modbus function 4 triggers the use of 'read ",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "input register'. Input registers (fct 4) usually",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", " are from 30000-39999. Most devices hold data in",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "2 byte integer registers. A temperature of 145.2C",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "is often sent as 1452. In that case you have to",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "use the symbolic assignment 'x/10.0'. Few devices",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "hold data as 4 byte floats in two registers.",None) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "Tick the Float flag in this case.",None)
-        modbus_help_label = QLabel(modbus_help_text)
-        fnt = modbus_help_label.font()
-        if platf == 'Darwin':
-            fnt.setPointSize(fnt.pointSize() - 2)
-        else:
-            fnt.setPointSize(fnt.pointSize() - 1)
-        modbus_help_label.setFont(fnt)
+        
+        # modbus external PID conf
+        modbus_PIDslave_label = QLabel(QApplication.translate("Label", "Slave",None))
+        self.modbus_PIDslave_Edit = QLineEdit(str(aw.modbus.PID_slave_ID))
+        self.modbus_PIDslave_Edit.setValidator(QIntValidator(0,65025,self.modbus_PIDslave_Edit))
+        self.modbus_PIDslave_Edit.setFixedWidth(50)
+        self.modbus_PIDslave_Edit.setAlignment(Qt.AlignRight)       
+#        modbus_register_label = QLabel(QApplication.translate("Label", "Register",None)) 
+        modbus_SVregister_label = QLabel(QApplication.translate("Label", "SV",None))
+        self.modbus_SVregister_Edit = QLineEdit(str(aw.modbus.PID_SV_register))
+        self.modbus_SVregister_Edit.setValidator(QIntValidator(0,65025,self.modbus_SVregister_Edit))
+        self.modbus_SVregister_Edit.setFixedWidth(50)
+        self.modbus_SVregister_Edit.setAlignment(Qt.AlignRight)
+                
+        modbus_Pregister_label = QLabel(QApplication.translate("Label", "P",None))
+        self.modbus_Pregister_Edit = QLineEdit(str(aw.modbus.PID_p_register))
+        self.modbus_Pregister_Edit.setValidator(QIntValidator(0,65025,self.modbus_Pregister_Edit))
+        self.modbus_Pregister_Edit.setFixedWidth(50)
+        self.modbus_Pregister_Edit.setAlignment(Qt.AlignRight)
+                
+        modbus_Iregister_label = QLabel(QApplication.translate("Label", "I",None))
+        self.modbus_Iregister_Edit = QLineEdit(str(aw.modbus.PID_i_register))
+        self.modbus_Iregister_Edit.setValidator(QIntValidator(0,65025,self.modbus_Iregister_Edit))
+        self.modbus_Iregister_Edit.setFixedWidth(50)
+        self.modbus_Iregister_Edit.setAlignment(Qt.AlignRight)
+                
+        modbus_Dregister_label = QLabel(QApplication.translate("Label", "D",None))
+        self.modbus_Dregister_Edit = QLineEdit(str(aw.modbus.PID_d_register))
+        self.modbus_Dregister_Edit.setValidator(QIntValidator(0,65025,self.modbus_Dregister_Edit))
+        self.modbus_Dregister_Edit.setFixedWidth(50)
+        self.modbus_Dregister_Edit.setAlignment(Qt.AlignRight)
+        
+        modbus_pid_registers = QHBoxLayout()
+        modbus_pid_registers.addWidget(modbus_SVregister_label)
+        modbus_pid_registers.addWidget(self.modbus_SVregister_Edit)
+        modbus_pid_registers.addSpacing(35)
+        modbus_pid_registers.addWidget(modbus_Pregister_label)
+        modbus_pid_registers.addWidget(self.modbus_Pregister_Edit)
+        modbus_pid_registers.addSpacing(15)
+        modbus_pid_registers.addWidget(modbus_Iregister_label)
+        modbus_pid_registers.addWidget(self.modbus_Iregister_Edit)
+        modbus_pid_registers.addSpacing(15)
+        modbus_pid_registers.addWidget(modbus_Dregister_label)
+        modbus_pid_registers.addWidget(self.modbus_Dregister_Edit)
+        
+        modbus_pid_registers_box = QGroupBox(QApplication.translate("GroupBox","Registers",None))
+        modbus_pid_registers_box.setLayout(modbus_pid_registers)
+        
+        modbus_pid_off_label = QLabel(QApplication.translate("Label", "OFF", None))
+        self.modbus_pid_off = QLineEdit(aw.modbus.PID_OFF_action)
+        self.modbus_pid_off.setToolTip(QApplication.translate("Tooltip", "OFF Action String", None))        
+        modbus_pid_on_label = QLabel(QApplication.translate("Label", "ON", None))
+        self.modbus_pid_on = QLineEdit(aw.modbus.PID_ON_action)
+        self.modbus_pid_on.setToolTip(QApplication.translate("Tooltip", "ON Action String", None))
+
+        modbus_pid_commands = QGridLayout()
+        modbus_pid_commands.addWidget(modbus_pid_on_label,0,0)
+        modbus_pid_commands.addWidget(self.modbus_pid_on,0,1)
+        modbus_pid_commands.addWidget(modbus_pid_off_label,1,0)
+        modbus_pid_commands.addWidget(self.modbus_pid_off,1,1)
+        
+        modbus_pid_commands_box = QGroupBox(QApplication.translate("GroupBox","Commands",None))
+        modbus_pid_commands_box.setLayout(modbus_pid_commands)
+        
+        modbus_pid = QHBoxLayout()
+        modbus_pid.addStretch()
+        modbus_pid.addWidget(modbus_PIDslave_label)
+        modbus_pid.addWidget(self.modbus_PIDslave_Edit)
+        modbus_pid.addWidget(modbus_pid_registers_box)
+        modbus_pid.addWidget(modbus_pid_commands_box)
+        modbus_pid.addStretch()
+
+        
+        modbus_pidgroup = QGroupBox(QApplication.translate("GroupBox", "PID",None))
+        modbus_pidgroup.setLayout(modbus_pid)
+        
+        modbus_sv_layout = QVBoxLayout()
+        modbus_sv_layout.addStretch()
+        modbus_sv_layout.addWidget(modbus_pidgroup)
+        modbus_sv_layout.addStretch()
+        
+        
+        helpButton = QPushButton(QApplication.translate("Button","Help",None))
+        helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
+        helpButton.setFocusPolicy(Qt.NoFocus)
+        helpButton.clicked.connect(self.showModbusbuttonhelp)
+        
+                
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None))
         self.scale_deviceEdit = QComboBox()
@@ -31076,6 +31492,7 @@ class comportDlg(ArtisanDialog):
         cancelButton.clicked.connect(self.reject)
         #button layout
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(helpButton)
         buttonLayout.addStretch()
         buttonLayout.addWidget(cancelButton)
         buttonLayout.addWidget(okButton)
@@ -31100,7 +31517,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52,55]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -31126,79 +31543,139 @@ class comportDlg(ArtisanDialog):
         modbus_gridV.addStretch()
         modbus_gridV.addLayout(modbus_grid)
         modbus_gridV.addStretch()
-        modbus_input1 = QGridLayout()
-        modbus_input1.addWidget(modbus_input1slavelabel,0,0,Qt.AlignRight)
-        modbus_input1.addWidget(self.modbus_input1slaveEdit,0,1)
-        modbus_input1.addWidget(modbus_input1registerlabel,1,0,Qt.AlignRight)
-        modbus_input1.addWidget(self.modbus_input1registerEdit,1,1)
-        modbus_input1.addWidget(modbus_input1codelabel,2,0,Qt.AlignRight)
-        modbus_input1.addWidget(self.modbus_input1code,2,1)
-        modbus_input1.addWidget(modbus_input1divlabel,3,0,Qt.AlignRight)
-        modbus_input1.addWidget(self.modbus_input1div,3,1)
-        modbus_input1.addWidget(modbus_input1modelabel,4,0,Qt.AlignRight)
-        modbus_input1.addWidget(self.modbus_input1mode,4,1)
-        modbus_input1.addWidget(modbus_input1floatlabel,5,0,Qt.AlignRight)
-        modbus_input1.addWidget(self.modbus_input1float,5,1)
-        modbus_input1group = QGroupBox(QApplication.translate("GroupBox", "Input 1",None))
-        modbus_input1group.setLayout(modbus_input1)
-        modbus_input2 = QGridLayout()
-        modbus_input2.addWidget(modbus_input2slavelabel,0,0,Qt.AlignRight)
-        modbus_input2.addWidget(self.modbus_input2slaveEdit,0,1)
-        modbus_input2.addWidget(modbus_input2registerlabel,1,0,Qt.AlignRight)
-        modbus_input2.addWidget(self.modbus_input2registerEdit,1,1)
-        modbus_input2.addWidget(modbus_input2codelabel,2,0,Qt.AlignRight)
-        modbus_input2.addWidget(self.modbus_input2code,2,1)
-        modbus_input2.addWidget(modbus_input2divlabel,3,0,Qt.AlignRight)
-        modbus_input2.addWidget(self.modbus_input2div,3,1)
-        modbus_input2.addWidget(modbus_input2modelabel,4,0,Qt.AlignRight)
-        modbus_input2.addWidget(self.modbus_input2mode,4,1)
-        modbus_input2.addWidget(modbus_input2floatlabel,5,0,Qt.AlignRight)
-        modbus_input2.addWidget(self.modbus_input2float,5,1)
-        modbus_input2group = QGroupBox(QApplication.translate("GroupBox", "Input 2",None))
-        modbus_input2group.setLayout(modbus_input2)
-        modbus_input3 = QGridLayout()
-        modbus_input3.addWidget(modbus_input3slavelabel,0,0,Qt.AlignRight)
-        modbus_input3.addWidget(self.modbus_input3slaveEdit,0,1)
-        modbus_input3.addWidget(modbus_input3registerlabel,1,0,Qt.AlignRight)
-        modbus_input3.addWidget(self.modbus_input3registerEdit,1,1)
-        modbus_input3.addWidget(modbus_input3codelabel,2,0,Qt.AlignRight)
-        modbus_input3.addWidget(self.modbus_input3code,2,1)
-        modbus_input3.addWidget(modbus_input3divlabel,3,0,Qt.AlignRight)
-        modbus_input3.addWidget(self.modbus_input3div,3,1)
-        modbus_input3.addWidget(modbus_input3modelabel,4,0,Qt.AlignRight)
-        modbus_input3.addWidget(self.modbus_input3mode,4,1)
-        modbus_input3.addWidget(modbus_input3floatlabel,5,0,Qt.AlignRight)
-        modbus_input3.addWidget(self.modbus_input3float,5,1)
-        modbus_input3group = QGroupBox(QApplication.translate("GroupBox", "Input 3",None))
-        modbus_input3group.setLayout(modbus_input3)
-        modbus_input4 = QGridLayout()
-        modbus_input4.addWidget(modbus_input4slavelabel,0,0,Qt.AlignRight)
-        modbus_input4.addWidget(self.modbus_input4slaveEdit,0,1)
-        modbus_input4.addWidget(modbus_input4registerlabel,1,0,Qt.AlignRight)
-        modbus_input4.addWidget(self.modbus_input4registerEdit,1,1)
-        modbus_input4.addWidget(modbus_input4codelabel,2,0,Qt.AlignRight)
-        modbus_input4.addWidget(self.modbus_input4code,2,1)
-        modbus_input4.addWidget(modbus_input4divlabel,3,0,Qt.AlignRight)
-        modbus_input4.addWidget(self.modbus_input4div,3,1)
-        modbus_input4.addWidget(modbus_input4modelabel,4,0,Qt.AlignRight)
-        modbus_input4.addWidget(self.modbus_input4mode,4,1)
-        modbus_input4.addWidget(modbus_input4floatlabel,5,0,Qt.AlignRight)
-        modbus_input4.addWidget(self.modbus_input4float,5,1)
-        modbus_input4group = QGroupBox(QApplication.translate("GroupBox", "Input 4",None))
-        modbus_input4group.setLayout(modbus_input4)
-        modbus_inputV = QHBoxLayout()
-        modbus_inputV.setContentsMargins(0,0,0,0)
-        modbus_inputV.addWidget(modbus_input1group)
-        modbus_inputV.addStretch()
-        modbus_inputV.addWidget(modbus_input2group)
-        modbus_inputV.addStretch()
-        modbus_inputV.addWidget(modbus_input3group)
-        modbus_inputV.addStretch()
-        modbus_inputV.addWidget(modbus_input4group)
-        modbus_inputV.addStretch()
+        
+        modbus_input_grid = QGridLayout()
+        
+        modbus_input_grid.addWidget(modbus_input1slavelabel,1,0,Qt.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1registerlabel,2,0,Qt.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1codelabel,3,0,Qt.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1divlabel,4,0,Qt.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1modelabel,5,0,Qt.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1floatlabel,6,0,Qt.AlignRight)
+        
+        modbus_input_grid.addWidget(QLabel(QApplication.translate("GroupBox", "Input 1",None)),0,1,Qt.AlignCenter)
+        modbus_input_grid.addWidget(self.modbus_input1slaveEdit,1,1)        
+        modbus_input_grid.addWidget(self.modbus_input1registerEdit,2,1)
+        modbus_input_grid.addWidget(self.modbus_input1code,3,1)
+        modbus_input_grid.addWidget(self.modbus_input1div,4,1)
+        modbus_input_grid.addWidget(self.modbus_input1mode,5,1)
+        modbus_input_grid.addWidget(self.modbus_input1float,6,1,Qt.AlignCenter)
+        
+        modbus_input_grid.addWidget(QLabel(QApplication.translate("GroupBox", "Input 2",None)),0,2,Qt.AlignCenter)
+        modbus_input_grid.addWidget(self.modbus_input2slaveEdit,1,2)
+        modbus_input_grid.addWidget(self.modbus_input2registerEdit,2,2)
+        modbus_input_grid.addWidget(self.modbus_input2code,3,2)
+        modbus_input_grid.addWidget(self.modbus_input2div,4,2)
+        modbus_input_grid.addWidget(self.modbus_input2mode,5,2)
+        modbus_input_grid.addWidget(self.modbus_input2float,6,2,Qt.AlignCenter)
+        
+        modbus_input_grid.addWidget(QLabel(QApplication.translate("GroupBox", "Input 3",None)),0,3,Qt.AlignCenter)
+        modbus_input_grid.addWidget(self.modbus_input3slaveEdit,1,3)
+        modbus_input_grid.addWidget(self.modbus_input3registerEdit,2,3)
+        modbus_input_grid.addWidget(self.modbus_input3code,3,3)
+        modbus_input_grid.addWidget(self.modbus_input3div,4,3)
+        modbus_input_grid.addWidget(self.modbus_input3mode,5,3)
+        modbus_input_grid.addWidget(self.modbus_input3float,6,3,Qt.AlignCenter)
+        
+        modbus_input_grid.addWidget(QLabel(QApplication.translate("GroupBox", "Input 4",None)),0,4,Qt.AlignCenter)
+        modbus_input_grid.addWidget(self.modbus_input4slaveEdit,1,4)
+        modbus_input_grid.addWidget(self.modbus_input4registerEdit,2,4)
+        modbus_input_grid.addWidget(self.modbus_input4code,3,4)
+        modbus_input_grid.addWidget(self.modbus_input4div,4,4)
+        modbus_input_grid.addWidget(self.modbus_input4mode,5,4)
+        modbus_input_grid.addWidget(self.modbus_input4float,6,4,Qt.AlignCenter)
+        
+        modbus_input_grid.addWidget(QLabel(QApplication.translate("GroupBox", "Input 5",None)),0,5,Qt.AlignCenter)
+        modbus_input_grid.addWidget(self.modbus_input5slaveEdit,1,5)
+        modbus_input_grid.addWidget(self.modbus_input5registerEdit,2,5)
+        modbus_input_grid.addWidget(self.modbus_input5code,3,5)
+        modbus_input_grid.addWidget(self.modbus_input5div,4,5)
+        modbus_input_grid.addWidget(self.modbus_input5mode,5,5)
+        modbus_input_grid.addWidget(self.modbus_input5float,6,5,Qt.AlignCenter)
+        
+        modbus_input_grid.addWidget(QLabel(QApplication.translate("GroupBox", "Input 6",None)),0,6,Qt.AlignCenter)
+        modbus_input_grid.addWidget(self.modbus_input6slaveEdit,1,6)
+        modbus_input_grid.addWidget(self.modbus_input6registerEdit,2,6)
+        modbus_input_grid.addWidget(self.modbus_input6code,3,6)
+        modbus_input_grid.addWidget(self.modbus_input6div,4,6)
+        modbus_input_grid.addWidget(self.modbus_input6mode,5,6)
+        modbus_input_grid.addWidget(self.modbus_input6float,6,6,Qt.AlignCenter)
+        
+#        modbus_input1 = QGridLayout()
+#        modbus_input1.addWidget(modbus_input1slavelabel,0,0,Qt.AlignRight)
+#        modbus_input1.addWidget(self.modbus_input1slaveEdit,0,1)
+#        modbus_input1.addWidget(modbus_input1registerlabel,1,0,Qt.AlignRight)
+#        modbus_input1.addWidget(self.modbus_input1registerEdit,1,1)
+#        modbus_input1.addWidget(modbus_input1codelabel,2,0,Qt.AlignRight)
+#        modbus_input1.addWidget(self.modbus_input1code,2,1)
+#        modbus_input1.addWidget(modbus_input1divlabel,3,0,Qt.AlignRight)
+#        modbus_input1.addWidget(self.modbus_input1div,3,1)
+#        modbus_input1.addWidget(modbus_input1modelabel,4,0,Qt.AlignRight)
+#        modbus_input1.addWidget(self.modbus_input1mode,4,1)
+#        modbus_input1.addWidget(modbus_input1floatlabel,5,0,Qt.AlignRight)
+#        modbus_input1.addWidget(self.modbus_input1float,5,1)
+#        modbus_input1group = QGroupBox(QApplication.translate("GroupBox", "Input 1",None))
+#        modbus_input1group.setLayout(modbus_input1)
+#        modbus_input2 = QGridLayout()
+#        modbus_input2.addWidget(modbus_input2slavelabel,0,0,Qt.AlignRight)
+#        modbus_input2.addWidget(self.modbus_input2slaveEdit,0,1)
+#        modbus_input2.addWidget(modbus_input2registerlabel,1,0,Qt.AlignRight)
+#        modbus_input2.addWidget(self.modbus_input2registerEdit,1,1)
+#        modbus_input2.addWidget(modbus_input2codelabel,2,0,Qt.AlignRight)
+#        modbus_input2.addWidget(self.modbus_input2code,2,1)
+#        modbus_input2.addWidget(modbus_input2divlabel,3,0,Qt.AlignRight)
+#        modbus_input2.addWidget(self.modbus_input2div,3,1)
+#        modbus_input2.addWidget(modbus_input2modelabel,4,0,Qt.AlignRight)
+#        modbus_input2.addWidget(self.modbus_input2mode,4,1)
+#        modbus_input2.addWidget(modbus_input2floatlabel,5,0,Qt.AlignRight)
+#        modbus_input2.addWidget(self.modbus_input2float,5,1)
+#        modbus_input2group = QGroupBox(QApplication.translate("GroupBox", "Input 2",None))
+#        modbus_input2group.setLayout(modbus_input2)
+#        modbus_input3 = QGridLayout()
+#        modbus_input3.addWidget(modbus_input3slavelabel,0,0,Qt.AlignRight)
+#        modbus_input3.addWidget(self.modbus_input3slaveEdit,0,1)
+#        modbus_input3.addWidget(modbus_input3registerlabel,1,0,Qt.AlignRight)
+#        modbus_input3.addWidget(self.modbus_input3registerEdit,1,1)
+#        modbus_input3.addWidget(modbus_input3codelabel,2,0,Qt.AlignRight)
+#        modbus_input3.addWidget(self.modbus_input3code,2,1)
+#        modbus_input3.addWidget(modbus_input3divlabel,3,0,Qt.AlignRight)
+#        modbus_input3.addWidget(self.modbus_input3div,3,1)
+#        modbus_input3.addWidget(modbus_input3modelabel,4,0,Qt.AlignRight)
+#        modbus_input3.addWidget(self.modbus_input3mode,4,1)
+#        modbus_input3.addWidget(modbus_input3floatlabel,5,0,Qt.AlignRight)
+#        modbus_input3.addWidget(self.modbus_input3float,5,1)
+#        modbus_input3group = QGroupBox(QApplication.translate("GroupBox", "Input 3",None))
+#        modbus_input3group.setLayout(modbus_input3)
+#        modbus_input4 = QGridLayout()
+#        modbus_input4.addWidget(modbus_input4slavelabel,0,0,Qt.AlignRight)
+#        modbus_input4.addWidget(self.modbus_input4slaveEdit,0,1)
+#        modbus_input4.addWidget(modbus_input4registerlabel,1,0,Qt.AlignRight)
+#        modbus_input4.addWidget(self.modbus_input4registerEdit,1,1)
+#        modbus_input4.addWidget(modbus_input4codelabel,2,0,Qt.AlignRight)
+#        modbus_input4.addWidget(self.modbus_input4code,2,1)
+#        modbus_input4.addWidget(modbus_input4divlabel,3,0,Qt.AlignRight)
+#        modbus_input4.addWidget(self.modbus_input4div,3,1)
+#        modbus_input4.addWidget(modbus_input4modelabel,4,0,Qt.AlignRight)
+#        modbus_input4.addWidget(self.modbus_input4mode,4,1)
+#        modbus_input4.addWidget(modbus_input4floatlabel,5,0,Qt.AlignRight)
+#        modbus_input4.addWidget(self.modbus_input4float,5,1)
+#        modbus_input4group = QGroupBox(QApplication.translate("GroupBox", "Input 4",None))
+#        modbus_input4group.setLayout(modbus_input4)
+#        modbus_inputV = QHBoxLayout()
+#        modbus_inputV.setContentsMargins(0,0,0,0)
+#        modbus_inputV.addWidget(modbus_input1group)
+#        modbus_inputV.addStretch()
+#        modbus_inputV.addWidget(modbus_input2group)
+#        modbus_inputV.addStretch()
+#        modbus_inputV.addWidget(modbus_input3group)
+#        modbus_inputV.addStretch()
+#        modbus_inputV.addWidget(modbus_input4group)
+#        modbus_inputV.addStretch()
+        
         modbus_gridVLayout = QHBoxLayout()
         modbus_gridVLayout.addLayout(modbus_gridV)
-        modbus_gridVLayout.addWidget(modbus_help_label)
+        modbus_gridVLayout.addStretch()
+        modbus_gridVLayout.addLayout(modbus_input_grid)#(modbus_sv_layout)
         modbus_gridVLayout.addStretch()
         modbus_setup = QHBoxLayout()
         modbus_setup.addWidget(self.modbus_littleEndianFloats)
@@ -31213,7 +31690,7 @@ class comportDlg(ArtisanDialog):
         modbus_setup.addWidget(self.modbus_portEdit)
         tab3Layout = QVBoxLayout()
         tab3Layout.addLayout(modbus_gridVLayout)
-        tab3Layout.addLayout(modbus_inputV)
+        tab3Layout.addLayout(modbus_sv_layout)#(modbus_input_grid)
         tab3Layout.addLayout(modbus_setup)
         tab3Layout.addStretch()
         tab3Layout.setContentsMargins(0,0,0,0)
@@ -31286,6 +31763,23 @@ class comportDlg(ArtisanDialog):
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(buttonLayout)
         self.setLayout(Mlayout)
+        
+    def showModbusbuttonhelp(self):
+        modbus_help_text = QApplication.translate("Message", "The MODBUS device corresponds to input channels",None)
+        modbus_help_text += QApplication.translate("Message", "1 and 2.. The MODBUS_34 extra device adds",None)
+        modbus_help_text += QApplication.translate("Message", " input channels 3 and 4.",None) + "<br><br>"
+        modbus_help_text += QApplication.translate("Message", "Inputs with slave id set to 0 are turned off.",None) + "<br><br>"
+        modbus_help_text += QApplication.translate("Message", "Modbus function 3 'read holding register' is the standard.",None)
+        modbus_help_text += QApplication.translate("Message", " Modbus function 4 triggers the use of 'read ",None)
+        modbus_help_text += QApplication.translate("Message", " input register'. Input registers (fct 4) usually",None)
+        modbus_help_text += QApplication.translate("Message", " are from 30000-39999.",None) + "<br><br>"
+        modbus_help_text += QApplication.translate("Message", "Most devices hold data in 2 byte integer registers. A temperature of 145.2C",None)
+        modbus_help_text += QApplication.translate("Message", " is often sent as 1452. In that case you have to",None)
+        modbus_help_text += QApplication.translate("Message", " set the divider to 'x/10'.",None) + "<br><br>"
+        modbus_help_text += QApplication.translate("Message", "Few devices hold data as 4 byte floats in two registers.",None)
+        modbus_help_text += QApplication.translate("Message", " Tick the Float flag in this case.",None)
+        QMessageBox.information(self,QApplication.translate("Message", "MODBUS Help",None),modbus_help_text)
+
 
     def portComboBoxIndexChanged(self,portComboBox,i):
         portComboBox.setSelection(i)
@@ -31324,7 +31818,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52,55]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -31417,7 +31911,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52,55]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -31489,6 +31983,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.curveBox = QHBoxLayout()
         self.curveBox.addWidget(self.curves)
         self.curveBox.addWidget(self.lcds)
+        
+        self.controlButtonFlag = QCheckBox(QApplication.translate("Label", "Control", None))
+        self.controlButtonFlag.setChecked(aw.qmc.Controlbuttonflag)
+        self.controlButtonFlag.stateChanged.connect(lambda i=0:self.showControlbuttonToggle(i))
+        
         self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Meter", None))
         self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None))
         self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","TC4", None))
@@ -31575,13 +32074,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.arduinoETComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoETChannel))
         self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoBTChannel))
         arduinoATLabel =QLabel(QApplication.translate("Label", "AT Channel",None))
+        
         arduinoTemperatures = ["None","T1","T2","T3","T4","T5","T6"]
         self.arduinoATComboBox = QComboBox()        
         self.arduinoATComboBox.addItems(arduinoTemperatures)
         self.arduinoATComboBox.setCurrentIndex(arduinoTemperatures.index(aw.ser.arduinoATChannel))
-        self.showControlButton = QCheckBox(QApplication.translate("CheckBox", "Control Button",None))
+        self.showControlButton = QCheckBox(QApplication.translate("CheckBox", "PID Firmware",None))
         self.showControlButton.setChecked(aw.qmc.PIDbuttonflag)
-        self.showControlButton.stateChanged.connect(lambda i=0:self.showControlbuttonToggle(i))
+        self.showControlButton.stateChanged.connect(lambda i=0:self.PIDfirmwareToggle(i))
         FILTLabel =QLabel(QApplication.translate("Label", "Filter",None))
         self.FILTspinBoxes = []
         for i in range(4):
@@ -31987,6 +32487,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         deviceSelector = QHBoxLayout()
         deviceSelector.addWidget(self.devicetypeComboBox)
         deviceSelector.addStretch()
+        deviceSelector.addWidget(self.controlButtonFlag)
+        deviceSelector.addStretch()
         grid = QGridLayout()
         grid.addLayout(self.curveBox,0,1)
         grid.addWidget(self.nonpidButton,2,0)
@@ -32108,15 +32610,20 @@ class DeviceAssignmentDlg(ArtisanDialog):
             items.append(item)
         return items
 
-    def showControlbuttonToggle(self,i):
+    def PIDfirmwareToggle(self,i):
         if i:
             aw.qmc.PIDbuttonflag = True
-            if aw.qmc.device in [0,19,26]: # FUJI, DTA, ARDUINOTC4
-                aw.button_10.setVisible(True)
         else:
             aw.qmc.PIDbuttonflag = False
-            aw.button_10.setVisible(False)
-        
+        aw.showControlButton()
+            
+    def showControlbuttonToggle(self,i):
+        if i:
+            aw.qmc.Controlbuttonflag = True
+        else:
+            aw.qmc.Controlbuttonflag = False
+        aw.showControlButton()
+            
     def createDeviceTable(self):
         try:
             self.devicetable.clear()
@@ -32455,6 +32962,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
             aw.ser.arduinoATChannel = str(self.arduinoATComboBox.currentText())
             aw.ser.ArduinoFILT = [sb.value() for sb in self.FILTspinBoxes]
+            
+            aw.ser.externalprogram = str(self.programedit.text())
+            
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA
                 if str(self.controlpidtypeComboBox.currentText()) == "Fuji PXG":
@@ -32508,10 +33018,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.timeout = 1
                 message = QApplication.translate("Message","PID to control ET set to {0} {1}" + \
                                                  " ; PID to read BT set to {2} {3}", None).format(str1,str(aw.ser.controlETpid[1]),str2,str(aw.ser.readBTpid[1]))
-                aw.button_10.setVisible(True)
-                if aw.ser.showFujiLCDs:
-                    aw.LCD6frame.setVisible(True)
-                    aw.LCD7frame.setVisible(True)
             elif self.arduinoButton.isChecked():
                 meter = "Arduino (TC4)"
                 aw.qmc.device = 19
@@ -32522,8 +33028,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.timeout = 1
                 aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
                 message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)
-                if aw.qmc.PIDbuttonflag:
-                    aw.button_10.setVisible(True)
             elif self.programButton.isChecked():
                 meter = str(self.programedit.text())
                 aw.ser.externalprogram = meter
@@ -32713,7 +33217,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ####  DEVICE 21 is +309_34 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 22 is +FUJI DUTY% but +DEVICE cannot be set as main device
+                ####  DEVICE 22 is +PID DUTY% but +DEVICE cannot be set as main device
                 ##########################
                 elif meter == "Omega HHM28[6]":
                     aw.qmc.device = 23
@@ -32848,7 +33352,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    aw.button_10.setVisible(True)
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
                 ####  DEVICE 54 is +VOLTCRAFT 204_34 but +DEVICE cannot be set as main device
@@ -32865,6 +33368,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
                 if meter != "NONE":
                     aw.qmc.delay = max(aw.qmc.delay,aw.qmc.min_delay)
+            # update Control button visibility
+            aw.showControlButton()           
+            
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an elif entry above to specify the default serial settings
             #extra devices serial config
@@ -32930,7 +33436,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 52
                 8, # 53
                 8, # 54
-                8] # 55
+                7, # 55
+                8] # 56
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -32956,8 +33463,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     else:
                         aw.extratimeout.append(dsettings[4])
             if self.nonpidButton.isChecked():
-                if meter != "Hottop BT/ET":
-                    aw.button_10.setVisible(False)
                 aw.button_12.setVisible(False)
                 aw.button_13.setVisible(False)
                 aw.button_14.setVisible(False)
@@ -33059,7 +33564,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55]):
                 aw.setcommport()
             #self.close()
             self.accept()
@@ -34282,7 +34787,8 @@ class WheelDlg(ArtisanDialog):
 class MyTableWidgetItemQLineEdit(QTableWidgetItem):
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
-        QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+        #QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+        super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -34302,7 +34808,8 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem):
       
 class MyTableWidgetItemInt(QTableWidgetItem):
     def __init__(self, text, sortKey):
-        QTableWidgetItem.__init__(self, text, QTableWidgetItem.UserType)
+        #QTableWidgetItem.__init__(self, text, QTableWidgetItem.UserType)
+        super(QTableWidgetItem,self).__init__(text, QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -34312,7 +34819,8 @@ class MyTableWidgetItemInt(QTableWidgetItem):
 class MyTableWidgetItemQCheckBox(QTableWidgetItem):
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
-        QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+#        QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+        super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -34322,7 +34830,8 @@ class MyTableWidgetItemQCheckBox(QTableWidgetItem):
 class MyTableWidgetItemQComboBox(QTableWidgetItem):
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
-        QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+#        QTableWidgetItem.__init__(self, "", QTableWidgetItem.UserType)
+        super(QTableWidgetItem,self).__init__("", QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -34906,11 +35415,11 @@ class AlarmDlg(ArtisanDialog):
                     self.setalarmtablerow(i)
                 self.alarmtable.resizeColumnsToContents()
                 # improve width of Qlineedit columns
-                self.alarmtable.setColumnWidth(2,50)
-                self.alarmtable.setColumnWidth(3,50)
-                self.alarmtable.setColumnWidth(5,50)
-                self.alarmtable.setColumnWidth(6,80)
-                self.alarmtable.setColumnWidth(8,40)
+#                self.alarmtable.setColumnWidth(2,60)
+#                self.alarmtable.setColumnWidth(3,60)
+#                self.alarmtable.setColumnWidth(5,60)
+#                self.alarmtable.setColumnWidth(6,80)
+#                self.alarmtable.setColumnWidth(8,60)
                 header = self.alarmtable.horizontalHeader()
                 header.setStretchLastSection(True)
                 self.markNotEnabledAlarmRows()
@@ -38661,12 +39170,12 @@ class FujiPID(object):
 ######################## Arduino CONTROL DIALOG ######################
 ############################################################################
 
-class ArduinoDlgControl(ArtisanDialog):
+class PID_DlgControl(ArtisanDialog):
     def __init__(self, parent = None):
-        super(ArduinoDlgControl,self).__init__(parent)
+        super(PID_DlgControl,self).__init__(parent)
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","Arduino Control",None))
+        self.setWindowTitle(QApplication.translate("Form Caption","PID Control",None))
         # PID tab
         tab1Layout = QVBoxLayout()
         pidGrp = QGroupBox(QApplication.translate("GroupBox","p-i-d",None))
@@ -38674,30 +39183,41 @@ class ArduinoDlgControl(ArtisanDialog):
         self.pidKp.setAlignment(Qt.AlignRight)
         self.pidKp.setRange(.0,999.)
         self.pidKp.setSingleStep(.1)
-        self.pidKp.setValue(aw.arduino.pidKp)
+        self.pidKp.setValue(aw.pidcontrol.pidKp)
         pidKpLabel = QLabel("kp")
         self.pidKi = QDoubleSpinBox()
         self.pidKi.setAlignment(Qt.AlignRight)
         self.pidKi.setRange(.0,999.)
         self.pidKi.setSingleStep(.1)
-        self.pidKi.setValue(aw.arduino.pidKi)         
+        self.pidKi.setValue(aw.pidcontrol.pidKi)         
         pidKiLabel = QLabel("ki")
         self.pidKd = QDoubleSpinBox()
         self.pidKd.setAlignment(Qt.AlignRight)
         self.pidKd.setRange(.0,999.)
         self.pidKd.setSingleStep(.1)
-        self.pidKd.setValue(aw.arduino.pidKd)
+        self.pidKd.setValue(aw.pidcontrol.pidKd)
         pidKdLabel = QLabel("kd")
         pidSetPID = QPushButton(QApplication.translate("Button","Set",None))
         pidSetPID.clicked.connect(self.pidConf)
+        pidSetPID.setFocusPolicy(Qt.NoFocus)
         
-        pidSourceItems = ["1","2","3","4"]
         self.pidSource = QComboBox()
-        self.pidSource.addItems(pidSourceItems)
-        self.pidSource.setCurrentIndex(aw.arduino.pidSource - 1)        
+        if aw.qmc.device == 19 and aw.qmc.PIDbuttonflag:
+            # Arduino/TC4
+            pidSourceItems = ["1","2","3","4"]
+            self.pidSource.addItems(pidSourceItems)
+            self.pidSource.setCurrentIndex(aw.pidcontrol.pidSource - 1)        
+        else:
+            # Hottop or MODBUS or others (self.qmc.device in [53,29])
+            pidSourceItems = ["BT","ET"]
+            self.pidSource.addItems(pidSourceItems)
+            if aw.pidcontrol.pidSource == 1:
+                self.pidSource.setCurrentIndex(0)
+            else:
+                self.pidSource.setCurrentIndex(1)
         
         pidSourceLabel = QLabel(QApplication.translate("Label","Source",None))
-        
+
         pidGrid = QGridLayout()
         pidGrid.addWidget(pidKpLabel,0,0)
         pidGrid.addWidget(self.pidKp,0,1)
@@ -38706,25 +39226,27 @@ class ArduinoDlgControl(ArtisanDialog):
         pidGrid.addWidget(pidKdLabel,2,0)
         pidGrid.addWidget(self.pidKd,2,1)              
 
-        self.pidCycle = QSpinBox()
-        self.pidCycle.setAlignment(Qt.AlignRight)
-        self.pidCycle.setRange(0,99999)
-        self.pidCycle.setSingleStep(100)
-        self.pidCycle.setValue(aw.arduino.pidCycle)
-        self.pidCycle.setSuffix(" ms")
-        pidCycleLabel = QLabel(QApplication.translate("Label","Cycle",None))
+
         pidSourceBox = QHBoxLayout()
         pidSourceBox.addStretch()
         pidSourceBox.addWidget(pidSourceLabel)
         pidSourceBox.addWidget(self.pidSource)
-        pidSourceBox.addSpacing(80)
+        #pidSourceBox.addSpacing(80)
         pidSourceBox.addStretch()
+        
+        self.pidCycle = QSpinBox()
+        self.pidCycle.setAlignment(Qt.AlignRight)
+        self.pidCycle.setRange(0,99999)
+        self.pidCycle.setSingleStep(100)
+        self.pidCycle.setValue(aw.pidcontrol.pidCycle)
+        self.pidCycle.setSuffix(" ms")
+        pidCycleLabel = QLabel(QApplication.translate("Label","Cycle",None))
         
         pidCycleBox = QHBoxLayout()
         pidCycleBox.addStretch()  
         pidCycleBox.addWidget(pidCycleLabel)
         pidCycleBox.addWidget(self.pidCycle)
-        pidCycleBox.addSpacing(80)
+#        pidCycleBox.addSpacing(80)
         pidCycleBox.addStretch()  
         
         pidSetBox = QHBoxLayout()
@@ -38733,13 +39255,53 @@ class ArduinoDlgControl(ArtisanDialog):
         
         pidVBox = QVBoxLayout()
         pidVBox.addLayout(pidSourceBox)
-        pidVBox.addLayout(pidCycleBox)
+        if aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4
+            pidVBox.addLayout(pidCycleBox)
         pidVBox.addLayout(pidSetBox)
+        
+        #PID target (only shown if interal PID for hottop/modbus/TC4 is active
+        controlItems = ["None",aw.qmc.etypesf(0),aw.qmc.etypesf(1),aw.qmc.etypesf(2),aw.qmc.etypesf(3)]
+        #positiveControl
+        positiveControlLabel = QLabel(QApplication.translate("Label","Positive", None))
+        self.positiveControlCombo = QComboBox()
+        self.positiveControlCombo.addItems(controlItems)
+        self.positiveControlCombo.setFocusPolicy(Qt.NoFocus)
+        self.positiveControlCombo.setCurrentIndex(aw.pidcontrol.pidPositiveTarget)
+        #negativeControl
+        negativeControlLabel = QLabel(QApplication.translate("Label","Negative", None))
+        self.negativeControlCombo = QComboBox()
+        self.negativeControlCombo.addItems(controlItems)
+        self.negativeControlCombo.setFocusPolicy(Qt.NoFocus)
+        self.negativeControlCombo.setCurrentIndex(aw.pidcontrol.pidNegativeTarget)
+        
+        controlSelectorLayout = QGridLayout()
+        controlSelectorLayout.addWidget(positiveControlLabel,0,0)
+        controlSelectorLayout.addWidget(self.positiveControlCombo,0,1)
+        controlSelectorLayout.addWidget(negativeControlLabel,1,0)
+        controlSelectorLayout.addWidget(self.negativeControlCombo,1,1)
+                
+        self.invertControlFlag = QCheckBox(QApplication.translate("Label", "Invert Control", None))
+        self.invertControlFlag.setFocusPolicy(Qt.NoFocus)
+        self.invertControlFlag.setChecked(aw.pidcontrol.invertControl)
+
+        controlVBox = QVBoxLayout()
+        controlVBox.addLayout(controlSelectorLayout)
+        controlVBox.addWidget(self.invertControlFlag)
+        
+        controlHBox = QHBoxLayout()
+        controlHBox.addStretch()
+        controlHBox.addLayout(controlVBox)
+        controlHBox.addStretch()
+        
+        pidTargetGrp = QGroupBox(QApplication.translate("GroupBox","Target",None))
+        pidTargetGrp.setLayout(controlHBox)
         
         pidGridBox = QHBoxLayout()
         pidGridBox.addLayout(pidGrid)
         pidGridBox.addStretch()
         pidGridBox.addLayout(pidVBox)
+        if not (aw.qmc.device == 19 and aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
+            pidGridBox.addWidget(pidTargetGrp)
         
         pidGridVBox = QVBoxLayout()
         pidGridVBox.addLayout(pidGridBox)
@@ -38749,19 +39311,21 @@ class ArduinoDlgControl(ArtisanDialog):
         self.pidSV.setAlignment(Qt.AlignRight)
         self.pidSV.setRange(0,999)
         self.pidSV.setSingleStep(10)
-        self.pidSV.setValue(aw.arduino.svValue)
+        self.pidSV.setValue(aw.pidcontrol.svValue)
         pidSVLabel = QLabel(QApplication.translate("Label","SV",None))
         
         self.pidSVLookahead = QSpinBox()
         self.pidSVLookahead.setAlignment(Qt.AlignRight)
         self.pidSVLookahead.setRange(0,999)
         self.pidSVLookahead.setSingleStep(1)
-        self.pidSVLookahead.setValue(aw.arduino.svLookahead)  
+        self.pidSVLookahead.setValue(aw.pidcontrol.svLookahead)  
         self.pidSVLookahead.setSuffix(" s")
         pidSVLookaheadLabel = QLabel(QApplication.translate("Label","Lookahead",None))
         
         pidSetSV = QPushButton(QApplication.translate("Button","Set",None))
         pidSetSV.clicked.connect(self.setSV)
+        pidSetSV.setFocusPolicy(Qt.NoFocus)
+
         
         pidSVModeLabel = QLabel(QApplication.translate("Label","Mode",None))
         pidModeItems = [
@@ -38770,30 +39334,30 @@ class ArduinoDlgControl(ArtisanDialog):
             QApplication.translate("Label", "Background",None)]
         self.pidMode = QComboBox()
         self.pidMode.addItems(pidModeItems)
-        self.pidMode.setCurrentIndex(aw.arduino.svMode)
+        self.pidMode.setCurrentIndex(aw.pidcontrol.svMode)
         
         self.pidSVbuttonsFlag = QCheckBox(QApplication.translate("Label","SV Buttons",None))
-        self.pidSVbuttonsFlag.setChecked(aw.arduino.svButtons)
-        self.pidSVbuttonsFlag.stateChanged.connect(lambda flag=1: aw.arduino.activateONOFFeasySV(flag))
+        self.pidSVbuttonsFlag.setChecked(aw.pidcontrol.svButtons)
+        self.pidSVbuttonsFlag.stateChanged.connect(lambda flag=1: aw.pidcontrol.activateONOFFeasySV(flag))
         self.pidSVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None))
-        self.pidSVsliderFlag.setChecked(aw.arduino.svSlider)
-        self.pidSVsliderFlag.stateChanged.connect(lambda flag=1: aw.arduino.activateSVSlider(flag))
+        self.pidSVsliderFlag.setChecked(aw.pidcontrol.svSlider)
+        self.pidSVsliderFlag.stateChanged.connect(lambda flag=1: aw.pidcontrol.activateSVSlider(flag))
         
         self.pidSVSliderMin = QSpinBox()
         self.pidSVSliderMin.setAlignment(Qt.AlignRight)
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
-        self.pidSVSliderMin.setValue(aw.arduino.svSliderMin)
+        self.pidSVSliderMin.setValue(aw.pidcontrol.svSliderMin)
         pidSVSliderMinLabel = QLabel(QApplication.translate("Label","min",None))
-        self.pidSVSliderMin.valueChanged.connect(aw.arduino.sliderMinValueChanged)
+        self.pidSVSliderMin.valueChanged.connect(aw.pidcontrol.sliderMinValueChanged)
         
         self.pidSVSliderMax = QSpinBox()
         self.pidSVSliderMax.setAlignment(Qt.AlignRight)
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
-        self.pidSVSliderMax.setValue(aw.arduino.svSliderMax)   
+        self.pidSVSliderMax.setValue(aw.pidcontrol.svSliderMax)   
         pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","max",None))
-        self.pidSVSliderMax.valueChanged.connect(aw.arduino.sliderMaxValueChanged)
+        self.pidSVSliderMax.valueChanged.connect(aw.pidcontrol.sliderMaxValueChanged)
         
         if aw.qmc.mode == "F":
             self.pidSVSliderMin.setSuffix(" F")
@@ -38842,7 +39406,7 @@ class ArduinoDlgControl(ArtisanDialog):
         svBox.addWidget(svGrp)
                 
         self.startPIDonCHARGE = QCheckBox(QApplication.translate("CheckBox", "Start PID on CHARGE",None))
-        self.startPIDonCHARGE.setChecked(aw.arduino.pidOnCHARGE)
+        self.startPIDonCHARGE.setChecked(aw.pidcontrol.pidOnCHARGE)
 
         tab1Layout.addLayout(pidBox)
         tab1Layout.addLayout(svBox)
@@ -38897,7 +39461,7 @@ class ArduinoDlgControl(ArtisanDialog):
         buttonLayout.addWidget(exportButton)
         buttonLayout.addStretch()
         self.loadRampSoakFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load Ramp/Soak table from profile",None))
-        self.loadRampSoakFromProfile.setChecked(aw.arduino.loadRampSoakFromProfile)
+        self.loadRampSoakFromProfile.setChecked(aw.pidcontrol.loadRampSoakFromProfile)
         
         tab2InnerLayout.addStretch()
         tab2InnerLayout.addLayout(rsGrid)
@@ -38909,11 +39473,11 @@ class ArduinoDlgControl(ArtisanDialog):
             
         ############################
         okButton = QPushButton(QApplication.translate("Button","OK",None))
-        okButton.clicked.connect(self.close)
+        okButton.clicked.connect(lambda _:self.close())
         onButton = QPushButton(QApplication.translate("Button","On",None))
-        onButton.clicked.connect(aw.arduino.pidOn)
+        onButton.clicked.connect(aw.pidcontrol.pidOn)
         offButton = QPushButton(QApplication.translate("Button","Off",None))
-        offButton.clicked.connect(aw.arduino.pidOff)
+        offButton.clicked.connect(aw.pidcontrol.pidOff)
         okButtonLayout = QHBoxLayout()
         okButtonLayout.addWidget(onButton)
         okButtonLayout.addWidget(offButton)
@@ -38923,7 +39487,6 @@ class ArduinoDlgControl(ArtisanDialog):
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         tabWidget.addTab(C1Widget,QApplication.translate("Tab","PID",None))
-        C1Widget.setTabOrder(self.pidCycle, self.pidSource)
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         tabWidget.addTab(C2Widget,QApplication.translate("Tab","Ramp/Soak",None))
@@ -38942,9 +39505,9 @@ class ArduinoDlgControl(ArtisanDialog):
             infile = io.open(filename, 'r', encoding='utf-8')
             rampsoaks = json.load(infile)
             infile.close()
-            aw.arduino.svValues = rampsoaks["svValues"]
-            aw.arduino.svRamps = rampsoaks["svRamps"]
-            aw.arduino.svSoaks = rampsoaks["svSoaks"]
+            aw.pidcontrol.svValues = rampsoaks["svValues"]
+            aw.pidcontrol.svRamps = rampsoaks["svRamps"]
+            aw.pidcontrol.svSoaks = rampsoaks["svSoaks"]
             self.setrampsoaks()
         except Exception as ex:
 #            import traceback
@@ -38959,9 +39522,9 @@ class ArduinoDlgControl(ArtisanDialog):
         try:
             self.saverampsoaks()
             rampsoaks = {}
-            rampsoaks["svValues"] = aw.arduino.svValues
-            rampsoaks["svRamps"] = aw.arduino.svRamps
-            rampsoaks["svSoaks"] = aw.arduino.svSoaks
+            rampsoaks["svValues"] = aw.pidcontrol.svValues
+            rampsoaks["svRamps"] = aw.pidcontrol.svRamps
+            rampsoaks["svSoaks"] = aw.pidcontrol.svSoaks
             rampsoaks["mode"] = aw.qmc.mode
             outfile = open(filename, 'w')
             json.dump(rampsoaks, outfile, ensure_ascii=True)
@@ -38975,45 +39538,55 @@ class ArduinoDlgControl(ArtisanDialog):
             
     def saverampsoaks(self):
         for i in range(8):
-            aw.arduino.svValues[i] = self.SVWidgets[i].value()
-            aw.arduino.svRamps[i] = aw.arduino.QTime2time(self.RampWidgets[i].time())
-            aw.arduino.svSoaks[i] = aw.arduino.QTime2time(self.SoakWidgets[i].time())
+            aw.pidcontrol.svValues[i] = self.SVWidgets[i].value()
+            aw.pidcontrol.svRamps[i] = aw.pidcontrol.QTime2time(self.RampWidgets[i].time())
+            aw.pidcontrol.svSoaks[i] = aw.pidcontrol.QTime2time(self.SoakWidgets[i].time())
             
     def setrampsoaks(self):
         for i in range(8):
-            self.SVWidgets[i].setValue(aw.arduino.svValues[i])
-            self.RampWidgets[i].setTime(aw.arduino.time2QTime(aw.arduino.svRamps[i]))
-            self.SoakWidgets[i].setTime(aw.arduino.time2QTime(aw.arduino.svSoaks[i]))
-    
+            self.SVWidgets[i].setValue(aw.pidcontrol.svValues[i])
+            self.RampWidgets[i].setTime(aw.pidcontrol.time2QTime(aw.pidcontrol.svRamps[i]))
+            self.SoakWidgets[i].setTime(aw.pidcontrol.time2QTime(aw.pidcontrol.svSoaks[i]))
+
     def pidConf(self):
         kp = self.pidKp.value() # 5.00
         ki = self.pidKi.value() # 0.15
         kd = self.pidKd.value() # 0.00
         source = self.pidSource.currentIndex() + 1 # 1-4, def 1
         cycle = self.pidCycle.value() # def 1000 in ms
-        aw.arduino.confPID(kp,ki,kd,source,cycle)
+        aw.pidcontrol.confPID(kp,ki,kd,source,cycle)
+        if not (aw.qmc.device == 19 and aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
+            aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
+            aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
+            aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
         
     def setSV(self):
-        aw.arduino.setSV(self.pidSV.value())
+        aw.pidcontrol.setSV(self.pidSV.value())
         
     def close(self):
         kp = self.pidKp.value() # 5.00
         ki = self.pidKi.value() # 0.15
         kd = self.pidKd.value() # 0.00
+        
         source = self.pidSource.currentIndex() + 1 # 1-4, def 1
+        if not (aw.qmc.device == 19 and aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
+            aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
+            aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
+            aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
         cycle = self.pidCycle.value() # def 1000 in ms
-        aw.arduino.setPID(kp,ki,kd,source,cycle)
+        aw.pidcontrol.setPID(kp,ki,kd,source,cycle)
         #
-        aw.arduino.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
-        aw.arduino.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
-        aw.arduino.svSlider = self.pidSVsliderFlag.isChecked()
-        aw.arduino.svButtons = self.pidSVbuttonsFlag.isChecked()
-        aw.arduino.activateONOFFeasySV(aw.arduino.svButtons)
-        aw.arduino.svMode = self.pidMode.currentIndex()
-        aw.arduino.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
-        aw.arduino.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
-        aw.arduino.svLookahead = self.pidSVLookahead.value()
-        aw.arduino.svValue = self.pidSV.value()
+        aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
+        aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
+        aw.pidcontrol.svSlider = self.pidSVsliderFlag.isChecked()
+        aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
+        aw.pidcontrol.svButtons = self.pidSVbuttonsFlag.isChecked()
+        aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons)
+        aw.pidcontrol.svMode = self.pidMode.currentIndex()
+        aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
+        aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
+        aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
+        aw.pidcontrol.svValue = self.pidSV.value()
         #
         self.saverampsoaks()
         #
@@ -39085,7 +39658,7 @@ class DTApidDlgControl(ArtisanDialog):
 ##########################  ARDUINO CLASS DEFINITION  ############################
 ###################################################################################
 
-class ArduinoTC4(object):
+class PIDcontrol(object):
     def __init__(self):
         self.pidActive = False
         self.sv = None # the last sv send to the Arduino
@@ -39102,12 +39675,50 @@ class ArduinoTC4(object):
         self.svSliderMin = 300
         self.svSliderMax = 480
         self.svValue = 390 # the value in the setSV textinput box of the PID dialog
-        self.pidKp = 11.0
-        self.pidKi = 0.05
+        self.pidKp = 20.0
+        self.pidKi = 0.04
         self.pidKd = 0.0
-        self.pidSource = 1 # TC4 input channel
+        # pidSource
+        #   either the TC4 input channel from [1,..,4] if self.qmc.device == 19 (Arduino/TC4)
+        #   in all other cases (HOTTOP, MODBUS,..), 1 is interpreted as BT and 2 as ET
+        self.pidSource = 1
         self.pidCycle = 1000
-        
+        # the positive target should increase with positive PID duty
+        self.pidPositiveTarget = 0 # one of [0,1,..,4] with 0: None, 1,..,4: for slider event 1-4
+        # the negative target should decrease with negative PID duty
+        self.pidNegativeTarget = 0 # one of [0,1,..,4] with 0: None, 1,..,4: for slider event 1-4
+        # if invertControl is True, a PID duty of 100% delivers 0% positive duty and a 0% PID duty delivers 100% positive duty
+        self.invertControl = False
+
+    # returns True if an external PID controller is in use (MODBUS or TC4 PID firmware)
+    # and False if the internal software PID is in charge
+    def externalPIDControl(self):
+        # TC4 with PID firmware or MODBUS and SV register set
+        return ((aw.qmc.device == 19 and aw.qmc.PIDbuttonflag) or 
+                (aw.qmc.device == 29 and aw.modbus.PID_slave_ID != 0))
+             
+    # v is from [-min,max]
+    def setEnergy(self,v):
+        try:
+            if aw.pidcontrol.pidPositiveTarget:
+                heat = min(100,max(0,int(v)))
+                if aw.pidcontrol.invertControl:
+                    heat = abs(100 - heat)
+                slidernr = aw.pidcontrol.pidPositiveTarget - 1               
+                aw.moveslider(slidernr,heat) # move slider               
+                aw.fireslideraction(slidernr) 
+            if aw.pidcontrol.pidNegativeTarget:
+                cool = min(100,abs(min(0,int(v))))
+                if aw.pidcontrol.invertControl:
+                    cool = abs(100 - cool)
+                slidernr = aw.pidcontrol.pidNegativeTarget - 1
+                aw.moveslider(slidernr,cool) # move slider               
+                aw.fireslideraction(slidernr) 
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            pass
+
     def conv2celsius(self):
         try:
             self.svValue = int(round(aw.qmc.fromFtoC(self.svValue)))
@@ -39148,37 +39759,67 @@ class ArduinoTC4(object):
             self.pidOn()
 
     def pidOn(self):
-        if aw.ser.ArduinoIsInitialized:
-            self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle) # first configure PID according to the actual settings
-            try:
-                #### lock shared resources #####
-                aw.ser.COMsemaphore.acquire(1)
-                if aw.ser.SP.isOpen():
-                    aw.ser.SP.flushInput()
-                    aw.ser.SP.flushOutput()
-                    aw.ser.SP.write(str2cmd("PID;ON\n"))
-                    self.pidActive = True
-                    aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])                    
-                    aw.sendmessage(QApplication.translate("Message","PID turned on", None))
-            finally:
-                if aw.ser.COMsemaphore.available() < 1:
-                    aw.ser.COMsemaphore.release(1)
+        if aw.qmc.flagon:
+            # TC4 hardware PID
+            if aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
+                if aw.ser.ArduinoIsInitialized:
+                    self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle) # first configure PID according to the actual settings
+                    try:
+                        #### lock shared resources #####
+                        aw.ser.COMsemaphore.acquire(1)
+                        if aw.ser.SP.isOpen():
+                            aw.ser.SP.flushInput()
+                            aw.ser.SP.flushOutput()
+                            aw.ser.SP.write(str2cmd("PID;ON\n"))
+                            self.pidActive = True
+                            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])                    
+                            aw.sendmessage(QApplication.translate("Message","PID turned on", None))
+                    finally:
+                        if aw.ser.COMsemaphore.available() < 1:
+                            aw.ser.COMsemaphore.release(1)
+            # MODBUS hardware PID
+            elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl() and aw.modbus.PID_ON_action and aw.modbus.PID_ON_action != ""):
+                aw.eventaction(4,aw.modbus.PID_ON_action) 
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])       
+            # software PID
+            elif aw.qmc.Controlbuttonflag:
+                aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
+                aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
+                aw.qmc.pid.setControl(lambda v: aw.pidcontrol.setEnergy(v))
+                self.pidActive = True
+                aw.qmc.pid.on()
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
 
     def pidOff(self):
-        if aw.ser.ArduinoIsInitialized:
-            try:
-                #### lock shared resources #####
-                aw.ser.COMsemaphore.acquire(1)
-                if aw.ser.SP.isOpen():
-                    aw.ser.SP.flushInput()
-                    aw.ser.SP.flushOutput()
-                    aw.ser.SP.write(str2cmd("PID;OFF\n"))
-                    aw.sendmessage(QApplication.translate("Message","PID turned off", None))
-            finally:
-                if aw.ser.COMsemaphore.available() < 1:
-                    aw.ser.COMsemaphore.release(1)
+        # TC4 hardware PID
+        if aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
+            if aw.ser.ArduinoIsInitialized:
+                try:
+                    #### lock shared resources #####
+                    aw.ser.COMsemaphore.acquire(1)
+                    if aw.ser.SP.isOpen():
+                        aw.ser.SP.flushInput()
+                        aw.ser.SP.flushOutput()
+                        aw.ser.SP.write(str2cmd("PID;OFF\n"))
+                        aw.sendmessage(QApplication.translate("Message","PID turned off", None))
+                finally:
+                    if aw.ser.COMsemaphore.available() < 1:
+                        aw.ser.COMsemaphore.release(1)
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+                self.pidActive = False
+        # MODBUS hardware PID
+        elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl() and aw.modbus.PID_OFF_action and aw.modbus.PID_OFF_action != ""):
+            aw.eventaction(4,aw.modbus.PID_OFF_action)
             aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+        # software PID
+        elif (aw.qmc.device == 53 or # Hottop
+              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
+              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
+            aw.qmc.pid.setControl(lambda _: _)
             self.pidActive = False
+            aw.qmc.pid.off()
+            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+
         
     def sliderMinValueChanged(self,i):
         self.svSliderMin = i
@@ -39189,6 +39830,7 @@ class ArduinoTC4(object):
         aw.sliderSV.setMaximum(self.svSliderMax)
 
     # returns SV (or None) wrt. to the ramp-soak table and the given time t
+    # (used only internally)
     def svRampSoak(self,t):
         segment_end_time = 0 # the (end) time of the segments
         prev_segment_end_time = 0 # the (end) time of the previous segment
@@ -39222,51 +39864,82 @@ class ArduinoTC4(object):
             return self.svRampSoak(tx)
         elif self.svMode == 2 and aw.qmc.background:
             # Follow Background mode
-            if int(aw.ser.arduinoETChannel) == self.pidSource: # we observe the ET
+            if aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # in case we run TC4 with the PIDfirmware
+                if int(aw.ser.arduinoETChannel) == self.pidSource: # we observe the ET
+                    j = aw.qmc.backgroundtime2index(tx + self.svLookahead)
+                    return aw.qmc.temp1B[j]
+                elif int(aw.ser.arduinoBTChannel) == self.pidSource: # we observe the BT
+                    j = aw.qmc.backgroundtime2index(tx + self.svLookahead)
+                    return aw.qmc.temp2B[j]
+                else:
+                    return None
+            else:
                 j = aw.qmc.backgroundtime2index(tx + self.svLookahead)
-                return aw.qmc.temp1B[j]
-            elif int(aw.ser.arduinoBTChannel) == self.pidSource: # we observe the BT
-                j = aw.qmc.backgroundtime2index(tx + self.svLookahead)
-                return aw.qmc.temp2B[j]
+                if self.pidSource == 1: # we observe the BT
+                    return aw.qmc.temp2B[j]
+                else: # in all other cases we observe the ET
+                    return aw.qmc.temp1B[j] 
         else:
             # return None in manual mode
             return None
 
-    def setSV(self,sv,move=True):
-        if aw.ser.ArduinoIsInitialized:
-            sv = max(0,sv)
-            if self.sv != sv: # nothing to do (avoid loops via moveslider!)
-                try:
-                    #### lock shared resources #####
-                    aw.ser.COMsemaphore.acquire(1)
-                    if aw.ser.SP.isOpen():
-                        aw.ser.SP.flushInput()
-                        aw.ser.SP.flushOutput()
-                        aw.ser.SP.write(str2cmd("PID;SV;" + str(sv) +"\n"))
-                        self.sv = sv
-                        if move:
-                            aw.moveSVslider(sv)
-                        libtime.sleep(.1)
-                finally:
-                    if aw.ser.COMsemaphore.available() < 1:
-                        aw.ser.COMsemaphore.release(1)
+    def setSV(self,sv,move=True,init=True):  
+        if aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
+            if aw.ser.ArduinoIsInitialized:
+                sv = max(0,sv)
+                if self.sv != sv: # nothing to do (avoid loops via moveslider!)
+                    try:
+                        #### lock shared resources #####
+                        aw.ser.COMsemaphore.acquire(1)
+                        if aw.ser.SP.isOpen():
+                            aw.ser.SP.flushInput()
+                            aw.ser.SP.flushOutput()
+                            aw.ser.SP.write(str2cmd("PID;SV;" + str(sv) +"\n"))
+                            self.sv = sv # remember last sv
+                            if move:
+                                aw.moveSVslider(sv)
+                            libtime.sleep(.1)
+                    finally:
+                        if aw.ser.COMsemaphore.available() < 1:
+                            aw.ser.COMsemaphore.release(1)
+        elif (aw.qmc.device == 53 or # Hottop
+              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
+              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
+            if move:
+                aw.moveSVslider(sv)
+            else:
+                aw.qmc.pid.setTarget(sv,init=init)
+        elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and Control ticked
+            aw.modbus.setTarget(sv)
+            self.sv = sv
+            if move:
+                aw.moveSVslider(sv)
 
     def adjustsv(self,diff):
         self.setSV(self.sv + diff,True)
-
+        
     def activateSVSlider(self,flag):
-        if flag and aw.qmc.device == 19: # only show for Arduino TC4
-            if aw.qmc.flagon:
-                aw.sliderGrpBoxSV.setVisible(True)
-                aw.sliderSV.setMinimum(self.svSliderMin)
-                aw.sliderSV.setMaximum(self.svSliderMax)
+        if flag:
+            aw.sliderGrpBoxSV.setVisible(True)
+            aw.sliderSV.blockSignals(True)
+            aw.sliderSV.setMinimum(self.svSliderMin)
+            aw.sliderSV.setMaximum(self.svSliderMax)
+            # we set the SV slider/lcd to the last SV issues or the minimum
+            if aw.pidcontrol.sv != None:
+                sv = aw.pidcontrol.sv
+            else:
+                sv = self.svSliderMin
+            aw.updateSVSliderLCD(sv)
+            aw.sliderSV.setValue(sv)
+            
+            aw.sliderSV.blockSignals(False)
             self.svSlider = True
         else:
             aw.sliderGrpBoxSV.setVisible(False)
             self.svSlider = False
 
     def activateONOFFeasySV(self,flag):
-        if flag and aw.qmc.device == 19: # only show for Arduino TC4
+        if flag:
             if aw.qmc.flagon:
                 aw.button_12.setVisible(True)
                 aw.button_13.setVisible(True)
@@ -39284,6 +39957,7 @@ class ArduinoTC4(object):
             aw.button_17.setVisible(False)
             self.svButtons = False
 
+    # just store the p-i-d configuration
     def setPID(self,kp,ki,kd,source,cycle):
         self.pidKp = kp
         self.pidKi = ki
@@ -39291,23 +39965,32 @@ class ArduinoTC4(object):
         self.pidSource = source
         self.pidCycle = cycle
     
+    # send conf to connected PID
     def confPID(self,kp,ki,kd,source,cycle):
-        if aw.ser.ArduinoIsInitialized:
-            try:
-                #### lock shared resources #####
-                aw.ser.COMsemaphore.acquire(1)
-                if aw.ser.SP.isOpen():
-                    aw.ser.SP.flushInput()
-                    aw.ser.SP.flushOutput()
-                    aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
-                    libtime.sleep(.1)
-                    aw.ser.SP.write(str2cmd("PID;CHAN;" + str(source) + "\n"))
-                    libtime.sleep(.1)
-                    aw.ser.SP.write(str2cmd("PID;CT;" + str(cycle) + "\n"))
-                    libtime.sleep(.1)
-            finally:
-                if aw.ser.COMsemaphore.available() < 1:
-                    aw.ser.COMsemaphore.release(1)
+        if aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
+            if aw.ser.ArduinoIsInitialized:
+                try:
+                    #### lock shared resources #####
+                    aw.ser.COMsemaphore.acquire(1)
+                    if aw.ser.SP.isOpen():
+                        aw.ser.SP.flushInput()
+                        aw.ser.SP.flushOutput()
+                        aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
+                        libtime.sleep(.1)
+                        aw.ser.SP.write(str2cmd("PID;CHAN;" + str(source) + "\n"))
+                        libtime.sleep(.1)
+                        aw.ser.SP.write(str2cmd("PID;CT;" + str(cycle) + "\n"))
+                        libtime.sleep(.1)
+                finally:
+                    if aw.ser.COMsemaphore.available() < 1:
+                        aw.ser.COMsemaphore.release(1)
+        elif (aw.qmc.device == 53 or # Hottop
+              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
+              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
+            aw.qmc.pid.setPID(kp,ki,kd)
+            aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
+        elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and Control ticked
+            aw.modbus.setPID(kp,ki,kd)
 
 
 ###################################################################################
@@ -39377,6 +40060,15 @@ class DtaPID(object):
 ###########################################################################################################################################
 ###########################################################################################################################################
 
+# the following avoids the "No document could be created" dialog and the Console message
+# "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
+if sys.platform.startswith("darwin"):
+    from Cocoa import NSDocument
+    class Document(NSDocument):
+#        def windowNibName(self):
+#            return None #"Document"
+        def makeWindowControllers(self):
+            pass
 
 def main():
     # suppress all warnings
@@ -39455,9 +40147,9 @@ def main():
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore'):
         app.exec_()
-    del aw
-    del app   
-    sys.exit(0)
+#    del aw
+#    del app   
+#    sys.exit(0)
 
 ##############################################################################################################################################
 ##############################################################################################################################################
