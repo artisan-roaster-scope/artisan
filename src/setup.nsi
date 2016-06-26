@@ -7,7 +7,6 @@
 !insertmacro GetParameters
 
 ; HM NIS Edit Wizard helper defines
-!define py2exeOutputDir 'dist'
 !define PRODUCT_NAME "Artisan"
 !define PRODUCT_VERSION "0.9.9.0"
 !define PRODUCT_PUBLISHER "The Artisan Team"
