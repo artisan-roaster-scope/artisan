@@ -16681,7 +16681,32 @@ class ApplicationWindow(QMainWindow):
             graph_image = ""
 
             if len(profiles) < 11:
-                try:              
+                try:
+                    # remove lines and artists from background profile
+                    try:
+                        for l in [
+                                aw.qmc.l_back1,
+                                aw.qmc.l_back2,
+                                aw.qmc.l_back3,
+                                aw.qmc.l_delta1B,
+                                aw.qmc.l_delta2B
+                                ]:
+                            if l:
+                                aw.qmc.ax.lines.remove(l)
+                        for a in [
+                                aw.qmc.l_eventtype1dots,
+                                aw.qmc.l_eventtype2dots,
+                                aw.qmc.l_eventtype3dots,
+                                aw.qmc.l_eventtype4dots,
+                                aw.qmc.l_backgroundeventtype1dots,
+                                aw.qmc.l_backgroundeventtype2dots,
+                                aw.qmc.l_backgroundeventtype3dots,
+                                aw.qmc.l_backgroundeventtype4dots]:
+                            if a:
+                                a.remove()
+                    except Exception:
+                        pass
+                        
                     aw.qmc.ax.set_xlim(min_start_time,max_end_time) # we adjust the min, max time scale to ensure all data is visible
                     graph_image = "roastlog-graph"
                     self.qmc.ax.set_title("")
@@ -17802,15 +17827,23 @@ class ApplicationWindow(QMainWindow):
         return (rc1,rc2,rc3)
 
     def viewErrorLog(self):
-        self.error_dlg = errorDlg(self)
-        self.error_dlg.setModal(False)
-        self.error_dlg.show()
+        if self.error_dlg:
+            self.error_dlg.raise_()
+            self.error_dlg.activateWindow()
+        else:
+            self.error_dlg = errorDlg(self)
+            self.error_dlg.setModal(False)
+            self.error_dlg.show()
         QApplication.processEvents()
 
     def viewSerialLog(self):
-        self.serial_dlg = serialLogDlg(self)
-        self.serial_dlg.setModal(False)
-        self.serial_dlg.show()
+        if self.serial_dlg:
+            self.serial_dlg.raise_()
+            self.serial_dlg.activateWindow()
+        else:
+            self.serial_dlg = serialLogDlg(self)
+            self.serial_dlg.setModal(False)
+            self.serial_dlg.show()
         QApplication.processEvents()
         
     def viewartisansettings(self):
@@ -17824,8 +17857,12 @@ class ApplicationWindow(QMainWindow):
         QApplication.processEvents()
 
     def viewMessageLog(self):
-        self.message_dlg = messageDlg(self)
-        self.message_dlg.setModal(False)
+        if self.message_dlg:
+            self.message_dlg.raise_()
+            self.message_dlg.activateWindow()
+        else:
+            self.message_dlg = messageDlg(self)
+            self.message_dlg.setModal(False)
         self.message_dlg.show()
         QApplication.processEvents()
 
