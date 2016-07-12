@@ -16098,7 +16098,7 @@ class ApplicationWindow(QMainWindow):
 
     def productionReport(self):
         # get profile filenames
-        files = self.ArtisanOpenFilesDialog(ext="*.alog")
+        files = self.reportFiles()
         try:
             if files and len(files) > 0:
                 profiles = [self.deserialize(f) for f in files]
@@ -16169,7 +16169,7 @@ class ApplicationWindow(QMainWindow):
                 
     def productionCSVReport(self):
         # get profile filenames
-        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+        profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
             filename = self.ArtisanSaveFileDialog(msg="Export CSV",ext="*.csv")
@@ -16210,7 +16210,7 @@ class ApplicationWindow(QMainWindow):
 
     def productionExcelReport(self):
         # get profile filenames
-        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+        profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
             filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.xlsx")
@@ -16294,86 +16294,7 @@ class ApplicationWindow(QMainWindow):
 #                    traceback.print_exc(file=sys.stdout)
                     pass
                     
-                    
-#    def productionSYLKReport(self):
-#        # get profile filenames
-#        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
-#        if profiles and len(profiles) > 0:
-#            # select file
-#            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.slk")
-#            if filename:
-#                try:
-#                    # open file
-#                    if sys.version < '3':
-#                        out = open(filename, 'wb')
-#                    else:
-#                        out = open(filename, 'w',newline="")
-#                    # write header
-#                    out.write("ID;PArtisan\n")
-#                    out.write("P;PGeneral\n")
-#                    out.write("P;PT.M.JJJJ\ h:mm;;@\n")
-#                    out.write("C;Y1;X1;K\"Batch\"\n")
-#                    out.write("C;Y1;X2;K\"Time\"\n")
-#                    out.write("C;Y1;X3;K\"Profile\"\n")
-#                    out.write("C;Y1;X4;K\"Beans\"\n")
-#                    out.write("C;Y1;X7;K\"Loss\"\n")
-#                    # write data
-#                    row = 2
-#                    unit = ""
-#                    c = 1
-#                    decimalPoint = QLocale().decimalPoint()
-#                    for p in profiles:
-#                        try:
-#                            raw_data = self.profileProductionData(self.deserialize(p),c)
-#                            c += 1
-#                            if unit == "":
-#                                if raw_data["weight"][2] == "g" or raw_data["weight"][2] == "Kg":
-#                                    unit = "Kg"
-#                                else:
-#                                    unit = "lb"
-#                            d = self.productionData2string(raw_data,units=False)
-#                            out.write("C;Y" + str(row) + ";X1;K\"" + s2a(d["id"]) + "\"\n")
-#                            # date formats in SYLK don't translate between locales: JJJJ on a German system does not load on an English system, YYYY would
-#                            # therefore we write out the datetime as string
-#                            #out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', decimalPoint) + "\n")
-#                            out.write("C;Y" + str(row) + ";X2;K" + s2a("\"" + QDateTime(d["datetime"]).toString("yyyy-MM-dd hh:mm") + "\"") + "\n")
-#                            out.write("C;Y" + str(row) + ";X3;K\"" + s2a(d["title"]) + "\"\n")
-#                            out.write("C;Y" + str(row) + ";X4;K\"" + s2a(d["beans"]) + "\"\n")
-#                            w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-#                            w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-#                            out.write("C;Y" + str(row) + ";X5;K" + str(w_in).replace('.', decimalPoint) + "\n")
-#                            out.write("C;Y" + str(row) + ";X6;K" + str(w_out).replace('.', decimalPoint) + "\n")
-#                            out.write("C;Y" + str(row) + ";X7;E((R" + str(row) + "C5 - R" + str(row) + "C6) / R" + str(row) + "C5)\n")   
-#                            row += 1               
-#                        except Exception as e:
-#                            pass
-#                    # write trailer
-#                    out.write("C;Y1;X5;K\"In (" + unit.lower() + ")\"\n")
-#                    out.write("C;Y1;X6;K\"Out (" + unit.lower() + ")\"\n")
-#                    if row > 0:
-#                        out.write("C;Y" + str(row) + ";X1;K\"" + u(QApplication.translate("HTML Report Template", "SUM", None)) +"\"\n")
-##                        out.write("F;P0;Y" + str(row) + ";X1\n")
-#                        out.write("C;Y" + str(row) + ";X5;K0;Esum(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X6;K0;Esum(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X7;E((R" + str(row) + "C5 - R" + str(row) + "C6) / R" + str(row) + "C5)\n")
-#                    #
-##                    out.write("F;P0;R1\n")
-#                    # date formats in SYLK don't translate between locales: JJJJ on a German system does not load on an English system, YYYY would
-#                    # therefore we write out the datetime as string
-#                    #out.write("F;P1;C2\n")
-#                    out.write("F;W2 2 15\n")
-#                    out.write("F;W3 3 20\n")
-#                    out.write("F;W4 4 30\n")
-#                    out.write("F;C5;FF2D\n")
-#                    out.write("F;C6;FF2D\n")
-#                    out.write("F;C7;F%2D\n")
-#                    out.write("F;SDM4;R1\n")
-#                    out.write("F;SDM4;R" + str(row) + "\n")
-#                    out.write("E\n")                     
-#                    # close file
-#                    out.close()
-#                except:
-#                    pass
+
                     
                     
     # extracts the following from a give profile dict in a new dict:
@@ -16543,10 +16464,28 @@ class ApplicationWindow(QMainWindow):
             cupping = rd["cupping"],
         )
 
+    def reportFiles(self):
+        import zipfile
+        import tempfile
+        # get profile filenames
+        selected_files = self.ArtisanOpenFilesDialog(ext="*.alog *.zip")      # added zip files
+        files = []
+        for f in selected_files:
+            if zipfile.is_zipfile(f):
+                zf = zipfile.ZipFile(f)
+                ziptmpdir = tempfile.mkdtemp()
+                zf.extractall(ziptmpdir)
+                for n in zf.namelist():
+                    nf = os.path.join(ziptmpdir,n)
+                    if os.path.splitext(nf)[1] == ".alog":
+                        files.append(nf)
+            else: # a normal *.alog file
+                files.append(f)
+        return files
                 
     def rankingReport(self):
         # get profile filenames
-        files = self.ArtisanOpenFilesDialog(ext="*.alog")
+        files = self.reportFiles()
         if files and len(files) > 0:
             profiles = [self.deserialize(f) for f in files]
             # let's sort by isodate
@@ -16840,7 +16779,7 @@ class ApplicationWindow(QMainWindow):
 
 
     def rankingCSVReport(self):        # get profile filenames
-        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+        profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
             filename = self.ArtisanSaveFileDialog(msg="Export CSV",ext="*.csv")
@@ -16892,7 +16831,7 @@ class ApplicationWindow(QMainWindow):
                     
     def rankingExcelReport(self):
         # get profile filenames
-        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
+        profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
             filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.xlsx")
@@ -17066,145 +17005,6 @@ class ApplicationWindow(QMainWindow):
                 except Exception as e:
                     pass
 
-                    
-#    def rankingSYLKReport(self):
-#        # get profile filenames
-#        profiles = self.ArtisanOpenFilesDialog(ext="*.alog")
-#        if profiles and len(profiles) > 0:
-#            # select file
-#            filename = self.ArtisanSaveFileDialog(msg="Export Excel",ext="*.slk")
-#            if filename:
-#                try:
-#                    # open file
-#                    if sys.version < '3':
-#                        out = open(filename, 'wb')
-#                    else:
-#                        out = open(filename, 'w',newline="")
-#                    # write header
-#                    out.write("ID;PArtisan\n")
-#                    out.write("P;PGeneral\n")
-#                    out.write("P;PT.M.JJJJ\ h:mm;;@\n")
-#                    out.write("P;Pm:ss;;@\n")
-#                    out.write("C;Y1;X1;K\"Batch\"\n")
-#                    out.write("C;Y1;X2;K\"Time\"\n")
-#                    out.write("C;Y1;X3;K\"Profile\"\n") 
-#                    out.write("C;Y1;X4;K\"Load\"\n")                    
-#                    out.write("C;Y1;X5;K\"Charge (" + aw.qmc.mode + ")\"\n")
-#                    out.write("C;Y1;X6;K\"FCs\"\n")
-#                    out.write("C;Y1;X7;K\"FCs (" + aw.qmc.mode + ")\"\n")
-#                    out.write("C;Y1;X8;K\"DROP\"\n")
-#                    out.write("C;Y1;X9;K\"DROP (" + aw.qmc.mode + ")\"\n")
-#                    out.write("C;Y1;X10;K\"DRY (%)\"\n")
-#                    out.write("C;Y1;X11;K\"MAI (%)\"\n")
-#                    out.write("C;Y1;X12;K\"DEV (%)\"\n")
-#                    out.write("C;Y1;X13;K\"BTa\"\n")
-#                    out.write("C;Y1;X14;K\"Loss (%)\"\n")
-#                    out.write("C;Y1;X15;K\"Color\"\n")
-#                    out.write("C;Y1;X16;K\"Cup\"\n")
-#                    # write data
-#                    row = 2
-#                    unit = ""
-#                    c = 1
-#                    decimalPoint = QLocale().decimalPoint()
-#                    for p in profiles:
-#                        try:
-#                            raw_data = self.profileProductionData(self.deserialize(p),c)
-#                            c += 1
-#                            rd = self.profileRankingData(self.deserialize(p))
-#                            if unit == "":
-#                                if raw_data["weight"][2] == "g" or raw_data["weight"][2] == "Kg":
-#                                    unit = "Kg"
-#                                else:
-#                                    unit = "lb"
-#                            d = self.productionData2string(raw_data,units=False)
-#                            if "id" in d:
-#                                out.write("C;Y" + str(row) + ";X1;K\"" + s2a(d["id"]) + "\"\n")
-#                            if "datetime" in d:
-#                                # date formats in SYLK don't translate between locales: JJJJ on a German system does not load on an English system, YYYY would
-#                                # therefore we write out the datetime as string
-#                                #out.write("C;Y" + str(row) + ";X2;K" + str(self.excel_date(d["datetime"])).replace('.', decimalPoint) + "\n")
-#                                out.write("C;Y" + str(row) + ";X2;K" + s2a("\"" + QDateTime(d["datetime"]).toString("yyyy-MM-dd hh:mm") + "\"") + "\n")
-#                            if "title" in d:
-#                                out.write("C;Y" + str(row) + ";X3;K\"" + s2a(d["title"]) + "\"\n")
-#                            if "weight" in raw_data:
-#                                w_in = aw.convertWeight(raw_data["weight"][0],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-#                                w_out = aw.convertWeight(raw_data["weight"][1],aw.qmc.weight_units.index(raw_data["weight"][2]),aw.qmc.weight_units.index(unit))
-#                                out.write("C;Y" + str(row) + ";X4;K" + str(w_in).replace('.', decimalPoint) + "\n")
-#                            else:
-#                                w_in = 0
-#                                w_out = 0
-#                            if "charge_temp" in rd and "temp_unit" in rd:
-#                                out.write("C;Y" + str(row) + ";X5;K" + str(aw.qmc.convertTemp(rd["charge_temp"],rd["temp_unit"],aw.qmc.mode)).replace('.', decimalPoint) + "\n"),                            
-#                            if "FCs_time" in rd:
-#                                out.write("C;Y" + str(row) + ";X6;K" + str(rd["FCs_time"]/86400.).replace('.', decimalPoint) + "\n")
-#                            if "FCs_temp" in rd and "temp_unit" in rd:
-#                                out.write("C;Y" + str(row) + ";X7;K" + str(aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],aw.qmc.mode)).replace('.', decimalPoint) + "\n"),
-#                            if "DROP_time" in rd:
-#                                out.write("C;Y" + str(row) + ";X8;K" + str(rd["DROP_time"]/86400.).replace('.', decimalPoint) + "\n")
-#                            if "DROP_temp" in rd and "temp_unit" in rd:
-#                                out.write("C;Y" + str(row) + ";X9;K" + str(aw.qmc.convertTemp(rd["DROP_temp"],rd["temp_unit"],aw.qmc.mode)).replace('.', decimalPoint) + "\n"),
-#                            if "DRY_percent" in rd:
-#                                out.write("C;Y" + str(row) + ";X10;K" + str(rd["DRY_percent"]/100.).replace('.', decimalPoint) + "\n")
-#                            if "MAI_percent" in rd:
-#                                out.write("C;Y" + str(row) + ";X11;K" + str(rd["MAI_percent"]/100.).replace('.', decimalPoint) + "\n")
-#                            if "DEV_percent" in rd:
-#                                out.write("C;Y" + str(row) + ";X12;K" + str(rd["DEV_percent"]/100.).replace('.', decimalPoint) + "\n")
-#                            if "BTa" in rd:
-#                                out.write("C;Y" + str(row) + ";X13;K" + str(rd["BTa"]) + "\n")
-#                            if w_in > 0 and w_out > 0:
-#                                out.write("C;Y" + str(row) + ";X14;K" + str(aw.weight_loss(w_in,w_out)/100.).replace('.', decimalPoint) + "\n")
-#                            if "color" in rd and rd["color"] and rd["color"] > 0:
-#                                out.write("C;Y" + str(row) + ";X15;K" + str(rd["color"]).replace('.', decimalPoint) + "\n")
-#                            if "cupping" in rd:
-#                                out.write("C;Y" + str(row) + ";X16;K" + str(rd["cupping"]).replace('.', decimalPoint) + "\n")
-#                            row += 1               
-#                        except Exception as e:
-##                            import traceback
-##                            traceback.print_exc(file=sys.stdout)
-#                            pass
-#                    # write trailer
-#                    if row > 0:
-#                        out.write("C;Y" + str(row) + ";X1;K\"" + u(QApplication.translate("HTML Report Template", "AVG", None)) +"\"\n")
-#                        out.write("C;Y" + str(row) + ";X4;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X5;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X6;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X7;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X8;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X9;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X10;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X11;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X12;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X13;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X14;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X15;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#                        out.write("C;Y" + str(row) + ";X16;K0;EAVERAGE(R[-" + str(row - 2) + "]C:R[-1]C)\n")
-#
-#                    #
-#                    # date formats in SYLK don't translate between locales: JJJJ on a German system does not load on an English system, YYYY would
-#                    # therefore we write out the datetime as string
-#                    #out.write("F;P1;C2\n")
-#                    out.write("F;P2;C6\n")
-#                    out.write("F;P2;C8\n")
-#                    out.write("F;W2 2 15\n")
-#                    out.write("F;W3 3 20\n")
-#                    out.write("F;C4;FF2D\n")
-#                    out.write("F;C5;FF1D\n")
-#                    out.write("F;C7;FF1D\n")
-#                    out.write("F;C9;FF1D\n")
-#                    out.write("F;C10;F%1D\n")
-#                    out.write("F;C11;F%1D\n")
-#                    out.write("F;C12;F%1D\n")
-#                    out.write("F;C13;FF0D\n")
-#                    out.write("F;C14;F%1D\n")
-#                    out.write("F;C15;FF0D\n")
-#                    out.write("F;C16;FF2D\n")
-#                    out.write("F;SDM4;R" + str(row) + "\n")
-#                    out.write("E\n")                     
-#                    # close file
-#                    out.close()
-#                except Exception as e:
-#                    pass
-#
     def htmlReport(self):
         try:
             rcParams['path.effects'] = []
