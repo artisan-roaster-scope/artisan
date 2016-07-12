@@ -30,6 +30,7 @@ o openpyxl 2.3.3
 
 
 CHECK FOR UPDATES
+# pip install --upgrade pip
 # pip install pip-review
 # pip-review --local --interactive
 
@@ -320,6 +321,10 @@ Note: PyQt needs to be re-installed after a qt update
 
 6) Install PyQt
 
+
+make sure that the current Python is in the path (otherwise the following ./configure.py might fail:
+# export PATH=/Library/Frameworks/Python.framework/Versions/3.4/bin:/Library/Frameworks/Python.framework/Versions/3.4/lib:${PATH}
+
 # tar xzf PyQt-mac-gpl-4.10.4.tar.gz 
 # cd PyQt-mac-gpl-4.10.4
 # python configure.py
@@ -425,6 +430,13 @@ installed matplotlib dependencies before its compilation via
 (best) alternative: install matplotlib via pip to make the installation independent of any X11 installation and avoid error messages like
 
 10/11/15 9:22:16.761 PM Artisan[2280]: ImportError: dlopen(/Applications/Artisan.app/Contents/Resources/lib/python2.7/lib-dynload/matplotlib/ft2font.so, 2): Library not loaded: /usr/X11/lib/libfreetype.6.dylib
+
+The following is the expected dependency of the matplotlib on libfreetype
+# otool -L Artisan.app/Contents/Resources/lib/python2.7/lib-dynload/matplotlib/ft2font.so
+Artisan.app/Contents/Resources/lib/python2.7/lib-dynload/matplotlib/ft2font.so:
+	@executable_path/../Frameworks/libfreetype.6.dylib (compatibility version 19.0.0, current version 19.0.0)
+	/usr/lib/libstdc++.6.dylib (compatibility version 7.0.0, current version 104.1.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1226.10.1)
 
 
 # sudo pip install --upgrade pip

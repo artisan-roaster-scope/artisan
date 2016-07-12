@@ -3,7 +3,11 @@
 QT=/usr/local/Qt5.4.2/5.4/gcc_64/
 
 # translations
-pylupdate4 artisan.pro
+# PyQt5
+pylupdate5 artisan.pro
+# PyQt4
+#pylupdate4 artisan.pro
+
 lrelease -verbose artisan.pro
 
 # distribution

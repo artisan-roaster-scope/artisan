@@ -31,7 +31,6 @@ try:
     QTDIR = os.environ["QT_PATH"] + r'/'
 except:
     QTDIR = r'/Users/luther/Qt5.6.0/5.6/clang_64/' # qt5
-    #QTDIR = r'/Developer/Applications/Qt/' # qt4
 
 APP = ['artisan.py']
 
@@ -42,9 +41,10 @@ DATA_FILES = [
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqicns.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqico.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjp2.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjp2.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqmng.dylib']),
+    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqmacjp2.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqmng.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtga.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),
@@ -119,6 +119,7 @@ plist.update({ 'CFBundleDisplayName': 'Artisan',
                     'LSPrefersPPC': False,
                     'LSArchitecturePriority': 'x86_64',
                     'NSHumanReadableCopyright': LICENSE,
+                    'NSHighResolutionCapable': True,
                 })
   
 OPTIONS = {
@@ -140,7 +141,7 @@ OPTIONS = {
                     'QtHelp','QtMultimedia','QtNetwork',
                     'QtOpenGL','QtScript','QtScriptTools',
                     'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
-    'packages': ['yoctopuce','gevent','PyQt5'],
+    'packages': ['yoctopuce','gevent'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
@@ -154,7 +155,8 @@ OPTIONS = {
                  'PyQt5.QtSvg',
                  'PyQt5.QtXml',
                  'PyQt5.QtDBus',
-                 'PyQt5.QtPrintSupport'],
+                 'PyQt5.QtPrintSupport'
+                 ],
     'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
                       '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
                       'bsddb','curses','tcl',
@@ -187,99 +189,78 @@ os.chdir('./dist')
 
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 os.system(r'mkdir Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matplotlib/.dylibs')
-os.system(r'cp -R /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python3.45/lib-dynload/matplotlib/.dylibs')
+os.system(r'cp -R /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matplotlib/.dylibs')
 os.system(r'cp /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
+#
+# temporary commented:
 
-
-# delete unused Qt.framework files (py2app exclude does not seem to work)
-# for Qt4
+## for Qt5
 #print('*** Removing unused Qt frameworks ***')
 #for fw in [
-#            'phonon',
-#            'QtDeclarative',
-#            'QtHelp',
-#            'QtMultimedia',
-#            'QtNetwork',
-#            'QtOpenGL',
-#            'QtScript',
-#            'QtScriptTools',
-#            'QtSql',
-#            'QtDBus',
-#            'QtDesigner',
-#            'QtTest',
-#            'QtWebKit',
-#            'QtXMLPatterns']:
-#    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw + ".framework"):
+#            'QtDeclarative.framework',
+#            'QtHelp.framework',
+#            'QtMultimedia.framework',
+#            'QtNetwork.framework',
+#            'QtOpenGL.framework',
+#            'QtScript.framework',
+#            'QtScriptTools.framework',
+#            'QtSql.framework',
+#            'QtDesigner.framework',
+#            'QtTest.framework',
+#            'QtWebKit.framework',
+#            'QtWebKitWidgets.framework',
+#            'QtXMLPatterns.framework',
+#            'QtCLucene.framework',
+#            'QtPositioning.framework',
+#            'QtQml.framework',
+#            'QtSensors.framework',
+#            'QtWebChannel.framework',
+#            'QtQuick.framework',
+#            'QtMultimediaWidgets.framework',]:
+#    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw):
 #        for file in files:
-#            print('Deleting', file)
+##            print('Deleting', file)
 #            os.remove(os.path.join(root,file))
-# for Qt5
-print('*** Removing unused Qt frameworks ***')
-for fw in [
-            'QtDeclarative.framework',
-            'QtHelp.framework',
-            'QtMultimedia.framework',
-            'QtNetwork.framework',
-            'QtOpenGL.framework',
-            'QtScript.framework',
-            'QtScriptTools.framework',
-            'QtSql.framework',
-            'QtDesigner.framework',
-            'QtTest.framework',
-            'QtWebKit.framework',
-            'QtWebKitWidgets.framework',
-            'QtXMLPatterns.framework',
-            'QtCLucene.framework',
-            'QtPositioning.framework',
-            'QtQml.framework',
-            'QtSensors.framework',
-            'QtWebChannel.framework',
-            'QtQuick.framework',
-            'QtMultimediaWidgets.framework',]:
-    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw):
-        for file in files:
-#            print('Deleting', file)
-            os.remove(os.path.join(root,file))
 
-print('*** Removing Qt debug libs ***')
-for root, dirs, files in os.walk('.'):
-    for file in files:
-        if 'debug' in file:
-            print('Deleting', file)
-            os.remove(os.path.join(root,file))
-        elif file.startswith('test_'):
-            print('Deleting', file)
-            os.remove(os.path.join(root,file))
-        elif '_tests' in file:
-            print('Deleting', file)            
-            os.remove(os.path.join(root,file))               
-        elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
-            print('Deleting', file)
-            os.remove(os.path.join(root,file))
-        # remove also all .h .in .cpp .cc .html files 
-        elif file.endswith('.h') and file != "pyconfig.h":
-            print('Deleting', file)
-            os.remove(os.path.join(root,file))
-        elif file.endswith('.in'):
-            print('Deleting', file)
-            os.remove(os.path.join(root,file))
-        elif file.endswith('.cpp'):
-            print('Deleting', file)
-            os.remove(os.path.join(root,file))
-        elif file.endswith('.cc'):
-            print('Deleting', file)
-            os.remove(os.path.join(root,file))
-# .afm files should not be removed as without matplotlib will fail on startup            
-#        elif file.endswith('.afm'):
-#            print('Deleting', file)
+#print('*** Removing unused files ***')
+#for root, dirs, files in os.walk('.'):
+#    for file in files:
+#        if 'debug' in file:
+##            print('Deleting', file)
 #            os.remove(os.path.join(root,file))
-    # remove test files        
-    for dir in dirs:
-        if 'tests' in dir:
-            for r,d,f in os.walk(os.path.join(root,dir)):
-                for fl in f:
-                    print('Deleting', os.path.join(r,fl))
-                    os.remove(os.path.join(r,fl))                
+#        elif file.startswith('test_'):
+##            print('Deleting', file)
+#            os.remove(os.path.join(root,file))
+#        elif '_tests' in file:
+##            print('Deleting', file)            
+#            os.remove(os.path.join(root,file))               
+#        elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
+##            print('Deleting', file)
+#            os.remove(os.path.join(root,file))
+#        # remove also all .h .in .cpp .cc .html files 
+#        elif file.endswith('.h') and file != "pyconfig.h":
+##            print('Deleting', file)
+#            os.remove(os.path.join(root,file))
+#        elif file.endswith('.in'):
+##            print('Deleting', file)
+#            os.remove(os.path.join(root,file))
+#        elif file.endswith('.cpp'):
+##            print('Deleting', file)
+#            os.remove(os.path.join(root,file))
+#        elif file.endswith('.cc'):
+##            print('Deleting', file)
+#            os.remove(os.path.join(root,file))
+## .afm files should not be removed as without matplotlib will fail on startup            
+##        elif file.endswith('.afm'):
+##            print('Deleting', file)
+##            os.remove(os.path.join(root,file))
+#    # remove test files        
+#    for dir in dirs:
+#        if 'tests' in dir:
+#            for r,d,f in os.walk(os.path.join(root,dir)):
+#                for fl in f:
+##                    print('Deleting', os.path.join(r,fl))
+#                    os.remove(os.path.join(r,fl))                
             
 os.chdir('..')
 os.system(r"rm artisan-mac-" + VERSION + r".dmg")

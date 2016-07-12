@@ -814,7 +814,8 @@ class tgraphcanvas(FigureCanvas):
                        "Hottop BT/ET",          #53
                        "+Hottop Heater/Fan",    #54
                        "+MODBUS_56",            #55
-                       "-Omega HH806W"          #56 NOT WORKING 
+                       "Apollo DT301",          #56
+                       "-Omega HH806W"          #57 NOT WORKING 
                        ]
 
         #extra devices
@@ -1217,11 +1218,11 @@ class tgraphcanvas(FigureCanvas):
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
 #                              # -1 equals None
         self.alarmoffset = []  # for timed alarms, the seconds after alarmtime the alarm is triggered
-        self.alarmtime2menuidx = [2,4,5,6,7,8,9,10,3,0,1] # maps self.alarmtime index to menu idx (to move TP in menu from index 9 to 3)
-        self.menuidx2alarmtime = [9,-1,0,8,1,2,3,4,5,6,7] # inverse of above (note that those two are only inverse in one direction!)
+        self.alarmtime2menuidx = [2,4,5,6,7,8,9,10,3,0,11,1] # maps self.alarmtime index to menu idx (to move TP in menu from index 9 to 3)
+        self.menuidx2alarmtime = [9,-1,0,8,1,2,3,4,5,6,7,10] # inverse of above (note that those two are only inverse in one direction!)
         self.alarmcond = []    # 0 = falls below; 1 = rises above
-        # alarmstate is set to 'not triggered' on reset()
-        self.alarmstate = []   # 1=triggered, 0=not triggered. Needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
+        # alarmstate is set to 'not triggered' on reset(). This is needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
+        self.alarmstate = []   # <time>=triggered, 0=not triggered. 
         self.alarmsource = []   # -3=None, -2=DeltaET, -1=DeltaBT, 0=ET , 1=BT, 2=extratemp1[0], 3=extratemp2[0], 4=extratemp2[1],....
         self.alarmtemperature = []  # set temperature number (example 500)
         self.alarmaction = []       # -1 = no action; 0 = open a window;
@@ -1523,6 +1524,10 @@ class tgraphcanvas(FigureCanvas):
 #        if self.ax and self.delta_ax: #self.designerflag and self.ax and self.delta_ax:
 #            self.ax.set_zorder(0.1)
 #            self.delta_ax.set_zorder(0)
+
+#    def draw(self):
+#        FigureCanvas.draw(self)
+#        self.fig.canvas.flush_events()
     
     # returns the prefix of length l of s and adds eclipse
     def abbrevString(self,s,l):
@@ -1561,11 +1566,18 @@ class tgraphcanvas(FigureCanvas):
             # when Qt thinks it is convenient
             #self.fig.canvas.draw_idle() # this blocks (overwrites) drawing of the projections in updategraphics
             try:
-                self.fig.canvas.draw() # the triggered _draw_event(self,evt) function resets the self.in_draw_event if done
+                # self.fig.canvas.draw() causes randomly a black border where the axis should be drawn
+                #self.fig.canvas.draw() # the triggered _draw_event(self,evt) function resets the self.in_draw_event if done
+                self.fig.canvas.draw_idle()
+                # make sure that the GUI framework has a chance to run its event loop
+                # and clear any GUI events.  This needs to be in a try/except block
+                # because the default implemenation of this method is to raise
+                # NotImplementedError          
+                self.fig.canvas.flush_events()
             except:
                 pass
             
-            self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)  # causes randomly a black border where the axis should be drawn
+#            self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)  # causes randomly a black border where the axis should be drawn
             self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
             
             #aw.qmc.ax.draw_artist(aw.qmc.ax.xaxis)
@@ -1700,7 +1712,7 @@ class tgraphcanvas(FigureCanvas):
     # hook up to mpls event handling framework for draw events
     # this is emitted after the canvas has finished a full redraw
     def _draw_event(self, evt):
-        #self.fig.canvas.flush_events() # THIS prevents the black border on >Qt5.5, but slows down things on redraw otherwise!!!
+        #self.fig.canvas.flush_events() # THIS prevents the black border on >Qt5.5, but slows down things (especially resizings) on redraw otherwise!!!
         self.ax_background = None
         
 
@@ -1971,6 +1983,11 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         rcParams['path.effects'] = []
 
+                    #auto mark CHARGE (this forces a realignment/redraw by reseting the cache ax_background)
+                    if self.autoChargeIdx and aw.qmc.timeindex[0] < 0:
+                        self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
+                        self.autoChargeIdx = 0
+
                     ##### updated canvas
                     try:
                         if self.ax_background:
@@ -2047,11 +2064,8 @@ class tgraphcanvas(FigureCanvas):
                     #check if HUD is ON (done after self.fig.canvas.draw())
                     if self.HUDflag:
                         aw.showHUD[aw.HUDfunction]()
-
-                    #auto mark CHARGE/TP/DRY/FCs/DROP
-                    if self.autoChargeIdx and aw.qmc.timeindex[0] < 0:
-                        self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
-                        self.autoChargeIdx = 0
+                        
+                    #auto mark TP/DRY/FCs/DROP                        
                     if self.autoTPIdx != 0:
                         self.markTP()
                         self.autoTPIdx = 0
@@ -2064,6 +2078,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoDropIdx != 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
                         self.autoDropIdx = 0
+
 
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
@@ -2182,8 +2197,10 @@ class tgraphcanvas(FigureCanvas):
                         self.redraw(recompute)
                 elif redraw and force: # ensure that we at least redraw the canvas
                     self.updateBackground()
+                    #self.delayedUpdateBackground()
             elif redraw and force: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
                     self.updateBackground()
+                    #self.delayedUpdateBackground()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -2250,7 +2267,7 @@ class tgraphcanvas(FigureCanvas):
             self.delta_ax.lines = []
 
     def setalarm(self,alarmnumber):
-        self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
+        self.alarmstate[alarmnumber] = aw.qmc.timeclock.elapsed()/1000.    #turn off flag as it has been read
         aw.sendmessage(QApplication.translate("Message","Alarm {0} triggered", None).format(alarmnumber + 1))
         if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
             QApplication.beep()
@@ -3974,13 +3991,13 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
     
                             self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                                            picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha)
+                                                                            picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha)
                             self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                                            picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha)
+                                                                            picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha)
                             self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                                            picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha)
+                                                                            picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha)
                             self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                                            picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha)                                                                        
+                                                                            picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha)                                                                        
                                                                               
                     #check backgroundDetails flag
                     if self.backgroundDetails:
@@ -4162,13 +4179,13 @@ class tgraphcanvas(FigureCanvas):
                                 E4_nonempty = True
     
                         self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                              picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
+                                                              picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                              picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
+                                                              picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                              picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
+                                                              picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                              picker=7,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                                                              picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                             
 
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
@@ -8425,21 +8442,23 @@ class SampleThread(QThread):
                         # qmc.alarmtime = 7 (COOL)
                         # qmc.alarmtime = 8 (TP)
                         # qmc.alarmtime = 9 (ON)
+                        # qmc.alamrtime = 10 (If Alarm)
                         # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
-                        # 1) the alarm is START
+                        # 1) the alarm From is START
                         # 2) the alarm was not triggered yet
                         # 3) the alarm From is ON
                         # 4) the alarm From is CHARGE
                         # 5) the alarm From is any other event but TP
-                        # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized   
+                        # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
                         if aw.qmc.alarmflag[i] \
                           and not aw.qmc.alarmstate[i] \
-                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
-                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmnflag) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
+                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmstate) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
+                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmstate) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
                           and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
                           or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
                           or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                          or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
+                          or (aw.qmc.alarmtime[i] == 10 and aw.qmc.alarmguard[i] != -1)  \
+                          or (aw.qmc.alarmtime[i] == 8 and aw.qmc.timeindex[0] > -1 \
                                 and aw.qmc.TPalarmtimeindex)):
                             #########
                             # check alarmoffset (time after From event):
@@ -8453,6 +8472,8 @@ class SampleThread(QThread):
                                     alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
                                 elif aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
                                     alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
+                                elif aw.qmc.alarmtime[i] == 10: # time after the trigger of the alarmguard (if one is set)
+                                    alarm_time = alarm_time - aw.qmc.alarmstate[aw.qmc.alarmguard[i]]
                                 if alarm_time >= aw.qmc.alarmoffset[i]:
                                     aw.qmc.temporaryalarmflag = i
                             #########
@@ -9760,7 +9781,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonlistmaxlen = 11
         #10 palettes of buttons
         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
-        self.buttonpalettemaxlen = [10]*10  #keeps max len of each palette
+        self.buttonpalettemaxlen = [14]*10  #keeps max len of each palette
 
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
@@ -14814,9 +14835,18 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventbuttoncolor = ["yellow"]*len(self.extraeventstypes)
                     self.extraeventbuttontextcolor = ["black"]*len(self.extraeventstypes)
                 if settings.contains("buttonpalette"):
+                    self.buttonpalettemaxlen = [max(14,toInt(x)) for x in toList(settings.value("buttonpalettemaxlen",self.buttonpalettemaxlen))]
                     self.buttonpalette = toList(settings.value("buttonpalette",self.buttonpalette))
+                    if self.buttonpalette == None:
+                        self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]] # initialize empty palettes
+                    else:
+                        self.buttonpalette = self.buttonpalette[:10] # maximal 10 palettes are supported
+                    for i in range(len(self.buttonpalette)):
+                        if self.buttonpalette[i] == None:
+                            self.buttonpalette[i] = []
+                        elif len(self.buttonpalette[i]) > self.buttonpalettemaxlen[i]:
+                            self.buttonpalette[i] = self.buttonpalette[i][:self.buttonpalettemaxlen[i]]
                     
-#                    self.buttonpalettemaxlen = [max(9,toInt(x)) for x in toList(settings.value("buttonpalettemaxlen",self.buttonpalettemaxlen))]
 #                    mlist = [toList(x) for x in toList(settings.value("buttonpalette",self.buttonpalette))]
 #                    for i in range(len(mlist)):
 #                        if len(mlist[i]) in [9,13,14]:
@@ -19104,14 +19134,24 @@ class ApplicationWindow(QMainWindow):
             # added slider settings
             if len(copy)>9 and len(copy[9]) == 4:
                 self.eventslidervisibilities = copy[9][:]
+            else:
+                self.eventslidervisibilities = [0,0,0,0]
             if len(copy)>10 and len(copy[10]) == 4:
                 self.eventslideractions = copy[10][:]
+            else:
+                self.eventslideractions = [0,0,0,0]
             if len(copy)>11 and len(copy[11]) == 4:
                 self.eventslidercommands = copy[11][:]
+            else:
+                self.eventslidercommands = ["","","",""]
             if len(copy)>12 and len(copy[12]) == 4:
                 self.eventslideroffsets = copy[12][:]
+            else:
+                self.eventslideroffsets = [0,0,0,0]
             if len(copy)>13 and len(copy[13]) == 4:
                 self.eventsliderfactors = copy[13][:]
+            else:
+                self.eventsliderfactors = [1.0,1.0,1.0,1.0]
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
             self.updateSlidersProperties()
@@ -27888,6 +27928,8 @@ class serialport(object):
         #MS6514 variables
         self.MS6514PrevTemp1 = -1
         self.MS6514PrevTemp2 = -1
+        #DT301 variable
+        self.DT301PrevTemp = -1
         #select PID type that controls the roaster.
         # Reads/Controls ET
         self.controlETpid = [0,1]        # index0: type of pid: 0 = FujiPXG, 1 = FujiPXR3, 2 = DTA 
@@ -27968,7 +28010,8 @@ class serialport(object):
                                    self.HOTTOP_BTET,        #53
                                    self.HOTTOP_HF,          #54
                                    self.MODBUS_56,          #55
-                                   self.HH806W              #56
+                                   self.DT301,              #56
+                                   self.HH806W              #57
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -28178,14 +28221,14 @@ class serialport(object):
             if "," in output:
                 parts = output.split(",")
                 if len(parts) > 2:
-                    aw.qmc.program_t3 = float(parts[2])
+                    aw.qmc.program_t3 = float(parts[2].strip())
                     if len(parts) > 3:
-                        aw.qmc.program_t4 = float(parts[3])
+                        aw.qmc.program_t4 = float(parts[3].strip())
                         if len(parts) > 4:
-                            aw.qmc.program_t5 = float(parts[4])
+                            aw.qmc.program_t5 = float(parts[4].strip())
                             if len(parts) > 5:
-                                aw.qmc.program_t6 = float(parts[5])
-                return tx,float(parts[0]),float(parts[1])
+                                aw.qmc.program_t6 = float(parts[5].strip())
+                return tx,float(parts[0].strip()),float(parts[1].strip())
             else:
                 return tx,0.,float(output)
         except Exception as e:
@@ -28228,6 +28271,11 @@ class serialport(object):
     def MastechMS6514(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.MS6514temperature()
+        return tx,t2,t1 
+
+    def DT301(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.DT301temperature()
         return tx,t2,t1 
 
     def HH806W(self):
@@ -28614,7 +28662,7 @@ class serialport(object):
                         
                     # error
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): {0} bytes received but 16 needed",None).format(nbytes))
+                    aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): {0} bytes received but 18 needed",None).format(nbytes))
                     return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
@@ -28634,6 +28682,60 @@ class serialport(object):
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r))) 
+
+
+    def DT301temperature(self, retry=3):
+        try:
+            r = ""
+            command = b"\xEC\xD0\xF3"
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+                self.SP.write(command)
+                libtime.sleep(0.01)  # this may not be necessary but works well
+                r = bytearray(self.SP.read(11))
+                if len(r)==11 and data[0] == 0xfc and data[1] == 0x13 and data[10] == 0xf3:
+                    for i in range(2,6):
+                        temp = (temp << 4) | (data[i] & 0xf)
+                    self.DT301PrevTemp = temp/10.0,0
+                    return self.DT301PrevTemp
+                else:
+                    if retry:
+                        self.SP.flushInput()
+                        self.SP.flushOutput()
+                        libtime.sleep(.05)
+                        return self.DT301temperature(retry=retry-1)
+                    else:
+                        self.closeport()
+                        # error but return previous temperature
+                        if self.DT301PrevTemp != -1:
+                            s = self.DT301PrevTemp
+                            self.DT301PrevTemp = -1
+                            return s,0
+                        
+                        # error
+                        nbytes = len(r)
+                        aw.qmc.adderror(QApplication.translate("Error Message","DT301temperature(): {0} bytes received but 11 needed",None).format(nbytes))
+                        return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+            else:
+                return -1,-1
+        except serial.SerialException:
+            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.DT301temperature()"
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.DT301temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
+        finally:
+            self.closeport()
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("DT301 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r))) 
+
 
     def HOTTOPtemperatures(self):
         try:
@@ -33423,7 +33525,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 36 is +Phidget 1048_AT but +DEVICE cannot be set as main device
                 ##########################
-                ##########################
                 elif meter == "Phidget 1046 RTD":
                     aw.qmc.device = 37
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
@@ -33454,15 +33555,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 44 is +ARDUINOTC4_78 but +DEVICE cannot be set as main device
                 ##########################
-                ##########################
                 elif meter == "Yocto Thermocouple":
                     aw.qmc.device = 45
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
-                ##########################
                 elif meter == "Yocto PT100":
                     aw.qmc.device = 46
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
-                ##########################
                 elif meter == "Phidget 1045 IR":
                     aw.qmc.device = 47
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
@@ -33502,6 +33600,19 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
+                ##########################
+                ####  DEVICE 55 is +MODBUS_56 but +DEVICE cannot be set as main device
+                ##########################
+                elif meter == "Apollo DT301":
+                    aw.qmc.device = 56
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
+
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
                 if meter != "NONE":
                     aw.qmc.delay = max(aw.qmc.delay,aw.qmc.min_delay)
@@ -33574,7 +33685,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 8, # 53
                 8, # 54
                 7, # 55
-                8] # 56
+                3, # 56
+                8] # 57
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -34995,11 +35107,6 @@ class AlarmDlg(ArtisanDialog):
         addButton.clicked.connect(self.addalarm)
         addButton.setMinimumWidth(80)
         addButton.setFocusPolicy(Qt.NoFocus)
-        self.insertButton = QPushButton(QApplication.translate("Button","Insert",None))
-        self.insertButton.clicked.connect(self.insertalarm)
-        self.insertButton.setMinimumWidth(80)
-        self.insertButton.setFocusPolicy(Qt.NoFocus)
-        self.insertButton.setEnabled(False)
         deleteButton = QPushButton(QApplication.translate("Button","Delete",None))
         deleteButton.clicked.connect(self.deletealarm)
         deleteButton.setMinimumWidth(80)
@@ -35036,7 +35143,6 @@ class AlarmDlg(ArtisanDialog):
         mainlayout = QVBoxLayout()
         tablelayout.addWidget(self.alarmtable)
         buttonlayout.addWidget(addButton)
-        buttonlayout.addWidget(self.insertButton)
         buttonlayout.addWidget(deleteButton)
         buttonlayout.addStretch()
         buttonlayout.addSpacing(10)
@@ -35069,10 +35175,6 @@ class AlarmDlg(ArtisanDialog):
 
     def selectionChanged(self):
         selected = self.alarmtable.selectedRanges()
-        if selected and len(selected) > 0:
-            self.insertButton.setEnabled(True)
-        else:
-            self.insertButton.setEnabled(False)
 
     def clearalarms(self):
         aw.qmc.alarmsfile = ""
@@ -35135,43 +35237,6 @@ class AlarmDlg(ArtisanDialog):
         self.markNotEnabledAlarmRows()
         self.alarmtable.setSortingEnabled(True)
 
-    def insertalarm(self):
-        self.alarmtable.setSortingEnabled(False)
-        nalarms = self.alarmtable.rowCount()
-        if nalarms:
-            # check for selection
-            selected = self.alarmtable.selectedRanges()
-            if selected and len(selected) > 0:
-                selected_row = selected[0].topRow()
-                aw.qmc.alarmflag.insert(selected_row,1)
-                aw.qmc.alarmguard.insert(selected_row,-1)
-                aw.qmc.alarmnegguard.insert(selected_row,-1)
-                aw.qmc.alarmtime.insert(selected_row,-1)
-                aw.qmc.alarmoffset.insert(selected_row,0)
-                aw.qmc.alarmcond.insert(selected_row,1)
-                aw.qmc.alarmstate.insert(selected_row,0)
-                aw.qmc.alarmsource.insert(selected_row,1)
-                aw.qmc.alarmtemperature.insert(selected_row,500)
-                aw.qmc.alarmaction.insert(selected_row,0)
-                aw.qmc.alarmbeep.insert(selected_row,0)
-                aw.qmc.alarmstrings.insert(selected_row,QApplication.translate("Label","Enter description",None))
-                self.alarmtable.insertRow(selected_row)
-                self.setalarmtablerow(selected_row)
-                self.alarmtable.resizeColumnsToContents()
-                #  improve width of Qlineedit columns
-                self.alarmtable.setColumnWidth(2,50)
-                self.alarmtable.setColumnWidth(3,50)
-                self.alarmtable.setColumnWidth(5,50)
-                self.alarmtable.setColumnWidth(6,80)
-                self.alarmtable.setColumnWidth(8,40)
-                header = self.alarmtable.horizontalHeader()
-                header.setStretchLastSection(False)
-                self.deselectAll()
-                # select newly inserted item
-                self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(selected_row,0,selected_row,self.alarmtable.columnCount()-1),True)
-                header.setStretchLastSection(True)
-                self.markNotEnabledAlarmRows()
-        self.alarmtable.setSortingEnabled(True)
 
     def deletealarm(self):
         self.alarmtable.setSortingEnabled(False)
@@ -35198,6 +35263,10 @@ class AlarmDlg(ArtisanDialog):
                 self.deselectAll()
                 # select row number that was just deleted
                 self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(selected_row,0,selected_row,self.alarmtable.columnCount()-1),True)
+                self.alarmtable.sortItems(0)
+                # renumber elements
+                for i in range(nalarms - 1):
+                    self.alarmtable.setItem(i, 0, MyTableWidgetItemInt(str(i+1),i))
             else:
                 self.alarmtable.removeRow(self.alarmtable.rowCount() - 1)
                 # nothing selected, we pop the last element
@@ -35215,6 +35284,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmstrings.pop()
                 self.alarmtable.setRowCount(nalarms - 1)
                 self.deselectAll()
+                self.alarmtable.sortItems(0)         
             self.markNotEnabledAlarmRows()
         self.alarmtable.setSortingEnabled(True)
 
@@ -35416,7 +35486,9 @@ class AlarmDlg(ArtisanDialog):
                                QApplication.translate("ComboBox","SC START",None), # qmc.alarmtime 4
                                QApplication.translate("ComboBox","SC END",None), # qmc.alarmtime 5
                                QApplication.translate("ComboBox","DROP",None), # qmc.alarmtime 6
-                               QApplication.translate("ComboBox","COOL",None)]) # qmc.alarmtime 7
+#                               QApplication.translate("ComboBox","COOL",None)]) # qmc.alarmtime 7
+                               QApplication.translate("ComboBox","COOL",None), # qmc.alarmtime 7
+                               QApplication.translate("ComboBox","If Alarm",None)]) # qmc.alarmtime 10
         timeComboBox.setCurrentIndex(aw.qmc.alarmtime2menuidx[aw.qmc.alarmtime[i]])
         #time after selected event
         timeoffsetedit = QLineEdit(aw.qmc.stringfromseconds(max(0,aw.qmc.alarmoffset[i])))
@@ -35485,29 +35557,29 @@ class AlarmDlg(ArtisanDialog):
         #text description
         descriptionedit = QLineEdit(u(aw.qmc.alarmstrings[i]))
         descriptionedit.setCursorPosition(0)
-        self.alarmtable.setItem (i, 0, MyTableWidgetItemInt(str(i+1),i))
+        self.alarmtable.setItem(i, 0, MyTableWidgetItemInt(str(i+1),i))
         self.alarmtable.setCellWidget(i,1,flagComboBox)
-        self.alarmtable.setItem (i, 1, MyTableWidgetItemQCheckBox(flagComboBox))
+        self.alarmtable.setItem(i, 1, MyTableWidgetItemQCheckBox(flagComboBox))
         self.alarmtable.setCellWidget(i,2,guardedit)
-        self.alarmtable.setItem (i, 2, MyTableWidgetItemQLineEdit(guardedit))
+        self.alarmtable.setItem(i, 2, MyTableWidgetItemQLineEdit(guardedit))
         self.alarmtable.setCellWidget(i,3,negguardedit)
-        self.alarmtable.setItem (i, 3, MyTableWidgetItemQLineEdit(negguardedit))
+        self.alarmtable.setItem(i, 3, MyTableWidgetItemQLineEdit(negguardedit))
         self.alarmtable.setCellWidget(i,4,timeComboBox)
-        self.alarmtable.setItem (i, 4, MyTableWidgetItemQComboBox(timeComboBox))
+        self.alarmtable.setItem(i, 4, MyTableWidgetItemQComboBox(timeComboBox))
         self.alarmtable.setCellWidget(i,5,timeoffsetedit)
-        self.alarmtable.setItem (i, 5, MyTableWidgetItemQLineEdit(timeoffsetedit))
+        self.alarmtable.setItem(i, 5, MyTableWidgetItemQLineEdit(timeoffsetedit))
         self.alarmtable.setCellWidget(i,6,typeComboBox)
-        self.alarmtable.setItem (i, 6, MyTableWidgetItemQComboBox(typeComboBox))
+        self.alarmtable.setItem(i, 6, MyTableWidgetItemQComboBox(typeComboBox))
         self.alarmtable.setCellWidget(i,7,condComboBox)
-        self.alarmtable.setItem (i, 7, MyTableWidgetItemQComboBox(condComboBox))
+        self.alarmtable.setItem(i, 7, MyTableWidgetItemQComboBox(condComboBox))
         self.alarmtable.setCellWidget(i,8,tempedit)
-        self.alarmtable.setItem (i, 8, MyTableWidgetItemQLineEdit(tempedit))
+        self.alarmtable.setItem(i, 8, MyTableWidgetItemQLineEdit(tempedit))
         self.alarmtable.setCellWidget(i,9,actionComboBox)
-        self.alarmtable.setItem (i, 9, MyTableWidgetItemQComboBox(actionComboBox))
+        self.alarmtable.setItem(i, 9, MyTableWidgetItemQComboBox(actionComboBox))
         self.alarmtable.setCellWidget(i,10,beepWidget)
-        self.alarmtable.setItem (i, 10, MyTableWidgetItemQCheckBox(beepWidget.layout().itemAt(1).widget()))
+        self.alarmtable.setItem(i, 10, MyTableWidgetItemQCheckBox(beepWidget.layout().itemAt(1).widget()))
         self.alarmtable.setCellWidget(i,11,descriptionedit)
-        self.alarmtable.setItem (i, 11, MyTableWidgetItemQLineEdit(descriptionedit))
+        self.alarmtable.setItem(i, 11, MyTableWidgetItemQLineEdit(descriptionedit))
 
     # puts a gray background on alarm rows that have already been fired
     def markNotEnabledAlarmRows(self):

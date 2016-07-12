@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
+<dict>	
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -81,6 +81,8 @@
 	<string>Artisan</string>
 	<key>CFBundleIconFile</key>
 	<string>artisan.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.google.code.p.Artisan'</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -135,7 +137,7 @@
 		<key>PythonExecutable</key>
 		<string>/Library/Frameworks/Python.framework/Versions/3.5/bin/python3.5</string>
 		<key>PythonLongVersion</key>
-		<string>3.5.1 (v3.5.1:37a07cee5969, Dec  5 2015, 21:12:44) \n[GCC 4.2.1 (Apple Inc. build 5666) (dot 3)]</string>
+		<string>3.5.2</string>
 		<key>PythonShortVersion</key>
 		<string>3.5</string>
 		<key>py2app</key>

@@ -106,6 +106,7 @@ plist.update({ 'CFBundleDisplayName': 'Artisan',
                     'LSPrefersPPC': False,
                     'LSArchitecturePriority': 'x86_64',
                     'NSHumanReadableCopyright': LICENSE,
+                    'NSHighResolutionCapable': True,
                 })
                 
 OPTIONS = {
@@ -120,8 +121,8 @@ OPTIONS = {
                     'imageformats/libqgif.dylib',
                     'imageformats/libqicns.dylib',                   
                     'imageformats/libqico.dylib',
-                    'imageformats/libqjp2.dylib',
-                    'imageformats/libqmng.dylib',
+#                    'imageformats/libqjp2.dylib',
+#                    'imageformats/libqmng.dylib',
                     'imageformats/libqtga.dylib',
                     'imageformats/libqwbmp.dylib',
                     'imageformats/libqwebp.dylib',
