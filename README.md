@@ -131,14 +131,14 @@ Version History
 ----
 Related Software
 ----------------
-- [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm)
+- [RoastLogger](http://roastlogger.co.uk/coffee/roastlogger/roastlogger.htm)
 - [RoasterThing](http://www.roasterthing.com)
 - [Typica](http://www.randomfield.com/programs/typica/)
 - [Roast Monitor](http://coffeesnobs.com.au/RoastMonitor/)
 
 if you need commercial support
 
-- [Cropster](https://www.cropster.com/products/coffee-roaster/features/roasting/)
+- [Cropster](https://www.cropster.com/products/roast/)
 - [roastlog](http://roastlog.com)
 - [Profiling Dynamics™](http://www.roasterdynamics.com/Profiling_Dynamics.html)
 - [Probat Pilot](http://www.probat-shoproaster.com/en/plants-equipment/control-software/general-features/)
