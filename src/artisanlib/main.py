@@ -1578,6 +1578,7 @@ class tgraphcanvas(FigureCanvas):
                 pass
             
 #            self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.bbox)  # causes randomly a black border where the axis should be drawn
+                    # aw.qmc.ax.bbox seems not to contain the axis (it is smaller than aw.qmc.ax.get_figure().bbox and does not start at 0,0)
             self.ax_background = self.fig.canvas.copy_from_bbox(aw.qmc.ax.get_figure().bbox)
             
             #aw.qmc.ax.draw_artist(aw.qmc.ax.xaxis)
@@ -2033,10 +2034,11 @@ class tgraphcanvas(FigureCanvas):
                                 if self.l_ETprojection != None:
                                     aw.qmc.ax.draw_artist(self.l_ETprojection)
                             
-                            if aw.qmc.ax.clipbox:
+                            if False: #aw.qmc.ax.clipbox:
                                 self.fig.canvas.blit(aw.qmc.ax.clipbox) # .clipbox is None in matplotlib <1.5
                             else:
-                                self.fig.canvas.blit(aw.qmc.ax.bbox) # causes randomly a black border where the axis should be drawn
+#                                self.fig.canvas.blit(aw.qmc.ax.bbox) # causes randomly a black border where the axis should be drawn
+                                self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
                                 
                                 
                         else:
@@ -8385,7 +8387,7 @@ class SampleThread(QThread):
                     except Exception:
                         pass
                         
-                    #update SV on Arduino/TC4, Hottop, or MODBUS if in Ramp/Soak or Background Follow mode and PID is active
+                    #update SV on Arduino/TC4, Hottop, or MODBUS if in Ramp/Soak or Background Follow mode and PID is active                    
                     if aw.qmc.flagon and aw.qmc.timeindex[6] == 0: # only during sampling and before DROP
                         if aw.qmc.device in [19,29,53] and aw.pidcontrol.pidActive and aw.pidcontrol.svMode in [1,2]:
                             # calculate actual SV
@@ -10795,9 +10797,13 @@ class ApplicationWindow(QMainWindow):
         aw.sendmessage(QApplication.translate("Message","SV set to %s"%s, None))
         aw.pidcontrol.setSV(self.sliderSV.value(),False)
 
-    def moveSVslider(self,v):
+    # if setValue=False, the slider is only moved without a change signal being issued
+    def moveSVslider(self,v,setValue=True):
         if aw.pidcontrol.svSlider:
-            self.sliderSV.setValue(v)
+            if setValue:
+                self.sliderSV.setValue(v)
+            else:
+                self.sliderSV.setSliderPosition(v)
 
     def sliderReleased(self,n):
         if n == 0:
@@ -10943,7 +10949,7 @@ class ApplicationWindow(QMainWindow):
                         self.ser.sendTXcommand(cmd_str)
                 elif action == 2: # alarm and button call program action (without any argument)
                     try:
-                        if cmd_str and len(cmd_str.split(" ")) > 1:
+                        if cmd_str and (len(cmd_str.split(" ")) > 1 or platf == 'Darwin'):
                             self.call_prog_with_args(cmd_str) # a command with argument
                         else:
 # take care, the QDir().current() directory changes with loads and saves 
@@ -27348,8 +27354,8 @@ class modbusport(object):
             self.connect()
             self.master.write_register(int(register),int(value),unit=int(slave))
         except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -27921,7 +27927,10 @@ class serialport(object):
                 # TC4, HOTTOP or MODBUS with Artisan Software PID
             return aw.qmc.timeclock.elapsed()/1000., aw.qmc.pid.lastOutput, aw.qmc.pid.target
         else:
-            return aw.qmc.timeclock.elapsed()/1000.,-1,-1
+            if aw.pidcontrol.sv != None:
+                return aw.qmc.timeclock.elapsed()/1000.,-1,aw.pidcontrol.sv
+            else:
+                return aw.qmc.timeclock.elapsed()/1000.,-1,-1
 
     def DTAtemperature(self):
         ###########################################################
@@ -39789,7 +39798,8 @@ class PIDcontrol(object):
                             aw.ser.COMsemaphore.release(1)
             # MODBUS hardware PID
             elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl() and aw.modbus.PID_ON_action and aw.modbus.PID_ON_action != ""):
-                aw.eventaction(4,aw.modbus.PID_ON_action) 
+                aw.eventaction(4,aw.modbus.PID_ON_action)
+                self.pidActive = True
                 aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])       
             # software PID
             elif aw.qmc.Controlbuttonflag:
@@ -39821,6 +39831,7 @@ class PIDcontrol(object):
         elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl() and aw.modbus.PID_OFF_action and aw.modbus.PID_OFF_action != ""):
             aw.eventaction(4,aw.modbus.PID_OFF_action)
             aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            self.pidActive = False
         # software PID
         elif (aw.qmc.device == 53 or # Hottop
               (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
@@ -39893,7 +39904,7 @@ class PIDcontrol(object):
             # return None in manual mode
             return None
 
-    def setSV(self,sv,move=True,init=True):  
+    def setSV(self,sv,move=True,init=False):
         if aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
             if aw.ser.ArduinoIsInitialized:
                 sv = max(0,sv)
@@ -39915,15 +39926,15 @@ class PIDcontrol(object):
         elif (aw.qmc.device == 53 or # Hottop
               (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
               (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
+            aw.qmc.pid.setTarget(sv,init=init)
             if move:
-                aw.moveSVslider(sv)
-            else:
-                aw.qmc.pid.setTarget(sv,init=init)
+                aw.moveSVslider(sv) # only move the slider
         elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and Control ticked
-            aw.modbus.setTarget(sv)
             self.sv = sv
             if move:
                 aw.moveSVslider(sv)
+            else:
+                aw.modbus.setTarget(sv)
 
     def adjustsv(self,diff):
         self.setSV(self.sv + diff,True)

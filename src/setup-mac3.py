@@ -260,9 +260,9 @@ for root, dirs, files in os.walk('.'):
         elif '_tests' in file:
 #            print('Deleting', file)            
             os.remove(os.path.join(root,file))               
-        elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
-#            print('Deleting', file)
-            os.remove(os.path.join(root,file))
+#        elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
+##            print('Deleting', file)
+#            os.remove(os.path.join(root,file))
         # remove also all .h .in .cpp .cc .html files 
         elif file.endswith('.h') and file != "pyconfig.h":
 #            print('Deleting', file)
