@@ -2491,7 +2491,7 @@ class tgraphcanvas(FigureCanvas):
 
                     #delete existing message
                     else:
-                        text = str(aw.messagelabel.text())
+                        text = u(aw.messagelabel.text())
                         if len(text):
                             if text[0] == ">":
                                 aw.sendmessage("",style="background-color:'transparent';")
@@ -10794,7 +10794,6 @@ class ApplicationWindow(QMainWindow):
             s = "%.1f"%self.sliderSV.value()
         else:
             s = "%.0f"%self.sliderSV.value()
-        aw.sendmessage(QApplication.translate("Message","SV set to %s"%s, None))
         aw.pidcontrol.setSV(self.sliderSV.value(),False)
 
     # if setValue=False, the slider is only moved without a change signal being issued
@@ -11107,6 +11106,36 @@ class ApplicationWindow(QMainWindow):
             except Exception:
                 pass
                 
+                
+    def calc_env(self):
+        # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
+        my_env = os.environ.copy()
+        try:            
+            if 'PYTHONHOME' in my_env:
+                del my_env['PYTHONHOME']
+            if 'PYTHONPATH' in my_env:
+                del my_env['PYTHONPATH']
+            # try to source users environment to make external Python scripts run in their "natural" env
+            if platf in ['Darwin', 'Linux']:
+                if platf == 'Darwin':
+                    command = ['bash', '-c', 'source ~/.bash_profile && env']
+                elif platf == 'Linux':
+                    command = ['bash', '-c', 'source init_env && env']
+                try:
+                    proc = subprocess.Popen(command, stdout = subprocess.PIPE)
+                    for line in proc.stdout:
+                        (key, _, value) = line.partition("=")
+                        # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
+                        if not ((key in ['PYTHONHOME','PYTHONPATH']) and (("Artisan.app" in value) or "artisan" in value)):
+                            my_env[key] = value
+                    proc.communicate()
+                except:
+                    pass
+        except:
+            pass
+        return my_env
+        
+                        
     def call_prog_with_args(self,cmd_str):
         cmd_str_parts = cmd_str.split(" ")
         if len(cmd_str_parts) > 0:
@@ -11115,7 +11144,8 @@ class ApplicationWindow(QMainWindow):
             current = QDir.current()
             QDir.setCurrent(u(aw.getAppPath()))
             prg_file = u(qd.absolutePath())
-            subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False)
+            my_env = self.calc_env()
+            subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False,env=my_env)
             QDir.setCurrent(current.absolutePath())
             # alternative approach, that seems to fail on some Mac OS X versions:
             #QProcess.startDetached(prg_file)
@@ -12206,7 +12236,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEvents = profile["specialevents"]
                 self.qmc.backgroundEtypes = profile["specialeventstype"]
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
-                self.qmc.backgroundEStrings = profile["specialeventsStrings"]
+                self.qmc.backgroundEStrings = [d(x) for x in profile["specialeventsStrings"]]
                 self.qmc.backgroundFlavors = profile["flavors"]
                 self.qmc.titleB = profile["title"]
                 if "roastbatchnr" in profile:
@@ -14097,6 +14127,11 @@ class ApplicationWindow(QMainWindow):
             #restore x,y formating mode            
             if settings.contains("fmt_data_RoR"):
                 self.qmc.fmt_data_RoR = bool(toBool(settings.value("fmt_data_RoR",self.qmc.fmt_data_RoR)))
+            #restore playback aid
+            if settings.contains("detectBackgroundEventTime"):
+                self.qmc.detectBackgroundEventTime = toInt(settings.value("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime))
+            if settings.contains("backgroundReproduce"):
+                self.qmc.backgroundReproduce = bool(toBool(settings.value("backgroundReproduce",self.qmc.backgroundReproduce)))
             #restore phases
             if settings.contains("Phases"):
                 self.qmc.phases = [toInt(x) for x in toList(settings.value("Phases",self.qmc.phases))]
@@ -14330,6 +14365,9 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.input4div = toInt(settings.value("input4div",self.modbus.input4div))
                 self.modbus.input5div = toInt(settings.value("input5div",self.modbus.input5div))
                 self.modbus.input6div = toInt(settings.value("input6div",self.modbus.input6div))
+            if settings.contains("PIDmultiplier"):
+                self.modbus.PIDmultiplier = toInt(settings.value("PIDmultiplier",self.modbus.PIDmultiplier))
+                self.modbus.SVmultiplier = toInt(settings.value("SVmultiplier",self.modbus.SVmultiplier))
             if settings.contains("PID_slave_ID"):
                 self.modbus.PID_slave_ID = toInt(settings.value("PID_slave_ID",self.modbus.PID_slave_ID))
                 self.modbus.PID_SV_register = toInt(settings.value("PID_SV_register",self.modbus.PID_SV_register))
@@ -15240,6 +15278,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Controlbuttonflag",self.qmc.Controlbuttonflag)
             settings.endGroup()
             settings.setValue("fmt_data_RoR",self.qmc.fmt_data_RoR)
+            settings.setValue("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime)
+            settings.setValue("backgroundReproduce",self.qmc.backgroundReproduce)
             settings.setValue("PhasesMode",self.qmc.phases_mode)
             settings.setValue("PhasesEspresso",self.qmc.phases_espresso)
             settings.setValue("PhasesFilter",self.qmc.phases_filter)
@@ -15361,6 +15401,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input6code",self.modbus.input6code)
             settings.setValue("input6div",self.modbus.input6div)
             settings.setValue("input6mode",self.modbus.input6mode)
+            settings.setValue("PIDmultiplier",self.modbus.PIDmultiplier)
+            settings.setValue("SVmultiplier",self.modbus.SVmultiplier)
             settings.setValue("littleEndianFloats",self.modbus.littleEndianFloats)
             settings.setValue("type",self.modbus.type)
             settings.setValue("host",self.modbus.host)
@@ -17884,6 +17926,8 @@ class ApplicationWindow(QMainWindow):
             self.modbus.input6float = bool(dialog.modbus_input6float.isChecked())
             self.modbus.input6div = dialog.modbus_input6div.currentIndex()
             self.modbus.input6mode = str(dialog.modbus_input6mode.currentText())
+            self.modbus.SVmultiplier = dialog.modbus_SVmultiplier.currentIndex()
+            self.modbus.PIDmultiplier = dialog.modbus_PIDmultiplier.currentIndex()
             self.modbus.littleEndianFloats = bool(dialog.modbus_littleEndianFloats.isChecked())
             self.modbus.type = int(dialog.modbus_type.currentIndex())
             self.modbus.host = str(dialog.modbus_hostEdit.text())
@@ -26557,20 +26601,16 @@ class backgroundDlg(ArtisanDialog):
                 return 0       
 
     def setreproduce(self):
-        if aw.qmc.background:
-            aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
-            s = None
-            if self.backgroundReproduce.isChecked():
-                aw.qmc.backgroundReproduce = True
-                msg = QApplication.translate("Message","Playback Aid set ON at {0} secs",None).format(str(aw.qmc.detectBackgroundEventTime))
-            else:
-                aw.qmc.backgroundReproduce = False
-                msg = QApplication.translate("StatusBar","Playback Aid set OFF",None)
-                s = "background-color:'transparent';"
-            aw.sendmessage(msg, style=s)
+        aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
+        s = None
+        if self.backgroundReproduce.isChecked():
+            aw.qmc.backgroundReproduce = True
+            msg = QApplication.translate("Message","Playback Aid set ON at {0} secs",None).format(str(aw.qmc.detectBackgroundEventTime))
         else:
-            self.backgroundReproduce.setChecked(False)
-            aw.sendmessage(QApplication.translate("Message","No profile background found",None))
+            aw.qmc.backgroundReproduce = False
+            msg = QApplication.translate("StatusBar","Playback Aid set OFF",None)
+            s = "background-color:'transparent';"
+        aw.sendmessage(msg, style=s)
 
     def adjustcolor(self,curve):
         
@@ -27200,6 +27240,8 @@ class modbusport(object):
         self.input6code = 3
         self.input6div = 0
         self.input6mode = "C"
+        self.SVmultiplier = 1
+        self.PIDmultiplier = 0
         self.littleEndianFloats = False
         self.master = None
         self.COMsemaphore = QSemaphore(1)
@@ -27466,13 +27508,23 @@ class modbusport(object):
 
     def setTarget(self,sv,init=None):
         if self.PID_slave_ID:
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_SV_register,sv*10)
+            multiplier = 1.
+            if aw.modbus.SVmultiplier == 1:
+                multiplier = 10.
+            elif aw.modbus.SVmultiplier == 2:
+                multiplier = 100.
+            self.writeSingleRegister(self.PID_slave_ID,self.PID_SV_register,sv*multiplier)
         
     def setPID(self,p,i,d):
         if self.PID_slave_ID and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_p_register,p*10.)
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_i_register,i*10.)
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_d_register,d*10.)
+            multiplier = 1.
+            if aw.modbus.PIDmultiplier == 1:
+                multiplier = 10.
+            elif aw.modbus.PIDmultiplier == 2:
+                multiplier = 100.
+            self.writeSingleRegister(self.PID_slave_ID,self.PID_p_register,p*multiplier)
+            self.writeSingleRegister(self.PID_slave_ID,self.PID_i_register,i*multiplier)
+            self.writeSingleRegister(self.PID_slave_ID,self.PID_d_register,d*multiplier)
         
 
 
@@ -27928,9 +27980,10 @@ class serialport(object):
             return aw.qmc.timeclock.elapsed()/1000., aw.qmc.pid.lastOutput, aw.qmc.pid.target
         else:
             if aw.pidcontrol.sv != None:
-                return aw.qmc.timeclock.elapsed()/1000.,-1,aw.pidcontrol.sv
+                sv = aw.pidcontrol.sv
             else:
-                return aw.qmc.timeclock.elapsed()/1000.,-1,-1
+                sv = -1
+            return aw.qmc.timeclock.elapsed()/1000.,-1,sv
 
     def DTAtemperature(self):
         ###########################################################
@@ -28023,9 +28076,17 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("DElta DTA:" + settings + " || Tx = " + cmd2str(command) + " || Rx = " + str(r))
 
+
+
     def callprogram(self):
         try:
-            output = os.popen(aw.ser.externalprogram,"r").readline()
+#            output = os.popen(aw.ser.externalprogram,"r").readline()
+            # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
+            my_env = aw.calc_env()
+            
+            p = subprocess.Popen(aw.ser.externalprogram,env=my_env,stdout=subprocess.PIPE)
+            output = p.communicate()[0]
+            
             tx = aw.qmc.timeclock.elapsed()/1000.
             if "," in output:
                 parts = output.split(",")
@@ -28044,6 +28105,7 @@ class serialport(object):
             tx = aw.qmc.timeclock.elapsed()/1000.
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " callprogram(): {0} ").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "callprogram() received:",None) + " {0} ").format(str(output)),exc_tb.tb_lineno)
             return tx,0.,0.
             
     def callprogram_34(self):
@@ -31371,6 +31433,22 @@ class comportDlg(ArtisanDialog):
         self.modbus_SVregister_Edit.setValidator(QIntValidator(0,65025,self.modbus_SVregister_Edit))
         self.modbus_SVregister_Edit.setFixedWidth(50)
         self.modbus_SVregister_Edit.setAlignment(Qt.AlignRight)
+        
+        modbus_multis = ["", "10","100"]
+        
+        modbus_SVmultiplier_label = QLabel(QApplication.translate("Label", "SV Multiplier",None))
+        self.modbus_SVmultiplier = QComboBox()
+        self.modbus_SVmultiplier.setFocusPolicy(Qt.NoFocus)
+        self.modbus_SVmultiplier.addItems(modbus_multis)
+        self.modbus_SVmultiplier.setCurrentIndex(aw.modbus.SVmultiplier)
+        self.modbus_SVmultiplier.setFixedWidth(70)
+        
+        modbus_PIDmultiplier_label = QLabel(QApplication.translate("Label", "p-i-d Multiplier",None))
+        self.modbus_PIDmultiplier = QComboBox()
+        self.modbus_PIDmultiplier.setFocusPolicy(Qt.NoFocus)
+        self.modbus_PIDmultiplier.addItems(modbus_multis)
+        self.modbus_PIDmultiplier.setCurrentIndex(aw.modbus.PIDmultiplier)
+        self.modbus_PIDmultiplier.setFixedWidth(70)
                 
         modbus_Pregister_label = QLabel(QApplication.translate("Label", "P",None))
         self.modbus_Pregister_Edit = QLineEdit(str(aw.modbus.PID_p_register))
@@ -31403,8 +31481,19 @@ class comportDlg(ArtisanDialog):
         modbus_pid_registers.addWidget(modbus_Dregister_label)
         modbus_pid_registers.addWidget(self.modbus_Dregister_Edit)
         
+        modbus_pid_multipliers = QHBoxLayout()
+        modbus_pid_multipliers.addWidget(self.modbus_SVmultiplier)
+        modbus_pid_multipliers.addWidget(modbus_SVmultiplier_label)
+        modbus_pid_multipliers.addStretch()
+        modbus_pid_multipliers.addWidget(modbus_PIDmultiplier_label)
+        modbus_pid_multipliers.addWidget(self.modbus_PIDmultiplier)
+        
+        modbus_pid_regmulti = QVBoxLayout()
+        modbus_pid_regmulti.addLayout(modbus_pid_registers)
+        modbus_pid_regmulti.addLayout(modbus_pid_multipliers)
+        
         modbus_pid_registers_box = QGroupBox(QApplication.translate("GroupBox","Registers",None))
-        modbus_pid_registers_box.setLayout(modbus_pid_registers)
+        modbus_pid_registers_box.setLayout(modbus_pid_regmulti)
         
         modbus_pid_off_label = QLabel(QApplication.translate("Label", "OFF", None))
         self.modbus_pid_off = QLineEdit(aw.modbus.PID_OFF_action)
@@ -39905,6 +39994,8 @@ class PIDcontrol(object):
             return None
 
     def setSV(self,sv,move=True,init=False):
+        if not move:            
+            aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv, None))
         if aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
             if aw.ser.ArduinoIsInitialized:
                 sv = max(0,sv)
@@ -39926,9 +40017,10 @@ class PIDcontrol(object):
         elif (aw.qmc.device == 53 or # Hottop
               (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
               (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
-            aw.qmc.pid.setTarget(sv,init=init)
             if move:
                 aw.moveSVslider(sv) # only move the slider
+            else:
+                aw.qmc.pid.setTarget(sv,init=init)
         elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and Control ticked
             self.sv = sv
             if move:
