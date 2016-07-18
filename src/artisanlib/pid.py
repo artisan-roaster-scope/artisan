@@ -66,7 +66,7 @@ class PID(object):
                     self.lastError = err
                 else:
                     dt = now - self.lastTime
-                    if dt:
+                    if dt>0:
                         derr = (err - self.lastError) / dt
                         if self.lastInput:
                             dinput = (i - self.lastInput) / dt
@@ -102,7 +102,7 @@ class PID(object):
                             if self.Ki > 0.0:
                                 self.Iterm += self.outMin - output
                             output = self.outMin
-                        
+                            
                         self.lastOutput = output # kept to initialize Iterm on reactivating the PID
                         
                         output = int(round(output))

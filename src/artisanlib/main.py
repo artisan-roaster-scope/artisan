@@ -27977,7 +27977,7 @@ class serialport(object):
                 (aw.qmc.device == 53) or \
                 (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl()):
                 # TC4, HOTTOP or MODBUS with Artisan Software PID
-            return aw.qmc.timeclock.elapsed()/1000., aw.qmc.pid.lastOutput, aw.qmc.pid.target
+            return aw.qmc.timeclock.elapsed()/1000., max(-99,aw.qmc.pid.lastOutput), aw.qmc.pid.target
         else:
             if aw.pidcontrol.sv != None:
                 sv = aw.pidcontrol.sv
@@ -39687,6 +39687,7 @@ class PID_DlgControl(ArtisanDialog):
         aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
         aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
         aw.pidcontrol.svSlider = self.pidSVsliderFlag.isChecked()
+        aw.pidcontrol.svValue = self.pidSV.value()
         aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
         aw.pidcontrol.svButtons = self.pidSVbuttonsFlag.isChecked()
         aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons)
@@ -39694,7 +39695,6 @@ class PID_DlgControl(ArtisanDialog):
         aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
-        aw.pidcontrol.svValue = self.pidSV.value()
         #
         self.saverampsoaks()
         #
@@ -40017,6 +40017,7 @@ class PIDcontrol(object):
         elif (aw.qmc.device == 53 or # Hottop
               (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
               (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
+            self.sv = max(0,sv) # remember last SV
             if move:
                 aw.moveSVslider(sv) # only move the slider
             else:
