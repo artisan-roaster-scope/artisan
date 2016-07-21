@@ -850,7 +850,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.patch.set_edgecolor(self.backcolor)
 
 
-        if mpl.__version__.split()[0] == 2:
+        if int(mpl.__version__.split('.')[0]) >= 2:
             self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
         else:
             self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
@@ -3641,7 +3641,7 @@ class tgraphcanvas(FigureCanvas):
     
                 self.fig.clf()   #wipe out figure. keep_observers=False
     
-                if mpl.__version__.split()[0] == 2:
+                if int(mpl.__version__.split('.')[0]) >= 2:
                     self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
                 else:
                     self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
@@ -4407,7 +4407,7 @@ class tgraphcanvas(FigureCanvas):
 #                        leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
     
                 # we create here the project line plots to have the accurate time axis after CHARGE
-                if mpl.__version__.split()[0] == 2:
+                if int(mpl.__version__.split('.')[0]) >= 2:
                     dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0
                 else:
                     dashes_setup = [3,4,1,4] # matplot 1.5 default
@@ -4751,7 +4751,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.clf()
         #create a new name ax1 instead of ax (ax is used when plotting profiles)
 
-        if mpl.__version__.split()[0] == 2:
+        if int(mpl.__version__.split('.')[0]) >= 2:
             self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor=self.backcolor) #) radar green facecolor='#d5de9c'
         else:
             self.ax1 = self.fig.add_subplot(111,projection='polar',axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
@@ -7601,7 +7601,7 @@ class tgraphcanvas(FigureCanvas):
             # same as redraw but using different axes
             self.fig.clf()
             #create a new name ax1 instead of ax
-            if mpl.__version__.split()[0] == 2:
+            if int(mpl.__version__.split('.')[0]) >= 2:
                 self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor=self.backcolor)            
             else:
                 self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg=self.backcolor)
@@ -7853,11 +7853,23 @@ class VMToolbar(NavigationToolbar):
             ('Forward', 'Forward to next view', 'forward', 'forward'),
             (None, None, None, None),
             ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
+#            ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
             ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
         )
 
         NavigationToolbar.__init__(self, plotCanvas, parent)
 #        super(NavigationToolbar,self).__init__(plotCanvas,parent)
+
+
+# add green flag menu on matplotlib v2.0 and later
+        if int(mpl.__version__.split('.')[0]) >= 2:
+            if len(self.actions()) > 0:
+                # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
+                a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
+                a.triggered.connect(self.edit_parameters)     
+                a.setToolTip('Edit axis, curve and image parameters')
+                self.insertAction(self.actions()[-1],a)
+        
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
@@ -14372,8 +14384,8 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.PID_slave_ID = toInt(settings.value("PID_slave_ID",self.modbus.PID_slave_ID))
                 self.modbus.PID_SV_register = toInt(settings.value("PID_SV_register",self.modbus.PID_SV_register))
                 self.modbus.PID_p_register = toInt(settings.value("PID_p_register",self.modbus.PID_p_register))
-                self.modbus.PID_i_register = toInt(settings.value("input4div",self.modbus.PID_i_register))
-                self.modbus.PID_d_register = toInt(settings.value("input4div",self.modbus.PID_d_register))
+                self.modbus.PID_i_register = toInt(settings.value("PID_i_register",self.modbus.PID_i_register))
+                self.modbus.PID_d_register = toInt(settings.value("PID_d_register",self.modbus.PID_d_register))
             if settings.contains("PID_OFF_action"):
                 self.modbus.PID_OFF_action = s2a(toString(settings.value("PID_OFF_action",self.modbus.PID_OFF_action)))
             if settings.contains("PID_ON_action"):
@@ -24421,44 +24433,44 @@ class EventsDlg(ArtisanDialog):
         self.E4command = QLineEdit(aw.eventslidercommands[3])
         self.E1offset = QSpinBox()
         self.E1offset.setAlignment(Qt.AlignRight)
-        self.E1offset.setRange(-999,999)
+        self.E1offset.setRange(-9999,9999)
         self.E1offset.setValue(aw.eventslideroffsets[0])
         self.E2offset = QSpinBox()
         self.E2offset.setAlignment(Qt.AlignRight)
-        self.E2offset.setRange(-999,999)
+        self.E2offset.setRange(-9999,9999)
         self.E2offset.setValue(aw.eventslideroffsets[1])
         self.E3offset = QSpinBox()
         self.E3offset.setAlignment(Qt.AlignRight)
-        self.E3offset.setRange(-999,999)
+        self.E3offset.setRange(-9999,9999)
         self.E3offset.setValue(aw.eventslideroffsets[2])
         self.E4offset = QSpinBox()
         self.E4offset.setAlignment(Qt.AlignRight)
-        self.E4offset.setRange(-999,999)
+        self.E4offset.setRange(-9999,9999)
         self.E4offset.setValue(aw.eventslideroffsets[3])
         self.E1factor = QDoubleSpinBox()
         self.E1factor.setAlignment(Qt.AlignRight)
         self.E1factor.setRange(-999,999)
         self.E1factor.setDecimals(2)
         self.E1factor.setValue(aw.eventsliderfactors[0])
-        self.E1factor.setMaximumWidth(60)
+        self.E1factor.setMaximumWidth(70)
         self.E2factor = QDoubleSpinBox()
         self.E2factor.setAlignment(Qt.AlignRight)
         self.E2factor.setRange(-999,999)
         self.E2factor.setDecimals(2)
         self.E2factor.setValue(aw.eventsliderfactors[1])
-        self.E2factor.setMaximumWidth(60)
+        self.E2factor.setMaximumWidth(70)
         self.E3factor = QDoubleSpinBox()
         self.E3factor.setAlignment(Qt.AlignRight)
         self.E3factor.setRange(-999,999)
         self.E3factor.setDecimals(2)
         self.E3factor.setValue(aw.eventsliderfactors[2])
-        self.E3factor.setMaximumWidth(60)
+        self.E3factor.setMaximumWidth(70)
         self.E4factor = QDoubleSpinBox()
         self.E4factor.setAlignment(Qt.AlignRight)
         self.E4factor.setRange(-999,999)
         self.E4factor.setDecimals(2)
         self.E4factor.setValue(aw.eventsliderfactors[3])
-        self.E4factor.setMaximumWidth(60)
+        self.E4factor.setMaximumWidth(70)
         helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         helpsliderbutton.clicked.connect(self.showSliderHelp)
