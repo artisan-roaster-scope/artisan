@@ -10,9 +10,21 @@ Summary
 
 Artisan is a software that helps coffee roasters record, analyze, and control roast profiles. When used in conjunction with a thermocouple data logger or a proportional–integral–derivative controller (PID controller), this software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
 
-[Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)
+Donations
+---------
+
+This software is open-source and absolutely free, even for commercial use.
+
+If you think Artisan is worth of some money and you are willing to contribute financially to its further development, feel free to send any amount through PayPal.
+
+[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N5WW9UN6K669L)
+
+
 
 ![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/teaser.jpg?raw=true)
+
+[Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)
+
 
 
 Features
@@ -82,14 +94,7 @@ Documentation and Support
   * INSTRUCTABLE: [Roast Coffee With Artisan and Phidgets](http://www.instructables.com/id/Roast-Coffee-With-Artisan-and-Phidgets)
 
 
-Donations
----------
 
-This software is open-source and absolutely free, even for commercial use.
-
-If you think Artisan is worth of some money and you are willing to contribute financially to its further development, feel free to send any amount through PayPal.
-
-[![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N5WW9UN6K669L)
 
 
 Version History
