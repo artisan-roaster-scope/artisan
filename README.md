@@ -21,7 +21,7 @@ If you think Artisan is worth of some money and you are willing to contribute fi
 
 
 
-![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/teaser.jpg?raw=true)
+![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/FZ94-PID-small.png?raw=true)
 
 [Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)
 
