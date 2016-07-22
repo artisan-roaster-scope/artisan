@@ -815,7 +815,8 @@ class tgraphcanvas(FigureCanvas):
                        "+Hottop Heater/Fan",    #54
                        "+MODBUS_56",            #55
                        "Apollo DT301",          #56
-                       "-Omega HH806W"          #57 NOT WORKING 
+                       "HH806W",                #57
+                       "EXETECH755"             #58
                        ]
 
         #extra devices
@@ -850,7 +851,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.patch.set_edgecolor(self.backcolor)
 
 
-        if int(mpl.__version__.split('.')[0]) >= 2:
+        if mpl.__version__.split()[0] == 2:
             self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
         else:
             self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
@@ -3641,7 +3642,7 @@ class tgraphcanvas(FigureCanvas):
     
                 self.fig.clf()   #wipe out figure. keep_observers=False
     
-                if int(mpl.__version__.split('.')[0]) >= 2:
+                if mpl.__version__.split()[0] == 2:
                     self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
                 else:
                     self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
@@ -4407,7 +4408,7 @@ class tgraphcanvas(FigureCanvas):
 #                        leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
     
                 # we create here the project line plots to have the accurate time axis after CHARGE
-                if int(mpl.__version__.split('.')[0]) >= 2:
+                if mpl.__version__.split()[0] == 2:
                     dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0
                 else:
                     dashes_setup = [3,4,1,4] # matplot 1.5 default
@@ -4751,7 +4752,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.clf()
         #create a new name ax1 instead of ax (ax is used when plotting profiles)
 
-        if int(mpl.__version__.split('.')[0]) >= 2:
+        if mpl.__version__.split()[0] == 2:
             self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor=self.backcolor) #) radar green facecolor='#d5de9c'
         else:
             self.ax1 = self.fig.add_subplot(111,projection='polar',axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
@@ -7601,7 +7602,7 @@ class tgraphcanvas(FigureCanvas):
             # same as redraw but using different axes
             self.fig.clf()
             #create a new name ax1 instead of ax
-            if int(mpl.__version__.split('.')[0]) >= 2:
+            if mpl.__version__.split()[0] == 2:
                 self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor=self.backcolor)            
             else:
                 self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg=self.backcolor)
@@ -7853,23 +7854,11 @@ class VMToolbar(NavigationToolbar):
             ('Forward', 'Forward to next view', 'forward', 'forward'),
             (None, None, None, None),
             ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
-#            ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
             ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
         )
 
         NavigationToolbar.__init__(self, plotCanvas, parent)
 #        super(NavigationToolbar,self).__init__(plotCanvas,parent)
-
-
-# add green flag menu on matplotlib v2.0 and later
-        if int(mpl.__version__.split('.')[0]) >= 2:
-            if len(self.actions()) > 0:
-                # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
-                a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
-                a.triggered.connect(self.edit_parameters)     
-                a.setToolTip('Edit axis, curve and image parameters')
-                self.insertAction(self.actions()[-1],a)
-        
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
@@ -14384,8 +14373,8 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.PID_slave_ID = toInt(settings.value("PID_slave_ID",self.modbus.PID_slave_ID))
                 self.modbus.PID_SV_register = toInt(settings.value("PID_SV_register",self.modbus.PID_SV_register))
                 self.modbus.PID_p_register = toInt(settings.value("PID_p_register",self.modbus.PID_p_register))
-                self.modbus.PID_i_register = toInt(settings.value("PID_i_register",self.modbus.PID_i_register))
-                self.modbus.PID_d_register = toInt(settings.value("PID_d_register",self.modbus.PID_d_register))
+                self.modbus.PID_i_register = toInt(settings.value("input4div",self.modbus.PID_i_register))
+                self.modbus.PID_d_register = toInt(settings.value("input4div",self.modbus.PID_d_register))
             if settings.contains("PID_OFF_action"):
                 self.modbus.PID_OFF_action = s2a(toString(settings.value("PID_OFF_action",self.modbus.PID_OFF_action)))
             if settings.contains("PID_ON_action"):
@@ -24433,44 +24422,44 @@ class EventsDlg(ArtisanDialog):
         self.E4command = QLineEdit(aw.eventslidercommands[3])
         self.E1offset = QSpinBox()
         self.E1offset.setAlignment(Qt.AlignRight)
-        self.E1offset.setRange(-9999,9999)
+        self.E1offset.setRange(-999,999)
         self.E1offset.setValue(aw.eventslideroffsets[0])
         self.E2offset = QSpinBox()
         self.E2offset.setAlignment(Qt.AlignRight)
-        self.E2offset.setRange(-9999,9999)
+        self.E2offset.setRange(-999,999)
         self.E2offset.setValue(aw.eventslideroffsets[1])
         self.E3offset = QSpinBox()
         self.E3offset.setAlignment(Qt.AlignRight)
-        self.E3offset.setRange(-9999,9999)
+        self.E3offset.setRange(-999,999)
         self.E3offset.setValue(aw.eventslideroffsets[2])
         self.E4offset = QSpinBox()
         self.E4offset.setAlignment(Qt.AlignRight)
-        self.E4offset.setRange(-9999,9999)
+        self.E4offset.setRange(-999,999)
         self.E4offset.setValue(aw.eventslideroffsets[3])
         self.E1factor = QDoubleSpinBox()
         self.E1factor.setAlignment(Qt.AlignRight)
         self.E1factor.setRange(-999,999)
         self.E1factor.setDecimals(2)
         self.E1factor.setValue(aw.eventsliderfactors[0])
-        self.E1factor.setMaximumWidth(70)
+        self.E1factor.setMaximumWidth(60)
         self.E2factor = QDoubleSpinBox()
         self.E2factor.setAlignment(Qt.AlignRight)
         self.E2factor.setRange(-999,999)
         self.E2factor.setDecimals(2)
         self.E2factor.setValue(aw.eventsliderfactors[1])
-        self.E2factor.setMaximumWidth(70)
+        self.E2factor.setMaximumWidth(60)
         self.E3factor = QDoubleSpinBox()
         self.E3factor.setAlignment(Qt.AlignRight)
         self.E3factor.setRange(-999,999)
         self.E3factor.setDecimals(2)
         self.E3factor.setValue(aw.eventsliderfactors[2])
-        self.E3factor.setMaximumWidth(70)
+        self.E3factor.setMaximumWidth(60)
         self.E4factor = QDoubleSpinBox()
         self.E4factor.setAlignment(Qt.AlignRight)
         self.E4factor.setRange(-999,999)
         self.E4factor.setDecimals(2)
         self.E4factor.setValue(aw.eventsliderfactors[3])
-        self.E4factor.setMaximumWidth(70)
+        self.E4factor.setMaximumWidth(60)
         helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         helpsliderbutton.clicked.connect(self.showSliderHelp)
@@ -27881,7 +27870,8 @@ class serialport(object):
                                    self.HOTTOP_HF,          #54
                                    self.MODBUS_56,          #55
                                    self.DT301,              #56
-                                   self.HH806W              #57
+                                   self.HH806W,             #57
+                                   self.EXTECH755          #58
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -27989,7 +27979,7 @@ class serialport(object):
                 (aw.qmc.device == 53) or \
                 (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl()):
                 # TC4, HOTTOP or MODBUS with Artisan Software PID
-            return aw.qmc.timeclock.elapsed()/1000., max(-99,aw.qmc.pid.lastOutput), aw.qmc.pid.target
+            return aw.qmc.timeclock.elapsed()/1000., aw.qmc.pid.lastOutput, aw.qmc.pid.target
         else:
             if aw.pidcontrol.sv != None:
                 sv = aw.pidcontrol.sv
@@ -28377,6 +28367,62 @@ class serialport(object):
         t2,t1 = self.TEVA18Btemperature()
         return tx,t2,t1
 
+    def EXTECH755(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.EXTECH755pressure()
+        return tx,t2,t1
+
+    # EXTECH755 Device
+    # returns t1,t2 from EXTECH 755. By Bailey Glen
+    def EXTECH755pressure(self, retry=3):
+        try:
+            r = ''
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write(b'\x56\xaa\x01')
+                self.SP.flush()
+                r = self.SP.read(10)
+                if len(r) == 10:
+                    ##Single  line to return pressure twice. obviously only need to do this once.
+                    # Takes the last 5 of the 10 byte signal, which is ascii for a float
+                    # multiplied by 10 for visual per Brian Glens request, values are now off
+                    return float(r[5:])*float(10) ,float(r[5:])*float(10)
+                else:
+                    if retry:
+                        return self.EXTECH755pressure(retry=retry - 1)
+                    else:
+                        nbytes = len(r)
+                        aw.qmc.adderror(QApplication.translate("Error Message",
+                                                               "Extech755pressure(): {0} bytes received but 10 needed",
+                                                               None).format(nbytes))
+                        return -1, -1
+            else:
+                return -1, -1
+        except serial.SerialException:
+            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))  # zzz = miliseconds
+            error = QApplication.translate("Error Message", "Serial Exception:", None) + " ser.EXTECH755pressure()"
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error, exc_tb.tb_lineno)
+            return -1, -1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",
+                                                    None) + " ser.EXTECH755pressure() {0}").format(str(ex)),
+                            exc_tb.tb_lineno)
+            return -1, -1
+        finally:
+            self.closeport()
+            # note: logged chars should be unicode not binary
+            if aw.seriallogflag: #I seriously doubt this works!!!!! Not sure what its for
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize) + "," + str(
+                    self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial(
+                    "EXTECH755 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(b'\x56\xaa\x01')) + " || Rx = " + cmd2str(
+                        binascii.hexlify(r[5:])))
+
     #multimeter
     def HHM28(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -28473,19 +28519,19 @@ class serialport(object):
                             if(r[i] == "\x65" and r[i+1] == "\x14"):
                                 index = i
                                 break
-                
+
                     if index > 0:
                         r += self.SP.read(index)
                     else:
                         r += self.SP.read(18-1)     # maybe last character is 0x65. otherwise error.
-                
+
                         if(len(r) >= 9):
                             # find 0x65 0x14
                             for i in range(len(r)-1):
                                 if(r[i] == "\x65" and r[i+1] == "\x14"):
                                     index = i
                                     break
-                
+
                 if(index >= 0 and len(r) >= index+18):
                     if(r[index+16] == "\x0d" and r[index+17] == "\x0a"):
                         #convert to binary to hex string
@@ -28499,7 +28545,7 @@ class serialport(object):
 
                         if((r[index+11] >= "\x40" and r[index+11] <= "\x43") or (r[index+11] >= "\xC2" and r[index+11] <= "\xC3")):
                             s1 = -1
-                    
+
                         if(r[index+12] == "\x40"):
                             s2 = -1
 
@@ -28528,12 +28574,12 @@ class serialport(object):
                         self.MS6514PrevTemp1 = s1
                         self.MS6514PrevTemp2 = s2
                         return s1,s2
-                
+
                 if retry:
                     self.closeport()
                     libtime.sleep(.05)
                     a,b = self.MS6514temperature(retry=retry-1)
-                    return a,b                    
+                    return a,b
                 else:
                     # error but return previous temperature
                     if(self.MS6514PrevTemp1 != -1 or self.MS6514PrevTemp2 != -1):
@@ -28542,7 +28588,7 @@ class serialport(object):
                         self.MS6514PrevTemp1 = -1
                         self.MS6514PrevTemp2 = -1
                         return s1,s2
-                        
+
                     # error
                     nbytes = len(r)
                     aw.qmc.adderror(QApplication.translate("Error Message","MS6514temperature(): {0} bytes received but 18 needed",None).format(nbytes))
@@ -28564,7 +28610,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r))) 
+                aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
 
     def DT301temperature(self, retry=3):
@@ -33534,7 +33580,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #extra devices serial config
             #set of different serial settings modes options
             ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
-                         [19200,8,'N',1,1],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1],[115200,8,'N',1,1]]
+                         [19200,8,'N',1,1],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1],[115200,8,'N',1,1],
+                         [9600,8,'N',0,1]]
             #map device index to a setting mode (chose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
@@ -33596,7 +33643,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 8, # 54
                 7, # 55
                 3, # 56
-                8] # 57
+                8, # 57
+                10] # 58
+
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -39699,7 +39748,6 @@ class PID_DlgControl(ArtisanDialog):
         aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
         aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
         aw.pidcontrol.svSlider = self.pidSVsliderFlag.isChecked()
-        aw.pidcontrol.svValue = self.pidSV.value()
         aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
         aw.pidcontrol.svButtons = self.pidSVbuttonsFlag.isChecked()
         aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons)
@@ -39707,6 +39755,7 @@ class PID_DlgControl(ArtisanDialog):
         aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
+        aw.pidcontrol.svValue = self.pidSV.value()
         #
         self.saverampsoaks()
         #
@@ -40029,7 +40078,6 @@ class PIDcontrol(object):
         elif (aw.qmc.device == 53 or # Hottop
               (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
               (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
-            self.sv = max(0,sv) # remember last SV
             if move:
                 aw.moveSVslider(sv) # only move the slider
             else:
