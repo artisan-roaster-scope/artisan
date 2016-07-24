@@ -979,6 +979,7 @@ class tgraphcanvas(FigureCanvas):
         self.backmoveflag = 1 # aligns background on redraw if 1
         self.detectBackgroundEventTime = 20 #seconds
         self.backgroundReproduce = False
+        self.backgroundPlaybackEvents = False
         self.Betypes = [QApplication.translate("Scope Annotation", "Speed",None),
                         QApplication.translate("Scope Annotation", "Heater",None),
                         QApplication.translate("Scope Annotation", "Damper",None),
@@ -2052,7 +2053,7 @@ class tgraphcanvas(FigureCanvas):
                                 if self.l_ETprojection != None:
                                     aw.qmc.ax.draw_artist(self.l_ETprojection)
                                     
-                        if aw.qmc.background and aw.qmc.backgroundReproduce and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
+                        if aw.qmc.background and (aw.qmc.backgroundReproduce or aw.qmc.backgroundPlaybackEvents) and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
                             aw.qmc.playbackevent()
                     except Exception:
                         pass
@@ -2441,7 +2442,7 @@ class tgraphcanvas(FigureCanvas):
                 #find time distances
                 for i in range(len(self.backgroundEvents)):
                     timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)
-                    if  timed > 0 and timed < self.detectBackgroundEventTime:
+                    if  aw.qmc.backgroundReproduce and timed > 0 and timed < self.detectBackgroundEventTime:
                         #write text message
                         message = "> " +  self.stringfromseconds(timed) + " [" + u(self.Betypesf(self.backgroundEtypes[i]))
                         message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " + self.backgroundEStrings[i]
@@ -2486,9 +2487,17 @@ class tgraphcanvas(FigureCanvas):
                             if "::" in self.backgroundEStrings[i]:
                                 aw.fujipid.replay(self.backgroundEStrings[i])
                                 libtime.sleep(.5)  #avoid possible close times (rounding off)
-
-                        #future Arduino
-                        #if self.device == 19:
+                        
+                        
+                        # if playbackevents is active, we fire the event by moving the slider, but only if
+                        # a event type is given (type!=4), the background event type is named exactly as the one of the foreground
+                        # the event slider is active/visible and has an action defined
+                        elif aw.qmc.backgroundPlaybackEvents and self.backgroundEtypes[i] < 4 and \
+                            (u(self.etypesf(self.backgroundEtypes[i]) == u(self.Betypesf(self.backgroundEtypes[i])))) and \
+                            aw.eventslidervisibilities[self.backgroundEtypes[i]] and aw.eventslideractions[self.backgroundEtypes[i]]:
+                            
+                            aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
+                            aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event
 
                     #delete existing message
                     else:
@@ -10806,10 +10815,6 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCDSV.display(v)
 
     def sliderSVreleased(self):
-        if aw.qmc.LCDdecimalplaces:
-            s = "%.1f"%self.sliderSV.value()
-        else:
-            s = "%.0f"%self.sliderSV.value()
         aw.pidcontrol.setSV(self.sliderSV.value(),False)
 
     # if setValue=False, the slider is only moved without a change signal being issued
@@ -10820,21 +10825,21 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sliderSV.setSliderPosition(v)
 
-    def sliderReleased(self,n):
+    def sliderReleased(self,n,force=False):
         if n == 0:
-            if self.slider1.value() != self.eventslidervalues[0]:
+            if force or self.slider1.value() != self.eventslidervalues[0]:
                 self.eventslidervalues[0] = self.slider1.value()
                 self.recordsliderevent(n)
         elif n == 1:
-            if self.slider2.value() != self.eventslidervalues[1]:
+            if force or self.slider2.value() != self.eventslidervalues[1]:
                 self.eventslidervalues[1] = self.slider2.value()
                 self.recordsliderevent(n)
         elif n == 2:
-            if self.slider3.value() != self.eventslidervalues[2]:
+            if force or self.slider3.value() != self.eventslidervalues[2]:
                 self.eventslidervalues[2] = self.slider3.value()
                 self.recordsliderevent(n)
         elif n == 3:
-            if self.slider4.value() != self.eventslidervalues[3]:
+            if force or self.slider4.value() != self.eventslidervalues[3]:
                 self.eventslidervalues[3] = self.slider4.value()
                 self.recordsliderevent(n)
         return False
@@ -14148,6 +14153,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.detectBackgroundEventTime = toInt(settings.value("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime))
             if settings.contains("backgroundReproduce"):
                 self.qmc.backgroundReproduce = bool(toBool(settings.value("backgroundReproduce",self.qmc.backgroundReproduce)))
+            if settings.contains("backgroundPlaybackEvents"):
+                self.qmc.backgroundPlaybackEvents = bool(toBool(settings.value("backgroundPlaybackEvents",self.qmc.backgroundPlaybackEvents)))
             #restore phases
             if settings.contains("Phases"):
                 self.qmc.phases = [toInt(x) for x in toList(settings.value("Phases",self.qmc.phases))]
@@ -15296,6 +15303,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("fmt_data_RoR",self.qmc.fmt_data_RoR)
             settings.setValue("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime)
             settings.setValue("backgroundReproduce",self.qmc.backgroundReproduce)
+            settings.setValue("backgroundPlaybackEvents",self.qmc.backgroundPlaybackEvents)
             settings.setValue("PhasesMode",self.qmc.phases_mode)
             settings.setValue("PhasesEspresso",self.qmc.phases_espresso)
             settings.setValue("PhasesFilter",self.qmc.phases_filter)
@@ -26511,6 +26519,10 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundReproduce.setChecked(aw.qmc.backgroundReproduce)
         self.backgroundReproduce.setFocusPolicy(Qt.NoFocus)
         self.backgroundReproduce.stateChanged.connect(self.setreproduce)
+        self.backgroundPlaybackEvents = QCheckBox(QApplication.translate("CheckBox","Playback Events",None))
+        self.backgroundPlaybackEvents.setChecked(aw.qmc.backgroundPlaybackEvents)
+        self.backgroundPlaybackEvents.setFocusPolicy(Qt.NoFocus)
+        self.backgroundPlaybackEvents.stateChanged.connect(self.setplaybackevent)
         etimelabel =QLabel(QApplication.translate("Label", "Text Warning",None))
         etimeunit =QLabel(QApplication.translate("Label", "sec",None))
         self.etimeSpinBox = QSpinBox()
@@ -26570,6 +26582,8 @@ class backgroundDlg(ArtisanDialog):
         tab4content.addWidget(etimelabel)
         tab4content.addWidget(self.etimeSpinBox)
         tab4content.addWidget(etimeunit)
+        tab4content.addStretch()
+        tab4content.addWidget(self.backgroundPlaybackEvents)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(layoutBoxed)
         tab1layout.addStretch()
@@ -26616,6 +26630,17 @@ class backgroundDlg(ArtisanDialog):
             except Exception: 
                 return 0       
 
+    def setplaybackevent(self):
+        s = None
+        if self.backgroundPlaybackEvents.isChecked():
+            aw.qmc.backgroundPlaybackEvents = True
+            msg = QApplication.translate("Message","Playback Events set ON",None)
+        else:
+            aw.qmc.backgroundPlaybackEvents = False
+            msg = QApplication.translate("StatusBar","Playback Events set OFF",None)
+            s = "background-color:'transparent';"
+        aw.sendmessage(msg, style=s)
+        
     def setreproduce(self):
         aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
         s = None
@@ -27412,8 +27437,8 @@ class modbusport(object):
             self.connect()
             self.master.write_register(int(register),int(value),unit=int(slave))
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -28630,15 +28655,15 @@ class serialport(object):
 
     def DT301temperature(self, retry=3):
         try:
-            r = ""
+            temp = 0
             command = b"\xEC\xD0\xF3"
             if not self.SP.isOpen():
                 self.openport()
             if self.SP.isOpen():
                 self.SP.write(command)
                 libtime.sleep(0.01)  # this may not be necessary but works well
-                r = bytearray(self.SP.read(11))
-                if len(r)==11 and data[0] == 0xfc and data[1] == 0x13 and data[10] == 0xf3:
+                data = bytearray(self.SP.read(11))
+                if len(data)==11 and data[0] == 0xfc and data[1] == 0x13 and data[10] == 0xf3:
                     for i in range(2,6):
                         temp = (temp << 4) | (data[i] & 0xf)
                     self.DT301PrevTemp = temp/10.0,0
@@ -28658,7 +28683,7 @@ class serialport(object):
                             return s,0
                         
                         # error
-                        nbytes = len(r)
+                        nbytes = len(data)
                         aw.qmc.adderror(QApplication.translate("Error Message","DT301temperature(): {0} bytes received but 11 needed",None).format(nbytes))
                         return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
@@ -28678,7 +28703,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("DT301 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r))) 
+                aw.addserial("DT301 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(data))) 
 
 
     def HOTTOPtemperatures(self):
@@ -35077,7 +35102,6 @@ class AlarmDlg(ArtisanDialog):
         
         #table for alarms
         self.alarmtable = QTableWidget()
-        self.alarmtable.itemSelectionChanged.connect(self.selectionChanged)
         self.createalarmtable()
         allonButton = QPushButton(QApplication.translate("Button","All On",None))
         allonButton.clicked.connect(lambda flag=1: self.alarmson(1))
@@ -35154,9 +35178,6 @@ class AlarmDlg(ArtisanDialog):
         selected = self.alarmtable.selectedRanges()
         if selected and len(selected) > 0:
             self.alarmtable.setRangeSelected(selected[0],False)
-
-    def selectionChanged(self):
-        selected = self.alarmtable.selectedRanges()
 
     def clearalarms(self):
         aw.qmc.alarmsfile = ""
@@ -39896,7 +39917,7 @@ class PIDcontrol(object):
                 heat = min(100,max(0,int(v)))
                 if aw.pidcontrol.invertControl:
                     heat = abs(100 - heat)
-                slidernr = aw.pidcontrol.pidPositiveTarget - 1               
+                slidernr = aw.pidcontrol.pidPositiveTarget - 1
                 aw.moveslider(slidernr,heat) # move slider               
                 aw.fireslideraction(slidernr) 
             if aw.pidcontrol.pidNegativeTarget:
