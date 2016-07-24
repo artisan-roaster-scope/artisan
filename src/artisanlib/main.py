@@ -815,7 +815,7 @@ class tgraphcanvas(FigureCanvas):
                        "+Hottop Heater/Fan",    #54
                        "+MODBUS_56",            #55
                        "Apollo DT301",          #56
-                       "Extech 755",            #57
+                       "EXTECH 755",            #57
                        "-Omega HH806W"          #58 NOT WORKING 
                        ]
 
@@ -7960,7 +7960,10 @@ class VMToolbar(NavigationToolbar):
 #            else:
 #                return
         axes = allaxes[0]
-        figureoptions.figure_edit(axes, self)
+        try:
+            figureoptions.figure_edit(axes, self)
+        except Exception as e:
+            pass
         aw.fetchCurveStyles()
         # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -31249,9 +31252,9 @@ class comportDlg(ArtisanDialog):
         stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None))
         self.stopbitsComboBox = QComboBox()
         stopbitslabel.setBuddy(self.stopbitsComboBox)
-        self.stopbits = ["0","1","2"]
+        self.stopbits = ["1","2"]
         self.stopbitsComboBox.addItems(self.stopbits)
-        self.stopbitsComboBox.setCurrentIndex(aw.ser.stopbits)
+        self.stopbitsComboBox.setCurrentIndex(aw.ser.stopbits-1)
         timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
         self.timeoutEdit.setValidator(QIntValidator(0,5,self.timeoutEdit))
@@ -31288,9 +31291,9 @@ class comportDlg(ArtisanDialog):
         modbus_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None))
         self.modbus_stopbitsComboBox = QComboBox()
         modbus_stopbitslabel.setBuddy(self.modbus_stopbitsComboBox)
-        self.modbus_stopbits = ["0","1","2"]
+        self.modbus_stopbits = ["1","2"]
         self.modbus_stopbitsComboBox.addItems(self.stopbits)
-        self.modbus_stopbitsComboBox.setCurrentIndex(aw.modbus.stopbits)
+        self.modbus_stopbitsComboBox.setCurrentIndex(aw.modbus.stopbits - 1)
         modbus_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.modbus_timeoutEdit = QLineEdit(str(aw.modbus.timeout))
         self.modbus_timeoutEdit.setValidator(QIntValidator(1,5,self.modbus_timeoutEdit))
@@ -31642,9 +31645,9 @@ class comportDlg(ArtisanDialog):
         scale_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None))
         self.scale_stopbitsComboBox = QComboBox()
         scale_stopbitslabel.setBuddy(self.scale_stopbitsComboBox)
-        self.scale_stopbits = ["0","1","2"]
+        self.scale_stopbits = ["1","2"]
         self.scale_stopbitsComboBox.addItems(self.stopbits)
-        self.scale_stopbitsComboBox.setCurrentIndex(aw.scale.stopbits)
+        self.scale_stopbitsComboBox.setCurrentIndex(aw.scale.stopbits - 1)
         scale_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.scale_timeoutEdit = QLineEdit(str(aw.scale.timeout))
         self.scale_timeoutEdit.setValidator(QIntValidator(1,5,self.scale_timeoutEdit))
@@ -31685,9 +31688,9 @@ class comportDlg(ArtisanDialog):
         color_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None))
         self.color_stopbitsComboBox = QComboBox()
         color_stopbitslabel.setBuddy(self.color_stopbitsComboBox)
-        self.color_stopbits = ["0","1","2"]
+        self.color_stopbits = ["1","2"]
         self.color_stopbitsComboBox.addItems(self.stopbits)
-        self.color_stopbitsComboBox.setCurrentIndex(aw.color.stopbits)
+        self.color_stopbitsComboBox.setCurrentIndex(aw.color.stopbits - 1)
         color_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None))
         self.color_timeoutEdit = QLineEdit(str(aw.color.timeout))
         self.color_timeoutEdit.setValidator(QIntValidator(1,5,self.color_timeoutEdit))
@@ -33581,13 +33584,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
-                elif meter == "Extech 755":
+                elif meter == "EXTECH 755":
                     aw.qmc.device = 57
                     #aw.ser.comport = "COM4"
                     aw.ser.baudrate = 9600
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
-                    aw.ser.stopbits = 0
+                    aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
 
@@ -33602,7 +33605,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #extra devices serial config
             #set of different serial settings modes options
             ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
-                         [19200,8,'N',1,1],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1],[115200,8,'N',1,1],[9600,8,'N',0,1]]
+                         [19200,8,'N',1,1],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1],[115200,8,'N',1,1]]
             #map device index to a setting mode (chose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
@@ -33664,8 +33667,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 8, # 54
                 7, # 55
                 3, # 56
-                8, # 57
-                9] # 58
+                3, # 57
+                8] # 58
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
