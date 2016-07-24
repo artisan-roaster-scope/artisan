@@ -5157,7 +5157,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[0] = len(self.timex)-1
                             else:
                                 message = QApplication.translate("Message","Not enough variables collected yet. Try again in a few seconds", None)
-                        if self.device == 19 and aw.pidcontrol.pidOnCHARGE and not aw.pidcontrol.pidActive: # Arduino/TC4
+                        if self.device in [19,53,29] and aw.pidcontrol.pidOnCHARGE and not aw.pidcontrol.pidActive: # Arduino/TC4, Hottop, MODBUS
                             aw.pidcontrol.pidOn()
                     self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
