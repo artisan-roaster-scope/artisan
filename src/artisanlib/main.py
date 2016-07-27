@@ -4002,14 +4002,15 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E4backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
     
+                            
                             self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                                            picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha)
+                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha)
                             self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                                            picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha)
+                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha)
                             self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                                            picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha)
+                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha)
                             self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                                            picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha)                                                                        
+                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha)                                                                        
                                                                               
                     #check backgroundDetails flag
                     if self.backgroundDetails:
@@ -4191,13 +4192,13 @@ class tgraphcanvas(FigureCanvas):
                                 E4_nonempty = True
     
                         self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                              picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
+                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                              picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
+                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                              picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
+                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                              picker=2,linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                             
 
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
@@ -7970,8 +7971,18 @@ class VMToolbar(NavigationToolbar):
 #                return
         axes = allaxes[0]
         try:
+            # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
+            steps_post_lines = []
+            for line in aw.qmc.ax.lines:
+                if line.get_drawstyle() == "steps-post":
+                    steps_post_lines.append(line)
+                    line.set_drawstyle("steps")
             figureoptions.figure_edit(axes, self)
+            for line in steps_post_lines:
+                line.set_drawstyle("steps-post")
         except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             pass
         aw.fetchCurveStyles()
         # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
@@ -15052,6 +15063,12 @@ class ApplicationWindow(QMainWindow):
         aw.button_9.setVisible(bool(aw.qmc.buttonvisibility[6]))
         aw.button_20.setVisible(bool(aw.qmc.buttonvisibility[7]))
 
+    def getColor(self,line):
+        c = line.get_color()
+        if isinstance(c, (list, tuple)):
+            c = mpl.colors.rgb2hex(c)
+        return c
+        
     def fetchCurveStyles(self):
         try:
             if aw.qmc.l_temp1:
@@ -15066,7 +15083,7 @@ class ApplicationWindow(QMainWindow):
                 m = aw.qmc.l_temp1.get_marker()
                 if not isinstance(m, (int)):
                     self.qmc.ETmarker = m
-                self.qmc.palette["et"] = aw.qmc.l_temp1.get_color()
+                self.qmc.palette["et"] = self.getColor(aw.qmc.l_temp1)
             if aw.qmc.l_temp2:
                 self.qmc.BTlinestyle = aw.qmc.l_temp2.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -15079,7 +15096,7 @@ class ApplicationWindow(QMainWindow):
                 if not isinstance(m, (int)):
                     self.qmc.BTmarker = m
                 self.qmc.BTmarkersize = aw.qmc.l_temp2.get_markersize()
-                self.qmc.palette["bt"] = aw.qmc.l_temp2.get_color()
+                self.qmc.palette["bt"] = self.getColor(aw.qmc.l_temp2)
             if aw.qmc.l_delta1:
                 self.qmc.ETdeltalinestyle = aw.qmc.l_delta1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -15092,7 +15109,7 @@ class ApplicationWindow(QMainWindow):
                 if not isinstance(m, (int)):
                     self.qmc.ETdeltamarker = m
                 self.qmc.ETdeltamarkersize = aw.qmc.l_delta1.get_markersize()
-                self.qmc.palette["deltaet"] = aw.qmc.l_delta1.get_color()
+                self.qmc.palette["deltaet"] = self.getColor(aw.qmc.l_delta1)
             if aw.qmc.l_delta2:
                 self.qmc.BTdeltalinestyle = aw.qmc.l_delta2.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -15105,7 +15122,7 @@ class ApplicationWindow(QMainWindow):
                 if not isinstance(m, (int)):
                     self.qmc.BTdeltamarker = m
                 self.qmc.BTdeltamarkersize = aw.qmc.l_delta2.get_markersize()  
-                self.qmc.palette["deltabt"] = aw.qmc.l_delta2.get_color()
+                self.qmc.palette["deltabt"] = self.getColor(aw.qmc.l_delta2)
             if aw.qmc.l_back1:
                 self.qmc.ETbacklinestyle = aw.qmc.l_back1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -15118,7 +15135,7 @@ class ApplicationWindow(QMainWindow):
                 if not isinstance(m, (int)):
                     self.qmc.ETbackmarker = m                
                 self.qmc.ETbackmarkersize = aw.qmc.l_back1.get_markersize()
-                self.qmc.backgroundmetcolor = aw.qmc.l_back1.get_color()
+                self.qmc.backgroundmetcolor = self.getColor(aw.qmc.l_back1)
             if aw.qmc.l_back2:
                 self.qmc.BTbacklinestyle = aw.qmc.l_back2.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -15131,7 +15148,7 @@ class ApplicationWindow(QMainWindow):
                 if not isinstance(m, (int)):
                     self.qmc.BTbackmarker = m                                
                 self.qmc.BTbackmarkersize = aw.qmc.l_back2.get_markersize()
-                self.qmc.backgroundbtcolor = aw.qmc.l_back2.get_color()
+                self.qmc.backgroundbtcolor = self.getColor(aw.qmc.l_back2)
             if aw.qmc.l_back3:
                 self.qmc.XTbacklinestyle = aw.qmc.l_back3.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -15144,7 +15161,7 @@ class ApplicationWindow(QMainWindow):
                 if not isinstance(m, (int)):
                     self.qmc.XTbackmarker = m                                
                 self.qmc.XTbackmarkersize = aw.qmc.l_back3.get_markersize()
-                self.qmc.backgroundxtcolor = aw.qmc.l_back3.get_color()
+                self.qmc.backgroundxtcolor = self.getColor(aw.qmc.l_back3)
             if aw.qmc.l_delta1B:
                 self.qmc.ETBdeltalinestyle = aw.qmc.l_delta1B.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -15157,7 +15174,7 @@ class ApplicationWindow(QMainWindow):
                 if not isinstance(m, (int)):
                     self.qmc.ETBdeltamarker = m                                
                 self.qmc.ETBdeltamarkersize = aw.qmc.l_delta1B.get_markersize()
-                self.qmc.backgrounddeltaetcolor = aw.qmc.l_delta1B.get_color()
+                self.qmc.backgrounddeltaetcolor = self.getColor(aw.qmc.l_delta1B)
             if aw.qmc.l_delta2B:
                 self.qmc.BTBdeltalinestyle = aw.qmc.l_delta2B.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -15170,7 +15187,7 @@ class ApplicationWindow(QMainWindow):
                 if not isinstance(m, (int)):
                     self.qmc.BTBdeltamarker = m
                 self.qmc.BTBdeltamarkersize = aw.qmc.l_delta2B.get_markersize()
-                self.qmc.backgrounddeltabtcolor = aw.qmc.l_delta2B.get_color()
+                self.qmc.backgrounddeltabtcolor = self.getColor(aw.qmc.l_delta2B)
             x1 = x2 = 0
             for i in range(len(aw.qmc.extradevices)):
                 if aw.extraCurveVisibility1[i]:
@@ -15185,8 +15202,8 @@ class ApplicationWindow(QMainWindow):
                     if not isinstance(m, (int)):
                         self.qmc.extramarkers1[i] = m
                     self.qmc.extramarkersizes1[i] = l1.get_markersize()
-                    aw.qmc.extradevicecolor1[i] = l1.get_color()
-                    aw.setLabelColor(aw.extraLCDlabel1[i],QColor(l1.get_color()))
+                    aw.qmc.extradevicecolor1[i] = self.getColor(l1)
+                    aw.setLabelColor(aw.extraLCDlabel1[i],QColor(aw.qmc.extradevicecolor1[i]))
                     aw.qmc.extraname1[i] = l1.get_label()
                     x1 = x1 + 1
                 if aw.extraCurveVisibility2[i]:
@@ -15201,8 +15218,8 @@ class ApplicationWindow(QMainWindow):
                     if not isinstance(m, (int)):
                         self.qmc.extramarkers2[i] = m
                     self.qmc.extramarkersizes2[i] = l2.get_markersize()
-                    aw.qmc.extradevicecolor2[i] = l2.get_color()
-                    aw.setLabelColor(aw.extraLCDlabel2[i],QColor(l2.get_color()))
+                    aw.qmc.extradevicecolor2[i] = self.getColor(l2)
+                    aw.setLabelColor(aw.extraLCDlabel2[i],QColor(aw.qmc.extradevicecolor2[i]))
                     aw.qmc.extraname2[i] = l2.get_label()
                     x2 = x2 + 1
             if self.qmc.eventsGraphflag == 2:
@@ -15222,10 +15239,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.EvalueMarkerSize[1] = self.qmc.l_eventtype2dots.get_markersize()
                 self.qmc.EvalueMarkerSize[2] = self.qmc.l_eventtype3dots.get_markersize()
                 self.qmc.EvalueMarkerSize[3] = self.qmc.l_eventtype4dots.get_markersize()
-                self.qmc.EvalueColor[0] = self.qmc.l_eventtype1dots.get_color()
-                self.qmc.EvalueColor[1] = self.qmc.l_eventtype2dots.get_color()
-                self.qmc.EvalueColor[2] = self.qmc.l_eventtype3dots.get_color()
-                self.qmc.EvalueColor[3] = self.qmc.l_eventtype4dots.get_color()
+                self.qmc.EvalueColor[0] = self.getColor(self.qmc.l_eventtype1dots)
+                self.qmc.EvalueColor[1] = self.getColor(self.qmc.l_eventtype2dots)
+                self.qmc.EvalueColor[2] = self.getColor(self.qmc.l_eventtype3dots)
+                self.qmc.EvalueColor[3] = self.getColor(self.qmc.l_eventtype4dots)
                 self.qmc.Evaluelinethickness[0] = self.qmc.l_eventtype1dots.get_linewidth()
                 self.qmc.Evaluelinethickness[1] = self.qmc.l_eventtype2dots.get_linewidth()
                 self.qmc.Evaluelinethickness[2] = self.qmc.l_eventtype3dots.get_linewidth()
@@ -16592,7 +16609,7 @@ class ApplicationWindow(QMainWindow):
             colors = 0
             colors_count = 0
             cuppings = 0
-            cuppings_count = 0
+            cuppings_countst = 0
             handles = []
             labels = []
             color=iter(cm.Set1(numpy.linspace(0,1,len(profiles))))            
