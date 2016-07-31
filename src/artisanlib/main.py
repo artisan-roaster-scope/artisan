@@ -27758,7 +27758,8 @@ class colorport(extraserialport):
         self.timeout = 3
         self.devicefunctionlist = {
             "None" : None,
-            "Tonino" : self.readTonino
+            "Tiny Tonino" : self.readTonino,
+            "Classic Tonino" : self.readTonino
         }
 
     # returns color as int or -1 if something went wrong
@@ -27787,7 +27788,6 @@ class colorport(extraserialport):
                     self.SP.write(str2cmd('\nSCAN\n'))
                     #self.SP.flush()
                     libtime.sleep(.1)
-                    libtime.sleep(1.0)
                     v = self.SP.readline()
                     n = int(v.decode('ascii').split(":")[1]) # response should have format "SCAN:128"
                     return n
@@ -31727,6 +31727,7 @@ class comportDlg(ArtisanDialog):
         except Exception:
             self.color_deviceEdit.setCurrentIndex(0)
         self.color_deviceEdit.setEditable(False)
+        self.color_deviceEdit.activated.connect(lambda i=0:self.colorDeviceIndexChanged(i))
         color_devicelabel.setBuddy(self.color_deviceEdit)
         color_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None))
         self.color_comportEdit = PortComboBox(selection = aw.color.comport)
@@ -32040,6 +32041,17 @@ class comportDlg(ArtisanDialog):
         Mlayout.addLayout(buttonLayout)
         self.setLayout(Mlayout)
         
+    def colorDeviceIndexChanged(self,i):
+        try:
+            if i==2: # Classic Tonino
+                aw.color.baudrate = 115200
+            elif i==1: # Tiny Tonino
+                aw.color.baudrate = 57600
+            self.color_baudrateComboBox.setCurrentIndex(self.color_bauds.index(str(aw.color.baudrate)))
+        except Exception as e:
+            print(e)
+            pass
+        
     def showModbusbuttonhelp(self):
         modbus_help_text = QApplication.translate("Message", "The MODBUS device corresponds to input channels",None)
         modbus_help_text += QApplication.translate("Message", "1 and 2.. The MODBUS_34 extra device adds",None)
@@ -32055,7 +32067,6 @@ class comportDlg(ArtisanDialog):
         modbus_help_text += QApplication.translate("Message", "Few devices hold data as 4 byte floats in two registers.",None)
         modbus_help_text += QApplication.translate("Message", " Tick the Float flag in this case.",None)
         QMessageBox.information(self,QApplication.translate("Message", "MODBUS Help",None),modbus_help_text)
-
 
     def portComboBoxIndexChanged(self,portComboBox,i):
         portComboBox.setSelection(i)
