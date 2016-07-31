@@ -12,8 +12,8 @@ v1.0.0 (XX.XX.2016)
     * adds alarms triggerd at a specified time after another alarm specified as "If Alarm" was triggered, if "from" rules is set to "If Alarm"    
     * adds improved Windows installer (option to uninstall previous versions during installation and silent option)
     * adds support for loading Artisan profiles from zip files for reporting (as kindly contributed by David Baxter)
-    * adds experimental support for the Apollo DT301 (http://www.ueitest.com/products/temperature-humidity/dt301 by Rob Gardner)
-    * adds experimental support for the Extech 755 pressure manometer (http://www.extech.com/display/?id=14489 as kindly contributed by William and Brian Glen)
+    * adds experimental support for the [Apollo DT301](http://www.ueitest.com/products/temperature-humidity/dt301) (by Rob Gardner)
+    * adds experimental support for the [Extech 755](http://www.extech.com/display/?id=14489) pressure manometer (by William and Brian Glen)
     * adds "Playback Events" function to playback background events if corresponding sliders with actions are defined
     * adds serial port to DUMMY device. If selected as main device, one can send serial commands to its serial port from alamrs and buttons
     * adds russian translations (thanks to Taras Prokopyuk)

@@ -31,7 +31,7 @@ Features
 --------
 - free for personal and commercial use
 - multi-platform (Mac, Windows, and Linux)
-- multi-language (German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norwegian, Greek, Turkish, Chinese, Hungarian,...)
+- multi-language (German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norwegian, Greek, Turkish, Chinese, Hungarian, Russian, ...)
 - multi-device (manual and automatic logging of roast temperatures via supported devices; see blog post [Device Selection](http://artisan-roasterscope.blogspot.de/2013/06/device-selection.html))
   * Fuji PXR/PXG 4 & 5 PID
   * Delta DTA PID (works for DTB too)
@@ -40,12 +40,13 @@ Features
   * General Tools DT309DL
   * CENTER 300, 301, 302, 303, 304, 305, 306, 309
   * VOLTCRAFT K201, K202, K204, 300K, 302KJ
-  * EXTECH 421509
+  * EXTECH 755, 421509
+  * Apollo DT301
   * [Arduino TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) with PID
   * TE VA18B
   * HHM28 multimeter
   * Amprobe TMD-56 (non-wireless)
-  * Phidgets (1010, 1011, 1018, 1019, 1045, 1046, 1048, 1051, 1073)
+  * Phidgets 1010, 1011, 1018, 1019, 1045, 1046, 1048, 1051, 1073
   * Mastech MS6514
   * Yocto Thermocouple and PT100
   * [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html)
