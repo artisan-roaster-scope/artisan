@@ -3,6 +3,42 @@ Detailed Release History
 
 
 ----
+v1.0.0 (XX.XX.2016)
+------------------
+
+ * New Features
+    * adds internal PID and support to control external MODBUS PIDs
+    * adds two more MODBUS input channels (now 6 in total)
+    * adds alarms triggerd at a specified time after another alarm specified as "If Alarm" was triggered, if "from" rules is set to "If Alarm"    
+    * adds improved Windows installer (option to uninstall previous versions during installation and silent option)
+    * adds support for loading Artisan profiles from zip files for reporting (as kindly contributed by David Baxter)
+    * adds experimental support for the Apollo DT301 (http://www.ueitest.com/products/temperature-humidity/dt301 by Rob Gardner)
+    * adds experimental support for the Extech 755 pressure manometer (http://www.extech.com/display/?id=14489 as kindly contributed by William and Brian Glen)
+    * adds "Playback Events" function to playback background events if corresponding sliders with actions are defined
+    * adds serial port to DUMMY device. If selected as main device, one can send serial commands to its serial port from alamrs and buttons
+    * adds russian translations (thanks to Taras Prokopyuk)
+ * Changes
+    * dramatically improves speed of MODBUS over serial communication (by patching the underlying pymodbus lib)
+    * makes message, error and serial logs autoupdating
+    * removes "insert" in alarm table, which is not compatible to the new flexible alarmtable sorting
+    * restrict file extension to ".alog" on loading a profile
+    * current slider and button definitions are now automatically saved to palette #0 on closing the events dialog such that those definitions cannot get lost accidentially by pressing a number key to quickly entering an event value during recording
+    * reconstruct users environment on calling external programs on MacOS X, not to limit them to the Artisan contained limited Python environment
+    * remembers playback aid settings
+ * Bug Fixes
+    * improves ranking reports for mixed profiles with different temperature units
+    * fixed an issue with the Arduino/TC4 communication setup
+    * 3rd temperature channel of background profile did not move along the rest
+    * fixes program path if used as extra devices
+    * allows custom event values of value -1
+    * improved Amprobe and Mastech support handling communication failures better
+    * fixes image paths in HTML reports
+    * fixes hangs and accent character support on "Playback Aid"
+    * improved autoDROP
+    * fixes WebLCDs on Mac OS X    
+    * various stability improvements
+    
+----
 v0.9.9 (14.03.2016)
 ------------------
 
