@@ -2001,6 +2001,11 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.ax.draw_artist(self.l_eventtype2dots)
                                 aw.qmc.ax.draw_artist(self.l_eventtype3dots)
                                 aw.qmc.ax.draw_artist(self.l_eventtype4dots)
+                            # draw delta lines
+                            if self.DeltaETflag and self.l_delta1 != None:
+                                aw.qmc.ax.draw_artist(self.l_delta1)
+                            if self.DeltaBTflag and self.l_delta2 != None:
+                                aw.qmc.ax.draw_artist(self.l_delta2)
                             # draw extra curves
                             xtra_dev_lines1 = 0
                             xtra_dev_lines2 = 0
@@ -2011,11 +2016,6 @@ class tgraphcanvas(FigureCanvas):
                                 if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
                                     aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
                                     xtra_dev_lines2 = xtra_dev_lines2 + 1
-                            # draw delta lines
-                            if self.DeltaETflag and self.l_delta1 != None:
-                                aw.qmc.ax.draw_artist(self.l_delta1)
-                            if self.DeltaBTflag and self.l_delta2 != None:
-                                aw.qmc.ax.draw_artist(self.l_delta2)
                             # draw ET
                             if aw.qmc.ETcurve:
                                 aw.qmc.ax.draw_artist(self.l_temp1)
@@ -16609,7 +16609,7 @@ class ApplicationWindow(QMainWindow):
             colors = 0
             colors_count = 0
             cuppings = 0
-            cuppings_countst = 0
+            cuppings_count = 0
             handles = []
             labels = []
             color=iter(cm.Set1(numpy.linspace(0,1,len(profiles))))            
@@ -27846,6 +27846,8 @@ class serialport(object):
         self.MS6514PrevTemp2 = -1
         #DT301 variable
         self.DT301PrevTemp = -1
+        #EXPTECH755 variable
+        self.EXTECH755PrevTemp = -1
         #select PID type that controls the roaster.
         # Reads/Controls ET
         self.controlETpid = [0,1]        # index0: type of pid: 0 = FujiPXG, 1 = FujiPXR3, 2 = DTA 
@@ -28446,7 +28448,23 @@ class serialport(object):
                     ##Single  line to return pressure twice. obviously only need to do this once.
                     # Takes the last 5 of the 10 byte signal, which is ascii for a float
                     # multiplied by 10 for visual per Brian Glens request, values are now off
-                    return float(r[5:])*float(10) ,float(r[5:])*float(10)
+                    try:
+                        self.EXTECH755PrevTemp = float(r[5:])*float(10)
+                        return self.EXTECH755PrevTemp, self.EXTECH755PrevTemp
+                    except:
+                        if retry:
+                            return self.EXTECH755pressure(retry=retry - 1)
+                        else:
+                            nbytes = len(r)
+                            aw.qmc.adderror(QApplication.translate("Error Message",
+                                                               "Extech755pressure(): conversion error, {0} bytes received",
+                                                               None).format(nbytes))
+                            if self.EXTECH755PrevTemp != -1:
+                                s = self.EXTECH755PrevTemp
+                                self.EXTECH755PrevTemp = -1
+                                return s,s
+                            else:
+                                return -1,-1                       
                 else:
                     if retry:
                         return self.EXTECH755pressure(retry=retry - 1)
@@ -28455,7 +28473,12 @@ class serialport(object):
                         aw.qmc.adderror(QApplication.translate("Error Message",
                                                                "Extech755pressure(): {0} bytes received but 10 needed",
                                                                None).format(nbytes))
-                        return -1, -1
+                        if self.EXTECH755PrevTemp != -1:
+                            s = self.EXTECH755PrevTemp
+                            self.EXTECH755PrevTemp = -1
+                            return s,s
+                        else:
+                            return -1,-1
             else:
                 return -1, -1
         except serial.SerialException:
@@ -28679,30 +28702,31 @@ class serialport(object):
             if self.SP.isOpen():
                 self.SP.write(command)
                 libtime.sleep(0.01)  # this may not be necessary but works well
-                data = bytearray(self.SP.read(11))
-                if len(data)==11 and data[0] == 0xfc and data[1] == 0x13 and data[10] == 0xf3:
-                    for i in range(2,6):
-                        temp = (temp << 4) | (data[i] & 0xf)
-                    self.DT301PrevTemp = temp/10.0,0
-                    return self.DT301PrevTemp
+                r = self.SP.read(11)
+                if len(r)==11:
+                    data = bytearray(r)
+                    if len(data)==11 and data[0] == 0xfc and data[1] == 0x13 and data[10] == 0xf3:
+                        for i in range(2,6):
+                            temp = (temp << 4) | (data[i] & 0xf)
+                        self.DT301PrevTemp = temp/10.0,0
+                        return self.DT301PrevTemp,-1
+                if retry:
+                    self.SP.flushInput()
+                    self.SP.flushOutput()
+                    libtime.sleep(.05)
+                    return self.DT301temperature(retry=retry-1)
                 else:
-                    if retry:
-                        self.SP.flushInput()
-                        self.SP.flushOutput()
-                        libtime.sleep(.05)
-                        return self.DT301temperature(retry=retry-1)
-                    else:
-                        self.closeport()
-                        # error but return previous temperature
-                        if self.DT301PrevTemp != -1:
-                            s = self.DT301PrevTemp
-                            self.DT301PrevTemp = -1
-                            return s,0
+                    self.closeport()
+                    # error but return previous temperature
+                    if self.DT301PrevTemp != -1:
+                        s = self.DT301PrevTemp
+                        self.DT301PrevTemp = -1
+                        return s,0
                         
-                        # error
-                        nbytes = len(data)
-                        aw.qmc.adderror(QApplication.translate("Error Message","DT301temperature(): {0} bytes received but 11 needed",None).format(nbytes))
-                        return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+                    # error
+                    nbytes = len(data)
+                    aw.qmc.adderror(QApplication.translate("Error Message","DT301temperature(): {0} bytes received but 11 needed",None).format(nbytes))
+                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
         except serial.SerialException:
@@ -30273,10 +30297,10 @@ class serialport(object):
                     if(((t213 & 0xf0) >> 4) != 14):
                         #ERROR try again .....
                         continue
-                    elif(((t213 & 0x0f) & 0x02) != 2):
-                        #ERROR
-                        # device seems not to be in temp mode, break here
-                        raise ValueError
+#                    elif(((t213 & 0x0f) & 0x02) != 2):
+#                        #ERROR
+#                        # device seems not to be in temp mode, break here
+#                        raise ValueError
                     # convert
                     bNegative = 0
                     iDivisor = 0
@@ -31769,7 +31793,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52,55]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -32070,7 +32094,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52,55]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -32163,7 +32187,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,50,51,52,55]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -33583,9 +33607,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 49 is an external program _56
                 ##########################
-                elif meter == "DUMMY":
+                elif meter == "DUMMY": # including a dummy serial device (can be used for serial commands)
                     aw.qmc.device = 50
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1                    
                 ##########################
                 ####  DEVICE 51 is +304_34 but +DEVICE cannot be set as main device
                 ##########################
