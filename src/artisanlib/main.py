@@ -1569,8 +1569,8 @@ class tgraphcanvas(FigureCanvas):
             #self.fig.canvas.draw_idle() # this blocks (overwrites) drawing of the projections in updategraphics
             try:
                 # self.fig.canvas.draw() causes randomly a black border where the axis should be drawn
-                #self.fig.canvas.draw() # the triggered _draw_event(self,evt) function resets the self.in_draw_event if done
-                self.fig.canvas.draw_idle()
+                self.fig.canvas.draw() # the triggered _draw_event(self,evt) function resets the self.in_draw_event if done
+                #self.fig.canvas.draw_idle()
                 # make sure that the GUI framework has a chance to run its event loop
                 # and clear any GUI events.  This needs to be in a try/except block
                 # because the default implemenation of this method is to raise
@@ -1993,66 +1993,68 @@ class tgraphcanvas(FigureCanvas):
 
                     ##### updated canvas
                     try:
-                        if self.ax_background:
-                            self.fig.canvas.restore_region(self.ax_background)
-                            # draw eventtypes
-                            if self.eventsshowflag and self.eventsGraphflag == 2:
-                                aw.qmc.ax.draw_artist(self.l_eventtype1dots)
-                                aw.qmc.ax.draw_artist(self.l_eventtype2dots)
-                                aw.qmc.ax.draw_artist(self.l_eventtype3dots)
-                                aw.qmc.ax.draw_artist(self.l_eventtype4dots)
-                            # draw delta lines
-                            if self.DeltaETflag and self.l_delta1 != None:
-                                aw.qmc.ax.draw_artist(self.l_delta1)
-                            if self.DeltaBTflag and self.l_delta2 != None:
-                                aw.qmc.ax.draw_artist(self.l_delta2)
-                            # draw extra curves
-                            xtra_dev_lines1 = 0
-                            xtra_dev_lines2 = 0
-                            for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                                if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
-                                    aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
-                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
-                                    aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
-                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
-                            # draw ET
-                            if aw.qmc.ETcurve:
-                                aw.qmc.ax.draw_artist(self.l_temp1)
-                            # draw BT
-                            if aw.qmc.BTcurve:
-                                aw.qmc.ax.draw_artist(self.l_temp2)
-                             
-                            if aw.qmc.device == 18 and aw.qmc.l_timeline != None: # not NONE device
-                                aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
-                                
-                            if aw.qmc.BTcurve:
-                                for a in self.l_annotations:
-                                    aw.qmc.ax.draw_artist(a)
-                            
-                            if aw.qmc.projectFlag:
-                                if self.l_BTprojection != None:
-                                    aw.qmc.ax.draw_artist(self.l_BTprojection)
-                                if self.l_ETprojection != None:
-                                    aw.qmc.ax.draw_artist(self.l_ETprojection)
-                            
-                            if False: #aw.qmc.ax.clipbox:
-                                self.fig.canvas.blit(aw.qmc.ax.clipbox) # .clipbox is None in matplotlib <1.5
-                            else:
-#                                self.fig.canvas.blit(aw.qmc.ax.bbox) # causes randomly a black border where the axis should be drawn
-                                self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
-                                
-                                
-                        else:
-                            # we do not have a background to bitblit, so do a full redraw
-                            self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
-                            #self.updateProjection()                           
-                            if aw.qmc.projectFlag and (self.l_BTprojection != None or self.l_ETprojection != None):
-                                if self.l_BTprojection != None:
-                                    aw.qmc.ax.draw_artist(self.l_BTprojection)
-                                if self.l_ETprojection != None:
-                                    aw.qmc.ax.draw_artist(self.l_ETprojection)
+                        if not self.block_update:
+                        #-- start update display
+                            if self.ax_background:
+                                self.fig.canvas.restore_region(self.ax_background)
+                                # draw eventtypes
+                                if self.eventsshowflag and self.eventsGraphflag == 2:
+                                    aw.qmc.ax.draw_artist(self.l_eventtype1dots)
+                                    aw.qmc.ax.draw_artist(self.l_eventtype2dots)
+                                    aw.qmc.ax.draw_artist(self.l_eventtype3dots)
+                                    aw.qmc.ax.draw_artist(self.l_eventtype4dots)
+                                # draw delta lines
+                                if self.DeltaETflag and self.l_delta1 != None:
+                                    aw.qmc.ax.draw_artist(self.l_delta1)
+                                if self.DeltaBTflag and self.l_delta2 != None:
+                                    aw.qmc.ax.draw_artist(self.l_delta2)
+                                # draw extra curves
+                                xtra_dev_lines1 = 0
+                                xtra_dev_lines2 = 0
+                                for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                                    if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
+                                        aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
+                                        xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                    if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
+                                        aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
+                                        xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                # draw ET
+                                if aw.qmc.ETcurve:
+                                    aw.qmc.ax.draw_artist(self.l_temp1)
+                                # draw BT
+                                if aw.qmc.BTcurve:
+                                    aw.qmc.ax.draw_artist(self.l_temp2)
+                                 
+                                if aw.qmc.device == 18 and aw.qmc.l_timeline != None: # not NONE device
+                                    aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
                                     
+                                if aw.qmc.BTcurve:
+                                    for a in self.l_annotations:
+                                        aw.qmc.ax.draw_artist(a)
+                                
+                                if aw.qmc.projectFlag:
+                                    if self.l_BTprojection != None:
+                                        aw.qmc.ax.draw_artist(self.l_BTprojection)
+                                    if self.l_ETprojection != None:
+                                        aw.qmc.ax.draw_artist(self.l_ETprojection)
+                                
+                                if False: #aw.qmc.ax.clipbox:
+                                    self.fig.canvas.blit(aw.qmc.ax.clipbox) # .clipbox is None in matplotlib <1.5
+                                else:
+    #                                self.fig.canvas.blit(aw.qmc.ax.bbox) # causes randomly a black border where the axis should be drawn
+                                    self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
+                                    
+                                    
+                            else:
+                                # we do not have a background to bitblit, so do a full redraw
+                                self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
+                                if aw.qmc.projectFlag and (self.l_BTprojection != None or self.l_ETprojection != None):
+                                    if self.l_BTprojection != None:
+                                        aw.qmc.ax.draw_artist(self.l_BTprojection)
+                                    if self.l_ETprojection != None:
+                                        aw.qmc.ax.draw_artist(self.l_ETprojection)
+                        #-- end update display
+                        
                         if aw.qmc.background and (aw.qmc.backgroundReproduce or aw.qmc.backgroundPlaybackEvents) and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
                             aw.qmc.playbackevent()
                     except Exception:
@@ -9784,7 +9786,7 @@ class ApplicationWindow(QMainWindow):
 
         self.eNumberSpinBox.setAlignment(Qt.AlignCenter)
         self.eNumberSpinBox.setToolTip(QApplication.translate("Tooltip", "Number of events found", None))
-        self.eNumberSpinBox.setRange(0,20)
+        self.eNumberSpinBox.setRange(0,99)
         self.eNumberSpinBox.valueChanged.connect(self.changeEventNumber)
         self.eNumberSpinBox.setMaximumWidth(40)
         self.lineEvent = QLineEdit()
@@ -14913,7 +14915,7 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventbuttoncolor = ["yellow"]*len(self.extraeventstypes)
                     self.extraeventbuttontextcolor = ["black"]*len(self.extraeventstypes)
                 if settings.contains("buttonpalette"):
-                    self.buttonpalettemaxlen = [max(14,toInt(x)) for x in toList(settings.value("buttonpalettemaxlen",self.buttonpalettemaxlen))]
+                    self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value("buttonpalettemaxlen",self.buttonpalettemaxlen))]
                     self.buttonpalette = toList(settings.value("buttonpalette",self.buttonpalette))
                     if self.buttonpalette == None:
                         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]] # initialize empty palettes
@@ -17799,7 +17801,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u("Morten M") + uchr(252) + u("nchow")
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
-        contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner<br>")
+        contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -28447,9 +28449,8 @@ class serialport(object):
                 if len(r) == 10:
                     ##Single  line to return pressure twice. obviously only need to do this once.
                     # Takes the last 5 of the 10 byte signal, which is ascii for a float
-                    # multiplied by 10 for visual per Brian Glens request, values are now off
                     try:
-                        self.EXTECH755PrevTemp = float(r[5:])*float(10)
+                        self.EXTECH755PrevTemp = float(r[5:])
                         return self.EXTECH755PrevTemp, self.EXTECH755PrevTemp
                     except:
                         if retry:
