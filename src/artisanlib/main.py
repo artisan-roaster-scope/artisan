@@ -28146,8 +28146,15 @@ class serialport(object):
 #            output = os.popen(aw.ser.externalprogram,"r").readline()
             # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
             my_env = aw.calc_env()
+        
+            # hide the console window on Windows 
+            startupinfo = None  
+            if platf == 'Windows':
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
+                startupinfo.wShowWindow = subprocess.SW_HIDE
             
-            p = subprocess.Popen(aw.ser.externalprogram,env=my_env,stdout=subprocess.PIPE)
+            p = subprocess.Popen(aw.ser.externalprogram,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
             output = p.communicate()[0]
             
             tx = aw.qmc.timeclock.elapsed()/1000.
