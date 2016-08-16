@@ -29995,7 +29995,20 @@ class serialport(object):
                     aw.sendmessage(str(e))
 #                    aw.sendmessage("error: " + str(errmsg))
                 try:
-                    self.YOCTOsensor = YTemperature.FirstTemperature()
+                    # already "First" YOCTOsensor connected?
+                    already_first_connected = False
+                    if aw.ser.YOCTOsensor != None:
+                        already_first_connected = True
+                    else:
+                        for s in aw.extraser:
+                            if s.YOCTOsensor != None:
+                                already_first_connected = True
+                                break
+                    if already_first_connected:
+                        # we ask for the next one
+                        self.YOCTOsensor = YTemperature.nextTemperature()
+                    else:
+                        self.YOCTOsensor = YTemperature.FirstTemperature()
                     if mode == 0 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
