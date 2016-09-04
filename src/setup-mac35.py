@@ -30,7 +30,7 @@ LICENSE = 'GNU General Public License (GPL)'
 try:
     QTDIR = os.environ["QT_PATH"] + r'/'
 except:
-    QTDIR = r'/Users/luther/Qt5.6.0/5.6/clang_64/' # qt5
+    QTDIR = r'/Users/luther/Qt5.7.0/5.7/clang_64/' # qt5
 
 APP = ['artisan.py']
 
@@ -51,8 +51,8 @@ DATA_FILES = [
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqwbmp.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqwebp.dylib']),
     ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
-    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
-    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
+#    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
+#    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
     ("../Resources/qt_plugins/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # qt5/# standard     
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
@@ -104,11 +104,15 @@ DATA_FILES = [
     ("../Resources", [r"includes/alarmclock.woff"]),
     ("../Resources", [r"includes/artisan.tpl"]),
     ("../Resources", [r"includes/bigtext.js"]),
+    ("../Resources", [r"includes/sorttable.js"]),
+    ("../Resources", [r"includes/report-template.htm"]),
+    ("../Resources", [r"includes/roast-template.htm"]),
+    ("../Resources", [r"includes/ranking-template.htm"]),
     ("../Resources", [r"includes/Humor-Sans.ttf"]),
     ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
   ]
   
-plist = Plist.fromFile('Info35.plist')
+plist = Plist.fromFile('Info.plist')
 plist.update({ 'CFBundleDisplayName': 'Artisan',
                     'CFBundleGetInfoString': 'Artisan, Roast Logger',
                     'CFBundleIdentifier': 'com.google.code.p.Artisan',
@@ -222,45 +226,45 @@ os.system(r'cp /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/s
 ##            print('Deleting', file)
 #            os.remove(os.path.join(root,file))
 
-#print('*** Removing unused files ***')
-#for root, dirs, files in os.walk('.'):
-#    for file in files:
-#        if 'debug' in file:
-##            print('Deleting', file)
+print('*** Removing unused files ***')
+for root, dirs, files in os.walk('.'):
+    for file in files:
+        if 'debug' in file:
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+        elif file.startswith('test_'):
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+        elif '_tests' in file:
+#            print('Deleting', file)            
+            os.remove(os.path.join(root,file))               
+        elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+        # remove also all .h .in .cpp .cc .html files 
+        elif file.endswith('.h') and file != "pyconfig.h":
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+        elif file.endswith('.in'):
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+        elif file.endswith('.cpp'):
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+        elif file.endswith('.cc'):
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+# .afm files should not be removed as without matplotlib will fail on startup            
+#        elif file.endswith('.afm'):
+#            print('Deleting', file)
 #            os.remove(os.path.join(root,file))
-#        elif file.startswith('test_'):
-##            print('Deleting', file)
-#            os.remove(os.path.join(root,file))
-#        elif '_tests' in file:
-##            print('Deleting', file)            
-#            os.remove(os.path.join(root,file))               
-#        elif file.endswith('.pyc') and file != "site.pyc" and os.path.isfile(os.path.join(root,file[:-3] + 'pyo')):
-##            print('Deleting', file)
-#            os.remove(os.path.join(root,file))
-#        # remove also all .h .in .cpp .cc .html files 
-#        elif file.endswith('.h') and file != "pyconfig.h":
-##            print('Deleting', file)
-#            os.remove(os.path.join(root,file))
-#        elif file.endswith('.in'):
-##            print('Deleting', file)
-#            os.remove(os.path.join(root,file))
-#        elif file.endswith('.cpp'):
-##            print('Deleting', file)
-#            os.remove(os.path.join(root,file))
-#        elif file.endswith('.cc'):
-##            print('Deleting', file)
-#            os.remove(os.path.join(root,file))
-## .afm files should not be removed as without matplotlib will fail on startup            
-##        elif file.endswith('.afm'):
-##            print('Deleting', file)
-##            os.remove(os.path.join(root,file))
-#    # remove test files        
-#    for dir in dirs:
-#        if 'tests' in dir:
-#            for r,d,f in os.walk(os.path.join(root,dir)):
-#                for fl in f:
-##                    print('Deleting', os.path.join(r,fl))
-#                    os.remove(os.path.join(r,fl))                
+    # remove test files        
+    for dir in dirs:
+        if 'tests' in dir:
+            for r,d,f in os.walk(os.path.join(root,dir)):
+                for fl in f:
+#                    print('Deleting', os.path.join(r,fl))
+                    os.remove(os.path.join(r,fl))                
             
 os.chdir('..')
 os.system(r"rm artisan-mac-" + VERSION + r".dmg")

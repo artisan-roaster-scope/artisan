@@ -114,16 +114,16 @@ OPTIONS = {
     'argv_emulation': False, # this would confuses GUI processing
     'qt_plugins': [
                     'iconengines/libqsvgicon.dylib',
-                    'imageformats/libqsvg.dylib',
-                    'imageformats/libqjpeg.dylib',
-                    'imageformats/libqtiff.dylib',
                     'imageformats/libqdds.dylib',
                     'imageformats/libqgif.dylib',
-                    'imageformats/libqicns.dylib',                   
+                    'imageformats/libqicns.dylib',                  
                     'imageformats/libqico.dylib',
-#                    'imageformats/libqjp2.dylib',
-#                    'imageformats/libqmng.dylib',
+                    'imageformats/libqjp2.dylib',
+                    'imageformats/libqjpeg.dylib',
+                    'imageformats/libqmng.dylib',                    
+                    'imageformats/libqsvg.dylib', 
                     'imageformats/libqtga.dylib',
+                    'imageformats/libqtiff.dylib',
                     'imageformats/libqwbmp.dylib',
                     'imageformats/libqwebp.dylib',
                     'platforms/libqcocoa.dylib',  # qt5

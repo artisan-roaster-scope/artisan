@@ -113,7 +113,7 @@ DATA_FILES = [
     ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
   ]
   
-plist = Plist.fromFile('Info3.plist')
+plist = Plist.fromFile('Info.plist')
 plist.update({ 'CFBundleDisplayName': 'Artisan',
                     'CFBundleGetInfoString': 'Artisan, Roast Logger',
                     'CFBundleIdentifier': 'com.google.code.p.Artisan',

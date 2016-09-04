@@ -51,6 +51,7 @@ mkdir dist/Resources/qt_plugins
 mkdir dist/Resources/qt_plugins/imageformats
 mkdir dist/Resources/qt_plugins/iconengines
 mkdir dist/Resources/qt_plugins/platforms
+mkdir dist/Resources/qt_plugins/platformthemes
 cp $QT/plugins/imageformats/libqsvg.so dist/Resources/qt_plugins/imageformats
 patchelf --set-rpath '${ORIGIN}/../../..:${ORIGIN}/../../../../lib' dist/Resources/qt_plugins/imageformats/libqsvg.so
 cp $QT/plugins/imageformats/libqgif.so dist/Resources/qt_plugins/imageformats
@@ -63,6 +64,8 @@ cp $QT/plugins/iconengines/libqsvgicon.so dist/Resources/qt_plugins/iconengines
 patchelf --set-rpath '${ORIGIN}/../../..:${ORIGIN}/../../../../lib' dist/Resources/qt_plugins/iconengines/libqsvgicon.so
 cp $QT/plugins/platforms/libqxcb.so dist/Resources/qt_plugins/platforms
 patchelf --set-rpath '${ORIGIN}/../../..:${ORIGIN}/../../../../lib' dist/Resources/qt_plugins/platforms/libqxcb.so
+cp $QT/plugins/platformthemes/libqgtk2.so dist/Resources/qt_plugins/platformthemes
+patchelf --set-rpath '${ORIGIN}/../../..:${ORIGIN}/../../../../lib' dist/Resources/qt_plugins/platformthemes/libqgtk2.so
 cp qt.conf dist
 mkdir dist/translations
 cp translations/*.qm dist/translations

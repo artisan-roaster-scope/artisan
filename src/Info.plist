@@ -99,56 +99,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-    <key>NSHighResolutionCapable</key>
-    <string>True</string>	
-	<key>PyMainFileNames</key>
-	<array>
-		<string>__boot__</string>
-	</array>
-	<key>PyOptions</key>
-	<dict>
-		<key>alias</key>
-		<false/>
-		<key>argv_emulation</key>
-		<false/>
-		<key>emulate_shell_environment</key>
-		<false/>
-		<key>no_chdir</key>
-		<false/>
-		<key>optimize</key>
-		<integer>2</integer>
-		<key>prefer_ppc</key>
-		<false/>
-		<key>site_packages</key>
-		<true/>
-		<key>use_pythonpath</key>
-		<false/>
-	</dict>
-	<key>PyResourcePackages</key>
-	<array>
-	</array>
-	<key>PyRuntimeLocations</key>
-	<array>
-		<string>@executable_path/../Frameworks/Python.framework/Versions/2.7/Python</string>
-	</array>
-	<key>PythonInfoDict</key>
-	<dict>
-		<key>PythonExecutable</key>
-		<string>/Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python</string>
-		<key>PythonLongVersion</key>
-		<string>2.7.3 (v2.7.3:70274d53c1dd, Apr  9 2012, 20:52:43) 
-[GCC 4.2.1 (Apple Inc. build 5666) (dot 3)]</string>
-		<key>PythonShortVersion</key>
-		<string>2.7</string>
-		<key>py2app</key>
-		<dict>
-			<key>alias</key>
-			<false/>
-			<key>template</key>
-			<string>app</string>
-			<key>version</key>
-			<string>0.8</string>
-		</dict>
-	</dict>
+   	<key>NSHighResolutionCapable</key>
+   	<string>True</string>
 </dict>
 </plist>

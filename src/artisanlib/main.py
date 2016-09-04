@@ -408,7 +408,11 @@ class Artisan(QApplication):
         return super(Artisan, self).event(event)
 
 
-app = Artisan(sys.argv)
+args = sys.argv
+if sys.platform == 'linux' :
+    # avoid a GTK bug in Ubuntu Unity
+    args = args + ['-style','Cleanlooks']
+app = Artisan(args)
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
@@ -440,10 +444,18 @@ def __dependencies_for_freezing():
     # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
     import scipy.linalg.cython_blas
     import scipy.linalg.cython_lapack
+    
+    import appdirs
+    import packaging
+    import packaging.version
+    import packaging.specifiers
+    import packaging.markers
+    import packaging.requirements
+    
     if pyqtversion < 5:
         import PyQt4.QtSvg
         import PyQt4.QtXml
-        import PyQt4.QtDBus # needed for QT5 builds
+        import PyQt4.QtDBus
         import PyQt4.QtPrintSupport # needed for by platform plugin libqcocoa
     else:
         import PyQt5.QtSvg
@@ -897,6 +909,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.roastpropertiesflag = 1  #resets roast properties if not zero
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None)
+        self.title_show_always = False
         self.ambientTemp = 0.
         self.ambientTempSource = 0 # indicates the temperature curve that is used to automatically fill the ambient temperature on DROP
 #                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
@@ -2048,11 +2061,11 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 # we do not have a background to bitblit, so do a full redraw
                                 self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
-                                if aw.qmc.projectFlag and (self.l_BTprojection != None or self.l_ETprojection != None):
-                                    if self.l_BTprojection != None:
-                                        aw.qmc.ax.draw_artist(self.l_BTprojection)
-                                    if self.l_ETprojection != None:
-                                        aw.qmc.ax.draw_artist(self.l_ETprojection)
+#                                if aw.qmc.projectFlag and (self.l_BTprojection != None or self.l_ETprojection != None):
+#                                    if self.l_BTprojection != None:
+#                                        aw.qmc.ax.draw_artist(self.l_BTprojection)
+#                                    if self.l_ETprojection != None:
+#                                        aw.qmc.ax.draw_artist(self.l_ETprojection)
                         #-- end update display
                         
                         if aw.qmc.background and (aw.qmc.backgroundReproduce or aw.qmc.backgroundPlaybackEvents) and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
@@ -3671,14 +3684,10 @@ class tgraphcanvas(FigureCanvas):
                 fontprop_xlarge = aw.mpl_fontproperties.copy()
                 fontprop_xlarge.set_size("x-large")
                 self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
-                if aw.qmc.flagstart:
-                    self.ax.set_ylabel("")
-                    self.ax.set_xlabel("")
+                if aw.qmc.flagstart and not aw.qmc.title_show_always:
                     self.ax.set_title("")
                     self.fig.suptitle("")
                 else:
-                    self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
-                    self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
                     if self.roastbatchnr == 0:
                         title = self.title
                     else:
@@ -3690,6 +3699,12 @@ class tgraphcanvas(FigureCanvas):
                     title = aw.qmc.abbrevString(title,stl)
                     self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                         fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
+                if aw.qmc.flagstart:
+                    self.ax.set_ylabel("")
+                    self.ax.set_xlabel("")
+                else:
+                    self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
+                    self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "min",None)),color = self.palette["xlabel"],fontproperties=fontprop_medium)
                 
                 two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag)))
     
@@ -3702,7 +3717,7 @@ class tgraphcanvas(FigureCanvas):
                         suptitleX = 0.93
                     else:
                         suptitleX = 1
-                    if aw.qmc.flagstart:
+                    if aw.qmc.flagstart and not aw.qmc.title_show_always:
                         self.fig.suptitle("")
                     else:
                         if self.roastbatchnrB == 0:
@@ -5061,7 +5076,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.togglecrosslines()
             aw.qmc.ax.set_xlabel("")
             aw.qmc.ax.set_ylabel("")
-            aw.qmc.ax.set_title("")
+            if not aw.qmc.title_show_always:
+                aw.qmc.ax.set_title("")
             if aw.qmc.delta_ax:
                 aw.qmc.delta_ax.set_ylabel("")
                     
@@ -5076,7 +5092,8 @@ class tgraphcanvas(FigureCanvas):
                     
             aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
             aw.qmc.roastbatchpos = 1 # initialized to 1, set to increased batchsequence on DROP
-            aw.qmc.fig.suptitle("")
+            if not aw.qmc.title_show_always:
+                aw.qmc.fig.suptitle("")
             aw.qmc.updateDeltaSamples()
             aw.disableSaveActions()
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None))
@@ -10456,9 +10473,11 @@ class ApplicationWindow(QMainWindow):
         ib = False
         try:
             if platf == "Darwin":
-                # the sys.frozen is set by py2app and is unset otherwise
-                if str(sys.frozen) == "macosx_app":
+                # the sys.frozen is set by py2app and pyinstaller and is unset otherwise
+                if getattr( sys, 'frozen', False ):      
                     ib = True
+#                if str(sys.frozen) == "macosx_app":
+#                    ib = True                    
             elif platf == "Windows":
                 ib = (hasattr(sys, "frozen") or # new py2exe
                     hasattr(sys, "importers") # old py2exe
@@ -14830,6 +14849,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.gridlinestyle = toInt(settings.value("gridlinestyle",self.qmc.gridlinestyle))
                 self.qmc.gridalpha = toDouble(settings.value("gridalpha",self.qmc.gridalpha))
             settings.endGroup()
+            if settings.contains("titleshowalways"):
+                self.qmc.title_show_always = bool(toBool(settings.value("titleshowalways",aw.qmc.title_show_always)))
             if settings.contains("roastpropertiesflag"):
                 self.qmc.roastpropertiesflag = toInt(settings.value("roastpropertiesflag",self.qmc.roastpropertiesflag))
             if settings.contains("customflavorlabels"):
@@ -15757,6 +15778,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("quantifiermax",self.eventquantifiermax)
             settings.setValue("quantifiercoarse",self.eventquantifiercoarse)
             settings.endGroup()
+            settings.setValue("titleshowalways",self.qmc.title_show_always)
             settings.setValue("roastpropertiesflag",self.qmc.roastpropertiesflag)
             settings.setValue("customflavorlabels",self.qmc.customflavorlabels)
             settings.beginGroup("Batch")
@@ -21655,6 +21677,8 @@ class editGraphDlg(ArtisanDialog):
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
         self.titleedit = QLineEdit(aw.qmc.title)
+        self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
+        self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
         #Date
         datelabel1 = QLabel("<b>" + u(QApplication.translate("Label", "Date",None)) + "</b>")
         date = aw.qmc.roastdate.date().toString()
@@ -22011,9 +22035,13 @@ class editGraphDlg(ArtisanDialog):
         else:
             datebatch.addWidget(batchedit)
         textLayout.addLayout(datebatch,0,1)
+        
+        titleLine = QHBoxLayout()
+        titleLine.addWidget(self.titleedit)
+        titleLine.addWidget(self.titleShowAlwaysFlag)
 
         textLayout.addWidget(titlelabel,2,0)
-        textLayout.addWidget(self.titleedit,2,1)
+        textLayout.addLayout(titleLine,2,1)
         textLayout.addWidget(beanslabel,3,0)
         textLayout.addWidget(self.beansedit,3,1)        
         textLayout.addWidget(operatorlabel,4,0)
@@ -22994,6 +23022,7 @@ class editGraphDlg(ArtisanDialog):
             self.saveEventTable()
         # Update Title
         aw.qmc.title = u(self.titleedit.text())
+        aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
         aw.qmc.container_idx = self.tareComboBox.currentIndex() - 3
         # Update beans
         aw.qmc.beans = u(self.beansedit.toPlainText())
@@ -29962,6 +29991,18 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1018values() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
+    # given the YOCTOsensor, return the first of the given mode (mode=0 => Yocto-Thermocouple; mode=1 => Yocto-Thermocouple)
+    # that is not in the list of already connected ones
+    def getNextYOCTOsensorOfType(self,mode,connected_yoctos,YOCTOsensor):
+        if YOCTOsensor:
+            productName = YOCTOsensor.get_module().get_productName()
+            if not (YOCTOsensor.get_module().get_serialNumber() in connected_yoctos) and ((mode == 0 and productName == "Yocto-Thermocouple") or (mode == 1 and productName == "Yocto-PT100")):
+                return YOCTOsensor
+            else:
+                return self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.nextTemperature(YOCTOsensor))
+        else:
+            return None
+
     # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe
     def YOCTOtemperatures(self,mode=0):
         try: 
@@ -30002,28 +30043,26 @@ class serialport(object):
                     aw.sendmessage(str(e))
 #                    aw.sendmessage("error: " + str(errmsg))
                 try:
-                    # already "First" YOCTOsensor connected?
-                    already_first_connected = False
-                    if aw.ser.YOCTOsensor != None:
-                        already_first_connected = True
+                    # already connected YOCTOsensors?
+                    if aw.ser.YOCTOsensor == None:
+                        connected_yoctos = []
                     else:
-                        for s in aw.extraser:
-                            if s.YOCTOsensor != None:
-                                already_first_connected = True
-                                break
-                    if already_first_connected:
-                        # we ask for the next one
-                        self.YOCTOsensor = YTemperature.nextTemperature()
-                    else:
-                        self.YOCTOsensor = YTemperature.FirstTemperature()
+                        connected_yoctos = [aw.ser.YOCTOsensor.get_module().get_serialNumber()]
+                    for s in aw.extraser:
+                        if s.YOCTOsensor != None:
+                            connected_yoctos.append(s.YOCTOsensor.get_module().get_serialNumber())
+                    
+                    # search for the next one of the required type, but not yet connected
+                    self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.FirstTemperature())
+                    
                     if mode == 0 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
                         self.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
                         aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None))                       
                     elif mode == 1 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
-                        aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None))                       
-                except Exception:
+                        aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None))
+                except:
                     pass
             probe1 = -1
             probe2 = -1
@@ -30058,7 +30097,6 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " YOCTOtemperatures() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
-
 
     def ARDUINOTC4temperature(self):
         try:
