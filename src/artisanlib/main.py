@@ -691,7 +691,7 @@ class tgraphcanvas(FigureCanvas):
         self.min_delay = 1000
         
         # oversampling flag
-        self.oversampling = False
+        self.oversampling = True
         self.oversampling_min_delay = 1000 # in contrast to what the user dialog says (3000) we enable oversampling already with 1s
         
         # extra event sampling interval in miliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
@@ -944,7 +944,8 @@ class tgraphcanvas(FigureCanvas):
         #lists to store temps and rates of change. Second most IMPORTANT variables. All need same dimension.
         #self.temp1 = ET ; self.temp2 = BT; self.delta1 = deltaMET; self.delta2 = deltaBT
         self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]
-        self.stemp1,self.stemp2 = [],[] # smoothed versions of temp1/temp2 usind in redraw()
+        self.stemp1,self.stemp2 = [],[] # smoothed versions of temp1/temp2 used in redraw()
+        self.tstemp1,self.tstemp2 = [],[] # (temporarily) smoothed version of temp1/temp2 used in sample() to compute the RoR
         self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # used in sample()       
 
         #indexes for CHARGE[0],DRYe[1],FCs[2],FCe[3],SCs[4],SCe[5],DROP[6] and COOLe[7]
@@ -1009,7 +1010,7 @@ class tgraphcanvas(FigureCanvas):
         self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="slateblue")
         # background Deltas
         self.DeltaETBflag = False
-        self.DeltaBTBflag = False
+        self.DeltaBTBflag = True
 
         # projection variables of change of rate
         self.HUDflag = False
@@ -1041,7 +1042,7 @@ class tgraphcanvas(FigureCanvas):
         self.beans = ""
 
         #flags to show projections, draw Delta ET, and draw Delta BT
-        self.projectFlag = False
+        self.projectFlag = True
         self.ETcurve = True
         self.BTcurve = True
         self.ETlcd = True
@@ -1049,7 +1050,7 @@ class tgraphcanvas(FigureCanvas):
         self.swaplcds = False
         self.LCDdecimalplaces = 1
         self.DeltaETflag = False
-        self.DeltaBTflag = False
+        self.DeltaBTflag = True
         self.DeltaETlcdflag = True
         self.DeltaBTlcdflag = True
         self.HUDbuttonflag = False
@@ -1057,7 +1058,7 @@ class tgraphcanvas(FigureCanvas):
         self.Controlbuttonflag = False
         # user filter values x are translated as follows to internal filter values: y = x*2 + 1 (to go the other direction: x = y/2)
         # this is to ensure, that only uneven window values are used and no wrong shift is happening through smoothing
-        self.deltafilter = 5 # => corresponds to 2 on the user interface
+        self.deltafilter = 17 # => corresponds to 2 on the user interface
         self.curvefilter = 3 # => corresponds to 1 on the user interface
         self.deltaspan = 6 # the time period taken to compute one deltaBT/ET value (1-15sec)
         self.deltasamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
@@ -1066,7 +1067,7 @@ class tgraphcanvas(FigureCanvas):
         self.altsmoothing = False # toggle between standard and alternative smoothing approach
         self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
 
-        self.patheffects = 3
+        self.patheffects = 2
         self.graphstyle = 0
         self.graphfont = 0
 
@@ -1083,9 +1084,8 @@ class tgraphcanvas(FigureCanvas):
         self.xextrabuttonactionstrings = [""]*2
 
         #flag to activate the automatic marking of the CHARGE and DROP events
-        #self.autoChargeDropFlag = False # has been replaced by the following two separate flags
-        self.autoChargeFlag = False
-        self.autoDropFlag = False
+        self.autoChargeFlag = True
+        self.autoDropFlag = True
         #autodetected CHARGE and DROP index
         self.autoChargeIdx = 0
         self.autoDropIdx = 0
@@ -1147,7 +1147,7 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventsvalue = []
         #flag that makes the events location type bars (horizontal bars) appear on the plot. flag read on redraw()
         # 0 = no event bars; 1 = type bars (4 bars); 2 = value bars (10 bars)
-        self.eventsGraphflag = 0
+        self.eventsGraphflag = 1
         #flag that shows events in the graph
         self.eventsshowflag = 0
         #flag that shows major event annotations in the graph
@@ -1263,18 +1263,18 @@ class tgraphcanvas(FigureCanvas):
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 600
         self.ylimit_min = 0
-        self.zlimit = 100
+        self.zlimit = 60
         self.zlimit_min = 0
         self.RoRlimitF = 170
         self.RoRlimitC = 75
-        self.endofx = 60
+        self.endofx = 900 # 15min*60=900
         self.startofx = 0
-        self.resetmaxtime = 60  #time when pressing reset
+        self.resetmaxtime = 900  #time when pressing reset
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
         self.locktimex = False # if true, do not set time axis min and max from profile on load
         self.locktimex_start = 0 # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
-        self.xgrid = 60   #initial time separation; 60 = 1 minute
-        self.ygrid = 100  #initial temperature separation
+        self.xgrid = 120   #initial time separation; 60 = 1 minute
+        self.ygrid = 150  #initial temperature separation
         self.zgrid = 10   #initial RoR separation
         self.gridstyles =    ["-","--","-.",":"," "]  #solid,dashed,dash-dot,dotted,None
         self.gridlinestyle = 0
@@ -3132,6 +3132,7 @@ class tgraphcanvas(FigureCanvas):
             self.rateofchange1 = 0.0
             self.rateofchange2 = 0.0
             self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2 = [],[],[],[],[],[],[]
+            self.tstemp1,self.tstemp2 = [],[]
             self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
             self.timeindex = [-1,0,0,0,0,0,0,0]
             #extra devices
@@ -4549,8 +4550,8 @@ class tgraphcanvas(FigureCanvas):
         # just set it to the defaults to avoid strange conversion issues
         self.ylimit = 600
         self.ylimit_min = 0
-        self.ygrid = 100
-        self.zlimit = 50
+        self.ygrid = 150
+        self.zlimit = 60
         self.zlimit_min = 0
         self.zgrid = 10
         if self.mode == "C":
@@ -4580,9 +4581,9 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
-        self.ylimit = 350
+        self.ylimit = 300
         self.ylimit_min = 0
-        self.ygrid = 50
+        self.ygrid = 100
         self.zlimit = 50
         self.zlimit_min = 0
         self.zgrid = 10
@@ -4932,8 +4933,8 @@ class tgraphcanvas(FigureCanvas):
             if aw.extraeventsbuttonsflag:
                 aw.update_extraeventbuttons_visibility()
                 aw.showExtraButtons()
-            aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons)
-            aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
+            aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons and aw.button_10.isVisible())
+            aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider and aw.button_10.isVisible())
             self.block_update = False # unblock the updating of the bitblit canvas            
             aw.showLCDs() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
@@ -6168,9 +6169,14 @@ class tgraphcanvas(FigureCanvas):
                     fmtstr = "%.1f"
                 else:
                     fmtstr = "%.0f" 
-                dryphaseP = fmtstr%(dryphasetime*100./totaltime)
-                midphaseP = fmtstr%(midphasetime*100./totaltime)
-                finishphaseP = fmtstr%(finishphasetime*100./totaltime)
+                if totaltime:
+                    dryphaseP = fmtstr%(dryphasetime*100./totaltime)
+                    midphaseP = fmtstr%(midphasetime*100./totaltime)
+                    finishphaseP = fmtstr%(finishphasetime*100./totaltime)
+                else:
+                    dryphaseP = " --- "
+                    midphaseP = " --- "
+                    finishphaseP = " --- "
                             
                 #find Lowest Point in BT
                 LP = 1000 
@@ -8307,6 +8313,20 @@ class SampleThread(QThread):
                             aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
                         if aw.qmc.BTcurve:
                             aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+                            
+                    #we will the temporary smoothed ET/BT data arrays
+                    cf = aw.qmc.curvefilter
+                    if self.temp_decay_weights == None or len(self.temp_decay_weights) != cf: # recompute only on changes
+                        self.temp_decay_weights = numpy.arange(1,cf+1)
+                    if len(aw.qmc.temp1) > cf:
+                        st1 = numpy.average(aw.qmc.temp1[-cf:],weights=self.temp_decay_weights)
+                        st2 = numpy.average(aw.qmc.temp2[-cf:],weights=self.temp_decay_weights)
+                    else:
+                        st1 = aw.qmc.temp1[-1]
+                        st2 = aw.qmc.temp2[-1]
+                    aw.qmc.tstemp1.append(st1)
+                    aw.qmc.tstemp2.append(st2)
+                            
                     #we need a minimum of two readings to calculate rate of change
                     if local_flagstart and length_of_qmc_timex > 1:                        
                         if aw.qmc.altsmoothing:
@@ -8318,8 +8338,8 @@ class SampleThread(QThread):
                             left_index = min(length_of_qmc_timex,max(2,(aw.qmc.deltasamples + 1)))
                             timed = aw.qmc.timex[-1] - aw.qmc.timex[-left_index]   #time difference between last aw.qmc.deltasamples readings
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-left_index])/timed)*60.  #delta ET (degress/minute)
-                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                            aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                            aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
 
 
 
@@ -8355,6 +8375,17 @@ class SampleThread(QThread):
                             else:
                                 aw.qmc.unfiltereddelta2.append(0.)
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+                    # limit displayed RoR
+                    if aw.qmc.mode == "C":
+                        if rateofchange1plot > 35 or rateofchange1plot < -35:
+                            rateofchange1plot = None
+                        if rateofchange2plot > 35 or rateofchange2plot < -35:
+                            rateofchange2plot = None
+                    else:
+                        if rateofchange1plot > 35 or rateofchange1plot < -65:
+                            rateofchange1plot = None
+                        if rateofchange2plot > 35 or rateofchange2plot < -65:
+                            rateofchange2plot = None
                     # append new data to the rateofchange
                     if local_flagstart:
                         # only if we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
@@ -8647,6 +8678,7 @@ class Athreadserver(QWidget):
     def createSampleThread(self):
         sthread = SampleThread(self)
         sthread.decay_weights = None
+        sthread.temp_decay_weights = None
         #QApplication.processEvents()
 
         #connect graphics to GUI thread
@@ -8757,7 +8789,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.setContentsMargins(0,0,0,0)
         self.HUD.setContentsMargins(0,0,0,0)
         #events config
-        self.eventsbuttonflag = 1
+        self.eventsbuttonflag = 0
         self.minieventsflag = 0   #minieditor flag
 
         #create a serial port object (main ET BT device)
@@ -10235,6 +10267,12 @@ class ApplicationWindow(QMainWindow):
             res = True
         elif aw.qmc.Controlbuttonflag:
             res = True
+        if res:
+            aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons)
+            aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
+        else:
+            aw.pidcontrol.activateONOFFeasySV(False)
+            aw.pidcontrol.activateSVSlider(False)
         aw.button_10.setVisible(res)
         self.LCD6frame.setVisible(lcds)
         self.LCD7frame.setVisible(lcds)
@@ -10671,8 +10709,11 @@ class ApplicationWindow(QMainWindow):
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
                     if self.qmc.timeindex[1]: # after DRY
                         ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
-                        dryphaseP = fmtstr%(ts*100./totaltime)
-                        if not aw.qmc.LCDdecimalplaces:
+                        if totaltime:
+                        	dryphaseP = fmtstr%(ts*100./totaltime)
+                        else:
+                            dryphaseP = " --- "
+                        if not aw.qmc.LCDdecimalplaces and totaltime:
                             dryphaseP += " "
                         self.TPlcd.display(u(dryphaseP))
                     else:
@@ -10702,8 +10743,11 @@ class ApplicationWindow(QMainWindow):
                     elif aw.qmc.phasesLCDmode == 1: # percentage mode
                         if self.qmc.timeindex[2]:
                             ts = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
-                        midphaseP = fmtstr%(ts*100./totaltime)
-                        if not aw.qmc.LCDdecimalplaces:
+                        if midphaseP:
+                            midphaseP = fmtstr%(ts*100./totaltime)
+                        else:
+                            midphaseP = " --- "
+                        if not aw.qmc.LCDdecimalplaces and totaltime:
                             midphaseP += " "
                         self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "RAMP%",None)) + "</b></small>")
                         self.DRYlcd.display(u(midphaseP))
@@ -10750,8 +10794,11 @@ class ApplicationWindow(QMainWindow):
                         self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
                         self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
                     elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                        finishphaseP = fmtstr%(ts*100./totaltime)
-                        if not aw.qmc.LCDdecimalplaces:
+                        if totaltime:
+                            finishphaseP = fmtstr%(ts*100./totaltime)
+                        else:
+                            finishphaseP = " --- "
+                        if not aw.qmc.LCDdecimalplaces and totaltime:
                             finishphaseP += " "
                         self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "DEV%",None)) + "</b></small>")
                         self.FCslcd.display(u(finishphaseP))
@@ -13838,8 +13885,8 @@ class ApplicationWindow(QMainWindow):
             profile["roastingnotes"] = encodeLocal(self.qmc.roastingnotes)
             profile["cuppingnotes"] = encodeLocal(self.qmc.cuppingnotes)
             profile["timex"] = [self.float2float(x,5) for x in self.qmc.timex]
-            profile["temp1"] = [self.float2float(x,4) for x in self.qmc.temp1]
-            profile["temp2"] = [self.float2float(x,4) for x in self.qmc.temp2]
+            profile["temp1"] = [self.float2float(x,5) for x in self.qmc.temp1]
+            profile["temp2"] = [self.float2float(x,5) for x in self.qmc.temp2]
             profile["phases"] = self.qmc.phases
             profile["zmax"] = int(self.qmc.zlimit)
             profile["zmin"] = int(self.qmc.zlimit_min)
@@ -17424,48 +17471,49 @@ class ApplicationWindow(QMainWindow):
         dryphase = midphase = finishphase = coolphase = "--"
         if "totaltime" in cp:
             totaltime = cp["totaltime"]
-            #dryphase
-            if "dryphasetime" in cp:
-                dryphasetime = cp["dryphasetime"]
-                dryphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["dryphasetime"]),int(round(dryphasetime*100./totaltime)))
-                if "dry_phase_ror" in cp:
-                    dryphase += "<br>%.1f%s%s/min"%(cp["dry_phase_ror"],uchr(176),aw.qmc.mode)
-                if "dry_phase_ts" in cp:
-                    dryphase += "<br>%d"%(cp["dry_phase_ts"])
-                    if "dry_phase_ts_ET" in cp and "dry_phase_ts_BT" in cp:
-                        dryphase += " [%d-%d]"%(cp["dry_phase_ts_ET"],cp["dry_phase_ts_BT"])
-                    if "dryphaseeval" in cp:
-                        dryphase += "<br>" + d(cp["dryphaseeval"])
-            #midphase
-            if "midphasetime" in cp:
-                midphasetime = cp["midphasetime"]
-                midphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["midphasetime"]),int(round(midphasetime*100./totaltime)))
-                if "mid_phase_ror" in cp:
-                    midphase += "<br>%.1f%s%s/min"%(cp["mid_phase_ror"],uchr(176),aw.qmc.mode)
-                if "mid_phase_ts" in cp:
-                    midphase += "<br>%d"%(cp["mid_phase_ts"])
-                    if "mid_phase_ts_ET" in cp and "mid_phase_ts_BT" in cp:
-                        midphase += " [%d-%d]"%(cp["mid_phase_ts_ET"],cp["mid_phase_ts_BT"])
-                if "midphaseeval" in cp:
-                    midphase += "<br>" + d(cp["midphaseeval"])
-            #finishphase
-            if "finishphasetime" in cp:
-                finishphasetime = cp["finishphasetime"]
-                finishphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["finishphasetime"]),int(round(finishphasetime*100./totaltime)))
-                if "finish_phase_ror" in cp:
-                    finishphase += "<br>%.1f%s%s/min"%(cp["finish_phase_ror"],uchr(176),aw.qmc.mode)
-                if "finish_phase_ts" in cp:
-                    finishphase += "<br>%d"%(cp["finish_phase_ts"])
-                    if "finish_phase_ts_ET" in cp and "finish_phase_ts_BT" in cp:
-                        finishphase += " [%d-%d]"%(cp["finish_phase_ts_ET"],cp["finish_phase_ts_BT"])
-                if "finishphaseeval" in cp:
-                    finishphase += "<br>" + d(cp["finishphaseeval"])
-            #coolphase
-            if "coolphasetime" in cp:
-                coolphasetime = cp["coolphasetime"]
-                coolphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["coolphasetime"]),int(round(coolphasetime*100./totaltime)))
-                if "coolphaseeval" in cp:
-                    coolphase += "<br>" + d(cp["coolphaseeval"])
+            if totaltime:
+                #dryphase
+                if "dryphasetime" in cp:
+                    dryphasetime = cp["dryphasetime"]
+                    dryphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["dryphasetime"]),int(round(dryphasetime*100./totaltime)))
+                    if "dry_phase_ror" in cp:
+                        dryphase += "<br>%.1f%s%s/min"%(cp["dry_phase_ror"],uchr(176),aw.qmc.mode)
+                    if "dry_phase_ts" in cp:
+                        dryphase += "<br>%d"%(cp["dry_phase_ts"])
+                        if "dry_phase_ts_ET" in cp and "dry_phase_ts_BT" in cp:
+                            dryphase += " [%d-%d]"%(cp["dry_phase_ts_ET"],cp["dry_phase_ts_BT"])
+                        if "dryphaseeval" in cp:
+                            dryphase += "<br>" + d(cp["dryphaseeval"])
+                #midphase
+                if "midphasetime" in cp:
+                    midphasetime = cp["midphasetime"]
+                    midphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["midphasetime"]),int(round(midphasetime*100./totaltime)))
+                    if "mid_phase_ror" in cp:
+                        midphase += "<br>%.1f%s%s/min"%(cp["mid_phase_ror"],uchr(176),aw.qmc.mode)
+                    if "mid_phase_ts" in cp:
+                        midphase += "<br>%d"%(cp["mid_phase_ts"])
+                        if "mid_phase_ts_ET" in cp and "mid_phase_ts_BT" in cp:
+                            midphase += " [%d-%d]"%(cp["mid_phase_ts_ET"],cp["mid_phase_ts_BT"])
+                    if "midphaseeval" in cp:
+                        midphase += "<br>" + d(cp["midphaseeval"])
+                #finishphase
+                if "finishphasetime" in cp:
+                    finishphasetime = cp["finishphasetime"]
+                    finishphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["finishphasetime"]),int(round(finishphasetime*100./totaltime)))
+                    if "finish_phase_ror" in cp:
+                        finishphase += "<br>%.1f%s%s/min"%(cp["finish_phase_ror"],uchr(176),aw.qmc.mode)
+                    if "finish_phase_ts" in cp:
+                        finishphase += "<br>%d"%(cp["finish_phase_ts"])
+                        if "finish_phase_ts_ET" in cp and "finish_phase_ts_BT" in cp:
+                            finishphase += " [%d-%d]"%(cp["finish_phase_ts_ET"],cp["finish_phase_ts_BT"])
+                    if "finishphaseeval" in cp:
+                        finishphase += "<br>" + d(cp["finishphaseeval"])
+                #coolphase
+                if "coolphasetime" in cp:
+                    coolphasetime = cp["coolphasetime"]
+                    coolphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["coolphasetime"]),int(round(coolphasetime*100./totaltime)))
+                    if "coolphaseeval" in cp:
+                        coolphase += "<br>" + d(cp["coolphaseeval"])
         return dryphase, midphase, finishphase, coolphase
 
     def event2html(self,cp,time_key,BT_key=None,prev_time_key=None):
@@ -17823,7 +17871,8 @@ class ApplicationWindow(QMainWindow):
         contributors += u("Morten M") + uchr(252) + u("nchow")
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
-        contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)<br>")
+        contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
+        contributors += u(", Marco Cremonese<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -23715,7 +23764,7 @@ class WindowsDlg(ArtisanDialog):
         self.xaxislencombobox.currentIndexChanged.connect(self.xaxislenloc)
         ygridlabel = QLabel(QApplication.translate("Label", "Step",None))
         self.ygridSpinBox = QSpinBox()
-        self.ygridSpinBox.setRange(10,100)
+        self.ygridSpinBox.setRange(10,500)
         self.ygridSpinBox.setSingleStep(5)
         self.ygridSpinBox.setValue(aw.qmc.ygrid)
         self.ygridSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
@@ -27894,7 +27943,7 @@ class serialport(object):
         self.arduinoBTChannel = "2"
         self.arduinoATChannel = "None" # the channel the Ambient Temperature of the Arduino TC4 is reported as (this value will overwrite the corresponding real channel)
         self.ArduinoIsInitialized = 0
-        self.ArduinoFILT = [10,10,10,10] # Arduino Filter settings per channel in %
+        self.ArduinoFILT = [70,70,70,70] # Arduino Filter settings per channel in %
         self.HH806Winitflag = 0
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
@@ -32962,7 +33011,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         else:
             aw.qmc.PIDbuttonflag = False
         aw.showControlButton()
-            
+        
     def showControlbuttonToggle(self,i):
         if i:
             aw.qmc.Controlbuttonflag = True

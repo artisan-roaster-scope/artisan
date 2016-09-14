@@ -17,6 +17,7 @@ v1.0.0 (XX.XX.2016)
     * adds "Playback Events" function to playback background events if corresponding sliders with actions are defined
     * adds serial port to DUMMY device. If selected as main device, one can send serial commands to its serial port from alamrs and buttons
     * adds russian translations (thanks to Taras Prokopyuk)
+    * adds support for multiple-connected Yoctopuce devices (thanks to Nick Watson)
  * Changes
     * dramatically improves speed of MODBUS over serial communication (by patching the underlying pymodbus lib)
     * makes message, error and serial logs autoupdating
@@ -25,6 +26,7 @@ v1.0.0 (XX.XX.2016)
     * current slider and button definitions are now automatically saved to palette #0 on closing the events dialog such that those definitions cannot get lost accidentially by pressing a number key to quickly entering an event value during recording
     * reconstruct users environment on calling external programs on MacOS X, not to limit them to the Artisan contained limited Python environment
     * remembers playback aid settings
+    * improved RoR smoothing during recordings
  * Bug Fixes
     * improves ranking reports for mixed profiles with different temperature units
     * fixed an issue with the Arduino/TC4 communication setup
