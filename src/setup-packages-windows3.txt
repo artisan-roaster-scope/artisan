@@ -18,7 +18,7 @@ o pymodbus (py3 trunk)
 o yoctopuce 1.10.20773
 o requests 2.7.0
 o bottle 0.13 trunk
-o gevent 1.1b3
+o gevent 1.2.0
 o geventwebsocket 0.9.5
 o python-qrcode 5.1
 o win_inet_pton 1.0.1
@@ -28,6 +28,8 @@ o openpyxl 2.3.3
 
 Upgrade History:
 
+- 2016-09-18
+ . gevent 1.1.0 => 1.2.0
 - 2016-03-07
  . openpyxl 2.3.3
 - 2015-09-13 (initialized)

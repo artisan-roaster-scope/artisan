@@ -18,6 +18,7 @@ v1.0.0 (XX.XX.2016)
     * adds serial port to DUMMY device. If selected as main device, one can send serial commands to its serial port from alamrs and buttons
     * adds russian translations (thanks to Taras Prokopyuk)
     * adds support for multiple-connected Yoctopuce devices (thanks to Nick Watson)
+    * adds undo of the last entered main event by clicking its button again
  * Changes
     * dramatically improves speed of MODBUS over serial communication (by patching the underlying pymodbus lib)
     * makes message, error and serial logs autoupdating
