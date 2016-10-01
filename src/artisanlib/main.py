@@ -980,6 +980,7 @@ class tgraphcanvas(FigureCanvas):
         self.xtcurveidx = 0 # the selected extra background courve to be displayed
         self.delta1B,self.delta2B = [],[]
         self.timeindexB = [-1,0,0,0,0,0,0,0]
+        self.TP_time_B = -1
         self.backgroundEvents = [] #indexes of background events
         self.backgroundEtypes = []
         self.backgroundEvalues = []
@@ -3483,7 +3484,7 @@ class tgraphcanvas(FigureCanvas):
                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
         return [temp_anno, time_anno]
 
-    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,path_effects=None):
+    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,path_effects=None,TP_time=-1):
         ystep_down = ystep_up = 0
         anno_artists = []
         #Add markers for CHARGE
@@ -3509,6 +3510,16 @@ class tgraphcanvas(FigureCanvas):
                     a = 1.
                     e = 0
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a)
+                elif TP_time > -1:
+                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),u(self.stringfromseconds(TP_time,False)))
+                    if timeindex2:
+                        a = aw.qmc.backgroundalpha
+                    else:
+                        a = 1.
+                    e = 0
+                    TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
+                    anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a)                    
                 #Add Dry End markers
                 if timeindex[1]:
                     tidx = timeindex[1]
@@ -4042,7 +4053,7 @@ class tgraphcanvas(FigureCanvas):
                                 startB = self.timeB[self.timeindexB[0]]
                             else:
                                 startB = 0
-                        self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex)
+                        self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex,TP_time=self.TP_time_B)
                         
                     #END of Background
                     
@@ -10928,7 +10939,7 @@ class ApplicationWindow(QMainWindow):
                     if self.qmc.timeindex[1]: # after DRY
                         ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
                         if totaltime:
-                        	dryphaseP = fmtstr%(ts*100./totaltime)
+                            dryphaseP = fmtstr%(ts*100./totaltime)
                         else:
                             dryphaseP = " --- "
                         if not aw.qmc.LCDdecimalplaces and totaltime:
@@ -12541,6 +12552,10 @@ class ApplicationWindow(QMainWindow):
                 timex = profile["extratimex"]
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.extratimexB = timex
+                try:
+                    self.qmc.TP_time_B = profile["computed"]["TP_time"]
+                except:
+                    pass
                 b1 = self.qmc.smooth_list(tb,t1,window_len=self.qmc.curvefilter)
                 b2 = self.qmc.smooth_list(tb,t2,window_len=self.qmc.curvefilter)
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
@@ -18530,6 +18545,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.backgroundEvalues, self.qmc.backgroundEStrings,self.qmc.backgroundFlavors = [],[],[]
         self.qmc.timeindexB = [-1,0,0,0,0,0,0,0]
         self.qmc.backmoveflag = 1
+        self.qmc.TP_time_B = -1
 
     def switchETBT(self):
         t2 = aw.qmc.temp2
@@ -23788,10 +23804,10 @@ class autosaveDlg(ArtisanDialog):
         self.pathEdit.setText(filename)
 
     def autoChanged(self):
-        aw.qmc.autosavepath = str(self.pathEdit.text())
+        aw.qmc.autosavepath = u(self.pathEdit.text())
         if self.autocheckbox.isChecked():
             aw.qmc.autosaveflag = 1
-            aw.qmc.autosaveprefix = self.prefixEdit.text()
+            aw.qmc.autosaveprefix = u(self.prefixEdit.text())
             message = QApplication.translate("Message","Autosave ON. Prefix: {0}").format(self.prefixEdit.text())
             aw.sendmessage(message)
         else:
@@ -26476,7 +26492,7 @@ class flavorDlg(ArtisanDialog):
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(0,1))
         backButton = QPushButton(QApplication.translate("Button","OK",None))
-        backButton.clicked.connect(self.close)
+        backButton.clicked.connect(lambda _:self.close())
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Background", None))
         if aw.qmc.flavorbackgroundflag:
             self.backgroundCheck.setChecked(True)
@@ -26672,13 +26688,13 @@ class flavorDlg(ArtisanDialog):
         aw.qmc.flavorchart()
 
     def closeEvent(self,_):
-        self.savetable()
-        aw.qmc.safesaveflag = True
-        self.accept()
-        aw.qmc.redraw(recomputeAllDeltas=False)
+        self.close()
 
     def close(self):
-        self.closeEvent(None)
+        self.savetable()
+        aw.qmc.safesaveflag = True
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        self.accept()
 
 #################################################################
 #################### BACKGROUND DIALOG  #########################
@@ -27524,7 +27540,7 @@ class ArtisanModbusUdpClient(ModbusUdpClient):
         self.socket = None
         self.timeout  = kwargs.get('timeout',  Defaults.Timeout)
         #BaseModbusClient.__init__(self, framer(ClientDecoder()),**kwargs)
-        super(BaseModbusClient,self).__init__(framer(ClientDecoder()),**kwargs)
+        super(ModbusUdpClient,self).__init__(framer(ClientDecoder()),**kwargs)
     
     def connect(self):
         ''' Connect to the modbus tcp server
@@ -27668,10 +27684,17 @@ class modbusport(object):
                         stopbits=self.stopbits,
                         timeout=self.timeout)  
                 elif self.type == 3: # TCP
-                    self.master = ModbusTcpClient(
-                            host=self.host, 
-                            port=self.port,
-                            )
+                    try:
+                        self.master = ModbusTcpClient(
+                                host=self.host, 
+                                port=self.port,
+                                timeout=0.5, #self.timeout
+                                )
+                    except:
+                        self.master = ModbusTcpClient(
+                                host=self.host, 
+                                port=self.port,
+                                )
                 elif self.type == 4: # UDP
                     try:
                         self.master = ArtisanModbusUdpClient(

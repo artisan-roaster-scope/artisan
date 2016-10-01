@@ -19,6 +19,7 @@ v1.0.0 (XX.XX.2016)
     * adds russian translations (thanks to Taras Prokopyuk)
     * adds support for multiple-connected Yoctopuce devices (thanks to Nick Watson)
     * adds undo of the last entered main event by clicking its button again
+    * adds TP annotation on background profiles
  * Changes
     * dramatically improves speed of MODBUS over serial communication (by patching the underlying pymodbus lib)
     * makes message, error and serial logs autoupdating
