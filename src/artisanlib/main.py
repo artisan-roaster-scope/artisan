@@ -925,6 +925,7 @@ class tgraphcanvas(FigureCanvas):
         
         self.moisture_greens = 0.
         self.moisture_roasted = 0.
+        self.greens_temp = 0.
         
         self.beansize = 0.0
 
@@ -3258,6 +3259,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ambient_humidity = 0.
                     self.beansize = 0.
                     self.moisture_greens = 0.
+                    self.greens_temp = 0.
                     self.volumeCalcWeightInStr = ""
                     self.volumeCalcWeightOutStr = ""
                 else:
@@ -11623,7 +11625,11 @@ class ApplicationWindow(QMainWindow):
             qd = QDir(u(cmd))
             current = QDir.current()
             QDir.setCurrent(u(aw.getAppPath()))
-            prg_file = u(qd.absolutePath())
+            if platf == 'Windows' and sys.version < '3':
+                import locale
+                prg_file = u(qd.absolutePath()).encode(locale.getpreferredencoding())
+            else:
+                prg_file = u(qd.absolutePath())
             my_env = self.calc_env()
             subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False,env=my_env)
             QDir.setCurrent(current.absolutePath())
@@ -13842,6 +13848,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.moisture_greens = profile["moisture_greens"]
             else:
                 self.qmc.moisture_greens = 0.
+            if "greens_temp" in profile:
+                self.qmc.greens_temp = profile["greens_temp"]
+            else:
+                self.qmc.greens_temp = 0.
             if "moisture_roasted" in profile:
                 self.qmc.moisture_roasted = profile["moisture_roasted"]
             else:
@@ -14282,6 +14292,7 @@ class ApplicationWindow(QMainWindow):
             profile["ambientTemp"] = self.qmc.ambientTemp
             profile["ambient_humidity"] = self.qmc.ambient_humidity
             profile["moisture_greens"] = self.qmc.moisture_greens
+            profile["greens_temp"] = self.qmc.greens_temp
             profile["moisture_roasted"] = self.qmc.moisture_roasted
             profile["extradevices"] = self.qmc.extradevices
             profile["extraname1"] = [encodeLocal(n) for n in self.qmc.extraname1]
@@ -22356,6 +22367,18 @@ class editGraphDlg(ArtisanDialog):
         self.colorSystemComboBox = QComboBox()
         self.colorSystemComboBox.addItems(aw.qmc.color_systems)
         self.colorSystemComboBox.setCurrentIndex(aw.qmc.color_system_idx)
+        #Greens Temp
+        greens_temp_label = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
+        greens_temp_unit_label = QLabel(aw.qmc.mode)
+        self.greens_temp_edit = QLineEdit()
+        self.greens_temp_edit.setText(str(aw.qmc.greens_temp))
+        self.greens_temp_edit.setMaximumWidth(50)
+        self.greens_temp_edit.setValidator(QDoubleValidator(0., 100., 1, self.greens_temp_edit))
+        self.greens_temp_edit.setAlignment(Qt.AlignRight)
+        greens_temp = QHBoxLayout()
+        greens_temp.addWidget(self.greens_temp_edit)
+        greens_temp.addWidget(greens_temp_unit_label)
+        greens_temp.addStretch()        
         #Moisture Greens
         moisture_greens_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Greens",None)) + "</b>")
         moisture_greens_unit_label = QLabel(QApplication.translate("Label", "%",None))
@@ -22363,7 +22386,7 @@ class editGraphDlg(ArtisanDialog):
         self.moisture_greens_edit.setText(str(aw.qmc.moisture_greens))
         self.moisture_greens_edit.setMaximumWidth(50)
         self.moisture_greens_edit.setValidator(QDoubleValidator(0., 100., 1, self.moisture_greens_edit))
-        self.moisture_greens_edit.setAlignment(Qt.AlignRight)
+        self.moisture_greens_edit.setAlignment(Qt.AlignRight)                
         #Moisture Roasted
         #bag humidity
         moisture_roasted_label = QLabel("<b>" + u(QApplication.translate("Label", "Roasted",None)) + "</b>")
@@ -22656,23 +22679,25 @@ class editGraphDlg(ArtisanDialog):
         humidityGrid.addWidget(moisture_greens_label,0,0)
         humidityGrid.addWidget(self.moisture_greens_edit,0,1)
         humidityGrid.addWidget(moisture_greens_unit_label,0,2)
-        humidityGrid.addLayout(moisture_roasted,0,6)
+        humidityGrid.addLayout(moisture_roasted,0,5)
+        humidityGrid.addWidget(greens_temp_label,0,9)
+        humidityGrid.addLayout(greens_temp,0,10)
 #        humidityGrid.addWidget(moisture_roasted_label,1,0)
 #        humidityGrid.addWidget(self.moisture_roasted_edit,1,1)
 #        humidityGrid.addWidget(moisture_roasted_unit_label,1,2)
-        humidityGrid.addWidget(ambientSourceLabel,0,10,Qt.AlignRight)
+        humidityGrid.addWidget(ambientSourceLabel,0,11,Qt.AlignRight)
         humidityGrid.addWidget(ambientlabel,2,0)
         humidityGrid.addWidget(self.ambient_humidity_edit,2,1)
         humidityGrid.addWidget(ambient_humidity_unit_label,2,2)
 #        humidityGrid.addWidget(ambient_humidity_at_label,2,4)
 #        humidityGrid.addWidget(self.ambientedit,2,6)
 #        humidityGrid.addWidget(ambientunitslabel,2,7)
-        humidityGrid.addLayout(ambient,2,6)
-        humidityGrid.addWidget(updateAmbientTemp,2,9)
-        humidityGrid.addWidget(self.ambientComboBox,2,10,Qt.AlignRight)
-        humidityGrid.setColumnMinimumWidth(3, 10)
-        humidityGrid.setColumnMinimumWidth(5, 10)
-        humidityGrid.setColumnMinimumWidth(8, 10)
+        humidityGrid.addLayout(ambient,2,5)
+        humidityGrid.addWidget(updateAmbientTemp,2,10)
+        humidityGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignRight)
+        humidityGrid.setColumnMinimumWidth(3, 11)
+        humidityGrid.setColumnMinimumWidth(5, 11)
+        humidityGrid.setColumnMinimumWidth(8, 11)
         roastFlagsLayout = QHBoxLayout()
         roastFlagsGrid = QGridLayout()
         roastFlagsGrid.addWidget(self.lowFC,0,0)
@@ -23610,6 +23635,11 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.whole_color = int(str(self.whole_color_edit.text()))
         aw.qmc.ground_color = int(str(self.ground_color_edit.text()))
         aw.qmc.color_system_idx = self.colorSystemComboBox.currentIndex()
+        #update beans temperature
+        try:
+            aw.qmc.greens_temp = float(str(self.greens_temp_edit.text()))
+        except Exception:
+            aw.qmc.greens_temp = 0.
         #update greens moisture
         try:
             aw.qmc.moisture_greens = float(str(self.moisture_greens_edit.text()))
@@ -28749,7 +28779,11 @@ class serialport(object):
                 startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
                 startupinfo.wShowWindow = subprocess.SW_HIDE
             
-            p = subprocess.Popen(aw.ser.externalprogram,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
+            if platf == 'Windows' and sys.version < '3':
+                import locale
+                p = subprocess.Popen(aw.ser.externalprogram.encode(locale.getpreferredencoding()),env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
+            else:
+                p = subprocess.Popen(aw.ser.externalprogram,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
             output = p.communicate()[0]
             
             tx = aw.qmc.timeclock.elapsed()/1000.
@@ -33947,7 +33981,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         fileName = aw.ArtisanOpenFileDialog()
         if fileName:
             self.outprogramedit.setText(fileName)
-            aw.ser.externaloutprogram = str(self.outprogramedit.text())
+            aw.ser.externaloutprogram = u(self.outprogramedit.text())
 
     def enableDisableAddDeleteButtons(self):
         if len(aw.qmc.extradevices) >= aw.nLCDS:
@@ -34164,7 +34198,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.ser.arduinoATChannel = str(self.arduinoATComboBox.currentText())
             aw.ser.ArduinoFILT = [sb.value() for sb in self.FILTspinBoxes]
             
-            aw.ser.externalprogram = str(self.programedit.text())
+            aw.ser.externalprogram = u(self.programedit.text())
             
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA
@@ -34230,7 +34264,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
                 message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)
             elif self.programButton.isChecked():
-                meter = str(self.programedit.text())
+                meter = u(self.programedit.text())
                 aw.ser.externalprogram = meter
                 aw.qmc.device = 27
                 message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)

@@ -1,7 +1,7 @@
 Current Versions:
 
 o Python 2.7.11
-o pyserial 3.2.1
+o pyserial 2.7 (3.x not supported under Windows XP)
 o QT 4.8.7
 o PyQt 4.11.4
 o numpy 1.10.4
@@ -36,7 +36,7 @@ Upgrade History:
 
 - 2016-10-15
  . yoctopuce 1.10.22936 => 1.10.25534
- . pyserial 2.7 => 3.2.1
+ . pyserial 2.7
 - 2016-09-18
  . gevent 1.1.0 => 1.2.0
 - 2016-03-07
