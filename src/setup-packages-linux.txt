@@ -1,20 +1,20 @@
 Current Versions:
 
 o Python 2.7.10
-o pyserial 2.7
+o pyserial 3.2.1
 o QT 5.4.2
 o SIP 4.16.8
 o PyQt 4.11.4
-o numpy 1.9.2
+o numpy 1.11.2
 o scipy 0.15.1
-o matplotlib 1.4.3
+o matplotlib 1.5.3
 (o MinimalModbus 0.5)
 o pyemf 2.0.0
 ( o cx_freeze (tip from 2013-03-26) )
-o patchelf
+o patchelf v0.9
 o bbfreeze 1.1.3
 o pymodbus 1.3.0
-o yoctopuce 1.10.20384
+o yoctopuce 1.10.25534
 o requests 2.7.0
 o gevent-1.2.0
 o bottle 0.12.7
@@ -31,6 +31,14 @@ CHECK FOR UPDATES
 
 Upgrade History:
 
+- 2016-10-15
+ . yoctopuce 1.10.22936 => 1.10.25534
+ . pyserial 2.7 => 3.2.1
+- 2016-10-12
+ . patchelf => 0.9
+ . matplotlib => 1.5.3
+ . scipy 0.15.1 => 0.18.1
+ . numpy 1.9.2 => 1.11.2
 - 2016-09-18
  . gevent 1.1.0 => 1.2.0
 - 2016-03-07
@@ -266,6 +274,10 @@ on Ubuntu with  the system Python 2.7.3:
 # python2.7 setup.py build
 # sudo python2.7 setup.py install
 
+or pip install
+
+# sudo -H /usr/local/bin/python2.7 -m pip install numpy --no-binary :all:
+NOTE: the no-binary is important to avoid issues on building (Bad Value: Not enough room for program headers, try linking with -N) with patchelf
 
 7) scipy
 (depends on blas, lapack and gfortran)
@@ -274,11 +286,22 @@ on Ubuntu with  the system Python 2.7.3:
 # sudo python2.7 setup.py install
 
 
+or pip install
+
+# sudo -H /usr/local/bin/python2.7 -m pip install scipy --no-binary :all:
+NOTE: the no-binary is important to avoid issues on building (Bad Value: Not enough room for program headers, try linking with -N) with patchelf
+
+
 8) matplotlib
 (depends on libpng)
 
 # python2.7 setup.py build
 # sudo python2.7 setup.py install
+
+or pip install
+
+# sudo -H /usr/local/bin/python2.7 -m pip install matplotlib==1.5.3 --no-binary :all:
+NOTE: the no-binary is important to avoid issues on building (Bad Value: Not enough room for program headers, try linking with -N) with patchelf
 
 
 to minimize binary builds remove test and sample data
@@ -303,6 +326,7 @@ NOTE: replace site-packages by dist-packages if using the default Ubuntu python 
 
 11) patchelf
 
+# sudo ./bootstrap.sh
 # ./configure
 # make
 # sudo make install
@@ -363,6 +387,11 @@ download from https://pypi.python.org/pypi/yoctopuce/1.10.16490
 copy shared libs
 # sudo mkdir /usr/local/lib/python2.7/site-packages/yoctopuce/cdll
 # sudo cp yoctopuce/cdll/* /usr/local/lib/python2.7/site-packages/yoctopuce/cdll
+
+alt:
+
+# sudo -H /usr/local/bin/pip install yoctopuce --upgrade
+
 
 16) requests 2.3.0
 

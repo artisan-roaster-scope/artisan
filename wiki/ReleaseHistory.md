@@ -39,7 +39,8 @@ v1.0.0 (XX.XX.2016)
     * fixes image paths in HTML reports
     * fixes hangs and accent character support on "Playback Aid"
     * improved autoDROP
-    * fixes WebLCDs on Mac OS X    
+    * fixes WebLCDs on Mac OS X   
+    * fixes Fuji PXG duty overflow on 0% 
     * various stability improvements
     
 ----

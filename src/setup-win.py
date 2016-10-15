@@ -26,7 +26,8 @@ INCLUDES = [
             "scipy.interpolate",
             ]
 
-EXCLUDES = ['_tkagg',
+EXCLUDES = ['gevent._socket3',
+            '_tkagg',
             '_ps',
             '_fltkagg',
             'Tkinter',

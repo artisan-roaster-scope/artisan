@@ -1,11 +1,11 @@
 #!/bin/sh
 export MACOSX_DEPLOYMENT_TARGET=10.7
-export PYTHON="/Library/Frameworks/Python.framework/Versions/3.4"
+export PYTHON=/Library/Frameworks/Python.framework/Versions/3.4
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/3.4/lib/python3.4/site-packages"
 
 export PATH=$PYTHON/bin:$PYTHON:/lib:$PATH
 
-export QT_PATH=/Users/luther/Qt5.6.1/5.6/clang_64
+export QT_PATH=~/Qt5.6.1/5.6/clang_64
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 
@@ -15,5 +15,5 @@ $QT_PATH/bin/lrelease -verbose artisan.pro
 
 # distribution
 rm -rf build dist
-python3.4 setup-mac3.py py2app
+$PYTHON/bin/python3.4 setup-mac3.py py2app
 

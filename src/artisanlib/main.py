@@ -710,7 +710,7 @@ class tgraphcanvas(FigureCanvas):
 
         #show phases LCDs during roasts
         self.phasesLCDflag = True
-        self.phasesLCDmode = 0 # one of 0: time, 1: percentage, 2: temp mode
+        self.phasesLCDmode = 1 # one of 0: time, 1: percentage, 2: temp mode
         
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
@@ -754,6 +754,12 @@ class tgraphcanvas(FigureCanvas):
         self.phidgetRemoteFlag = False
         self.phidgetServerID = ""
         self.phidgetPassword = ""
+        
+        self.yoctoRemoteFlag = False
+        self.yoctoServerID = "127.0.0.1"
+        self.YOCTOchanUnit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
+        self.YOCTOchan1Unit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
+        self.YOCTOchan2Unit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
         
         self.phidget1018_async = [False]*8
         self.phidget1018_raws = [False]*8
@@ -870,7 +876,7 @@ class tgraphcanvas(FigureCanvas):
         self.delta_ax = self.ax.twinx()
 
         #legend location
-        self.legendloc = 2
+        self.legendloc = 7
         self.fig.subplots_adjust(
             # all values in percent
             top=0.93, # the top of the subplots of the figure (default: 0.9)
@@ -908,6 +914,7 @@ class tgraphcanvas(FigureCanvas):
         self.alignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP, 7:ALL
 
         self.roastpropertiesflag = 1  #resets roast properties if not zero
+        self.roastpropertiesAutoOpenFlag = 0  #open roast properties dialog if not zero
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None)
         self.title_show_always = False
         self.ambientTemp = 0.
@@ -1258,6 +1265,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.temporarysetsv = None #set by sample() to a new SV to be send to the PID by updategraphics() within the GUI thread as this moves the SV slider        
         self.temporary_error = None # set by adderror() to a new error message, send to the message line by updategraphics()
+        self.temporarymoveslider = None # set by pidcontrol.setEnergy (indirectly called from sample())
+                # holds tuple (slidernr,value) and is executued and reset by updategraphics
         
         self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>]q
 
@@ -1489,7 +1498,7 @@ class tgraphcanvas(FigureCanvas):
         self.program_t6 = -1
 
         #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT
-        self.dutycycle = 0.
+        self.dutycycle = -1
         self.dutycycleTX = 0.
         self.currentpidsv = 0.
 
@@ -1952,6 +1961,13 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         aw.pidcontrol.setSV(self.temporarysetsv,init=False)
                 self.temporarysetsv = None
+                
+                #check move slider pending actions
+                if self.temporarymoveslider:
+                    slidernr,value = self.temporarymoveslider
+                    aw.moveslider(slidernr,value) # move slider  
+                    aw.fireslideraction(slidernr) # fire action
+                self.temporarymoveslider = None
                 
                 #write error message
                 if self.temporary_error != None:
@@ -3533,7 +3549,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                 #Add 1Cs markers            
                 if timeindex[2]:
                     tidx = timeindex[2]
@@ -3550,7 +3566,7 @@ class tgraphcanvas(FigureCanvas):
                         e = 0
                     else:
                         e = -80
-                    self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                 #Add 1Ce markers
                 if timeindex[3]:
                     tidx = timeindex[3]
@@ -3564,7 +3580,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                     #add a water mark if FCs
                     if timeindex[2] and not timeindex2:
                         self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -3584,7 +3600,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                 #Add 2Ce markers
                 if timeindex[5]:
                     tidx = timeindex[5]
@@ -3598,7 +3614,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                     #do water mark if SCs
                     if timeindex[4] and not timeindex2:
                         self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -3627,7 +3643,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
-                    self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                    anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                     
                     #do water mark if FCs, but no FCe nor SCs nor SCe
                     if timeindex[2] and not timeindex[3] and not timeindex[4] and not timeindex[5] and not timeindex2:
@@ -3641,6 +3657,7 @@ class tgraphcanvas(FigureCanvas):
                     endidx = self.ax.get_xlim()[1] # or timex[-1]
                     if timex[tidx] < endidx:
                         self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None)#,lod=False)                        
+                aw.qmc.l_annotations = anno_artists
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -4633,14 +4650,17 @@ class tgraphcanvas(FigureCanvas):
         self.redraw()
 
     #converts a loaded profile to a different temperature scale. t input is the requested mode (F or C).
-    def convertTemperature(self,t):
+    def convertTemperature(self,t,silent=False):
         #verify there is a loaded profile
         profilelength = len(self.timex)
         if profilelength > 0:
             if t == "F":
-                string = QApplication.translate("Message", "Convert profile data to Fahrenheit?",None)
-                reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None),string,
-                        QMessageBox.Yes|QMessageBox.Cancel)
+                if silent:
+                    reply = QMessageBox.Yes
+                else:
+                    string = QApplication.translate("Message", "Convert profile data to Fahrenheit?",None)
+                    reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None),string,
+                            QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Cancel:
                     return 
                 elif reply == QMessageBox.Yes:
@@ -4679,18 +4699,22 @@ class tgraphcanvas(FigureCanvas):
                             self.stemp2B[i] = self.fromCtoF(self.stemp2B[i])
 
                         self.fahrenheitMode()
-                        aw.sendmessage(QApplication.translate("Message","Profile changed to Fahrenheit", None))
+                        if not silent:
+                            aw.sendmessage(QApplication.translate("Message","Profile changed to Fahrenheit", None))
 
-                    else:
+                    elif not silent:
                         QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Temperature",None),
                                                 QApplication.translate("Message", "Unable to comply. You already are in Fahrenheit", None))
                         aw.sendmessage(QApplication.translate("Message","Profile not changed", None))
                         return
 
             elif t == "C":
-                string = QApplication.translate("Message", "Convert profile data to Celsius?",None)
-                reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None),string,
-                        QMessageBox.Yes|QMessageBox.Cancel)
+                if silent:
+                    reply = QMessageBox.Yes
+                else:
+                    string = QApplication.translate("Message", "Convert profile data to Celsius?",None)
+                    reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None),string,
+                            QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Cancel:
                     return 
                 elif reply == QMessageBox.Yes:
@@ -4722,18 +4746,19 @@ class tgraphcanvas(FigureCanvas):
                             self.stemp1B[i] = self.fromFtoC(self.stemp1B[i])
                             self.stemp2B[i] = self.fromFtoC(self.stemp2B[i])
 
-                    else:
+                    elif not silent:
                         QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Temperature",None),
                                                 QApplication.translate("Message", "Unable to comply. You already are in Celsius",None))
                         aw.sendmessage(QApplication.translate("Message","Profile not changed", None))
                         return
 
                     self.celsiusMode()
-                    aw.sendmessage(QApplication.translate("Message","Profile changed to Celsius", None))
+                    if not silent:
+                        aw.sendmessage(QApplication.translate("Message","Profile changed to Celsius", None))
+            if not silent:
+                self.redraw(recomputeAllDeltas=True,smooth=True)
 
-            self.redraw(recomputeAllDeltas=True,smooth=True)
-
-        else:
+        elif not silent:
             QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Scale",None),
                                           QApplication.translate("Message", "No profile data found",None))
 
@@ -5149,6 +5174,11 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setVisible(True)
             aw.phasesLCDs.hide()
             aw.hideEventsMinieditor()
+            try:
+                if aw.clusterEventsFlag:
+                    aw.clusterEvents()
+            except:
+                pass
             if aw.qmc.autosaveflag and aw.qmc.autosavepath:
                 aw.automaticsave()
         except Exception as ex:
@@ -5187,10 +5217,16 @@ class tgraphcanvas(FigureCanvas):
                     removed = False
                     if aw.button_8.isFlat() and self.timeindex[1] > -1:
                         # undo wrongly set CHARGE
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "00:00", None))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
-                            self.l_annotations[-1].remove()
-                            self.l_annotations[-2].remove()
+                            try:
+                                self.l_annotations[-1].remove()
+                            except:
+                                pass
+                            try:
+                                self.l_annotations[-2].remove()
+                            except:
+                                pass
                             self.l_annotations = self.l_annotations[:-2]                            
                             self.timeindex[0] = -1
                             self.xaxistosm(redraw=False)
@@ -5215,7 +5251,7 @@ class tgraphcanvas(FigureCanvas):
                                 aw.pidcontrol.pidOn()
                         self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "00:00", None))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
                         t2 = self.temp2[self.timeindex[0]]
                         tx = self.timex[self.timeindex[0]]
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
@@ -5268,6 +5304,8 @@ class tgraphcanvas(FigureCanvas):
                     aw.sendmessage(message) 
                 except Exception:
                     pass
+                if aw.qmc.roastpropertiesAutoOpenFlag:
+                    aw.editgraph()
 
     # called from sample() and marks the autodetected TP visually on the graph
     def markTP(self):
@@ -5304,16 +5342,18 @@ class tgraphcanvas(FigureCanvas):
                     self.safesaveflag = True
                     
                     removed = False
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
                     if aw.button_19.isFlat() and self.timeindex[1] > 0:
                         # undo wrongly set DRY
-                        
-                        st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
+                        st = self.stringfromseconds(self.timex[self.timeindex[1]]-start)
                         DE_str = aw.arabicReshape(QApplication.translate("Scope Annotation","DE {0}", None).format(st))
-                        
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == DE_str:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
-                            self.l_annotations = self.l_annotations[:-2]  
+                            self.l_annotations = self.l_annotations[:-2] 
                             self.timeindex[1] = 0
                             removed = True
                     else:
@@ -5329,7 +5369,7 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.phasesbuttonflag:
                             self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
                         #calculate time elapsed since charge time
-                        st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
+                        st = self.stringfromseconds(self.timex[self.timeindex[1]]-start)
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE {0}", None).format(st))
                         #anotate temperature
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
@@ -5384,9 +5424,13 @@ class tgraphcanvas(FigureCanvas):
                     self.safesaveflag = True
                     
                     removed = False
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
                     if aw.button_3.isFlat() and self.timeindex[2] > 0:
                         # undo wrongly set FCs
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[2]]-start)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -5407,7 +5451,7 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.phasesbuttonflag:
                             self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
                         #calculate time elapsed since charge time
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[2]]-start)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         if self.timeindex[1]:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
@@ -5463,9 +5507,13 @@ class tgraphcanvas(FigureCanvas):
                     self.safesaveflag = True
                     
                     removed = False
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
                     if aw.button_4.isFlat() and self.timeindex[3] > 0:
                         # undo wrongly set FCe
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[3]]-start)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -5483,7 +5531,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 return
                         #calculate time elapsed since charge time
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[3]]-start)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
@@ -5539,9 +5587,13 @@ class tgraphcanvas(FigureCanvas):
                     self.safesaveflag = True
                     
                     removed = False
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
                     if aw.button_5.isFlat() and self.timeindex[4] > 0:
                         # undo wrongly set FCs
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[4]]-start)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -5558,7 +5610,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[4] = len(self.timex)-1
                             else:
                                 return
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[4]]-start)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         if self.timeindex[3]:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
@@ -5621,9 +5673,13 @@ class tgraphcanvas(FigureCanvas):
                     self.safesaveflag = True
                     
                     removed = False
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
                     if aw.button_6.isFlat() and self.timeindex[5] > 0:
                         # undo wrongly set FCs
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[5]]-start)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -5640,7 +5696,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[5] = len(self.timex)-1
                             else:
                                 return
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[5]]-start)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
@@ -5705,9 +5761,13 @@ class tgraphcanvas(FigureCanvas):
                     self.safesaveflag = True
                     
                     removed = False
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
                     if aw.button_9.isFlat() and self.timeindex[6] > 0:
                         # undo wrongly set FCs
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[6]]-start)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
                             self.l_annotations[-2].remove()
@@ -5730,7 +5790,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.timeindex[6] = len(self.timex)-1
                             else:
                                 return
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[6]]-start)))
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         if self.timeindex[5]:
                             self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
@@ -5883,10 +5943,14 @@ class tgraphcanvas(FigureCanvas):
                     self.safesaveflag = True
                     
                     removed = False
+                    if self.timeindex[0] > -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
                     if aw.button_20.isFlat() and self.timeindex[7] > 0:
                         # undo wrongly set COOL
                         
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[7]] - start)))
                         
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.l_annotations[-1].remove()
@@ -5906,7 +5970,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 return
                         #calculate time elapsed since charge time
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE {0}", None).format(self.stringfromseconds(self.timex[self.timeindex[7]] - start)))
                         #anotate temperature
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
@@ -6414,7 +6478,7 @@ class tgraphcanvas(FigureCanvas):
 
                 if self.statisticsflags[0]:
                     statsprop = aw.mpl_fontproperties.copy()
-                    statsprop.set_size(13)
+                    statsprop.set_size(11)
                     self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ dryphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
                     if self.timeindex[2]: # only if FCs exists
                         self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + midphaseP+"%",color=self.palette["text"],ha="center",fontproperties=statsprop)
@@ -6464,7 +6528,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.statisticsflags[2] or self.statisticsflags[4] or self.statisticsflags[5]:
                     #Write flavor estimation
                     statsprop = aw.mpl_fontproperties.copy()
-                    statsprop.set_size(13)
+                    statsprop.set_size(11)
                     self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontproperties=statsprop)
                     if self.timeindex[2]: # only if FCs exists
                         self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontproperties=statsprop)
@@ -8543,7 +8607,7 @@ class SampleThread(QThread):
                         if aw.qmc.BTcurve:
                             aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
                             
-                    #we will the temporary smoothed ET/BT data arrays
+                    #we populate the temporary smoothed ET/BT data arrays
                     cf = aw.qmc.curvefilter
                     if self.temp_decay_weights == None or len(self.temp_decay_weights) != cf: # recompute only on changes
                         self.temp_decay_weights = numpy.arange(1,cf+1)
@@ -8611,9 +8675,9 @@ class SampleThread(QThread):
                         if rateofchange2plot > 35 or rateofchange2plot < -35:
                             rateofchange2plot = None
                     else:
-                        if rateofchange1plot > 35 or rateofchange1plot < -65:
+                        if rateofchange1plot > 95 or rateofchange1plot < -95:
                             rateofchange1plot = None
-                        if rateofchange2plot > 35 or rateofchange2plot < -65:
+                        if rateofchange2plot > 95 or rateofchange2plot < -95:
                             rateofchange2plot = None
                     # append new data to the rateofchange
                     if local_flagstart:
@@ -8711,7 +8775,7 @@ class SampleThread(QThread):
                             if sv != None and sv != aw.pidcontrol.sv:
                                 sv = max(0,sv) # we don't send SV < 0
                                 aw.qmc.temporarysetsv = sv
-                                # aw.pidcontrol.setSV(sv,init=False) # this is called in updategraphics() within the GUI thread to move the sliders
+                                # aw.pidcontrol.setSV(sv,init=False) # this is called in () within the GUI thread to move the sliders
                         #update SV on FujiPIDs
                         elif aw.qmc.device == 0 and aw.fujipid.followBackground:
                             # calculate actual SV
@@ -9074,6 +9138,7 @@ class ApplicationWindow(QMainWindow):
         self.eventquantifiermin = [0,0,0,0]
         self.eventquantifiermax = [100,100,100,100]
         self.eventquantifiercoarse = [0,0,0,0]
+        self.clusterEventsFlag = False
         self.eventquantifierlinspaces = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
         self.eventquantifiersteps = 10
         self.eventquantifierthresholdfine = 1.5
@@ -9208,6 +9273,14 @@ class ApplicationWindow(QMainWindow):
         fileConvertPDFAction = QAction(QApplication.translate("Menu", "PDF...",None),self)
         fileConvertPDFAction.triggered.connect(self.fileConvertPDF)
         self.exportMenu.addAction(fileConvertPDFAction)
+        
+        fileConvertFahrenheitAction = QAction(QApplication.translate("Menu", "Fahrenheit...",None),self)
+        fileConvertFahrenheitAction.triggered.connect(self.fileConvertToFahrenheit)
+        self.exportMenu.addAction(fileConvertFahrenheitAction)
+        
+        fileConvertCelsiusAction = QAction(QApplication.translate("Menu", "Celsius...",None),self)
+        fileConvertCelsiusAction.triggered.connect(self.fileConvertToCelsius)
+        self.exportMenu.addAction(fileConvertCelsiusAction)
         
 
         self.fileMenu.addSeparator()
@@ -10100,6 +10173,7 @@ class ApplicationWindow(QMainWindow):
         #10 palettes of buttons
         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
         self.buttonpalettemaxlen = [14]*10  #keeps max len of each palette
+        self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
 
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
@@ -10482,6 +10556,80 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
+    # order event table by time
+    def orderEvents(self):
+        nevents = len(aw.qmc.specialevents)
+        if nevents:
+            for i in range(nevents-1):
+                if aw.qmc.specialevents[i] > aw.qmc.specialevents[i+1]:
+                    itime = aw.qmc.specialevents[i]
+                    itype = aw.qmc.specialeventstype[i]
+                    istring = aw.qmc.specialeventsStrings[i]
+                    ivalue = aw.qmc.specialeventsvalue[i]
+                    aw.qmc.specialevents[i] = aw.qmc.specialevents[i+1]
+                    aw.qmc.specialeventstype[i] = aw.qmc.specialeventstype[i+1]
+                    aw.qmc.specialeventsStrings[i] = aw.qmc.specialeventsStrings[i+1]
+                    aw.qmc.specialeventsvalue[i] = aw.qmc.specialeventsvalue[i+1]
+                    aw.qmc.specialevents[i+1] = itime
+                    aw.qmc.specialeventstype[i+1] = itype
+                    aw.qmc.specialeventsStrings[i+1] = istring
+                    aw.qmc.specialeventsvalue[i+1] = ivalue
+                    self.orderEvents()
+                    return
+
+    # if only_active then only the event types with quantifiers activated are grouped
+    def clusterEvents(self,only_active=False):
+        for i in range(4):
+            if not only_active or aw.eventquantifieractive[i]:
+                self.clusterEventsType(i)
+            
+    # cluster of events of the given type (0-3)
+    def clusterEventsType(self,type):
+        nevents = len(aw.qmc.specialevents)
+        if nevents:
+            # first order the events table
+            self.orderEvents()
+            # second detect the minimum time span between two events (could be equal to the sampling rate)
+            min_span = None
+            last_event_idx = None # index of last event analyzed
+            for i in range(len(aw.qmc.specialevents)):
+                if aw.qmc.specialeventstype[i] == type and last_event_idx != None:
+                    time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
+                    if min_span == None or time_diff < min_span:
+                        min_span = time_diff
+                last_event_idx = i
+            if min_span != None:
+                indexes_to_be_removed = []
+                last_event_idx = None # index of last event analyzed
+                last_index_not_removed = None
+                # group those with minimally 2x min_span time delta by keeping the first with the value of the last
+                for i in range(len(aw.qmc.specialevents)):
+                    if last_event_idx != None:
+                        time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
+                        if time_diff < 2*min_span:
+                            indexes_to_be_removed.append(i)
+                            if last_index_not_removed != None:
+                                aw.qmc.specialeventsvalue[last_index_not_removed] = aw.qmc.specialeventsvalue[i]
+                        else:
+                            last_index_not_removed = i
+                    last_event_idx = i
+                # remove marked events
+                specialevents = []
+                specialeventstype = []
+                specialeventsStrings = []
+                specialeventsvalue = []   
+                for i in range(len(aw.qmc.specialevents)):
+                    if not (i in indexes_to_be_removed):
+                        specialevents.append(aw.qmc.specialevents[i])
+                        specialeventstype.append(aw.qmc.specialeventstype[i])
+                        specialeventsStrings.append(aw.qmc.specialeventsStrings[i])
+                        specialeventsvalue.append(aw.qmc.specialeventsvalue[i])
+                aw.qmc.specialevents = specialevents
+                aw.qmc.specialeventstype = specialeventstype
+                aw.qmc.specialeventsStrings = specialeventsStrings
+                aw.qmc.specialeventsvalue = specialeventsvalue 
+                
+                
 
 
     # decides on visibility of the Control button based on the selected devices and configuration
@@ -11123,7 +11271,10 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCDSV.display(v)
 
     def sliderSVreleased(self):
-        aw.pidcontrol.setSV(self.sliderSV.value(),False)
+        if aw.qmc.device == 0:
+            aw.fujipid.setsv(self.sliderSV.value(),silent=True)
+        else:
+            aw.pidcontrol.setSV(self.sliderSV.value(),False)
 
     # if setValue=False, the slider is only moved without a change signal being issued
     def moveSVslider(self,v,setValue=True):
@@ -11984,7 +12135,8 @@ class ApplicationWindow(QMainWindow):
                         # keep on looking for digits
                         self.quickEventShortCut = (eventNr,eventValueStr)
             else:
-                self.setbuttonsfrom(button.index(key))
+                if aw.buttonpalette_shortcuts:
+                    self.setbuttonsfrom(button.index(key))
         elif key == 58 and not aw.qmc.flagon: # screenshots only if not sampling!
             self.desktopscreenshot()
         elif key == 59 and not aw.qmc.flagon: # screenshots only if not sampling!
@@ -14344,7 +14496,45 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.redraw()
                         aw.qmc.fig.savefig(fconv,transparent=True,facecolor='none', edgecolor='none',frameon=True) # transparent=True is need to get the delta curves and legend drawn
                     else:
-                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {} not converted.", None).format(fconv,fname + u(ext)))
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(ext)))
+                except:
+                    pass
+                i += 1
+                aw.qmc.reset(soundOn=False)
+            aw.qmc.roastpropertiesflag = flag_temp
+            progress.cancel()
+            progress = None
+        
+    def fileConvertToFahrenheit(self):
+        self.fileConverToTemp("F")
+
+    def fileConvertToCelsius(self):
+        self.fileConverToTemp("C")
+        
+    def fileConverToTemp(self,t):
+        files = self.ArtisanOpenFilesDialog(ext="*.alog")
+        if files and len(files) > 0:
+            outdir = self.ArtisanExistingDirectoryDialog()
+            progress = QProgressDialog(QApplication.translate("Message", "Converting...",None), None, 0, len(files), self)
+            progress.setCancelButton(None)
+            progress.setWindowModality(Qt.WindowModal)
+            progress.setAutoClose(True)
+            progress.show()
+            i = 1
+            flag_temp = aw.qmc.roastpropertiesflag
+            for f in files:
+                try:
+                    progress.setValue(i)
+                    QApplication.processEvents()
+                    fname = u(QFileInfo(f).fileName())
+                    fconv = u(QDir(outdir).filePath(fname))
+                    if not os.path.exists(fconv):
+                        aw.qmc.reset(redraw=False,soundOn=False)
+                        self.setProfile(f,self.deserialize(f),quiet=True)
+                        aw.qmc.convertTemperature(t,True)
+                        aw.fileSave(fconv)
+                    else:
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname))
                 except:
                     pass
                 i += 1
@@ -14438,6 +14628,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.PIDbuttonflag = bool(toBool(settings.value("PIDbuttonflag",self.qmc.PIDbuttonflag)))
             if settings.contains("Controlbuttonflag"):
                 self.qmc.Controlbuttonflag = bool(toBool(settings.value("Controlbuttonflag",self.qmc.Controlbuttonflag)))
+            if settings.contains("yoctoRemoteFlag"):
+                self.qmc.yoctoRemoteFlag = bool(toBool(settings.value("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)))
+                self.qmc.yoctoServerID = toString(settings.value("yoctoServerID",self.qmc.yoctoServerID))
             # activate CONTROL BUTTON
             aw.showControlButton()
             if settings.contains("controlETpid"):
@@ -15133,6 +15326,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.title_show_always = bool(toBool(settings.value("titleshowalways",aw.qmc.title_show_always)))
             if settings.contains("roastpropertiesflag"):
                 self.qmc.roastpropertiesflag = toInt(settings.value("roastpropertiesflag",self.qmc.roastpropertiesflag))
+            if settings.contains("roastpropertiesAutoOpenFlag"):
+                self.qmc.roastpropertiesAutoOpenFlag = toInt(settings.value("roastpropertiesAutoOpenFlag",self.qmc.roastpropertiesAutoOpenFlag))
             if settings.contains("customflavorlabels"):
                 self.qmc.customflavorlabels = list(map(u,list(toStringList(settings.value("customflavorlabels",self.qmc.customflavorlabels)))))
             #restore sliders
@@ -15155,6 +15350,8 @@ class ApplicationWindow(QMainWindow):
                 self.eventquantifiermax = [toInt(x) for x in toList(settings.value("quantifiermax",self.eventquantifiermax))]
                 if settings.contains("quantifiercoarse"):
                     self.eventquantifiercoarse = [toInt(x) for x in toList(settings.value("quantifiercoarse",self.eventquantifiercoarse))]
+                    if settings.contains("clusterEventsFlag"):
+                        self.clusterEventsFlag = bool(toBool(settings.value("clusterEventsFlag",aw.clusterEventsFlag)))
             settings.endGroup()
             settings.beginGroup("Batch")
             if settings.contains("batchcounter"):
@@ -15258,6 +15455,8 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventbuttontextcolor[i] = str(self.extraeventbuttontextcolor[i])
                 #update individual visibility of each buttons
                 self.realignbuttons()
+                if settings.contains("buttonpalette_shortcuts"):
+                    self.buttonpalette_shortcuts = bool(toBool(settings.value("buttonpalette_shortcuts",self.buttonpalette_shortcuts)))
             settings.endGroup()
             
             #update axis limits
@@ -15619,6 +15818,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("showFujiLCDs",self.ser.showFujiLCDs)
             settings.setValue("PIDbuttonflag",self.qmc.PIDbuttonflag)
             settings.setValue("Controlbuttonflag",self.qmc.Controlbuttonflag)
+            settings.setValue("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)
+            settings.setValue("yoctoServerID",self.qmc.yoctoServerID)
             settings.endGroup()
             settings.setValue("fmt_data_RoR",self.qmc.fmt_data_RoR)
             settings.setValue("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime)
@@ -16033,6 +16234,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraeventsbuttonsflag",self.extraeventsbuttonsflag)
             settings.setValue("buttonpalette",self.buttonpalette)
             settings.setValue("buttonpalettemaxlen",self.buttonpalettemaxlen)
+            settings.setValue("buttonpalette_shortcuts",self.buttonpalette_shortcuts)
             settings.endGroup()
             settings.beginGroup("grid")
             settings.setValue("xgrid",self.qmc.xgrid)
@@ -16057,9 +16259,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("quantifiermin",self.eventquantifiermin)
             settings.setValue("quantifiermax",self.eventquantifiermax)
             settings.setValue("quantifiercoarse",self.eventquantifiercoarse)
+            settings.setValue("clusterEventsFlag",self.clusterEventsFlag)
             settings.endGroup()
             settings.setValue("titleshowalways",self.qmc.title_show_always)
             settings.setValue("roastpropertiesflag",self.qmc.roastpropertiesflag)
+            settings.setValue("roastpropertiesAutoOpenFlag",self.qmc.roastpropertiesAutoOpenFlag)
             settings.setValue("customflavorlabels",self.qmc.customflavorlabels)
             settings.beginGroup("Batch")
             settings.setValue("batchcounter",self.qmc.batchcounter)
@@ -16348,7 +16552,7 @@ class ApplicationWindow(QMainWindow):
         res = {}        
         # id (prefix+nr)
         res["nr"] = u(data["batchnr"])
-        res["id"] = u(data["batchprefix"]) + (u(data["batchnr"]) if (data["batchnr"] != 0) else u(""))
+        res["id"] = ((u(data["batchprefix"]) + u(data["batchnr"])) if (data["batchnr"] != 0) else u(""))
         # title
         res["title"] = data["title"]
         # date and time
@@ -16727,7 +16931,7 @@ class ApplicationWindow(QMainWindow):
             res["FCs_time"] = timex[timeindex[2]] - start
             # FCs_temp
             res["FCs_temp"] = bt[timeindex[2]]
-        if timeindex[2] > 0:
+        if timeindex[6] > 0:
             # DROP_time
             res["DROP_time"] = timex[timeindex[6]] - start
             # DROP_temp
@@ -16980,7 +17184,7 @@ class ApplicationWindow(QMainWindow):
                 # add BT curve to graph
                 if len(profiles) < 11:
                     try:
-                        label = u(pd["batchprefix"]) + (u(pd["batchnr"]) if pd["batchnr"] > 0 else u(""))
+                        label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]
                         stemp = self.qmc.smooth_list(timex,temp,window_len=self.qmc.curvefilter)
@@ -18105,7 +18309,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
-        contributors += u(", Marco Cremonese<br>")
+        contributors += u(", Marco Cremonese, Nick Watson<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -21794,6 +21998,11 @@ class editGraphDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))
         
+        self.org_specialevents = aw.qmc.specialevents
+        self.org_specialeventstype = aw.qmc.specialeventstype
+        self.org_specialeventsStrings = aw.qmc.specialeventsStrings
+        self.org_specialeventsvalue = aw.qmc.specialeventsvalue
+        
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #MARKERS
         chargelabel = QLabel("<b>" + u(QApplication.translate("Label", "CHARGE",None)) + "</b>")
@@ -21928,12 +22137,25 @@ class editGraphDlg(ArtisanDialog):
         self.roastproperties = QCheckBox(QApplication.translate("CheckBox","Delete roast properties on RESET", None))
         self.roastproperties.setChecked(bool(aw.qmc.roastpropertiesflag))
         self.roastproperties.stateChanged.connect(self.roastpropertiesChanged)
+        self.roastpropertiesAutoOpen = QCheckBox(QApplication.translate("CheckBox","Open on CHARGE", None))
+        self.roastpropertiesAutoOpen.setChecked(bool(aw.qmc.roastpropertiesAutoOpenFlag))
+        self.roastpropertiesAutoOpen.stateChanged.connect(self.roastpropertiesAutoOpenChanged)
         # EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
         self.eventtablecopy = []
         self.createEventTable()
+        self.clusterEventsButton = QPushButton(QApplication.translate("Button", "Cluster",None))
+        self.clusterEventsButton.setFocusPolicy(Qt.NoFocus)
+        self.clusterEventsButton.setMaximumSize(self.clusterEventsButton.sizeHint())
+        self.clusterEventsButton.setMinimumSize(self.clusterEventsButton.minimumSizeHint())
+        self.clusterEventsButton.clicked.connect(self.clusterEvents)
+        self.clearEventsButton = QPushButton(QApplication.translate("Button", "Clear",None))
+        self.clearEventsButton.setFocusPolicy(Qt.NoFocus)
+        self.clearEventsButton.setMaximumSize(self.clearEventsButton.sizeHint())
+        self.clearEventsButton.setMinimumSize(self.clearEventsButton.minimumSizeHint())
+        self.clearEventsButton.clicked.connect(self.clearEvents) 
         self.createalarmTableButton = QPushButton(QApplication.translate("Button", "Create Alarms",None))
         self.createalarmTableButton.setFocusPolicy(Qt.NoFocus)
         self.createalarmTableButton.setMaximumSize(self.createalarmTableButton.sizeHint())
@@ -22233,7 +22455,7 @@ class editGraphDlg(ArtisanDialog):
         #Cancel Button
         cancelButton = QPushButton(QApplication.translate("Button", "Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
-        cancelButton.clicked.connect(self.reject)
+        cancelButton.clicked.connect(self.cancel_dialog)
         cancelButton.setMaximumSize(cancelButton.sizeHint())
         cancelButton.setMinimumSize(cancelButton.minimumSize())
         
@@ -22474,6 +22696,8 @@ class editGraphDlg(ArtisanDialog):
         okLayout = QHBoxLayout()
         okLayout.addWidget(self.roastproperties)
         okLayout.addStretch()
+        okLayout.addWidget(self.roastpropertiesAutoOpen)
+        okLayout.addStretch()
         okLayout.addWidget(cancelButton,0)
         okLayout.addWidget(saveButton,1)
         okLayout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
@@ -22491,7 +22715,11 @@ class editGraphDlg(ArtisanDialog):
         eventbuttonLayout = QHBoxLayout()
         eventbuttonLayout.addWidget(self.createalarmTableButton)
         eventbuttonLayout.addStretch()
+        eventbuttonLayout.addWidget(self.clusterEventsButton)
         eventbuttonLayout.addWidget(self.ordereventTableButton)
+        eventbuttonLayout.addStretch()
+        eventbuttonLayout.addWidget(self.clearEventsButton)
+        eventbuttonLayout.addStretch()
         eventbuttonLayout.addWidget(self.deleventTableButton)
         eventbuttonLayout.addWidget(self.neweventTableButton)
         #tab 1
@@ -22561,6 +22789,13 @@ class editGraphDlg(ArtisanDialog):
         #totallayout.addLayout(buttonsLayout)
         self.volume_percent()
         self.setLayout(totallayout)
+        
+    def cancel_dialog(self):
+        aw.qmc.specialevents = self.org_specialevents
+        aw.qmc.specialeventstype = self.org_specialeventstype
+        aw.qmc.specialeventsStrings = self.org_specialeventsStrings
+        aw.qmc.specialeventsvalue = self.org_specialeventsvalue
+        self.reject()   
 
     # calcs volume (in ml) from density (in g/l) and weight (in g)
     def calc_volume(self,density,weight):
@@ -22780,6 +23015,12 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.roastpropertiesflag = 1
         else:
             aw.qmc.roastpropertiesflag = 0
+            
+    def roastpropertiesAutoOpenChanged(self):
+        if self.roastpropertiesAutoOpen.isChecked():
+            aw.qmc.roastpropertiesAutoOpenFlag = 1
+        else:
+            aw.qmc.roastpropertiesAutoOpenFlag = 0
 
     def createDataTable(self):
         self.datatable.clear()
@@ -23004,6 +23245,25 @@ class editGraphDlg(ArtisanDialog):
                 aw.qmc.alarmbeep.append(0)
                 aw.qmc.alarmstrings.append(str(int(aw.qmc.specialeventsvalue[r]*10 - 10)))
         
+    def clusterEvents(self):
+        nevents = len(aw.qmc.specialevents)
+        if nevents:
+            aw.clusterEvents()
+            self.createEventTable()
+            aw.qmc.redraw(recomputeAllDeltas=False)
+            aw.qmc.safesaveflag = True
+            
+    def clearEvents(self):
+        nevents = len(aw.qmc.specialevents)
+        if nevents:
+            aw.qmc.specialevents = []
+            aw.qmc.specialeventstype = []
+            aw.qmc.specialeventsStrings = []
+            aw.qmc.specialeventsvalue = []
+            self.createEventTable()
+            aw.qmc.redraw(recomputeAllDeltas=False)
+            aw.qmc.safesaveflag = True
+        
     def createAlarmEventTable(self):
         if len(aw.qmc.specialevents):
             # check for selection
@@ -23022,26 +23282,12 @@ class editGraphDlg(ArtisanDialog):
     def orderEventTable(self):
         self.saveEventTable()
         self.orderEventTableLoop()
+        aw.qmc.safesaveflag = True
         
     def orderEventTableLoop(self):
         nevents = len(aw.qmc.specialevents)
         if nevents:
-            for i in range(nevents-1):
-                if aw.qmc.specialevents[i] > aw.qmc.specialevents[i+1]:
-                    itime = aw.qmc.specialevents[i]
-                    itype = aw.qmc.specialeventstype[i]
-                    istring = aw.qmc.specialeventsStrings[i]
-                    ivalue = aw.qmc.specialeventsvalue[i]
-                    aw.qmc.specialevents[i] = aw.qmc.specialevents[i+1]
-                    aw.qmc.specialeventstype[i] = aw.qmc.specialeventstype[i+1]
-                    aw.qmc.specialeventsStrings[i] = aw.qmc.specialeventsStrings[i+1]
-                    aw.qmc.specialeventsvalue[i] = aw.qmc.specialeventsvalue[i+1]
-                    aw.qmc.specialevents[i+1] = itime
-                    aw.qmc.specialeventstype[i+1] = itype
-                    aw.qmc.specialeventsStrings[i+1] = istring
-                    aw.qmc.specialeventsvalue[i+1] = ivalue
-                    self.orderEventTableLoop()
-                    return
+            aw.orderEvents()
             self.createEventTable()
             aw.qmc.redraw(recomputeAllDeltas=False)
 
@@ -24155,16 +24401,22 @@ class WindowsDlg(ArtisanDialog):
 
     # exit dialog with OK
     def updatewindow(self):
-        yl = int(str(self.ylimitEdit.text()))
-        yl_min = int(str(self.ylimitEdit_min.text()))
-        if yl > yl_min:
-            aw.qmc.ylimit = yl
-            aw.qmc.ylimit_min = yl_min
-        zl = int(str(self.zlimitEdit.text()))
-        zl_min = int(str(self.zlimitEdit_min.text()))
-        if zl > zl_min:
-            aw.qmc.zlimit = zl
-            aw.qmc.zlimit_min = zl_min
+        try:
+            yl = int(str(self.ylimitEdit.text()))
+            yl_min = int(str(self.ylimitEdit_min.text()))
+            if yl > yl_min:
+                aw.qmc.ylimit = yl
+                aw.qmc.ylimit_min = yl_min
+        except:
+            pass
+        try:
+            zl = int(str(self.zlimitEdit.text()))
+            zl_min = int(str(self.zlimitEdit_min.text()))
+            if zl > zl_min:
+                aw.qmc.zlimit = zl
+                aw.qmc.zlimit_min = zl_min
+        except:
+            pass
         aw.qmc.endofx = aw.qmc.stringtoseconds(str(self.xlimitEdit.text()))
         resettime = aw.qmc.stringtoseconds(str(self.resetEdit.text()))
         startedittime_str = str(self.xlimitEdit_min.text())
@@ -24198,14 +24450,14 @@ class WindowsDlg(ArtisanDialog):
             self.xlimitEdit.setText(aw.qmc.stringfromseconds(60))
         self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(0))
         if aw.qmc.mode == "F":
-            self.ylimitEdit.setText("750")
+            self.ylimitEdit.setText("600")
             self.ylimitEdit_min.setText("0")
-            self.zlimitEdit.setText("100")
+            self.zlimitEdit.setText("60")
             self.zlimitEdit_min.setText("0")
         else:
-            self.ylimitEdit.setText("400")
+            self.ylimitEdit.setText("300")
             self.ylimitEdit_min.setText("0")
-            self.zlimitEdit.setText("40")
+            self.zlimitEdit.setText("50")
             self.zlimitEdit_min.setText("0")
 
 ##########################################################################
@@ -24709,6 +24961,10 @@ class EventsDlg(ArtisanDialog):
         self.transferpalettecombobox.setMaximumWidth(120)
         self.transferpalettecombobox.addItems(palettelist)
         transferpalettebutton.clicked.connect(self.transferbuttonsto)
+        self.switchPaletteByNumberKey = QCheckBox(QApplication.translate("CheckBox","Switch Using Number Keys",None))
+        self.switchPaletteByNumberKey.setChecked(aw.buttonpalette_shortcuts)
+        self.switchPaletteByNumberKey.setFocusPolicy(Qt.NoFocus)
+        
         setpalettebutton.clicked.connect(self.setbuttonsfrom)
         backupbutton = QPushButton(QApplication.translate("Button","Save", None))
         backupbutton.setFocusPolicy(Qt.NoFocus)
@@ -24910,6 +25166,9 @@ class EventsDlg(ArtisanDialog):
         applyquantifierbutton =  QPushButton(QApplication.translate("Button","Apply",None))
         applyquantifierbutton.setFocusPolicy(Qt.NoFocus)
         applyquantifierbutton.clicked.connect(self.applyQuantifiers)
+        self.clusterEventsFlag = QCheckBox(QApplication.translate("Label","Cluster", None))
+        self.clusterEventsFlag.setFocusPolicy(Qt.NoFocus)
+        self.clusterEventsFlag.setChecked(bool(aw.clusterEventsFlag))
         ### LAYOUTS
         #### tab1 layout
         bartypeLayout = QHBoxLayout()
@@ -25170,8 +25429,15 @@ class EventsDlg(ArtisanDialog):
         paletteBox.addStretch()
         paletteBox.addLayout(paletteGrid)
         paletteBox.addStretch()
+        paletteFlags = QHBoxLayout()
+        paletteFlags.addStretch()
+        paletteFlags.addWidget(self.switchPaletteByNumberKey)
+        paletteFlags.addStretch()
+        paletteManagementBox = QVBoxLayout()
+        paletteManagementBox.addLayout(paletteBox)
+        paletteManagementBox.addLayout(paletteFlags)
         paletteGroupLayout = QGroupBox(QApplication.translate("GroupBox","Management",None))
-        paletteGroupLayout.setLayout(paletteBox)
+        paletteGroupLayout.setLayout(paletteManagementBox)
         paletteButtons = QHBoxLayout()
         paletteButtons.addStretch()
         paletteButtons.addWidget(restorebutton)
@@ -25274,6 +25540,8 @@ class EventsDlg(ArtisanDialog):
         tab6Layout.addWidget(self.E4coarse,4,4,Qt.AlignCenter)
         QuantifierApplyHBox = QHBoxLayout()
         QuantifierApplyHBox.addStretch()
+        QuantifierApplyHBox.addWidget(self.clusterEventsFlag)
+        QuantifierApplyHBox.addStretch()
         QuantifierApplyHBox.addWidget(applyquantifierbutton)
         C6VBox = QVBoxLayout()
         C6VBox.addLayout(tab6Layout)
@@ -25329,6 +25597,7 @@ class EventsDlg(ArtisanDialog):
         aw.computeLinespaces()
         # remove previous quantifier events
         # recompute quantifier events
+        redraw = False
         for i in range(4):
             if aw.eventquantifieractive[i]:
                 temp,timex = aw.quantifier2tempandtime(i)
@@ -25358,10 +25627,11 @@ class EventsDlg(ArtisanDialog):
                                 aw.qmc.specialeventsStrings.append("Q")
                                 aw.qmc.specialeventsvalue.append(float(d+1))
                                 aw.qmc.safesaveflag = True
-                                
-                    # redraw                 
-                    aw.qmc.redraw(recomputeAllDeltas=False)
-        
+                    redraw = True
+        if aw.clusterEventsFlag:
+            aw.clusterEvents(True)
+        if redraw:
+            aw.qmc.redraw(recomputeAllDeltas=False)
 
     def tabSwitched(self,i):
         if i == 0:
@@ -25911,6 +26181,7 @@ class EventsDlg(ArtisanDialog):
         aw.eventsliderfactors[3] = float(self.E4factor.value())
 
     def saveQuantifierSettings(self):
+        aw.clusterEventsFlag = bool(self.clusterEventsFlag.isChecked())
         aw.eventquantifieractive[0] = int(self.E1active.isChecked())
         aw.eventquantifieractive[1] = int(self.E2active.isChecked())
         aw.eventquantifieractive[2] = int(self.E3active.isChecked())
@@ -26066,6 +26337,8 @@ class EventsDlg(ArtisanDialog):
                 pass
             aw.qmc.xextrabuttonactionstrings[0] = u(self.RESETbuttonActionString.text())
             aw.qmc.xextrabuttonactionstrings[1] = u(self.STARTbuttonActionString.text())
+            
+            aw.buttonpalette_shortcuts = self.switchPaletteByNumberKey.isChecked()
             #save etypes
             if len(u(self.etype0.text())) and len(u(self.etype1.text())) and len(u(self.etype2.text())) and len(u(self.etype3.text())):
                 aw.qmc.etypes[0] = u(self.etype0.text())
@@ -26690,7 +26963,7 @@ class flavorDlg(ArtisanDialog):
     def closeEvent(self,_):
         self.close()
 
-    def close(self):
+    def close(self):   
         self.savetable()
         aw.qmc.safesaveflag = True
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -27847,7 +28120,7 @@ class modbusport(object):
 #        import logging
 #        logging.basicConfig()
 #        log = logging.getLogger()
-#        log.setLevel(logging.DEBUG)
+#        log.setLevel(logging.DEBUG)readSingleRegister
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -28344,7 +28617,9 @@ class serialport(object):
             t2 = -1
         #get current duty cycle and update LCD 7
         try:
-            aw.qmc.dutycycle = max(0,min(100,aw.fujipid.readdutycycle()))
+            dc = aw.fujipid.readdutycycle()
+            if dc != -1: # on wrong reading we just keep the previous one
+                aw.qmc.dutycycle = max(0,min(100,dc))
             aw.qmc.dutycycleTX = aw.qmc.timeclock.elapsed()/1000.
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -29117,7 +29392,7 @@ class serialport(object):
                     # first try to resync data (shift to right assuming some extra bytes were appended):
                     for i in range(4):
                         if hex2int(r[1+i])==62 and hex2int(r[2+i])==15:
-                            s1 = hex2int(r[6+1],r[7+i])/10.
+                            s1 = hex2int(r[6+i],r[7+i])/10.
                             s2 = hex2int(r[11+i],r[12+i])/10.
                             return s1,s2                            
                     if retry:
@@ -30333,12 +30608,13 @@ class serialport(object):
                         YAPI._yApiCLibFile = libpath + "/libyapi-amd64.so"
                         YAPI._yApiCLibFileFallback = libpath + "/libyapi-i386.so"  # just in case                
                 ## WINDOWS/Linux DLL HACK END
-                # alt: PreregisterHub( )
-#                if YAPI.RegisterHub("usb", errmsg) == YAPI.SUCCESS:
                 try:
-                    YAPI.RegisterHub("usb", errmsg)
-#                    res = YAPI.RegisterHub("usb", errmsg)
-#                    aw.sendmessage("res: " + str(res))
+                    if aw.qmc.yoctoRemoteFlag:
+                        YAPI.RegisterHub(aw.qmc.yoctoServerID)
+                    else:
+                        YAPI.RegisterHub("usb", errmsg)
+#                       res = YAPI.RegisterHub("usb", errmsg)
+#                       aw.sendmessage("res: " + str(res))
                 except Exception as e:
                     aw.sendmessage(str(e))
 #                    aw.sendmessage("error: " + str(errmsg))
@@ -30355,13 +30631,50 @@ class serialport(object):
                     # search for the next one of the required type, but not yet connected
                     self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YTemperature.FirstTemperature())
                     
+                    yocto_res = 0.001
                     if mode == 0 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
                         self.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
-                        aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None))                       
+                        aw.sendmessage(QApplication.translate("Message","Yocto Thermocouple attached",None))  
+                        # increase the resolution
+                        try:
+                            self.YOCTOchan1.set_resolution(yocto_res)
+                            self.YOCTOchan2.set_resolution(yocto_res)
+                        except:
+                            pass
+                        # get units
+                        try:
+                            unit1 = self.YOCTOchan1.get_unit()
+                            if unit1 != None and len(unit1) > 0 and unit1[-1] != "C":
+                                aw.qmc.YOCTOchan1Unit = "F"
+                            else:
+                                aw.qmc.YOCTOchan1Unit = "C"
+                            unit2 = self.YOCTOchan2.get_unit()
+                            if unit2 != None and len(unit2) > 0 and unit2[-1] != "C":
+                                aw.qmc.YOCTOchan2Unit = "F"
+                            else:
+                                aw.qmc.YOCTOchan2Unit = "C"
+                        except:
+                            pass                   
                     elif mode == 1 and self.YOCTOsensor != None and self.YOCTOsensor.isOnline():
-                        aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None))
+                        aw.sendmessage(QApplication.translate("Message","Yocto PT100 attached",None))  
+                        # increase the resolution
+                        try:
+                            self.YOCTOsensor.set_resolution(yocto_res)
+                            self.YOCTOsensor.set_resolution(yocto_res)
+                        except:
+                            pass  
+                        # get units
+                        try:
+                            unit = self.YOCTOchan.get_unit()
+                            if unit != None and len(unit) > 0 and unit[-1] != "C":
+                                aw.qmc.YOCTOchanUnit = "F"
+                            else:
+                                aw.qmc.YOCTOchanUnit = "C"
+                        except:
+                            pass   
+                    
                 except:
                     pass
             probe1 = -1
@@ -30370,17 +30683,32 @@ class serialport(object):
                 try:
                     if self.YOCTOchan1 and self.YOCTOchan1.isOnline():
                         probe1 = self.YOCTOchan1.get_currentValue()
-                except Exception:
+                        # convert temperature scale
+                        if aw.qmc.YOCTOchan1Unit == "C" and aw.qmc.mode == "F":
+                            probe1 = aw.qmc.fromCtoF(probe1)
+                        elif aw.qmc.YOCTOchan1Unit == "F" and aw.qmc.mode == "C":
+                            probe1 = aw.qmc.fromFtoC(probe1)
+                except:
                     pass
                 try:
                     if self.YOCTOchan2 and self.YOCTOchan2.isOnline():
                         probe2 = self.YOCTOchan2.get_currentValue()
+                        # convert temperature scale
+                        if aw.qmc.YOCTOchan2Unit == "C" and aw.qmc.mode == "F":
+                            probe2 = aw.qmc.fromCtoF(probe2)
+                        elif aw.qmc.YOCTOchan2Unit == "F" and aw.qmc.mode == "C":
+                            probe2 = aw.qmc.fromFtoC(probe2)
                 except Exception:
                     pass
             elif mode == 1:
                 try:
                     if self.YOCTOsensor and self.YOCTOsensor.isOnline():
                         probe1 = self.YOCTOsensor.get_currentValue()
+                        # convert temperature scale
+                        if aw.qmc.YOCTOchanUnit == "C" and aw.qmc.mode == "F":
+                            probe1 = aw.qmc.fromCtoF(probe1)
+                        elif aw.qmc.YOCTOchanUnit == "F" and aw.qmc.mode == "C":
+                            probe1 = aw.qmc.fromFtoC(probe1)
                 except Exception:
                     pass
             return probe1, probe2
@@ -30478,7 +30806,7 @@ class serialport(object):
                 #self.SP.flush()
                 #libtime.sleep(.1)
                 rl = self.SP.readline().decode('utf-8')[:-2]
-                res = rl.rsplit(',')  
+                res = rl.rsplit(',') 
                 #response: list ["t0","t1","t2"]  with t0 = internal temp; t1 = ET; t2 = BT on "CHAN;1200" 
                 #response: list ["t0","t1","t2","t3","t4"]  with t0 = internal temp; t1 = ET; t2 = BT, t3 = chan3, t4 = chan4 on "CHAN;1234" if ArduinoTC4_34 is configured
                 # after PID_ON: + [,"Heater", "Fan", "SV"]
@@ -31739,7 +32067,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_input1slaveEdit.setFixedWidth(65)
         self.modbus_input1slaveEdit.setAlignment(Qt.AlignRight)
         self.modbus_input1registerEdit = QLineEdit(str(aw.modbus.input1register))
-        self.modbus_input1registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input1registerEdit))
+        self.modbus_input1registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input1registerEdit))
         self.modbus_input1registerEdit.setFixedWidth(65)
         self.modbus_input1registerEdit.setAlignment(Qt.AlignRight)
         self.modbus_input1float = QCheckBox()
@@ -31766,7 +32094,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_input2slaveEdit.setFixedWidth(65)
         self.modbus_input2slaveEdit.setAlignment(Qt.AlignRight)
         self.modbus_input2registerEdit = QLineEdit(str(aw.modbus.input2register))
-        self.modbus_input2registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input2registerEdit))
+        self.modbus_input2registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input2registerEdit))
         self.modbus_input2registerEdit.setFixedWidth(65)
         self.modbus_input2registerEdit.setAlignment(Qt.AlignRight)
         self.modbus_input2float = QCheckBox()
@@ -31793,7 +32121,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_input3slaveEdit.setFixedWidth(65)
         self.modbus_input3slaveEdit.setAlignment(Qt.AlignRight)
         self.modbus_input3registerEdit = QLineEdit(str(aw.modbus.input3register))
-        self.modbus_input3registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input3registerEdit))
+        self.modbus_input3registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input3registerEdit))
         self.modbus_input3registerEdit.setFixedWidth(65)
         self.modbus_input3registerEdit.setAlignment(Qt.AlignRight)
         self.modbus_input3float = QCheckBox()
@@ -31820,7 +32148,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_input4slaveEdit.setFixedWidth(65)
         self.modbus_input4slaveEdit.setAlignment(Qt.AlignRight)
         self.modbus_input4registerEdit = QLineEdit(str(aw.modbus.input4register))
-        self.modbus_input4registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input4registerEdit))
+        self.modbus_input4registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input4registerEdit))
         self.modbus_input4registerEdit.setFixedWidth(65)
         self.modbus_input4registerEdit.setAlignment(Qt.AlignRight)
         self.modbus_input4float = QCheckBox()
@@ -31841,13 +32169,12 @@ class comportDlg(ArtisanDialog):
         self.modbus_input4mode.addItems(modbus_modes)
         self.modbus_input4mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input4mode)))
         self.modbus_input4mode.setFixedWidth(70)
-
         self.modbus_input5slaveEdit = QLineEdit(str(aw.modbus.input5slave))
         self.modbus_input5slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input5slaveEdit))
         self.modbus_input5slaveEdit.setFixedWidth(65)
         self.modbus_input5slaveEdit.setAlignment(Qt.AlignRight)
         self.modbus_input5registerEdit = QLineEdit(str(aw.modbus.input5register))
-        self.modbus_input5registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input5registerEdit))
+        self.modbus_input5registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input5registerEdit))
         self.modbus_input5registerEdit.setFixedWidth(65)
         self.modbus_input5registerEdit.setAlignment(Qt.AlignRight)
         self.modbus_input5float = QCheckBox()
@@ -31874,7 +32201,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_input6slaveEdit.setFixedWidth(65)
         self.modbus_input6slaveEdit.setAlignment(Qt.AlignRight)
         self.modbus_input6registerEdit = QLineEdit(str(aw.modbus.input6register))
-        self.modbus_input6registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input6registerEdit))
+        self.modbus_input6registerEdit.setValidator(QIntValidator(0,65536,self.modbus_input6registerEdit))
         self.modbus_input6registerEdit.setFixedWidth(65)
         self.modbus_input6registerEdit.setAlignment(Qt.AlignRight)
         self.modbus_input6float = QCheckBox()
@@ -31922,13 +32249,13 @@ class comportDlg(ArtisanDialog):
         # modbus external PID conf
         modbus_PIDslave_label = QLabel(QApplication.translate("Label", "Slave",None))
         self.modbus_PIDslave_Edit = QLineEdit(str(aw.modbus.PID_slave_ID))
-        self.modbus_PIDslave_Edit.setValidator(QIntValidator(0,65025,self.modbus_PIDslave_Edit))
+        self.modbus_PIDslave_Edit.setValidator(QIntValidator(0,65536,self.modbus_PIDslave_Edit))
         self.modbus_PIDslave_Edit.setFixedWidth(50)
         self.modbus_PIDslave_Edit.setAlignment(Qt.AlignRight)       
 #        modbus_register_label = QLabel(QApplication.translate("Label", "Register",None)) 
         modbus_SVregister_label = QLabel(QApplication.translate("Label", "SV",None))
         self.modbus_SVregister_Edit = QLineEdit(str(aw.modbus.PID_SV_register))
-        self.modbus_SVregister_Edit.setValidator(QIntValidator(0,65025,self.modbus_SVregister_Edit))
+        self.modbus_SVregister_Edit.setValidator(QIntValidator(0,65536,self.modbus_SVregister_Edit))
         self.modbus_SVregister_Edit.setFixedWidth(50)
         self.modbus_SVregister_Edit.setAlignment(Qt.AlignRight)
         
@@ -31950,19 +32277,19 @@ class comportDlg(ArtisanDialog):
                 
         modbus_Pregister_label = QLabel(QApplication.translate("Label", "P",None))
         self.modbus_Pregister_Edit = QLineEdit(str(aw.modbus.PID_p_register))
-        self.modbus_Pregister_Edit.setValidator(QIntValidator(0,65025,self.modbus_Pregister_Edit))
+        self.modbus_Pregister_Edit.setValidator(QIntValidator(0,65536,self.modbus_Pregister_Edit))
         self.modbus_Pregister_Edit.setFixedWidth(50)
         self.modbus_Pregister_Edit.setAlignment(Qt.AlignRight)
                 
         modbus_Iregister_label = QLabel(QApplication.translate("Label", "I",None))
         self.modbus_Iregister_Edit = QLineEdit(str(aw.modbus.PID_i_register))
-        self.modbus_Iregister_Edit.setValidator(QIntValidator(0,65025,self.modbus_Iregister_Edit))
+        self.modbus_Iregister_Edit.setValidator(QIntValidator(0,65536,self.modbus_Iregister_Edit))
         self.modbus_Iregister_Edit.setFixedWidth(50)
         self.modbus_Iregister_Edit.setAlignment(Qt.AlignRight)
                 
         modbus_Dregister_label = QLabel(QApplication.translate("Label", "D",None))
         self.modbus_Dregister_Edit = QLineEdit(str(aw.modbus.PID_d_register))
-        self.modbus_Dregister_Edit.setValidator(QIntValidator(0,65025,self.modbus_Dregister_Edit))
+        self.modbus_Dregister_Edit.setValidator(QIntValidator(0,65536,self.modbus_Dregister_Edit))
         self.modbus_Dregister_Edit.setFixedWidth(50)
         self.modbus_Dregister_Edit.setAlignment(Qt.AlignRight)
         
@@ -32031,6 +32358,11 @@ class comportDlg(ArtisanDialog):
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         helpButton.setFocusPolicy(Qt.NoFocus)
         helpButton.clicked.connect(self.showModbusbuttonhelp)
+        
+        scanButton = QPushButton(QApplication.translate("Button","Scan",None))
+        scanButton.setToolTip(QApplication.translate("Tooltip","Scan MODBUS",None))
+        scanButton.setFocusPolicy(Qt.NoFocus)
+        scanButton.clicked.connect(self.scanModbus)
         
                 
         ##########################    TAB 4 WIDGETS   SCALE
@@ -32314,6 +32646,8 @@ class comportDlg(ArtisanDialog):
         modbus_gridVLayout.addLayout(modbus_input_grid)#(modbus_sv_layout)
         modbus_gridVLayout.addStretch()
         modbus_setup = QHBoxLayout()
+        modbus_setup.addWidget(scanButton)
+        modbus_setup.addStretch()
         modbus_setup.addWidget(self.modbus_littleEndianFloats)
         modbus_setup.addStretch()
         modbus_setup.addWidget(modbus_typelabel)
@@ -32425,6 +32759,21 @@ class comportDlg(ArtisanDialog):
         modbus_help_text += QApplication.translate("Message", "Few devices hold data as 4 byte floats in two registers.",None)
         modbus_help_text += QApplication.translate("Message", " Tick the Float flag in this case.",None)
         QMessageBox.information(self,QApplication.translate("Message", "MODBUS Help",None),modbus_help_text)
+        
+        
+    def scanModbus(self):
+        scan_mobuds_dlg = scanModbusDlg(self)
+        scan_mobuds_dlg.port = str(self.modbus_comportEdit.getSelection())
+        scan_mobuds_dlg.baudrate = int(str(self.modbus_baudrateComboBox.currentText()))
+        scan_mobuds_dlg.bytesize = int(str(self.modbus_bytesizeComboBox.currentText()))
+        scan_mobuds_dlg.stopbits = int(str(self.modbus_stopbitsComboBox.currentText()))
+        scan_mobuds_dlg.parity = str(self.modbus_parityComboBox.currentText())
+        scan_mobuds_dlg.timeout = int(str(self.modbus_timeoutEdit.text()))   
+        scan_mobuds_dlg.mtype = int(self.modbus_type.currentIndex())
+        scan_mobuds_dlg.mhost = str(self.modbus_hostEdit.text())
+        scan_mobuds_dlg.mport = int(str(self.modbus_portEdit.text()))
+        scan_mobuds_dlg.show()
+            
 
     def portComboBoxIndexChanged(self,portComboBox,i):
         portComboBox.setSelection(i)
@@ -32579,6 +32928,183 @@ class comportDlg(ArtisanDialog):
 
     def closeserialports(self):
         aw.closeserialports()
+
+#################################################################################
+##################   MODBUS Scan DIALOG for testing registers    ################
+#################################################################################
+
+class scanModbusDlg(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(scanModbusDlg,self).__init__(parent)
+        self.setModal(True)
+        # current setup selected in the MODBUS tab
+        self.port = ""
+        self.baudrate = 19200
+        self.bytesize = 8
+        self.stopbits = 1
+        self.parity = "N"
+        self.timeout = 1
+        self.mtype = 1
+        self.mhost = "127.0.0.1"
+        self.mport = 502
+        # save current MODBUS serial, type, host, port settings
+        self.port_aw = aw.modbus.comport
+        self.baudrate_aw = aw.modbus.baudrate
+        self.bytesize_aw = aw.modbus.bytesize
+        self.parity_aw = aw.modbus.parity
+        self.stopbits_aw = aw.modbus.stopbits
+        self.timeout_aw = aw.modbus.timeout        
+        self.mtype_aw = aw.modbus.type
+        self.mhost_aw = aw.modbus.host
+        self.mport_aw = aw.modbus.port
+        self.stop = False # if True stop the processing
+        self.setWindowTitle(QApplication.translate("Form Caption","Scan Modbus", None))
+        self.slave = 1
+        self.slaveLabel = QLabel(QApplication.translate("Label", "Slave",None))
+        self.slaveEdit = QLineEdit(str(self.slave))
+        self.slaveEdit.setValidator(QIntValidator(1,247,self.slaveEdit))
+        self.slaveEdit.setFixedWidth(65)
+        self.slaveEdit.setAlignment(Qt.AlignRight)
+        self.min_register = 0
+        self.registerLabel = QLabel(QApplication.translate("Label", "Register",None))
+        self.toLabel = QLabel(QApplication.translate("Label", "–",None))
+        self.minRegisterEdit = QLineEdit(str(self.min_register))
+        self.minRegisterEdit.setValidator(QIntValidator(0,65536,self.minRegisterEdit))
+        self.minRegisterEdit.setFixedWidth(65)
+        self.minRegisterEdit.setAlignment(Qt.AlignRight)
+        self.max_register = 65536
+        self.maxRegisterEdit = QLineEdit(str(self.max_register))
+        self.maxRegisterEdit.setValidator(QIntValidator(0,65536,self.maxRegisterEdit))
+        self.maxRegisterEdit.setFixedWidth(65)
+        self.maxRegisterEdit.setAlignment(Qt.AlignRight)                        
+        self.code3 = True
+        self.code4 = False
+        self.checkbox3 = QCheckBox(QApplication.translate("CheckBox","Fct. 3", None))
+        self.checkbox3.setChecked(self.code3)
+        self.checkbox3.stateChanged.connect(self.checkbox3Changed)
+        self.checkbox4 = QCheckBox(QApplication.translate("CheckBox","Fct. 4", None))
+        self.checkbox4.setChecked(self.code4)
+        self.checkbox4.stateChanged.connect(self.checkbox4Changed)
+        self.modbusEdit = QTextEdit()
+        self.modbusEdit.setReadOnly(True)
+        startButton = QPushButton(QApplication.translate("Button","Start", None))
+        startButton.setMaximumWidth(150)
+        startButton.clicked.connect(self.start_pressed)
+        labellayout = QHBoxLayout()
+        labellayout.addWidget(self.slaveLabel)
+        labellayout.addStretch()
+        labellayout.addWidget(self.registerLabel)
+        labellayout.addStretch()
+        srlayout = QHBoxLayout()
+        srlayout.addWidget(self.slaveEdit)
+        srlayout.addStretch()
+        srlayout.addWidget(self.minRegisterEdit)
+        srlayout.addWidget(self.toLabel)
+        srlayout.addWidget(self.maxRegisterEdit)
+        cblayout= QHBoxLayout()
+        cblayout.addStretch()
+        cblayout.addWidget(self.checkbox3)
+        cblayout.addStretch()
+        cblayout.addWidget(self.checkbox4)
+        cblayout.addStretch()
+        hlayout = QHBoxLayout()
+        hlayout.addStretch()
+        hlayout.addWidget(startButton)
+        hlayout.addStretch()
+        layout = QVBoxLayout()
+        layout.addLayout(labellayout)
+        layout.addLayout(srlayout)
+        layout.addLayout(cblayout)
+        layout.addWidget(self.modbusEdit)
+        layout.addLayout(hlayout)
+        self.setLayout(layout)
+        
+    def keyPressEvent(self,event):
+        key = int(event.key())
+#        modifiers = QApplication.keyboardModifiers()
+        if key != 0:
+            self.stop = True               
+
+    def start_pressed(self):
+        # set MODBUS serial, type, host, port settings from dialog
+        aw.modbus.comport = self.port
+        aw.modbus.baudrate = self.baudrate
+        aw.modbus.bytesize = self.bytesize
+        aw.modbus.stopbits = self.stopbits
+        aw.modbus.parity = self.parity
+        aw.modbus.timeout = self.timeout
+        aw.modbus.type = self.mtype
+        aw.modbus.host = self.mhost
+        aw.modbus.port = self.mport
+        self.stop = False
+        
+        # update slave and register limits
+        self.slave = int(self.slaveEdit.text())
+        self.min_register = int(self.minRegisterEdit.text())
+        self.max_register = int(self.maxRegisterEdit.text())
+        
+        # scan and report
+        result = "Register,Value<br>"
+        result += "--------------<br>"
+        for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)):
+            QApplication.processEvents()
+            if self.stop:
+                result += "<br>stopped<br>"
+                break
+            if self.code3:
+                aw.modbus.sleepBetween()
+                aw.modbus.sleepBetween()
+                aw.modbus.connect()
+                try:
+                    res = aw.modbus.master.read_input_registers(int(register),1,unit=self.slave)
+                except:
+                    res = None    
+                if res != None and  not isinstance(res,ExceptionResponse):
+                    decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
+                    r = decoder.decode_16bit_uint()
+                    result += str(register) + "(3)," + str(r) + "<br>"
+            if self.code4:
+                aw.modbus.sleepBetween()
+                aw.modbus.sleepBetween()
+                aw.modbus.connect()
+                try:
+                    res = aw.modbus.master.read_holding_registers(int(register),1,unit=self.slave)
+                except:
+                    res = None    
+                if res != None and  not isinstance(res,ExceptionResponse):
+                    decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
+                    r = decoder.decode_16bit_uint()
+                    result += str(register) + "(4)," + str(r) + "<br>"
+        self.modbusEdit.setHtml(result)
+        # reconstruct MODBUS setup
+        aw.modbus.comport = self.port_aw
+        aw.modbus.baudrate = self.baudrate_aw
+        aw.modbus.bytesize = self.bytesize_aw
+        aw.modbus.stopbits = self.stopbits_aw
+        aw.modbus.parity = self.parity_aw
+        aw.modbus.timeout = self.timeout_aw
+        aw.modbus.type = self.mtype_aw
+        aw.modbus.host = self.mhost_aw
+        aw.modbus.port = self.mport_aw           
+            
+    def update(self):
+        if aw.seriallogflag:
+            self.modbusEdit.setText(self.getstring())
+
+    def checkbox3Changed(self):
+        if self.checkbox3.isChecked():
+            self.code3 = True
+        else:
+            self.code3 = False
+
+    def checkbox4Changed(self):
+        if self.checkbox4.isChecked():
+            self.code4 = True
+        else:
+            self.code4 = False
+            
+    def closeEvent(self,_):
+        self.accept()
 
 
 #################################################################################
@@ -33028,9 +33554,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.phidgetBoxRemoteFlag = QCheckBox()
         self.phidgetBoxRemoteFlag.setFocusPolicy(Qt.NoFocus)
         self.phidgetBoxRemoteFlag.setChecked(aw.qmc.phidgetRemoteFlag)
-        phidgetServerIdLabel = QLabel(QApplication.translate("Label","ServerId:", None))
+        phidgetServerIdLabel = QLabel(QApplication.translate("Label","Server", None))
         self.phidgetServerId = QLineEdit(aw.qmc.phidgetServerID)
-        phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password:", None))
+        phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password", None))
         self.phidgetPassword = QLineEdit(aw.qmc.phidgetPassword)
         self.phidgetPassword.setEchoMode(3)
         phidgetServerBox = QHBoxLayout()
@@ -33060,6 +33586,29 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetVBox.addWidget(phidgetNetworkGroupBox)
         phidgetVBox.setSpacing(5)
         phidgetVBox.setContentsMargins(0,0,0,0)
+        # yoctopuce widgets
+        self.yoctoBoxRemoteFlag = QCheckBox()
+        self.yoctoBoxRemoteFlag.setFocusPolicy(Qt.NoFocus)
+        self.yoctoBoxRemoteFlag.setChecked(aw.qmc.yoctoRemoteFlag)
+        yoctoServerIdLabel = QLabel(QApplication.translate("Label","VirtualHub", None))
+        self.yoctoServerId = QLineEdit(aw.qmc.yoctoServerID)
+        yoctoServerBox = QHBoxLayout()
+        yoctoServerBox.addWidget(yoctoServerIdLabel)
+        yoctoServerBox.addWidget(self.yoctoServerId)
+        yoctoServerBox.setContentsMargins(0,0,0,0)
+        yoctoServerBox.setSpacing(3)
+        yoctoNetworkGrid = QGridLayout()
+        yoctoNetworkGrid.addWidget(self.yoctoBoxRemoteFlag,0,0)
+        yoctoNetworkGrid.addLayout(yoctoServerBox,0,1)
+        yoctoNetworkGrid.setContentsMargins(0,0,0,0)
+        yoctoNetworkGrid.setSpacing(20)
+        yoctoNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None))
+        yoctoNetworkGroupBox.setLayout(yoctoNetworkGrid)
+        yoctoVBox = QVBoxLayout()
+        yoctoVBox.addWidget(yoctoNetworkGroupBox)
+        yoctoVBox.addStretch()
+        yoctoVBox.setSpacing(5)
+        yoctoVBox.setContentsMargins(0,0,0,0)      
         # create pid box
         PIDgrid = QGridLayout()
         PIDgrid.addWidget(label1,0,1)
@@ -33171,6 +33720,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
         tab4Layout = QVBoxLayout()
         tab4Layout.addLayout(phidgetVBox)        
         tab4Layout.setContentsMargins(0,0,0,0)
+        #LAYOUT TAB 5 (Yoctopuce)
+        tab5Layout = QVBoxLayout()
+        tab5Layout.addLayout(yoctoVBox)        
+        tab5Layout.setContentsMargins(0,0,0,0)
         #main tab widget
         TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -33185,6 +33738,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
         TabWidget.addTab(C4Widget,QApplication.translate("Tab","Phidgets",None))
+        C5Widget = QWidget()
+        C5Widget.setLayout(tab5Layout)
+        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Yoctopuce",None))
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
@@ -34158,6 +34714,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.LCD2frame.setLayout(aw.LCD3frame.layout())
                 aw.LCD3frame.setLayout(tmp.layout())        
             aw.qmc.swaplcds = swap
+            
+            # Yotopuce conigurations
+            aw.qmc.yoctoRemoteFlag = self.yoctoBoxRemoteFlag.isChecked()
+            aw.qmc.yoctoServerID = u(self.yoctoServerId.text())
             
             # Phidget configurations
             for i in range(4):
@@ -36118,6 +36678,10 @@ class PXRpidDlgControl(ArtisanDialog):
         tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: #ffaaff}")
         tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","SV Buttons OFF",None))
         tab2easyOFFsvbutton.setStyleSheet("QPushButton { background-color: lightblue}")
+        tab2easyONsvslider = QPushButton(QApplication.translate("Button","SV Slider ON",None))
+        tab2easyONsvslider.setStyleSheet("QPushButton { background-color: #ffccff}")
+        tab2easyOFFsvslider = QPushButton(QApplication.translate("Button","SV Slider OFF",None))
+        tab2easyOFFsvslider.setStyleSheet("QPushButton { background-color: #aaddff}")
         tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV",None))
         self.readsvedit = QLineEdit()
         tab2svbutton.clicked.connect(self.setsv)
@@ -36125,6 +36689,8 @@ class PXRpidDlgControl(ArtisanDialog):
         tab2cancelbutton.clicked.connect(self.reject)
         tab2easyONsvbutton.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFeasySV(1))
         tab2easyOFFsvbutton.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFeasySV(0))
+        tab2easyONsvslider.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFsliderSV(1))
+        tab2easyOFFsvslider.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFsliderSV(0))
         svwarning1 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None) + "</b><br>"
                             + QApplication.translate("Label", "Writing eeprom memory",None) + "<br>"
                             + QApplication.translate("Label", "<u>Max life</u> 10,000 writes",None) + "<br>"
@@ -37343,12 +37909,40 @@ class PXG4pidDlgControl(ArtisanDialog):
             self.radiosv7.setChecked(True)
         tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None))
         tab2svbutton.setFocusPolicy(Qt.NoFocus)
-        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","ON SV buttons",None))
+        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","SV Buttons ON",None))
         tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: 'lightblue'}")
         tab2easyONsvbutton.setFocusPolicy(Qt.NoFocus)
-        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","OFF SV buttons",None))
+        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","SV Buttons OFF",None))
         tab2easyOFFsvbutton.setFocusPolicy(Qt.NoFocus)
         tab2easyOFFsvbutton.setStyleSheet("QPushButton { background-color:'#ffaaff' }")
+        tab2easyONsvslider = QPushButton(QApplication.translate("Button","SV Slider ON",None))
+        tab2easyONsvslider.setStyleSheet("QPushButton { background-color: #aaddff}")
+        tab2easyONsvslider.setFocusPolicy(Qt.NoFocus)
+        tab2easyOFFsvslider = QPushButton(QApplication.translate("Button","SV Slider OFF",None))
+        tab2easyOFFsvslider.setFocusPolicy(Qt.NoFocus)
+        tab2easyOFFsvslider.setStyleSheet("QPushButton { background-color:'#ffccff' }") 
+       
+        self.pidSVSliderMin = QSpinBox()
+        self.pidSVSliderMin.setAlignment(Qt.AlignRight)
+        self.pidSVSliderMin.setRange(0,999)
+        self.pidSVSliderMin.setSingleStep(10)
+        self.pidSVSliderMin.setValue(aw.pidcontrol.svSliderMin)
+        pidSVSliderMinLabel = QLabel(QApplication.translate("Label","SV min",None))
+        self.pidSVSliderMin.valueChanged.connect(aw.pidcontrol.sliderMinValueChanged)        
+        self.pidSVSliderMax = QSpinBox()
+        self.pidSVSliderMax.setAlignment(Qt.AlignRight)
+        self.pidSVSliderMax.setRange(0,999)
+        self.pidSVSliderMax.setSingleStep(10)
+        self.pidSVSliderMax.setValue(aw.pidcontrol.svSliderMax)   
+        pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","SV max",None))
+        self.pidSVSliderMax.valueChanged.connect(aw.pidcontrol.sliderMaxValueChanged)        
+        if aw.qmc.mode == "F":
+            self.pidSVSliderMin.setSuffix(" F")
+            self.pidSVSliderMax.setSuffix(" F")
+        elif aw.qmc.mode == "C":
+            self.pidSVSliderMin.setSuffix(" C")
+            self.pidSVSliderMax.setSuffix(" C")
+                    
         tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV (7-0)",None))
         tab2getsvbutton.setFocusPolicy(Qt.NoFocus)
         tab2putsvbutton = QPushButton(QApplication.translate("Button","Write SV (7-0)",None))
@@ -37358,6 +37952,8 @@ class PXG4pidDlgControl(ArtisanDialog):
         tab2putsvbutton.clicked.connect(self.writeSetValues)
         tab2easyONsvbutton.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFeasySV(1))
         tab2easyOFFsvbutton.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFeasySV(0))
+        tab2easyONsvslider.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFsliderSV(1))
+        tab2easyOFFsvslider.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFsliderSV(0))
         self.radiosv1.clicked.connect(lambda sv=1: self.setNsv(1))
         self.radiosv2.clicked.connect(lambda sv=2: self.setNsv(2))
         self.radiosv3.clicked.connect(lambda sv=3: self.setNsv(3))
@@ -37657,8 +38253,14 @@ class PXG4pidDlgControl(ArtisanDialog):
         tab2Layout.addWidget(self.radiosv1,7,2)
         tab2Layout.addWidget(tab2easyOFFsvbutton,8,0)
         tab2Layout.addWidget(tab2easyONsvbutton,8,1)
-        tab2Layout.addWidget(tab2getsvbutton,9,0)
-        tab2Layout.addWidget(tab2putsvbutton,9,1)
+        tab2Layout.addWidget(pidSVSliderMinLabel,8,3)
+        tab2Layout.addWidget(self.pidSVSliderMin,8,4)
+        tab2Layout.addWidget(tab2easyOFFsvslider,9,0)
+        tab2Layout.addWidget(tab2easyONsvslider,9,1)
+        tab2Layout.addWidget(pidSVSliderMaxLabel,9,3)
+        tab2Layout.addWidget(self.pidSVSliderMax,9,4)
+        tab2Layout.addWidget(tab2getsvbutton,10,0)
+        tab2Layout.addWidget(tab2putsvbutton,10,1)
         tab3Layout = QGridLayout() #TAB3
         tab3Layout.setSpacing(10)
         tab3Layoutbutton = QGridLayout()
@@ -39073,7 +39675,10 @@ class PXG4pidDlgControl(ArtisanDialog):
             soakkey = "segment" + str(i+1) + "soak"
             aw.fujipid.PXG4[svkey][0] = float(self.segmenttable.cellWidget(i,0).text())
             aw.fujipid.PXG4[rampkey][0] = aw.qmc.stringtoseconds(self.segmenttable.cellWidget(i,1).text())
-            aw.fujipid.PXG4[soakkey][0] = aw.qmc.stringtoseconds(self.segmenttable.cellWidget(i,2).text())            
+            aw.fujipid.PXG4[soakkey][0] = aw.qmc.stringtoseconds(self.segmenttable.cellWidget(i,2).text())
+        # SV slider
+        aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
+        aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())          
         self.close()
         
 
@@ -39315,6 +39920,10 @@ class FujiPID(object):
             #we compose a message then we send it by using self.readoneword()
             return self.readoneword(self.message2send(stationNo,4,31001,1))
 
+    # activates the SV slider
+    def activateONOFFsliderSV(self,flag):
+        aw.pidcontrol.activateSVSlider(flag)
+
     #activates the PID SV buttons in the main window to adjust the SV value. Called from the PID control pannels/SV tab
     def activateONOFFeasySV(self,flag):
         #turn off
@@ -39379,28 +39988,28 @@ class FujiPID(object):
             elif aw.ser.controlETpid[0] == 1:
                 reg = aw.modbus.address2register(self.PXR["mv1"][1],4)
             if reg != None:
-                val = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,4)/100.
+                v = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,4)
             else:
-                val = -0.01
+                val = -1
         else:
             command = ""
             #if control pid is fuji PXG4
             if aw.ser.controlETpid[0] == 0:
                 command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["mv1"][1],1)
-                val = self.readoneword(command)/100.
+                v = self.readoneword(command)
             #or if control pid is fuji PXR
             elif aw.ser.controlETpid[0] == 1:
                 command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
-                val = self.readoneword(command)/100.
-                #val range -3 to 103%. Check for possible decimal digit user settings
-                #if val/100 <= 103 and val/100 >= -3:         
-##                val /= 100.
-##                elif val/1000 <= 103 and val/1000 >= -3:
-##                    val /= 1000.
-##                elif val/10 <= 103 and val/10 >= -3:
-##                    val /=10.
-##                else:
-##                    return -1
+                v = self.readoneword(command)
+        if v == None:
+            val = -1
+        elif v >= 65236: # -3% to 0%
+            val = 0   
+        elif v <= 10300: # <= 103%
+            val = v/100.
+        else: # value out of range (possible a communication error)
+            val = -1   
+        #val range -3 to 103%. Check for possible decimal digit user settings
         return val
 
     #turns ON turns OFF current ramp soak mode
@@ -39493,6 +40102,19 @@ class FujiPID(object):
         #Fuji PXG 
         if aw.ser.controlETpid[0] == 0: 
             #send command to the current sv (1-7)
+            
+            #-- experimental begin
+            # read the current svN (1-7) being used
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4["selectsv"][1],3)
+                N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,self.PXG4["selectsv"][1],1)
+                N = aw.fujipid.readoneword(command)
+            if N > 0:
+                aw.fujipid.PXG4["selectsv"][0] = N            
+            #-- experimental end
+            
             svkey = "sv"+ str(aw.fujipid.PXG4["selectsv"][0]) #current sv
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(self.PXG4[svkey][1],6)
@@ -39548,13 +40170,13 @@ class FujiPID(object):
             if aw.ser.controlETpid[0] == 0:
                 # read the current svN (1-7) being used
                 if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(aw.fujipid.PXG4["sv0"][1],3)
+                    reg = aw.modbus.address2register(aw.fujipid.PXG4["selectsv"][1],3)
                     N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
                 else:
                     command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,self.PXG4["selectsv"][1],1)
                     N = aw.fujipid.readoneword(command)
                 if N > 0:
-                    self.PXG4["selectsv"][0] = N
+                    aw.fujipid.PXG4["selectsv"][0] = N
                     svkey = "sv" + str(N)
                     if aw.ser.useModbusPort:
                         reg = aw.modbus.address2register(self.PXG4[svkey][1],6)
@@ -40328,21 +40950,19 @@ class PIDcontrol(object):
              
     # v is from [-min,max]
     def setEnergy(self,v):
-        try:
+        try: 
             if aw.pidcontrol.pidPositiveTarget:
                 heat = min(100,max(0,int(v)))
                 if aw.pidcontrol.invertControl:
                     heat = abs(100 - heat)
                 slidernr = aw.pidcontrol.pidPositiveTarget - 1
-                aw.moveslider(slidernr,heat) # move slider               
-                aw.fireslideraction(slidernr) 
+                aw.qmc.temporarymoveslider = (slidernr,heat)
             if aw.pidcontrol.pidNegativeTarget:
                 cool = min(100,abs(min(0,int(v))))
                 if aw.pidcontrol.invertControl:
                     cool = abs(100 - cool)
                 slidernr = aw.pidcontrol.pidNegativeTarget - 1
-                aw.moveslider(slidernr,cool) # move slider               
-                aw.fireslideraction(slidernr) 
+                aw.qmc.temporarymoveslider = (slidernr,cool)
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -40521,20 +41141,20 @@ class PIDcontrol(object):
             if aw.ser.ArduinoIsInitialized:
                 sv = max(0,sv)
                 if self.sv != sv: # nothing to do (avoid loops via moveslider!)
-                    try:
-                        #### lock shared resources #####
-                        aw.ser.COMsemaphore.acquire(1)
-                        if aw.ser.SP.isOpen():
-                            aw.ser.SP.flushInput()
-                            aw.ser.SP.flushOutput()
-                            aw.ser.SP.write(str2cmd("PID;SV;" + str(sv) +"\n"))
-                            self.sv = sv # remember last sv
-                            if move:
-                                aw.moveSVslider(sv)
-                            libtime.sleep(.1)
-                    finally:
-                        if aw.ser.COMsemaphore.available() < 1:
-                            aw.ser.COMsemaphore.release(1)
+                    if move == True:
+                        aw.moveSVslider(sv) # only move the slider
+                    else:
+                        try:
+                            #### lock shared resources #####
+                            aw.ser.COMsemaphore.acquire(1)
+                            if aw.ser.SP.isOpen():
+                                aw.ser.SP.flushInput()
+                                aw.ser.SP.flushOutput()
+                                aw.ser.SP.write(str2cmd("PID;SV;" + str(sv) +"\n"))
+                                self.sv = sv # remember last sv
+                        finally:
+                            if aw.ser.COMsemaphore.available() < 1:
+                                aw.ser.COMsemaphore.release(1)
         elif (aw.qmc.device == 53 or # Hottop
               (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
               (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
