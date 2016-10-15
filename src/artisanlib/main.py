@@ -9834,7 +9834,10 @@ class ApplicationWindow(QMainWindow):
         self.button_2.clicked.connect(lambda _:self.qmc.ToggleRecorder())
         
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
-        self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.5
+        if platf == 'Windows':
+            self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.8
+        else:
+            self.standard_button_height = QPushButton("Test").sizeHint().height() * 1.3
 
 
         #create 1C START, 1C END, 2C START and 2C END buttons
@@ -12343,15 +12346,18 @@ class ApplicationWindow(QMainWindow):
                     prefix = u("")                    
                 filename = self.generateFilename(prefix=prefix)
                 oldDir = u(QDir.current())
-                QDir.setCurrent(self.qmc.autosavepath)
-                #write
-                self.serialize(u(filename),self.getProfile())
-                #restore dirs
-                QDir.setCurrent(oldDir)
-                self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
-                self.setCurrentFile(filename)
-                self.qmc.safesaveflag = False
-                return filename
+                res = QDir.setCurrent(self.qmc.autosavepath)
+                if res:
+                    #write
+                    self.serialize(u(filename),self.getProfile())
+                    #restore dirs
+                    QDir.setCurrent(oldDir)
+                    self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
+                    self.setCurrentFile(filename)
+                    self.qmc.safesaveflag = False
+                    return filename
+                else:
+                    self.sendmessage(QApplication.translate("Message","Autosave path does not exist. Autosave failed.", None))                    
             else:
                 self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None))
                 self.autosaveconf()
@@ -24053,7 +24059,7 @@ class autosaveDlg(ArtisanDialog):
         cancelButton.setFocusPolicy(Qt.NoFocus)
         pathButton = QPushButton(QApplication.translate("Button","Path", None))
         pathButton.setFocusPolicy(Qt.NoFocus)
-        self.pathEdit = QLineEdit(str(aw.qmc.autosavepath))
+        self.pathEdit = QLineEdit(u(aw.qmc.autosavepath))
         self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None))
         cancelButton.clicked.connect(self.close)
         okButton.clicked.connect(self.autoChanged)
