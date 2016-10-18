@@ -23,6 +23,7 @@ o python-qrcode 5.1
 o pip 7.1.0
 o Phidgets 2.1.8 7/2013
 o openpyxl 2.3.3
+o unidecode 0.4.19
 
 CHECK FOR UPDATES
 # pip install pip-review
@@ -34,6 +35,7 @@ Upgrade History:
 - 2016-10-15
  . yoctopuce 1.10.22936 => 1.10.25534
  . pyserial 2.7 => 3.2.1
+ . unidecode 0.4.19
 - 2016-10-12
  . patchelf => 0.9
  . matplotlib => 1.5.3
@@ -431,6 +433,11 @@ https://github.com/lincolnloop/python-qrcode
 21) pip
 
 # sudo yum install python-pip
+
+
+22) unidecode
+
+# sudo -H python -m pip install unidecode --upgrade
 
 ====
 

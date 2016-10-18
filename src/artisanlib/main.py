@@ -189,9 +189,11 @@ from pymodbus.factory import ClientDecoder
 
 import json
 import unicodedata
+from unidecode import unidecode
 
 from artisanlib.weblcds import startWeb, stopWeb
 from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopControl, releaseHottopControl, setHottop
+
 
 
 
@@ -266,7 +268,29 @@ else:
         return str(c,"latin1")
     def s2a(s):
         return s.encode('ascii','ignore').decode("ascii")   
+
+
+umlaute_dict = {
+   uchr(228): 'ae',  # U+00E4   \xc3\xa4
+   uchr(246): 'oe',  # U+00F6   \xc3\xb6
+   uchr(252): 'ue',  # U+00FC   \xc3\xbc
+   uchr(196): 'Ae',  # U+00C4   \xc3\x84
+   uchr(214): 'Oe',  # U+00D6   \xc3\x96
+   uchr(220): 'Ue',  # U+00DC   \xc3\x9c
+   uchr(223): 'ss',  # U+00DF   \xc3\x9f
+}
+
+def toASCII(s):
+    if s == None:
+        return None
+    else:
+        utf8_string = u(s)
+        if locale.startswith("de"):
+            for k in umlaute_dict.keys():
+                utf8_string = utf8_string.replace(k, umlaute_dict[k])
+        return unidecode(utf8_string)
         
+                
 def path2url(path):
     return urlparse.urljoin(
       'file:', urllib.pathname2url(path))        
@@ -3518,6 +3542,8 @@ class tgraphcanvas(FigureCanvas):
                     a = aw.qmc.backgroundalpha
                 else:
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
+                    if aw.qmc.graphfont == 1:
+                        st1 = toASCII(st1)
                     e = 0
                     a = 1.  
                 anno_artists += self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
@@ -3636,7 +3662,9 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         tx = t0idx
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None),str(self.stringfromseconds(timex[tidx]-t0,False)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None),str(self.stringfromseconds(timex[tidx]-t0,False)))                    
+                    if aw.qmc.graphfont == 1:
+                        st1 = toASCII(st1)
                     if timeindex2:
                         a = aw.qmc.backgroundalpha
                     else:
@@ -3723,10 +3751,13 @@ class tgraphcanvas(FigureCanvas):
                         title = self.title
                     else:
                         title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + self.title
+
                     if self.background and self.titleB and len(self.titleB) > 10:
                         stl = 33
                     else:
                         stl = 38
+                    if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
+                        title = toASCII(title)
                     title = aw.qmc.abbrevString(title,stl)
                     self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                         fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
@@ -3755,6 +3786,8 @@ class tgraphcanvas(FigureCanvas):
                             titleB = self.titleB
                         else:
                             titleB = self.roastbatchprefixB + u(self.roastbatchnrB) + u(" ") + self.titleB
+                        if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
+                            titleB = toASCII(titleB)
                         if self.title == None or u(self.title).strip() == "":
                             self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
                                 horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
@@ -4456,6 +4489,8 @@ class tgraphcanvas(FigureCanvas):
                         ncol = int(math.ceil(len(handles)/2.))
                     else:
                         ncol = int(math.ceil(len(handles)))
+                    if aw.qmc.graphfont == 1:
+                        labels = [toASCII(l) for l in labels]
                     leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
                     leg.draggable(state=True)
                     frame = leg.get_frame()
@@ -4992,6 +5027,7 @@ class tgraphcanvas(FigureCanvas):
             self.flagon = False
             # now wait until the current sampling round is done
             while self.flagsampling:
+                QApplication.processEvents()
                 libtime.sleep(.01)
             # clear data from monitoring-only mode
             if len(self.timex) == 1:
@@ -5170,19 +5206,22 @@ class tgraphcanvas(FigureCanvas):
             #prevents accidentally deleting a modified profile:
             if len(self.timex) > 2:
                 self.safesaveflag = True
-            aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None))
-            aw.button_2.setText(QApplication.translate("Button", "START",None))
-            aw.lowerbuttondialog.setVisible(False)
-            aw.messagelabel.setVisible(True)
-            aw.phasesLCDs.hide()
-            aw.hideEventsMinieditor()
             try:
                 if aw.clusterEventsFlag:
                     aw.clusterEvents()
             except:
                 pass
             if aw.qmc.autosaveflag and aw.qmc.autosavepath:
-                aw.automaticsave()
+                try:
+                    aw.automaticsave()
+                except:
+                    pass
+            aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None))
+            aw.button_2.setText(QApplication.translate("Button", "START",None))
+            aw.lowerbuttondialog.setVisible(False)
+            aw.messagelabel.setVisible(True)
+            aw.phasesLCDs.hide()
+            aw.hideEventsMinieditor()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -8958,6 +8997,7 @@ class SampleThread(QThread):
         except Exception:
             aw.qmc.flagsampling = False # we signal that we are done with sampling
         finally:
+            aw.qmc.flagsampling = False # we signal that we are done with sampling
             aw.qmc.flagsamplingthreadrunning = False
             if sys.platform.startswith("darwin"):
                 del pool
@@ -10561,6 +10601,7 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
+
     # order event table by time
     def orderEvents(self):
         nevents = len(aw.qmc.specialevents)
@@ -10589,7 +10630,7 @@ class ApplicationWindow(QMainWindow):
                 self.clusterEventsType(i)
             
     # cluster of events of the given type (0-3)
-    def clusterEventsType(self,type):
+    def clusterEventsType(self,tp):
         nevents = len(aw.qmc.specialevents)
         if nevents:
             # first order the events table
@@ -10598,7 +10639,7 @@ class ApplicationWindow(QMainWindow):
             min_span = None
             last_event_idx = None # index of last event analyzed
             for i in range(len(aw.qmc.specialevents)):
-                if aw.qmc.specialeventstype[i] == type and last_event_idx != None:
+                if aw.qmc.specialeventstype[i] == tp and last_event_idx != None:
                     time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
                     if min_span == None or time_diff < min_span:
                         min_span = time_diff
@@ -11416,7 +11457,7 @@ class ApplicationWindow(QMainWindow):
             pass
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
-    #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan ; 10= HOTTOP Cooling Fan
+    #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -11587,7 +11628,30 @@ class ApplicationWindow(QMainWindow):
                                         setHottop(cooling_motor=False)
                                 except Exception:
                                     pass
-                    
+                elif action == 11: # p-i-d, expects 3 float numbers separated by semicolon
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # "<p>;<i>;<d>"
+                        if len(cmds) == 3:
+                            kp = float(cmds[0])
+                            ki = float(cmds[1])
+                            kd = float(cmds[2])
+                            #FUJI/DELTA pid
+                            if aw.qmc.device == 0 or aw.qmc.device == 26:
+                                # set-p-i-d currently only set from dialog
+                                if self.ser.controlETpid[0] == 0:
+                                    # 1. get current PID
+                                    N = aw.fujipid.getCurrentPIDnumberPXG()     
+                                    # 2. call setpid(self,k) with k that active pid
+                                    aw.fujipid.setpidPXG(N,kp,ki,kd)
+                                elif self.ser.controlETpid[0] == 1:
+                                    aw.fujipid.setpidPXR("p",kp)
+                                    libtime.sleep(0.035)
+                                    aw.fujipid.setpidPXR("i",ki)
+                                    libtime.sleep(0.035)
+                                    aw.fujipid.setpidPXR("d",kd)
+                            else:
+                                aw.pidcontrol.confPID(kp,ki,kd)                    
+                                #aw.pidcontrol.setPID(kp,ki,kd) # we don't set the new values in the dialog
             except Exception:
                 pass
                 
@@ -12735,7 +12799,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
                 self.qmc.backgroundEStrings = [d(x) for x in profile["specialeventsStrings"]]
                 self.qmc.backgroundFlavors = profile["flavors"]
-                self.qmc.titleB = profile["title"]
+                self.qmc.titleB = d(profile["title"])
                 if "roastbatchnr" in profile:
                     try:
                         self.qmc.roastbatchnrB = int(profile["roastbatchnr"])
@@ -18326,7 +18390,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
-        contributors += u(", Marco Cremonese, Nick Watson<br>")
+        contributors += u(", Nick Watson<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -22820,6 +22884,8 @@ class editGraphDlg(ArtisanDialog):
         #totallayout.addLayout(buttonsLayout)
         self.volume_percent()
         self.setLayout(totallayout)
+        self.titleedit.setFocus()
+
         
     def cancel_dialog(self):
         aw.qmc.specialevents = self.org_specialevents
@@ -25250,7 +25316,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "IO Command",None),
                        QApplication.translate("ComboBox", "Hottop Heater",None),
                        QApplication.translate("ComboBox", "Hottop Fan",None),
-                       QApplication.translate("ComboBox", "Hottop Command",None)]
+                       QApplication.translate("ComboBox", "Hottop Command",None),
+                       QApplication.translate("ComboBox", "p-i-d",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -25947,15 +26014,16 @@ class EventsDlg(ArtisanDialog):
             #action
             actionComboBox = QComboBox()
             actionComboBox.addItems([QApplication.translate("ComboBox","None",None),
-                                    QApplication.translate("ComboBox","Serial Command",None),
+                                     QApplication.translate("ComboBox","Serial Command",None),
                                      QApplication.translate("ComboBox","Call Program",None),
                                      QApplication.translate("ComboBox","Multiple Event",None),
-                                    QApplication.translate("ComboBox","Modbus Command",None),
-                                    QApplication.translate("ComboBox","DTA Command",None),
-                                    QApplication.translate("ComboBox","IO Command",None),
-                                    QApplication.translate("ComboBox", "Hottop Heater",None),
-                                    QApplication.translate("ComboBox", "Hottop Fan",None),
-                                    QApplication.translate("ComboBox", "Hottop Command",None)])
+                                     QApplication.translate("ComboBox","Modbus Command",None),
+                                     QApplication.translate("ComboBox","DTA Command",None),
+                                     QApplication.translate("ComboBox","IO Command",None),
+                                     QApplication.translate("ComboBox", "Hottop Heater",None),
+                                     QApplication.translate("ComboBox", "Hottop Fan",None),
+                                     QApplication.translate("ComboBox", "Hottop Command",None),
+                                     QApplication.translate("ComboBox", "p-i-d",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1
@@ -28787,7 +28855,7 @@ class serialport(object):
             
             if platf == 'Windows' and sys.version < '3':
                 import locale
-                p = subprocess.Popen(aw.ser.externalprogram.encode(locale.getpreferredencoding()),env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
+                p = subprocess.Popen(aw.ser.externalprogram.encode(locale.getpreferredencoding()),env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo,shell=True)
             else:
                 p = subprocess.Popen(aw.ser.externalprogram,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
             output = p.communicate()[0]
@@ -37603,57 +37671,18 @@ class PXRpidDlgControl(ArtisanDialog):
         self.status.showMessage(QApplication.translate("StatusBar","Finished reading pid values",None),5000)
 
     def setpid(self,var):
-        r = ""
         if var == "p":
             if str(self.pedit.text()).isdigit():
-                p = int(str(self.pedit.text()))*10
-                if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(aw.fujipid.PXR["p"][1],6)
-                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,p)
-                    r = "        "
-                else:
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["p"][1],p)
-                    r = aw.ser.sendFUJIcommand(command,8)
-            else:
-                return -1
+                p = int(str(self.pedit.text()))
+                aw.fujipid.setpidPXR(var,p)
         elif var == "i":
             if str(self.iedit.text()).isdigit():
-                i = int(str(self.iedit.text()))*10
-                if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(aw.fujipid.PXR["i"][1],6)
-                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,i)
-                    r = "        "
-                else:
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["i"][1],i)
-                    r = aw.ser.sendFUJIcommand(command,8)
-            else:
-                return -1
+                i = int(str(self.iedit.text()))
+                aw.fujipid.setpidPXR(var,i)
         elif var == "d":
             if str(self.dedit.text()).isdigit():
-                d = int(str(self.dedit.text()))*10
-                if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(aw.fujipid.PXR["d"][1],6)
-                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,d)
-                    r = "        "
-                else:
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["d"][1],d)
-                    r = aw.ser.sendFUJIcommand(command,8)
-            else:
-                return -1
-
-        if len(r) == 8:
-            message = QApplication.translate("StatusBar","{0} successfully sent to pid ",None).format(var)
-            self.status.showMessage(message,5000)
-            if var == "p":
-                aw.fujipid.PXR["p"][0] = p
-            elif var == "i":
-                aw.fujipid.PXR["i"][0] = i
-            elif var == "d":
-                aw.fujipid.PXR["i"][0] = d
-        else:
-            mssg = QApplication.translate("StatusBar","setpid(): There was a problem setting {0}",None).format(var)
-            self.status.showMessage(mssg,5000)
-            aw.qmc.adderror(mssg)
+                d = int(str(self.dedit.text()))
+                aw.fujipid.setpidPXR(var,d)
 
     def createsegmenttable(self):
         self.segmenttable.setRowCount(8)
@@ -38920,18 +38949,25 @@ class PXG4pidDlgControl(ArtisanDialog):
                     #put back radio button
                     if N == 1:
                         self.radiosv1.setChecked(True)
+                        self.radiopid1.setChecked(True)
                     elif N == 2:
                         self.radiosv2.setChecked(True)
+                        self.radiopid2.setChecked(True)
                     elif N == 3:
                         self.radiosv3.setChecked(True)
+                        self.radiopid3.setChecked(True)
                     elif N == 4:
                         self.radiosv4.setChecked(True)
+                        self.radiopid4.setChecked(True)
                     elif N == 5:
                         self.radiosv5.setChecked(True)
+                        self.radiopid5.setChecked(True)
                     elif N == 6:
                         self.radiosv6.setChecked(True)
+                        self.radiopid6.setChecked(True)
                     elif N == 7:
                         self.radiosv7.setChecked(True)
+                        self.radiopid7.setChecked(True)
                     return
             else:
                 mssg = QApplication.translate("StatusBar","PID was already using pid {0}",None).format(str(N))
@@ -39031,39 +39067,39 @@ class PXG4pidDlgControl(ArtisanDialog):
         #first get the new sv value from the correspondig edit ine
         if k == 1:
             if self.p1edit.text() != "" and self.i1edit.text() != "" and self.d1edit.text() != "":
-                newPvalue = int(float(str(self.p1edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i1edit.text()))*10.)
-                newDvalue = int(float(str(self.d1edit.text()))*10.)
+                newPvalue = int(float(str(self.p1edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+                newIvalue = int(float(str(self.i1edit.text().replace(',','.')))*10.)
+                newDvalue = int(float(str(self.d1edit.text().replace(',','.')))*10.)
         elif k == 2:
             if self.p2edit.text() != "" and self.i2edit.text() != "" and self.d2edit.text() != "":
-                newPvalue = int(float(str(self.p2edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i2edit.text()))*10.)
-                newDvalue = int(float(str(self.d2edit.text()))*10.) 
+                newPvalue = int(float(str(self.p2edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+                newIvalue = int(float(str(self.i2edit.text().replace(',','.')))*10.)
+                newDvalue = int(float(str(self.d2edit.text().replace(',','.')))*10.) 
         elif k == 3:
             if self.p3edit.text() != "" and self.i3edit.text() != "" and self.d3edit.text() != "":
-                newPvalue = int(float(str(self.p3edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i3edit.text()))*10.)
-                newDvalue = int(float(str(self.d3edit.text()))*10.)
+                newPvalue = int(float(str(self.p3edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+                newIvalue = int(float(str(self.i3edit.text().replace(',','.')))*10.)
+                newDvalue = int(float(str(self.d3edit.text().replace(',','.')))*10.)
         elif k == 4:
             if self.p4edit.text() != "" and self.i4edit.text() != "" and self.d4edit.text() != "":
-                newPvalue = int(float(str(self.p4edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i4edit.text()))*10.)
-                newDvalue = int(float(str(self.d4edit.text()))*10.) 
+                newPvalue = int(float(str(self.p4edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+                newIvalue = int(float(str(self.i4edit.text().replace(',','.')))*10.)
+                newDvalue = int(float(str(self.d4edit.text().replace(',','.')))*10.) 
         elif k == 5:
             if self.p5edit.text() != "" and self.i5edit.text() != "" and self.d5edit.text() != "":
-                newPvalue = int(float(str(self.p5edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i5edit.text()))*10.)
-                newDvalue = int(float(str(self.d5edit.text()))*10.) 
+                newPvalue = int(float(str(self.p5edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+                newIvalue = int(float(str(self.i5edit.text().replace(',','.')))*10.)
+                newDvalue = int(float(str(self.d5edit.text().replace(',','.')))*10.) 
         elif k == 6:
             if self.p6edit.text() != "" and self.i6edit.text() != "" and self.d6edit.text() != "":
-                newPvalue = int(float(str(self.p6edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i6edit.text()))*10.)
-                newDvalue = int(float(str(self.d6edit.text()))*10.) 
+                newPvalue = int(float(str(self.p6edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+                newIvalue = int(float(str(self.i6edit.text().replace(',','.')))*10.)
+                newDvalue = int(float(str(self.d6edit.text().replace(',','.')))*10.) 
         elif k == 7:
             if self.p7edit.text() != "" and self.i7edit.text() != "" and self.d7edit.text() != "":
-                newPvalue = int(float(str(self.p7edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
-                newIvalue = int(float(str(self.i7edit.text()))*10.)
-                newDvalue = int(float(str(self.d7edit.text()))*10.) 
+                newPvalue = int(float(str(self.p7edit.text().replace(',','.')))*10.) #multiply by 10 because of decimal point. Then convert to int.
+                newIvalue = int(float(str(self.i7edit.text().replace(',','.')))*10.)
+                newDvalue = int(float(str(self.d7edit.text().replace(',','.')))*10.) 
         #send command to the right sv
         pkey = "p" + str(k)
         ikey = "i" + str(k)
@@ -39089,57 +39125,57 @@ class PXG4pidDlgControl(ArtisanDialog):
         #verify it went ok
         if len(p) == 8 and len(i)==8 and len(d) == 8:
             if k == 1:               
-                aw.fujipid.PXG4[pkey][0] = float(str(self.p1edit.text()))
-                aw.fujipid.PXG4[ikey][0] = float(str(self.i1edit.text()))
-                aw.fujipid.PXG4[dkey][0] = float(str(self.d1edit.text()))
+                aw.fujipid.PXG4[pkey][0] = float(str(self.p1edit.text().replace(',','.')))
+                aw.fujipid.PXG4[ikey][0] = float(str(self.i1edit.text().replace(',','.')))
+                aw.fujipid.PXG4[dkey][0] = float(str(self.d1edit.text().replace(',','.')))
                 message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
                                                    )).format(str(k),str(self.p1edit.text()),str(self.i1edit.text()),str(self.d1edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(1)
             elif k == 2:
-                aw.fujipid.PXG4[pkey][0] = float(str(self.p2edit.text()))
-                aw.fujipid.PXG4[ikey][0] = float(str(self.i2edit.text()))
-                aw.fujipid.PXG4[dkey][0] = float(str(self.d2edit.text()))
+                aw.fujipid.PXG4[pkey][0] = float(str(self.p2edit.text().replace(',','.')))
+                aw.fujipid.PXG4[ikey][0] = float(str(self.i2edit.text().replace(',','.')))
+                aw.fujipid.PXG4[dkey][0] = float(str(self.d2edit.text().replace(',','.')))
                 message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
                                                    )).format(str(k),str(self.p2edit.text()),str(self.i2edit.text()),str(self.d2edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(2)
             elif k == 3:
-                aw.fujipid.PXG4[pkey][0] = float(str(self.p3edit.text()))
-                aw.fujipid.PXG4[ikey][0] = float(str(self.i3edit.text()))
-                aw.fujipid.PXG4[dkey][0] = float(str(self.d3edit.text()))
+                aw.fujipid.PXG4[pkey][0] = float(str(self.p3edit.text().replace(',','.')))
+                aw.fujipid.PXG4[ikey][0] = float(str(self.i3edit.text().replace(',','.')))
+                aw.fujipid.PXG4[dkey][0] = float(str(self.d3edit.text().replace(',','.')))
                 message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
                                                    )).format(str(k),str(self.p3edit.text()),str(self.i3edit.text()),str(self.d3edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(3)
             elif k == 4:
-                aw.fujipid.PXG4[pkey][0] = float(str(self.p4edit.text()))
-                aw.fujipid.PXG4[ikey][0] = float(str(self.i4edit.text()))
-                aw.fujipid.PXG4[dkey][0] = float(str(self.d4edit.text()))
+                aw.fujipid.PXG4[pkey][0] = float(str(self.p4edit.text().replace(',','.')))
+                aw.fujipid.PXG4[ikey][0] = float(str(self.i4edit.text().replace(',','.')))
+                aw.fujipid.PXG4[dkey][0] = float(str(self.d4edit.text().replace(',','.')))
                 message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
                                                    )).format(str(k),str(self.p4edit.text()),str(self.i4edit.text()),str(self.d4edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(4)
             elif k == 5:
-                aw.fujipid.PXG4[pkey][0] = float(str(self.p5edit.text()))
-                aw.fujipid.PXG4[ikey][0] = float(str(self.i5edit.text()))
-                aw.fujipid.PXG4[dkey][0] = float(str(self.d5edit.text()))
+                aw.fujipid.PXG4[pkey][0] = float(str(self.p5edit.text().replace(',','.')))
+                aw.fujipid.PXG4[ikey][0] = float(str(self.i5edit.text().replace(',','.')))
+                aw.fujipid.PXG4[dkey][0] = float(str(self.d5edit.text().replace(',','.')))
                 message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
                                                    )).format(str(k),str(self.p5edit.text()),str(self.i5edit.text()),str(self.d5edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(5)
             elif k == 6:
-                aw.fujipid.PXG4[pkey][0] = float(str(self.p6edit.text()))
-                aw.fujipid.PXG4[ikey][0] = float(str(self.i6edit.text()))
-                aw.fujipid.PXG4[dkey][0] = float(str(self.d6edit.text()))
+                aw.fujipid.PXG4[pkey][0] = float(str(self.p6edit.text().replace(',','.')))
+                aw.fujipid.PXG4[ikey][0] = float(str(self.i6edit.text().replace(',','.')))
+                aw.fujipid.PXG4[dkey][0] = float(str(self.d6edit.text().replace(',','.')))
                 message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
                                                    )).format(str(k),str(self.p6edit.text()),str(self.i6edit.text()),str(self.d6edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(6)
             elif k == 7:
-                aw.fujipid.PXG4[pkey][0] = float(str(self.p7edit.text()))
-                aw.fujipid.PXG4[ikey][0] = float(str(self.i7edit.text()))
-                aw.fujipid.PXG4[dkey][0] = float(str(self.d7edit.text()))
+                aw.fujipid.PXG4[pkey][0] = float(str(self.p7edit.text().replace(',','.')))
+                aw.fujipid.PXG4[ikey][0] = float(str(self.i7edit.text().replace(',','.')))
+                aw.fujipid.PXG4[dkey][0] = float(str(self.d7edit.text().replace(',','.')))
                 message = (QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
                                                    )).format(str(k),str(self.p7edit.text()),str(self.i7edit.text()),str(self.d7edit.text()))
                 self.status.showMessage(message,5000)
@@ -39937,6 +39973,114 @@ class FujiPID(object):
                     "segment?":[0,31009],
                     "mv1":[0,31004]   #duty cycle rx -300 to 10300  = -3.00% to 103.00%                     }
                     }
+
+    #writes new values for p - i - d
+    def setpidPXG(self,k,newPvalue,newIvalue,newDvalue):
+        if k != None and k > 0:
+            #send command to the right sv
+            pkey = "p" + str(k)
+            ikey = "i" + str(k)
+            dkey = "d" + str(k)
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXG4[pkey][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(float(newPvalue)*10.))
+                libtime.sleep(0.035)
+                reg = aw.modbus.address2register(aw.fujipid.PXG4[ikey][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(float(newIvalue)*10.))
+                libtime.sleep(0.035)
+                reg = aw.modbus.address2register(aw.fujipid.PXG4[dkey][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,int(float(newDvalue)*10.))
+                libtime.sleep(0.035)
+                p = i = d = "        "
+            else:
+                commandp = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[pkey][1],int(float(newPvalue)*10.))
+                commandi = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[ikey][1],int(float(newIvalue)*10.))
+                commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[dkey][1],int(float(newDvalue)*10.))
+                p = aw.ser.sendFUJIcommand(commandp,8)
+                libtime.sleep(0.035) 
+                i = aw.ser.sendFUJIcommand(commandi,8)
+                libtime.sleep(0.035) 
+                d = aw.ser.sendFUJIcommand(commandd,8)
+                libtime.sleep(0.035) 
+            #verify it went ok
+            if len(p) == 8 and len(i)==8 and len(d) == 8:
+                aw.fujipid.PXG4[pkey][0] = float(newPvalue)
+                aw.fujipid.PXG4[ikey][0] = float(newIvalue)
+                aw.fujipid.PXG4[dkey][0] = float(newDvalue)
+                message = QApplication.translate("StatusBar","pid #{0} successfully set to ({1},{2},{3})",None
+                                                       ).format(str(k),str(newPvalue),str(newIvalue),str(newDvalue))
+                aw.sendmessage(message)
+            else:
+                lp = len(p)
+                li = len(i)
+                ld = len(d)
+                message = QApplication.translate("StatusBar","pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) ",None
+                                                       ).format(str(k),str(lp),str(li),str(ld))
+                aw.sendmessage(message)
+                aw.qmc.adderror(message)
+                                    
+    def getCurrentPIDnumberPXG(self):
+        if aw.ser.useModbusPort:
+            reg = aw.modbus.address2register(aw.fujipid.PXG4["selectedpid"][1],3)
+            N = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)
+        else:
+            command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
+            N = aw.fujipid.readoneword(command)
+        libtime.sleep(0.035) 
+        return N
+                        
+    def setpidPXR(self,var,v):
+        r = ""
+        if var == "p":
+            if str(self.pedit.text()).isdigit():
+                p = int(v)*10
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["p"][1],6)
+                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,p)
+                    r = "        "
+                else:
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["p"][1],p)
+                    r = aw.ser.sendFUJIcommand(command,8)
+            else:
+                return -1
+        elif var == "i":
+            if str(self.iedit.text()).isdigit():
+                i = int(v)*10
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["i"][1],6)
+                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,i)
+                    r = "        "
+                else:
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["i"][1],i)
+                    r = aw.ser.sendFUJIcommand(command,8)
+            else:
+                return -1
+        elif var == "d":
+            if str(self.dedit.text()).isdigit():
+                d = int(v)*10
+                if aw.ser.useModbusPort:
+                    reg = aw.modbus.address2register(aw.fujipid.PXR["d"][1],6)
+                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,d)
+                    r = "        "
+                else:
+                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["d"][1],d)
+                    r = aw.ser.sendFUJIcommand(command,8)
+            else:
+                return -1
+
+        if len(r) == 8:
+            message = QApplication.translate("StatusBar","{0} successfully sent to pid ",None).format(var)
+            aw.sendmessage(message)
+            if var == "p":
+                aw.fujipid.PXR["p"][0] = p
+            elif var == "i":
+                aw.fujipid.PXR["i"][0] = i
+            elif var == "d":
+                aw.fujipid.PXR["i"][0] = d
+        else:
+            message = QApplication.translate("StatusBar","setpid(): There was a problem setting {0}",None).format(var)
+            aw.sendmessage(message)
+            aw.qmc.adderror(message)
                     
     def calcSV(self,tx):
         if aw.qmc.background:
@@ -41253,15 +41397,17 @@ class PIDcontrol(object):
             self.svButtons = False
 
     # just store the p-i-d configuration
-    def setPID(self,kp,ki,kd,source,cycle):
+    def setPID(self,kp,ki,kd,source=None,cycle=None):
         self.pidKp = kp
         self.pidKi = ki
         self.pidKd = kd
-        self.pidSource = source
-        self.pidCycle = cycle
+        if source != None:
+            self.pidSource = source
+        if cycle != None:
+            self.pidCycle = cycle
     
     # send conf to connected PID
-    def confPID(self,kp,ki,kd,source,cycle):
+    def confPID(self,kp,ki,kd,source=None,cycle=None):
         if aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
             if aw.ser.ArduinoIsInitialized:
                 try:
@@ -41271,11 +41417,13 @@ class PIDcontrol(object):
                         aw.ser.SP.flushInput()
                         aw.ser.SP.flushOutput()
                         aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
-                        libtime.sleep(.1)
-                        aw.ser.SP.write(str2cmd("PID;CHAN;" + str(source) + "\n"))
-                        libtime.sleep(.1)
-                        aw.ser.SP.write(str2cmd("PID;CT;" + str(cycle) + "\n"))
-                        libtime.sleep(.1)
+                        if source != None:
+                            libtime.sleep(.1)
+                            aw.ser.SP.write(str2cmd("PID;CHAN;" + str(source) + "\n"))
+                        if cycle != None:
+                            libtime.sleep(.1)
+                            aw.ser.SP.write(str2cmd("PID;CT;" + str(cycle) + "\n"))
+                        aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
                 finally:
                     if aw.ser.COMsemaphore.available() < 1:
                         aw.ser.COMsemaphore.release(1)
@@ -41283,9 +41431,11 @@ class PIDcontrol(object):
               (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
               (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
             aw.qmc.pid.setPID(kp,ki,kd)
+            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
             aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
-        elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and Control ticked
+        elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and (external) Control ticked
             aw.modbus.setPID(kp,ki,kd)
+            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
 
 
 ###################################################################################

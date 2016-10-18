@@ -25,6 +25,7 @@ o python-qrcode 5.1
 o win_inet_pton 1.0.1
 o python-qrcode 5.2.2
 o openpyxl 2.3.3
+o unidecode 0.4.19
 
 
 CHECK FOR UPDATES
@@ -37,6 +38,7 @@ Upgrade History:
 - 2016-10-15
  . yoctopuce 1.10.22936 => 1.10.25534
  . pyserial 2.7
+ . unidecode 0.4.19
 - 2016-09-18
  . gevent 1.1.0 => 1.2.0
 - 2016-03-07
@@ -268,6 +270,10 @@ https://github.com/lincolnloop/python-qrcode
 # python setup.py build
 # sudo python setup.py install
 
-22)
+22) openpyxl
 
 # pip install openpyxl
+
+23) unidecode
+
+# pip install unidecode
