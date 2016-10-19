@@ -20,6 +20,17 @@ v1.0.0 (XX.XX.2016)
     * adds support for multiple-connected Yoctopuce devices (thanks to Nick Watson)
     * adds undo of the last entered main event by clicking its button again
     * adds TP annotation on background profiles
+    * adds SV slider to the Fuji PXG
+    * adds pyinstaller build setup for Mac OS X
+    * adds flag to disable/enable the number key shortcuts for switching palettes
+    * adds MODBUS scanner
+    * adds Custom Events clustering
+    * adds flag to automatically open roast properties on CHARGE
+    * adds Yoctopuce VirtualHub support for acessing remote Yoctopuce devices over the network
+    * adds automatic unit conversion for Yoctopuce devices
+    * adds profile C<->F batch conversion
+    * adds a field for green bean temperature
+    * adds p-i-d button action    
  * Changes
     * dramatically improves speed of MODBUS over serial communication (by patching the underlying pymodbus lib)
     * makes message, error and serial logs autoupdating
@@ -29,6 +40,8 @@ v1.0.0 (XX.XX.2016)
     * reconstruct users environment on calling external programs on MacOS X, not to limit them to the Artisan contained limited Python environment
     * remembers playback aid settings
     * improved RoR smoothing during recordings
+    * makes development percentage the default for the phases lcds
+    * increases resolution for Yoctopuce devices
  * Bug Fixes
     * improves ranking reports for mixed profiles with different temperature units
     * fixed an issue with the Arduino/TC4 communication setup
@@ -40,7 +53,9 @@ v1.0.0 (XX.XX.2016)
     * fixes hangs and accent character support on "Playback Aid"
     * improved autoDROP
     * fixes WebLCDs on Mac OS X   
-    * fixes Fuji PXG duty overflow on 0% 
+    * fixes Fuji PXG duty overflow for values from -3% to 0%
+    * fixes handling of external program paths containing accent characters on Windows
+    * fixes handling of accent characters in autosave path
     * various stability improvements
     
 ----
