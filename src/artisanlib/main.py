@@ -10673,8 +10673,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.specialevents = specialevents
                 aw.qmc.specialeventstype = specialeventstype
                 aw.qmc.specialeventsStrings = specialeventsStrings
-                aw.qmc.specialeventsvalue = specialeventsvalue 
-                
+                aw.qmc.specialeventsvalue = specialeventsvalue
                 
 
 
@@ -22225,7 +22224,6 @@ class editGraphDlg(ArtisanDialog):
         #table for showing events
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
-        self.eventtablecopy = []
         self.createEventTable()
         self.clusterEventsButton = QPushButton(QApplication.translate("Button", "Cluster",None))
         self.clusterEventsButton.setFocusPolicy(Qt.NoFocus)
@@ -23252,14 +23250,12 @@ class editGraphDlg(ArtisanDialog):
             btline.setReadOnly(True)
             btline.setAlignment(Qt.AlignRight)
             bttemp = "%.0f"%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
-            self.eventtablecopy.append(btline) 
             btline.setText(bttemp)
 
             etline = QLineEdit()
             etline.setReadOnly(True)
             etline.setAlignment(Qt.AlignRight)
             ettemp = "%.0f"%(aw.qmc.temp1[aw.qmc.specialevents[i]]) + aw.qmc.mode
-            self.eventtablecopy.append(etline) 
             etline.setText(ettemp)
             
             valueEdit = QLineEdit()
@@ -23273,7 +23269,6 @@ class editGraphDlg(ArtisanDialog):
                 timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
             else:
                 timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]))                
-            self.eventtablecopy.append(str(timez)) 
             timeline.setText(timez)
             timeline.setValidator(QRegExpValidator(regextime,self))
             
@@ -23311,8 +23306,10 @@ class editGraphDlg(ArtisanDialog):
         nevents = self.eventtable.rowCount() 
         for i in range(nevents):
             timez = self.eventtable.cellWidget(i,0)
-            if self.eventtablecopy[i] !=  str(timez.text()):
+            if aw.qmc.timeindex[0] > -1:
                 aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(str(timez.text())))
+            else:
+                aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.stringtoseconds(str(timez.text())))
             description = self.eventtable.cellWidget(i,3)
             aw.qmc.specialeventsStrings[i] = u(description.text())
             etype = self.eventtable.cellWidget(i,4)
@@ -23565,7 +23562,10 @@ class editGraphDlg(ArtisanDialog):
         if len(aw.qmc.timex):
             #prevents accidentally deleting a modified profile.
             aw.qmc.safesaveflag = True
-            if self.chargeeditcopy != str(self.chargeedit.text()):
+            if self.chargeedit.text() == "":
+                aw.qmc.timeindex[0] = -1
+                aw.qmc.xaxistosm(redraw=False)
+            elif self.chargeeditcopy != str(self.chargeedit.text()):
                 #if there is a CHARGE recorded and the time entered is positive. Use relative time
                 if aw.qmc.stringtoseconds(str(self.chargeedit.text())) > 0 and aw.qmc.timeindex[0] != -1:
                     startindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]] + aw.qmc.stringtoseconds(str(self.chargeedit.text())))

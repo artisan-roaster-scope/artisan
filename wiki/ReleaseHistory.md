@@ -15,7 +15,7 @@ v1.0.0 (XX.XX.2016)
     * adds experimental support for the [Apollo DT301](http://www.ueitest.com/products/temperature-humidity/dt301) (by Rob Gardner)
     * adds experimental support for the [Extech 755](http://www.extech.com/display/?id=14489) pressure manometer (by William and Brian Glen)
     * adds "Playback Events" function to playback background events if corresponding sliders with actions are defined
-    * adds serial port to DUMMY device. If selected as main device, one can send serial commands to its serial port from alamrs and buttons
+    * adds serial port to DUMMY device. If selected as main device, one can send serial commands to its serial port from alarms and buttons
     * adds russian translations (thanks to Taras Prokopyuk)
     * adds support for multiple-connected Yoctopuce devices (thanks to Nick Watson)
     * adds undo of the last entered main event by clicking its button again
