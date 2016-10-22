@@ -1722,7 +1722,7 @@ class tgraphcanvas(FigureCanvas):
     # the inverse of eventsInternal2ExternalValue, converting an external to an internal event value
     def eventsExternal2InternalValue(self,v):
         if v< 1.0 and v > -1.0:
-            return 0.0
+            return 1.0
         elif v>=1.0:
             return v/10. + 1.
         else:
@@ -5028,7 +5028,7 @@ class tgraphcanvas(FigureCanvas):
             # now wait until the current sampling round is done
             while self.flagsampling:
                 QApplication.processEvents()
-                libtime.sleep(.01)
+                libtime.sleep(.1)
             # clear data from monitoring-only mode
             if len(self.timex) == 1:
                 aw.qmc.clearMeasurements()
@@ -8633,14 +8633,6 @@ class SampleThread(QThread):
                         else:
                             aw.qmc.timex[-1] = tx
                             
-                    if aw.pidcontrol.pidActive and \
-                        (aw.qmc.device == 53 or # Hottop
-                        (aw.qmc.device in [19,29] and not aw.pidcontrol.externalPIDControl())): # MODBUS or TC4 + Artisan Software PID lib
-                        if aw.pidcontrol.pidSource == 1:
-                            aw.qmc.pid.update(t2_final) # BT
-                        else:
-                            aw.qmc.pid.update(t1_final) # ET
-                            
                     # update lines data using the lists with new data
                     if local_flagstart:
                         if aw.qmc.ETcurve:
@@ -8660,6 +8652,14 @@ class SampleThread(QThread):
                         st2 = aw.qmc.temp2[-1]
                     aw.qmc.tstemp1.append(st1)
                     aw.qmc.tstemp2.append(st2)
+                            
+                    if aw.pidcontrol.pidActive and \
+                        (aw.qmc.device == 53 or # Hottop
+                        (aw.qmc.device in [19,29] and not aw.pidcontrol.externalPIDControl())): # MODBUS or TC4 + Artisan Software PID lib
+                        if aw.pidcontrol.pidSource == 1:
+                            aw.qmc.pid.update(t2_final) # BT
+                        else:
+                            aw.qmc.pid.update(t1_final) # ET
                             
                     #we need a minimum of two readings to calculate rate of change
                     if local_flagstart and length_of_qmc_timex > 1:                        
@@ -10605,23 +10605,23 @@ class ApplicationWindow(QMainWindow):
     # order event table by time
     def orderEvents(self):
         nevents = len(aw.qmc.specialevents)
-        if nevents:
-            for i in range(nevents-1):
-                if aw.qmc.specialevents[i] > aw.qmc.specialevents[i+1]:
-                    itime = aw.qmc.specialevents[i]
-                    itype = aw.qmc.specialeventstype[i]
-                    istring = aw.qmc.specialeventsStrings[i]
-                    ivalue = aw.qmc.specialeventsvalue[i]
-                    aw.qmc.specialevents[i] = aw.qmc.specialevents[i+1]
-                    aw.qmc.specialeventstype[i] = aw.qmc.specialeventstype[i+1]
-                    aw.qmc.specialeventsStrings[i] = aw.qmc.specialeventsStrings[i+1]
-                    aw.qmc.specialeventsvalue[i] = aw.qmc.specialeventsvalue[i+1]
-                    aw.qmc.specialevents[i+1] = itime
-                    aw.qmc.specialeventstype[i+1] = itype
-                    aw.qmc.specialeventsStrings[i+1] = istring
-                    aw.qmc.specialeventsvalue[i+1] = ivalue
-                    self.orderEvents()
-                    return
+        packed_events = []
+        # pack
+        for i in range(nevents):
+            packed_events.append(
+                (aw.qmc.specialevents[i],
+                 aw.qmc.specialeventstype[i],
+                 aw.qmc.specialeventsStrings[i],
+                 aw.qmc.specialeventsvalue[i]))
+        # sort
+        packed_events.sort(key=lambda tup: tup[0])
+        # unpack
+        for i in range(nevents):
+            aw.qmc.specialevents[i] = packed_events[i][0]
+            aw.qmc.specialeventstype[i] = packed_events[i][1]
+            aw.qmc.specialeventsStrings[i] = packed_events[i][2]
+            aw.qmc.specialeventsvalue[i] = packed_events[i][3]
+            
 
     # if only_active then only the event types with quantifiers activated are grouped
     def clusterEvents(self,only_active=False):
@@ -16550,7 +16550,8 @@ class ApplicationWindow(QMainWindow):
             aw.LargeLCDs = tmp_LargeLCDs
         # now wait until the current sampling thread is terminated
         while aw.qmc.flagsamplingthreadrunning:
-            libtime.sleep(.01)
+            QApplication.processEvents()
+            libtime.sleep(.1)
         try:
             self.closeserialports()
         except Exception:
@@ -28472,7 +28473,7 @@ class colorport(extraserialport):
         try:
             if not self.SP:
                 self.connect()
-                libtime.sleep(3)
+                libtime.sleep(2)
                 # put Tonino into PC mode on first connect
                 self.SP.write(str2cmd('\nTONINO\n'))
                 #self.SP.flush()
@@ -31049,11 +31050,11 @@ class serialport(object):
                 #seems like iam running the loop forever, forever .... with sleep it is ok
                 #seen this sometimes in communication between threads in C or C++. --> volatile problem?
                 if counter > 0:
-                    libtime.sleep(1)
+                    libtime.sleep(0.7)
                 counter = counter + 1
                 if not self.SP.isOpen():
                     self.openport()    
-                    libtime.sleep(2)
+                    libtime.sleep(1)
                 if self.SP.isOpen():
                     self.SP.flushInput()
                     r = self.SP.read(14)
@@ -31322,7 +31323,7 @@ class serialport(object):
             aw.qmc.samplingsemaphore.acquire(1)
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(2)
+                libtime.sleep(1)
                 #Reinitialize Arduino in case communication was interrupted
                 if aw.qmc.device == 19:
                     self.ArduinoIsInitialized = 0
@@ -41418,10 +41419,10 @@ class PIDcontrol(object):
                         aw.ser.SP.flushOutput()
                         aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
                         if source != None:
-                            libtime.sleep(.1)
+                            libtime.sleep(.03)
                             aw.ser.SP.write(str2cmd("PID;CHAN;" + str(source) + "\n"))
                         if cycle != None:
-                            libtime.sleep(.1)
+                            libtime.sleep(.03)
                             aw.ser.SP.write(str2cmd("PID;CT;" + str(cycle) + "\n"))
                         aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
                 finally:
