@@ -20,12 +20,14 @@
 # Inspiered by http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
 
 import time
+import numpy
 
 # expects a function control that takes a value from [<outMin>,<outMax>] to control the heater as called on each update()
 class PID(object):
     def __init__(self, control=lambda _: _, p=2.0, i=0.03, d=0.0):
         self.outMin = 0 # minimum output value
         self.outMax = 100 # maximum output value
+        self.dutySteps = 1 # change [1-10] between previous and new PID duty to trigger call of control function
         self.control = control
         self.Kp = p
         self.Ki = i
@@ -37,12 +39,17 @@ class PID(object):
         self.lastOutput = 0.0 # used to reinitialize the Iterm and to apply simple moving average on the derivative part in derivative_on_measurement mode
         self.lastTime = 0.0
         self.lastDerr = 0.0 # used for simple moving average filtering on the derivative part in derivative_on_error mode
-        self.filterInput = False
-        self.filterTarger = False
-        self.filterDerivative = False
         self.target = 0.0
         self.active = False
         self.derivative_on_error = False # if False => derivative_on_measurement (avoids the Derivative Kick on changing the target)
+        # PID output smoothing    
+        self.output_smoothing_factor = 2
+        self.output_decay_weights = None
+        self.previous_outputs = []
+        # PID input smoothing
+        self.input_smoothing_factor = 2
+        self.input_decay_weights = None
+        self.previous_inputs = []
         
     def on(self):
         self.init()
@@ -53,9 +60,41 @@ class PID(object):
         
     def isActive(self):
         return self.active
+    
+    def smooth_output(self,output):
+        # create or update smoothing decay weights
+        if self.output_decay_weights == None or len(self.output_decay_weights) != self.output_smoothing_factor: # recompute only on changes
+            self.output_decay_weights = numpy.arange(1,self.output_smoothing_factor+1)
+        # add new value
+        self.previous_outputs.append(output)
+        # throw away superflous values
+        self.previous_outputs = self.previous_outputs[-self.output_smoothing_factor:]
+        # compute smoothed output
+        if len(self.previous_outputs) < self.output_smoothing_factor:
+            res = output # no smoothing yet
+        else:
+            res = numpy.average(self.previous_outputs,weights=self.output_decay_weights)
+        return res
+    
+    def smooth_input(self,input):
+        # create or update smoothing decay weights
+        if self.input_decay_weights == None or len(self.input_decay_weights) != self.input_smoothing_factor: # recompute only on changes
+            self.input_decay_weights = numpy.arange(1,self.input_smoothing_factor+1)
+        # add new value
+        self.previous_inputs.append(input)
+        # throw away superflous values
+        self.previous_inputs = self.previous_inputs[-self.input_smoothing_factor:]
+        # compute smoothed output
+        if len(self.previous_inputs) < self.input_smoothing_factor:
+            res = input # no smoothing yet
+        else:
+            res = numpy.average(self.previous_inputs,weights=self.input_decay_weights)
+        return res
+        
 
     # update control value
     def update(self, i):
+        i = self.smooth_input(i)
         try:
             if self.active:
                 now = time.time()
@@ -103,10 +142,10 @@ class PID(object):
                                 self.Iterm += self.outMin - output
                             output = self.outMin
                             
-                        self.lastOutput = output # kept to initialize Iterm on reactivating the PID
-                        
-                        output = int(round(output))
-                        self.control(output)
+                        output = int(round(self.smooth_output(output)))
+                        if output >= self.lastOutput + self.dutySteps or output <= self.lastOutput - self.dutySteps:
+                            self.control(output)
+                            self.lastOutput = output # kept to initialize Iterm on reactivating the PID   
         except Exception:
 #            import sys
 #            import traceback
@@ -125,6 +164,9 @@ class PID(object):
         self.lastTime = 0.0
         self.lastDerr = 0.0
         self.Iterm = self.lastOutput
+        # initialize the output smoothing
+        self.output_decay_weights = None
+        self.previous_outputs = []
 
     def setTarget(self, target,init=True):
         self.target = target
@@ -142,6 +184,9 @@ class PID(object):
     def setLimits(self,outMin,outMax):
         self.outMin = outMin
         self.outMax = outMax
+        
+    def setDutySteps(self,steps):
+        self.dutySteps = steps
         
     def setControl(self,f):
         self.control = f
