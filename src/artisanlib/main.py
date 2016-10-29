@@ -15124,6 +15124,10 @@ class ApplicationWindow(QMainWindow):
                 aw.pidcontrol.svSliderMin = toInt(settings.value("svSliderMin",aw.pidcontrol.svSliderMin))
                 aw.pidcontrol.svSliderMax = toInt(settings.value("svSliderMax",aw.pidcontrol.svSliderMax))
                 aw.pidcontrol.svValue = toInt(settings.value("svValue",aw.pidcontrol.svValue))
+                if settings.contains("dutyMin"):
+                    aw.pidcontrol.dutyMin = toInt(settings.value("dutyMin",aw.pidcontrol.dutyMin))
+                if settings.contains("dutyMax"):
+                    aw.pidcontrol.dutyMax = toInt(settings.value("dutyMax",aw.pidcontrol.dutyMax))
                 aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
                 aw.pidcontrol.pidKp = toDouble(settings.value("pidKp",aw.pidcontrol.pidKp))
                 aw.pidcontrol.pidKi = toDouble(settings.value("pidKi",aw.pidcontrol.pidKi))
@@ -16117,6 +16121,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("svSliderMin",aw.pidcontrol.svSliderMin)
             settings.setValue("svSliderMax",aw.pidcontrol.svSliderMax)
             settings.setValue("svValue",aw.pidcontrol.svValue)
+            settings.setValue("dutyMin",aw.pidcontrol.dutyMin)
+            settings.setValue("dutyMax",aw.pidcontrol.dutyMax)
             settings.setValue("pidKp",aw.pidcontrol.pidKp)
             settings.setValue("pidKi",aw.pidcontrol.pidKi)
             settings.setValue("pidKd",aw.pidcontrol.pidKd)
@@ -33251,6 +33257,7 @@ class scanModbusDlg(ArtisanDialog):
             QApplication.processEvents()
             if self.stop:
                 result += "<br>stopped<br>"
+                self.modbusEdit.setHtml(result)
                 break
             if self.code3:
                 aw.modbus.sleepBetween()
@@ -33264,6 +33271,7 @@ class scanModbusDlg(ArtisanDialog):
                     decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
                     r = decoder.decode_16bit_uint()
                     result += str(register) + "(3)," + str(r) + "<br>"
+                    self.modbusEdit.setHtml(result)
             if self.code4:
                 aw.modbus.sleepBetween()
                 aw.modbus.sleepBetween()
@@ -33276,8 +33284,7 @@ class scanModbusDlg(ArtisanDialog):
                     decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
                     r = decoder.decode_16bit_uint()
                     result += str(register) + "(4)," + str(r) + "<br>"
-            self.modbusEdit.setHtml(result)
-        self.modbusEdit.setHtml(result)
+                    self.modbusEdit.setHtml(result)
         # reconstruct MODBUS setup
         aw.modbus.comport = self.port_aw
         aw.modbus.baudrate = self.baudrate_aw
@@ -40179,11 +40186,18 @@ class FujiPID(object):
     def calcSV(self,tx):
         if aw.qmc.background:
             # Follow Background mode
-            j = aw.qmc.backgroundtime2index(tx + self.lookahead)
             if aw.qmc.swapETBT: # we observe the BT
-                return aw.qmc.temp2B[j]
+                res = aw.qmc.backgroundSmoothedBTat(tx + self.svLookahead) # smoothed and approximated background
+                if res == -1:
+                    return None # no background value for that time point
+                else:
+                    return res
             else: # we observe the ET
-                return aw.qmc.temp1B[j]
+                res = aw.qmc.backgroundSmoothedETat(tx + self.svLookahead) # smoothed and approximated background
+                if res == -1:
+                    return None # no background value for that time point
+                else:
+                    return res
         else:
             return None
     
@@ -40841,7 +40855,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSV.setRange(0,999)
         self.pidSV.setSingleStep(10)
         self.pidSV.setValue(aw.pidcontrol.svValue)
-        pidSVLabel = QLabel(QApplication.translate("Label","SV",None))
+        pidSVLabel = QLabel(QApplication.translate("Label","Set",None))
         
         self.pidSVLookahead = QSpinBox()
         self.pidSVLookahead.setAlignment(Qt.AlignRight)
@@ -40857,7 +40871,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidDutySteps.setSingleStep(1)
         self.pidDutySteps.setValue(aw.pidcontrol.dutySteps)  
         self.pidDutySteps.setSuffix(" %")
-        pidDutyStepsLabel = QLabel(QApplication.translate("Label","Duty Steps",None))
+        pidDutyStepsLabel = QLabel(QApplication.translate("Label","Steps",None))
         
         pidSetSV = QPushButton(QApplication.translate("Button","Set",None))
         pidSetSV.clicked.connect(self.setSV)
@@ -40873,10 +40887,10 @@ class PID_DlgControl(ArtisanDialog):
         self.pidMode.addItems(pidModeItems)
         self.pidMode.setCurrentIndex(aw.pidcontrol.svMode)
         
-        self.pidSVbuttonsFlag = QCheckBox(QApplication.translate("Label","SV Buttons",None))
+        self.pidSVbuttonsFlag = QCheckBox(QApplication.translate("Label","Buttons",None))
         self.pidSVbuttonsFlag.setChecked(aw.pidcontrol.svButtons)
         self.pidSVbuttonsFlag.stateChanged.connect(lambda flag=1: aw.pidcontrol.activateONOFFeasySV(flag))
-        self.pidSVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None))
+        self.pidSVsliderFlag = QCheckBox(QApplication.translate("Label","Slider",None))
         self.pidSVsliderFlag.setChecked(aw.pidcontrol.svSlider)
         self.pidSVsliderFlag.stateChanged.connect(lambda flag=1: aw.pidcontrol.activateSVSlider(flag))
         
@@ -40885,7 +40899,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVSliderMin.setRange(0,999)
         self.pidSVSliderMin.setSingleStep(10)
         self.pidSVSliderMin.setValue(aw.pidcontrol.svSliderMin)
-        pidSVSliderMinLabel = QLabel(QApplication.translate("Label","min",None))
+        pidSVSliderMinLabel = QLabel(QApplication.translate("Label","Min",None))
         self.pidSVSliderMin.valueChanged.connect(aw.pidcontrol.sliderMinValueChanged)
         
         self.pidSVSliderMax = QSpinBox()
@@ -40893,7 +40907,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSVSliderMax.setRange(0,999)
         self.pidSVSliderMax.setSingleStep(10)
         self.pidSVSliderMax.setValue(aw.pidcontrol.svSliderMax)   
-        pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","max",None))
+        pidSVSliderMaxLabel = QLabel(QApplication.translate("Label","Max",None))
         self.pidSVSliderMax.valueChanged.connect(aw.pidcontrol.sliderMaxValueChanged)
         
         if aw.qmc.mode == "F":
@@ -40924,12 +40938,26 @@ class PID_DlgControl(ArtisanDialog):
         svInputBox = QHBoxLayout()
         svInputBox.addWidget(self.pidSVbuttonsFlag)
         svInputBox.addStretch()
-        svInputBox.addWidget(pidDutyStepsLabel)
-        svInputBox.addWidget(self.pidDutySteps)
-        svInputBox.addStretch()
         svInputBox.addWidget(pidSVLabel)
         svInputBox.addWidget(self.pidSV)
         svInputBox.addWidget(pidSetSV)
+        
+        self.dutyMin = QSpinBox()
+        self.dutyMin.setAlignment(Qt.AlignRight)
+        self.dutyMin.setRange(-100,100)
+        self.dutyMin.setSingleStep(10)
+        self.dutyMin.setValue(aw.pidcontrol.dutyMin)
+        self.dutyMin.setSuffix(" %")
+        dutyMinLabel = QLabel(QApplication.translate("Label","Min",None))
+        
+        self.dutyMax = QSpinBox()
+        self.dutyMax.setAlignment(Qt.AlignRight)
+        self.dutyMax.setRange(-100,100)
+        self.dutyMax.setSingleStep(10)
+        self.dutyMax.setValue(aw.pidcontrol.dutyMax) 
+        self.dutyMax.setSuffix(" %")
+        dutyMaxLabel = QLabel(QApplication.translate("Label","Max",None))
+        
         
         svGrpBox = QVBoxLayout()
         svGrpBox.addLayout(modeBox)
@@ -40939,11 +40967,27 @@ class PID_DlgControl(ArtisanDialog):
         svGrp = QGroupBox(QApplication.translate("GroupBox","Set Value",None))
         svGrp.setLayout(svGrpBox)
         
+        dutyGrid = QGridLayout()
+        dutyGrid.addWidget(pidDutyStepsLabel,0,0)
+        dutyGrid.addWidget(self.pidDutySteps,0,1)
+        dutyGrid.addWidget(dutyMinLabel,1,0)
+        dutyGrid.addWidget(self.dutyMin,1,1)
+        dutyGrid.addWidget(dutyMaxLabel,2,0)
+        dutyGrid.addWidget(self.dutyMax,2,1)
+        
+        
+        dutyGrpBox = QVBoxLayout()
+        dutyGrpBox.addLayout(dutyGrid)
+        dutyGrpBox.addStretch()
+        dutyGrp = QGroupBox(QApplication.translate("GroupBox","Duty",None))
+        dutyGrp.setLayout(dutyGrpBox)
+        
         pidBox = QHBoxLayout()
         pidBox.addWidget(pidGrp)
         
         svBox = QHBoxLayout()
         svBox.addWidget(svGrp)
+        svBox.addWidget(dutyGrp)
                 
         self.startPIDonCHARGE = QCheckBox(QApplication.translate("CheckBox", "Start PID on CHARGE",None))
         self.startPIDonCHARGE.setChecked(aw.pidcontrol.pidOnCHARGE)
@@ -41127,6 +41171,8 @@ class PID_DlgControl(ArtisanDialog):
         aw.pidcontrol.svMode = self.pidMode.currentIndex()
         aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
+        aw.pidcontrol.dutyMin = min(self.dutyMin.value(),self.dutyMax.value())
+        aw.pidcontrol.dutyMax = max(self.dutyMin.value(),self.dutyMax.value())
         aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
         aw.pidcontrol.dutySteps = self.pidDutySteps.value()
         #
@@ -41218,6 +41264,8 @@ class PIDcontrol(object):
         self.svSliderMin = 0
         self.svSliderMax = 480
         self.svValue = 390 # the value in the setSV textinput box of the PID dialog
+        self.dutyMin = 0
+        self.dutyMax = 100
         self.pidKp = 20.0
         self.pidKi = 0.04
         self.pidKd = 0.0
@@ -41337,6 +41385,8 @@ class PIDcontrol(object):
                 aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
                 aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
                 aw.qmc.pid.setDutySteps(aw.pidcontrol.dutySteps)
+                aw.qmc.pid.setDutyMin(aw.pidcontrol.dutyMin)
+                aw.qmc.pid.setDutyMax(aw.pidcontrol.dutyMax)
                 aw.qmc.pid.setControl(lambda v: aw.pidcontrol.setEnergy(v))
                 if aw.pidcontrol.svMode == 0:
                     aw.pidcontrol.setSV(aw.pidcontrol.svValue)

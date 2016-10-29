@@ -28,6 +28,8 @@ class PID(object):
         self.outMin = 0 # minimum output value
         self.outMax = 100 # maximum output value
         self.dutySteps = 1 # change [1-10] between previous and new PID duty to trigger call of control function
+        self.dutyMin = 0
+        self.dutyMax = 100
         self.control = control
         self.Kp = p
         self.Ki = i
@@ -142,7 +144,7 @@ class PID(object):
                                 self.Iterm += self.outMin - output
                             output = self.outMin
                             
-                        output = int(round(self.smooth_output(output)))
+                        output = min(self.dutyMax,max(self.dutyMin,int(round(self.smooth_output(output)))))
                         if output >= self.lastOutput + self.dutySteps or output <= self.lastOutput - self.dutySteps:
                             self.control(output)
                             self.lastOutput = output # kept to initialize Iterm on reactivating the PID   
@@ -187,6 +189,12 @@ class PID(object):
         
     def setDutySteps(self,steps):
         self.dutySteps = steps
+        
+    def setDutyMin(self,m):
+        self.dutyMin = m
+        
+    def setDutyMax(self,m):
+        self.dutyMax = m
         
     def setControl(self,f):
         self.control = f
