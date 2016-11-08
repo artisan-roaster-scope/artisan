@@ -15,9 +15,11 @@ Donations
 
 This software is open-source and absolutely free, even for commercial use.
 
-If you think Artisan is worth of some money and you are willing to contribute financially to its further development, feel free to send any amount through PayPal.
+If you think Artisan is worth of some money and you are willing to contribute financially to its further development, feel free to send any amount through PayPal via this button in EUR
 
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N5WW9UN6K669L)
+
+or via my [PayPal.Me page](https://www.paypal.me/MarkoLuther)
 
 
 
