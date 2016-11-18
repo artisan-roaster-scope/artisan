@@ -5,7 +5,7 @@ export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/3.4/lib/python3
 
 export PATH=$PYTHON/bin:$PYTHON:/lib:$PATH
 
-export QT_PATH=~/Qt5.6.1/5.6/clang_64
+export QT_PATH=~/Qt5.6.2/5.6/clang_64
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 

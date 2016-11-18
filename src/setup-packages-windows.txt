@@ -1,6 +1,6 @@
 Current Versions:
 
-o Python 2.7.11
+o Python 2.7.12
 o pyserial 2.7 (3.x not supported under Windows XP)
 o QT 4.8.7
 o PyQt 4.11.4
@@ -35,6 +35,11 @@ CHECK FOR UPDATES
 
 Upgrade History:
 
+
+- 2016-10-17
+ . Python 2.7.11 => 2.7.12
+ . matplotlib 1.5.1 => 1.5.3
+ . numpy 1.10.4 => 1.11.2
 - 2016-10-15
  . yoctopuce 1.10.22936 => 1.10.25534
  . pyserial 2.7

@@ -42,11 +42,12 @@ Installation Mac OS X
    + some other serial2USB dongles use the [http://prolificusa.com/pl-2303hx-drivers/](Prolific PL2303 driver) (on Mac OS X 10.8 and higher some reported that the org. Profilic driver failed to work, but the [NoZAP driver](http://sourceforge.net/projects/osx-pl2303/) did work)
 
 2. Download and run the [Artisan OS X installer](http://code.google.com/p/artisan/downloads/list)
-3. on OS X 10.8 Mountain Lion you need to (temporarily during installation) tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app
+3. on OS X 10.8 Mountain Lion and later you need to (temporarily during installation) tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app.
 4. Double click on the `dmg` file you just downloaded
 5. Double click the disk image which appears on your desktop
 6. Drag the `artisan` application icon to your `Applications` directory.
-7. On OS X > 10.7: after first application start, tick again "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel
+7. On first app start Mac OS X can warn about unidentified developer. See [https://support.apple.com/kb/PH21769](https://support.apple.com/kb/PH21769) on how to open an app from an unidentified developer.
+8. On OS X > 10.7: after first application start, tick again "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel
 
 Installation Linux
 ------------------

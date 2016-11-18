@@ -1,44 +1,30 @@
-originally installed:
-- Python 2.7.3
-- Python 3.2.3
+Assuming Jessy with Python 2.7.9 and Python 3.4.2 installed
 
 
-#sudo apt-get install python
- => already newest
+Basic preparations
 
-sudo apt-get install python-dev-all
-#sudo apt-get install libjpeg-dev
-#sudo apt-get install libfreetype6-dev
-sudo apt-get install python-setuptools
-sudo apt-get install python-pip
+# sudo apt-get install python-dev  # 2.7.9
+# sudo apt-get install libjpeg-dev
+# sudo apt-get install libfreetype6-dev
+# sudo apt-get install libxft-dev
 
-sudo easy_install -U distribute
-sudo pip install -IU pip # update pip
+# sudo apt-get install python-setuptools
+# sudo apt-get install python-pip
+# sudo apt-get install python3-pip
 
-sudo pip install RPi.GPIO
-sudo pip install pySerial # v2.5
 
-sudo apt-get install python-numpy # v1.6.2
-sudo apt-get install python-scipy # 0.10.1
-sudo apt-get install python-matplotlib # 1.1.1rc2
-sudo apt-get install python-qt4 # Qt4.8.1, PyQt 4.9.3
-sudo apt-get install pyqt4-dev-tools
+# sudo apt-get install python-numpy
+# sudo apt-get install python-scipy
+# sudo apt-get install python-matplotlib
+
+# sudo apt-get install python-qt4 # Qt4.8.6, PyQt 4.11.2
+# sudo apt-get install pyqt4-dev-tools
+
+
+
+
 
 sudo apt-get install git
-
-
-
-After the update to Jessy:
-- Python 2.7.9
- . pyserial v2.6
- . numpy 1.8.2
- . Qt 4.8.6
- . PyQt 4.11.2
- . pip 7.1.2
-- Python 3.4.2
- . pyserial v2.6
- . numpy 1.8.2
-
 
 
 ==
@@ -54,18 +40,19 @@ for scipy installation:
 
 1) installing/updating libs for Python2
 
-upgrade pip
-# sudo pip install -IU pip
-# sudo pip install -IU pyserial  # 2.7
-# sudo pip install -IU numpy # 1.9.3
-# sudo pip install -IU scipy # 0.16.0
-# sudo pip install -IU matplotlib # 1.4.3
-# sudo pip install -IU qrcode # 5.1
-# sudo pip install -IU yoctopuce # 1.10.21486
-# sudo pip install -IU requests # 2.7.0
-# sudo pip install -IU gevent # 1.0.2
-# sudo pip install -IU bottle # 0.12.8
+
+# sudo pip install -IU pip # 8.1.2
+# sudo pip install -IU pyserial  # 3.2.1
+# sudo pip install -IU numpy # 1.11.2
+# sudo pip install -IU scipy # 0.18.1
+# sudo pip --no-cache-dir install -IU matplotlib # 1.5.3
+# sudo pip install -IU qrcode # 5.3
+# sudo pip install -IU yoctopuce # 1.10.25748
+# sudo pip install -IU requests # 2.11.1
+# sudo pip install -IU gevent # 1.1.2
+# sudo pip install -IU bottle # 0.12.10
 # sudo pip install -IU gevent-websocket # 0.9.5
+# sudo pip install -IU unidecode # 0.4.19
 
 pymodbus (from py3 trunk)
 # cd /tmp
@@ -87,7 +74,12 @@ Phidgets (from Web)
 # sudo python setup.py install
 
 install Phidgets lib on Raspberry
-install Yocto lib on Raspberry
+# sudo apt-get install libusb-1.0-0-dev
+# wget http://www.phidgets.com/downloads/libraries/libphidget.tar.gz
+# tar zxvf libphidget.tar.gz
+# cd libphidget-*
+# ./configure
+# sudo make install
 
 
 Artisan
@@ -100,47 +92,28 @@ Artisan
 
 
 
+
+
+
 2) installing/updating libs for Python3
 
-# sudo apt-get install python-pip
-# sudo pip3 install -IU pyserial # 2.7
-# sudo pip3 install -IU numpy # 1.9.3
-# sudo pip3 install -IU scipy # 
-# sudo pip3 install -IU matplotlib # 
-
-
-# sudo apt-get install qt5-default
-
-# wget https://www.riverbankcomputing.com/static/Downloads/sip4/sip-4.17-snapshot-9102d6c3daf0.tar.gz
-# python3 configure.py
-# make
-# sudo make install
-
-# wget https://www.riverbankcomputing.com/static/Downloads/PyQt4/PyQt-x11-gpl-4.11.5-snapshot-cc708df12d26.tar.gz
-# python3 configure.py -q /usr/lib/arm-linux-gnueabihf/qt5/bin/qmake
-# make
-# sudo make install
-
-
-upgrade pip
-# sudo pip3 install -IU pip
-# sudo pip3 install -IU pyserial  # 2.7
-# sudo pip3 install -IU numpy # 1.10.0
-## # sudo pip3 install -IU scipy # 0.16.0
-##   => fails
-#  sudo apt-get install python3-scipy
-# sudo pip3 install -IU matplotlib # 1.4.3
- (+ nose-1.3.7 pyparsing-2.0.3 python-dateutil-2.4.2 pytz-2015.6 six-1.10.0)
-# sudo pip3 install -IU qrcode # 5.1
-# sudo pip3 install -IU yoctopuce # 1.10.21486
+# sudo pip3 install -IU pip # 8.1.2
+# sudo pip3 install -IU pyserial # 3.2.1
+# sudo pip3 install -IU numpy # 1.11.2
+# sudo pip3 install -IU scipy # 0.18.1
+# sudo apt-get install qt5-default # 5.3.2
+# sudo apt-get install qttools5-dev-tools
+# sudo apt-get install python3-pyqt5
+# sudo apt-get install pyqt5-dev-tools
+# sudo pip3 --no-cache-dir install -IU matplotlib # 1.5.3
+# sudo pip3 install -IU qrcode # 5.3
+# sudo pip3 install -IU yoctopuce # 1.0.25748
 # sudo pip3 install -IU requests # 2.7.0
-## # sudo pip3 install -IU gevent # 1.0.2
-##  => not py3 compatible!
-# sudo pip3 install cython git+git://github.com/gevent/gevent.git#egg=gevent
-  (installs cython 0.23.4 and gevent-1.1b6.dev0)
-
-# sudo pip3 install -IU bottle # 0.12.8
+# sudo pip3 install -IU gevent # 1.1.2
+# sudo pip3 install -IU bottle # 0.12.10
 # sudo pip3 install -IU gevent-websocket # 0.9.5
+# sudo pip3 install -IU unidecode # 0.4.19
+# sudo pip3 install pyinstaller
 
 
 pymodbus (from py3 trunk)
@@ -150,8 +123,8 @@ pymodbus (from py3 trunk)
 # cd pymodbus-python3
 # vi setup.py
  => remove dependency to twisted (2x)
-# python3.4 setup.py build
-# sudo python3.4 setup.py install
+# python3 setup.py build
+# sudo python3 setup.py install
 
 
 Phidgets (from Web)
@@ -159,6 +132,8 @@ Phidgets (from Web)
 # wget http://www.phidgets.com/downloads/libraries/PhidgetsPython.zip
 # unzip PhidgetsPython.zip
 # cd PhidgetsPython
-# python3.4 setup.py build
-# sudo python3.4 setup.py install
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
 
