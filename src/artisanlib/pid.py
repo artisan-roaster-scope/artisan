@@ -101,7 +101,6 @@ class PID(object):
             if self.active:
                 now = time.time()
                 err = self.target - i
-                
                 if not self.lastError or not self.lastTime:
                     self.lastTime = now
                     self.lastError = err
@@ -170,7 +169,7 @@ class PID(object):
         self.output_decay_weights = None
         self.previous_outputs = []
 
-    def setTarget(self, target,init=True):
+    def setTarget(self, target, init=True):
         self.target = target
         if init:
             self.init()

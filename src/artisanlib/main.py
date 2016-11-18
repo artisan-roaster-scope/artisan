@@ -8762,9 +8762,8 @@ class SampleThread(QThread):
                     aw.qmc.tstemp1.append(st1)
                     aw.qmc.tstemp2.append(st2)
                             
-                    if aw.pidcontrol.pidActive and \
-                        (aw.qmc.device == 53 or # Hottop
-                        (aw.qmc.device in [19,29] and not aw.pidcontrol.externalPIDControl())): # MODBUS or TC4 + Artisan Software PID lib
+                    if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
+                            not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
                         if aw.pidcontrol.pidSource == 1:
                             #aw.qmc.pid.update(t2_final) # original BT
                             aw.qmc.pid.update(st2) # smoothed BT
@@ -11685,7 +11684,7 @@ class ApplicationWindow(QMainWindow):
     def eventaction(self,action,cmd):
         if action:
             try:
-                cmd_str = str(cmd)
+                cmd_str = u(cmd)
                 if action == 1:
                     cmd_str_bin = ""
                     #example a2b_uu("Hello") sends Hello in binary format instead of ASCII
@@ -11696,9 +11695,9 @@ class ApplicationWindow(QMainWindow):
                         self.ser.sendTXcommand(cmd_str_bin)
                     else:
                         self.ser.sendTXcommand(cmd_str)
-                elif action == 2: # alarm and button call program action (without any argument)
+                elif action == 2: # slider and button call program action
                     try:
-                        if cmd_str and (len(cmd_str.split(" ")) > 1 or platf == 'Darwin'):
+                        if cmd_str and (len(cmd_str.split(" ")) > 1 or platf == 'Darwin' or platf == 'Linux'):
                             self.call_prog_with_args(cmd_str) # a command with argument
                         else:
 # take care, the QDir().current() directory changes with loads and saves 
@@ -11883,17 +11882,13 @@ class ApplicationWindow(QMainWindow):
     def calc_env(self):
         # we try to set the users standard environment, replacing the one pointing to the restrictive python build in Artisan
         my_env = os.environ.copy()
-        try:            
-            if 'PYTHONHOME' in my_env:
-                del my_env['PYTHONHOME']
-            if 'PYTHONPATH' in my_env:
-                del my_env['PYTHONPATH']
+        try:
+            for v in ['PYTHONHOME','PYTHONPATH','LD_LIBRARY_PATH']:
+                if v in my_env:
+                    del my_env[v]
             # try to source users environment to make external Python scripts run in their "natural" env
             if platf in ['Darwin', 'Linux']:
-                if platf == 'Darwin':
-                    command = ['bash', '-c', 'source ~/.bash_profile && env']
-                elif platf == 'Linux':
-                    command = ['bash', '-c', 'source init_env && env']
+                command = ['bash', '-c', 'source ~/.bash_profile ~/.bash_login ~/.profile 2>/dev/null && env']
                 try:
                     proc = subprocess.Popen(command, stdout = subprocess.PIPE)
                     for line in proc.stdout:
@@ -11910,22 +11905,27 @@ class ApplicationWindow(QMainWindow):
         
                         
     def call_prog_with_args(self,cmd_str):
+        print("cmd_str",cmd_str,type(cmd_str))
         cmd_str_parts = cmd_str.split(" ")
         if len(cmd_str_parts) > 0:
-            cmd = cmd_str_parts[0].strip()
-            qd = QDir(u(cmd))
-            current = QDir.current()
-            QDir.setCurrent(u(aw.getAppPath()))
-            if platf == 'Windows' and sys.version < '3':
-                import locale
-                prg_file = u(qd.absolutePath()).encode(locale.getpreferredencoding())
-            else:
-                prg_file = u(qd.absolutePath())
-            my_env = self.calc_env()
-            subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False,env=my_env)
-            QDir.setCurrent(current.absolutePath())
-            # alternative approach, that seems to fail on some Mac OS X versions:
-            #QProcess.startDetached(prg_file)
+            try:
+                cmd = cmd_str_parts[0].strip()
+                qd = QDir(u(cmd))
+                current = QDir.current()
+                QDir.setCurrent(u(aw.getAppPath()))
+                if platf == 'Windows' and sys.version < '3':
+                    import locale
+                    prg_file = u(qd.absolutePath()).encode(locale.getpreferredencoding())
+                else:
+                    prg_file = u(qd.absolutePath())
+                my_env = self.calc_env()
+                subprocess.Popen(cmd_str,shell=True,env=my_env)
+#                subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False,env=my_env)
+                QDir.setCurrent(current.absolutePath())
+                # alternative approach, that seems to fail on some Mac OS X versions:
+                #QProcess.startDetached(prg_file)
+            except Exception:
+                pass
                     
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     # updates corresponding eventslidervalues
@@ -15423,7 +15423,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("buttonactions"):
                 self.qmc.buttonactions = [toInt(x) for x in toList(settings.value("buttonactions"))]
             if settings.contains("buttonactionstrings"):
-                self.qmc.buttonactionstrings = list(map(str,list(toStringList(settings.value("buttonactionstrings",self.qmc.buttonactionstrings)))))
+                self.qmc.buttonactionstrings = list(map(u,list(toStringList(settings.value("buttonactionstrings",self.qmc.buttonactionstrings)))))
             if settings.contains("extrabuttonactions"):
                 self.qmc.extrabuttonactions = [toInt(x) for x in toList(settings.value("extrabuttonactions"))]
             if settings.contains("extrabuttonactionstrings"):
@@ -15673,7 +15673,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("slidervisibilities"):
                 self.eventslidervisibilities = [toInt(x) for x in toList(settings.value("slidervisibilities",self.eventslidervisibilities))]
                 self.eventslideractions = [toInt(x) for x in toList(settings.value("slideractions",self.eventslideractions))]
-                self.eventslidercommands = list(map(str,list(toStringList(settings.value("slidercommands",self.eventslidercommands)))))
+                self.eventslidercommands = list(map(u,list(toStringList(settings.value("slidercommands",self.eventslidercommands)))))
                 self.eventslideroffsets = [toInt(x) for x in toList(settings.value("slideroffsets",self.eventslideroffsets))]
                 self.eventsliderfactors = [toDouble(x) for x in toList(settings.value("sliderfactors",self.eventsliderfactors))]
             if settings.contains("eventslidersflag"):
@@ -24691,7 +24691,7 @@ class WindowsDlg(ArtisanDialog):
         self.ylimitEdit.setMaximumWidth(60)
         self.ylimitEdit_min = QLineEdit()
         self.ylimitEdit_min.setMaximumWidth(60)
-        self.ylimitEdit.setValidator(QIntValidator(0, 850, self.ylimitEdit))
+        self.ylimitEdit.setValidator(QIntValidator(0, 9999, self.ylimitEdit))
         self.ylimitEdit_min.setValidator(QIntValidator(-150, 500, self.ylimitEdit_min))
         self.ylimitEdit.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.ylimitEdit_min.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
@@ -24717,6 +24717,7 @@ class WindowsDlg(ArtisanDialog):
         self.xrotationSpinBox.setRange(0,90)
         self.xrotationSpinBox.setSingleStep(5)
         self.xrotationSpinBox.setValue(aw.qmc.xrotation)
+        self.xrotationSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.xrotationSpinBox.valueChanged.connect(self.changexrotation)
         self.xrotationSpinBox.setMaximumWidth(40)
         self.legendComboBox = QComboBox()
@@ -24804,12 +24805,14 @@ class WindowsDlg(ArtisanDialog):
         self.gridwidthSpinBox.setValue(aw.qmc.gridthickness)
         self.gridwidthSpinBox.valueChanged.connect(self.changegridwidth)
         self.gridwidthSpinBox.setMaximumWidth(40)
+        self.gridwidthSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         gridalphalabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
         self.gridalphaSpinBox = QSpinBox()
         self.gridalphaSpinBox.setRange(1,10)
         self.gridalphaSpinBox.setValue(int(aw.qmc.gridalpha*10))
         self.gridalphaSpinBox.valueChanged.connect(self.changegridalpha)
         self.gridalphaSpinBox.setMaximumWidth(40)
+        self.gridalphaSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         okButton = QPushButton(QApplication.translate("Button","OK",None))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
@@ -24831,37 +24834,51 @@ class WindowsDlg(ArtisanDialog):
         xlayout.addWidget(resettimelabel,2,2)
         xlayout.addWidget(self.resetEdit,2,3)
         xlayout.addWidget(xrotationlabel,3,0)
-        xlayout.addWidget(self.fixmaxtimeFlag,3,2)
+        xlayout.addWidget(self.fixmaxtimeFlag,3,2,1,2,Qt.AlignRight)
         xlayout.addWidget(self.xrotationSpinBox,3,1)
         ylayout = QGridLayout()
-        ylayout.addWidget(ylimitLabel_min,0,0)
+        ylayout.addWidget(ylimitLabel_min,0,0,Qt.AlignRight)
         ylayout.addWidget(self.ylimitEdit_min,0,1)
-        ylayout.addWidget(ylimitLabel,0,2)
-        ylayout.addWidget(self.ylimitEdit,0,3)
-        ylayout.addWidget(ygridlabel,1,0)
-        ylayout.addWidget(self.ygridSpinBox,1,1)
+        ylayout.addWidget(ylimitLabel,0,3,Qt.AlignRight)
+        ylayout.addWidget(self.ylimitEdit,0,4)
+        ylayout.addWidget(ygridlabel,0,6,Qt.AlignRight)
+        ylayout.addWidget(self.ygridSpinBox,0,7)
+        ylayout.setColumnMinimumWidth(2,10)
+        ylayout.setColumnMinimumWidth(5,10)
+        ylayoutHbox = QHBoxLayout()
+        ylayoutHbox.addStretch()
+        ylayoutHbox.addLayout(ylayout)
+        ylayoutHbox.addStretch()
         zlayout = QGridLayout()
-        zlayout.addWidget(zlimitLabel_min,0,0)
+        zlayout.addWidget(zlimitLabel_min,0,0,Qt.AlignRight)
         zlayout.addWidget(self.zlimitEdit_min,0,1)
-        zlayout.addWidget(zlimitLabel,0,2)
-        zlayout.addWidget(self.zlimitEdit,0,3)
-        zlayout.addWidget(zgridlabel,1,0)
-        zlayout.addWidget(self.zgridSpinBox,1,1)
+        zlayout.addWidget(zlimitLabel,0,3,Qt.AlignRight)
+        zlayout.addWidget(self.zlimitEdit,0,4)
+        zlayout.addWidget(zgridlabel,0,6,Qt.AlignRight)
+        zlayout.addWidget(self.zgridSpinBox,0,7)
+        zlayout.setColumnMinimumWidth(2,10)
+        zlayout.setColumnMinimumWidth(5,10)
+        zlayoutHbox = QHBoxLayout()
+        zlayoutHbox.addStretch()
+        zlayoutHbox.addLayout(zlayout)
+        zlayoutHbox.addStretch()
         legentlayout = QHBoxLayout()
+        legentlayout.addStretch()
         legentlayout.addWidget(self.legendComboBox,0,Qt.AlignLeft)
+        legentlayout.addStretch()
         graphgridlayout = QGridLayout()
-        graphgridlayout.addWidget(linestylegridlabel,1,0)
+        graphgridlayout.addWidget(linestylegridlabel,1,0,Qt.AlignRight)
         graphgridlayout.addWidget(self.gridstylecombobox,1,1,Qt.AlignLeft)
-        graphgridlayout.addWidget(gridthicknesslabel,1,2)
+        graphgridlayout.addWidget(gridthicknesslabel,1,2,Qt.AlignRight)
         graphgridlayout.addWidget(self.gridwidthSpinBox,1,3,Qt.AlignLeft)
-        graphgridlayout.addWidget(gridalphalabel,2,0)
-        graphgridlayout.addWidget(self.gridalphaSpinBox,2,1,Qt.AlignLeft)
+        graphgridlayout.addWidget(gridalphalabel,2,2,Qt.AlignRight)
+        graphgridlayout.addWidget(self.gridalphaSpinBox,2,3,Qt.AlignLeft)
         xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None))
         xGroupLayout.setLayout(xlayout)
         yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None))
-        yGroupLayout.setLayout(ylayout)
+        yGroupLayout.setLayout(ylayoutHbox)
         zGroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT/DeltaET Axis",None))
-        zGroupLayout.setLayout(zlayout)
+        zGroupLayout.setLayout(zlayoutHbox)
         legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None))
         legendLayout.setLayout(legentlayout)
         GridGroupLayout = QGroupBox(QApplication.translate("GroupBox","Grid",None))
@@ -25252,7 +25269,7 @@ class EventsDlg(ArtisanDialog):
         self.eventsshowflagbox = QCheckBox(QApplication.translate("CheckBox","Events",None))
         self.eventsshowflagbox.setChecked(bool(aw.qmc.eventsshowflag))
         self.eventsshowflagbox.stateChanged.connect(self.eventsshowflagChanged)        
-        self.eventsclampflag = QCheckBox(QApplication.translate("CheckBox","Clamp",None))
+        self.eventsclampflag = QCheckBox(QApplication.translate("CheckBox","Snap",None))
         self.eventsclampflag.setChecked(bool(aw.qmc.clampEvents))
         self.eventsclampflag.stateChanged.connect(self.eventsclampflagChanged)
         if aw.qmc.eventsGraphflag!=2:
@@ -26768,10 +26785,10 @@ class EventsDlg(ArtisanDialog):
         aw.eventslideractions[1] = int(self.E2action.currentIndex())
         aw.eventslideractions[2] = int(self.E3action.currentIndex())
         aw.eventslideractions[3] = int(self.E4action.currentIndex())
-        aw.eventslidercommands[0] = str(self.E1command.text())
-        aw.eventslidercommands[1] = str(self.E2command.text())
-        aw.eventslidercommands[2] = str(self.E3command.text())
-        aw.eventslidercommands[3] = str(self.E4command.text())
+        aw.eventslidercommands[0] = u(self.E1command.text())
+        aw.eventslidercommands[1] = u(self.E2command.text())
+        aw.eventslidercommands[2] = u(self.E3command.text())
+        aw.eventslidercommands[3] = u(self.E4command.text())
         aw.eventslideroffsets[0] = int(self.E1offset.value())
         aw.eventslideroffsets[1] = int(self.E2offset.value())
         aw.eventslideroffsets[2] = int(self.E3offset.value())
@@ -41542,10 +41559,10 @@ class PID_DlgControl(ArtisanDialog):
         dutyGrid = QGridLayout()
         dutyGrid.addWidget(pidDutyStepsLabel,0,0)
         dutyGrid.addWidget(self.pidDutySteps,0,1)
-        dutyGrid.addWidget(dutyMinLabel,1,0)
-        dutyGrid.addWidget(self.dutyMin,1,1)
-        dutyGrid.addWidget(dutyMaxLabel,2,0)
-        dutyGrid.addWidget(self.dutyMax,2,1)
+        dutyGrid.addWidget(dutyMaxLabel,1,0)
+        dutyGrid.addWidget(self.dutyMax,1,1)
+        dutyGrid.addWidget(dutyMinLabel,2,0)
+        dutyGrid.addWidget(self.dutyMin,2,1)
         
         
         dutyGrpBox = QVBoxLayout()
@@ -41845,7 +41862,7 @@ class PIDcontrol(object):
         self.svSliderMin = 0
         self.svSliderMax = 480
         self.svValue = 390 # the value in the setSV textinput box of the PID dialog
-        self.dutyMin = 0
+        self.dutyMin = -100
         self.dutyMax = 100
         self.pidKp = 20.0
         self.pidKi = 0.04
@@ -41996,9 +42013,7 @@ class PIDcontrol(object):
             aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
             self.pidActive = False
         # software PID
-        elif (aw.qmc.device == 53 or # Hottop
-              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
-              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
+        elif aw.qmc.Controlbuttonflag:
             aw.qmc.pid.setControl(lambda _: _)
             self.pidActive = False
             aw.qmc.pid.off()
@@ -42103,9 +42118,7 @@ class PIDcontrol(object):
             return None
 
     def setDutySteps(self,dutySteps):
-        if (aw.qmc.device == 53 or # Hottop
-              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
-              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
+        if aw.qmc.Controlbuttonflag and not aw.pidcontrol.externalPIDControl():
             aw.qmc.pid.setDutySteps(aw.pidcontrol.dutySteps)
 
     
@@ -42130,18 +42143,19 @@ class PIDcontrol(object):
                     finally:
                         if aw.ser.COMsemaphore.available() < 1:
                             aw.ser.COMsemaphore.release(1)
-        elif (aw.qmc.device == 53 or # Hottop
-              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
-              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
-            self.sv = max(0,sv) # remember last SV
-            if move and aw.pidcontrol.svSlider:
-                aw.moveSVslider(sv,setValue=True) # only move the SV slider
-            aw.qmc.pid.setTarget(sv,init=init)
         elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and Control ticked
             self.sv = max(0,sv)
             if move:
                 aw.moveSVslider(sv,setValue=True)
             aw.modbus.setTarget(sv)
+        elif aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
+#        elif (aw.qmc.device == 53 or # Hottop
+#              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
+#              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
+#            self.sv = max(0,sv) # remember last SV
+            if move and aw.pidcontrol.svSlider:
+                aw.moveSVslider(sv,setValue=True) # only move the SV slider
+            aw.qmc.pid.setTarget(sv,init=init)
 
     def adjustsv(self,diff):
         self.setSV(self.sv + diff,True)
@@ -42214,16 +42228,16 @@ class PIDcontrol(object):
                 finally:
                     if aw.ser.COMsemaphore.available() < 1:
                         aw.ser.COMsemaphore.release(1)
-        elif (aw.qmc.device == 53 or # Hottop
-              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
-              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
-            aw.qmc.pid.setPID(kp,ki,kd)
-            aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
-            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
         elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and (external) Control ticked
             aw.modbus.setPID(kp,ki,kd)
             aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
-
+        elif aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
+#         (aw.qmc.device == 53 or # Hottop
+#              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
+#              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
+            aw.qmc.pid.setPID(kp,ki,kd)
+            aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
+            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
 
 ###################################################################################
 ##########################  DTA PID CLASS DEFINITION  ############################
