@@ -1645,8 +1645,9 @@ class tgraphcanvas(FigureCanvas):
                 # make sure that the GUI framework has a chance to run its event loop
                 # and clear any GUI events.  This needs to be in a try/except block
                 # because the default implemenation of this method is to raise
-                # NotImplementedError          
-                self.fig.canvas.flush_events()
+                # NotImplementedError        
+                #self.fig.canvas.flush_events() # don't FLUSH event as this can lead to a second redraw started from within the same GUI thread and 
+                # causen a hang by the blocked semaphore
             except:
                 pass
             
@@ -3727,16 +3728,15 @@ class tgraphcanvas(FigureCanvas):
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
-    def redraw(self, recomputeAllDeltas=True, smooth=False,sampling=False):    
+    def redraw(self, recomputeAllDeltas=True, smooth=False,sampling=False):
         self.resetlinecountcaches() # ensure that the line counts are up to date
         self.resetlines() # get rid of HUD, projection and cross lines
         if aw.qmc.designerflag:
             aw.qmc.redrawdesigner()
         else:
             try:
-                QApplication.processEvents()
                 #### lock shared resources   ####
-                aw.qmc.samplingsemaphore.acquire(1)            
+                aw.qmc.samplingsemaphore.acquire(1)
     
                 rcParams['path.effects'] = []
                 if aw.qmc.graphstyle == 1:
@@ -4428,7 +4428,7 @@ class tgraphcanvas(FigureCanvas):
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
     
-                QApplication.processEvents()
+#                QApplication.processEvents()
                 
                 ##### ET,BT curves
                 if aw.qmc.ETcurve:
@@ -4586,7 +4586,6 @@ class tgraphcanvas(FigureCanvas):
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
-                QApplication.processEvents()
     
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
@@ -11905,7 +11904,6 @@ class ApplicationWindow(QMainWindow):
         
                         
     def call_prog_with_args(self,cmd_str):
-        print("cmd_str",cmd_str,type(cmd_str))
         cmd_str_parts = cmd_str.split(" ")
         if len(cmd_str_parts) > 0:
             try:
@@ -11919,8 +11917,10 @@ class ApplicationWindow(QMainWindow):
                 else:
                     prg_file = u(qd.absolutePath())
                 my_env = self.calc_env()
-                subprocess.Popen(cmd_str,shell=True,env=my_env)
-#                subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False,env=my_env)
+                if platf == 'Windows':
+                    subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False,env=my_env)
+                else:
+                    subprocess.Popen(cmd_str,shell=True,env=my_env)
                 QDir.setCurrent(current.absolutePath())
                 # alternative approach, that seems to fail on some Mac OS X versions:
                 #QProcess.startDetached(prg_file)
@@ -20175,15 +20175,16 @@ class ApplicationWindow(QMainWindow):
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None):
         super(ArtisanDialog,self).__init__(parent)
-        #self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        windowFlags = self.windowFlags()
-        #windowFlags &= ~Qt.WindowContextHelpButtonHint # remove help button
-        #windowFlags &= ~Qt.WindowMaximizeButtonHint # remove maximise button
-        #windowFlags &= ~Qt.WindowMinMaxButtonsHint  # remove min/max combo
-        #windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
-        windowFlags |= Qt.WindowSystemMenuHint  # Adds a window system menu, and possibly a close button
-        windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
-        self.setWindowFlags(windowFlags)
+# setting those Windows flags could be the reason for some instabilities on Windows
+#        #self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+#        windowFlags = self.windowFlags()
+#        #windowFlags &= ~Qt.WindowContextHelpButtonHint # remove help button
+#        #windowFlags &= ~Qt.WindowMaximizeButtonHint # remove maximise button
+#        #windowFlags &= ~Qt.WindowMinMaxButtonsHint  # remove min/max combo
+#        #windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
+#        windowFlags |= Qt.WindowSystemMenuHint  # Adds a window system menu, and possibly a close button
+#        windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
+#        self.setWindowFlags(windowFlags)
     
                               
     def keyPressEvent(self,event):
@@ -31635,7 +31636,7 @@ class serialport(object):
             error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.ARDUINOTC4temperature()"
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + " " + str(e),exc_tb.tb_lineno)
+            aw.qmc.adderror(timez + " " + error + " " + str(e),exc_tb.tb_lineno)
             return -1.,-1.
         except Exception as e:
             # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
@@ -31976,7 +31977,7 @@ class serialport(object):
             error  = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendTXcommand()"
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + " " + str(e),exc_tb.tb_lineno)
+            aw.qmc.adderror(timez + " " + error + " " + str(e),exc_tb.tb_lineno)
         except Exception as ex:
             #self.closeport() # do not close the serial port as reopening might take too long
             _, _, exc_tb = sys.exc_info()
