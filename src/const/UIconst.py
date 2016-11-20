@@ -156,6 +156,7 @@ TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None)
 TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None)
 TOOLKIT_MENU_WHEELGRAPH = QApplication.translate("Menu", "Wheel Graph", None)
 TOOLKIT_MENU_LCDS = QApplication.translate("Menu", "LCDs", None)
+TOOLKIT_MENU_FULLSCREEN = QApplication.translate("Menu", "Fullscreen", None)
 TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None)
 
 
