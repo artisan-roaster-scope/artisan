@@ -11761,6 +11761,28 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.08
                                 except Exception:
                                     pass
+                            elif cs.startswith('mwrite'):
+                                try:
+                                    cmds = eval(cs[len('mwrite'):])
+                                    print("cmds",cmds)
+                                    if isinstance(cmds,tuple):
+                                        if len(cmds) == 4 and not isinstance(cmds[0],list):
+                                            # cmd has format "mwrite(s,r,am,om)"
+                                            aw.modbus.maskWriteRegister(*cmds)
+                                            followupCmd = 0.08
+                                        else:
+                                        # cmd has format "mwrite([s,r,am,om],..,[s,r,am,om])"
+                                            for cmd in cmds:
+                                                if followupCmd:
+                                                    libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
+                                                aw.modbus.maskWriteRegister(*cmd)
+                                                followupCmd = 0.08
+                                    else:
+                                        # cmd has format "write([s,r,am,om])"
+                                        aw.modbus.maskWriteRegister(*cmds)
+                                        followupCmd = 0.08
+                                except Exception:
+                                    pass                                    
                             elif cs.startswith("wcoils"):
                                 try:
                                     cmds = eval(cs[len('wcoils'):])
@@ -26212,7 +26234,9 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<b>Action</b> Perform an action on slider release",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Command</b> depends on the action type<br>('{}' is replaced by <i>value</i>*<i>factor</i> + <i>offset</i>)",None))
         string += u(QApplication.translate("Message", "<ul><li>Serial Command: ASCII serial command or binary a2b_uu(serial command)",None))
-        string += u(QApplication.translate("Message", "<li>Modbus Command: <ul><li>write([slaveId,register,value],..,[slaveId,register,value])<li>wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])<li>wcoils(slaveId,register,&lt;bool&gt;)</ul>writes values to the registers in slaves specified by the given ids",None))
+        string += u(QApplication.translate("Message", "<li>Modbus Command: <ul><li>write([slaveId,register,value],..,[slaveId,register,value])",None))
+        string += u(QApplication.translate("Message", "<li>mwrite(slaveId,register,andMask,orMask)<li>wcoil(slaveId,register,&lt;bool&gt;)<li>wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])",None))
+        string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given ids",None))
         string += u(QApplication.translate("Message", "<li>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None)) + "</ul>"
         string += u(QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Factor</b> multiplicator of the slider value",None))
@@ -27040,7 +27064,7 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<UL><LI>Serial Command: ASCII serial command or binary a2b_uu(serial command)",None))
         string += u(QApplication.translate("Message", "<LI>Call Program: A program/script path (absolute or relative)",None))
         string += u(QApplication.translate("Message", "<LI>Multiple Event: Adds events of other button numbers separated by a comma: 1,2,..",None))
-        string += u(QApplication.translate("Message", "<LI>Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) or wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;]) writes values to the registers in slaves specified by the given ids",None))
+        string += u(QApplication.translate("Message", "<LI>Modbus Command: <ul><li>write([slaveId,register,value],..,[slaveId,register,value])<li>wcoil(slaveId,register,&lt;bool&gt;)<li>wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])<li>mwrite(slaveId,register,andMask,orMask)</ul>writes values to the registers in slaves specified by the given ids",None))
         string += u(QApplication.translate("Message", "<LI>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None))
         string += u(QApplication.translate("Message", "<LI>IO Command: set(n,0), set(n,1), toggle(n) to set Phidget IO digital output n",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Heater: sets heater to value",None))
@@ -28413,7 +28437,7 @@ class StatisticsDlg(ArtisanDialog):
         targetlabel =QLabel(QApplication.translate("Label", "Target",None))
         self.targetedit = QSpinBox()
         self.targetedit.setAlignment(Qt.AlignRight)
-        self.targetedit.setRange(0,999)
+        self.targetedit.setRange(0,9999)
         self.targetedit.setValue(aw.qmc.AUCtarget)
         self.targetFlag = QCheckBox(QApplication.translate("CheckBox","Background", None))
         self.targetedit.setEnabled(not aw.qmc.AUCtargetFlag)
@@ -28745,7 +28769,7 @@ class modbusport(object):
                         stopbits=self.stopbits,
                         timeout=self.timeout)          
                 self.master.connect()
-                libtime.sleep(.3) # avoid possible hickups on startup
+                libtime.sleep(.7) # avoid possible hickups on startup
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -28810,6 +28834,25 @@ class modbusport(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
+
+    def maskWriteRegister(self,slave,register,and_mask,or_mask):
+        print("maskWriteRegister",slave,register,and_mask,or_mask)
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            self.master.mask_write_register(int(register),int(and_mask),int(or_mask),unit=int(slave))
+            libtime.sleep(.3) # avoid possible hickups on startup
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            self.disconnect()
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeMask() {0}").format(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+
 
     # value=int or float
     # writes a single precision 32bit float (2-registers)
@@ -33538,8 +33581,11 @@ class comportDlg(ArtisanDialog):
         modbus_help_text += QApplication.translate("Message", " set the divider to 'x/10'.",None) + "<br><br>"
         modbus_help_text += QApplication.translate("Message", "Few devices hold data as 4 byte floats in two registers.",None)
         modbus_help_text += QApplication.translate("Message", " Tick the Float flag in this case.",None)
-        QMessageBox.information(self,QApplication.translate("Message", "MODBUS Help",None),modbus_help_text)
-        
+#        QMessageBox.information(self,QApplication.translate("Message", "MODBUS Help",None),modbus_help_text)
+        msgbox = QMessageBox(self)
+        msgbox.setWindowTitle(QApplication.translate("Message", "MODBUS Help",None))
+        msgbox.setInformativeText(modbus_help_text)
+        msgbox.show()
         
     def scanModbus(self):
         scan_mobuds_dlg = scanModbusDlg(self)
@@ -41822,13 +41868,13 @@ class PID_DlgControl(ArtisanDialog):
         aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
         aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
         aw.pidcontrol.svSlider = self.pidSVsliderFlag.isChecked()
+        aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
+        aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.svValue = self.pidSV.value()
         aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
         aw.pidcontrol.svButtons = self.pidSVbuttonsFlag.isChecked()
         aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons)
         aw.pidcontrol.svMode = self.pidMode.currentIndex()
-        aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
-        aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.dutyMin = min(self.dutyMin.value(),self.dutyMax.value())
         aw.pidcontrol.dutyMax = max(self.dutyMin.value(),self.dutyMax.value())
         aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
@@ -42208,14 +42254,16 @@ class PIDcontrol(object):
             if move:
                 aw.moveSVslider(sv,setValue=True)
             aw.modbus.setTarget(sv)
+            self.sv = sv # remember last sv
         elif aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
 #        elif (aw.qmc.device == 53 or # Hottop
 #              (aw.qmc.device == 19 and not aw.pidcontrol.externalPIDControl()) or # TC4 + Artisan Software PID lib
 #              (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl())): # MODBUS + Artisan Software PID lib
 #            self.sv = max(0,sv) # remember last SV
             if move and aw.pidcontrol.svSlider:
-                aw.moveSVslider(sv,setValue=True) # only move the SV slider
+                aw.moveSVslider(sv,setValue=True)
             aw.qmc.pid.setTarget(sv,init=init)
+            self.sv = sv # remember last sv
 
     def adjustsv(self,diff):
         self.setSV(self.sv + diff,True)
