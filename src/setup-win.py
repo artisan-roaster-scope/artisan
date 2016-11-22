@@ -9,8 +9,6 @@ from distutils.core import setup
 import matplotlib as mpl
 import py2exe
 
-import os
-
 import numpy
 import os
 import sys
@@ -23,8 +21,8 @@ def numpy_dll_paths_fix():
         for item in filenames:
             if item.endswith('.dll'):
                 paths.add(dirpath)
-
-    sys.path.append(*list(paths))
+    if paths:
+        sys.path.append(*list(paths))
 
 numpy_dll_paths_fix()
 

@@ -11764,7 +11764,6 @@ class ApplicationWindow(QMainWindow):
                             elif cs.startswith('mwrite'):
                                 try:
                                     cmds = eval(cs[len('mwrite'):])
-                                    print("cmds",cmds)
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 4 and not isinstance(cmds[0],list):
                                             # cmd has format "mwrite(s,r,am,om)"
@@ -25971,51 +25970,51 @@ class EventsDlg(ArtisanDialog):
         defaultButtonsLayout = QGridLayout()
         defaultButtonsLayout.addWidget(self.RESETbuttonLabel,0,0,Qt.AlignRight)
         defaultButtonsLayout.addWidget(self.RESETbuttonActionType,0,1)
-        self.RESETbuttonActionType.setMaximumWidth(100)
+#        self.RESETbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.RESETbuttonActionString,0,2)        
         defaultButtonsLayout.addWidget(self.ONbuttonLabel,1,0,Qt.AlignRight)
         defaultButtonsLayout.addWidget(self.ONbuttonActionType,1,1)
-        self.ONbuttonActionType.setMaximumWidth(100)
+#        self.ONbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.ONbuttonActionString,1,2)
         defaultButtonsLayout.addWidget(self.OFFbuttonLabel,2,0,Qt.AlignRight)
         defaultButtonsLayout.addWidget(self.OFFbuttonActionType,2,1)
-        self.OFFbuttonActionType.setMaximumWidth(100)
+#        self.OFFbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.OFFbuttonActionString,2,2)
         defaultButtonsLayout.addWidget(self.STARTbuttonLabel,3,0,Qt.AlignRight)
         defaultButtonsLayout.addWidget(self.STARTbuttonActionType,3,1)
-        self.STARTbuttonActionType.setMaximumWidth(100)
+#        self.STARTbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.STARTbuttonActionString,3,2)        
         defaultButtonsLayout.addWidget(self.CHARGEbutton,4,0)
         defaultButtonsLayout.addWidget(self.CHARGEbuttonActionType,4,1)
-        self.CHARGEbuttonActionType.setMaximumWidth(100)
+#        self.CHARGEbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.CHARGEbuttonActionString,4,2)
         defaultButtonsLayout.addWidget(self.DRYbutton,5,0)
         defaultButtonsLayout.addWidget(self.DRYbuttonActionType,5,1)
-        self.DRYbuttonActionType.setMaximumWidth(100)
+#        self.DRYbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.DRYbuttonActionString,5,2)
         defaultButtonsLayout.addWidget(self.FCSbutton,0,4)
         defaultButtonsLayout.addWidget(self.FCSbuttonActionType,0,5)
-        self.FCSbuttonActionType.setMaximumWidth(100)
+#        self.FCSbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.FCSbuttonActionString,0,6)
         defaultButtonsLayout.addWidget(self.FCEbutton,1,4)
         defaultButtonsLayout.addWidget(self.FCEbuttonActionType,1,5)
-        self.FCEbuttonActionType.setMaximumWidth(100)
+#        self.FCEbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.FCEbuttonActionString,1,6)
         defaultButtonsLayout.addWidget(self.SCSbutton,2,4)
         defaultButtonsLayout.addWidget(self.SCSbuttonActionType,2,5)
-        self.SCSbuttonActionType.setMaximumWidth(100)
+#        self.SCSbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.SCSbuttonActionString,2,6)
         defaultButtonsLayout.addWidget(self.SCEbutton,3,4)
         defaultButtonsLayout.addWidget(self.SCEbuttonActionType,3,5)
-        self.SCEbuttonActionType.setMaximumWidth(100)
+#        self.SCEbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.SCEbuttonActionString,3,6)
         defaultButtonsLayout.addWidget(self.DROPbutton,4,4)
         defaultButtonsLayout.addWidget(self.DROPbuttonActionType,4,5)
-        self.DROPbuttonActionType.setMaximumWidth(100)
+#        self.DROPbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.DROPbuttonActionString,4,6)
         defaultButtonsLayout.addWidget(self.COOLbutton,5,4)
         defaultButtonsLayout.addWidget(self.COOLbuttonActionType,5,5)
-        self.COOLbuttonActionType.setMaximumWidth(100)
+#        self.COOLbuttonActionType.setMaximumWidth(100)
         defaultButtonsLayout.addWidget(self.COOLbuttonActionString,5,6)
         defaultButtonsLayout.setContentsMargins(5,5,5,5)
         defaultButtonsLayout.setHorizontalSpacing(10)
@@ -28769,7 +28768,7 @@ class modbusport(object):
                         stopbits=self.stopbits,
                         timeout=self.timeout)          
                 self.master.connect()
-                libtime.sleep(.7) # avoid possible hickups on startup
+                libtime.sleep(.03) # avoid possible hickups on startup
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -28781,6 +28780,7 @@ class modbusport(object):
             self.COMsemaphore.acquire(1)
             self.connect()
             self.master.write_coils(int(register),list(values),unit=int(slave))
+            libtime.sleep(.3) # avoid possible hickups on startup
         except Exception as ex:
             self.disconnect()
 #            import traceback
@@ -28798,6 +28798,7 @@ class modbusport(object):
             self.COMsemaphore.acquire(1)
             self.connect()
             self.master.write_coil(int(register),value,unit=int(slave))
+            libtime.sleep(.3) # avoid possible hickups on startup
         except Exception as ex:
             self.disconnect()
             _, _, exc_tb = sys.exc_info()
@@ -28825,6 +28826,7 @@ class modbusport(object):
             self.COMsemaphore.acquire(1)
             self.connect()
             self.master.write_register(int(register),int(value),unit=int(slave))
+            libtime.sleep(.03) # avoid possible hickups on startup
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -28836,13 +28838,12 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
 
     def maskWriteRegister(self,slave,register,and_mask,or_mask):
-        print("maskWriteRegister",slave,register,and_mask,or_mask)
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
             self.master.mask_write_register(int(register),int(and_mask),int(or_mask),unit=int(slave))
-            libtime.sleep(.3) # avoid possible hickups on startup
+            libtime.sleep(.03)
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -28868,6 +28869,7 @@ class modbusport(object):
             builder.add_32bit_float(float(value))
             payload = builder.build() # .tolist()
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
+            libtime.sleep(.03)
         except Exception as ex:
             self.disconnect()
             _, _, exc_tb = sys.exc_info()
