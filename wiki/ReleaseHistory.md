@@ -31,6 +31,10 @@ v1.0.0 (XX.XX.2016)
     * adds profile C<->F batch conversion
     * adds a field for green bean temperature
     * adds p-i-d button action    
+    * adds auto axis limits calculation via manual trigger or automatic on load
+    * adds AUC statistics, LCD and guide
+    * adds possibility to "clamp" by-value custom events to the x-axis in the range of 0-100
+    * adds support for MODBUS mask-write method (function code 22)
  * Changes
     * dramatically improves speed of MODBUS over serial communication (by patching the underlying pymodbus lib)
     * makes message, error and serial logs autoupdating
@@ -42,6 +46,8 @@ v1.0.0 (XX.XX.2016)
     * improved RoR smoothing during recordings
     * makes development percentage the default for the phases lcds
     * increases resolution for Yoctopuce devices
+	* timeouts accept one decimal place
+	* improved dialog layouts
  * Bug Fixes
     * improves ranking reports for mixed profiles with different temperature units
     * fixed an issue with the Arduino/TC4 communication setup
@@ -56,6 +62,7 @@ v1.0.0 (XX.XX.2016)
     * fixes Fuji PXG duty overflow for values from -3% to 0%
     * fixes handling of external program paths containing accent characters on Windows
     * fixes handling of accent characters in autosave path
+	* improves handling of external program calls
     * various stability improvements
     
 ----
