@@ -42106,8 +42106,8 @@ class PIDcontrol(object):
                     #### lock shared resources #####
                     aw.ser.COMsemaphore.acquire(1)
                     if aw.ser.SP.isOpen():
-                        aw.ser.SP.flushInput()
-                        aw.ser.SP.flushOutput()
+#                        aw.ser.SP.flushInput()
+#                        aw.ser.SP.flushOutput()
                         aw.ser.SP.write(str2cmd("PID;OFF\n"))
                         aw.sendmessage(QApplication.translate("Message","PID turned off", None))
                 finally:
