@@ -3249,13 +3249,13 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
             try:
                 
+                # the RESET button action needs to be fired outside of the sempaphore to avoid lockups
+                aw.eventactionx(aw.qmc.xextrabuttonactions[0],aw.qmc.xextrabuttonactionstrings[0])
+
                 #### lock shared resources #####
                 aw.qmc.samplingsemaphore.acquire(1)
                 if self.flagon:
                     self.OffMonitor()
-                    
-                aw.eventactionx(aw.qmc.xextrabuttonactions[0],aw.qmc.xextrabuttonactionstrings[0])
-
                 #reset time
                 aw.qmc.timeclock.start()
                 
@@ -12348,20 +12348,22 @@ class ApplicationWindow(QMainWindow):
                     if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                         aw.fujipid.lookahead = max(0,aw.fujipid.lookahead-1)
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
-                    elif (aw.pidcontrol and
-                             ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
-                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
-                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 29))): # MODBUS hardware PID
+                    elif aw.qmc.Controlbuttonflag: # software PID
+#                      (aw.pidcontrol and
+#                             ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
+#                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
+#                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 29))): # MODBUS hardware PID
                         aw.pidcontrol.svLookahead = max(0,aw.pidcontrol.svLookahead-1)
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
                 elif key == 43:                       #+
                     if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                         aw.fujipid.lookahead = aw.fujipid.lookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
-                    elif (aw.pidcontrol and
-                             ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
-                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
-                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 29))): # MODBUS hardware PID
+                    elif aw.qmc.Controlbuttonflag: # software PID
+#                       (aw.pidcontrol and
+#                             ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
+#                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
+#                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 29))): # MODBUS hardware PID
                         aw.pidcontrol.svLookahead = aw.pidcontrol.svLookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
                 elif key == 32:                       #SELECTS ACTIVE BUTTON
@@ -17403,9 +17405,9 @@ class ApplicationWindow(QMainWindow):
         return ('{0:.0f}'.format(aw.qmc.convertTemp(data[key],unit,aw.qmc.mode)) + aw.qmc.mode if key in data else "")
     
             
-    def rankingData2htmlentry(self,production_data,ranking_data):
+    def rankingData2htmlentry(self,production_data,ranking_data,plot_color=None):
         HTML_REPORT_TEMPLATE = u("""<tr>
-<td>$batch</td>
+<td$color_code>$batch</td>
 <td>$time</td>
 <td>$title</td>
 <td sorttable_customkey=\"$in_num\">$weightin</td>
@@ -17424,7 +17426,13 @@ class ApplicationWindow(QMainWindow):
 </tr>""")
         pd = self.productionData2string(production_data)
         rd = self.rankingData2string(ranking_data)
+        batch_td_color = u("")
+        if plot_color is not None:
+            batch_color = [x * 100 for x in plot_color[0:3]]
+            batch_color.append(0.7)
+            batch_td_color = u(' style="background-color: rgba(' + '%,'.join(map(str, batch_color)) + ')"')        
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
+            color_code = batch_td_color,
             batch = pd["id"],
             time = pd["time"],
             title = pd["title"],
@@ -17533,7 +17541,6 @@ class ApplicationWindow(QMainWindow):
                 pd = self.profileProductionData(p,c)
                 c += 1
                 rd = self.profileRankingData(p)
-                entries += self.rankingData2htmlentry(pd,rd) + "\n"
                 i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
                 o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
                 if i > 0:
@@ -17575,9 +17582,13 @@ class ApplicationWindow(QMainWindow):
                 if rd["cupping"] > 0:
                     cuppings += rd["cupping"]
                     cuppings_count += 1
-                # add BT curve to graph
-                if len(profiles) < 11:
+                if len(profiles) >= 11:
+                    entries += self.rankingData2htmlentry(pd,rd) + "\n"
+                else:
+                    # add BT curve to graph
                     try:
+                        cl = next(color)
+                        entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"                    
                         label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]
@@ -17606,7 +17617,6 @@ class ApplicationWindow(QMainWindow):
                         min_start_time = min(min_start_time,timex[charge])
                         max_end_time = max(max_end_time,timex[drop])
                         # cut-out only CHARGE to DROP
-                        cl = next(color)
                         self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground="w")],
                                 linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
@@ -17642,8 +17652,11 @@ class ApplicationWindow(QMainWindow):
 
             if len(profiles) < 11:
                 try:
-                    # remove lines and artists from background profile
+                    # remove annotations, lines and artists from background profile
                     try:
+                        for l in aw.qmc.l_annotations:
+                            if l:
+                                l.remove()
                         for l in [
                                 aw.qmc.l_back1,
                                 aw.qmc.l_back2,
