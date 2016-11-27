@@ -1305,11 +1305,14 @@ class tgraphcanvas(FigureCanvas):
         self.alarmsfile = "" # filename alarms were loaded from
         self.temporaryalarmflag = -3 #holds temporary index value of triggered alarm in updategraphics()
         self.TPalarmtimeindex = None # is set to the current  aw.qmc.timeindex by sample(), if alarms are defined and once the TP is detected
+        
+        self.tempory_sample_trigger_redraw = False
 
         self.temporarysetsv = None #set by sample() to a new SV to be send to the PID by updategraphics() within the GUI thread as this moves the SV slider        
         self.temporary_error = None # set by adderror() to a new error message, send to the message line by updategraphics()
-        self.temporarymoveslider = None # set by pidcontrol.setEnergy (indirectly called from sample())
+        self.temporarymovepositiveslider = None # set by pidcontrol.setEnergy (indirectly called from sample())
                 # holds tuple (slidernr,value) and is executued and reset by updategraphics
+        self.temporarymovenegativeslider = None
         
         self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>]q
 
@@ -2015,11 +2018,18 @@ class tgraphcanvas(FigureCanvas):
                 self.temporarysetsv = None
                 
                 #check move slider pending actions
-                if self.temporarymoveslider:
-                    slidernr,value = self.temporarymoveslider
-                    aw.moveslider(slidernr,value) # move slider  
-                    aw.fireslideraction(slidernr) # fire action
-                self.temporarymoveslider = None
+                if self.temporarymovepositiveslider:
+                    slidernr,value = self.temporarymovepositiveslider
+                    if aw.sliderpos(slidernr) != value:
+                        aw.moveslider(slidernr,value) # move slider  
+                        aw.fireslideraction(slidernr) # fire action
+                self.temporarymovepositiveslider = None
+                if self.temporarymovenegativeslider:
+                    slidernr,value = self.temporarymovenegativeslider
+                    if aw.sliderpos(slidernr) != value:
+                        aw.moveslider(slidernr,value) # move slider  
+                        aw.fireslideraction(slidernr) # fire action
+                self.temporarymovenegativeslider = None
                 
                 #write error message
                 if self.temporary_error != None:
@@ -2076,65 +2086,69 @@ class tgraphcanvas(FigureCanvas):
                     ##### updated canvas
                     try:
                         if not self.block_update:
-                        #-- start update display
-                            if self.ax_background:
-                                self.fig.canvas.restore_region(self.ax_background)
-                                # draw eventtypes
-                                if self.eventsshowflag and self.eventsGraphflag == 2:
-                                    aw.qmc.ax.draw_artist(self.l_eventtype1dots)
-                                    aw.qmc.ax.draw_artist(self.l_eventtype2dots)
-                                    aw.qmc.ax.draw_artist(self.l_eventtype3dots)
-                                    aw.qmc.ax.draw_artist(self.l_eventtype4dots)
-                                # draw delta lines
-                                if self.DeltaETflag and self.l_delta1 != None:
-                                    aw.qmc.ax.draw_artist(self.l_delta1)
-                                if self.DeltaBTflag and self.l_delta2 != None:
-                                    aw.qmc.ax.draw_artist(self.l_delta2)
-                                # draw extra curves
-                                xtra_dev_lines1 = 0
-                                xtra_dev_lines2 = 0
-                                for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                                    if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
-                                        aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
-                                        xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                    if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
-                                        aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
-                                        xtra_dev_lines2 = xtra_dev_lines2 + 1
-                                # draw ET
-                                if aw.qmc.ETcurve:
-                                    aw.qmc.ax.draw_artist(self.l_temp1)
-                                # draw BT
-                                if aw.qmc.BTcurve:
-                                    aw.qmc.ax.draw_artist(self.l_temp2)
-                                 
-                                if aw.qmc.device == 18 and aw.qmc.l_timeline != None: # not NONE device
-                                    aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
-                                    
-                                if aw.qmc.BTcurve:
-                                    for a in self.l_annotations:
-                                        aw.qmc.ax.draw_artist(a)
-                                
-                                if aw.qmc.projectFlag:
-                                    if self.l_BTprojection != None and aw.qmc.BTcurve:
-                                        aw.qmc.ax.draw_artist(self.l_BTprojection)
-                                    if self.l_ETprojection != None and aw.qmc.ETcurve:
-                                        aw.qmc.ax.draw_artist(self.l_ETprojection)
-                                        
-                                if aw.qmc.AUCguideFlag and aw.qmc.AUCguideTime and aw.qmc.AUCguideTime > 0:
-                                    aw.qmc.ax.draw_artist(self.l_AUCguide)
-                                    
-                                
-                                if False: #aw.qmc.ax.clipbox:
-                                    self.fig.canvas.blit(aw.qmc.ax.clipbox) # .clipbox is None in matplotlib <1.5
-                                else:
-    #                                self.fig.canvas.blit(aw.qmc.ax.bbox) # causes randomly a black border where the axis should be drawn
-                                    self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
-                                    
-                                    
+                            if self.tempory_sample_trigger_redraw:
+                                self.tempory_sample_trigger_redraw = False
+                                aw.qmc.redraw()
                             else:
-                                # we do not have a background to bitblit, so do a full redraw
-                                self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
-                        #-- end update display
+                            #-- start update display
+                                if self.ax_background:
+                                    self.fig.canvas.restore_region(self.ax_background)
+                                    # draw eventtypes
+                                    if self.eventsshowflag and self.eventsGraphflag == 2:
+                                        aw.qmc.ax.draw_artist(self.l_eventtype1dots)
+                                        aw.qmc.ax.draw_artist(self.l_eventtype2dots)
+                                        aw.qmc.ax.draw_artist(self.l_eventtype3dots)
+                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
+                                    # draw delta lines
+                                    if self.DeltaETflag and self.l_delta1 != None:
+                                        aw.qmc.ax.draw_artist(self.l_delta1)
+                                    if self.DeltaBTflag and self.l_delta2 != None:
+                                        aw.qmc.ax.draw_artist(self.l_delta2)
+                                    # draw extra curves
+                                    xtra_dev_lines1 = 0
+                                    xtra_dev_lines2 = 0
+                                    for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                                        if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
+                                            aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
+                                            xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                        if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
+                                            aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
+                                            xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                    # draw ET
+                                    if aw.qmc.ETcurve:
+                                        aw.qmc.ax.draw_artist(self.l_temp1)
+                                    # draw BT
+                                    if aw.qmc.BTcurve:
+                                        aw.qmc.ax.draw_artist(self.l_temp2)
+                                     
+                                    if aw.qmc.device == 18 and aw.qmc.l_timeline != None: # not NONE device
+                                        aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
+                                        
+                                    if aw.qmc.BTcurve:
+                                        for a in self.l_annotations:
+                                            aw.qmc.ax.draw_artist(a)
+                                    
+                                    if aw.qmc.projectFlag:
+                                        if self.l_BTprojection != None and aw.qmc.BTcurve:
+                                            aw.qmc.ax.draw_artist(self.l_BTprojection)
+                                        if self.l_ETprojection != None and aw.qmc.ETcurve:
+                                            aw.qmc.ax.draw_artist(self.l_ETprojection)
+                                            
+                                    if aw.qmc.AUCguideFlag and aw.qmc.AUCguideTime and aw.qmc.AUCguideTime > 0:
+                                        aw.qmc.ax.draw_artist(self.l_AUCguide)
+                                        
+                                    
+                                    if False: #aw.qmc.ax.clipbox:
+                                        self.fig.canvas.blit(aw.qmc.ax.clipbox) # .clipbox is None in matplotlib <1.5
+                                    else:
+        #                                self.fig.canvas.blit(aw.qmc.ax.bbox) # causes randomly a black border where the axis should be drawn
+                                        self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
+                                        
+                                        
+                                else:
+                                    # we do not have a background to bitblit, so do a full redraw
+                                    self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
+                            #-- end update display
                         
                         if aw.qmc.background and (aw.qmc.backgroundReproduce or aw.qmc.backgroundPlaybackEvents) and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
                             aw.qmc.playbackevent()
@@ -8577,6 +8591,7 @@ class SampleThread(QThread):
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
+        redraw = False
         try:
             ##### lock resources  #########
             gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
@@ -8857,6 +8872,7 @@ class SampleThread(QThread):
                         if  not aw.qmc.fixmaxtime and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
                             aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
                             aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
+                            aw.qmc.tempory_sample_trigger_redraw = True # we enfore a full redraw within updategraphics
                         if aw.qmc.projectFlag:
                             aw.qmc.updateProjection()
                         
@@ -11962,6 +11978,16 @@ class ApplicationWindow(QMainWindow):
             except Exception:
                 pass
                     
+    def sliderpos(self,n):
+        if n == 0:
+            return self.slider1.value()
+        elif n == 1:
+            return self.slider2.value()
+        elif n == 2:
+            return self.slider3.value()
+        elif n == 3:
+            return self.slider4.value()
+            
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     # updates corresponding eventslidervalues
     def moveslider(self,n,v):
@@ -18747,31 +18773,35 @@ class ApplicationWindow(QMainWindow):
                             TP_index = aw.findTP()
                     else:
                         TP_index = -1
+                
+                if aw.qmc.AUCbegin == 0 and timeindex[0] > -1: # CHARGE
+                    AUCbegin_idx = timeindex[0]
+                elif aw.qmc.AUCbegin == 1 and TP_index > -1: # TP
+                    AUCbegin_idx = TP_index
+                elif aw.qmc.AUCbegin == 2 and timeindex[1] > 0: # DRY END
+                    AUCbegin_idx = timeindex[1]
+                elif aw.qmc.AUCbegin == 3 and timeindex[2] > 0: # FC START
+                    AUCbegin_idx = timeindex[2]
+                else:
+                    AUCbegin_idx = 0
+
                 if start == None:
-                    if aw.qmc.AUCbegin == 0 and timeindex[0] > -1: # CHARGE
-                        st = timeindex[0]
-                    elif aw.qmc.AUCbegin == 1 and TP_index > -1: # TP
-                        st = TP_index
-                    elif aw.qmc.AUCbegin == 2 and timeindex[1] > 0: # DRY END
-                        st = timeindex[1]
-                    elif aw.qmc.AUCbegin == 3 and timeindex[2] > 0: # FC START
-                        st = timeindex[2]
-                    else:
-                        st = 0
+                    st = AUCbegin_idx
                 else:
                     st = start
+                
                 ed = min(len(timex),(end or timeindex[6]))
                 
                 if aw.qmc.AUCbaseFlag:
                     # we take the base temperature from the BT at st
-                    rtet = temp1[st]
-                    rtbt = temp2[st]
+                    rtet = temp1[AUCbegin_idx]
+                    rtbt = temp2[AUCbegin_idx]
                 else:
                     rtet = rtbt = aw.qmc.AUCbase
                 rtet = aw.qmc.convertTemp(rtet,aw.qmc.mode,"C")
                 rtbt = aw.qmc.convertTemp(rtbt,aw.qmc.mode,"C")
                 
-                for i in range(st+1,ed):
+                for i in range(st,ed):
                     ET += self.calcAUC(rtet,timex,temp1,i)
                     BT += self.calcAUC(rtbt,timex,temp2,i)
                     delta += self.calcAUC(rtbt,timex,temp1,i,temp2)
@@ -28442,7 +28472,7 @@ class StatisticsDlg(ArtisanDialog):
             self.baseedit.setSuffix(" F")
         else:
             self.baseedit.setSuffix(" C")
-        self.baseFlag = QCheckBox(QApplication.translate("CheckBox","From Temp", None))
+        self.baseFlag = QCheckBox(QApplication.translate("CheckBox","From Event", None))
         self.baseedit.setEnabled(not aw.qmc.AUCbaseFlag)
         self.baseFlag.setChecked(aw.qmc.AUCbaseFlag)
         self.baseFlag.stateChanged.connect(self.switchAUCbase)
@@ -30808,7 +30838,10 @@ class serialport(object):
             self.PhidgetManager = PhidgetManager()
         if aw.qmc.phidgetRemoteFlag:
             libtime.sleep(.1)
-            self.PhidgetManager.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+            if sys.version < '3':
+                self.PhidgetManager.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+            else:
+                self.PhidgetManager.openRemote(aw.qmc.phidgetServerID.encode('utf-8'),password=aw.qmc.phidgetPassword.encode('utf-8'))
         else:
             self.PhidgetManager.openManager()
         devices = self.PhidgetManager.getAttachedDevices()
@@ -30876,7 +30909,10 @@ class serialport(object):
                         self.PhidgetIRSensor.setOnAttachHandler(self.phidget1045attached)
                         self.PhidgetIRSensor.setOnDetachHandler(self.phidget1045detached)
                         if aw.qmc.phidgetRemoteFlag:
-                            self.PhidgetIRSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
+                            if sys.version < '3':
+                                self.PhidgetIRSensor.openRemote(aw.qmc.phidgetServerID,serial=ser,password=aw.qmc.phidgetPassword)
+                            else:
+                                self.PhidgetIRSensor.openRemote(aw.qmc.phidgetServerID.encode('utf-8'),serial=ser,password=aw.qmc.phidgetPassword.encode('utf-8'))
                         else:
                             self.PhidgetIRSensor.openPhidget(serial=ser)
                         libtime.sleep(0.1)
@@ -30977,7 +31013,10 @@ class serialport(object):
                     aw.ser.PhidgetTemperatureSensor.setOnAttachHandler(self.phidget1048attached)
                     aw.ser.PhidgetTemperatureSensor.setOnDetachHandler(self.phidget1048detached)
                     if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        if sys.version < '3':
+                            aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        else:
+                            aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID.encode('utf-8'),password=aw.qmc.phidgetPassword.encode('utf-8'))
                     else:
                         aw.ser.PhidgetTemperatureSensor.openPhidget()
                     libtime.sleep(0.1)
@@ -31186,7 +31225,10 @@ class serialport(object):
                     aw.ser.PhidgetBridgeSensor.setOnAttachHandler(self.phidget1046attached)
                     aw.ser.PhidgetBridgeSensor.setOnDetachHandler(self.phidget1046detached)
                     if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        if sys.version < '3':
+                            aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        else:
+                            aw.ser.PhidgetBridgeSensor.openRemote(aw.qmc.phidgetServerID.encode('utf-8'),password=aw.qmc.phidgetPassword.encode('utf-8'))
                     else:
                         aw.ser.PhidgetBridgeSensor.openPhidget()
                     libtime.sleep(0.1)
@@ -31303,7 +31345,10 @@ class serialport(object):
                     aw.ser.PhidgetIO.setOnAttachHandler(self.phidget1018attached)
                     aw.ser.PhidgetIO.setOnDetachHandler(self.phidget1018detached)
                     if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetIO.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        if sys.version < '3':
+                            aw.ser.PhidgetIO.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
+                        else:
+                            aw.ser.PhidgetIO.openRemote(aw.qmc.phidgetServerID.encode('utf-8'),password=aw.qmc.phidgetPassword.encode('utf-8'))
                     else:
                         aw.ser.PhidgetIO.openPhidget()
                     libtime.sleep(0.1)
@@ -34396,7 +34441,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.phidgetBoxRemoteFlag = QCheckBox()
         self.phidgetBoxRemoteFlag.setFocusPolicy(Qt.NoFocus)
         self.phidgetBoxRemoteFlag.setChecked(aw.qmc.phidgetRemoteFlag)
-        phidgetServerIdLabel = QLabel(QApplication.translate("Label","Server", None))
+        phidgetServerIdLabel = QLabel(QApplication.translate("Label","ServerID", None))
         self.phidgetServerId = QLineEdit(aw.qmc.phidgetServerID)
         phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password", None))
         self.phidgetPassword = QLineEdit(aw.qmc.phidgetPassword)
@@ -42022,13 +42067,13 @@ class PIDcontrol(object):
                     if aw.pidcontrol.invertControl:
                         heat = abs(100 - heat)
                     slidernr = aw.pidcontrol.pidPositiveTarget - 1
-                    aw.qmc.temporarymoveslider = (slidernr,heat)
+                    aw.qmc.temporarymovepositiveslider = (slidernr,heat)
                 if aw.pidcontrol.pidNegativeTarget:
                     cool = min(100,abs(min(0,int(v))))
                     if aw.pidcontrol.invertControl:
                         cool = abs(100 - cool)
                     slidernr = aw.pidcontrol.pidNegativeTarget - 1
-                    aw.qmc.temporarymoveslider = (slidernr,cool)
+                    aw.qmc.temporarymovenegativeslider = (slidernr,cool)
             except Exception as e:
     #            import traceback
     #            traceback.print_exc(file=sys.stdout)

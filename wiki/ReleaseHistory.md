@@ -35,6 +35,7 @@ v1.0.0 (XX.XX.2016)
     * adds AUC statistics, LCD and guide
     * adds possibility to "clamp" by-value custom events to the x-axis in the range of 0-100
     * adds support for MODBUS mask-write method (function code 22)
+    * adds Raspberry Pi (Jessy) build
  * Changes
     * dramatically improves speed of MODBUS over serial communication (by patching the underlying pymodbus lib)
     * makes message, error and serial logs autoupdating

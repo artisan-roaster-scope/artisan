@@ -127,11 +127,11 @@ pymodbus (from py3 trunk)
 # sudo python3 setup.py install
 
 
-Phidgets (from Web)
+Phidgets Py3 variant (from Web)
 # cd /tmp
-# wget http://www.phidgets.com/downloads/libraries/PhidgetsPython.zip
-# unzip PhidgetsPython.zip
-# cd PhidgetsPython
+# wget https://github.com/subdir/phidgets-python3/archive/master.zip
+# unzip master.zip
+# cd phidgets-python3-master
 # python3 setup.py build
 # sudo python3 setup.py install
 
