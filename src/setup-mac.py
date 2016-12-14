@@ -75,6 +75,8 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_no.qm"]),
     ("../translations", [r"translations/artisan_nl.qm"]),
     ("../translations", [r"translations/artisan_tr.qm"]),
+    ("../translations", [r"translations/artisan_th.qm"]),
+    ("../translations", [r"translations/artisan_id.qm"]),
     ("../Resources", [r"qt.conf"]),
     ("../Resources", [r"artisanProfile.icns"]),
     ("../Resources", [r"artisanAlarms.icns"]),

@@ -7,7 +7,7 @@ v1.0.0 (XX.XX.2016)
 ------------------
 
  * New Features
-    * adds internal PID and support to control external MODBUS PIDs
+    * adds [internal PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html) and support to control external MODBUS PIDs
     * adds two more MODBUS input channels (now 6 in total)
     * adds alarms triggerd at a specified time after another alarm specified as "If Alarm" was triggered, if "from" rules is set to "If Alarm"    
     * adds improved Windows installer (option to uninstall previous versions during installation and silent option)
@@ -32,7 +32,7 @@ v1.0.0 (XX.XX.2016)
     * adds a field for green bean temperature
     * adds p-i-d button action    
     * adds auto axis limits calculation via manual trigger or automatic on load
-    * adds AUC statistics, LCD and guide
+    * adds [AUC statistics, LCD and guide](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html)
     * adds possibility to "clamp" by-value custom events to the x-axis in the range of 0-100
     * adds support for MODBUS mask-write method (function code 22)
     * adds Raspberry Pi (Jessy) build

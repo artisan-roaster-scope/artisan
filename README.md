@@ -106,7 +106,7 @@ Version History
 
 | Version | Date | Comment |
 |---------|------|---------|
-| v1.0.0 | XX.XX.XXXX | Adds internal software PID, external MODBUS PID control, Apollo DT301, Extech 755, fast MODBUS RTU, AUC, RPi build, bug fixes and stability improvements |
+| v1.0.0 | XX.XX.XXXX | Adds [internal software PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html), external MODBUS PID control, Apollo DT301, Extech 755, fast MODBUS RTU, [AUC](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html), RPi build, bug fixes and stability improvements |
 | v0.9.9 | 14.03.2016 | Adds batch and ranking reports, batch conversions, follow-background for Fuji PIDs, additional keyboard short cuts, designer improvements, bug fixes |
 | v0.9.8 | 21.10.2015 | US weight and volume units, extended [symbolic formulas and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html), [ln()/x^2 approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html), bug fixes |
 | v0.9.7 | 29.07.2015 | Bug fixes |
