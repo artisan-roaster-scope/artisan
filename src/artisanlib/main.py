@@ -506,23 +506,26 @@ if QSettings().contains('resetqsettings') and not toInt(QSettings().value('reset
 else:
     locale = ""
 supported_languages = [
-    "en"
     "ar",
     "de",
     "el",
+    "en"
     "es",
     "fi",
     "fr",
     "he",
     "hu",
+    "id",    
     "it",
     "ja",
     "ko",
     "nl",
     "no",
     "pt",
+    "pl",
     "ru",
     "sv",
+    "th",
     "tr",
     "zh",
 ]
@@ -900,6 +903,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.fig = Figure(tight_layout={"pad":.2},frameon=True) # ,"h_pad":0.0,"w_pad":0.0
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
+    
 
         #figure back color
         if platf == 'Darwin':
@@ -909,8 +913,12 @@ class tgraphcanvas(FigureCanvas):
         self.fig.patch.set_facecolor(self.backcolor)
         self.fig.patch.set_edgecolor(self.backcolor)
 
-
-        if int(mpl.__version__.split('.')[0]) >= 2:
+        v = 2
+        try:
+            v = int(mpl.__version__.split('.')[0])
+        except:
+            pass
+        if v >= 2:
             self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
         else:
             self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
@@ -1568,6 +1576,7 @@ class tgraphcanvas(FigureCanvas):
         self.plotterequationresults = [[],[],[],[],[],[],[],[],[]]
         #message string for plotter 
         self.plottermessage = ""
+        
 
         #buffers for real time symbolic evalualtion
         self.RTtemp1=0.
@@ -1936,7 +1945,7 @@ class tgraphcanvas(FigureCanvas):
                     payload['alert']['title'] = alertTitle
                 if alertTimeout:
                     payload['alert']['timeout'] = alertTimeout
-            requests.post(url, data=json.dumps(payload),headers=headers,timeout=0.1)
+            requests.post(url, data=json.dumps(payload),headers=headers,timeout=0.3)
         except Exception:
             pass
             
@@ -3773,7 +3782,12 @@ class tgraphcanvas(FigureCanvas):
     
                 self.fig.clf()   #wipe out figure. keep_observers=False
     
-                if int(mpl.__version__.split('.')[0]) >= 2:
+                v = 2
+                try:
+                    v = int(mpl.__version__.split('.')[0])
+                except:
+                    pass
+                if v >= 2:
                     self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
                 else:
                     self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
@@ -4552,17 +4566,23 @@ class tgraphcanvas(FigureCanvas):
                         ncol = int(math.ceil(len(handles)))
                     if aw.qmc.graphfont == 1:
                         labels = [toASCII(l) for l in labels]
-                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
+                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
                     leg.draggable(state=True)
                     frame = leg.get_frame()
                     frame.set_facecolor('white')
+                    #frame.set_linewidth(0)
                     #frame.set_edgecolor('darkgrey')
                     frame.set_linewidth(0.5)
 #                    if aw.qmc.graphstyle == 1:
 #                        leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
     
                 # we create here the project line plots to have the accurate time axis after CHARGE
-                if int(mpl.__version__.split('.')[0]) >= 2:
+                v = 2
+                try:
+                    v = int(mpl.__version__.split('.')[0])
+                except:
+                    pass                
+                if v >= 2:
                     dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0
                 else:
                     dashes_setup = [3,4,1,4] # matplot 1.5 default
@@ -4944,8 +4964,13 @@ class tgraphcanvas(FigureCanvas):
         pi = math.pi
         self.fig.clf()
         #create a new name ax1 instead of ax (ax is used when plotting profiles)
-
-        if int(mpl.__version__.split('.')[0]) >= 2:
+        
+        v = 2
+        try:
+            v = int(mpl.__version__.split('.')[0])
+        except:
+            pass
+        if v >= 2:
             self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor=self.backcolor) #) radar green facecolor='#d5de9c'
         else:
             self.ax1 = self.fig.add_subplot(111,projection='polar',axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
@@ -8093,7 +8118,12 @@ class tgraphcanvas(FigureCanvas):
             # same as redraw but using different axes
             self.fig.clf()
             #create a new name ax1 instead of ax
-            if int(mpl.__version__.split('.')[0]) >= 2:
+            v = 2
+            try:
+                v = int(mpl.__version__.split('.')[0])
+            except:
+                pass
+            if v >= 2:
                 self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor=self.backcolor)            
             else:
                 self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg=self.backcolor)
@@ -8354,7 +8384,12 @@ class VMToolbar(NavigationToolbar):
 
 
 # add green flag menu on matplotlib v2.0 and later
-        if int(mpl.__version__.split('.')[0]) >= 2:
+        v = 2
+        try:
+            v = int(mpl.__version__.split('.')[0])
+        except:
+            pass
+        if v >= 2:
             if len(self.actions()) > 0:
                 # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
                 a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
@@ -9693,12 +9728,12 @@ class ApplicationWindow(QMainWindow):
 
         self.languageMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_LANGUAGE)
 
-        self.EnglishLanguage = QAction(UIconst.CONF_MENU_ENGLISH,self)
-        self.EnglishLanguage.setCheckable(True)
-        self.EnglishLanguage.triggered.connect(lambda lang="en":self.changelocale("en"))
-        self.languageMenu.addAction(self.EnglishLanguage)
-        if locale == "en" or locale == "en_US":
-            self.EnglishLanguage.setChecked(True)
+        self.ArabicLanguage = QAction(UIconst.CONF_MENU_ARABIC,self)
+        self.ArabicLanguage.setCheckable(True)
+        self.ArabicLanguage.triggered.connect(lambda lang="ar":self.changelocale("ar"))
+        self.languageMenu.addAction(self.ArabicLanguage)
+        if locale == "ar":
+            self.ArabicLanguage.setChecked(True)
 
         self.GermanLanguage = QAction(UIconst.CONF_MENU_GERMAN,self)
         self.GermanLanguage.setCheckable(True)
@@ -9707,12 +9742,19 @@ class ApplicationWindow(QMainWindow):
         if locale == "de":
             self.GermanLanguage.setChecked(True)
 
-        self.FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
-        self.FrenchLanguage.setCheckable(True)
-        self.FrenchLanguage.triggered.connect(lambda lang="fr":self.changelocale("fr"))
-        self.languageMenu.addAction(self.FrenchLanguage)
-        if locale == "fr":
-            self.FrenchLanguage.setChecked(True)
+        self.GreekLanguage = QAction(UIconst.CONF_MENU_GREEK,self)
+        self.GreekLanguage.setCheckable(True)
+        self.GreekLanguage.triggered.connect(lambda lang="el":self.changelocale("el"))
+        self.languageMenu.addAction(self.GreekLanguage)
+        if locale == "el":
+            self.GreekLanguage.setChecked(True)
+
+        self.EnglishLanguage = QAction(UIconst.CONF_MENU_ENGLISH,self)
+        self.EnglishLanguage.setCheckable(True)
+        self.EnglishLanguage.triggered.connect(lambda lang="en":self.changelocale("en"))
+        self.languageMenu.addAction(self.EnglishLanguage)
+        if locale == "en" or locale == "en_US":
+            self.EnglishLanguage.setChecked(True)
 
         self.SpanishLanguage = QAction(UIconst.CONF_MENU_SPANISH,self)
         self.SpanishLanguage.setCheckable(True)
@@ -9721,12 +9763,40 @@ class ApplicationWindow(QMainWindow):
         if locale == "es":
             self.SpanishLanguage.setChecked(True)
 
-        self.SwedishLanguage = QAction(UIconst.CONF_MENU_SWEDISH,self)
-        self.SwedishLanguage.setCheckable(True)
-        self.SwedishLanguage.triggered.connect(lambda lang="sv":self.changelocale("sv"))
-        self.languageMenu.addAction(self.SwedishLanguage) 
-        if locale == "sv":
-            self.SwedishLanguage.setChecked(True)
+        self.FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
+        self.FinishLanguage.setCheckable(True)
+        self.FinishLanguage.triggered.connect(lambda lang="fi":self.changelocale("fi"))
+        self.languageMenu.addAction(self.FinishLanguage)
+        if locale == "fi":
+            self.FinishLanguage.setChecked(True)
+
+        self.FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
+        self.FrenchLanguage.setCheckable(True)
+        self.FrenchLanguage.triggered.connect(lambda lang="fr":self.changelocale("fr"))
+        self.languageMenu.addAction(self.FrenchLanguage)
+        if locale == "fr":
+            self.FrenchLanguage.setChecked(True)
+
+        self.HebrewLanguage = QAction(UIconst.CONF_MENU_HEBREW,self)
+        self.HebrewLanguage.setCheckable(True)
+        self.HebrewLanguage.triggered.connect(lambda lang="he":self.changelocale("he"))
+        self.languageMenu.addAction(self.HebrewLanguage)
+        if locale == "he":
+            self.HebrewLanguage.setChecked(True)
+
+        self.HungarianLanguage = QAction(UIconst.CONF_MENU_HUNGARIAN,self)
+        self.HungarianLanguage.setCheckable(True)
+        self.HungarianLanguage.triggered.connect(lambda lang="hu":self.changelocale("hu"))
+        self.languageMenu.addAction(self.HungarianLanguage)
+        if locale == "hu":
+            self.HungarianLanguage.setChecked(True)
+
+        self.IndonesianLanguage = QAction(UIconst.CONF_MENU_INDONESIAN,self)
+        self.IndonesianLanguage.setCheckable(True)
+        self.IndonesianLanguage.triggered.connect(lambda lang="id":self.changelocale("id"))
+        self.languageMenu.addAction(self.IndonesianLanguage)
+        if locale == "id":
+            self.IndonesianLanguage.setChecked(True)
 
         self.ItalianLanguage = QAction(UIconst.CONF_MENU_ITALIAN,self)
         self.ItalianLanguage.setCheckable(True)
@@ -9734,6 +9804,76 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.addAction(self.ItalianLanguage) 
         if locale == "it":
             self.ItalianLanguage.setChecked(True)
+
+        self.JapaneseLanguage = QAction(UIconst.CONF_MENU_JAPANESE,self)
+        self.JapaneseLanguage.setCheckable(True)
+        self.JapaneseLanguage.triggered.connect(lambda lang="ja":self.changelocale("ja"))
+        self.languageMenu.addAction(self.JapaneseLanguage)
+        if locale == "ja":
+            self.JapaneseLanguage.setChecked(True)
+
+        self.KoreanLanguage = QAction(UIconst.CONF_MENU_KOREAN,self)
+        self.KoreanLanguage.setCheckable(True)
+        self.KoreanLanguage.triggered.connect(lambda lang="ko":self.changelocale("ko"))
+        self.languageMenu.addAction(self.KoreanLanguage)
+        if locale == "ko":
+            self.KoreanLanguage.setChecked(True)
+
+        self.DutchLanguage = QAction(UIconst.CONF_MENU_DUTCH,self)
+        self.DutchLanguage.setCheckable(True)
+        self.DutchLanguage.triggered.connect(lambda lang="nl":self.changelocale("nl"))
+        self.languageMenu.addAction(self.DutchLanguage)
+        if locale == "nl":
+            self.DutchLanguage.setChecked(True)
+
+        self.NorwegianLanguage = QAction(UIconst.CONF_MENU_NORWEGIAN,self)
+        self.NorwegianLanguage.setCheckable(True)
+        self.NorwegianLanguage.triggered.connect(lambda lang="no":self.changelocale("no"))
+        self.languageMenu.addAction(self.NorwegianLanguage)
+        if locale == "no":
+            self.NorwegianLanguage.setChecked(True)
+
+        self.PortugueseLanguage = QAction(UIconst.CONF_MENU_PORTUGUESE,self)
+        self.PortugueseLanguage.setCheckable(True)
+        self.PortugueseLanguage.triggered.connect(lambda lang="pt":self.changelocale("pt"))
+        self.languageMenu.addAction(self.PortugueseLanguage)
+        if locale == "pt":
+            self.PortugueseLanguage.setChecked(True)
+
+        self.PolishLanguage = QAction(UIconst.CONF_MENU_POLISH,self)
+        self.PolishLanguage.setCheckable(True)
+        self.PolishLanguage.triggered.connect(lambda lang="pl":self.changelocale("pl"))
+        self.languageMenu.addAction(self.PolishLanguage)
+        if locale == "pl":
+            self.PolishLanguage.setChecked(True)
+
+        self.RussianLanguage = QAction(UIconst.CONF_MENU_RUSSIAN,self)
+        self.RussianLanguage.setCheckable(True)
+        self.RussianLanguage.triggered.connect(lambda lang="ru":self.changelocale("ru"))
+        self.languageMenu.addAction(self.RussianLanguage)
+        if locale == "ru":
+            self.RussianLanguage.setChecked(True)
+
+        self.SwedishLanguage = QAction(UIconst.CONF_MENU_SWEDISH,self)
+        self.SwedishLanguage.setCheckable(True)
+        self.SwedishLanguage.triggered.connect(lambda lang="sv":self.changelocale("sv"))
+        self.languageMenu.addAction(self.SwedishLanguage) 
+        if locale == "sv":
+            self.SwedishLanguage.setChecked(True)
+            
+        self.ThaiLanguage = QAction(UIconst.CONF_MENU_THAI,self)
+        self.ThaiLanguage.setCheckable(True)
+        self.ThaiLanguage.triggered.connect(lambda lang="th":self.changelocale("th"))
+        self.languageMenu.addAction(self.ThaiLanguage)
+        if locale == "th":
+            self.ThaiLanguage.setChecked(True)
+
+        self.TurkishLanguage = QAction(UIconst.CONF_MENU_TURKISH,self)
+        self.TurkishLanguage.setCheckable(True)
+        self.TurkishLanguage.triggered.connect(lambda lang="tr":self.changelocale("tr"))
+        self.languageMenu.addAction(self.TurkishLanguage)
+        if locale == "tr":
+            self.TurkishLanguage.setChecked(True)
 
         self.ChineseChinaLanguage = QAction(UIconst.CONF_MENU_CHINESE_CN,self)
         self.ChineseChinaLanguage.setCheckable(True)
@@ -9748,97 +9888,8 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.addAction(self.ChineseTaiwanLanguage) 
         if locale == "zh_TW":
             self.ChineseTaiwanLanguage.setChecked(True)
-
-        self.GreekLanguage = QAction(UIconst.CONF_MENU_GREEK,self)
-        self.GreekLanguage.setCheckable(True)
-        self.GreekLanguage.triggered.connect(lambda lang="el":self.changelocale("el"))
-        self.languageMenu.addAction(self.GreekLanguage)
-        if locale == "el":
-            self.GreekLanguage.setChecked(True)
-
-        self.NorwegianLanguage = QAction(UIconst.CONF_MENU_NORWEGIAN,self)
-        self.NorwegianLanguage.setCheckable(True)
-        self.NorwegianLanguage.triggered.connect(lambda lang="no":self.changelocale("no"))
-        self.languageMenu.addAction(self.NorwegianLanguage)
-        if locale == "no":
-            self.NorwegianLanguage.setChecked(True)
-
-        self.DutchLanguage = QAction(UIconst.CONF_MENU_DUTCH,self)
-        self.DutchLanguage.setCheckable(True)
-        self.DutchLanguage.triggered.connect(lambda lang="nl":self.changelocale("nl"))
-        self.languageMenu.addAction(self.DutchLanguage)
-        if locale == "nl":
-            self.DutchLanguage.setChecked(True)
-
-        self.KoreanLanguage = QAction(UIconst.CONF_MENU_KOREAN,self)
-        self.KoreanLanguage.setCheckable(True)
-        self.KoreanLanguage.triggered.connect(lambda lang="ko":self.changelocale("ko"))
-        self.languageMenu.addAction(self.KoreanLanguage)
-        if locale == "ko":
-            self.KoreanLanguage.setChecked(True)
-
-        self.PortugueseLanguage = QAction(UIconst.CONF_MENU_PORTUGUESE,self)
-        self.PortugueseLanguage.setCheckable(True)
-        self.PortugueseLanguage.triggered.connect(lambda lang="pt":self.changelocale("pt"))
-        self.languageMenu.addAction(self.PortugueseLanguage)
-        if locale == "pt":
-            self.PortugueseLanguage.setChecked(True)
-
-        self.RussianLanguage = QAction(UIconst.CONF_MENU_RUSSIAN,self)
-        self.RussianLanguage.setCheckable(True)
-        self.RussianLanguage.triggered.connect(lambda lang="ru":self.changelocale("ru"))
-        self.languageMenu.addAction(self.RussianLanguage)
-        if locale == "ru":
-            self.RussianLanguage.setChecked(True)
-
-        self.ArabicLanguage = QAction(UIconst.CONF_MENU_ARABIC,self)
-        self.ArabicLanguage.setCheckable(True)
-        self.ArabicLanguage.triggered.connect(lambda lang="ar":self.changelocale("ar"))
-        self.languageMenu.addAction(self.ArabicLanguage)
-        if locale == "ar":
-            self.ArabicLanguage.setChecked(True)
-
-        self.FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
-        self.FinishLanguage.setCheckable(True)
-        self.FinishLanguage.triggered.connect(lambda lang="fi":self.changelocale("fi"))
-        self.languageMenu.addAction(self.FinishLanguage)
-        if locale == "fi":
-            self.FinishLanguage.setChecked(True)
-
-        self.TurkishLanguage = QAction(UIconst.CONF_MENU_TURKISH,self)
-        self.TurkishLanguage.setCheckable(True)
-        self.TurkishLanguage.triggered.connect(lambda lang="tr":self.changelocale("tr"))
-        self.languageMenu.addAction(self.TurkishLanguage)
-        if locale == "tr":
-            self.TurkishLanguage.setChecked(True)
-
-        self.JapaneseLanguage = QAction(UIconst.CONF_MENU_JAPANESE,self)
-        self.JapaneseLanguage.setCheckable(True)
-        self.JapaneseLanguage.triggered.connect(lambda lang="ja":self.changelocale("ja"))
-        self.languageMenu.addAction(self.JapaneseLanguage)
-        if locale == "ja":
-            self.JapaneseLanguage.setChecked(True)
-
-        self.HungarianLanguage = QAction(UIconst.CONF_MENU_HUNGARIAN,self)
-        self.HungarianLanguage.setCheckable(True)
-        self.HungarianLanguage.triggered.connect(lambda lang="hu":self.changelocale("hu"))
-        self.languageMenu.addAction(self.HungarianLanguage)
-        if locale == "hu":
-            self.HungarianLanguage.setChecked(True)
-
-        self.HebrewLanguage = QAction(UIconst.CONF_MENU_HEBREW,self)
-        self.HebrewLanguage.setCheckable(True)
-        self.HebrewLanguage.triggered.connect(lambda lang="he":self.changelocale("he"))
-        self.languageMenu.addAction(self.HebrewLanguage)
-        if locale == "he":
-            self.HebrewLanguage.setChecked(True)
-
-        self.PolishLanguage = QAction(UIconst.CONF_MENU_POLISH,self)
-        self.PolishLanguage.setCheckable(True)
-        self.PolishLanguage.triggered.connect(lambda lang="pl":self.changelocale("pl"))
-        self.languageMenu.addAction(self.PolishLanguage)
-        if locale == "pl":
-            self.PolishLanguage.setChecked(True)
+            
+            
 
         # TOOLKIT menu
         self.designerAction = QAction(UIconst.TOOLKIT_MENU_DESIGNER,self)
@@ -11682,7 +11733,16 @@ class ApplicationWindow(QMainWindow):
     def setdpi(self,dpi,moveWindow=True):
         if aw:
             aw.dpi = dpi
-            self.qmc.fig.set_dpi(dpi)
+            v = 2
+            try:
+                v = int(mpl.__version__.split('.')[0])
+            except:
+                pass
+            if v >= 2:
+                # on mpl >= v2 we assume hidpi support and consider the pixel ratio
+                self.qmc.fig.set_dpi(dpi*aw.devicePixelRatio())
+            else:
+                self.qmc.fig.set_dpi(dpi)
             #move widget to update display
             if moveWindow: 
                 aw.qmc.fig.canvas.draw()
@@ -18891,7 +18951,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
-        contributors += u(", Nick Watson<br>")
+        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -28661,7 +28721,7 @@ class modbusport(object):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 0.5
+        self.timeout = 1.0
         self.PID_slave_ID = 0
         self.PID_SV_register = 0
         self.PID_p_register = 0
@@ -29032,7 +29092,7 @@ class extraserialport(object):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 0.5
+        self.timeout = 1.0
         self.devicefunctionlist = {}
         self.device = None
         self.SP = None
@@ -29092,7 +29152,7 @@ class scaleport(extraserialport):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 0.5
+        self.timeout = 1.0
         self.devicefunctionlist = {
             "None" : None,
             "KERN NDE" : self.readKERN_NDE,
@@ -29249,7 +29309,7 @@ class serialport(object):
         self.bytesize = 8
         self.parity= 'O'
         self.stopbits = 1
-        self.timeout=0.5
+        self.timeout=1.0
         #serial port for ET/BT
         self.SP = serial.Serial()
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
@@ -29889,7 +29949,7 @@ class serialport(object):
 
     # EXTECH755 Device
     # returns t1,t2 from EXTECH 755. By Bailey Glen
-    def EXTECH755pressure(self, retry=3):
+    def EXTECH755pressure(self, retry=2):
         try:
             r = ''
             if not self.SP.isOpen():
@@ -30034,7 +30094,7 @@ class serialport(object):
         return "{0:0>{1}}".format(bin(n)[2:], digits)
 
     #similar to Omega HH806
-    def MS6514temperature(self, retry=3):
+    def MS6514temperature(self, retry=2):
         try:
 #            command = str2cmd("#0A0000NA2\r\n")  #"#0A0101NA4\r\n"
             r = ""
@@ -30113,8 +30173,9 @@ class serialport(object):
                         return s1,s2
                 
                 if retry:
-                    self.closeport()
-                    libtime.sleep(.05)
+                    if retry < 2:
+                        self.closeport()
+                        libtime.sleep(.05)
                     a,b = self.MS6514temperature(retry=retry-1)
                     return a,b                    
                 else:
@@ -30150,7 +30211,7 @@ class serialport(object):
                 aw.addserial("MS6514 :" + settings + " || Rx = " + cmd2str(binascii.hexlify(r))) 
 
 
-    def DT301temperature(self, retry=3):
+    def DT301temperature(self, retry=2):
         try:
             temp = 0
             command = b"\xEC\xD0\xF3"
@@ -30223,7 +30284,7 @@ class serialport(object):
             return -1,-1
 
     #t2 and t1 from Omega HH806, HH802 or Amprobe TMD56 meter 
-    def HH806AUtemperature(self, retry=3):
+    def HH806AUtemperature(self, retry=2):
         try:
             command = str2cmd("#0A0000NA2\r\n")
             r = ""
@@ -30245,13 +30306,14 @@ class serialport(object):
                 else:
                     # first try to resync data (shift to right assuming some extra bytes were appended):
                     for i in range(4):
-                        if hex2int(r[1+i])==62 and hex2int(r[2+i])==15:
+                        if len(r) > 12+i and hex2int(r[1+i])==62 and hex2int(r[2+i])==15:
                             s1 = hex2int(r[6+i],r[7+i])/10.
                             s2 = hex2int(r[11+i],r[12+i])/10.
                             return s1,s2                            
                     if retry:
-                        self.closeport()
-                        libtime.sleep(.05)
+                        if retry < 2:
+                            self.closeport()
+                            libtime.sleep(.05)
                         a,b = self.HH806AUtemperature(retry=retry-1)
                         return a,b
                     else:
@@ -30501,7 +30563,7 @@ class serialport(object):
 
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
-    def HH506RAtemperature(self, retry=3):
+    def HH506RAtemperature(self, retry=2):
         #if initial id "X" has not changed then get a new one;
         if self.HH506RAid == "X":
             self.HH506RAGetID()                       # obtain new id one time; self.HH506RAid should not be "X" any more
@@ -30549,7 +30611,7 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("H506 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str(binascii.hexlify(r)))
 
-    def CENTER302temperature(self,retry=3):
+    def CENTER302temperature(self,retry=2):
         try:
             command = str2cmd("\x41")
             r = ""
@@ -30607,7 +30669,7 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER302 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
-    def CENTER303temperature(self,retry=3):
+    def CENTER303temperature(self,retry=2):
         try:
             command = str2cmd("\x41")
             r = ""
@@ -30679,7 +30741,7 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER303 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
-    def CENTER306temperature(self,retry=3):
+    def CENTER306temperature(self,retry=2):
         try:
             command = str2cmd("\x41")
             r = ""
@@ -30748,7 +30810,7 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER306 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
-    def CENTER309temperature(self, retry=3):
+    def CENTER309temperature(self, retry=2):
         ##    command = "\x4B" returns 4 bytes . Model number.
         ##    command = "\x48" simulates HOLD button
         ##    command = "\x4D" simulates MAX/MIN button
@@ -35107,7 +35169,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'O'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                 #else if DTA pid
                 else:
                     aw.qmc.device = 26
@@ -35116,7 +35178,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                 message = QApplication.translate("Message","PID to control ET set to {0} {1}" + \
                                                  " ; PID to read BT set to {2} {3}", None).format(str1,str(aw.ser.controlETpid[1]),str2,str(aw.ser.readBTpid[1]))
             elif self.arduinoButton.isChecked():
@@ -35126,7 +35188,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
-                aw.ser.timeout = 0.5
+                aw.ser.timeout = 1.0
                 aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
                 message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)
             elif self.programButton.isChecked():
@@ -35143,7 +35205,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 elif meter == "Omega HH506RA":
                     aw.qmc.device = 2
@@ -35152,7 +35214,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 7
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     aw.ser.HH506RAid = "X" # ensure the HH506RA gets reinitalized if settings changed
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 elif meter == "CENTER 309":
@@ -35162,7 +35224,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 elif meter == "CENTER 306":
                     aw.qmc.device = 4
@@ -35171,7 +35233,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 elif meter == "CENTER 305":
                     aw.qmc.device = 5
@@ -35180,7 +35242,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port", None).format(meter)
                 elif meter == "CENTER 304":
                     aw.qmc.device = 6
@@ -35189,7 +35251,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 309. Now, chose serial port", None).format(meter)
                 elif meter == "CENTER 303":
                     aw.qmc.device = 7
@@ -35198,7 +35260,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 elif meter == "CENTER 302":
                     aw.qmc.device = 8
@@ -35207,7 +35269,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port", None).format(meter)
                 elif meter == "CENTER 301":
                     aw.qmc.device = 9
@@ -35216,7 +35278,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port", None).format(meter)
                 elif meter == "CENTER 300":
                     aw.qmc.device = 10
@@ -35225,7 +35287,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port", None).format(meter)
                 elif meter == "VOLTCRAFT K204":
                     aw.qmc.device = 11
@@ -35234,7 +35296,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 309. Now, chose serial port", None).format(meter)
                 elif meter == "VOLTCRAFT K202":
                     aw.qmc.device = 12
@@ -35243,7 +35305,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 306. Now, chose serial port", None).format(meter)
                 elif meter == "VOLTCRAFT 300K":
                     aw.qmc.device = 13
@@ -35261,7 +35323,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port", None).format(meter)
                 elif meter == "EXTECH 421509":
                     aw.qmc.device = 15
@@ -35270,7 +35332,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 7
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH506RA. Now, chose serial port", None).format(meter)
                 elif meter == "Omega HH802U":
                     aw.qmc.device = 16
@@ -35279,7 +35341,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH806AU. Now, chose serial port", None).format(meter)
                 elif meter == "Omega HH309":
                     aw.qmc.device = 17
@@ -35288,7 +35350,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 #special device manual mode. No serial settings.
                 elif meter == "NONE":
@@ -35312,7 +35374,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)
                 ##########################
                 ####  DEVICE 21 is +309_34 but +DEVICE cannot be set as main device
@@ -35327,7 +35389,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, check Serial Port settings", None).format(meter)
 # +DEVICEs cannot be set as main device
                 ##########################
@@ -35352,7 +35414,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose Modbus serial port", None).format(meter)
                 elif meter == "VOLTCRAFT K201":
                     aw.qmc.device = 30
@@ -35361,7 +35423,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 302. Now, chose serial port", None).format(meter)
                 elif meter == "Amprobe TMD-56":
                     aw.qmc.device = 31
@@ -35370,7 +35432,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to Omega HH806AU. Now, chose serial port", None).format(meter)
                 ##########################
                 ####  DEVICE 32 is +ArduinoTC4_56 but +DEVICE cannot be set as main device
@@ -35400,7 +35462,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 elif meter == "Phidget IO 12":
                     aw.qmc.device = 40
@@ -35440,7 +35502,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5                  
+                    aw.ser.timeout = 1.0
                 ##########################
                 ####  DEVICE 51 is +304_34 but +DEVICE cannot be set as main device
                 ##########################
@@ -35454,7 +35516,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
                 ####  DEVICE 54 is +VOLTCRAFT 204_34 but +DEVICE cannot be set as main device
@@ -35466,7 +35528,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
                 ####  DEVICE 55 is +MODBUS_56 but +DEVICE cannot be set as main device
@@ -35478,7 +35540,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
                 elif meter == "EXTECH 755":
@@ -35488,7 +35550,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 0.5
+                    aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -42562,6 +42624,7 @@ def main():
             pass
 
     aw.show()
+        
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore'):
         app.exec_()
