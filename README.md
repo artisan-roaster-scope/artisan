@@ -54,8 +54,9 @@ Features
   * [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html)
   * external program
 - multi-format (import and export of various file formats: HTML, PDF, SVG, CSV, JSON, Omega HH506RA, K202, K204, [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm))
-- unlimited number of temperature and virtual curves incl. rate-of-rise curves for ET and BT
-- [spike filter](http://artisan-roasterscope.blogspot.de/2013/05/fighting-spikes.html) and curve smoothing
+- unlimited number of temperature and [virtual curves](https://artisan-roasterscope.blogspot.de/2014/04/virtual-devices-and-symbolic-assignments.html) incl. rate-of-rise curves for ET and BT
+- [spike filter](http://artisan-roasterscope.blogspot.de/2013/05/fighting-spikes.html) and [curve smoothing](https://artisan-roasterscope.blogspot.de/2014/01/sampling-interval-smoothing-and-rate-of.html)
+- [symbolic expressions](https://artisan-roasterscope.blogspot.de/2016/03/roast-calculus.html)
 - Fahrenheit and Celsius support
 - logging of roast events like FCs, FCe,.. via tablet-friendly buttons
 - [custom event programmable buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html) supporting the [Hottop Roaster Interface](http://artisan-roasterscope.blogspot.de/2013/02/controlling-hottop.html)
@@ -63,18 +64,20 @@ Features
 - head-up-display and projections predicting ET/BT development
 - phases LCDs predicting and counting developments per phase
 - automatic CHARGE/DROP event detection
+- [event quantifiers](https://artisan-roasterscope.blogspot.de/2014/04/event-quantifiers.html)
 - template/background profile with playback aid for reproduction of roasts
 - configurable profile evaluations and statistics
 - weight input from digital scales ([Kern](http://www.kern-sohn.com/) and [Acaia](http://acaia.co/))
 - color input from color meters (supports for now [Tonino](http://my-tonino.com/))
 - cupping editor and graphs
 - profile designer and wheel graph editor
-- LargeLCDs and WebLCDs
-- volume calculator
-- batch counter
+- [LargeLCDs and WebLCDs](https://artisan-roasterscope.blogspot.de/2016/03/lcds.html)
+- [volume calculator](https://artisan-roasterscope.blogspot.de/2014/11/batch-volume-and-bean-density.html)
+- [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html)
 - roast, production (for tax reporting) and ranking reports
 - PID-based roast reproduction (follow background mode)
-- software PID
+- [software PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html)
+- [Area under the Curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html)
 
 
 Documentation and Support
@@ -108,15 +111,15 @@ Version History
 |---------|------|---------|
 | v1.0.0 | XX.XX.XXXX | Adds [internal software PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html), external MODBUS PID control, Apollo DT301, Extech 755, fast MODBUS RTU, [AUC](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html), RPi build, bug fixes and stability improvements |
 | v0.9.9 | 14.03.2016 | Adds batch and ranking reports, batch conversions, follow-background for Fuji PIDs, additional keyboard short cuts, designer improvements, bug fixes |
-| v0.9.8 | 21.10.2015 | US weight and volume units, extended [symbolic formulas and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html), [ln()/x^2 approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html), bug fixes |
+| v0.9.8 | 21.10.2015 | US weight and volume units, extended [symbolic expressions and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html), [ln()/x^2 approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html), bug fixes |
 | v0.9.7 | 29.07.2015 | Bug fixes |
 | v0.9.6 | 20.07.2015 | Bug fixes |
-| v0.9.5 | 06.07.2015 | Batch counter, app settings export/import, bug fixes (last Windows Celeron and Mac OS X 10.6 version)|
+| v0.9.5 | 06.07.2015 | [Batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html), app settings export/import, bug fixes (last Windows Celeron and Mac OS X 10.6 version)|
 | v0.9.4 | 06.06.2015 | Bug fixes |
 | v0.9.3 | 15.05.2015 | Phidget 1051, [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html), one extra background curve, bug fixes |
 | v0.9.2 | 16.01.2015 | Bug fixes |
 | v0.9.1 | 03.01.2015 | [Acaia](http://acaia.co/) scale support, QR code, bug fixes |
-| v0.9.0 | 17.11.2014 | MODBUS ASCII/TCP/UDP, Yocto TC and PT100, Phidget 1045 IR, Phidget 1046 Wheatstone Bridge wiring, Phidgets async mode, Polish translations, LargeLCDs, WebLCDs, 2nd set of roast phases, volume calculator, moisture loss and organic loss, container tare, RoR delta span, phasesLCDs showing Rao's development ratio |
+| v0.9.0 | 17.11.2014 | MODBUS ASCII/TCP/UDP, Yocto TC and PT100, Phidget 1045 IR, Phidget 1046 Wheatstone Bridge wiring, Phidgets async mode, Polish translations, [LargeLCDs, WebLCDs](https://artisan-roasterscope.blogspot.de/2016/03/lcds.html), 2nd set of roast phases, [volume calculator](https://artisan-roasterscope.blogspot.de/2014/11/batch-volume-and-bean-density.html), moisture loss and organic loss, container tare, RoR delta span, phasesLCDs showing Rao's development ratio |
 | v0.8.0 | 25.05.2014 | Phidget IO, Phidget remote, Arduino TC4 PID, Mastech MS6514 |
 | v0.7.5 | 06.04.2014 | Bug fixes |
 | v0.7.4 | 13.01.2014 | Bug fixes |
@@ -124,11 +127,11 @@ Version History
 | v0.7.2 | 19.12.2013 | Bug fixes |
 | v0.7.1 | 02.12.2013 | Bug fixes |
 | v0.7.0 | 30.11.2013 | Phidget 1046/1048, phases LCDs, xkcd style, extended alarms, [Tonino](http://my-tonino.com/) support |
-| v0.6.0 | 14.06.2013 | Monitoring-only mode, sliders, extended alarms, Modbus RTU, Amprobe TMD-56, spike filter, additional localizations |
+| v0.6.0 | 14.06.2013 | Monitoring-only mode, sliders, extended alarms, [Modbus RTU](http://artisan-roasterscope.blogspot.de/2013/05/more-modbus.html), Amprobe TMD-56, [spike filter](http://artisan-roasterscope.blogspot.de/2013/05/fighting-spikes.html), additional localizations |
 | v0.5.6 | 08.11.2012 | Bug fixes  (last Mac OS X 10.4/10.5 version) |
 | v0.5.2 | 23.07.2011 | Delta DTA PID support, automatic CHARGE/DROP |
-| v0.5.0 | 10.06.2011 | HHM28, wheel graph, math plotter, multiple and virtual devices, symbolic expressions, custom buttons |
-| v0.4.0 | 10.04.2011 | Localization, events replay, alarms, profile designer |
+| v0.5.0 | 10.06.2011 | HHM28, wheel graph, math plotter, multiple and [virtual devices, symbolic expressions](https://artisan-roasterscope.blogspot.de/2014/04/virtual-devices-and-symbolic-assignments.html), [custom buttons](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html) |
+| v0.4.0 | 10.04.2011 | Localization, events replay, [alarms](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html), profile designer |
 | v0.3.4 | 28.02.2011 | Arduino TC4, TE VA18B, delta filter |
 | v0.3.3 | 13.02.2011 | Fuji PXR5/PXG5, manual device, keyboard shortcuts, Linux |
 | v0.3.0 | 11.01.2011 | New profile file format |
