@@ -21891,7 +21891,7 @@ class HUDDlg(ArtisanDialog):
     def lnvar(self,i):
         if self.lnvarCheck.isChecked():
             #check for finished roast
-            if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
+            if aw.qmc.timeindex[0] > -1:
                 res = aw.qmc.lnRegression()
                 self.lnresult.setText(res)
             else:
