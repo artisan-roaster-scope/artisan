@@ -14744,8 +14744,9 @@ class ApplicationWindow(QMainWindow):
         try:
             _,_,tsb = aw.ts()   
             computedProfile["AUC"] = self.float2float(tsb,0)
-            computedProfile["AUCbegin"] = computedProfile["AUCbase"] = ""
+            computedProfile["AUCbegin"] = ""
             computedProfile["AUCbase"] = self.float2float(aw.qmc.AUCbase,0)
+            computedProfile["AUCfromeventflag"] = int(aw.qmc.AUCbaseFlag)
             if (aw.qmc.AUCbegin == 0):
                 computedProfile["AUCbegin"] = "CHARGE"
                 if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
@@ -14766,17 +14767,17 @@ class ApplicationWindow(QMainWindow):
             pass
         try:
             _,_,ts1b = aw.ts(self.qmc.timeindex[0],DRY_time_idx)
-            computedProfile["dry_phase_ts_BT"] = self.float2float(ts1b,0)
+            computedProfile["dry_phase_AUC"] = self.float2float(ts1b,0)
         except Exception:
             pass
         try:
             _,_,ts2b = aw.ts(DRY_time_idx,self.qmc.timeindex[2])
-            computedProfile["mid_phase_ts_BT"] = self.float2float(ts2b,0)
+            computedProfile["mid_phase_AUC"] = self.float2float(ts2b,0)
         except Exception:
             pass
         try:
             _,_,ts3b = aw.ts(self.qmc.timeindex[2],self.qmc.timeindex[6])
-            computedProfile["finish_phase_ts_BT"] = self.float2float(ts3b,0)
+            computedProfile["finish_phase_AUC"] = self.float2float(ts3b,0)
         except Exception:
             pass
         ######### Weight, Volume, Loss, Gain, Density #########
@@ -18621,8 +18622,8 @@ class ApplicationWindow(QMainWindow):
                     dryphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["dryphasetime"]),int(round(dryphasetime*100./totaltime)))
                     if "dry_phase_ror" in cp:
                         dryphase += "<br>%.1f%s%s/min"%(cp["dry_phase_ror"],uchr(176),aw.qmc.mode)
-                    if "dry_phase_ts_BT" in cp:
-                        dryphase += "<br>%dC*min"%(cp["dry_phase_ts_BT"])
+                    if "dry_phase_AUC" in cp:
+                        dryphase += "<br>%dC*min"%(cp["dry_phase_AUC"])
                         if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
                             dryphase += u(" [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"])))
                         elif ("AUCbase" in cp):
@@ -18635,8 +18636,8 @@ class ApplicationWindow(QMainWindow):
                     midphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["midphasetime"]),int(round(midphasetime*100./totaltime)))
                     if "mid_phase_ror" in cp:
                         midphase += "<br>%.1f%s%s/min"%(cp["mid_phase_ror"],uchr(176),aw.qmc.mode)
-                    if "mid_phase_ts_BT" in cp:
-                        midphase += "<br>%dC*min"%(cp["mid_phase_ts_BT"])                            
+                    if "mid_phase_AUC" in cp:
+                        midphase += "<br>%dC*min"%(cp["mid_phase_AUC"])                            
                         if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
                             midphase += u(" [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"])))
                         elif ("AUCbase" in cp):
@@ -18649,8 +18650,8 @@ class ApplicationWindow(QMainWindow):
                     finishphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["finishphasetime"]),int(round(finishphasetime*100./totaltime)))
                     if "finish_phase_ror" in cp:
                         finishphase += "<br>%.1f%s%s/min"%(cp["finish_phase_ror"],uchr(176),aw.qmc.mode)
-                    if "finish_phase_ts_BT" in cp:
-                        finishphase += "<br>%dC*min"%(cp["finish_phase_ts_BT"])                            
+                    if "finish_phase_AUC" in cp:
+                        finishphase += "<br>%dC*min"%(cp["finish_phase_AUC"])                            
                         if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
                             finishphase += u(" [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"])))
                         elif ("AUCbase" in cp):
