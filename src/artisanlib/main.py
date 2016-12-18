@@ -9528,6 +9528,10 @@ class ApplicationWindow(QMainWindow):
         fileConvertRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
         fileConvertRoastLoggerAction.triggered.connect(self.fileConvertRoastLogger)
         self.exportMenu.addAction(fileConvertRoastLoggerAction)
+
+        fileConvertProbatAction = QAction(QApplication.translate("Menu", "Probat Pilot...",None),self)
+        fileConvertProbatAction.triggered.connect(self.fileConvertPilot)
+        self.exportMenu.addAction(fileConvertProbatAction)
         
         fileConvertPNGAction = QAction(QApplication.translate("Menu", "PNG...",None),self)
         fileConvertPNGAction.triggered.connect(self.fileConvertPNG)
@@ -13512,7 +13516,7 @@ class ApplicationWindow(QMainWindow):
             return False
             
     def indent(self,elem, level=0):
-        i = "\n" + level*"  "
+        i = "\r\n" + level*"  " # Windows line ending (as Pilot is only available on Windows)
         if len(elem):
             if not elem.text or not elem.text.strip():
                 elem.text = i + "  "
@@ -13536,7 +13540,7 @@ class ApplicationWindow(QMainWindow):
             
             charge = ET.SubElement(tree, "charge")
             if aw.qmc.weight[0]:
-                charge.text = '{0:.2f}'.format(aw.qmc.weight[0]) + " " + aw.qmc.weight[2]
+                charge.text = u(aw.float2float(aw.convertWeight(aw.qmc.weight[0],aw.qmc.weight_units.index(aw.qmc.weight[2]),1)))
             
             beans = ET.SubElement(tree, "coffeetype")
             if aw.qmc.beans and aw.qmc.beans != "":
@@ -13555,8 +13559,7 @@ class ApplicationWindow(QMainWindow):
                 notes.text = self.qmc.roastingnotes
             
             roasttype = ET.SubElement(tree, "roasttype")
-            if aw.qmc.title and aw.qmc.title != "":
-                roasttype.text = aw.qmc.title
+            roasttype.text = "0" # 0: global, 1: time, 2: temp
             
             recipedata = ET.SubElement(tree, "recipedata", temp_unit=aw.qmc.mode)
             diagrampoints = ET.SubElement(recipedata, "diagrampoints")
@@ -15074,6 +15077,9 @@ class ApplicationWindow(QMainWindow):
                         
     def fileConvertRoastLogger(self):
         self.fileConvert(".csv",self.exportRoastLogger)
+        
+    def fileConvertPilot(self):
+        self.fileConvert(".xml",self.exportPilot)
 
     def fileConvertPNG(self):
         files = self.ArtisanOpenFilesDialog(ext="*.alog")
@@ -19968,16 +19974,22 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.roastertype = u(roaster)
                     
                 chargestr = root.find("charge").text
-                if chargestr:
-                    w,unit = self.split_units(chargestr.replace(",","."))
-                    if w:
-                        aw.qmc.weight[0] = aw.float2float(w,2)
-                        unit = unit.lower()
-                        # valid units: g, Kg lb oz
-                        if unit in ["g","lb","oz"]:
-                            aw.qmc.weight[2] = unit
-                        elif unit == "kg":
-                            aw.qmc.weight[2] = "Kg"
+                if chargestr: # contains floating point number; default unit Kg
+                    try:
+                        aw.qmc.weight[0] = float(chargestr)
+                        aw.qmc.weight[2] = "Kg"
+                    except:
+                        pass
+                        
+#                    w,unit = self.split_units(chargestr.replace(",","."))
+#                    if w:
+#                        aw.qmc.weight[0] = aw.float2float(w,2)
+#                        unit = unit.lower()
+#                        # valid units: g, Kg lb oz
+#                        if unit in ["g","lb","oz"]:
+#                            aw.qmc.weight[2] = unit
+#                        elif unit == "kg":
+#                            aw.qmc.weight[2] = "Kg"
 
                 colorstr = root.find("coffeecolor").text
                 if colorstr:
