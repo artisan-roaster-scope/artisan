@@ -578,16 +578,25 @@ from artisanlib import pid
 # higher resultion time signal (at least on Mac OS X)
 class ArtisanTime():
     def __init__(self):
-        self.clock = libtime.time()
+        if sys.version < '3':
+            self.clock = libtime.time()
+        else:
+            self.clock = libtime.perf_counter()
 
     def setHMS(self,a,b,c,d):
         self.start()
         
     def start(self):
-        self.clock = libtime.time()
+        if sys.version < '3':
+            self.clock = libtime.time()
+        else:
+            self.clock = libtime.perf_counter()
         
     def elapsed(self):
-        return (libtime.time() - self.clock)*1000.
+        if sys.version < '3':
+            return (libtime.time() - self.clock)*1000.
+        else:
+            return (libtime.perf_counter() - self.clock)*1000.
 
     
 
@@ -1015,7 +1024,7 @@ class tgraphcanvas(FigureCanvas):
         self.ETfunction,self.BTfunction = "",""
 
         #put a "aw.qmc.safesaveflag = True" whenever there is a change of a profile like at [DROP], edit properties Dialog, etc
-        #prevents accidentally deleting a modified profile.
+        #prevents accidentally deleting a modified profile. ("dirty file")
         self.safesaveflag = False
         
         self.pid = pid.PID()
@@ -3599,6 +3608,7 @@ class tgraphcanvas(FigureCanvas):
                     e = 0
                     a = 1.  
                 anno_artists += self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
+                
                 #Add TP marker
                 if self.markTPflag and TP_index and TP_index > 0:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
@@ -3632,6 +3642,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
+                
                 #Add 1Cs markers            
                 if timeindex[2]:
                     tidx = timeindex[2]
@@ -3728,6 +3739,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     else:
                         e = 0
+                    
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                     
                     #do water mark if FCs, but no FCe nor SCs nor SCe
@@ -4345,14 +4357,26 @@ class tgraphcanvas(FigureCanvas):
                                 self.E4values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
                                 E4_nonempty = True
     
-                        self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
+                        if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
+                            self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
-                        self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
+                        else:
+                            self.l_eventtype1dots, = self.ax.plot([None],[None])
+                        if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex):    
+                            self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
-                        self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
+                        else:
+                            self.l_eventtype2dots, = self.ax.plot([None],[None])
+                        if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
+                            self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
-                        self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
+                        else:
+                            self.l_eventtype3dots, = self.ax.plot([None],[None])
+                        if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
+                            self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                        else:
+                            self.l_eventtype4dots, = self.ax.plot([None],[None])
                             
 
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
@@ -6680,16 +6704,12 @@ class tgraphcanvas(FigureCanvas):
                             st1 += u("  ")
                             st2 += u("  ")
                             st3 += u("  ")
-                        _,ts1e,ts1b = aw.ts(self.timeindex[0],dryEndIndex,TP_index)
-                        _,ts2e,ts2b = aw.ts(dryEndIndex,self.timeindex[2],TP_index)
-                        _,ts3e,ts3b = aw.ts(self.timeindex[2],self.timeindex[6],TP_index)
+                        _,_,ts1b = aw.ts(self.timeindex[0],dryEndIndex,TP_index)
+                        _,_,ts2b = aw.ts(dryEndIndex,self.timeindex[2],TP_index)
+                        _,_,ts3b = aw.ts(self.timeindex[2],self.timeindex[6],TP_index)
                         st1 += u(ts1b) + u("C*min")
                         st2 += u(ts2b) + u("C*min")
                         st3 += u(ts3b) + u("C*min")
-                        if not self.statisticsflags[4]:
-                            st1 += u(" [" + str(ts1e) + "-" + str(ts1b) + "]")
-                            st2 += u(" [" + str(ts2e) + "-" + str(ts2b) + "]")
-                            st3 += u(" [" + str(ts3e) + "-" + str(ts3b) + "]")
                     if self.statisticsflags[2]:
                         st1 = st1 + u(")")
                         st2 = st2 + u(")")
@@ -8626,7 +8646,6 @@ class SampleThread(QThread):
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
-        redraw = False
         try:
             ##### lock resources  #########
             gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
@@ -8650,10 +8669,16 @@ class SampleThread(QThread):
                 if aw.qmc.device != 18: # not NONE device
                 
                     #### first retrieve readings from the main device
-                    timeBeforeETBT = libtime.time() # the time before sending the request to the main device
+                    if sys.version < '3':
+                        timeBeforeETBT = libtime.time() # the time before sending the request to the main device
+                    else:
+                        timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
                     #read time, ET (t1) and BT (t2) TEMPERATURE
                     tx,t1,t2 = self.sample_main_device()
-                    timeAfterETBT = libtime.time() # the time the data of the main device was received
+                    if sys.version < '3':
+                        timeAfterETBT = libtime.time() # the time the data of the main device was received
+                    else:
+                        timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
                     aw.qmc.RTtemp1 = t1
                     aw.qmc.RTtemp2 = t2
                     ##############  if using Extra devices
@@ -8730,7 +8755,10 @@ class SampleThread(QThread):
                                 errormessage = "ERROR: extra devices lengths don't match: %s"%string
                                 errormessage += "\nPlease Reset: Extra devices"
                             raise Exception(errormessage)
-                    timeAfterExtra = libtime.time() # the time the data of all extra devices was received
+                    if sys.version < '3':
+                        timeAfterExtra = libtime.time() # the time the data of all extra devices was received
+                    else:
+                        timeAfterExtra = libtime.perf_counter() # the time the data of all extra devices was received
                     if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
                         # send another sampling action if any
                         try:
@@ -9139,7 +9167,10 @@ class SampleThread(QThread):
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
             while True:
                 if aw.qmc.flagon:
-                    start = libtime.time()
+                    if sys.version < '3':
+                        start = libtime.time()
+                    else:
+                        start = libtime.perf_counter()
                     #tx = aw.qmc.timeclock.elapsed()
                     
                     #collect information
@@ -9150,7 +9181,11 @@ class SampleThread(QThread):
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
                     
                     min_delay = aw.qmc.delay
-                    dt = max(0.05,min(min_delay,aw.qmc.delay)/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
+                    if sys.version < '3':
+                        now = libtime.time()
+                    else:
+                        now = libtime.perf_counter()
+                    dt = max(0.05,min(min_delay,aw.qmc.delay)/1000. - now + start) # min of 1sec to allow for refresh the display
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     if aw.qmc.flagon:
@@ -9270,7 +9305,16 @@ class ApplicationWindow(QMainWindow):
         self.defaultdpi = 120
         self.dpi = self.defaultdpi
         self.qmc = tgraphcanvas(self.main_widget)
-        self.qmc.fig.set_dpi(self.defaultdpi)
+        v = 2
+        try:
+            v = int(mpl.__version__.split('.')[0])
+        except:
+            pass
+        if v >= 2:
+            # on mpl >= v2 we assume hidpi support and consider the pixel ratio
+            self.qmc.fig.set_dpi(self.defaultdpi*self.devicePixelRatio())
+        else:
+            self.qmc.fig.set_dpi(self.defaultdpi)
         
         #self.qmc.setAttribute(Qt.WA_NoSystemBackground)
         
@@ -9435,6 +9479,10 @@ class ApplicationWindow(QMainWindow):
         importK204Action.triggered.connect(self.importK204)
         self.importMenu.addAction(importK204Action)
 
+        importPilotAction = QAction(QApplication.translate("Menu", "Probat Pilot...",None),self)
+        importPilotAction.triggered.connect(self.importPilot)
+        self.importMenu.addAction(importPilotAction)
+
         self.fileMenu.addSeparator()
 
         self.fileSaveAction = QAction(UIconst.FILE_MENU_SAVE,self)
@@ -9461,6 +9509,10 @@ class ApplicationWindow(QMainWindow):
         fileExportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
         fileExportRoastLoggerAction.triggered.connect(self.fileExportRoastLogger)
         self.exportMenu.addAction(fileExportRoastLoggerAction)
+
+        fileExportPilotAction = QAction(QApplication.translate("Menu", "Probat Pilot...",None),self)
+        fileExportPilotAction.triggered.connect(self.fileExportPilot)
+        self.exportMenu.addAction(fileExportPilotAction)
         
         
         self.exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_CONVERT)
@@ -12681,7 +12733,10 @@ class ApplicationWindow(QMainWindow):
         #if moves on
         if self.keyboardmoveflag:
             if kcommand == "space":
-                now = libtime.time()
+                if sys.version < '3':
+                    now = libtime.time()
+                else:
+                    now = libtime.perf_counter()
                 if self.lastkeyboardcmd == 0 or (now > self.lastkeyboardcmd + 2): # accept SPACE keyboard cmds only every 2sec.
                     self.keyboardmove[self.keyboardmoveindex]()   #apply button command
                     #behaviour rules after pressing a button
@@ -13069,7 +13124,7 @@ class ApplicationWindow(QMainWindow):
             f = QFile(u(filename))
             if not f.open(QFile.ReadOnly):
                 raise IOError(u(f.errorString()))
-            stream = QTextStream(f)            
+            stream = QTextStream(f)
             firstChar = stream.read(1)
             if firstChar == "{":
                 f.close()
@@ -13454,6 +13509,130 @@ class ApplicationWindow(QMainWindow):
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
+            return False
+            
+    def indent(self,elem, level=0):
+        i = "\n" + level*"  "
+        if len(elem):
+            if not elem.text or not elem.text.strip():
+                elem.text = i + "  "
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+            for elem in elem:
+                self.indent(elem, level+1)
+            if not elem.tail or not elem.tail.strip():
+                elem.tail = i
+        else:
+            if level and (not elem.tail or not elem.tail.strip()):
+                elem.tail = i            
+            
+    def exportPilot(self,filename):
+        try:
+            try:
+                import xml.etree.cElementTree as ET
+            except ImportError:
+                import xml.etree.ElementTree as ET
+            tree = ET.Element("recipe")
+            
+            charge = ET.SubElement(tree, "charge")
+            if aw.qmc.weight[0]:
+                charge.text = '{0:.2f}'.format(aw.qmc.weight[0]) + " " + aw.qmc.weight[2]
+            
+            beans = ET.SubElement(tree, "coffeetype")
+            if aw.qmc.beans and aw.qmc.beans != "":
+                beans.text = aw.qmc.beans
+            
+            color = ET.SubElement(tree, "coffeecolor")
+            if aw.qmc.ground_color:
+                color.text = str(aw.qmc.ground_color)
+            
+            roaster = ET.SubElement(tree, "roaster")
+            if aw.qmc.roastertype and aw.qmc.roastertype != "":
+                roaster.text = aw.qmc.roastertype
+            
+            notes = ET.SubElement(tree, "notes")
+            if self.qmc.roastingnotes and self.qmc.roastingnotes != "":
+                notes.text = self.qmc.roastingnotes
+            
+            roasttype = ET.SubElement(tree, "roasttype")
+            if aw.qmc.title and aw.qmc.title != "":
+                roasttype.text = aw.qmc.title
+            
+            recipedata = ET.SubElement(tree, "recipedata", temp_unit=aw.qmc.mode)
+            diagrampoints = ET.SubElement(recipedata, "diagrampoints")
+            
+            # if CHARGE is defined, only export from CHARGE
+            # if DROP is defined only export until DROP
+            end_temp = None
+            end_time = None
+            for i in arange(len(aw.qmc.timex)):
+                if (self.qmc.timeindex[0] < 0 or i >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or i <= self.qmc.timeindex[6]):
+                    data = ET.SubElement(diagrampoints, "data")
+                    t = self.qmc.timex[i]
+                    if self.qmc.timeindex[0] > -1:
+                        t = t - self.qmc.timex[self.qmc.timeindex[0]]
+                    time = ET.SubElement(data,"time")
+                    time.text = "%02d:%02d"% divmod(t,60)
+                    end_time = time.text
+                    temp = ET.SubElement(data,"temperature")
+                    temp.text = str(int(round(self.qmc.temp2[i])))
+                    end_temp = temp.text
+                    burner = ET.SubElement(data,"burnercapacity")
+                    if len(self.qmc.extradevices) > 0:
+                        burner.text = str(int(round(self.qmc.extratemp1[0][i])))
+                    rising = ET.SubElement(data,"rising")
+                    if self.qmc.delta2[i] and self.qmc.delta2[i] > 0:
+                        rising.text = "true"                        
+                    else:
+                        rising.text = "false"
+
+            endtemperature = ET.SubElement(tree, "endtemperature")
+            if end_temp:
+                endtemperature.text = end_temp
+                
+            endtime = ET.SubElement(tree, "endtime")
+            if end_temp:
+                endtime.text = end_time
+                
+            cooling = ET.SubElement(tree, "coolingtime")
+            if self.qmc.timeindex[7]:
+                t = self.qmc.timex[self.qmc.timeindex[7]] - self.qmc.timex[self.qmc.timeindex[6]]
+                cooling.text = "%02d:%02d"% divmod(t,60)
+            else:
+                cooling.text = "00:00"
+            
+            switchpoints = ET.SubElement(recipedata, "switchpoints")
+            # take data from 2nd extra event type
+            for i in arange(len(self.qmc.specialevents)):
+                if self.qmc.specialeventstype[i] == 1 and (self.qmc.timeindex[0] < 0 or self.qmc.specialevents[i] >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or self.qmc.specialevents[i] <= self.qmc.timeindex[6]):
+                    data = ET.SubElement(switchpoints, "data")
+                    if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
+                        timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+                    else:
+                        timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]))
+                    t = self.qmc.specialevents[i]
+                    if self.qmc.timeindex[0] > -1:
+                        t = t - self.qmc.timeindex[0]
+                    time = ET.SubElement(data,"time")
+                    time.text = timez
+                    temp = ET.SubElement(data,"temperature")
+                    temp.text = str(int(round(self.qmc.temp2[self.qmc.specialevents[i]])))
+                    burner = ET.SubElement(data,"burnercapacity")
+                    b = self.qmc.eventsInternal2ExternalValue(self.qmc.specialeventsvalue[i])
+                    burner.text = str(int(round(b)))
+                    rising = ET.SubElement(data,"rising")
+                    if self.qmc.delta2[i] and self.qmc.delta2[i] > 0:
+                        rising.text = "true"                        
+                    else:
+                        rising.text = "false"
+            self.indent(tree)
+            ET.ElementTree(tree).write(filename,encoding='utf-8', xml_declaration=True)
+            return True
+        except Exception as ex:
+#           import traceback
+#           traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportPilot() {0}").format(str(ex)),exc_tb.tb_lineno)
             return False
 
     #Write readings to RoastLogger CSV file
@@ -14092,12 +14271,12 @@ class ApplicationWindow(QMainWindow):
 
             old_mode = self.qmc.mode
             if "mode" in profile:
-                self.qmc.mode = str(profile["mode"])
+                m = str(profile["mode"])
             #convert modes only if needed comparing the new uploaded mode to the old one.
             #otherwise it would incorrectly convert the uploaded phases
-            if self.qmc.mode == "F" and old_mode == "C":
+            if m == "F" and self.qmc.mode == "C":
                 self.qmc.fahrenheitMode()
-            if self.qmc.mode == "C" and old_mode == "F":
+            if m == "C" and self.qmc.mode == "F":
                 self.qmc.celsiusMode()
             if "phases" in profile:
                 self.qmc.phases = profile["phases"]
@@ -14558,24 +14737,42 @@ class ApplicationWindow(QMainWindow):
             computedProfile["total_ts_BT"] = self.float2float(tsb,0)
         except Exception:
             pass
+        ######### AUC area #########  #Dave
         try:
-            ts1,ts1e,ts1b = aw.ts(self.qmc.timeindex[0],DRY_time_idx)
-            computedProfile["dry_phase_ts"] = self.float2float(ts1,0)
-            computedProfile["dry_phase_ts_ET"] = self.float2float(ts1e,0)
+            _,_,tsb = aw.ts()   
+            computedProfile["AUC"] = self.float2float(tsb,0)
+            computedProfile["AUCbegin"] = computedProfile["AUCbase"] = ""
+            computedProfile["AUCbase"] = self.float2float(aw.qmc.AUCbase,0)
+            if (aw.qmc.AUCbegin == 0):
+                computedProfile["AUCbegin"] = "CHARGE"
+                if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
+                    computedProfile["AUCbase"] = computedProfile["CHARGE_BT"]
+            elif (aw.qmc.AUCbegin == 1):
+                computedProfile["AUCbegin"] = "TP"
+                if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
+                    computedProfile["AUCbase"] = computedProfile["TP_BT"]
+            elif (aw.qmc.AUCbegin == 2):
+                computedProfile["AUCbegin"] = "DE"
+                if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
+                    computedProfile["AUCbase"] = computedProfile["DRY_BT"]
+            elif (aw.qmc.AUCbegin == 3):
+                computedProfile["AUCbegin"] = "FCs"
+                if aw.qmc.AUCbaseFlag:  # base AUC is taken from BT at AUCbegin event
+                    computedProfile["AUCbase"] = computedProfile["FCs_BT"]                
+        except Exception:
+            pass
+        try:
+            _,_,ts1b = aw.ts(self.qmc.timeindex[0],DRY_time_idx)
             computedProfile["dry_phase_ts_BT"] = self.float2float(ts1b,0)
         except Exception:
             pass
         try:
-            ts2,ts2e,ts2b = aw.ts(DRY_time_idx,self.qmc.timeindex[2])
-            computedProfile["mid_phase_ts"] = self.float2float(ts2,0)
-            computedProfile["mid_phase_ts_ET"] = self.float2float(ts2e,0)
+            _,_,ts2b = aw.ts(DRY_time_idx,self.qmc.timeindex[2])
             computedProfile["mid_phase_ts_BT"] = self.float2float(ts2b,0)
         except Exception:
             pass
         try:
-            ts3,ts3e,ts3b = aw.ts(self.qmc.timeindex[2],self.qmc.timeindex[6])
-            computedProfile["finish_phase_ts"] = self.float2float(ts3,0)
-            computedProfile["finish_phase_ts_ET"] = self.float2float(ts3e,0)
+            _,_,ts3b = aw.ts(self.qmc.timeindex[2],self.qmc.timeindex[6])
             computedProfile["finish_phase_ts_BT"] = self.float2float(ts3b,0)
         except Exception:
             pass
@@ -14833,6 +15030,9 @@ class ApplicationWindow(QMainWindow):
 
     def fileExportRoastLogger(self):
         self.fileExport(QApplication.translate("Message", "Export RoastLogger",None),"*.csv",self.exportRoastLogger)
+        
+    def fileExportPilot(self):
+        self.fileExport(QApplication.translate("Message", "Export Probat Pilot",None),"*.xml",self.exportPilot)
         
         
     def fileConvert(self,ext,dumper):
@@ -17046,7 +17246,7 @@ class ApplicationWindow(QMainWindow):
         date = data["roastdate"].date()
         time = data["roastdate"].time()
         if date:
-            res["time"] = u(date.toString("yyyy-MM-dd")) # Qt.SystemLocaleShortDate, Qt.ISODate
+            res["time"] = u(date.toString("yy-MM-dd")) # Qt.SystemLocaleShortDate, Qt.ISODate
         if time:
             res["time"] += u(" " + time.toString("HH:mm")) # Qt.SystemLocaleShortDate, Qt.ISODate
         # beans
@@ -17440,7 +17640,7 @@ class ApplicationWindow(QMainWindow):
         if "computed" in profile:
             comp = profile["computed"]
             if "total_ts_BT" in comp:
-                res["BTa"] = comp["total_ts_BT"]
+                res["BTa"] = comp["AUC"]
         # color
         if "ground_color" in profile:
             res["color"] = profile["ground_color"]
@@ -17777,7 +17977,7 @@ class ApplicationWindow(QMainWindow):
                         ncol = int(math.ceil(len(handles)/2.))
                     else:
                         ncol = int(math.ceil(len(handles)))
-                    self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=True)
+                    self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False)
                             
                     # generate graph
                     self.qmc.fig.canvas.draw()
@@ -18115,10 +18315,17 @@ class ApplicationWindow(QMainWindow):
                 charge = u("--")
             dryphase, midphase, finishphase, coolphase = self.phases2html(cp)
             etbta = u("--")
-            if "total_ts" in cp and cp["total_ts"] != 0:
-                etbta = u("%d"%(cp["total_ts"]))
-                if "total_ts_ET" in cp and "total_ts_BT" in cp:
-                    etbta += u(" [%d-%d]"%(cp["total_ts_ET"],cp["total_ts_BT"]))
+#            if "total_ts" in cp and cp["total_ts"] != 0:
+#                etbta = u("%d"%(cp["total_ts"]))
+#                if "total_ts_ET" in cp and "total_ts_BT" in cp:
+#                    etbta += u(" [%d-%d]"%(cp["total_ts_ET"],cp["total_ts_BT"]))
+            #Dave new way of presenting AUC
+            if ("AUC" in cp and cp["AUC"] != 0):
+                etbta = u("%dC*min"%(cp["AUC"]))
+                if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
+                    etbta += u(" [%s,%d]"%(cp["AUCbegin"],cp["AUCbase"]))
+                elif ("AUCbase" in cp):
+                    etbta += u(" [%d]"%(cp["AUCbase"]))
             tmpdir = u(QDir.tempPath() + "/")
             graph_image = "roastlog-graph"
             if platf == 'Darwin':
@@ -18408,22 +18615,26 @@ class ApplicationWindow(QMainWindow):
                     dryphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["dryphasetime"]),int(round(dryphasetime*100./totaltime)))
                     if "dry_phase_ror" in cp:
                         dryphase += "<br>%.1f%s%s/min"%(cp["dry_phase_ror"],uchr(176),aw.qmc.mode)
-                    if "dry_phase_ts" in cp:
-                        dryphase += "<br>%d"%(cp["dry_phase_ts"])
-                        if "dry_phase_ts_ET" in cp and "dry_phase_ts_BT" in cp:
-                            dryphase += " [%d-%d]"%(cp["dry_phase_ts_ET"],cp["dry_phase_ts_BT"])
-                        if "dryphaseeval" in cp:
-                            dryphase += "<br>" + d(cp["dryphaseeval"])
+                    if "dry_phase_ts_BT" in cp:
+                        dryphase += "<br>%dC*min"%(cp["dry_phase_ts_BT"])
+                        if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
+                            dryphase += u(" [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"])))
+                        elif ("AUCbase" in cp):
+                            dryphase += u(" [%d]"%(round(cp["AUCbase"])))
+                    if "dryphaseeval" in cp:
+                        dryphase += "<br>" + d(cp["dryphaseeval"])
                 #midphase
                 if "midphasetime" in cp:
                     midphasetime = cp["midphasetime"]
                     midphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["midphasetime"]),int(round(midphasetime*100./totaltime)))
                     if "mid_phase_ror" in cp:
                         midphase += "<br>%.1f%s%s/min"%(cp["mid_phase_ror"],uchr(176),aw.qmc.mode)
-                    if "mid_phase_ts" in cp:
-                        midphase += "<br>%d"%(cp["mid_phase_ts"])
-                        if "mid_phase_ts_ET" in cp and "mid_phase_ts_BT" in cp:
-                            midphase += " [%d-%d]"%(cp["mid_phase_ts_ET"],cp["mid_phase_ts_BT"])
+                    if "mid_phase_ts_BT" in cp:
+                        midphase += "<br>%dC*min"%(cp["mid_phase_ts_BT"])                            
+                        if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
+                            midphase += u(" [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"])))
+                        elif ("AUCbase" in cp):
+                            midphase += u(" [%d]"%(round(cp["AUCbase"])))
                     if "midphaseeval" in cp:
                         midphase += "<br>" + d(cp["midphaseeval"])
                 #finishphase
@@ -18432,10 +18643,12 @@ class ApplicationWindow(QMainWindow):
                     finishphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["finishphasetime"]),int(round(finishphasetime*100./totaltime)))
                     if "finish_phase_ror" in cp:
                         finishphase += "<br>%.1f%s%s/min"%(cp["finish_phase_ror"],uchr(176),aw.qmc.mode)
-                    if "finish_phase_ts" in cp:
-                        finishphase += "<br>%d"%(cp["finish_phase_ts"])
-                        if "finish_phase_ts_ET" in cp and "finish_phase_ts_BT" in cp:
-                            finishphase += " [%d-%d]"%(cp["finish_phase_ts_ET"],cp["finish_phase_ts_BT"])
+                    if "finish_phase_ts_BT" in cp:
+                        finishphase += "<br>%dC*min"%(cp["finish_phase_ts_BT"])                            
+                        if ("AUCbegin" in cp and cp["AUCbegin"] != '' and "AUCbase" in cp):
+                            finishphase += u(" [%s,%d]"%(cp["AUCbegin"],round(cp["AUCbase"])))
+                        elif ("AUCbase" in cp):
+                            finishphase += u(" [%d]"%(round(cp["AUCbase"])))
                     if "finishphaseeval" in cp:
                         finishphase += "<br>" + d(cp["finishphaseeval"])
                 #coolphase
@@ -19703,6 +19916,139 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK204() {0}").format(str(ex)),exc_tb.tb_lineno)
+
+    def split_units(self,value):
+        """
+        >>> split_units("2GB")
+        (2.0, 'GB')
+        >>> split_units("17 ft")
+        (17.0, 'ft')
+        >>> split_units("   3.4e-27 frobnitzem ")
+        (3.4e-27, 'frobnitzem')
+        >>> split_units("9001")
+        (9001.0, '')
+        >>> split_units("spam sandwhiches")
+        (0, 'spam sandwhiches')
+        >>> split_units("")
+        (0, '')
+        """
+        units = ""
+        number = 0
+        while value:
+            try:
+                number = float(value)
+                break
+            except ValueError:
+                units = value[-1:] + units
+                value = value[:-1]
+        return number, units.strip()
+    
+    
+    def importPilot(self):
+        try:
+            try:
+                import xml.etree.cElementTree as ET
+            except ImportError:
+                import xml.etree.ElementTree as ET
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import HH506RA CSV", None))
+            if len(filename) == 0:
+                return
+            if self.qmc.reset():
+                tree = ET.ElementTree(file=filename)
+                root = tree.getroot()
+  
+                title = root.find("roasttype").text
+                if title:
+                    aw.qmc.title = u(title)
+                beans = root.find("coffeetype").text
+                if beans:
+                    aw.qmc.beans = u(beans)
+                roaster = root.find("roaster").text
+                if roaster:
+                    aw.qmc.roastertype = u(roaster)
+                    
+                chargestr = root.find("charge").text
+                if chargestr:
+                    w,unit = self.split_units(chargestr.replace(",","."))
+                    if w:
+                        aw.qmc.weight[0] = aw.float2float(w,2)
+                        unit = unit.lower()
+                        # valid units: g, Kg lb oz
+                        if unit in ["g","lb","oz"]:
+                            aw.qmc.weight[2] = unit
+                        elif unit == "kg":
+                            aw.qmc.weight[2] = "Kg"
+
+                colorstr = root.find("coffeecolor").text
+                if colorstr:
+                    c = None
+                    for e in colorstr.strip().split():
+                        try:
+                            c = int(e)
+                            break
+                        except:
+                            pass
+                    if c:
+                        aw.qmc.ground_color = c
+
+                notes = root.find("notes").text
+                if notes:
+                    self.qmc.roastingnotes = u(notes)
+
+                recipedata = tree.find('recipedata')
+                m = recipedata.get("temp_unit")
+                if m:
+                    m = m.lower()
+                    if m == "c" and self.qmc.mode == "F":
+                        self.qmc.celsiusMode()
+                    elif m == "f" and self.qmc.mode == "C":
+                        self.qmc.fahrenheitMode()
+                        
+                # add extra device if needed
+                for _ in range(max(0,1 - len(self.qmc.extradevices))):
+                    self.addDevice()
+                if self.qmc.extraname1[0] == "Extra 1":
+                    self.qmc.extraname1[0] = "Burner" 
+                
+                diagrampoints = tree.find('recipedata/diagrampoints')
+                for elem in diagrampoints.findall("data"):
+                    timez = float(self.qmc.stringtoseconds(elem.find("time").text))
+                    self.qmc.timex.append(timez)
+                    self.qmc.temp1.append(-1)
+                    bt = elem.find("temperature").text
+                    bt = bt.replace(",",".")
+                    self.qmc.temp2.append(float(bt))
+                    self.qmc.extratimex[0].append(timez)
+                    burner = elem.find("burnercapacity").text
+                    burner = burner.replace(",",".")
+                    self.qmc.extratemp1[0].append(float(burner))
+                    self.qmc.extratemp2[0].append(-1)
+                    
+                # set CHARGE and DROP
+                self.qmc.timeindex[0] = 0
+                self.qmc.timeindex[6] = len(self.qmc.timex) - 1
+                    
+                switchpoints = tree.find('recipedata/switchpoints')
+                for elem in switchpoints.findall("data"):
+                    time = float(self.qmc.stringtoseconds(elem.find("time").text))                    
+                    self.qmc.specialevents.append(self.qmc.time2index(time))
+                    self.qmc.specialeventstype.append(1)
+                    self.qmc.specialeventsvalue.append(self.qmc.str2eventsvalue(elem.find("burnercapacity").text))
+                    self.qmc.specialeventsStrings.append("")
+                
+
+                self.sendmessage(QApplication.translate("Message","Probat Pilot recipe loaded successfully", None))
+                self.qmc.redraw()
+                aw.qmc.safesaveflag = True
+        except IOError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " importPilot(): {0}").format(str(ex)))
+        except ValueError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importPilot(): {0}").format(str(ex)))
+        except Exception as ex:
+            import traceback
+            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importPilot() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     def importHH506RA(self):
         try:
@@ -23733,7 +24079,7 @@ class editGraphDlg(ArtisanDialog):
             deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)                    
             if i in aw.qmc.specialevents:
                 index = aw.qmc.specialevents.index(i)
-                text = QApplication.translate("Table", "EVENT #{0} {1}{2}",None).format(str(index+1),aw.qmc.etypesf(aw.qmc.specialeventstype[index])[0],aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[index]))
+                text = QApplication.translate("Table", "#{0} {1}{2}",None).format(str(index+1),aw.qmc.etypesf(aw.qmc.specialeventstype[index])[0],aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[index]))
                 Rtime.setText(text + u(" " + Rtime.text()))
             self.datatable.setItem(i,0,Rtime)
             if i in aw.qmc.specialevents:
@@ -28346,7 +28692,7 @@ class backgroundDlg(ArtisanDialog):
                     elif i in aw.qmc.backgroundEvents:
                         self.datatable.item(i,0).setBackground(QColor('yellow'))
                         index = aw.qmc.backgroundEvents.index(i)
-                        text = QApplication.translate("Table", "EVENT #{0} {1}{2}",None).format(str(index+1),aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0],aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[index]))
+                        text = QApplication.translate("Table", "#{0} {1}{2}",None).format(str(index+1),aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0],aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[index]))
                     else:
                         text = u("")
                     Rtime.setText(text + u(" " + Rtime.text()))                
