@@ -8780,10 +8780,11 @@ class SampleThread(QThread):
                                 tx = tx + (tx_2 - tx) / 2.0
                                 t2 = (t2 + t2_2) / 2.0
                                 t1 = (t1 + t1_2) / 2.0
-                            elif t1 == -1 or t2 == -1:
-                                t1 = t1_2
-                                t2 = t2_2
-                                tx = tx_2 
+                            else: # use new values only to fix reading errors of the initial set of values
+                                if t1 == -1:
+                                    t1 = t1_2
+                                if t2 == -1:
+                                    t2 = t2_2
                     ####### all values retrieved                
 
                     if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
@@ -8948,8 +8949,13 @@ class SampleThread(QThread):
                                 aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                         # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
                         elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():
-                            aw.qmc.autoTPIdx = 1
-                            aw.qmc.TPalarmtimeindex = aw.findTP()
+                            tp = aw.findTP()
+                            try:
+                                if aw.qmc.temp2[tp] != -1: # only mark TP if not an error value!
+                                    aw.qmc.autoTPIdx = 1
+                                    aw.qmc.TPalarmtimeindex = tp
+                            except:
+                                pass
                         # autodetect DROP event
                         # only if 9min into roast and BT>180C/356F
                         if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
@@ -10877,6 +10883,16 @@ class ApplicationWindow(QMainWindow):
 
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
+
+    def autoAdjustAxis(self):
+        if aw.qmc.autotimex:
+            # auto adjust
+            t_min,t_max = aw.calcAutoAxis()
+            aw.qmc.startofx = t_min
+            if aw.qmc.timeindex[0] != -1:
+                aw.qmc.endofx = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
+            else:
+                aw.qmc.endofx = t_max
 
     def toggleFullscreen(self):
         if self.full_screen_mode_active or self.isFullScreen():
@@ -14591,14 +14607,9 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.roastbatchnrB = 0
                     self.qmc.roastbatchprefixB = u("")
                     self.qmc.roastbatchposB = 1
-            if aw.qmc.autotimex:
-                # auto adjust
-                t_min,t_max = aw.calcAutoAxis()
-                aw.qmc.startofx = t_min
-                if aw.qmc.timeindex[0] != -1:
-                    aw.qmc.endofx = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
-                else:
-                    aw.qmc.endofx = t_max
+                    
+            aw.autoAdjustAxis()
+                    
             return True
         except Exception as ex:
 #            import traceback
@@ -19832,6 +19843,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.temp1 = self.qmc.temp2
                     self.qmc.temp2 = tmp
                 self.qmc.endofx = self.qmc.timex[-1]
+                aw.autoAdjustAxis()
                 self.sendmessage(QApplication.translate("Message","K202 file loaded successfully", None))
                 self.qmc.redraw()
         except IOError as ex:
@@ -19912,6 +19924,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.temp1 = self.qmc.temp2
                     self.qmc.temp2 = tmp
                 self.qmc.endofx = self.qmc.timex[-1]
+                aw.autoAdjustAxis()
                 self.sendmessage(QApplication.translate("Message","K204 file loaded successfully", None))
                 self.qmc.redraw()
         except IOError as ex:
@@ -19924,32 +19937,32 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK204() {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    def split_units(self,value):
-        """
-        >>> split_units("2GB")
-        (2.0, 'GB')
-        >>> split_units("17 ft")
-        (17.0, 'ft')
-        >>> split_units("   3.4e-27 frobnitzem ")
-        (3.4e-27, 'frobnitzem')
-        >>> split_units("9001")
-        (9001.0, '')
-        >>> split_units("spam sandwhiches")
-        (0, 'spam sandwhiches')
-        >>> split_units("")
-        (0, '')
-        """
-        units = ""
-        number = 0
-        while value:
-            try:
-                number = float(value)
-                break
-            except ValueError:
-                units = value[-1:] + units
-                value = value[:-1]
-        return number, units.strip()
-    
+#    def split_units(self,value):
+#        """
+#        >>> split_units("2GB")
+#        (2.0, 'GB')
+#        >>> split_units("17 ft")
+#        (17.0, 'ft')
+#        >>> split_units("   3.4e-27 frobnitzem ")
+#        (3.4e-27, 'frobnitzem')
+#        >>> split_units("9001")
+#        (9001.0, '')
+#        >>> split_units("spam sandwhiches")
+#        (0, 'spam sandwhiches')
+#        >>> split_units("")
+#        (0, '')
+#        """
+#        units = ""
+#        number = 0
+#        while value:
+#            try:
+#                number = float(value)
+#                break
+#            except ValueError:
+#                units = value[-1:] + units
+#                value = value[:-1]
+#        return number, units.strip()
+#    
     
     def importPilot(self):
         try:
@@ -19957,45 +19970,51 @@ class ApplicationWindow(QMainWindow):
                 import xml.etree.cElementTree as ET
             except ImportError:
                 import xml.etree.ElementTree as ET
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import HH506RA CSV", None))
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import Probat Recipe", None))
             if len(filename) == 0:
                 return
             if self.qmc.reset():
                 tree = ET.ElementTree(file=filename)
                 root = tree.getroot()
+                
+                date = root.find("historydate")
+                time = root.find("historytime")
+                if date != None and time != None:
+                    aw.qmc.roastdate = QDateTime(QDate.fromString(date.text,"M/d/yyyy"),QTime.fromString(time.text,"h:mm AP"))
   
-                title = root.find("roasttype").text
-                if title:
-                    aw.qmc.title = u(title)
-                beans = root.find("coffeetype").text
-                if beans:
-                    aw.qmc.beans = u(beans)
-                roaster = root.find("roaster").text
-                if roaster:
-                    aw.qmc.roastertype = u(roaster)
+                title = root.find("roasttype")
+                if title == None:
+                    aw.qmc.title = u(os.path.basename(filename))
+                else:
+                    aw.qmc.title = u(title.text)
+                beans = root.find("coffeetype")
+                if beans != None:
+                    aw.qmc.beans = u(beans.text)
+                roaster = root.find("roaster")
+                if roaster != None:
+                    aw.qmc.roastertype = u(roaster.text)
                     
-                chargestr = root.find("charge").text
-                if chargestr: # contains floating point number; default unit Kg
+                chargestr = root.find("charge")
+                if chargestr == None:
+                    chargestr = root.find("chargingcapacity")
+                if chargestr != None: # contains floating point number; default unit Kg
                     try:
-                        aw.qmc.weight[0] = float(chargestr)
+                        aw.qmc.weight[0] = float(chargestr.text)
                         aw.qmc.weight[2] = "Kg"
                     except:
                         pass
-                        
-#                    w,unit = self.split_units(chargestr.replace(",","."))
-#                    if w:
-#                        aw.qmc.weight[0] = aw.float2float(w,2)
-#                        unit = unit.lower()
-#                        # valid units: g, Kg lb oz
-#                        if unit in ["g","lb","oz"]:
-#                            aw.qmc.weight[2] = unit
-#                        elif unit == "kg":
-#                            aw.qmc.weight[2] = "Kg"
+                dischargestr = root.find("dischargingcapacity")
+                if dischargestr != None: # contains floating point number; default unit Kg
+                    try:
+                        aw.qmc.weight[1] = float(dischargestr.text)
+                        aw.qmc.weight[3] = "Kg"
+                    except:
+                        pass
 
-                colorstr = root.find("coffeecolor").text
-                if colorstr:
+                colorstr = root.find("coffeecolor")
+                if colorstr != None:
                     c = None
-                    for e in colorstr.strip().split():
+                    for e in colorstr.text.strip().split():
                         try:
                             c = int(e)
                             break
@@ -20004,13 +20023,19 @@ class ApplicationWindow(QMainWindow):
                     if c:
                         aw.qmc.ground_color = c
 
-                notes = root.find("notes").text
-                if notes:
-                    self.qmc.roastingnotes = u(notes)
+                notes = root.find("notes")
+                if notes != None:
+                    self.qmc.roastingnotes = u(notes.text)
 
                 recipedata = tree.find('recipedata')
-                m = recipedata.get("temp_unit")
-                if m:
+                if recipedata != None:
+                    m = recipedata.get("temp_unit")
+                else:
+                    m = None
+                if m == None:
+                    historydata = tree.find('historydata')
+                    m = historydata.get("temp_unit")
+                if m != None:
                     m = m.lower()
                     if m == "c" and self.qmc.mode == "F":
                         self.qmc.celsiusMode()
@@ -20023,7 +20048,12 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.extraname1[0] == "Extra 1":
                     self.qmc.extraname1[0] = "Burner" 
                 
-                diagrampoints = tree.find('recipedata/diagrampoints')
+                if recipedata != None:
+                    diagrampoints = tree.find('recipedata/diagrampoints')
+                else:
+                    diagrampoints = None
+                if diagrampoints == None:
+                    diagrampoints = tree.find('historydata')
                 for elem in diagrampoints.findall("data"):
                     timez = float(self.qmc.stringtoseconds(elem.find("time").text))
                     self.qmc.timex.append(timez)
@@ -20041,16 +20071,18 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timeindex[0] = 0
                 self.qmc.timeindex[6] = len(self.qmc.timex) - 1
                     
-                switchpoints = tree.find('recipedata/switchpoints')
-                for elem in switchpoints.findall("data"):
-                    time = float(self.qmc.stringtoseconds(elem.find("time").text))                    
-                    self.qmc.specialevents.append(self.qmc.time2index(time))
-                    self.qmc.specialeventstype.append(1)
-                    self.qmc.specialeventsvalue.append(self.qmc.str2eventsvalue(elem.find("burnercapacity").text))
-                    self.qmc.specialeventsStrings.append("")
+                if recipedata != None:
+                    switchpoints = tree.find('recipedata/switchpoints')
+                    for elem in switchpoints.findall("data"):
+                        time = float(self.qmc.stringtoseconds(elem.find("time").text))                    
+                        self.qmc.specialevents.append(self.qmc.time2index(time))
+                        self.qmc.specialeventstype.append(1)
+                        self.qmc.specialeventsvalue.append(self.qmc.str2eventsvalue(elem.find("burnercapacity").text))
+                        self.qmc.specialeventsStrings.append("")
+                        
+                aw.autoAdjustAxis()
                 
-
-                self.sendmessage(QApplication.translate("Message","Probat Pilot recipe loaded successfully", None))
+                self.sendmessage(QApplication.translate("Message","Probat Pilot data imported successfully", None))
                 self.qmc.redraw()
                 aw.qmc.safesaveflag = True
         except IOError as ex:
@@ -20062,6 +20094,7 @@ class ApplicationWindow(QMainWindow):
             traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importPilot() {0}").format(str(ex)),exc_tb.tb_lineno)
+
 
     def importHH506RA(self):
         try:
@@ -20116,6 +20149,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.temp1 = self.qmc.temp2
                     self.qmc.temp2 = tmp
                 self.qmc.endofx = self.qmc.timex[-1]
+                aw.autoAdjustAxis()
                 self.sendmessage(QApplication.translate("Message","HH506RA file loaded successfully", None))
                 self.qmc.redraw()
         except IOError as ex:
