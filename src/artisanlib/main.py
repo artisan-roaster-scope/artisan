@@ -1392,10 +1392,10 @@ class tgraphcanvas(FigureCanvas):
             label.set_color(self.palette["xlabel"])
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
-        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None)))
-        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None)))
-        self.l_delta1, = self.ax.plot(self.timex,self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=u(QApplication.translate("Label", "DeltaET", None)))
-        self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=u(QApplication.translate("Label", "DeltaBT", None)))
+#        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None)))
+#        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None)))
+#        self.l_delta1, = self.ax.plot(self.timex,self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=u(QApplication.translate("Label", "DeltaET", None)))
+#        self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=u(QApplication.translate("Label", "DeltaBT", None)))
         self.l_back1 = None
         self.l_back2 = None
         self.l_back3 = None # one extra background curve
@@ -1412,10 +1412,10 @@ class tgraphcanvas(FigureCanvas):
 
         self.l_timeline = None
 
-        self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
-        self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
-        self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2])
-        self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3])
+#        self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
+#        self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
+#        self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2])
+#        self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3])
         
         self.l_annotations = []
 
@@ -4169,13 +4169,17 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E4backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
     
-                            self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
+                            if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
+                                self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                                             picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))
-                            self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
+                            if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
+                                self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                                             picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
-                            self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
+                            if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
+                                self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                                             picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
-                            self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
+                            if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
+                                self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                                             picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
                                                                               
                     #check backgroundDetails flag
@@ -4906,6 +4910,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
                             #extra devices curves
                             nextra = len(aw.qmc.extratemp1)
+                            nextra2 = len(aw.qmc.extratemp2)
                             if nextra:
                                 for e in range(nextra):
                                     aw.qmc.extratemp1[e][i] = self.fromFtoC(aw.qmc.extratemp1[e][i])
@@ -5353,6 +5358,7 @@ class tgraphcanvas(FigureCanvas):
             #prevents accidentally deleting a modified profile:
             if len(self.timex) > 2:
                 self.safesaveflag = True
+                aw.autoAdjustAxis() # automatic adjust axis after roast if auto axis is enabled
             try:
                 if aw.clusterEventsFlag:
                     aw.clusterEvents()
@@ -6897,7 +6903,7 @@ class tgraphcanvas(FigureCanvas):
     def polyfit(self,xarray,yarray,deg,startindex,endindex,deltacurvep):
         xa = xarray[startindex:endindex]
         ya = yarray[startindex:endindex]
-        if len(xa) > 0 and len(xa) == len(ya):
+        if len(xa) > 0 and len(xa) == len(ya) and not all(x == 0 for x in xa) and not all(x == 0 for x in ya):
             try:
                 z = numpy.polyfit(xa,ya,deg)
                 p = numpy.poly1d(z)
@@ -14185,7 +14191,7 @@ class ApplicationWindow(QMainWindow):
     def setProfile(self,filename,profile,quiet=False):
         try:
             #extra devices load and check
-            if "extratimex" in profile and len(profile["extratimex"]) > 0:
+            if "extratimex" in profile:
                 if "extradevices" in profile:
                     if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
                         string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
@@ -14215,7 +14221,7 @@ class ApplicationWindow(QMainWindow):
                     self.addSerialPort()
                 # c) set extra temp curves and prepare empty extra smoothed temp curves
                 if "extratimex" in profile:
-                    self.qmc.extratimex = profile["extratimex"] + [profile["extratimex"][0]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
+                    self.qmc.extratimex = profile["extratimex"] + [profile["timex"]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                 if "extratemp1" in profile:
                     self.qmc.extratemp1 = profile["extratemp1"] + [[-1]*len(self.qmc.extratimex[0])]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp1 = [[]]*len(self.qmc.extratemp1)
@@ -14612,8 +14618,8 @@ class ApplicationWindow(QMainWindow):
                     
             return True
         except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
@@ -17838,7 +17844,10 @@ class ApplicationWindow(QMainWindow):
 #            # erase annotations
 #            # erase statistics
             min_start_time = aw.qmc.startofx
-            max_end_time = aw.qmc.endofx
+            if aw.qmc.autotimex:
+                max_end_time = 0
+            else:
+                max_end_time = aw.qmc.endofx
             first_profile = True
             first_profile_event_time = 0
             for p in profiles:
@@ -17984,7 +17993,7 @@ class ApplicationWindow(QMainWindow):
                     except Exception:
                         pass
                         
-                    aw.qmc.ax.set_xlim(min_start_time,max_end_time) # we adjust the min, max time scale to ensure all data is visible
+                    aw.qmc.ax.set_xlim(min_start_time-60,max_end_time+60) # we adjust the min, max time scale to ensure all data is visible
                     graph_image = "roastlog-graph"
                     self.qmc.ax.set_title("")
                     self.qmc.fig.suptitle("")           
@@ -22044,7 +22053,13 @@ class HUDDlg(ArtisanDialog):
         endindex = min(l,aw.qmc.time2index(endtime + start))
         z = aw.qmc.polyfit(self.curves[self.c1ComboBox.currentIndex()],self.curves[self.c2ComboBox.currentIndex()],
            self.polyfitdeg.value(),startindex,endindex,self.deltacurves[self.c2ComboBox.currentIndex()])
+        res = True
         if z != None:
+            for e in z:
+                if numpy.isnan(e):
+                    res = False
+                    return False
+        if res and z != None:
             s = ""
             sign = "+"
             z = z[::-1]
@@ -22068,8 +22083,10 @@ class HUDDlg(ArtisanDialog):
             if sign == "-":
                 s = sign + s
             self.result.setText(s)
+            return True
         else:
             self.result.setText("")
+            return False
 
     def polyfitcurveschanged(self,i):
         self.polyfitdeg.blockSignals(True)
@@ -22081,7 +22098,11 @@ class HUDDlg(ArtisanDialog):
         try:
             if self.polyfitCheck.isChecked() and len(aw.qmc.timex) > 2:
                 QApplication.processEvents()
-                self.doPolyfit()
+                res = self.doPolyfit()
+                if not res:
+                    self.polyfitCheck.setChecked(False)
+                    self.result.setText("")
+                    aw.qmc.resetlines()
                 QApplication.processEvents()
             else:
                 self.polyfitCheck.setChecked(False)
@@ -22153,17 +22174,26 @@ class HUDDlg(ArtisanDialog):
         self.c2ComboBox.setCurrentIndex(idx+1)
 
     def polyfit(self,i):
-        if self.polyfitCheck.isChecked():
-            #check for finished roast
-            if len(aw.qmc.timex) > 2:
-                self.doPolyfit()
+        try:
+            if self.polyfitCheck.isChecked():
+                #check for finished roast
+                if len(aw.qmc.timex) > 2:
+                    res = self.doPolyfit()
+                    if not res:
+                        self.polyfitCheck.setChecked(False)
+                        aw.qmc.resetlines()
+                        self.redraw_enabled_math_curves()
+                else:
+                    aw.sendmessage(QApplication.translate("Error Message", "Polyfit: no profile data available", None))
+                    self.polyfitCheck.setChecked(False)
             else:
-                aw.sendmessage(QApplication.translate("Error Message", "Polyfit: no profile data available", None))
-                self.polyfitCheck.setChecked(False)
-        else:
-            self.result.setText("")
-            aw.qmc.resetlines()
-            self.redraw_enabled_math_curves()
+                self.result.setText("")
+                aw.qmc.resetlines()
+                self.redraw_enabled_math_curves()
+        except:
+            import traceback
+            traceback.print_exc(file=sys.stdout)
+            pass
 
     def interpolation(self,i):
         mode = str(self.interpComboBox.currentText())
@@ -43019,7 +43049,7 @@ def main():
     aw.show()
         
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
-    with numpy.errstate(invalid='ignore'):
+    with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
         app.exec_()
         
 # the following seems to create issue on Mac and Windows builds on exit

@@ -1,27 +1,27 @@
 #!/bin/sh
 
 export QT_SELECT="default"
-export QTTOOLDIR="/usr/lib/arm-linux-gnueabihf/qt5/bin"
+export QTTOOLDIR="/usr/lib/arm-linux-gnueabihf/qt4/bin"
 export QTLIBDIR="/usr/lib/arm-linux-gnueabihf"
-export QT_PATH=/usr/share/qt5
+export QT_PATH=/usr/share/qt4
 
-export QT=/usr/lib/arm-linux-gnueabihf/qt5
+export QT=/usr/lib/arm-linux-gnueabihf/qt4
 
 
 # translations
-pylupdate5 artisan.pro
+pylupdate4 artisan.pro
 lrelease -verbose artisan.pro
 
 # distribution
 rm -rf build dist
 
-#pyinstaller3 --noconfirm \
+#pyinstaller --noconfirm \
 #    --clean \
 #    --osx-bundle-identifier=com.google.code.p.Artisan \
 #    --windowed \
 #    artisan.spec
 #    --log-level=WARN \
-pyinstaller3 -D -n artisan -y -c --log-level=WARN "artisan.py"
+pyinstaller --runtime-hook rthook_pyqt4.py -D -n artisan -y -c --log-level=WARN "artisan.py"
 
 
 mv dist/artisan dist/artisan.d
@@ -33,11 +33,11 @@ mkdir dist/translations
 cp $QT_PATH/translations/qt_ar.qm dist/translations
 cp $QT_PATH/translations/qt_de.qm dist/translations
 cp $QT_PATH/translations/qt_es.qm dist/translations
-cp $QT_PATH/translations/qt_fi.qm dist/translations
+#cp $QT_PATH/translations/qt_fi.qm dist/translations
 cp $QT_PATH/translations/qt_fr.qm dist/translations
 cp $QT_PATH/translations/qt_he.qm dist/translations
 cp $QT_PATH/translations/qt_hu.qm dist/translations
-cp $QT_PATH/translations/qt_it.qm dist/translations
+#cp $QT_PATH/translations/qt_it.qm dist/translations
 cp $QT_PATH/translations/qt_ja.qm dist/translations
 cp $QT_PATH/translations/qt_ko.qm dist/translations
 cp $QT_PATH/translations/qt_pl.qm dist/translations
@@ -49,7 +49,7 @@ cp $QT_PATH/translations/qt_zh_TW.qm dist/translations
 cp translations/*.qm dist/translations
 
 # copy data
-cp -R /usr/local/lib/python3.4/dist-packages/matplotlib/mpl-data/ dist
+cp -R /usr/local/lib/python2.7/dist-packages/matplotlib/mpl-data/ dist
 rm -rf dist/mpl-data/sample_data
 
 # copy file icon and other includes
@@ -75,7 +75,7 @@ cp -R Wheels dist
 cp README.txt dist
 cp LICENSE.txt dist
 
-cp /usr/local/lib/python3.4/dist-packages/yoctopuce/cdll/* dist
+cp /usr/local/lib/python2.7/dist-packages/yoctopuce/cdll/* dist
 
 
 
@@ -120,4 +120,4 @@ rm -f ${NAME}_raspbian-jessie.deb
 chmod 755 debian/DEBIAN
 chmod 755 debian/DEBIAN/postinst
 chmod 755 debian/DEBIAN/prerm
-dpkg-deb --build debian ${NAME}_raspbian-jessie-py3.deb
+dpkg-deb --build debian ${NAME}_raspbian-jessie-py2.deb
