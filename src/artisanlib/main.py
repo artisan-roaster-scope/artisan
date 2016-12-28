@@ -4910,7 +4910,6 @@ class tgraphcanvas(FigureCanvas):
                                     self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
                             #extra devices curves
                             nextra = len(aw.qmc.extratemp1)
-                            nextra2 = len(aw.qmc.extratemp2)
                             if nextra:
                                 for e in range(nextra):
                                     aw.qmc.extratemp1[e][i] = self.fromFtoC(aw.qmc.extratemp1[e][i])
@@ -11894,23 +11893,32 @@ class ApplicationWindow(QMainWindow):
                                 else:
                                     aw.modbus.sleepBetween(write=False)
                                 #libtime.sleep(followupCmd) #this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec)
-                            if cs.startswith('write'):
+                            if cs.startswith('writem'):
+                                try:
+                                    cmds = eval(cs[len('writem'):])
+                                    if isinstance(cmds,tuple) and len(cmds) == 3:
+                                        # cmd has format "writem(s,r,[v1,..,vn])" or "writem(s,r,v)"
+                                        aw.modbus.writeRegisters(*cmds)
+                                        followupCmd = 0.08
+                                except Exception:
+                                    pass
+                            elif cs.startswith('write'):
                                 try:
                                     cmds = eval(cs[len('write'):])
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
-                                            # cmd has format "write(s,r,v)"
+                                            # cmd has format "mwrite(s,r,v)"
                                             aw.modbus.writeRegister(*cmds)
                                             followupCmd = 0.08
                                         else:
-                                        # cmd has format "write([s,r,v],..,[s,r,v])"
+                                        # cmd has format "mwrite([s,r,v],..,[s,r,v])"
                                             for cmd in cmds:
                                                 if followupCmd:
                                                     libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
                                                 aw.modbus.writeRegister(*cmd)
                                                 followupCmd = 0.08
                                     else:
-                                        # cmd has format "write([s,r,v])"
+                                        # cmd has format "mwrite([s,r,v])"
                                         aw.modbus.writeRegister(*cmds)
                                         followupCmd = 0.08
                                 except Exception:
@@ -23787,6 +23795,7 @@ class editGraphDlg(ArtisanDialog):
         okLayout.addStretch()
         okLayout.addWidget(cancelButton,0)
         okLayout.addWidget(saveButton,1)
+        okLayout.setSpacing(10)
         okLayout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
         timeLayoutBox = QHBoxLayout()
         timeLayoutBox.addStretch()
@@ -23872,6 +23881,7 @@ class editGraphDlg(ArtisanDialog):
         totallayout.addWidget(self.TabWidget)
         totallayout.addLayout(okLayout)
         totallayout.setContentsMargins(10,10,10,0)
+        totallayout.setSpacing(0)
         #totallayout.addStretch()
         #totallayout.addLayout(buttonsLayout)
         self.volume_percent()
@@ -26759,9 +26769,12 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<b>Action</b> Perform an action on slider release",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Command</b> depends on the action type<br>('{}' is replaced by <i>value</i>*<i>factor</i> + <i>offset</i>)",None))
         string += u(QApplication.translate("Message", "<ul><li>Serial Command: ASCII serial command or binary a2b_uu(serial command)",None))
-        string += u(QApplication.translate("Message", "<li>Modbus Command: <ul><li>write([slaveId,register,value],..,[slaveId,register,value])",None))
-        string += u(QApplication.translate("Message", "<li>mwrite(slaveId,register,andMask,orMask)<li>wcoil(slaveId,register,&lt;bool&gt;)<li>wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])",None))
-        string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given ids",None))
+        string += u(QApplication.translate("Message", "<LI>Modbus Command: <ul><li><b>write</b>([slaveId,register,value],..,[slaveId,register,value])<br>write register: <i>MODBUS function 6 (int) or function 16 (float)</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>wcoil</b>(slaveId,register,&lt;bool&gt;)<br>write coil: <i>MODBUS function 5</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>wcoils</b>(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])<br>write coils: <i>MODBUS function 15</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>mwrite</b>(slaveId,register,andMask,orMask)<br>mask write register: <i>MODBUS function 22</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>writem</b>(slaveId,register,value) or <b>writem</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write registers: <i>MODBUS function 16</i>",None))
+        string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given id",None))
         string += u(QApplication.translate("Message", "<li>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None)) + "</ul>"
         string += u(QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Factor</b> multiplicator of the slider value",None))
@@ -27589,7 +27602,12 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<UL><LI>Serial Command: ASCII serial command or binary a2b_uu(serial command)",None))
         string += u(QApplication.translate("Message", "<LI>Call Program: A program/script path (absolute or relative)",None))
         string += u(QApplication.translate("Message", "<LI>Multiple Event: Adds events of other button numbers separated by a comma: 1,2,..",None))
-        string += u(QApplication.translate("Message", "<LI>Modbus Command: <ul><li>write([slaveId,register,value],..,[slaveId,register,value])<li>wcoil(slaveId,register,&lt;bool&gt;)<li>wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])<li>mwrite(slaveId,register,andMask,orMask)</ul>writes values to the registers in slaves specified by the given ids",None))
+        string += u(QApplication.translate("Message", "<LI>Modbus Command: <ul><li><b>write</b>([slaveId,register,value],..,[slaveId,register,value])<br>write register: <i>MODBUS function 6 (int) or function 16 (float)</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>wcoil</b>(slaveId,register,&lt;bool&gt;)<br>write coil: <i>MODBUS function 5</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>wcoils</b>(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])<br>write coils: <i>MODBUS function 15</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>mwrite</b>(slaveId,register,andMask,orMask)<br>mask write register: <i>MODBUS function 22</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>writem</b>(slaveId,register,value) or <b>writem</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write registers: <i>MODBUS function 16</i>",None))
+        string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given id",None))
         string += u(QApplication.translate("Message", "<LI>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None))
         string += u(QApplication.translate("Message", "<LI>IO Command: set(n,0), set(n,1), toggle(n) to set Phidget IO digital output n",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Heater: sets heater to value",None))
@@ -29299,7 +29317,7 @@ class modbusport(object):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    # write multiple coils on slave
+    # function 15 (Write Multiple Coils)
     def writeCoils(self,slave,register,values):
         try:
             #### lock shared resources #####
@@ -29317,7 +29335,7 @@ class modbusport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)    
                 
-    # write single coil on slave (function 5)
+    # function 5 (Write Single Coil)
     def writeCoil(self,slave,register,value):
         try:
             #### lock shared resources #####
@@ -29333,7 +29351,7 @@ class modbusport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
         
-    # write value to register on slave (function 6)
+    # write value to register on slave (function 6 for int or function 16 for float)
     # value can be one of string (containing an int or float), an int or a float
     def writeRegister(self,slave,register,value):
         if stringp(value):
@@ -29346,6 +29364,7 @@ class modbusport(object):
         elif isinstance(value, float):
             self.writeWord(slave,register,value)
 
+    # function 6 (Write Single Holding Register)
     def writeSingleRegister(self,slave,register,value):
         try:
             #### lock shared resources #####
@@ -29363,6 +29382,7 @@ class modbusport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
 
+    # function 22 (Mask Write Register)
     def maskWriteRegister(self,slave,register,and_mask,or_mask):
         try:
             #### lock shared resources #####
@@ -29379,8 +29399,26 @@ class modbusport(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
+                
+    # function 16 (Write Multiple Holding Registers)
+    # values is a list of integers or one integer
+    def writeRegisters(self,slave,register,values):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            self.master.write_registers(int(register),values,unit=int(slave))
+            libtime.sleep(.03)
+        except Exception as ex:
+            self.disconnect()
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeRegisters() {0}").format(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
 
 
+    # function 16 (Write Multiple Holding Registers)
     # value=int or float
     # writes a single precision 32bit float (2-registers)
     def writeWord(self,slave,register,value):
@@ -29404,6 +29442,7 @@ class modbusport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
 
+    # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     def readFloat(self,slave,register,code=3):
         try:
             #### lock shared resources #####
@@ -29442,6 +29481,7 @@ class modbusport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("MODBUS readFloat :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
 
+    # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     def readSingleRegister(self,slave,register,code=3):
 #        import logging
 #        logging.basicConfig()
@@ -35080,6 +35120,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         buttonLayout.addStretch()
         buttonLayout.addWidget(cancelButton)
         buttonLayout.addWidget(okButton)
+        buttonLayout.setSpacing(10)
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(grid)
         tab1Layout.setContentsMargins(0,5,0,0)
@@ -35129,7 +35170,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(buttonLayout)
-        Mlayout.setContentsMargins(2,5,2,0)
+        Mlayout.setSpacing(0)
+        Mlayout.setContentsMargins(0,0,0,0)
         self.setLayout(Mlayout)
         
     def changeOutprogramFlag(self,i):

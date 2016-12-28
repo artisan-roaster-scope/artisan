@@ -34,7 +34,7 @@ v1.0.0 (XX.XX.2016)
     * adds auto axis limits calculation via manual trigger or automatic on load
     * adds [AUC statistics, LCD and guide](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html)
     * adds possibility to "clamp" by-value custom events to the x-axis in the range of 0-100
-    * adds support for MODBUS mask-write method (function code 22)
+    * adds support for MODBUS mask-write (mwrite; function code 22) and write registers (writem; function code 16) methods
     * adds Raspberry Pi (Jessy) build
     * adds color labels to HTM ranking reports
  * Changes
