@@ -17620,7 +17620,7 @@ class ApplicationWindow(QMainWindow):
     #  . "DRY_percent": float (first phase percentage)
     #  . "MAI_percent": float (second phase percentage)
     #  . "DEV_percent": float (third phase percentage)
-    #  . "BTa": int
+    #  . "AUC": int
     #  . "color": int
     #  . "cup": int
     def profileRankingData(self,profile):
@@ -17668,11 +17668,11 @@ class ApplicationWindow(QMainWindow):
             dev_time = timex[timeindex[6]] - timex[timeindex[2]]
             # DEV_percent
             res["DEV_percent"] = (dev_time/total_time) * 100.
-        # BTa
+        # AUC
         if "computed" in profile:
             comp = profile["computed"]
-            if "total_ts_BT" in comp:
-                res["BTa"] = comp["AUC"]
+            if "AUC" in comp:
+                res["AUC"] = comp["AUC"]
         # color
         if "ground_color" in profile:
             res["color"] = profile["ground_color"]
@@ -17691,7 +17691,7 @@ class ApplicationWindow(QMainWindow):
     #  . "DRY_percent"
     #  . "MAI_percent"
     #  . "DEV_percent"
-    #  . "BTa"
+    #  . "AUC"
     #  . "color"
     #  . "cupping"
     def rankingData2string(self,data,units=True):
@@ -17715,8 +17715,8 @@ class ApplicationWindow(QMainWindow):
         res["MAI_percent"] = ('{0:.1f}'.format(data["MAI_percent"]) + ("%" if units else "") if "MAI_percent" in data else "")
         res["DEV_percent_num"] = ('{0:.1f}'.format(data["DEV_percent"]) if "DEV_percent" in data else 0)
         res["DEV_percent"] = ('{0:.1f}'.format(data["DEV_percent"]) + ("%" if units else "") if "DEV_percent" in data else "")
-        res["BTa_num"] = (data["BTa"] if "BTa" in data else 0)
-        res["BTa"] = (data["BTa"] if "BTa" in data else "")
+        res["AUC_num"] = (data["AUC"] if "AUC" in data else 0)
+        res["AUC"] = (data["AUC"] if "AUC" in data else "")
         return res
         
     def formatTemp(self,data,key,unit):
@@ -17737,7 +17737,7 @@ class ApplicationWindow(QMainWindow):
 <td sorttable_customkey=\"$DRY_percent_num\">$DRY_percent</td>
 <td sorttable_customkey=\"$MAI_percent_num\">$MAI_percent</td>
 <td sorttable_customkey=\"$DEV_percent_num\">$DEV_percent</td>
-<td sorttable_customkey=\"$BTa_num\">$BTa</td>
+<td sorttable_customkey=\"$AUC_num\">$AUC</td>
 <td sorttable_customkey=\"$loss_num\">$weightloss</td>
 <td sorttable_customkey=\"$color_num\">$color</td>
 <td>$cupping</td>
@@ -17772,8 +17772,8 @@ class ApplicationWindow(QMainWindow):
             MAI_percent = rd["MAI_percent"],
             DEV_percent_num = rd["DEV_percent_num"],
             DEV_percent = rd["DEV_percent"],
-            BTa_num = rd["BTa_num"],
-            BTa = rd["BTa"],
+            AUC_num = rd["AUC_num"],
+            AUC = rd["AUC"],
             loss_num = '{0:.2f}'.format(pd["weight_loss_num"]),
             weightloss = pd["weight_loss"],
             color_num = str(rd["color_num"]),
@@ -17830,8 +17830,8 @@ class ApplicationWindow(QMainWindow):
             MAI_percent_count = 0
             DEV_percent = 0
             DEV_percent_count = 0
-            BTa = 0
-            BTa_count = 0
+            AUC = 0
+            AUC_count = 0
             loss = 0
             loss_count = 0   
             colors = 0
@@ -17891,9 +17891,9 @@ class ApplicationWindow(QMainWindow):
                 if "DEV_percent" in rd:
                     DEV_percent += rd["DEV_percent"]
                     DEV_percent_count += 1
-                if "BTa" in rd:
-                    BTa += rd["BTa"]
-                    BTa_count += 1
+                if "AUC" in rd:
+                    AUC += rd["AUC"]
+                    AUC_count += 1
                 if i > 0 and o > 0:
                     loss += aw.weight_loss(i,o)
                     loss_count += 1
@@ -18072,7 +18072,7 @@ class ApplicationWindow(QMainWindow):
                 DRY_percent_avg = ('{0:.1f}%'.format(DRY_percent / DRY_percent_count) if DRY_percent > 0 and DRY_percent_count > 0 else ""),
                 MAI_percent_avg = ('{0:.1f}%'.format(MAI_percent / MAI_percent_count) if MAI_percent > 0 and MAI_percent_count > 0 else ""),
                 DEV_percent_avg = ('{0:.1f}%'.format(DEV_percent / DEV_percent_count) if DEV_percent > 0 and DEV_percent_count > 0 else ""),
-                BTa_avg = ('{0:.0f}'.format(BTa / BTa_count) if BTa > 0 and BTa_count > 0 else ""),
+                AUC_avg = ('{0:.0f}'.format(AUC / AUC_count) if AUC > 0 and AUC_count > 0 else ""),
                 loss_avg = ('{0:.1f}'.format(loss / loss_count) + "%" if loss_count > 0 and loss > 0 else ""),
                 colors_avg = ("#" + '{0:.0f}'.format(colors / colors_count) if colors > 0 and colors_count > 0 else ""),
                 cup_avg = ('{0:.2f}'.format(cuppings / cuppings_count) if cuppings > 0 and cuppings_count > 0 else ""),
@@ -18117,7 +18117,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         outfile = open(filename, 'w',newline="")
                     writer= csv.writer(outfile,delimiter='\t')
-                    writer.writerow(["batch","time","profile","load (g)","charge (" + aw.qmc.mode + ")","FCs","FCs (" + aw.qmc.mode + ")","DROP","DROP (" + aw.qmc.mode + ")","DRY (%)","MAI (%)","DEV (%)","BTa","loss (%)","color","cup"])
+                    writer.writerow(["batch","time","profile","load (g)","charge (" + aw.qmc.mode + ")","FCs","FCs (" + aw.qmc.mode + ")","DROP","DROP (" + aw.qmc.mode + ")","DRY (%)","MAI (%)","DEV (%)","AUC","loss (%)","color","cup"])
                     # write data
                     c = 1
                     for p in profiles:
@@ -18139,7 +18139,7 @@ class ApplicationWindow(QMainWindow):
                                 rd["DRY_percent"],
                                 rd["MAI_percent"],
                                 rd["DEV_percent"],
-                                rd["BTa"],
+                                rd["AUC"],
                                 str(pd["weight_loss"]),
                                 rd["color"],
                                 rd["cupping"],
@@ -18201,7 +18201,7 @@ class ApplicationWindow(QMainWindow):
                     ws['K1'].font = bf
                     ws['L1'] = u(QApplication.translate("HTML Report Template", "DEV",None)) 
                     ws['L1'].font = bf
-                    ws['M1'] = u(QApplication.translate("HTML Report Template", "BTa",None)) 
+                    ws['M1'] = u(QApplication.translate("HTML Report Template", "AUC",None)) 
                     ws['M1'].font = bf
                     ws['N1'] = u(QApplication.translate("HTML Report Template", "Loss",None)) 
                     ws['N1'].font = bf
@@ -18266,8 +18266,8 @@ class ApplicationWindow(QMainWindow):
                             if "DEV_percent" in rd:
                                 ws['L{0}'.format(c)] = rd["DEV_percent"]/100.
                                 ws['L{0}'.format(c)].number_format = "0.0%"
-                            if "BTa" in rd:
-                                ws['M{0}'.format(c)] = rd["BTa"]
+                            if "AUC" in rd:
+                                ws['M{0}'.format(c)] = rd["AUC"]
                                 ws['M{0}'.format(c)].number_format = "0"
                             if w_in > 0 and w_out > 0:
                                 ws['N{0}'.format(c)] = aw.weight_loss(w_in,w_out)/100.
@@ -19578,7 +19578,22 @@ class ApplicationWindow(QMainWindow):
     def openRecentSetting(self):
         action = self.sender()
         if action:
-            self.loadSettings(fn=toString(action.data()))
+            fname = toString(action.data())
+            if os.path.isfile(fname):
+                self.loadSettings(fn=fname)
+            else:
+                settings = QSettings()
+                files = toStringList(settings.value('recentSettingList'))
+                try:
+                    removeAll(files,fname)
+                except ValueError:
+                    pass
+                settings.setValue('recentSettingList', files)
+                for widget in QApplication.topLevelWidgets():
+                    if isinstance(widget, ApplicationWindow):
+                        widget.updateRecentSettingActions()
+                self.sendmessage(QApplication.translate("Message","Settings not found", None))
+                
         
     def saveSettings(self):
         path = QDir()
