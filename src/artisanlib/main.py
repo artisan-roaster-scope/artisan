@@ -9002,9 +9002,10 @@ class SampleThread(QThread):
                                                 # establish this one
                                                 aw.lastdigitizedvalue[i] = d
                                                 aw.lastdigitizedtemp[i] = t
-                                                # now move corresponding slider and add event
                                                 v = d * 10.
-                                                aw.qmc.quantifiedEvent.append([i,v])
+                                                # now move corresponding slider and add event if its value is not equal to the previous one
+                                                if ((aw.float2float((v + 10.0) / 10.0)) != aw.lastEventValue(i)):
+                                                    aw.qmc.quantifiedEvent.append([i,v])
                     except Exception:
                         pass
                         
@@ -10925,6 +10926,21 @@ class ApplicationWindow(QMainWindow):
         else:
             return aw.qmc.startofx, aw.qmc.endofx
         
+    # returns the last event value of the given type, or None if no event was ever recorded
+    def lastEventValue(self,type):
+        res = None
+        try:
+            if sys.version < '3':
+                r = xrange(len(aw.qmc.specialeventstype) - 1, -1, -1)
+            else:
+                r = range(len(aw.qmc.specialeventstype) - 1, -1, -1)
+            for i in r:
+                if aw.qmc.specialeventstype[i] == type:
+                    res = aw.qmc.specialeventsvalue[i]
+                    break
+        except Exception:
+            pass
+        return res
 
     # order event table by time
     def orderEvents(self):
@@ -11442,7 +11458,7 @@ class ApplicationWindow(QMainWindow):
                     self.AUClcd.display(u(v))
                 self.AUClcd.setStyleSheet("QLCDNumber { color: black; }") 
             elif aw.qmc.AUCLCDmode == 1:
-                if aw.qmc.AUCtargetFlag and  aw.qmc.background and aw.qmc.AUCbackground > 0:
+                if aw.qmc.AUCtargetFlag and aw.qmc.background and aw.qmc.AUCbackground > 0:
                     # background AUC as target
                     target = aw.qmc.AUCbackground
                 else:
@@ -13292,10 +13308,16 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
                 backgroundDrop = self.qmc.timeindexB[6]
                 try:
-                    self.qmc.TP_time_B = profile["computed"]["TP_time"]
+                    try:
+                        self.qmc.TP_time_B = profile["computed"]["TP_time"]
+                    except:
+                        if (self.qmc.extratimexB) > 0:
+                            self.qmc.TP_time_B = 0
+                        else:
+                            self.qmc.TP_time_B = None
                     _,_,auc = aw.ts(tp=aw.qmc.backgroundtime2index(self.qmc.TP_time_B),background=True)
                     aw.qmc.AUCbackground = auc
-                except:
+                except Exception:
                     pass
                 if len(self.qmc.timeB) > backgroundDrop:
                     message =  u(QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(u(filename),str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))))
@@ -14666,7 +14688,10 @@ class ApplicationWindow(QMainWindow):
             if TP_index > 0 and len(self.qmc.timex) > 0:
                 TP_time_idx = TP_index
             else:
-                TP_time_idx = None
+                if len(self.qmc.timex) > 0:
+                    TP_time_idx = 0
+                else:
+                    TP_time_idx = None
             if TP_time_idx:
                 computedProfile["TP_time"] = self.float2float(self.qmc.timex[TP_time_idx] - start)
                 computedProfile["TP_ET"] = self.float2float(self.qmc.temp1[TP_time_idx])
@@ -18820,6 +18845,7 @@ class ApplicationWindow(QMainWindow):
         return result
 
     #Flavor defect estimation chart for each leg. Thanks to Jim Schulman 
+    #http://www.home-barista.com/home-roasting/roasting-techniques-to-emphasize-coffees-origin-t3914.html#p42178
     def defect_estimation(self):
         dryphasetime = self.qmc.statisticstimes[1]
         midphasetime = self.qmc.statisticstimes[2]
@@ -29087,6 +29113,14 @@ class StatisticsDlg(ArtisanDialog):
             aw.qmc.AUCtargetFlag = self.targetFlag.isChecked()
             aw.qmc.AUCguideFlag = self.guideFlag.isChecked()
             aw.qmc.AUClcdFlag = self.AUClcdFlag.isChecked()
+            try:
+                if aw.qmc.TP_time_B:
+                    _,_,auc = aw.ts(tp=aw.qmc.backgroundtime2index(aw.qmc.TP_time_B),background=True)
+                else:
+                    _,_,auc = aw.ts(tp=0,background=True)
+                aw.qmc.AUCbackground = auc
+            except:
+                pass
             aw.qmc.statisticsconditions[0] = mindry
             aw.qmc.statisticsconditions[1] = maxdry
             aw.qmc.statisticsconditions[2] = minmid
