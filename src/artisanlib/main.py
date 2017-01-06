@@ -1653,7 +1653,7 @@ class tgraphcanvas(FigureCanvas):
     def doUpdate(self):
         if not self.designerflag:
             self.resetlinecountcaches() # ensure that the line counts are up to date
-            self.resetlines() # get rid of HUD, projection and cross lines
+            self.resetlines() # get rid of HUD, projection, cross lines and AUC line
             self.resetdeltalines() # just in case
             
             # ask the canvas to kindly draw it self some time in the future
@@ -2342,9 +2342,9 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.stemp1BX) > n3 and len(self.stemp2BX) > n3 and len(self.extratimexB) > n3:
                     c += 1
             if aw.qmc.backgroundeventsflag and aw.qmc.eventsGraphflag == 2:
-                c += 4
+                c += len(set(aw.qmc.backgroundEtypes))
         if aw.qmc.eventsshowflag and aw.qmc.eventsGraphflag == 2:
-            c += 4
+            c += 4 # always 4 ax lines are added as new events might have to be drawn of each of the 4 types
         return c
 
     def lendeltaaxlines(self):
@@ -3766,6 +3766,7 @@ class tgraphcanvas(FigureCanvas):
     def redraw(self, recomputeAllDeltas=True, smooth=False,sampling=False):
         self.resetlinecountcaches() # ensure that the line counts are up to date
         self.resetlines() # get rid of HUD, projection and cross lines
+        
         if aw.qmc.designerflag:
             aw.qmc.redrawdesigner()
         else:
@@ -4039,7 +4040,7 @@ class tgraphcanvas(FigureCanvas):
                                 jump -= 10
     
                 rcParams['path.sketch'] = (scale, length, randomness)
-    
+                
                 #check BACKGROUND flag
                 if self.background: 
                     #check to see if there is both a profile loaded and a background loaded
@@ -4171,7 +4172,7 @@ class tgraphcanvas(FigureCanvas):
     
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))
+                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                                             picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
@@ -4200,7 +4201,6 @@ class tgraphcanvas(FigureCanvas):
                     
                 if aw.qmc.patheffects:
                     rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
-                    
                     
                 handles = []
                 labels = []
@@ -4483,8 +4483,6 @@ class tgraphcanvas(FigureCanvas):
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
-    
-#                QApplication.processEvents()
                 
                 ##### ET,BT curves
                 if aw.qmc.ETcurve:
@@ -4621,16 +4619,23 @@ class tgraphcanvas(FigureCanvas):
                 self.updateBackground() # update bitlblit backgrounds
                 #######################################
                     
-                self.l_BTprojection, = self.ax.plot([], [],color = self.palette["bt"],
+                    
+                # add projection and AUC guide lines last as those are removed by updategraphics for optimized redrawing and not cached
+                if aw.qmc.projectFlag and aw.qmc.BTcurve:
+                    self.l_BTprojection, = self.ax.plot([], [],color = self.palette["bt"],
                                                 dashes=dashes_setup,
+                                                label=aw.arabicReshape(QApplication.translate("Label", "BTprojection", None)),
                                                 linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
-                self.l_ETprojection, = self.ax.plot([], [],color = self.palette["et"],
+                if aw.qmc.projectFlag and aw.qmc.ETcurve:
+                    self.l_ETprojection, = self.ax.plot([], [],color = self.palette["et"],
                                                 dashes=dashes_setup,
+                                                label=aw.arabicReshape(QApplication.translate("Label", "ETprojection", None)),
                                                 linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                                                 
-                self.l_AUCguide, = self.ax.plot([], [],color = self.palette["bt"],
+                if aw.qmc.AUCguideFlag:
+                    self.l_AUCguide, = self.ax.plot([], [],color = self.palette["bt"],
+                                                label=aw.arabicReshape(QApplication.translate("Label", "AUCguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
-    
     
                 # if designer ON
                 if self.designerflag:
@@ -4639,7 +4644,7 @@ class tgraphcanvas(FigureCanvas):
                     if len(self.timex):
                         self.xaxistosm()
                         self.redrawdesigner()
-    
+                        
             except Exception as ex:
     #            import traceback
     #            traceback.print_exc(file=sys.stdout)
@@ -10927,7 +10932,7 @@ class ApplicationWindow(QMainWindow):
             return aw.qmc.startofx, aw.qmc.endofx
         
     # returns the last event value of the given type, or None if no event was ever recorded
-    def lastEventValue(self,type):
+    def lastEventValue(self,tp):
         res = None
         try:
             if sys.version < '3':
@@ -10935,7 +10940,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 r = range(len(aw.qmc.specialeventstype) - 1, -1, -1)
             for i in r:
-                if aw.qmc.specialeventstype[i] == type:
+                if aw.qmc.specialeventstype[i] == tp:
                     res = aw.qmc.specialeventsvalue[i]
                     break
         except Exception:
