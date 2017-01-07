@@ -3764,9 +3764,6 @@ class tgraphcanvas(FigureCanvas):
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
     def redraw(self, recomputeAllDeltas=True, smooth=False,sampling=False):
-        self.resetlinecountcaches() # ensure that the line counts are up to date
-        self.resetlines() # get rid of HUD, projection and cross lines
-        
         if aw.qmc.designerflag:
             aw.qmc.redrawdesigner()
         else:
@@ -14226,7 +14223,7 @@ class ApplicationWindow(QMainWindow):
     def setProfile(self,filename,profile,quiet=False):
         try:
             #extra devices load and check
-            if "extratimex" in profile:
+            if "extratimex" in profile and len(profile["extratimex"]) > 0:
                 if "extradevices" in profile:
                     if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
                         string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
@@ -14653,8 +14650,8 @@ class ApplicationWindow(QMainWindow):
                     
             return True
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
@@ -20153,8 +20150,8 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importPilot(): {0}").format(str(ex)))
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importPilot() {0}").format(str(ex)),exc_tb.tb_lineno)
 
@@ -22245,8 +22242,8 @@ class HUDDlg(ArtisanDialog):
                 aw.qmc.resetlines()
                 self.redraw_enabled_math_curves()
         except:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             pass
 
     def interpolation(self,i):

@@ -3,12 +3,13 @@ export MACOSX_DEPLOYMENT_TARGET=10.7
 
 export PYTHON=/Library/Frameworks/Python.framework/Versions/3.5
 
-export PYTHONPATH=$PYTHON/lib/python3.4/site-packages
+export PYTHONPATH=$PYTHON/lib/python3.5/site-packages
 export QT_PATH=~/Qt5.7.1/5.7/clang_64
 
 export PATH=$PYTHON/bin:$PYTHON/lib:$PATH
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 #export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
+export DYLD_LIBRARY_PATH=$PYTHON/lib/python3.5/site-packages/PIL/.dylibs/:$DYLD_LIBRARY_PATH
 
 # translations
 $PYTHON/bin/pylupdate5 artisan.pro
