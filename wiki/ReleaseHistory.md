@@ -16,7 +16,6 @@ v1.0.0 (XX.XX.2016)
     * adds experimental support for the [Extech 755](http://www.extech.com/display/?id=14489) pressure manometer (by William and Brian Glen)
     * adds "Playback Events" function to playback background events if corresponding sliders with actions are defined
     * adds serial port to DUMMY device. If selected as main device, one can send serial commands to its serial port from alarms and buttons
-    * adds russian translations (thanks to Taras Prokopyuk)
     * adds support for multiple-connected Yoctopuce devices (thanks to Nick Watson)
     * adds undo of the last entered main event by clicking its button again
     * adds TP annotation on background profiles
@@ -37,6 +36,8 @@ v1.0.0 (XX.XX.2016)
     * adds support for MODBUS mask-write (mwrite; function code 22) and write registers (writem; function code 16) methods
     * adds Raspberry Pi (Jessy) build
     * adds color labels to HTM ranking reports
+    * adds Russian, Indonesian, Thai and Korean translations (thanks to Taras Prokopyuk, Azis Nawawi, Rit Multi, Joongbae Dave Cho)
+    * adds Probat Pilot import/export
  * Changes
     * dramatically improves speed of MODBUS over serial communication (by patching the underlying pymodbus lib)
     * makes message, error and serial logs autoupdating
@@ -68,6 +69,7 @@ v1.0.0 (XX.XX.2016)
     * various stability improvements
     * fixes hang on RESET serial action
     * fixes Phidgets remote access on Python 3
+    * fixes dual slider PID setup
 
 ----
 v0.9.9 (14.03.2016)

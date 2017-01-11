@@ -1122,7 +1122,7 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaBTlcdflag = True
         self.HUDbuttonflag = False
         self.PIDbuttonflag = True # TC4 PID firmware available?
-        self.Controlbuttonflag = False
+        self.Controlbuttonflag = False # PID Control active (either internal/external or Fuji)
         # user filter values x are translated as follows to internal filter values: y = x*2 + 1 (to go the other direction: x = y/2)
         # this is to ensure, that only uneven window values are used and no wrong shift is happening through smoothing
         self.deltafilter = 17 # => corresponds to 2 on the user interface
@@ -2512,35 +2512,27 @@ class tgraphcanvas(FigureCanvas):
                 # RampSoak ON
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setrampsoak(1)
-                elif ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
-                      (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
-                      (aw.qmc.Controlbuttonflag and aw.qmc.device == 29)): # MODBUS hardware/software PID
+                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # internal or external MODBUS PID control
                     aw.pidcontrol.svMode = 1
                     aw.pidcontrol.pidOn()
             elif self.alarmaction[alarmnumber] == 18:
                 # RampSoak OFF
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setrampsoak(0)
-                elif ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
-                      (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
-                      (aw.qmc.Controlbuttonflag and aw.qmc.device == 29)): # MODBUS hardware/software PID
+                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag):  # internal or external MODBUS PID control
                     aw.pidcontrol.svMode = 0
                     aw.pidcontrol.pidOff()
             elif self.alarmaction[alarmnumber] == 19:
                 # PID ON
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setONOFFstandby(0)
-                elif ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
-                      (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
-                      (aw.qmc.Controlbuttonflag and aw.qmc.device == 29)): # MODBUS hardware/software PID
+                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # internal or external MODBUS PID control
                     aw.pidcontrol.pidOn()
             elif self.alarmaction[alarmnumber] == 20:
                 # PID OFF
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setONOFFstandby(1)
-                elif ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
-                      (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
-                      (aw.qmc.Controlbuttonflag and aw.qmc.device == 29)): # MODBUS hardware/software PID
+                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # internal or external MODBUS PID control
                     aw.pidcontrol.pidOff()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -3626,7 +3618,7 @@ class tgraphcanvas(FigureCanvas):
                     TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
                     
                     TP_time = TP_time - t0
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","{0}", None),u(self.stringfromseconds(TP_time,False)))
+                    st1 = aw.arabicReshape("{0}",u(self.stringfromseconds(TP_time,False)))
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a)                    
                 #Add Dry End markers
                 if timeindex[1]:
@@ -7427,7 +7419,7 @@ class tgraphcanvas(FigureCanvas):
                         label=u(QApplication.translate("Label", "ET", None)))
             if self.BTcurve:
                 self.ax.plot(timez, btvals, markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,
-                    linestyle=self.BTlinestyle,drawstyle=self.BTlinestyle,color=self.palette["bt"],
+                    linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],
                         label=u(QApplication.translate("Label", "BT", None)))
 
             #add markers (big circles) '0'
@@ -12522,10 +12514,7 @@ class ApplicationWindow(QMainWindow):
                             aw.fujipid.setrampsoak(0)
                             aw.fujipid.followBackground = False
                             aw.sendmessage(QApplication.translate("Message","PID Mode: Manual", None))
-                    elif (aw.pidcontrol and
-                            ((aw.qmc.device == 19 and aw.arduino) or  # Arduino TC4
-                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
-                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 29))): # MODBUS hardware/software PID
+                    elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware/software PID
                         aw.pidcontrol.svMode = (aw.pidcontrol.svMode+1) %3
                         # 0: manual, 1: Ramp/Soak, 2: Follow (background profile)        
                         if aw.pidcontrol.svMode == 0:
@@ -12538,22 +12527,14 @@ class ApplicationWindow(QMainWindow):
                     if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                         aw.fujipid.lookahead = max(0,aw.fujipid.lookahead-1)
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
-                    elif aw.qmc.Controlbuttonflag: # software PID
-#                      (aw.pidcontrol and
-#                             ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
-#                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
-#                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 29))): # MODBUS hardware PID
+                    elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
                         aw.pidcontrol.svLookahead = max(0,aw.pidcontrol.svLookahead-1)
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
                 elif key == 43:                       #+
                     if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                         aw.fujipid.lookahead = aw.fujipid.lookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
-                    elif aw.qmc.Controlbuttonflag: # software PID
-#                       (aw.pidcontrol and
-#                             ((aw.qmc.device == 19 and aw.arduino) or # Arduino TC4
-#                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 53) or # Hottop
-#                              (aw.qmc.Controlbuttonflag and aw.qmc.device == 29))): # MODBUS hardware PID
+                    elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
                         aw.pidcontrol.svLookahead = aw.pidcontrol.svLookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
                 elif key == 32:                       #SELECTS ACTIVE BUTTON
@@ -19227,7 +19208,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
-        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi<br>")
+        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, " +  uchr(51312) + uchr(51473) + uchr(48176) + " (Joongbae Dave Cho)<br>")
         box = QMessageBox(self)
         
         #create a html QString
