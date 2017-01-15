@@ -69,7 +69,6 @@ v1.0.0 (XX.XX.2016)
     * various stability improvements
     * fixes hang on RESET serial action
     * fixes Phidgets remote access on Python 3
-    * fixes dual slider PID setup
 
 ----
 v0.9.9 (14.03.2016)

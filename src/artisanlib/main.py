@@ -1563,7 +1563,7 @@ class tgraphcanvas(FigureCanvas):
         self.program_t5 = -1
         self.program_t6 = -1
 
-        #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT
+        #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs and ET-BT
         self.dutycycle = -1
         self.dutycycleTX = 0.
         self.currentpidsv = 0.
@@ -3437,6 +3437,9 @@ class tgraphcanvas(FigureCanvas):
                     aw.moveSVslider(0)
                 aw.pidcontrol.sv = None
                 aw.fujipid.sv = None
+                aw.qmc.dutycycle = -1
+                aw.qmc.dutycycleTX = 0.
+                aw.qmc.currentpidsv = 0.
                 
                 # if there is already some data recorded, we remove the filename to force writing a new file
                 # and avoid accidential overwriting of existing data
@@ -9668,10 +9671,12 @@ class ApplicationWindow(QMainWindow):
         editGraphAction = QAction(UIconst.ROAST_MENU_PROPERTIES,self)
         editGraphAction.triggered.connect(self.editgraph)
         self.GraphMenu.addAction(editGraphAction)
+        editGraphAction.setShortcut("Ctrl+T")
 
         backgroundAction = QAction(UIconst.ROAST_MENU_BACKGROUND,self)
         backgroundAction.triggered.connect(self.background)
         self.GraphMenu.addAction(backgroundAction)
+        backgroundAction.setShortcut("Ctrl+B")
 
         self.flavorAction = QAction(UIconst.ROAST_MENU_CUPPROFILE,self)
         self.flavorAction.triggered.connect(self.flavorchart)
@@ -9719,10 +9724,12 @@ class ApplicationWindow(QMainWindow):
         self.deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
         self.deviceAction.triggered.connect(self.deviceassigment)
         self.ConfMenu.addAction(self.deviceAction)
+        self.deviceAction.setShortcut("Ctrl+D")
 
         self.commportAction = QAction(UIconst.CONF_MENU_SERIALPORT,self)
         self.commportAction.triggered.connect(self.setcommport)
         self.ConfMenu.addAction(self.commportAction)
+        self.commportAction.setShortcut("Ctrl+S")
 
         calibrateDelayAction = QAction(UIconst.CONF_MENU_SAMPLING,self)
         calibrateDelayAction.triggered.connect(self.calibratedelay)
@@ -9739,6 +9746,7 @@ class ApplicationWindow(QMainWindow):
         eventsAction = QAction(UIconst.CONF_MENU_EVENTS,self)
         eventsAction.triggered.connect(self.eventsconf)
         self.ConfMenu.addAction(eventsAction)
+        eventsAction.setShortcut("Ctrl+E")
 
         alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
         alarmAction.triggered.connect(self.alarmconfig)
@@ -9771,6 +9779,7 @@ class ApplicationWindow(QMainWindow):
         WindowconfigAction = QAction(UIconst.CONF_MENU_AXES,self)
         WindowconfigAction.triggered.connect(self.Windowconfig)
         self.ConfMenu.addAction(WindowconfigAction)
+        WindowconfigAction.setShortcut("Ctrl+A")
 
         self.ConfMenu.addSeparator()
 
@@ -9971,12 +9980,14 @@ class ApplicationWindow(QMainWindow):
         self.lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
         self.lcdsAction.triggered.connect(self.largeLCDs)
         self.ToolkitMenu.addAction(self.lcdsAction)
+        self.lcdsAction.setShortcut("Ctrl+L")
 
         self.fullscreenAction = QAction(UIconst.TOOLKIT_MENU_FULLSCREEN,self)
         self.fullscreenAction.triggered.connect(self.toggleFullscreen)
         self.fullscreenAction.setCheckable(True)
         self.fullscreenAction.setChecked(False)
         self.ToolkitMenu.addAction(self.fullscreenAction)
+        self.fullscreenAction.setShortcut("Ctrl+F")
 
         self.ToolkitMenu.addSeparator()
 
@@ -15094,7 +15105,7 @@ class ApplicationWindow(QMainWindow):
                         self.setProfile(f,self.deserialize(f),quiet=True)
                         dumper(fconv)
                     else:
-                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {} not converted.", None).format(fconv,fname + u(ext)))
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(ext)))
                 except Exception as e:
                     pass
                 i += 1
@@ -15142,7 +15153,7 @@ class ApplicationWindow(QMainWindow):
                             self.image = aw.qmc.grab()
                         self.image.save(fconv,"PNG")
                     else:
-                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {} not converted.", None).format(fconv,fname + u(".png")))                        
+                        aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(".png")))                        
                 except:
                     pass
                 i += 1
@@ -17271,7 +17282,7 @@ class ApplicationWindow(QMainWindow):
     #  . "weight_out_num" (numeric in g)
     #  . "weight_loss_num" (numeric in %)
     def productionData2string(self,data,units=True):
-        res = {}        
+        res = {}
         # id (prefix+nr)
         res["nr"] = u(data["batchnr"])
         res["id"] = ((u(data["batchprefix"]) + u(data["batchnr"])) if (data["batchnr"] != 0) else u(""))
