@@ -9729,7 +9729,6 @@ class ApplicationWindow(QMainWindow):
         self.commportAction = QAction(UIconst.CONF_MENU_SERIALPORT,self)
         self.commportAction.triggered.connect(self.setcommport)
         self.ConfMenu.addAction(self.commportAction)
-        self.commportAction.setShortcut("Ctrl+S")
 
         calibrateDelayAction = QAction(UIconst.CONF_MENU_SAMPLING,self)
         calibrateDelayAction.triggered.connect(self.calibratedelay)
@@ -9779,7 +9778,6 @@ class ApplicationWindow(QMainWindow):
         WindowconfigAction = QAction(UIconst.CONF_MENU_AXES,self)
         WindowconfigAction.triggered.connect(self.Windowconfig)
         self.ConfMenu.addAction(WindowconfigAction)
-        WindowconfigAction.setShortcut("Ctrl+A")
 
         self.ConfMenu.addSeparator()
 
@@ -19219,7 +19217,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
-        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, " +  uchr(51312) + uchr(51473) + uchr(48176) + " (Joongbae Dave Cho)<br>")
+        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers)<br>")
         box = QMessageBox(self)
         
         #create a html QString
