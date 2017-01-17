@@ -3,9 +3,9 @@ Artisan helps coffee roasters record, analyze, and control roast profiles. With 
 
 HOME
 
-The project home is on Google Code were all source and binary files are available as well as an issue tracker.
+The project home is on GitHub were all source and binary files are available as well as an issue tracker.
 
-<http://code.google.com/p/artisan/>
+<https://github.com/artisan-roaster-scope/artisan>
 
 
 MAILING LISTS
@@ -14,10 +14,16 @@ Users: <https://lists.mokelbu.de/listinfo/artisan-user>
 Developers: <https://lists.mokelbu.de/listinfo/artisan-devel>
 
 
+ARTISAN BLOG
+
+https://artisan-roasterscope.blogspot.de
+
+
+
 FEATURES
 
-o runs on Windows, Mac OS X (>=10.7) on Intel 64bit processor, and Linux
-(on OS X 10.8 Mountain Lion and later you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
+o runs on Windows, Mac OS X (>=10.7) on Intel 64bit processor, and Linux (incl. Raspberry Pi)
+o UI translated in several languages (English, German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norwegian, Finish, Hungarian, Hebrew, Polish, Greek, Turkish, Chinese, Russian, Thai, Indonesian, Korean,..)
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
  - Delta DTA PID
@@ -69,12 +75,15 @@ o LargeLCDs and WebLCDs
 o volume calculator
 o batch counter
 o roast, production (for tax reporting) and ranking reports
-o PID-based roast reproduction (follow background mode)
+o software PID and PID-based roast reproduction (follow background mode)
+o Area under the Curve (AUC)
 
 
 INSTALLATION
 
-(see the Artisan project Wiki at GoogleCode for the latest installation instructions)
+(see the Artisan project Wiki on GitHub for the latest installation instructions
+https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md)
+
 
 o Windows
 
@@ -92,6 +101,7 @@ o Mac OS X (>=10.7.x)
 - Install USB/serial driver for your meter
  . for Omega meters download and run the FTDI VCP OS X installer
    http://www.ftdichip.com/Drivers/VCP.htm
+   NOTE: OS X 10.9 and later contain already support for the FTDI hardware and therefore no additional driver needs to be installed on those systems
  . for Voltkraft meters using the original Voltkraft USB cable it is the CP210x driver from Silicon Labs
    http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx
  . some other serial2USB dongles use the Prolific PL2303 chips
@@ -155,28 +165,40 @@ LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
 
-- Python 2.7.x and 3.4.x released under the PSF licence http://www.python.org/psf/
+- Python 2.7.x and 3.x released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
-- QT 4.8.x / 5.4.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
+- QT 4.8.x / 5.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
   http://qt-project.org/products/licensing
-- Numpy 1.9.x and Scipy 0.14.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
+- Numpy and Scipy, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
 - PyQt 5.x and SIP 4.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
-- matplotlib 1.5.x, Copyright (c) 2002-2015 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
+- matplotlib, Copyright (c) 2002-2015 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
   http://matplotlib.sourceforge.net
-- py2app 0.9.x under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
+- py2app under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
   Copyright (c) 2010-2012 Ronald Oussoren <ronaldoussoren at mac.com>.
   http://packages.python.org/py2app/
 - py2exe, Copyright (c) 2000-2005 Thomas Heller, Mark Hammond, Jimmy Retzlaff
   http://www.py2exe.org/
-- bbfreeze, Copyright (c) 2007-2012 brainbot technologies AG. Distributed under the zlib/libpng license.
-- pymodbus 1.3.x under the BSD License by Galen Collins
+- bbfreeze, Copyright (c) 2007-2012 brainbot technologies AG. Distributed under the zlib/libpng license
+- pyinstaller under the GPL license
+  http://www.pyinstaller.org
+- pymodbus under the BSD License by Galen Collins
+  https://github.com/bashwork/pymodbus
 - arabic_reshaper.py under GPL by Abd Allah Diab (Mpcabd)
 
 
 
 VERSION HISTORY
+
+v1.0.0 ()
+ - adds internal software PID
+ - external MODBUS PID control and faster MODBUS RTU
+ - adds support for Apollo DT301 and Extech 755
+ - adds Area under the Curve (AUC)
+ - adds additional translations
+ - adds RPi build
+ - bug fixes and stability improvements
 
 v0.9.9 (14.3.2016)
  - adds batch and ranking reports as well as batch conversions
