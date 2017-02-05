@@ -8997,13 +8997,21 @@ class SampleThread(QThread):
                                         if d != None and (ld == None or ld != d):
                                             # and only if significantly different than previous to avoid fluktuation
                                             if ld == None or linespacethreshold < abs(t - lt):
-                                                # establish this one
-                                                aw.lastdigitizedvalue[i] = d
-                                                aw.lastdigitizedtemp[i] = t
-                                                v = d * 10.
-                                                # now move corresponding slider and add event if its value is not equal to the previous one
-                                                if ((aw.float2float((v + 10.0) / 10.0)) != aw.lastEventValue(i)):
-                                                    aw.qmc.quantifiedEvent.append([i,v])
+                                                # we also ignore those values that move towards the last recorded event value
+                                                lv = aw.lastEventValue(i)
+                                                if len(temp)>1:
+                                                    t_prev = temp[-2]
+                                                else:
+                                                    t_prev = none
+                                                # test if t is increasing or decreasing
+                                                if lv == None or t_prev == None or ((d > lv) and (t > t_prev)) or ((d < lv and t < t_prev)):
+                                                    # establish this one
+                                                    aw.lastdigitizedvalue[i] = d
+                                                    aw.lastdigitizedtemp[i] = t
+                                                    v = d * 10.
+                                                    # now move corresponding slider and add event if its value is not equal to the previous one                                                    
+                                                    if ((aw.float2float((v + 10.0) / 10.0)) != lv):
+                                                        aw.qmc.quantifiedEvent.append([i,v])
                     except Exception:
                         pass
                         
@@ -10932,7 +10940,7 @@ class ApplicationWindow(QMainWindow):
         
     # returns the last event value of the given type, or None if no event was ever recorded
     def lastEventValue(self,tp):
-        res = None
+        res_last = None
         try:
             if sys.version < '3':
                 r = xrange(len(aw.qmc.specialeventstype) - 1, -1, -1)
@@ -10940,11 +10948,11 @@ class ApplicationWindow(QMainWindow):
                 r = range(len(aw.qmc.specialeventstype) - 1, -1, -1)
             for i in r:
                 if aw.qmc.specialeventstype[i] == tp:
-                    res = aw.qmc.specialeventsvalue[i]
+                    res_last = aw.qmc.specialeventsvalue[i]
                     break
         except Exception:
             pass
-        return res
+        return res_last
 
     # order event table by time
     def orderEvents(self):
