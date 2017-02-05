@@ -1642,6 +1642,7 @@ class tgraphcanvas(FigureCanvas):
 #        if not self.block_update:
 #            self.block_update = True
 #            QTimer.singleShot(self.delayTimeout,self.doUpdate)
+
     def delayedUpdateBackground(self):
         self.updateBackground()
 
@@ -20760,16 +20761,17 @@ class ApplicationWindow(QMainWindow):
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None):
         super(ArtisanDialog,self).__init__(parent)
+#        if platf == 'Windows':
 # setting those Windows flags could be the reason for some instabilities on Windows
 #        #self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-#        windowFlags = self.windowFlags()
+#            windowFlags = self.windowFlags()
 #        #windowFlags &= ~Qt.WindowContextHelpButtonHint # remove help button
 #        #windowFlags &= ~Qt.WindowMaximizeButtonHint # remove maximise button
 #        #windowFlags &= ~Qt.WindowMinMaxButtonsHint  # remove min/max combo
 #        #windowFlags |= Qt.WindowMinimizeButtonHint  # Add minimize  button
 #        windowFlags |= Qt.WindowSystemMenuHint  # Adds a window system menu, and possibly a close button
-#        windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
-#        self.setWindowFlags(windowFlags)
+#            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
+#            self.setWindowFlags(windowFlags)
     
                               
     def keyPressEvent(self,event):
@@ -23113,6 +23115,11 @@ class editGraphDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))
         
+
+        settings = QSettings()
+        if settings.contains("RoastGeometry"):
+            toByteArray(self.restoreGeometry(settings.value("RoastGeometry")))
+        
         self.org_specialevents = aw.qmc.specialevents
         self.org_specialeventstype = aw.qmc.specialeventstype
         self.org_specialeventsStrings = aw.qmc.specialeventsStrings
@@ -23921,7 +23928,14 @@ class editGraphDlg(ArtisanDialog):
         self.setLayout(totallayout)
         self.titleedit.setFocus()
 
-        
+    def closeEvent(self, event):
+        settings = QSettings()
+        #save window geometry
+        if sip.getapi('QVariant') == 1:
+            settings.setValue("RoastGeometry",QVariant(self.saveGeometry()))
+        else:
+            settings.setValue("RoastGeometry",self.saveGeometry())
+
     def cancel_dialog(self):
         aw.qmc.specialevents = self.org_specialevents
         aw.qmc.specialeventstype = self.org_specialeventstype
@@ -25651,6 +25665,11 @@ class calculatorDlg(ArtisanDialog):
         super(calculatorDlg,self).__init__(parent)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Calculator",None))
+        
+        settings = QSettings()
+        if settings.contains("CalculatorGeometry"):
+            toByteArray(self.restoreGeometry(settings.value("CalculatorGeometry")))
+            
         #RATE OF CHANGE
         self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile",None))
         self.result2 = QLabel()
@@ -25860,6 +25879,14 @@ class calculatorDlg(ArtisanDialog):
             outx = float(str(self.VoutEdit.text()))
             inx = aw.convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
             self.VinEdit.setText("%.3f"%inx)
+
+    def closeEvent(self, event):
+        settings = QSettings()
+        #save window geometry
+        if sip.getapi('QVariant') == 1:
+            settings.setValue("CalculatorGeometry",QVariant(self.saveGeometry()))
+        else:
+            settings.setValue("CalculatorGeometry",self.saveGeometry())              
 
 ##########################################################################
 #####################  EVENTS CONFIGURATION DLG     ######################
@@ -28226,6 +28253,11 @@ class backgroundDlg(ArtisanDialog):
         super(backgroundDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Profile Background", None))
         self.setModal(True)
+        
+        settings = QSettings()
+        if settings.contains("BackgroundGeometry"):
+            toByteArray(self.restoreGeometry(settings.value("BackgroundGeometry")))
+        
         #TAB 1
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
@@ -28481,6 +28513,14 @@ class backgroundDlg(ArtisanDialog):
     def accept(self):
         aw.qmc.backgroundmovespeed = self.speedSpinBox.value()
         self.close()
+        
+    def closeEvent(self,event):
+        settings = QSettings()
+        #save window geometry
+        if sip.getapi('QVariant') == 1:
+            settings.setValue("BackgroundGeometry",QVariant(self.saveGeometry()))
+        else:
+            settings.setValue("BackgroundGeometry",self.saveGeometry())    
         
     def getColorIdx(self,c):
         try:
@@ -37598,6 +37638,16 @@ class AlarmDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Alarms",None))
         
+        if platf == 'Windows':
+            windowFlags = self.windowFlags()
+            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
+            self.setWindowFlags(windowFlags)
+                    
+        # restore window position
+        settings = QSettings()
+        if settings.contains("AlarmsGeometry"):
+            toByteArray(self.restoreGeometry(settings.value("AlarmsGeometry")))
+        
         #table for alarms
         self.alarmtable = QTableWidget()
         self.createalarmtable()
@@ -37859,7 +37909,16 @@ class AlarmDlg(ArtisanDialog):
 
     def closealarms(self):
         self.savealarms()
+        settings = QSettings()
+        #save window geometry
+        if sip.getapi('QVariant') == 1:
+            settings.setValue("AlarmsGeometry",QVariant(self.saveGeometry()))
+        else:
+            settings.setValue("AlarmsGeometry",self.saveGeometry())  
         self.accept()
+    
+    def closeEvent(self, event):
+        self.closealarms()
 
     def showAlarmbuttonhelp(self):
         string  = u(QApplication.translate("Message", "<b>Nr:</b> alarm number for reference",None)) + "<br>"
@@ -37971,7 +38030,7 @@ class AlarmDlg(ArtisanDialog):
         else:
             guardstr = "0"
         guardedit = QLineEdit(guardstr)
-        guardedit.setValidator(QIntValidator(0, 30,guardedit))
+        guardedit.setValidator(QIntValidator(0, 999,guardedit))
         guardedit.setAlignment(Qt.AlignRight)
         #neg guarded by alarm
         if aw.qmc.alarmnegguard[i] > -1:
@@ -37979,7 +38038,7 @@ class AlarmDlg(ArtisanDialog):
         else:
             negguardstr = "0"
         negguardedit = QLineEdit(negguardstr)
-        negguardedit.setValidator(QIntValidator(0, 30,negguardedit))
+        negguardedit.setValidator(QIntValidator(0, 999,negguardedit))
         negguardedit.setAlignment(Qt.AlignRight)
         #Effective time from
         timeComboBox = QComboBox()
@@ -42038,6 +42097,11 @@ class PID_DlgControl(ArtisanDialog):
         self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(QApplication.translate("Form Caption","PID Control",None))
+        
+        settings = QSettings()
+        if settings.contains("PIDGeometry"):
+            toByteArray(self.restoreGeometry(settings.value("PIDGeometry")))
+        
         # PID tab
         tab1Layout = QVBoxLayout()
         pidGrp = QGroupBox(QApplication.translate("GroupBox","p-i-d",None))
@@ -42513,6 +42577,12 @@ class PID_DlgControl(ArtisanDialog):
         self.closeEvent(None)        
 
     def closeEvent(self,event):
+        settings = QSettings()
+        #save window geometry
+        if sip.getapi('QVariant') == 1:
+            settings.setValue("PIDGeometry",QVariant(self.saveGeometry()))
+        else:
+            settings.setValue("PIDGeometry",self.saveGeometry())   
         self.accept()
 
 
@@ -42568,10 +42638,12 @@ class DTApidDlgControl(ArtisanDialog):
 
     #write uses function = 6
     def writesv(self):
-        newsv = hex(int(abs(float(str(self.svedit.text())))*10.))[2:].upper()
-        ### create command message2send(unitID,function,address,ndata)
-        command = aw.dtapid.message2send(aw.ser.controlETpid[1],6,aw.dtapid.dtamem["sv"][1],newsv)
-        #read sv
+        v = self.svedit.text()
+        if v:
+            newsv = hex(int(abs(float(str(v)))*10.))[2:].upper()
+            ### create command message2send(unitID,function,address,ndata)
+            command = aw.dtapid.message2send(aw.ser.controlETpid[1],6,aw.dtapid.dtamem["sv"][1],newsv)
+                #read sv
         aw.ser.sendDTAcommand(command)
 
 ###################################################################################
