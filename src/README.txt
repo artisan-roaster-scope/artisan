@@ -191,7 +191,7 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
-v1.0.0 ()
+v1.0.0 (24.2.2017)
  - adds internal software PID
  - external MODBUS PID control and faster MODBUS RTU
  - adds support for Apollo DT301 and Extech 755

@@ -33,7 +33,7 @@ o unidecode 0.4.19
 CHECK FOR UPDATES
 # pip install --upgrade pip
 # pip install pip-review
-# sudo pip-review --local --interactive
+# sudo -H pip-review --local --interactive
 
 Note:
 To build Artisan on Mac OS X 10.11 El Capitan and later one needs to 

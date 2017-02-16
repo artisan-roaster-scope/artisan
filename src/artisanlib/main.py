@@ -1393,9 +1393,13 @@ class tgraphcanvas(FigureCanvas):
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
 #        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None)))
+        self.l_temp1 = None
 #        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None)))
+        self.l_temp2 = None
 #        self.l_delta1, = self.ax.plot(self.timex,self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=u(QApplication.translate("Label", "DeltaET", None)))
+        self.l_delta1 = None
 #        self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=u(QApplication.translate("Label", "DeltaBT", None)))
+        self.l_delta2 = None
         self.l_back1 = None
         self.l_back2 = None
         self.l_back3 = None # one extra background curve
@@ -3824,11 +3828,16 @@ class tgraphcanvas(FigureCanvas):
                         stl = 33
                     else:
                         stl = 38
+                    if aw.qmc.graphfont != 1: # Humor font runs very long!!
+                        stl = int(stl*1.5)
+                        
+                        
                     if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
                         title = toASCII(title)
                     title = aw.qmc.abbrevString(title,stl)
                     self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                         fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
+
                 if aw.qmc.flagstart:
                     self.ax.set_ylabel("")
                     self.ax.set_xlabel("")
@@ -7497,7 +7506,13 @@ class tgraphcanvas(FigureCanvas):
     def on_pick(self,event):
         self.setCursor(Qt.ClosedHandCursor)
 
-        self.indexpoint = event.ind
+        if isinstance(event.ind, (int)):
+            self.indexpoint = event.ind
+        else:
+            N = len(event.ind)
+            if not N: return
+            self.indexpoint = event.ind[0]
+        
         self.mousepress = True
 
         line = event.artist
@@ -7521,6 +7536,7 @@ class tgraphcanvas(FigureCanvas):
         
         try:
             if self.mousepress:                                 #if mouse clicked
+                
                 self.timex[self.indexpoint] = event.xdata
                 if self.workingline == 1:
                     self.temp1[self.indexpoint] = ydata
@@ -7643,6 +7659,8 @@ class tgraphcanvas(FigureCanvas):
                         aw.sendmessage(string1+string2+string3)
 
         except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " on_motion() {0}").format(str(e)),exc_tb.tb_lineno)
             self.unrarefy_designer()
@@ -14269,11 +14287,11 @@ class ApplicationWindow(QMainWindow):
                 if "extramathexpression1" in profile:
                     old = self.qmc.extramathexpression1
                     new = [d(x) for x in profile["extramathexpression1"]]
-                    self.qmc.extramathexpression1 = (old + new[len(old):])[:len(new)]
+                    self.qmc.extramathexpression1 = (old + new[len(old):])[:len(self.qmc.extraname1)]
                 if "extramathexpression2" in profile:
                     old = self.qmc.extramathexpression2
                     new = [d(x) for x in profile["extramathexpression2"]]
-                    self.qmc.extramathexpression2 = (old + new[len(old):])[:len(new)]
+                    self.qmc.extramathexpression2 = (old + new[len(old):])[:len(self.qmc.extraname2)]
 #                if "extramathexpression1" in profile:
 #                    self.qmc.extramathexpression1 = [d(x) for x in profile["extramathexpression1"]] + self.qmc.extramathexpression1[len(profile["extramathexpression1"]):]
 #                if "extramathexpression2" in profile:
@@ -34546,7 +34564,7 @@ class scanModbusDlg(ArtisanDialog):
         # scan and report
         result = "Register,Value<br>"
         result += "--------------<br>"
-        for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)):
+        for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1):
             QApplication.processEvents()
             if self.stop:
                 result += "<br>stopped<br>"
@@ -35376,63 +35394,68 @@ class DeviceAssignmentDlg(ArtisanDialog):
                             break 
                 devices = sorted(map(lambda x:(x[1:] if x.startswith("+") else x),dev), key=lambda x: (x[1:] if x.startswith("+") else x))
                 for i in range(nddevices):
-                    typeComboBox =  QComboBox()
-                    typeComboBox.addItems(devices[:])
                     try:
-                        dev_name = aw.qmc.devices[aw.qmc.extradevices[i]-1]
-                        if dev_name[0] == "+":
-                            dev_name = dev_name[1:]
-                        typeComboBox.setCurrentIndex(devices.index(dev_name))
-                    except Exception:
+                        typeComboBox =  QComboBox()
+                        typeComboBox.addItems(devices[:])
+                        try:
+                            dev_name = aw.qmc.devices[aw.qmc.extradevices[i]-1]
+                            if dev_name[0] == "+":
+                                dev_name = dev_name[1:]
+                            typeComboBox.setCurrentIndex(devices.index(dev_name))
+                        except Exception:
+                            pass
+                        color1Button = QPushButton(QApplication.translate("Button","Select",None))
+                        color1Button.setFocusPolicy(Qt.NoFocus)
+                        color1Button.clicked.connect(lambda l = 1, c = i: self.setextracolor(1,c))
+                        color2Button = QPushButton(QApplication.translate("Button","Select",None))
+                        color2Button.setFocusPolicy(Qt.NoFocus)
+                        color2Button.clicked.connect(lambda l = 2, c = i: self.setextracolor(2,c))
+                        name1edit = QLineEdit(u(aw.qmc.extraname1[i]))
+                        name2edit = QLineEdit(u(aw.qmc.extraname2[i]))
+                        mexpr1edit = QLineEdit(u(aw.qmc.extramathexpression1[i]))
+                        mexpr2edit = QLineEdit(u(aw.qmc.extramathexpression2[i]))
+                        mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None))
+                        mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None))
+                        LCD1visibilityComboBox =  QCheckBox()
+                        if aw.extraLCDvisibility1[i]:
+                            LCD1visibilityComboBox.setCheckState(Qt.Checked)
+                        else:
+                            LCD1visibilityComboBox.setCheckState(Qt.Unchecked)
+                        LCD1visibilityComboBox.stateChanged.connect(lambda x=0,lcd=1, ind=i: self.updateLCDvisibility(x,1,ind))
+                        LCD2visibilityComboBox =  QCheckBox()
+                        if aw.extraLCDvisibility2[i]:
+                            LCD2visibilityComboBox.setCheckState(Qt.Checked)
+                        else:
+                            LCD2visibilityComboBox.setCheckState(Qt.Unchecked)
+                        LCD2visibilityComboBox.stateChanged.connect(lambda x=0,lcd=2, ind=i: self.updateLCDvisibility(x,2,ind))
+                        Curve1visibilityComboBox =  QCheckBox()
+                        if aw.extraCurveVisibility1[i]:
+                            Curve1visibilityComboBox.setCheckState(Qt.Checked)
+                        else:
+                            Curve1visibilityComboBox.setCheckState(Qt.Unchecked)
+                        Curve1visibilityComboBox.stateChanged.connect(lambda x=0,curve=1, ind=i: self.updateCurveVisibility(bool(x),1,ind))
+                        Curve2visibilityComboBox =  QCheckBox()
+                        if aw.extraCurveVisibility2[i]:
+                            Curve2visibilityComboBox.setCheckState(Qt.Checked)
+                        else:
+                            Curve2visibilityComboBox.setCheckState(Qt.Unchecked)
+                        Curve2visibilityComboBox.stateChanged.connect(lambda x=0,curve=2, ind=i: self.updateCurveVisibility(bool(x),2,ind))
+                        #add widgets to the table
+                        self.devicetable.setCellWidget(i,0,typeComboBox)
+                        self.devicetable.setCellWidget(i,1,color1Button)
+                        self.devicetable.setCellWidget(i,2,color2Button)
+                        self.devicetable.setCellWidget(i,3,name1edit)
+                        self.devicetable.setCellWidget(i,4,name2edit)
+                        self.devicetable.setCellWidget(i,5,mexpr1edit)
+                        self.devicetable.setCellWidget(i,6,mexpr2edit)
+                        self.devicetable.setCellWidget(i,7,LCD1visibilityComboBox)
+                        self.devicetable.setCellWidget(i,8,LCD2visibilityComboBox)
+                        self.devicetable.setCellWidget(i,9,Curve1visibilityComboBox)
+                        self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)
+                    except Exception as e:
+#                        import traceback
+#                        traceback.print_exc(file=sys.stdout)
                         pass
-                    color1Button = QPushButton(QApplication.translate("Button","Select",None))
-                    color1Button.setFocusPolicy(Qt.NoFocus)
-                    color1Button.clicked.connect(lambda l = 1, c = i: self.setextracolor(1,c))
-                    color2Button = QPushButton(QApplication.translate("Button","Select",None))
-                    color2Button.setFocusPolicy(Qt.NoFocus)
-                    color2Button.clicked.connect(lambda l = 2, c = i: self.setextracolor(2,c))
-                    name1edit = QLineEdit(u(aw.qmc.extraname1[i]))
-                    name2edit = QLineEdit(u(aw.qmc.extraname2[i]))
-                    mexpr1edit = QLineEdit(u(aw.qmc.extramathexpression1[i]))
-                    mexpr2edit = QLineEdit(u(aw.qmc.extramathexpression2[i]))
-                    mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None))
-                    mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None))
-                    LCD1visibilityComboBox =  QCheckBox()
-                    if aw.extraLCDvisibility1[i]:
-                        LCD1visibilityComboBox.setCheckState(Qt.Checked)
-                    else:
-                        LCD1visibilityComboBox.setCheckState(Qt.Unchecked)
-                    LCD1visibilityComboBox.stateChanged.connect(lambda x=0,lcd=1, ind=i: self.updateLCDvisibility(x,1,ind))
-                    LCD2visibilityComboBox =  QCheckBox()
-                    if aw.extraLCDvisibility2[i]:
-                        LCD2visibilityComboBox.setCheckState(Qt.Checked)
-                    else:
-                        LCD2visibilityComboBox.setCheckState(Qt.Unchecked)
-                    LCD2visibilityComboBox.stateChanged.connect(lambda x=0,lcd=2, ind=i: self.updateLCDvisibility(x,2,ind))
-                    Curve1visibilityComboBox =  QCheckBox()
-                    if aw.extraCurveVisibility1[i]:
-                        Curve1visibilityComboBox.setCheckState(Qt.Checked)
-                    else:
-                        Curve1visibilityComboBox.setCheckState(Qt.Unchecked)
-                    Curve1visibilityComboBox.stateChanged.connect(lambda x=0,curve=1, ind=i: self.updateCurveVisibility(bool(x),1,ind))
-                    Curve2visibilityComboBox =  QCheckBox()
-                    if aw.extraCurveVisibility2[i]:
-                        Curve2visibilityComboBox.setCheckState(Qt.Checked)
-                    else:
-                        Curve2visibilityComboBox.setCheckState(Qt.Unchecked)
-                    Curve2visibilityComboBox.stateChanged.connect(lambda x=0,curve=2, ind=i: self.updateCurveVisibility(bool(x),2,ind))
-                    #add widgets to the table
-                    self.devicetable.setCellWidget(i,0,typeComboBox)
-                    self.devicetable.setCellWidget(i,1,color1Button)
-                    self.devicetable.setCellWidget(i,2,color2Button)
-                    self.devicetable.setCellWidget(i,3,name1edit)
-                    self.devicetable.setCellWidget(i,4,name2edit)
-                    self.devicetable.setCellWidget(i,5,mexpr1edit)
-                    self.devicetable.setCellWidget(i,6,mexpr2edit)
-                    self.devicetable.setCellWidget(i,7,LCD1visibilityComboBox)
-                    self.devicetable.setCellWidget(i,8,LCD2visibilityComboBox)
-                    self.devicetable.setCellWidget(i,9,Curve1visibilityComboBox)
-                    self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)
                 self.devicetable.resizeColumnsToContents()
                 header = self.devicetable.horizontalHeader()
                 header.setStretchLastSection(True)

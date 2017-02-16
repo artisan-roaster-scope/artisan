@@ -1,3 +1,15 @@
+artisan (1.0.0-6) precise; urgency=low
+  * new upstream release
+  * changes since 0.9.9:
+   - adds internal software PID
+   - external MODBUS PID control and faster MODBUS RTU
+   - adds support for Apollo DT301 and Extech 755
+   - adds Area under the Curve (AUC)
+   - adds additional translations
+   - adds RPi build
+   - bug fixes and stability improvements
+ --  <marko.luther@gmx.net>  Fri, 24 Feb 2017 19:32:14 +0200
+
 artisan (0.9.9-2) precise; urgency=low
   * new upstream release
   * changes since 0.9.8:
