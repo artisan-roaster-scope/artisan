@@ -25,7 +25,7 @@ o python-qrcode 5.1
 o win_inet_pton 1.0.1
 o python-qrcode 5.2.2
 o openpyxl 2.3.3
-o unidecode 0.04.20
+o unidecode 0.4.20
 o qrcode 5.3
 
 
@@ -47,7 +47,7 @@ Upgrade History:
  . qrcode 5.2.2 => 5.3
  . requests 2.9.1 => 2.13.0
  . setuptools 20.10.1 => 34.2.0
- . Unidecode 0.4.19 => 0.04.20
+ . Unidecode 0.4.19 => 0.4.20
  . yoctopuce 1.10.25913 => 1.10.26490
  . numpy 1.11.2 => 1.12.0
 - 2016-10-17
