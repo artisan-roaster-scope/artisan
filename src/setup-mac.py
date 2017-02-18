@@ -30,7 +30,7 @@ LICENSE = 'GNU General Public License (GPL)'
 try:
     QTDIR = os.environ["QT_PATH"] + r'/'
 except:
-    QTDIR = r'/Users/luther/Qt5.6.2/5.6/clang_64/' # qt5
+    QTDIR = r'/Users/luther/Qt5.8.0/5.8/clang_64/' # qt5
     #QTDIR = r'/Developer/Applications/Qt/' # qt4
 
 APP = ['artisan.py']
@@ -116,7 +116,7 @@ OPTIONS = {
     'argv_emulation': False, # this would confuses GUI processing
     'qt_plugins': [
                     'iconengines/libqsvgicon.dylib',
-                    'imageformats/libqdds.dylib',
+#                    'imageformats/libqdds.dylib', # not on Qt5.8.x
                     'imageformats/libqgif.dylib',
                     'imageformats/libqicns.dylib',                  
                     'imageformats/libqico.dylib',

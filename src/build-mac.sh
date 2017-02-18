@@ -5,7 +5,7 @@ export PYTHONPATH=$PYTHON/lib/python2.7/site-packages
 
 export PATH=$PYTHON/bin:$PYTHON:/lib:$PATH
 
-export QT_PATH=~/Qt5.7.1/5.7/clang_64
+export QT_PATH=~/Qt5.8.0/5.8/clang_64
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 

@@ -1417,9 +1417,13 @@ class tgraphcanvas(FigureCanvas):
         self.l_timeline = None
 
 #        self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
+        self.l_eventtype1dots = None
 #        self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
+        self.l_eventtype2dots = None
 #        self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2])
+        self.l_eventtype3dots = None
 #        self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3])
+        self.l_eventtype4dots = None
         
         self.l_annotations = []
 
@@ -8408,6 +8412,14 @@ class tgraphcanvas(FigureCanvas):
 
 # changed "NavigationToolbar" for "VMToolbar" in ApplicationWindow
 
+def my_get_icon(name):
+    basedir = os.path.join(mpl.rcParams['datapath'], 'images')
+    p = os.path.join(basedir, name.replace('.svg','.png'))
+    if os.path.exists(p):
+        return QIcon(p)
+    else:
+        None
+        
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent):
         self.toolitems = (
@@ -8433,7 +8445,10 @@ class VMToolbar(NavigationToolbar):
         if v >= 2:
             if len(self.actions()) > 0:
                 # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
-                a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
+                if svgsupport:
+                    a = QAction(self._icon("qt4_editor_options.svg"),'Customize',self)
+                else:
+                    a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
                 a.triggered.connect(self.edit_parameters)     
                 a.setToolTip('Edit axis, curve and image parameters')
                 self.insertAction(self.actions()[-1],a)
@@ -8444,6 +8459,11 @@ class VMToolbar(NavigationToolbar):
         self.draw_org = self.draw
         self.draw = self.draw_new
 
+
+    # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
+    if not svgsupport:
+        figureoptions.get_icon = my_get_icon    
+    
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def draw_new(self):
         self.draw_org()
@@ -8482,69 +8502,75 @@ class VMToolbar(NavigationToolbar):
             return QIcon(p)
         else:
             return QIcon(os.path.join(self.basedir, name))
-
+        
     def edit_parameters(self):
-        allaxes = self.canvas.figure.get_axes()
-        if len(allaxes) == 1:
-#            axes = allaxes[0]
-            pass
-        else:
-#            titles = []
-            if aw.qmc.flagstart:
-                # temporary set the axis to get proper menu items (same code as in redraw)
-                aw.qmc.ax.set_ylabel(aw.qmc.mode)
-                aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None)))
-                two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
-                if two_ax_mode and aw.qmc.delta_ax:
-                    aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
-#            for axes in allaxes:
-#                title = axes.get_title()
-#                ylabel = axes.get_ylabel()
-#                fmt = None
-#                if title:
-#                    fmt = u(QApplication.translate("Label","Curves",None))
-#                    if ylabel:
-#                        fmt += " (%(ylabel)s)"
-#                elif ylabel:
-#                    fmt = u(QApplication.translate("Label","Delta Curves",None)) + u(" (%(ylabel)s)")
-#                else:
-#                    fmt = "%(axes_repr)s"
-#                if fmt:
-#                    titles.append(fmt % dict(title = title,
-#                                     ylabel = ylabel,
-#                                     axes_repr = repr(axes)))
-#            if aw.qmc.flagstart:
-#                aw.qmc.ax.set_ylabel("")
-#                aw.qmc.ax.set_xlabel("")
-#                aw.qmc.ax.set_title("")
-#                if aw.qmc.delta_ax:
-#                    aw.qmc.delta_ax.set_ylabel("")
-#            item, ok = QInputDialog.getItem(self, 'Customize',
-#                                                  'Select axes:', titles,
-#                                                  0, False)
-#            if ok:
-#                axes = allaxes[titles.index(u(item))]
-#            else:
-#                return
-        axes = allaxes[0]
         try:
-            # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
-            steps_post_lines = []
-            for line in aw.qmc.ax.lines:
-                if line.get_drawstyle() == "steps-post":
-                    steps_post_lines.append(line)
-                    line.set_drawstyle("steps")
-            figureoptions.figure_edit(axes, self)
-            for line in steps_post_lines:
-                line.set_drawstyle("steps-post")
+            allaxes = self.canvas.figure.get_axes()
+            if len(allaxes) == 1:
+#                axes = allaxes[0]
+                pass
+            else:
+    #            titles = []
+                if aw.qmc.flagstart:
+                    # temporary set the axis to get proper menu items (same code as in redraw)
+                    aw.qmc.ax.set_ylabel(aw.qmc.mode)
+                    aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None)))
+                    two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
+                    if two_ax_mode and aw.qmc.delta_ax:
+                        aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
+    #            for axes in allaxes:
+    #                title = axes.get_title()
+    #                ylabel = axes.get_ylabel()
+    #                fmt = None
+    #                if title:
+    #                    fmt = u(QApplication.translate("Label","Curves",None))
+    #                    if ylabel:
+    #                        fmt += " (%(ylabel)s)"
+    #                elif ylabel:
+    #                    fmt = u(QApplication.translate("Label","Delta Curves",None)) + u(" (%(ylabel)s)")
+    #                else:
+    #                    fmt = "%(axes_repr)s"
+    #                if fmt:
+    #                    titles.append(fmt % dict(title = title,
+    #                                     ylabel = ylabel,
+    #                                     axes_repr = repr(axes)))
+    #            if aw.qmc.flagstart:
+    #                aw.qmc.ax.set_ylabel("")
+    #                aw.qmc.ax.set_xlabel("")
+    #                aw.qmc.ax.set_title("")
+    #                if aw.qmc.delta_ax:
+    #                    aw.qmc.delta_ax.set_ylabel("")
+    #            item, ok = QInputDialog.getItem(self, 'Customize',
+    #                                                  'Select axes:', titles,
+    #                                                  0, False)
+    #            if ok:
+    #                axes = allaxes[titles.index(u(item))]
+    #            else:
+    #                return
+            axes = allaxes[0]
+            try:
+                # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
+                steps_post_lines = []
+                for line in aw.qmc.ax.lines:
+                    if line.get_drawstyle() == "steps-post":
+                        steps_post_lines.append(line)
+                        line.set_drawstyle("steps")
+                figureoptions.figure_edit(axes, self)
+                for line in steps_post_lines:
+                    line.set_drawstyle("steps-post")
+            except Exception as e:
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
+                pass
+            aw.fetchCurveStyles()
+            # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
+            aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " edit_parameters() {0}").format(str(e)),exc_tb.tb_lineno)
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            pass
-        aw.fetchCurveStyles()
-        # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
-        aw.qmc.redraw(recomputeAllDeltas=False)
-
+    
 
 ########################################################################################
 ###     Sample thread
@@ -9020,7 +9046,7 @@ class SampleThread(QThread):
                                                 if len(temp)>1:
                                                     t_prev = temp[-2]
                                                 else:
-                                                    t_prev = none
+                                                    t_prev = None
                                                 # test if t is increasing or decreasing
                                                 if lv == None or t_prev == None or ((d > lv) and (t > t_prev)) or ((d < lv and t < t_prev)):
                                                     # establish this one
@@ -9346,7 +9372,7 @@ class ApplicationWindow(QMainWindow):
             v = int(mpl.__version__.split('.')[0])
         except:
             pass
-        if v >= 2:
+        if v >= 2 and pyqtversion >= 5:
             # on mpl >= v2 we assume hidpi support and consider the pixel ratio
             self.qmc.fig.set_dpi(self.defaultdpi*self.devicePixelRatio())
         else:
@@ -11861,7 +11887,7 @@ class ApplicationWindow(QMainWindow):
                 v = int(mpl.__version__.split('.')[0])
             except:
                 pass
-            if v >= 2:
+            if v >= 2 and pyqtversion >= 5:
                 # on mpl >= v2 we assume hidpi support and consider the pixel ratio
                 self.qmc.fig.set_dpi(dpi*aw.devicePixelRatio())
             else:
@@ -19276,7 +19302,7 @@ class ApplicationWindow(QMainWindow):
         QApplication.instance().aboutQt()
         
     def helpHelp(self):
-        QDesktopServices.openUrl(QUrl("http://coffeetroupe.com/artisandocs/", QUrl.TolerantMode))
+        QDesktopServices.openUrl(QUrl("https://artisan-roasterscope.blogspot.com", QUrl.TolerantMode))
 
     def applicationscreenshot(self):
         if pyqtversion < 5:

@@ -1,31 +1,32 @@
 Current Versions:
 
-o Python 2.7.12
+o Python 2.7.13
 o pyserial 2.7 (3.x not supported under Windows XP)
 o QT 4.8.7
 o PyQt 4.11.4
-o numpy 1.10.4
-o scipy 0.15.1
-o matplotlib 1.4.3
+o numpy 1.12.0
+o scipy 0.16.1 (not updated to 0.18.1 as this is not available as binary build without Intels MKL lib, which opens a warning dialog in py2exe builds)
+o matplotlib 2.0.0
 o pyparsing 2.0.1
 o dateutil 2.2
-o pytz 2013.9
+o pytz 2016.10
 o six 1.5.2
 o minimalmodbus 0.6
 o Phidgets Python 2.1.8
-o py2exe 0.6.9
+o py2exe 0.9.2.2
 o NSIS 2.46
 o pymodbus 1.3.0
-o yoctopuce 1.10.25534
-o requests 2.9.1
+o yoctopuce 1.10.26490
+o requests 2.13.0
 o bottle 0.13 trunk
-o gevent 1.2.0
+o gevent 1.2.1
 o geventwebsocket 0.9.5
 o python-qrcode 5.1
 o win_inet_pton 1.0.1
 o python-qrcode 5.2.2
 o openpyxl 2.3.3
-o unidecode 0.4.19
+o unidecode 0.04.20
+o qrcode 5.3
 
 
 CHECK FOR UPDATES
@@ -35,7 +36,20 @@ CHECK FOR UPDATES
 
 Upgrade History:
 
-
+- 2017-02-17
+ . Python 2.7.12 => 2.7.13
+ . gevent 1.1.2 => 1.2.1
+ . greenlet 0.4.10 => 0.4.12
+ . matplotlib 1.5.2 => 2.0.0
+ . py2exe 0.6.9 => 0.9.2.2
+ . PyAudio 0.2.9 => 0.2.10
+ . pytz 2016.7 => 2016.10
+ . qrcode 5.2.2 => 5.3
+ . requests 2.9.1 => 2.13.0
+ . setuptools 20.10.1 => 34.2.0
+ . Unidecode 0.4.19 => 0.04.20
+ . yoctopuce 1.10.25913 => 1.10.26490
+ . numpy 1.11.2 => 1.12.0
 - 2016-10-17
  . Python 2.7.11 => 2.7.12
  . matplotlib 1.5.1 => 1.5.3
