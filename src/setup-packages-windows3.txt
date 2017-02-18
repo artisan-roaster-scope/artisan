@@ -181,6 +181,9 @@ download gevent-1.1b3-cp34-none-win32.whl
 
 # py -3 -m pip install gevent-1.1b3-cp34-none-win32.whl 
 
+the file _util_py2.py needs to be deleted from the site-packages/gevent folder
+to make py2exe happy (on Python3)
+
 16) geventwebsocket 0.9.5
 
 https://pypi.python.org/pypi/gevent-websocket/

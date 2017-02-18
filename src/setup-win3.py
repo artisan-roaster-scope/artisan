@@ -27,7 +27,8 @@ INCLUDES = [
 #            "urlparse",
             ]
 
-EXCLUDES = ['_tkagg',
+EXCLUDES = ['six.moves.urllib.parse',
+            '_tkagg',
             '_ps',
             '_fltkagg',
             'Tkinter',
@@ -36,6 +37,10 @@ EXCLUDES = ['_tkagg',
             '_gtk',
             'gtkcairo',
             'pydoc',
+            'doctest',
+            'pdb',
+            'pyreadline',
+            'optparse',
             'sqlite3',
             'bsddb',
             'curses',
@@ -44,6 +49,9 @@ EXCLUDES = ['_tkagg',
             '_gtagg',
             '_cocoaagg',
             '_wx',
+            # the following two lines avoid a infinite loop in py2exe 0.9.2.2
+            'six.moves',
+            'six.moves.urllib',
             ]
 
 # current version of Artisan
