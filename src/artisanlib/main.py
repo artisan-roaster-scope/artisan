@@ -1989,11 +1989,11 @@ class tgraphcanvas(FigureCanvas):
                         lcdformat = "%.1f"
                     else:
                         lcdformat = "%.0f"
-                    if -100 < self.temp1[-1] < 1000:
+                    if len(self.temp1) and -100 < self.temp1[-1] < 1000:
                         aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
                     else:
                         aw.lcd2.display("--")
-                    if -100 < self.temp2[-1] < 1000:
+                    if len(self.temp2) and -100 < self.temp2[-1] < 1000:
                         aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
                     else:
                         aw.lcd3.display("--")
@@ -6757,9 +6757,11 @@ class tgraphcanvas(FigureCanvas):
     def drawmanual(self,et,bt,tx):
         self.timex.append(tx)
         self.temp1.append(et)
-        self.l_temp1.set_data(self.timex, self.temp1)
+        if aw.qmc.ETcurve:
+            self.l_temp1.set_data(self.timex, self.temp1)
         self.temp2.append(bt)
-        self.l_temp2.set_data(self.timex, self.temp2)
+        if aw.qmc.BTcurve:
+            self.l_temp2.set_data(self.timex, self.temp2)
 
     def movebackground(self,direction,step):
         lt = len(self.timeB)
