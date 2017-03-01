@@ -41624,13 +41624,13 @@ class FujiPID(object):
         if aw.qmc.background:
             # Follow Background mode
             if aw.qmc.swapETBT: # we observe the BT
-                res = aw.qmc.backgroundSmoothedBTat(tx + self.svLookahead) # smoothed and approximated background
+                res = aw.qmc.backgroundSmoothedBTat(tx + self.lookahead) # smoothed and approximated background
                 if res == -1:
                     return None # no background value for that time point
                 else:
                     return res
             else: # we observe the ET
-                res = aw.qmc.backgroundSmoothedETat(tx + self.svLookahead) # smoothed and approximated background
+                res = aw.qmc.backgroundSmoothedETat(tx + self.lookahead) # smoothed and approximated background
                 if res == -1:
                     return None # no background value for that time point
                 else:
