@@ -11812,6 +11812,8 @@ class ApplicationWindow(QMainWindow):
                 action = (action+2 if action > 1 else action)
                 if action > 5:
                     action = action + 1 # skip the 6:IO Command
+                    if action > 10:
+                        action = action + 1 # skip the 11 p-i-d action
                 value = int(round((self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]))
                 if action in [8,9]:
                     cmd = value
@@ -11920,7 +11922,7 @@ class ApplicationWindow(QMainWindow):
             pass
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
-    #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d
+    #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -12145,6 +12147,44 @@ class ApplicationWindow(QMainWindow):
                             else:
                                 aw.pidcontrol.confPID(kp,ki,kd)                    
                                 #aw.pidcontrol.setPID(kp,ki,kd) # we don't set the new values in the dialog
+                elif action == 12: # Fuji Command (currently only "write(<unitId>,<register>,<value>)" is supproted
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        followupCmd = 0 # contains the required sleep time
+                        for c in cmds:
+                            cs = c.strip().replace("_",str(aw.modbus.lastReadResult)) # the last read value can be accessed via the "_" symbol
+                            if followupCmd:
+                                try:
+                                    if followupCmd == 0.08:
+                                        aw.modbus.sleepBetween(write=True)
+                                    else:
+                                        aw.modbus.sleepBetween(write=False)
+                                except:
+                                    pass
+                            if cs.startswith('write'):
+                                try:
+                                    cmds = eval(cs[len('write'):])
+                                    if isinstance(cmds,tuple):
+                                        if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                            # cmd has format "write(s,r,v)"
+                                            command = aw.fujipid.message2send(cmds[0],6,cmds[1],cmds[2])
+                                            r = aw.ser.sendFUJIcommand(command,8)
+                                            followupCmd = 0.08
+                                        else:
+                                        # cmd has format "write([s,r,v],..,[s,r,v])"
+                                            for cmd in cmds:
+                                                if followupCmd:
+                                                    libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
+                                                command = aw.fujipid.message2send(cmd[0],6,cmd[1],cmd[2])
+                                                r = aw.ser.sendFUJIcommand(command,8)
+                                                followupCmd = 0.08
+                                    else:
+                                        # cmd has format "write([s,r,v])"
+                                        command = aw.fujipid.message2send(cmds[0],6,cmds[1],cmds[2])
+                                        r = aw.ser.sendFUJIcommand(command,8)
+                                        followupCmd = 0.08
+                                except Exception:
+                                    pass
             except Exception:
                 pass
                 
@@ -26274,7 +26314,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Call Program",None),
                        QApplication.translate("ComboBox", "Hottop Heater",None),
                        QApplication.translate("ComboBox", "Hottop Fan",None),
-                       QApplication.translate("ComboBox", "Hottop Command",None)]
+                       QApplication.translate("ComboBox", "Hottop Command",None),
+                       QApplication.translate("ComboBox", "Fuji Command",None)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -26493,7 +26534,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Hottop Heater",None),
                        QApplication.translate("ComboBox", "Hottop Fan",None),
                        QApplication.translate("ComboBox", "Hottop Command",None),
-                       QApplication.translate("ComboBox", "p-i-d",None)]
+                       QApplication.translate("ComboBox", "p-i-d",None),
+                       QApplication.translate("ComboBox", "Fuji Command",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -27228,7 +27270,8 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox", "Hottop Heater",None),
                                      QApplication.translate("ComboBox", "Hottop Fan",None),
                                      QApplication.translate("ComboBox", "Hottop Command",None),
-                                     QApplication.translate("ComboBox", "p-i-d",None)])
+                                     QApplication.translate("ComboBox", "p-i-d",None),
+                                     QApplication.translate("ComboBox", "Fuji Command",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1
@@ -30263,7 +30306,7 @@ class serialport(object):
                 p = subprocess.Popen(aw.ser.externalprogram.encode(locale.getpreferredencoding()),env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo,shell=True)
             else:
                 p = subprocess.Popen(aw.ser.externalprogram,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
-            output = p.communicate()[0]
+            output = p.communicate()[0].decode('UTF-8')
             
             tx = aw.qmc.timeclock.elapsed()/1000.
             if "," in output:
@@ -41791,26 +41834,8 @@ class FujiPID(object):
     def setONOFFstandby(self,flag):
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
-        #Fuji PXG 
+        #Fuji PXG
         if aw.ser.controlETpid[0] == 0:
-            if aw.ser.useModbusPort:
-                reg = aw.modbus.address2register(aw.fujipid.PXR["runstandby"][1],6)
-                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
-                r = "00000000"
-            else:
-                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["runstandby"][1],flag)
-                #TX and RX
-                r = aw.ser.sendFUJIcommand(command,8)
-            if r == command:
-                if flag == 1:
-                    aw.fujipid.PXR["runstandby"][0] = 1
-                elif flag == 0:
-                    aw.fujipid.PXR["runstandby"][0] = 0
-            else:
-                mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
-                aw.qmc.adderror(mssg)
-        #Fuji PXR
-        elif aw.ser.controlETpid[0] == 1:
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4["runstandby"][1],6)
                 aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
@@ -41822,8 +41847,26 @@ class FujiPID(object):
             if r == command:
                 if flag == 1:
                     aw.fujipid.PXG4["runstandby"][0] = 1
-                elif r == command and flag == 0:
+                elif flag == 0:
                     aw.fujipid.PXG4["runstandby"][0] = 0
+            else:
+                mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
+                aw.qmc.adderror(mssg)
+        #Fuji PXR
+        elif aw.ser.controlETpid[0] == 1:
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXR["runstandby"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,flag)
+                r = "00000000"
+            else:
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["runstandby"][1],flag)
+                #TX and RX
+                r = aw.ser.sendFUJIcommand(command,8)
+            if r == command:
+                if flag == 1:
+                    aw.fujipid.PXR["runstandby"][0] = 1
+                elif r == command and flag == 0:
+                    aw.fujipid.PXR["runstandby"][0] = 0
             else:
                 mssg = QApplication.translate("Error Message","Exception:",None) + " setONOFFstandby()"
                 aw.qmc.adderror(mssg)
