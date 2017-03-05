@@ -50,7 +50,7 @@ import codecs
 import numpy
 import requests
 import subprocess
-
+import shlex
 
 if sys.version < '3':
     import urlparse, urllib
@@ -12222,16 +12222,16 @@ class ApplicationWindow(QMainWindow):
                 qd = QDir(u(cmd))
                 current = QDir.current()
                 QDir.setCurrent(u(aw.getAppPath()))
-                if platf == 'Windows' and sys.version < '3':
-                    import locale
-                    prg_file = u(qd.absolutePath()).encode(locale.getpreferredencoding())
-                else:
-                    prg_file = u(qd.absolutePath())
                 my_env = self.calc_env()
                 if platf == 'Windows':
+                    if sys.version < '3':
+                        import locale
+                        prg_file = u(qd.absolutePath()).encode(locale.getpreferredencoding())
+                    else:
+                        prg_file = u(qd.absolutePath())
                     subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False,env=my_env)
                 else:
-                    subprocess.Popen(cmd_str,shell=True,env=my_env)
+                    subprocess.Popen(os.path.expanduser(cmd_str),shell=True,env=my_env)
                 QDir.setCurrent(current.absolutePath())
                 # alternative approach, that seems to fail on some Mac OS X versions:
                 #QProcess.startDetached(prg_file)
@@ -30301,12 +30301,16 @@ class serialport(object):
                 startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
                 startupinfo.wShowWindow = subprocess.SW_HIDE
             
-            if platf == 'Windows' and sys.version < '3':
-                import locale
-                p = subprocess.Popen(aw.ser.externalprogram.encode(locale.getpreferredencoding()),env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo,shell=True)
+            cmd_str = os.path.expanduser(aw.ser.externalprogram)
+            if platf == 'Windows':
+                if sys.version < '3':
+                    import locale
+                    cmd_str = cmd_str.encode(locale.getpreferredencoding())
+                p = subprocess.Popen(cmd_str,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo,shell=True)
             else:
-                p = subprocess.Popen(aw.ser.externalprogram,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
-            output = p.communicate()[0].decode('UTF-8')
+#                p = subprocess.Popen(shlex.split(cmd_str),env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
+                p = subprocess.Popen(cmd_str,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
+            output = p.communicate()[0]
             
             tx = aw.qmc.timeclock.elapsed()/1000.
             if "," in output:
