@@ -27317,7 +27317,11 @@ class EventsDlg(ArtisanDialog):
 
     def setlabeleventbutton(self,_,i):
         labeledit = self.eventbuttontable.cellWidget(i,0)
-        aw.extraeventslabels[i] = u(labeledit.text())
+        label = u(labeledit.text())
+        if "\\n" in label:              #make multiple line text if "\n" found in label string
+            parts = label.split("\\n")
+            label = chr(10).join(parts)
+        aw.extraeventslabels[i] = label
         aw.settooltip()
 
     def setdescriptioneventbutton(self,_,i):
@@ -27675,7 +27679,6 @@ class EventsDlg(ArtisanDialog):
                 aw.qmc.autoChargeFlag = self.autoCharge.isChecked()
                 aw.qmc.autoDropFlag = self.autoDrop.isChecked()
                 aw.qmc.markTPflag = self.markTP.isChecked()
-                self.savetableextraeventbutton()
                 #save quantifiers
                 aw.updateSlidersProperties() # set visibility and event names on slider widgets
                 # we save the current button and slider definitions to palette 0
@@ -40517,7 +40520,7 @@ class PXG4pidDlgControl(ArtisanDialog):
 
     #writes new value on sv(i)
     def setsv(self,i):
-        #first get the new sv value from the correspondig edit ine
+        #first get the new sv value from the correspondig edit line
         if i == 1:
             if self.sv1edit.text() != "":
                 newSVvalue = int(float(str(self.sv1edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
@@ -40737,25 +40740,25 @@ class PXG4pidDlgControl(ArtisanDialog):
             self.status.showMessage(msg,1000)
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4[pkey][1],3)
-                p = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10
+                p = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
             else:
                 commandp = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[pkey][1],1)
-                p = aw.fujipid.readoneword(commandp)/10
+                p = aw.fujipid.readoneword(commandp)/10.
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4[ikey][1],3)
-                i = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10
+                i = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
             else:
                 commandi = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[ikey][1],1)
-                i = aw.fujipid.readoneword(commandi)/10
+                i = aw.fujipid.readoneword(commandi)/10.
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXG4[dkey][1],3)
-                dd = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10
+                dd = aw.modbus.readSingleRegister(aw.ser.controlETpid[1],reg,3)/10.
             else:
                 commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[dkey][1],1)
-                dd = aw.fujipid.readoneword(commandd)/10
-            p = int(p)
-            i = int(i)
-            dd = int(dd)
+                dd = aw.fujipid.readoneword(commandd)/10.
+            p = float(p)
+            i = float(i)
+            dd = float(dd)
             if p != -1 and i != -1 and dd != -1:
                 aw.fujipid.PXG4[pkey][0] = p
                 aw.fujipid.PXG4[ikey][0] = i
@@ -41261,27 +41264,27 @@ class PXG4pidDlgControl(ArtisanDialog):
         aw.fujipid.PXG4["sv6"][0] = float(self.sv6edit.text())
         aw.fujipid.PXG4["sv7"][0] = float(self.sv7edit.text())
         # store set values
-        aw.fujipid.PXG4["p1"][0] = int(self.p1edit.text())
-        aw.fujipid.PXG4["p2"][0] = int(self.p2edit.text())
-        aw.fujipid.PXG4["p3"][0] = int(self.p3edit.text())
-        aw.fujipid.PXG4["p4"][0] = int(self.p4edit.text())
-        aw.fujipid.PXG4["p5"][0] = int(self.p5edit.text())
-        aw.fujipid.PXG4["p6"][0] = int(self.p6edit.text())
-        aw.fujipid.PXG4["p7"][0] = int(self.p7edit.text())
-        aw.fujipid.PXG4["i1"][0] = int(self.i1edit.text())
-        aw.fujipid.PXG4["i2"][0] = int(self.i2edit.text())
-        aw.fujipid.PXG4["i3"][0] = int(self.i3edit.text())
-        aw.fujipid.PXG4["i4"][0] = int(self.i4edit.text())
-        aw.fujipid.PXG4["i5"][0] = int(self.i5edit.text())
-        aw.fujipid.PXG4["i6"][0] = int(self.i6edit.text())
-        aw.fujipid.PXG4["i7"][0] = int(self.i7edit.text())
-        aw.fujipid.PXG4["d1"][0] = int(self.d1edit.text())
-        aw.fujipid.PXG4["d2"][0] = int(self.d2edit.text())
-        aw.fujipid.PXG4["d3"][0] = int(self.d3edit.text())
-        aw.fujipid.PXG4["d4"][0] = int(self.d4edit.text())
-        aw.fujipid.PXG4["d5"][0] = int(self.d5edit.text())
-        aw.fujipid.PXG4["d6"][0] = int(self.d6edit.text())
-        aw.fujipid.PXG4["d7"][0] = int(self.d7edit.text())
+        aw.fujipid.PXG4["p1"][0] = float(self.p1edit.text())
+        aw.fujipid.PXG4["p2"][0] = float(self.p2edit.text())
+        aw.fujipid.PXG4["p3"][0] = float(self.p3edit.text())
+        aw.fujipid.PXG4["p4"][0] = float(self.p4edit.text())
+        aw.fujipid.PXG4["p5"][0] = float(self.p5edit.text())
+        aw.fujipid.PXG4["p6"][0] = float(self.p6edit.text())
+        aw.fujipid.PXG4["p7"][0] = float(self.p7edit.text())
+        aw.fujipid.PXG4["i1"][0] = float(self.i1edit.text())
+        aw.fujipid.PXG4["i2"][0] = float(self.i2edit.text())
+        aw.fujipid.PXG4["i3"][0] = float(self.i3edit.text())
+        aw.fujipid.PXG4["i4"][0] = float(self.i4edit.text())
+        aw.fujipid.PXG4["i5"][0] = float(self.i5edit.text())
+        aw.fujipid.PXG4["i6"][0] = float(self.i6edit.text())
+        aw.fujipid.PXG4["i7"][0] = float(self.i7edit.text())
+        aw.fujipid.PXG4["d1"][0] = float(self.d1edit.text())
+        aw.fujipid.PXG4["d2"][0] = float(self.d2edit.text())
+        aw.fujipid.PXG4["d3"][0] = float(self.d3edit.text())
+        aw.fujipid.PXG4["d4"][0] = float(self.d4edit.text())
+        aw.fujipid.PXG4["d5"][0] = float(self.d5edit.text())
+        aw.fujipid.PXG4["d6"][0] = float(self.d6edit.text())
+        aw.fujipid.PXG4["d7"][0] = float(self.d7edit.text())
         # store segment table
         for i in range(16):
             svkey = "segment" + str(i+1) + "sv"
