@@ -30310,7 +30310,7 @@ class serialport(object):
             else:
 #                p = subprocess.Popen(shlex.split(cmd_str),env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
                 p = subprocess.Popen(cmd_str,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
-            output = p.communicate()[0]
+            output = p.communicate()[0].decode('UTF-8')
             
             tx = aw.qmc.timeclock.elapsed()/1000.
             if "," in output:
