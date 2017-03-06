@@ -30301,15 +30301,14 @@ class serialport(object):
                 startupinfo.dwFlags = subprocess.CREATE_NEW_CONSOLE | subprocess.STARTF_USESHOWWINDOW
                 startupinfo.wShowWindow = subprocess.SW_HIDE
             
-            cmd_str = os.path.expanduser(aw.ser.externalprogram)
             if platf == 'Windows':
+                cmd_str = os.path.expanduser(aw.ser.externalprogram)
                 if sys.version < '3':
                     import locale
                     cmd_str = cmd_str.encode(locale.getpreferredencoding())
                 p = subprocess.Popen(cmd_str,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo,shell=True)
             else:
-#                p = subprocess.Popen(shlex.split(cmd_str),env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
-                p = subprocess.Popen(cmd_str,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
+                p = subprocess.Popen([os.path.expanduser(c) for c in shlex.split(aw.ser.externalprogram)],env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
             output = p.communicate()[0].decode('UTF-8')
             
             tx = aw.qmc.timeclock.elapsed()/1000.
@@ -35557,7 +35556,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
     def loadprogramname(self):
         fileName = aw.ArtisanOpenFileDialog()
         if fileName:
-            self.programedit.setText(fileName)
+            if ' ' in fileName:
+                self.programedit.setText('"' + fileName + '"')
+            else:
+            	self.programedit.setText(fileName)
             
     def loadoutprogramname(self):
         fileName = aw.ArtisanOpenFileDialog()
