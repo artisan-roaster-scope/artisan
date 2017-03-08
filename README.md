@@ -40,7 +40,7 @@ Features
   * VOLTCRAFT K201, K202, K204, 300K, 302KJ
   * EXTECH 755, 421509
   * Apollo DT301
-  * [Arduino TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) with PID
+  * [Arduino TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) with PID ([https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan/trunk/src/aArtisan/commands.txt](serial protocol))
   * TE VA18B
   * HHM28 multimeter
   * Amprobe TMD-56 (non-wireless)

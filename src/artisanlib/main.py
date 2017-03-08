@@ -11644,6 +11644,7 @@ class ApplicationWindow(QMainWindow):
                         self.TP2DRYlabel.setText("")
                 else:
                     # before DRY
+                    dryexpectedtime = None
                     self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
                     if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         # display expected time to reach DRY as defined in the background profile or the phases dialog
@@ -11659,7 +11660,13 @@ class ApplicationWindow(QMainWindow):
                             self.DRYlcd.display(u("--:--"))
                     else:
                         self.DRYlcd.display(u("--:--"))
-                    self.TP2DRYlabel.setText("")
+                    
+                    # TP2DRY (display estimated time between TP and DRY)
+                    if dryexpectedtime and window_width > 950 and self.qmc.TPalarmtimeindex:
+                        t = tx - self.qmc.timex[self.qmc.TPalarmtimeindex] + dryexpectedtime # time after TP plus expected-time-to-DRY = total time expected for 1nd phase
+                        self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                    else:
+                        self.TP2DRYlabel.setText("")
                 # FCs phase LCD  
                 if self.qmc.timeindex[2]:
                     # after FCs
@@ -11695,6 +11702,7 @@ class ApplicationWindow(QMainWindow):
                         self.DRY2FCslabel.setText("")
                 else:
                     # before FCs
+                    fcsexpectedtime = None
                     self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
                     if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
@@ -11712,7 +11720,12 @@ class ApplicationWindow(QMainWindow):
                             self.FCslcd.display(u("--:--"))
                     else:
                         self.FCslcd.display(u("--:--"))
-                    self.DRY2FCslabel.setText("")
+                    # DRY2FCs (display estimated time between DRY and FCs)
+                    if fcsexpectedtime and window_width > 950 and self.qmc.timeindex[1]:
+                        t = tx - self.qmc.timex[self.qmc.timeindex[1]] + fcsexpectedtime # time after DRY plus expected-time-to-FCs = total time expected for 2nd phase
+                        self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                    else:
+                        self.DRY2FCslabel.setText("")
             else:
                 if aw.qmc.phasesLCDmode == 0: # time mode
                     self.TPlcd.display("--:--")                
@@ -12168,7 +12181,7 @@ class ApplicationWindow(QMainWindow):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
                                             # cmd has format "write(s,r,v)"
                                             command = aw.fujipid.message2send(cmds[0],6,cmds[1],cmds[2])
-                                            r = aw.ser.sendFUJIcommand(command,8)
+                                            aw.ser.sendFUJIcommand(command,8)
                                             followupCmd = 0.08
                                         else:
                                         # cmd has format "write([s,r,v],..,[s,r,v])"
@@ -12176,12 +12189,12 @@ class ApplicationWindow(QMainWindow):
                                                 if followupCmd:
                                                     libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
                                                 command = aw.fujipid.message2send(cmd[0],6,cmd[1],cmd[2])
-                                                r = aw.ser.sendFUJIcommand(command,8)
+                                                aw.ser.sendFUJIcommand(command,8)
                                                 followupCmd = 0.08
                                     else:
                                         # cmd has format "write([s,r,v])"
                                         command = aw.fujipid.message2send(cmds[0],6,cmds[1],cmds[2])
-                                        r = aw.ser.sendFUJIcommand(command,8)
+                                        aw.ser.sendFUJIcommand(command,8)
                                         followupCmd = 0.08
                                 except Exception:
                                     pass
@@ -35559,7 +35572,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             if ' ' in fileName:
                 self.programedit.setText('"' + fileName + '"')
             else:
-            	self.programedit.setText(fileName)
+                self.programedit.setText(fileName)
             
     def loadoutprogramname(self):
         fileName = aw.ArtisanOpenFileDialog()
