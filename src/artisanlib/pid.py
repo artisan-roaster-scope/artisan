@@ -130,7 +130,7 @@ class PID(object):
                             D = self.Kd * derr
                         else:
                             D = - self.Kd * dinput
-                        
+                            
                         output = P + self.Iterm + D
                         
                         # clamp output to [outMin,outMax] and avoid integral windup
@@ -197,3 +197,6 @@ class PID(object):
         
     def setControl(self,f):
         self.control = f
+        
+    def getDuty(self):
+        return self.lastOutput

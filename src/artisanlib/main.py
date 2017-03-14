@@ -9063,7 +9063,16 @@ class SampleThread(QThread):
                         
                     #update SV on Arduino/TC4, Hottop, or MODBUS if in Ramp/Soak or Background Follow mode and PID is active                    
                     if aw.qmc.flagon: # only during sampling
-                        if aw.qmc.device in [19,29,53] and aw.pidcontrol.pidActive and aw.pidcontrol.svMode in [1,2]:
+                        #update SV on FujiPIDs
+                        if aw.qmc.device == 0 and aw.fujipid.followBackground:
+                            # calculate actual SV
+                            sv = aw.fujipid.calcSV(tx)
+                            # update SV (if needed)
+                            if sv != None and sv != aw.fujipid.sv:
+                                sv = max(0,sv) # we don't send SV < 0
+                                aw.qmc.temporarysetsv = sv
+                                # aw.fujipid.setsv(sv,silent=True) # this is called in updategraphics() within the GUI thread to move the sliders                                
+                        elif aw.pidcontrol.pidActive and aw.pidcontrol.svMode in [1,2]:
                             # calculate actual SV
                             sv = aw.pidcontrol.calcSV(tx)
                             # update SV (if needed)
@@ -9071,15 +9080,6 @@ class SampleThread(QThread):
                                 sv = max(0,sv) # we don't send SV < 0
                                 aw.qmc.temporarysetsv = sv
                                 # aw.pidcontrol.setSV(sv,init=False) # this is called in () within the GUI thread to move the sliders
-                        #update SV on FujiPIDs
-                        elif aw.qmc.device == 0 and aw.fujipid.followBackground:
-                            # calculate actual SV
-                            sv = aw.fujipid.calcSV(tx)
-                            # update SV (if needed)
-                            if sv != None and sv != aw.fujipid.sv:
-                                sv = max(0,sv) # we don't send SV < 0
-                                aw.qmc.temporarysetsv = sv
-                                # aw.fujipid.setsv(sv,silent=True) # this is called in updategraphics() within the GUI thread to move the sliders
                                 
                     # update AUC running value
                     if aw.qmc.flagstart: # only during recording
@@ -21642,7 +21642,7 @@ class HUDDlg(ArtisanDialog):
         TabWidget.addTab(C0Widget,QApplication.translate("Tab","Graph",None))
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","HUD",None))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Filters",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         tab2Layout.setContentsMargins(10,0,10,0)
@@ -30199,13 +30199,17 @@ class serialport(object):
                 (aw.qmc.device == 53) or \
                 (aw.qmc.device == 29 and not aw.pidcontrol.externalPIDControl()):
                 # TC4, HOTTOP or MODBUS with Artisan Software PID
-            return aw.qmc.timeclock.elapsed()/1000., max(-99,aw.qmc.pid.lastOutput), aw.qmc.pid.target
+            return aw.qmc.timeclock.elapsed()/1000., min(100,max(-100,aw.qmc.pid.getDuty())), aw.qmc.pid.target
         else:
             if aw.pidcontrol.sv != None:
                 sv = aw.pidcontrol.sv
             else:
                 sv = -1
-            return aw.qmc.timeclock.elapsed()/1000.,-1,sv
+            if aw.qmc.device == 29: # external MODBUS PID
+                duty = -1
+            else:
+                duty = min(100,max(-100,aw.qmc.pid.getDuty()))
+            return aw.qmc.timeclock.elapsed()/1000.,duty,sv
             
 
     def DTAtemperature(self):
@@ -31374,12 +31378,10 @@ class serialport(object):
                     if retry:
                         return self.CENTER303temperature(retry=retry-1)
                     else:
-                        _, _, exc_tb = sys.exc_info()
                         nbytes = len(r)
                         error = QApplication.translate("Error Message","CENTER303temperature(): {0} bytes received but 8 needed",None).format(nbytes)
                         timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-                        _, _, exc_tb = sys.exc_info()
-                        aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+                        aw.qmc.adderror(timez + " " + error)
                         return -1,-1
             else:
                 return -1,-1 
