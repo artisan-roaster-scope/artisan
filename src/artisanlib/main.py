@@ -1338,8 +1338,14 @@ class tgraphcanvas(FigureCanvas):
         self.ylimit_min = 0
         self.zlimit = 60
         self.zlimit_min = 0
-        self.RoRlimitF = 170
-        self.RoRlimitC = 75
+        # RoR display limits
+        # user configurable RoR limits (only applied if flag is True; applied before TP during recording as well as full redraw)
+        self.RoRlimitFlag = True
+        self.RoRlimit = 95
+        self.RoRlimitm = -95
+        # system fixed RoR limits (only applied if flag is True; usually higher than the user configurable once and always applied)
+        self.maxRoRlimit = 170
+        # axis limits
         self.endofx = 900 # 15min*60=900
         self.startofx = 0
         self.resetmaxtime = 900  #time when pressing reset
@@ -2310,11 +2316,10 @@ class tgraphcanvas(FigureCanvas):
                 btime = self.timeB[self.timeindexB[1]]
             elif self.timeindexB[0] != -1 and self.timeindex[0] != -1: # CHARGE
                 ptime = self.timex[self.timeindex[0]]
+                btime = self.timeB[self.timeindexB[0]]              
+            elif self.timeindexB[0] != -1: # if no foreground profile, align 0:00 to the CHARGE event of the background profile
+                ptime = 0
                 btime = self.timeB[self.timeindexB[0]]
-# this one would align according to the background profiles CHARGE even if there is no foreground profile loaded                
-#            elif self.timeindexB[0] != -1:
-#                ptime = 0
-#                btime = self.timeB[self.timeindexB[0]]
             if ptime != None and btime != None:
                 difference = ptime - btime
                 if difference > 0:
@@ -3765,6 +3770,43 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),exc_tb.tb_lineno)
 
+
+    # computes the RoR deltas and returns the smoothed versions for both temperature channels
+    def recomputeDeltas(self,timex,timeindex,t1,t2):
+        tx = numpy.array(timex)
+        if timeindex[0] > -1:
+            roast_start_idx = timeindex[0]
+        else:
+            roast_start_idx = 0
+        if timeindex[6] > 0:
+            roast_end_idx = timeindex[6]
+        else:
+            roast_end_idx = len(tx)
+        tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
+        with numpy.errstate(divide='ignore'):
+            nt1 = numpy.array(t1[roast_start_idx:roast_end_idx])
+            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+        with numpy.errstate(divide='ignore'):
+            nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
+            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+        lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
+        # make lists equal in length
+        if lt > ld1:
+            z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+        if lt > ld2:
+            z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
+        self.delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
+        self.delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
+        # add None for parts before and after CHARGE/DROP
+        delta1 = numpy.concatenate(([None]*(roast_start_idx),self.delta1,[None]*(len(tx)-roast_end_idx)))
+        delta2 = numpy.concatenate(([None]*(roast_start_idx),self.delta2,[None]*(len(tx)-roast_end_idx)))
+        # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
+        if aw.qmc.RoRlimitFlag:
+            # remove values beyond the RoRlimit
+            delta1 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
+            delta2 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
+        return delta1, delta2
+
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
     def redraw(self, recomputeAllDeltas=True, smooth=False,sampling=False):
@@ -4077,61 +4119,15 @@ class tgraphcanvas(FigureCanvas):
                                                 sketch_params=None,path_effects=[],
                                                 alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None)))
     
-                    #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
+                    #populate background delta ET (self.delta1B) and delta BT (self.delta2B)                    
                     if self.DeltaETBflag or self.DeltaBTBflag:
                         if recomputeAllDeltas:
-                            tx = numpy.array(self.timeB)
-                            if aw.qmc.timeindexB[0] > -1:
-                                roast_start_idx = aw.qmc.timeindexB[0]
-                            else:
-                                roast_start_idx = 0
-                            if aw.qmc.timeindexB[6] > 0:
-                                roast_end_idx = aw.qmc.timeindexB[6]
-                            else:
-                                roast_end_idx = len(tx)
-                            tx_roast = numpy.array(self.timeB[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
-                            with numpy.errstate(divide='ignore'):
-                                #nt1 = numpy.array(self.stemp1B)
-                                nt1 = numpy.array(self.stemp1B[roast_start_idx:roast_end_idx])
-                                #z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)                            
-                                z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)                            
-                            with numpy.errstate(divide='ignore'):
-                                #nt2 = numpy.array(self.stemp2B)
-                                nt2 = numpy.array(self.stemp2B[roast_start_idx:roast_end_idx])
-                                #z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                                z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
-                            lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
-                            if lt > ld1:
-                                z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
-                            if lt > ld2:
-                                z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-#                            self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=self.timeindexB[0],toIndex=self.timeindexB[6])
-#                            self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=self.timeindexB[0],toIndex=self.timeindexB[6])
-                            self.delta1B = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
-                            self.delta2B = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
-                            # add None for parts before and after CHARGE/DROP
-                            self.delta1B = numpy.concatenate(([None]*(roast_start_idx),self.delta1B,[None]*(len(tx)-roast_end_idx)))
-                            self.delta2B = numpy.concatenate(([None]*(roast_start_idx),self.delta2B,[None]*(len(tx)-roast_end_idx)))
-#                            # cut out the part after DROP
-#                            if aw.qmc.timeindexB[6]:
-#                                self.delta1B = numpy.append(self.delta1B[:self.timeindexB[6]+1],[None]*(len(self.delta1B)-self.timeindexB[6]-1))
-#                                self.delta2B = numpy.append(self.delta2B[:self.timeindexB[6]+1],[None]*(len(self.delta2B)-self.timeindexB[6]-1))
-#                            # cut out the part before CHARGE
-#                            if aw.qmc.timeindexB[0] > -1 and aw.qmc.timeindexB[0] < aw.qmc.timeindexB[6]:
-#                                self.delta1B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta1B[aw.qmc.timeindexB[0]:])
-#                                self.delta2B = numpy.append([None]*(aw.qmc.timeindexB[0]),self.delta2B[aw.qmc.timeindexB[0]:])
-                            # filter out values beyond the delta limits
-#                            if aw.qmc.mode == "C":
-#                                rorlimit = aw.qmc.RoRlimitC
-#                            else:
-#                                rorlimit = aw.qmc.RoRlimitF
-#                            self.delta1B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1B]
-#                            self.delta2B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2B]
+                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB,self.stemp1B,self.stemp2B)                           
                         
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
-                            if self.DeltaETBflag and len(self.timeB) == len(self.delta2B):
+                            if self.DeltaETBflag and len(self.timeB) == len(self.delta1B):
                                 self.l_delta1B, = self.ax.plot(self.timeB, self.delta1B,transform=trans,markersize=self.ETBdeltamarkersize,
                                 sketch_params=None,path_effects=[],
                                 marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None)))
@@ -4388,69 +4384,19 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.l_eventtype4dots, = self.ax.plot([None],[None])
                             
-
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:
                     if recomputeAllDeltas:
-                        tx = numpy.array(self.timex)
-                        if aw.qmc.timeindex[0] > -1:
-                            roast_start_idx = aw.qmc.timeindex[0]
-                        else:
-                            roast_start_idx = 0
-                        if aw.qmc.timeindex[6] > 0:
-                            roast_end_idx = aw.qmc.timeindex[6]
-                        else:
-                            roast_end_idx = len(tx)
-                        tx_roast = numpy.array(self.timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
-                        if aw.qmc.flagon or len(tx) != len(self.stemp1):
+                        if aw.qmc.flagon and len(self.timex) != len(self.stemp1):
                             t1 = self.temp1
                         else:
                             t1 = self.stemp1
-                        with numpy.errstate(divide='ignore'):
-                            #nt1 = numpy.array(t1)
-                            nt1 = numpy.array(t1[roast_start_idx:roast_end_idx])
-                            #z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
-                            #z1 = numpy.concatenate(([None]*(aw.qmc.timeindex[0]),z1,[None]*(len(t1)-aw.qmc.timeindex[6])))
-                        if aw.qmc.flagon or len(tx) != len(self.stemp2):
+                        if aw.qmc.flagon and len(self.timex) != len(self.stemp2):
                             t2 = self.temp2
                         else:
                             t2 = self.stemp2
-                        with numpy.errstate(divide='ignore'):
-                            #nt2 = numpy.array(t2)
-                            nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
-                            #z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx[aw.qmc.deltasamples:] - tx[:-aw.qmc.deltasamples])/60.)
-                            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
-                            #z2 = numpy.concatenate(([None]*(aw.qmc.timeindex[0]),z2,[None]*(len(t2)-aw.qmc.timeindex[6])))
-                        lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
-                        # make lists equal in length
-                        if lt > ld1:
-                            z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
-                        if lt > ld2:
-                            z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                        #self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0],toIndex=aw.qmc.timeindex[6])
-                        #self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0],toIndex=aw.qmc.timeindex[6])
-                        self.delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
-                        self.delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
-                        # add None for parts before and after CHARGE/DROP
-                        self.delta1 = numpy.concatenate(([None]*(roast_start_idx),self.delta1,[None]*(len(tx)-roast_end_idx)))
-                        self.delta2 = numpy.concatenate(([None]*(roast_start_idx),self.delta2,[None]*(len(tx)-roast_end_idx)))
-                        # filter out values beyond the delta limits
-#                        # cut out the part after DROP
-#                        if aw.qmc.timeindex[6]:
-#                            self.delta1 = numpy.append(self.delta1[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta1)-aw.qmc.timeindex[6]-1))
-#                            self.delta2 = numpy.append(self.delta2[:aw.qmc.timeindex[6]+1],[None]*(len(self.delta2)-aw.qmc.timeindex[6]-1))
-#                        # cut out the part before CHARGE
-#                        if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0] < aw.qmc.timeindex[6]:
-#                            self.delta1 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta1[aw.qmc.timeindex[0]:])
-#                            self.delta2 = numpy.append([None]*(aw.qmc.timeindex[0]),self.delta2[aw.qmc.timeindex[0]:])
-                        # remove values beyond the RoRlimit
-                        if aw.qmc.mode == "C":
-                            rorlimit = aw.qmc.RoRlimitC
-                        else:
-                            rorlimit = aw.qmc.RoRlimitF
-                        self.delta1 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1]
-                        self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
+                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,aw.qmc.timeindex,t1,t2)
+
                         
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
@@ -4780,6 +4726,8 @@ class tgraphcanvas(FigureCanvas):
             self.BTtarget = int(round(self.fromCtoF(self.BTtarget)))
             self.BT2target = int(round(self.fromCtoF(self.BT2target)))
             self.AUCbase = int(round(self.fromCtoF(self.AUCbase)))
+            self.RoRlimit = int(round(self.fromCtoF(self.RoRlimit)))
+            self.RoRlimitm = int(round(self.fromCtoF(self.RoRlimitm)))
             # conv Arduino mode
             if aw:
                 aw.pidcontrol.conv2fahrenheit()
@@ -4814,6 +4762,8 @@ class tgraphcanvas(FigureCanvas):
             self.BTtarget = int(round(self.fromFtoC(self.BTtarget)))
             self.BT2target = int(round(self.fromFtoC(self.BT2target)))
             self.AUCbase = int(round(self.fromFtoC(self.AUCbase)))
+            self.RoRlimit = int(round(self.fromFtoC(self.RoRlimit)))
+            self.RoRlimitm = int(round(self.fromFtoC(self.RoRlimitm)))
             # conv Arduino mode
             if aw:
                 aw.pidcontrol.conv2celsius()
@@ -8947,17 +8897,12 @@ class SampleThread(QThread):
                                 aw.qmc.unfiltereddelta2.append(0.)
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
                     # limit displayed RoR (only before TP is recognized)
-                    if not aw.qmc.TPalarmtimeindex:
-                        if aw.qmc.mode == "C":
-                            if rateofchange1plot != None and (rateofchange1plot > 25 or rateofchange1plot < -25):
-                                rateofchange1plot = None
-                            if rateofchange2plot != None and (rateofchange2plot > 25 or rateofchange2plot < -25):
-                                rateofchange2plot = None
-                        else:
-                            if rateofchange1plot != None and (rateofchange1plot > 95 or rateofchange1plot < -95):
-                                rateofchange1plot = None
-                            if rateofchange2plot != None and (rateofchange2plot > 95 or rateofchange2plot < -95):
-                                rateofchange2plot = None
+                    if not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
+                        if rateofchange1plot != None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitC) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                            rateofchange1plot = None
+                        if rateofchange2plot != None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitC) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                            rateofchange2plot = None
+                                
                     # append new data to the rateofchange
                     if local_flagstart:
                         # only if we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
@@ -16133,6 +16078,12 @@ class ApplicationWindow(QMainWindow):
                 if len(self.qmc.plotcurves) == 6:
                     self.qmc.plotcurves += ["","",""]
                     self.qmc.plotcurvecolor += ["black","black","black"]
+            settings.beginGroup("RoRlimits")
+            if settings.contains("RoRlimitFlag"):
+                self.qmc.RoRlimitFlag = bool(toBool(settings.value("RoRlimitFlag",self.qmc.RoRlimitFlag)))
+                self.qmc.RoRlimit = toInt(settings.value("RoRlimit",self.qmc.RoRlimit))
+                self.qmc.RoRlimitm = toInt(settings.value("RoRlimitm",self.qmc.RoRlimitm))
+            settings.endGroup()
             settings.beginGroup("grid")
             if settings.contains("xgrid"):
                 self.qmc.xgrid = toInt(settings.value("xgrid",self.qmc.xgrid))
@@ -17071,6 +17022,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("buttonpalette",self.buttonpalette)
             settings.setValue("buttonpalettemaxlen",self.buttonpalettemaxlen)
             settings.setValue("buttonpalette_shortcuts",self.buttonpalette_shortcuts)
+            settings.endGroup()
+            settings.beginGroup("RoRlimits")
+            settings.setValue("RoRlimitFlag",self.qmc.RoRlimitFlag)
+            settings.setValue("RoRlimit",self.qmc.RoRlimit)
+            settings.setValue("RoRlimitm",self.qmc.RoRlimitm)
             settings.endGroup()
             settings.beginGroup("grid")
             settings.setValue("xgrid",self.qmc.xgrid)
@@ -19810,7 +19766,7 @@ class ApplicationWindow(QMainWindow):
                     # delete background
                     self.deleteBackground()
                 if foreground_profile_path or background_profile_path:
-                    aw.qmc.redraw(recomputeAllDeltas=False)
+                    aw.qmc.redraw(recomputeAllDeltas=True)
         except Exception:
             pass
 #            import traceback
@@ -21188,6 +21144,42 @@ class HUDDlg(ArtisanDialog):
         inputFilterHBox.addStretch()
         inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filters",None))
         inputFilterGroupLayout.setLayout(inputFilterHBox)
+        
+        #swapETBT flag
+        self.rorFilter = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
+        self.rorFilter.setChecked(aw.qmc.RoRlimitFlag)
+        self.rorFilter.setFocusPolicy(Qt.NoFocus)
+        rorminlabel = QLabel(QApplication.translate("Label", "min",None))
+        rormaxlabel = QLabel(QApplication.translate("Label", "max",None))
+        self.rorminLimit = QSpinBox()
+        self.rorminLimit.setRange(-999,999)    #(min,max)
+        self.rorminLimit.setAlignment(Qt.AlignRight)
+        self.rorminLimit.setMinimumWidth(80)
+        self.rorminLimit.setValue(aw.qmc.RoRlimitm)
+        self.rormaxLimit = QSpinBox()
+        self.rormaxLimit.setRange(-999,999)
+        self.rormaxLimit.setAlignment(Qt.AlignRight)
+        self.rormaxLimit.setMinimumWidth(80)
+        self.rormaxLimit.setValue(aw.qmc.RoRlimit)
+        if aw.qmc.mode == "F":
+            self.rorminLimit.setSuffix(" F")
+            self.rormaxLimit.setSuffix(" F")
+        elif aw.qmc.mode == "C":
+            self.rorminLimit.setSuffix(" C")
+            self.rormaxLimit.setSuffix(" C")
+        rorFilterGrid = QGridLayout()
+        rorFilterGrid.setColumnMinimumWidth(3,40)
+        rorFilterGrid.addWidget(self.rorFilter,0,0)
+        rorFilterGrid.addWidget(QLabel(),0,1)
+        rorFilterGrid.addWidget(rorminlabel,0,2)
+        rorFilterGrid.addWidget(self.rorminLimit,0,3)
+        rorFilterGrid.addWidget(rormaxlabel,0,4)
+        rorFilterGrid.addWidget(self.rormaxLimit,0,5)
+        rorFilterHBox = QHBoxLayout()
+        rorFilterHBox.addLayout(rorFilterGrid)
+        rorFilterHBox.addStretch()
+        rorFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","RoR Filter",None))
+        rorFilterGroupLayout.setLayout(rorFilterHBox)
         # path effects
         effectslabel = QLabel(QApplication.translate("Label", "Path Effects",None))
         self.PathEffects = QSpinBox()
@@ -21242,6 +21234,7 @@ class HUDDlg(ArtisanDialog):
         #tab1
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(inputFilterGroupLayout)
+        tab1Layout.addWidget(rorFilterGroupLayout)
         tab1Layout.addWidget(hudGroupLayout)
         tab1Layout.addStretch()
         #tab2
@@ -22526,6 +22519,9 @@ class HUDDlg(ArtisanDialog):
 
     #button OK
     def updatetargets(self):
+        aw.qmc.RoRlimitFlag = self.rorFilter.isChecked()
+        aw.qmc.RoRlimitm = int(self.rorminLimit.value())
+        aw.qmc.RoRlimit = int(self.rormaxLimit.value())
         aw.qmc.filterDropOuts = self.FilterSpikes.isChecked()
         aw.qmc.altsmoothing = self.AltSmoothing.isChecked()
         aw.qmc.dropSpikes = self.DropSpikes.isChecked()
@@ -22564,7 +22560,7 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.resetlinecountcaches()
         aw.qmc.resetdeltalines()
         aw.qmc.resetlines()
-        aw.qmc.redraw(recomputeAllDeltas=False)
+        aw.qmc.redraw(recomputeAllDeltas=True)
         self.accept()
 
 ########################################################################################
