@@ -8898,9 +8898,9 @@ class SampleThread(QThread):
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
                     # limit displayed RoR (only before TP is recognized)
                     if not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
-                        if rateofchange1plot != None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitC) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                        if rateofchange1plot != None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
                             rateofchange1plot = None
-                        if rateofchange2plot != None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitC) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                        if rateofchange2plot != None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
                             rateofchange2plot = None
                                 
                     # append new data to the rateofchange
