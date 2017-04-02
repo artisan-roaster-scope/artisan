@@ -4220,6 +4220,9 @@ class tgraphcanvas(FigureCanvas):
                     # The second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
                     # the third mode plots the events by value. They are not annotations but actual lines.
     
+    
+                    print("redraw",self.eventsGraphflag,Nevents)
+    
                     if Nevents:
                         for i in range(Nevents):
                             if self.specialeventstype[i] == 4 or self.eventsGraphflag == 0:
@@ -4363,26 +4366,39 @@ class tgraphcanvas(FigureCanvas):
                                 self.E4values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
                                 E4_nonempty = True
     
+                        print(E1_nonempty,E2_nonempty,E3_nonempty,E4_nonempty)
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
-                            self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
+                            E1x = self.E1timex
+                            E1y = self.E1values
+                        else:
+                            E1x = []
+                            E1y = []
+                        self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
+                        if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex): 
+                            E2x = self.E2timex
+                            E2y = self.E2values
                         else:
-                            self.l_eventtype1dots, = self.ax.plot([None],[None])
-                        if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex):    
-                            self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
+                            E2x = []
+                            E2y = []   
+                        self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
-                        else:
-                            self.l_eventtype2dots, = self.ax.plot([None],[None])
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
-                            self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
+                            E3x = self.E3timex
+                            E3y = self.E3values
+                        else:
+                            E3x = []
+                            E3y = []                           
+                        self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
-                        else:
-                            self.l_eventtype3dots, = self.ax.plot([None],[None])
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
-                            self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                            E4x = self.E4timex
+                            E4y = self.E4values
                         else:
-                            self.l_eventtype4dots, = self.ax.plot([None],[None])
+                            E4x = []
+                            E4y = []                           
+                        self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
+                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:

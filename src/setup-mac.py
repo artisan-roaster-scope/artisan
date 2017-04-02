@@ -30,8 +30,9 @@ LICENSE = 'GNU General Public License (GPL)'
 try:
     QTDIR = os.environ["QT_PATH"] + r'/'
 except:
-    QTDIR = r'/Users/luther/Qt5.8.0/5.8/clang_64/' # qt5
-    #QTDIR = r'/Developer/Applications/Qt/' # qt4
+    from os.path import expanduser
+    HOME = expanduser("~")
+    QTDIR = HOME + r'/Qt5.8.0/5.8/clang_64/'
 
 APP = ['artisan.py']
 
@@ -144,7 +145,7 @@ OPTIONS = {
     'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
-    'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'
+    'matplotlib_backends': '-', # '-' for imported or explicit 'qt5agg'
     'includes': ['serial',
                  'PyQt5',
                  'PyQt5.QtCore',
