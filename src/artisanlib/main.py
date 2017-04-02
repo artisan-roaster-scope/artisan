@@ -4219,10 +4219,7 @@ class tgraphcanvas(FigureCanvas):
                     # the first mode just places annotations. They are text annotations.
                     # The second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
                     # the third mode plots the events by value. They are not annotations but actual lines.
-    
-    
-                    print("redraw",self.eventsGraphflag,Nevents)
-    
+        
                     if Nevents:
                         for i in range(Nevents):
                             if self.specialeventstype[i] == 4 or self.eventsGraphflag == 0:
