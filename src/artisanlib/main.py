@@ -4363,7 +4363,6 @@ class tgraphcanvas(FigureCanvas):
                                 self.E4values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
                                 E4_nonempty = True
     
-                        print(E1_nonempty,E2_nonempty,E3_nonempty,E4_nonempty)
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
                             E1x = self.E1timex
                             E1y = self.E1values
