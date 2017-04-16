@@ -45,11 +45,11 @@ class PID(object):
         self.active = False
         self.derivative_on_error = False # if False => derivative_on_measurement (avoids the Derivative Kick on changing the target)
         # PID output smoothing    
-        self.output_smoothing_factor = 2
+        self.output_smoothing_factor = 1
         self.output_decay_weights = None
         self.previous_outputs = []
         # PID input smoothing
-        self.input_smoothing_factor = 2
+        self.input_smoothing_factor = 1
         self.input_decay_weights = None
         self.previous_inputs = []
         
@@ -124,6 +124,9 @@ class PID(object):
                         
                         # limit the effect of I
                         self.Iterm += self.Ki * err * dt
+                        
+                        # clamp Iterm to [outMin,outMax] and avoid integral windup
+                        self.Iterm = max(self.outMin,min(self.outMax,self.Iterm))
                             
                         P = self.Kp * err
                         if self.derivative_on_error:
@@ -135,12 +138,8 @@ class PID(object):
                         
                         # clamp output to [outMin,outMax] and avoid integral windup
                         if output > self.outMax:
-                            if self.Ki > 0.0:
-                                self.Iterm -= output - self.outMax
                             output = self.outMax
                         elif output < self.outMin:
-                            if self.Ki > 0.0:
-                                self.Iterm += self.outMin - output
                             output = self.outMin
                             
                         output = min(self.dutyMax,max(self.dutyMin,int(round(self.smooth_output(output)))))

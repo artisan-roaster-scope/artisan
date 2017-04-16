@@ -1129,7 +1129,9 @@ class tgraphcanvas(FigureCanvas):
         self.curvefilter = 3 # => corresponds to 1 on the user interface
         self.deltaspan = 6 # the time period taken to compute one deltaBT/ET value (1-15sec)
         self.deltasamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
+        self.background_deltasamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
         self.profile_sampling_interval = None # will be updated on loading a profile
+        self.background_profile_sampling_interval = None # will be updated on loading a profile into the background
         
         self.altsmoothing = False # toggle between standard and alternative smoothing approach
         self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
@@ -1619,6 +1621,10 @@ class tgraphcanvas(FigureCanvas):
         else:
             interval = self.profile_sampling_interval
         self.deltasamples = int(max(1,self.deltaspan / int(interval)))
+        
+    def updateBackgroundDeltaSamples(self):
+        if self.background_profile_sampling_interval:
+            self.background_deltasamples = int(max(1,self.deltaspan / int(self.background_profile_sampling_interval)))        
     
     # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
     # NOTE: this hack slows down redraw!
@@ -3772,7 +3778,12 @@ class tgraphcanvas(FigureCanvas):
 
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
-    def recomputeDeltas(self,timex,timeindex,t1,t2):
+    # if background=True, the deltas of the background profile are recomputed using background_deltasamples
+    def recomputeDeltas(self,timex,timeindex,t1,t2,background=False):
+        if background:
+            deltasamples = aw.qmc.background_deltasamples
+        else:
+            deltasamples = aw.qmc.deltasamples
         tx = numpy.array(timex)
         if timeindex[0] > -1:
             roast_start_idx = timeindex[0]
@@ -3785,10 +3796,10 @@ class tgraphcanvas(FigureCanvas):
         tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
         with numpy.errstate(divide='ignore'):
             nt1 = numpy.array(t1[roast_start_idx:roast_end_idx])
-            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+            z1 = (nt1[deltasamples:] - nt1[:-deltasamples]) / ((tx_roast[deltasamples:] - tx_roast[:-deltasamples])/60.)
         with numpy.errstate(divide='ignore'):
             nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
-            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+            z2 = (nt2[deltasamples:] - nt2[:-deltasamples]) / ((tx_roast[deltasamples:] - tx_roast[:-deltasamples])/60.)
         lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
         # make lists equal in length
         if lt > ld1:
@@ -4122,7 +4133,7 @@ class tgraphcanvas(FigureCanvas):
                     #populate background delta ET (self.delta1B) and delta BT (self.delta2B)                    
                     if self.DeltaETBflag or self.DeltaBTBflag:
                         if recomputeAllDeltas:
-                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB,self.stemp1B,self.stemp2B)                           
+                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB,self.stemp1B,self.stemp2B,True)                           
                         
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
@@ -5097,7 +5108,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.reset(True,False,sampling=True,keepProperties=True)                     
 
             if aw.qmc.device == 53:
-                startHottop(0.8,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
+                startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
             except Exception:
@@ -5290,6 +5301,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.roastbatchpos = 1 # initialized to 1, set to increased batchsequence on DROP
             if not aw.qmc.title_show_always:
                 aw.qmc.fig.suptitle("")
+            aw.qmc.profile_sampling_interval = self.delay / 1000.
             aw.qmc.updateDeltaSamples()
             aw.disableSaveActions()
             aw.sendmessage(QApplication.translate("Message","Scope recording...", None))
@@ -8947,9 +8959,9 @@ class SampleThread(QThread):
                             aw.qmc.updateProjection()
                         
                         # autodetect CHARGE event
-                        # only if BT > 203F/95C
+                        # only if BT > 170F/77C
                         if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
-                            ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
+                            ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 77) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 170)):
                             if aw.BTbreak(length_of_qmc_timex - 1):
                                 # we found a BT break at the current index minus 2
                                 aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
@@ -10905,13 +10917,23 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
-    def autoAdjustAxis(self):
+    def autoAdjustAxis(self,background=False):
         if aw.qmc.autotimex:
             # auto adjust
-            t_min,t_max = aw.calcAutoAxis()
-            aw.qmc.startofx = t_min
-            if aw.qmc.timeindex[0] != -1:
+            if background:
+                t_min,t_max = aw.calcAutoAxisBackground()
+            else:
+                t_min,t_max = aw.calcAutoAxis()
+            
+            if background and aw.qmc.timeindexB[0] != -1:
+                aw.qmc.startofx = t_min - aw.qmc.timeB[aw.qmc.timeindexB[0]]
+            else:
+                aw.qmc.startofx = t_min
+                            
+            if not background and aw.qmc.timeindex[0] != -1:
                 aw.qmc.endofx = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
+            elif background and aw.qmc.timeindexB[0] != -1:
+                aw.qmc.endofx = t_max - aw.qmc.timeB[aw.qmc.timeindexB[0]]
             else:
                 aw.qmc.endofx = t_max
 
@@ -10940,6 +10962,21 @@ class ApplicationWindow(QMainWindow):
             return t_start, t_end
         else:
             return aw.qmc.startofx, aw.qmc.endofx
+            
+    def calcAutoAxisBackground(self):
+        if len(aw.qmc.timeB) > 3:
+            # profile loaded?
+            t_start = aw.qmc.startofx
+            t_end = aw.qmc.endofx
+            if self.qmc.timeindexB[0] > -1: # CHARGE set
+                t_start = aw.qmc.timeB[aw.qmc.timeindexB[0]] - 60
+            if self.qmc.timeindexB[7] > 0: # COOL set
+                t_end = aw.qmc.timeB[aw.qmc.timeindexB[7]] + 60
+            elif self.qmc.timeindexB[6] > 0: # DROP set
+                t_end = aw.qmc.timeB[aw.qmc.timeindexB[6]] + 90
+            return t_start, t_end
+        else:
+            return aw.qmc.startofx, aw.qmc.endofx            
         
     # returns the last event value of the given type, or None if no event was ever recorded
     def lastEventValue(self,tp):
@@ -11878,11 +11915,13 @@ class ApplicationWindow(QMainWindow):
         if aw:
             self.fileSaveAction.setEnabled(True)
             self.fileSaveAsAction.setEnabled(True) 
+            self.ConfMenu.setEnabled(True)
 
     def disableSaveActions(self):
         if aw:
             self.fileSaveAction.setEnabled(False)
             self.fileSaveAsAction.setEnabled(False) 
+            self.ConfMenu.setEnabled(False)
 
     # relocate event actions, by skippig 3=MultipleEvent and 7=SliderAction
     def eventactionx(self,a,cmd):
@@ -13334,7 +13373,6 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.roastbatchposB = 1
                 
 # we don't load alarms from backgrounds as this would overload the one of the foreground profile that automatically loads this background
-
                 #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
                 if self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
                     l = len(self.qmc.backgroundFlavors)
@@ -13363,6 +13401,8 @@ class ApplicationWindow(QMainWindow):
                         times.append(startendB[2])
                         self.qmc.timebackgroundindexupdate(times[:])
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
+                self.qmc.background_profile_sampling_interval = profile["samplinginterval"]
+                self.qmc.updateBackgroundDeltaSamples()
                 backgroundDrop = self.qmc.timeindexB[6]
                 try:
                     try:
@@ -13376,6 +13416,10 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.AUCbackground = auc
                 except Exception:
                     pass
+                    
+                if not aw.curFile: # if no foreground is loaded, autoadjustAxis
+                    aw.autoAdjustAxis(True)
+                    
                 if len(self.qmc.timeB) > backgroundDrop:
                     message =  u(QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(u(filename),str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))))
                 else:
@@ -15072,7 +15116,7 @@ class ApplicationWindow(QMainWindow):
             # remember background profile path
             profile["backgroundpath"] = encodeLocal(self.qmc.backgroundpath)
             #write only:
-            profile["samplinginterval"] = self.qmc.delay / 1000.
+            profile["samplinginterval"] = self.qmc.profile_sampling_interval
             profile["oversampling"] = self.qmc.oversampling
             profile["svValues"] = aw.pidcontrol.svValues
             profile["svRamps"] = aw.pidcontrol.svRamps
@@ -22382,6 +22426,7 @@ class HUDDlg(ArtisanDialog):
         if aw.qmc.deltaspan != self.spanitems[i]:
             aw.qmc.deltaspan = self.spanitems[i]
             aw.qmc.updateDeltaSamples()
+            aw.qmc.updateBackgroundDeltaSamples()
             aw.qmc.redraw(recomputeAllDeltas=True)
         
     def changeDecimalPlaceslcd(self,i):
