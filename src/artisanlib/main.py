@@ -11945,6 +11945,7 @@ class ApplicationWindow(QMainWindow):
                     if cmd_str_bin:
                         self.ser.sendTXcommand(cmd_str_bin)
                     else:
+                        cmd_str = cmd_str.replace('\\r\\n','\n\r').replace('\\n', '\n').replace('\\t','\t')
                         self.ser.sendTXcommand(cmd_str)
                 elif action == 2: # slider and button call program action
                     try:
@@ -32239,7 +32240,8 @@ class serialport(object):
                     if arch == '32bit':
                         YAPI._yApiCLibFile = libpath + "\\lib\\yapi.dll"
                     else:
-                        YAPI._yApiCLibFile = libpath + "\\lib\\yapi-amd64.dll"
+                        YAPI._yApiCLibFile = libpath + "\\lib\\yapi64.dll"
+                    YAPI._yApiCLibFileFallback = libpath + "\\lib\\yapi.dll"
                 elif platf == "Linux" and aw.appFrozen():
                     if machine.find("arm") >= 0: # Raspberry
                         YAPI._yApiCLibFile = libpath + "/libyapi-armhf.so"
