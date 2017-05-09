@@ -610,7 +610,7 @@ class tgraphcanvas(FigureCanvas):
 
         #default palette of colors
         self.palette = {"background":'white',"grid":'green',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',"rect1":'green',
-                        "rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
+                        "rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',"et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue'}
 
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
@@ -1333,7 +1333,7 @@ class tgraphcanvas(FigureCanvas):
                 # holds tuple (slidernr,value) and is executued and reset by updategraphics
         self.temporarymovenegativeslider = None
         
-        self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>]q
+        self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>,<recordEvent>]
 
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 600
@@ -2233,7 +2233,7 @@ class tgraphcanvas(FigureCanvas):
                 #check quantified events
                 for el in self.quantifiedEvent:
                     aw.moveslider(el[0],el[1])
-                    if aw.qmc.flagstart:
+                    if aw.qmc.flagstart and el[2]:
                         value = aw.float2float((el[1] + 10.0) / 10.0)
                         aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription=u("Q"))
                 self.quantifiedEvent = []
@@ -4077,11 +4077,11 @@ class tgraphcanvas(FigureCanvas):
     
                     for i in range(12):
                         if i == 0:
-                            color = self.palette["rect3"]
+                            color = self.palette["background"] #self.palette["rect3"] # brown
                         elif i%2:
-                            color = self.palette["rect2"]
+                            color = self.palette["rect5"] #self.palette["rect2"] # orange
                         else:
-                            color = self.palette["rect1"]
+                            color = self.palette["background"] #self.palette["rect1"] # green
                         if self.clampEvents:
                             barposition = 100 - start - jump # draw custom events aligned with the temperature axis
                         else:
@@ -5426,7 +5426,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.timeindex[0] = len(self.timex)-1
                                 else:
                                     message = QApplication.translate("Message","Not enough data collected yet. Try again in a few seconds", None)
-                            if self.device in [19,53,29] and aw.pidcontrol.pidOnCHARGE and not aw.pidcontrol.pidActive: # Arduino/TC4, Hottop, MODBUS
+                            if aw.pidcontrol.pidOnCHARGE and not aw.pidcontrol.pidActive: # Arduino/TC4, Hottop, MODBUS
                                 aw.pidcontrol.pidOn()
                         self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
@@ -8211,7 +8211,7 @@ class tgraphcanvas(FigureCanvas):
             for z in range(len(n)):
                 #create wheel
                 theta,segmentwidth,radii = [],[],[]
-                count = startangle[z]
+                count = startangle[z] 
                 for i in range(n[z]):
                     #negative number affect eventpicker
                     if count > threesixty:
@@ -8231,7 +8231,11 @@ class tgraphcanvas(FigureCanvas):
                     bar[z].set_alpha(min(self.segmentsalpha[z][count],1))
                     bar[z].set_url(str(z) + "-" + str(count))
                     self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
-                        rotation=textangles[z][count],horizontalalignment="center",verticalalignment="center",fontsize=self.wheeltextsize[z],fontproperties=aw.mpl_fontproperties)
+                        rotation=textangles[z][count],
+                        horizontalalignment='center',
+                        verticalalignment="center",
+                        fontsize=self.wheeltextsize[z],
+                        fontproperties=aw.mpl_fontproperties)
                     count += 1
             self.fig.canvas.draw()
 
@@ -8783,12 +8787,6 @@ class SampleThread(QThread):
                     else:
                         timeAfterExtra = libtime.perf_counter() # the time the data of all extra devices was received
                     if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
-                        # send another sampling action if any
-                        try:
-                            if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
-                                aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
-                        except Exception:
-                            pass
                         # let's do the oversampling thing and take a second reading from the main device
                         sampling_interval = aw.qmc.delay/1000.
                         etbt_time = timeAfterETBT - timeBeforeETBT
@@ -8797,7 +8795,7 @@ class SampleThread(QThread):
                         # and only half of the sampling interval is gone
                         if (sampling_interval - gone) > etbt_time and gone < (sampling_interval / 2.0):
                             # place the second ET/BT sampling in the middle of the sampling interval
-                            libtime.sleep((sampling_interval / 2.0) - gone)
+                            libtime.sleep((sampling_interval / 2.0) - gone)                       
                             tx_2,t1_2,t2_2 = self.sample_main_device()
                             if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
                                 tx = tx + (tx_2 - tx) / 2.0
@@ -8807,7 +8805,13 @@ class SampleThread(QThread):
                                 if t1 == -1:
                                     t1 = t1_2
                                 if t2 == -1:
-                                    t2 = t2_2
+                                    t2 = t2_2 
+                            # send another sampling action if any
+                            try:
+                                if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
+                                    aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
+                            except Exception:
+                                pass    
                     ####### all values retrieved                
 
                     if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
@@ -8995,38 +8999,7 @@ class SampleThread(QThread):
 
                     #process active quantifiers
                     try:
-                        if local_flagstart:
-                            for i in range(4):
-                                if aw.eventquantifieractive[i]:
-                                    temp,_ = aw.quantifier2tempandtime(i)
-                                    if temp: # corresponding curve is available
-                                        linespace = aw.eventquantifierlinspaces[i]
-                                        if aw.eventquantifiercoarse[i]:
-                                            linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
-                                        else:
-                                            linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine                        
-                                        t = temp[-1]
-                                        d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
-                                        ld = aw.lastdigitizedvalue[i]
-                                        lt = aw.lastdigitizedtemp[i]
-                                        if d != None and (ld == None or ld != d):
-                                            # and only if significantly different than previous to avoid fluktuation
-                                            if ld == None or linespacethreshold < abs(t - lt):
-                                                # we also ignore those values that move towards the last recorded event value
-                                                lv = aw.lastEventValue(i)
-                                                if len(temp)>1:
-                                                    t_prev = temp[-2]
-                                                else:
-                                                    t_prev = None
-                                                # test if t is increasing or decreasing
-                                                if lv == None or t_prev == None or ((d > lv) and (t > t_prev)) or ((d < lv and t < t_prev)):
-                                                    # establish this one
-                                                    aw.lastdigitizedvalue[i] = d
-                                                    aw.lastdigitizedtemp[i] = t
-                                                    v = d * 10.
-                                                    # now move corresponding slider and add event if its value is not equal to the previous one                                                    
-                                                    if ((aw.float2float((v + 10.0) / 10.0)) != lv):
-                                                        aw.qmc.quantifiedEvent.append([i,v])
+                        aw.process_active_quantifiers()
                     except Exception:
                         pass
                         
@@ -9176,7 +9149,7 @@ class SampleThread(QThread):
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
             #update screen in main GUI thread
-            self.updategraphics.emit()
+            self.updategraphics.emit()   
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
@@ -9422,6 +9395,8 @@ class ApplicationWindow(QMainWindow):
         self.eventslidercommands = ["","","",""]
         self.eventslideroffsets = [0,0,0,0]
         self.eventsliderfactors = [1.0,1.0,1.0,1.0]
+        self.eventslidermin = [0,0,0,0]
+        self.eventslidermax = [100,100,100,100]
         self.eventslidersflag = 1  #shows/hides sliders  1/0; records the user choice, not the actual state!
         
         #event quantifiers        
@@ -10917,6 +10892,77 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
+#    def process_active_quantifiers(self):
+#        print("process_active_quantifiers")
+#        for i in range(4):
+#            if aw.eventquantifieractive[i]:
+#                temp,_ = aw.quantifier2tempandtime(i)
+#                if temp: # corresponding curve is available
+#                    linespace = aw.eventquantifierlinspaces[i]
+#                    if aw.eventquantifiercoarse[i]:
+#                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
+#                    else:
+#                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine                        
+#                    t = temp[-1]
+#                    d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
+#                    ld = aw.lastdigitizedvalue[i]
+#                    lt = aw.lastdigitizedtemp[i]
+#                    if d != None and (ld == None or ld != d):
+#                        # and only if significantly different than previous to avoid fluktuation
+#                        if ld == None or linespacethreshold < abs(t - lt):
+#                            # we also ignore those values that move towards the last recorded event value
+#                            lv = aw.lastEventValue(i)
+#                            if len(temp)>1:
+#                                t_prev = temp[-2]
+#                            else:
+#                                t_prev = None
+#                            # test if t is increasing or decreasing
+#                            if lv == None or t_prev == None or ((d + 1 > lv) and (t > t_prev)) or ((d + 1 < lv and t < t_prev)):
+#                                # establish this one
+#                                aw.lastdigitizedvalue[i] = d
+#                                aw.lastdigitizedtemp[i] = t
+#                                v = d * 10.
+#                                # now move corresponding slider and add event if its value is not equal to the previous one                                                    
+#                                if ((aw.float2float((v + 10.0) / 10.0)) != lv):
+#                                    if aw.qmc.flagon and not aw.qmc.flagstart: # only in monitor mode, we set the last value to be used for relative +- button action as base
+#                                        aw.extraeventsactionslastvalue[i] = int(round(v))
+#                                    aw.qmc.quantifiedEvent.append([i,v,True]) 
+
+    def process_active_quantifiers(self):
+        for i in range(4):
+            if aw.eventquantifieractive[i]:
+                temp,_ = aw.quantifier2tempandtime(i)
+                if temp: # corresponding curve is available
+                    linespace = aw.eventquantifierlinspaces[i]
+                    if aw.eventquantifiercoarse[i]:
+                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
+                    else:
+                        linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine                        
+                    t = temp[-1]
+                    d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
+                    v = d * 10.
+                    ld = aw.lastdigitizedvalue[i]
+                    lt = aw.lastdigitizedtemp[i]
+                    addEvent = False
+                    # and only if significantly different than previous we record an event to avoid fluktuation
+                    if d != None and (ld == None or ld != d) and ld == None or linespacethreshold < abs(t - lt) and ((aw.float2float((v + 10.0) / 10.0)) != aw.lastEventValue(i)):
+                        # we add event if its value is not equal to the previous one
+                        addEvent = True
+                        # only in OnRecorder mode, we remember the last values to ensure that the initial results are recorded
+                        if aw.qmc.flagstart:
+                            aw.lastdigitizedvalue[i] = d
+                            aw.lastdigitizedtemp[i] = t
+                    if aw.qmc.flagon and not aw.qmc.flagstart: # only in monitor mode, we set the last value to be used for relative +- button action as base
+                        aw.extraeventsactionslastvalue[i] = int(round(v))
+                    # in OnMonitor mode we at least move the slider:
+                    aw.qmc.quantifiedEvent.append([i,v,addEvent])
+                                                                        
+    def updateSliderColors(self):
+        self.sliderLCD1.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[0])
+        self.sliderLCD2.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[1])
+        self.sliderLCD3.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[2])
+        self.sliderLCD4.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[3])
+
     def autoAdjustAxis(self,background=False):
         if aw.qmc.autotimex:
             # auto adjust
@@ -11756,19 +11802,24 @@ class ApplicationWindow(QMainWindow):
         lcdframe.setLayout(LCDbox)
         return lcdframe
 
+    def setSliderNumber(self,lcd,v):
+        if v < 10:
+            lcd.setNumDigits(1)
+        elif v > 99:
+            lcd.setNumDigits(3)
+        else:
+            lcd.setNumDigits(2)
+        lcd.display(v)
+        
     def updateSliderLCD(self,n,v):
-        if v > 99:
-            v = 99
-        elif v < 0:
-            v = 0
         if n == 0:
-            self.sliderLCD1.display(v)
+            self.setSliderNumber(self.sliderLCD1,v)
         elif n == 1:
-            self.sliderLCD2.display(v)
+            self.setSliderNumber(self.sliderLCD2,v)
         elif n == 2:
-            self.sliderLCD3.display(v)
+            self.setSliderNumber(self.sliderLCD3,v)
         elif n == 3:
-            self.sliderLCD4.display(v)
+            self.setSliderNumber(self.sliderLCD4,v)
             
     def updateSVSliderLCD(self,v):
         if v > aw.pidcontrol.svSliderMax:
@@ -11842,7 +11893,7 @@ class ApplicationWindow(QMainWindow):
     def sliderLCD(self):
         slcd = QLCDNumber()
         slcd.setSegmentStyle(2)
-        slcd.setNumDigits(2)
+        slcd.setNumDigits(1)
         slcd.setMinimumHeight(35)
         slcd.setMinimumWidth(50)
         slcd.setMaximumWidth(50)
@@ -11862,6 +11913,17 @@ class ApplicationWindow(QMainWindow):
         s.setMaximumWidth(50) 
         s.setContentsMargins(0,0,0,0)
         return s
+        
+    def updateSliderMinMax(self):
+        self.slider1.setMinimum(self.eventslidermin[0])
+        self.slider1.setMaximum(self.eventslidermax[0])
+        self.slider2.setMinimum(self.eventslidermin[1])
+        self.slider2.setMaximum(self.eventslidermax[1])
+        self.slider3.setMinimum(self.eventslidermin[2])
+        self.slider3.setMaximum(self.eventslidermax[2])
+        self.slider4.setMinimum(self.eventslidermin[3])
+        self.slider4.setMaximum(self.eventslidermax[3])
+        
 
     def setLabelColor(self,label,color):
         palette = QPalette(label.palette()) # make a copy of the palette
@@ -15514,6 +15576,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.markTPflag = bool(toBool(settings.value("markTP",self.qmc.markTPflag)))
             if settings.contains("EvalueColor"):
                 self.qmc.EvalueColor = list(map(str,list(toStringList(settings.value("EvalueColor",self.qmc.EvalueColor)))))
+                aw.updateSliderColors()
                 self.qmc.EvalueMarker = list(map(str,list(toStringList(settings.value("EvalueMarker",self.qmc.EvalueMarker)))))
             if settings.contains("Evaluelinethickness"):
                 self.qmc.Evaluelinethickness = [toInt(x) for x in toList(settings.value("Evaluelinethickness",self.qmc.Evaluelinethickness))]
@@ -16167,6 +16230,10 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidercommands = list(map(u,list(toStringList(settings.value("slidercommands",self.eventslidercommands)))))
                 self.eventslideroffsets = [toInt(x) for x in toList(settings.value("slideroffsets",self.eventslideroffsets))]
                 self.eventsliderfactors = [toDouble(x) for x in toList(settings.value("sliderfactors",self.eventsliderfactors))]
+            if settings.contains("slidermin"):
+                self.eventslidermin = [toInt(x) for x in toList(settings.value("slidermin",self.eventslidermax))]
+                self.eventslidermax = [toInt(x) for x in toList(settings.value("slidermax",self.eventslidermax))]
+                aw.updateSliderMinMax()
             if settings.contains("eventslidersflag"):
                 self.eventslidersflag = toInt(settings.value("eventslidersflag",self.eventslidersflag))
             settings.endGroup()
@@ -17100,6 +17167,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("slidercommands",self.eventslidercommands)
             settings.setValue("slideroffsets",self.eventslideroffsets)
             settings.setValue("sliderfactors",self.eventsliderfactors)
+            settings.setValue("slidermin",self.eventslidermin)
+            settings.setValue("slidermax",self.eventslidermax)
             settings.setValue("eventslidersflag",self.eventslidersflag)
             settings.endGroup()
             settings.beginGroup("Quantifiers")
@@ -19773,7 +19842,6 @@ class ApplicationWindow(QMainWindow):
             self.stopdesigner()
         wheeldialog = WheelDlg(self)
         wheeldialog.show()
-        wheeldialog.setFixedSize(wheeldialog.size())
 
     def background(self):
         dialog = backgroundDlg(self)
@@ -25757,10 +25825,13 @@ class WindowsDlg(ArtisanDialog):
 
     # exit dialog with OK
     def updatewindow(self):
+        limits_changed = False
         try:
             yl = int(str(self.ylimitEdit.text()))
             yl_min = int(str(self.ylimitEdit_min.text()))
             if yl > yl_min:
+                if (aw.qmc.ylimit != yl) or (aw.qmc.ylimit_min != yl_min):
+                    limits_changed = True
                 aw.qmc.ylimit = yl
                 aw.qmc.ylimit_min = yl_min
         except:
@@ -25768,11 +25839,19 @@ class WindowsDlg(ArtisanDialog):
         try:
             zl = int(str(self.zlimitEdit.text()))
             zl_min = int(str(self.zlimitEdit_min.text()))
+            if (aw.qmc.zlimit != zl) or (aw.qmc.zlimit_min != zl_min):
+                limits_changed = True
             if zl > zl_min:
                 aw.qmc.zlimit = zl
                 aw.qmc.zlimit_min = zl_min
         except:
             pass
+            
+        if limits_changed and aw.qmc.crossmarker == True:
+            # switch crosslines off and on again to adjust for changed axis limits
+            aw.qmc.togglecrosslines()
+            aw.qmc.togglecrosslines()
+            
         aw.qmc.endofx = aw.qmc.stringtoseconds(str(self.xlimitEdit.text()))
         resettime = aw.qmc.stringtoseconds(str(self.resetEdit.text()))
         startedittime_str = str(self.xlimitEdit_min.text())
@@ -26362,6 +26441,10 @@ class EventsDlg(ArtisanDialog):
         offsettitlelabel.setFont(titlefont)
         factortitlelabel = QLabel(QApplication.translate("Label","Factor", None))
         factortitlelabel.setFont(titlefont)
+        min_titlelabel = QLabel(QApplication.translate("Label","Min", None))
+        min_titlelabel.setFont(titlefont)
+        max_titlelabel = QLabel(QApplication.translate("Label","Max", None))
+        max_titlelabel.setFont(titlefont)
         self.E1visibility = QCheckBox(aw.qmc.etypesf(0))
         self.E1visibility.setFocusPolicy(Qt.NoFocus)
         self.E1visibility.setChecked(bool(aw.eventslidervisibilities[0]))
@@ -26447,6 +26530,38 @@ class EventsDlg(ArtisanDialog):
         self.E4factor.setDecimals(2)
         self.E4factor.setValue(aw.eventsliderfactors[3])
         self.E4factor.setMaximumWidth(70)
+        self.E1_min = QSpinBox()
+        self.E1_min.setAlignment(Qt.AlignRight)
+        self.E1_min.setRange(0,100)
+        self.E1_min.setValue(aw.eventslidermin[0])
+        self.E2_min = QSpinBox()
+        self.E2_min.setAlignment(Qt.AlignRight)
+        self.E2_min.setRange(0,100)
+        self.E2_min.setValue(aw.eventslidermin[1])
+        self.E3_min = QSpinBox()
+        self.E3_min.setAlignment(Qt.AlignRight)
+        self.E3_min.setRange(0,100)
+        self.E3_min.setValue(aw.eventslidermin[2])
+        self.E4_min = QSpinBox()
+        self.E4_min.setAlignment(Qt.AlignRight)
+        self.E4_min.setRange(0,100)
+        self.E4_min.setValue(aw.eventslidermin[3])
+        self.E1_max = QSpinBox()
+        self.E1_max.setAlignment(Qt.AlignRight)
+        self.E1_max.setRange(0,100)
+        self.E1_max.setValue(aw.eventslidermax[0])
+        self.E2_max = QSpinBox()
+        self.E2_max.setAlignment(Qt.AlignRight)
+        self.E2_max.setRange(0,100)
+        self.E2_max.setValue(aw.eventslidermax[1])
+        self.E3_max = QSpinBox()
+        self.E3_max.setAlignment(Qt.AlignRight)
+        self.E3_max.setRange(0,100)
+        self.E3_max.setValue(aw.eventslidermax[2])
+        self.E4_max = QSpinBox()
+        self.E4_max.setAlignment(Qt.AlignRight)
+        self.E4_max.setRange(0,100)
+        self.E4_max.setValue(aw.eventslidermax[3]) 
         helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         helpsliderbutton.clicked.connect(self.showSliderHelp)
@@ -26888,6 +27003,8 @@ class EventsDlg(ArtisanDialog):
         tab5Layout.addWidget(commandtitlelabel,0,2)
         tab5Layout.addWidget(offsettitlelabel,0,3)
         tab5Layout.addWidget(factortitlelabel,0,4)
+        tab5Layout.addWidget(min_titlelabel,0,5)
+        tab5Layout.addWidget(max_titlelabel,0,6)
         tab5Layout.addWidget(self.E1visibility,1,0)
         tab5Layout.addWidget(self.E2visibility,2,0)
         tab5Layout.addWidget(self.E3visibility,3,0)
@@ -26908,6 +27025,14 @@ class EventsDlg(ArtisanDialog):
         tab5Layout.addWidget(self.E2factor,2,4)
         tab5Layout.addWidget(self.E3factor,3,4)
         tab5Layout.addWidget(self.E4factor,4,4)
+        tab5Layout.addWidget(self.E1_min,1,5)
+        tab5Layout.addWidget(self.E2_min,2,5)
+        tab5Layout.addWidget(self.E3_min,3,5)
+        tab5Layout.addWidget(self.E4_min,4,5)
+        tab5Layout.addWidget(self.E1_max,1,6)
+        tab5Layout.addWidget(self.E2_max,2,6)
+        tab5Layout.addWidget(self.E3_max,3,6)
+        tab5Layout.addWidget(self.E4_max,4,6)
         SliderHelpHBox = QHBoxLayout()
         SliderHelpHBox.addStretch()
         SliderHelpHBox.addWidget(helpsliderbutton)
@@ -27062,6 +27187,7 @@ class EventsDlg(ArtisanDialog):
             self.updateSliderTab()
             self.saveQuantifierSettings()
         elif i == 3: # switched to Quantifier tab
+            self.saveSliderSettings()
             self.updateQuantifierTab()
         elif i == 4: # switched to Palette tab
             # store slider settings from Slider tab to global variables
@@ -27151,6 +27277,16 @@ class EventsDlg(ArtisanDialog):
         self.E2factor.setValue(aw.eventsliderfactors[1])
         self.E3factor.setValue(aw.eventsliderfactors[2])
         self.E4factor.setValue(aw.eventsliderfactors[3])
+        # set slider min
+        self.E1_min.setValue(aw.eventslidermin[0])
+        self.E2_min.setValue(aw.eventslidermin[1])
+        self.E3_min.setValue(aw.eventslidermin[2])
+        self.E4_min.setValue(aw.eventslidermin[3])
+        # set slider max
+        self.E1_max.setValue(aw.eventslidermax[0])
+        self.E2_max.setValue(aw.eventslidermax[1])
+        self.E3_max.setValue(aw.eventslidermax[2])
+        self.E4_max.setValue(aw.eventslidermax[3])
 
     def setElinethickness(self,_,val):
         self.E1thicknessSpinBox.setDisabled(True)
@@ -27273,6 +27409,7 @@ class EventsDlg(ArtisanDialog):
         if colorf.isValid():
             colorname = str(colorf.name())
             aw.qmc.EvalueColor[b] = colorname
+            aw.updateSliderColors()
             aw.qmc.redraw()
 
     def realignbuttons(self):
@@ -27613,6 +27750,15 @@ class EventsDlg(ArtisanDialog):
         aw.eventsliderfactors[1] = float(self.E2factor.value())
         aw.eventsliderfactors[2] = float(self.E3factor.value())
         aw.eventsliderfactors[3] = float(self.E4factor.value())
+        aw.eventslidermin[0] = int(min(self.E1_min.value(),self.E1_max.value()))
+        aw.eventslidermin[1] = int(min(self.E2_min.value(),self.E2_max.value()))
+        aw.eventslidermin[2] = int(min(self.E3_min.value(),self.E3_max.value()))
+        aw.eventslidermin[3] = int(min(self.E4_min.value(),self.E4_max.value()))
+        aw.eventslidermax[0] = int(max(self.E1_min.value(),self.E1_max.value()))
+        aw.eventslidermax[1] = int(max(self.E2_min.value(),self.E2_max.value()))
+        aw.eventslidermax[2] = int(max(self.E3_min.value(),self.E3_max.value()))
+        aw.eventslidermax[3] = int(max(self.E4_min.value(),self.E4_max.value()))
+        aw.updateSliderMinMax()
 
     def saveQuantifierSettings(self):
         aw.clusterEventsFlag = bool(self.clusterEventsFlag.isChecked())
@@ -27668,6 +27814,8 @@ class EventsDlg(ArtisanDialog):
         self.eventslidercommands = aw.eventslidercommands
         self.eventslideroffsets = aw.eventslideroffsets
         self.eventsliderfactors = aw.eventsliderfactors
+        self.eventslidermin = aw.eventslidermin
+        self.eventslidermax = aw.eventslidermax
         # palettes
         self.buttonpalette = aw.buttonpalette
         # styles
@@ -27707,6 +27855,8 @@ class EventsDlg(ArtisanDialog):
         aw.eventslidercommands = self.eventslidercommands
         aw.eventslideroffsets = self.eventslideroffsets
         aw.eventsliderfactors = self.eventsliderfactors
+        aw.eventslidermin = self.eventslidermin
+        aw.eventslidermax = self.eventslidermax
         # palettes
         aw.buttonpalette = self.buttonpalette
         # styles
@@ -29760,8 +29910,8 @@ class modbusport(object):
             return r
         except Exception as ex:
             self.disconnect()
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -36931,16 +37081,21 @@ class graphColorDlg(ArtisanDialog):
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
 
+    
+    
+    def setcolor(self,palette,disj_palette,select):
+        res = aw.colordialog(QColor(palette[select]))
+        if QColor.isValid(res):
+            nc = str(res.name())
+            if nc != disj_palette[select]:
+                palette[select] = nc
+
     def paintlcds(self,text,flag,lcdnumber):
         if lcdnumber ==1:
             if flag == 0:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteB["timer"]))).name())
-                if nc != aw.lcdpaletteF["timer"]:
-                    aw.lcdpaletteB["timer"] = nc
+                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"timer")
             elif flag == 1:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteF["timer"]))).name())
-                if nc != aw.lcdpaletteB["timer"]:
-                    aw.lcdpaletteF["timer"] = nc
+                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"timer")
             elif flag == 2 and text:
                 nc = self.lcdcolors[self.lcd1colorComboBox.currentIndex()]
                 if nc != aw.lcdpaletteF["timer"]:
@@ -36948,15 +37103,11 @@ class graphColorDlg(ArtisanDialog):
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-        if lcdnumber ==2:
+        if lcdnumber == 2:
             if flag == 0:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteB["et"]))).name())
-                if nc != aw.lcdpaletteF["et"]:
-                    aw.lcdpaletteB["et"] = nc
+                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"et")
             elif flag == 1:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteF["et"]))).name())
-                if nc != aw.lcdpaletteB["et"]:
-                    aw.lcdpaletteF["et"] = nc
+                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"et")
             elif flag == 2 and text:
                 nc = self.lcdcolors[self.lcd2colorComboBox.currentIndex()]
                 if nc != aw.lcdpaletteF["et"]:
@@ -36966,13 +37117,9 @@ class graphColorDlg(ArtisanDialog):
                 aw.largeLCDs_dialog.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         if lcdnumber ==3:
             if flag == 0:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteB["bt"]))).name())
-                if nc != aw.lcdpaletteF["bt"]:
-                    aw.lcdpaletteB["bt"] = nc
+                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"bt")
             elif flag == 1:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteF["bt"]))).name())
-                if nc != aw.lcdpaletteB["bt"]:
-                    aw.lcdpaletteF["bt"] = nc
+                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"bt")
             elif flag == 2 and text:
                 nc = self.lcdcolors[self.lcd3colorComboBox.currentIndex()]
                 if nc != aw.lcdpaletteF["bt"]:
@@ -36982,13 +37129,9 @@ class graphColorDlg(ArtisanDialog):
                 aw.largeLCDs_dialog.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
         if lcdnumber ==4:
             if flag == 0:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteB["deltaet"]))).name())
-                if nc != aw.lcdpaletteF["deltaet"]:
-                    aw.lcdpaletteB["deltaet"] = nc
+                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltaet")
             elif flag == 1:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteF["deltaet"]))).name())
-                if nc != aw.lcdpaletteB["deltaet"]:
-                    aw.lcdpaletteF["deltaet"] = nc
+                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltaet")
             elif flag == 2 and text:
                 nc = self.lcdcolors[self.lcd4colorComboBox.currentIndex()]
                 if nc != aw.lcdpaletteF["deltaet"]:
@@ -36996,13 +37139,9 @@ class graphColorDlg(ArtisanDialog):
             aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
         if lcdnumber ==5:
             if flag == 0:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteB["deltabt"]))).name())
-                if nc != aw.lcdpaletteF["deltabt"]:
-                    aw.lcdpaletteB["deltabt"] = nc
+                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltabt")
             elif flag == 1:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteF["deltabt"]))).name())
-                if nc != aw.lcdpaletteB["deltabt"]:
-                    aw.lcdpaletteF["deltabt"] = nc
+                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltabt")
             elif flag == 2 and text:
                 nc = self.lcdcolors[self.lcd5colorComboBox.currentIndex()]
                 if nc != aw.lcdpaletteF["deltabt"]:
@@ -37010,20 +37149,16 @@ class graphColorDlg(ArtisanDialog):
             aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
         if lcdnumber ==6:
             if flag == 0:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteB["sv"]))).name())
-                if nc != aw.lcdpaletteF["sv"]:
-                    aw.lcdpaletteB["sv"] = nc
+                self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"sv")
             elif flag == 1:
-                nc = str((aw.colordialog(QColor(aw.lcdpaletteF["sv"]))).name())
-                if nc != aw.lcdpaletteB["sv"]:
-                    aw.lcdpaletteF["sv"] = nc
+                self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"sv")
             elif flag == 2 and text:
                 nc = self.lcdcolors[self.lcd6colorComboBox.currentIndex()]
                 if nc != aw.lcdpaletteF["sv"]:
                     aw.lcdpaletteB["sv"] = nc
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-            #aw.updateExtraLCDvisibility()
+            aw.updateExtraLCDvisibility()
 
     # adds a new event to the Dlg
     def recolor(self, x):
