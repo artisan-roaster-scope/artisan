@@ -8211,7 +8211,16 @@ class tgraphcanvas(FigureCanvas):
             for z in range(len(n)):
                 #create wheel
                 theta,segmentwidth,radii = [],[],[]
-                count = startangle[z] 
+                count = startangle[z]
+                ## to work around a bug with polar projection in matplotlib 2.x we have to add an initial offset to count
+                ## however, there still seems to be something broken..
+                v = 2
+                try:
+                    v = int(mpl.__version__.split('.')[0])
+                except:
+                    pass
+                if v >= 2:
+                    count = count + div * 100/n[z] / 2.
                 for i in range(n[z]):
                     #negative number affect eventpicker
                     if count > threesixty:
@@ -10952,7 +10961,7 @@ class ApplicationWindow(QMainWindow):
                         if aw.qmc.flagstart:
                             aw.lastdigitizedvalue[i] = d
                             aw.lastdigitizedtemp[i] = t
-                    if aw.qmc.flagon and not aw.qmc.flagstart: # only in monitor mode, we set the last value to be used for relative +- button action as base
+                    if aw.qmc.flagon: # only in monitor mode, we set the last value to be used for relative +- button action as base
                         aw.extraeventsactionslastvalue[i] = int(round(v))
                     # in OnMonitor mode we at least move the slider:
                     aw.qmc.quantifiedEvent.append([i,v,addEvent])
@@ -11888,7 +11897,8 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.flagstart:
             value = aw.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value)
-        self.fireslideraction(n)
+        if self.qmc.flagon:
+            self.fireslideraction(n)
 
     def sliderLCD(self):
         slcd = QLCDNumber()
@@ -12325,16 +12335,16 @@ class ApplicationWindow(QMainWindow):
     def moveslider(self,n,v):
         if v >= 0 and v <= 100:
             self.eventslidervalues[n] = v
-            if n == 0:
+            if n == 0 and self.slider1.value() != v:
                 self.slider1.setValue(v)
                 self.updateSliderLCD(0,v)
-            elif n == 1:
+            elif n == 1 and self.slider2.value() != v:
                 self.slider2.setValue(v)
                 self.updateSliderLCD(1,v)
-            elif n == 2:
+            elif n == 2 and self.slider3.value() != v:
                 self.slider3.setValue(v)
                 self.updateSliderLCD(2,v)
-            elif n == 3:
+            elif n == 3 and self.slider4.value() != v:
                 self.slider4.setValue(v)
                 self.updateSliderLCD(3,v)
 
@@ -12360,7 +12370,11 @@ class ApplicationWindow(QMainWindow):
                 new_value = cmdvalue
             elif eventtype > 4: # relative values for +/- actions
                 etype = eventtype-5 # the real event type has a offset of 5 in this case
-                new_value = min(100,max(0,self.extraeventsactionslastvalue[etype] + cmdvalue))
+                new_value = self.extraeventsactionslastvalue[etype] + cmdvalue
+                
+            # limit value w.r.t. the event slider min/max specification
+            new_value = min(aw.eventslidermax[etype],max(aw.eventslidermin[etype],new_value))
+                
             # the new_value is combined with the event factor and offset as specified in the slider definition
             actionvalue = int(round((self.eventsliderfactors[etype] * new_value) + self.eventslideroffsets[etype]))
             if self.extraeventsactions[ee] in [8,9]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
@@ -12813,7 +12827,7 @@ class ApplicationWindow(QMainWindow):
                             if len(eventValueStr) == 2:
                                 # both digits entered, create the event
                                 self.quickEventShortCut = None
-                                value = int(eventValueStr)
+                                value = max(aw.eventslidermin[eventNr],min(aw.eventslidermax[eventNr],int(eventValueStr)))
                                 aw.moveslider(eventNr,value)
                                 if aw.qmc.flagstart:
                                     aw.qmc.EventRecordAction(extraevent = 1,eventtype=eventNr,eventvalue=(value + 10)/10.)
@@ -20839,12 +20853,26 @@ class ApplicationWindow(QMainWindow):
             self.sendmessage(QApplication.translate("Message","Palette #%i empty"%(pindex), None))
             return 0  #failed
 
+    def encodeTreeStrings(self,tree):
+        return self.mapTree(tree,encodeLocal)
+  
+    def decodeTreeStrings(self,tree):
+        return self.mapTree(tree,d)
+
+    def mapTree(self,tree,f):
+        if isinstance(tree,(list,tuple)):
+            return [self.mapTree(e,f) for e in tree]
+        elif isinstance(tree,basestring):
+            return f(tree)
+        else:
+            return tree
+    
     def backuppaletteeventbuttons(self):
         palette = {}
         #convert labels to unicode
         for i in range(len(self.buttonpalette)):
             key = str(i)
-            palette[key] = self.buttonpalette[i]
+            palette[key] = self.encodeTreeStrings(self.buttonpalette[i])
         palette["maxlen"] = self.buttonpalettemaxlen
         try:
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Palettes",None),ext="*.apal")
@@ -20870,6 +20898,7 @@ class ApplicationWindow(QMainWindow):
                 for i in range(10):  #10 palettes (0-9)
                     key = str(i)
                     nextpalette = [[], [], [], [], [], [], [], [], [], [], [], [], [], []]
+                    palette[key] = self.decodeTreeStrings(palette[key])                    
                     if len(palette[key]):
                         for x in range(9):
                             if x < 4:
@@ -20878,20 +20907,32 @@ class ApplicationWindow(QMainWindow):
                                 else:
                                     nextpalette[x] = list(map(int,palette[key][x]))     #  type int
                             else:
-                                nextpalette[x] = list(map(str,palette[key][x])) #  type unicode
+                                nextpalette[x] = list(map(u,palette[key][x])) #  type unicode
                         # read in extended palette data containing slider settings:
                         if len(palette[key])==14:
                             nextpalette[9] = list(map(int,palette[key][9]))     #  type int
                             nextpalette[10] = list(map(int,palette[key][10]))     #  type int
-                            nextpalette[11] = list(map(str,palette[key][11])) #  type unicode
+                            nextpalette[11] = list(map(u,palette[key][11])) #  type unicode
                             nextpalette[12] = list(map(int,palette[key][12]))     #  type int
                             nextpalette[13] = list(map(float,palette[key][13]))     #  type double
                         else:
-                            nextpalette[9] = self.buttonpalette[9]
-                            nextpalette[10] = self.buttonpalette[10]
-                            nextpalette[11] = self.buttonpalette[11]
-                            nextpalette[12] = self.buttonpalette[12]
-                            nextpalette[13] = self.buttonpalette[13]
+                            nextpalette[9] = self.buttonpalette[i][9]
+                            if len(self.buttonpalette[i]) == 11:
+                                nextpalette[10] = self.buttonpalette[i][10]
+                            else:
+                                nextpalette[10] = []
+                            if len(self.buttonpalette[i]) == 12:
+                                nextpalette[11] = self.buttonpalette[i][11]
+                            else:
+                                nextpalette[11] = []
+                            if len(self.buttonpalette[i]) == 13:
+                                nextpalette[12] = self.buttonpalette[i][12]
+                            else:
+                                nextpalette[12] = []
+                            if len(self.buttonpalette[i]) == 14:
+                                nextpalette[13] = self.buttonpalette[i][13]
+                            else:
+                                nextpalette[13] = []
                     self.buttonpalette[i] = nextpalette[:]
             else:
                 message = QApplication.translate("Message","Invalid palettes file format", None)
