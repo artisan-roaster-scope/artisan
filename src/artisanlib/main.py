@@ -609,7 +609,7 @@ class tgraphcanvas(FigureCanvas):
     def __init__(self,parent):
 
         #default palette of colors
-        self.palette = {"background":'white',"grid":'green',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',"rect1":'green',
+        self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',"rect1":'green',
                         "rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',"et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue'}
 
@@ -1225,7 +1225,7 @@ class tgraphcanvas(FigureCanvas):
         #plot events by value
         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
-        self.EvalueColor = ["brown","blue","purple","grey"]
+        self.EvalueColor = ['#4895CE','#49B160','#800080','#910113'] #["brown","blue","purple","grey"]
         self.EvalueMarker = ["o","s","h","D"]
         self.EvalueMarkerSize = [8,8,8,8]
         self.Evaluelinethickness = [2,2,2,2]
@@ -10491,7 +10491,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonlistmaxlen = 11
         #10 palettes of buttons
         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
-        self.buttonpalettemaxlen = [14]*10  #keeps max len of each palette
+        self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
 
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
@@ -16332,31 +16332,6 @@ class ApplicationWindow(QMainWindow):
                     for i in range(len(self.buttonpalette)):
                         if self.buttonpalette[i] == None:
                             self.buttonpalette[i] = []
-                        elif len(self.buttonpalette[i]) > self.buttonpalettemaxlen[i]:
-                            self.buttonpalette[i] = self.buttonpalette[i][:self.buttonpalettemaxlen[i]]
-                    
-#                    mlist = [toList(x) for x in toList(settings.value("buttonpalette",self.buttonpalette))]
-#                    for i in range(len(mlist)):
-#                        if len(mlist[i]) in [9,13,14]:
-#                            self.buttonpalette[i].append([toInt(x) for x in toList(mlist[i][0])])              #types
-#                            self.buttonpalette[i].append([toInt(x) for x in toList(mlist[i][1])])              #values
-#                            self.buttonpalette[i].append([toInt(x) for x in toList(mlist[i][2])])              #actions
-#                            self.buttonpalette[i].append([toInt(x) for x in toList(mlist[i][3])])              #visibility
-#                            self.buttonpalette[i].append(list(map(str,[toString(x) for x in toList(mlist[i][4])]))) #strings
-#                            self.buttonpalette[i].append(list(map(str,[toString(x) for x in toList(mlist[i][5])]))) #labels
-#                            self.buttonpalette[i].append(list(map(str,[toString(x) for x in toList(mlist[i][6])]))) #descriptions
-#                            self.buttonpalette[i].append(list(map(str,[toString(x) for x in toList(mlist[i][7])]))) #color
-#                            self.buttonpalette[i].append(list(map(str,[toString(x) for x in toList(mlist[i][8])]))) #textcolor
-#                            if len(mlist[i]) == 14:
-#                                self.buttonpalette[i].append([toInt(x) for x in toList(mlist[i][9])])            #slider visibility
-#                                self.buttonpalette[i].append([toInt(x) for x in toList(mlist[i][10])])            #slider actions
-#                                self.buttonpalette[i].append(list(map(str,[toString(x) for x in toList(mlist[i][11])]))) #sider commands
-#                                self.buttonpalette[i].append([toInt(x) for x in toList(mlist[i][12])])            #slider offsets
-#                                self.buttonpalette[i].append([toDouble(x) for x in toList(mlist[i][13])])         #slider factors
-#                            else:
-#                                self.buttonpalette[i].extend([[],[],[],[],[]])
-#                        else:
-#                            self.buttonpalette[i].extend([[],[],[],[],[],[],[],[],[],[],[],[],[]])
                 for i in range(len(self.extraeventsactionstrings)):
                     self.extraeventsactionstrings[i] = u(self.extraeventsactionstrings[i])
                     self.extraeventslabels[i] = u(self.extraeventslabels[i])
@@ -19421,7 +19396,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
-        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers)<br>")
+        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -20805,6 +20780,16 @@ class ApplicationWindow(QMainWindow):
         copy.append(self.eventslidercommands[:])
         copy.append(self.eventslideroffsets[:])
         copy.append(self.eventsliderfactors[:])
+        # added quantifier settings
+        copy.append(self.eventquantifieractive[:])
+        copy.append(self.eventquantifiersource[:])
+        copy.append(self.eventquantifiermin[:])
+        copy.append(self.eventquantifiermax[:])
+        copy.append(self.eventquantifiercoarse[:])
+        # added slider min/max
+        copy.append(self.eventslidermin[:])        
+        copy.append(self.eventslidermax[:])
+              
         self.buttonpalette[pindex] = copy[:] 
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
         self.sendmessage(QApplication.translate("Message","Buttons copied to Palette #%i"%(pindex), None))
@@ -20843,6 +20828,36 @@ class ApplicationWindow(QMainWindow):
                 self.eventsliderfactors = copy[13][:]
             else:
                 self.eventsliderfactors = [1.0,1.0,1.0,1.0]
+                
+            if len(copy)>14 and len(copy[14]) == 4:
+                self.eventquantifieractive = copy[14][:]
+            else:
+                self.eventquantifieractive = [0,0,0,0]
+            if len(copy)>15 and len(copy[15]) == 4:
+                self.eventquantifiersource = copy[15][:]
+            else:
+                self.eventquantifiersource = [0,0,0,0]
+            if len(copy)>16 and len(copy[16]) == 4:
+                self.eventquantifiermin = copy[16][:]
+            else:
+                self.eventquantifiermin = [0,0,0,0]
+            if len(copy)>17 and len(copy[17]) == 4:
+                self.eventquantifiermax = copy[17][:]
+            else:
+                self.eventquantifiermax = [100,100,100,100]
+            if len(copy)>18 and len(copy[18]) == 4:
+                self.eventquantifiercoarse = copy[18][:]
+            else:
+                self.eventquantifiercoarse = [0,0,0,0]
+            if len(copy)>19 and len(copy[19]) == 4:
+                self.eventslidermin = copy[19][:]
+            else:
+                self.eventslidermin = [0,0,0,0]
+            if len(copy)>20 and len(copy[20]) == 4:
+                self.eventslidermin = copy[20][:]
+            else:
+                self.eventslidermin = [100,100,100,100]
+                
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
             self.updateSlidersProperties()
@@ -20875,7 +20890,7 @@ class ApplicationWindow(QMainWindow):
             palette[key] = self.encodeTreeStrings(self.buttonpalette[i])
         palette["maxlen"] = self.buttonpalettemaxlen
         try:
-            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Palettes",None),ext="*.apal")
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Palettes",None),ext="*.apal") 
             if filename:
                 #write
                 self.serialize(filename,palette)
@@ -20911,28 +20926,28 @@ class ApplicationWindow(QMainWindow):
                         # read in extended palette data containing slider settings:
                         if len(palette[key])==14:
                             nextpalette[9] = list(map(int,palette[key][9]))     #  type int
-                            nextpalette[10] = list(map(int,palette[key][10]))     #  type int
-                            nextpalette[11] = list(map(u,palette[key][11])) #  type unicode
-                            nextpalette[12] = list(map(int,palette[key][12]))     #  type int
-                            nextpalette[13] = list(map(float,palette[key][13]))     #  type double
+                            nextpalette[10] = list(map(int,palette[key][10]))   #  type int
+                            nextpalette[11] = list(map(u,palette[key][11]))     #  type unicode
+                            nextpalette[12] = list(map(int,palette[key][12]))   #  type int
+                            nextpalette[13] = list(map(float,palette[key][13])) #  type double
                         else:
-                            nextpalette[9] = self.buttonpalette[i][9]
-                            if len(self.buttonpalette[i]) == 11:
-                                nextpalette[10] = self.buttonpalette[i][10]
-                            else:
-                                nextpalette[10] = []
-                            if len(self.buttonpalette[i]) == 12:
-                                nextpalette[11] = self.buttonpalette[i][11]
-                            else:
-                                nextpalette[11] = []
-                            if len(self.buttonpalette[i]) == 13:
-                                nextpalette[12] = self.buttonpalette[i][12]
-                            else:
-                                nextpalette[12] = []
-                            if len(self.buttonpalette[i]) == 14:
-                                nextpalette[13] = self.buttonpalette[i][13]
-                            else:
-                                nextpalette[13] = []
+                            for k in range(9,14):
+                                if len(self.buttonpalette[i]) == k+1:
+                                    nextpalette[k] = self.buttonpalette[i][k]
+
+                        if len(palette[key])==21:
+                            nextpalette[14] = list(map(int,palette[key][14]))     #  type int
+                            nextpalette[15] = list(map(int,palette[key][15]))     #  type int
+                            nextpalette[16] = list(map(int,palette[key][16]))     #  type int
+                            nextpalette[17] = list(map(int,palette[key][17]))     #  type int
+                            nextpalette[18] = list(map(int,palette[key][18]))     #  type int                                
+                            nextpalette[19] = list(map(int,palette[key][19]))     #  type int                                
+                            nextpalette[20] = list(map(int,palette[key][20]))     #  type int
+                        else:
+                            for k in range(14,21):
+                                if len(self.buttonpalette[i]) == k+1:
+                                    nextpalette[k] = self.buttonpalette[i][k]
+                                
                     self.buttonpalette[i] = nextpalette[:]
             else:
                 message = QApplication.translate("Message","Invalid palettes file format", None)
@@ -29951,8 +29966,8 @@ class modbusport(object):
             return r
         except Exception as ex:
             self.disconnect()
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
