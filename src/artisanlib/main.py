@@ -20790,7 +20790,7 @@ class ApplicationWindow(QMainWindow):
         copy.append(self.eventslidermin[:])        
         copy.append(self.eventslidermax[:])
               
-        self.buttonpalette[pindex] = copy[:] 
+        self.buttonpalette[pindex] = copy[:]
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
         self.sendmessage(QApplication.translate("Message","Buttons copied to Palette #%i"%(pindex), None))
 
@@ -20854,9 +20854,9 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.eventslidermin = [0,0,0,0]
             if len(copy)>20 and len(copy[20]) == 4:
-                self.eventslidermin = copy[20][:]
+                self.eventslidermax = copy[20][:]
             else:
-                self.eventslidermin = [100,100,100,100]
+                self.eventslidermax = [100,100,100,100]
                 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
