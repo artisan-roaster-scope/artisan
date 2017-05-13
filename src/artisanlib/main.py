@@ -1061,10 +1061,10 @@ class tgraphcanvas(FigureCanvas):
         self.detectBackgroundEventTime = 20 #seconds
         self.backgroundReproduce = False
         self.backgroundPlaybackEvents = False
-        self.Betypes = [QApplication.translate("Scope Annotation", "Speed",None),
-                        QApplication.translate("Scope Annotation", "Heater",None),
-                        QApplication.translate("Scope Annotation", "Damper",None),
-                        QApplication.translate("Scope Annotation", "Fan",None),
+        self.Betypes = [QApplication.translate("ComboBox", "Air",None),
+                        QApplication.translate("ComboBox", "Drum",None),
+                        QApplication.translate("ComboBox", "Damper",None),
+                        QApplication.translate("ComboBox", "Burner",None),
                         "--"]
         self.backgroundFlavors = []
         self.flavorbackgroundflag = False
@@ -1196,16 +1196,16 @@ class tgraphcanvas(FigureCanvas):
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
         self.specialevents = []
         #ComboBox text event types. They can be modified in eventsDlg()
-        self.etypes = [QApplication.translate("ComboBox", "Speed",None),
-                       QApplication.translate("ComboBox", "Power",None),
+        self.etypes = [QApplication.translate("ComboBox", "Air",None),
+                       QApplication.translate("ComboBox", "Drum",None),
                        QApplication.translate("ComboBox", "Damper",None),
-                       QApplication.translate("ComboBox", "Fan",None),
+                       QApplication.translate("ComboBox", "Burner",None),
                        "--"]
         #default etype settings to restore
-        self.etypesdefault = [QApplication.translate("ComboBox", "Speed",None),
-                              QApplication.translate("ComboBox", "Power",None),
+        self.etypesdefault = [QApplication.translate("ComboBox", "Air",None),
+                              QApplication.translate("ComboBox", "Drum",None),
                               QApplication.translate("ComboBox", "Damper",None),
-                              QApplication.translate("ComboBox", "Fan",None),
+                              QApplication.translate("ComboBox", "Burner",None),
                               "--"]
         #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc.
         self.specialeventstype = []
@@ -4172,16 +4172,16 @@ class tgraphcanvas(FigureCanvas):
                             for i in range(len(self.backgroundEvents)):
                                 if self.backgroundEtypes[i] == 0:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E1backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
+                                    self.E1backgroundvalues.append(self.eventpositionbars[min(11,max(0,int(round(self.backgroundEvalues[i]))))])
                                 elif self.backgroundEtypes[i] == 1:
                                     self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E2backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
+                                    self.E2backgroundvalues.append(self.eventpositionbars[min(11,max(0,int(round(self.backgroundEvalues[i]))))])
                                 elif self.backgroundEtypes[i] == 2:
                                     self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E3backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
+                                    self.E3backgroundvalues.append(self.eventpositionbars[min(11,max(0,int(round(self.backgroundEvalues[i]))))])
                                 elif self.backgroundEtypes[i] == 3:
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E4backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
+                                    self.E4backgroundvalues.append(self.eventpositionbars[min(11,max(0,int(round(self.backgroundEvalues[i]))))])
     
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
@@ -4359,19 +4359,19 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(Nevents):
                             if self.specialeventstype[i] == 0:           
                                 self.E1timex.append(self.timex[self.specialevents[i]])
-                                self.E1values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
+                                self.E1values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[i]))))])
                                 E1_nonempty = True
                             elif self.specialeventstype[i] == 1:
                                 self.E2timex.append(self.timex[self.specialevents[i]])
-                                self.E2values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
+                                self.E2values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[i]))))])
                                 E2_nonempty = True
                             elif self.specialeventstype[i] == 2:
                                 self.E3timex.append(self.timex[self.specialevents[i]])
-                                self.E3values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
+                                self.E3values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[i]))))])
                                 E3_nonempty = True
                             elif self.specialeventstype[i] == 3:
                                 self.E4timex.append(self.timex[self.specialevents[i]])
-                                self.E4values.append(self.eventpositionbars[min(11,max(0,int(self.specialeventsvalue[i])))])
+                                self.E4values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[i]))))])
                                 E4_nonempty = True
     
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
@@ -6272,16 +6272,16 @@ class tgraphcanvas(FigureCanvas):
                         etype = self.specialeventstype[-1]
                         if etype == 0:
                             self.E1timex.append(self.timex[self.specialevents[-1]])
-                            self.E1values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                            self.E1values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[-1]))))])
                         elif etype == 1:
                             self.E2timex.append(self.timex[self.specialevents[-1]])
-                            self.E2values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                            self.E2values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[-1]))))])
                         elif etype == 2:
                             self.E3timex.append(self.timex[self.specialevents[-1]])
-                            self.E3values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                            self.E3values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[-1]))))])
                         elif etype == 3:
                             self.E4timex.append(self.timex[self.specialevents[-1]])
-                            self.E4values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                            self.E4values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[-1]))))])
                         #if Event show flag
                         if self.eventsshowflag:
                             index = self.specialevents[-1]
@@ -9952,6 +9952,7 @@ class ApplicationWindow(QMainWindow):
         if locale == "tr":
             self.TurkishLanguage.setChecked(True)
 
+        # simplified Chinese
         self.ChineseChinaLanguage = QAction(UIconst.CONF_MENU_CHINESE_CN,self)
         self.ChineseChinaLanguage.setCheckable(True)
         self.ChineseChinaLanguage.triggered.connect(lambda lang="zh_CN":self.changelocale("zh_CN"))
@@ -9959,6 +9960,7 @@ class ApplicationWindow(QMainWindow):
         if locale == "zh_CN":
             self.ChineseChinaLanguage.setChecked(True)
 
+        # traditional Chinese
         self.ChineseTaiwanLanguage = QAction(UIconst.CONF_MENU_CHINESE_TW,self)
         self.ChineseTaiwanLanguage.setCheckable(True)
         self.ChineseTaiwanLanguage.triggered.connect(lambda lang="zh_TW":self.changelocale("zh_TW"))
@@ -14505,12 +14507,13 @@ class ApplicationWindow(QMainWindow):
             old_mode = self.qmc.mode
             if "mode" in profile:
                 m = str(profile["mode"])
-            #convert modes only if needed comparing the new uploaded mode to the old one.
-            #otherwise it would incorrectly convert the uploaded phases
-            if m == "F" and self.qmc.mode == "C":
-                self.qmc.fahrenheitMode()
-            if m == "C" and self.qmc.mode == "F":
-                self.qmc.celsiusMode()
+                #convert modes only if needed comparing the new uploaded mode to the old one.
+                #otherwise it would incorrectly convert the uploaded phases
+                if m == "F" and self.qmc.mode == "C":
+                    self.qmc.fahrenheitMode()
+                if m == "C" and self.qmc.mode == "F":
+                    self.qmc.celsiusMode()
+
             if "phases" in profile:
                 self.qmc.phases = profile["phases"]
             if "flavors" in profile:
@@ -15070,8 +15073,9 @@ class ApplicationWindow(QMainWindow):
         ######### Similarity #########
         try:
             det,dbt = aw.curveSimilarity(aw.qmc.phases[1])
-            if det != None:
+            if det != None and not math.isnan(det):
                 computedProfile["det"] = det
+            if dbt != None and not math.isnan(dbt):
                 computedProfile["dbt"] = dbt
         except Exception:
             pass
@@ -16741,7 +16745,14 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
             settings.setValue("minieventsflag",self.minieventsflag)
             settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
-            settings.setValue("etypes",self.qmc.etypes)
+            # we only store etype names if they have be modified by the user to allow automatic translations otherwise
+            if ((self.qmc.etypes[0] != QApplication.translate("ComboBox", "Air",None)) or
+                (self.qmc.etypes[1] != QApplication.translate("ComboBox", "Drum",None)) or
+                (self.qmc.etypes[2] != QApplication.translate("ComboBox", "Damper",None)) or
+                (self.qmc.etypes[3] != QApplication.translate("ComboBox", "Burner",None))):
+                settings.setValue("etypes",self.qmc.etypes)
+            else:   
+                settings.remove("etypes")
             settings.setValue("eventsshowflag",self.qmc.eventsshowflag)
             settings.setValue("clampEvents",self.qmc.clampEvents)
             settings.setValue("annotationsflag",self.qmc.annotationsflag)
@@ -19976,6 +19987,7 @@ class ApplicationWindow(QMainWindow):
         if locale != languagelocale:
             # switch old flag off
             self.switchLanguageFlag(locale,False)
+            # check if etypes are unmodified by user and in that case, remove etypes from settings to avoid overwriting of translations:
             # switch new flag on
             self.switchLanguageFlag(languagelocale,True)
             settings = QSettings()
@@ -20720,7 +20732,14 @@ class ApplicationWindow(QMainWindow):
             p.setStyleSheet(style)
 #            p.setMinimumHeight(50)
             p.setMinimumHeight(aw.standard_button_height)
-            p.setText(self.extraeventslabels[i])
+            l = self.extraeventslabels[i]
+            # event type et
+            et = self.extraeventstypes[i]
+            if et > 4:
+                et = et - 5
+            if et < 4:
+                l = l.replace("\\t",self.qmc.etypes[et])
+            p.setText(l)
             p.setFocusPolicy(Qt.NoFocus)
             p.clicked.connect(lambda _,x=i:self.recordextraevent(x))
             self.buttonlist.append(p)
@@ -27596,8 +27615,14 @@ class EventsDlg(ArtisanDialog):
             if "\\n" in label:              #make multiple line text if "\n" found in label string
                 parts = label.split("\\n")
                 label = chr(10).join(parts)
-            aw.extraeventslabels[i] = label
-            aw.buttonlist[i].setText(aw.extraeventslabels[i])
+            aw.extraeventslabels[i] = label            
+            # event type et
+            et = self.extraeventstypes[i]
+            if et > 4:
+                et = et - 5
+            if et < 4:
+                label = label.replace("\\t",self.qmc.etypes[et])            
+            aw.buttonlist[i].setText(label)
             descriptionedit = self.eventbuttontable.cellWidget(i,1)
             aw.extraeventsdescriptions[i] = u(descriptionedit.text())
             typecombobox = self.eventbuttontable.cellWidget(i,2)
@@ -28027,6 +28052,7 @@ class EventsDlg(ArtisanDialog):
 
     def showEventbuttonhelp(self):
         string = u(QApplication.translate("Message", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None)) + "<br>"
+        string += u(QApplication.translate("Message", "Enter \\t to be substituted by the event type.",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Event Description</b> Description of the Event to be recorded.",None)) + "<br>"  
         string += u(QApplication.translate("Message", "<b>Event type</b> Type of event to be recorded.",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Event value</b> Value of event (1-100) to be recorded",None)) + "<br>"
