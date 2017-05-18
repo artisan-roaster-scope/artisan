@@ -108,6 +108,7 @@ ROAST_MENU_SWITCH_ETBT = QApplication.translate("Menu", "Switch ET<->BT", None)
 CONF_MENU = QApplication.translate("Menu", "Config", None)
 if platf != 'Darwin':
     CONF_MENU = "&" + CONF_MENU
+CONF_MENU_MACHINE = QApplication.translate("Menu", "Machine", None)
 CONF_MENU_DEVICE = QApplication.translate("Menu", "Device...", None)
 CONF_MENU_SERIALPORT = QApplication.translate("Menu", "Serial Port...", None)
 CONF_MENU_SAMPLING = QApplication.translate("Menu", "Sampling Interval...", None)

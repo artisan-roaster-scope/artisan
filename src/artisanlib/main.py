@@ -9729,6 +9729,9 @@ class ApplicationWindow(QMainWindow):
         self.GraphMenu.addAction(self.switchETBTAction)
 
         # CONFIGURATION menu
+        self.machineMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_MACHINE)
+        self.populateMachineMenu()
+        
         self.deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
         self.deviceAction.triggered.connect(self.deviceassigment)
         self.ConfMenu.addAction(self.deviceAction)
@@ -10938,6 +10941,30 @@ class ApplicationWindow(QMainWindow):
 #                                    if aw.qmc.flagon and not aw.qmc.flagstart: # only in monitor mode, we set the last value to be used for relative +- button action as base
 #                                        aw.extraeventsactionslastvalue[i] = int(round(v))
 #                                    aw.qmc.quantifiedEvent.append([i,v,True]) 
+
+    def populateMachineMenu(self):
+        print("populateMachineMenu")
+        for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),"Machines")):
+            for file in files:
+                if file.endswith(".aset"): 
+                    d = os.path.split(root)
+                    p = os.path.join(root,file)
+                    f = file.replace(".aset","").replace("_"," ")
+                    if len(d) > 0:
+                        print(d[-1],f,p)
+                        a = QAction(self, visible=True,
+                            triggered=self.openMachineSettings)
+                        a.setData(p)
+                        a.setText(u(d[-1] + u(" ") + u(f) + u("...")))
+                        print(a)
+                        self.machineMenu.addAction(a)
+                        print("added")
+
+    def openMachineSettings(self):
+        action = self.sender()
+        if action:
+            print(action.data())
+        
 
     def process_active_quantifiers(self):
         for i in range(4):
@@ -27621,7 +27648,7 @@ class EventsDlg(ArtisanDialog):
             if et > 4:
                 et = et - 5
             if et < 4:
-                label = label.replace("\\t",self.qmc.etypes[et])            
+                label = label.replace("\\t",aw.qmc.etypes[et])
             aw.buttonlist[i].setText(label)
             descriptionedit = self.eventbuttontable.cellWidget(i,1)
             aw.extraeventsdescriptions[i] = u(descriptionedit.text())
@@ -34949,20 +34976,20 @@ class scanModbusDlg(ArtisanDialog):
                 result += "<br>stopped<br>"
                 self.modbusEdit.setHtml(result)
                 break
-            if self.code3:
+            if self.code4:
                 aw.modbus.sleepBetween()
                 aw.modbus.sleepBetween()
                 aw.modbus.connect()
                 try:
                     res = aw.modbus.master.read_input_registers(int(register),1,unit=self.slave)
                 except:
-                    res = None    
+                    res = None
                 if res != None and  not isinstance(res,ExceptionResponse):
                     decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
                     r = decoder.decode_16bit_uint()
-                    result += str(register) + "(3)," + str(r) + "<br>"
+                    result += str(register) + "(4)," + str(r) + "<br>"
                     self.modbusEdit.setHtml(result)
-            if self.code4:
+            if self.code3:
                 aw.modbus.sleepBetween()
                 aw.modbus.sleepBetween()
                 aw.modbus.connect()
@@ -34973,7 +35000,7 @@ class scanModbusDlg(ArtisanDialog):
                 if res != None and  not isinstance(res,ExceptionResponse):
                     decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
                     r = decoder.decode_16bit_uint()
-                    result += str(register) + "(4)," + str(r) + "<br>"
+                    result += str(register) + "(3)," + str(r) + "<br>"
                     self.modbusEdit.setHtml(result)
         # reconstruct MODBUS setup
         aw.modbus.comport = self.port_aw
