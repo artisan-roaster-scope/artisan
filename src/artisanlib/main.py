@@ -1039,8 +1039,8 @@ class tgraphcanvas(FigureCanvas):
 
         #background profile
         self.background = False
-        self.backgroundDetails = False
-        self.backgroundeventsflag = False
+        self.backgroundDetails = True
+        self.backgroundeventsflag = True
         self.backgroundpath = ""
         self.backgroundmovespeed = 30
         self.titleB = ""
@@ -1419,6 +1419,9 @@ class tgraphcanvas(FigureCanvas):
 
         for label in self.ax.xaxis.get_ticklabels():
             label.set_color(self.palette["xlabel"])
+            
+        self.backgroundETcurve = True
+        self.backgroundBTcurve = True
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
 #        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None)))
@@ -4150,11 +4153,19 @@ class tgraphcanvas(FigureCanvas):
                                                         alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundXT", None)))                                    
     
                     #draw background
-                    self.l_back1, = self.ax.plot(self.timeB, self.stemp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
+                    if aw.qmc.backgroundETcurve:
+                        temp_etb = self.stemp1B
+                    else:
+                        temp_etb = [None]*len(self.timeB)
+                    self.l_back1, = self.ax.plot(self.timeB,temp_etb,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
                                                 sketch_params=None,path_effects=[],
                                                 linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
-                                                alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None)))
-                    self.l_back2, = self.ax.plot(self.timeB, self.stemp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker, 
+                                                alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None)))                        
+                    if aw.qmc.backgroundBTcurve:
+                        temp_btb = self.stemp2B
+                    else:
+                        temp_btb = [None]*len(self.timeB)
+                    self.l_back2, = self.ax.plot(self.timeB, temp_btb,markersize=self.BTbackmarkersize,marker=self.BTbackmarker, 
                                                 linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
                                                 sketch_params=None,path_effects=[],
                                                 alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None)))
@@ -5377,7 +5388,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 if aw.clusterEventsFlag:
                     aw.clusterEvents()
-            except Exception:
+            except:
                 pass
             if aw.qmc.autosaveflag and aw.qmc.autosavepath:
                 try:
@@ -11159,6 +11170,7 @@ class ApplicationWindow(QMainWindow):
                         min_span = time_diff
                 last_event_idx = i
             if min_span != None:
+                min_span = min(1,min_span,aw.qmc.delay/1000 * 3)
                 indexes_to_be_removed = []
                 last_event_idx = None # index of last event analyzed
                 last_index_not_removed = None
@@ -16363,6 +16375,9 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.alignEvent = toInt(settings.value("alignEvent",aw.qmc.alignEvent))
                 if settings.contains("movespeed"):
                     aw.qmc.backgroundmovespeed = toInt(settings.value("movespeed",aw.qmc.backgroundmovespeed))
+            if settings.contains("ETBflag"):
+                aw.qmc.backgroundETcurve = bool(toBool(settings.value("ETBflag",aw.qmc.backgroundETcurve)))
+                aw.qmc.backgroundBTcurve = bool(toBool(settings.value("BTBflag",aw.qmc.backgroundBTcurve)))                    
             settings.endGroup()
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = toInt(settings.value("autosaveflag",self.qmc.autosaveflag))
@@ -17197,6 +17212,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaETB",aw.qmc.DeltaETBflag)
             settings.setValue("DeltaBTB",aw.qmc.DeltaBTBflag)
             settings.setValue("alignEvent",aw.qmc.alignEvent)
+            settings.setValue("ETBflag",aw.qmc.backgroundETcurve)
+            settings.setValue("BTBflag",aw.qmc.backgroundBTcurve)
             settings.endGroup()
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
             settings.setValue("autosaveprefix",self.qmc.autosaveprefix)
@@ -28752,12 +28769,16 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Annotations", None))
         self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None))
         self.backgroundDeltaETflag = QCheckBox(QApplication.translate("CheckBox","DeltaET", None))
-        self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None))        
+        self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None)) 
+        self.backgroundETflag = QCheckBox(QApplication.translate("CheckBox","ET", None))
+        self.backgroundBTflag = QCheckBox(QApplication.translate("CheckBox","BT", None))        
         self.backgroundCheck.setChecked(aw.qmc.background)
         self.backgroundDetails.setChecked(aw.qmc.backgroundDetails)
         self.backgroundeventsflag.setChecked(aw.qmc.backgroundeventsflag)
         self.backgroundDeltaETflag.setChecked(aw.qmc.DeltaETBflag)
         self.backgroundDeltaBTflag.setChecked(aw.qmc.DeltaBTBflag)
+        self.backgroundETflag.setChecked(aw.qmc.backgroundETcurve)
+        self.backgroundBTflag.setChecked(aw.qmc.backgroundBTcurve)
         loadButton = QPushButton(QApplication.translate("Button","Load", None))
         loadButton.setFocusPolicy(Qt.NoFocus)
         delButton = QPushButton(QApplication.translate("Button","Delete", None))
@@ -28862,6 +28883,8 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundeventsflag.clicked.connect(self.readChecks)
         self.backgroundDeltaETflag.clicked.connect(self.readChecks)
         self.backgroundDeltaBTflag.clicked.connect(self.readChecks)
+        self.backgroundETflag.clicked.connect(self.readChecks)
+        self.backgroundBTflag.clicked.connect(self.readChecks)
         delButton.clicked.connect(self.delete)
         self.upButton.clicked.connect(lambda m= "up": self.move("up"))
         self.downButton.clicked.connect(lambda m="down": self.move("down"))
@@ -28910,6 +28933,8 @@ class backgroundDlg(ArtisanDialog):
         checkslayout1.addWidget(self.backgroundCheck)
         checkslayout1.addWidget(self.backgroundDetails)
         checkslayout1.addWidget(self.backgroundeventsflag)
+        checkslayout1.addWidget(self.backgroundETflag)
+        checkslayout1.addWidget(self.backgroundBTflag)
         checkslayout1.addWidget(self.backgroundDeltaETflag)
         checkslayout1.addWidget(self.backgroundDeltaBTflag)
         checkslayout1.addStretch()
@@ -29167,6 +29192,8 @@ class backgroundDlg(ArtisanDialog):
         aw.qmc.backgroundeventsflag = bool(self.backgroundeventsflag.isChecked())
         aw.qmc.DeltaETBflag = bool(self.backgroundDeltaETflag.isChecked())
         aw.qmc.DeltaBTBflag = bool(self.backgroundDeltaBTflag.isChecked())
+        aw.qmc.backgroundETcurve = bool(self.backgroundETflag.isChecked())
+        aw.qmc.backgroundBTcurve = bool(self.backgroundBTflag.isChecked())
         aw.qmc.redraw(recomputeAllDeltas=True)
         
     def changeAlignEventidx(self,i):

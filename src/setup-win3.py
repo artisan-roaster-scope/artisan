@@ -168,7 +168,8 @@ os.system('copy includes\\report-template.htm dist')
 os.system('copy includes\\roast-template.htm dist')
 os.system('copy includes\\ranking-template.htm dist')
 os.system('copy includes\\jquery-1.11.1.min.js dist')
-os.system(r'xcopy includes\\Machines dist /S')
+os.system(r'mkdir dist\\Machines')
+os.system(r'xcopy includes\\Machines dist\\Machines /y /S')
 os.system('copy ..\\Redistribution2010\\vcredist_x86.exe dist')
 
 
