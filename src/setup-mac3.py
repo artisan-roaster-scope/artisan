@@ -113,6 +113,7 @@ DATA_FILES = [
     ("../Resources", [r"includes/ranking-template.htm"]),
     ("../Resources", [r"includes/Humor-Sans.ttf"]),
     ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
+    ("../Resources", [r"includes/Machines"]),
   ]
   
 plist = Plist.fromFile('Info.plist')
