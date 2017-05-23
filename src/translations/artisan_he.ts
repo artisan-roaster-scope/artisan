@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="he" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="he">
 <context>
     <name>About</name>
     <message>
@@ -4276,7 +4277,7 @@ END</source>
         <source>AUCguide</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../artisanlib/main.py" line="35082"/>
         <source>–</source>
         <translation type="unfinished"></translation>
@@ -6845,12 +6846,22 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
         <source>Host</source>
-        <translation>רֶשֶׁת</translation>
+        <translation type="obsolete">רֶשֶׁת</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
         <source>Machine network name or IP address</source>
-        <translation>שם רשת מחשב או כתובת IP</translation>
+        <translation type="obsolete">שם רשת מחשב או כתובת IP</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11039"/>
+        <source>Machine</source>
+        <translation>מְכוֹנָה</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11039"/>
+        <source>Network name or IP address</source>
+        <translation>שם רשת או כתובת IP</translation>
     </message>
 </context>
 <context>

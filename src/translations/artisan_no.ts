@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="nb" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="nb">
 <context>
     <name>About</name>
     <message>
@@ -4436,7 +4437,7 @@ END</source>
         <source>AUCguide</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../artisanlib/main.py" line="35082"/>
         <source>–</source>
         <translation type="unfinished"></translation>
@@ -7262,12 +7263,22 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
         <source>Host</source>
-        <translation>Network</translation>
+        <translation type="obsolete">Network</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
         <source>Machine network name or IP address</source>
-        <translation>Maskinnavn eller IP-adresse</translation>
+        <translation type="obsolete">Maskinnavn eller IP-adresse</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11039"/>
+        <source>Machine</source>
+        <translation>Maskin</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11039"/>
+        <source>Network name or IP address</source>
+        <translation>Nettverksnavn eller IP-adresse</translation>
     </message>
 </context>
 <context>

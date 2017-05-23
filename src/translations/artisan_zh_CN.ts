@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="zh_CN" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="zh_CN">
 <context>
     <name>About</name>
     <message>
@@ -4306,7 +4307,7 @@ END</source>
         <source>AUCguide</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../artisanlib/main.py" line="35082"/>
         <source>–</source>
         <translation type="unfinished"></translation>
@@ -6865,12 +6866,22 @@ Repeat Operation at the end: {0}</source>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
         <source>Host</source>
-        <translation>网络</translation>
+        <translation type="obsolete">网络</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
         <source>Machine network name or IP address</source>
-        <translation>机器网络名称或IP地址</translation>
+        <translation type="obsolete">机器网络名称或IP地址</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11039"/>
+        <source>Machine</source>
+        <translation>机</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11039"/>
+        <source>Network name or IP address</source>
+        <translation>网络名称或IP地址</translation>
     </message>
 </context>
 <context>

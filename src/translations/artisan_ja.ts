@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="ja" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.1" language="ja">
 <context>
     <name>About</name>
     <message>
@@ -4432,7 +4433,7 @@ END</translation>
         <source>AUCguide</source>
         <translation type="unfinished"></translation>
     </message>
-    <message encoding="UTF-8">
+    <message>
         <location filename="../artisanlib/main.py" line="35082"/>
         <source>–</source>
         <translation type="unfinished"></translation>
@@ -7258,12 +7259,22 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
         <source>Host</source>
-        <translation>ネットワーク</translation>
+        <translation type="obsolete">ネットワーク</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
         <source>Machine network name or IP address</source>
-        <translation>マシンのネットワーク名またはIPアドレス</translation>
+        <translation type="obsolete">マシンのネットワーク名またはIPアドレス</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11039"/>
+        <source>Machine</source>
+        <translation>機械</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="11039"/>
+        <source>Network name or IP address</source>
+        <translation>ネットワーク名またはIPアドレス</translation>
     </message>
 </context>
 <context>

@@ -1637,6 +1637,7 @@ class tgraphcanvas(FigureCanvas):
         if self.mode == "C":
             self.mode = "F"
             self.celsiusMode()
+            self.phases = self.phases_celsius_defaults
         
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -1931,40 +1932,47 @@ class tgraphcanvas(FigureCanvas):
                     menu = QMenu(self) 
                     # populate menu
                     ac = QAction(menu)
-                    if self.timeindex[0] > -1:
-                        ac.setText(u(QApplication.translate("Label", "at")) + u(" ") + self.stringfromseconds(event.xdata - self.timex[self.timeindex[0]]))
+                    bt = self.temp2[timex]
+                    if self.mode == "C":
+                        btdelta = 50
                     else:
-                        ac.setText(u(QApplication.translate("Label", "at")) + u(" ") + self.stringfromseconds(event.xdata))
-                    ac.setEnabled(False)
-                    menu.addAction(ac)
-                    for k in [(u(QApplication.translate("Label","CHARGE")),0),
-                              (u(QApplication.translate("Label","DRY END")),1),
-                              (u(QApplication.translate("Label","FC START")),2),
-                              (u(QApplication.translate("Label","FC END")),3),
-                              (u(QApplication.translate("Label","SC START")),4),
-                              (u(QApplication.translate("Label","SC END")),5),
-                              (u(QApplication.translate("Label","DROP")),6),
-                              (u(QApplication.translate("Label","COOL")),7)]:
-                        idx_before = idx_after = 0
-                        for i in range(k[1]):
-                            if self.timeindex[i] and self.timeindex[i] != -1:
-                                idx_before = self.timeindex[i]
-                        for i in range(6,k[1],-1) :
-                            if self.timeindex[i] and self.timeindex[i] != -1:
-                                idx_after = self.timeindex[i]
-                        if ((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after):
-                            ac = QAction(menu)
-                            ac.key = (k[1],timex)
-                            ac.setText(" " + k[0])
-                            menu.addAction(ac)
-                    # add user EVENT entry
-                    ac = QAction(menu)
-                    ac.setText(u(" ") + u(QApplication.translate("Label", "EVENT")))
-                    ac.key = (-1,timex)
-                    menu.addAction(ac)
-                    # show menu
-                    menu.triggered.connect(self.event_popup_action)
-                    menu.popup(QCursor.pos())
+                        btdelta = 70
+                    if bt != -1 and abs(bt-event.ydata) < btdelta:
+                        # we surpress the popup if not clicked close enough to the BT curve
+                        if self.timeindex[0] > -1:
+                            ac.setText(u(QApplication.translate("Label", "at")) + u(" ") + self.stringfromseconds(event.xdata - self.timex[self.timeindex[0]]))
+                        else:
+                            ac.setText(u(QApplication.translate("Label", "at")) + u(" ") + self.stringfromseconds(event.xdata))
+                        ac.setEnabled(False)
+                        menu.addAction(ac)
+                        for k in [(u(QApplication.translate("Label","CHARGE")),0),
+                                  (u(QApplication.translate("Label","DRY END")),1),
+                                  (u(QApplication.translate("Label","FC START")),2),
+                                  (u(QApplication.translate("Label","FC END")),3),
+                                  (u(QApplication.translate("Label","SC START")),4),
+                                  (u(QApplication.translate("Label","SC END")),5),
+                                  (u(QApplication.translate("Label","DROP")),6),
+                                  (u(QApplication.translate("Label","COOL")),7)]:
+                            idx_before = idx_after = 0
+                            for i in range(k[1]):
+                                if self.timeindex[i] and self.timeindex[i] != -1:
+                                    idx_before = self.timeindex[i]
+                            for i in range(6,k[1],-1) :
+                                if self.timeindex[i] and self.timeindex[i] != -1:
+                                    idx_after = self.timeindex[i]
+                            if ((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after):
+                                ac = QAction(menu)
+                                ac.key = (k[1],timex)
+                                ac.setText(" " + k[0])
+                                menu.addAction(ac)
+                        # add user EVENT entry
+                        ac = QAction(menu)
+                        ac.setText(u(" ") + u(QApplication.translate("Label", "EVENT")))
+                        ac.key = (-1,timex)
+                        menu.addAction(ac)
+                        # show menu
+                        menu.triggered.connect(self.event_popup_action)
+                        menu.popup(QCursor.pos())
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -9527,10 +9535,12 @@ class ApplicationWindow(QMainWindow):
         fileImportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None),self)
         fileImportJSONAction.triggered.connect(self.fileImportJSON)
         self.importMenu.addAction(fileImportJSONAction)
+        
+        self.importMenu.addSeparator()
 
-        fileImportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
-        fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
-        self.importMenu.addAction(fileImportRoastLoggerAction)
+        importBulletAction = QAction(QApplication.translate("Menu", "Aillio Bullet R1...",None),self)
+        importBulletAction.triggered.connect(self.importBullet)
+        self.importMenu.addAction(importBulletAction)
 
         importHH506RAAction = QAction(QApplication.translate("Menu", "HH506RA...",None),self)
         importHH506RAAction.triggered.connect(self.importHH506RA)
@@ -9547,6 +9557,11 @@ class ApplicationWindow(QMainWindow):
         importPilotAction = QAction(QApplication.translate("Menu", "Probat Pilot...",None),self)
         importPilotAction.triggered.connect(self.importPilot)
         self.importMenu.addAction(importPilotAction)
+
+        fileImportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
+        fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
+        self.importMenu.addAction(fileImportRoastLoggerAction)
+
 
         self.fileMenu.addSeparator()
 
@@ -9570,14 +9585,16 @@ class ApplicationWindow(QMainWindow):
         fileExportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None),self)
         fileExportJSONAction.triggered.connect(self.fileExportJSON)
         self.exportMenu.addAction(fileExportJSONAction)
-
-        fileExportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
-        fileExportRoastLoggerAction.triggered.connect(self.fileExportRoastLogger)
-        self.exportMenu.addAction(fileExportRoastLoggerAction)
+        
+        self.exportMenu.addSeparator()
 
         fileExportPilotAction = QAction(QApplication.translate("Menu", "Probat Pilot...",None),self)
         fileExportPilotAction.triggered.connect(self.fileExportPilot)
         self.exportMenu.addAction(fileExportPilotAction)
+
+        fileExportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
+        fileExportRoastLoggerAction.triggered.connect(self.fileExportRoastLogger)
+        self.exportMenu.addAction(fileExportRoastLoggerAction)
         
         
         self.exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_CONVERT)
@@ -11001,16 +11018,12 @@ class ApplicationWindow(QMainWindow):
                 aw.settypedefault() 
                 if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
                     host,res = QInputDialog.getText(self,
-                        QApplication.translate("Message", "Host",None),
-                        QApplication.translate("Message", "Machine network name or IP address",None),text="127.0.0.1")
+                        QApplication.translate("Message", "Machine",None),
+                        QApplication.translate("Message", "Network name or IP address",None),text="127.0.0.1")
                     if res:
                         aw.modbus.host = host
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-
-                        
-                
-            
 
     def process_active_quantifiers(self):
         # called every sampling interval
@@ -13722,7 +13735,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timeindex[7] = self.time2index(COOL)
             self.qmc.endofx = self.qmc.timex[-1]
             self.sendmessage(QApplication.translate("Message","Artisan CSV file loaded successfully", None))
-            self.qmc.safesaveflag = True
+            self.qmc.safesaveflag = True            
+            aw.autoAdjustAxis()
             self.qmc.redraw()
         except Exception as ex:
 #            import traceback
@@ -14049,6 +14063,7 @@ class ApplicationWindow(QMainWindow):
                 #update etypes combo box
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
+                aw.autoAdjustAxis()
                 self.qmc.redraw()
         except Exception as ex:
 #            import traceback
@@ -14343,7 +14358,8 @@ class ApplicationWindow(QMainWindow):
         finally:
             infile.close()
             if res:
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                aw.autoAdjustAxis()
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading                
                 self.qmc.redraw()
 
         if error_msg: 
@@ -20430,6 +20446,93 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importPilot() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    def importBullet(self):
+        try:
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import HH506RA CSV", None))
+            if len(filename) == 0:
+                return
+            import io
+            infile = io.open(filename, 'r', encoding='utf-8')
+            obj = json.load(infile)
+            infile.close()
+            bt = obj["beanTemperature"]
+            dt = obj["drumTemperature"]
+            sr = obj["sampleRate"]
+            d = obj["dateTime"] # RFC 3339 date time
+            tx = [x*1.0/sr for x in range(len(bt))]
+
+            if len(tx) == len(bt) == len(dt):
+                self.roastertype = u("Aillio Bullet R1")
+                try:
+                    self.qmc.roastdate = QDateTime.fromString(d,Qt.ISODate)
+                except:
+                    pass
+                self.qmc.timex = tx
+                self.qmc.temp1 = dt
+                self.qmc.temp2 = bt
+                try:
+                    self.qmc.title = obj["beanName"]
+                    try:
+                        self.qmc.beans = obj["bean"]["beanName"]
+                    except:
+                        pass
+                    self.qmc.ground_color = int(round(obj["agtron"]))
+                    if "Agtron" in self.qmc.color_systems:
+                        self.qmc.color_system_idx = self.qmc.color_systems.index("Agtron")
+                    else:
+                        self.qmc.color_system_idx = 0
+                    wunit = self.qmc.weight_units.index(self.qmc.weight[2])
+                    if wunit in [1,3]: # turn Kg into g, and lb into oz
+                        wunit = wuint -1
+                    self.qmc.weight = [obj["weightGreen"],obj["weightRoasted"],self.qmc.weight_units[wunit]]
+                    self.qmc.ambientTemp = obj["ambient"]
+                    self.qmc.ambient_humidity = obj["humidity"]
+                    self.qmc.roastingnotes = obj["comments"]
+                    self.qmc.roastbatchnr = obj["roastNumber"] 
+                    try:
+                        aw.qmc.timeindex = [0,
+                             obj["indexYellowingStart"],
+                             obj["indexFirstCrackStart"],
+                             obj["indexFirstCrackEnd"],
+                             obj["indexSecondCrackStart"],
+                             obj["indexSecondCrackEnd"],
+                             len(tx) - 1,
+                             0
+                             ]
+                    except:
+                        pass   
+                        
+                    try:
+                        eventtypes = ["blowerSetting","drumSpeedSetting","","inductionPowerSetting"]
+                        for j in range(len(eventtypes)):
+                            eventname = eventtypes[j]
+                            if eventname != "":
+                                last = None
+                                ip = obj[eventname]
+                                for i in range(len(ip)):
+                                    v = ip[i]+1
+                                    if last == None or last != v:
+                                        aw.qmc.specialevents.append(i)
+                                        aw.qmc.specialeventstype.append(j)
+                                        aw.qmc.specialeventsvalue.append(v)
+                                        aw.qmc.specialeventsStrings.append("")
+                                        last = v
+                    except:
+                        pass
+                except:
+                    pass
+            aw.autoAdjustAxis()
+            self.qmc.redraw()                
+        except IOError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " self.importBullet(): {0}").format(str(ex)))
+        except ValueError as ex:
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " self.importBullet(): {0}").format(str(ex)))
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " self.importBullet() {0}").format(str(ex)),exc_tb.tb_lineno)
+        
 
     def importHH506RA(self):
         try:

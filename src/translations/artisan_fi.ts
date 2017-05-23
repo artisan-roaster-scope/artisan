@@ -6679,12 +6679,12 @@ Proceed?</source>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
-        <source>Host</source>
+        <source>Machine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="11039"/>
-        <source>Machine network name or IP address</source>
+        <source>Network name or IP address</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
