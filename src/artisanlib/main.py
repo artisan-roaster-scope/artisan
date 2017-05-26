@@ -9429,6 +9429,10 @@ class ApplicationWindow(QMainWindow):
         self.pidcontrol = PIDcontrol()
         
         self.soundflag = 0
+        
+        # recent roasts, an ordered list (first-in, first-out) of dictionaries holding partial roast-properties and a link to the background profile if any
+        self.recentRoasts = []
+        self.maxRecentRoasts = 20 # the maximum number of recent roasts held
 
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv seetings)
         self.lcdpaletteB = {"timer":'black',"et":'black',"bt":'black',"deltaet":'black',"deltabt":'black',"sv":'black'}
@@ -9510,11 +9514,7 @@ class ApplicationWindow(QMainWindow):
         self.helpMenu = self.menuBar().addMenu(UIconst.HELP_MENU)
 
         #FILE menu
-        self.newRoastAction = QAction(UIconst.FILE_MENU_NEW,self)
-
-        self.newRoastAction.setShortcut(QKeySequence.New)
-        self.newRoastAction.triggered.connect(self.newRoast)
-        self.fileMenu.addAction(self.newRoastAction)
+        self.newRoastMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_NEW)
 
         self.fileLoadAction = QAction(UIconst.FILE_MENU_OPEN,self)
         self.fileLoadAction.setShortcut(QKeySequence.Open)
@@ -9528,11 +9528,11 @@ class ApplicationWindow(QMainWindow):
 
         self.importMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_IMPORT)
 
-        fileImportCSVAction = QAction(QApplication.translate("Menu", "CSV...",None),self)
+        fileImportCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
         fileImportCSVAction.triggered.connect(self.fileImportCSV)
         self.importMenu.addAction(fileImportCSVAction)
 
-        fileImportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None),self)
+        fileImportJSONAction = QAction(QApplication.translate("Menu", "Artisan JSON...",None),self)
         fileImportJSONAction.triggered.connect(self.fileImportJSON)
         self.importMenu.addAction(fileImportJSONAction)
         
@@ -9578,11 +9578,11 @@ class ApplicationWindow(QMainWindow):
 
         self.exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_EXPORT)
 
-        fileExportCSVAction = QAction(QApplication.translate("Menu", "CSV...",None),self)
+        fileExportCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
         fileExportCSVAction.triggered.connect(self.fileExportCSV)
         self.exportMenu.addAction(fileExportCSVAction)
 
-        fileExportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None),self)
+        fileExportJSONAction = QAction(QApplication.translate("Menu", "Artisan JSON...",None),self)
         fileExportJSONAction.triggered.connect(self.fileExportJSON)
         self.exportMenu.addAction(fileExportJSONAction)
         
@@ -9597,43 +9597,49 @@ class ApplicationWindow(QMainWindow):
         self.exportMenu.addAction(fileExportRoastLoggerAction)
         
         
-        self.exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_CONVERT)
-
-        fileConvertCSVAction = QAction(QApplication.translate("Menu", "CSV...",None),self)
-        fileConvertCSVAction.triggered.connect(self.fileConvertCSV)
-        self.exportMenu.addAction(fileConvertCSVAction)
-
-        fileConvertJSONAction = QAction(QApplication.translate("Menu", "JSON...",None),self)
-        fileConvertJSONAction.triggered.connect(self.fileConvertJSON)
-        self.exportMenu.addAction(fileConvertJSONAction)
-
-        fileConvertRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
-        fileConvertRoastLoggerAction.triggered.connect(self.fileConvertRoastLogger)
-        self.exportMenu.addAction(fileConvertRoastLoggerAction)
-
-        fileConvertProbatAction = QAction(QApplication.translate("Menu", "Probat Pilot...",None),self)
-        fileConvertProbatAction.triggered.connect(self.fileConvertPilot)
-        self.exportMenu.addAction(fileConvertProbatAction)
-        
-        fileConvertPNGAction = QAction(QApplication.translate("Menu", "PNG...",None),self)
-        fileConvertPNGAction.triggered.connect(self.fileConvertPNG)
-        self.exportMenu.addAction(fileConvertPNGAction)
-        
-        fileConvertSVGAction = QAction(QApplication.translate("Menu", "SVG...",None),self)
-        fileConvertSVGAction.triggered.connect(self.fileConvertSVG)
-        self.exportMenu.addAction(fileConvertSVGAction)
-        
-        fileConvertPDFAction = QAction(QApplication.translate("Menu", "PDF...",None),self)
-        fileConvertPDFAction.triggered.connect(self.fileConvertPDF)
-        self.exportMenu.addAction(fileConvertPDFAction)
+        self.convMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_CONVERT)
         
         fileConvertFahrenheitAction = QAction(QApplication.translate("Menu", "Fahrenheit...",None),self)
         fileConvertFahrenheitAction.triggered.connect(self.fileConvertToFahrenheit)
-        self.exportMenu.addAction(fileConvertFahrenheitAction)
+        self.convMenu.addAction(fileConvertFahrenheitAction)
         
         fileConvertCelsiusAction = QAction(QApplication.translate("Menu", "Celsius...",None),self)
         fileConvertCelsiusAction.triggered.connect(self.fileConvertToCelsius)
-        self.exportMenu.addAction(fileConvertCelsiusAction)
+        self.convMenu.addAction(fileConvertCelsiusAction)
+        
+        self.convMenu.addSeparator()
+
+        fileConvertCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
+        fileConvertCSVAction.triggered.connect(self.fileConvertCSV)
+        self.convMenu.addAction(fileConvertCSVAction)
+
+        fileConvertJSONAction = QAction(QApplication.translate("Menu", "Artisan JSON...",None),self)
+        fileConvertJSONAction.triggered.connect(self.fileConvertJSON)
+        self.convMenu.addAction(fileConvertJSONAction)
+        
+        self.convMenu.addSeparator()
+
+        fileConvertProbatAction = QAction(QApplication.translate("Menu", "Probat Pilot...",None),self)
+        fileConvertProbatAction.triggered.connect(self.fileConvertPilot)
+        self.convMenu.addAction(fileConvertProbatAction)
+
+        fileConvertRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None),self)
+        fileConvertRoastLoggerAction.triggered.connect(self.fileConvertRoastLogger)
+        self.convMenu.addAction(fileConvertRoastLoggerAction)
+        
+        self.convMenu.addSeparator()
+        
+        fileConvertPNGAction = QAction(QApplication.translate("Menu", "PNG...",None),self)
+        fileConvertPNGAction.triggered.connect(self.fileConvertPNG)
+        self.convMenu.addAction(fileConvertPNGAction)
+        
+        fileConvertSVGAction = QAction(QApplication.translate("Menu", "SVG...",None),self)
+        fileConvertSVGAction.triggered.connect(self.fileConvertSVG)
+        self.convMenu.addAction(fileConvertSVGAction)
+        
+        fileConvertPDFAction = QAction(QApplication.translate("Menu", "PDF...",None),self)
+        fileConvertPDFAction.triggered.connect(self.fileConvertPDF)
+        self.convMenu.addAction(fileConvertPDFAction)
         
 
         self.fileMenu.addSeparator()
@@ -10974,9 +10980,102 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
+    def createRecentRoast(self,title,beans,weightIn,weightOut,weightUnit,volumeIn,volumeOut,volumeUnit,
+            densityWeight,densityWeightUnit,densityVolume,densityVolumeUnit, beanSize,
+            moistureGreen,moistureRoasted,wholeColor,groundColor,colorSystem,background):
+        d = {
+            "title": title,
+            "weightIn": weightIn,
+            "weightUnit": weightUnit,
+        }
+        d["beans"] = beans
+        d["weightOut"] = weightOut
+        d["volumeIn"] = volumeIn
+        d["volumeOut"] = volumeOut
+        d["volumeUnit"] = volumeUnit
+        d["densityWeight"] = densityWeight
+        d["densityWeightUnit"] = densityWeightUnit
+        d["densityVolume"] = densityVolume
+        d["densityVolumeUnit"] = densityVolumeUnit
+        d["beanSize"] = beanSize
+        d["moistureGreen"] = moistureGreen
+        d["moistureRoasted"] = moistureRoasted
+        d["wholeColor"] = wholeColor
+        d["groundColor"] = groundColor
+        d["colorSystem"] = colorSystem
+        d["background"] = background
+        return d
+    
+    def setRecentRoast(self,rr):
+        self.qmc.title = rr["title"]
+        self.qmc.weight = [rr["weightIn"],rr["weightOut"],rr["weightUnit"]]
+        self.qmc.volume = [rr["volumeIn"],rr["volumeOut"],rr["volumeUnit"]]
+        self.qmc.density = [rr["densityWeight"],rr["densityWeightUnit"],rr["densityVolume"],rr["densityVolumeUnit"]]
+        self.qmc.beansize = rr["beanSize"]
+        self.qmc.moisture_green = rr["moistureGreen"]
+        self.qmc.moisture_roasted = rr["moistureRoasted"]
+        self.qmc.whole_color = rr["wholeColor"]
+        self.qmc.ground_color = rr["groundColor"]
+        self.qmc.color_system_idx = rr["colorSystem"]
+        
+    # d is a recentRoast dict
+    def addRecentRoast(self,d):
+        # check for duplications
+        entry_with_same_title = None
+        for i in range(len(self.recentRoasts)):
+            if self.recentRoasts[i]["title"] == d["title"] and self.recentRoasts[i]["weightIn"] == d["weightIn"] and self.recentRoasts[i]["weightUnit"] == d["weightUnit"]:
+                entry_with_same_title = i
+                break
+        if entry_with_same_title != None:
+            # we remove the duplicate entry first
+            rr = self.recentRoasts[:entry_with_same_title] + self.recentRoasts[entry_with_same_title+1:]
+        else:
+            rr = self.recentRoasts
+        self.recentRoasts = [d] + rr[:self.maxRecentRoasts-1]
+        
+    def recentRoastLabel(self,rr):
+        res = rr["title"] + " (" + "%g" % rr["weightIn"] +rr["weightUnit"]+")"
+        return res
+        
+    def newRecentRoast(self):
+        action = self.sender()
+        if action:
+            rr = action.data()
+            if "background" in rr:
+                try:
+                    aw.qmc.resetlinecountcaches()
+                    self.loadbackground(rr["background"])
+                    aw.qmc.background = True
+                    aw.qmc.timealign(redraw=False)
+                    aw.qmc.redraw()
+                except:
+                    pass                        
+                self.newRoast()
+            self.setRecentRoast(rr)
+                
+        
+    def updateNewMenuRecentRoasts(self):
+        self.newRoastMenu.clear()
+        # add NEW menu item
+        self.newRoastAction = QAction(UIconst.FILE_MENU_NEW,self)
+        self.newRoastAction.setShortcut(QKeySequence.New)
+        self.newRoastAction.triggered.connect(self.newRoast)
+        self.newRoastMenu.addAction(self.newRoastAction)
+        # add recent roasts items
+        if len(self.recentRoasts) > 0:
+            self.newRoastMenu.addSeparator()
+            for rr in self.recentRoasts:
+                act = QAction(self, visible=True,
+                                triggered=self.newRecentRoast)
+                act.setData(rr)
+                act.setText(self.recentRoastLabel(rr))
+                self.newRoastMenu.addAction(act)
+        
+    def recentRoastsMenuList(self):
+        return [self.recentRoastLabel(rr) for rr in self.recentRoasts]
+        
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
-        # TODO: update the slider and button labels
         # update extra LCD label substitutions
         for i in range(len(aw.qmc.extradevices)):
             if i < len(aw.qmc.extraname1):
@@ -11189,7 +11288,7 @@ class ApplicationWindow(QMainWindow):
                 last_index_not_removed = None
                 # group those with minimally 2x min_span time delta by keeping the first with the value of the last
                 for i in range(len(aw.qmc.specialevents)):
-                    if last_event_idx != None:
+                    if aw.qmc.specialeventstype[i] == tp and last_event_idx != None:
                         time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
                         if time_diff < 2*min_span:
                             indexes_to_be_removed.append(i)
@@ -11197,7 +11296,8 @@ class ApplicationWindow(QMainWindow):
                                 aw.qmc.specialeventsvalue[last_index_not_removed] = aw.qmc.specialeventsvalue[i]
                         else:
                             last_index_not_removed = i
-                    last_event_idx = i
+                    if aw.qmc.specialeventstype[i] == tp:
+                        last_event_idx = i
                 # remove marked events
                 specialevents = []
                 specialeventstype = []
@@ -11990,8 +12090,7 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.flagstart:
             value = aw.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value)
-        if self.qmc.flagon:
-            self.fireslideraction(n)
+        self.fireslideraction(n)
 
     def sliderLCD(self):
         slcd = QLCDNumber()
@@ -16455,6 +16554,14 @@ class ApplicationWindow(QMainWindow):
                     self.buttonpalette_shortcuts = bool(toBool(settings.value("buttonpalette_shortcuts",self.buttonpalette_shortcuts)))
             settings.endGroup()
             
+            # recent roasts
+            if settings.contains("recentRoasts"):
+                try:
+                    self.recentRoasts = settings.value("recentRoasts",self.recentRoasts)
+                    self.updateNewMenuRecentRoasts()
+                except:
+                    pass
+            
             #update axis limits
             if not self.qmc.locktimex:
                 self.qmc.startofx = 0
@@ -17303,6 +17410,8 @@ class ApplicationWindow(QMainWindow):
             except Exception:
                 pass
             settings.setValue("dpi",aw.dpi)
+            
+            settings.setValue("recentRoasts",self.recentRoasts)
 
         except Exception:
 #            import traceback
@@ -19197,7 +19306,7 @@ class ApplicationWindow(QMainWindow):
         # try to consider only indices until FCs and not beyond
         FCs_index = end
         if self.qmc.timeindex[2]:
-            FCs_index = self.qmc.timeindex[6]
+            FCs_index = self.qmc.timeindex[2]
         if FCs_index > start and FCs_index < end:
             end = FCs_index
         # try to consider only indices from start of roast on and not before
@@ -20483,7 +20592,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.color_system_idx = 0
                     wunit = self.qmc.weight_units.index(self.qmc.weight[2])
                     if wunit in [1,3]: # turn Kg into g, and lb into oz
-                        wunit = wuint -1
+                        wunit = wunit -1
                     self.qmc.weight = [obj["weightGreen"],obj["weightRoasted"],self.qmc.weight_units[wunit]]
                     self.qmc.ambientTemp = obj["ambient"]
                     self.qmc.ambient_humidity = obj["humidity"]
@@ -23606,6 +23715,56 @@ class equDataDlg(ArtisanDialog):
 #            traceback.print_exc(file=sys.stdout)
             pass
             
+########################################################################################
+#####################  RECENT ROAST POPUP  #############################################
+
+
+class RoastsComboBox(QComboBox):
+    def __init__(self, parent = None, selection = None):
+        super(RoastsComboBox, self).__init__(parent)
+        self.installEventFilter(self)
+        self.selection = u(selection) # just the roast title
+        # a list of triples as returned by serial.tools.list_ports
+        self.ports = []
+        self.edited = selection
+        self.updateMenu()
+        self.editTextChanged.connect(lambda txt="":self.textEdited(txt))
+        self.setEditable(True)
+
+    def textEdited(self,txt):
+        self.edited = txt
+
+    def getSelection(self):
+        return self.edited or self.selection
+
+    def setSelection(self,i):
+        if i >= 0:
+            try:
+#                self.selection = u(self.ports[i][0])
+                self.edited = None # reset the user text editing
+            except Exception:
+                pass
+
+    def eventFilter(self, obj, event):
+# the next prevents correct setSelection on Windows
+#        if event.type() == QEvent.FocusIn:
+#            self.setSelection(self.currentIndex())
+        if event.type() == QEvent.MouseButtonPress:
+            self.updateMenu()
+        return False
+
+    # the first entry is always just the current text edit line
+    def updateMenu(self):
+        self.blockSignals(True)
+        try:
+            roasts = aw.recentRoastsMenuList()
+            self.clear()
+            self.addItems([u(self.edited)] + roasts)
+        except:
+            pass
+        self.blockSignals(False)
+        
+
 
 ########################################################################################
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
@@ -23805,9 +23964,22 @@ class editGraphDlg(ArtisanDialog):
         #self.createDataTable()        
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
-        self.titleedit = QLineEdit(aw.qmc.title)
+        #self.titleedit = QLineEdit(aw.qmc.title)
+
+        self.titleedit = RoastsComboBox(selection = aw.qmc.title)
+        self.titleedit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
+#        self.titleedit.lineEdit().setMaxLength(45)
+#        self.titleedit.currentIndexChanged.connect(lambda i=self.titleedit.currentIndex():self.recentRoastIndexChanged(i))
+        self.titleedit.activated.connect(self.recentRoastActivated)
+
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
         self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
+        
+        # add to recent
+        self.addRecentButton = QPushButton("+")
+        self.addRecentButton.clicked.connect(self.addRecentRoast)
+        self.addRecentButton.setFocusPolicy(Qt.NoFocus)
+        
         #Date
         datelabel1 = QLabel("<b>" + u(QApplication.translate("Label", "Date",None)) + "</b>")
         date = aw.qmc.roastdate.date().toString()
@@ -24179,6 +24351,8 @@ class editGraphDlg(ArtisanDialog):
         
         titleLine = QHBoxLayout()
         titleLine.addWidget(self.titleedit)
+        titleLine.addWidget(self.addRecentButton)
+        titleLine.addSpacing(5)
         titleLine.addWidget(self.titleShowAlwaysFlag)
 
         textLayout.addWidget(titlelabel,2,0)
@@ -24429,7 +24603,110 @@ class editGraphDlg(ArtisanDialog):
         self.volume_percent()
         self.setLayout(totallayout)
         self.titleedit.setFocus()
-
+        
+    def recentRoastActivated(self,n):
+        # note, the first item is the edited text!
+        rr = aw.recentRoasts[n-1]
+        self.titleedit.textEdited(rr["title"])
+        self.titleedit.setEditText(rr["title"])
+        self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["weightUnit"]))
+        self.weightinedit.setText("%g" % rr["weightIn"])
+        # all of the following items might not be in the dict
+        self.beansedit.setPlainText(rr["beans"])
+        self.weightoutedit.setText("%g" % rr["weightOut"])
+        self.volumeinedit.setText("%g" % rr["volumeIn"])
+        self.volumeoutedit.setText("%g" % rr["volumeOut"])
+        self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
+        self.bean_density_weight_edit.setText(str(rr["densityWeight"]))
+        self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["densityWeightUnit"]))
+        self.bean_density_volume_edit.setText(str(rr["densityVolume"]))
+        self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["densityVolumeUnit"]))
+        self.bean_size_edit.setText(str(rr["beanSize"]))
+        self.moisture_greens_edit.setText(str(rr["moistureGreen"]))
+        self.moisture_roasted_edit.setText(str(rr["moistureRoasted"]))
+        self.whole_color_edit.setText(str(rr["wholeColor"]))
+        self.ground_color_edit.setText(str(rr["groundColor"]))
+        self.colorSystemComboBox.setCurrentIndex(rr["colorSystem"])
+        # Note: the background profile will not be changed if recent roast is activated from Roast Properties
+        
+    def addRecentRoast(self):
+        title = u(self.titleedit.currentText())
+        if self.weightinedit.text() != "":
+            weightIn = float(str(self.weightinedit.text()))
+        else:
+            weightIn = 0.0
+        beans = u(self.beansedit.toPlainText())
+        # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
+        if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
+            if self.weightoutedit.text() != "":
+                weightOut = float(str(self.weightoutedit.text()))
+            else:
+                weightOut = 0.0
+            weightUnit = u(self.unitsComboBox.currentText())
+            if self.volumeinedit.text() != "":
+                volumeIn = float(str(self.volumeinedit.text()))
+            else:
+                volumeIn = 0.0
+            if self.volumeoutedit.text() != "":
+                volumeOut = float(str(self.volumeoutedit.text()))
+            else:
+                volumeIn = 0.0
+            volumeUnit = u(self.volumeUnitsComboBox.currentText())
+            if self.bean_density_weight_edit.text() != "":
+                densityWeight = float(str(self.bean_density_weight_edit.text()))
+            else:
+                densityWeight = 0.0
+            densityWeightUnit = u(self.bean_density_weightUnitsComboBox.currentText())
+            if self.bean_density_volume_edit.text() != "":
+                densityVolume = float(str(self.bean_density_volume_edit.text()))
+            else:
+                densityVolume = 0.0
+            densityVolumeUnit = u(self.bean_density_volumeUnitsComboBox.currentText())
+            if self.bean_size_edit.text() != "":
+                beanSize = float(str(self.bean_size_edit.text()))
+            else:
+                beanSize = 0.0
+            if self.moisture_greens_edit.text() != "":
+                moistureGreen = float(self.moisture_greens_edit.text())
+            else:
+                moistureGreen = 0.0
+            if self.moisture_roasted_edit.text() != "":
+                moistureRoasted = float(self.moisture_roasted_edit.text())
+            else:
+                moistureRoasted = 0.0
+            if self.whole_color_edit.text() != "":
+                wholeColor = int(str(self.whole_color_edit.text()))
+            else:
+                wholeColor = 0
+            if self.ground_color_edit.text() != "":
+                groundColor = int(str(self.ground_color_edit.text()))
+            else:
+                groundColor = 0
+            colorSystem = self.colorSystemComboBox.currentIndex()
+            background = aw.qmc.backgroundpath
+            rr = aw.createRecentRoast(
+                title,
+                beans,
+                weightIn,
+                weightOut,
+                weightUnit,
+                volumeIn,
+                volumeOut,
+                volumeUnit,
+                densityWeight,
+                densityWeightUnit,
+                densityVolume,
+                densityVolumeUnit, 
+                beanSize,
+                moistureGreen,
+                moistureRoasted,
+                wholeColor,
+                groundColor,
+                colorSystem,
+                background                            
+                )
+            aw.addRecentRoast(rr)
+        
     def closeEvent(self, event):
         settings = QSettings()
         #save window geometry
@@ -24476,9 +24753,9 @@ class editGraphDlg(ArtisanDialog):
                     res = self.calc_volume(d,w)
                     if self.volumeUnitsComboBox.currentIndex() == 1:
                         res = res / 1000.0
-                        self.volumeinedit.setText(str(aw.float2float(res,4)))
+                        self.volumeinedit.setText("%g" % aw.float2float(res,4))
                     else:
-                        self.volumeinedit.setText(str(aw.float2float(res)))
+                        self.volumeinedit.setText("%g" % aw.float2float(res))
             except Exception:
                 pass
                         
@@ -24497,7 +24774,7 @@ class editGraphDlg(ArtisanDialog):
             if le.text() and le.text() != "":
                 wi = float(le.text())
                 if wi != 0.0:
-                    le.setText(str(aw.float2float(aw.convertWeight(wi,o,i),4)))
+                    le.setText("%g" % aw.float2float(aw.convertWeight(wi,o,i),4))
         self.calculated_density()
 
     def changeVolumeUnit(self,i):
@@ -24507,7 +24784,7 @@ class editGraphDlg(ArtisanDialog):
             if le.text() and le.text() != "":
                 wi = float(le.text())
                 if wi != 0.0:
-                    le.setText(str(aw.float2float(aw.convertVolume(wi,o,i),4)))
+                    le.setText("%g" % aw.float2float(aw.convertVolume(wi,o,i),4))
         self.calculated_density()
         
     def changeDensityWeightUnit(self,i):
@@ -24632,9 +24909,9 @@ class editGraphDlg(ArtisanDialog):
             text_out = aw.convertWeight(text_out,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
             # substract tare
             text_out = text_out - tare
-            self.weightoutedit.setText(str(aw.float2float(text_out)))
+            self.weightoutedit.setText("%g" % aw.float2float(text_out))
         elif previous_out != aw.qmc.weight[1]:
-            self.weightoutedit.setText(str(aw.float2float(aw.qmc.weight[1])))
+            self.weightoutedit.setText("%g" % aw.float2float(aw.qmc.weight[1]))
 
     def inWeight(self):
         tare = 0
@@ -24654,9 +24931,9 @@ class editGraphDlg(ArtisanDialog):
             text_in = aw.convertWeight(text_in,aw.qmc.weight_units.index(aw.qmc.weight[2]),0)
             # substract tare
             text_in = text_in - tare
-            self.weightinedit.setText(str(aw.float2float(text_in)))
+            self.weightinedit.setText("%g" % aw.float2float(text_in))
         elif previous_in != aw.qmc.weight[0]:
-            self.weightinedit.setText(str(aw.float2float(aw.qmc.weight[0])))
+            self.weightinedit.setText("%g" % aw.float2float(aw.qmc.weight[0]))
 
     def roastpropertiesChanged(self):
         if self.roastproperties.isChecked():
@@ -25201,7 +25478,8 @@ class editGraphDlg(ArtisanDialog):
                     aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
             self.saveEventTable()
         # Update Title
-        aw.qmc.title = u(self.titleedit.text())
+#        aw.qmc.title = u(self.titleedit.text())
+        aw.qmc.title = u(self.titleedit.currentText())
         aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
         aw.qmc.container_idx = self.tareComboBox.currentIndex() - 3
         # Update beans
