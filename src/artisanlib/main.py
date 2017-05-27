@@ -14718,8 +14718,10 @@ class ApplicationWindow(QMainWindow):
                 if m == "C" and self.qmc.mode == "F":
                     self.qmc.celsiusMode()
 
-            if "phases" in profile:
-                self.qmc.phases = profile["phases"]
+# if auto-adjusted is ticked phases will automatically adjust to the set values in the profile
+# we better not load the phases from the profile not to change the user defined phases settings
+#            if "phases" in profile:
+#                self.qmc.phases = profile["phases"]
             if "flavors" in profile:
                 self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
             #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
@@ -28326,9 +28328,17 @@ class EventsDlg(ArtisanDialog):
         aw.eventslideroffsets[2] = int(self.E3offset.value())
         aw.eventslideroffsets[3] = int(self.E4offset.value())
         aw.eventsliderfactors[0] = float(self.E1factor.value())
+        if aw.eventsliderfactors[0] == 0: # a zero does not make much sense and might be a user error
+            aw.eventsliderfactors[0] = 1.0
         aw.eventsliderfactors[1] = float(self.E2factor.value())
+        if aw.eventsliderfactors[1] == 1: # a zero does not make much sense and might be a user error
+            aw.eventsliderfactors[1] = 1.0
         aw.eventsliderfactors[2] = float(self.E3factor.value())
+        if aw.eventsliderfactors[2] == 1: # a zero does not make much sense and might be a user error
+            aw.eventsliderfactors[2] = 1.0
         aw.eventsliderfactors[3] = float(self.E4factor.value())
+        if aw.eventsliderfactors[3] == 1: # a zero does not make much sense and might be a user error
+            aw.eventsliderfactors[3] = 1.0
         aw.eventslidermin[0] = int(min(self.E1_min.value(),self.E1_max.value()))
         aw.eventslidermin[1] = int(min(self.E2_min.value(),self.E2_max.value()))
         aw.eventslidermin[2] = int(min(self.E3_min.value(),self.E3_max.value()))
