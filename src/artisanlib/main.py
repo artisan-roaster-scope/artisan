@@ -12783,7 +12783,7 @@ class ApplicationWindow(QMainWindow):
             self.setLCDsDigitCount(3)
 
     def enableEditMenus(self):
-        self.newRoastAction.setEnabled(True)
+        self.newRoastMenu.setEnabled(True)
         self.fileLoadAction.setEnabled(True) # open
         self.openRecentMenu.setEnabled(True) # open recent
         self.importMenu.setEnabled(True) # import
@@ -12813,9 +12813,9 @@ class ApplicationWindow(QMainWindow):
 
     def disableEditMenus(self,designer=False):
         if designer:
-            self.newRoastAction.setEnabled(False)
+            self.newRoastMenu.setEnabled(False)
         else:
-            self.newRoastAction.setEnabled(True)
+            self.newRoastMenu.setEnabled(True)
         self.fileLoadAction.setEnabled(False) # open
         self.openRecentMenu.setEnabled(False) # open recent
         self.importMenu.setEnabled(False) # import
