@@ -36511,9 +36511,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.extraname2[i] = u("")
                     
                 l1 = "<b>" + aw.qmc.extraname1[i] + "</b>"
-                aw.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                aw.extraLCDlabel1[i].setText(l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
                 l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
-                aw.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                aw.extraLCDlabel2[i].setText(l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
                 if mexpr2edit:
                     aw.qmc.extramathexpression1[i] = u(mexpr1edit.text())
                 else:

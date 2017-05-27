@@ -30,21 +30,21 @@ LICENSE = 'GNU General Public License (GPL)'
 try:
     QTDIR = os.environ["QT_PATH"] + r'/'
 except:
-    QTDIR = r'/Users/luther/Qt5.7.1/5.7/clang_64/' # qt5
+    QTDIR = r'/Users/luther/Qt5.8.0/5.8/clang_64/' # qt5
 
 APP = ['artisan.py']
 
 DATA_FILES = [
     "LICENSE.txt",
     ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
-    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqdds.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqdds.dylib']),  # not on Qt5.8.x
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqicns.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqico.dylib']),
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjp2.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjp2.dylib']),  # not on Qt5.6.x
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqmacjp2.dylib']),
-#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqmng.dylib']),
+#    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqmng.dylib']), # not on Qt5.6.x
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtga.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),
@@ -198,36 +198,34 @@ os.chdir('./dist')
 os.system(r'mkdir Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matplotlib/.dylibs')
 os.system(r'cp -R /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matplotlib/.dylibs')
 os.system(r'cp /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
-#
-# temporary commented:
 
-## for Qt5
-#print('*** Removing unused Qt frameworks ***')
-#for fw in [
-#            'QtDeclarative.framework',
-#            'QtHelp.framework',
-#            'QtMultimedia.framework',
-#            'QtNetwork.framework',
-#            'QtOpenGL.framework',
-#            'QtScript.framework',
-#            'QtScriptTools.framework',
-#            'QtSql.framework',
-#            'QtDesigner.framework',
-#            'QtTest.framework',
-#            'QtWebKit.framework',
-#            'QtWebKitWidgets.framework',
-#            'QtXMLPatterns.framework',
-#            'QtCLucene.framework',
-#            'QtPositioning.framework',
-#            'QtQml.framework',
-#            'QtSensors.framework',
-#            'QtWebChannel.framework',
-#            'QtQuick.framework',
-#            'QtMultimediaWidgets.framework',]:
-#    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw):
-#        for file in files:
-##            print('Deleting', file)
-#            os.remove(os.path.join(root,file))
+# for Qt5
+print('*** Removing unused Qt frameworks ***')
+for fw in [
+            'QtDeclarative.framework',
+            'QtHelp.framework',
+            'QtMultimedia.framework',
+            'QtNetwork.framework',
+            'QtOpenGL.framework',
+            'QtScript.framework',
+            'QtScriptTools.framework',
+            'QtSql.framework',
+            'QtDesigner.framework',
+            'QtTest.framework',
+            'QtWebKit.framework',
+            'QtWebKitWidgets.framework',
+            'QtXMLPatterns.framework',
+            'QtCLucene.framework',
+            'QtPositioning.framework',
+            'QtQml.framework',
+            'QtSensors.framework',
+            'QtWebChannel.framework',
+            'QtQuick.framework',
+            'QtMultimediaWidgets.framework',]:
+    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw):
+        for file in files:
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
 
 print('*** Removing unused files ***')
 for root, dirs, files in os.walk('.'):
