@@ -1187,7 +1187,7 @@ class tgraphcanvas(FigureCanvas):
         self.volume_units = ["l","gal","qt","pt","cup","ml"]
         #[0]volume in, [1]volume out, [2]units (string)
         self.volume = [0,0,self.volume_units[0]]
-        x
+        
         #[0]probe weight, [1]weight unit, [2]probe volume, [3]volume unit
         self.density = [0.,self.weight_units[0],1.,self.volume_units[0]]
         
@@ -4471,15 +4471,16 @@ class tgraphcanvas(FigureCanvas):
                         
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
-                        trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
-                        if self.DeltaETflag:
-                            self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                            linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
-                        if self.DeltaBTflag:           
-                            self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
-                            linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))    
+                        if len(self.timex) == len(self.delta1) and len(self.timex)  == len(self.delta2):
+                            trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
+                            if self.DeltaETflag:
+                                self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                                linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
+                            if self.DeltaBTflag:           
+                                self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                                linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))    
     
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
@@ -11032,6 +11033,7 @@ class ApplicationWindow(QMainWindow):
         else:
             rr = self.recentRoasts
         self.recentRoasts = [d] + rr[:self.maxRecentRoasts-1]
+        self.updateNewMenuRecentRoasts()
         
     def recentRoastLabel(self,rr):
         res = rr["title"] + " (" + "%g" % rr["weightIn"] +rr["weightUnit"]+")"
@@ -30091,37 +30093,39 @@ class StatisticsDlg(ArtisanDialog):
 ###########################################################################################
 
 
-# hack to allow retry count and timeout to be configured on pymodbus UDP, without blocking on connection failures
-class ArtisanModbusUdpClient(ModbusUdpClient):
-    ''' Adds timeout to UDP client
-    '''
-    def __init__(self, host='127.0.0.1', port=Defaults.Port,
-        framer=ModbusSocketFramer, **kwargs):
-        ''' Initialize a client instance
+# Timeout/Retry should be fixed from pymodbus v1.3 on
 
-        :param host: The host to connect to (default 127.0.0.1)
-        :param port: The modbus port to connect to (default 502)
-        :param framer: The modbus framer to use (default ModbusSocketFramer)
-        '''
-        self.host = host
-        self.port = port
-        self.socket = None
-        self.timeout  = kwargs.get('timeout',  Defaults.Timeout)
-        super(ModbusUdpClient,self).__init__(framer(ClientDecoder()),**kwargs)
-    
-    def connect(self):
-        ''' Connect to the modbus tcp server
-
-        :returns: True if connection succeeded, False otherwise
-        '''
-        if self.socket: return True
-        try:
-            family = ModbusUdpClient._get_address_family(self.host)
-            self.socket = socket.socket(family, socket.SOCK_DGRAM)
-            self.socket.settimeout(self.timeout)
-        except socket.error:
-            self.close()
-        return self.socket != None
+## hack to allow retry count and timeout to be configured on pymodbus UDP, without blocking on connection failures
+#class ArtisanModbusUdpClient(ModbusUdpClient):
+#    ''' Adds timeout to UDP client
+#    '''
+#    def __init__(self, host='127.0.0.1', port=Defaults.Port,
+#        framer=ModbusSocketFramer, **kwargs):
+#        ''' Initialize a client instance
+#
+#        :param host: The host to connect to (default 127.0.0.1)
+#        :param port: The modbus port to connect to (default 502)
+#        :param framer: The modbus framer to use (default ModbusSocketFramer)
+#        '''
+#        self.host = host
+#        self.port = port
+#        self.socket = None
+#        self.timeout  = kwargs.get('timeout',  Defaults.Timeout)
+#        super(ModbusUdpClient,self).__init__(framer(ClientDecoder()),**kwargs)
+#    
+#    def connect(self):
+#        ''' Connect to the modbus tcp server
+#
+#        :returns: True if connection succeeded, False otherwise
+#        '''
+#        if self.socket: return True
+#        try:
+#            family = ModbusUdpClient._get_address_family(self.host)
+#            self.socket = socket.socket(family, socket.SOCK_DGRAM)
+#            self.socket.settimeout(self.timeout)
+#        except socket.error:
+#            self.close()
+#        return self.socket != None
 
 
 # pymodbus version
@@ -30264,7 +30268,8 @@ class modbusport(object):
                                 )
                 elif self.type == 4: # UDP
                     try:
-                        self.master = ArtisanModbusUdpClient(
+#                        self.master = ArtisanModbusUdpClient(
+                        self.master = ModbusUdpClient(
                             host=self.host, 
                             port=self.port,
                             retry_on_empty=False,
@@ -30272,7 +30277,8 @@ class modbusport(object):
                             timeout=0.3, #self.timeout
                             )
                     except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
-                        self.master = ArtisanModbusUdpClient(
+#                        self.master = ArtisanModbusUdpClient(
+                        self.master = ModbusUdpClient(
                             host=self.host, 
                             port=self.port,
                             )
