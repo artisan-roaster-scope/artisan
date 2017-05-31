@@ -2514,6 +2514,8 @@ class tgraphcanvas(FigureCanvas):
                         slidernr = 3
                     if slidernr != None:
                         aw.moveslider(slidernr,slidervalue)
+                        # we set the last value to be used for relative +- button action as base
+                        aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
                         if aw.qmc.flagstart:
                             value = aw.float2float((slidervalue + 10.0) / 10.0)
                             aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber,slidernr)))
@@ -8329,7 +8331,7 @@ class tgraphcanvas(FigureCanvas):
             nsegments = len(self.segmentlengths[x])
             parentanglecount = 0
             for i in range(nsegments):
-                if  self.wheellabelparent[x][i]:                                                  #if parent selected (otherwise 0) 
+                if self.wheellabelparent[x][i]:                                                   #if parent selected (otherwise 0) 
                     parentindex = self.wheellabelparent[x][i]                                     #parent index
                     if self.wheellabelparent[x][i] == parentindex:                                #if match
                         parentangle = self.segmentlengths[x-1][self.wheellabelparent[x][i]-1]     #find parent angle (in %)
@@ -11043,7 +11045,7 @@ class ApplicationWindow(QMainWindow):
         action = self.sender()
         if action:
             rr = action.data()
-            if "background" in rr:
+            if "background" in rr and rr["background"] != None and rr["background"] != "":
                 try:
                     aw.qmc.resetlinecountcaches()
                     self.loadbackground(rr["background"])
@@ -35129,7 +35131,8 @@ class comportDlg(ArtisanDialog):
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
         TabWidget.addTab(C5Widget,QApplication.translate("Tab","Color",None))
-        if devid == 29: # switch to MODBUS tab if MODBUS device was selected as main device
+        if devid == 29 or (devid == 0 and aw.ser.useModbusPort) : # switch to MODBUS tab if MODBUS device was selected as main device
+            # or if PID and "Use ModbusPort" was selected
             TabWidget.setCurrentIndex(2)
         #incorporate layouts
         Mlayout = QVBoxLayout()

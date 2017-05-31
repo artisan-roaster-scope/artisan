@@ -2,6 +2,8 @@
 
 QT=/usr/local/Qt-5.4.2/
 
+#export LD_LIBRARY_PATH=/usr/local/lib/python2.7/site-packages/matplotlib/.libs:$LD_LIBRARY_PATH
+
 # translations
 # PyQt5
 pylupdate5 artisan.pro
