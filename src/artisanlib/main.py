@@ -1867,58 +1867,66 @@ class tgraphcanvas(FigureCanvas):
         
 
     def onpick(self,event):
-        if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
-            timex = self.backgroundtime2index(event.artist.get_xdata()[event.ind][0])
-            idxs = []
-            for i in range(len(self.backgroundEvents)):
-                if self.backgroundEvents[i] == timex or self.backgroundEvents[i] -1 == timex or self.backgroundEvents[i] + 1 == timex:
-                    idxs.append(i)
-            message = u("")
-            event_times = []
-            for i in idxs:
+        try:            
+            if isinstance(event.ind, (int)):
+                ind = event.ind
+            else:
+                if not len(event.ind): return
+                ind = event.ind[0]    
+            if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
+                timex = self.backgroundtime2index(event.artist.get_xdata()[ind])
+                idxs = []
+                for i in range(len(self.backgroundEvents)):
+                    if self.backgroundEvents[i] == timex or self.backgroundEvents[i] -1 == timex or self.backgroundEvents[i] + 1 == timex:
+                        idxs.append(i)
+                message = u("")
+                event_times = []
+                for i in idxs:
+                    if len(message) != 0:
+                        message += u(", ")
+                    else:
+                        message += u("Background: ")
+                    message += u(self.Betypesf(self.backgroundEtypes[i])) + " = " + self.eventsvalues(self.backgroundEvalues[i])
+                    event_times.append(self.timeB[self.backgroundEvents[i]])
+                    if self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
+                        message += u(" (") + u(self.backgroundEStrings[i]) + u(")")
                 if len(message) != 0:
-                    message += u(", ")
-                else:
-                    message += u("Background: ")
-                message += u(self.Betypesf(self.backgroundEtypes[i])) + " = " + self.eventsvalues(self.backgroundEvalues[i])
-                event_times.append(self.timeB[self.backgroundEvents[i]])
-                if self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
-                    message += u(" (") + u(self.backgroundEStrings[i]) + u(")")
-            if len(message) != 0:
-                if aw.qmc.timeindex[0] != -1:
-                    start = aw.qmc.timex[aw.qmc.timeindex[0]]
-                else:
-                    start = 0
-                tx_string = ""
-                for et in event_times:
-                    tx_string += self.stringfromseconds(et - start) + ", "
-                message += u(" @ ") + tx_string[:-2]
-                aw.sendmessage(message,append=False)
-        elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
-            timex = self.time2index(event.artist.get_xdata()[event.ind][0])
-            idxs = []
-            for i in range(len(self.specialevents)):
-                if self.specialevents[i] == timex or self.specialevents[i] + 1 == timex or self.specialevents[i] -1 == timex:
-                    idxs.append(i)
-            message = u("")
-            event_times = []
-            for i in idxs:
+                    if aw.qmc.timeindex[0] != -1:
+                        start = aw.qmc.timex[aw.qmc.timeindex[0]]
+                    else:
+                        start = 0
+                    tx_string = ""
+                    for et in event_times:
+                        tx_string += self.stringfromseconds(et - start) + ", "
+                    message += u(" @ ") + tx_string[:-2]
+                    aw.sendmessage(message,append=False)
+            elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
+                timex = self.time2index(event.artist.get_xdata()[ind])
+                idxs = []
+                for i in range(len(self.specialevents)):
+                    if self.specialevents[i] == timex or self.specialevents[i] + 1 == timex or self.specialevents[i] -1 == timex:
+                        idxs.append(i)
+                message = u("")
+                event_times = []
+                for i in idxs:
+                    if len(message) != 0:
+                        message += u(", ")
+                    message += u(self.etypesf(self.specialeventstype[i])) + " = " + self.eventsvalues(self.specialeventsvalue[i])
+                    event_times.append(self.timex[self.specialevents[i]])
+                    if self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
+                        message += u(" (") + u(self.specialeventsStrings[i]) + u(")")
                 if len(message) != 0:
-                    message += u(", ")
-                message += u(self.etypesf(self.specialeventstype[i])) + " = " + self.eventsvalues(self.specialeventsvalue[i])
-                event_times.append(self.timex[self.specialevents[i]])
-                if self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
-                    message += u(" (") + u(self.specialeventsStrings[i]) + u(")")
-            if len(message) != 0:
-                if aw.qmc.timeindex[0] != -1:
-                    start = aw.qmc.timex[aw.qmc.timeindex[0]]
-                else:
-                    start = 0
-                tx_string = ""
-                for et in event_times:
-                    tx_string += self.stringfromseconds(et - start) + ", "
-                message += u(" @ ") + tx_string[:-2]
-                aw.sendmessage(message,append=False)
+                    if aw.qmc.timeindex[0] != -1:
+                        start = aw.qmc.timex[aw.qmc.timeindex[0]]
+                    else:
+                        start = 0
+                    tx_string = ""
+                    for et in event_times:
+                        tx_string += self.stringfromseconds(et - start) + ", "
+                    message += u(" @ ") + tx_string[:-2]
+                    aw.sendmessage(message,append=False)
+        except:
+            pass
 
     def onclick(self,event):
         try:
