@@ -258,7 +258,7 @@ else:
         else:
             return None
     def hex2int(h1,h2=None):
-        if h2:
+        if h2 != None:
             return int(h1*256 + h2)
         else:
             return int(h1)
@@ -3058,30 +3058,33 @@ class tgraphcanvas(FigureCanvas):
                     #############   end of mathexpression loop ##########################
                     
                 #created Ys values 
-                if len(self.timex)>0:
-                    if RTsname:
-                        Y = [self.temp1[-1], self.temp2[-1]] # in realtime mode we take the last value
-                    else:
-                        Y = [self.temp1[index], self.temp2[index]]
-                    if len(self.extratimex):
-                        if len(self.extratimex[0]):
-                            for i in range(len(self.extradevices)):
-                                if RTsname:
-                                    Y.append(self.extratemp1[i][-1])
-                                    Y.append(self.extratemp2[i][-1])
-                                else:
-                                    Y.append(self.extratemp1[i][index])  
-                                    Y.append(self.extratemp2[i][index])
+                try:
+                    if len(self.timex)>0:
+                        if RTsname:
+                            Y = [self.temp1[-1], self.temp2[-1]] # in realtime mode we take the last value
+                        else:
+                            Y = [self.temp1[index], self.temp2[index]]
+                        if len(self.extratimex):
+                            if len(self.extratimex[0]):
+                                for i in range(len(self.extradevices)):
+                                    if RTsname:
+                                        Y.append(self.extratemp1[i][-1])
+                                        Y.append(self.extratemp2[i][-1])
+                                    else:
+                                        Y.append(self.extratemp1[i][index])  
+                                        Y.append(self.extratemp2[i][index])
+                                    
+                        #add Ys and their value to math dictionary
+                        for i in range(len(Yval)):
+                            if "Y"+ Yval[i] not in mathdictionary:
+                                mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
                                 
-                    #add Ys and their value to math dictionary
-                    for i in range(len(Yval)):
-                        if "Y"+ Yval[i] not in mathdictionary:
-                            mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
-                            
-                    #add other timeshifted expressions to the math dictionary: shifted P
-                    for i in range(len(timeshiftexpressions)):
-                        if timeshiftexpressions[i] not in mathdictionary:
-                            mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
+                        #add other timeshifted expressions to the math dictionary: shifted P
+                        for i in range(len(timeshiftexpressions)):
+                            if timeshiftexpressions[i] not in mathdictionary:
+                                mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]
+                except:
+                    pass
                        
 
                 #background symbols just in case there was no profile loaded but a background loaded.
@@ -24985,8 +24988,11 @@ class editGraphDlg(ArtisanDialog):
             self.datatable.verticalHeader().setResizeMode(2)
         else:
             self.datatable.verticalHeader().setSectionResizeMode(2)
+        offset = 0
+        if aw.qmc.timeindex[0] > -1:
+            offset = aw.qmc.timex[aw.qmc.timeindex[0]]
         for i in range(ndata):
-            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
+            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-offset))))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             if aw.qmc.LCDdecimalplaces:
                 fmtstr = "%.1f"
@@ -30153,7 +30159,7 @@ class modbusport(object):
     """ this class handles the communications with all the modbus devices"""
     def __init__(self):
         # retries
-        self.readRetries = 1
+        self.readRetries = 2
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = "COM5"      #NOTE: this string should not be translated.
         self.baudrate = 115200
@@ -30222,16 +30228,17 @@ class modbusport(object):
         
     # this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     def sleepBetween(self,write=False):
-        if write:
-            if self.type in [3,4]: # TCP or UDP
-                libtime.sleep(0.040)
-            else:
-                libtime.sleep(0.085)
-        else:
-            if self.type in [3,4]: # delay between writes only on serial connections
-                pass
-            else:
-                libtime.sleep(0.035)
+        pass # handled in MODBUS lib
+#        if write:
+#            if self.type in [3,4]: # TCP or UDP
+#                libtime.sleep(0.040)
+#            else:
+#                libtime.sleep(0.085)
+#        else:
+#            if self.type in [3,4]: # delay between writes only on serial connections
+#                pass
+#            else:
+#                libtime.sleep(0.035)
     
     def address2register(self,addr,code=3):
         if code == 3 or code == 6:
@@ -42507,7 +42514,7 @@ class FujiPID(object):
     def gettemperature(self, stationNo):
         if aw.ser.useModbusPort:
             # we use the pymodbus implementation
-            return aw.modbus.readSingleRegister(stationNo,aw.modbus.address2register(31001,4),4)
+            return aw.modbus.readSingleRegister(stationNo,aw.modbus.address2register(31001,4),4)            
         else:
             #we compose a message then we send it by using self.readoneword()
             return self.readoneword(self.message2send(stationNo,4,31001,1))
