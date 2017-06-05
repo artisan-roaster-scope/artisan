@@ -4132,7 +4132,7 @@ class tgraphcanvas(FigureCanvas):
                         jump = 5
     
                     for j in range(120):
-                        i = j/10
+                        i = int(j/10)
                         if self.clampEvents:
                             barposition = 101 - start - jump # draw custom events aligned with the temperature axis
                         else:
