@@ -1251,7 +1251,7 @@ class tgraphcanvas(FigureCanvas):
         self.Evaluelinethickness = [1,1,1,1]
         self.Evaluealpha = [.8,.8,.8,.8]
         #the event value position bars are calculated at redraw()
-        self.eventpositionbars = [0.]*12
+        self.eventpositionbars = [0.]*120
 
         #curve styles
         self.linestyle_default = "-"
@@ -1353,6 +1353,7 @@ class tgraphcanvas(FigureCanvas):
         self.temporarymovepositiveslider = None # set by pidcontrol.setEnergy (indirectly called from sample())
                 # holds tuple (slidernr,value) and is executued and reset by updategraphics
         self.temporarymovenegativeslider = None
+        self.temporayslider_force_move = True # if True move the slider independent of the slider position to fire slider action!
         
         self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>,<recordEvent>]
 
@@ -2104,15 +2105,17 @@ class tgraphcanvas(FigureCanvas):
                 #check move slider pending actions
                 if self.temporarymovepositiveslider:
                     slidernr,value = self.temporarymovepositiveslider
-                    if aw.sliderpos(slidernr) != value:
+                    if aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
                         aw.moveslider(slidernr,value) # move slider  
                         aw.fireslideraction(slidernr) # fire action
+                        self.temporayslider_force_move = False
                 self.temporarymovepositiveslider = None
                 if self.temporarymovenegativeslider:
                     slidernr,value = self.temporarymovenegativeslider
-                    if aw.sliderpos(slidernr) != value:
-                        aw.moveslider(slidernr,value) # move slider  
+                    if aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
+                        aw.moveslider(slidernr,value) # move slider
                         aw.fireslideraction(slidernr) # fire action
+                        self.temporayslider_force_move = False
                 self.temporarymovenegativeslider = None
                 
                 #write error message
@@ -4118,38 +4121,46 @@ class tgraphcanvas(FigureCanvas):
                     if self.clampEvents:
                         step = 10
                         start = 100
-                        jump = 10
+                        jump = 1
                     else:
                         if self.mode == "C":
-                            step = 2
-                            start = 40
-                        else:
                             step = 5
-                            start = 100
-                        jump = 20
-    
-                    for i in range(12):
-                        if i == 0:
-                            color = self.palette["background"] #self.palette["rect3"] # brown
-                        elif i%2:
-                            color = self.palette["rect5"] #self.palette["rect2"] # orange
+                            start = 60
                         else:
-                            color = self.palette["background"] #self.palette["rect1"] # green
+                            step = 10
+                            start = 125
+                        jump = 5
+    
+                    for j in range(120):
+                        i = j/10
                         if self.clampEvents:
-                            barposition = 100 - start - jump # draw custom events aligned with the temperature axis
+                            barposition = 101 - start - jump # draw custom events aligned with the temperature axis
                         else:
                             barposition = self.phases[0]-start-jump
-                        if not self.clampEvents or (i!=0 and i!=11): # don't draw the first and the last bar in clamp mode
-                            rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.15)
-                            self.ax.add_patch(rectEvent)
-                        self.eventpositionbars[i] = barposition
+                        if i == j/10.:
+                            if self.clampEvents:
+                                c1 = "background"
+                                c2 = "rect5"
+                            else:
+                                c1 = "rect5"
+                                c2 = "background"
+                            if i == 0:
+                                color = self.palette[c1] #self.palette["rect3"] # brown
+                            elif i%2:
+                                color = self.palette[c2] #self.palette["rect2"] # orange # the uneven ones
+                            else:
+                                color = self.palette[c1] #self.palette["rect1"] # green # the even ones                                
+                            if not self.clampEvents or (i!=0 and i!=11): # don't draw the first and the last bar in clamp mode
+                                rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.15)
+                                self.ax.add_patch(rectEvent)
+                        self.eventpositionbars[j] = barposition
                         if self.clampEvents:
-                            jump -= 10
+                            jump -= 1
                         else:
                             if self.mode == "C":
-                                jump -= 5
+                                jump -= 5/10.
                             else:
-                                jump -= 10
+                                jump -= 1
     
                 rcParams['path.sketch'] = (scale, length, randomness)
                 
@@ -4233,16 +4244,16 @@ class tgraphcanvas(FigureCanvas):
                             for i in range(len(self.backgroundEvents)):
                                 if self.backgroundEtypes[i] == 0:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E1backgroundvalues.append(self.eventpositionbars[min(11,max(0,int(round(self.backgroundEvalues[i]))))])
+                                    self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
                                 elif self.backgroundEtypes[i] == 1:
                                     self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E2backgroundvalues.append(self.eventpositionbars[min(11,max(0,int(round(self.backgroundEvalues[i]))))])
+                                    self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
                                 elif self.backgroundEtypes[i] == 2:
                                     self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E3backgroundvalues.append(self.eventpositionbars[min(11,max(0,int(round(self.backgroundEvalues[i]))))])
+                                    self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
                                 elif self.backgroundEtypes[i] == 3:
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
-                                    self.E4backgroundvalues.append(self.eventpositionbars[min(11,max(0,int(round(self.backgroundEvalues[i]))))])
+                                    self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
     
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
@@ -4420,19 +4431,19 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(Nevents):
                             if self.specialeventstype[i] == 0:           
                                 self.E1timex.append(self.timex[self.specialevents[i]])
-                                self.E1values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[i]))))])
+                                self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E1_nonempty = True
                             elif self.specialeventstype[i] == 1:
                                 self.E2timex.append(self.timex[self.specialevents[i]])
-                                self.E2values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[i]))))])
+                                self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E2_nonempty = True
                             elif self.specialeventstype[i] == 2:
                                 self.E3timex.append(self.timex[self.specialevents[i]])
-                                self.E3values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[i]))))])
+                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E3_nonempty = True
                             elif self.specialeventstype[i] == 3:
                                 self.E4timex.append(self.timex[self.specialevents[i]])
-                                self.E4values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[i]))))])
+                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E4_nonempty = True
     
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
@@ -6336,16 +6347,16 @@ class tgraphcanvas(FigureCanvas):
                         etype = self.specialeventstype[-1]
                         if etype == 0:
                             self.E1timex.append(self.timex[self.specialevents[-1]])
-                            self.E1values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[-1]))))])
+                            self.E1values.append(self.eventpositionbars[min(10,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
                         elif etype == 1:
                             self.E2timex.append(self.timex[self.specialevents[-1]])
-                            self.E2values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[-1]))))])
+                            self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
                         elif etype == 2:
                             self.E3timex.append(self.timex[self.specialevents[-1]])
-                            self.E3values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[-1]))))])
+                            self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
                         elif etype == 3:
                             self.E4timex.append(self.timex[self.specialevents[-1]])
-                            self.E4values.append(self.eventpositionbars[min(11,max(0,int(round(self.specialeventsvalue[-1]))))])
+                            self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
                         #if Event show flag
                         if self.eventsshowflag:
                             index = self.specialevents[-1]
@@ -12825,6 +12836,7 @@ class ApplicationWindow(QMainWindow):
         self.saveAsSettingsAction.setEnabled(True)
         self.resetAction.setEnabled(True)
         self.switchAction.setEnabled(True)
+        self.machineMenu.setEnabled(True)
 
     def disableEditMenus(self,designer=False):
         if designer:
@@ -12862,6 +12874,8 @@ class ApplicationWindow(QMainWindow):
         self.saveAsSettingsAction.setEnabled(False)
         self.resetAction.setEnabled(False)
         self.switchAction.setEnabled(False)
+        self.machineMenu.setEnabled(False)
+
 
     def update_minieventline_visibility(self):
         if self.minieventsflag:
@@ -16616,7 +16630,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     aw.dpi = toInt(settings.value("dpi",aw.dpi))
                     if aw.dpi != aw.defaultdpi:
-                        aw.setdpi(aw.dpi,moveWindow=False) # with moveWindow=True, Mac builds fail on startup!
+                        aw.setdpi(aw.dpi,moveWindow=True) # with moveWindow=True, Mac builds fail on startup!
                 except Exception as e:
                     pass
             #restore geometry
@@ -43615,7 +43629,7 @@ class PIDcontrol(object):
         # if invertControl is True, a PID duty of 100% delivers 0% positive duty and a 0% PID duty delivers 100% positive duty
         self.invertControl = False
         # PID sv smoothing
-        self.sv_smoothing_factor = 2
+        self.sv_smoothing_factor = 0 # off if 0
         self.sv_decay_weights = None
         self.previous_svs = []
 
@@ -43690,6 +43704,7 @@ class PIDcontrol(object):
 
     def pidOn(self):
         if aw.qmc.flagon:
+            aw.qmc.temporayslider_force_move = True
             self.lastEnergy = None
             # TC4 hardware PID
             if aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
@@ -43720,7 +43735,8 @@ class PIDcontrol(object):
                 aw.qmc.pid.setDutyMax(aw.pidcontrol.dutyMax)
                 aw.qmc.pid.setControl(lambda v: aw.pidcontrol.setEnergy(v))
                 if aw.pidcontrol.svMode == 0:
-                    aw.pidcontrol.setSV(aw.pidcontrol.svValue)
+                    aw.pidcontrol.setSV(aw.sliderSV.value())
+#                    aw.pidcontrol.setSV(aw.pidcontrol.svValue)
                 self.pidActive = True
                 aw.qmc.pid.on()
                 aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
@@ -43790,19 +43806,22 @@ class PIDcontrol(object):
         return None
     
     def smooth_sv(self,sv):
-        # create or update smoothing decay weights
-        if self.sv_decay_weights == None or len(self.sv_decay_weights) != self.sv_smoothing_factor: # recompute only on changes
-            self.sv_decay_weights = numpy.arange(1,self.sv_smoothing_factor+1)
-        # add new value
-        self.previous_svs.append(sv)
-        # throw away superflous values
-        self.previous_svs = self.previous_svs[-self.sv_smoothing_factor:]
-        # compute smoothed output
-        if len(self.previous_svs) < self.sv_smoothing_factor:
-            res = sv # no smoothing yet
+        if self.sv_smoothing_factor:
+            # create or update smoothing decay weights
+            if self.sv_decay_weights == None or len(self.sv_decay_weights) != self.sv_smoothing_factor: # recompute only on changes
+                self.sv_decay_weights = numpy.arange(1,self.sv_smoothing_factor+1)
+            # add new value
+            self.previous_svs.append(sv)
+            # throw away superflous values
+            self.previous_svs = self.previous_svs[-self.sv_smoothing_factor:]
+            # compute smoothed output
+            if len(self.previous_svs) < self.sv_smoothing_factor:
+                res = sv # no smoothing yet
+            else:
+                res = numpy.average(self.previous_svs,weights=self.sv_decay_weights)
+            return res
         else:
-            res = numpy.average(self.previous_svs,weights=self.sv_decay_weights)
-        return res
+            return sv
                         
     # returns None if in manual mode or no other sv (via ramp/soak or follow mode) defined
     def calcSV(self,tx):
@@ -43825,9 +43844,22 @@ class PIDcontrol(object):
                     followBT = True
                 else:
                     followBT = False
-            if aw.qmc.timeindex[0] < 0 or aw.qmc.timeindex[6] > 0:
-                # before and after DROP the SV configured in the dialog is returned (min/maxed)
+#            if aw.qmc.timeindex[0] < 0 or aw.qmc.timeindex[6] > 0:
+#                # before and after DROP the SV configured in the dialog is returned (min/maxed)
+#                return max(aw.pidcontrol.svSliderMin,(min(aw.pidcontrol.svSliderMax,aw.pidcontrol.svValue)))
+            if aw.qmc.timeindex[6] > 0: # after DROP, the SV configured in the dialog is returned (min/maxed)
                 return max(aw.pidcontrol.svSliderMin,(min(aw.pidcontrol.svSliderMax,aw.pidcontrol.svValue)))
+            elif aw.qmc.timeindex[0] < 0: # before CHARGE, the CHARGE temp of the background profile is returned
+                if aw.qmc.timeindexB[0] < 0:
+                    # no CHARGE in background, return manual SV
+                    return max(aw.pidcontrol.svSliderMin,(min(aw.pidcontrol.svSliderMax,aw.pidcontrol.svValue)))
+                else:
+                    # if background contains a CHARGE event
+                    if followBT:
+                        res = aw.qmc.backgroundBTat(aw.qmc.timeB[aw.qmc.timeindexB[0]]) # smoothed and approximated background
+                    else: # in all other cases we observe the ET
+                        res = aw.qmc.backgroundETat(aw.qmc.timeB[aw.qmc.timeindexB[0]]) # smoothed and approximated background
+                    return self.smooth_sv(res)
             elif ((not aw.qmc.timeB or tx+self.svLookahead > aw.qmc.timeB[-1]) or (aw.qmc.timeindexB[6] > 0 and tx+self.svLookahead > aw.qmc.timeB[aw.qmc.timeindexB[6]])):
                 # if tx+self.svLookahead > last background data or background has a DROP and tx+self.svLookahead index is beyond that DROP index
                 return None # "deactivate" background follow mode

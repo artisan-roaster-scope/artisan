@@ -36,20 +36,20 @@ class PID(object):
         self.Kd = d
         self.errSum = 0.0
         self.Iterm = 0.0
-        self.lastError = 0.0 # used for derivative_on_error mode
+        self.lastError = None # used for derivative_on_error mode
         self.lastInput = 0.0 # used for derivative_on_measurement mode
-        self.lastOutput = 0.0 # used to reinitialize the Iterm and to apply simple moving average on the derivative part in derivative_on_measurement mode
-        self.lastTime = 0.0
+        self.lastOutput = None # used to reinitialize the Iterm and to apply simple moving average on the derivative part in derivative_on_measurement mode
+        self.lastTime = None
         self.lastDerr = 0.0 # used for simple moving average filtering on the derivative part in derivative_on_error mode
         self.target = 0.0
         self.active = False
         self.derivative_on_error = False # if False => derivative_on_measurement (avoids the Derivative Kick on changing the target)
         # PID output smoothing    
-        self.output_smoothing_factor = 1
+        self.output_smoothing_factor = 0 # off if 0
         self.output_decay_weights = None
         self.previous_outputs = []
         # PID input smoothing
-        self.input_smoothing_factor = 1
+        self.input_smoothing_factor = 0 # off if 0
         self.input_decay_weights = None
         self.previous_inputs = []
         
@@ -65,29 +65,30 @@ class PID(object):
     
     def smooth_output(self,output):
         # create or update smoothing decay weights
-        if self.output_decay_weights == None or len(self.output_decay_weights) != self.output_smoothing_factor: # recompute only on changes
+        if self.output_smoothing_factor != 0 and (self.output_decay_weights == None or len(self.output_decay_weights) != self.output_smoothing_factor): # recompute only on changes
             self.output_decay_weights = numpy.arange(1,self.output_smoothing_factor+1)
         # add new value
         self.previous_outputs.append(output)
         # throw away superflous values
         self.previous_outputs = self.previous_outputs[-self.output_smoothing_factor:]
         # compute smoothed output
-        if len(self.previous_outputs) < self.output_smoothing_factor:
+        if len(self.previous_outputs) < self.output_smoothing_factor or self.output_smoothing_factor == 0:
             res = output # no smoothing yet
         else:
             res = numpy.average(self.previous_outputs,weights=self.output_decay_weights)
         return res
+            
     
     def smooth_input(self,input):
         # create or update smoothing decay weights
-        if self.input_decay_weights == None or len(self.input_decay_weights) != self.input_smoothing_factor: # recompute only on changes
+        if self.input_smoothing_factor != 0 and (self.input_decay_weights == None or len(self.input_decay_weights) != self.input_smoothing_factor): # recompute only on changes
             self.input_decay_weights = numpy.arange(1,self.input_smoothing_factor+1)
         # add new value
         self.previous_inputs.append(input)
         # throw away superflous values
         self.previous_inputs = self.previous_inputs[-self.input_smoothing_factor:]
         # compute smoothed output
-        if len(self.previous_inputs) < self.input_smoothing_factor:
+        if len(self.previous_inputs) < self.input_smoothing_factor or self.input_smoothing_factor == 0:
             res = input # no smoothing yet
         else:
             res = numpy.average(self.previous_inputs,weights=self.input_decay_weights)
@@ -101,7 +102,7 @@ class PID(object):
             if self.active:
                 now = time.time()
                 err = self.target - i
-                if not self.lastError or not self.lastTime:
+                if self.lastError == None or self.lastTime == None:
                     self.lastTime = now
                     self.lastError = err
                 else:
@@ -136,15 +137,17 @@ class PID(object):
                             
                         output = P + self.Iterm + D
                         
+                        output = self.smooth_output(output)
+                        
                         # clamp output to [outMin,outMax] and avoid integral windup
                         if output > self.outMax:
                             output = self.outMax
                         elif output < self.outMin:
                             output = self.outMin
                             
-                        output = min(self.dutyMax,max(self.dutyMin,int(round(self.smooth_output(output)))))
-                        if output >= self.lastOutput + self.dutySteps or output <= self.lastOutput - self.dutySteps:
-                            self.control(output)
+                        int_output = min(self.dutyMax,max(self.dutyMin,int(round(output))))
+                        if self.lastOutput == None or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
+                            self.control(int_output)
                             self.lastOutput = output # kept to initialize Iterm on reactivating the PID   
         except Exception:
 #            import sys
@@ -163,7 +166,11 @@ class PID(object):
         self.lastError = 0.0
         self.lastTime = 0.0
         self.lastDerr = 0.0
-        self.Iterm = self.lastOutput
+        if self.lastOutput != None:
+            self.Iterm = self.lastOutput
+        else:
+            self.Iterm = 0.0
+        self.lastOutput = None
         # initialize the output smoothing
         self.output_decay_weights = None
         self.previous_outputs = []

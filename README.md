@@ -49,7 +49,7 @@ Features
   * Yocto Thermocouple and PT100
   * [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html)
   * external program
-- multi-format (import and export of various file formats: HTML, PDF, SVG, CSV, JSON, Omega HH506RA, K202, K204, [RoastLogger](http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm))
+- multi-format (import and export of various file formats: HTML, PDF, SVG, CSV, JSON, Omega HH506RA, K202, K204, [RoastLogger](http://roastlogger.co.uk/coffee/roastlogger/roastlogger.htm))
 - unlimited number of temperature and [virtual curves](https://artisan-roasterscope.blogspot.de/2014/04/virtual-devices-and-symbolic-assignments.html) incl. rate-of-rise curves for ET and BT
 - [spike filter](http://artisan-roasterscope.blogspot.de/2013/05/fighting-spikes.html) and [curve smoothing](https://artisan-roasterscope.blogspot.de/2014/01/sampling-interval-smoothing-and-rate-of.html)
 - [symbolic expressions](https://artisan-roasterscope.blogspot.de/2016/03/roast-calculus.html)
