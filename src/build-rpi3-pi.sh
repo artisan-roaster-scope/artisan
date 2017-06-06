@@ -98,7 +98,7 @@ sed -i "s/_VERSION_/${VERSION}/g" debian/DEBIAN/control
 gzip -9 debian/usr/share/man/man1/artisan.1
 chmod +r debian/usr/share/man/man1/artisan.1.gz
 gzip -9 debian/usr/share/doc/artisan/changelog
-chmod +r debian/usr/share/doc/artisan/changelog.1.gz
+chmod +r debian/usr/share/doc/artisan/changelog.gz
 
 chmod +r debian/usr/share/applications/artisan.desktop
 chmod -x debian/usr/share/applications/artisan.desktop

@@ -32,6 +32,7 @@ o qrcode 5.3
 CHECK FOR UPDATES
 # pip install pip-review
 # pip-review --local --interactive
+# c:\Python27\Scripts\pip-review --interactive --local
 
 
 Upgrade History:

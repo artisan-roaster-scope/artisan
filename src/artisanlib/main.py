@@ -6347,7 +6347,7 @@ class tgraphcanvas(FigureCanvas):
                         etype = self.specialeventstype[-1]
                         if etype == 0:
                             self.E1timex.append(self.timex[self.specialevents[-1]])
-                            self.E1values.append(self.eventpositionbars[min(10,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
+                            self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
                         elif etype == 1:
                             self.E2timex.append(self.timex[self.specialevents[-1]])
                             self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
