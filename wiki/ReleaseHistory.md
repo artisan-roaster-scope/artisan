@@ -1,7 +1,43 @@
 Detailed Release History
 ========================
 
+----
+v1.1.0 (xx.06.2017)
+------------------
 
+ * New Features
+    * adds Recent Roast Properties
+    *  adds "Fuji Command" to send commands to connected Fuji PIDs
+    *  adds ~ path expansion to users home directory and improves external program argument handling (thanks to Max)
+    *  adds prediction of DRY and MAY phases to Phases LCDs before the corresponding phases have been completed
+    *  adds configuration for RoR min/max filter
+    *  adds substitution of \r\n, \n and \t by the corresponding newline and tab characters in serial commands
+    *  adds \t by type substitution in event button labels and {n} substitutions in LCD labels
+    *  adds slider min/max settings
+    *  adds slider synchronization per event quantifiers
+    *  adds flags to hide/show background ET/BT curves
+    *  adds Aillio Bullet R1 profile import
+    *  adds Probat Probatone 2 support
+ * Changes
+    * changes background of snapped by-value events
+    * renamed and localized custom event labels
+    * profiles sampling interval setting cannot be modified after recording anymore
+    * increases resolution on displaying by-value events from 0-10 to 0-100
+ * Bug Fixes
+    * fixed random issue with line breaks in custom button labels
+    * fixed Fuji background issue
+    * fixes call-program issue on Python3
+    * fixes extra event line initialisation
+    * fixes PID I windup and minimizes extra PID smoothing delays
+    * fixes auto time-axis alignment for background profiles
+    * fixes 64bit Yoctopuce lib path for Windows builds
+    * fixes "Start PID on CHARGE" for MODBUS/TC4 devices
+    * fixes LCD color setup
+    * fixes unicode handling in palette save/load
+    * various small fixes and improvements to the quantifier and clustering mechanisms
+    * fixes a failure to load profiles caused by a NaN in the computed section of saved profiles
+    * fixes a Fuji MODBUS decoding issue on Python3
+        
 ----
 v1.0.0 (24.02.2017)
 ------------------

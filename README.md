@@ -30,7 +30,7 @@ Features
 - free for personal and commercial use
 - multi-platform (Mac, Windows, and Linux)
 - multi-language (English, German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norwegian, Finish, Hungarian, Hebrew, Polish, Greek, Turkish, Chinese, Russian, Thai, Indonesian, Korean,..)
-- multi-device (manual and automatic logging of roast temperatures via supported devices; see blog post [Device Selection](http://artisan-roasterscope.blogspot.de/2013/06/device-selection.html))
+- multi-device (manual and automatic logging of roast temperatures via supported devices; see [Device Selection](http://artisan-roasterscope.blogspot.de/2013/06/device-selection.html))
   * Fuji PXR/PXG 4 & 5 PID
   * Delta DTA PID (works for DTB too)
   * [Modbus](http://artisan-roasterscope.blogspot.de/2013/05/more-modbus.html) Serial ASCII/RTU/Binary, TCP and UDP (known to work with PIDs of Fuji, ENDA, Watlow, meters like myPCLab, as well as several variable frequency drives)
@@ -58,10 +58,10 @@ Features
 - [custom event programmable buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html) supporting the [Hottop Roaster Interface](http://artisan-roasterscope.blogspot.de/2013/02/controlling-hottop.html)
 - [time and temperature-based alarms](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html) with user defined actions
 - head-up-display and projections predicting ET/BT development
-- phases LCDs predicting and counting developments per phase
+- [phases LCDs predicting and counting developments per phase](https://artisan-roasterscope.blogspot.de/2017/02/roast-phases-statistics-and-phases-lcds.html)
 - automatic CHARGE/DROP event detection
 - [event quantifiers](https://artisan-roasterscope.blogspot.de/2014/04/event-quantifiers.html)
-- template/background profile with playback aid for reproduction of roasts
+- template/background profile with playback aid and replay functions for reproduction of roasts
 - configurable profile evaluations and statistics
 - weight input from digital scales ([Kern](http://www.kern-sohn.com/) and [Acaia](http://acaia.co/))
 - color input from color meters (supports for now [Tonino](http://my-tonino.com/))
@@ -70,7 +70,7 @@ Features
 - [LargeLCDs and WebLCDs](https://artisan-roasterscope.blogspot.de/2016/03/lcds.html)
 - [volume calculator](https://artisan-roasterscope.blogspot.de/2014/11/batch-volume-and-bean-density.html)
 - [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html)
-- roast, production (for tax reporting) and ranking reports
+- [roast, production (for tax reporting) and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html)
 - PID-based roast reproduction (follow background mode)
 - [software PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html)
 - [Area under the Curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html)
@@ -105,8 +105,9 @@ Version History
 
 | Version | Date | Comment |
 |---------|------|---------|
+| v1.1.0 | xx.06.2017 | Adds Recent Roast Properties, Aillio Bullet R1 profile import and support for Probats Probatone 2 machines |
 | v1.0.0 | 24.02.2017 | Adds [internal software PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html), external MODBUS PID control, Apollo DT301, Extech 755, fast MODBUS RTU, [AUC](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html), RPi build, additional translations, bug fixes and stability improvements |
-| v0.9.9 | 14.03.2016 | Adds batch and ranking reports, batch conversions, follow-background for Fuji PIDs, additional keyboard short cuts, designer improvements, bug fixes |
+| v0.9.9 | 14.03.2016 | Adds [batch and ranking reports, batch conversions, follow-background for Fuji PIDs, additional keyboard short cuts, designer improvements, bug fixes](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html) |
 | v0.9.8 | 21.10.2015 | US weight and volume units, extended [symbolic expressions and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html), [ln()/x^2 approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html), bug fixes |
 | v0.9.7 | 29.07.2015 | Bug fixes |
 | v0.9.6 | 20.07.2015 | Bug fixes |

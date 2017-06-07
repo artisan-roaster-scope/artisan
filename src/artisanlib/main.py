@@ -3505,12 +3505,12 @@ class tgraphcanvas(FigureCanvas):
 
                 if not keepProperties:
                     # reset sliders
-                    aw.moveslider(0,0)
-                    aw.moveslider(1,0)
-                    aw.moveslider(2,0)
-                    aw.moveslider(3,0)
+                    aw.moveslider(0,aw.eventslidermin[0])
+                    aw.moveslider(1,aw.eventslidermin[1])
+                    aw.moveslider(2,aw.eventslidermin[2])
+                    aw.moveslider(3,aw.eventslidermin[3])
                     # reset Arduino/TC4 PID SV
-                    aw.moveSVslider(0)
+                    aw.moveSVslider(aw.pidcontrol.svSliderMin)
                 aw.pidcontrol.sv = None
                 aw.fujipid.sv = None
                 aw.qmc.dutycycle = -1
@@ -11140,7 +11140,7 @@ class ApplicationWindow(QMainWindow):
                 return 
             elif reply == QMessageBox.Yes:
                 aw.loadSettings(fn=action.data())
-                aw.settypedefault() 
+                aw.settypedefault()
                 if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
                     host,res = QInputDialog.getText(self,
                         QApplication.translate("Message", "Machine",None),
@@ -12143,6 +12143,12 @@ class ApplicationWindow(QMainWindow):
         return s
         
     def updateSliderMinMax(self):
+        # first block slider signals to avoid sending out signals
+        self.slider1.blockSignals(True)
+        self.slider2.blockSignals(True)
+        self.slider3.blockSignals(True)
+        self.slider4.blockSignals(True)
+        # reset limits
         self.slider1.setMinimum(self.eventslidermin[0])
         self.slider1.setMaximum(self.eventslidermax[0])
         self.slider2.setMinimum(self.eventslidermin[1])
@@ -12151,7 +12157,16 @@ class ApplicationWindow(QMainWindow):
         self.slider3.setMaximum(self.eventslidermax[2])
         self.slider4.setMinimum(self.eventslidermin[3])
         self.slider4.setMaximum(self.eventslidermax[3])
-        
+        # update slider LCDs
+        self.updateSliderLCD(0,min(self.eventslidermax[0],max(self.eventslidermin[0],self.slider1.value())))
+        self.updateSliderLCD(1,min(self.eventslidermax[1],max(self.eventslidermin[1],self.slider2.value())))
+        self.updateSliderLCD(2,min(self.eventslidermax[2],max(self.eventslidermin[2],self.slider3.value())))
+        self.updateSliderLCD(3,min(self.eventslidermax[3],max(self.eventslidermin[3],self.slider4.value())))
+        # unblock sliders signaling
+        self.slider1.blockSignals(False)
+        self.slider2.blockSignals(False)
+        self.slider3.blockSignals(False)
+        self.slider4.blockSignals(False)        
 
     def setLabelColor(self,label,color):
         palette = QPalette(label.palette()) # make a copy of the palette
@@ -16129,10 +16144,14 @@ class ApplicationWindow(QMainWindow):
                 aw.pidcontrol.svSliderMin = toInt(settings.value("svSliderMin",aw.pidcontrol.svSliderMin))
                 aw.pidcontrol.svSliderMax = toInt(settings.value("svSliderMax",aw.pidcontrol.svSliderMax))
                 aw.pidcontrol.svValue = toInt(settings.value("svValue",aw.pidcontrol.svValue))
+                
+                aw.sliderSV.blockSignals(True)
                 if settings.contains("dutyMin"):
                     aw.pidcontrol.dutyMin = toInt(settings.value("dutyMin",aw.pidcontrol.dutyMin))
                 if settings.contains("dutyMax"):
                     aw.pidcontrol.dutyMax = toInt(settings.value("dutyMax",aw.pidcontrol.dutyMax))
+                aw.sliderSV.blockSignals(False)
+                    
                 aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
                 aw.pidcontrol.pidKp = toDouble(settings.value("pidKp",aw.pidcontrol.pidKp))
                 aw.pidcontrol.pidKi = toDouble(settings.value("pidKi",aw.pidcontrol.pidKi))
@@ -16483,7 +16502,7 @@ class ApplicationWindow(QMainWindow):
                 self.eventslideroffsets = [toInt(x) for x in toList(settings.value("slideroffsets",self.eventslideroffsets))]
                 self.eventsliderfactors = [toDouble(x) for x in toList(settings.value("sliderfactors",self.eventsliderfactors))]
             if settings.contains("slidermin"):
-                self.eventslidermin = [toInt(x) for x in toList(settings.value("slidermin",self.eventslidermax))]
+                self.eventslidermin = [toInt(x) for x in toList(settings.value("slidermin",self.eventslidermin))]
                 self.eventslidermax = [toInt(x) for x in toList(settings.value("slidermax",self.eventslidermax))]
                 aw.updateSliderMinMax()
             if settings.contains("eventslidersflag"):
@@ -16601,7 +16620,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.endofx = self.qmc.resetmaxtime
             if self.qmc.endofx < 1:
                 self.qmc.endofx = 60
-                                
+            
             res = True
             
         except Exception:
@@ -30272,6 +30291,7 @@ class modbusport(object):
                 pass
 
     def connect(self):
+        
         if self.master and not self.master.socket:
             self.master = None
         if self.master == None:
