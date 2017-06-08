@@ -10486,18 +10486,22 @@ class ApplicationWindow(QMainWindow):
         self.label2 = QLabel()
         self.label2.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label2.setText("<big><b>" + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
+        self.setLabelColor(self.label2,QColor(self.qmc.palette["et"]))
         #BT
         self.label3 = QLabel()
         self.label3.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label3.setText("<big><b>" + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
+        self.setLabelColor(self.label3,QColor(self.qmc.palette["bt"]))
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label4.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
+        self.setLabelColor(self.label4,QColor(self.qmc.palette["deltaet"]))
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label5.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
+        self.setLabelColor(self.label5,QColor(self.qmc.palette["deltabt"]))
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
