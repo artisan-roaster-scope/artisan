@@ -15,8 +15,9 @@ Donations
 
 This software is open-source and absolutely free, even for commercial use.
 
-If you think Artisan is worth of some money and you are willing to contribute financially to its further development, feel free to send any amount via my [PayPal.Me page](https://www.paypal.me/MarkoLuther). Thanks!
+If you think Artisan is useful to you, contribute financially to its further development. Send any amount via my [PayPal.Me page](https://www.paypal.me/MarkoLuther). Thanks!
 
+> *Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roasting businesses and consultant that use Artisan in their daily work tend to donate 100-300.- (in $ or EUR). For extra tech support, please inquire.*
 
 
 ![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/FZ94-PID-small.png?raw=true)
@@ -49,7 +50,9 @@ Features
   * Yocto Thermocouple and PT100
   * [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html)
   * external program
-- multi-format (import and export of various file formats: HTML, PDF, SVG, CSV, JSON, Omega HH506RA, K202, K204, [RoastLogger](http://roastlogger.co.uk/coffee/roastlogger/roastlogger.htm))
+- and machines
+  * [Probat Probatone 2](https://artisan-roasterscope.blogspot.de/2017/06/probat-probatone.html)
+- multi-format (import and export of various file formats: HTML, PDF, SVG, CSV, JSON, Omega HH506RA, K202, K204, [RoastLogger](http://roastlogger.co.uk/coffee/roastlogger/roastlogger.htm), [Probat Pilot](http://www.probat-shoproaster.com/en/plants-equipment/control-software/general-features/), [Aillio Bullet R1](https://aillio.com))
 - unlimited number of temperature and [virtual curves](https://artisan-roasterscope.blogspot.de/2014/04/virtual-devices-and-symbolic-assignments.html) incl. rate-of-rise curves for ET and BT
 - [spike filter](http://artisan-roasterscope.blogspot.de/2013/05/fighting-spikes.html) and [curve smoothing](https://artisan-roasterscope.blogspot.de/2014/01/sampling-interval-smoothing-and-rate-of.html)
 - [symbolic expressions](https://artisan-roasterscope.blogspot.de/2016/03/roast-calculus.html)
@@ -105,7 +108,7 @@ Version History
 
 | Version | Date | Comment |
 |---------|------|---------|
-| v1.1.0 | xx.06.2017 | Adds Recent Roast Properties, Aillio Bullet R1 profile import and support for Probats Probatone 2 machines |
+| v1.1.0 | 10.06.2017 | Adds [Recent Roast Properties](https://artisan-roasterscope.blogspot.de/2017/06/recent-roast-properties.html), [Aillio Bullet R1](https://aillio.com) profile import and support for [Probat Probatone 2](https://artisan-roasterscope.blogspot.de/2017/06/probat-probatone.html) |
 | v1.0.0 | 24.02.2017 | Adds [internal software PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html), external MODBUS PID control, Apollo DT301, Extech 755, fast MODBUS RTU, [AUC](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html), RPi build, additional translations, bug fixes and stability improvements |
 | v0.9.9 | 14.03.2016 | Adds [batch and ranking reports, batch conversions, follow-background for Fuji PIDs, additional keyboard short cuts, designer improvements, bug fixes](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html) |
 | v0.9.8 | 21.10.2015 | US weight and volume units, extended [symbolic expressions and plotter](http://artisan-roasterscope.blogspot.de/2015/10/signals-symbolic-assignments-and-plotter.html), [ln()/x^2 approximations](http://artisan-roasterscope.blogspot.de/2015/10/natural-roasts.html), bug fixes |

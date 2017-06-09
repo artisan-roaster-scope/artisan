@@ -43,6 +43,8 @@ o ET/BT logging and PID control supporting the following devices
  - Yocto Thermocouple and PT100
  - Hottop KN-8828B-2K+
  - external program 
+and machines
+ - Probat Probatone 2
 o unlimited number of devices/curves running at the same time
 o symbolic manipulation of device outputs
 o Fahrenheit and Celsius display and conversion
@@ -191,6 +193,12 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v1.1.0 (10.6.2017)
+ - adds Recent Roast Properties
+ - adds Aillio Bullet R1 profile import
+ - adds support for Probat Probatone 2
+ - bug fixes and stability improvements
+ 
 v1.0.0 (24.2.2017)
  - adds internal software PID
  - external MODBUS PID control and faster MODBUS RTU

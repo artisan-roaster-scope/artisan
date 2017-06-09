@@ -1,3 +1,12 @@
+artisan (1.1.0-1) precise; urgency=low
+  * new upstream release
+  * changes since 1.0.0:
+   - adds Recent Roast Properties
+   - adds Aillio Bullet R1 profile import
+   - adds support for Probat Probatone 2
+   - bug fixes and stability improvements
+ --  <marko.luther@gmx.net>  Sat, 10 Jun 2017 19:32:14 +0200
+
 artisan (1.0.0-6) precise; urgency=low
   * new upstream release
   * changes since 0.9.9:

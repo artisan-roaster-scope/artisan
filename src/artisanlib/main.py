@@ -609,8 +609,9 @@ class tgraphcanvas(FigureCanvas):
     def __init__(self,parent):
 
         #default palette of colors
-        self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',"rect1":'green',
-                        "rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',"et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
+        self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
+                        "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
+                        "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue'}
 
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
@@ -5512,20 +5513,20 @@ class tgraphcanvas(FigureCanvas):
                         self.l_annotations += self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
                         # mark active slider values that are not zero                   
                         for slidernr in range(4):
-    #                        if aw.eventslidervisibilities[slidernr]:
-                            # we record also for inactive sliders as some button press actions might have changed the event values also for those
-                            if slidernr == 0:
-                                slidervalue = aw.slider1.value()
-                            elif slidernr == 1:
-                                slidervalue = aw.slider2.value()
-                            elif slidernr == 2:
-                                slidervalue = aw.slider3.value()
-                            elif slidernr == 3:
-                                slidervalue = aw.slider4.value()
-                            if slidervalue != 0:
-                                value = aw.float2float((slidervalue + 10.0) / 10.0)
-                                # note that EventRecordAction avoids to generate events were type and value matches to the previously recorded one
-                                aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
+                            if aw.eventslidervisibilities[slidernr]:
+                                # we record also for inactive sliders as some button press actions might have changed the event values also for those
+                                if slidernr == 0:
+                                    slidervalue = aw.slider1.value()
+                                elif slidernr == 1:
+                                    slidervalue = aw.slider2.value()
+                                elif slidernr == 2:
+                                    slidervalue = aw.slider3.value()
+                                elif slidernr == 3:
+                                    slidervalue = aw.slider4.value()
+                                if slidervalue != 0:
+                                    value = aw.float2float((slidervalue + 10.0) / 10.0)
+                                    # note that EventRecordAction avoids to generate events were type and value matches to the previously recorded one
+                                    aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
                 except Exception:
                     pass
             else:
@@ -8974,11 +8975,9 @@ class SampleThread(QThread):
                             aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                             aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
 
-
-
                         aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                         aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
-
+                        
                         #######   filter deltaBT deltaET
                         # decay smoothing
                         if aw.qmc.deltafilter and not aw.qmc.altsmoothing:
@@ -9008,13 +9007,15 @@ class SampleThread(QThread):
                             else:
                                 aw.qmc.unfiltereddelta2.append(0.)
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+                        
+                        
                     # limit displayed RoR (only before TP is recognized)
                     if not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
-                        if rateofchange1plot != None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                        if rateofchange1plot != None and not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
                             rateofchange1plot = None
-                        if rateofchange2plot != None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
+                        if rateofchange2plot != None and not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
                             rateofchange2plot = None
-                                
+                            
                     # append new data to the rateofchange
                     if local_flagstart:
                         # only if we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
@@ -9460,8 +9461,22 @@ class ApplicationWindow(QMainWindow):
         self.maxRecentRoasts = 20 # the maximum number of recent roasts held
 
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv seetings)
-        self.lcdpaletteB = {"timer":'black',"et":'black',"bt":'black',"deltaet":'black',"deltabt":'black',"sv":'black'}
-        self.lcdpaletteF = {"timer":'white',"et":'white',"bt":'white',"deltaet":'white',"deltabt":'white',"sv":'yellow'}
+        self.lcdpaletteB = {
+            "timer":'black',
+            "et":'#D9D9D9', #'black',
+            "bt":'#D9D9D9', #'black',
+            "deltaet":'#BFBFBF', #'black',
+            "deltabt":'#BFBFBF', #'black',
+            "sv":'#404040', #'black'
+            }
+        self.lcdpaletteF = {
+            "timer":'white',
+            "et":'red', #'white',
+            "bt":'#00007F', #'white',
+            "deltaet":'orange', #'white',
+            "deltabt":'blue', #'white',
+            "sv":'yellow'
+            }
 
         #user defined event buttons
         self.extraeventsbuttonsflag = 1  #shows/hides rows of buttons  1/0; records the user choice, not the actual state!
@@ -16611,7 +16626,11 @@ class ApplicationWindow(QMainWindow):
             # recent roasts
             if settings.contains("recentRoasts"):
                 try:
-                    self.recentRoasts = settings.value("recentRoasts",self.recentRoasts)
+                    rr = settings.value("recentRoasts",self.recentRoasts)
+                    if rr != None:
+                        self.recentRoasts = rr
+                    else:
+                        self.recentRoasts = []
                     self.updateNewMenuRecentRoasts()
                 except:
                     pass
@@ -24660,28 +24679,29 @@ class editGraphDlg(ArtisanDialog):
         
     def recentRoastActivated(self,n):
         # note, the first item is the edited text!
-        rr = aw.recentRoasts[n-1]
-        self.titleedit.textEdited(rr["title"])
-        self.titleedit.setEditText(rr["title"])
-        self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["weightUnit"]))
-        self.weightinedit.setText("%g" % rr["weightIn"])
-        # all of the following items might not be in the dict
-        self.beansedit.setPlainText(rr["beans"])
-        self.weightoutedit.setText("%g" % rr["weightOut"])
-        self.volumeinedit.setText("%g" % rr["volumeIn"])
-        self.volumeoutedit.setText("%g" % rr["volumeOut"])
-        self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
-        self.bean_density_weight_edit.setText(str(rr["densityWeight"]))
-        self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["densityWeightUnit"]))
-        self.bean_density_volume_edit.setText(str(rr["densityVolume"]))
-        self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["densityVolumeUnit"]))
-        self.bean_size_edit.setText(str(rr["beanSize"]))
-        self.moisture_greens_edit.setText(str(rr["moistureGreen"]))
-        self.moisture_roasted_edit.setText(str(rr["moistureRoasted"]))
-        self.whole_color_edit.setText(str(rr["wholeColor"]))
-        self.ground_color_edit.setText(str(rr["groundColor"]))
-        self.colorSystemComboBox.setCurrentIndex(rr["colorSystem"])
-        # Note: the background profile will not be changed if recent roast is activated from Roast Properties
+        if n > 0:
+            rr = aw.recentRoasts[n-1]
+            self.titleedit.textEdited(rr["title"])
+            self.titleedit.setEditText(rr["title"])
+            self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["weightUnit"]))
+            self.weightinedit.setText("%g" % rr["weightIn"])
+            # all of the following items might not be in the dict
+            self.beansedit.setPlainText(rr["beans"])
+            self.weightoutedit.setText("%g" % rr["weightOut"])
+            self.volumeinedit.setText("%g" % rr["volumeIn"])
+            self.volumeoutedit.setText("%g" % rr["volumeOut"])
+            self.volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["volumeUnit"]))
+            self.bean_density_weight_edit.setText(str(rr["densityWeight"]))
+            self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["densityWeightUnit"]))
+            self.bean_density_volume_edit.setText(str(rr["densityVolume"]))
+            self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["densityVolumeUnit"]))
+            self.bean_size_edit.setText(str(rr["beanSize"]))
+            self.moisture_greens_edit.setText(str(rr["moistureGreen"]))
+            self.moisture_roasted_edit.setText(str(rr["moistureRoasted"]))
+            self.whole_color_edit.setText(str(rr["wholeColor"]))
+            self.ground_color_edit.setText(str(rr["groundColor"]))
+            self.colorSystemComboBox.setCurrentIndex(rr["colorSystem"])
+            # Note: the background profile will not be changed if recent roast is activated from Roast Properties
         
     def addRecentRoast(self):
         title = u(self.titleedit.currentText())
