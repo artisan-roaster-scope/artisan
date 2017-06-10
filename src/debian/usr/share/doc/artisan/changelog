@@ -1,4 +1,4 @@
-artisan (1.1.0-1) precise; urgency=low
+artisan (1.1.0-2) precise; urgency=low
   * new upstream release
   * changes since 1.0.0:
    - adds Recent Roast Properties

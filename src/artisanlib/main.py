@@ -9852,9 +9852,9 @@ class ApplicationWindow(QMainWindow):
         self.commportAction.triggered.connect(self.setcommport)
         self.ConfMenu.addAction(self.commportAction)
 
-        calibrateDelayAction = QAction(UIconst.CONF_MENU_SAMPLING,self)
-        calibrateDelayAction.triggered.connect(self.calibratedelay)
-        self.ConfMenu.addAction(calibrateDelayAction)
+        self.calibrateDelayAction = QAction(UIconst.CONF_MENU_SAMPLING,self)
+        self.calibrateDelayAction.triggered.connect(self.calibratedelay)
+        self.ConfMenu.addAction(self.calibrateDelayAction)
 
         self.oversamplingAction = QAction(UIconst.CONF_MENU_OVERSAMPLING,self)
         self.oversamplingAction.triggered.connect(self.oversampling)
@@ -12239,13 +12239,15 @@ class ApplicationWindow(QMainWindow):
         if aw:
             self.fileSaveAction.setEnabled(True)
             self.fileSaveAsAction.setEnabled(True) 
-            self.ConfMenu.setEnabled(True)
+            #self.ConfMenu.setEnabled(True)
+            self.calibrateDelayAction.setEnabled(True)
 
     def disableSaveActions(self):
         if aw:
             self.fileSaveAction.setEnabled(False)
             self.fileSaveAsAction.setEnabled(False) 
-            self.ConfMenu.setEnabled(False)
+            #self.ConfMenu.setEnabled(False)
+            self.calibrateDelayAction.setEnabled(False)
 
     # relocate event actions, by skippig 3=MultipleEvent and 7=SliderAction
     def eventactionx(self,a,cmd):
