@@ -147,6 +147,9 @@ v0.9.9 (14.03.2016)
     * ensures that alarms are sorted based on alarm numbers on opening the dialog
     * fixed volume increase calculation
 
+**Note**
+_This is the latest version supporting Mac OS X 10.7 and 10.8_
+
 ----
 v0.9.8 (21.10.2015)
 ------------------

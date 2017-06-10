@@ -32,7 +32,7 @@ Newer OS like Windows 7 come with this file.
 
 Installation Mac OS X
 ---------------------
-(>=10.7.x, 64bit processor only)
+(>=10.9, 64bit processor only)
 
 1. Install USB/serial driver
    + for Omega HH806AU and HH506RA meters download and run the [FTDI VCP OS X installer](http://www.ftdichip.com/Drivers/VCP.htm)
@@ -47,7 +47,7 @@ Installation Mac OS X
 5. Double click the disk image which appears on your desktop
 6. Drag the `artisan` application icon to your `Applications` directory.
 7. On first app start Mac OS X can warn about unidentified developer. See [https://support.apple.com/kb/PH21769](https://support.apple.com/kb/PH21769) on how to open an app from an unidentified developer.
-8. On OS X > 10.7: after first application start, tick again "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel
+8. On OS X: after first application start, tick again "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel
 
 Installation Linux
 ------------------

@@ -92,7 +92,7 @@
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.7</string>
+	<string>10.9</string>
 	<key>NSAppleScriptEnabled</key>
 	<false/>
 	<key>NSMainNibFile</key>
