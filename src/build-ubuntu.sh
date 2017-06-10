@@ -85,4 +85,7 @@ cp $QT/translations/qt_ru.qm dist/translations
 cp $QT/translations/qt_sv.qm dist/translations
 cp $QT/translations/qt_zh_CN.qm dist/translations
 cp $QT/translations/qt_zh_TW.qm dist/translations
+mkdir dist/Machines
+find includes/Machines -name '.*.aset' -exec rm -r {} \;
+cp -R includes/Machines/* dist/Machines
 tar -cf dist-ubuntu.tar dist

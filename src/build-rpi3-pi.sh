@@ -74,6 +74,9 @@ cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist
 cp LICENSE.txt dist
+mkdir dist/Machines
+find includes/Machines -name '.*.aset' -exec rm -r {} \;
+cp -R includes/Machines/* dist/Machines
 
 cp /usr/local/lib/python3.4/dist-packages/yoctopuce/cdll/* dist
 
