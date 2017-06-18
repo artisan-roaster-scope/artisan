@@ -8488,13 +8488,13 @@ def my_get_icon(name):
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent):
         self.toolitems = (
-            ('Home', 'Reset original view', 'home', 'home'),
-            ('Back', 'Back to  previous view', 'back', 'back'),
-            ('Forward', 'Forward to next view', 'forward', 'forward'),
+            ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
+            ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
+            ('Forward', QApplication.translate("Tooltip", 'Forward to next view', None), 'forward', 'forward'),
             (None, None, None, None),
-            ('Pan', 'Pan axes with left mouse, zoom with right', 'move', 'pan'),
-#            ('Subplots', 'Configure subplots', 'subplots', 'configure_subplots'),
-            ('Zoom', 'Zoom to rectangle', 'zoom_to_rect', 'zoom'),
+            ('Pan', QApplication.translate("Tooltip", 'Pan axes with left mouse, zoom with right', None), 'move', 'pan'),
+#            ('Subplots', QApplication.translate("Tooltip", 'Configure subplots', None), 'subplots', 'configure_subplots'),
+            ('Zoom', QApplication.translate("Tooltip", 'Zoom to rectangle', None), 'zoom_to_rect', 'zoom'),
         )
 
         NavigationToolbar.__init__(self, plotCanvas, parent)
@@ -8515,7 +8515,7 @@ class VMToolbar(NavigationToolbar):
                 else:
                     a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
                 a.triggered.connect(self.edit_parameters)     
-                a.setToolTip('Edit axis, curve and image parameters')
+                a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
                 self.insertAction(self.actions()[-1],a)
         
 
@@ -8941,7 +8941,7 @@ class SampleThread(QThread):
                             
                     #we populate the temporary smoothed ET/BT data arrays
                     cf = aw.qmc.curvefilter * 2 # we smooth twice as heavy for PID/RoR calcuation as for norma curve smoothing
-                    if self.temp_decay_weights == None or len(self.temp_decay_weights) != cf: # recompute only on changes
+                    if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
                         self.temp_decay_weights = numpy.arange(1,cf+1)
                     if len(aw.qmc.temp1) > cf:
                         st1 = numpy.average(aw.qmc.temp1[-cf:],weights=self.temp_decay_weights)
@@ -9517,7 +9517,7 @@ class ApplicationWindow(QMainWindow):
         self.clusterEventsFlag = False
         self.eventquantifierlinspaces = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
         self.eventquantifiersteps = 10
-        self.eventquantifierthresholdfine = 1.5
+        self.eventquantifierthresholdfine = .5 # original: 1.5, changed to 0.5 for Probat Probatone
         self.eventquantifierthresholdcoarse = .5
         self.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
         self.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
@@ -11064,19 +11064,26 @@ class ApplicationWindow(QMainWindow):
         
     # d is a recentRoast dict
     def addRecentRoast(self,d):
-        # check for duplications
-        entry_with_same_title = None
-        for i in range(len(self.recentRoasts)):
-            if self.recentRoasts[i]["title"] == d["title"] and self.recentRoasts[i]["weightIn"] == d["weightIn"] and self.recentRoasts[i]["weightUnit"] == d["weightUnit"]:
-                entry_with_same_title = i
-                break
-        if entry_with_same_title != None:
-            # we remove the duplicate entry first
-            rr = self.recentRoasts[:entry_with_same_title] + self.recentRoasts[entry_with_same_title+1:]
-        else:
-            rr = self.recentRoasts
-        self.recentRoasts = [d] + rr[:self.maxRecentRoasts-1]
-        self.updateNewMenuRecentRoasts()
+        try:
+            # check for duplications
+            entry_with_same_title = None
+            for i in range(len(self.recentRoasts)):
+                if self.recentRoasts[i]["title"] == d["title"] and self.recentRoasts[i]["weightIn"] == d["weightIn"] and self.recentRoasts[i]["weightUnit"] == d["weightUnit"]:
+                    entry_with_same_title = i
+                    break
+            if entry_with_same_title != None:
+                # we remove the duplicate entry first
+                rr = self.recentRoasts[:entry_with_same_title] + self.recentRoasts[entry_with_same_title+1:]
+            else:
+                rr = self.recentRoasts
+            self.recentRoasts = [d] + rr[:self.maxRecentRoasts-1]
+            self.updateNewMenuRecentRoasts()
+        except Exception as e:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),exc_tb.tb_lineno)
+        
         
     def recentRoastLabel(self,rr):
         res = rr["title"] + " (" + "%g" % rr["weightIn"] +rr["weightUnit"]+")"
@@ -11182,7 +11189,8 @@ class ApplicationWindow(QMainWindow):
                         if aw.eventquantifiercoarse[i]:
                             linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
                         else:
-                            linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine                        
+                            linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine
+                        print(abs(linespace[1] - linespace[0]),linespacethreshold)
                         t = temp[-1]
                         d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
                         ld = aw.lastdigitizedvalue[i] # in internal format so 0.8 representing 70%
@@ -24706,82 +24714,89 @@ class editGraphDlg(ArtisanDialog):
             # Note: the background profile will not be changed if recent roast is activated from Roast Properties
         
     def addRecentRoast(self):
-        title = u(self.titleedit.currentText())
-        if self.weightinedit.text() != "":
-            weightIn = float(str(self.weightinedit.text()))
-        else:
-            weightIn = 0.0
-        beans = u(self.beansedit.toPlainText())
-        # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
-        if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
-            if self.weightoutedit.text() != "":
-                weightOut = float(str(self.weightoutedit.text()))
+        try:
+            title = u(self.titleedit.currentText())
+            if self.weightinedit.text() != "":
+                weightIn = float(str(self.weightinedit.text()))
             else:
-                weightOut = 0.0
-            weightUnit = u(self.unitsComboBox.currentText())
-            if self.volumeinedit.text() != "":
-                volumeIn = float(str(self.volumeinedit.text()))
-            else:
-                volumeIn = 0.0
-            if self.volumeoutedit.text() != "":
-                volumeOut = float(str(self.volumeoutedit.text()))
-            else:
-                volumeIn = 0.0
-            volumeUnit = u(self.volumeUnitsComboBox.currentText())
-            if self.bean_density_weight_edit.text() != "":
-                densityWeight = float(str(self.bean_density_weight_edit.text()))
-            else:
-                densityWeight = 0.0
-            densityWeightUnit = u(self.bean_density_weightUnitsComboBox.currentText())
-            if self.bean_density_volume_edit.text() != "":
-                densityVolume = float(str(self.bean_density_volume_edit.text()))
-            else:
-                densityVolume = 0.0
-            densityVolumeUnit = u(self.bean_density_volumeUnitsComboBox.currentText())
-            if self.bean_size_edit.text() != "":
-                beanSize = float(str(self.bean_size_edit.text()))
-            else:
-                beanSize = 0.0
-            if self.moisture_greens_edit.text() != "":
-                moistureGreen = float(self.moisture_greens_edit.text())
-            else:
-                moistureGreen = 0.0
-            if self.moisture_roasted_edit.text() != "":
-                moistureRoasted = float(self.moisture_roasted_edit.text())
-            else:
-                moistureRoasted = 0.0
-            if self.whole_color_edit.text() != "":
-                wholeColor = int(str(self.whole_color_edit.text()))
-            else:
-                wholeColor = 0
-            if self.ground_color_edit.text() != "":
-                groundColor = int(str(self.ground_color_edit.text()))
-            else:
-                groundColor = 0
-            colorSystem = self.colorSystemComboBox.currentIndex()
-            background = aw.qmc.backgroundpath
-            rr = aw.createRecentRoast(
-                title,
-                beans,
-                weightIn,
-                weightOut,
-                weightUnit,
-                volumeIn,
-                volumeOut,
-                volumeUnit,
-                densityWeight,
-                densityWeightUnit,
-                densityVolume,
-                densityVolumeUnit, 
-                beanSize,
-                moistureGreen,
-                moistureRoasted,
-                wholeColor,
-                groundColor,
-                colorSystem,
-                background                            
-                )
-            aw.addRecentRoast(rr)
+                weightIn = 0.0
+            beans = u(self.beansedit.toPlainText())
+            # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
+            if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
+                if self.weightoutedit.text() != "":
+                    weightOut = float(str(self.weightoutedit.text()))
+                else:
+                    weightOut = 0.0
+                weightUnit = u(self.unitsComboBox.currentText())
+                if self.volumeinedit.text() != "":
+                    volumeIn = float(str(self.volumeinedit.text()))
+                else:
+                    volumeIn = 0.0
+                if self.volumeoutedit.text() != "":
+                    volumeOut = float(str(self.volumeoutedit.text()))
+                else:
+                    volumeIn = 0.0
+                volumeUnit = u(self.volumeUnitsComboBox.currentText())
+                if self.bean_density_weight_edit.text() != "":
+                    densityWeight = float(str(self.bean_density_weight_edit.text()))
+                else:
+                    densityWeight = 0.0
+                densityWeightUnit = u(self.bean_density_weightUnitsComboBox.currentText())
+                if self.bean_density_volume_edit.text() != "":
+                    densityVolume = float(str(self.bean_density_volume_edit.text()))
+                else:
+                    densityVolume = 0.0
+                densityVolumeUnit = u(self.bean_density_volumeUnitsComboBox.currentText())
+                if self.bean_size_edit.text() != "":
+                    beanSize = float(str(self.bean_size_edit.text()))
+                else:
+                    beanSize = 0.0
+                if self.moisture_greens_edit.text() != "":
+                    moistureGreen = float(self.moisture_greens_edit.text())
+                else:
+                    moistureGreen = 0.0
+                if self.moisture_roasted_edit.text() != "":
+                    moistureRoasted = float(self.moisture_roasted_edit.text())
+                else:
+                    moistureRoasted = 0.0
+                if self.whole_color_edit.text() != "":
+                    wholeColor = int(str(self.whole_color_edit.text()))
+                else:
+                    wholeColor = 0
+                if self.ground_color_edit.text() != "":
+                    groundColor = int(str(self.ground_color_edit.text()))
+                else:
+                    groundColor = 0
+                colorSystem = self.colorSystemComboBox.currentIndex()
+                background = aw.qmc.backgroundpath
+                rr = aw.createRecentRoast(
+                    title,
+                    beans,
+                    weightIn,
+                    weightOut,
+                    weightUnit,
+                    volumeIn,
+                    volumeOut,
+                    volumeUnit,
+                    densityWeight,
+                    densityWeightUnit,
+                    densityVolume,
+                    densityVolumeUnit, 
+                    beanSize,
+                    moistureGreen,
+                    moistureRoasted,
+                    wholeColor,
+                    groundColor,
+                    colorSystem,
+                    background                            
+                    )
+                aw.addRecentRoast(rr)
+        except Exception as e:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),exc_tb.tb_lineno)
+
         
     def closeEvent(self, event):
         settings = QSettings()
@@ -43854,7 +43869,7 @@ class PIDcontrol(object):
     def smooth_sv(self,sv):
         if self.sv_smoothing_factor:
             # create or update smoothing decay weights
-            if self.sv_decay_weights == None or len(self.sv_decay_weights) != self.sv_smoothing_factor: # recompute only on changes
+            if self.sv_decay_weights is None or len(self.sv_decay_weights) != self.sv_smoothing_factor: # recompute only on changes
                 self.sv_decay_weights = numpy.arange(1,self.sv_smoothing_factor+1)
             # add new value
             self.previous_svs.append(sv)
