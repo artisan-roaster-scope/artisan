@@ -790,9 +790,9 @@ class tgraphcanvas(FigureCanvas):
         # Phidget variables
         self.phidget1048_types = [
             ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
-            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
-            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
-            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE] # probe types (ThermocoupleType)
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_J_TYPE,
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_E_TYPE,
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_T_TYPE] # probe types (ThermocoupleType)
         self.phidget1048_async = [False]*4
         self.phidget1048_changeTriggers = [1.0]*4
         self.phidget1048_changeTriggersValues = [x / 10.0 for x in range(1, 11, 1)]
