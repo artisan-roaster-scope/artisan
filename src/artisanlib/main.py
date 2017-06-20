@@ -788,11 +788,12 @@ class tgraphcanvas(FigureCanvas):
         self.device = 18                                    # default device selected to None (18). Calls appropiate function
         
         # Phidget variables
-        self.phidget1048_types = [
+        # probe type values: k-type => 1, j-type => 2, e-type => 3, t-type => 4
+        self.phidget1048_types = [ # defaults all to k-type:
             ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
-            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_J_TYPE,
-            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_E_TYPE,
-            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_T_TYPE] # probe types (ThermocoupleType)
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE] # probe types (ThermocoupleType)
         self.phidget1048_async = [False]*4
         self.phidget1048_changeTriggers = [1.0]*4
         self.phidget1048_changeTriggersValues = [x / 10.0 for x in range(1, 11, 1)]
@@ -11190,7 +11191,6 @@ class ApplicationWindow(QMainWindow):
                             linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdcoarse
                         else:
                             linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine
-                        print(abs(linespace[1] - linespace[0]),linespacethreshold)
                         t = temp[-1]
                         d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
                         ld = aw.lastdigitizedvalue[i] # in internal format so 0.8 representing 70%
@@ -32590,7 +32590,7 @@ class serialport(object):
     
     def configure1048(self):
         for i in range(aw.ser.PhidgetTemperatureInputCount):
-            if i < 2 or  (i > 1 and i < 4 and 35 in aw.qmc.extradevices):
+            if i < 2 or (i > 1 and i < 4 and 35 in aw.qmc.extradevices):
                 aw.ser.PhidgetTemperatureSensor.setThermocoupleType(i,aw.qmc.phidget1048_types[i])
         aw.ser.Phidget1048values = [-1]*4
         changeTrigger = False
