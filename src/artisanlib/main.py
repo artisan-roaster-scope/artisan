@@ -907,6 +907,7 @@ class tgraphcanvas(FigureCanvas):
         self.extradevicecolor2 = []                                 # extra line 2 color. list with colors.
         self.extratemp1,self.extratemp2 = [],[]                     # extra temp1, temp2. List of lists
         self.extrastemp1,self.extrastemp2 = [],[]                   # smoothed extra temp1, temp2. List of lists
+        self.extractimex1,self.extractimex2,self.extractemp1,self.extractemp2 = [],[],[],[] # variants of extratimex/extratemp1/extratemp2 with -1 dropout values removed
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
         self.extramathexpression1,self.extramathexpression2 = [],[]           # list with user defined math evaluating strings. Example "2*cos(x)"
@@ -1022,7 +1023,8 @@ class tgraphcanvas(FigureCanvas):
         self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]
         self.stemp1,self.stemp2 = [],[] # smoothed versions of temp1/temp2 used in redraw()
         self.tstemp1,self.tstemp2 = [],[] # (temporarily) smoothed version of temp1/temp2 used in sample() to compute the RoR
-        self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # used in sample()       
+        self.ctimex1, self.ctimex2, self.ctemp1,self.ctemp2 = [], [],[],[] # (potential shorter) variants of timex/temp1/temp2 with -1 dropout values removed
+        self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # used in sample()   
 
         #indexes for CHARGE[0],DRYe[1],FCs[2],FCe[3],SCs[4],SCe[5],DROP[6] and COOLe[7]
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryEnd
@@ -1139,7 +1141,6 @@ class tgraphcanvas(FigureCanvas):
         self.curvefilter = 3 # => corresponds to 1 on the user interface
         self.deltaspan = 6 # the time period taken to compute one deltaBT/ET value (1-15sec)
         self.deltasamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
-        self.background_deltasamples = 2 # the number of samples that make up the delta span, to be used in the delta computations (> 0!)
         self.profile_sampling_interval = None # will be updated on loading a profile
         self.background_profile_sampling_interval = None # will be updated on loading a profile into the background
         
@@ -1373,7 +1374,7 @@ class tgraphcanvas(FigureCanvas):
         self.maxRoRlimit = 170
         # axis limits
         self.endofx = 900 # 15min*60=900
-        self.startofx = 0
+        self.startofx = -30
         self.resetmaxtime = 900  #time when pressing reset
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
         self.locktimex = True # if true, do not set time axis min and max from profile on load
@@ -1514,7 +1515,7 @@ class tgraphcanvas(FigureCanvas):
 
         # variables
 
-        self.filterDropOuts = True
+        self.filterDropOuts = True # Smooth Spikes
         self.filterDropOut_tmin = self.filterDropOut_tmin_F_default
         self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
         self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
@@ -1630,7 +1631,7 @@ class tgraphcanvas(FigureCanvas):
         self.plottermessage = ""
         
 
-        #buffers for real time symbolic evalualtion
+        #buffers for real time symbolic evaluation
         self.RTtemp1=0.
         self.RTtemp2=0.        
         self.RTextratemp1=[]
@@ -1653,11 +1654,7 @@ class tgraphcanvas(FigureCanvas):
             interval = self.delay / 1000.
         else:
             interval = self.profile_sampling_interval
-        self.deltasamples = int(max(1,self.deltaspan / int(interval)))
-        
-    def updateBackgroundDeltaSamples(self):
-        if self.background_profile_sampling_interval:
-            self.background_deltasamples = int(max(1,self.deltaspan / int(self.background_profile_sampling_interval)))        
+        self.deltasamples = int(max(1,self.deltaspan / int(interval)))    
     
     # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
     # NOTE: this hack slows down redraw!
@@ -2003,7 +2000,7 @@ class tgraphcanvas(FigureCanvas):
             self.specialeventsStrings.append("")
             self.specialeventsvalue.append(0)
         aw.qmc.safesaveflag = True
-        self.redraw()
+        self.redraw(recomputeAllDeltas=False)
         
     def updateWebLCDs(self,bt=None,et=None,time=None,alertTitle=None,alertText=None,alertTimeout=None):
         try:
@@ -2243,8 +2240,6 @@ class tgraphcanvas(FigureCanvas):
                             aw.qmc.playbackevent()
                     except Exception:
                         pass
-#                        import traceback
-#                        traceback.print_exc(file=sys.stdout)
                     #####
 
                     #update phase lcds
@@ -2372,7 +2367,7 @@ class tgraphcanvas(FigureCanvas):
                 btime = self.timeB[self.timeindexB[1]]
             elif self.timeindexB[0] != -1 and self.timeindex[0] != -1: # CHARGE
                 ptime = self.timex[self.timeindex[0]]
-                btime = self.timeB[self.timeindexB[0]]              
+                btime = self.timeB[self.timeindexB[0]]
             elif self.timeindexB[0] != -1: # if no foreground profile, align 0:00 to the CHARGE event of the background profile
                 ptime = 0
                 btime = self.timeB[self.timeindexB[0]]
@@ -2606,6 +2601,26 @@ class tgraphcanvas(FigureCanvas):
                     aw.fujipid.setONOFFstandby(1)
                 elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # internal or external MODBUS PID control
                     aw.pidcontrol.pidOff()
+                    
+            elif self.alarmaction[alarmnumber] == 21:
+                # SV slider alarm
+                try:
+                    sv = float(str(self.alarmstrings[alarmnumber]))
+                    if aw.qmc.device == 0:
+                        if sv != None and sv != aw.fujipid.sv:
+                            sv = max(0,sv) # we don't send SV < 0
+                            #aw.qmc.temporarysetsv = sv
+                            aw.fujipid.setsv(sv,silent=True)
+                    elif aw.pidcontrol.pidActive:
+                        if sv != None and sv != aw.pidcontrol.sv:
+                            sv = max(0,sv) # we don't send SV < 0
+                            #aw.qmc.temporarysetsv = sv
+                            aw.pidcontrol.setSV(sv,init=False)
+                except Exception as e:
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(e)),exc_tb.tb_lineno)
+                    aw.sendmessage(QApplication.translate("Message","Alarm trigger SV slider error, description '{0}' not a valid number",None).format(u(self.alarmstrings[alarmnumber])))
+
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -2687,7 +2702,7 @@ class tgraphcanvas(FigureCanvas):
     #make a projection of change of rate of BT on the graph
     def updateProjection(self):
         try:
-            if len(aw.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
+            if len(aw.qmc.ctemp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
                 #self.resetlines()
                 if self.timeindex[0] != -1:
                     starttime = self.timex[self.timeindex[0]]
@@ -2697,15 +2712,15 @@ class tgraphcanvas(FigureCanvas):
                     #calculate the temperature endpoint at endofx acording to the latest rate of change
                     if self.l_BTprojection != None:
                         if aw.qmc.BTcurve and len(aw.qmc.delta2) > 0 and aw.qmc.delta2[-1] != None:
-                            BTprojection = self.temp2[-1] + aw.qmc.delta2[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
+                            BTprojection = self.ctemp2[-1] + aw.qmc.delta2[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
                             #plot projections
-                            self.l_BTprojection.set_data([self.timex[-1],self.endofx+starttime], [self.temp2[-1], BTprojection])
+                            self.l_BTprojection.set_data([self.timex[-1],self.endofx+starttime], [self.ctemp2[-1], BTprojection])
                         elif self.l_BTprojection:
                             self.l_BTprojection.set_data([],[])
                     if self.l_ETprojection != None:
                         if aw.qmc.ETcurve and len(aw.qmc.delta1) > 0 and aw.qmc.delta1[-1] != None:
-                            ETprojection = self.temp1[-1] + aw.qmc.delta1[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
-                            self.l_ETprojection.set_data([self.timex[-1],self.endofx+starttime], [self.temp1[-1], ETprojection])
+                            ETprojection = self.ctemp1[-1] + aw.qmc.delta1[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
+                            self.l_ETprojection.set_data([self.timex[-1],self.endofx+starttime], [self.ctemp1[-1], ETprojection])
                         elif self.l_ETprojection:
                             self.l_ETprojection.set_data([],[])
                 elif self.projectionmode == 1:
@@ -2719,20 +2734,20 @@ class tgraphcanvas(FigureCanvas):
                     # 3 Gas or electric power: gas heats BT _faster_ because of hoter air.
                     # Every roaster will have a different constantN.
 
-                    den = self.temp1[-1] - self.temp2[-1]  #denominator ETn - BTn 
+                    den = self.ctemp1[-1] - self.ctemp2[-1]  #denominator ETn - BTn 
                     if den > 0 and len(aw.qmc.delta2)>0 and aw.qmc.delta2[-1]: # if ETn > BTn
                         #get x points
                         xpoints = list(numpy.arange(self.timex[-1],self.endofx + starttime, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds); why? now +starttime
                         #get y points
-                        ypoints = [self.temp2[-1]]                                  # start initializing with last BT
+                        ypoints = [self.ctemp2[-1]]                                  # start initializing with last BT
                         K =  self.projectionconstant*aw.qmc.delta2[-1]/den/60.                 # multiplier
                         for _ in arange(len(xpoints)-1):                                     # create new points from previous points
-                            DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
+                            DeltaT = K*(self.ctemp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
                             ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
 
                         #plot ET level (straight line) and BT curve
                         if self.l_ETprojection != None:
-                            self.l_ETprojection.set_data([self.timex[-1],self.endofx + starttime], [self.temp1[-1], self.temp1[-1]])
+                            self.l_ETprojection.set_data([self.timex[-1],self.endofx + starttime], [self.ctemp1[-1], self.ctemp1[-1]])
                         if self.l_BTprojection != None:
                             self.l_BTprojection.set_data(xpoints, ypoints)
                     else:
@@ -3294,13 +3309,15 @@ class tgraphcanvas(FigureCanvas):
             self.safesaveflag = False  #now flag is cleared (OFF)
             self.rateofchange1 = 0.0
             self.rateofchange2 = 0.0
-            self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2 = [],[],[],[],[],[],[]
+            self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2, self.ctimex1, self.ctimex2, self.ctemp1, self.ctemp2 = [],[],[],[],[],[],[],[],[],[],[]
             self.tstemp1,self.tstemp2 = [],[]
             self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
             self.timeindex = [-1,0,0,0,0,0,0,0]
             #extra devices
             for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):
                 self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]            #reset all variables that need to be reset (but for the actually measurements that will be treated separately at the end of this function)
+                self.extractimex1[i],self.extractimex2[i],self.extractemp1[i],self.extractemp2[i] = [],[],[],[]
+                
             self.specialevents=[]
             aw.lcd1.display("00:00")
             if aw.WebLCDs:
@@ -3325,7 +3342,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " clearMeasurements() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -3474,7 +3491,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.tipping_flag = False
                 aw.qmc.scorching_flag = False
                 aw.qmc.divots_flag = False
-
+                
                 #Designer variables
                 self.indexpoint = 0
                 self.workingline = 2            #selects ET or BT
@@ -3555,8 +3572,8 @@ class tgraphcanvas(FigureCanvas):
                 if self.crossmarker:
                     self.togglecrosslines()
             except Exception as ex:
-    #            import traceback
-    #            traceback.print_exc(file=sys.stdout)
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " reset() {0}").format(str(ex)),exc_tb.tb_lineno)
             finally:
@@ -3566,7 +3583,7 @@ class tgraphcanvas(FigureCanvas):
             self.clearMeasurements()
             ### REDRAW  ##
             if redraw:
-                self.redraw(False,sampling=sampling)
+                self.redraw(True,sampling=sampling)
             return True
 
     def medfilt(self, x, k):
@@ -3608,7 +3625,12 @@ class tgraphcanvas(FigureCanvas):
                     ys = numpy.convolve(w/w.sum(),s,mode='valid')
                     hwl = int((window_len/2))
                     res = ys[hwl:-hwl]
-                    if len(res) != len(y):
+                    if len(res)+1 == len(y) and len(res) > 0:
+                        try:
+                            return ys[hwl-1:-hwl]
+                        except:
+                            return y
+                    elif len(res) != len(y):                       
                         return y
                     else:
                         return res
@@ -3634,13 +3656,41 @@ class tgraphcanvas(FigureCanvas):
                         self.smooth(numpy.array(a)[fromIndex:toIndex],numpy.array(b)[fromIndex:toIndex],window_len,window).tolist(),
                         [None]*(len(a)-toIndex)
                          )).tolist()
-#            elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
-#                return numpy.concatenate((b[:aw.qmc.timeindex[0]+1],
-#                    self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()[aw.qmc.timeindex[0]+1:])).tolist()            
             else:
                 return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
         else:
-            return b
+            # filter spikes
+            if aw.qmc.filterDropOuts and len(a) == len(b) and len(a) > 1:
+                return self.medfilt(numpy.array(b),5).tolist() # k=3 seems not to catch all spikes in all cases
+            else:
+                return b
+                
+    # ignore -1 readings, good ramp up
+    def decay_smooth_list(self, l, window_len=7, decay_weights=None):
+        try:
+            if l != None and ((isinstance(l,(numpy.ndarray,numpy.generic)) and l.size) or l) and aw.qmc.deltafilter and not aw.qmc.altsmoothing:
+                if decay_weights == None:
+                    decay_weights = numpy.arange(1,window_len+1)
+                else:
+                    window_len = len(decay_weights)
+                if decay_weights.sum() == 0:
+                    return l.tolist()
+                else:
+                    res = []
+                    for i in range(len(l)):
+                        seq = l[max(0,i-window_len + 1):i+1] 
+                        # we need to surpress -1 drop out values from this
+                        seq = filter(lambda item: item != -1,seq)
+                        w = decay_weights[max(0,window_len-len(seq)):]
+                        w = w[len(w)-len(seq):]
+                        res.append(numpy.average(seq,weights=w))
+                    return res
+            else:
+                return l.tolist()
+        except Exception:
+            pass
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):                
         if aw.qmc.patheffects:
@@ -3836,12 +3886,7 @@ class tgraphcanvas(FigureCanvas):
 
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
-    # if background=True, the deltas of the background profile are recomputed using background_deltasamples
-    def recomputeDeltas(self,timex,timeindex,t1,t2,background=False):
-        if background:
-            deltasamples = aw.qmc.background_deltasamples
-        else:
-            deltasamples = aw.qmc.deltasamples
+    def recomputeDeltas(self,timex,timeindex,t1,t2,optimalSmoothing=True):
         tx = numpy.array(timex)
         if timeindex[0] > -1:
             roast_start_idx = timeindex[0]
@@ -3854,31 +3899,78 @@ class tgraphcanvas(FigureCanvas):
         tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
         with numpy.errstate(divide='ignore'):
             nt1 = numpy.array(t1[roast_start_idx:roast_end_idx])
-            z1 = (nt1[deltasamples:] - nt1[:-deltasamples]) / ((tx_roast[deltasamples:] - tx_roast[:-deltasamples])/60.)
+            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
         with numpy.errstate(divide='ignore'):
             nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
-            z2 = (nt2[deltasamples:] - nt2[:-deltasamples]) / ((tx_roast[deltasamples:] - tx_roast[:-deltasamples])/60.)
+            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
         lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
         # make lists equal in length
         if lt > ld1:
-            z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+            #z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+            z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
         if lt > ld2:
-            z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-        self.delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
-        self.delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
+            #z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
+            z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
+        if optimalSmoothing:
+            delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
+            delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
+        else:
+            user_filter = int(round(self.deltafilter/2))
+            delta1 = self.decay_smooth_list(z1,window_len=user_filter)
+            delta2 = self.decay_smooth_list(z2,window_len=user_filter)
+                      
         # add None for parts before and after CHARGE/DROP
-        delta1 = numpy.concatenate(([None]*(roast_start_idx),self.delta1,[None]*(len(tx)-roast_end_idx)))
-        delta2 = numpy.concatenate(([None]*(roast_start_idx),self.delta2,[None]*(len(tx)-roast_end_idx)))
+        delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx)))
+        delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))
         # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
         if aw.qmc.RoRlimitFlag:
             # remove values beyond the RoRlimit
             delta1 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
             delta2 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
+        if isinstance(delta1, (numpy.ndarray, numpy.generic)):
+            delta1 = delta1.tolist()
+        if isinstance(delta2, (numpy.ndarray, numpy.generic)):
+            delta2 = delta2.tolist()
         return delta1, delta2
+            
+            
+    # fills in intermediate interpolated values replacing -1 values based on surrounding values
+    # [1, 2, 3, -1, -1, -1, 10, 11] => [1, 2, 3, 4.75, 6.5, 8.25, 11]
+    # [1,2,3,-1,-1,-1,-1] => [1,2,3,-1,-1,-1,-1]
+    def fill_gaps(self,l):
+        res = []
+        last_val = -1
+        skip = -1
+        for i,e in enumerate(l):
+            if i >= skip:
+                if e == -1 and last_val != -1:
+                    next_val = None
+                    next_idx = None # first index of an element beyond i of a value different to -1
+                    for j in range(i+1,len(l)):
+                        if l[j] != -1:
+                            next_val = l[j]
+                            next_idx = j
+                            break
+                    if next_val == None:
+                        # no further valid values, we append the tail
+                        res.extend(l[i:])
+                        return res
+                    else:
+                        # compute intermediate values
+                        step = (next_val - last_val) / (j-i+1.)
+                        for _ in range(j-i):
+                            last_val = last_val + step
+                            res.append(last_val)
+                        skip = next_idx
+                else:
+                    res.append(e)
+                    last_val = e
+        return res
+        
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
-    def redraw(self, recomputeAllDeltas=True, smooth=False,sampling=False):
+    def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
         if aw.qmc.designerflag:
             aw.qmc.redrawdesigner()
         else:
@@ -4207,7 +4299,16 @@ class tgraphcanvas(FigureCanvas):
                     #populate background delta ET (self.delta1B) and delta BT (self.delta2B)                    
                     if self.DeltaETBflag or self.DeltaBTBflag:
                         if recomputeAllDeltas:
-                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB,self.stemp1B,self.stemp2B,True)                           
+                            # we populate temporary smoothed ET/BT data arrays
+                            cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                            if sampling or aw.qmc.flagon:
+                                temp_decay_weights = numpy.arange(1,cf+1)
+                                st1 = self.decay_smooth_list(self.fill_gaps(self.temp1B),decay_weights=temp_decay_weights)
+                                st2 = self.decay_smooth_list(self.fill_gaps(self.temp2B),decay_weights=temp_decay_weights)
+                            else: # we use optimal smoothing in the offline case
+                                st1 = self.smooth_list(self.timeB,self.fill_gaps(self.temp1B),window_len=cf)
+                                st2 = self.smooth_list(self.timeB,self.fill_gaps(self.temp2B),window_len=cf)
+                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB,st1,st2,optimalSmoothing=(not (sampling or aw.qmc.flagon)))
                         
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
@@ -4293,10 +4394,15 @@ class tgraphcanvas(FigureCanvas):
                 labels = []
                 
                 if smooth or len(self.stemp1) != len(self.timex):
-                    self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
+                    if aw.qmc.flagon: # we don't smooth, but remove the dropouts
+                        self.stemp1 = self.fill_gaps(self.temp1)
+                    else:
+                        self.stemp1 = self.smooth_list(self.timex,self.fill_gaps(self.temp1),window_len=self.curvefilter)
                 if smooth or len(self.stemp2) != len(self.timex):
-                    self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
-
+                    if aw.qmc.flagon:  # we don't smooth, but remove the dropouts
+                        self.stemp2 = self.fill_gaps(self.temp2)
+                    else:                    
+                        self.stemp2 = self.smooth_list(self.timex,self.fill_gaps(self.temp2),window_len=self.curvefilter)                            
     
                 if self.eventsshowflag:
                     Nevents = len(self.specialevents)
@@ -4483,18 +4589,18 @@ class tgraphcanvas(FigureCanvas):
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:
-                    if recomputeAllDeltas:
-                        if aw.qmc.flagon and len(self.timex) != len(self.stemp1):
+                    if recomputeAllDeltas and not self.flagstart: # during recording we don't recompute the deltas
+                        cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                        if aw.qmc.flagon or len(self.timex) != len(self.stemp1):
                             t1 = self.temp1
                         else:
-                            t1 = self.stemp1
-                        if aw.qmc.flagon and len(self.timex) != len(self.stemp2):
+                            t1 = self.smooth_list(self.timex,self.fill_gaps(self.temp1),window_len=cf)
+                        if aw.qmc.flagon or len(self.timex) != len(self.stemp2):
                             t2 = self.temp2
                         else:
-                            t2 = self.stemp2
-                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,aw.qmc.timeindex,t1,t2)
-
-                        
+                            t2 = self.smooth_list(self.timex,self.fill_gaps(self.temp2),window_len=cf)
+                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,aw.qmc.timeindex,t1,t2,optimalSmoothing=(not aw.qmc.flagon))
+                                                    
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
                         if len(self.timex) == len(self.delta1) and len(self.timex)  == len(self.delta2):
@@ -4512,31 +4618,31 @@ class tgraphcanvas(FigureCanvas):
                 self.extratemp1lines,self.extratemp2lines = [],[]
                 for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
                     if aw.extraCurveVisibility1[i]:
-                        if aw.qmc.flagon:
+                        if False and aw.qmc.flagon:
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
                             markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
                         else:
                             if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
-                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
+                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
                             markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
                     if aw.extraCurveVisibility2[i]:
-                        if aw.qmc.flagon:
+                        if False and aw.qmc.flagon:
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
                         else:
                             if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
-                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
-                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],
+                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter)
+                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
                 
                 ##### ET,BT curves
                 if aw.qmc.ETcurve:
-                    if aw.qmc.flagon:
+                    if False and aw.qmc.flagon:
                         self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,
                         sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
                         linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
@@ -4545,7 +4651,7 @@ class tgraphcanvas(FigureCanvas):
                         sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
                         linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
                 if aw.qmc.BTcurve:
-                    if aw.qmc.flagon:
+                    if False and aw.qmc.flagon:
                         self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,
                         sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
                         linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
@@ -4755,28 +4861,28 @@ class tgraphcanvas(FigureCanvas):
                 return seconds    #return negative number
 
     def fromFtoC(self,Ffloat):
-        if Ffloat != None:
+        if Ffloat in [-1,None]:
+            return Ffloat
+        else:
             return (Ffloat-32.0)*(5.0/9.0)
-        else:
-            return None
 
-    def fromCtoF(self,CFloat):
-        if CFloat != None:
-            return (CFloat*9.0/5.0)+32.0
+    def fromCtoF(self,Cfloat):
+        if Cfloat in [-1,None]:
+            return Cfloat
         else:
-            return None
+            return (Cfloat*9.0/5.0)+32.0
             
     def RoRfromCtoF(self,CRoR):
-        if CRoR != None:
-            return (CRoR*9.0/5.0)
+        if CRoR in [-1,None]:
+            return CRoR
         else:
-            return None
+            return (CRoR*9.0/5.0)
     
     def RoRfromFtoC(self,FRoR):
-        if FRoR != None:
-            return FRoR*(5.0/9.0)
+        if FRoR in [-1,None]:
+            return FRoR
         else:
-            return None
+            return FRoR*(5.0/9.0)
     
     def convertRoR(self,r,source_unit,target_unit):
         if source_unit == "C":
@@ -5191,7 +5297,6 @@ class tgraphcanvas(FigureCanvas):
             except Exception:
                 pass
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-            aw.qmc.clearMeasurements()
             
             #reset alarms
             self.temporaryalarmflag = -3
@@ -8698,8 +8803,8 @@ class SampleThread(QThread):
                         # no way to correct this
                         return temp
             else:
-                # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)
-                if len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
+                # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)                
+                if (aw.qmc.minmaxLimits or aw.qmc.dropSpikes) and len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-1] != -1 and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
                     tempx[-1] = (tempx[-2] + temp) / 2.0
                 return temp                
         except Exception as e:
@@ -8730,7 +8835,7 @@ class SampleThread(QThread):
             return tx,-1.0,-1.0
 
     def compute_delta(self, times, temps, n):
-        """Compute a tempurature delta using numpy's polyfit with degree 1.
+        """Compute a temperature delta using numpy's polyfit with degree 1.
 
         The latest n values from times and temps are used.  This returns a
         least-squares linear fit of the series. The result's units are degrees
@@ -8786,13 +8891,13 @@ class SampleThread(QThread):
                         timeBeforeETBT = libtime.time() # the time before sending the request to the main device
                     else:
                         timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
-                    #read time, ET (t1) and BT (t2) TEMPERATURE
+                    #read time, ET (t1) and BT (t2) TEMPERATURE                    
                     tx,t1,t2 = self.sample_main_device()
                     if sys.version < '3':
                         timeAfterETBT = libtime.time() # the time the data of the main device was received
                     else:
                         timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
-                    aw.qmc.RTtemp1 = t1
+                    aw.qmc.RTtemp1 = t1 # store readings for real-time symbolic evaluation
                     aw.qmc.RTtemp2 = t2
                     ##############  if using Extra devices
                     nxdevices = len(aw.qmc.extradevices)
@@ -8825,14 +8930,20 @@ class SampleThread(QThread):
                                     extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)                                    
                                 if local_flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
-                                    aw.qmc.extratemp2[i].append(float(extrat2))
+                                    aw.qmc.extratemp2[i].append(float(extrat2))                                       
                                     aw.qmc.extratimex[i].append(extratx)
+                                    if extrat1 != -1:
+                                        aw.qmc.extractimex1[i].append(float(extratx))
+                                        aw.qmc.extractemp1[i].append(float(extrat1))
+                                    if extrat2 != -1:
+                                        aw.qmc.extractimex2[i].append(float(extratx))
+                                        aw.qmc.extractemp2[i].append(float(extrat2))
                                     # update extra lines
                                     if aw.extraCurveVisibility1[i] and len(aw.qmc.extratemp1lines) > xtra_dev_lines1:
-                                        aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                                        aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extractimex1[i], aw.qmc.extractemp1[i])
                                         xtra_dev_lines1 = xtra_dev_lines1 + 1
                                     if aw.extraCurveVisibility2[i] and len(aw.qmc.extratemp2lines) > xtra_dev_lines2:
-                                        aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                                        aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extractimex2[i], aw.qmc.extractemp2[i])
                                         xtra_dev_lines2 = xtra_dev_lines2 + 1
                                 else:
                                     # we do not record, so we just replace the old last value
@@ -8881,23 +8992,27 @@ class SampleThread(QThread):
                         # and only half of the sampling interval is gone
                         if (sampling_interval - gone) > etbt_time and gone < (sampling_interval / 2.0):
                             # place the second ET/BT sampling in the middle of the sampling interval
-                            libtime.sleep((sampling_interval / 2.0) - gone)                       
+                            libtime.sleep((sampling_interval / 2.0) - gone)
                             tx_2,t1_2,t2_2 = self.sample_main_device()
+                            tx = tx + (tx_2 - tx) / 2.0
                             if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
-                                tx = tx + (tx_2 - tx) / 2.0
                                 t2 = (t2 + t2_2) / 2.0
                                 t1 = (t1 + t1_2) / 2.0
                             else: # use new values only to fix reading errors of the initial set of values
                                 if t1 == -1:
                                     t1 = t1_2
+                                elif t1_2 != -1:
+                                    t1 = (t1 + t1_2) / 2.0
                                 if t2 == -1:
-                                    t2 = t2_2 
-                            # send another sampling action if any
-                            try:
-                                if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
-                                    aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
-                            except Exception:
-                                pass    
+                                    t2 = t2_2
+                                elif t2_2 != -1:
+                                    t2 = (t2 + t2_2) / 2.0
+#                            # send another sampling action if any
+#                            try:
+#                                if aw.qmc.extra_event_sampling_delay == 0 and aw.qmc.extrabuttonactions[2]:
+#                                    aw.eventactionx(aw.qmc.extrabuttonactions[2],aw.qmc.extrabuttonactionstrings[2])
+#                            except Exception:
+#                                pass    
                     ####### all values retrieved                
 
                     if aw.qmc.ETfunction != None and len(aw.qmc.ETfunction):
@@ -8910,6 +9025,7 @@ class SampleThread(QThread):
                     # modbus channel 1+2, respect input temperature scale setting
                     t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
                     t2 = self.inputFilter(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
+                    
                     length_of_qmc_timex = len(aw.qmc.timex)
                     t1_final = t1
                     t2_final = t2
@@ -8918,6 +9034,12 @@ class SampleThread(QThread):
                         aw.qmc.temp1.append(t1_final)
                         aw.qmc.timex.append(tx)
                         length_of_qmc_timex += 1
+                        if t1_final != -1:
+                            aw.qmc.ctimex1.append(tx)
+                            aw.qmc.ctemp1.append(t1_final)
+                        if t2_final != -1:
+                            aw.qmc.ctimex2.append(tx)
+                            aw.qmc.ctemp2.append(t2_final)
                     else:
                         if len(aw.qmc.temp2) > 0:
                             aw.qmc.temp2[-1] = t2_final
@@ -8933,48 +9055,95 @@ class SampleThread(QThread):
                         else:
                             aw.qmc.timex[-1] = tx
                             
-                    # update lines data using the lists with new data
+                        if len(aw.qmc.ctemp2) > 0:
+                            aw.qmc.ctemp2[-1] = t2_final
+                        else:
+                            aw.qmc.ctemp2.append(t2_final)
+                        if len(aw.qmc.ctemp1) > 0:
+                            aw.qmc.ctemp1[-1] = t1_final
+                        else:
+                            aw.qmc.ctemp1.append(t1_final)
+                        if len(aw.qmc.ctimex2) > 0:
+                            aw.qmc.ctimex2[-1] = tx
+                        else:
+                            aw.qmc.ctimex2.append(tx)
+                        if len(aw.qmc.ctimex1) > 0:
+                            aw.qmc.ctimex1[-1] = tx
+                        else:
+                            aw.qmc.ctimex1.append(tx)
+                            
+                            
+                    # update lines data using the lists with new data (use stempX instead of tempX to supress dropouts
                     if local_flagstart:
                         if aw.qmc.ETcurve:
-                            aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
+                            aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.ctemp1)
                         if aw.qmc.BTcurve:
-                            aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+                            aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.ctemp2)
                             
-                    #we populate the temporary smoothed ET/BT data arrays
-                    cf = aw.qmc.curvefilter * 2 # we smooth twice as heavy for PID/RoR calcuation as for norma curve smoothing
+                    #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
+                    cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                     if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
                         self.temp_decay_weights = numpy.arange(1,cf+1)
-                    if len(aw.qmc.temp1) > cf:
-                        st1 = numpy.average(aw.qmc.temp1[-cf:],weights=self.temp_decay_weights)
-                        st2 = numpy.average(aw.qmc.temp2[-cf:],weights=self.temp_decay_weights)
+                    # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
+                    if -1 in aw.qmc.temp1[-(cf+1):]:                        
+                        cf1 = 1
+                        dw1 = [1]
                     else:
-                        st1 = aw.qmc.temp1[-1]
-                        st2 = aw.qmc.temp2[-1]
+                        cf1 = cf
+                        dw1 = self.temp_decay_weights
+                    if -1 in aw.qmc.temp2[-(cf+1):]:
+                        cf2 = 1
+                        dw2 = [1]
+                    else:
+                        cf2 = cf
+                        dw2 = self.temp_decay_weights
+                    st1 = numpy.average(aw.qmc.ctemp1[-min(len(aw.qmc.ctemp1),cf1):],weights=dw1[max(0,cf1-len(aw.qmc.ctemp1)):])
+                    st2 = numpy.average(aw.qmc.ctemp2[-min(len(aw.qmc.ctemp2),cf2):],weights=dw2[max(0,cf2-len(aw.qmc.ctemp2)):])
                     aw.qmc.tstemp1.append(st1)
                     aw.qmc.tstemp2.append(st2)
-                            
                     if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
                             not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
                         if aw.pidcontrol.pidSource == 1:
-                            #aw.qmc.pid.update(t2_final) # original BT
                             aw.qmc.pid.update(st2) # smoothed BT
                         else:
-                            #aw.qmc.pid.update(t1_final) # original ET
                             aw.qmc.pid.update(st1) # smoothed ET
                             
                     #we need a minimum of two readings to calculate rate of change
-                    if local_flagstart and length_of_qmc_timex > 1:                        
-                        if aw.qmc.altsmoothing:
-                            # Use numpy to compute a linear approximation for deltas:
-                            aw.qmc.rateofchange1 = self.compute_delta(aw.qmc.timex, aw.qmc.temp1, aw.qmc.smoothingwindowsize)
-                            aw.qmc.rateofchange2 = self.compute_delta(aw.qmc.timex, aw.qmc.temp2, aw.qmc.smoothingwindowsize)
-                        else:
-                            # Compute delta using the last two data points with:
-                            left_index = min(length_of_qmc_timex,max(2,(aw.qmc.deltasamples + 1)))
-                            timed = aw.qmc.timex[-1] - aw.qmc.timex[-left_index]   #time difference between last aw.qmc.deltasamples readings
-                            #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
-                            aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+                    if local_flagstart and length_of_qmc_timex > 1:
+#                        if t1_final != -1 or t2_final != -1 and not aw.qmc.altsmoothing:
+#                            # we compute the time dalta for the RoR calc
+#                            left_index = min(length_of_qmc_timex,max(2,(aw.qmc.deltasamples + 1)))
+#                            timed = aw.qmc.timex[-1] - aw.qmc.timex[-left_index]   #time difference between last aw.qmc.deltasamples readings
+                        # compute T1 RoR
+                        if t1_final == -1:  # we repeat the last RoR if underlying temperature dropped
+                            if aw.qmc.unfiltereddelta1:
+                                aw.qmc.rateofchange1 = aw.qmc.unfiltereddelta1[-1]
+                            else:
+                                aw.qmc.rateofchange1 = 0.
+                        else: # normal data received
+                            if aw.qmc.altsmoothing:
+                                # Use numpy to compute a linear approximation for deltas:
+                                aw.qmc.rateofchange1 = self.compute_delta(aw.qmc.timex, aw.qmc.temp1, aw.qmc.smoothingwindowsize)
+                            else:
+                                #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                                left_index = min(len(aw.qmc.ctimex1),max(2,(aw.qmc.deltasamples + 1)))
+                                timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
+                                aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+                        # compute T2 RoR
+                        if t2_final == -1:  # we repeat the last RoR if underlying temperature dropped
+                            if aw.qmc.unfiltereddelta2:
+                                aw.qmc.rateofchange2 = aw.qmc.unfiltereddelta2[-1]
+                            else:
+                                aw.qmc.rateofchange2 = 0.
+                        else: # normal data received
+                            if aw.qmc.altsmoothing:
+                                # Use numpy to compute a linear approximation for deltas:
+                                aw.qmc.rateofchange2 = self.compute_delta(aw.qmc.timex, aw.qmc.temp2, aw.qmc.smoothingwindowsize)
+                            else:
+                                #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                                left_index = min(len(aw.qmc.ctimex2),max(2,(aw.qmc.deltasamples + 1)))
+                                timed = aw.qmc.ctimex2[-1] - aw.qmc.ctimex2[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
+                                aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
 
                         aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                         aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
@@ -8988,6 +9157,7 @@ class SampleThread(QThread):
                                     self.decay_weights = numpy.arange(1,user_filter+1)
                                 aw.qmc.rateofchange1 = numpy.average(aw.qmc.unfiltereddelta1[-user_filter:],weights=self.decay_weights)
                                 aw.qmc.rateofchange2 = numpy.average(aw.qmc.unfiltereddelta2[-user_filter:],weights=self.decay_weights)
+                                
                         if aw.qmc.timeindex[6]:
                             rateofchange1plot = None
                             rateofchange2plot = None
@@ -8995,7 +9165,7 @@ class SampleThread(QThread):
                             rateofchange1plot = aw.qmc.rateofchange1
                             rateofchange2plot = aw.qmc.rateofchange2
                     else:
-                        if local_flagstart:
+                        if local_flagstart: # recording started, but not yet enough readings to calc a RoR
                             aw.qmc.unfiltereddelta1.append(0.)
                             aw.qmc.unfiltereddelta2.append(0.)
                         else:
@@ -9017,7 +9187,7 @@ class SampleThread(QThread):
                         if rateofchange2plot != None and not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
                             rateofchange2plot = None
                             
-                    # append new data to the rateofchange
+                    # append new data to the rateofchange arrays
                     if local_flagstart:
                         # only if we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
                         if length_of_qmc_timex > int(round(aw.qmc.deltafilter/2)) + max(2,(aw.qmc.deltasamples + 1)):
@@ -9035,6 +9205,7 @@ class SampleThread(QThread):
                             aw.qmc.delta2[-1] = rateofchange2plot
                         else:
                             aw.qmc.delta2.append(rateofchange2plot)
+                    
                     if local_flagstart:
                         if aw.qmc.DeltaETflag:
                             aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
@@ -9107,7 +9278,7 @@ class SampleThread(QThread):
                             if sv != None and sv != aw.pidcontrol.sv:
                                 sv = max(0,sv) # we don't send SV < 0
                                 aw.qmc.temporarysetsv = sv
-                                # aw.pidcontrol.setSV(sv,init=False) # this is called in () within the GUI thread to move the sliders
+                                # aw.pidcontrol.setSV(sv,init=False) # this is called in updategraphics() within the GUI thread to move the sliders
                                 
                     # update AUC running value
                     if aw.qmc.flagstart: # only during recording
@@ -9197,14 +9368,14 @@ class SampleThread(QThread):
                             elif aw.qmc.alarmsource[i] == -1 and aw.qmc.delta2[-1]: #check DeltaBT (might be None
                                 alarm_temp = aw.qmc.delta2[-1]
                             elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                alarm_temp = aw.qmc.temp1[-1]
+                                alarm_temp = aw.qmc.ctemp1[-1]
                             elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                alarm_temp = aw.qmc.temp2[-1]
+                                alarm_temp = aw.qmc.ctemp2[-1]
                             elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
                                 if (aw.qmc.alarmsource[i])%2==0:
-                                    alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    alarm_temp = aw.qmc.extractemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
                                 else:
-                                    alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    alarm_temp = aw.qmc.extractemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
                             alarm_limit = aw.qmc.alarmtemperature[i]
                             if alarm_temp != None and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
                                 aw.qmc.temporaryalarmflag = i
@@ -11192,22 +11363,23 @@ class ApplicationWindow(QMainWindow):
                         else:
                             linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine
                         t = temp[-1]
-                        d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
-                        ld = aw.lastdigitizedvalue[i] # in internal format so 0.8 representing 70%
-                        lt = aw.lastdigitizedtemp[i] # last digitized raw value corresponding to ld
-                        if d != None and (ld == None or ld != d):
-                            if ld == None or lt == None or linespacethreshold < abs(t - lt): # and only if significantly different than previous to avoid fluktuation
-                                # test if t is increasing or decreasing
-                                v = d * 10.
-                                # establish this one
-                                aw.lastdigitizedvalue[i] = d
-                                aw.lastdigitizedtemp[i] = t
-                                lv = aw.lastEventValue(i)
-                                # now move corresponding slider and add event if its value is not equal to the previous one                                                    
-                                if ((aw.float2float((v + 10.0) / 10.0)) != lv):
-                                    # we set the last value to be used for relative +- button action as base
-                                    aw.extraeventsactionslastvalue[i] = int(round(v))
-                                    aw.qmc.quantifiedEvent.append([i,v])
+                        if t != -1: # -1 is an error value
+                            d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
+                            ld = aw.lastdigitizedvalue[i] # in internal format so 0.8 representing 70%
+                            lt = aw.lastdigitizedtemp[i] # last digitized raw value corresponding to ld
+                            if d != None and (ld == None or ld != d):
+                                if ld == None or lt == None or linespacethreshold < abs(t - lt): # and only if significantly different than previous to avoid fluktuation
+                                    # test if t is increasing or decreasing
+                                    v = d * 10.
+                                    # establish this one
+                                    aw.lastdigitizedvalue[i] = d
+                                    aw.lastdigitizedtemp[i] = t
+                                    lv = aw.lastEventValue(i)
+                                    # now move corresponding slider and add event if its value is not equal to the previous one                                                    
+                                    if ((aw.float2float((v + 10.0) / 10.0)) != lv):
+                                        # we set the last value to be used for relative +- button action as base
+                                        aw.extraeventsactionslastvalue[i] = int(round(v))
+                                        aw.qmc.quantifiedEvent.append([i,v])
                                                                         
     def updateSliderColors(self):
         self.sliderLCD1.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[0])
@@ -13692,14 +13864,15 @@ class ApplicationWindow(QMainWindow):
                 timex = profile["extratimex"]
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.extratimexB = timex
-                b1 = self.qmc.smooth_list(tb,t1,window_len=self.qmc.curvefilter)
-                b2 = self.qmc.smooth_list(tb,t2,window_len=self.qmc.curvefilter)
+                b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter)
+                b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter)
+                
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
                 b1x = []
                 b2x = []
                 for i in range(min(len(t1x),len(t2x))):
-                    b1x.append(self.qmc.smooth_list(tb,t1x[i],window_len=self.qmc.curvefilter))
-                    b2x.append(self.qmc.smooth_list(tb,t2x[i],window_len=self.qmc.curvefilter))
+                    b1x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter))
+                    b2x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter))
                 # NOTE: parallel assignment after time intensive smoothing is necessary to avoid redraw failure!
                 self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = b1,b2,b1x,b2x
                 self.qmc.backgroundEvents = profile["specialevents"]
@@ -13753,7 +13926,6 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.timebackgroundindexupdate(times[:])
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
                 self.qmc.background_profile_sampling_interval = profile["samplinginterval"]
-                self.qmc.updateBackgroundDeltaSamples()
                 backgroundDrop = self.qmc.timeindexB[6]
                 try:
                     try:
@@ -13971,6 +14143,14 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extrastemp1.append([])
             self.qmc.extrastemp2 = self.qmc.extrastemp2[:n-1]
             self.qmc.extrastemp2.append([])
+            self.qmc.extractimex1 = self.qmc.extratctimex1[:n-1]
+            self.qmc.extractimex1.append([])
+            self.qmc.extractimex2 = self.qmc.extratctimex2[:n-1]
+            self.qmc.extractimex2.append([])
+            self.qmc.extractemp1 = self.qmc.extractemp1[:n-1]
+            self.qmc.extractemp1.append([])
+            self.qmc.extractemp2 = self.qmc.extractemp2[:n-1]
+            self.qmc.extractemp2.append([])
 
             #add new style variables
             self.qmc.extralinestyles1 = self.qmc.extralinestyles1[:n-1]
@@ -14268,6 +14448,8 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.extradevicecolor2 = []
             aw.qmc.extratemp1,aw.qmc.extratemp2 = [],[]
             aw.qmc.extrastemp1,aw.qmc.extrastemp2 = [],[]
+            aw.qmc.extractimex1,aw.qmc.extractimex2 = [],[]
+            aw.qmc.extractemp1,aw.qmc.extractemp2 = [],[]
             aw.qmc.extratemp1lines,aw.qmc.extratemp2lines = [],[]
             aw.qmc.extralinestyles1,aw.qmc.extralinestyles2 = [],[]
             aw.qmc.extradrawstyles1,aw.qmc.extradrawstyles2 = [],[]
@@ -14710,9 +14892,13 @@ class ApplicationWindow(QMainWindow):
                 if "extratemp1" in profile:
                     self.qmc.extratemp1 = profile["extratemp1"] + [[-1]*len(self.qmc.extratimex[0])]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp1 = [[]]*len(self.qmc.extratemp1)
+                    self.qmc.extractemp1 = [[]]*len(self.qmc.extratemp1)
+                    self.qmc.extractimex1 = [[]]*len(self.qmc.extratemp1)
                 if "extratemp2" in profile:
                     self.qmc.extratemp2 = profile["extratemp2"] + [[-1]*len(self.qmc.extratimex[0])]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp2 = [[]]*len(self.qmc.extratemp2)
+                    self.qmc.extractemp2 = [[]]*len(self.qmc.extratemp2)
+                    self.qmc.extractimex2 = [[]]*len(self.qmc.extratemp2)
                 # d) set other extra curve attribute lists
                 if "extraname1" in profile:
                     self.qmc.extraname1 = [d(x) for x in profile["extraname1"] + self.qmc.extraname1[len(profile["extraname1"]):]]
@@ -16377,43 +16563,59 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("BTlinestyle"):
                 self.qmc.BTlinestyle = s2a(toString(settings.value("BTlinestyle",self.qmc.BTlinestyle)))
                 self.qmc.BTdrawstyle = s2a(toString(settings.value("BTdrawstyle",self.qmc.BTdrawstyle)))
+                if self.qmc.BTdrawstyle == '-':
+                    self.qmc.BTdrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTlinewidth = toInt(settings.value("BTlinewidth",self.qmc.BTlinewidth))
                 self.qmc.BTmarker = s2a(toString(settings.value("BTmarker",self.qmc.BTmarker)))
                 self.qmc.BTmarkersize = toInt(settings.value("BTmarkersize",self.qmc.BTmarkersize))
                 self.qmc.ETlinestyle = s2a(toString(settings.value("ETlinestyle",self.qmc.ETlinestyle)))
                 self.qmc.ETdrawstyle = s2a(toString(settings.value("ETdrawstyle",self.qmc.ETdrawstyle)))
+                if self.qmc.ETdrawstyle == '-':
+                    self.qmc.ETdrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETlinewidth = toInt(settings.value("ETlinewidth",self.qmc.ETlinewidth))
                 self.qmc.ETmarker = s2a(toString(settings.value("ETmarker",self.qmc.ETmarker)))
                 self.qmc.ETmarkersize = toInt(settings.value("ETmarkersize",self.qmc.ETmarkersize))
                 self.qmc.BTdeltalinestyle = s2a(toString(settings.value("BTdeltalinestyle",self.qmc.BTdeltalinestyle)))
                 self.qmc.BTdeltadrawstyle = s2a(toString(settings.value("BTdeltadrawstyle",self.qmc.BTdeltadrawstyle)))
+                if self.qmc.BTdeltadrawstyle == '-':
+                    self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTdeltalinewidth = toInt(settings.value("BTdeltalinewidth",self.qmc.BTdeltalinewidth))
                 self.qmc.BTdeltamarker = s2a(toString(settings.value("BTdeltamarker",self.qmc.BTdeltamarker)))
                 self.qmc.BTdeltamarkersize = toInt(settings.value("BTdeltamarkersize",self.qmc.BTdeltamarkersize))
                 self.qmc.ETdeltalinestyle = s2a(toString(settings.value("ETdeltalinestyle",self.qmc.ETdeltalinestyle)))
                 self.qmc.ETdeltadrawstyle = s2a(toString(settings.value("ETdeltadrawstyle",self.qmc.ETdeltadrawstyle)))
+                if self.qmc.ETdeltadrawstyle == '-':
+                    self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETdeltalinewidth = toInt(settings.value("ETdeltalinewidth",self.qmc.ETdeltalinewidth))
                 self.qmc.ETdeltamarker = s2a(toString(settings.value("ETdeltamarker",self.qmc.ETdeltamarker)))
                 self.qmc.ETdeltamarkersize = toInt(settings.value("ETdeltamarkersize",self.qmc.ETdeltamarkersize))
                 self.qmc.BTbacklinestyle = s2a(toString(settings.value("BTbacklinestyle",self.qmc.BTbacklinestyle)))
                 self.qmc.BTbackdrawstyle = s2a(toString(settings.value("BTbackdrawstyle",self.qmc.BTbackdrawstyle)))
+                if self.qmc.BTbackdrawstyle == '-':
+                    self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTbacklinewidth = toInt(settings.value("BTbacklinewidth",self.qmc.BTbacklinewidth))
                 self.qmc.BTbackmarker = s2a(toString(settings.value("BTbackmarker",self.qmc.BTbackmarker)))
                 self.qmc.BTbackmarkersize = toInt(settings.value("BTbackmarkersize",self.qmc.BTbackmarkersize))
                 self.qmc.ETbacklinestyle = s2a(toString(settings.value("ETbacklinestyle",self.qmc.ETbacklinestyle)))
                 self.qmc.ETbackdrawstyle = s2a(toString(settings.value("ETbackdrawstyle",self.qmc.ETbackdrawstyle)))
+                if self.qmc.ETbackdrawstyle == '-':
+                    self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETbacklinewidth = toInt(settings.value("ETbacklinewidth",self.qmc.ETbacklinewidth))
                 self.qmc.ETbackmarker = s2a(toString(settings.value("ETbackmarker",self.qmc.ETbackmarker)))
                 self.qmc.ETbackmarkersize = toInt(settings.value("ETbackmarkersize",self.qmc.ETbackmarkersize))
                 self.qmc.XTbacklinestyle = s2a(toString(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle)))
                 self.qmc.XTbackdrawstyle = s2a(toString(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle)))
+                if self.qmc.XTbackdrawstyle == '-':
+                    self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.XTbacklinewidth = toInt(settings.value("XTbacklinewidth",self.qmc.XTbacklinewidth))
                 self.qmc.XTbackmarker = s2a(toString(settings.value("XTbackmarker",self.qmc.XTbackmarker)))
                 self.qmc.XTbackmarkersize = toInt(settings.value("XTbackmarkersize",self.qmc.ETbackmarkersize))
                 self.qmc.extralinestyles1 = list(map(str,list(toStringList(settings.value("extralinestyles1",self.qmc.extralinestyles1)))))
                 self.qmc.extralinestyles2 = list(map(str,list(toStringList(settings.value("extralinestyles2",self.qmc.extralinestyles2)))))
                 self.qmc.extradrawstyles1 = list(map(str,list(toStringList(settings.value("extradrawstyles1",self.qmc.extradrawstyles1)))))
+                self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles1]                                
                 self.qmc.extradrawstyles2 = list(map(str,list(toStringList(settings.value("extradrawstyles2",self.qmc.extradrawstyles2)))))
+                self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles2]                                                
                 self.qmc.extralinewidths1 = [toInt(x) for x in toList(settings.value("extralinewidths1"))]
                 self.qmc.extralinewidths2 = [toInt(x) for x in toList(settings.value("extralinewidths2"))]
                 self.qmc.extramarkers1 = list(map(str,list(toStringList(settings.value("extramarkers1",self.qmc.extramarkers1)))))
@@ -16422,11 +16624,13 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extramarkersizes2 = [toInt(x) for x in toList(settings.value("extramarkersizes2"))]
                 self.qmc.BTBdeltalinestyle = s2a(toString(settings.value("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle)))
                 self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle)))
+                
                 self.qmc.BTBdeltalinewidth = toInt(settings.value("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth))
                 self.qmc.BTBdeltamarker = s2a(toString(settings.value("BTBdeltamarker",self.qmc.BTBdeltamarker)))
                 self.qmc.BTBdeltamarkersize = toInt(settings.value("BTBdeltamarkersize",self.qmc.BTBdeltamarkersize))
                 self.qmc.ETBdeltalinestyle = s2a(toString(settings.value("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle)))
                 self.qmc.ETBdeltadrawstyle = s2a(toString(settings.value("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle)))
+                
                 self.qmc.ETBdeltalinewidth = toInt(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))
                 self.qmc.ETBdeltamarker = s2a(toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker)))
                 self.qmc.ETBdeltamarkersize = toInt(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))
@@ -16458,6 +16662,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extratimex.append([])
                 self.qmc.extrastemp1.append([])
                 self.qmc.extrastemp2.append([])
+                self.qmc.extractimex1.append([])
+                self.qmc.extractimex2.append([])
+                self.qmc.extractemp1.append([])
+                self.qmc.extractemp2.append([])
             #extra LCDs
             self.updateLCDproperties()
             # set extraLCD colors
@@ -19000,6 +19208,10 @@ class ApplicationWindow(QMainWindow):
                 else:
                     titleB = aw.qmc.roastbatchprefixB + u(aw.qmc.roastbatchnrB) + u(" ") + u(aw.qmc.titleB)
                 background = u(titleB)
+            if aw.qmc.alarmsfile:
+                alarms = u(os.path.basename(aw.qmc.alarmsfile))
+            else:
+                alarms = u("--")            
             if aw.qmc.roastbatchnr == 0:
                 batch = u("")
             else:
@@ -19065,6 +19277,8 @@ class ApplicationWindow(QMainWindow):
                 cool_phase=coolphase,
                 background_label=u(QApplication.translate("HTML Report Template", "Background:", None)),
                 background=background,
+                alarms_label=u(QApplication.translate("HTML Report Template", "Alarms:", None)),
+                alarms=alarms,
                 ror_label=u(QApplication.translate("HTML Report Template", "RoR:", None)),
                 ror= ror,
                 etbta_label=u(QApplication.translate("HTML Report Template", "AUC:", None)),
@@ -19424,7 +19638,7 @@ class ApplicationWindow(QMainWindow):
             d4 = self.qmc.temp2[i] - self.qmc.temp2[i-1]
             dpre = (d1 + d2) / 2.0
             dpost = (d3 + d4) / 2.0
-            #print("BTbreak",self.qmc.temp2[i],d3 < .0,d4 < .0,abs(dpost),(offset + (2.5 * abs(dpre))))
+            #print("BTbreak",i,self.qmc.temp2[i],d3 < .0,d4 < .0,abs(dpost),(offset + (2.5 * abs(dpre))))
             if d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (2.5 * abs(dpre)))):
                 return True
             else:
@@ -20149,7 +20363,7 @@ class ApplicationWindow(QMainWindow):
     def background(self):
         dialog = backgroundDlg(self)
         dialog.show()
-        dialog.setFixedSize(dialog.size())
+        #dialog.setFixedSize(dialog.size())
         
     def deleteBackground(self):
         self.qmc.backgroundpath = ""
@@ -20577,7 +20791,8 @@ class ApplicationWindow(QMainWindow):
                     m = None
                 if m == None:
                     historydata = tree.find('historydata')
-                    m = historydata.get("temp_unit")
+                    if historydata != None:
+                        m = historydata.get("temp_unit")
                 if m != None:
                     m = m.lower()
                     if m == "c" and self.qmc.mode == "F":
@@ -20597,18 +20812,19 @@ class ApplicationWindow(QMainWindow):
                     diagrampoints = None
                 if diagrampoints == None:
                     diagrampoints = tree.find('historydata')
-                for elem in diagrampoints.findall("data"):
-                    timez = float(self.qmc.stringtoseconds(elem.find("time").text))
-                    self.qmc.timex.append(timez)
-                    self.qmc.temp1.append(-1)
-                    bt = elem.find("temperature").text
-                    bt = bt.replace(",",".")
-                    self.qmc.temp2.append(float(bt))
-                    self.qmc.extratimex[0].append(timez)
-                    burner = elem.find("burnercapacity").text
-                    burner = burner.replace(",",".")
-                    self.qmc.extratemp1[0].append(float(burner))
-                    self.qmc.extratemp2[0].append(-1)
+                if diagrampoints != None:
+                    for elem in diagrampoints.findall("data"):
+                        timez = float(self.qmc.stringtoseconds(elem.find("time").text))
+                        self.qmc.timex.append(timez)
+                        self.qmc.temp1.append(-1)
+                        bt = elem.find("temperature").text
+                        bt = bt.replace(",",".")
+                        self.qmc.temp2.append(float(bt))
+                        self.qmc.extratimex[0].append(timez)
+                        burner = elem.find("burnercapacity").text
+                        burner = burner.replace(",",".")
+                        self.qmc.extratemp1[0].append(float(burner))
+                        self.qmc.extratemp2[0].append(-1)
                     
                 # set CHARGE and DROP
                 self.qmc.timeindex[0] = 0
@@ -22960,7 +23176,6 @@ class HUDDlg(ArtisanDialog):
         if aw.qmc.deltaspan != self.spanitems[i]:
             aw.qmc.deltaspan = self.spanitems[i]
             aw.qmc.updateDeltaSamples()
-            aw.qmc.updateBackgroundDeltaSamples()
             aw.qmc.redraw(recomputeAllDeltas=True)
         
     def changeDecimalPlaceslcd(self,i):
@@ -23896,7 +24111,11 @@ class editGraphDlg(ArtisanDialog):
             self.charge_idx = aw.findBTbreak(0,dryEndIndex)
             self.drop_idx = aw.findBTbreak(dryEndIndex)
             if self.charge_idx != 0 and self.charge_idx != aw.qmc.timeindex[0]:
-                charge_str = aw.qmc.stringfromseconds(int(aw.qmc.timex[self.charge_idx]))
+                if aw.qmc.timeindex[0] == -1:
+                    time_diff = int(round(aw.qmc.timex[self.charge_idx]))
+                else:
+                    time_diff = int(round(aw.qmc.timex[self.charge_idx] - aw.qmc.timex[aw.qmc.timeindex[0]]))
+                charge_str = aw.qmc.stringfromseconds(time_diff)
             if self.drop_idx != 0 and self.drop_idx != aw.qmc.timeindex[6]:
                 drop_str = aw.qmc.stringfromseconds(int(aw.qmc.timex[self.drop_idx]-aw.qmc.timex[aw.qmc.timeindex[0]]))
         self.chargeestimate = QLabel(charge_str)
@@ -25287,11 +25506,18 @@ class editGraphDlg(ArtisanDialog):
             # check for selection
             selected = self.eventtable.selectedRanges()
             if selected and len(selected) > 0:
-                rows = [s.topRow() for s in selected]
+                rows = []
+                for s in selected:
+                    top = s.topRow()
+                    for x in range(s.rowCount()):
+                        rows.append(top + x)
+                #rows = [s.topRow() for s in selected]
                 self.createAlarmEventRows(rows)
                 message = QApplication.translate("Message","Alarms from events #{0} created", None).format(str([r+1 for r in rows]))
             else:
-                message = QApplication.translate("Message","No event selected", None)
+                rows = range(self.eventtable.rowCount())
+                self.createAlarmEventRows(rows)
+                message = QApplication.translate("Message","Alarms from events #{0} created", None).format(str([r+1 for r in rows]))
             aw.sendmessage(message)
         else:
             message = QApplication.translate("Message","No events found", None)
@@ -25346,7 +25572,12 @@ class editGraphDlg(ArtisanDialog):
             # check for selection
             selected = self.eventtable.selectedRanges()
             if selected and len(selected) > 0:
-                rows = [s.topRow() for s in selected]
+                #rows = [s.topRow() for s in selected]
+                rows = []
+                for s in selected:
+                    top = s.topRow()
+                    for x in range(s.rowCount()):
+                        rows.append(top + x)
                 self.deleteEventRows(rows)
                 message = QApplication.translate("Message"," Events #{0} deleted", None).format(str([r+1 for r in rows]))
             else:
@@ -26248,15 +26479,19 @@ class WindowsDlg(ArtisanDialog):
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.resetEdit.setValidator(QRegExpValidator(regextime,self))
         self.resetEdit.setText(aw.qmc.stringfromseconds(aw.qmc.resetmaxtime))
+        self.resetEdit.setToolTip(QApplication.translate("Tooltip", "Initial time axis max on RESET if LOCK is ticked", None))
         # fixmaxtime flag
         self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Lock Max",None))
         self.fixmaxtimeFlag.setChecked(aw.qmc.fixmaxtime)
+        self.fixmaxtimeFlag.setToolTip(QApplication.translate("Tooltip", "Do not automatically extend the time max limit by 3min on need", None))
         # locktimex flag
         self.locktimexFlag = QCheckBox(QApplication.translate("CheckBox", "Lock",None))
         self.locktimexFlag.setChecked(aw.qmc.locktimex)
+        self.locktimexFlag.setToolTip(QApplication.translate("Tooltip", "Do not set time axis min and max from profile on load", None))
         # locktimex flag
         self.autotimexFlag = QCheckBox(QApplication.translate("CheckBox", "Auto",None))
         self.autotimexFlag.setChecked(aw.qmc.autotimex)
+        self.autotimexFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set time axis min and max from profile CHARGE/DROP on load and OFF", None))
         autoButton = QPushButton(QApplication.translate("Button","Calc",None))
         autoButton.setFocusPolicy(Qt.NoFocus)
         autoButton.clicked.connect(self.autoAxis)
@@ -27820,20 +28055,21 @@ class EventsDlg(ArtisanDialog):
                     lt = None # last digitized temp value
                     for ii in arange(len(temp)):
                         t = temp[ii]
-                        d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
-                        if d != None and (ld == None or ld != d):
-                            # take only changes
-                            # and only if significantly different than previous to avoid fluktuation
-                            if ld == None or lt == None or linespacethreshold < abs(t - lt):
-                                # establish this one
-                                ld = d
-                                lt = t
-                                # add to event table
-                                aw.qmc.specialevents.append(aw.qmc.time2index(timex[ii]))
-                                aw.qmc.specialeventstype.append(i)
-                                aw.qmc.specialeventsStrings.append("Q")
-                                aw.qmc.specialeventsvalue.append(float(d+1))
-                                aw.qmc.safesaveflag = True
+                        if t != -1: # -1 is an error value
+                            d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
+                            if d != None and (ld == None or ld != d):
+                                # take only changes
+                                # and only if significantly different than previous to avoid fluktuation
+                                if ld == None or lt == None or linespacethreshold < abs(t - lt):
+                                    # establish this one
+                                    ld = d
+                                    lt = t
+                                    # add to event table
+                                    aw.qmc.specialevents.append(aw.qmc.time2index(timex[ii]))
+                                    aw.qmc.specialeventstype.append(i)
+                                    aw.qmc.specialeventsStrings.append("Q")
+                                    aw.qmc.specialeventsvalue.append(float(d+1))
+                                    aw.qmc.safesaveflag = True
                     redraw = True
         if aw.clusterEventsFlag:
             aw.clusterEvents(True)
@@ -29769,8 +30005,8 @@ class backgroundDlg(ArtisanDialog):
     def createDataTable(self):
         self.datatable.clear()
         ndata = len(aw.qmc.timeB)
-        if aw.qmc.timeindex[0] != -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
-            start = aw.qmc.timex[aw.qmc.timeindex[0]]
+        if aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
+            start = aw.qmc.timeB[aw.qmc.timeindexB[0]]
         else:
             start = 0
         if ndata:
@@ -29778,8 +30014,8 @@ class backgroundDlg(ArtisanDialog):
             headers = [QApplication.translate("Table","Time",None),
                                                       QApplication.translate("Table","ET",None),
                                                       QApplication.translate("Table","BT",None),
-                                                      QApplication.translate("Table","DeltaBT",None),
-                                                      QApplication.translate("Table","DeltaET",None)]
+                                                      QApplication.translate("Table","DeltaET",None),
+                                                      QApplication.translate("Table","DeltaBT",None)]
             xtcurve = False # no XT curve
             if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
                 idx3 = aw.qmc.xtcurveidx - 1
@@ -29805,8 +30041,12 @@ class backgroundDlg(ArtisanDialog):
             for i in range(ndata):
                 Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
                 Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                ET = QTableWidgetItem("%.0f"%aw.qmc.temp1B[i])
-                BT = QTableWidgetItem("%.0f"%aw.qmc.temp2B[i])
+                if aw.qmc.LCDdecimalplaces:
+                    fmtstr = "%.1f"
+                else:
+                    fmtstr = "%.0f"
+                ET = QTableWidgetItem(fmtstr%aw.qmc.temp1B[i])
+                BT = QTableWidgetItem(fmtstr%aw.qmc.temp2B[i])
                 ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                 BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                 if i:
@@ -29861,8 +30101,8 @@ class backgroundDlg(ArtisanDialog):
                     Rtime.setText(text + u(" " + Rtime.text()))                
                 self.datatable.setItem(i,1,ET)
                 self.datatable.setItem(i,2,BT)
-                self.datatable.setItem(i,3,deltaBT)
-                self.datatable.setItem(i,4,deltaET)
+                self.datatable.setItem(i,3,deltaET)
+                self.datatable.setItem(i,4,deltaBT)
                 
                 if xtcurve: # an XT column is availble, fill it with data
                     if aw.qmc.xtcurveidx % 2:
@@ -30233,7 +30473,7 @@ class modbusport(object):
     """ this class handles the communications with all the modbus devices"""
     def __init__(self):
         # retries
-        self.readRetries = 2
+        self.readRetries = 3 # if oversampling is on readReatries+1 is used
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = "COM5"      #NOTE: this string should not be translated.
         self.baudrate = 115200
@@ -30361,7 +30601,7 @@ class modbusport(object):
                         self.master = ModbusTcpClient(
                                 host=self.host, 
                                 port=self.port,
-                                timeout=0.3, #self.timeout
+                                timeout=0.1, #self.timeout
                                 )
                     except:
                         self.master = ModbusTcpClient(
@@ -30375,8 +30615,8 @@ class modbusport(object):
                             host=self.host, 
                             port=self.port,
                             retry_on_empty=False,
-                            retries=1,
-                            timeout=0.3, #self.timeout
+                            retries=2,
+                            timeout=0.1, #self.timeout
                             )
                     except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
 #                        self.master = ArtisanModbusUdpClient(
@@ -30530,7 +30770,10 @@ class modbusport(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            retry = self.readRetries
+            if aw.qmc.oversampling:
+                retry = self.readRetries + 1
+            else:
+                retry = self.readRetries                
             while True:
                 if code==3:
                     res = self.master.read_holding_registers(int(register),2,unit=int(slave))
@@ -30573,7 +30816,10 @@ class modbusport(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            retry = self.readRetries
+            if aw.qmc.oversampling:
+                retry = self.readRetries
+            else:
+                retry = self.readRetries + 1
             while True:
                 try:
                     if code==3:
@@ -30585,6 +30831,7 @@ class modbusport(object):
                 if res == None or isinstance(res,ExceptionResponse):
                     if retry > 0:
                         retry = retry - 1
+                        libtime.sleep(0.020)
                     else:
                         raise Exception("Exception response")
                 else:
@@ -30593,7 +30840,7 @@ class modbusport(object):
             r = decoder.decode_16bit_uint()
             return r
         except Exception as ex:
-            self.disconnect()
+#            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
@@ -36535,6 +36782,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.extratemp2.pop(x)
             aw.qmc.extrastemp1.pop(x)
             aw.qmc.extrastemp2.pop(x)
+            aw.qmc.extractimex1.pop(x)
+            aw.qmc.extractimex2.pop(x)
+            aw.qmc.extractemp1.pop(x)
+            aw.qmc.extractemp2.pop(x)
             aw.qmc.extralinestyles1.pop(x)
             aw.qmc.extralinestyles2.pop(x)
             aw.qmc.extradrawstyles1.pop(x)
@@ -39106,7 +39357,8 @@ class AlarmDlg(ArtisanDialog):
                                  QApplication.translate("ComboBox","RampSoak ON",None),
                                  QApplication.translate("ComboBox","RampSoak OFF",None),
                                  QApplication.translate("ComboBox","PID ON",None),
-                                 QApplication.translate("ComboBox","PID OFF",None)])
+                                 QApplication.translate("ComboBox","PID OFF",None),
+                                 QApplication.translate("ComboBox","SV",None)])
         actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i] + 1)
         #beep
         beepWidget = QWidget()
