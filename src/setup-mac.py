@@ -127,7 +127,7 @@ OPTIONS = {
 #                    'imageformats/libqmng.dylib', # not on Qt5.6.x
                     'imageformats/libqsvg.dylib', 
                     'imageformats/libqtga.dylib',
-                    'imageformats/libqtiff.dylib',
+#                    'imageformats/libqtiff.dylib', # produces a strip error
                     'imageformats/libqwbmp.dylib',
                     'imageformats/libqwebp.dylib',
                     'platforms/libqcocoa.dylib',  # qt5

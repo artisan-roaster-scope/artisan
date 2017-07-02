@@ -170,6 +170,7 @@ from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpC
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder, BinaryPayloadBuilder
 from pymodbus.pdu import ExceptionResponse
+from pymodbus.exceptions import ModbusException
 import socket
 from pymodbus.constants import Defaults
 from pymodbus.transaction import ModbusSocketFramer
@@ -981,6 +982,9 @@ class tgraphcanvas(FigureCanvas):
         
         #self.flagalignFCs = False
         self.alignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP, 7:ALL
+        
+        self.replayType = 0 # 0: by time, 1: by BT, 2: by ET
+        self.replayedBackgroundEvents = [] # set of BackgroundEvent indicies that have already been replayed (cleared in ClearMeasurements)
 
         self.roastpropertiesflag = 1  #resets roast properties if not zero
         self.roastpropertiesAutoOpenFlag = 0  #open roast properties dialog if not zero
@@ -2625,76 +2629,94 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    # called only after CHARGE
     def playbackevent(self):
         try:
+            reproducing = None # index of the event that is currently replaying (surpress other replays in this round)
             #needed when using device NONE
             if len(self.timex):
                 #find time distances
                 for i in range(len(self.backgroundEvents)):
-                    timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)
-                    if  aw.qmc.backgroundReproduce and timed > 0 and timed < self.detectBackgroundEventTime:
-                        #write text message
-                        message = "> " + " [" + u(self.Betypesf(self.backgroundEtypes[i]))
-                        message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " +  self.stringfromseconds(timed) + " : " + self.backgroundEStrings[i]  
-                        #rotate colors to get attention
-                        if timed%2:
-                            style = "background-color:'transparent';"
+                    if not i in aw.qmc.replayedBackgroundEvents: # never replay one event twice
+                        timed = self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.
+                        if aw.qmc.replayType == 0: # replay by time
+                            delta = timed
+                        elif aw.qmc.replayType == 1: # replay by BT if RoR > 0
+                            if aw.qmc.delta2 and aw.qmc.delta2[-1] != None and aw.qmc.delta2[-1]>0:
+                                delta = self.stemp2B[self.backgroundEvents[i]] - self.ctemp2[-1]
+                            else: # before TP we switch back to time-based
+                                delta = timed
+                        elif aw.qmc.replayType == 2: # replay by ET (if DeltaET > 0)
+                            if aw.qmc.delta1 and aw.qmc.delta1[-1] != None and aw.qmc.delta1[-1]>0:
+                                delta = self.stemp1B[self.backgroundEvents[i]] - self.ctemp1[-1]
+                            else: # before TP we switch back to time-based
+                                delta = timed
                         else:
-                            style = "background-color:'yellow';"
+                            delta = 1 # don't trigger this one
+                        if reproducing == None and aw.qmc.backgroundReproduce and timed > 0 and timed < self.detectBackgroundEventTime:
+                            #write text message
+                            message = "> " + " [" + u(self.Betypesf(self.backgroundEtypes[i]))
+                            message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " +  self.stringfromseconds(timed) + " : " + self.backgroundEStrings[i]  
+                            #rotate colors to get attention
+                            if timed%2:
+                                style = "background-color:'transparent';"
+                            else:
+                                style = "background-color:'yellow';"
+                                
+                            aw.sendmessage(message,style)
+                            reproducing = i
+    
+                        if delta <= 0:
+                            #for devices that support automatic roaster control
+                            #if Fuji PID
+                            if self.device == 0:
+    
+                                # COMMAND SET STRINGS
+                                #  (adjust the SV PID to the float VALUE1)
+                                # SETRS::VALUE1::VALUE2::VALUE3  (VALUE1 = target SV. float VALUE2 = time to reach int VALUE 1 (ramp) in minutes. int VALUE3 = hold (soak) time in minutes)
+    
+                                # IMPORTANT: VALUES are for controlling ET only (not BT). The PID should control ET not BT. The PID should be connected to ET only.
+                                # Therefore, these values don't reflect a BT defined profile. They define an ET profile.
+                                # They reflect the changes in ET, which indirectly define BT after some time lag
+    
+                                # There are two ways to record a roast. One is by changing Set Values (SV) during the roast,
+                                # the other is by using ramp/soaks segments (RS). 
+                                # Examples:
+    
+                                # SETSV::560.3           sets an SV value of 560.3F in the PID at the time of the recorded background event
+    
+                                # SETRS::440.2::2::0     starts Ramp Soak mode so that it reaches 440.2F in 2 minutes and holds (soaks) 440.2F for zero minutes
+    
+                                # SETRS::300.0::2::3::SETRS::540.0::6::0::SETRS::560.0::4::0::SETRS::560::0::0
+                                #       this command has 4 comsecutive commands inside (4 segments)
+                                #       1 SETRS::300.0::2::3 reach 300.0F in 2 minutes and hold it for 3 minutes (ie. total dry phase time = 5 minutes)
+                                #       2 SETRS::540.0::6::0 then reach 540.0F in 6 minutes and hold it there 0 minutes (ie. total mid phase time = 6 minutes )
+                                #       3 SETRS::560.0::4::0 then reach 560.0F in 4 minutes and hold it there 0 minutes (ie. total finish phase time = 4 minutes)
+                                #       4 SETRS::560::0::0 then do nothing (because ramp time and soak time are both 0)
+                                #       END ramp soak mode
+    
+                                if "::" in self.backgroundEStrings[i]:
+                                    aw.fujipid.replay(self.backgroundEStrings[i])
+                                    libtime.sleep(.5)  #avoid possible close times (rounding off)
                             
-                        aw.sendmessage(message,style)
-                        break
-
-                    elif timed == 0:
-                        #for devices that support automatic roaster control
-                        #if Fuji PID
-                        if self.device == 0:
-
-                            # COMMAND SET STRINGS
-                            #  (adjust the SV PID to the float VALUE1)
-                            # SETRS::VALUE1::VALUE2::VALUE3  (VALUE1 = target SV. float VALUE2 = time to reach int VALUE 1 (ramp) in minutes. int VALUE3 = hold (soak) time in minutes)
-
-                            # IMPORTANT: VALUES are for controlling ET only (not BT). The PID should control ET not BT. The PID should be connected to ET only.
-                            # Therefore, these values don't reflect a BT defined profile. They define an ET profile.
-                            # They reflect the changes in ET, which indirectly define BT after some time lag
-
-                            # There are two ways to record a roast. One is by changing Set Values (SV) during the roast,
-                            # the other is by using ramp/soaks segments (RS). 
-                            # Examples:
-
-                            # SETSV::560.3           sets an SV value of 560.3F in the PID at the time of the recorded background event
-
-                            # SETRS::440.2::2::0     starts Ramp Soak mode so that it reaches 440.2F in 2 minutes and holds (soaks) 440.2F for zero minutes
-
-                            # SETRS::300.0::2::3::SETRS::540.0::6::0::SETRS::560.0::4::0::SETRS::560::0::0
-                            #       this command has 4 comsecutive commands inside (4 segments)
-                            #       1 SETRS::300.0::2::3 reach 300.0F in 2 minutes and hold it for 3 minutes (ie. total dry phase time = 5 minutes)
-                            #       2 SETRS::540.0::6::0 then reach 540.0F in 6 minutes and hold it there 0 minutes (ie. total mid phase time = 6 minutes )
-                            #       3 SETRS::560.0::4::0 then reach 560.0F in 4 minutes and hold it there 0 minutes (ie. total finish phase time = 4 minutes)
-                            #       4 SETRS::560::0::0 then do nothing (because ramp time and soak time are both 0)
-                            #       END ramp soak mode
-
-                            if "::" in self.backgroundEStrings[i]:
-                                aw.fujipid.replay(self.backgroundEStrings[i])
-                                libtime.sleep(.5)  #avoid possible close times (rounding off)
-                        
-                        
-                        # if playbackevents is active, we fire the event by moving the slider, but only if
-                        # a event type is given (type!=4), the background event type is named exactly as the one of the foreground
-                        # the event slider is active/visible and has an action defined
-                        elif aw.qmc.backgroundPlaybackEvents and self.backgroundEtypes[i] < 4 and \
-                            (u(self.etypesf(self.backgroundEtypes[i]) == u(self.Betypesf(self.backgroundEtypes[i])))) and \
-                            aw.eventslidervisibilities[self.backgroundEtypes[i]] and aw.eventslideractions[self.backgroundEtypes[i]]:
                             
-                            aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
-                            aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event
-
-                    #delete existing message
-                    else:
-                        text = u(aw.messagelabel.text())
-                        if len(text):
-                            if text[0] == ">":
-                                aw.sendmessage("",style="background-color:'transparent';")
+                            # if playbackevents is active, we fire the event by moving the slider, but only if
+                            # a event type is given (type!=4), the background event type is named exactly as the one of the foreground
+                            # the event slider is active/visible and has an action defined
+                            if aw.qmc.backgroundPlaybackEvents and self.backgroundEtypes[i] < 4 and \
+                                (u(self.etypesf(self.backgroundEtypes[i]) == u(self.Betypesf(self.backgroundEtypes[i])))) and \
+                                aw.eventslidervisibilities[self.backgroundEtypes[i]]: #  and aw.eventslideractions[self.backgroundEtypes[i]]
+                                
+                                aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
+                                aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event
+                                aw.qmc.replayedBackgroundEvents.append(i)
+    
+                #delete existing message
+                if reproducing == None:
+                    text = u(aw.messagelabel.text())
+                    if len(text):
+                        if text[0] == ">":
+                            aw.sendmessage("",style="background-color:'transparent';")
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackevent() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -3318,6 +3340,7 @@ class tgraphcanvas(FigureCanvas):
                 self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]            #reset all variables that need to be reset (but for the actually measurements that will be treated separately at the end of this function)
                 self.extractimex1[i],self.extractimex2[i],self.extractemp1[i],self.extractemp2[i] = [],[],[],[]
                 
+            self.replayedBackgroundEvents=[]
             self.specialevents=[]
             aw.lcd1.display("00:00")
             if aw.WebLCDs:
@@ -9097,8 +9120,14 @@ class SampleThread(QThread):
                     else:
                         cf2 = cf
                         dw2 = self.temp_decay_weights
-                    st1 = numpy.average(aw.qmc.ctemp1[-min(len(aw.qmc.ctemp1),cf1):],weights=dw1[max(0,cf1-len(aw.qmc.ctemp1)):])
-                    st2 = numpy.average(aw.qmc.ctemp2[-min(len(aw.qmc.ctemp2),cf2):],weights=dw2[max(0,cf2-len(aw.qmc.ctemp2)):])
+                    if len(aw.qmc.ctemp1) > 0:
+                        st1 = numpy.average(aw.qmc.ctemp1[-min(len(aw.qmc.ctemp1),cf1):],weights=dw1[max(0,cf1-len(aw.qmc.ctemp1)):])
+                    else:
+                        st1 = -1
+                    if len(aw.qmc.ctemp2) > 0:                    
+                        st2 = numpy.average(aw.qmc.ctemp2[-min(len(aw.qmc.ctemp2),cf2):],weights=dw2[max(0,cf2-len(aw.qmc.ctemp2)):])
+                    else:
+                        st2 = -1
                     aw.qmc.tstemp1.append(st1)
                     aw.qmc.tstemp2.append(st2)
                     if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
@@ -16007,6 +16036,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundReproduce = bool(toBool(settings.value("backgroundReproduce",self.qmc.backgroundReproduce)))
             if settings.contains("backgroundPlaybackEvents"):
                 self.qmc.backgroundPlaybackEvents = bool(toBool(settings.value("backgroundPlaybackEvents",self.qmc.backgroundPlaybackEvents)))
+            if settings.contains("replayType"):
+                aw.qmc.replayType = toInt(settings.value("replayType",aw.qmc.replayType))
             #restore phases
             if settings.contains("Phases"):
                 self.qmc.phases = [toInt(x) for x in toList(settings.value("Phases",self.qmc.phases))]
@@ -17219,6 +17250,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime)
             settings.setValue("backgroundReproduce",self.qmc.backgroundReproduce)
             settings.setValue("backgroundPlaybackEvents",self.qmc.backgroundPlaybackEvents)
+            settings.setValue("replayType",self.qmc.replayType)
             settings.setValue("PhasesMode",self.qmc.phases_mode)
             settings.setValue("PhasesEspresso",self.qmc.phases_espresso)
             settings.setValue("PhasesFilter",self.qmc.phases_filter)
@@ -25389,16 +25421,21 @@ class editGraphDlg(ArtisanDialog):
             typeComboBox.addItems(etypes)
             typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
 
+            if aw.qmc.LCDdecimalplaces:
+                fmtstr = "%.1f"
+            else:
+                fmtstr = "%.0f"
+                
             btline = QLineEdit()
             btline.setReadOnly(True)
             btline.setAlignment(Qt.AlignRight)
-            bttemp = "%.0f"%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
+            bttemp = fmtstr%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
             btline.setText(bttemp)
 
             etline = QLineEdit()
             etline.setReadOnly(True)
             etline.setAlignment(Qt.AlignRight)
-            ettemp = "%.0f"%(aw.qmc.temp1[aw.qmc.specialevents[i]]) + aw.qmc.mode
+            ettemp = fmtstr%(aw.qmc.temp1[aw.qmc.specialevents[i]]) + aw.qmc.mode
             etline.setText(ettemp)
             
             valueEdit = QLineEdit()
@@ -25442,6 +25479,7 @@ class editGraphDlg(ArtisanDialog):
         # improve width of Time column
         self.eventtable.setColumnWidth(0,60)
         self.eventtable.setColumnWidth(1,65)
+        self.eventtable.setColumnWidth(2,65)
         self.eventtable.setColumnWidth(5,55)
         # header.setSectionResizeMode(QHeaderView.Stretch)
 
@@ -29626,6 +29664,16 @@ class backgroundDlg(ArtisanDialog):
         self.datatable.setTabKeyNavigation(True)
         self.createDataTable()
         #TAB 4
+        self.replayComboBox = QComboBox()
+        replayVariants = [
+            QApplication.translate("Label","by time", None),
+            QApplication.translate("Label","by BT", None),
+            QApplication.translate("Label","by ET", None),
+            ]
+        self.replayComboBox.addItems(replayVariants)
+        self.replayComboBox.setCurrentIndex(aw.qmc.replayType)
+        self.replayComboBox.currentIndexChanged.connect(lambda i=self.replayComboBox.currentIndex() :self.changeReplayTypeidx(i))    
+                
         self.backgroundReproduce = QCheckBox(QApplication.translate("CheckBox","Playback Aid",None))
         self.backgroundReproduce.setChecked(aw.qmc.backgroundReproduce)
         self.backgroundReproduce.setFocusPolicy(Qt.NoFocus)
@@ -29692,24 +29740,24 @@ class backgroundDlg(ArtisanDialog):
         layoutBoxed.addLayout(layoutBoxedH)
         layoutBoxed.addStretch()
         alignButtonBoxed = QHBoxLayout()
-        alignButtonBoxed.addWidget(loadButton)
-        alignButtonBoxed.addWidget(delButton)
         alignButtonBoxed.addStretch()
         alignButtonBoxed.addWidget(alignButton)
         alignButtonBoxed.addWidget(self.alignComboBox)
         tab4content = QHBoxLayout()
         tab4content.addWidget(self.backgroundReproduce)
-        tab4content.addStretch()
+        tab4content.addSpacing(15)
         tab4content.addWidget(etimelabel)
         tab4content.addWidget(self.etimeSpinBox)
         tab4content.addWidget(etimeunit)
+        tab4content.addSpacing(15)
         tab4content.addStretch()
         tab4content.addWidget(self.backgroundPlaybackEvents)
+        tab4content.addSpacing(15)
+        tab4content.addWidget(self.replayComboBox)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(layoutBoxed)
         tab1layout.addStretch()
         tab1layout.addLayout(alignButtonBoxed)
-        tab1layout.addWidget(self.pathedit)
         tab1layout.addLayout(tab4content)
         tab1layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         tab2layout = QVBoxLayout()
@@ -29731,10 +29779,13 @@ class backgroundDlg(ArtisanDialog):
         C3Widget.setLayout(tab3layout)
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","Data",None))
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(loadButton)
+        buttonLayout.addWidget(delButton)
         buttonLayout.addStretch()
         buttonLayout.addWidget(okButton)
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(TabWidget) 
+        mainLayout.addWidget(self.pathedit)
         mainLayout.addLayout(buttonLayout)
         mainLayout.setContentsMargins(5, 10, 5, 5) # left, top, right, bottom 
         self.setLayout(mainLayout)
@@ -29917,6 +29968,9 @@ class backgroundDlg(ArtisanDialog):
         
     def changeAlignEventidx(self,i):
         aw.qmc.alignEvent = i
+        
+    def changeReplayTypeidx(self,i):
+        aw.qmc.replayType = i
 
     def changeXTcurveidx(self,i):
         aw.qmc.xtcurveidx = i
@@ -29957,8 +30011,10 @@ class backgroundDlg(ArtisanDialog):
         ndata = len(aw.qmc.backgroundEvents)
         if ndata:
             self.eventtable.setRowCount(ndata)
-            self.eventtable.setColumnCount(4)
+            self.eventtable.setColumnCount(6)
             self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None),
+                                                       QApplication.translate("Table", "BT", None),
+                                                       QApplication.translate("Table", "ET", None),
                                                        QApplication.translate("Table","Description",None),
                                                        QApplication.translate("Table","Type",None),
                                                        QApplication.translate("Table","Value",None)])
@@ -29978,29 +30034,50 @@ class backgroundDlg(ArtisanDialog):
             for i in range(ndata):
                 timez = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start)))
                 timez.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+    
+                if aw.qmc.LCDdecimalplaces:
+                    fmtstr = "%.1f"
+                else:
+                    fmtstr = "%.0f"
+                
+                btline = QTableWidgetItem(fmtstr%(aw.qmc.temp2B[aw.qmc.backgroundEvents[i]]) + aw.qmc.mode)
+                btline.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+                
+                etline = QTableWidgetItem(fmtstr%(aw.qmc.temp1B[aw.qmc.backgroundEvents[i]]) + aw.qmc.mode)
+                etline.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+                            
+                
                 description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
                 etype = QTableWidgetItem(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[i]))
                 evalue = QTableWidgetItem(aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[i]))
                 evalue.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 #add widgets to the table
                 self.eventtable.setItem(i,0,timez)
-                self.eventtable.setItem(i,1,description)
-                self.eventtable.setItem(i,2,etype)
-                self.eventtable.setItem(i,3,evalue)
+                self.eventtable.setItem(i,1,btline)
+                self.eventtable.setItem(i,2,etline)
+                self.eventtable.setItem(i,3,description)
+                self.eventtable.setItem(i,4,etype)
+                self.eventtable.setItem(i,5,evalue)
             # improve width of Time column
             self.eventtable.setColumnWidth(1,175)
             header = self.eventtable.horizontalHeader()
             if pyqtversion < 5:
                 header.setResizeMode(0, QHeaderView.Fixed)
-                header.setResizeMode(1, QHeaderView.Stretch)
+                header.setResizeMode(1, QHeaderView.Fixed)
                 header.setResizeMode(2, QHeaderView.Fixed)
-                header.setResizeMode(3, QHeaderView.Fixed)
+                header.setResizeMode(3, QHeaderView.Stretch)
+                header.setResizeMode(4, QHeaderView.Fixed)
+                header.setResizeMode(5, QHeaderView.Fixed)
             else:
                 header.setSectionResizeMode(0, QHeaderView.Fixed)
-                header.setSectionResizeMode(1, QHeaderView.Stretch)
+                header.setSectionResizeMode(1, QHeaderView.Fixed)
                 header.setSectionResizeMode(2, QHeaderView.Fixed)
-                header.setSectionResizeMode(3, QHeaderView.Fixed)
+                header.setSectionResizeMode(3, QHeaderView.Stretch)
+                header.setSectionResizeMode(4, QHeaderView.Fixed)
+                header.setSectionResizeMode(5, QHeaderView.Fixed)
             self.eventtable.resizeColumnsToContents()
+            self.eventtable.setColumnWidth(1,65)
+            self.eventtable.setColumnWidth(2,65)
 
     def createDataTable(self):
         self.datatable.clear()
@@ -30473,7 +30550,7 @@ class modbusport(object):
     """ this class handles the communications with all the modbus devices"""
     def __init__(self):
         # retries
-        self.readRetries = 3 # if oversampling is on readReatries+1 is used
+        self.readRetries = 2
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = "COM5"      #NOTE: this string should not be translated.
         self.baudrate = 115200
@@ -30770,18 +30847,16 @@ class modbusport(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if aw.qmc.oversampling:
-                retry = self.readRetries + 1
-            else:
-                retry = self.readRetries                
+            retry = self.readRetries                
             while True:
                 if code==3:
                     res = self.master.read_holding_registers(int(register),2,unit=int(slave))
                 else:
                     res = self.master.read_input_registers(int(register),2,unit=int(slave))
-                if res == None or isinstance(res,ExceptionResponse):
+                if res == None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
                     if retry > 0:
                         retry = retry - 1
+                        #libtime.sleep(0.020)
                     else:
                         raise Exception("Exception response")
                 else:
@@ -30816,10 +30891,7 @@ class modbusport(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if aw.qmc.oversampling:
-                retry = self.readRetries
-            else:
-                retry = self.readRetries + 1
+            retry = self.readRetries
             while True:
                 try:
                     if code==3:
@@ -30828,14 +30900,14 @@ class modbusport(object):
                         res = self.master.read_input_registers(int(register),1,unit=int(slave))
                 except:
                     res = None
-                if res == None or isinstance(res,ExceptionResponse):
+                if res == None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
                     if retry > 0:
                         retry = retry - 1
-                        libtime.sleep(0.020)
+                        #libtime.sleep(0.020)
                     else:
                         raise Exception("Exception response")
                 else:
-                    break                    
+                    break
             decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
             r = decoder.decode_16bit_uint()
             return r
