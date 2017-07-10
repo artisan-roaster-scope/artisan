@@ -22,7 +22,7 @@ https://artisan-roasterscope.blogspot.de
 
 FEATURES
 
-o runs on Windows, Mac OS X (>=10.9) on Intel 64bit processor, and Linux (incl. Raspberry Pi)
+o runs on Windows, Mac OS X (>=10.10) on Intel 64bit processor, and Linux (incl. Raspberry Pi)
 o UI translated in several languages (English, German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norwegian, Finish, Hungarian, Hebrew, Polish, Greek, Turkish, Chinese, Russian, Thai, Indonesian, Korean,..)
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
@@ -98,7 +98,7 @@ http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A
 If artisan starts when clicking on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything. Newer OS like Windows 7 come with this file.
 
 
-o Mac OS X (>=10.9.x)
+o Mac OS X (>=10.10.x)
 
 - Install USB/serial driver for your meter
  . for Omega meters download and run the FTDI VCP OS X installer
@@ -198,6 +198,7 @@ v1.1.0 (10.6.2017)
  - adds Aillio Bullet R1 profile import
  - adds support for Probat Probatone 2
  - bug fixes and stability improvements
+=> last version supporting OS X 10.9
  
 v1.0.0 (24.2.2017)
  - adds internal software PID
@@ -214,6 +215,7 @@ v0.9.9 (14.3.2016)
  - adds additional keyboard short cuts
  - designer improvements
  - bug fixes
+=> last version supporting OS X 10.7 and 10.8
 
 v0.9.8 (18.10.2015)
  - US weight and volume units
@@ -231,6 +233,7 @@ v0.9.5 (6.7.2015)
  - adds batch counter
  - adds app settings export/import
  - bug fixes
+=> last Windows Celeron and Mac OS X 10.6 version
 
 v0.9.4 (6.6.2015)
 - bug fixes
@@ -351,6 +354,7 @@ v0.5.6 (8.11.2012)
 - adds spike filter
 - adds additional localizations
 - bug fixes
+=> last Mac OS X 10.4/10.5 version and last version support PPC processors
 
 v0.5.5 (28.9.2011)
 - fixes ArdruinoTC4 extra devices

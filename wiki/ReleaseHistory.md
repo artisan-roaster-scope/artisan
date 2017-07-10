@@ -107,6 +107,9 @@ v1.0.0 (24.02.2017)
     * fixes hang on RESET serial action
     * fixes Phidgets remote access on Python 3
 
+**Note**
+_This is the latest version supporting Mac OS X 10.7 and 10.9_
+
 ----
 v0.9.9 (14.03.2016)
 ------------------
@@ -813,7 +816,7 @@ v0.3.0 (11.01.2011)
 
  * fixed occasional ET/BT swap
  * fixed issues wrt. accent characters
- * added 10.5.x support for Intel-only
+ * added OS X 10.5.x support for Intel-only
  * new file format to store profiles
  * added configurable min/max values for x/y axis
  * added alignment of background profile wrt. CHARGE during roast

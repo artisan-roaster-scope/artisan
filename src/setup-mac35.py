@@ -12,7 +12,7 @@ from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
 def my_parse_makefile(filename, g):
     their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.9'
+    g['MACOSX_DEPLOYMENT_TARGET'] = '10.10'
 sysconfig.parse_makefile = my_parse_makefile
 
 import sys, os
@@ -30,7 +30,7 @@ LICENSE = 'GNU General Public License (GPL)'
 try:
     QTDIR = os.environ["QT_PATH"] + r'/'
 except:
-    QTDIR = r'/Users/luther/Qt5.8.0/5.8/clang_64/' # qt5
+    QTDIR = r'/Users/luther/Qt5.9.1/5.9.1/clang_64/' # qt5
 
 APP = ['artisan.py']
 

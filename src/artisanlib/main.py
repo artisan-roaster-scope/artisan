@@ -31369,10 +31369,10 @@ class serialport(object):
         #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
         tx = aw.qmc.timeclock.elapsed()/1000.
         # get the temperature for ET. aw.fujipid.gettemperature(unitID)
-        t1 = aw.fujipid.gettemperature(self.controlETpid[1])/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
+        t1 = aw.fujipid.gettemperature(self.controlETpid[0],self.controlETpid[1])/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
         #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
         if self.readBTpid[0] < 2:                    
-            t2 = aw.fujipid.gettemperature(self.readBTpid[1])/10.
+            t2 = aw.fujipid.gettemperature(self.readBTpid[0],self.readBTpid[1])/10.
         elif self.readBTpid[0] == 3:
             ### arguments to create command to READ TEMPERATURE
             unitID = self.readBTpid[1]
@@ -31438,7 +31438,7 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
         if self.readBTpid[0] < 2:                    
-            t2 = aw.fujipid.gettemperature(self.readBTpid[1])/10.
+            t2 = aw.fujipid.gettemperature(self.readBTpid[0],self.readBTpid[1])/10.
         elif self.readBTpid[0] == 3:
             ### create command
             command = aw.dtapid.message2send(self.readBTpid[1],3,aw.dtapid.dtamem["pv"][1],1)
@@ -42739,7 +42739,7 @@ class FujiPID(object):
                   #################  CH11    Sets passwords
                   #################  CH12    Sets the parameters mask functions to hide parameters from the user
                   ################# READ ONLY MEMORY (address starts with digit 3)
-                  "pv?":[31001],"sv?":[0,31002],"alarm?":[31007],"fault?":[31008],"stat?":[31041],"mv1":[0,31042]
+                  "pv?":[0,31001],"sv?":[0,31002],"alarm?":[31007],"fault?":[31008],"stat?":[31041],"mv1":[0,31042]
                   }
         
         # "KEY": [VALUE,MEMORY_ADDRESS]
@@ -42910,13 +42910,21 @@ class FujiPID(object):
     ##TX/RX FUNCTIONS
     #This function reads read-only memory (with 3xxxx memory we need function=4)
     #both PXR3 and PXG4 use the same memory location 31001 (3xxxx = read only)
-    def gettemperature(self, stationNo):
-        if aw.ser.useModbusPort:
-            # we use the pymodbus implementation
-            return aw.modbus.readSingleRegister(stationNo,aw.modbus.address2register(31001,4),4)            
+    # pidType: 0=PXG, 1=PXR, 2=None, 3=DTA (here we support only 0 and 1 for now
+    def gettemperature(self, pidType, stationNo):
+        if pidType > 1:
+            return -1
         else:
-            #we compose a message then we send it by using self.readoneword()
-            return self.readoneword(self.message2send(stationNo,4,31001,1))
+            if pidType == 0:
+                reg = self.PXG4["pv?"][1]
+            else:
+                reg = self.PXR["pv?"][1]
+            if aw.ser.useModbusPort:
+                # we use the pymodbus implementation
+                return aw.modbus.readSingleRegister(stationNo,aw.modbus.address2register(reg,4),4)            
+            else:
+                #we compose a message then we send it by using self.readoneword()
+                return self.readoneword(self.message2send(stationNo,4,reg,1))
 
     # activates the SV slider
     def activateONOFFsliderSV(self,flag):
