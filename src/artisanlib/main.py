@@ -1249,6 +1249,8 @@ class tgraphcanvas(FigureCanvas):
         self.eventsshowflag = 1
         #flag that shows major event annotations in the graph
         self.annotationsflag = 1
+        #shows events anchored to the BT curve if true, events anchored to greater of ET or BT curve if false
+        self.showeventsonbt = False
         #plot events by value
         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
@@ -4461,6 +4463,12 @@ class tgraphcanvas(FigureCanvas):
                                         temp = self.stemp2[int(self.specialevents[i])]
                                 else:
                                     temp = None
+                                # plot events on BT when showeventsonbt is true
+                                if aw.qmc.showeventsonbt and temp and aw.qmc.BTcurve:
+                                    if aw.qmc.flagon:
+                                        temp = self.temp2[int(self.specialevents[i])]
+                                    else:
+                                        temp = self.stemp2[int(self.specialevents[i])]                                
                                 if temp:
                                     if self.specialeventstype[i] == 0:
                                         boxstyle = 'square,pad=0.2'
@@ -16078,6 +16086,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.clampEvents = toInt(settings.value("clampEvents",int(self.qmc.clampEvents)))
             if settings.contains("annotationsflag"):
                 self.qmc.annotationsflag = toInt(settings.value("annotationsflag",int(self.qmc.annotationsflag)))
+            if settings.contains("showeventsonbt"):
+                self.qmc.showeventsonbt = bool(toBool(settings.value("showeventsonbt",self.qmc.showeventsonbt))) 
             if settings.contains("autoChargeDrop"):
                 self.qmc.autoChargeFlag = bool(toBool(settings.value("autoChargeDrop",False)))
                 self.qmc.autoDropFlag = self.qmc.autoChargeFlag
@@ -17293,6 +17303,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("eventsshowflag",self.qmc.eventsshowflag)
             settings.setValue("clampEvents",self.qmc.clampEvents)
             settings.setValue("annotationsflag",self.qmc.annotationsflag)
+            settings.setValue("showeventsonbt",self.qmc.showeventsonbt)
             settings.setValue("autoCharge",self.qmc.autoChargeFlag)
             settings.setValue("autoDrop",self.qmc.autoDropFlag)
             settings.setValue("markTP",self.qmc.markTPflag)
@@ -17773,6 +17784,7 @@ class ApplicationWindow(QMainWindow):
         events["etypes"] = u(list(map(u,self.qmc.etypes)))
         events["eventsshowflag"] = str(self.qmc.eventsshowflag)
         events["annotationsflag"] = str(self.qmc.annotationsflag)
+        events["showeventsonbt"] = str(self.qmc.showeventsonbt)
         events["autoCharge"] = str(self.qmc.autoChargeFlag)
         events["autoDrop"] = str(self.qmc.autoDropFlag)
         events["markTP"] = str(self.qmc.markTPflag)
@@ -27067,6 +27079,9 @@ class EventsDlg(ArtisanDialog):
         self.annotationsflagbox = QCheckBox(QApplication.translate("CheckBox","Annotations",None))
         self.annotationsflagbox.setChecked(bool(aw.qmc.annotationsflag))
         self.annotationsflagbox.stateChanged.connect(self.annotationsflagChanged)
+        self.showeventsonbtbox = QCheckBox(QApplication.translate("CheckBox","Show on BT",None))
+        self.showeventsonbtbox.setChecked(bool(aw.qmc.showeventsonbt))
+        self.showeventsonbtbox.stateChanged.connect(self.showeventsonbtChanged)
         self.eventsshowflagbox = QCheckBox(QApplication.translate("CheckBox","Events",None))
         self.eventsshowflagbox.setChecked(bool(aw.qmc.eventsshowflag))
         self.eventsshowflagbox.stateChanged.connect(self.eventsshowflagChanged)        
@@ -27588,6 +27603,8 @@ class EventsDlg(ArtisanDialog):
         FlagsLayout.addWidget(self.eventsbuttonflag)
         FlagsLayout.addSpacing(5)
         FlagsLayout.addWidget(self.minieventsflag)
+        FlagsLayout.addSpacing(5)
+        FlagsLayout.addWidget(self.showeventsonbtbox)
         FlagsLayout.addSpacing(5)
         FlagsLayout.addWidget(self.annotationsflagbox)
         FlagsLayout.addStretch()
@@ -28657,7 +28674,14 @@ class EventsDlg(ArtisanDialog):
         else:
             aw.qmc.annotationsflag = 0
         aw.qmc.redraw(recomputeAllDeltas=False)
-
+        
+    def showeventsonbtChanged(self):  
+        if self.showeventsonbtbox.isChecked():
+            aw.qmc.showeventsonbt = 1
+        else:
+            aw.qmc.showeventsonbt = 0
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        
     def minieventsflagChanged(self):
         if self.minieventsflag.isChecked():
             aw.minieventsflag = 1
@@ -28743,6 +28767,7 @@ class EventsDlg(ArtisanDialog):
         self.eventsbuttonflagstored = aw.eventsbuttonflag
         self.eventsshowflagstored = aw.qmc.eventsshowflag
         self.annotationsflagstored = aw.qmc.annotationsflag
+        self.showeventsonbtstored = aw.qmc.showeventsonbt
         self.minieventsflagstored = aw.minieventsflag
         self.eventsGraphflagstored = aw.qmc.eventsGraphflag
         self.etypesstored = aw.qmc.etypes
@@ -28784,6 +28809,7 @@ class EventsDlg(ArtisanDialog):
         aw.eventsbuttonflag = self.eventsbuttonflagstored
         aw.qmc.eventsshowflag = self.eventsshowflagstored
         aw.qmc.annotationsflag = self.annotationsflagstored
+        aw.qmc.showeventsonbt = self.showeventsonbtstored
         aw.minieventsflag = self.minieventsflagstored
         aw.qmc.eventsGraphflag = self.eventsGraphflagstored
         aw.qmc.etypes = self.etypesstored
