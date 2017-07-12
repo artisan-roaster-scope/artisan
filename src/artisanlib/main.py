@@ -10824,7 +10824,7 @@ class ApplicationWindow(QMainWindow):
         #10 palettes of buttons
         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
-        self.buttonpalette_shortcuts = False # if True palettes can be changed via the number keys
+        self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
 
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
@@ -13145,6 +13145,8 @@ class ApplicationWindow(QMainWindow):
                 #uncomment next line to find the integer value of a key
                 #print(key)
                 
+                shiftnumbers = [61,33,34,167,36,37,38,47,40,41] # int key vals for shifted number keys
+                
                 if key == 70: # F SELECTS FULL SCREEN MODE
                     if self.full_screen_mode_active or self.isFullScreen():
                         self.full_screen_mode_active = False
@@ -13154,6 +13156,8 @@ class ApplicationWindow(QMainWindow):
                         self.full_screen_mode_active = True
                         self.showFullScreen()
                         aw.fullscreenAction.setChecked(True)
+                elif aw.buttonpalette_shortcuts and key in shiftnumbers: # palette switch via SHIFT-NUM-Keys
+                    self.setbuttonsfrom(shiftnumbers.index(key))
                 elif key == 72:                       #H
                     if not aw.qmc.designerflag:
                         self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
@@ -13318,9 +13322,10 @@ class ApplicationWindow(QMainWindow):
                             else:
                                 # keep on looking for digits
                                 self.quickEventShortCut = (eventNr,eventValueStr)
-                    else:
-                        if aw.buttonpalette_shortcuts:
-                            self.setbuttonsfrom(button.index(key))
+# now shift modifier is required to switch palettes via number keys
+#                    else:
+#                        if aw.buttonpalette_shortcuts:
+#                            self.setbuttonsfrom(button.index(key))
                 elif key == 58 and not aw.qmc.flagon: # screenshots only if not sampling!
                     self.desktopscreenshot()
                 elif key == 59 and not aw.qmc.flagon: # screenshots only if not sampling!
@@ -13562,7 +13567,7 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[p]</b></td><td>Toggle PID mode</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[h]</b></td><td>Load background profile</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[+,-]</b></td><td>Inc/dec PID lookahead</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[0-9]</b></td><td>Changes Event Button Palettes</td></tr>",None))
+        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[SHIFT 0-9]</b></td><td>Changes Event Button Palettes</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[;]</b></td><td>Application ScreenShot</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[:]</b></td><td>Desktop ScreenShot</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[q,w,e,r + <i>nn</i>]</b></td><td>Quick Custom Event</td></tr>",None))
