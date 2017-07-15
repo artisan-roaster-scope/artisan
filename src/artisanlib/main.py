@@ -4356,7 +4356,10 @@ class tgraphcanvas(FigureCanvas):
                                 height = 20
     
                             for p in range(len(self.backgroundEvents)):
-                                st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
+                                if self.backgroundEtypes[p] < 4:
+                                    st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
+                                else:
+                                    st1 = u("E")
                                 if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
                                     temp = self.temp1B[self.backgroundEvents[p]]
                                 else:
@@ -6500,10 +6503,11 @@ class tgraphcanvas(FigureCanvas):
                             index = self.specialevents[-1]
                             if etype < 4:
                                 firstletter = self.etypesf(self.specialeventstype[-1])[0]
+                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
                             else:
                                 firstletter = "E"
-                            secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
-                            if self.eventsGraphflag == 0:
+                                secondletter = ""
+                            if self.specialeventstype[-1] == 4 or self.eventsGraphflag == 0:
                                 if self.mode == "F":
                                     height = 50
                                 else:
@@ -6513,8 +6517,33 @@ class tgraphcanvas(FigureCanvas):
                                     temp = self.temp1[index]
                                 else:
                                     temp = self.temp2[index]
+                                if self.specialeventstype[-1] == 0:
+                                    boxstyle = 'square,pad=0.2'
+                                    boxcolor = self.EvalueColor[0]
+                                    textcolor = 'white'
+                                elif self.specialeventstype[-1] == 1:
+                                    boxstyle = 'circle,pad=0.1'
+                                    boxcolor = self.EvalueColor[1]
+                                    textcolor = 'white'
+                                elif self.specialeventstype[-1] == 2:
+                                    boxstyle = 'sawtooth,pad=0.4,tooth_size=0.8'
+                                    boxcolor = self.EvalueColor[2]
+                                    textcolor = 'white'
+                                elif self.specialeventstype[-1] == 3:
+                                    boxstyle = 'round4,pad=0.3,rounding_size=0.15'
+                                    boxcolor = self.EvalueColor[3]
+                                    textcolor = 'white'
+                                elif self.specialeventstype[-1] == 4:
+                                    boxstyle = 'square,pad=0.2'
+                                    boxcolor = 'yellow'
+                                    textcolor = self.palette["text"]
                                 self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                                                 color=self.palette["text"],
+                                                 arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
+                                                 bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                                 fontsize="xx-small",
+                                                 fontproperties=aw.mpl_fontproperties,
+                                                 backgroundcolor='yellow')
                             #if Event Type-Bars flag
                             elif self.eventsGraphflag == 1 and etype < 4:
                                 char1 = self.etypesf(0)[0]
