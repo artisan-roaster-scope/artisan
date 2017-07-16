@@ -1881,6 +1881,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 if not len(event.ind): return
                 ind = event.ind[0]    
+            digits = (1 if aw.qmc.LCDdecimalplaces else 0)
             if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
                 timex = self.backgroundtime2index(event.artist.get_xdata()[ind])
                 idxs = []
@@ -1889,6 +1890,7 @@ class tgraphcanvas(FigureCanvas):
                         idxs.append(i)
                 message = u("")
                 event_times = []
+                event_temps = []
                 for i in idxs:
                     if len(message) != 0:
                         message += u(", ")
@@ -1896,6 +1898,7 @@ class tgraphcanvas(FigureCanvas):
                         message += u("Background: ")
                     message += u(self.Betypesf(self.backgroundEtypes[i])) + " = " + self.eventsvalues(self.backgroundEvalues[i])
                     event_times.append(self.timeB[self.backgroundEvents[i]])
+                    event_temps.append(str(aw.float2float(self.temp2B[self.backgroundEvents[i]],digits)))
                     if self.backgroundEStrings[i] and self.backgroundEStrings[i]!="":
                         message += u(" (") + u(self.backgroundEStrings[i]) + u(")")
                 if len(message) != 0:
@@ -1904,8 +1907,8 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     tx_string = ""
-                    for et in event_times:
-                        tx_string += self.stringfromseconds(et - start) + ", "
+                    for i in range(len(event_times)):
+                        tx_string += self.stringfromseconds(event_times[i] - start) + " " + event_temps[i] + aw.qmc.mode + ", "
                     message += u(" @ ") + tx_string[:-2]
                     aw.sendmessage(message,append=False)
             elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
@@ -1916,11 +1919,13 @@ class tgraphcanvas(FigureCanvas):
                         idxs.append(i)
                 message = u("")
                 event_times = []
+                event_temps = []
                 for i in idxs:
                     if len(message) != 0:
                         message += u(", ")
                     message += u(self.etypesf(self.specialeventstype[i])) + " = " + self.eventsvalues(self.specialeventsvalue[i])
                     event_times.append(self.timex[self.specialevents[i]])
+                    event_temps.append(str(aw.float2float(self.temp2[self.specialevents[i]],digits)))
                     if self.specialeventsStrings[i] and self.specialeventsStrings[i]!="":
                         message += u(" (") + u(self.specialeventsStrings[i]) + u(")")
                 if len(message) != 0:
@@ -1929,8 +1934,8 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         start = 0
                     tx_string = ""
-                    for et in event_times:
-                        tx_string += self.stringfromseconds(et - start) + ", "
+                    for i in range(len(event_times)):
+                        tx_string += self.stringfromseconds(event_times[i] - start) + " " + event_temps[i] + aw.qmc.mode + ", "
                     message += u(" @ ") + tx_string[:-2]
                     aw.sendmessage(message,append=False)
         except:
@@ -2646,12 +2651,12 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.replayType == 0: # replay by time
                             delta = timed
                         elif aw.qmc.replayType == 1: # replay by BT if RoR > 0
-                            if aw.qmc.delta2 and aw.qmc.delta2[-1] != None and aw.qmc.delta2[-1]>0:
+                            if aw.qmc.TPalarmtimeindex:
                                 delta = self.stemp2B[self.backgroundEvents[i]] - self.ctemp2[-1]
                             else: # before TP we switch back to time-based
                                 delta = timed
                         elif aw.qmc.replayType == 2: # replay by ET (if DeltaET > 0)
-                            if aw.qmc.delta1 and aw.qmc.delta1[-1] != None and aw.qmc.delta1[-1]>0:
+                            if aw.qmc.TPalarmtimeindex:
                                 delta = self.stemp1B[self.backgroundEvents[i]] - self.ctemp1[-1]
                             else: # before TP we switch back to time-based
                                 delta = timed
@@ -6543,7 +6548,8 @@ class tgraphcanvas(FigureCanvas):
                                     boxcolor = 'yellow'
                                     textcolor = self.palette["text"]
                                 self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                                 color=self.palette["text"],
+                                                 #color=self.palette["text"],
+                                                 color=textcolor,
                                                  arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
                                                  bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                                  fontsize="xx-small",
