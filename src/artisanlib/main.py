@@ -1251,6 +1251,8 @@ class tgraphcanvas(FigureCanvas):
         self.annotationsflag = 1
         #shows events anchored to the BT curve if true, events anchored to greater of ET or BT curve if false
         self.showeventsonbt = False
+        #selectively show/hide event types 
+        self.showEtypes = [True]*5
         #plot events by value
         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
@@ -4227,8 +4229,9 @@ class tgraphcanvas(FigureCanvas):
                         start = 60
                     jump = 20
                     for i in range(4):
-                        rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.15)
-                        self.ax.add_patch(rectEvent)
+                        if aw.qmc.showEtypes[3-i]:                   
+                            rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.15)
+                            self.ax.add_patch(rectEvent)
                         if self.mode == "C":
                             jump -= 10
                         else:
@@ -4356,14 +4359,16 @@ class tgraphcanvas(FigureCanvas):
                                 height = 20
     
                             for p in range(len(self.backgroundEvents)):
-                                if self.backgroundEtypes[p] < 4:
-                                    st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
+                                if self.backgroundEtypes[p] < 4: 
+                                    st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])) 
                                 else:
-                                    st1 = u("E")
+                                    st1 = u("E") 
                                 if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
                                     temp = self.temp1B[self.backgroundEvents[p]]
                                 else:
                                     temp = self.temp2B[self.backgroundEvents[p]]
+                                if not aw.qmc.showEtypes[self.backgroundEtypes[p]]:
+                                    continue
                                 self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),path_effects=[],
                                                     xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
                                                     fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
@@ -4373,16 +4378,16 @@ class tgraphcanvas(FigureCanvas):
                             self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
                             self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
                             for i in range(len(self.backgroundEvents)):
-                                if self.backgroundEtypes[i] == 0:
+                                if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
-                                elif self.backgroundEtypes[i] == 1:
+                                elif self.backgroundEtypes[i] == 1 and aw.qmc.showEtypes[1]:
                                     self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
-                                elif self.backgroundEtypes[i] == 2:
+                                elif self.backgroundEtypes[i] == 2 and aw.qmc.showEtypes[2]:
                                     self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
-                                elif self.backgroundEtypes[i] == 3:
+                                elif self.backgroundEtypes[i] == 3 and aw.qmc.showEtypes[3]:
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
     
@@ -4472,7 +4477,7 @@ class tgraphcanvas(FigureCanvas):
                                         temp = self.temp2[int(self.specialevents[i])]
                                     else:
                                         temp = self.stemp2[int(self.specialevents[i])]                                
-                                if temp:
+                                if temp and aw.qmc.showEtypes[self.specialeventstype[i]]:
                                     if self.specialeventstype[i] == 0:
                                         boxstyle = 'square,pad=0.2'
                                         boxcolor = self.EvalueColor[0]
@@ -4518,13 +4523,13 @@ class tgraphcanvas(FigureCanvas):
                         #count (as length of the list) and collect their times for each different type. Each type will have a different plot heigh
                         netypes=[[],[],[],[]]
                         for i in range(Nevents):
-                            if self.specialeventstype[i] == 0:
+                            if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:
                                 netypes[0].append(self.timex[self.specialevents[i]])
-                            elif self.specialeventstype[i] == 1:
+                            elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                 netypes[1].append(self.timex[self.specialevents[i]])
-                            elif self.specialeventstype[i] == 2:
+                            elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                 netypes[2].append(self.timex[self.specialevents[i]])
-                            elif self.specialeventstype[i] == 3:
+                            elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                 netypes[3].append(self.timex[self.specialevents[i]])
                                 
                         letters = char1+char2+char3+char4   #"NPDF" first letter for each type (None, Power, Damper, Fan)
@@ -4541,7 +4546,7 @@ class tgraphcanvas(FigureCanvas):
                             if self.specialeventstype[i] > 3:
                                 # a special event of type "--"
                                 pass
-                            else:
+                            elif aw.qmc.showEtypes[self.specialeventstype[i]]:
                                 firstletter = self.etypes[self.specialeventstype[i]][0]
                                 secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
                                 #some times ET is not drawn (ET = 0) when using device NONE
@@ -4571,19 +4576,19 @@ class tgraphcanvas(FigureCanvas):
                         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                         E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
                         for i in range(Nevents):
-                            if self.specialeventstype[i] == 0:           
+                            if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:           
                                 self.E1timex.append(self.timex[self.specialevents[i]])
                                 self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E1_nonempty = True
-                            elif self.specialeventstype[i] == 1:
+                            elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                 self.E2timex.append(self.timex[self.specialevents[i]])
                                 self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E2_nonempty = True
-                            elif self.specialeventstype[i] == 2:
+                            elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                 self.E3timex.append(self.timex[self.specialevents[i]])
                                 self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E3_nonempty = True
-                            elif self.specialeventstype[i] == 3:
+                            elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                 self.E4timex.append(self.timex[self.specialevents[i]])
                                 self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E4_nonempty = True
@@ -4727,16 +4732,16 @@ class tgraphcanvas(FigureCanvas):
                             labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
     
                 if self.eventsshowflag and self.eventsGraphflag == 2 and Nevents:
-                    if E1_nonempty:
+                    if E1_nonempty and aw.qmc.showEtypes[0]:
                         handles.append(self.l_eventtype1dots)
                         labels.append(aw.arabicReshape(self.etypesf(0)))
-                    if E2_nonempty:
+                    if E2_nonempty and aw.qmc.showEtypes[1]:
                         handles.append(self.l_eventtype2dots)
                         labels.append(aw.arabicReshape(self.etypesf(1)))
-                    if E3_nonempty:
+                    if E3_nonempty and aw.qmc.showEtypes[2]:
                         handles.append(self.l_eventtype3dots)
                         labels.append(aw.arabicReshape(self.etypesf(2)))
-                    if E4_nonempty:
+                    if E4_nonempty and aw.qmc.showEtypes[3]:
                         handles.append(self.l_eventtype4dots)
                         labels.append(aw.arabicReshape(self.etypesf(3)))                        
                             
@@ -6499,15 +6504,15 @@ class tgraphcanvas(FigureCanvas):
                             self.E4timex.append(self.timex[self.specialevents[-1]])
                             self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
                         #if Event show flag
-                        if self.eventsshowflag:
+                        if self.eventsshowflag and aw.qmc.showEtypes[etype]:
                             index = self.specialevents[-1]
                             if etype < 4:
                                 firstletter = self.etypesf(self.specialeventstype[-1])[0]
-                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
+                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1]) 
                             else:
                                 firstletter = "E"
-                                secondletter = ""
-                            if self.specialeventstype[-1] == 4 or self.eventsGraphflag == 0:
+                                secondletter = "" 
+                            if self.specialeventstype[-1] == 4 or ( self.eventsGraphflag == 0 and aw.qmc.showEtypes[self.specialeventstype[-1]] ): 
                                 if self.mode == "F":
                                     height = 50
                                 else:
@@ -6581,13 +6586,13 @@ class tgraphcanvas(FigureCanvas):
                                             fontproperties=fontprop_small)
                             elif self.eventsGraphflag == 2 and etype < 4:
                                 # update lines data using the lists with new data
-                                if etype == 0:
+                                if etype == 0 and aw.qmc.showEtypes[0]:
                                     self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
-                                elif etype == 1:
+                                elif etype == 1 and aw.qmc.showEtypes[1]:
                                     self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
-                                elif etype == 2:
+                                elif etype == 2 and aw.qmc.showEtypes[2]:
                                     self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
-                                elif etype == 3:
+                                elif etype == 3 and aw.qmc.showEtypes[3]:
                                     self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
                         self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBacground() needed
                         temp = "%.1f "%self.temp2[i]            
@@ -6657,7 +6662,7 @@ class tgraphcanvas(FigureCanvas):
                 #if Event show flag
                 if self.eventsshowflag:
                     index = self.specialevents[-1]
-                    if self.specialeventstype[-1] < 4:
+                    if self.specialeventstype[-1] < 4 and aw.qmc.showEtypes[self.specialeventstype[-1]]:
                         firstletter = self.etypesf(self.specialeventstype[-1])[0]
                         secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
                         if self.eventsGraphflag == 0:
@@ -16122,6 +16127,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.annotationsflag = toInt(settings.value("annotationsflag",int(self.qmc.annotationsflag)))
             if settings.contains("showeventsonbt"):
                 self.qmc.showeventsonbt = bool(toBool(settings.value("showeventsonbt",self.qmc.showeventsonbt))) 
+            if settings.contains("showEtypes"):
+                self.qmc.showEtypes = [bool(toBool(x)) for x in toList(settings.value("showEtypes",self.qmc.showEtypes))]                
             if settings.contains("autoChargeDrop"):
                 self.qmc.autoChargeFlag = bool(toBool(settings.value("autoChargeDrop",False)))
                 self.qmc.autoDropFlag = self.qmc.autoChargeFlag
@@ -17338,6 +17345,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("clampEvents",self.qmc.clampEvents)
             settings.setValue("annotationsflag",self.qmc.annotationsflag)
             settings.setValue("showeventsonbt",self.qmc.showeventsonbt)
+            settings.setValue("showEtypes",self.qmc.showEtypes)            
             settings.setValue("autoCharge",self.qmc.autoChargeFlag)
             settings.setValue("autoDrop",self.qmc.autoDropFlag)
             settings.setValue("markTP",self.qmc.markTPflag)
@@ -17819,6 +17827,7 @@ class ApplicationWindow(QMainWindow):
         events["eventsshowflag"] = str(self.qmc.eventsshowflag)
         events["annotationsflag"] = str(self.qmc.annotationsflag)
         events["showeventsonbt"] = str(self.qmc.showeventsonbt)
+        events["showEtypes"] = str(aw.qmc.showEtypes)
         events["autoCharge"] = str(self.qmc.autoChargeFlag)
         events["autoDrop"] = str(self.qmc.autoDropFlag)
         events["markTP"] = str(self.qmc.markTPflag)
@@ -27142,6 +27151,18 @@ class EventsDlg(ArtisanDialog):
         typelabel2 = QLabel("2")
         typelabel3 = QLabel("3")
         typelabel4 = QLabel("4")
+        self.showEtype1 = QCheckBox(QApplication.translate("CheckBox","",None))
+        self.showEtype2 = QCheckBox(QApplication.translate("CheckBox","",None))
+        self.showEtype3 = QCheckBox(QApplication.translate("CheckBox","",None))
+        self.showEtype4 = QCheckBox(QApplication.translate("CheckBox","",None))
+        self.showEtype1.setChecked(aw.qmc.showEtypes[0])
+        self.showEtype2.setChecked(aw.qmc.showEtypes[1])
+        self.showEtype3.setChecked(aw.qmc.showEtypes[2])
+        self.showEtype4.setChecked(aw.qmc.showEtypes[3])
+        self.showEtype1.stateChanged.connect(lambda : self.changeShowEtypes(0))         #toggle        
+        self.showEtype2.stateChanged.connect(lambda : self.changeShowEtypes(1))         #toggle        
+        self.showEtype3.stateChanged.connect(lambda : self.changeShowEtypes(2))         #toggle        
+        self.showEtype4.stateChanged.connect(lambda : self.changeShowEtypes(3))         #toggle                
         self.etype0 = QLineEdit(aw.qmc.etypesf(0))
         self.etype0.setCursorPosition(0)
         self.etype1 = QLineEdit(aw.qmc.etypesf(1))
@@ -27658,13 +27679,17 @@ class EventsDlg(ArtisanDialog):
 
         typeLayout = QGridLayout()
         typeLayout.addWidget(typelabel1,0,0)
-        typeLayout.addWidget(self.etype0,0,1)
-        typeLayout.addWidget(typelabel2,0,2)
-        typeLayout.addWidget(self.etype1,0,3)
-        typeLayout.addWidget(typelabel3,0,4)
-        typeLayout.addWidget(self.etype2,0,5)
-        typeLayout.addWidget(typelabel4,0,6)
-        typeLayout.addWidget(self.etype3,0,7)        
+        typeLayout.addWidget(self.showEtype1,0,1)
+        typeLayout.addWidget(self.etype0,0,2)
+        typeLayout.addWidget(typelabel2,0,3)
+        typeLayout.addWidget(self.showEtype2,0,4)
+        typeLayout.addWidget(self.etype1,0,5)
+        typeLayout.addWidget(typelabel3,0,6)
+        typeLayout.addWidget(self.showEtype3,0,7)
+        typeLayout.addWidget(self.etype2,0,8)
+        typeLayout.addWidget(typelabel4,0,9)
+        typeLayout.addWidget(self.showEtype4,0,10)
+        typeLayout.addWidget(self.etype3,0,11)        
         buttonLayout = QHBoxLayout()
         buttonLayout.addLayout(FlagsLayout2)
         buttonLayout.addStretch()
@@ -28083,6 +28108,11 @@ class EventsDlg(ArtisanDialog):
         
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
+        self.showEtypes = [True]*5
+        self.showEtype1.setChecked(self.showEtypes[0])
+        self.showEtype2.setChecked(self.showEtypes[1])
+        self.showEtype3.setChecked(self.showEtypes[2])
+        self.showEtype4.setChecked(self.showEtypes[3])       
         self.etype0.setText(aw.qmc.etypesdefault[0])
         self.etype0.setCursorPosition(0)
         self.etype1.setText(aw.qmc.etypesdefault[1])
@@ -28711,9 +28741,13 @@ class EventsDlg(ArtisanDialog):
         
     def showeventsonbtChanged(self):  
         if self.showeventsonbtbox.isChecked():
-            aw.qmc.showeventsonbt = 1
+            aw.qmc.showeventsonbt = True
         else:
-            aw.qmc.showeventsonbt = 0
+            aw.qmc.showeventsonbt = False
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        
+    def changeShowEtypes(self,etype):
+        aw.qmc.showEtypes[etype] = not aw.qmc.showEtypes[etype]
         aw.qmc.redraw(recomputeAllDeltas=False)
         
     def minieventsflagChanged(self):
@@ -28802,6 +28836,7 @@ class EventsDlg(ArtisanDialog):
         self.eventsshowflagstored = aw.qmc.eventsshowflag
         self.annotationsflagstored = aw.qmc.annotationsflag
         self.showeventsonbtstored = aw.qmc.showeventsonbt
+        self.showEtypesstored = aw.qmc.showEtypes[:]
         self.minieventsflagstored = aw.minieventsflag
         self.eventsGraphflagstored = aw.qmc.eventsGraphflag
         self.etypesstored = aw.qmc.etypes
@@ -28844,6 +28879,7 @@ class EventsDlg(ArtisanDialog):
         aw.qmc.eventsshowflag = self.eventsshowflagstored
         aw.qmc.annotationsflag = self.annotationsflagstored
         aw.qmc.showeventsonbt = self.showeventsonbtstored
+        aw.qmc.showEtypes = self.showEtypesstored[:]
         aw.minieventsflag = self.minieventsflagstored
         aw.qmc.eventsGraphflag = self.eventsGraphflagstored
         aw.qmc.etypes = self.etypesstored
