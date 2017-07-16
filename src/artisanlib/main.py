@@ -1650,6 +1650,10 @@ class tgraphcanvas(FigureCanvas):
             self.mode = "F"
             self.celsiusMode()
             self.phases = self.phases_celsius_defaults
+            
+        #Extras more info
+        self.idx_met = None
+        self.showmet = False
         
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -1876,6 +1880,16 @@ class tgraphcanvas(FigureCanvas):
 
     def onpick(self,event):
         try:            
+            if event.artist in [self.met_annotate]:
+                message = u("")
+                message += u("MET ") + str(aw.float2float(self.met_timex_temp1_delta[1],1))
+                message += u(" @ ") + self.stringfromseconds(self.met_timex_temp1_delta[0])
+                if self.met_timex_temp1_delta[2] >= 0:   #met_delta
+                    message += u(", ") + str(self.met_timex_temp1_delta[2]) + u(" ") + QApplication.translate("Message","seconds before FCs", None)
+                elif self.met_timex_temp1_delta[2] < 0:   #met_delta
+                    message += u(", ") + str(-self.met_timex_temp1_delta[2]) + u(" ") + QApplication.translate("Message","seconds after FCs", None)
+                aw.sendmessage(message)
+                return
             if isinstance(event.ind, (int)):
                 ind = event.ind
             else:
@@ -6723,6 +6737,39 @@ class tgraphcanvas(FigureCanvas):
     def writecharacteristics(self,TP_index=None,LP=None):
         try:
             if self.statisticsflags[3] and self.timeindex[0]>-1 and self.temp1 and self.temp2 and self.temp1[self.timeindex[0]:self.timeindex[6]+1] and self.temp2[self.timeindex[0]:self.timeindex[6]+1]:
+                # MET temp and time relative to FCs
+                if TP_index != None:
+                    met_temp = max(self.temp1[TP_index:self.timeindex[6]])
+                    self.idx_met = self.temp1.index(met_temp)
+                    if self.idx_met and self.timeindex[2]:
+                        # time between MET and FCs
+                        met_delta = aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.idx_met],0)
+                    else:
+                        met_delta = None    
+                    self.met_timex_temp1_delta = [(self.timex[self.idx_met]-self.timex[self.timeindex[0]]), met_temp, met_delta ] #used in onpick() to display the MET temp and time
+                # plot a MET marker
+                if self.showmet and TP_index != None and aw.qmc.ETcurve:
+                    if self.mode == "F":
+                        height = 0
+                    else:
+                        height = 0
+                    boxstyle = 'round4,pad=0.3,rounding_size=0.15'
+                    boxcolor = '#58dc00' #match the ET color
+                    textcolor = 'white'
+                    fontprop_small = aw.mpl_fontproperties.copy()
+                    fontprop_small.set_size("xx-small")
+                    self.met_annotate = self.ax.annotate("MET", xy=(self.timex[self.idx_met], met_temp),
+                                 xytext=(self.timex[self.idx_met], met_temp + height),
+                                 ha = "center",
+                                 alpha=0.9,
+                                 color=textcolor,
+                                 #arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
+                                 bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                 fontproperties=fontprop_small,
+                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                 picker=True,
+                                 )
+
                 statsprop = aw.mpl_fontproperties.copy()
                 statsprop.set_size("small")
                 if aw.qmc.statisticsmode == 0:
@@ -16928,6 +16975,11 @@ class ApplicationWindow(QMainWindow):
                 if settings.contains("buttonpalette_shortcuts"):
                     self.buttonpalette_shortcuts = bool(toBool(settings.value("buttonpalette_shortcuts",self.buttonpalette_shortcuts)))
             settings.endGroup()
+            # Extras more info            
+            settings.beginGroup("ExtrasMoreInfo")
+            if settings.contains("showmet"):
+                self.qmc.showmet = bool(toBool(settings.value("showmet",self.qmc.showmet)))
+            settings.endGroup()
             
             # recent roasts
             if settings.contains("recentRoasts"):
@@ -17787,6 +17839,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("batchprefix",self.qmc.batchprefix)
             settings.setValue("lastroastepoch",self.qmc.lastroastepoch)
             settings.endGroup()
+            settings.beginGroup("ExtrasMoreInfo")
+            settings.setValue("showmet",self.qmc.showmet)
+            settings.endGroup()
             try:
                 settings.setValue("appearance",str(aw.style().objectName()).lower())
             except Exception:
@@ -17876,6 +17931,7 @@ class ApplicationWindow(QMainWindow):
         extras["HUDMode"]= str(self.HUDfunction)                      # key modified
         extras["hudETpid"]= str(self.qmc.hudETpid)
         extras["Beep"]= str(self.soundflag)
+        extras["showmet"]= str(self.qmc.showmet)
         axes["xmin"]= str(self.qmc.startofx)
         axes["xmax"]= str(self.qmc.endofx)
         axes["ymax"]= str(self.qmc.ylimit)
@@ -22527,6 +22583,20 @@ class HUDDlg(ArtisanDialog):
         tab5Layout.addWidget(WebLCDsGroupWidget)
         tab5Layout.addStretch()
         tab5Layout.addLayout(defresLayout)
+        ##### TAB 6
+        #show met 
+        self.ShowMet = QCheckBox(QApplication.translate("CheckBox", "Show MET",None))
+        self.ShowMet.setChecked(aw.qmc.showmet)
+        self.ShowMet.stateChanged.connect(self.changeShowMet)         #toggle        
+        moreInfoLayout = QHBoxLayout()
+        moreInfoLayout.addWidget(self.ShowMet)
+        moreInfoLayout.addStretch()
+        moreinfoGroupWidget = QGroupBox(QApplication.translate("GroupBox","More Info",None))
+        moreinfoGroupWidget.setLayout(moreInfoLayout)
+        tab6Layout = QVBoxLayout()
+        tab6Layout.addWidget(moreinfoGroupWidget)
+        tab6Layout.addStretch()
+
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
         C0Widget = QWidget()
@@ -22548,6 +22618,9 @@ class HUDDlg(ArtisanDialog):
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
         TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None))
+        C6Widget = QWidget()
+        C6Widget.setLayout(tab6Layout)
+        TabWidget.addTab(C6Widget,QApplication.translate("Tab","More Info",None))
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(cancelButton)
@@ -23390,6 +23463,10 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.interpolation(i)
 
+    def changeShowMet(self):
+        aw.qmc.showmet = not aw.qmc.showmet
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        
     def closeEvent(self,_):
         self.close()
         
