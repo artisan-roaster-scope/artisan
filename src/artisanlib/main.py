@@ -1654,6 +1654,7 @@ class tgraphcanvas(FigureCanvas):
         #Extras more info
         self.idx_met = None
         self.showmet = False
+        self.extendevents = False
         
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -4396,30 +4397,59 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
                             self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
+                            E1b_last = E2b_last = E3b_last = E4b_last = 0  #not really necessary but guarantees that Exb_last is defined 
                             for i in range(len(self.backgroundEvents)):
                                 if self.backgroundEtypes[i] == 0 and aw.qmc.showEtypes[0]:
                                     self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
+                                    E1b_last = i
                                 elif self.backgroundEtypes[i] == 1 and aw.qmc.showEtypes[1]:
                                     self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
+                                    E2b_last = i
                                 elif self.backgroundEtypes[i] == 2 and aw.qmc.showEtypes[2]:
                                     self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
+                                    E3b_last = i
                                 elif self.backgroundEtypes[i] == 3 and aw.qmc.showEtypes[3]:
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
+                                    E4b_last = i
     
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
+                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if cool exists and last event was earlier
+                                    self.E1backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
+                                    self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
+                                elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if drop exists and last event was earlier
+                                    self.E1backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
+                                    self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                                             picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
+                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if cool exists and last event was earlier
+                                    self.E2backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
+                                    self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
+                                elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if drop exists and last event was earlier
+                                    self.E2backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
+                                    self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                                             picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
                             if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
+                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if cool exists and last event was earlier
+                                    self.E3backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
+                                    self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
+                                elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if drop exists and last event was earlier
+                                    self.E3backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
+                                    self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                                             picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
                             if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
+                                if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if cool exists and last event was earlier
+                                    self.E4backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
+                                    self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
+                                elif (self.timeindexB[6] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[6]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if drop exists and last event was earlier
+                                    self.E4backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
+                                    self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                                             picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
                                                                               
@@ -4594,25 +4624,36 @@ class tgraphcanvas(FigureCanvas):
                         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                         E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
+                        E1_last = E2_last = E3_last = E4_last = 0  #not really necessary but guarantees that Ex_last is defined 
                         for i in range(Nevents):
                             if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:           
                                 self.E1timex.append(self.timex[self.specialevents[i]])
                                 self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E1_nonempty = True
+                                E1_last = i
                             elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                 self.E2timex.append(self.timex[self.specialevents[i]])
                                 self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E2_nonempty = True
+                                E2_last = i
                             elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                 self.E3timex.append(self.timex[self.specialevents[i]])
                                 self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E3_nonempty = True
+                                E3_last = i
                             elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                 self.E4timex.append(self.timex[self.specialevents[i]])
                                 self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E4_nonempty = True
+                                E4_last = i
     
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
+                            if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
+                                self.E1timex.append(self.timex[self.timeindex[7]]) #time of cool
+                                self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E1_last]-1)*10))))]) #repeat last event value
+                            elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E1_last]]):   #if drop exists and last event was earlier
+                                self.E1timex.append(self.timex[self.timeindex[6]]) #time of drop
+                                self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E1_last]-1)*10))))]) #repeat last event value
                             E1x = self.E1timex
                             E1y = self.E1values
                         else:
@@ -4621,6 +4662,12 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex): 
+                            if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
+                                self.E2timex.append(self.timex[self.timeindex[7]]) #time of cool
+                                self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E2_last]-1)*10))))]) #repeat last event value
+                            elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E2_last]]):   #if drop exists and last event was earlier
+                                self.E2timex.append(self.timex[self.timeindex[6]]) #time of drop
+                                self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E2_last]-1)*10))))]) #repeat last event value
                             E2x = self.E2timex
                             E2y = self.E2values
                         else:
@@ -4629,6 +4676,12 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
+                            if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
+                                self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
+                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
+                            elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E3_last]]):   #if drop exists and last event was earlier
+                                self.E3timex.append(self.timex[self.timeindex[6]]) #time of drop
+                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
                             E3x = self.E3timex
                             E3y = self.E3values
                         else:
@@ -4637,6 +4690,12 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                               picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
+                            if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
+                                self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
+                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
+                            elif (self.timeindex[6] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[6]] > self.timex[self.specialevents[E4_last]]):   #if drop exists and last event was earlier
+                                self.E4timex.append(self.timex[self.timeindex[6]]) #time of drop
+                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
                             E4x = self.E4timex
                             E4y = self.E4values
                         else:
@@ -16979,6 +17038,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ExtrasMoreInfo")
             if settings.contains("showmet"):
                 self.qmc.showmet = bool(toBool(settings.value("showmet",self.qmc.showmet)))
+            if settings.contains("extendevents"):
+                self.qmc.extendevents = bool(toBool(settings.value("extendevents",self.qmc.extendevents)))
             settings.endGroup()
             
             # recent roasts
@@ -17841,6 +17902,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("ExtrasMoreInfo")
             settings.setValue("showmet",self.qmc.showmet)
+            settings.setValue("extendevents",self.qmc.extendevents)
             settings.endGroup()
             try:
                 settings.setValue("appearance",str(aw.style().objectName()).lower())
@@ -17932,6 +17994,7 @@ class ApplicationWindow(QMainWindow):
         extras["hudETpid"]= str(self.qmc.hudETpid)
         extras["Beep"]= str(self.soundflag)
         extras["showmet"]= str(self.qmc.showmet)
+        extras["extendevents"]= str(self.qmc.extendevents)
         axes["xmin"]= str(self.qmc.startofx)
         axes["xmax"]= str(self.qmc.endofx)
         axes["ymax"]= str(self.qmc.ylimit)
@@ -22588,9 +22651,16 @@ class HUDDlg(ArtisanDialog):
         self.ShowMet = QCheckBox(QApplication.translate("CheckBox", "Show MET",None))
         self.ShowMet.setChecked(aw.qmc.showmet)
         self.ShowMet.stateChanged.connect(self.changeShowMet)         #toggle        
+        #extend events
+        self.ExtendEvents = QCheckBox(QApplication.translate("CheckBox", "Extend Events to drop/cool\n(only when Bars=Value)",None))
+        self.ExtendEvents.setChecked(aw.qmc.extendevents)
+        self.ExtendEvents.stateChanged.connect(self.changeExtendEvents)         #toggle        
+        specialEventsLayout = QHBoxLayout()
+        specialEventsLayout.addWidget(self.ExtendEvents)
         moreInfoLayout = QHBoxLayout()
         moreInfoLayout.addWidget(self.ShowMet)
         moreInfoLayout.addStretch()
+        moreInfoLayout.addWidget(self.ExtendEvents)
         moreinfoGroupWidget = QGroupBox(QApplication.translate("GroupBox","More Info",None))
         moreinfoGroupWidget.setLayout(moreInfoLayout)
         tab6Layout = QVBoxLayout()
@@ -23466,7 +23536,11 @@ class HUDDlg(ArtisanDialog):
     def changeShowMet(self):
         aw.qmc.showmet = not aw.qmc.showmet
         aw.qmc.redraw(recomputeAllDeltas=False)
-        
+
+    def changeExtendEvents(self):
+        aw.qmc.extendevents = not aw.qmc.extendevents
+        aw.qmc.redraw(recomputeAllDeltas=False)
+                
     def closeEvent(self,_):
         self.close()
         
