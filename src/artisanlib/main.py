@@ -1656,6 +1656,11 @@ class tgraphcanvas(FigureCanvas):
         self.showmet = False
         self.extendevents = False
         
+        #mouse cross lines measurement 
+        self.baseX,self.baseY = None, None
+        self.base_horizontalcrossline, self.base_verticalcrossline = None, None
+        self.base_messagevisible = False        
+        
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
     #####################################################################################
@@ -1956,12 +1961,29 @@ class tgraphcanvas(FigureCanvas):
         except:
             pass
 
+    def onrelease(self,event):     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
+        try:
+            if event.button==1: 
+                self.baseX,self.baseY = None, None
+                self.base_horizontalcrossline, self.base_verticalcrossline = None, None
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " onclick() {0}").format(str(e)),exc_tb.tb_lineno)
+
     def onclick(self,event):
         try:
             if not self.designerflag and event.inaxes == None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==3:
                 aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
+            elif event.button==1 and event.inaxes and aw.qmc.crossmarker and not self.designerflag and not self.wheelflag and not aw.qmc.flagon:
+                self.baseX,self.baseY = event.xdata, event.ydata
+                if self.base_horizontalcrossline == None and self.base_verticalcrossline == None:
+                    # Mark starting point of click-and-drag with a marker
+                    self.base_horizontalcrossline, = self.ax.plot(self.baseX,self.baseY,'r+', markersize=20)
+                    self.base_verticalcrossline, = self.ax.plot(self.baseX,self.baseY,'wo', markersize = 2)
             elif event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag:# and not self.flagon:
                 timex = self.time2index(event.xdata)
                 if timex > 0:
@@ -8696,6 +8718,7 @@ class tgraphcanvas(FigureCanvas):
             message = QApplication.translate("Message", "Mouse Cross ON: move mouse around",None)
             aw.sendmessage(message)
             self.crossmouseid = self.fig.canvas.mpl_connect('motion_notify_event', self.drawcross)
+            self.onreleaseid = self.fig.canvas.mpl_connect('button_release_event', self.onrelease)  #mouse cross lines measurement            
         else:
             #turn OFF
             self.crossmarker = False
@@ -8709,11 +8732,21 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.mpl_disconnect(self.crossmouseid)
             self.l_horizontalcrossline = None
             self.l_verticalcrossline = None
+            self.fig.canvas.mpl_disconnect(self.onreleaseid)  #mouse cross lines measurement
 
     def drawcross(self,event):
         if event.inaxes == self.ax:
             x = event.xdata 
             y = event.ydata
+            if self.baseX and self.baseY:
+                deltaX = aw.qmc.stringfromseconds(event.xdata - self.baseX)
+                deltaY = str(aw.float2float(event.ydata - self.baseY,1))
+                message = "delta Time= " + deltaX + "   delta Temp= " + deltaY
+                aw.sendmessage(message)
+                self.base_messagevisible = True
+            elif self.base_messagevisible:
+                aw.sendmessage("")
+                self.base_messagevisible = False
             if x and y:
                 if self.l_horizontalcrossline == None:
                     self.l_horizontalcrossline, = self.ax.plot([self.startofx,self.endofx*2], [y,y],color = self.palette["text"], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
@@ -8727,6 +8760,9 @@ class tgraphcanvas(FigureCanvas):
                     self.fig.canvas.restore_region(self.ax_background)
                     aw.qmc.ax.draw_artist(self.l_horizontalcrossline)
                     aw.qmc.ax.draw_artist(self.l_verticalcrossline)
+                    if self.base_horizontalcrossline and self.base_verticalcrossline:
+                        aw.qmc.ax.draw_artist(self.base_horizontalcrossline)
+                        aw.qmc.ax.draw_artist(self.base_verticalcrossline)
                     self.fig.canvas.blit(aw.qmc.ax.bbox)
                 else:
                     self.fig.canvas.draw()
