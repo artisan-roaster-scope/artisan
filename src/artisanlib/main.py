@@ -4766,7 +4766,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
-                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
+                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=self.extraname1[i])[0])
                     if aw.extraCurveVisibility2[i]:
                         if False and aw.qmc.flagon:
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
@@ -14367,9 +14367,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extrastemp1.append([])
             self.qmc.extrastemp2 = self.qmc.extrastemp2[:n-1]
             self.qmc.extrastemp2.append([])
-            self.qmc.extractimex1 = self.qmc.extratctimex1[:n-1]
+            self.qmc.extractimex1 = self.qmc.extractimex1[:n-1]
             self.qmc.extractimex1.append([])
-            self.qmc.extractimex2 = self.qmc.extratctimex2[:n-1]
+            self.qmc.extractimex2 = self.qmc.extractimex2[:n-1]
             self.qmc.extractimex2.append([])
             self.qmc.extractemp1 = self.qmc.extractemp1[:n-1]
             self.qmc.extractemp1.append([])
@@ -14404,7 +14404,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp2[l],color=self.qmc.extradevicecolor2[l],markersize=self.qmc.extramarkersizes2[l],marker=self.qmc.extramarkers2[l],linewidth=self.qmc.extralinewidths2[l],linestyle=self.qmc.extralinestyles2[l],drawstyle=self.qmc.extradrawstyles2[l],label=self.qmc.extraname2[l])[0])
 
             self.updateExtraLCDvisibility()
-        except Exception as e:
+        except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
