@@ -8741,7 +8741,8 @@ class tgraphcanvas(FigureCanvas):
             if self.baseX and self.baseY:
                 deltaX = aw.qmc.stringfromseconds(event.xdata - self.baseX)
                 deltaY = str(aw.float2float(event.ydata - self.baseY,1))
-                message = "delta Time= " + deltaX + "   delta Temp= " + deltaY
+                RoR = str(aw.float2float(60 * (event.ydata - self.baseY) / (event.xdata - self.baseX),1))  
+                message = "delta Time= " + deltaX + ",    delta Temp= " + deltaY + " " + aw.qmc.mode + ",    RoR= " + RoR + " " + aw.qmc.mode + "/min"
                 aw.sendmessage(message)
                 self.base_messagevisible = True
             elif self.base_messagevisible:
