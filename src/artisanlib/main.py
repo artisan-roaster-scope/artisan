@@ -1814,14 +1814,23 @@ class tgraphcanvas(FigureCanvas):
         return res
 
     def updateAmbientTemp(self):
-        if aw.qmc.device == 34: # Phidget 1048 (use internal temp)
+        if aw.qmc.device in [34,58]: # Phidget 1048 or TMP1101 channel 4 (use internal temp)
             try:
-                if aw.ser.PhidgetTemperatureSensor != None and aw.ser.PhidgetTemperatureSensor.isAttached():
-                    t = aw.ser.PhidgetTemperatureSensor.getAmbientTemperature()
+                if aw.ser.PhidgetTemperatureSensor != None and aw.ser.PhidgetTemperatureSensor[0].getAttached():
+                    ambient = PhidgetTemperatureSensor()
+                    ambient.setDeviceSerialNumber(aw.ser.PhidgetTemperatureSensor[0].getDeviceSerialNumber())
+                    if aw.qmc.device == 58:
+                        ambient.setHubPort(aw.ser.PhidgetTemperatureSensor[0].getHubPort())
+                    ambient.setChannel(4)
+                    ambient.openWaitForAttachment(1500)
+                    libtime.sleep(.5)
+                    t = ambient.getTemperature()
                     if aw.qmc.mode == "F":
                         aw.qmc.ambientTemp = aw.float2float(aw.qmc.fromCtoF(t))
                     else:
                         aw.qmc.ambientTemp = aw.float2float(t)
+                    if ambient.getAttached():
+                        ambient.close()
             except Exception:
                 pass
         else:
@@ -5551,25 +5560,25 @@ class tgraphcanvas(FigureCanvas):
         except Exception:
             pass
         # disconnect phidgets
-        ser.removePhidgetServer()
         if ser.PhidgetTemperatureSensor:
             try:
-                ser.PhidgetTemperatureSensorAttached = False
-                ser.PhidgetTemperatureSensor.closePhidget()
-                ser.PhidgetTemperatureSensor = None
+                if ser.PhidgetTemperatureSensor[0].getAttached():
+                    ser.PhidgetTemperatureSensor[0].close()
+                if len(ser.PhidgetTemperatureSensor) > 1 and ser.PhidgetTemperatureSensor[1].getAttached():
+                    ser.PhidgetTemperatureSensor[1].close()
             except Exception:
                 pass
+            ser.PhidgetTemperatureSensor = None
         if ser.PhidgetIRSensor:
             try:
-                ser.PhidgetIRSensorSensorAttached = False
                 if ser.PhidgetIRSensor.getAttached():
                     ser.PhidgetIRSensor.close()
                 ser.PhidgetIRSensor = None
                 if ser.PhidgetIRSensorIC.getAttached():
                     ser.PhidgetIRSensorIC.close()
-                ser.PhidgetIRSensorIC = None
             except Exception:
                 pass
+            ser.PhidgetIRSensorIC = None
         if ser.PhidgetBridgeSensor:
             try:
                 ser.PhidgetBridgeSensorAttached = False
@@ -5584,9 +5593,7 @@ class tgraphcanvas(FigureCanvas):
                 ser.PhidgetIO = None
             except Exception:
                 pass
-        if ser.PhidgetManager:
-            ser.PhidgetManager.closeManager()
-            ser.PhidgetManager = None
+        ser.removePhidgetServer()
         if ser.YOCTOsensor:
             try:
                 YAPI.FreeAPI()
@@ -31498,13 +31505,15 @@ class serialport(object):
         ##### SPECIAL METER FLAGS ########
         self.PhidgetManager = None
         #stores the Phidget 1048 TemperatureSensor object (None if not initialized)
-        self.PhidgetTemperatureSensor = None
-        self.PhidgetTemperatureSensorAttached = False
+        self.PhidgetTemperatureSensor = None # either None or a list containing one PhidgetTemperatureSensor() object per channel
         self.Phidget1048values = [-1]*4 # the values gathered by registered change triggers
-        self.PhidgetTemperatureInputCount = 0
+        # list of (serial,port) tuples filled on attaching the corresponding main device and consumed on attaching the other channel pairs
+        self.Phidget1048_34_serialports = []
+        self.Phidget1048_AT_serialports = []
+        self.PhidgetTMP1101_34_serialports = []
+        self.PhidgetTMP1101_AT_serialports = []
         #stores the Phidget 1045 TemperatureSensor object (None if not initialized)
         self.PhidgetIRSensor = None
-        self.PhidgetIRSensorSensorAttached = False
         self.PhidgetIRSensorIC = None
         self.Phidget1045value = -1
         #stores the Phidget BridgeSensor object (None if not initialized)
@@ -31933,17 +31942,17 @@ class serialport(object):
 
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.PHIDGET1048temperature(0)
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,0)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
 
     def PHIDGET1048_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.PHIDGET1048temperature(1)
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,1)
         return tx,t1,t2
 
     def PHIDGET1048_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.PHIDGET1048temperature(2)
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,2)
         return tx,t1,t2
 
     def PHIDGET1046(self):
@@ -31983,15 +31992,18 @@ class serialport(object):
         
     def PHIDGET_TMP1101(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        return tx,-1,-1
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,0)
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
         
     def PHIDGET_TMP1101_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        return tx,-1,-1
-        
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,1)
+        return tx,t1,t2
+            
     def PHIDGET_TMP1101_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        return tx,-1,-1
+        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,2)
+        return tx,t1,t2
 
     def PHIDGET_TMP1100(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -33242,7 +33254,6 @@ class serialport(object):
             aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input attached",None))
         else:
             return
-        self.PhidgetIRSensorSensorAttached = True
         
     def phidget1045detached(self,deviceType,e):
         if deviceType == DeviceID.PHIDID_1045:
@@ -33251,7 +33262,6 @@ class serialport(object):
             aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 1-input detached",None))
         elif deviceType == DeviceID.PHIDID_TMP1100:
             aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input detached",None))
-        self.PhidgetIRSensorSensorAttached = False
 
     # this one is reused for the 1045 (IR), the 1051 (1xTC) and TMP1100 (1xTC)
     def PHIDGET1045temperature(self,deviceType=DeviceID.PHIDID_1045,retry=True):
@@ -33286,7 +33296,7 @@ class serialport(object):
                         self.PhidgetIRSensorIC.setDeviceSerialNumber(ser)
                         self.PhidgetIRSensorIC.setChannel(1) # attache to the IC channel
                         self.PhidgetIRSensorIC.openWaitForAttachment(timeout)
-                        libtime.sleep(.3)
+                        libtime.sleep(.5)
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
                         #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -33299,7 +33309,7 @@ class serialport(object):
                             pass
                         self.PhidgetIRSensor = None
                         self.PhidgetIRSensorIC = None
-            if self.PhidgetIRSensorSensorAttached:
+            if self.PhidgetIRSensor and self.PhidgetIRSensor.getAttached():
                     res = -1
                     ambient = -1
                     try:
@@ -33315,7 +33325,8 @@ class serialport(object):
                     except Exception:
                         pass
                     try:
-                        ambient = self.PhidgetIRSensorIC.getTemperature()
+                        if self.PhidgetIRSensorIC.getAttached():
+                            ambient = self.PhidgetIRSensorIC.getTemperature()
                     except Exception:
                         pass
                     if ambient == -1:
@@ -33327,16 +33338,16 @@ class serialport(object):
                             return res,ambient
             elif retry:
                 libtime.sleep(0.1)
-                return self.PHIDGET1045temperature(retry=False)
+                return self.PHIDGET1045temperature(deviceType,retry=False)
             else:
                 return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             try:
-                if self.PhidgetIRSensor.getAttached():
+                if self.PhidgetIRSensor and self.PhidgetIRSensor.getAttached():
                     self.PhidgetIRSensor.close()
-                if self.PhidgetIRSensorIC.getAttached():
+                if self.PhidgetIRSensorIC and self.PhidgetIRSensorIC.getAttached():
                     self.PhidgetIRSensorIC.close()
             except Exception:
                 pass
@@ -33348,112 +33359,155 @@ class serialport(object):
 
 #----
 
-    def phidget1048TemperatureChanged(self,e):
-        if aw.qmc.phidget1048_async[e.index]:
-            if aw.ser.Phidget1048values[e.index] != -1:
-                aw.ser.Phidget1048values[e.index] = (aw.ser.Phidget1048values[e.index] + e.temperature)/2.0
-            else:
-                aw.ser.Phidget1048values[e.index] = e.temperature
-
-    def phidget1048getSensorReading(self,i):
-        if aw.qmc.phidget1048_async[i]:
-            if aw.ser.Phidget1048values[i] == -1:
-                aw.ser.Phidget1048values[i] = aw.ser.PhidgetTemperatureSensor.getTemperature(i)                
-            return aw.ser.Phidget1048values[i]
-        else:
-            return aw.ser.PhidgetTemperatureSensor.getTemperature(i)
-    
-    def configure1048(self):
-        for i in range(aw.ser.PhidgetTemperatureInputCount):
-            if i < 2 or (i > 1 and i < 4 and 35 in aw.qmc.extradevices):
-                aw.ser.PhidgetTemperatureSensor.setThermocoupleType(i,aw.qmc.phidget1048_types[i])
-        aw.ser.Phidget1048values = [-1]*4
-        changeTrigger = False
-        for i in range(aw.ser.PhidgetTemperatureInputCount):
-            if i < 2 or (i < 4 and 35 in aw.qmc.extradevices):
-                if aw.qmc.phidget1048_async[i]:
-                    aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,aw.qmc.phidget1048_changeTriggers[i])
-                    changeTrigger = True
+    def phidget1048TemperatureChanged(self,e,t,idx):
+        if self.PhidgetTemperatureSensor:
+            channel = self.PhidgetTemperatureSensor[idx].getChannel()
+            if aw.qmc.phidget1048_async[channel]:
+                if self.Phidget1048values[channel] != -1:
+                    self.Phidget1048values[channel] = (self.Phidget1048values[channel] + t)/2.0
                 else:
-                    aw.ser.PhidgetTemperatureSensor.setTemperatureChangeTrigger(i,0.5)
-        if changeTrigger:
-            aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(lambda e=None:self.phidget1048TemperatureChanged(e))
-        else:
-            aw.ser.PhidgetTemperatureSensor.setOnTemperatureChangeHandler(None)
+                    self.Phidget1048values[channel] = t
 
-    def phidget1048attached(self,e):
-        aw.ser.PhidgetTemperatureInputCount = aw.ser.PhidgetTemperatureSensor.getTemperatureInputCount()
-        self.configure1048()
-        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None))
-        aw.ser.PhidgetTemperatureSensorAttached = True
+    def phidget1048getSensorReading(self,i,idx):
+        if aw.qmc.phidget1048_async[i]:
+            if self.Phidget1048values[i] == -1:
+                self.Phidget1048values[i] = self.PhidgetTemperatureSensor[idx].getTemperature()
+            return self.Phidget1048values[i]
+        else:
+            return self.PhidgetTemperatureSensor[idx].getTemperature()
+    
+    def configure1048(self,idx):
+        if self.PhidgetTemperatureSensor:
+            channel = self.PhidgetTemperatureSensor[idx].getChannel()
+            if channel < 4: # the ambient temperature sensor does not need to be configured
+                self.PhidgetTemperatureSensor[idx].setThermocoupleType(PHIDGET_THERMOCOUPLE_TYPE_21_22_MAPPING(aw.qmc.phidget1048_types[channel]))
         
-    def phidget1048detached(self,e):
-        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input detached",None))
-        aw.ser.PhidgetTemperatureSensorAttached = False
+                if aw.qmc.phidget1048_async[channel]:
+                    self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(aw.qmc.phidget1048_changeTriggers[channel])
+                else:
+                    self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(0)
+                if aw.qmc.phidget1048_async[channel]:
+                    self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda e,t: self.phidget1048TemperatureChanged(e,t,idx))
+                else:
+                    self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda e,t:None)        
+                self.Phidget1048values[channel] = -1
+
+    def phidget1048attached(self,deviceType,e,idx):
+        self.configure1048(idx)
+        if self.PhidgetTemperatureSensor and self.PhidgetTemperatureSensor[idx].getChannel() == 0:
+            aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None))
+        
+    def phidget1048detached(self,deviceType,e,idx):
+        if self.PhidgetTemperatureSensor and self.PhidgetTemperatureSensor[idx].getChannel() == 0:
+            aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input detached",None))
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
-    def PHIDGET1048temperature(self,mode=0,retry=True):
+    def PHIDGET1048temperature(self,deviceType=DeviceID.PHIDID_1048,mode=0,retry=True):
         try:
-            if aw.ser.PhidgetTemperatureSensor == None:
-                aw.ser.PhidgetTemperatureSensor = PhidgetTemperatureSensor()
-                try:
-                    aw.ser.PhidgetTemperatureSensor.setOnAttachHandler(self.phidget1048attached)
-                    aw.ser.PhidgetTemperatureSensor.setOnDetachHandler(self.phidget1048detached)
-                    if aw.qmc.phidgetRemoteFlag:
-                        if sys.version < '3':
-                            aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
-                        else:
-                            aw.ser.PhidgetTemperatureSensor.openRemote(aw.qmc.phidgetServerID.encode('utf-8'),password=aw.qmc.phidgetPassword.encode('utf-8'))
-                    else:
-                        aw.ser.PhidgetTemperatureSensor.openPhidget()
-                    libtime.sleep(0.1)
-                except Exception as ex:
-                    #_, _, exc_tb = sys.exc_info()
-                    #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
-                    aw.ser.PhidgetBridgeSensorAttached = False
-                    try:
-                        aw.ser.PhidgetTemperatureSensor.closePhidget()
-                    except Exception:
-                        pass
-                    aw.ser.PhidgetTemperatureSensor = None
-            if aw.ser.PhidgetTemperatureSensorAttached:
+            if self.PhidgetTemperatureSensor == None:
+                ser = None
+                port = None 
                 if mode == 0:
+                    # we scan for available main device
+                    ser,port = self.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType)
+                    if deviceType == DeviceID.PHIDID_1048:
+                        aw.ser.Phidget1048_34_serialports.append([ser,port])
+                        aw.ser.Phidget1048_AT_serialports.append([ser,port])
+                    else:
+                        aw.ser.PhidgetTMP1101_34_serialports.append([ser,port])
+                        aw.ser.PhidgetTMP1101_AT_serialports.append([ser,port])
+                # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
+                elif mode == 1:
+                    if deviceType == DeviceID.PHIDID_1048:
+                        if aw.ser.Phidget1048_34_serialports:
+                            ser = aw.ser.Phidget1048_34_serialports[0][0]
+                            port = aw.ser.Phidget1048_34_serialports[0][1]
+                            aw.ser.Phidget1048_34_serialports = aw.ser.Phidget1048_34_serialports[1:]
+                    else:
+                        if aw.ser.PhidgetTMP1101_34_serialports:
+                            ser = aw.ser.PhidgetTMP1101_34_serialports[0][0]
+                            port = aw.ser.PhidgetTMP1101_34_serialports[0][1]
+                            aw.ser.PhidgetTMP1101_34_serialports = aw.ser.PhidgetTMP1101_34_serialports[1:]                        
+                elif mode == 2:
+                    if deviceType == DeviceID.PHIDID_1048:
+                        if aw.ser.Phidget1048_34_serialports:
+                            ser = aw.ser.Phidget1048_AT_serialports[0][0]
+                            port = aw.ser.Phidget1048_AT_serialports[0][1]
+                            aw.ser.Phidget1048_AT_serialports = aw.ser.Phidget1048_AT_serialports[1:]
+                    else:
+                        if aw.ser.PhidgetTMP1101_34_serialports:
+                            ser = aw.ser.PhidgetTMP1101_AT_serialports[0][0]
+                            port = aw.ser.PhidgetTMP1101_AT_serialports[0][1]
+                            aw.ser.PhidgetTMP1101_AT_serialports = aw.ser.PhidgetTMP1101_AT_serialports[1:]  
+                if ser:
+                    self.PhidgetTemperatureSensor = [PhidgetTemperatureSensor()]
+                    if mode != 2:
+                        self.PhidgetTemperatureSensor.append(PhidgetTemperatureSensor())
+                    try:
+                        self.PhidgetTemperatureSensor[0].setOnAttachHandler(lambda e:self.phidget1048attached(deviceType,e,0))
+                        self.PhidgetTemperatureSensor[0].setOnDetachHandler(lambda e:self.phidget1048detached(deviceType,e,0))
+                        if mode != 2:                            
+                            self.PhidgetTemperatureSensor[1].setOnAttachHandler(lambda e:self.phidget1048attached(deviceType,e,0))                        
+                            self.PhidgetTemperatureSensor[1].setOnDetachHandler(lambda e:self.phidget1048detached(deviceType,e,0))
+                        if aw.qmc.phidgetRemoteFlag:
+                            self.PhidgetTemperatureSensor[0].setIsLocal(False);
+                            self.PhidgetTemperatureSensor[0].setIsRemote(True);
+                            if mode != 2:
+                                self.PhidgetTemperatureSensor[1].setIsLocal(False);
+                                self.PhidgetTemperatureSensor[1].setIsRemote(True);
+                            self.addPhidgetServer()
+                            timeout = 2000
+                        else:
+                            self.PhidgetTemperatureSensor[0].setIsLocal(True);
+                            self.PhidgetTemperatureSensor[0].setIsRemote(False);
+                            if mode != 2:
+                                self.PhidgetTemperatureSensor[1].setIsLocal(True);
+                                self.PhidgetTemperatureSensor[1].setIsRemote(False);
+                            timeout = 1500                            
+                        if port != None:
+                            self.PhidgetTemperatureSensor[0].setHubPort(port)
+                            if mode != 2:
+                                self.PhidgetTemperatureSensor[1].setHubPort(port)
+                        self.PhidgetTemperatureSensor[0].setDeviceSerialNumber(ser)
+                        self.PhidgetTemperatureSensor[0].setChannel(mode*2)
+                        self.PhidgetTemperatureSensor[0].openWaitForAttachment(timeout)
+                        if mode != 2:
+                            self.PhidgetTemperatureSensor[1].setDeviceSerialNumber(ser)
+                            self.PhidgetTemperatureSensor[1].setChannel(mode*2 + 1)
+                            self.PhidgetTemperatureSensor[1].openWaitForAttachment(timeout)
+                        libtime.sleep(.5)
+                    except Exception as ex:
+                        #_, _, exc_tb = sys.exc_info()
+                        #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+                        aw.ser.PhidgetBridgeSensorAttached = False
+                        try:
+                            if self.PhidgetTemperatureSensor[0].getAttached():
+                                self.PhidgetTemperatureSensor[0].close()
+                            if mode != 2 and self.PhidgetTemperatureSensor[1].getAttached():
+                                self.PhidgetTemperatureSensor[1].close()
+                        except Exception:
+                            pass
+                        self.PhidgetTemperatureSensor = None
+            if self.PhidgetTemperatureSensor and self.PhidgetTemperatureSensor[0].getAttached():
+                # now just harvest both temps (or one in case type is 2)
+                if mode in [0,1]:
                     probe1 = probe2 = -1
                     try:
-                        if aw.ser.PhidgetTemperatureInputCount > 0:
-                            probe1 = self.phidget1048getSensorReading(0)
-                            if aw.qmc.mode == "F":
-                                probe1 = aw.qmc.fromCtoF(probe1)
+                        probe1 = self.phidget1048getSensorReading(mode*2,0)
+                        if aw.qmc.mode == "F":
+                            probe1 = aw.qmc.fromCtoF(probe1)
                     except Exception:
                         pass
                     try:
-                        if aw.ser.PhidgetTemperatureInputCount > 1:
-                            probe2 = self.phidget1048getSensorReading(1)
-                            if aw.qmc.mode == "F":
-                                probe2 = aw.qmc.fromCtoF(probe2)
+                        probe2 = self.phidget1048getSensorReading(mode*2 + 1,1)
+                        if aw.qmc.mode == "F":
+                            probe2 = aw.qmc.fromCtoF(probe2)
                     except Exception:
                         pass
                     return probe1, probe2
-                elif mode == 1:
-                    probe3 = probe4 = -1
-                    try:
-                        if aw.ser.PhidgetTemperatureInputCount > 2:
-                            probe3 = self.phidget1048getSensorReading(2)
-                            if aw.qmc.mode == "F":
-                                probe3 = aw.qmc.fromCtoF(probe3)
-                    except Exception:
-                        pass
-                    try:
-                        if aw.ser.PhidgetTemperatureInputCount > 2:
-                            probe4 = self.phidget1048getSensorReading(3)
-                            if aw.qmc.mode == "F":
-                                probe4 = aw.qmc.fromCtoF(probe4)
-                    except Exception:
-                        pass
-                    return probe3, probe4
                 elif mode == 2:
                     try:
-                        at = aw.ser.PhidgetTemperatureSensor.getAmbientTemperature()
+                        at = self.PhidgetTemperatureSensor[0].getTemperature()
                         if aw.qmc.mode == "F":
                             at = aw.qmc.fromCtoF(at)
                         return at,-1
@@ -33463,18 +33517,20 @@ class serialport(object):
                     return -1,-1
             elif retry:
                 libtime.sleep(0.1)
-                return self.PHIDGET1048temperature(mode,False)
+                return self.PHIDGET1048temperature(deviceType,mode,False)
             else:
                 return -1,-1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             try:
-                aw.ser.PhidgetTemperatureSensor.closePhidget()
+                if self.PhidgetTemperatureSensor[0].getAttached():
+                    self.PhidgetTemperatureSensor[0].close()
+                if mode != 2 and self.PhidgetTemperatureSensor[1].getAttached():
+                    self.PhidgetTemperatureSensor[1].close()
             except Exception:
                 pass
-            aw.ser.PhidgetTemperatureSensor = None
-            aw.ser.PhidgetBridgeSensorAttached = False
+            self.PhidgetTemperatureSensor = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
@@ -37908,7 +37964,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
-                elif meter == "Phidget TMP1101 TC":
+                elif meter == "Phidget TMP1101 4xTC":
                     aw.qmc.device = 58
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
@@ -37918,7 +37974,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ####  DEVICE 60 is +Phidget TMP1101_AT TC but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                elif meter == "Phidget TMP1100 TC":
+                elif meter == "Phidget TMP1100 1xTC":
                     aw.qmc.device = 61
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
@@ -38051,6 +38107,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.LCD3frame.setLayout(tmp.layout())        
             aw.qmc.swaplcds = swap
             
+            # close all ports to force a reopen
+            aw.qmc.disconnectProbes()
+            
             # Yotopuce conigurations
             aw.qmc.yoctoRemoteFlag = self.yoctoBoxRemoteFlag.isChecked()
             aw.qmc.yoctoServerID = u(self.yoctoServerId.text())
@@ -38064,30 +38123,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.phidget1046_formula[i] = self.formulaCombos1046[i].currentIndex()
                 aw.qmc.phidget1046_async[i] = self.asyncCheckBoxes1046[i].isChecked()
             aw.qmc.phidget1046_dataRate = aw.qmc.phidget_dataRatesValues[self.dataRateCombo1046.currentIndex()]
-            if aw.ser.PhidgetBridgeSensor:
-                aw.ser.PhidgetBridgeSensorAttached = False
-                try:
-                    aw.ser.PhidgetBridgeSensor.closePhidget()
-                except Exception:
-                    pass
-                aw.ser.PhidgetBridgeSensor = None
-            if aw.ser.PhidgetTemperatureSensor:
-                aw.ser.PhidgetTemperatureSensorAttached = False
-                try:
-                    aw.ser.PhidgetTemperatureSensor.closePhidget()
-                except Exception:
-                    pass
-                aw.ser.PhidgetTemperatureSensor = None                
             aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
             aw.qmc.phidget1045_changeTrigger = aw.qmc.phidget1045_changeTriggersValues[self.changeTriggerCombos1045.currentIndex()]
             aw.qmc.phidget1045_emissivity = self.emissivitySpinBox.value()            
-            if aw.qmc.phidget1045_async:
-                aw.ser.PhidgetIRSensorSensorAttached = False
-                try:
-                    aw.ser.PhidgetIRSensor.closePhidget()
-                except Exception:
-                    pass
-                aw.ser.PhidgetIRSensor = None
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
             aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
             aw.qmc.phidgetPassword = u(self.phidgetPassword.text())
@@ -38095,33 +38133,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.phidgetPort = int(self.phidgetPort.text())
             except:
                 pass
-            asyncMode = False
             for i in range(8):
                 aw.qmc.phidget1018_async[i] = self.asyncCheckBoxes[i].isChecked()
-                if aw.qmc.phidget1018_async[i] and (i < 2 or (i < 4 and 41 in aw.qmc.extradevices) or (i < 6 and 42 in aw.qmc.extradevices) or (i < 8 and 43 in aw.qmc.extradevices)):
-                    asyncMode = True
                 aw.qmc.phidget1018_raws[i] = self.rawCheckBoxes[i].isChecked()
                 aw.qmc.phidget1018_dataRates[i] = aw.qmc.phidget_dataRatesValues[self.dataRateCombos[i].currentIndex()]
                 aw.qmc.phidget1018_changeTriggers[i] = aw.qmc.phidget1018_changeTriggersValues[self.changeTriggerCombos[i].currentIndex()]
             aw.qmc.phidget1018Ratiometric = self.phidgetBoxRatiometricFlag.isChecked()
-            try:
-                if aw.ser.PhidgetIO and aw.ser.PhidgetIO.isAttached():
-                    # set also the raw, changeTrigger and rate things
-                    try:
-                        for i in range(max(3,aw.ser.PhidgetIO.getSensorCount())):
-                            aw.ser.PhidgetIO.setSensorChangeTrigger(i,1000) # "deactivate" triggers for non async channels
-                            if i < 2 or (i < 4 and 41 in aw.qmc.extradevices) or (i < 6 and 42 in aw.qmc.extradevices) or (i < 8 and 43 in aw.qmc.extradevices):
-                                if not aw.qmc.phidget1018_raws[i] and aw.qmc.phidget1018_async[i]:
-                                    aw.ser.PhidgetIO.setSensorChangeTrigger(i,aw.qmc.phidget1018_changeTriggers[i]) # force fixed data rate if 0 (default 10)
-                                    aw.ser.PhidgetIO.setDataRate(i, aw.qmc.phidget1018_dataRates[i])
-                    except Exception:
-                        pass
-                    if asyncMode:
-                        aw.ser.PhidgetIO.setOnSensorChangeHandler(lambda e=None:aw.ser.phidget1018SensorChanged(e))
-                    else:
-                        aw.ser.PhidgetIO.setOnSensorChangeHandler(None)
-            except Exception:
-                pass
+
             # LCD visibility
             aw.LCD2frame.setVisible(aw.qmc.ETlcd)
             aw.LCD3frame.setVisible(aw.qmc.BTlcd)
