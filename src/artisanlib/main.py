@@ -33447,8 +33447,8 @@ class serialport(object):
                         self.PhidgetTemperatureSensor[0].setOnAttachHandler(lambda e:self.phidget1048attached(deviceType,e,0))
                         self.PhidgetTemperatureSensor[0].setOnDetachHandler(lambda e:self.phidget1048detached(deviceType,e,0))
                         if mode != 2:                            
-                            self.PhidgetTemperatureSensor[1].setOnAttachHandler(lambda e:self.phidget1048attached(deviceType,e,0))                        
-                            self.PhidgetTemperatureSensor[1].setOnDetachHandler(lambda e:self.phidget1048detached(deviceType,e,0))
+                            self.PhidgetTemperatureSensor[1].setOnAttachHandler(lambda e:self.phidget1048attached(deviceType,e,1))                        
+                            self.PhidgetTemperatureSensor[1].setOnDetachHandler(lambda e:self.phidget1048detached(deviceType,e,1))
                         if aw.qmc.phidgetRemoteFlag:
                             self.PhidgetTemperatureSensor[0].setIsLocal(False);
                             self.PhidgetTemperatureSensor[0].setIsRemote(True);
@@ -36684,7 +36684,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1048VBox = QVBoxLayout()
         phidget1048VBox.addLayout(phidget1048HBox)
         phidget1048VBox.addStretch()
-        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048/1051",None))
+        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048/1051/TMP1100/TMP1101",None))
         phidget1048GroupBox.setLayout(phidget1048VBox)
         phidget1048GroupBox.setContentsMargins(0,10,0,0)
         phidget1048HBox.setContentsMargins(0,0,0,0)
