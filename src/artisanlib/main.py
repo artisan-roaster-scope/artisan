@@ -156,6 +156,7 @@ from Phidget22.DeviceClass import DeviceClass
 from Phidget22.ThermocoupleType import ThermocoupleType
 from Phidget22.Phidget import *
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
+from Phidget22.Devices.VoltageRatioInput import VoltageRatioInput as Phidget1046TemperatureSensor
 
 
 # import Yoctopuce Python library (installed form PyPI)
