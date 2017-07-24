@@ -1913,7 +1913,7 @@ class tgraphcanvas(FigureCanvas):
 
     def onpick(self,event):
         try:            
-            if event.artist in [self.met_annotate]:
+            if self.showmet and event.artist in [self.met_annotate]:
                 message = u("")
                 message += u("MET ") + str(aw.float2float(self.met_timex_temp1_delta[1],1))
                 message += u(" @ ") + self.stringfromseconds(self.met_timex_temp1_delta[0])
@@ -1985,7 +1985,8 @@ class tgraphcanvas(FigureCanvas):
                         tx_string += self.stringfromseconds(event_times[i] - start) + " " + event_temps[i] + aw.qmc.mode + ", "
                     message += u(" @ ") + tx_string[:-2]
                     aw.sendmessage(message,append=False)
-        except:
+        except Exception as e:
+            print(e)
             pass
 
     def onrelease(self,event):     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
