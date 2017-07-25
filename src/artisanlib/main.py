@@ -1672,6 +1672,7 @@ class tgraphcanvas(FigureCanvas):
         #Extras more info
         self.idx_met = None
         self.showmet = False
+        self.met_annotate = []
         self.extendevents = False
         
         #mouse cross lines measurement 
