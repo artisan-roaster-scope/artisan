@@ -98,7 +98,14 @@ Documentation and Support
     - [ARTISAN #4 Configure Tools Extras (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SmZua2VSd2FjZFE/view?usp=sharing)
   * Hottop USA: [Speaking Alarms for Windows](https://www.hottopusa.com/SayStatic.html)
   * INSTRUCTABLE: [Roast Coffee With Artisan and Phidgets](http://www.instructables.com/id/Roast-Coffee-With-Artisan-and-Phidgets)
-
+- Tutorial Videos (provided by users)
+  * [Rick Groszkiewicz](https://www.youtube.com/channel/UCrLDJbbG8c6fO1KXjbDTllw)
+    - [YouTube video on Alarms](https://www.youtube.com/watch?v=KLnb8lZwHjE)
+    - [YouTube video on Events](https://www.youtube.com/watch?v=614R8i-EoHI)
+    - [YouTube video showing a full Hottop/TC4 roast](https://www.youtube.com/watch?v=mE2qdb4qGrc)
+  * [A full software PID controlled on a Probatone 5 on Vimeo](https://vimeo.com/193018671)
+  * [Hottop KN-8828B-2K+ YouTube tutorial](https://www.youtube.com/watch?v=glyE_6vv-Lo&t=110s) by [roastmasterscoffee](https://www.youtube.com/channel/UCsba_bXJQbqFX06X5xP_7ug)
+  * [Hottop KN-8828B-2K+ YouTube tutorial](https://www.youtube.com/watch?v=T0If1ZbxjOI&t=310s) by [NapoHBarista TV](https://www.youtube.com/channel/UC-k4iHzxb8xrLZ2NSlUo8hg)
 
 
 
