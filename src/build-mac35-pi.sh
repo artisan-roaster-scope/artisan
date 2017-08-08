@@ -46,7 +46,7 @@ cp $QT_PATH/translations/qt_zh_CN.qm dist/Artisan.app/Contents/Resources/transla
 cp $QT_PATH/translations/qt_zh_TW.qm dist/Artisan.app/Contents/Resources/translations
 cp translations/*.qm dist/Artisan.app/Contents/Resources/translations
 
-# copy firmware and file icon
+# copy file icons and others
 cp artisanProfile.icns dist/Artisan.app/Contents/Resources
 cp artisanAlarms.icns dist/Artisan.app/Contents/Resources
 cp artisanPalettes.icns dist/Artisan.app/Contents/Resources

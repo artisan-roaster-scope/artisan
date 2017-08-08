@@ -15,7 +15,7 @@ a = Analysis(['artisan.py'],
              win_private_assemblies=False,
              cipher=block_cipher)
 
-a.binaries = [x for x in a.binaries if not x[0].startswith("/Library/Frameworks/Phidget21.framework/Versions/Current/Phidget21")]
+a.binaries = [x for x in a.binaries if not x[0].startswith("/Library/Frameworks/Phidget22.framework/Versions/Current/Phidget22")]
 
 pyz = PYZ(a.pure, a.zipped_data,cipher=block_cipher)
 
