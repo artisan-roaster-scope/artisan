@@ -120,7 +120,6 @@ from matplotlib import cm
 #print(QLibraryInfo.location(QLibraryInfo.PluginsPath))
 
 svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
-4
 
 from functools import reduce as freduce
 if pyqtversion < 5:
@@ -1849,7 +1848,7 @@ class tgraphcanvas(FigureCanvas):
         return res
 
     def updateAmbientTemp(self):
-        if aw.qmc.device in [34,58]: # Phidget 1048 or TMP1101 channel 4 (use internal temp)
+        if self.ambientTempSource != 0 and aw.qmc.device in [34,58]: # Phidget 1048 or TMP1101 channel 4 (use internal temp)
             try:
                 if aw.ser.PhidgetTemperatureSensor != None and aw.ser.PhidgetTemperatureSensor[0].getAttached():
                     ambient = PhidgetTemperatureSensor()
@@ -9676,16 +9675,16 @@ class SampleThread(QThread):
                             elif aw.qmc.alarmsource[i] == -1 and aw.qmc.delta2[-1]: #check DeltaBT (might be None
                                 alarm_temp = aw.qmc.delta2[-1]
                             elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                alarm_temp = aw.qmc.ctemp1[-1]
+                                alarm_temp = aw.qmc.temp1[-1]
                             elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                alarm_temp = aw.qmc.ctemp2[-1]
+                                alarm_temp = aw.qmc.temp2[-1]
                             elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
                                 if (aw.qmc.alarmsource[i])%2==0:
-                                    alarm_temp = aw.qmc.extractemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
                                 else:
-                                    alarm_temp = aw.qmc.extractemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
                             alarm_limit = aw.qmc.alarmtemperature[i]
-                            if alarm_temp != None and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                            if alarm_temp != None and alarm_temp != -1 and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
                                 aw.qmc.temporaryalarmflag = i
                 #############    if using DEVICE 18 (no device). Manual mode
                 # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
@@ -17262,6 +17261,7 @@ class ApplicationWindow(QMainWindow):
                     return True
                 else:
                     self.stopWebLCDs()
+                    self.WebLCDs = False
                     return False
             else:
                 return False
@@ -17271,6 +17271,7 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " startWebLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
             self.stopWebLCDs()
+            self.WebLCDs = False
             return False
             
     def stopWebLCDs(self):
@@ -22748,7 +22749,12 @@ class HUDDlg(ArtisanDialog):
         self.WebLCDsPort.setMaximumWidth(45)
         self.QRpic = QLabel() # the QLabel holding the QR code image
         if aw.WebLCDs:
-            self.setWebLCDsURL()
+            try:
+                self.setWebLCDsURL()
+            except:
+                self.WebLCDsURL.setText("")
+                self.QRpic.setPixmap(QPixmap())
+                aw.WebLCDs = False
         else:
             self.WebLCDsURL.setText("")
             self.QRpic.setPixmap(QPixmap())
@@ -22880,17 +22886,22 @@ class HUDDlg(ArtisanDialog):
         
     def toggleWebLCDs(self,i):
         if i:
-            self.WebLCDsAlerts.setDisabled(False)
-            self.WebLCDsPort.setDisabled(True)
-            self.setWebLCDsURL()
-            res = aw.startWebLCDs()
-            if not res:
-                self.WebLCDsPort.setDisabled(False)
+            try:
+                self.setWebLCDsURL() # this might fail if socket cannot be established
+                self.WebLCDsAlerts.setDisabled(False)
+                self.WebLCDsPort.setDisabled(True)
+                res = aw.startWebLCDs()
+                if not res:
+                    self.WebLCDsPort.setDisabled(False)
+                    self.WebLCDsURL.setText("")
+                    self.QRpic.setPixmap(QPixmap())
+                    self.WebLCDsFlag.setChecked(False)
+                else:
+                    self.WebLCDsFlag.setChecked(True)
+            except Exception:
                 self.WebLCDsURL.setText("")
                 self.QRpic.setPixmap(QPixmap())
-                self.WebLCDsFlag.setChecked(False)
-            else:
-                self.WebLCDsFlag.setChecked(True)
+                aw.WebLCDs = False
         else:   
             self.WebLCDsAlerts.setDisabled(True)
             self.WebLCDsFlag.setChecked(False)
@@ -33222,42 +33233,6 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER309 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
-#    def getFirstMatchingPhidgetsSerialNum(self,name):
-#        if self.PhidgetManager == None:
-#            self.PhidgetManager = PhidgetManager()
-#        if aw.qmc.phidgetRemoteFlag:
-#            libtime.sleep(.1)
-#            if sys.version < '3':
-#                self.PhidgetManager.openRemote(aw.qmc.phidgetServerID,password=aw.qmc.phidgetPassword)
-#            else:
-#                self.PhidgetManager.openRemote(aw.qmc.phidgetServerID.encode('utf-8'),password=aw.qmc.phidgetPassword.encode('utf-8'))
-#        else:
-#            self.PhidgetManager.openManager()
-#        devices = self.PhidgetManager.getAttachedDevices()
-#        res = -1
-#        if len(devices) == 0:
-#            libtime.sleep(.2)
-#            devices = self.PhidgetManager.getAttachedDevices()
-#            if len(devices) == 0:
-#                res = 0
-#        for d in devices:
-#            ser = d.getSerialNum()
-#            if d.getDeviceName() == name:
-#                # try if it can be opened (so not yet opened by another channel)
-#                try:
-#                    if not aw.qmc.phidgetRemoteFlag and name == 'Phidget Temperature Sensor IR': # only for the IR we support multiple devices
-#                        d.openPhidget(serial=ser)
-#                        libtime.sleep(.4)
-#                        d.waitForAttach(800)
-#                        d.closePhidget()
-#                    res = ser
-#                    break                    
-#                except Exception:
-#                    pass
-#            else:
-#                res = 0
-#        return res
-
     def addPhidgetServer(self):
         if not aw.qmc.phidgetServerAdded:
             PhidgetNetwork.addServer("PhidgetServer",aw.qmc.phidgetServerID,aw.qmc.phidgetPort,aw.qmc.phidgetPassword,0)
@@ -33382,7 +33357,7 @@ class serialport(object):
     # this one is reused for the 1045 (IR), the 1051 (1xTC) and TMP1100 (1xTC)
     def PHIDGET1045temperature(self,deviceType=DeviceID.PHIDID_1045,retry=True):
         try:
-            if self.PhidgetIRSensor == None:
+            if not self.PhidgetIRSensor:
                 ser,port = self.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType)
                 if ser:
                     self.PhidgetIRSensor = PhidgetTemperatureSensor()
@@ -33420,12 +33395,12 @@ class serialport(object):
                             pass
                         libtime.sleep(.5)
                     except Exception as ex:
-                        #_, _, exc_tb = sys.exc_info()
-                        #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1045temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
                         try:
-                            if self.PhidgetIRSensor.getAttached():
+                            if self.PhidgetIRSensor and self.PhidgetIRSensor.getAttached():
                                 self.PhidgetIRSensor.close()
-                            if self.PhidgetIRSensorIC.getAttached():
+                            if self.PhidgetIRSensorIC and self.PhidgetIRSensorIC.getAttached():
                                 self.PhidgetIRSensorIC.close()
                         except Exception:
                             pass
@@ -33433,32 +33408,32 @@ class serialport(object):
                         self.Phidget1045value = -1
                         self.PhidgetIRSensorIC = None
             if self.PhidgetIRSensor and self.PhidgetIRSensor.getAttached():
-                    res = -1
-                    ambient = -1
-                    try:
-                        if (deviceType == DeviceID.PHIDID_1045 and aw.qmc.phidget1045_async) or (deviceType != DeviceID.PHIDID_1045 and aw.qmc.phidget1048_async[0]):
-                            if self.Phidget1045value == -1:
-                                self.Phidget1045value = self.PhidgetIRSensor.getTemperature()
-                            probe = self.Phidget1045value
-                        else:
-                            probe = self.PhidgetIRSensor.getTemperature()
-                        if aw.qmc.mode == "F":
-                            probe = aw.qmc.fromCtoF(probe)
-                        res = probe
-                    except Exception:
-                        pass
-                    try:
-                        if self.PhidgetIRSensorIC.getAttached():
-                            ambient = self.PhidgetIRSensorIC.getTemperature()
-                    except Exception:
-                        pass
-                    if ambient == -1:
-                        return -1,-1
+                res = -1
+                ambient = -1
+                try:
+                    if (deviceType == DeviceID.PHIDID_1045 and aw.qmc.phidget1045_async) or (deviceType != DeviceID.PHIDID_1045 and aw.qmc.phidget1048_async[0]):
+                        if self.Phidget1045value == -1:
+                            self.Phidget1045value = self.PhidgetIRSensor.getTemperature()
+                        probe = self.Phidget1045value
                     else:
-                        if deviceType == DeviceID.PHIDID_1045:
-                            return self.phidget1045temp(res,ambient),ambient
-                        else:
-                            return res,ambient
+                        probe = self.PhidgetIRSensor.getTemperature()
+                    if aw.qmc.mode == "F":
+                        probe = aw.qmc.fromCtoF(probe)
+                    res = probe
+                except Exception:
+                    pass
+                try:
+                    if self.PhidgetIRSensorIC and self.PhidgetIRSensorIC.getAttached():
+                        ambient = self.PhidgetIRSensorIC.getTemperature()
+                except Exception:
+                    pass
+                if ambient == -1:
+                    return -1,-1
+                else:
+                    if deviceType == DeviceID.PHIDID_1045:
+                        return self.phidget1045temp(res,ambient),ambient
+                    else:
+                        return res,ambient
             elif retry:
                 libtime.sleep(0.1)
                 return self.PHIDGET1045temperature(deviceType,retry=False)
@@ -33535,7 +33510,7 @@ class serialport(object):
     # works for the 4xTC USB_Phidget 1048 and the 4xTC VINT Phidget TMP1101
     def PHIDGET1048temperature(self,deviceType=DeviceID.PHIDID_1048,mode=0,retry=True):
         try:
-            if self.PhidgetTemperatureSensor == None:
+            if not self.PhidgetTemperatureSensor:
                 ser = None
                 port = None 
                 if mode == 0:
@@ -33763,8 +33738,8 @@ class serialport(object):
             return self.phidget1046getTemperature(i,idx)
 
     def configure1046(self,idx):
-        if self.PhidgetTemperatureSensor and len(self.PhidgetTemperatureSensor) > idx:
-            channel = self.PhidgetTemperatureSensor[idx].getChannel()
+        if self.PhidgetBridgeSensor and len(self.PhidgetBridgeSensor) > idx:
+            channel = self.PhidgetBridgeSensor[idx].getChannel()
             if channel < 4:
                 # set gain
                 try:
@@ -33805,12 +33780,12 @@ class serialport(object):
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4
     def PHIDGET1046temperature(self,mode=0,retry=True):
         try:
-            if aw.ser.PhidgetBridgeSensor == None:
+            if not aw.ser.PhidgetBridgeSensor:
                 ser = None
                 port = None 
                 if mode == 0:
                     # we scan for available main device
-                    ser,port = self.getFirstMatchingPhidget('PhidgetTemperatureSensor',DeviceID.PHIDID_1046)
+                    ser,port = self.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046)
                     if ser != None:
                         aw.ser.Phidget1046_34_serialports.append([ser,port])
                 # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
@@ -33894,7 +33869,7 @@ class serialport(object):
 #--- Phidget IO Binay Output (only one supported for now)
 
     def phidgetBinaryOUTattach(self):
-        if aw.ser.PhidgetBinaryOut == None:
+        if not aw.ser.PhidgetBinaryOut:
             # try to attach up to 8 IO channels of the first Phidget 1010, 1013, 1018, 1019 module
             ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019)
             if ser != None:
@@ -33959,7 +33934,7 @@ class serialport(object):
 #--- Phidget Digital PWM Output (only one supported for now)
 
     def phidgetOUTattach(self):
-        if aw.ser.PhidgetDigitalOut == None:
+        if not aw.ser.PhidgetDigitalOut:
             # try to attach the 4 channels of the Phidget OUT1100 module
             ser,port = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_OUT1100)
             if ser != None:
@@ -34082,7 +34057,7 @@ class serialport(object):
     #  - Phidget IO 2/2/2 (1011): DeviceID.PHIDID_1011
     def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0,retry=True):
         try:
-            if self.PhidgetIO == None:
+            if not self.PhidgetIO:
                 ser = None
                 port = None 
                 if mode == 0:
@@ -34222,7 +34197,7 @@ class serialport(object):
     # mode = 0 for 2x thermocouple model; mode = 1 for 1x PT100 type probe
     def YOCTOtemperatures(self,mode=0):
         try: 
-            if self.YOCTOsensor == None:
+            if not self.YOCTOsensor:
 #                aw.sendmessage(str(YAPI._yApiCLibFile))
                 errmsg=YRefParam()
 #                aw.sendmessage(str(errmsg))
@@ -34262,7 +34237,7 @@ class serialport(object):
 #                    aw.sendmessage("error: " + str(errmsg))
                 try:
                     # already connected YOCTOsensors?
-                    if aw.ser.YOCTOsensor == None:
+                    if not aw.ser.YOCTOsensor:
                         connected_yoctos = []
                     else:
                         connected_yoctos = [aw.ser.YOCTOsensor.get_module().get_serialNumber()]
@@ -37285,7 +37260,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.phidgetBoxRemoteFlag.setChecked(aw.qmc.phidgetRemoteFlag)
         phidgetServerIdLabel = QLabel(QApplication.translate("Label","ServerID", None))
         self.phidgetServerId = QLineEdit(aw.qmc.phidgetServerID)
-        self.phidgetServerId.setMinimumWidth(300)
+        self.phidgetServerId.setMinimumWidth(200)
         phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password", None))
         self.phidgetPassword = QLineEdit(aw.qmc.phidgetPassword)
         self.phidgetPassword.setEchoMode(3)
