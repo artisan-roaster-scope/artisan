@@ -120,7 +120,7 @@ from matplotlib import cm
 #print(QLibraryInfo.location(QLibraryInfo.PluginsPath))
 
 svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
-
+4
 
 from functools import reduce as freduce
 if pyqtversion < 5:
@@ -21851,7 +21851,7 @@ class ApplicationWindow(QMainWindow):
     def mapTree(self,tree,f):
         if isinstance(tree,(list,tuple)):
             return [self.mapTree(e,f) for e in tree]
-        elif isinstance(tree,basestring):
+        elif stringp(tree):
             return f(tree)
         else:
             return tree
@@ -36975,8 +36975,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 changeTriggersCombo.setCurrentIndex(aw.qmc.phidget1048_changeTriggersValues.index(aw.qmc.phidget1048_changeTriggers[i-1]))
             except Exception:
                 pass
-            changeTriggersCombo.setMinimumSize(80,20)
-            changeTriggersCombo.setMaximumSize(100,30)
+            
+#            changeTriggersCombo.setMinimumSize(80,20)
+#            changeTriggersCombo.setMaximumSize(100,30)
+            
+            changeTriggersCombo.setMinimumContentsLength(2)
+            width = changeTriggersCombo.minimumSizeHint().width()
+            changeTriggersCombo.setMinimumWidth(width)
+            changeTriggersCombo.setMaximumWidth(width)
+            
             self.changeTriggerCombos1048.append(changeTriggersCombo)
             phidgetBox1048.addWidget(changeTriggersCombo,3,i)
             asyncFlag = QCheckBox()
@@ -36996,7 +37003,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 probeTypeCombo.setCurrentIndex(aw.qmc.phidget1048_types[i-1]-1)
             except Exception:
                 pass
-            probeTypeCombo.setMaximumSize(55,80)
+                
+#            probeTypeCombo.setMaximumSize(55,80)
+            probeTypeCombo.setMinimumContentsLength(2)
+            width = probeTypeCombo.minimumSizeHint().width()
+            probeTypeCombo.setMinimumWidth(width)
+            probeTypeCombo.setMaximumWidth(width)
+            
             self.probeTypeCombos.append(probeTypeCombo)
             phidgetBox1048.addWidget(probeTypeCombo,1,i)            
             rowLabel = QLabel(str(i))
@@ -37012,8 +37025,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombo1048.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1048_dataRate))
         except Exception:
             pass
-        self.dataRateCombo1048.setMinimumSize(80,20)
-        self.dataRateCombo1048.setMaximumSize(100,30)
+        #self.dataRateCombo1048.setMinimumSize(80,20)
+        #self.dataRateCombo1048.setMaximumSize(100,30)
+        self.dataRateCombo1048.setMinimumContentsLength(2)
+        width = self.dataRateCombo1048.minimumSizeHint().width()
+        self.dataRateCombo1048.setMinimumWidth(width)
+        self.dataRateCombo1048.setMaximumWidth(width)
+        
         phidgetBox1048.addWidget(self.dataRateCombo1048,4,1)
         phidgetBox1048.setSpacing(5)
             
@@ -37094,8 +37112,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 gainCombo.setCurrentIndex(aw.qmc.phidget1046_gain[i-1] - 1)
             except Exception:
                 pass
-            gainCombo.setMinimumSize(80,20)
-            gainCombo.setMaximumSize(100,30)
+
+#            gainCombo.setMinimumSize(80,20)
+#            gainCombo.setMaximumSize(100,30)           
+            gainCombo.setMinimumContentsLength(2)
+            width = gainCombo.minimumSizeHint().width()
+            gainCombo.setMinimumWidth(width)
+            gainCombo.setMaximumWidth(width)
+            
             self.gainCombos1046.append(gainCombo)
             phidgetBox1046.addWidget(gainCombo,1,i)
             
@@ -37109,8 +37133,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 formulaCombo.setCurrentIndex(aw.qmc.phidget1046_formula[i-1])
             except Exception:
                 pass
-            formulaCombo.setMinimumSize(80,20)
-            formulaCombo.setMaximumSize(100,30)
+                
+#            formulaCombo.setMinimumSize(80,20)
+#            formulaCombo.setMaximumSize(100,30)                     
+            formulaCombo.setMinimumContentsLength(2)
+            width = formulaCombo.minimumSizeHint().width()
+            formulaCombo.setMinimumWidth(width)
+            formulaCombo.setMaximumWidth(width)
+                        
             self.formulaCombos1046.append(formulaCombo)
             phidgetBox1046.addWidget(formulaCombo,2,i)
 
@@ -37133,8 +37163,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombo1046.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1046_dataRate))
         except Exception:
             pass
-        self.dataRateCombo1046.setMaximumSize(80,20)
-        self.dataRateCombo1046.setMaximumSize(100,30)
+#        self.dataRateCombo1046.setMaximumSize(80,20)
+#        self.dataRateCombo1046.setMaximumSize(100,30)                 
+        self.dataRateCombo1046.setMinimumContentsLength(2)
+        width = self.dataRateCombo1046.minimumSizeHint().width()
+        self.dataRateCombo1046.setMinimumWidth(width)
+        self.dataRateCombo1046.setMaximumWidth(width)
+            
         phidgetBox1046.addWidget(self.dataRateCombo1046,4,1)
         phidgetBox1046.setSpacing(5)
      
@@ -37186,7 +37221,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 dataRatesCombo.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1018_dataRates[i-1]))
             except Exception:
                 pass
-            dataRatesCombo.setMaximumSize(80,50)
+
+            dataRatesCombo.setMinimumContentsLength(2)
+            width = dataRatesCombo.minimumSizeHint().width()
+            dataRatesCombo.setMinimumWidth(width)
+            dataRatesCombo.setMaximumWidth(width)
+            
             self.dataRateCombos.append(dataRatesCombo)
             phidgetBox1018.addWidget(dataRatesCombo,4,i)
             changeTriggersCombo = QComboBox()
@@ -37200,7 +37240,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1018_changeTriggersValues.index(aw.qmc.phidget1018_changeTriggers[i-1])))
             except Exception:
                 pass
-            changeTriggersCombo.setMaximumSize(80,50)
+            changeTriggersCombo.setMaximumSize(20,50)
+
+            changeTriggersCombo.setMinimumContentsLength(2)
+            width = changeTriggersCombo.minimumSizeHint().width()
+            changeTriggersCombo.setMinimumWidth(width)
+            changeTriggersCombo.setMaximumWidth(width)
+            
             self.changeTriggerCombos.append(changeTriggersCombo)
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
             asyncFlag = QCheckBox()
