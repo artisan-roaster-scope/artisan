@@ -320,7 +320,7 @@ umlaute_dict = {
 }
 
 def toASCII(s):
-    if s == None:
+    if s is None:
         return None
     else:
         utf8_string = u(s)
@@ -336,7 +336,7 @@ def path2url(path):
         
 if sip.getapi('QVariant') == 1:
     def toInt(x):
-        if x == None:
+        if x is None:
             return 0
         else:
             return x.toInt()[0]
@@ -345,17 +345,17 @@ if sip.getapi('QVariant') == 1:
     def toList(x):
         return x.toList()
     def toFloat(x):
-        if x == None:
+        if x is None:
             return 0.
         else:
             return x.toFloat()
     def toDouble(x):
-        if x == None:
+        if x is None:
             return 0.
         else:
             return x.toDouble()
     def toBool(x):
-        if x == None:
+        if x is None:
             return False
         else:
             return x.toBool()
@@ -369,7 +369,7 @@ if sip.getapi('QVariant') == 1:
         return x.toByteArray()
 else:
     def toInt(x):
-        if x == None:
+        if x is None:
             return 0
         else:
             try:
@@ -379,12 +379,12 @@ else:
     def toString(x):
         return u(x)
     def toList(x):
-        if x == None:
+        if x is None:
             return []
         else:
             return list(x)
     def toFloat(x):
-        if x == None:
+        if x is None:
             return 0.
         else:
             try:
@@ -392,7 +392,7 @@ else:
             except:
                 return 0.
     def toDouble(x):
-        if x == None:
+        if x is None:
             return 0.
         else:
             try:
@@ -400,7 +400,7 @@ else:
             except:
                 return 0.
     def toBool(x):
-        if x == None:
+        if x is None:
             return False
         else:
             if sys.version < '3':
@@ -1719,7 +1719,7 @@ class tgraphcanvas(FigureCanvas):
     # update the aw.qmc.deltaspan from the given sampling interval and aw.qmc.deltasamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
     def updateDeltaSamples(self):
-        if self.flagstart or self.profile_sampling_interval == None:
+        if self.flagstart or self.profile_sampling_interval is None:
             interval = self.delay / 1000.
         else:
             interval = self.profile_sampling_interval
@@ -1827,22 +1827,25 @@ class tgraphcanvas(FigureCanvas):
     def ambientTempSourceAvg(self):
         res = None
         if self.ambientTempSource:
-            start = 0
-            end = len(aw.qmc.temp1) - 1
-            if self.timeindex[0] > -1: # CHARGE
-                start = self.timeindex[0]
-            if self.timeindex[6] > 0: # DROP
-                end = self.timeindex[6]
-            if self.ambientTempSource == 1: # from ET
-                res = numpy.mean(aw.qmc.temp1[start:end])
-            elif self.ambientTempSource == 2: # from BT
-                res = numpy.mean(aw.qmc.temp2[start:end])
-            elif self.ambientTempSource > 2 and ((self.ambientTempSource - 3) < (2*len(aw.qmc.extradevices))): 
-                # from an extra device
-                if (self.ambientTempSource)%2==0:
-                    res = numpy.mean(aw.qmc.extratemp2[(self.ambientTempSource - 3)//2][start:end])
-                else:
-                    res = numpy.mean(aw.qmc.extratemp1[(self.ambientTempSource - 3)//2][start:end])
+            try:
+                start = 0
+                end = len(aw.qmc.temp1) - 1
+                if self.timeindex[0] > -1: # CHARGE
+                    start = self.timeindex[0]
+                if self.timeindex[6] > 0: # DROP
+                    end = self.timeindex[6]
+                if self.ambientTempSource == 1: # from ET
+                    res = numpy.mean([e for e in aw.qmc.temp1[start:end] if e != None and e != -1])
+                elif self.ambientTempSource == 2: # from BT
+                    res = numpy.mean([e for e in aw.qmc.temp2[start:end] if e != None and e != -1])
+                elif self.ambientTempSource > 2 and ((self.ambientTempSource - 3) < (2*len(aw.qmc.extradevices))): 
+                    # from an extra device
+                    if (self.ambientTempSource)%2==0:
+                        res = numpy.mean([e for e in aw.qmc.extratemp2[(self.ambientTempSource - 3)//2][start:end] if e != None and e != -1])
+                    else:
+                        res = numpy.mean([e for e in aw.qmc.extratemp1[(self.ambientTempSource - 3)//2][start:end] if e != None and e != -1])
+            except: # the array to average over might get empty and mean thus invoking an exception
+                pass
         if res:
             res = aw.float2float(res)
         return res
@@ -1887,7 +1890,7 @@ class tgraphcanvas(FigureCanvas):
     # -10.1 => -91
     # -11.0 => -100
     def eventsInternal2ExternalValue(self,v):
-        if v == None:
+        if v is None:
             return 0
         elif (v <= 1.0) and (v >= -1.0):
             return 0
@@ -1932,7 +1935,7 @@ class tgraphcanvas(FigureCanvas):
     # the inverse to eventsvalues above (string -> value)
     def str2eventsvalue(self,s):
         st = s.strip()
-        if st == None or len(st) == 0:
+        if st is None or len(st) == 0:
             return -1
         else:
             return self.eventsExternal2InternalValue(float(st))
@@ -2034,13 +2037,13 @@ class tgraphcanvas(FigureCanvas):
 
     def onclick(self,event):
         try:
-            if not self.designerflag and event.inaxes == None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==3:
+            if not self.designerflag and event.inaxes is None and not aw.qmc.flagstart and not aw.qmc.flagon and event.button==3:
                 aw.qmc.statisticsmode = (aw.qmc.statisticsmode + 1)%2
                 aw.qmc.writecharacteristics()
                 aw.qmc.fig.canvas.draw_idle()
             elif event.button==1 and event.inaxes and aw.qmc.crossmarker and not self.designerflag and not self.wheelflag and not aw.qmc.flagon:
                 self.baseX,self.baseY = event.xdata, event.ydata
-                if self.base_horizontalcrossline == None and self.base_verticalcrossline == None:
+                if self.base_horizontalcrossline is None and self.base_verticalcrossline is None:
                     # Mark starting point of click-and-drag with a marker
                     self.base_horizontalcrossline, = self.ax.plot(self.baseX,self.baseY,'r+', markersize=20)
                     self.base_verticalcrossline, = self.ax.plot(self.baseX,self.baseY,'wo', markersize = 2)
@@ -2543,15 +2546,15 @@ class tgraphcanvas(FigureCanvas):
 # delta lines are now drawn on the main ax
     def resetlines(self):
         #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
-        if self.linecount == None:
+        if self.linecount is None:
             self.linecount = self.lenaxlines()
-        if self.deltalinecount == None:
+        if self.deltalinecount is None:
             self.deltalinecount = self.lendeltaaxlines()
         self.ax.lines = self.ax.lines[0:(self.linecount+self.deltalinecount)]
 
 # delta lines are now drawn on the main ax
     def resetdeltalines(self):
-        if self.deltalinecount == None:
+        if self.deltalinecount is None:
             self.deltalinecount = self.lendeltaaxlines()
         if self.delta_ax:
             self.delta_ax.lines = []
@@ -2759,7 +2762,7 @@ class tgraphcanvas(FigureCanvas):
                                 delta = timed
                         else:
                             delta = 1 # don't trigger this one
-                        if reproducing == None and aw.qmc.backgroundReproduce and timed > 0 and timed < self.detectBackgroundEventTime:
+                        if reproducing is None and aw.qmc.backgroundReproduce and timed > 0 and timed < self.detectBackgroundEventTime:
                             #write text message
                             message = "> " + " [" + u(self.Betypesf(self.backgroundEtypes[i]))
                             message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " +  self.stringfromseconds(timed) + " : " + self.backgroundEStrings[i]  
@@ -2818,7 +2821,7 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.replayedBackgroundEvents.append(i)
     
                 #delete existing message
-                if reproducing == None:
+                if reproducing is None:
                     text = u(aw.messagelabel.text())
                     if len(text):
                         if text[0] == ">":
@@ -3249,7 +3252,7 @@ class tgraphcanvas(FigureCanvas):
                     res = -1
                 except IndexError as e:
                     res = -1
-                if res == None:
+                if res is None:
                     return -1
                 
                 else:
@@ -3798,7 +3801,7 @@ class tgraphcanvas(FigureCanvas):
     def decay_smooth_list(self, l, window_len=7, decay_weights=None):
         try:
             if l != None and ((isinstance(l,(numpy.ndarray,numpy.generic)) and l.size) or l) and aw.qmc.deltafilter and not aw.qmc.altsmoothing:
-                if decay_weights == None:
+                if decay_weights is None:
                     decay_weights = numpy.arange(1,window_len+1)
                 else:
                     window_len = len(decay_weights)
@@ -4083,7 +4086,7 @@ class tgraphcanvas(FigureCanvas):
                             next_val = l[j]
                             next_idx = j
                             break
-                    if next_val == None:
+                    if next_val is None:
                         # no further valid values, we append the tail
                         res.extend(l[i:])
                         return res
@@ -4204,7 +4207,7 @@ class tgraphcanvas(FigureCanvas):
                             titleB = self.roastbatchprefixB + u(self.roastbatchnrB) + u(" ") + self.titleB
                         if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
                             titleB = toASCII(titleB)
-                        if self.title == None or u(self.title).strip() == "":
+                        if self.title is None or u(self.title).strip() == "":
                             self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
                                 horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
                         else:
@@ -6941,9 +6944,9 @@ class tgraphcanvas(FigureCanvas):
                 statsprop = aw.mpl_fontproperties.copy()
                 statsprop.set_size("small")
                 if aw.qmc.statisticsmode == 0:
-                    if TP_index == None:
+                    if TP_index is None:
                         TP_index = aw.findTP()
-                    if LP == None:
+                    if LP is None:
                         #find Lowest Point in BT
                         LP = 1000 
                         if TP_index >= 0:
@@ -8836,11 +8839,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage("")
                 self.base_messagevisible = False
             if x and y:
-                if self.l_horizontalcrossline == None:
+                if self.l_horizontalcrossline is None:
                     self.l_horizontalcrossline, = self.ax.plot([self.startofx,self.endofx*2], [y,y],color = self.palette["text"], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
                 else:
                     self.l_horizontalcrossline.set_data([self.startofx,self.endofx*2], [y,y])
-                if self.l_verticalcrossline == None:
+                if self.l_verticalcrossline is None:
                     self.l_verticalcrossline, = self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color = self.palette["text"], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
                 else:
                     self.l_verticalcrossline.set_data([x,x], [self.ylimit_min,self.ylimit])
@@ -8858,11 +8861,11 @@ class tgraphcanvas(FigureCanvas):
             x = event.xdata 
             y = event.ydata
             if x and y and self.delta_ax:
-                if self.l_horizontalcrossline == None:
+                if self.l_horizontalcrossline is None:
                     self.l_horizontalcrossline, = self.delta_ax.plot([self.startofx,self.endofx*2], [y,y], color = self.palette["text"], linestyle = '-', linewidth = .5, alpha = 1.0,sketch_params=None,path_effects=[])
                 else:
                     self.l_horizontalcrossline.set_data([self.startofx,self.endofx*2], [y,y])
-                if self.l_verticalcrossline == None:
+                if self.l_verticalcrossline is None:
                     self.l_verticalcrossline, = self.delta_ax.plot([x,x], [self.zlimit_min,self.zlimit], color = self.palette["text"], linestyle = '-', linewidth = .5, alpha = 1.0,sketch_params=None,path_effects=[])
                 else:
                     self.l_verticalcrossline.set_data([x,x], [self.zlimit_min,self.zlimit])
@@ -9460,7 +9463,7 @@ class SampleThread(QThread):
                         if aw.qmc.deltafilter and not aw.qmc.altsmoothing:
                             user_filter = int(round(aw.qmc.deltafilter/2))
                             if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
-                                if self.decay_weights == None or len(self.decay_weights) != user_filter: # recompute only on changes
+                                if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
                                     self.decay_weights = numpy.arange(1,user_filter+1)
                                 aw.qmc.rateofchange1 = numpy.average(aw.qmc.unfiltereddelta1[-user_filter:],weights=self.decay_weights)
                                 aw.qmc.rateofchange2 = numpy.average(aw.qmc.unfiltereddelta2[-user_filter:],weights=self.decay_weights)
@@ -11674,8 +11677,8 @@ class ApplicationWindow(QMainWindow):
                             d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
                             ld = aw.lastdigitizedvalue[i] # in internal format so 0.8 representing 70%
                             lt = aw.lastdigitizedtemp[i] # last digitized raw value corresponding to ld
-                            if d != None and (ld == None or ld != d):
-                                if ld == None or lt == None or linespacethreshold < abs(t - lt): # and only if significantly different than previous to avoid fluktuation
+                            if d != None and (ld is None or ld != d):
+                                if ld is None or lt is None or linespacethreshold < abs(t - lt): # and only if significantly different than previous to avoid fluktuation
                                     # test if t is increasing or decreasing
                                     v = d * 10.
                                     # establish this one
@@ -11810,7 +11813,7 @@ class ApplicationWindow(QMainWindow):
             for i in range(len(aw.qmc.specialevents)):
                 if aw.qmc.specialeventstype[i] == tp and last_event_idx != None:
                     time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
-                    if min_span == None or time_diff < min_span:
+                    if min_span is None or time_diff < min_span:
                         min_span = time_diff
                 last_event_idx = i
             if min_span != None:
@@ -11919,7 +11922,7 @@ class ApplicationWindow(QMainWindow):
     def colordialog(self,c,noButtons=False,parent=None): # c a QColor
         if platform.system() == 'Darwin':
             if noButtons:
-                if parent == None:
+                if parent is None:
                     parent = self
                 cd = QColorDialog(parent)
                 cd.setOption(QColorDialog.NoButtons,True)
@@ -13118,7 +13121,7 @@ class ApplicationWindow(QMainWindow):
             elif eventtype > 4: # relative values for +/- actions
                 etype = eventtype-5 # the real event type has a offset of 5 in this case
                 p = self.extraeventsactionslastvalue[etype]
-                if p == None:
+                if p is None:
                     new_value = cmdvalue
                 else:
                     new_value = p + cmdvalue
@@ -13999,7 +14002,7 @@ class ApplicationWindow(QMainWindow):
             self.userprofilepath = u(freduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
 
     def ArtisanOpenFilesDialog(self,msg="Select",ext="*",path=None):
-        if path == None:   
+        if path is None:   
             path = self.getDefaultPath()
         if pyqtversion < 5:
             res = QFileDialog.getOpenFileNames(self,msg,path,ext)
@@ -14013,7 +14016,7 @@ class ApplicationWindow(QMainWindow):
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
-        if path == None:   
+        if path is None:   
             path = self.getDefaultPath()        
         if pyqtversion < 5:
             res = u(QFileDialog.getOpenFileName(self,msg,path,ext))
@@ -14026,7 +14029,7 @@ class ApplicationWindow(QMainWindow):
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
-        if path == None:
+        if path is None:
             path = self.getDefaultPath()
         if pyqtversion < 5:
             f = u(QFileDialog.getSaveFileName(self,msg,path,ext))
@@ -14038,7 +14041,7 @@ class ApplicationWindow(QMainWindow):
     #the central ExistingDirectoryDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None),path=None):
-        if path == None:
+        if path is None:
             path = self.getDefaultPath()
         f = u(QFileDialog.getExistingDirectory(self,msg,path))
         self.setDefaultPath(f)
@@ -17150,12 +17153,12 @@ class ApplicationWindow(QMainWindow):
                 if settings.contains("buttonpalette"):
                     self.buttonpalettemaxlen = [min(30,max(6,toInt(x))) for x in toList(settings.value("buttonpalettemaxlen",self.buttonpalettemaxlen))]
                     self.buttonpalette = toList(settings.value("buttonpalette",self.buttonpalette))
-                    if self.buttonpalette == None:
+                    if self.buttonpalette is None:
                         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]] # initialize empty palettes
                     else:
                         self.buttonpalette = self.buttonpalette[:10] # maximal 10 palettes are supported
                     for i in range(len(self.buttonpalette)):
-                        if self.buttonpalette[i] == None:
+                        if self.buttonpalette[i] is None:
                             self.buttonpalette[i] = []
                 for i in range(len(self.extraeventsactionstrings)):
                     self.extraeventsactionstrings[i] = u(self.extraeventsactionstrings[i])
@@ -19550,7 +19553,7 @@ class ApplicationWindow(QMainWindow):
                 cm = u("%.1f/%.1f" % (cp["det"],cp["dbt"])) + uchr(176) + aw.qmc.mode
             else:
                 cm = u("--")
-            if aw.qmc.titleB == None or aw.qmc.titleB == "":
+            if aw.qmc.titleB is None or aw.qmc.titleB == "":
                 background = u("--")
             else:
                 if aw.qmc.roastbatchnrB == 0:
@@ -19965,7 +19968,7 @@ class ApplicationWindow(QMainWindow):
         # try to consider only indices from TP of roast on and not before
         TP = TP_index
         # if TP not yet computed, let's try to compute it
-        if TP == None:
+        if TP is None:
             TP = self.findTP()
         if TP > start and TP < end:
             start = TP
@@ -20109,7 +20112,7 @@ class ApplicationWindow(QMainWindow):
             if t2 > 500:
                 t2 = 0
             ta = (max(0,t1) + max(0,t2)) / 2.0
-            if temp2 == None or len(temp2) < 2 or (i != -1 and len(temp2) < i+1):
+            if temp2 is None or len(temp2) < 2 or (i != -1 and len(temp2) < i+1):
                 return (max(0,ta-base) * dt)
             else:
                 e1 = aw.qmc.convertTemp(temp2[i],aw.qmc.mode,"C")
@@ -20168,7 +20171,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     AUCbegin_idx = 0
 
-                if start == None:
+                if start is None:
                     st = AUCbegin_idx
                 else:
                     st = start
@@ -21090,7 +21093,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.roastdate = QDateTime(QDate.fromString(date.text,"M/d/yyyy"),QTime.fromString(time.text,"h:mm AP"))
   
                 title = root.find("roasttype")
-                if title == None:
+                if title is None:
                     aw.qmc.title = u(os.path.basename(filename))
                 else:
                     aw.qmc.title = u(title.text)
@@ -21102,7 +21105,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.roastertype = u(roaster.text)
                     
                 chargestr = root.find("charge")
-                if chargestr == None:
+                if chargestr is None:
                     chargestr = root.find("chargingcapacity")
                 if chargestr != None: # contains floating point number; default unit Kg
                     try:
@@ -21139,7 +21142,7 @@ class ApplicationWindow(QMainWindow):
                     m = recipedata.get("temp_unit")
                 else:
                     m = None
-                if m == None:
+                if m is None:
                     historydata = tree.find('historydata')
                     if historydata != None:
                         m = historydata.get("temp_unit")
@@ -21160,7 +21163,7 @@ class ApplicationWindow(QMainWindow):
                     diagrampoints = tree.find('recipedata/diagrampoints')
                 else:
                     diagrampoints = None
-                if diagrampoints == None:
+                if diagrampoints is None:
                     diagrampoints = tree.find('historydata')
                 if diagrampoints != None:
                     for elem in diagrampoints.findall("data"):
@@ -21269,7 +21272,7 @@ class ApplicationWindow(QMainWindow):
                                 ip = obj[eventname]
                                 for i in range(len(ip)):
                                     v = ip[i]+1
-                                    if last == None or last != v:
+                                    if last is None or last != v:
                                         aw.qmc.specialevents.append(i)
                                         aw.qmc.specialeventstype.append(j)
                                         aw.qmc.specialeventsvalue.append(v)
@@ -23887,7 +23890,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         
         volumeInGroupLayout = QGroupBox(QApplication.translate("Label","in", None))
         volumeInGroupLayout.setLayout(volumeInVLayout)
-        if weightIn == None:
+        if weightIn is None:
             volumeInGroupLayout.setDisabled(True)
 
         self.resetInVolume()
@@ -23956,7 +23959,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         
         volumeOutGroupLayout = QGroupBox(QApplication.translate("Label","out", None))
         volumeOutGroupLayout.setLayout(volumeOutVLayout)
-        if weightOut == None:
+        if weightOut is None:
             volumeOutGroupLayout.setDisabled(True)
 
         self.resetOutVolume()
@@ -24032,7 +24035,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     def resetInVolume(self):
         try:
             line = self.coffeeinweightEdit.text()
-            if line == None or str(line).strip() == "":
+            if line is None or str(line).strip() == "":
                 self.coffeeinvolume.setText("")
                 self.inVolume = None
             else:
@@ -24044,7 +24047,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     def resetOutVolume(self):
         try:
             line = self.coffeeoutweightEdit.text()
-            if line == None or str(line).strip() == "":
+            if line is None or str(line).strip() == "":
                 self.coffeeoutvolume.setText("")
                 self.outVolume = None
             else:
@@ -28483,10 +28486,10 @@ class EventsDlg(ArtisanDialog):
                         t = temp[ii]
                         if t != -1: # -1 is an error value
                             d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
-                            if d != None and (ld == None or ld != d):
+                            if d != None and (ld is None or ld != d):
                                 # take only changes
                                 # and only if significantly different than previous to avoid fluktuation
-                                if ld == None or lt == None or linespacethreshold < abs(t - lt):
+                                if ld is None or lt is None or linespacethreshold < abs(t - lt):
                                     # establish this one
                                     ld = d
                                     lt = t
@@ -31043,7 +31046,7 @@ class modbusport(object):
             return addr - 30001      
 
     def isConnected(self):
-        return not (self.master == None) and self.master.socket
+        return not (self.master is None) and self.master.socket
         
     def disconnect(self):
         if self.isConnected():
@@ -31057,7 +31060,7 @@ class modbusport(object):
         
         if self.master and not self.master.socket:
             self.master = None
-        if self.master == None:
+        if self.master is None:
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 if self.type == 1: # Serial ASCII
@@ -31258,7 +31261,7 @@ class modbusport(object):
                     res = self.master.read_holding_registers(int(register),2,unit=int(slave))
                 else:
                     res = self.master.read_input_registers(int(register),2,unit=int(slave))
-                if res == None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
+                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
                     if retry > 0:
                         retry = retry - 1
                         #libtime.sleep(0.020)
@@ -31305,7 +31308,7 @@ class modbusport(object):
                         res = self.master.read_input_registers(int(register),1,unit=int(slave))
                 except:
                     res = None
-                if res == None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
+                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
                     if retry > 0:
                         retry = retry - 1
                         #libtime.sleep(0.020)
@@ -31397,12 +31400,12 @@ class extraserialport(object):
             aw.qmc.adderror(timez + " " + error + " Unable to open serial port",exc_tb.tb_lineno)
 
     def closeport(self):
-        if self.SP == None:
+        if self.SP is None:
             self.SP.close()
             libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
 
     def connect(self):
-        if self.SP == None:
+        if self.SP is None:
             try:
                 self.SP = serial.Serial()
                 self.openport()
@@ -33282,11 +33285,11 @@ class serialport(object):
             for p in phidgets:
                 if (p.getIsHubPortDevice() and hub) or p.getDeviceID() == device_id:
                     if p.getIsHubPortDevice() or p.getDeviceClass() == DeviceClass.PHIDCLASS_VINT:
-                        if serial == None or serial > p.getDeviceSerialNumber() or (serial == p.getDeviceSerialNumber() and port > p.getHubPort()):
+                        if serial is None or serial > p.getDeviceSerialNumber() or (serial == p.getDeviceSerialNumber() and port > p.getHubPort()):
                             serial = p.getDeviceSerialNumber()
                             port = p.getHubPort()
                     else:
-                        if serial == None or serial > p.getDeviceSerialNumber():
+                        if serial is None or serial > p.getDeviceSerialNumber():
                             serial = p.getDeviceSerialNumber()
                             port = None
                 p.close()
@@ -37264,7 +37267,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password", None))
         self.phidgetPassword = QLineEdit(aw.qmc.phidgetPassword)
         self.phidgetPassword.setEchoMode(3)
-        self.phidgetPassword.setMinimumWidth(150)
+        self.phidgetPassword.setMinimumWidth(100)
         phidgetPortLabel = QLabel(QApplication.translate("Label","Port", None))
         self.phidgetPort = QLineEdit(str(aw.qmc.phidgetPort))
         self.phidgetPort.setMaximumWidth(70)
@@ -43910,7 +43913,7 @@ class FujiPID(object):
             elif aw.ser.controlETpid[0] == 1:
                 command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
                 v = self.readoneword(command)
-        if v == None:
+        if v is None:
             val = -1
         elif v >= 65236: # -3% to 0%
             val = 0   
@@ -44939,7 +44942,7 @@ class PIDcontrol(object):
     # v is from [-min,max]
     def setEnergy(self,v):
         # only update control signal if different to previous (cache reset by PID_ON)
-        if self.lastEnergy == None or self.lastEnergy != v:
+        if self.lastEnergy is None or self.lastEnergy != v:
             try: 
                 if aw.pidcontrol.pidPositiveTarget:
                     heat = min(100,max(0,int(v)))
