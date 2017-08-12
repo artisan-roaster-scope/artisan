@@ -485,12 +485,12 @@ if sys.platform.startswith("linux"):
     # avoid a GTK bug in Ubuntu Unity
     args = args + ['-style','Cleanlooks']
 if platf == 'Windows':
-  # highDPI support must be set before creating the Application instance
-  try:
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
-  except Exception as e:
-    pass
+    # highDPI support must be set before creating the Application instance
+    try:
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+        QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+    except Exception as e:
+        pass
 app = Artisan(args)
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
