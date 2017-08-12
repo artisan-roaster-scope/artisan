@@ -117,6 +117,9 @@ download Python driver for the actual v22 API
 # pip3 install gevent
  => gevent-1.2.2
 
+you need manually to delete
+ Pthon35\lib\site-packages\gevent\_util_py2.py
+
 16) gevent websockets
 
 # pip3 install gevent_websocket

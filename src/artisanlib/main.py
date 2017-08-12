@@ -60,6 +60,13 @@ else:
 
 import artisanlib.arabic_reshaper
 
+
+try: # activate support for hiDPI screens on Windows
+    if str(platform.system()).startswith("Windows"):
+        os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+except:
+    pass
+
 # needs to be done before any other PyQt import
 import sip
 sip.setapi('QString', 2)
@@ -477,14 +484,26 @@ args = sys.argv
 if sys.platform.startswith("linux"):
     # avoid a GTK bug in Ubuntu Unity
     args = args + ['-style','Cleanlooks']
+if platf == 'Windows':
+  # highDPI support must be set before creating the Application instance
+  try:
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
+  except Exception as e:
+    pass
 app = Artisan(args)
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
-
-
+    try:
+        # activate scaling for hiDPI screen support on Windows
+        app.setAttribute(Qt.AA_EnableHighDpiScaling)
+        if hasattr(QStyleFactory, 'AA_UseHighDpiPixmaps'):
+            app.setAttribute(Qt.AA_UseHighDpiPixmaps)
+    except Exception as e:
+        pass
 
 # platform dependent imports:
 if sys.platform.startswith("darwin"):
@@ -4022,51 +4041,58 @@ class tgraphcanvas(FigureCanvas):
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     def recomputeDeltas(self,timex,timeindex,t1,t2,optimalSmoothing=True):
-        tx = numpy.array(timex)
-        if timeindex[0] > -1:
-            roast_start_idx = timeindex[0]
-        else:
-            roast_start_idx = 0
-        if timeindex[6] > 0:
-            roast_end_idx = timeindex[6]
-        else:
-            roast_end_idx = len(tx)
-        tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
-        with numpy.errstate(divide='ignore'):
-            nt1 = numpy.array(t1[roast_start_idx:roast_end_idx])
-            z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
-        with numpy.errstate(divide='ignore'):
-            nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
-            z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
-        lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
-        # make lists equal in length
-        if lt > ld1:
-            #z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
-            z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
-        if lt > ld2:
-            #z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-            z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
-        if optimalSmoothing:
-            delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
-            delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
-        else:
-            user_filter = int(round(self.deltafilter/2))
-            delta1 = self.decay_smooth_list(z1,window_len=user_filter)
-            delta2 = self.decay_smooth_list(z2,window_len=user_filter)
-                      
-        # add None for parts before and after CHARGE/DROP
-        delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx)))
-        delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))
-        # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
-        if aw.qmc.RoRlimitFlag:
-            # remove values beyond the RoRlimit
-            delta1 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
-            delta2 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
-        if isinstance(delta1, (numpy.ndarray, numpy.generic)):
-            delta1 = delta1.tolist()
-        if isinstance(delta2, (numpy.ndarray, numpy.generic)):
-            delta2 = delta2.tolist()
-        return delta1, delta2
+        try:
+            tx = numpy.array(timex)
+            if timeindex[0] > -1:
+                roast_start_idx = timeindex[0]
+            else:
+                roast_start_idx = 0
+            if timeindex[6] > 0:
+                roast_end_idx = timeindex[6]
+            else:
+                roast_end_idx = len(tx)
+            tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
+            with numpy.errstate(divide='ignore'):
+                nt1 = numpy.array(t1[roast_start_idx:roast_end_idx])
+                z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+            with numpy.errstate(divide='ignore'):
+                nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
+                z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+            lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
+            # make lists equal in length
+            if lt > ld1:
+                #z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+                z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
+            if lt > ld2:
+                #z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
+                z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
+            if optimalSmoothing:
+                delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
+                delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
+            else:
+                user_filter = int(round(self.deltafilter/2))
+                delta1 = self.decay_smooth_list(z1,window_len=user_filter)
+                delta2 = self.decay_smooth_list(z2,window_len=user_filter)
+                          
+            # add None for parts before and after CHARGE/DROP
+            delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx)))
+            delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))
+            # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
+            if aw.qmc.RoRlimitFlag:
+                # remove values beyond the RoRlimit
+                delta1 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
+                delta2 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
+            if isinstance(delta1, (numpy.ndarray, numpy.generic)):
+                delta1 = delta1.tolist()
+            if isinstance(delta2, (numpy.ndarray, numpy.generic)):
+                delta2 = delta2.tolist()
+            return delta1, delta2
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),exc_tb.tb_lineno)
+            return [0]*len(timex),[0]*len(timex)
             
             
     # fills in intermediate interpolated values replacing -1 values based on surrounding values
@@ -13853,9 +13879,8 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[v + <i>nnn</i>]</b></td><td>Quick PID SV</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[f]</b></td><td>Full Screen Mode</td></tr></table>",None))
 
-#        QMessageBox.information(self,QApplication.translate("Message", "Keyboard Shotcuts",None),string)
         msgbox = QMessageBox(self)
-        msgbox.setWindowTitle(QApplication.translate("Message", "Keyboard Shotcuts",None))
+        msgbox.setWindowTitle(QApplication.translate("Message", "Keyboard Shortcuts",None))
         msgbox.setInformativeText(string)
         msgbox.show()
         
@@ -16812,7 +16837,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.hudETpid = [toInt(x) for x in toList(settings.value("hudETpid"))]
             if settings.contains("buttonFlag"):
                 self.qmc.HUDbuttonflag = bool(toBool(settings.value("buttonFlag",self.qmc.HUDbuttonflag)))
-                if not self.qmc.HUDbuttonflag:
+                if self.qmc.HUDbuttonflag:
+                    aw.button_18.setVisible(True)
+                else:
                     aw.button_18.setVisible(False)
             settings.endGroup()
             settings.beginGroup("Style")

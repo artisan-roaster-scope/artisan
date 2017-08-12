@@ -14,7 +14,7 @@ PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 
-os.system(PYTHON35 + r'\Scripts\pylupdate5 artisan.pro')
+#os.system(PYTHON35 + r'\Scripts\pylupdate5 artisan.pro')
 
 a = Analysis(['artisan.py'],
              pathex=[PYQT_QT_BIN, ARTISAN_SRC],
