@@ -3614,7 +3614,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ystep_up = 0
 
                 # reset keyboard mode
-                aw.keyboardmoveindex = 0
+                aw.keyboardmoveindex = 3
                 aw.keyboardmoveflag = 0
                 aw.resetKeyboardButtonMarks()
                 
@@ -13743,9 +13743,10 @@ class ApplicationWindow(QMainWindow):
                 self.keyboardmoveflag = 1
                 # deactivate slider keyboard control
                 self.setSliderFocusPolicy(Qt.NoFocus)
-                self.keyboardmoveindex = 2
                 self.sendmessage(QApplication.translate("Message","Keyboard moves turned ON", None))
-                self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])                
+                self.keyboardmoveindex = self.previousActiveButton(self.keyboardmoveindex)
+#                self.keyboardmoveindex = 1
+#                self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
             elif self.keyboardmoveflag == 1:
                 # turn off 
                 self.keyboardmoveflag = 0
@@ -33283,6 +33284,7 @@ class serialport(object):
             aw.qmc.phidgetServerAdded = False
             
 # returns the serial and port of the attached device with lowest serial/port numbers of the given class and deviceID
+#   as well as a flag indicating if this is a remote channel
 # returned port is None for non VINT devices and serial is None if no matching device is attached
     def getFirstMatchingPhidget(self,phidget_class_name,device_id):
         try:
@@ -33303,12 +33305,7 @@ class serialport(object):
                 if device_id in [DeviceID.PHIDID_HUB0000]:
                     # we are looking for HUB ports
                     hub = 1
-                p.setIsHubPortDevice(hub)
                 if aw.qmc.phidgetRemoteFlag:
-                    p.setIsLocal(False);
-                    p.setIsRemote(True);
-                else:
-                    p.setIsLocal(True);
                     p.setIsRemote(False);
                 p.setOnAttachHandler(attachHandler)
                 p.setOnDetachHandler(detachHandler)
@@ -33335,7 +33332,7 @@ class serialport(object):
 #            traceback.print_exc(file=sys.stdout)            
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " getFirstMatchingPhidget() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return None,None
+            return None,None,False
         
 #---
 
@@ -33405,18 +33402,7 @@ class serialport(object):
                         self.PhidgetIRSensor.setOnAttachHandler(lambda e:self.phidget1045attached(deviceType,e))
                         self.PhidgetIRSensor.setOnDetachHandler(lambda e:self.phidget1045detached(deviceType,e))
                         if aw.qmc.phidgetRemoteFlag:
-                            self.PhidgetIRSensor.setIsLocal(False);
-                            self.PhidgetIRSensor.setIsRemote(True);
-                            self.PhidgetIRSensorIC.setIsLocal(False);
-                            self.PhidgetIRSensorIC.setIsRemote(True);
                             self.addPhidgetServer()
-#                            timeout = 2000
-                        else:
-                            self.PhidgetIRSensor.setIsLocal(True);
-                            self.PhidgetIRSensor.setIsRemote(False);
-                            self.PhidgetIRSensorIC.setIsLocal(True);
-                            self.PhidgetIRSensorIC.setIsRemote(False);
-#                            timeout = 1500
                         if port is not None:
                             self.PhidgetIRSensor.setHubPort(port)
                             self.PhidgetIRSensorIC.setHubPort(port)
@@ -33597,20 +33583,7 @@ class serialport(object):
                             self.PhidgetTemperatureSensor[1].setOnAttachHandler(lambda e:self.phidget1048attached(deviceType,e,1))                        
                             self.PhidgetTemperatureSensor[1].setOnDetachHandler(lambda e:self.phidget1048detached(deviceType,e,1))
                         if aw.qmc.phidgetRemoteFlag:
-                            self.PhidgetTemperatureSensor[0].setIsLocal(False);
-                            self.PhidgetTemperatureSensor[0].setIsRemote(True);
-                            if mode != 2:
-                                self.PhidgetTemperatureSensor[1].setIsLocal(False);
-                                self.PhidgetTemperatureSensor[1].setIsRemote(True);
                             self.addPhidgetServer()
-#                            timeout = 2000
-                        else:
-                            self.PhidgetTemperatureSensor[0].setIsLocal(True);
-                            self.PhidgetTemperatureSensor[0].setIsRemote(False);
-                            if mode != 2:
-                                self.PhidgetTemperatureSensor[1].setIsLocal(True);
-                                self.PhidgetTemperatureSensor[1].setIsRemote(False);
-#                            timeout = 1500
                         if port is not None:
                             self.PhidgetTemperatureSensor[0].setHubPort(port)
                             if mode != 2:
@@ -33841,14 +33814,7 @@ class serialport(object):
                             self.PhidgetBridgeSensor[i].setOnAttachHandler(lambda e:self.phidget1046attached(e,i))
                             self.PhidgetBridgeSensor[i].setOnDetachHandler(lambda e:self.phidget1046detached(e,i))
                             if aw.qmc.phidgetRemoteFlag:
-                                self.PhidgetBridgeSensor[i].setIsLocal(False);
-                                self.PhidgetBridgeSensor[i].setIsRemote(True);
                                 self.addPhidgetServer()
-#                                timeout = 2000
-                            else:
-                                self.PhidgetBridgeSensor[i].setIsLocal(True);
-                                self.PhidgetBridgeSensor[i].setIsRemote(False);
-#                                timeout = 1500                            
                             if port is not None:
                                 self.PhidgetBridgeSensor[i].setHubPort(port)
                             self.PhidgetBridgeSensor[i].setDeviceSerialNumber(ser)
@@ -33915,14 +33881,6 @@ class serialport(object):
             if ser is not None:
                 aw.ser.PhidgetBinaryOut = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]                
                 for i in range(8):
-                    if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetBinaryOut[i].setIsLocal(False);
-                        aw.ser.PhidgetBinaryOut[i].setIsRemote(True);
-#                        timeout = 2000
-                    else:
-                        aw.ser.PhidgetBinaryOut[i].setIsLocal(True);
-                        aw.ser.PhidgetBinaryOut[i].setIsRemote(False);
-#                        timeout = 1500
                     aw.ser.PhidgetBinaryOut[i].setChannel(i)
                     aw.ser.PhidgetBinaryOut[i].setDeviceSerialNumber(ser)
                     try:
@@ -33982,14 +33940,6 @@ class serialport(object):
                 for i in range(4):
                     if port is not None:
                         aw.ser.PhidgetDigitalOut[i].setHubPort(port)
-                    if aw.qmc.phidgetRemoteFlag:
-                        aw.ser.PhidgetDigitalOut[i].setIsLocal(False);
-                        aw.ser.PhidgetDigitalOut[i].setIsRemote(True);
-#                        timeout = 3000
-                    else:
-                        aw.ser.PhidgetDigitalOut[i].setIsLocal(True);
-                        aw.ser.PhidgetDigitalOut[i].setIsRemote(False);
-#                        timeout = 1500
                     aw.ser.PhidgetDigitalOut[i].setChannel(i)
                     aw.ser.PhidgetDigitalOut[i].setDeviceSerialNumber(ser)
                     try:
@@ -34154,18 +34104,7 @@ class serialport(object):
                             self.PhidgetIO[0].setChannel(mode*2)
                             self.PhidgetIO[1].setChannel(mode*2+1)
                         if aw.qmc.phidgetRemoteFlag:
-                            self.PhidgetIO[0].setIsLocal(False);
-                            self.PhidgetIO[0].setIsRemote(True);
-                            self.PhidgetIO[1].setIsLocal(False);
-                            self.PhidgetIO[1].setIsRemote(True);
                             self.addPhidgetServer()
-#                            timeout = 2000
-                        else:
-                            self.PhidgetIO[0].setIsLocal(True);
-                            self.PhidgetIO[0].setIsRemote(False);
-                            self.PhidgetIO[1].setIsLocal(True);
-                            self.PhidgetIO[1].setIsRemote(False);
-#                            timeout = 1500
                         self.PhidgetIO[0].setDeviceSerialNumber(ser)
                         try:
                             self.PhidgetIO[0].open() #.openWaitForAttachment(timeout)
