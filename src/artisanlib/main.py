@@ -13475,7 +13475,15 @@ class ApplicationWindow(QMainWindow):
                             pass
                         aw.qmc.background = True
                         aw.qmc.timealign(redraw=False)
-                        aw.qmc.redraw()             
+                        aw.qmc.redraw()  
+                elif key == 76:                       #L
+                    self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alrm")
+                    if len(u(self.filename)) == 0:
+                        return
+                    try:
+                        aw.loadAlarms(u(self.filename))          
+                    except:
+                        pass
                 elif key == 80:                       #P
                     # switch PID mode
                     if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
@@ -13871,6 +13879,7 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[o]</b></td><td>Retrieve Weight Out from Scale</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[p]</b></td><td>Toggle PID mode</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[h]</b></td><td>Load background profile</td></tr>",None))
+        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[l]</b></td><td>Load alarms</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[+,-]</b></td><td>Inc/dec PID lookahead</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[SHIFT 0-9]</b></td><td>Changes Event Button Palettes</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[;]</b></td><td>Application ScreenShot</td></tr>",None))
