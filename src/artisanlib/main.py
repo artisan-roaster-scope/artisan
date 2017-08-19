@@ -33305,8 +33305,6 @@ class serialport(object):
                 if device_id in [DeviceID.PHIDID_HUB0000]:
                     # we are looking for HUB ports
                     hub = 1
-                if aw.qmc.phidgetRemoteFlag:
-                    p.setIsRemote(False);
                 p.setOnAttachHandler(attachHandler)
                 p.setOnDetachHandler(detachHandler)
                 try:
@@ -33348,14 +33346,21 @@ class serialport(object):
 
     def configure1045(self):
         self.Phidget1045value = -1
-        if aw.qmc.phidget1045_async:
-            self.PhidgetIRSensor.setTemperatureChangeTrigger(aw.qmc.phidget1045_changeTrigger)
-        else:
-            self.PhidgetIRSensor.setTemperatureChangeTrigger(0)
-        if aw.qmc.phidget1045_async:
-            self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
-        else:
-            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e,t:None)
+        if self.PhidgetIRSensor is not None:
+            try:
+                if aw.qmc.phidget1045_async:
+                    self.PhidgetIRSensor.setTemperatureChangeTrigger(aw.qmc.phidget1045_changeTrigger)
+                else:
+                    self.PhidgetIRSensor.setTemperatureChangeTrigger(0)
+            except:
+                pass
+            try:
+                if aw.qmc.phidget1045_async:
+                    self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
+                else:
+                    self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e,t:None)
+            except:
+                pass
             
     def configureOneTC(self):
         self.Phidget1045value = -1
@@ -33514,12 +33519,15 @@ class serialport(object):
                 except Exception:
                     pass
                 # set change trigger
-                if aw.qmc.phidget1048_async[channel]:
-                    self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(aw.qmc.phidget1048_changeTriggers[channel])
-                    self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda e,t: self.phidget1048TemperatureChanged(e,t,idx))
-                else:
-                    self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(0)
-                    self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda e,t:None)
+                try:
+                    if aw.qmc.phidget1048_async[channel]:
+                        self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(aw.qmc.phidget1048_changeTriggers[channel])
+                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda e,t: self.phidget1048TemperatureChanged(e,t,idx))
+                    else:
+                        self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(0)
+                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda e,t:None)
+                except:
+                    pass
                 self.Phidget1048values[channel] = -1
 
     def phidget1048attached(self,deviceType,e,idx):
