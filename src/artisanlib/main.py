@@ -2763,18 +2763,19 @@ class tgraphcanvas(FigureCanvas):
             reproducing = None # index of the event that is currently replaying (surpress other replays in this round)
             #needed when using device NONE
             if len(self.timex):
-                #find time distances
+                #find time or temp distances
+                slider_events = {} # keep event type value pairs to move sliders (but only once per slider and per interval!)
                 for i in range(len(self.backgroundEvents)):
-                    if not i in aw.qmc.replayedBackgroundEvents: # never replay one event twice
+                    if i not in aw.qmc.replayedBackgroundEvents: # never replay one event twice
                         timed = self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.
                         if aw.qmc.replayType == 0: # replay by time
                             delta = timed
-                        elif aw.qmc.replayType == 1: # replay by BT if RoR > 0
+                        elif aw.qmc.replayType == 1: # replay by BT (after TP)
                             if aw.qmc.TPalarmtimeindex:
                                 delta = self.stemp2B[self.backgroundEvents[i]] - self.ctemp2[-1]
                             else: # before TP we switch back to time-based
                                 delta = timed
-                        elif aw.qmc.replayType == 2: # replay by ET (if DeltaET > 0)
+                        elif aw.qmc.replayType == 2: # replay by ET (after TP)
                             if aw.qmc.TPalarmtimeindex:
                                 delta = self.stemp1B[self.backgroundEvents[i]] - self.ctemp1[-1]
                             else: # before TP we switch back to time-based
@@ -2835,10 +2836,17 @@ class tgraphcanvas(FigureCanvas):
                                 (u(self.etypesf(self.backgroundEtypes[i]) == u(self.Betypesf(self.backgroundEtypes[i])))) and \
                                 aw.eventslidervisibilities[self.backgroundEtypes[i]]: #  and aw.eventslideractions[self.backgroundEtypes[i]]
                                 
-                                aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
-                                aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event
                                 aw.qmc.replayedBackgroundEvents.append(i)
-    
+                                slider_events[self.backgroundEtypes[i]] = self.eventsInternal2ExternalValue(self.backgroundEvalues[i]) # add to dict (later overwrite earlier slider moves!)
+                                # we move sliders only after processing all pending events (from the collected dict)
+                                #aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
+                                #aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event     
+                                      
+                # now move the sliders to the new values (if any)     
+                for k in slider_events.keys():
+                    aw.moveslider(k,slider_events[k])
+                    aw.sliderReleased(k,force=True)
+                                
                 #delete existing message
                 if reproducing is None:
                     text = u(aw.messagelabel.text())
@@ -15210,6 +15218,21 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 
+
+    def ensureCorrectExtraDeviceListLenght(self):
+        self.qmc.extraname1 = self.qmc.extraname1[:len(self.qmc.extradevices)]
+        self.qmc.extraname1 = self.qmc.extraname1 + [u"Extra 1"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extraname1))
+        self.qmc.extraname2 = self.qmc.extraname2[:len(self.qmc.extradevices)]
+        self.qmc.extraname2 = self.qmc.extraname2 + [u"Extra 2"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extraname2))
+        self.qmc.extramathexpression1 = self.qmc.extramathexpression1[:len(self.qmc.extradevices)]
+        self.qmc.extramathexpression1 = self.qmc.extramathexpression1 + [u""]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramathexpression1))
+        self.qmc.extramathexpression2 = self.qmc.extramathexpression2[:len(self.qmc.extradevices)]
+        self.qmc.extramathexpression2 = self.qmc.extramathexpression2 + [u""]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramathexpression2))
+        self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:len(self.qmc.extradevices)]
+        self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1 + ["black"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor1))
+        self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
+        self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2 + ["black"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor2)) 
+    
     #called by fileLoad()
     def setProfile(self,filename,profile,quiet=False):
         try:
@@ -15270,15 +15293,17 @@ class ApplicationWindow(QMainWindow):
                     old = self.qmc.extramathexpression2
                     new = [d(x) for x in profile["extramathexpression2"]]
                     self.qmc.extramathexpression2 = (old + new[len(old):])[:len(self.qmc.extraname2)]
-#                if "extramathexpression1" in profile:
-#                    self.qmc.extramathexpression1 = [d(x) for x in profile["extramathexpression1"]] + self.qmc.extramathexpression1[len(profile["extramathexpression1"]):]
-#                if "extramathexpression2" in profile:
-#                    self.qmc.extramathexpression2 = [d(x) for x in profile["extramathexpression2"]] + self.qmc.extramathexpression2[len(profile["extramathexpression2"]):]
                     
                 if "extradevicecolor1" in profile:
                     self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]] + self.qmc.extradevicecolor1[len(profile["extradevicecolor1"]):]
                 if "extradevicecolor2" in profile:
                     self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]] + self.qmc.extradevicecolor2[len(profile["extradevicecolor2"]):]
+                    
+
+                # ensure that extra list length are of the size of the extradevices:
+                self.ensureCorrectExtraDeviceListLenght()                 
+                    
+                    
                 if "extramarkersizes1" in profile:
                     self.qmc.extramarkersizes1 = profile["extramarkersizes1"] + self.qmc.extramarkersizes1[len(profile["extramarkersizes1"]):]
                 else:
@@ -16926,6 +16951,10 @@ class ApplicationWindow(QMainWindow):
                     self.extraCurveVisibility2 = [toBool(x) for x in toList(settings.value("extraCurveVisibility2",self.extraCurveVisibility2))]
             #create empty containers
             settings.endGroup()
+            
+            # ensure that extra list length are of the size of the extradevices:
+            self.ensureCorrectExtraDeviceListLenght()
+            
             #restore curve styles
             settings.beginGroup("CurveStyles")
             if settings.contains("BTlinestyle"):
@@ -26939,12 +26968,15 @@ class WindowsDlg(ArtisanDialog):
         timelocs =   [
                     #QApplication.translate("ComboBox", "30 seconds",None),
                       QApplication.translate("ComboBox", "1 minute",None),
-                      QApplication.translate("ComboBox", "2 minute",None),
-                      QApplication.translate("ComboBox", "3 minute",None),
-                      QApplication.translate("ComboBox", "4 minute",None),
-                      QApplication.translate("ComboBox", "5 minute",None)]
+                      QApplication.translate("ComboBox", "2 minutes",None),
+                      QApplication.translate("ComboBox", "3 minutes",None),
+                      QApplication.translate("ComboBox", "4 minutes",None),
+                      QApplication.translate("ComboBox", "5 minutes",None),
+                      QApplication.translate("ComboBox", "10 minutes",None),
+                      QApplication.translate("ComboBox", "30 minutes",None),
+                      QApplication.translate("ComboBox", "1 hour",None)]
         self.xaxislencombobox.addItems(timelocs)
-        self.timeconversion = [60,120,180,240,300]
+        self.timeconversion = [60,120,180,240,300,600,1800,3600]
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(aw.qmc.xgrid))
         except Exception:
@@ -36427,7 +36459,7 @@ class comportDlg(ArtisanDialog):
                 for i in range(nssdevices):
                     if len(aw.qmc.extradevices) > i:
                         devid = aw.qmc.extradevices[i]
-                        devicename = aw.qmc.devices[devid-1]
+                        devicename = aw.qmc.devices[max(0,devid-1)]
                         if devicename[0] == "+":
                             devname = devicename[1:]
                         else:
@@ -37585,7 +37617,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                         typeComboBox =  QComboBox()
                         typeComboBox.addItems(devices[:])
                         try:
-                            dev_name = aw.qmc.devices[aw.qmc.extradevices[i]-1]
+                            dev_name = aw.qmc.devices[max(0,aw.qmc.extradevices[i]-1)]
                             if dev_name[0] == "+":
                                 dev_name = dev_name[1:]
                             typeComboBox.setCurrentIndex(devices.index(dev_name))
@@ -37714,8 +37746,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.resetlinecountcaches()
             self.enableDisableAddDeleteButtons()
         except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " deldevice(): {0}").format(str(e)),exc_tb.tb_lineno)
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " deldevice(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def resetextradevices(self):
         try:
@@ -37792,8 +37824,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.resetlinecountcaches()
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "delextradevice(): {0}").format(str(ex)),exc_tb.tb_lineno)
 
