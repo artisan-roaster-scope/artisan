@@ -1725,6 +1725,7 @@ class tgraphcanvas(FigureCanvas):
         self.showmet = False
         self.met_annotate = []
         self.extendevents = False
+        self.statssummary = False        
         
         #mouse cross lines measurement 
         self.baseX,self.baseY = None, None
@@ -4959,6 +4960,9 @@ class tgraphcanvas(FigureCanvas):
                             self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
                         if self.timeindex[6]:
                             self.writestatistics(TP_index)
+
+                if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.statssummary >0:
+                    self.statsSummary()
     
 # this seems to mess up the focus if sliders are shown, but mini editor not
 #                    #if recorder on
@@ -5055,6 +5059,108 @@ class tgraphcanvas(FigureCanvas):
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
+
+    #add stats summmary to graph 
+    def statsSummary(self):
+        try:
+            if (aw.qmc.autotimex):
+                aw.autoAdjustAxis()
+                addtox = 0.20 * (aw.qmc.endofx - aw.qmc.startofx)
+                aw.qmc.endofx += addtox  #provide room for the stats
+                self.xaxistosm()
+
+            xdist = 0.80 * (aw.qmc.endofx - aw.qmc.startofx) 
+            ydist = aw.qmc.ylimit - aw.qmc.ylimit_min
+            
+            if aw.qmc.legendloc != 1:
+                # legend not in upper right
+                statsheight = aw.qmc.ylimit - (0.08 * ydist) # standard positioning
+            else:
+                # legend in upper right
+                statsheight = aw.qmc.ylimit - (0.13 * ydist)
+
+            # build roast of the day string
+            if aw.qmc.roastbatchpos != None and aw.qmc.roastbatchpos != 0:
+                roastoftheday = str(aw.qmc.roastbatchpos)
+                if locale == "en":
+                    if aw.qmc.roastbatchpos > 3:
+                        roastoftheday += 'th'
+                    elif aw.qmc.roastbatchpos == 3:
+                        roastoftheday += 'rd'
+                    elif aw.qmc.roastbatchpos == 2:
+                        roastoftheday += 'nd'
+                    elif aw.qmc.roastbatchpos == 1:
+                        roastoftheday += 'st'
+                else:
+                    roastoftheday = '#' + str(aw.qmc.roastbatchpos)
+                roastoftheday += ' ' + QApplication.translate("AddlInfo", "Roast of the Day",None) + '\n'
+            else:
+                roastoftheday = ''
+
+            cp = aw.computedProfileInformation()  # get all the computed proflie information
+            skipline = ' \n'     # simply a \n or whitespace+\n screws up.  No idea why.
+#            skipline = u'\u00b7\n'     # simply a \n or whitespace+\n screws up.  No idea why.
+#            lotsOspaces = '                                                                                              '  # so many spaces should push the dot off the screen
+#            skipline = lotsOspaces + u'.\n'     
+
+            statstr = ''
+            if self.statssummary:   
+                statstr += encodeLocal(aw.qmc.roastdate.date().toString()) + ' '
+                statstr += encodeLocal(aw.qmc.roastdate.time().toString()) + '\n'
+                statstr += roastoftheday
+                if aw.qmc.roastertype:
+                    statstr += str(aw.qmc.roastertype) + '\n'
+                if aw.qmc.ambientTemp != None:
+                    statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '   '
+                if aw.qmc.ambient_humidity != None:
+                    statstr += str(int(aw.qmc.ambient_humidity)) + '% ' + QApplication.translate("AddlInfo", "RH",None)
+                if aw.qmc.ambientTemp != None or aw.qmc.ambient_humidity != None:
+                    statstr += '\n'
+                if aw.qmc.greens_temp or aw.qmc.weight[0]:
+                    statstr += skipline
+                if aw.qmc.greens_temp:
+                    statstr += QApplication.translate("AddlInfo", "Bean Temp", None) + ': ' + str(int(aw.qmc.greens_temp)) + u'\u00b0' + aw.qmc.mode + '   ' + '\n'
+                if aw.qmc.weight[0]:
+                    statstr += QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ str(aw.float2float(aw.qmc.weight[0],2)) + ' ' + aw.qmc.weight[2] + '\n'
+                    if aw.qmc.weight[1]:
+                        statstr += QApplication.translate("AddlInfo", "Wight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%\n"
+
+                if aw.qmc.density[0]:
+                    statstr += skipline
+                    statstr += QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3]) + '\n'
+                    if cp["roasted_density"]:
+                        statstr += QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(-aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%\n"
+
+                if aw.qmc.volume[0]:
+                    statstr += skipline
+                    statstr += QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2]) + '\n'
+                    if cp["volume_gain"]:
+                        statstr += 'Volume Gain: ' + str(aw.float2float(cp["volume_gain"],2)) + "%\n"
+                        
+                if aw.qmc.beansize:
+                    statstr += skipline
+                    statstr += QApplication.translate("AddlInfo", "Bean Size", None) + ': '+ str(aw.qmc.beansize) + 'mm\n'
+
+                if aw.qmc.moisture_greens or aw.qmc.moisture_roasted:
+                    statstr += skipline
+                if aw.qmc.moisture_greens:
+                    statstr += QApplication.translate("AddlInfo", "Moisture Green", None) + ': '+ str(aw.float2float(aw.qmc.moisture_greens,1)) + "%\n"
+                if aw.qmc.moisture_roasted:
+                    statstr +=  QApplication.translate("AddlInfo", "Moisture Roasted", None) + ': '+ str(aw.float2float(aw.qmc.moisture_roasted,1)) + "%\n"
+                    
+                statstr += skipline
+                if aw.qmc.whole_color > 0:
+                    statstr += QApplication.translate("AddlInfo", "Whole Color", None) + ': '+ str(aw.qmc.whole_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx]) + "\n"
+                if aw.qmc.ground_color > 0:
+                    statstr += QApplication.translate("AddlInfo", "Ground Color", None) + ': '+ str(aw.qmc.ground_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx]) + "\n"
+
+#                statstr += lotsOspaces + '\u00b7'
+                    
+                self.ax.text(xdist, statsheight, statstr, verticalalignment='top')
+
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ts() {0}").format(str(e)),exc_tb.tb_lineno)
     
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
@@ -17243,6 +17349,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.showmet = bool(toBool(settings.value("showmet",self.qmc.showmet)))
             if settings.contains("extendevents"):
                 self.qmc.extendevents = bool(toBool(settings.value("extendevents",self.qmc.extendevents)))
+            if settings.contains("statssummary"):
+                self.qmc.statssummary = bool(toBool(settings.value("statssummary")))                
             settings.endGroup()
             
             # recent roasts
@@ -18110,6 +18218,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ExtrasMoreInfo")
             settings.setValue("showmet",self.qmc.showmet)
             settings.setValue("extendevents",self.qmc.extendevents)
+            settings.setValue("statssummary",self.qmc.statssummary)  #dave12            
             settings.endGroup()
             try:
                 settings.setValue("appearance",str(aw.style().objectName()).lower())
@@ -18202,6 +18311,7 @@ class ApplicationWindow(QMainWindow):
         extras["Beep"]= str(self.soundflag)
         extras["showmet"]= str(self.qmc.showmet)
         extras["extendevents"]= str(self.qmc.extendevents)
+        extras["statssummary"]= str(self.qmc.statssummary)
         axes["xmin"]= str(self.qmc.startofx)
         axes["xmax"]= str(self.qmc.endofx)
         axes["ymax"]= str(self.qmc.ylimit)
@@ -22867,12 +22977,16 @@ class HUDDlg(ArtisanDialog):
         self.ExtendEvents = QCheckBox(QApplication.translate("CheckBox", "Extend Events to drop/cool\n(only when Bars=Value)",None))
         self.ExtendEvents.setChecked(aw.qmc.extendevents)
         self.ExtendEvents.stateChanged.connect(self.changeExtendEvents)         #toggle        
+        #show stats summary 
+        self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Show Statistics Summary",None))
+        self.ShowStatsSummary.setChecked(aw.qmc.statssummary)
+        self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle        
         specialEventsLayout = QHBoxLayout()
         specialEventsLayout.addWidget(self.ExtendEvents)
-        moreInfoLayout = QHBoxLayout()
-        moreInfoLayout.addWidget(self.ShowMet)
-        moreInfoLayout.addStretch()
-        moreInfoLayout.addWidget(self.ExtendEvents)
+        moreInfoLayout = QGridLayout()
+        moreInfoLayout.addWidget(self.ShowMet,0,0)
+        moreInfoLayout.addWidget(self.ExtendEvents,0,1)
+        moreInfoLayout.addWidget(self.ShowStatsSummary,1,0)
         moreinfoGroupWidget = QGroupBox(QApplication.translate("GroupBox","More Info",None))
         moreinfoGroupWidget.setLayout(moreInfoLayout)
         tab6Layout = QVBoxLayout()
@@ -23758,6 +23872,13 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.extendevents = not aw.qmc.extendevents
         aw.qmc.redraw(recomputeAllDeltas=False)
                 
+    def changeStatsSummary(self):
+        aw.qmc.statssummary = not aw.qmc.statssummary
+        # IF Auto is set for the axis the recompute it
+        if aw.qmc.autotimex and not aw.qmc.statssummary:
+            aw.autoAdjustAxis()
+        aw.qmc.redraw(recomputeAllDeltas=False)                
+                        
     def closeEvent(self,_):
         self.close()
         
@@ -37748,6 +37869,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         except Exception as e:
 #            _, _, exc_tb = sys.exc_info()
 #            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " deldevice(): {0}").format(str(e)),exc_tb.tb_lineno)
+            pass
 
     def resetextradevices(self):
         try:
