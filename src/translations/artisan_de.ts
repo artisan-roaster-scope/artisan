@@ -1862,6 +1862,11 @@ END</source>
         <translation>CENTER306temperature(): {0} bytes empfangen aber 10 benötigt</translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="33135"/>
+        <source>VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed</source>
+        <translation>VOLTCRAFTPL125T2temperature(): {0} bytes empfangen aber 26 benötigt</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="31990"/>
         <source>DTAcommand(): {0} bytes received but 15 needed</source>
         <translation>DTAcommand(): {0} bytes empfangen aber 15 benötigt</translation>

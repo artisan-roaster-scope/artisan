@@ -30,7 +30,7 @@ o ET/BT logging and PID control supporting the following devices
  - Modbus Serial ASCII/RTU/Binary, TCP and UDP
  - Omega HH309, HH506RA, HH802U, HH806AU, HHM28
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
- - VOLTCRAFT K201, K202, K204, 300K, 302KJ
+ - VOLTCRAFT K201, K202, K204, 300K, 302KJ, PL-125-T2
  - EXTECH 421509
  - Arduino/TC4 with PID
  - TE VA18B

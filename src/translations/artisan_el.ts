@@ -1988,6 +1988,11 @@ END</source>
         <translation type="unfinished">CENTER306θερμο():{0}bytes εληφθη αλλα χρειζει10</translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="33135"/>
+        <source>VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed</source>
+        <translation type="unfinished">VOLTCRAFTPL125T2θερμο():{0}bytes εληφθη αλλα χρειζει 26</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="33294"/>
         <source>CENTER309temperature(): {0} bytes received but 45 needed</source>
         <translation type="unfinished">CENTER309θερμο():{0}bytes εληφθη αλλα χρειζει45</translation>

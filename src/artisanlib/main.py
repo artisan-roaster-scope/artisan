@@ -967,7 +967,8 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget HUB0000 IO",    #63
                        "+Phidget HUB0000 IO 34",#64
                        "+Phidget HUB0000 IO 56",#65
-                       "-Omega HH806W"          #66 NOT WORKING 
+                       "-Omega HH806W",          #66 NOT WORKING 
+                       "VOLTCRAFT PL-125-T2" #67
                        ]
 
         #extra devices
@@ -31912,6 +31913,7 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_34, #64
                                    self.PHIDGET_HUB0000_56, #65
                                    self.HH806W,             #66
+                                   self.VOLTCRAFTPL125T2,#67
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -32425,6 +32427,11 @@ class serialport(object):
     def VOLTCRAFT302KJ(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.CENTER303temperature()
+        return tx,t2,t1
+
+    def VOLTCRAFTPL125T2(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.VOLTCRAFTPL125T2temperature()
         return tx,t2,t1
 
     def EXTECH421509(self):
@@ -33271,6 +33278,55 @@ class serialport(object):
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER303 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+
+
+    def VOLTCRAFTPL125T2temperature(self,retry=2):
+        try:
+            command = bytearray([244, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            r = ""
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write(command)
+                self.SP.flush()
+                libtime.sleep(.05)
+                r = self.SP.read(26)
+                if len(r) == 26 and hex2int(r[0],r[1]) == 43605: # filter out bad/strange data
+                    #extract T1
+                    T1 = hex2int(r[19],r[18])/10. # select byte 19 and 18
+                    #extract T2
+                    T2 = hex2int(r[21],r[20])/10.# select byte 21 and 20 
+                    return T1,T2
+                else:
+                    if retry:
+                        return self.VOLTCRAFTPL125T2temperature(retry=retry-1)
+                    else:
+                        nbytes = len(r)
+                        error = QApplication.translate("Error Message","VOLTCRAFTPL125T2temperature(): {0} bytes received but 10 needed",None).format(nbytes)
+                        timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
+                        _,_, exc_tb = sys.exc_info()
+                        aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+                        return -1,-1
+            else:
+                return -1,-1
+        except serial.SerialException:
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " VOLTCRAFTPL125T2temperature()"
+            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " VOLTCRAFTPL125T2temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+        finally:
+            self.closeport()
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("VOLTCRAFTPL125T2 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+
 
     def CENTER306temperature(self,retry=2):
         try:
@@ -38235,6 +38291,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}, which is equivalent to CENTER 306. Now, chose serial port", None).format(meter)
+                elif meter == "VOLTCRAFT PL-125-T2":
+                    aw.qmc.device = 67
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1.0
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 elif meter == "VOLTCRAFT 300K":
                     aw.qmc.device = 13
                     #aw.ser.comport = "COM4"
@@ -38593,7 +38658,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 63
                 1, # 64
                 1, # 65
-                8] # 66
+                8,  #66
+                3] # 67
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
