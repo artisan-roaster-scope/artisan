@@ -33301,13 +33301,14 @@ class serialport(object):
                     return T1,T2
                 else:
                     if retry:
+                        libtime.sleep(.05)
                         return self.VOLTCRAFTPL125T2temperature(retry=retry-1)
                     else:
                         nbytes = len(r)
-                        error = QApplication.translate("Error Message","VOLTCRAFTPL125T2temperature(): {0} bytes received but 10 needed",None).format(nbytes)
+                        error = QApplication.translate("Error Message","VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed",None).format(nbytes)
                         timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
                         _,_, exc_tb = sys.exc_info()
-                        aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+                        aw.qmc.adderror(timez + " " + error)
                         return -1,-1
             else:
                 return -1,-1
