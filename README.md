@@ -38,7 +38,7 @@ Features
   * Omega HH309, HH506RA, HH802U, HH806AU, HHM28
   * General Tools DT309DL
   * CENTER 300, 301, 302, 303, 304, 305, 306, 309
-  * VOLTCRAFT K201, K202, K204, 300K, 302KJ
+  * VOLTCRAFT K201, K202, K204, 300K, 302KJ, PL-125-T2
   * EXTECH 755, 421509
   * Apollo DT301
   * [Arduino TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) with PID ([serial protocol](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan/trunk/src/aArtisan/commands.txt))

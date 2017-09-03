@@ -1995,6 +1995,11 @@ RESFRIA</translation>
         <translation type="unfinished">CENTER306temperature(): recebidos {0} bytes mas são necessários 10</translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="33135"/>
+        <source>VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed</source>
+        <translation type="unfinished">VOLTCRAFTPL125T2temperature(): recebidos {0} bytes mas são necessários 26</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="33294"/>
         <source>CENTER309temperature(): {0} bytes received but 45 needed</source>
         <translation type="unfinished">CENTER309temperature(): recebidos {0} bytes mas são necessários 45</translation>

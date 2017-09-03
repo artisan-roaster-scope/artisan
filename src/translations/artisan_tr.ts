@@ -1988,6 +1988,11 @@ END</source>
         <translation type="unfinished">CENTER306 derecesi(): {0} bayt teslim oldu fakat 10 lazım</translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="33135"/>
+        <source>VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed</source>
+        <translation type="unfinished">VOLTCRAFTPL125T2 derecesi(): {0} bayt teslim oldu fakat 26 lazım</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="33294"/>
         <source>CENTER309temperature(): {0} bytes received but 45 needed</source>
         <translation type="unfinished">CENTER309 derecesi(): {0} bayt teslim oldu fakat 45 lazım</translation>
