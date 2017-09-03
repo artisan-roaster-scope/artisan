@@ -37867,9 +37867,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.resetlinecountcaches()
             self.enableDisableAddDeleteButtons()
         except Exception as e:
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " deldevice(): {0}").format(str(e)),exc_tb.tb_lineno)
-            pass
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " deldevice(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def resetextradevices(self):
         try:
