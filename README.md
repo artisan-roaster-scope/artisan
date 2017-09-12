@@ -45,13 +45,25 @@ Features
   * TE VA18B
   * HHM28 multimeter
   * Amprobe TMD-56 (non-wireless)
-  * Phidgets 1010, 1011, 1018, 1019, 1045, 1046, 1048, 1051, 1073
+  * [Phidget IR 1045](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=34)
+  * Phidget TC
+     - 4x: [1048](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=38), VINT [TMP1101](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=726)
+     - 1x: [1051](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=43)
+     - 1x isolated: VINT [TMP1100](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=725)
+  * Phidget RTD
+     - 4x: [1046](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=35) (bridge needed)
+     - 1x: VINT [TMP1200](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=968)
+  * Phidget IO
+      - 8x analog in, 8x digital out: [1010](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=3), [1013](https://www.phidgets.com/?tier=3&prodid=8), [1018](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=18), [1019](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=20), [1073](https://www.phidgets.com/?tier=3&catid=1&pcid=0&prodid=69)
+      - 6x analog in, 6x digital out: VINT [HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643)
+      - 4x digital PWM out: VINT [OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714)
+      - 2x analog in, 2x digital out: [1011](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=4)
   * Mastech MS6514
-  * Yocto Thermocouple and PT100
-  * [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html)
+  * Yocto [Thermocouple](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-thermocouple) and [PT100](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-pt100)
   * external program
 - and machines
   * [Probat Probatone 2](https://artisan-roasterscope.blogspot.de/2017/06/probat-probatone.html)
+  * [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html)
 - multi-format (import and export of various file formats: HTML, PDF, SVG, CSV, JSON, Omega HH506RA, K202, K204, [RoastLogger](http://roastlogger.co.uk/coffee/roastlogger/roastlogger.htm), [Probat Pilot](http://www.probat-shoproaster.com/en/plants-equipment/control-software/general-features/), [Aillio Bullet R1](https://aillio.com))
 - unlimited number of temperature and [virtual curves](https://artisan-roasterscope.blogspot.de/2014/04/virtual-devices-and-symbolic-assignments.html) incl. rate-of-rise curves for ET and BT
 - [spike filter](http://artisan-roasterscope.blogspot.de/2013/05/fighting-spikes.html) and [curve smoothing](https://artisan-roasterscope.blogspot.de/2014/01/sampling-interval-smoothing-and-rate-of.html)
@@ -74,7 +86,7 @@ Features
 - [volume calculator](https://artisan-roasterscope.blogspot.de/2014/11/batch-volume-and-bean-density.html)
 - [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html)
 - [roast, production (for tax reporting) and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html)
-- PID-based roast reproduction (follow background mode)
+- [PID-based roast reproduction (follow background mode)](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html)
 - [software PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html)
 - [Area under the Curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html)
 
@@ -123,10 +135,10 @@ Version History
 | v0.9.6 | 20.07.2015 | Bug fixes |
 | v0.9.5 | 06.07.2015 | [Batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html), app settings export/import, bug fixes (last Windows Celeron and Mac OS X 10.6 version)|
 | v0.9.4 | 06.06.2015 | Bug fixes |
-| v0.9.3 | 15.05.2015 | Phidget 1051, [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html), one extra background curve, bug fixes |
+| v0.9.3 | 15.05.2015 | Phidget [1051](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=43), [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html), one extra background curve, bug fixes |
 | v0.9.2 | 16.01.2015 | Bug fixes |
 | v0.9.1 | 03.01.2015 | [Acaia](http://acaia.co/) scale support, QR code, bug fixes |
-| v0.9.0 | 17.11.2014 | MODBUS ASCII/TCP/UDP, Yocto TC and PT100, Phidget 1045 IR, Phidget 1046 Wheatstone Bridge wiring, Phidgets async mode, Polish translations, [LargeLCDs, WebLCDs](https://artisan-roasterscope.blogspot.de/2016/03/lcds.html), 2nd set of roast phases, [volume calculator](https://artisan-roasterscope.blogspot.de/2014/11/batch-volume-and-bean-density.html), moisture loss and organic loss, container tare, RoR delta span, [phasesLCDs showing Rao's development ratio](https://artisan-roasterscope.blogspot.de/2017/02/roast-phases-statistics-and-phases-lcds.html) |
+| v0.9.0 | 17.11.2014 | MODBUS ASCII/TCP/UDP, Yocto [Thermocouple](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-thermocouple) and [PT100](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-pt100), Phidget 1045 IR, Phidget 1046 Wheatstone Bridge wiring, Phidgets async mode, Polish translations, [LargeLCDs, WebLCDs](https://artisan-roasterscope.blogspot.de/2016/03/lcds.html), 2nd set of roast phases, [volume calculator](https://artisan-roasterscope.blogspot.de/2014/11/batch-volume-and-bean-density.html), moisture loss and organic loss, container tare, RoR delta span, [phasesLCDs showing Rao's development ratio](https://artisan-roasterscope.blogspot.de/2017/02/roast-phases-statistics-and-phases-lcds.html) |
 | v0.8.0 | 25.05.2014 | Phidget IO, Phidget remote, Arduino TC4 PID, Mastech MS6514 |
 | v0.7.5 | 06.04.2014 | Bug fixes |
 | v0.7.4 | 13.01.2014 | Bug fixes |
@@ -139,7 +151,7 @@ Version History
 | v0.5.2 | 23.07.2011 | Delta DTA PID support, automatic CHARGE/DROP |
 | v0.5.0 | 10.06.2011 | HHM28, wheel graph, math plotter, multiple and [virtual devices, symbolic expressions](https://artisan-roasterscope.blogspot.de/2014/04/virtual-devices-and-symbolic-assignments.html), [custom buttons](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html) |
 | v0.4.0 | 10.04.2011 | Localization, events replay, [alarms](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html), profile designer |
-| v0.3.4 | 28.02.2011 | Arduino TC4, TE VA18B, delta filter |
+| v0.3.4 | 28.02.2011 | [Arduino TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html), TE VA18B, delta filter |
 | v0.3.3 | 13.02.2011 | Fuji PXR5/PXG5, manual device, keyboard shortcuts, Linux |
 | v0.3.0 | 11.01.2011 | New profile file format |
 | v0.2.0 | 31.12.2010 | CENTER 300, 301, 302, 303, 304, 305, 306, VOLTCRAFT K202, K204 300K, 302KJ, EXTECH 421509 |

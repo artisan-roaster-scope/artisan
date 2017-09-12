@@ -1132,7 +1132,8 @@ class tgraphcanvas(FigureCanvas):
         self.xtcurveidx = 0 # the selected extra background courve to be displayed
         self.delta1B,self.delta2B = [],[]
         self.timeindexB = [-1,0,0,0,0,0,0,0]
-        self.TP_time_B = -1
+        self.TP_time_B = -1 # the time in seconds the backgrounds TP should be placed (originally retrieved from file, see TP_time_B_loaded)
+        self.TP_time_B_loaded = -1 # the time in seconds the background TP happend. While TP_time_B changes if background is moved, TP_time_b_loaded does not change and should be used for display
         self.backgroundEvents = [] #indexes of background events
         self.backgroundEtypes = []
         self.backgroundEvalues = []
@@ -2103,10 +2104,11 @@ class tgraphcanvas(FigureCanvas):
                                 if self.timeindex[i] and self.timeindex[i] != -1:
                                     idx_after = self.timeindex[i]
                             if ((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after):
-                                ac = QAction(menu)
-                                ac.key = (k[1],timex)
-                                ac.setText(" " + k[0])
-                                menu.addAction(ac)
+                                if not self.flagstart or (k[1] == 0 and self.timeindex[0] > -1) or (k[1] != 0 and self.timeindex[k[1]] != 0): # only add menu item during recording if already a value is set (via a button)
+                                    ac = QAction(menu)
+                                    ac.key = (k[1],timex)
+                                    ac.setText(" " + k[0])
+                                    menu.addAction(ac)
                         # add user EVENT entry
                         ac = QAction(menu)
                         ac.setText(u(" ") + u(QApplication.translate("Label", "EVENT")))
@@ -3566,7 +3568,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_1.setText(QApplication.translate("Button", "ON",None))
                 aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
                 aw.button_2.setText(QApplication.translate("Button", "START",None))
-                aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
+                aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
                 
                 # quantification is blocked if lock_quantification_sampling_ticks is not 0
                 # (eg. after a change of the event value by button or slider actions)
@@ -3628,11 +3630,12 @@ class tgraphcanvas(FigureCanvas):
                 aw.keyboardmoveflag = 0
                 aw.resetKeyboardButtonMarks()
                 
-                if not self.locktimex:
-                    self.startofx = 0
-                else:
-                    self.startofx = self.locktimex_start
-                    self.endofx = self.resetmaxtime
+                if not (aw.qmc.autotimex and aw.qmc.background):
+                    if not self.locktimex:
+                        self.startofx = 0
+                    else:
+                        self.startofx = self.locktimex_start
+                        self.endofx = self.resetmaxtime
                 if self.endofx < 1:
                     self.endofx = 60
 
@@ -3873,7 +3876,7 @@ class tgraphcanvas(FigureCanvas):
                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
         return [temp_anno, time_anno]
 
-    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,path_effects=None,TP_time=-1):
+    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,path_effects=None,TP_time=-1,TP_time_loaded=-1):
         ystep_down = ystep_up = 0
         anno_artists = []
         #Add markers for CHARGE
@@ -3913,7 +3916,7 @@ class tgraphcanvas(FigureCanvas):
                     TP_index = self.backgroundtime2index(TP_time) + timeindex[0]
                     
                     TP_time = TP_time - t0
-                    st1 = aw.arabicReshape("{0}",u(self.stringfromseconds(TP_time,False)))
+                    st1 = aw.arabicReshape("{0}",u(self.stringfromseconds(TP_time_loaded,False)))
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a)                    
                 #Add Dry End markers
                 if timeindex[1]:
@@ -4590,7 +4593,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 startB = 0
                         try:
-                            self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex,TP_time=self.TP_time_B)
+                            self.place_annotations(-1,d,self.timeB,self.timeindexB,self.temp2B,self.stemp2B,startB,self.timex,self.timeindex,TP_time=self.TP_time_B,TP_time_loaded=self.TP_time_B_loaded)
                         except Exception:
                             pass
 #                            import traceback
@@ -10815,9 +10818,9 @@ class ApplicationWindow(QMainWindow):
 
         if locale == "es":
             self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
-                                     "STOP":"QPushButton {font-size: 12pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                     "STOP":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}",
                                      "START":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}",
-                                     "OFF":"QPushButton {font-size: 12pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                     "OFF":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #43d300}",
                                      "ON":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }",
                                      "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
                                      "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
@@ -10839,9 +10842,9 @@ class ApplicationWindow(QMainWindow):
                                      }
         else:
             self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
-                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
                                      "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
-                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #43d300}",
                                      "ON":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red }",
                                      "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
                                      "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
@@ -14401,6 +14404,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     try:
                         self.qmc.TP_time_B = profile["computed"]["TP_time"]
+                        self.qmc.TP_time_B_loaded = profile["computed"]["TP_time"]
                     except:
                         if (self.qmc.extratimexB) > 0:
                             self.qmc.TP_time_B = 0
@@ -15774,8 +15778,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.titleB = ""
                     self.qmc.roastbatchnrB = 0
                     self.qmc.roastbatchprefixB = u("")
-                    self.qmc.roastbatchposB = 1
-                    
+                    self.qmc.roastbatchposB = 1                    
             aw.autoAdjustAxis()
                     
             return True
@@ -20454,7 +20457,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
-        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat<br>")
+        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -20909,6 +20912,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.timeindexB = [-1,0,0,0,0,0,0,0]
         self.qmc.backmoveflag = 1
         self.qmc.TP_time_B = -1
+        self.qmc.TP_time_B_loaded = -1
         self.qmc.AUCbackground = -1
 
     def switchETBT(self):
@@ -31913,7 +31917,7 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_34, #64
                                    self.PHIDGET_HUB0000_56, #65
                                    self.HH806W,             #66
-                                   self.VOLTCRAFTPL125T2,#67
+                                   self.VOLTCRAFTPL125T2,   #67
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
