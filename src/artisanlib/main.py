@@ -5073,8 +5073,10 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.endofx += addtox  #provide room for the stats
                 self.xaxistosm()
 
-            xdist = 0.80 * (aw.qmc.endofx - aw.qmc.startofx) 
-            ydist = aw.qmc.ylimit - aw.qmc.ylimit_min
+            if platf == 'Windows':
+                xdist = 0.80 * (aw.qmc.endofx - aw.qmc.startofx)
+            else:
+                xdist = 0.75*(aw.qmc.endofx - aw.qmc.startofx) 
             
             if aw.qmc.legendloc != 1:
                 # legend not in upper right
@@ -5114,11 +5116,11 @@ class tgraphcanvas(FigureCanvas):
                 statstr += roastoftheday
                 if aw.qmc.roastertype:
                     statstr += str(aw.qmc.roastertype) + '\n'
-                if aw.qmc.ambientTemp != None:
+                if aw.qmc.ambientTemp not in [None,0]:
                     statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '   '
-                if aw.qmc.ambient_humidity != None:
+                if aw.qmc.ambient_humidity not in [None,0]:
                     statstr += str(int(aw.qmc.ambient_humidity)) + '% ' + QApplication.translate("AddlInfo", "RH",None)
-                if aw.qmc.ambientTemp != None or aw.qmc.ambient_humidity != None:
+                if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [0, None]:
                     statstr += '\n'
                 if aw.qmc.greens_temp or aw.qmc.weight[0]:
                     statstr += skipline
@@ -5160,8 +5162,8 @@ class tgraphcanvas(FigureCanvas):
 
 #                statstr += lotsOspaces + '\u00b7'
                     
-                self.ax.text(xdist, statsheight, statstr, verticalalignment='top')
-
+                self.ax.text(xdist, statsheight, statstr.strip(), verticalalignment='top')
+                
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ts() {0}").format(str(e)),exc_tb.tb_lineno)
