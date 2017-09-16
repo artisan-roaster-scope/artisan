@@ -5076,7 +5076,8 @@ class tgraphcanvas(FigureCanvas):
             if platf == 'Windows':
                 xdist = 0.80 * (aw.qmc.endofx - aw.qmc.startofx)
             else:
-                xdist = 0.75*(aw.qmc.endofx - aw.qmc.startofx) 
+                xdist = 0.75*(aw.qmc.endofx - aw.qmc.startofx)
+            ydist = aw.qmc.ylimit - aw.qmc.ylimit_min
             
             if aw.qmc.legendloc != 1:
                 # legend not in upper right
@@ -5087,7 +5088,7 @@ class tgraphcanvas(FigureCanvas):
 
             # build roast of the day string
             if aw.qmc.roastbatchpos != None and aw.qmc.roastbatchpos != 0:
-                roastoftheday = str(aw.qmc.roastbatchpos)
+                roastoftheday = '\n' + str(aw.qmc.roastbatchpos)
                 if locale == "en":
                     if aw.qmc.roastbatchpos > 3:
                         roastoftheday += 'th'
@@ -5099,7 +5100,7 @@ class tgraphcanvas(FigureCanvas):
                         roastoftheday += 'st'
                 else:
                     roastoftheday = '#' + str(aw.qmc.roastbatchpos)
-                roastoftheday += ' ' + QApplication.translate("AddlInfo", "Roast of the Day",None) + '\n'
+                roastoftheday += ' ' + QApplication.translate("AddlInfo", "Roast of the Day",None)
             else:
                 roastoftheday = ''
 
@@ -5112,24 +5113,22 @@ class tgraphcanvas(FigureCanvas):
             statstr = ''
             if self.statssummary:   
                 statstr += encodeLocal(aw.qmc.roastdate.date().toString()) + ' '
-                statstr += encodeLocal(aw.qmc.roastdate.time().toString()) + '\n'
+                statstr += encodeLocal(aw.qmc.roastdate.time().toString())
                 statstr += roastoftheday
                 if aw.qmc.roastertype:
-                    statstr += str(aw.qmc.roastertype) + '\n'
+                    statstr += '\n' + str(aw.qmc.roastertype)
                 if aw.qmc.ambientTemp not in [None,0]:
-                    statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '   '
+                    statstr += '\n' + str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode
                 if aw.qmc.ambient_humidity not in [None,0]:
-                    statstr += str(int(aw.qmc.ambient_humidity)) + '% ' + QApplication.translate("AddlInfo", "RH",None)
-                if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [0, None]:
-                    statstr += '\n'
-                if aw.qmc.greens_temp or aw.qmc.weight[0]:
-                    statstr += skipline
+                    statstr +=  '   ' + str(int(aw.qmc.ambient_humidity)) + '% ' + QApplication.translate("AddlInfo", "RH",None)
+#                if aw.qmc.greens_temp or aw.qmc.weight[0]:
+#                    statstr += skipline
                 if aw.qmc.greens_temp:
-                    statstr += QApplication.translate("AddlInfo", "Bean Temp", None) + ': ' + str(int(aw.qmc.greens_temp)) + u'\u00b0' + aw.qmc.mode + '   ' + '\n'
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Bean Temp", None) + ': ' + str(int(aw.qmc.greens_temp)) + u'\u00b0' + aw.qmc.mode
                 if aw.qmc.weight[0]:
-                    statstr += QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ str(aw.float2float(aw.qmc.weight[0],2)) + ' ' + aw.qmc.weight[2] + '\n'
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ str(aw.float2float(aw.qmc.weight[0],2)) + ' ' + aw.qmc.weight[2]
                     if aw.qmc.weight[1]:
-                        statstr += QApplication.translate("AddlInfo", "Wight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%\n"
+                        statstr += '\n' + QApplication.translate("AddlInfo", "Wight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
 
                 if aw.qmc.density[0]:
                     statstr += skipline
@@ -5138,30 +5137,30 @@ class tgraphcanvas(FigureCanvas):
                         statstr += QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(-aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%\n"
 
                 if aw.qmc.volume[0]:
-                    statstr += skipline
-                    statstr += QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2]) + '\n'
+                    #statstr += skipline
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2])
                     if cp["volume_gain"]:
-                        statstr += 'Volume Gain: ' + str(aw.float2float(cp["volume_gain"],2)) + "%\n"
+                        statstr += '\n' + 'Volume Gain: ' + str(aw.float2float(cp["volume_gain"],2)) + "%"
                         
                 if aw.qmc.beansize:
-                    statstr += skipline
-                    statstr += QApplication.translate("AddlInfo", "Bean Size", None) + ': '+ str(aw.qmc.beansize) + 'mm\n'
+                    #statstr += skipline
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Bean Size", None) + ': '+ str(aw.qmc.beansize) + 'mm'
 
-                if aw.qmc.moisture_greens or aw.qmc.moisture_roasted:
-                    statstr += skipline
+#                if aw.qmc.moisture_greens or aw.qmc.moisture_roasted:
+#                    statstr += skipline
                 if aw.qmc.moisture_greens:
-                    statstr += QApplication.translate("AddlInfo", "Moisture Green", None) + ': '+ str(aw.float2float(aw.qmc.moisture_greens,1)) + "%\n"
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Moisture Green", None) + ': '+ str(aw.float2float(aw.qmc.moisture_greens,1)) + "%"
                 if aw.qmc.moisture_roasted:
-                    statstr +=  QApplication.translate("AddlInfo", "Moisture Roasted", None) + ': '+ str(aw.float2float(aw.qmc.moisture_roasted,1)) + "%\n"
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Moisture Roasted", None) + ': '+ str(aw.float2float(aw.qmc.moisture_roasted,1)) + "%"
                     
-                statstr += skipline
+#                statstr += skipline
                 if aw.qmc.whole_color > 0:
-                    statstr += QApplication.translate("AddlInfo", "Whole Color", None) + ': '+ str(aw.qmc.whole_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx]) + "\n"
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Whole Color", None) + ': '+ str(aw.qmc.whole_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
                 if aw.qmc.ground_color > 0:
-                    statstr += QApplication.translate("AddlInfo", "Ground Color", None) + ': '+ str(aw.qmc.ground_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx]) + "\n"
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Ground Color", None) + ': '+ str(aw.qmc.ground_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
 
 #                statstr += lotsOspaces + '\u00b7'
-                    
+                
                 self.ax.text(xdist, statsheight, statstr.strip(), verticalalignment='top')
                 
         except Exception as e:
@@ -11778,7 +11777,10 @@ class ApplicationWindow(QMainWindow):
                         a = QAction(self, visible=True,
                             triggered=self.openMachineSettings)
                         a.setData(p)
-                        a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
+                        if d[-1] == "Machines":
+                            a.setText(u(f)) # + u("...")
+                        else:
+                            a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
                         self.machineMenu.addAction(a)
                         one_added = True
         if one_added:
