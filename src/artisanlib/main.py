@@ -4653,12 +4653,12 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     temp = None
                                 # plot events on BT when showeventsonbt is true
-                                if aw.qmc.showeventsonbt and temp and aw.qmc.BTcurve:
+                                if aw.qmc.showeventsonbt and temp != None and aw.qmc.BTcurve:
                                     if aw.qmc.flagon:
                                         temp = self.temp2[int(self.specialevents[i])]
                                     else:
                                         temp = self.stemp2[int(self.specialevents[i])]                                
-                                if temp and aw.qmc.showEtypes[self.specialeventstype[i]]:
+                                if temp != None and aw.qmc.showEtypes[self.specialeventstype[i]]:
                                     if self.specialeventstype[i] == 0:
                                         boxstyle = 'square,pad=0.2'
                                         boxcolor = self.EvalueColor[0]
@@ -4690,6 +4690,7 @@ class tgraphcanvas(FigureCanvas):
                                                  )
     
                     if self.eventsGraphflag == 1 and Nevents:
+                        
                         char1 = self.etypes[0][0]
                         char2 = self.etypes[1][0]
                         char3 = self.etypes[2][0]
@@ -6884,6 +6885,7 @@ class tgraphcanvas(FigureCanvas):
                                                  bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                                  fontsize="xx-small",
                                                  fontproperties=aw.mpl_fontproperties,
+                                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
                                                  backgroundcolor='yellow')
                             #if Event Type-Bars flag
                             elif self.eventsGraphflag == 1 and etype < 4:
@@ -12408,7 +12410,7 @@ class ApplicationWindow(QMainWindow):
     def makePhasesLCDbox(self,label,lcd):
         label.setAlignment(Qt.Alignment(Qt.AlignRight | Qt.AlignVCenter))
         lcd.setMinimumHeight(30)
-        lcd.setMinimumWidth(60)
+        lcd.setMinimumWidth(70)
         lcd.setSegmentStyle(2)
         lcd.setFrameStyle(QFrame.Plain)
         lcd.setNumDigits(5)
