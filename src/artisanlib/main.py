@@ -5129,7 +5129,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.weight[0]:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ str(aw.float2float(aw.qmc.weight[0],2)) + ' ' + aw.qmc.weight[2]
                     if aw.qmc.weight[1]:
-                        statstr += '\n' + QApplication.translate("AddlInfo", "Wight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
+                        statstr += '\n' + QApplication.translate("AddlInfo", "Weight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
 
                 if aw.qmc.density[0]:
                     statstr += skipline
