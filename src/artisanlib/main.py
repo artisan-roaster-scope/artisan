@@ -10841,7 +10841,7 @@ class ApplicationWindow(QMainWindow):
                                      "PIDactive":"QPushButton {font-size: 10pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
                                      "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
                                      "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
-                                     "SELECTED":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
+                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
                                      }
         else:
             self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
@@ -10865,7 +10865,7 @@ class ApplicationWindow(QMainWindow):
                                      "PIDactive":"QPushButton {font-size: 10pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
                                      "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
                                      "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
-                                     "SELECTED":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
+                                     "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
                                      }
 
         #create ON/OFF buttons
