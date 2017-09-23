@@ -160,6 +160,8 @@ from Phidget22.PhidgetException import *
 from Phidget22.Net import Net as PhidgetNetwork
 from Phidget22.DeviceClass import DeviceClass
 from Phidget22.ThermocoupleType import ThermocoupleType
+from Phidget22.RTDType import RTDType
+from Phidget22.RTDWireSetup import RTDWireSetup
 from Phidget22.BridgeGain import BridgeGain
 from Phidget22.Phidget import *
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
@@ -222,6 +224,33 @@ def PHIDGET_THERMOCOUPLE_TYPE(tp):
         return ThermocoupleType.THERMOCOUPLE_TYPE_T
     else:
         return ThermocoupleType.THERMOCOUPLE_TYPE_K
+
+# maps Artisan RTD wire setups (order as listed in the menu; see phidget1200_wireValues) to Phdiget wire setups
+# 0 => 2-wire (default)
+# 2 => 3-wire
+# 3 => 4-wire
+def PHIDGET_RTD_WIRE(tp):
+    if tp == 1:
+        return RTDWireSetup.RTD_WIRE_SETUP_3WIRE
+    elif tp == 2:
+        return RTDWireSetup.RTD_WIRE_SETUP_4WIRE
+    else:
+        return RTDWireSetup.RTD_WIRE_SETUP_2WIRE
+     
+# maps Artisan RTD types (order as listed in the menu; see phidget1200_formulaValues) to Phdiget RTD types
+# 0 => PT100 3850 (default)
+# 2 => PT100 3920
+# 3 => PT1000 3850
+# 4 => PT1000 3920        
+def PHIDGET_RTD_TYPE(tp):
+    if tp == 1:
+        return RTDType.RTD_TYPE_PT100_3920
+    elif tp == 2:
+        return RTDType.RTD_TYPE_PT1000_3850
+    elif tp == 3:
+        return RTDType.RTD_TYPE_PT1000_3920
+    else:
+        return RTDType.RTD_TYPE_PT100_3850
     
 # maps Artisan gain values (see phidget1046_gainValues) to Phidgets gain values
 # defaults to no gain (BRIDGE_GAIN_1)
@@ -861,9 +890,22 @@ class tgraphcanvas(FigureCanvas):
 
         self.phidget1045_async = False
         self.phidget1045_changeTrigger = 1.0
-        self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(1, 11, 1)]
+        self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1045_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1045_changeTriggersValues))
         self.phidget1045_emissivity = 1.0
+        
+        self.phidget1200_async = False
+        self.phidget1200_formula = 0
+        self.phidget1200_formulaValues = ["PT100  3850", "PT100  3920","PT1000 3850", "PT1000 3920"]
+        self.phidget1200_wire = 0
+        self.phidget1200_wireValues = ["2-wire", "3-wire","4-wire"]
+        self.phidget1200_changeTrigger = 1.0
+        self.phidget1200_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
+        self.phidget1200_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1200_changeTriggersValues))
+        self.phidget1200_dataRate = 250 # in ms; (Phidgets default 8ms, 16ms if wireless is active on v21 API, 256ms on v22 API)
+        self.phidget1200_dataRatesStrings = ["250ms","500ms","750ms","1s"]
+        self.phidget1200_dataRatesValues = [250,500,700,1024]
+
 
         self.phidget1046_async = [False]*4
         self.phidget1046_gain = [1]*4 # defaults to no gain (values are 0-based)
@@ -967,8 +1009,9 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget HUB0000 IO",    #63
                        "+Phidget HUB0000 IO 34",#64
                        "+Phidget HUB0000 IO 56",#65
-                       "-Omega HH806W",          #66 NOT WORKING 
-                       "VOLTCRAFT PL-125-T2" #67
+                       "-Omega HH806W",         #66 NOT WORKING 
+                       "VOLTCRAFT PL-125-T2",   #67
+                       "Phidget TMP1200 1xRTD", #68
                        ]
 
         #extra devices
@@ -16460,6 +16503,12 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidget1045_changeTrigger = aw.float2float(toFloat(settings.value("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger)))
             if settings.contains("phidget1045_emissivity"):
                 self.qmc.phidget1045_emissivity = toDouble(settings.value("phidget1045_emissivity",self.qmc.phidget1045_emissivity))
+            if settings.contains("phidget1200_formula"):
+                self.qmc.phidget1200_formula = toInt(settings.value("phidget1200_formula",self.qmc.phidget1200_formula))
+                self.qmc.phidget1200_wire = toInt(settings.value("phidget1200_wire",self.qmc.phidget1200_wire))
+                self.qmc.phidget1200_async = bool(toBool(settings.value("phidget1200_async",self.qmc.phidget1200_async)))
+                self.qmc.phidget1200_changeTrigger = aw.float2float(toFloat(settings.value("phidget1200_changeTrigger",self.qmc.phidget1200_changeTrigger)))
+                self.qmc.phidget1200_dataRate = toInt(settings.value("phidget1200_dataRate",self.qmc.phidget1200_dataRate))
             if settings.contains("phidgetRemoteFlag"):
                 self.qmc.phidgetRemoteFlag = bool(toBool(settings.value("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)))
                 self.qmc.phidgetServerID = toString(settings.value("phidgetServerID",self.qmc.phidgetServerID))
@@ -17719,6 +17768,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidget1045_async",self.qmc.phidget1045_async)
             settings.setValue("phidget1045_changeTrigger",self.qmc.phidget1045_changeTrigger)
             settings.setValue("phidget1045_emissivity",self.qmc.phidget1045_emissivity)
+            settings.setValue("phidget1200_formula",self.qmc.phidget1200_formula)
+            settings.setValue("phidget1200_wire",self.qmc.phidget1200_wire)
+            settings.setValue("phidget1200_async",self.qmc.phidget1200_async)
+            settings.setValue("phidget1200_changeTrigger",self.qmc.phidget1200_changeTrigger)
+            settings.setValue("phidget1200_dataRate",self.qmc.phidget1200_dataRate) 
             settings.setValue("phidgetRemoteFlag",self.qmc.phidgetRemoteFlag)
             settings.setValue("phidgetServerID",self.qmc.phidgetServerID)
             settings.setValue("phidgetPassword",self.qmc.phidgetPassword)
@@ -31924,6 +31978,7 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_56, #65
                                    self.HH806W,             #66
                                    self.VOLTCRAFTPL125T2,   #67
+                                   self.PHIDGET_TMP1200,    #68
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -32313,6 +32368,11 @@ class serialport(object):
     def PHIDGET_TMP1100(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1100)
+        return tx,a,t
+
+    def PHIDGET_TMP1200(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t,a = self.PHIDGET1045temperature(DeviceID.PHIDID_TMP1200)
         return tx,a,t
         
     def PHIDGET_HUB0000(self):
@@ -33555,11 +33615,10 @@ class serialport(object):
 #---
 
     def phidget1045TemperatureChanged(self,e,t):
-        if aw.qmc.phidget1045_async:
-            if self.Phidget1045value != -1:
-                self.Phidget1045value = (self.Phidget1045value + t)/2.0
-            else:
-                self.Phidget1045value = t
+        if self.Phidget1045value != -1:
+            self.Phidget1045value = (self.Phidget1045value + t)/2.0
+        else:
+            self.Phidget1045value = t
             
     def phidget1045temp(self,temp,ambient):
         return (temp - ambient) * aw.qmc.phidget1045_emissivity + ambient
@@ -33593,6 +33652,27 @@ class serialport(object):
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
         else:
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e,t:None)
+            
+    def configureOneRTD(self):
+        self.Phidget1045value = -1
+        self.PhidgetIRSensor.setRTDType(PHIDGET_RTD_TYPE(aw.qmc.phidget1200_formula))
+        self.PhidgetIRSensor.setRTDWireSetup(PHIDGET_RTD_WIRE(aw.qmc.phidget1200_wire))        
+        if aw.qmc.phidget1200_async:
+            self.PhidgetIRSensor.setTemperatureChangeTrigger(aw.qmc.phidget1200_changeTrigger)
+        else:
+            self.PhidgetIRSensor.setTemperatureChangeTrigger(0)
+        if aw.qmc.phidget1200_async:
+            self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
+        else:
+            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e,t:None)
+        # set rate
+        try:
+            self.PhidgetIRSensor.setDataInterval(aw.qmc.phidget1200_dataRate)
+        except Exception:
+            pass
+        
+        
+        
 
     def phidget1045attached(self,deviceType,e):
         if deviceType == DeviceID.PHIDID_1045:
@@ -33604,9 +33684,10 @@ class serialport(object):
         elif deviceType == DeviceID.PHIDID_TMP1100:
             self.configureOneTC()
             aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input attached",None))
-        else:
-            return
-        
+        elif deviceType == DeviceID.PHIDID_TMP1200:
+            self.configureOneRTD()
+            aw.sendmessage(QApplication.translate("Message","Phidget RTD 1-input attached",None))
+
     def phidget1045detached(self,deviceType,e):
         if deviceType == DeviceID.PHIDID_1045:
             aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR detached",None))
@@ -33614,15 +33695,20 @@ class serialport(object):
             aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 1-input detached",None))
         elif deviceType == DeviceID.PHIDID_TMP1100:
             aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input detached",None))
+        elif deviceType == DeviceID.PHIDID_TMP1200:
+            aw.sendmessage(QApplication.translate("Message","Phidget VINT RTD 1-input detached",None))
 
-    # this one is reused for the 1045 (IR), the 1051 (1xTC) and TMP1100 (1xTC)
+    # this one is reused for the 1045 (IR), the 1051 (1xTC), TMP1100 (1xTC), and TMP1200 (1xRTD)
     def PHIDGET1045temperature(self,deviceType=DeviceID.PHIDID_1045,retry=True):
         try:
             if not self.PhidgetIRSensor:
                 ser,port = self.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType)
                 if ser:
                     self.PhidgetIRSensor = PhidgetTemperatureSensor()
-                    self.PhidgetIRSensorIC = PhidgetTemperatureSensor()
+                    if deviceType == DeviceID.PHIDID_TMP1200:
+                        self.phidgetIRSensorIC = None # the TMP1200 does not has an internal temperature sensor
+                    else:
+                        self.PhidgetIRSensorIC = PhidgetTemperatureSensor()
                     try:
                         self.PhidgetIRSensor.setOnAttachHandler(lambda e:self.phidget1045attached(deviceType,e))
                         self.PhidgetIRSensor.setOnDetachHandler(lambda e:self.phidget1045detached(deviceType,e))
@@ -33630,19 +33716,21 @@ class serialport(object):
                             self.addPhidgetServer()
                         if port is not None:
                             self.PhidgetIRSensor.setHubPort(port)
-                            self.PhidgetIRSensorIC.setHubPort(port)
+                            if deviceType != DeviceID.PHIDID_TMP1200:
+                                self.PhidgetIRSensorIC.setHubPort(port)
                         self.PhidgetIRSensor.setDeviceSerialNumber(ser)
                         self.PhidgetIRSensor.setChannel(0) # attache to the IR channel
                         try:
                             self.PhidgetIRSensor.open() #.openWaitForAttachment(timeout)
                         except:
                             pass
-                        self.PhidgetIRSensorIC.setDeviceSerialNumber(ser)
-                        self.PhidgetIRSensorIC.setChannel(1) # attache to the IC channel
-                        try:                            
-                            self.PhidgetIRSensorIC.open() #.openWaitForAttachment(timeout)
-                        except:
-                            pass
+                        if deviceType != DeviceID.PHIDID_TMP1200:
+                            self.PhidgetIRSensorIC.setDeviceSerialNumber(ser)
+                            self.PhidgetIRSensorIC.setChannel(1) # attache to the IC channel
+                            try:                            
+                                self.PhidgetIRSensorIC.open() #.openWaitForAttachment(timeout)
+                            except:
+                                pass
                         libtime.sleep(.5)
                     except Exception as ex:
                         _, _, exc_tb = sys.exc_info()
@@ -33661,7 +33749,9 @@ class serialport(object):
                 res = -1
                 ambient = -1
                 try:
-                    if (deviceType == DeviceID.PHIDID_1045 and aw.qmc.phidget1045_async) or (deviceType != DeviceID.PHIDID_1045 and aw.qmc.phidget1048_async[0]):
+                    if (deviceType == DeviceID.PHIDID_1045 and aw.qmc.phidget1045_async) or \
+                        (deviceType in [DeviceID.PHIDID_1051,DeviceID.PHIDID_TMP1100] and aw.qmc.phidget1048_async[0]) or \
+                        (deviceType == DeviceID.PHIDID_TMP1200 and aw.qmc.phidget1200_async):
                         if self.Phidget1045value == -1:
                             self.Phidget1045value = self.PhidgetIRSensor.getTemperature()
                         probe = self.Phidget1045value
@@ -33677,6 +33767,8 @@ class serialport(object):
                         ambient = self.PhidgetIRSensorIC.getTemperature()
                 except Exception:
                     pass
+                if deviceType == DeviceID.PHIDID_TMP1200:
+                    ambient = res
                 if ambient == -1:
                     return -1,-1
                 else:
@@ -36323,7 +36415,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -36655,7 +36747,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -36748,7 +36840,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -37159,10 +37251,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
             
-#            changeTriggersCombo.setMinimumSize(80,20)
-#            changeTriggersCombo.setMaximumSize(100,30)
-            
-            changeTriggersCombo.setMinimumContentsLength(2)
+            changeTriggersCombo.setMinimumContentsLength(1)
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
             changeTriggersCombo.setMaximumWidth(width)
@@ -37187,8 +37276,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
                 
-#            probeTypeCombo.setMaximumSize(55,80)
-            probeTypeCombo.setMinimumContentsLength(2)
+            probeTypeCombo.setMinimumContentsLength(1)
             width = probeTypeCombo.minimumSizeHint().width()
             probeTypeCombo.setMinimumWidth(width)
             probeTypeCombo.setMaximumWidth(width)
@@ -37208,14 +37296,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombo1048.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1048_dataRate))
         except Exception:
             pass
-        #self.dataRateCombo1048.setMinimumSize(80,20)
-        #self.dataRateCombo1048.setMaximumSize(100,30)
-        self.dataRateCombo1048.setMinimumContentsLength(2)
+        self.dataRateCombo1048.setMinimumContentsLength(3)
         width = self.dataRateCombo1048.minimumSizeHint().width()
         self.dataRateCombo1048.setMinimumWidth(width)
         self.dataRateCombo1048.setMaximumWidth(width)
         
-        phidgetBox1048.addWidget(self.dataRateCombo1048,4,1)
+        phidgetBox1048.addWidget(self.dataRateCombo1048,4,1,1,2)
         phidgetBox1048.setSpacing(5)
             
         typeLabel = QLabel(QApplication.translate("Label","Type", None))
@@ -37295,10 +37381,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 gainCombo.setCurrentIndex(aw.qmc.phidget1046_gain[i-1] - 1)
             except Exception:
                 pass
-
-#            gainCombo.setMinimumSize(80,20)
-#            gainCombo.setMaximumSize(100,30)           
-            gainCombo.setMinimumContentsLength(2)
+          
+            gainCombo.setMinimumContentsLength(1)
             width = gainCombo.minimumSizeHint().width()
             gainCombo.setMinimumWidth(width)
             gainCombo.setMaximumWidth(width)
@@ -37316,10 +37400,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 formulaCombo.setCurrentIndex(aw.qmc.phidget1046_formula[i-1])
             except Exception:
                 pass
-                
-#            formulaCombo.setMinimumSize(80,20)
-#            formulaCombo.setMaximumSize(100,30)                     
-            formulaCombo.setMinimumContentsLength(2)
+                                   
+            formulaCombo.setMinimumContentsLength(1)
             width = formulaCombo.minimumSizeHint().width()
             formulaCombo.setMinimumWidth(width)
             formulaCombo.setMaximumWidth(width)
@@ -37345,15 +37427,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
         try:
             self.dataRateCombo1046.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1046_dataRate))
         except Exception:
-            pass
-#        self.dataRateCombo1046.setMaximumSize(80,20)
-#        self.dataRateCombo1046.setMaximumSize(100,30)                 
-        self.dataRateCombo1046.setMinimumContentsLength(2)
+            pass                
+        self.dataRateCombo1046.setMinimumContentsLength(3)
         width = self.dataRateCombo1046.minimumSizeHint().width()
         self.dataRateCombo1046.setMinimumWidth(width)
         self.dataRateCombo1046.setMaximumWidth(width)
             
-        phidgetBox1046.addWidget(self.dataRateCombo1046,4,1)
+        phidgetBox1046.addWidget(self.dataRateCombo1046,4,1,1,2)
         phidgetBox1046.setSpacing(5)
      
         gainLabel = QLabel(QApplication.translate("Label","Gain", None))
@@ -37375,9 +37455,113 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1046GroupBox.setLayout(phidget1046VBox)
         phidget1046GroupBox.setContentsMargins(0,10,0,0)
         phidget1046HBox.setContentsMargins(0,0,0,0)
+        
+        
+        # TMP1200 RTD
+        phidgetBox1200 = QGridLayout()
+#        self.typeCombo1200 =
+
+        self.formulaCombo1200 = QComboBox()
+        self.formulaCombo1200.setFocusPolicy(Qt.NoFocus)
+        model = self.formulaCombo1200.model()
+        wireItems = self.createItems(aw.qmc.phidget1200_formulaValues)
+        for item in wireItems:
+            model.appendRow(item)
+        try:
+            self.formulaCombo1200.setCurrentIndex(aw.qmc.phidget1200_formula)
+        except Exception:
+            pass                                   
+        self.formulaCombo1200.setMinimumContentsLength(3)
+        width = self.formulaCombo1200.minimumSizeHint().width()
+        self.formulaCombo1200.setMinimumWidth(width)
+        self.formulaCombo1200.setMaximumWidth(width)   
+        
+        self.wireCombo1200 = QComboBox()
+        self.wireCombo1200.setFocusPolicy(Qt.NoFocus)
+        model = self.wireCombo1200.model()
+        wireItems = self.createItems(aw.qmc.phidget1200_wireValues)
+        for item in wireItems:
+            model.appendRow(item)
+        try:
+            self.wireCombo1200.setCurrentIndex(aw.qmc.phidget1200_wire)
+        except Exception:
+            pass                                   
+        self.wireCombo1200.setMinimumContentsLength(3)
+        width = self.wireCombo1200.minimumSizeHint().width()
+        self.wireCombo1200.setMinimumWidth(width)
+        self.wireCombo1200.setMaximumWidth(width)
+            
+        self.asyncCheckBoxe1200 = QCheckBox()
+        self.asyncCheckBoxe1200.setFocusPolicy(Qt.NoFocus)
+        self.asyncCheckBoxe1200.setChecked(aw.qmc.phidget1200_async)
+        self.asyncCheckBoxe1200.stateChanged.connect(lambda x,y=i-1 :self.asyncFlagStateChanged1200(y,x))
+            
+        self.changeTriggerCombo1200 = QComboBox()
+        self.changeTriggerCombo1200.setFocusPolicy(Qt.NoFocus)
+        model = self.changeTriggerCombo1200.model()
+        changeTriggerItems = self.createItems(aw.qmc.phidget1200_changeTriggersStrings)
+        for item in changeTriggerItems:
+            model.appendRow(item)
+        try:
+            self.changeTriggerCombo1200.setCurrentIndex(aw.qmc.phidget1200_changeTriggersValues.index(aw.qmc.phidget1200_changeTrigger))
+        except Exception:
+            pass
+#        self.changeTriggerCombo1200.setMaximumSize(65,100)     
+        self.changeTriggerCombo1200.setMinimumContentsLength(3)
+        width = self.changeTriggerCombo1200.minimumSizeHint().width()
+        self.changeTriggerCombo1200.setMinimumWidth(width)
+        self.changeTriggerCombo1200.setMaximumWidth(width) 
+        self.changeTriggerCombo1200.setEnabled(aw.qmc.phidget1200_async)      
+        
+        self.rateCombo1200 = QComboBox()
+        self.rateCombo1200.setFocusPolicy(Qt.NoFocus)
+        model = self.rateCombo1200.model()
+        dataRateItems = self.createItems(aw.qmc.phidget1200_dataRatesStrings)
+        for item in dataRateItems:
+            model.appendRow(item)
+        try:
+            self.rateCombo1200.setCurrentIndex(aw.qmc.phidget1200_dataRatesValues.index(aw.qmc.phidget1200_dataRate))
+        except Exception:
+            pass                
+        self.rateCombo1200.setMinimumContentsLength(3)
+        width = self.rateCombo1200.minimumSizeHint().width()
+        self.rateCombo1200.setMinimumWidth(width)
+        self.rateCombo1200.setMaximumWidth(width)
+        
+        typeLabel = QLabel(QApplication.translate("Label","Type", None))
+        wireLabel = QLabel(QApplication.translate("Label","Wiring", None))
+        asyncLabel = QLabel(QApplication.translate("Label","Async", None))
+        changeLabel = QLabel(QApplication.translate("Label","Change", None))
+        rateLabel = QLabel(QApplication.translate("Label","Rate", None))
+        
+        phidgetBox1200.addWidget(typeLabel,1,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(self.formulaCombo1200,1,1)        
+        phidgetBox1200.addWidget(wireLabel,2,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(self.wireCombo1200,2,1)        
+        phidgetBox1200.addWidget(asyncLabel,3,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(self.asyncCheckBoxe1200,3,1)
+        phidgetBox1200.addWidget(changeLabel,4,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(self.changeTriggerCombo1200,4,1)
+        phidgetBox1200.addWidget(rateLabel,5,0,Qt.AlignRight)
+        phidgetBox1200.addWidget(self.rateCombo1200,5,1)
+
+        phidget1200HBox = QHBoxLayout()
+        phidget1200HBox.addStretch()
+        phidget1200HBox.addLayout(phidgetBox1200)
+        phidget1200HBox.addStretch()
+        phidget1200VBox = QVBoxLayout()
+        phidget1200VBox.addLayout(phidget1200HBox)
+        phidget1200VBox.addStretch()
+        
+        phidget1200GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets TMP1200 RTD",None))
+        phidget1200HBox.setContentsMargins(0,0,0,0)
+        phidget1200GroupBox.setLayout(phidget1200VBox)
+        phidget1200GroupBox.setContentsMargins(0,10,0,0)
 
         phdget10481045GroupBoxHBox = QHBoxLayout()
         phdget10481045GroupBoxHBox.addWidget(phidget1048GroupBox)
+        phdget10481045GroupBoxHBox.addStretch()
+        phdget10481045GroupBoxHBox.addWidget(phidget1200GroupBox)
         phdget10481045GroupBoxHBox.addStretch()
         phdget10481045GroupBoxHBox.addWidget(phidget1046GroupBox) 
 
@@ -37405,7 +37589,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
 
-            dataRatesCombo.setMinimumContentsLength(2)
+            dataRatesCombo.setMinimumContentsLength(3)
             width = dataRatesCombo.minimumSizeHint().width()
             dataRatesCombo.setMinimumWidth(width)
             dataRatesCombo.setMaximumWidth(width)
@@ -37425,7 +37609,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 pass
             changeTriggersCombo.setMaximumSize(20,50)
 
-            changeTriggersCombo.setMinimumContentsLength(2)
+            changeTriggersCombo.setMinimumContentsLength(3)
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
             changeTriggersCombo.setMaximumWidth(width)
@@ -37705,6 +37889,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
         else:
             # enable ChangeTrigger selection
             self.changeTriggerCombos1045.setEnabled(True)
+            
+    def asyncFlagStateChanged1200(self,i,x):
+        if x == 0:
+            # disable ChangeTrigger selection
+            self.changeTriggerCombo1200.setEnabled(False)
+        else:
+            # enable ChangeTrigger selection
+            self.changeTriggerCombo1200.setEnabled(True)            
         
     def changeTriggerIndexChanged(self,i,x):
         pass
@@ -38584,6 +38776,25 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 65 is +Phidget HUB0000 IO 56 but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 66 is -HH806W but -DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                elif meter == "VOLTCRAFTPL125T2":
+                    aw.qmc.device = 67
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1.0
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
+                ##########################
+                ##########################
+                elif meter == "Phidget TMP1200 1xRTD":
+                    aw.qmc.device = 68
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
                 # ADD DEVICE:
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -38669,7 +38880,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 64
                 1, # 65
                 8,  #66
-                3] # 67
+                3, # 67
+                1] # 68
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -38738,7 +38950,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.phidget1046_dataRate = aw.qmc.phidget_dataRatesValues[self.dataRateCombo1046.currentIndex()]
             aw.qmc.phidget1045_async = self.asyncCheckBoxe1045.isChecked()
             aw.qmc.phidget1045_changeTrigger = aw.qmc.phidget1045_changeTriggersValues[self.changeTriggerCombos1045.currentIndex()]
-            aw.qmc.phidget1045_emissivity = self.emissivitySpinBox.value()            
+            aw.qmc.phidget1045_emissivity = self.emissivitySpinBox.value()  
+            
+            aw.qmc.phidget1200_formula = self.formulaCombo1200.currentIndex()
+            aw.qmc.phidget1200_wire = self.wireCombo1200.currentIndex()
+            aw.qmc.phidget1200_async = self.asyncCheckBoxe1200.isChecked()
+            aw.qmc.phidget1200_changeTrigger = aw.qmc.phidget1200_changeTriggersValues[self.changeTriggerCombo1200.currentIndex()]
+            aw.qmc.phidget1200_dataRate = aw.qmc.phidget1200_dataRatesValues[self.rateCombo1200.currentIndex()]
+            
+                      
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
             aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
             aw.qmc.phidgetPassword = u(self.phidgetPassword.text())
@@ -38767,7 +38987,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68]):
                 aw.setcommport()
             #self.close()
             self.accept()
