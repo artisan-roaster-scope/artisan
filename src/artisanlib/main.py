@@ -889,7 +889,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1048_dataRate = 256 # in ms; (Phidgets default 8ms, 16ms if wireless is active on v21 API, 256ms on v22 API)
 
         self.phidget1045_async = False
-        self.phidget1045_changeTrigger = 1.0
+        self.phidget1045_changeTrigger = 0.2
         self.phidget1045_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1045_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1045_changeTriggersValues))
         self.phidget1045_emissivity = 1.0
@@ -899,10 +899,10 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1200_formulaValues = ["PT100  3850", "PT100  3920","PT1000 3850", "PT1000 3920"]
         self.phidget1200_wire = 0
         self.phidget1200_wireValues = ["2-wire", "3-wire","4-wire"]
-        self.phidget1200_changeTrigger = 1.0
+        self.phidget1200_changeTrigger = 0.2
         self.phidget1200_changeTriggersValues = [x / 10.0 for x in range(0, 11, 1)]
         self.phidget1200_changeTriggersStrings = list(map(lambda x:str(x) + "C",self.phidget1200_changeTriggersValues))
-        self.phidget1200_dataRate = 250 # in ms; (Phidgets default 8ms, 16ms if wireless is active on v21 API, 256ms on v22 API)
+        self.phidget1200_dataRate = 250
         self.phidget1200_dataRatesStrings = ["250ms","500ms","750ms","1s"]
         self.phidget1200_dataRatesValues = [250,500,700,1024]
 
@@ -21459,9 +21459,26 @@ class ApplicationWindow(QMainWindow):
             infile.close()
             bt = obj["beanTemperature"]
             dt = obj["drumTemperature"]
+            ex = obj["exitTemperature"]
             sr = obj["sampleRate"]
             d = obj["dateTime"] # RFC 3339 date time
             tx = [x*1.0/sr for x in range(len(bt))]
+            
+            # add extra device if exitTemperatures are given and no extra device is configured
+            try:
+                if ex is not None and ex != [] and len(self.qmc.extradevices) < 1:
+                    string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
+                    reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
+                    if reply == QMessageBox.Yes:
+                        if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
+                            aw.addDevice()
+                            aw.qmc.resetlinecountcaches()
+                        else:
+                            return False
+                    else:
+                        return False
+            except:
+                pass
 
             if len(tx) == len(bt) == len(dt):
                 self.roastertype = u("Aillio Bullet R1")
@@ -21472,6 +21489,17 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timex = tx
                 self.qmc.temp1 = dt
                 self.qmc.temp2 = bt
+                
+                # initialize all extra curves with -1
+                for x in range(len(self.qmc.extradevices)):
+                    self.qmc.extratimex[x] = tx
+                    self.qmc.extratemp1[x] = [-1]*len(tx)
+                    self.qmc.extratemp2[x] = [-1]*len(tx)
+                    
+                # add exhaust data to first extra device
+                if ex is not None and ex != [] and len(self.qmc.extradevices) > 0:
+                    self.qmc.extratemp1[0] = ex
+                
                 try:
                     self.qmc.title = obj["beanName"]
                     try:
