@@ -10060,7 +10060,7 @@ class ApplicationWindow(QMainWindow):
 
         self.main_widget = QWidget(self)
         #set a minimum size (main window can be bigger but never smaller)
-        self.main_widget.setMinimumWidth(811)
+        self.main_widget.setMinimumWidth(800)
         #self.main_widget.setMinimumHeight(670)
 
         ####      create Matplotlib canvas widget
@@ -20517,7 +20517,8 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
-        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst<br>")
+        contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
+        contributors += u(", Nicolas (Marvell Street Coffee Roasters)<br>")
         box = QMessageBox(self)
         
         #create a html QString
