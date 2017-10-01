@@ -8,10 +8,10 @@ o Python: 3.5.3
 o Qt: 5.9.1 (installed via PyQt5 package)
 o PyQt5: 5.9
 o sip: 4.19.3 (installed via PyQt5 package)
+o pyserial: 3.4
 o numpy: 1.13.1+mkl
 o scip: 0.19.1
 o matplotlib: 2.0.2
-o pyserial: 3.4
 o pymodbus: 1.3.0 (patched)
 o bottle: 0.12.13
 o gevent: 1.2.2
@@ -20,7 +20,7 @@ o greenlet: 0.4.12
 o pefile: 2017.8.1
 o pyparsing: 2.2.0
 o python-dateutil: 2.6.1
-o ptz: 2017.2
+o pytz: 2017.2
 o pywin32: 221
 o qrcode: 5.3
 o requests: 2.18.3
@@ -82,11 +82,10 @@ and add the path:
 
 own patched pymodbus 1.3 (copy also the folder manually to site-packages!)
 # python setup.py install
+
+9) unidecode
+
 # pip3 install unidecode
-
-9) unicodedecode
-
-# pip3 install unicodedecode
  => unidecode-0.4.21
 
 10) Phidgets driver
