@@ -1038,12 +1038,13 @@ class tgraphcanvas(FigureCanvas):
     
 
         #figure back color
-        if platf == 'Darwin':
-            self.backcolor ="#EEEEEE"
-        else:
-            self.backcolor = "white"
-        self.fig.patch.set_facecolor(self.backcolor)
-        self.fig.patch.set_edgecolor(self.backcolor)
+#        if platf == 'Darwin':
+#            self.backcolor ="#EEEEEE"
+#        else:
+#            self.backcolor = "white"
+#        self.fig.patch.set_facecolor(self.backcolor)
+#        self.fig.patch.set_edgecolor(self.backcolor)
+        self.fig.patch.set_facecolor('None')
 
         v = 2
         try:
@@ -1065,6 +1066,8 @@ class tgraphcanvas(FigureCanvas):
             left=0.067, # the left side of the subplots of the figure (default: 0.125)
             right=.925) # the right side of the subplots of the figure (default: 0.9
         FigureCanvas.__init__(self, self.fig)
+        # important to make the Qt canvas transparent:
+        self.fig.canvas.setStyleSheet("background-color:transparent;")
 
         self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         self.fig.canvas.mpl_connect('pick_event', self.onpick)
@@ -1481,10 +1484,32 @@ class tgraphcanvas(FigureCanvas):
         self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>,<recordEvent>]
 
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
-        self.ylimit = 600
-        self.ylimit_min = 0
-        self.zlimit = 60
-        self.zlimit_min = 0
+        self.startofx_default = -30
+        self.endofx_default = 600 # 10min*60
+        
+        self.ylimit_F_default = 500
+        self.ylimit_min_F_default = 100
+        self.ygrid_F_default = 50
+        self.zlimit_F_default = 55
+        self.zlimit_min_F_default = -5  
+        self.zgrid_F_default = 10
+        
+        self.ylimit_C_default = 250
+        self.ylimit_min_C_default = 50
+        self.ygrid_C_default = 25
+        self.zlimit_C_default = 35
+        self.zlimit_min_C_default = -5
+        self.zgrid_C_default = 5
+        
+        #----
+        # set limits to F defaults
+        
+        self.ylimit = self.ylimit_F_default
+        self.ylimit_min = self.ylimit_min_F_default
+        self.zlimit = self.zlimit_F_default
+        self.zlimit_min = self.zlimit_min_F_default
+       
+        
         # RoR display limits
         # user configurable RoR limits (only applied if flag is True; applied before TP during recording as well as full redraw)
         self.RoRlimitFlag = True
@@ -1493,16 +1518,16 @@ class tgraphcanvas(FigureCanvas):
         # system fixed RoR limits (only applied if flag is True; usually higher than the user configurable once and always applied)
         self.maxRoRlimit = 170
         # axis limits
-        self.endofx = 900 # 15min*60=900
-        self.startofx = -30
+        self.endofx = self.endofx_default
+        self.startofx = self.startofx_default
         self.resetmaxtime = 900  #time when pressing reset
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
         self.locktimex = True # if true, do not set time axis min and max from profile on load
         self.autotimex = True # automatically set time axis min and max from profile CHARGE/DROP on load
-        self.locktimex_start = 0 # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
+        self.locktimex_start = self.startofx_default # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
         self.xgrid = 120   #initial time separation; 60 = 1 minute
-        self.ygrid = 150  #initial temperature separation
-        self.zgrid = 10   #initial RoR separation
+        self.ygrid = self.ygrid_F_default  #initial temperature separation
+        self.zgrid = self.zgrid_F_default   #initial RoR separation
         self.gridstyles =    ["-","--","-.",":"," "]  #solid,dashed,dash-dot,dotted,None
         self.gridlinestyle = 0
         self.gridthickness = 1
@@ -1641,7 +1666,7 @@ class tgraphcanvas(FigureCanvas):
         #data containers for wheel
         self.wheelnames,self.segmentlengths,self.segmentsalpha,self.wheellabelparent,self.wheelcolor = [],[],[],[],[]
 
-        #crerate starting wheel
+        #create starting wheel
         wheels = [4,6,12,50]
         for i in range(len(wheels)):
             w,a,c,co = [],[],[],[]
@@ -3636,7 +3661,7 @@ class tgraphcanvas(FigureCanvas):
                 
                 if not (aw.qmc.autotimex and aw.qmc.background):
                     if not self.locktimex:
-                        self.startofx = 0
+                        self.startofx = self.startofx_default
                     else:
                         self.startofx = self.locktimex_start
                         self.endofx = self.resetmaxtime
@@ -5076,10 +5101,10 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.endofx += addtox  #provide room for the stats
                 self.xaxistosm()
 
-            if platf == 'Windows':
+            if  platf == 'Windows':
                 xdist = 0.80 * (aw.qmc.endofx - aw.qmc.startofx)
             else:
-                xdist = 0.75*(aw.qmc.endofx - aw.qmc.startofx)
+                xdist = 0.77*(aw.qmc.endofx - aw.qmc.startofx)
             ydist = aw.qmc.ylimit - aw.qmc.ylimit_min
             
             if aw.qmc.legendloc != 1:
@@ -5102,13 +5127,12 @@ class tgraphcanvas(FigureCanvas):
                     elif aw.qmc.roastbatchpos == 1:
                         roastoftheday += 'st'
                 else:
-                    roastoftheday = '#' + str(aw.qmc.roastbatchpos)
+                    roastoftheday = '\n#' + str(aw.qmc.roastbatchpos)
                 roastoftheday += ' ' + QApplication.translate("AddlInfo", "Roast of the Day",None)
             else:
                 roastoftheday = ''
 
             cp = aw.computedProfileInformation()  # get all the computed proflie information
-            skipline = ' \n'     # simply a \n or whitespace+\n screws up.  No idea why.
 
             statstr = ''
             if self.statssummary:   
@@ -5124,24 +5148,21 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.greens_temp:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Bean Temp", None) + ': ' + str(int(aw.qmc.greens_temp)) + u'\u00b0' + aw.qmc.mode
                 if aw.qmc.weight[0]:
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ str(aw.float2float(aw.qmc.weight[0],2)) + ' ' + aw.qmc.weight[2]
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ str(aw.float2float(aw.qmc.weight[0],2)) + aw.qmc.weight[2]
                     if aw.qmc.weight[1]:
                         statstr += '\n' + QApplication.translate("AddlInfo", "Weight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
 
                 if aw.qmc.density[0]:
-                    statstr += skipline
-                    statstr += QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3]) + '\n'
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3]) + '\n'
                     if cp["roasted_density"]:
                         statstr += QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(-aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%\n"
 
                 if aw.qmc.volume[0]:
-                    #statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2])
                     if cp["volume_gain"]:
                         statstr += '\n' + 'Volume Gain: ' + str(aw.float2float(cp["volume_gain"],2)) + "%"
                         
                 if aw.qmc.beansize:
-                    #statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Bean Size", None) + ': '+ str(aw.qmc.beansize) + 'mm'
 
                 if aw.qmc.moisture_greens:
@@ -5263,12 +5284,12 @@ class tgraphcanvas(FigureCanvas):
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
         # just set it to the defaults to avoid strange conversion issues
-        self.ylimit = 600
-        self.ylimit_min = 0
-        self.ygrid = 150
-        self.zlimit = 60
-        self.zlimit_min = 0
-        self.zgrid = 10
+        self.ylimit = self.ylimit_F_default
+        self.ylimit_min = self.ylimit_min_F_default
+        self.ygrid = self.ygrid_F_default
+        self.zlimit = self.zlimit_F_default
+        self.zlimit_min = self.zlimit_min_F_default
+        self.zgrid = self.zgrid_F_default
         if self.mode == "C":
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
@@ -5299,12 +5320,12 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
-        self.ylimit = 300
-        self.ylimit_min = 0
-        self.ygrid = 100
-        self.zlimit = 50
-        self.zlimit_min = 0
-        self.zgrid = 10
+        self.ylimit = self.ylimit_C_default
+        self.ylimit_min = self.ylimit_min_C_default
+        self.ygrid = self.ygrid_C_default
+        self.zlimit = self.zlimit_C_default
+        self.zlimit_min = self.zlimit_min_C_default
+        self.zgrid = self.zgrid_C_default
         if self.mode == "F":
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
@@ -17232,7 +17253,7 @@ class ApplicationWindow(QMainWindow):
             
             #update axis limits
             if not self.qmc.locktimex:
-                self.qmc.startofx = 0
+                self.qmc.startofx = self.startofx_default
             else:
                 self.qmc.startofx = self.qmc.locktimex_start
                 self.qmc.endofx = self.qmc.resetmaxtime
@@ -27135,7 +27156,7 @@ class WindowsDlg(ArtisanDialog):
                 aw.qmc.startofx = starteditime
             aw.qmc.locktimex_start = starteditime
         else:
-            aw.qmc.startofx = 0
+            aw.qmc.startofx = self.startofx_default
             aw.qmc.locktimex_start = 0
         if resettime > 0:
             aw.qmc.resetmaxtime = resettime
@@ -45348,6 +45369,8 @@ def main():
         pass
 
     aw = ApplicationWindow()
+    
+#    aw.setStyleSheet("QMainWindow {background: 'white';}")
     
     # only here deactivating the app napping seems to have an effect
     if sys.platform.startswith("darwin"):
