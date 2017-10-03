@@ -1543,6 +1543,8 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveflag = 0
         self.autosaveprefix = ""
         self.autosavepath = ""
+        
+        self.autosavepdf = False # if true save PDF along alog files
 
         #used to place correct height of text to avoid placing text over text (annotations)
         self.ystep_down = 0
@@ -10260,11 +10262,11 @@ class ApplicationWindow(QMainWindow):
         self.saveGraphMenu.addAction(CoffeeGeekAction)
         
         SVGAction = QAction("SVG...",self)
-        SVGAction.triggered.connect(lambda _=None : self.saveVectorGraph(".svg"))
+        SVGAction.triggered.connect(lambda _=None : self.saveVectorGraph(extension=".svg"))
         self.saveGraphMenu.addAction(SVGAction)
 
         PDFAction = QAction("PDF...",self)
-        PDFAction.triggered.connect(lambda _=None : self.saveVectorGraph(".pdf"))
+        PDFAction.triggered.connect(lambda _=None : self.saveVectorGraph(extension=".pdf"))
         self.saveGraphMenu.addAction(PDFAction)
         
         
@@ -13861,6 +13863,13 @@ class ApplicationWindow(QMainWindow):
                     self.sendmessage(QApplication.translate("Message","Profile {0} saved in: {1}", None).format(filename,self.qmc.autosavepath))
                     self.setCurrentFile(filename)
                     self.qmc.safesaveflag = False
+                    
+                    if self.qmc.autosavepdf:
+                        if ".alog" in filename:
+                            filename = filename[0:-5]
+                        self.saveVectorGraph(extension=".pdf",fname=filename)
+                        self.sendmessage(QApplication.translate("Message","PDF saved", None))    
+                    
                     return filename
                 else:
                     self.sendmessage(QApplication.translate("Message","Autosave path does not exist. Autosave failed.", None))                    
@@ -16071,6 +16080,11 @@ class ApplicationWindow(QMainWindow):
                     self.sendmessage(QApplication.translate("Message","Profile saved", None))
                     aw.curFile = filename
                     self.qmc.safesaveflag = False
+                    if self.qmc.autosavepdf:
+                        if ".alog" in filename:
+                            filename = filename[0:-5]
+                        self.saveVectorGraph(extension=".pdf",fname=filename)
+                        self.sendmessage(QApplication.translate("Message","PDF saved", None))                    
                 else:
                     self.sendmessage(QApplication.translate("Message","Cancelled", None))
             else:
@@ -17174,6 +17188,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = toInt(settings.value("autosaveflag",self.qmc.autosaveflag))
+            if settings.contains("autosavepdf"):
+                self.qmc.autosavepdf = bool(toBool(settings.value("autosavepdf",self.qmc.autosavepdf)))
             if settings.contains("autosaveprefix"):
                 self.qmc.autosaveprefix = toString(settings.value("autosaveprefix",self.qmc.autosaveprefix))
             # WebLCDs            
@@ -18038,6 +18054,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("BTBflag",aw.qmc.backgroundBTcurve)
             settings.endGroup()
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
+            settings.setValue("autosavepdf",self.qmc.autosavepdf)
             settings.setValue("autosaveprefix",self.qmc.autosaveprefix)
             settings.beginGroup("WebLCDs")
             settings.setValue("active",self.WebLCDs)
@@ -21461,12 +21478,15 @@ class ApplicationWindow(QMainWindow):
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " resize() {0}").format(str(ex)))
 
-    def saveVectorGraph(self,extension=".pdf"):
+    def saveVectorGraph(self,extension=".pdf",fname=""):
         try: 
-            if extension == ".pdf":
-                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PDF", None),ext=extension)
+            if fname == "" or fname is None:
+                if extension == ".pdf":
+                    filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PDF", None),ext=extension, path=fname)
+                else:
+                    filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as SVG", None),ext=extension, path=fname)
             else:
-                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as SVG", None),ext=extension)
+                filename = fname
             if filename:
                 if extension not in filename:
                     filename += extension
@@ -26678,7 +26698,11 @@ class autosaveDlg(ArtisanDialog):
         autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]", None))
         self.autocheckbox = QCheckBox()
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None))
-        self.autocheckbox.setChecked(aw.qmc.autosaveflag)
+        self.autocheckbox.setChecked(aw.qmc.autosaveflag)        
+        autopdflabel = QLabel(QApplication.translate("CheckBox","Save PDF along", None))
+        self.autopdfcheckbox = QCheckBox()
+        self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save PDF version along .alog profiles",None))
+        self.autopdfcheckbox.setChecked(aw.qmc.autosavepdf)        
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None)))
@@ -26703,6 +26727,8 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(self.prefixEdit,1,1)
         autolayout.addWidget(pathButton,2,0)
         autolayout.addWidget(self.pathEdit,2,1)
+        autolayout.addWidget(self.autopdfcheckbox,3,0,Qt.AlignRight)
+        autolayout.addWidget(autopdflabel,3,1)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(autolayout)
         mainLayout.addStretch()
@@ -26724,6 +26750,7 @@ class autosaveDlg(ArtisanDialog):
             aw.qmc.autosaveflag = 0
             message = QApplication.translate("Message","Autosave OFF", None)
             aw.sendmessage(message)
+        aw.qmc.autosavepdf = self.autopdfcheckbox.isChecked()
         self.close()
 
 ##########################################################################
