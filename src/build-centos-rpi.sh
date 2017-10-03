@@ -71,5 +71,5 @@ cp README.txt dist
 cp LICENSE.txt dist
 
 
-## generate the .deb package
+tar -cf dist-centos64.tar dist
 
