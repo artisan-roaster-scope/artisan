@@ -26699,7 +26699,7 @@ class autosaveDlg(ArtisanDialog):
         self.autocheckbox = QCheckBox()
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None))
         self.autocheckbox.setChecked(aw.qmc.autosaveflag)        
-        autopdflabel = QLabel(QApplication.translate("CheckBox","Save PDF along", None))
+        autopdflabel = QLabel(QApplication.translate("CheckBox","Save PDF also", None))
         self.autopdfcheckbox = QCheckBox()
         self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save PDF version along .alog profiles",None))
         self.autopdfcheckbox.setChecked(aw.qmc.autosavepdf)        

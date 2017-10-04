@@ -184,6 +184,9 @@ download Python driver for the actual v22 API
 # sudo -H /usr/local/bin/python3.5 -m pip  install pyinstaller
  => pyinstaller-3.3
 
+19) fpm
 
-
-
+# sudo yum install ruby-devel gcc make rpm-build rubygems
+# sudo gem install --no-ri --no-rdoc fpm
+# fpm --version
+1.6.3
