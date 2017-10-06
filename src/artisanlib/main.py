@@ -1035,15 +1035,15 @@ class tgraphcanvas(FigureCanvas):
 
         self.fig = Figure(tight_layout={"pad":.2},frameon=True) # ,"h_pad":0.0,"w_pad":0.0
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
-    
-
-        #figure back color
+        
+#        #figure back color
 #        if platf == 'Darwin':
 #            self.backcolor ="#EEEEEE"
 #        else:
 #            self.backcolor = "white"
 #        self.fig.patch.set_facecolor(self.backcolor)
 #        self.fig.patch.set_edgecolor(self.backcolor)
+
         self.fig.patch.set_facecolor('None')
 
         v = 2
@@ -1066,8 +1066,9 @@ class tgraphcanvas(FigureCanvas):
             left=0.067, # the left side of the subplots of the figure (default: 0.125)
             right=.925) # the right side of the subplots of the figure (default: 0.9
         FigureCanvas.__init__(self, self.fig)
-        # important to make the Qt canvas transparent:
-        self.fig.canvas.setStyleSheet("background-color:transparent;")
+                    
+        # important to make the Qt canvas transparent (note that this changes stylesheets of childs like popups too!):
+        self.fig.canvas.setStyleSheet("background-color:transparent;") # default is white
 
         self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         self.fig.canvas.mpl_connect('pick_event', self.onpick)
@@ -2104,7 +2105,8 @@ class tgraphcanvas(FigureCanvas):
             elif event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag:# and not self.flagon:
                 timex = self.time2index(event.xdata)
                 if timex > 0:
-                    menu = QMenu(self) 
+                    menu = QMenu(aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
+#                    menu.setStyleSheet("QMenu::item {background-color: palette(window); selection-color: palette(window); selection-background-color: darkBlue;}")
                     # populate menu
                     ac = QAction(menu)
                     bt = self.temp2[timex]
@@ -8027,7 +8029,7 @@ class tgraphcanvas(FigureCanvas):
         self.currentx = event.xdata
         self.currenty = event.ydata
 
-        designermenu = QMenu(self)
+        designermenu = QMenu(aw)  # if we bind this to self, we inherit the background-color: transparent from self.fig
 
         designermenu.addSeparator()
 
