@@ -4822,11 +4822,13 @@ class tgraphcanvas(FigureCanvas):
                                 self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E1_last]-1)*10))))]) #repeat last event value
                             E1x = self.E1timex
                             E1y = self.E1values
+                            ds = "steps-post"
                         else:
                             E1x = []
                             E1y = []
+                            ds = None
                         self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
+                                                              picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex): 
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
                                 self.E2timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -4836,11 +4838,13 @@ class tgraphcanvas(FigureCanvas):
                                 self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E2_last]-1)*10))))]) #repeat last event value
                             E2x = self.E2timex
                             E2y = self.E2values
+                            ds = "steps-post"
                         else:
                             E2x = []
-                            E2y = []   
+                            E2y = []
+                            ds = None
                         self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
+                                                              picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
                                 self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -4850,11 +4854,13 @@ class tgraphcanvas(FigureCanvas):
                                 self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E3_last]-1)*10))))]) #repeat last event value
                             E3x = self.E3timex
                             E3y = self.E3values
+                            ds = "steps-post"
                         else:
                             E3x = []
-                            E3y = []                           
+                            E3y = []
+                            ds = None
                         self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
+                                                              picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -4864,11 +4870,13 @@ class tgraphcanvas(FigureCanvas):
                                 self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[E4_last]-1)*10))))]) #repeat last event value
                             E4x = self.E4timex
                             E4y = self.E4values
+                            ds = "steps-post"
                         else:
                             E4x = []
-                            E4y = []                           
+                            E4y = []
+                            ds = None
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                              picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                                                              picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:
@@ -5528,107 +5536,112 @@ class tgraphcanvas(FigureCanvas):
 
     #draws a polar star graph to score cupping. It does not delete any profile data.
     def flavorchart(self):
-
-        pi = math.pi
-        self.fig.clf()
-        #create a new name ax1 instead of ax (ax is used when plotting profiles)
-        
-        v = 2
         try:
-            v = int(mpl.__version__.split('.')[0])
-        except:
-            pass
-        if v >= 2:
-            self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor=self.backcolor) #) radar green facecolor='#d5de9c'
-        else:
-            self.ax1 = self.fig.add_subplot(111,projection='polar',axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
-        self.ax1.set_aspect(self.flavoraspect)
-        
-        aw.setFonts()
-
-        #find number of divisions
-        nflavors = len(self.flavors)      #last value of nflavors is used to close circle (same as flavors[0])
-
-        g_angle = numpy.arange(self.flavorstartangle,(360.+self.flavorstartangle),(360./nflavors))  #angles in degree
-        self.ax1.set_thetagrids(g_angle)
-        self.ax1.set_rmax(1.)
-        self.ax1.set_autoscale_on(False)
-        self.ax1.grid(True,linewidth=1.,color='green', linestyle = "-",alpha=.3)
-        # hack to make flavor labels visible also on top and bottom
-        self.ax1.set_xlabel(" -\n ", alpha=0.0)
-        self.ax1.set_title(" -\n ", alpha=0.0)
-
-        #create water marks 6-7 anf 8-9
-        self.ax1.bar(.1, .1, width=2.*pi, bottom=.6,color="green",linewidth=0.,alpha = .1)
-        self.ax1.bar(.1, .1, width=2.*pi, bottom=.8,color="green",linewidth=0.,alpha = .1)
-
-        #delete degrees ticks to anotate flavor characteristics 
-        for tick in self.ax1.xaxis.get_major_ticks():
-            tick.label1On = False
-        
-        fontprop_small = aw.mpl_fontproperties.copy()
-        fontprop_small.set_size("x-small")
-
-        #rename yaxis 
-        locs = self.ax1.get_yticks()
-        labels = []
-        for i in range(len(locs)):
-            stringlabel = str(int(locs[i]*10))
-            labels.append(stringlabel)
-        self.ax1.set_yticklabels(labels,color=self.palette["xlabel"],fontproperties=fontprop_small)
-
-        step = 2.*pi/nflavors
-        angles = [math.radians(self.flavorstartangle)]   #angles in radians
-        for i in range(nflavors-1): angles.append(angles[-1] + step)
-
-        #To close circle we need one more element. angle and values need same dimension in order to plot.
-        plotf = self.flavors[:]
-        plotf.append(self.flavors[0])
-        #normalize flavor values to 0-1 range
-        for i in range(len(plotf)):
-            plotf[i] /= 10.
-        angles.append(angles[-1]+step)
+    
+            pi = math.pi
+            self.fig.clf()
+            #create a new name ax1 instead of ax (ax is used when plotting profiles)
             
-        #anotate labels
-        for i in range(len(self.flavorlabels)):
-            if angles[i] > 2.*pi or angles[i] < 0.:
-                _,angles[i] = divmod(angles[i],(2.*pi))
-            if angles[i] <= (pi/2.) or angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degress
-                ha = "left"
+            v = 2
+            try:
+                v = int(mpl.__version__.split('.')[0])
+            except:
+                pass
+            if v >= 2:
+    #            self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor=self.backcolor) #) radar green facecolor='#d5de9c'
+                self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor='None') #) radar green facecolor='#d5de9c'
             else:
-                ha = "right"
-            self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
-                                fontproperties=fontprop_small,
-                                xytext=(angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
-
-        score = 0.
-        for i in range(nflavors):
-            score += self.flavors[i]
-        score /= (nflavors)
-        score *= 10.
-
-        txt = "%.2f" %score
-        self.ax1.text(0.,0.,txt,fontsize="x-large",fontproperties=aw.mpl_fontproperties,color="blue",horizontalalignment="center",bbox={"facecolor":"yellow", "alpha":0.3, "pad":10})
-
-        #add background to plot if found
-        if self.background:
-            if self.flavorbackgroundflag:
-                backgroundplotf = self.backgroundFlavors[:]
-                backgroundplotf.append(self.backgroundFlavors[0])
-                #normalize flavor values to 0-1 range
-                for i in range(len(backgroundplotf)):
-                    backgroundplotf[i] /= 10.
-
-                self.ax1.plot(angles,backgroundplotf,color="orange",marker="o",alpha=.5)
-                #needs matplotlib 1.0.0+
-                self.ax1.fill_between(angles,0,backgroundplotf, facecolor="yellow", alpha=0.1, interpolate=True)
-
-        #add to plot
-        self.ax1.plot(angles,plotf,color="blue",marker="o")
-        
-        self.ax1.fill_between(angles,0,plotf, facecolor='green', alpha=0.1, interpolate=True)
-
-        self.fig.canvas.draw()
+    #            self.ax1 = self.fig.add_subplot(111,projection='polar',axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
+                self.ax1 = self.fig.add_subplot(111,projection='polar',axisbg='None') #) radar green axisbg='#d5de9c'
+            self.ax1.set_aspect(self.flavoraspect)
+            
+            aw.setFonts(redraw=False)
+    
+            #find number of divisions
+            nflavors = len(self.flavors)      #last value of nflavors is used to close circle (same as flavors[0])
+    
+            g_angle = numpy.arange(self.flavorstartangle,(360.+self.flavorstartangle),(360./nflavors))  #angles in degree
+            self.ax1.set_thetagrids(g_angle)
+            self.ax1.set_rmax(1.)
+            self.ax1.set_autoscale_on(False)
+            self.ax1.grid(True,linewidth=1.,color='green', linestyle = "-",alpha=.3)
+            # hack to make flavor labels visible also on top and bottom
+            self.ax1.set_xlabel(" -\n ", alpha=0.0)
+            self.ax1.set_title(" -\n ", alpha=0.0)
+    
+            #create water marks 6-7 anf 8-9
+            self.ax1.bar(.1, .1, width=2.*pi, bottom=.6,color="green",linewidth=0.,alpha = .1)
+            self.ax1.bar(.1, .1, width=2.*pi, bottom=.8,color="green",linewidth=0.,alpha = .1)
+    
+            #delete degrees ticks to anotate flavor characteristics 
+            for tick in self.ax1.xaxis.get_major_ticks():
+                tick.label1On = False
+            
+            fontprop_small = aw.mpl_fontproperties.copy()
+            fontprop_small.set_size("x-small")
+    
+            #rename yaxis 
+            locs = self.ax1.get_yticks()
+            labels = []
+            for i in range(len(locs)):
+                stringlabel = str(int(locs[i]*10))
+                labels.append(stringlabel)
+            self.ax1.set_yticklabels(labels,color=self.palette["xlabel"],fontproperties=fontprop_small)
+    
+            step = 2.*pi/nflavors
+            angles = [math.radians(self.flavorstartangle)]   #angles in radians
+            for i in range(nflavors-1): angles.append(angles[-1] + step)
+    
+            #To close circle we need one more element. angle and values need same dimension in order to plot.
+            plotf = self.flavors[:]
+            plotf.append(self.flavors[0])
+            #normalize flavor values to 0-1 range
+            for i in range(len(plotf)):
+                plotf[i] /= 10.
+            angles.append(angles[-1]+step)
+                
+            #anotate labels
+            for i in range(len(self.flavorlabels)):
+                if angles[i] > 2.*pi or angles[i] < 0.:
+                    _,angles[i] = divmod(angles[i],(2.*pi))
+                if angles[i] <= (pi/2.) or angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degress
+                    ha = "left"
+                else:
+                    ha = "right"
+                self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
+                                    fontproperties=fontprop_small,
+                                    xytext=(angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
+    
+            score = 0.
+            for i in range(nflavors):
+                score += self.flavors[i]
+            score /= (nflavors)
+            score *= 10.
+    
+            txt = "%.2f" %score
+            self.ax1.text(0.,0.,txt,fontsize="x-large",fontproperties=aw.mpl_fontproperties,color="blue",horizontalalignment="center",bbox={"facecolor":"yellow", "alpha":0.3, "pad":10})
+    
+            #add background to plot if found
+            if self.background:
+                if self.flavorbackgroundflag:
+                    backgroundplotf = self.backgroundFlavors[:]
+                    backgroundplotf.append(self.backgroundFlavors[0])
+                    #normalize flavor values to 0-1 range
+                    for i in range(len(backgroundplotf)):
+                        backgroundplotf[i] /= 10.
+    
+                    self.ax1.plot(angles,backgroundplotf,color="orange",marker="o",alpha=.5)
+                    #needs matplotlib 1.0.0+
+                    self.ax1.fill_between(angles,0,backgroundplotf, facecolor="yellow", alpha=0.1, interpolate=True)
+    
+            #add to plot
+            self.ax1.plot(angles,plotf,color="blue",marker="o")
+            
+            self.ax1.fill_between(angles,0,plotf, facecolor='green', alpha=0.1, interpolate=True)
+    
+            self.fig.canvas.draw()
+        except Exception:
+            pass
         
     def samplingAction(self):
         try:
@@ -8725,15 +8738,18 @@ class tgraphcanvas(FigureCanvas):
             except:
                 pass
             if v >= 2:
-                self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor=self.backcolor)            
+#                self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor=self.backcolor)            
+                self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor='None')
+#                self.ax2 = self.fig.add_subplot(111, polar=True,facecolor='None')
             else:
-                self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg=self.backcolor)
+#                self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg=self.backcolor)
+                self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg='None')
             self.ax2.set_rmax(1.)
             self.ax2.set_aspect(self.wheelaspect)
-            self.ax2.set_autoscale_on(True)
+#            self.ax2.set_autoscale_on(True) # fails on MPL2.1
             self.ax2.grid(False)
 
-            #delete degrees ticks to anotate flavor characteristics 
+            #delete degrees ticks 
             for tick in self.ax2.xaxis.get_major_ticks():
                 tick.label1On = False
             #delete yaxis 
@@ -8753,7 +8769,7 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.canvas.draw()
                 return
 
-            n,textangles,textloc = [],[],[]
+            n,textangles,textloc = [],[],[] # nr of names, text angles, text locations
             for i in range(wheels):
                 l,tloc = [],[]
                 count = self.startangle[i]
@@ -8774,7 +8790,6 @@ class tgraphcanvas(FigureCanvas):
                 startangle[i] = startangle[i]/rad                   #convert angles to radians
                 n.append(len(names[i]))                             #store the number of names for each wheel
 
-
             #store the absolute len-radius origin of each circle
             lbottom = [0.]
             count = 0.
@@ -8791,26 +8806,18 @@ class tgraphcanvas(FigureCanvas):
             for z in range(len(n)):
                 #create wheel
                 theta,segmentwidth,radii = [],[],[]
-                count = startangle[z]
-                ## to work around a bug with polar projection in matplotlib 2.x we have to add an initial offset to count
-                ## however, there still seems to be something broken..
-                v = 2
-                try:
-                    v = int(mpl.__version__.split('.')[0])
-                except:
-                    pass
-                if v >= 2:
-                    count = count + div * 100/n[z] / 2.
+                count = startangle[z] 
                 for i in range(n[z]):
                     #negative number affect eventpicker
                     if count > threesixty:
                         count %= threesixty
                     elif count < 0.:
                         count += threesixty
-                    theta.append(count)
+                    theta.append(count + div*self.segmentlengths[z][i] / 2.)
                     count += div*self.segmentlengths[z][i]
                     segmentwidth.append(div*self.segmentlengths[z][i])
                     radii.append(Wradii[z])
+                
                 bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,
                                         linewidth=self.wheellinewidth,picker=1))
                 count = 0
@@ -33380,7 +33387,7 @@ class serialport(object):
             aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input attached",None))
         elif deviceType == DeviceID.PHIDID_TMP1200:
             self.configureOneRTD()
-            aw.sendmessage(QApplication.translate("Message","Phidget RTD 1-input attached",None))
+            aw.sendmessage(QApplication.translate("Message","Phidget VINT RTD 1-input attached",None))
 
     def phidget1045detached(self,deviceType,e):
         if deviceType == DeviceID.PHIDID_1045:
