@@ -5559,8 +5559,10 @@ class tgraphcanvas(FigureCanvas):
     
             #find number of divisions
             nflavors = len(self.flavors)      #last value of nflavors is used to close circle (same as flavors[0])
+            
     
-            g_angle = numpy.arange(self.flavorstartangle,(360.+self.flavorstartangle),(360./nflavors))  #angles in degree
+            sa = self.flavorstartangle % (360./nflavors)
+            g_angle = numpy.arange(sa,(360.+sa),(360./nflavors))  #angles in degree
             self.ax1.set_thetagrids(g_angle)
             self.ax1.set_rmax(1.)
             self.ax1.set_autoscale_on(False)
@@ -5589,7 +5591,8 @@ class tgraphcanvas(FigureCanvas):
             self.ax1.set_yticklabels(labels,color=self.palette["xlabel"],fontproperties=fontprop_small)
     
             step = 2.*pi/nflavors
-            angles = [math.radians(self.flavorstartangle)]   #angles in radians
+            startradian = math.radians(self.flavorstartangle)
+            angles = [startradian]   #angles in radians
             for i in range(nflavors-1): angles.append(angles[-1] + step)
     
             #To close circle we need one more element. angle and values need same dimension in order to plot.
@@ -5600,8 +5603,6 @@ class tgraphcanvas(FigureCanvas):
                 plotf[i] /= 10.
             angles.append(angles[-1]+step)
             
-            print(angles)
-                
             #anotate labels
             for i in range(len(self.flavorlabels)):
                 if angles[i] > 2.*pi or angles[i] < 0.:
@@ -5610,7 +5611,6 @@ class tgraphcanvas(FigureCanvas):
                     ha = "left"
                 else:
                     ha = "right"
-                print(i,angles[i])
                 self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
                                     fontproperties=fontprop_small,
                                     xytext=(angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
