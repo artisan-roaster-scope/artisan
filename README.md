@@ -41,7 +41,9 @@ Features
   * VOLTCRAFT K201, K202, K204, 300K, 302KJ, PL-125-T2
   * EXTECH 755, 421509
   * Apollo DT301
-  * [Arduino TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) with PID ([serial protocol](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan/trunk/src/aArtisan/commands.txt))
+  * [Arduino TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) with PID support
+     - [aArtisan firmware v3.10](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan/tags/REL-310) from 1.7.2015 by Jim ([serial commands](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan/trunk/src/aArtisan/commands.txt), baudrate: 115200)
+     - [aArtisanQ PID 6 firmware](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/branches/aArtisanQ_PID_6) by Brad ([configuration notes](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan_PID/tags/REL-aArtisanQ_PID_6_2_3/aArtisanQ_PID/Configuration%20Options.pdf), [serial commands](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan_PID/branches/aArtisanQ_PID_6/aArtisanQ_PID/commands.txt), baudrate: 115200)
   * TE VA18B
   * HHM28 multimeter
   * Amprobe TMD-56 (non-wireless)
@@ -94,9 +96,12 @@ Features
 Documentation and Support
 ------------------------
 - [Installation](wiki/Installation.md)
-- [Artisan Blog](http://artisan-roasterscope.blogspot.de/)
+- [Artisan Blog](http://artisan-roasterscope.blogspot.de/) ([Overview](https://artisan-roasterscope.blogspot.de/p/contents.html))
 - [User Mailing List](https://mailman.ghostdub.de/mailman/listinfo/artisan-user) (you need to subscribe to send and receive messages)
-  * NOTE: you will receive a warning on sign up that "the site is not secure". This is because the SSL-certificate to sign up for this list has expired. Just ignore this warning. The sign up and the use of the list IS secure. We currently don't have a way to fix that on the server. Sorry.
+  * NOTES: 
+     - you will receive a warning on sign up that "the site is not secure". This is because the SSL-certificate to sign up for this list has expired. Just ignore this warning. The sign up and the use of the list IS secure. We currently don't have a way to fix that on the server. Sorry.
+     - Only subscribers can send messages to the list. Messages from others are deleted by the system
+     - Messages with large attachments (images) will be deleted by the system
 - Documentation (written by users)
   * [Documentation on v0.5.x](http://coffeetroupe.com/artisandocs/)
   * [aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon

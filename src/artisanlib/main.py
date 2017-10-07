@@ -2625,7 +2625,7 @@ class tgraphcanvas(FigureCanvas):
                 # alarm popup message
                 #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber])
                 # alarm popup message with 10sec timeout
-                amb = ArtisanMessageBox(self,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=10)
+                amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=10)
                 amb.show()
                 #send alarm also to connected WebLCDs clients
                 if aw.WebLCDs and aw.WebLCDsAlerts:
@@ -3482,7 +3482,7 @@ class tgraphcanvas(FigureCanvas):
         #prevents deleting accidentally a finished roast
         if self.safesaveflag == True and len(aw.qmc.timex) > 3:
             string = QApplication.translate("Message","Save the profile, Discard the profile (Reset), or Cancel?", None)
-            reply = QMessageBox.warning(self,QApplication.translate("Message","Profile unsaved", None),string,
+            reply = QMessageBox.warning(aw,QApplication.translate("Message","Profile unsaved", None),string,
                                 QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
             if reply == QMessageBox.Save:
                 aw.fileSave(aw.curFile)  #if accepted, makes safesaveflag = False
@@ -5384,7 +5384,7 @@ class tgraphcanvas(FigureCanvas):
                     reply = QMessageBox.Yes
                 else:
                     string = QApplication.translate("Message", "Convert profile data to Fahrenheit?",None)
-                    reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None),string,
+                    reply = QMessageBox.question(aw,QApplication.translate("Message", "Convert Profile Temperature",None),string,
                             QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Cancel:
                     return 
@@ -5428,7 +5428,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.sendmessage(QApplication.translate("Message","Profile changed to Fahrenheit", None))
 
                     elif not silent:
-                        QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Temperature",None),
+                        QMessageBox.information(aw,QApplication.translate("Message", "Convert Profile Temperature",None),
                                                 QApplication.translate("Message", "Unable to comply. You already are in Fahrenheit", None))
                         aw.sendmessage(QApplication.translate("Message","Profile not changed", None))
                         return
@@ -5438,7 +5438,7 @@ class tgraphcanvas(FigureCanvas):
                     reply = QMessageBox.Yes
                 else:
                     string = QApplication.translate("Message", "Convert profile data to Celsius?",None)
-                    reply = QMessageBox.question(self,QApplication.translate("Message", "Convert Profile Temperature",None),string,
+                    reply = QMessageBox.question(aw,QApplication.translate("Message", "Convert Profile Temperature",None),string,
                             QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Cancel:
                     return 
@@ -5472,7 +5472,7 @@ class tgraphcanvas(FigureCanvas):
                             self.stemp2B[i] = self.fromFtoC(self.stemp2B[i])
 
                     elif not silent:
-                        QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Temperature",None),
+                        QMessageBox.information(aw,QApplication.translate("Message", "Convert Profile Temperature",None),
                                                 QApplication.translate("Message", "Unable to comply. You already are in Celsius",None))
                         aw.sendmessage(QApplication.translate("Message","Profile not changed", None))
                         return
@@ -5484,7 +5484,7 @@ class tgraphcanvas(FigureCanvas):
                 self.redraw(recomputeAllDeltas=True,smooth=True)
 
         elif not silent:
-            QMessageBox.information(self,QApplication.translate("Message", "Convert Profile Scale",None),
+            QMessageBox.information(aw,QApplication.translate("Message", "Convert Profile Scale",None),
                                           QApplication.translate("Message", "No profile data found",None))
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
@@ -5599,6 +5599,8 @@ class tgraphcanvas(FigureCanvas):
             for i in range(len(plotf)):
                 plotf[i] /= 10.
             angles.append(angles[-1]+step)
+            
+            print(angles)
                 
             #anotate labels
             for i in range(len(self.flavorlabels)):
@@ -5608,6 +5610,7 @@ class tgraphcanvas(FigureCanvas):
                     ha = "left"
                 else:
                     ha = "right"
+                print(i,angles[i])
                 self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + "\n" + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
                                     fontproperties=fontprop_small,
                                     xytext=(angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
@@ -7486,7 +7489,7 @@ class tgraphcanvas(FigureCanvas):
                                                      None)) + "</b><br><br>"
             string += str(roots)
 
-            QMessageBox.information(self,QApplication.translate("Message","Profile information",None),string)
+            QMessageBox.information(aw,QApplication.translate("Message","Profile information",None),string)
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info() 
@@ -7794,7 +7797,7 @@ class tgraphcanvas(FigureCanvas):
             self.togglecrosslines()
 
         if len(self.timex):
-            reply = QMessageBox.question(self,QApplication.translate("Message","Designer Start",None),
+            reply = QMessageBox.question(aw,QApplication.translate("Message","Designer Start",None),
                                          QApplication.translate("Message","Importing a profile in to Designer will decimate all data except the main [points].\nContinue?",None),
                                          QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
@@ -7881,7 +7884,7 @@ class tgraphcanvas(FigureCanvas):
     #loads main points from a profile so that they can be edited
     def initfromprofile(self):
         if self.timeindex[0] == -1 or self.timeindex[6] == 0:
-            QMessageBox.information(self,QApplication.translate("Message","Designer Init",None),
+            QMessageBox.information(aw,QApplication.translate("Message","Designer Init",None),
                                     QApplication.translate("Message","Unable to start designer.\nProfile missing [CHARGE] or [DROP]",None))
             self.disconnect_designer()
             return()
@@ -8888,7 +8891,7 @@ class tgraphcanvas(FigureCanvas):
         for x in range(1,len(self.wheellabelparent)):
             for i in range(len(self.wheellabelparent[x])):
                 if self.wheellabelparent[x][i] == 0:
-                    QMessageBox.information(self,"Wheel Hierarchy Problem",
+                    QMessageBox.information(aw,"Wheel Hierarchy Problem",
                     "Please assign a  a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
                     return
 
@@ -11703,7 +11706,7 @@ class ApplicationWindow(QMainWindow):
         action = self.sender()
         if action:
             string = QApplication.translate("Message", "Configure for {0}?",None).format(action.text())
-            reply = QMessageBox.question(self,QApplication.translate("Message", "Adjust Settings",None),string,
+            reply = QMessageBox.question(aw,QApplication.translate("Message", "Adjust Settings",None),string,
                 QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Cancel:
                 return 
@@ -13209,7 +13212,7 @@ class ApplicationWindow(QMainWindow):
 
     def resetApplication(self):
         string = QApplication.translate("Message","Do you want to reset all settings?", None)
-        reply = QMessageBox.warning(self,QApplication.translate("Message","Factory Reset", None),string,
+        reply = QMessageBox.warning(aw,QApplication.translate("Message","Factory Reset", None),string,
                             QMessageBox.Cancel | QMessageBox.Reset)
         if reply == QMessageBox.Reset :
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
@@ -13576,7 +13579,7 @@ class ApplicationWindow(QMainWindow):
                         #if designer ON
                         if self.qmc.designerflag:
                             string = QApplication.translate("Message","Exit Designer?", None)
-                            reply = QMessageBox.question(self,QApplication.translate("Message", "Designer Mode ON",None),string,QMessageBox.Yes|QMessageBox.Cancel)
+                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Designer Mode ON",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                             if reply == QMessageBox.Yes:
                                 self.stopdesigner()
                             else:
@@ -15253,7 +15256,7 @@ class ApplicationWindow(QMainWindow):
                         if quiet:
                             reply = QMessageBox.Yes
                         else:
-                            reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
+                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                         if reply == QMessageBox.Yes:
                             if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
                                 aw.qmc.resetlinecountcaches()
@@ -15685,7 +15688,7 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(aw,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
 
     # the int n specifies the number of digits
     def float2float(self,f,n=1):
@@ -17292,7 +17295,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + "  settingsLoad()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + "  settingsLoad()  @line " + str(exc_tb.tb_lineno))
 
 #--------------------------------
         try:
@@ -18146,7 +18149,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info() 
-            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEvent()  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEvent()  @line " + str(exc_tb.tb_lineno))
 
     #used for trouble shooting.
     def readartisansettings(self):
@@ -20444,7 +20447,7 @@ class ApplicationWindow(QMainWindow):
         aw.qmc.oversampling = not aw.qmc.oversampling
         aw.oversamplingAction.setChecked(aw.qmc.oversampling)
         if aw.qmc.oversampling and self.qmc.delay < aw.qmc.oversampling_min_delay:
-            QMessageBox.warning(self,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", 
+            QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", 
             "Oversampling is only active with a sampling interval equal or larger than 3s.",None))
 
 
@@ -20459,7 +20462,7 @@ class ApplicationWindow(QMainWindow):
         if ok:
             self.qmc.delay = int(secondsdelay*1000.)
             if self.qmc.delay <= self.qmc.min_delay + 1000:
-                QMessageBox.warning(self,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))
+                QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))
 
     def setcommport(self):
         dialog = comportDlg(self)
@@ -20881,7 +20884,7 @@ class ApplicationWindow(QMainWindow):
             dialog = AlarmDlg(self)
             dialog.show()
         else:
-            QMessageBox.information(self,QApplication.translate("Message", "Alarm Config",None),
+            QMessageBox.information(aw,QApplication.translate("Message", "Alarm Config",None),
                                     QApplication.translate("Message", "Alarms are not available for device None",None))
 
     def switchLanguageFlag(self,locale,value):
@@ -20939,7 +20942,7 @@ class ApplicationWindow(QMainWindow):
             self.switchLanguageFlag(languagelocale,True)
             settings = QSettings()
             settings.setValue('locale', languagelocale)
-            QMessageBox.information(self,QApplication.translate("Message", "Switch Language",None),
+            QMessageBox.information(aw,QApplication.translate("Message", "Switch Language",None),
                                     QApplication.translate("Message","Language successfully changed. Restart the application.",None))
 
     # takes the weight of the green and roasted coffee as floats and
@@ -21277,7 +21280,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 if ex is not None and ex != [] and len(self.qmc.extradevices) < 1:
                     string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
-                    reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
+                    reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                     if reply == QMessageBox.Yes:
                         if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
                             aw.addDevice()
@@ -37647,7 +37650,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         string += "#!/usr/bin/env python<br>"
         string += "print (\"237.1,100.4\")"
         translatedstring = QApplication.translate("Message",string,None)
-        QMessageBox.information(self,QApplication.translate("Message", "External program",None),translatedstring)
+        QMessageBox.information(aw,QApplication.translate("Message", "External program",None),translatedstring)
 
     def loadprogramname(self):
         fileName = aw.ArtisanOpenFileDialog()
@@ -41194,7 +41197,7 @@ class PXRpidDlgControl(ArtisanDialog):
         string += QApplication.translate("Message","If you need to change it, change it now and come back later",None) + "\n"
         string += QApplication.translate("Message","Use the Parameter Loader Software by Fuji if you need to\n\n",None) + "\n\n\n"
         string += QApplication.translate("Message","Continue?",None)
-        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
+        reply = QMessageBox.question(aw,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             return 0
@@ -42577,7 +42580,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         if N != -1:
             if N != svn:
                 string = QApplication.translate("Message","Current sv = {0}. Change now to sv = {1}?",None).format(str(N),str(svn))
-                reply = QMessageBox.question(self,QApplication.translate("Message","Change svN",None),string,
+                reply = QMessageBox.question(aw,QApplication.translate("Message","Change svN",None),string,
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     #change variable svN
@@ -42638,7 +42641,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             # if current svN is different than requested svN
             if N != pidn:
                 string = QApplication.translate("Message","Current pid = {0}. Change now to pid ={1}?",None).format(str(N),str(pidn))
-                reply = QMessageBox.question(self,QApplication.translate("Message","Change svN",None),string,
+                reply = QMessageBox.question(aw,QApplication.translate("Message","Change svN",None),string,
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     #change variable svN
@@ -43198,7 +43201,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         string += "\nIf you need to change it, change it now and come back later"
         string += "\nUse the Parameter Loader Software by Fuji if you need to\n\n"
         string += "\n\n\nContinue?" 
-        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
+        reply = QMessageBox.question(aw,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             return 0
@@ -43404,7 +43407,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             N = aw.fujipid.readoneword(command)
         aw.fujipid.PXG4["selectedpid"][0] = N
         string = QApplication.translate("StatusBar","Current pid = {0}. Proceed with autotune command?",None).format(str(N))
-        reply = QMessageBox.question(self,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
+        reply = QMessageBox.question(aw,QApplication.translate("Message","Ramp Soak start-end mode",None),string,
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             self.status.showMessage(QApplication.translate("StatusBar","Autotune cancelled",None),5000)
@@ -43850,8 +43853,7 @@ class FujiPID(object):
             aw.button_17.setVisible(False)
         #turn on
         elif flag == 1:
-            A = QLabel()
-            reply = QMessageBox.question(A,QApplication.translate("Message","Activate PID front buttons",None),
+            reply = QMessageBox.question(aw,QApplication.translate("Message","Activate PID front buttons",None),
                                          QApplication.translate("Message","Remember SV memory has a finite\nlife of ~10,000 writes.\n\nProceed?",None),
                                          QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Cancel:
