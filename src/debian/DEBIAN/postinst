@@ -50,6 +50,12 @@ case "$1" in
    fi
    ;;
 
+   1)
+   if rpm -q xdg-utils;
+       then set_mime;
+   fi
+   ;;
+
    *)
 
    ;;

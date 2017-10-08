@@ -49,6 +49,12 @@ case "$1" in
    fi
    ;;
 
+   0|2)
+   if rpm -q xdg-utils;
+       then clear_mime;
+   fi
+   ;;
+
    *)
 
    ;;
