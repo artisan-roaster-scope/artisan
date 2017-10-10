@@ -1496,7 +1496,7 @@ class tgraphcanvas(FigureCanvas):
         self.zgrid_F_default = 10
         
         self.ylimit_C_default = 250
-        self.ylimit_min_C_default = 50
+        self.ylimit_min_C_default = 0
         self.ygrid_C_default = 25
         self.zlimit_C_default = 35
         self.zlimit_min_C_default = -5
@@ -1521,7 +1521,7 @@ class tgraphcanvas(FigureCanvas):
         # axis limits
         self.endofx = self.endofx_default
         self.startofx = self.startofx_default
-        self.resetmaxtime = 900  #time when pressing reset
+        self.resetmaxtime = 600  #time when pressing reset: 10min*60
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
         self.locktimex = True # if true, do not set time axis min and max from profile on load
         self.autotimex = True # automatically set time axis min and max from profile CHARGE/DROP on load
@@ -2635,7 +2635,7 @@ class tgraphcanvas(FigureCanvas):
                 fname = u(self.alarmstrings[alarmnumber])
 # take care, the QDir().current() directory changes with loads and saves                
 #                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
-                if platf == 'Windows':
+                if False and platf == 'Windows': # this Windows version fails on commands with arguments
                     f = u("file:///") + u(QApplication.applicationDirPath()) + "/" + u(fname)
                     res = QDesktopServices.openUrl(QUrl(f, QUrl.TolerantMode))
                 else:
@@ -5731,6 +5731,8 @@ class tgraphcanvas(FigureCanvas):
             if len(self.timex) == 1:
                 aw.qmc.clearMeasurements()
             aw.pidcontrol.pidOff()
+            if aw.qmc.device == 53:
+                aw.HottopControlOff()
             # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
             if aw.qmc.device == 0 and aw.fujipid.followBackground:
                 if aw.fujipid.sv and aw.fujipid.sv > 0:
@@ -10066,6 +10068,7 @@ class ApplicationWindow(QMainWindow):
         self.eventslidermin = [0,0,0,0]
         self.eventslidermax = [100,100,100,100]
         self.eventslidersflag = 1  #shows/hides sliders  1/0; records the user choice, not the actual state!
+        self.eventslidercoarse = [0,0,0,0] # if 1, sliders step in multiples of 10, otherwise 1
         
         #event quantifiers        
         self.eventquantifieractive = [0,0,0,0]
@@ -10080,7 +10083,7 @@ class ApplicationWindow(QMainWindow):
         self.eventquantifierthresholdcoarse = .5
         self.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
         self.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
-
+        
         # set window title
         self.windowTitle = "Artisan %s"%str(__version__)
         self.setWindowTitle(self.windowTitle)
@@ -11432,7 +11435,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox1.setVisible(False)
         self.slider1.setTracking(False)
         self.slider1.sliderMoved.connect(lambda v=0:self.updateSliderLCD(0,v))
-        self.slider1.valueChanged.connect(lambda v=0:self.sliderReleased(0) or self.updateSliderLCD(0,v))
+        self.slider1.valueChanged.connect(lambda v=0:self.sliderReleased(0,updateLCD=True))
         self.slider1.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.slider2 = self.slider()
@@ -11452,7 +11455,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox2.setVisible(False)
         self.slider2.setTracking(False)
         self.slider2.sliderMoved.connect(lambda v=0:self.updateSliderLCD(1,v))
-        self.slider2.valueChanged.connect(lambda v=0:self.sliderReleased(1) or self.updateSliderLCD(1,v))
+        self.slider2.valueChanged.connect(lambda v=0:self.sliderReleased(1,updateLCD=True))
         self.slider2.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.slider3 = self.slider()
@@ -11472,7 +11475,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox3.setVisible(False)
         self.slider3.setTracking(False)
         self.slider3.sliderMoved.connect(lambda v=0:self.updateSliderLCD(2,v))
-        self.slider3.valueChanged.connect(lambda v=0:self.sliderReleased(2) or self.updateSliderLCD(2,v))
+        self.slider3.valueChanged.connect(lambda v=0:self.sliderReleased(2,updateLCD=True))
         self.slider3.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.slider4 = self.slider()
@@ -11492,7 +11495,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox4.setVisible(False)
         self.slider4.setTracking(False)
         self.slider4.sliderMoved.connect(lambda v=0:self.updateSliderLCD(3,v))
-        self.slider4.valueChanged.connect(lambda v=0:self.sliderReleased(3) or self.updateSliderLCD(3,v))
+        self.slider4.valueChanged.connect(lambda v=0:self.sliderReleased(3,updateLCD=True))
         self.slider4.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.sliderSV = self.slider()
@@ -11675,10 +11678,16 @@ class ApplicationWindow(QMainWindow):
         for i in range(len(aw.qmc.extradevices)):
             if i < len(aw.qmc.extraname1):
                 l1 = "<b>" + aw.qmc.extraname1[i] + "</b>"
-                aw.extraLCDlabel1[i].setText(l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
+                try:
+                    aw.extraLCDlabel1[i].setText(l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
+                except:
+                    aw.extraLCDlabel1[i].setText(l1)
             if i < len(aw.qmc.extraname2):
                 l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
-                aw.extraLCDlabel2[i].setText(l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))        
+                try:
+                    aw.extraLCDlabel2[i].setText(l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))        
+                except:
+                    aw.extraLCDlabel2[i].setText(l2)
         aw.settooltip()
 
     def populateMachineMenu(self):
@@ -11711,7 +11720,7 @@ class ApplicationWindow(QMainWindow):
             if reply == QMessageBox.Cancel:
                 return 
             elif reply == QMessageBox.Yes:
-                aw.loadSettings(fn=action.data())
+                aw.loadSettings(fn=action.data(),remember=False)
                 aw.settypedefault()
                 if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
                     host,res = QInputDialog.getText(self,
@@ -11721,6 +11730,35 @@ class ApplicationWindow(QMainWindow):
                         aw.modbus.host = host
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
+                elif aw.qmc.device == 53: # Hottop
+                    comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
+                    if platf == 'Darwin':
+                        ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
+                            '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])])
+                    else:
+                        ports = list(comports)
+                    if aw.ser.comport not in [p[0] for p in ports]:
+                        ports.append([aw.ser.comport,"",""])
+                    ports = sorted(ports,key=lambda p: p[0])
+                    items = [(p[1] if (p[1] and p[1]!="n/a") else p[0]) for p in ports]
+                    current = 0
+                    try:
+                        current = [p[0] for p in ports].index(aw.ser.comport)
+                    except Exception:
+                        pass
+                    port_name,res = QInputDialog.getItem(self,
+                        QApplication.translate("Message", "Serial Port Configuration",None),
+                        QApplication.translate("Message", "Comm Port",None),
+                        items,
+                        current,
+                        False)
+                    if res:
+                        try:
+                            pos = items.index(port_name)
+                            aw.ser.comport = ports[pos][0]
+                        except:
+                            pass
+                    
 
     def process_active_quantifiers(self):
         # called every sampling interval
@@ -12642,22 +12680,47 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sliderSV.setSliderPosition(v)
 
-    def sliderReleased(self,n,force=False):
+    # if updateLCD=True, call moveslider() which in turn updates the LCD
+    def sliderReleased(self,n,force=False, updateLCD=False):
         if n == 0:
             if force or self.slider1.value() != self.eventslidervalues[0]:
-                self.eventslidervalues[0] = self.slider1.value()
+                if aw.eventslidercoarse[0]:
+                    v = int(round(self.slider1.value() / 10.))*10
+                else:
+                    v = self.slider1.value()
+                self.eventslidervalues[0] = v
+                if updateLCD:
+                    self.moveslider(0,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 1:
             if force or self.slider2.value() != self.eventslidervalues[1]:
-                self.eventslidervalues[1] = self.slider2.value()
+                if aw.eventslidercoarse[1]:
+                    v = int(round(self.slider2.value() / 10.))*10
+                else:
+                    v = self.slider2.value()
+                self.eventslidervalues[1] = v
+                if updateLCD:
+                    self.moveslider(1,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 2:
             if force or self.slider3.value() != self.eventslidervalues[2]:
-                self.eventslidervalues[2] = self.slider3.value()
+                if aw.eventslidercoarse[2]:
+                    v = int(round(self.slider3.value() / 10.))*10
+                else:
+                    v = self.slider3.value()
+                self.eventslidervalues[2] = v
+                if updateLCD:
+                    self.moveslider(2,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 3:
             if force or self.slider4.value() != self.eventslidervalues[3]:
-                self.eventslidervalues[3] = self.slider4.value()
+                if aw.eventslidercoarse[3]:
+                    v = int(round(self.slider4.value() / 10.))*10
+                else:
+                    v = self.slider4.value()
+                self.eventslidervalues[3] = v
+                if updateLCD:
+                    self.moveslider(3,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         return False
 
@@ -12828,17 +12891,19 @@ class ApplicationWindow(QMainWindow):
                     else:
                         cmd_str = cmd_str.replace('\\r\\n','\n\r').replace('\\n', '\n').replace('\\t','\t')
                         self.ser.sendTXcommand(cmd_str)
-                elif action == 2: # slider and button call program action
+                elif action == 2: # button call program action
                     try:
-                        if cmd_str and (len(cmd_str.split(" ")) > 1 or platf == 'Darwin' or platf == 'Linux'):
-                            self.call_prog_with_args(cmd_str) # a command with argument
-                        else:
-# take care, the QDir().current() directory changes with loads and saves 
-#                        QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
-                            if platf in ['Windows','Linux']:
-                                QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/" + cmd_str, QUrl.TolerantMode))
-                            else: # on Darwin
-                                QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.TolerantMode))
+                        if cmd_str:
+                            self.call_prog_with_args(cmd_str)
+#                        if cmd_str and (len(cmd_str.split(" ")) > 1 or platf == 'Darwin' or platf == 'Linux'):
+#                            self.call_prog_with_args(cmd_str) # a command with argument
+#                        else:
+## take care, the QDir().current() directory changes with loads and saves 
+##                        QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
+#                            if platf in ['Windows','Linux']:
+#                                QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/" + cmd_str, QUrl.TolerantMode))
+#                            else: # on Darwin
+#                                QDesktopServices.openUrl(QUrl("file:///" + u(QApplication.applicationDirPath()) + "/../../../" + cmd_str, QUrl.TolerantMode))
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " eventaction() {0}").format(str(e)),exc_tb.tb_lineno)
@@ -13120,12 +13185,18 @@ class ApplicationWindow(QMainWindow):
                 QDir.setCurrent(u(aw.getAppPath()))
                 my_env = self.calc_env()
                 if platf == 'Windows':
+                    startupinfo = subprocess.STARTUPINFO()
+                    try:
+                        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                    except AttributeError:
+                        startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
                     if sys.version < '3':
                         import locale
                         prg_file = u(qd.absolutePath()).encode(locale.getpreferredencoding())
                     else:
                         prg_file = u(qd.absolutePath())
-                    subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]],shell=False,env=my_env)
+                    #subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]], shell=False,env=my_env)
+                    subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]], startupinfo=startupinfo,env=my_env).wait()
                 else:
                     subprocess.Popen(os.path.expanduser(cmd_str),shell=True,env=my_env)
                 QDir.setCurrent(current.absolutePath())
@@ -13146,21 +13217,27 @@ class ApplicationWindow(QMainWindow):
             
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     # updates corresponding eventslidervalues
-    def moveslider(self,n,v):
+    def moveslider(self,n,v,forceLCDupdate=False):
         if v >= 0 and v <= 100:
             self.eventslidervalues[n] = v
+            # first update slider LCDs if needed
+            if n == 0 and (forceLCDupdate or self.slider1.value() != v):
+                self.updateSliderLCD(0,v)
+            elif n == 1 and (forceLCDupdate or self.slider2.value() != v):
+                self.updateSliderLCD(1,v)
+            elif n == 2 and (forceLCDupdate or self.slider3.value() != v):
+                self.updateSliderLCD(2,v)
+            elif n == 3 and (forceLCDupdate or self.slider4.value() != v):
+                self.updateSliderLCD(3,v)
+            # now move sliders to actual values if needed
             if n == 0 and self.slider1.value() != v:
                 self.slider1.setValue(v)
-                self.updateSliderLCD(0,v)
             elif n == 1 and self.slider2.value() != v:
                 self.slider2.setValue(v)
-                self.updateSliderLCD(1,v)
             elif n == 2 and self.slider3.value() != v:
                 self.slider3.setValue(v)
-                self.updateSliderLCD(2,v)
             elif n == 3 and self.slider4.value() != v:
                 self.slider4.setValue(v)
-                self.updateSliderLCD(3,v)
 
     #called from user configured event buttons
     def recordextraevent(self,ee):
@@ -13372,12 +13449,18 @@ class ApplicationWindow(QMainWindow):
             aw.extraLCDframe1[i].setVisible(bool(aw.extraLCDvisibility1[i]))
             if i < len(aw.qmc.extraname1):
                 l1 = "<b>" + aw.qmc.extraname1[i] + "</b>"
-                aw.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                try:
+                    aw.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                except:
+                    aw.extraLCDlabel1[i].setText(l1)
             aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             self.extraLCDframe2[i].setVisible(bool(aw.extraLCDvisibility2[i])) 
             if i < len(aw.qmc.extraname2):
                 l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
-                aw.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                try:
+                    aw.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                except:
+                    aw.extraLCDlabel2[i].setText(l2)
             aw.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         #hide the rest (just in case)
         for i in range(ndev,aw.nLCDS):
@@ -17161,6 +17244,8 @@ class ApplicationWindow(QMainWindow):
                 aw.updateSliderMinMax()
             if settings.contains("eventslidersflag"):
                 self.eventslidersflag = toInt(settings.value("eventslidersflag",self.eventslidersflag))
+            if settings.contains("eventslidercoarse"):
+                self.eventslidercoarse = [toInt(x) for x in toList(settings.value("eventslidercoarse",self.eventslidercoarse))]                
             settings.endGroup()
             #restore quantifier
             settings.beginGroup("Quantifiers")
@@ -17281,7 +17366,7 @@ class ApplicationWindow(QMainWindow):
             
             #update axis limits
             if not self.qmc.locktimex:
-                self.qmc.startofx = self.startofx_default
+                self.qmc.startofx = self.qmc.startofx_default
             else:
                 self.qmc.startofx = self.qmc.locktimex_start
                 self.qmc.endofx = self.qmc.resetmaxtime
@@ -18114,6 +18199,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("slidermin",self.eventslidermin)
             settings.setValue("slidermax",self.eventslidermax)
             settings.setValue("eventslidersflag",self.eventslidersflag)
+            settings.setValue("eventslidercoarse",self.eventslidercoarse)
             settings.endGroup()
             settings.beginGroup("Quantifiers")
             settings.setValue("quantifieractive",self.eventquantifieractive)
@@ -20655,7 +20741,7 @@ class ApplicationWindow(QMainWindow):
         dialog.setFixedSize(dialog.size())
         QApplication.processEvents()
         
-    def loadSettings(self,fn=None):
+    def loadSettings(self,fn=None,remember=True):
         try:
             if fn:
                 filename = fn
@@ -20666,7 +20752,7 @@ class ApplicationWindow(QMainWindow):
                     aw.stopActivities()
                     res = aw.settingsLoad(filename)
                     aw.qmc.reset(soundOn=False)
-                    if res:
+                    if res and remember:
                         # update recentSettings menu
                         settings = QSettings()
                         files = toStringList(settings.value('recentSettingList'))
@@ -21850,6 +21936,8 @@ class ApplicationWindow(QMainWindow):
         # added slider min/max
         copy.append(self.eventslidermin[:])        
         copy.append(self.eventslidermax[:])
+        # added slider coarse
+        copy.append(self.eventslidercoarse[:])
               
         self.buttonpalette[pindex] = copy[:]
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
@@ -21918,6 +22006,10 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidermax = copy[20][:]
             else:
                 self.eventslidermax = [100,100,100,100]
+            if len(copy)>21 and len(copy[21]) == 4:
+                self.eventslidercoarse = copy[21][:]
+            else:
+                self.eventslidercoarse = [0,0,0,0]
                 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
@@ -27195,7 +27287,7 @@ class WindowsDlg(ArtisanDialog):
                 aw.qmc.startofx = starteditime
             aw.qmc.locktimex_start = starteditime
         else:
-            aw.qmc.startofx = self.startofx_default
+            aw.qmc.startofx = aw.qmc.startofx_default
             aw.qmc.locktimex_start = 0
         if resettime > 0:
             aw.qmc.resetmaxtime = resettime
@@ -27211,18 +27303,18 @@ class WindowsDlg(ArtisanDialog):
         if len(aw.qmc.timex) > 1:
             self.xlimitEdit.setText(aw.qmc.stringfromseconds(int(aw.qmc.timex[-1])))
         else:
-            self.xlimitEdit.setText(aw.qmc.stringfromseconds(60))
-        self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(0))
+            self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx_default))
+        self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx_default))
         if aw.qmc.mode == "F":
-            self.ylimitEdit.setText("600")
-            self.ylimitEdit_min.setText("0")
-            self.zlimitEdit.setText("60")
-            self.zlimitEdit_min.setText("0")
+            self.ylimitEdit.setText(str(aw.qmc.ylimit_F_default))
+            self.ylimitEdit_min.setText(str(aw.qmc.ylimit_min_F_default))
+            self.zlimitEdit.setText(str(aw.qmc.zlimit_F_default))
+            self.zlimitEdit_min.setText(str(aw.qmc.zlimit_min_F_default))
         else:
-            self.ylimitEdit.setText("300")
-            self.ylimitEdit_min.setText("0")
-            self.zlimitEdit.setText("50")
-            self.zlimitEdit_min.setText("0")
+            self.ylimitEdit.setText(str(aw.qmc.ylimit_C_default))
+            self.ylimitEdit_min.setText(str(aw.qmc.ylimit_min_C_default))
+            self.zlimitEdit.setText(str(aw.qmc.zlimit_C_default))
+            self.zlimitEdit_min.setText(str(aw.qmc.zlimit_min_C_default))
 
 ##########################################################################
 #####################  ROAST CALCULATOR DLG   ############################
@@ -27502,10 +27594,10 @@ class EventsDlg(ArtisanDialog):
         self.bartypeComboBox.addItems(barstyles)
         self.bartypeComboBox.setCurrentIndex(aw.qmc.eventsGraphflag)
         self.bartypeComboBox.currentIndexChanged.connect(self.eventsGraphTypeflagChanged)
-        typelabel1 = QLabel("1")
-        typelabel2 = QLabel("2")
-        typelabel3 = QLabel("3")
-        typelabel4 = QLabel("4")
+        typelabel1 = QLabel("0")
+        typelabel2 = QLabel("1")
+        typelabel3 = QLabel("2")
+        typelabel4 = QLabel("3")
         self.showEtype1 = QCheckBox(QApplication.translate("CheckBox","",None))
         self.showEtype2 = QCheckBox(QApplication.translate("CheckBox","",None))
         self.showEtype3 = QCheckBox(QApplication.translate("CheckBox","",None))
@@ -27773,7 +27865,7 @@ class EventsDlg(ArtisanDialog):
         restorebutton.setMaximumWidth(140)
         backupbutton.clicked.connect(aw.backuppaletteeventbuttons)
         restorebutton.clicked.connect(aw.restorepaletteeventbuttons)
-        ## tab3
+        ## tab5
         eventtitlelabel = QLabel(QApplication.translate("Label","Event", None))
         eventtitlelabel.setFont(titlefont)
         actiontitlelabel = QLabel(QApplication.translate("Label","Action", None))
@@ -27788,6 +27880,8 @@ class EventsDlg(ArtisanDialog):
         min_titlelabel.setFont(titlefont)
         max_titlelabel = QLabel(QApplication.translate("Label","Max", None))
         max_titlelabel.setFont(titlefont)
+        slidercoarsetitlelabel = QLabel(QApplication.translate("Label","Coarse", None))
+        slidercoarsetitlelabel.setFont(titlefont)
         self.E1visibility = QCheckBox(aw.qmc.etypesf(0))
         self.E1visibility.setFocusPolicy(Qt.NoFocus)
         self.E1visibility.setChecked(bool(aw.eventslidervisibilities[0]))
@@ -27905,7 +27999,19 @@ class EventsDlg(ArtisanDialog):
         self.E4_max = QSpinBox()
         self.E4_max.setAlignment(Qt.AlignRight)
         self.E4_max.setRange(0,100)
-        self.E4_max.setValue(aw.eventslidermax[3]) 
+        self.E4_max.setValue(aw.eventslidermax[3])
+        self.E1slider_coarse = QCheckBox()
+        self.E1slider_coarse.setFocusPolicy(Qt.NoFocus)
+        self.E1slider_coarse.setChecked(bool(aw.eventslidercoarse[0]))
+        self.E2slider_coarse = QCheckBox()
+        self.E2slider_coarse.setFocusPolicy(Qt.NoFocus)
+        self.E2slider_coarse.setChecked(bool(aw.eventslidercoarse[1]))
+        self.E3slider_coarse = QCheckBox()
+        self.E3slider_coarse.setFocusPolicy(Qt.NoFocus)
+        self.E3slider_coarse.setChecked(bool(aw.eventslidercoarse[2]))
+        self.E4slider_coarse = QCheckBox()
+        self.E4slider_coarse.setFocusPolicy(Qt.NoFocus)
+        self.E4slider_coarse.setChecked(bool(aw.eventslidercoarse[3]))
         helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         helpsliderbutton.clicked.connect(self.showSliderHelp)
@@ -28332,7 +28438,7 @@ class EventsDlg(ArtisanDialog):
         valueHLayout.addStretch()
         valueHLayout.addLayout(valueLayout)
         valueHLayout.addStretch()
-        ### tab3 layout
+        ### tab5 layout
         tab5Layout = QGridLayout()
         tab5Layout.addWidget(eventtitlelabel,0,0)
         tab5Layout.addWidget(actiontitlelabel,0,1)
@@ -28341,6 +28447,7 @@ class EventsDlg(ArtisanDialog):
         tab5Layout.addWidget(factortitlelabel,0,4)
         tab5Layout.addWidget(min_titlelabel,0,5)
         tab5Layout.addWidget(max_titlelabel,0,6)
+        tab5Layout.addWidget(slidercoarsetitlelabel,0,7)
         tab5Layout.addWidget(self.E1visibility,1,0)
         tab5Layout.addWidget(self.E2visibility,2,0)
         tab5Layout.addWidget(self.E3visibility,3,0)
@@ -28369,6 +28476,10 @@ class EventsDlg(ArtisanDialog):
         tab5Layout.addWidget(self.E2_max,2,6)
         tab5Layout.addWidget(self.E3_max,3,6)
         tab5Layout.addWidget(self.E4_max,4,6)
+        tab5Layout.addWidget(self.E1slider_coarse,1,7,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E2slider_coarse,2,7,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E3slider_coarse,3,7,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E4slider_coarse,4,7,Qt.AlignCenter)
         SliderHelpHBox = QHBoxLayout()
         SliderHelpHBox.addStretch()
         SliderHelpHBox.addWidget(helpsliderbutton)
@@ -28376,7 +28487,7 @@ class EventsDlg(ArtisanDialog):
         C5VBox.addLayout(tab5Layout)
         C5VBox.addStretch()
         C5VBox.addLayout(SliderHelpHBox)
-        ### tab4 layout
+        ### tab6 layout
         tab6Layout = QGridLayout()
         tab6Layout.addWidget(qeventtitlelabel,0,0)
         tab6Layout.addWidget(sourcetitlelabel,0,1)
@@ -28467,10 +28578,16 @@ class EventsDlg(ArtisanDialog):
         for i in range(len(aw.qmc.extradevices)):
             if i < len(aw.qmc.extraname1):
                 l1 = "<b>" + aw.qmc.extraname1[i] + "</b>"
-                aw.extraLCDlabel1[i].setText(l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
+                try:
+                    aw.extraLCDlabel1[i].setText(l1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
+                except:
+                    aw.extraLCDlabel1[i].setText(l1)                    
             if i < len(aw.qmc.extraname2):
                 l2 = "<b>" + aw.qmc.extraname2[i] + "</b>"
-                aw.extraLCDlabel2[i].setText(l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))        
+                try:
+                    aw.extraLCDlabel2[i].setText(l2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3]))
+                except:
+                    aw.extraLCDlabel2[i].setText(l2)
         aw.settooltip()
                 
     def showSliderHelp(self):
@@ -28648,6 +28765,11 @@ class EventsDlg(ArtisanDialog):
         self.E2_max.setValue(aw.eventslidermax[1])
         self.E3_max.setValue(aw.eventslidermax[2])
         self.E4_max.setValue(aw.eventslidermax[3])
+        # set slider coarse
+        self.E1slider_coarse.setChecked(bool(aw.eventslidercoarse[0]))
+        self.E2slider_coarse.setChecked(bool(aw.eventslidercoarse[1]))
+        self.E3slider_coarse.setChecked(bool(aw.eventslidercoarse[2]))
+        self.E4slider_coarse.setChecked(bool(aw.eventslidercoarse[3]))
 
     def setElinethickness(self,_,val):
         self.E1thicknessSpinBox.setDisabled(True)
@@ -29144,6 +29266,10 @@ class EventsDlg(ArtisanDialog):
         aw.eventslidermax[1] = int(max(self.E2_min.value(),self.E2_max.value()))
         aw.eventslidermax[2] = int(max(self.E3_min.value(),self.E3_max.value()))
         aw.eventslidermax[3] = int(max(self.E4_min.value(),self.E4_max.value()))
+        aw.eventslidercoarse[0] = int(self.E1slider_coarse.isChecked())
+        aw.eventslidercoarse[1] = int(self.E2slider_coarse.isChecked())
+        aw.eventslidercoarse[2] = int(self.E3slider_coarse.isChecked())
+        aw.eventslidercoarse[3] = int(self.E4slider_coarse.isChecked())
         aw.updateSliderMinMax()
 
     def saveQuantifierSettings(self):
@@ -29204,6 +29330,7 @@ class EventsDlg(ArtisanDialog):
         self.eventsliderfactors = aw.eventsliderfactors
         self.eventslidermin = aw.eventslidermin
         self.eventslidermax = aw.eventslidermax
+        self.eventslidercoarse = aw.eventslidercoarse
         # palettes
         self.buttonpalette = aw.buttonpalette
         # styles
@@ -29247,6 +29374,7 @@ class EventsDlg(ArtisanDialog):
         aw.eventsliderfactors = self.eventsliderfactors
         aw.eventslidermin = self.eventslidermin
         aw.eventslidermax = self.eventslidermax
+        aw.eventslidercoarse = self.eventslidercoarse
         # palettes
         aw.buttonpalette = self.buttonpalette
         # styles
