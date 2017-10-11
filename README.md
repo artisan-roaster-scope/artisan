@@ -123,6 +123,8 @@ Documentation and Support
   * [A full software PID controlled on a Probatone 5 on Vimeo](https://vimeo.com/193018671)
   * [Hottop KN-8828B-2K+ YouTube tutorial](https://www.youtube.com/watch?v=glyE_6vv-Lo&t=110s) by [roastmasterscoffee](https://www.youtube.com/channel/UCsba_bXJQbqFX06X5xP_7ug)
   * [Hottop KN-8828B-2K+ YouTube tutorial](https://www.youtube.com/watch?v=T0If1ZbxjOI&t=310s) by [NapoHBarista TV](https://www.youtube.com/channel/UC-k4iHzxb8xrLZ2NSlUo8hg)
+  * [Setup for TC4](https://www.youtube.com/watch?v=0-Co-pXF2NM) by [Brad](https://www.youtube.com/channel/UCxcEts9cSvi29QrXyt3qvsQ)
+  * [TC4 PID Control](https://www.youtube.com/watch?v=ykuUCXhGAC4) by [Brad](https://www.youtube.com/channel/UCxcEts9cSvi29QrXyt3qvsQ)
 
 
 
