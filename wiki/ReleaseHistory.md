@@ -2,6 +2,64 @@ Detailed Release History
 ========================
 
 ----
+v1.2.0 (xx.xx.2017)
+------------------
+
+ * New Features
+	- adds alarm file name to Roasting Report
+	- adds SV alarm action
+	- adds event replay by temperature (donated by doubleshot)
+  		- event replay is active only after CHARGE
+  		- replay-by-temperature is active only after TP and before it falls back to replay-by-time
+  		- to replay an event its event slider must be active (ticked) and the event name has to correspond to that of the background profile
+	- adds MET marker on ET curve inluding a picker to display MET details (by Dave Baxter)
+	- adds option to show events on BT instead of ET (by Dave Baxter)
+	- makes the display optional for of each of the four special events (Dave Baxter)
+	- adds click-and-drag measurements (by Dave Baxter)
+	- adds support for Phidgets API v22
+	- adds support for new VINT devices
+ 		- HUB0000 (Voltage Input)
+ 		- TMP1100 (1x isolated TC)
+ 		- TMP1101 (4x TC)
+ 		- TMP1200 (1x RTD)
+ 		- OUT1100 (4x 5V PWM)
+	- adds Phidgets 1048 data rate configuration
+	- adds support for multiple Phidgets devices of one type
+	- adds keyboard shortcut to quickly load alarm file
+	- adds support for the VOLTCRAFT PL-125-T2 (by Andreas Bader)
+	- adds Exhaust Temperature to the Aillio Bullet import
+	- adds optional automatic saving of PDFs along alog profiles
+	- adds Hottop to the machine menu
+ * Changes
+	- drops support for OS X 10.9 and earlier
+	- extends special event lines to the drop time (by Dave)
+	- drops support for Phidgets API v21
+	- Phidgets IO changes
+ 		- drops raw mode and ratio metric flag
+ 		- data range changed from 0-1000 (0-4095 in raw mode) to 0-5000mV
+	- adds tooltip translation for toolbar icon menus
+	- suppresses wrong readings caused by communication drop outs
+	- synchronizes background and foreground RoR smoothing to guarantee equal delay/shift
+	- SHIFT modifier now required to change palettes via number key shortcuts
+	- disallow placing (new) events during recording via the right-click popup menu to BT
+	- reduces initial window width from 811px to 800px to fit on the RPi 7" display
+	- all builds are now based on Python3.5 and Qt5.9.x
+	- axis defaults adjusted to increase size of relevant data on screen
+	- releases Hottop control on OFF
+	- adds coarse sliders stepping in multiples of 10 instead of 1
+ * Bug Fixes
+	- fixes for Numpy v1.13
+	- fixes for the Probatone 7" setup
+	- fixes an RoR filtering issue
+	- improved RoR ramp up calculation avoiding initial hickups
+	- fixes a MODBUS ASCII/BINARY build issue
+	- fixes HUD button visibility
+	- fixes background profiles TP time marks
+	- fixed washed out event annotations during recording
+	- fixes the wheel graph
+	- fixes "Call Program" for commands with parameters called from alarms on Windows
+
+----
 v1.1.0 (10.06.2017)
 ------------------
 
