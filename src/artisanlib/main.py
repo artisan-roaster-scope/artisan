@@ -26805,7 +26805,7 @@ class autosaveDlg(ArtisanDialog):
         self.autocheckbox.setChecked(aw.qmc.autosaveflag)        
         autopdflabel = QLabel(QApplication.translate("CheckBox","Save PDF also", None))
         self.autopdfcheckbox = QCheckBox()
-        self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save PDF version along .alog profiles",None))
+        self.autopdfcheckbox.setToolTip(QApplication.translate("Tooltip", "Save PDF version alongside .alog profiles",None))
         self.autopdfcheckbox.setChecked(aw.qmc.autosavepdf)        
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))

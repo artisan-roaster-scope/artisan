@@ -28,7 +28,7 @@ v1.2.0 (xx.xx.2017)
 	- adds keyboard shortcut to quickly load alarm file
 	- adds support for the VOLTCRAFT PL-125-T2 (by Andreas Bader)
 	- adds Exhaust Temperature to the Aillio Bullet import
-	- adds optional automatic saving of PDFs along alog profiles
+	- adds optional automatic saving of PDFs alongside alog profiles
 	- adds Hottop to the machine menu
  * Changes
 	- drops support for OS X 10.9 and earlier
