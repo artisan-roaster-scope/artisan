@@ -13195,10 +13195,21 @@ class ApplicationWindow(QMainWindow):
                         prg_file = u(qd.absolutePath()).encode(locale.getpreferredencoding())
                     else:
                         prg_file = u(qd.absolutePath())
+#                    CREATE_NEW_PROCESS_GROUP = 0x00000200
+#                    DETACHED_PROCESS = 0x00000008
                     #subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]], shell=False,env=my_env)
-                    subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]], startupinfo=startupinfo,env=my_env).wait()
+                    subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]], 
+                        startupinfo=startupinfo,
+                        stdin=None, stdout=None, stderr=None,
+#                        creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP, # with this the process ends before sleep
+#                        close_fds=True, # this seems not to change a thing
+                        env=my_env) #.wait() # with this wait(), the script blocks the Artisan event loop
                 else:
-                    subprocess.Popen(os.path.expanduser(cmd_str),shell=True,env=my_env)
+                    subprocess.Popen(os.path.expanduser(cmd_str),
+                        shell=True,
+                        stdin=None, stdout=None, stderr=None,
+                        close_fds=True,
+                        env=my_env)
                 QDir.setCurrent(current.absolutePath())
                 # alternative approach, that seems to fail on some Mac OS X versions:
                 #QProcess.startDetached(prg_file)
@@ -13468,7 +13479,7 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDframe2[i].setVisible(False)
         aw.LCD2frame.setVisible(aw.qmc.ETlcd)
         aw.LCD3frame.setVisible(aw.qmc.BTlcd)
-        aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)
+        aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)        
         aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
         if aw.largeLCDs_dialog:
             try:
@@ -14445,12 +14456,12 @@ class ApplicationWindow(QMainWindow):
     #read Artisan CSV
     def importCSV(self,filename):
         try:
-            import csv
             import io
+            import csv
             if sys.version < '3':
                 csvFile = io.open(filename, 'rb') # , encoding='utf-8'
             else:
-                csvFile = io.open(filename, 'r', newline="") # , encoding='utf-8'
+                csvFile = io.open(filename, 'r', newline="",encoding='utf-8')
             data = csv.reader(csvFile,delimiter='\t')
             #read file header
             header = next(data)
@@ -14481,10 +14492,16 @@ class ApplicationWindow(QMainWindow):
             for i in range(len(extra_fields)):
                 if i % 2 == 1:
                     # odd
-                    self.qmc.extraname2[int(i/2)] = d(extra_fields[i])
+                    if sys.version < '3':
+                        self.qmc.extraname2[int(i/2)] = d(extra_fields[i])
+                    else:
+                        self.qmc.extraname2[int(i/2)] = extra_fields[i]
                 else:
                     # even
-                    self.qmc.extraname1[int(i/2)] = d(extra_fields[i])
+                    if sys.version < '3':
+                        self.qmc.extraname1[int(i/2)] = d(extra_fields[i])
+                    else:
+                        self.qmc.extraname1[int(i/2)] = extra_fields[i]
             #read data
             last_time = None
             
@@ -15233,10 +15250,13 @@ class ApplicationWindow(QMainWindow):
                     [COOL, "COOL",False],
                     ]
                 import csv
+                
                 if sys.version < '3':
                     outfile = open(filename, 'wb')
                 else:
-                    outfile = open(filename, 'w',newline="")
+                    import io
+                    outfile = io.open(filename, 'w',newline="",encoding='utf8')
+                    
                 writer= csv.writer(outfile,delimiter='\t')
                 writer.writerow([
                     u("Date:" + self.qmc.roastdate.date().toString("dd'.'MM'.'yyyy")),
@@ -15251,8 +15271,9 @@ class ApplicationWindow(QMainWindow):
                     u("DROP:" + self.eventtime2string(DROP)),
                     u("COOL:" + self.eventtime2string(COOL)),
                     u("Time:" + self.qmc.roastdate.time().toString()[:-3])])
-                row = ([u('Time1'),u('Time2'),u('BT'),u('ET'),u('Event')] + freduce(lambda x,y: x + [u(y[0]),u(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))
-                row = [encodeLocal(e) for e in row]
+                row = ([u('Time1'),u('Time2'),u('BT'),u('ET'),u('Event')] + freduce(lambda x,y: x + [u(y[0]),u(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))                
+                if sys.version < '3':
+                    row = [encodeLocal(e) for e in row]
                 writer.writerow(row)
                 last_time = None
                 for i in range(len(self.qmc.timex)):
@@ -33417,6 +33438,7 @@ class serialport(object):
                 if device_id in [DeviceID.PHIDID_HUB0000]:
                     # we are looking for HUB ports
                     hub = 1
+                    p.setIsHubPortDevice(1)
                 p.setOnAttachHandler(attachHandler)
                 p.setOnDetachHandler(detachHandler)
                 try:
