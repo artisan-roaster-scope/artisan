@@ -168,6 +168,7 @@ from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemp
 from Phidget22.Devices.VoltageRatioInput import *
 from Phidget22.Devices.VoltageInput import *
 from Phidget22.Devices.DigitalOutput import *
+from Phidget22.Devices.VoltageOutput import *
 
 
 # import Yoctopuce Python library (installed form PyPI)
@@ -914,7 +915,8 @@ class tgraphcanvas(FigureCanvas):
         self.phidget1046_formulaValues = ["WS", "Div","raw"]
         self.phidget1046_dataRate = 256 # in ms; (Phidgets default 8ms, 16ms if wireless is active)
         
-        self.phidgetRemoteFlag = False
+        self.phidgetRemoteFlag = False # if True the specified remote server is harvestd to potentially attache Phidget devices
+        self.phidgetRemoteOnlyFlag = False # if True only Phidgets attached to remote servers are attached
         self.phidgetServerID = ""
         self.phidgetPassword = ""
         self.phidgetPort = 5661
@@ -1914,7 +1916,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.device == 58:
                         ambient.setHubPort(aw.ser.PhidgetTemperatureSensor[0].getHubPort())
                     ambient.setChannel(4)
-                    ambient.openWaitForAttachment(1500)
+                    ambient.openWaitForAttachment(1500) # timeout in ms
                     libtime.sleep(.5)
                     t = ambient.getTemperature()
                     if aw.qmc.mode == "F":
@@ -2632,7 +2634,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.updateWebLCDs(alertText=u(self.alarmstrings[alarmnumber]),alertTimeout=10)
             elif self.alarmaction[alarmnumber] == 1:
                 # alarm call program
-                fname = u(self.alarmstrings[alarmnumber])
+                fname = u(self.alarmstrings[alarmnumber].split('#')[0])
 # take care, the QDir().current() directory changes with loads and saves                
 #                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
                 if False and platf == 'Windows': # this Windows version fails on commands with arguments
@@ -2661,7 +2663,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.call_prog_with_args(fname)
                     res = True
                 if res:
-                    aw.sendmessage(QApplication.translate("Message","Alarm is calling: {0}",None).format(u(self.alarmstrings[alarmnumber])))
+                    aw.sendmessage(QApplication.translate("Message","Alarm is calling: {0}",None).format(fname))
                 else:
                     aw.qmc.adderror(QApplication.translate("Message","Calling alarm failed on {0}",None).format(f))
             elif self.alarmaction[alarmnumber] == 2:
@@ -5836,8 +5838,14 @@ class tgraphcanvas(FigureCanvas):
     def closePhidgetOUTPUTs(self):
         # close Phidget Digital Outputs
         aw.ser.phidgetOUTclose()
+        # close Phidget Digital Outputs on Hub
+        aw.ser.phidgetOUTcloseHub()
         # close Phidget IO Outputs
         aw.ser.phidgetBinaryOUTclose()
+        # close Phidget Analog Outputs
+        aw.ser.phidgetVOUTclose()
+        # close Phidget Analog Outputs on Hub
+        aw.ser.phidgetVOUTcloseHub()
         
         
     def disconnectProbes(self):
@@ -12875,7 +12883,7 @@ class ApplicationWindow(QMainWindow):
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
-    #         13= PWM Command
+    #         13= PWM Command; 14 VOUT Command
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -13139,13 +13147,29 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.08
                                 except Exception:
                                     pass
-                elif action == 13: # PWM Command (currently only "out(<channel>,<value>)" with <value> in [0-100] is supproted
+                elif action == 13: # PWM Command ("out(<channel>,<value>)" with <value> in [0-100])
                     try:
                         if cmd_str.startswith('out(') and len(cmd_str)>7 and len(cmd_str)<11:
                             c,v = cmd_str[4:-1].split(',')
-                            aw.ser.phidgetOUTsetPWM(int(c),int(v))
+                            aw.ser.phidgetOUTsetPWM(int(c),int(v))                            
+                        elif cmd_str.startswith('toggle(') and len(cmd_str)>8 and len(cmd_str)<10:
+                            c = cmd_str[7:8]
+                            aw.ser.phidgetOUTtogglePWM(int(c))
+                        elif cmd_str.startswith('outhub(') and len(cmd_str)>10 and len(cmd_str)<14:
+                            c,v = cmd_str[7:-1].split(',')
+                            aw.ser.phidgetOUTsetPWMhub(int(c),int(v))
+                        elif cmd_str.startswith('togglehub(') and len(cmd_str)>11 and len(cmd_str)<13:
+                            c = cmd_str[10:11]
+                            aw.ser.phidgetOUTtogglePWMhub(int(c))
                     except Exception:
                         pass
+                elif action == 14: # VOUT Command (currently only "out(<value>)" with <value> a float
+                    try:
+                        if cmd_str.startswith('out(') and len(cmd_str)>7:
+                            c,v = cmd_str[4:-1]
+                            aw.ser.phidgetVOUTsetVOUT(float(v))
+                    except Exception:
+                        pass                        
             except Exception:
                 pass
                 
@@ -16476,6 +16500,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidgetPassword = toString(settings.value("phidgetPassword",self.qmc.phidgetPassword))
                 if settings.contains("phidgetPort"):
                     self.qmc.phidgetPort = toInt(settings.value("phidgetPort",self.qmc.phidgetPort))
+                if settings.contains("phidgetRemoteOnlyFlag"):
+                    self.qmc.phidgetRemoteOnlyFlag = bool(toBool(settings.value("phidgetRemoteOnlyFlag",self.qmc.phidgetRemoteOnlyFlag)))
             if settings.contains("phidget1018_async"):
                 self.qmc.phidget1018_async = [bool(toBool(x)) for x in toList(settings.value("phidget1018_async",self.qmc.phidget1018_async))]
                 self.qmc.phidget1018_dataRates = [toInt(x) for x in toList(settings.value("phidget1018_dataRates",self.qmc.phidget1018_dataRates))]
@@ -17738,6 +17764,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidgetServerID",self.qmc.phidgetServerID)
             settings.setValue("phidgetPassword",self.qmc.phidgetPassword)
             settings.setValue("phidgetPort",self.qmc.phidgetPort)
+            settings.setValue("phidgetRemoteOnlyFlag",self.qmc.phidgetRemoteOnlyFlag)
             settings.setValue("phidget1018_async",self.qmc.phidget1018_async)
             settings.setValue("phidget1018_dataRates",self.qmc.phidget1018_dataRates)
             settings.setValue("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers)
@@ -27924,7 +27951,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Hottop Fan",None),
                        QApplication.translate("ComboBox", "Hottop Command",None),
                        QApplication.translate("ComboBox", "Fuji Command",None),
-                       QApplication.translate("ComboBox", "PWM Command",None)]
+                       QApplication.translate("ComboBox", "PWM Command",None),
+                       QApplication.translate("ComboBox", "VOUT Command",None)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -28195,7 +28223,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Hottop Command",None),
                        QApplication.translate("ComboBox", "p-i-d",None),
                        QApplication.translate("ComboBox", "Fuji Command",None),
-                       QApplication.translate("ComboBox", "PWM Command",None)]
+                       QApplication.translate("ComboBox", "PWM Command",None),
+                       QApplication.translate("ComboBox", "VOUT Command",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -28980,7 +29009,8 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","Hottop Command",None),
                                      QApplication.translate("ComboBox","p-i-d",None),
                                      QApplication.translate("ComboBox","Fuji Command",None),
-                                     QApplication.translate("ComboBox","PWM Command",None)])
+                                     QApplication.translate("ComboBox","PWM Command",None),
+                                     QApplication.translate("ComboBox","VOUT Command",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1
@@ -29515,7 +29545,8 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given id",None))
         string += u(QApplication.translate("Message", "<LI>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None))
         string += u(QApplication.translate("Message", "<LI>IO Command: set(n,0), set(n,1), toggle(n) to set Phidget IO digital output n",None))
-        string += u(QApplication.translate("Message", "<LI>PWM Command: out(n,v), set digital output channel n to PWM value v (0-100) on a Phidget Digital Output OUT1100 module",None))
+        string += u(QApplication.translate("Message", "<LI>PWM Command: out(n,v), toggle(n) set digital output channel n to PWM value v (0-100) on a Phidget OUT1100; outhub(n,v) and togglehub(n) on a Phidget HUB0000",None))
+        string += u(QApplication.translate("Message", "<LI>VOUT Command: out(v) set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V) on a Phidget OUT1000/OUT1001/OUT1002",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Heater: sets heater to value",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Fan: sets fan to value",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Command: motor(n),solenoid(n),stirrer(n),heater(h),fan(f) with n={0,1},h={0,..100},f={0,..10}",None))
@@ -31397,7 +31428,10 @@ class modbusport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("MODBUS readFloat :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
 
-    # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
+    # function 1 (Read Coil)
+    # function 2 (Read Discrete Input)
+    # function 3 (Read Multiple Holding Registers) and 
+    # function 4 (Read Input Registers)
     def readSingleRegister(self,slave,register,code=3):
 #        import logging
 #        logging.basicConfig()
@@ -31410,10 +31444,14 @@ class modbusport(object):
             retry = self.readRetries
             while True:
                 try:
-                    if code==3:
-                        res = self.master.read_holding_registers(int(register),1,unit=int(slave))
-                    else:
+                    if code==1:
+                        res = self.master.read_coils(int(register),1,unit=int(slave))
+                    elif code==2:
+                        res = self.master.read_discrete_inputs(int(register),1,unit=int(slave))                    
+                    elif code==4:
                         res = self.master.read_input_registers(int(register),1,unit=int(slave))
+                    else: # code==3
+                        res = self.master.read_holding_registers(int(register),1,unit=int(slave))
                 except:
                     res = None
                 if res is None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
@@ -31424,9 +31462,15 @@ class modbusport(object):
                         raise Exception("Exception response")
                 else:
                     break
-            decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
-            r = decoder.decode_16bit_uint()
-            return r
+            if code in [1,2]:
+                if res is not None and res.bits[0]:
+                    return 1
+                else:
+                    return 0                
+            else:
+                decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
+                r = decoder.decode_16bit_uint()
+                return r
         except Exception as ex:
 #            self.disconnect()
 #            import traceback
@@ -31724,8 +31768,15 @@ class serialport(object):
         self.PhidgetHUB_56_serialports = []
         #stores the Phidget Digital Output PMW objects (None if not initialized)      
         self.PhidgetDigitalOut = None
+        self.PhidgetDigitalOutLastPWM = [0]*4 # 0-100
+        self.PhidgetDigitalOutLastToggle = [None]*4 # if True, channel was last toggled ON, OFF otherwise
+        self.PhidgetDigitalOutHub = None
+        self.PhidgetDigitalOutLastPWMhub = [0]*6 # 0-100
+        self.PhidgetDigitalOutLastToggleHub = [None]*6 # if True, channel was last toggled ON, OFF otherwise
+        self.PhidgetAnalogOut = None
+        self.PhidgetAnalogOutHub = None
         #store the Phidget IO Binary Output objects
-        self.PhidgetBinaryOut = None
+        self.PhidgetBinaryOut = None # if attached, it contains a list of th 8 attached output channel objects
         #Yoctopuce channels
         self.YOCTOsensor = None
         self.YOCTOchan1 = None
@@ -33439,6 +33490,13 @@ class serialport(object):
                     # we are looking for HUB ports
                     hub = 1
                     p.setIsHubPortDevice(1)
+                
+                ## setIsRemote and setIsLocal have both to be set with inverse argument or both not to be set
+                ## all channels from one physical device have either be accessed via remote or from local
+                if aw.qmc.phidgetRemoteOnlyFlag:
+                    p.setIsRemote(True)
+                    p.setIsLocal(False)
+                
                 p.setOnAttachHandler(attachHandler)
                 p.setOnDetachHandler(detachHandler)
                 try:
@@ -33575,12 +33633,18 @@ class serialport(object):
                         self.PhidgetIRSensor.setDeviceSerialNumber(ser)
                         self.PhidgetIRSensor.setChannel(0) # attache to the IR channel
                         try:
+                            if aw.qmc.phidgetRemoteOnlyFlag:
+                                self.PhidgetIRSensor.setIsRemote(True)
+                                self.PhidgetIRSensor.setIsLocal(False)
                             self.PhidgetIRSensor.open() #.openWaitForAttachment(timeout)
                         except:
                             pass
                         if deviceType != DeviceID.PHIDID_TMP1200:
                             self.PhidgetIRSensorIC.setDeviceSerialNumber(ser)
                             self.PhidgetIRSensorIC.setChannel(1) # attache to the IC channel
+                            if aw.qmc.phidgetRemoteOnlyFlag:
+                                self.PhidgetIRSensorIC.setIsRemote(True)
+                                self.PhidgetIRSensorIC.setIsLocal(False)
                             try:                            
                                 self.PhidgetIRSensorIC.open() #.openWaitForAttachment(timeout)
                             except:
@@ -33764,6 +33828,9 @@ class serialport(object):
                                 self.PhidgetTemperatureSensor[1].setHubPort(port)
                         self.PhidgetTemperatureSensor[0].setDeviceSerialNumber(ser)
                         self.PhidgetTemperatureSensor[0].setChannel(mode*2)
+                        if aw.qmc.phidgetRemoteOnlyFlag:
+                            self.PhidgetTemperatureSensor[0].setIsRemote(True)
+                            self.PhidgetTemperatureSensor[0].setIsLocal(False)
                         try:
                             self.PhidgetTemperatureSensor[0].open() #.openWaitForAttachment(timeout)
                         except:
@@ -33771,6 +33838,9 @@ class serialport(object):
                         if mode != 2:
                             self.PhidgetTemperatureSensor[1].setDeviceSerialNumber(ser)
                             self.PhidgetTemperatureSensor[1].setChannel(mode*2 + 1)
+                            if aw.qmc.phidgetRemoteOnlyFlag:
+                                self.PhidgetTemperatureSensor[1].setIsRemote(True)
+                                self.PhidgetTemperatureSensor[1].setIsLocal(False)
                             try:
                                 self.PhidgetTemperatureSensor[1].open() # .openWaitForAttachment(timeout)
                             except:
@@ -33993,6 +34063,9 @@ class serialport(object):
                                 self.PhidgetBridgeSensor[i].setHubPort(port)
                             self.PhidgetBridgeSensor[i].setDeviceSerialNumber(ser)
                             self.PhidgetBridgeSensor[i].setChannel(mode*2)
+                            if aw.qmc.phidgetRemoteOnlyFlag:
+                                self.PhidgetBridgeSensor[i].setIsRemote(True)
+                                self.PhidgetBridgeSensor[i].setIsLocal(False)
                             try:
                                 self.PhidgetBridgeSensor[i].open() #.openWaitForAttachment(timeout)
                             except:
@@ -34046,7 +34119,10 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1046temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
-#--- Phidget IO Binay Output (only one supported for now)
+#--- Phidget IO Binay Output (only one device supported for now)
+#  only supporting 8 channel Phidget 1010, 1013, 1018, 1019 modules
+#  commands: set(n,0), set(n,1), toggle(n) with n channel number
+
 
     def phidgetBinaryOUTattach(self):
         if not aw.ser.PhidgetBinaryOut:
@@ -34057,6 +34133,9 @@ class serialport(object):
                 for i in range(8):
                     aw.ser.PhidgetBinaryOut[i].setChannel(i)
                     aw.ser.PhidgetBinaryOut[i].setDeviceSerialNumber(ser)
+                    if aw.qmc.phidgetRemoteOnlyFlag:
+                        aw.ser.PhidgetBinaryOut[i].setIsRemote(True)
+                        aw.ser.PhidgetBinaryOut[i].setIsLocal(False)
                     try:
                         aw.ser.PhidgetBinaryOut[i].open() #.openWaitForAttachment(timeout)
                     except:
@@ -34104,6 +34183,9 @@ class serialport(object):
     
              
 #--- Phidget Digital PWM Output (only one supported for now)
+#  only supporting 4 channel Phidget OUT1100 module
+#  commands: out(n,v) and toggle(n) with n channel number and value v from [0-100]
+#    toggle switches between last value != 0 and 0
 
     def phidgetOUTattach(self):
         if not aw.ser.PhidgetDigitalOut:
@@ -34116,12 +34198,42 @@ class serialport(object):
                         aw.ser.PhidgetDigitalOut[i].setHubPort(port)
                     aw.ser.PhidgetDigitalOut[i].setChannel(i)
                     aw.ser.PhidgetDigitalOut[i].setDeviceSerialNumber(ser)
+                    if aw.qmc.phidgetRemoteOnlyFlag:
+                        aw.ser.PhidgetDigitalOut[i].setIsRemote(True)
+                        aw.ser.PhidgetDigitalOut[i].setIsLocal(False)
                     try:
                         aw.ser.PhidgetDigitalOut[i].open() # we don't wait for the attach and might mis some data
                     except:
                         pass
                 libtime.sleep(.3)
                         
+    # channel: 0-3
+    def phidgetOUTtogglePWM(self,channel):
+        lastToggle = aw.ser.PhidgetDigitalOutLastToggle[channel]
+        lastPWM = aw.ser.PhidgetDigitalOutLastPWM[channel]
+        if lastToggle is None:  
+            if lastPWM == 0:
+                self.phidgetOUTsetPWM(channel,100)
+                aw.ser.PhidgetDigitalOutLastToggle[channel] = True
+            else:
+                self.phidgetOUTsetPWM(channel,0)
+                aw.ser.PhidgetDigitalOutLastPWM[channel] = lastPWM # we recreate that last PWM
+                aw.ser.PhidgetDigitalOutLastToggle[channel] = False
+        elif lastToggle:
+            if lastPWM == 0:
+                self.phidgetOUTsetPWM(channel,100)
+                aw.ser.PhidgetDigitalOutLastToggle[channel] = True
+            else:
+                self.phidgetOUTsetPWM(channel,0)
+                aw.ser.PhidgetDigitalOutLastPWM[channel] = lastPWM # we recreate that last PWM
+                aw.ser.PhidgetDigitalOutLastToggle[channel] = False
+        else:
+            if lastPWM == 0:
+                self.phidgetOUTsetPWM(channel,100)
+            else:
+                self.phidgetOUTsetPWM(channel,lastPWM)
+            aw.ser.PhidgetDigitalOutLastToggle[channel] = True
+
     # channel: 0-3
     # value: 0-100
     def phidgetOUTsetPWM(self,channel,value): 
@@ -34131,6 +34243,7 @@ class serialport(object):
             try:
                 if len(aw.ser.PhidgetDigitalOut) > channel and aw.ser.PhidgetDigitalOut[channel].getAttached():
                     aw.ser.PhidgetDigitalOut[channel].setDutyCycle(value/100.)
+                    aw.ser.PhidgetDigitalOutLastPWM[channel] = value
             except Exception:
                 pass
     
@@ -34143,7 +34256,132 @@ class serialport(object):
             except Exception:
                 pass
             aw.ser.PhidgetDigitalOut = None
-            
+
+#--- Phidget Digital PWM Output (only one supported for now)
+#  only supporting 6 channel Phidget HUB0000 module
+
+    def phidgetOUTattachHub(self):
+        if not aw.ser.PhidgetDigitalOutHub:
+            # try to attach the 6 channels of the Phidget HUB0000 module
+            ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_HUB0000)
+            if ser is not None:
+                aw.ser.PhidgetDigitalOutHub = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
+                for i in range(6):
+                    aw.ser.PhidgetDigitalOutHub[i].setChannel(0)
+                    aw.ser.PhidgetDigitalOutHub[i].setHubPort(i)
+                    aw.ser.PhidgetDigitalOutHub[i].setDeviceSerialNumber(ser)
+                    aw.ser.PhidgetDigitalOutHub[i].setIsHubPortDevice(True)
+                    if aw.qmc.phidgetRemoteOnlyFlag:
+                        aw.ser.PhidgetDigitalOutHub[i].setIsRemote(True)
+                        aw.ser.PhidgetDigitalOutHub[i].setIsLocal(False)
+                    try:
+                        aw.ser.PhidgetDigitalOutHub[i].open() # we don't wait for the attach and might mis some data
+                    except:
+                        pass
+                libtime.sleep(.3)
+                        
+    # channel: 0-3
+    def phidgetOUTtogglePWMhub(self,channel):
+        lastToggle = aw.ser.PhidgetDigitalOutLastToggleHub[channel]
+        lastPWM = aw.ser.PhidgetDigitalOutLastPWMhub[channel]
+        if lastToggle is None:  
+            if lastPWM == 0:
+                self.phidgetOUTsetPWMhub(channel,100)
+                aw.ser.PhidgetDigitalOutLastToggleHub[channel] = True
+            else:
+                self.phidgetOUTsetPWMhub(channel,0)
+                aw.ser.PhidgetDigitalOutLastPWMhub[channel] = lastPWM # we recreate that last PWM
+                aw.ser.PhidgetDigitalOutLastToggleHub[channel] = False
+        elif lastToggle:
+            if lastPWM == 0:
+                self.phidgetOUTsetPWMhub(channel,100)
+                aw.ser.PhidgetDigitalOutLastToggleHub[channel] = True
+            else:
+                self.phidgetOUTsetPWMhub(channel,0)
+                aw.ser.PhidgetDigitalOutLastPWMhub[channel] = lastPWM # we recreate that last PWM
+                aw.ser.PhidgetDigitalOutLastToggleHub[channel] = False
+        else:
+            if lastPWM == 0:
+                self.phidgetOUTsetPWMhub(channel,100)
+            else:
+                self.phidgetOUTsetPWMhub(channel,lastPWM)
+            aw.ser.PhidgetDigitalOutLastToggleHub[channel] = True
+
+    # channel: 0-5
+    # value: 0-100
+    def phidgetOUTsetPWMhub(self,channel,value): 
+        self.phidgetOUTattachHub()
+        if aw.ser.PhidgetDigitalOutHub:
+            # set PWM of the given channel
+            try:
+                if len(aw.ser.PhidgetDigitalOutHub) > channel and aw.ser.PhidgetDigitalOutHub[channel].getAttached():
+                    aw.ser.PhidgetDigitalOutHub[channel].setDutyCycle(value/100.)
+                    aw.ser.PhidgetDigitalOutLastPWMhub[channel] = value
+            except:
+                pass
+    
+    def phidgetOUTcloseHub(self):
+        if aw.ser.PhidgetDigitalOutHub and len(aw.ser.PhidgetDigitalOutHub)==6:
+            try:
+                for i in range(6):
+                    if aw.ser.PhidgetDigitalOutHub[i].getAttached():
+                        aw.ser.PhidgetDigitalOutHub[i].close()                        
+            except Exception:
+                pass
+            aw.ser.PhidgetDigitalOutHub = None
+
+
+#--- Phidget Analog Voltage Output (only one supported for now)
+#  only supporting 1 channel Phidget OUT1000, OUT1001 and OUT1002 modules
+#  commands: out(n,v) with n channel number and value v voltage in V as a float
+
+    def phidgetVOUTattach(self):
+        if not aw.ser.PhidgetAnalogOut:
+            # try to attach the Phidget OUT100x module
+            ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1000)
+            if ser == None:
+                ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1001)
+            if ser == None:
+                ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1002)
+            if ser is not None:
+                aw.ser.PhidgetAnalogOut = VoltageOutput()
+                if port is not None:
+                    aw.ser.PhidgetAnalogOut.setHubPort(port)
+                aw.ser.PhidgetAnalogOut.setDeviceSerialNumber(ser)
+                if aw.qmc.phidgetRemoteOnlyFlag:
+                    aw.ser.PhidgetAnalogOut.setIsRemote(True)
+                    aw.ser.PhidgetAnalogOut.setIsLocal(False)
+                try:
+                    aw.ser.PhidgetAnalogOut.open() # we don't wait for the attach and might mis some data
+                except:
+                    pass
+                libtime.sleep(.3)
+                        
+
+    # value: float
+    def phidgetVOUTsetVOUT(self,value): 
+        self.phidgetOUTattach()
+        if aw.ser.PhidgetAnalogOut:
+            # set voltage output
+            try:
+                if aw.ser.PhidgetAnalogOut and aw.ser.PhidgetAnalogOut.getAttached():
+                    if value > 0:
+                        aw.ser.PhidgetAnalogOut.setVoltage(value)
+                        aw.ser.PhidgetAnalogOut.setEnabled(True)
+                    else:
+                        aw.ser.PhidgetAnalogOut.setVoltage(0)
+                        aw.ser.PhidgetAnalogOut.setEnabled(False)
+            except Exception:
+                pass
+    
+    def phidgetVOUTclose(self):
+        if aw.ser.PhidgetAnalogOut and aw.ser.PhidgetAnalogOut.getAttached():
+            try:
+                aw.ser.PhidgetAnalogOut.close()                        
+            except Exception:
+                pass
+            aw.ser.PhidgetAnalogOut = None
+
         
 #---
 
@@ -35822,7 +36060,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_timeoutEdit = QLineEdit(str(aw.modbus.timeout))
         self.modbus_timeoutEdit.setValidator(QDoubleValidator(0,5,1,self.modbus_timeoutEdit))
 
-        modbus_function_codes = ["3","4"]
+        modbus_function_codes = ["1","2","3","4"]
         modbus_modes = ["", "C","F"]
         modbus_divs = ["", "1/10","1/100"]
         
@@ -37405,7 +37643,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.phidgetBoxRemoteFlag = QCheckBox()
         self.phidgetBoxRemoteFlag.setFocusPolicy(Qt.NoFocus)
         self.phidgetBoxRemoteFlag.setChecked(aw.qmc.phidgetRemoteFlag)
-        phidgetServerIdLabel = QLabel(QApplication.translate("Label","ServerID", None))
+        phidgetServerIdLabel = QLabel(QApplication.translate("Label","Host", None))
         self.phidgetServerId = QLineEdit(aw.qmc.phidgetServerID)
         self.phidgetServerId.setMinimumWidth(200)
         phidgetPasswordLabel = QLabel(QApplication.translate("Label","Password", None))
@@ -37415,6 +37653,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetPortLabel = QLabel(QApplication.translate("Label","Port", None))
         self.phidgetPort = QLineEdit(str(aw.qmc.phidgetPort))
         self.phidgetPort.setMaximumWidth(70)
+        self.phidgetBoxRemoteOnlyFlag = QCheckBox(QApplication.translate("Label","Remote Only", None))
+        self.phidgetBoxRemoteOnlyFlag.setFocusPolicy(Qt.NoFocus)
+        self.phidgetBoxRemoteOnlyFlag.setChecked(aw.qmc.phidgetRemoteOnlyFlag)
         phidgetServerBox = QHBoxLayout()
         phidgetServerBox.addWidget(phidgetServerIdLabel)
         phidgetServerBox.addWidget(self.phidgetServerId)
@@ -37437,6 +37678,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetNetworkGrid.addLayout(phidgetPortBox)
         phidgetNetworkGrid.addStretch()
         phidgetNetworkGrid.addLayout(phidgetPasswordBox)
+        phidgetNetworkGrid.addStretch()
+        phidgetNetworkGrid.addWidget(self.phidgetBoxRemoteOnlyFlag)
         phidgetNetworkGrid.setContentsMargins(0,0,0,0)
         phidgetNetworkGrid.setSpacing(20)
         phidgetNetworkGroupBox = QGroupBox(QApplication.translate("GroupBox","Network",None))
@@ -38689,6 +38932,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.phidgetRemoteFlag = self.phidgetBoxRemoteFlag.isChecked()
             aw.qmc.phidgetServerID = u(self.phidgetServerId.text())
             aw.qmc.phidgetPassword = u(self.phidgetPassword.text())
+            aw.qmc.phidgetRemoteOnlyFlag = self.phidgetBoxRemoteOnlyFlag.isChecked()
             try:
                 aw.qmc.phidgetPort = int(self.phidgetPort.text())
             except:
@@ -40321,7 +40565,7 @@ class AlarmDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<b>Condition:</b> alarm is triggered if source rises above or below the specified temperature",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Temp:</b> the specified temperature limit",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Action:</b> the action to be triggered if all conditions are fulfilled",None)) + "<br>"
-        string += u(QApplication.translate("Message", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button or the new value of the slider",None)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button, the new value of the slider or the program to call",None)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>NOTE:</b> each alarm is only triggered once",None))
         msgbox = QMessageBox(self)
         msgbox.setWindowTitle(QApplication.translate("Button", "Help",None))

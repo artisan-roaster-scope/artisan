@@ -18,11 +18,14 @@ v1.2.0 (xx.xx.2017)
 	- adds click-and-drag measurements (by Dave Baxter)
 	- adds support for Phidgets API v22
 	- adds support for new VINT devices
- 		- HUB0000 (Voltage Input)
+ 		- HUB0000 (Voltage Input, Digital Output)
  		- TMP1100 (1x isolated TC)
  		- TMP1101 (4x TC)
  		- TMP1200 (1x RTD)
  		- OUT1100 (4x 5V PWM)
+      - OUT1000 (4x 12bit Voltage Output, 0-4V2)
+      - OUT1001 (4x 12bit Isolated Voltage Output, -10V to +10V)
+      - OUT1002 (4x 16bit Isolated Voltage Output, -10V to +10V)
 	- adds Phidgets 1048 data rate configuration
 	- adds support for multiple Phidgets devices of one type
 	- adds keyboard shortcut to quickly load alarm file
@@ -30,6 +33,8 @@ v1.2.0 (xx.xx.2017)
 	- adds Exhaust Temperature to the Aillio Bullet import
 	- adds optional automatic saving of PDFs alongside alog profiles
 	- adds Hottop to the machine menu
+   - adds "remote only" flag to the Phidget tab to force remote access also for locally connected Phidgets if local Phidget server is running. That way the local Phidget server can be use on the machine running Artisan to access the Phidgets from Artisan and any other software (incl. the Phidget Control Panel) in parallel.
+   - adds support for MODBUS function 1 (Read Coil) and 2 (Read Discrete Input)
  * Changes
 	- drops support for OS X 10.9 and earlier
 	- extends special event lines to the drop time (by Dave)
@@ -47,6 +52,7 @@ v1.2.0 (xx.xx.2017)
 	- axis defaults adjusted to increase size of relevant data on screen
 	- releases Hottop control on OFF
 	- adds coarse sliders stepping in multiples of 10 instead of 1
+    - call program alarm actions interpret text after the comment delimiter # as a line comment
  * Bug Fixes
 	- fixes for Numpy v1.13
 	- fixes for the Probatone 7" setup
