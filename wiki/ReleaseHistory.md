@@ -18,7 +18,7 @@ v1.2.0 (xx.xx.2017)
 	- adds click-and-drag measurements (by Dave Baxter)
 	- adds support for Phidgets API v22
 	- adds support for new VINT devices
- 		- HUB0000 (Voltage Input, Digital Output)
+ 		- HUB0000 (Voltage Input, Digital Input, Digital Output)
  		- TMP1100 (1x isolated TC)
  		- TMP1101 (4x TC)
  		- TMP1200 (1x RTD)
@@ -27,6 +27,7 @@ v1.2.0 (xx.xx.2017)
       - OUT1001 (4x 12bit Isolated Voltage Output, -10V to +10V)
       - OUT1002 (4x 16bit Isolated Voltage Output, -10V to +10V)
 	- adds Phidgets 1048 data rate configuration
+   - adds Phidgets IO (1011, 1018,..) digital input support
 	- adds support for multiple Phidgets devices of one type
 	- adds keyboard shortcut to quickly load alarm file
 	- adds support for the VOLTCRAFT PL-125-T2 (by Andreas Bader)
@@ -64,6 +65,7 @@ v1.2.0 (xx.xx.2017)
 	- fixed washed out event annotations during recording
 	- fixes the wheel graph
 	- fixes "Call Program" for commands with parameters called from alarms on Windows
+   - fixes PID background-follow mode messing up as the end of the background profile is reached
 
 ----
 v1.1.0 (10.06.2017)

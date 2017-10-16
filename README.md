@@ -56,13 +56,13 @@ Features
      - 4x: [1046](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=35) (bridge needed)
      - 1x: VINT [TMP1200](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=968)
   * Phidget IO
-      - 8x analog in, 8x digital out: [1010](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=3), [1013](https://www.phidgets.com/?tier=3&prodid=8), [1018](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=18), [1019](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=20), [1073](https://www.phidgets.com/?tier=3&catid=1&pcid=0&prodid=69)
-      - 6x analog in, 6x digital out: VINT [HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643)
+      - 8x analog/digital in, 8x digital out: [1010](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=3), [1013](https://www.phidgets.com/?tier=3&prodid=8), [1018](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=18), [1019](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=20), [1073](https://www.phidgets.com/?tier=3&catid=1&pcid=0&prodid=69)
+      - 6x analog/digital in, 6x digital out: VINT [HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643)
       - 1x 12bit voltage out: VINT [OUT1000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=711)
       - 1x 12bit isolated voltage out: VINT [OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712)
       - 1x 16bit isolated voltage out: VINT [OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713)
       - 4x digital PWM out: VINT [OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714)
-      - 2x analog in, 2x digital out: [1011](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=4)
+      - 2x analog/digital in, 2x digital out: [1011](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=4)
   * Mastech MS6514
   * Yocto [Thermocouple](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-thermocouple) and [PT100](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-pt100)
   * external program

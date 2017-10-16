@@ -1012,6 +1012,14 @@ class tgraphcanvas(FigureCanvas):
                        "-Omega HH806W",         #66 NOT WORKING 
                        "VOLTCRAFT PL-125-T2",   #67
                        "Phidget TMP1200 1xRTD", #68
+                       "Phidget IO Digital",            #69
+                       "+Phidget IO Digital 34",        #70
+                       "+Phidget IO Digital 56",        #71
+                       "+Phidget IO Digital 78",        #72
+                       "Phidget 1011 IO Digital",       #73
+                       "Phidget HUB0000 IO Digital",    #74
+                       "+Phidget HUB0000 IO Digital 34",#75
+                       "+Phidget HUB0000 IO Digital 56",#76
                        ]
 
         #extra devices
@@ -31882,7 +31890,15 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_56, #65
                                    self.HH806W,             #66
                                    self.VOLTCRAFTPL125T2,   #67
-                                   self.PHIDGET_TMP1200,    #68
+                                   self.PHIDGET_TMP1200,    #68                                   
+                                   self.PHIDGET1018_D,        #69
+                                   self.PHIDGET1018_D_34,     #70
+                                   self.PHIDGET1018_D_56,     #71
+                                   self.PHIDGET1018_D_78,     #72
+                                   self.PHIDGET1011_D,        #73
+                                   self.PHIDGET_HUB0000_D,    #74
+                                   self.PHIDGET_HUB0000_D_34, #75
+                                   self.PHIDGET_HUB0000_D_56, #76
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -32254,6 +32270,46 @@ class serialport(object):
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3)
         return tx,v1,v2
         
+    def PHIDGET1011_D(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1011,0,True)
+        return tx,v1,v2
+        
+    def PHIDGET1018_D(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,0,True)
+        return tx,v1,v2
+
+    def PHIDGET1018_D_34(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,1,True)
+        return tx,v1,v2
+
+    def PHIDGET1018_D_56(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,2,True)
+        return tx,v1,v2
+
+    def PHIDGET1018_D_78(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_1010_1013_1018_1019,3,True)
+        return tx,v1,v2
+        
+    def PHIDGET_HUB0000_D(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0,True)
+        return tx,v1,v2
+
+    def PHIDGET_HUB0000_D_34(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1,True)
+        return tx,v1,v2
+
+    def PHIDGET_HUB0000_D_56(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2,True)
+        return tx,v1,v2        
+
     def PHIDGET_TMP1101(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,0)
@@ -34394,15 +34450,19 @@ class serialport(object):
                 else:
                     self.PhidgetIOvalues[channel] = v
 
-    def phidget1018getSensorReading(self,i,idx):
-        if aw.qmc.phidget1018_async[i]:            
+    def phidget1018getSensorReading(self,i,idx,digital=False):
+        if not digital and aw.qmc.phidget1018_async[i]:            
             if self.PhidgetIOvalues[i] == -1:
                 self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
             return self.PhidgetIOvalues[i]
         else:
-            return self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
+            if digital:
+                v = self.PhidgetIOvalues[i] = int(self.PhidgetIO[idx].getState())
+            else:
+                v = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
+            return v
 
-    def configure1018(self,deviceType,idx):
+    def configure1018(self,deviceType,idx,digital=False):
         # set data rates of all active inputs to 4ms
         if self.PhidgetIO and len(self.PhidgetIO) > idx:
             # reset async values
@@ -34416,7 +34476,7 @@ class serialport(object):
                 self.PhidgetIO[idx].setDataInterval(aw.qmc.phidget1018_dataRates[channel])
             except Exception:
                 pass
-            if aw.qmc.phidget1018_async[channel]:
+            if not digital and aw.qmc.phidget1018_async[channel]:
                 try:
                     ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltage()),self.PhidgetIO[idx].getMinVoltage())
                     self.PhidgetIO[idx].setVoltageChangeTrigger(ct)
@@ -34429,8 +34489,8 @@ class serialport(object):
                 self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda e,t:None) 
             self.PhidgetIOvalues[channel] = -1
 
-    def phidget1018attached(self,deviceType,e,idx):
-        self.configure1018(deviceType,idx)
+    def phidget1018attached(self,deviceType,e,idx,digital=False):
+        self.configure1018(deviceType,idx,digital)
         if self.PhidgetIO and self.PhidgetIO[idx].getChannel() == 0:
             if deviceType == DeviceID.PHIDID_1011:
                 aw.sendmessage(QApplication.translate("Message","Phidget IO 2/2/2 attached",None))
@@ -34457,7 +34517,8 @@ class serialport(object):
     #  - Phidget IO 8/8/8 (1010,1013,1018,1019,SBC): DeviceID.PHIDID_1010_1013_1018_1019
     #  - Phidget IO 6/6/6 (HUB0000): DeviceID.PHIDID_HUB0000
     #  - Phidget IO 2/2/2 (1011): DeviceID.PHIDID_1011
-    def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0,retry=True):
+    # if digital is set, the digital input states are returned instead of the analog input values
+    def PHIDGET1018values(self,deviceType=DeviceID.PHIDID_1010_1013_1018_1019,mode=0, digital=False, retry=True):
         try:
             if not self.PhidgetIO:
                 ser = None
@@ -34501,9 +34562,9 @@ class serialport(object):
                 if ser:        
                     self.PhidgetIO = [VoltageInput(),VoltageInput()]
                     try: 
-                        self.PhidgetIO[0].setOnAttachHandler(lambda e:self.phidget1018attached(deviceType,e,0))
+                        self.PhidgetIO[0].setOnAttachHandler(lambda e:self.phidget1018attached(deviceType,e,0,digital))
                         self.PhidgetIO[0].setOnDetachHandler(lambda e:self.phidget1018detached(deviceType,e,0))
-                        self.PhidgetIO[1].setOnAttachHandler(lambda e:self.phidget1018attached(deviceType,e,1))
+                        self.PhidgetIO[1].setOnAttachHandler(lambda e:self.phidget1018attached(deviceType,e,1,digital))
                         self.PhidgetIO[1].setOnDetachHandler(lambda e:self.phidget1018detached(deviceType,e,1))
                         if deviceType in [DeviceID.PHIDID_HUB0000]:
                             # we are looking to attach a HUB port
@@ -34543,17 +34604,17 @@ class serialport(object):
             if self.PhidgetIO and len(self.PhidgetIO)>1 and self.PhidgetIO[0].getAttached() and self.PhidgetIO[1].getAttached():
                 probe1 = probe2 = -1
                 try:
-                    probe1 = self.phidget1018getSensorReading(mode*2,0)
+                    probe1 = self.phidget1018getSensorReading(mode*2,0,digital)
                 except Exception:
                     pass
                 try:
-                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1)
+                    probe2 = self.phidget1018getSensorReading(mode*2 + 1,1,digital)
                 except Exception:
                     pass
                 return probe1, probe2
             elif retry:
                 libtime.sleep(0.1)
-                self.PHIDGET1018values(deviceType,mode,False)
+                self.PHIDGET1018values(deviceType,mode,digital,False)
             else:
                 return -1,-1
         except Exception as ex:
@@ -36497,7 +36558,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -36758,7 +36819,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -36851,7 +36912,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -38629,6 +38690,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
+                ##########################
                 elif meter == "Phidget IO":
                     aw.qmc.device = 40
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
@@ -38765,6 +38827,34 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.device = 68
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
+                elif meter == "Phidget IO Digital":
+                    aw.qmc.device = 69
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ####  DEVICE 70 is +Phidget IO Digital 34 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 71 is +Phidget IO Digital 56 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 72 is +Phidget IO Digital 78 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                elif meter == "Phidget 1011 IO Digital":
+                    aw.qmc.device = 73
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                elif meter == "Phidget HUB0000 IO Digital":
+                    aw.qmc.device = 74
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ##########################
+                ####  DEVICE 75 is +Phidget HUB0000 IO Digital 34 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 76 is +Phidget HUB0000 IO Digital 56 but +DEVICE cannot be set as main device
+                ##########################
+                
                 # ADD DEVICE:
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -38849,9 +38939,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 63
                 1, # 64
                 1, # 65
-                8,  #66
+                8, # 66
                 3, # 67
-                1] # 68
+                1, # 68
+                1, # 69
+                1, # 70
+                1, # 71
+                1, # 72
+                1, # 73
+                1, # 74
+                1, # 75
+                1, # 76
+                ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -38956,7 +39055,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76]):
                 aw.setcommport()
             #self.close()
             self.accept()
