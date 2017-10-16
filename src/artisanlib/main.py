@@ -7667,11 +7667,11 @@ class tgraphcanvas(FigureCanvas):
                     j = i - 1
                     tj = timearray[j]
                     tempj = temparray[j]
-                    s =  (tempi - tempj) / (ti - tj)
+                    s = (tempi - tempj) / (ti - tj)
                     return tempj + s*(seconds - tj)
                 else:
                     # should not be reached (guarded by the outer if)
-                    return ti
+                    return tempi
         else:
             return -1
             
@@ -45540,6 +45540,7 @@ class PIDcontrol(object):
                     followBT = True
                 else:
                     followBT = False
+                    
 #            if aw.qmc.timeindex[0] < 0 or aw.qmc.timeindex[6] > 0:
 #                # before and after DROP the SV configured in the dialog is returned (min/maxed)
 #                return max(aw.pidcontrol.svSliderMin,(min(aw.pidcontrol.svSliderMax,aw.pidcontrol.svValue)))
