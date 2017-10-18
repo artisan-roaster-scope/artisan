@@ -2677,8 +2677,9 @@ class tgraphcanvas(FigureCanvas):
             elif self.alarmaction[alarmnumber] == 2:
                 # alarm event button
                 button_number = None
+                text = self.alarmstrings[alarmnumber].split('#')[0]
                 try:
-                    button_number = int(str(self.alarmstrings[alarmnumber])) - 1 # the event buttons presented to the user are numbered from 1 on
+                    button_number = int(str(text)) - 1 # the event buttons presented to the user are numbered from 1 on
                 except Exception:
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(u(self.alarmstrings[alarmnumber])))
                 if button_number is not None:
@@ -2688,7 +2689,8 @@ class tgraphcanvas(FigureCanvas):
                 # alarm slider 1-4
                 slidernr = None
                 try:
-                    slidervalue = max(0,min(100,int(str(self.alarmstrings[alarmnumber]))))
+                    text = self.alarmstrings[alarmnumber].split('#')[0]
+                    slidervalue = max(0,min(100,int(str(text))))
                     if slidervalue < 0 or slidervalue > 100:
                         raise Exception()
                     if self.alarmaction[alarmnumber] == 3:
@@ -2784,7 +2786,8 @@ class tgraphcanvas(FigureCanvas):
             elif self.alarmaction[alarmnumber] == 21:
                 # SV slider alarm
                 try:
-                    sv = float(str(self.alarmstrings[alarmnumber]))
+                    text = self.alarmstrings[alarmnumber].split('#')[0]
+                    sv = float(str(text))
                     if aw.qmc.device == 0:
                         if sv is not None and sv != aw.fujipid.sv:
                             sv = max(0,sv) # we don't send SV < 0
@@ -13155,7 +13158,7 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.08
                                 except Exception:
                                     pass
-                elif action == 13: # PWM Command ("out(<channel>,<value>)" with <value> in [0-100])
+                elif action == 13: # PWM Command "out(<channel>,<value>)" with <value> in [0-100])
                     try:
                         if cmd_str.startswith('out(') and len(cmd_str)>7 and len(cmd_str)<11:
                             c,v = cmd_str[4:-1].split(',')
@@ -13171,11 +13174,11 @@ class ApplicationWindow(QMainWindow):
                             aw.ser.phidgetOUTtogglePWMhub(int(c))
                     except Exception:
                         pass
-                elif action == 14: # VOUT Command (currently only "out(<value>)" with <value> a float
+                elif action == 14: # VOUT Command (currently only "out(<channel>,<value>)" with <value> a float
                     try:
                         if cmd_str.startswith('out(') and len(cmd_str)>7:
-                            c,v = cmd_str[4:-1]
-                            aw.ser.phidgetVOUTsetVOUT(float(v))
+                            c,v = cmd_str[4:-1].split(',')
+                            aw.ser.phidgetVOUTsetVOUT(int(c),float(v))
                     except Exception:
                         pass                        
             except Exception:
@@ -29554,7 +29557,7 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<LI>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None))
         string += u(QApplication.translate("Message", "<LI>IO Command: set(n,0), set(n,1), toggle(n) to set Phidget IO digital output n",None))
         string += u(QApplication.translate("Message", "<LI>PWM Command: out(n,v), toggle(n) set digital output channel n to PWM value v (0-100) on a Phidget OUT1100; outhub(n,v) and togglehub(n) on a Phidget HUB0000",None))
-        string += u(QApplication.translate("Message", "<LI>VOUT Command: out(v) set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V) on a Phidget OUT1000/OUT1001/OUT1002",None))
+        string += u(QApplication.translate("Message", "<LI>VOUT Command: out(n,v) set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V) on a Phidget OUT1000/OUT1001/OUT1002",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Heater: sets heater to value",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Fan: sets fan to value",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Command: motor(n),solenoid(n),stirrer(n),heater(h),fan(f) with n={0,1},h={0,..100},f={0,..10}",None))
@@ -34176,17 +34179,27 @@ class serialport(object):
             return -1,-1
 
 #--- Phidget IO Binay Output (only one device supported for now)
-#  only supporting 8 channel Phidget 1010, 1013, 1018, 1019 modules
+#  only supporting (trying to attach in this order)
+#      4 channel Phidget 1014
+#      8 channel Phidget 1017
+#      8 channel Phidget 1010, 1013, 1018, 1019 modules
 #  commands: set(n,0), set(n,1), toggle(n) with n channel number
 
 
     def phidgetBinaryOUTattach(self):
         if not aw.ser.PhidgetBinaryOut:
+            ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1014)
+            ports = 4
+            if ser is not None:
+                ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1017)
+                ports = 8            
             # try to attach up to 8 IO channels of the first Phidget 1010, 1013, 1018, 1019 module
-            ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019)
+            if ser is not None:
+                ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019)
+                ports = 8
             if ser is not None:
                 aw.ser.PhidgetBinaryOut = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]                
-                for i in range(8):
+                for i in range(ports):
                     aw.ser.PhidgetBinaryOut[i].setChannel(i)
                     aw.ser.PhidgetBinaryOut[i].setDeviceSerialNumber(ser)
                     if aw.qmc.phidgetRemoteOnlyFlag:
@@ -34205,7 +34218,7 @@ class serialport(object):
         if aw.ser.PhidgetBinaryOut:
             # set state of the given channel
             try:
-                if len(aw.ser.PhidgetBinaryOut) > channel:
+                if len(aw.ser.PhidgetBinaryOut) > channel and aw.ser.PhidgetBinaryOut[channel] and aw.ser.PhidgetBinaryOut[channel].getAttached():
                     aw.ser.PhidgetBinaryOut[channel].setState(value)
             except Exception:
                 pass
@@ -34218,7 +34231,7 @@ class serialport(object):
         if aw.ser.PhidgetBinaryOut:
             # set PWM of the given channel
             try:
-                if len(aw.ser.PhidgetBinaryOut) > channel and aw.ser.PhidgetBinaryOut[channel].getAttached():
+                if len(aw.ser.PhidgetBinaryOut) > channel and aw.ser.PhidgetBinaryOut[channel] and aw.ser.PhidgetBinaryOut[channel].getAttached():
                     res = aw.ser.PhidgetBinaryOut[channel].getState()
             except:
                 pass
@@ -34388,52 +34401,60 @@ class serialport(object):
 
 
 #--- Phidget Analog Voltage Output (only one supported for now)
-#  only supporting 1 channel Phidget OUT1000, OUT1001 and OUT1002 modules
+#  only supporting 1 channel Phidget OUT1000, OUT1001 and OUT1002 modules as well as the 4 channel USB Phdiget 1002
 #  commands: out(n,v) with n channel number and value v voltage in V as a float
 
     def phidgetVOUTattach(self):
         if not aw.ser.PhidgetAnalogOut:
             # try to attach the Phidget OUT100x module
             ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1000)
+            ports = 1
             if ser == None:
                 ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1001)
+                ports = 1
             if ser == None:
                 ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1002)
+                ports = 1
+            if ser == None:
+                ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_1002)
+                ports = 4
             if ser is not None:
-                aw.ser.PhidgetAnalogOut = VoltageOutput()
-                if port is not None:
-                    aw.ser.PhidgetAnalogOut.setHubPort(port)
-                aw.ser.PhidgetAnalogOut.setDeviceSerialNumber(ser)
-                if aw.qmc.phidgetRemoteOnlyFlag:
-                    aw.ser.PhidgetAnalogOut.setIsRemote(True)
-                    aw.ser.PhidgetAnalogOut.setIsLocal(False)
-                try:
-                    aw.ser.PhidgetAnalogOut.open() # we don't wait for the attach and might mis some data
-                except:
-                    pass
+                aw.ser.PhidgetAnalogOut = [VoltageOutput(),VoltageOutput(),VoltageOutput(),VoltageOutput()]
+                for i in range(ports):
+                    if port is not None:
+                        aw.ser.PhidgetAnalogOut[i].setHubPort(port)
+                    aw.ser.PhidgetAnalogOut[i].setDeviceSerialNumber(ser)
+                    if aw.qmc.phidgetRemoteOnlyFlag:
+                        aw.ser.PhidgetAnalogOut[i].setIsRemote(True)
+                        aw.ser.PhidgetAnalogOut[i].setIsLocal(False)
+                    try:
+                        aw.ser.PhidgetAnalogOut[i].open() # we don't wait for the attach and might mis some data
+                    except:
+                        pass
                 libtime.sleep(.3)
                         
 
     # value: float
-    def phidgetVOUTsetVOUT(self,value): 
+    def phidgetVOUTsetVOUT(self,channel,value): 
         self.phidgetOUTattach()
         if aw.ser.PhidgetAnalogOut:
             # set voltage output
             try:
-                if aw.ser.PhidgetAnalogOut and aw.ser.PhidgetAnalogOut.getAttached():
+                if len(aw.ser.PhidgetAnalogOut) > channel and aw.ser.PhidgetAnalogOut[channel] and aw.ser.PhidgetAnalogOut[channel].getAttached():
                     if value > 0:
-                        aw.ser.PhidgetAnalogOut.setVoltage(value)
+                        aw.ser.PhidgetAnalogOut.setVoltage[channel](value)
                         aw.ser.PhidgetAnalogOut.setEnabled(True)
                     else:
-                        aw.ser.PhidgetAnalogOut.setVoltage(0)
+                        aw.ser.PhidgetAnalogOut.setVoltage[channel](0)
                         aw.ser.PhidgetAnalogOut.setEnabled(False)
             except Exception:
                 pass
     
     def phidgetVOUTclose(self):
-        if aw.ser.PhidgetAnalogOut and aw.ser.PhidgetAnalogOut.getAttached():
+        if aw.ser.PhidgetAnalogOut and len(aw.ser.PhidgetAnalogOut)==4:
             try:
-                aw.ser.PhidgetAnalogOut.close()                        
+                for i in range(4):
+                    aw.ser.PhidgetAnalogOut[i].close()                        
             except Exception:
                 pass
             aw.ser.PhidgetAnalogOut = None

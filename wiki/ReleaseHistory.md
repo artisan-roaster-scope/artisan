@@ -19,13 +19,16 @@ v1.2.0 (xx.xx.2017)
 	- adds support for Phidgets API v22
 	- adds support for new VINT devices
  		- HUB0000 (Voltage Input, Digital Input, Digital Output)
- 		- TMP1100 (1x isolated TC)
+ 		- TMP1100 (1x Isolated TC)
  		- TMP1101 (4x TC)
  		- TMP1200 (1x RTD)
  		- OUT1100 (4x 5V PWM)
       - OUT1000 (4x 12bit Voltage Output, 0-4V2)
       - OUT1001 (4x 12bit Isolated Voltage Output, -10V to +10V)
       - OUT1002 (4x 16bit Isolated Voltage Output, -10V to +10V)
+      - USB IO 1002 (4x Voltage Output)
+      - USB IO 1014 (4x Digital Output)
+      - USB IO 1017 (8x Digital Output)
 	- adds Phidgets 1048 data rate configuration
    - adds Phidgets IO (1011, 1018,..) digital input support
 	- adds support for multiple Phidgets devices of one type
