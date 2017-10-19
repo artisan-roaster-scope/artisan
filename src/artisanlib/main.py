@@ -10789,8 +10789,8 @@ class ApplicationWindow(QMainWindow):
                                      "HUD_ON":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #60ffed   }",
                                      "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
                                      "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                     "PID":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF }",
-                                     "PIDactive":"QPushButton {font-size: 10pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
+                                     "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
+                                     "PIDactive":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
                                      "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
                                      "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
                                      "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
@@ -10813,8 +10813,8 @@ class ApplicationWindow(QMainWindow):
                                      "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #60ffed   }",
                                      "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
                                      "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                     "PID":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF }",
-                                     "PIDactive":"QPushButton {font-size: 10pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
+                                     "PID":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #92C3FF }",
+                                     "PIDactive":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }",
                                      "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
                                      "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
                                      "SELECTED":"QPushButton {font-size: 11pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
