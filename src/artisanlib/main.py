@@ -34185,16 +34185,15 @@ class serialport(object):
 #      8 channel Phidget 1010, 1013, 1018, 1019 modules
 #  commands: set(n,0), set(n,1), toggle(n) with n channel number
 
-
-    def phidgetBinaryOUTattach(self):
+    def phidgetBinaryOUTattach(self,channel):
         if not aw.ser.PhidgetBinaryOut:
             ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1014)
             ports = 4
-            if ser is not None:
+            if ser is None:
                 ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1017)
-                ports = 8            
+                ports = 8
             # try to attach up to 8 IO channels of the first Phidget 1010, 1013, 1018, 1019 module
-            if ser is not None:
+            if ser is None:
                 ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019)
                 ports = 8
             if ser is not None:
@@ -34205,16 +34204,16 @@ class serialport(object):
                     if aw.qmc.phidgetRemoteOnlyFlag:
                         aw.ser.PhidgetBinaryOut[i].setIsRemote(True)
                         aw.ser.PhidgetBinaryOut[i].setIsLocal(False)
-                    try:
-                        aw.ser.PhidgetBinaryOut[i].open() #.openWaitForAttachment(timeout)
-                    except:
-                        pass
-                libtime.sleep(.3)
+        try:
+            if not aw.ser.PhidgetBinaryOut[channel].getAttached():
+                aw.ser.PhidgetBinaryOut[channel].openWaitForAttachment(500)
+        except:
+            pass
                 
     # channel: 0-8
     # value: True or False
     def phidgetBinaryOUTset(self,channel,value):
-        self.phidgetBinaryOUTattach()
+        self.phidgetBinaryOUTattach(channel)
         if aw.ser.PhidgetBinaryOut:
             # set state of the given channel
             try:
@@ -34326,10 +34325,10 @@ class serialport(object):
                 pass
             aw.ser.PhidgetDigitalOut = None
 
-#--- Phidget Digital PWM Output (only one supported for now)
+#--- Phidget Digital PWMhub Output (only one supported for now)
 #  only supporting 6 channel Phidget HUB0000 module
 
-    def phidgetOUTattachHub(self):
+    def phidgetOUTattachHub(self,channel):
         if not aw.ser.PhidgetDigitalOutHub:
             # try to attach the 6 channels of the Phidget HUB0000 module
             ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_HUB0000)
@@ -34343,11 +34342,11 @@ class serialport(object):
                     if aw.qmc.phidgetRemoteOnlyFlag:
                         aw.ser.PhidgetDigitalOutHub[i].setIsRemote(True)
                         aw.ser.PhidgetDigitalOutHub[i].setIsLocal(False)
-                    try:
-                        aw.ser.PhidgetDigitalOutHub[i].open() # we don't wait for the attach and might mis some data
-                    except:
-                        pass
-                libtime.sleep(.3)
+        try:
+            if not aw.ser.PhidgetDigitalOutHub[channel].getAttached():
+                aw.ser.PhidgetDigitalOutHub[channel].openWaitForAttachment(500) # we don't wait for the attach and might mis some data
+        except:
+            pass                        
                         
     # channel: 0-3
     def phidgetOUTtogglePWMhub(self,channel):
@@ -34378,8 +34377,8 @@ class serialport(object):
 
     # channel: 0-5
     # value: 0-100
-    def phidgetOUTsetPWMhub(self,channel,value): 
-        self.phidgetOUTattachHub()
+    def phidgetOUTsetPWMhub(self,channel,value):
+        self.phidgetOUTattachHub(channel)
         if aw.ser.PhidgetDigitalOutHub:
             # set PWM of the given channel
             try:
@@ -34409,13 +34408,13 @@ class serialport(object):
             # try to attach the Phidget OUT100x module
             ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1000)
             ports = 1
-            if ser == None:
+            if ser is None:
                 ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1001)
                 ports = 1
-            if ser == None:
+            if ser is None:
                 ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1002)
                 ports = 1
-            if ser == None:
+            if ser is None:
                 ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_1002)
                 ports = 4
             if ser is not None:
