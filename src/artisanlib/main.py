@@ -977,16 +977,16 @@ class tgraphcanvas(FigureCanvas):
                        "Amprobe TMD-56",        #31
                        "+ArduinoTC4 56",        #32
                        "+MODBUS_34",            #33
-                       "Phidget 1048 4xTC",     #34
-                       "+Phidget 1048 4xTC 34", #35
+                       "Phidget 1048 4xTC 01",  #34
+                       "+Phidget 1048 4xTC 23", #35
                        "+Phidget 1048 4xTC AT", #36
-                       "Phidget 1046 RTD",      #37
-                       "+Phidget 1046 RTD 34",  #38
+                       "Phidget 1046 4xRTD 01", #37
+                       "+Phidget 1046 4xRTD 23",#38
                        "Mastech MS6514",        #39
-                       "Phidget IO",            #40
-                       "+Phidget IO 34",        #41
-                       "+Phidget IO 56",        #42
-                       "+Phidget IO 78",        #43
+                       "Phidget IO 01",         #40
+                       "+Phidget IO 23",        #41
+                       "+Phidget IO 45",        #42
+                       "+Phidget IO 67",        #43
                        "+ArduinoTC4 78",        #44
                        "Yocto Thermocouple",    #45
                        "Yocto PT100",           #46
@@ -995,31 +995,31 @@ class tgraphcanvas(FigureCanvas):
                        "+Program 56",           #49
                        "DUMMY",                 #50
                        "+CENTER 304 34",        #51
-                       "Phidget 1051 TC",       #52
+                       "Phidget 1051 1xTC 01",  #52
                        "Hottop BT/ET",          #53
                        "+Hottop Heater/Fan",    #54
                        "+MODBUS 56",            #55
                        "Apollo DT301",          #56
                        "EXTECH 755",            #57
-                       "Phidget TMP1101 4xTC",  #58
-                       "+Phidget TMP1101 4xTC 34",#59
+                       "Phidget TMP1101 4xTC 01",#58
+                       "+Phidget TMP1101 4xTC 23",#59
                        "+Phidget TMP1101 4xTC AT",#60
                        "Phidget TMP1100 1xTC",  #61
-                       "Phidget 1011 IO",       #62
-                       "Phidget HUB0000 IO",    #63
-                       "+Phidget HUB0000 IO 34",#64
-                       "+Phidget HUB0000 IO 56",#65
+                       "Phidget 1011 IO 01",    #62
+                       "Phidget HUB0000 IO 01", #63
+                       "+Phidget HUB0000 IO 23",#64
+                       "+Phidget HUB0000 IO 45",#65
                        "-Omega HH806W",         #66 NOT WORKING 
                        "VOLTCRAFT PL-125-T2",   #67
                        "Phidget TMP1200 1xRTD", #68
-                       "Phidget IO Digital",            #69
-                       "+Phidget IO Digital 34",        #70
-                       "+Phidget IO Digital 56",        #71
-                       "+Phidget IO Digital 78",        #72
-                       "Phidget 1011 IO Digital",       #73
-                       "Phidget HUB0000 IO Digital",    #74
-                       "+Phidget HUB0000 IO Digital 34",#75
-                       "+Phidget HUB0000 IO Digital 56",#76
+                       "Phidget IO Digital 01",         #69
+                       "+Phidget IO Digital 23",        #70
+                       "+Phidget IO Digital 45",        #71
+                       "+Phidget IO Digital 67",        #72
+                       "Phidget 1011 IO Digital 01",    #73
+                       "Phidget HUB0000 IO Digital 01", #74
+                       "+Phidget HUB0000 IO Digital 23",#75
+                       "+Phidget HUB0000 IO Digital 45",#76
                        ]
 
         #extra devices
@@ -13038,6 +13038,9 @@ class ApplicationWindow(QMainWindow):
                         elif cmd_str.startswith('toggle(') and len(cmd_str)>8:
                             c = int(cmd_str[7:-1])
                             aw.ser.phidgetBinaryOUTtoggle(c)
+                        elif cmd_str.startswith('pulse(') and len(cmd_str)>9:
+                            c = int(cmd_str[6:-1])
+                            aw.ser.phidgetBinaryOUTpulse(c,t)
                     except Exception:
                         pass
                 elif action == 7: # slider call-program action
@@ -13158,20 +13161,32 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.08
                                 except Exception:
                                     pass
-                elif action == 13: # PWM Command "out(<channel>,<value>)" with <value> in [0-100])
+                elif action == 13: # PWM Command 
+                    ## out(<channel>,<value>)  with <value> in [0-100]
+                    ## toggle(<channel>)
+                    ## outhub(<channel>,<value>)
+                    ## togglehub(<channel>)
+                    ## pulse(<channel>,<millis>)
+                    ## pulsehub(<channel>,<millis>)
                     try:
                         if cmd_str.startswith('out(') and len(cmd_str)>7 and len(cmd_str)<11:
                             c,v = cmd_str[4:-1].split(',')
                             aw.ser.phidgetOUTsetPWM(int(c),int(v))                            
-                        elif cmd_str.startswith('toggle(') and len(cmd_str)>8 and len(cmd_str)<10:
+                        elif cmd_str.startswith('toggle(') and len(cmd_str)==9:
                             c = cmd_str[7:8]
                             aw.ser.phidgetOUTtogglePWM(int(c))
                         elif cmd_str.startswith('outhub(') and len(cmd_str)>10 and len(cmd_str)<14:
                             c,v = cmd_str[7:-1].split(',')
                             aw.ser.phidgetOUTsetPWMhub(int(c),int(v))
-                        elif cmd_str.startswith('togglehub(') and len(cmd_str)>11 and len(cmd_str)<13:
+                        elif cmd_str.startswith('togglehub(') and len(cmd_str)==12:
                             c = cmd_str[10:11]
                             aw.ser.phidgetOUTtogglePWMhub(int(c))
+                        elif cmd_str.startswith('pulse(') and len(cmd_str)>9 and len(cmd_str)<14:
+                            c,t = cmd_str[6:-1].split(',')
+                            aw.ser.phidgetOUTpulsePWM(int(c),int(t))
+                        elif cmd_str.startswith('pulsehub(') and len(cmd_str)>12 and len(cmd_str)<17:
+                            c,t = cmd_str[9:-1].split(',')
+                            aw.ser.phidgetOUTpulsePWMhub(int(c),int(t))
                     except Exception:
                         pass
                 elif action == 14: # VOUT Command (currently only "out(<channel>,<value>)" with <value> a float
@@ -29555,8 +29570,8 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<li><b>writem</b>(slaveId,register,value) or <b>writem</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write registers: <i>MODBUS function 16</i>",None))
         string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given id",None))
         string += u(QApplication.translate("Message", "<LI>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None))
-        string += u(QApplication.translate("Message", "<LI>IO Command: set(n,0), set(n,1), toggle(n) to set Phidget IO digital output n",None))
-        string += u(QApplication.translate("Message", "<LI>PWM Command: out(n,v), toggle(n) set digital output channel n to PWM value v (0-100) on a Phidget OUT1100; outhub(n,v) and togglehub(n) on a Phidget HUB0000",None))
+        string += u(QApplication.translate("Message", "<LI>IO Command: set(n,0), set(n,1), toggle(n), pulse(n,t) to set Phidget IO digital output n",None))
+        string += u(QApplication.translate("Message", "<LI>PWM Command: out(n,v), toggle(n), pulse(n,t) set digital output channel n to PWM value v (0-100) on a Phidget OUT1100; outhub(n,v), togglehub(n), pulsehub(n,t) on a Phidget HUB0000",None))
         string += u(QApplication.translate("Message", "<LI>VOUT Command: out(n,v) set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V) on a Phidget OUT1000/OUT1001/OUT1002",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Heater: sets heater to value",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Fan: sets fan to value",None))
@@ -31780,10 +31795,10 @@ class serialport(object):
         #stores the Phidget Digital Output PMW objects (None if not initialized)      
         self.PhidgetDigitalOut = None
         self.PhidgetDigitalOutLastPWM = [0]*4 # 0-100
-        self.PhidgetDigitalOutLastToggle = [None]*4 # if True, channel was last toggled ON, OFF otherwise
+        self.PhidgetDigitalOutLastToggle = [None]*4 # if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
         self.PhidgetDigitalOutHub = None
         self.PhidgetDigitalOutLastPWMhub = [0]*6 # 0-100
-        self.PhidgetDigitalOutLastToggleHub = [None]*6 # if True, channel was last toggled ON, OFF otherwise
+        self.PhidgetDigitalOutLastToggleHub = [None]*6 # if not None, channel was last toggled OFF and the value indicates that lastPWM on switching OFF
         self.PhidgetAnalogOut = None
         self.PhidgetAnalogOutHub = None
         #store the Phidget IO Binary Output objects
@@ -33529,7 +33544,7 @@ class serialport(object):
 # returns the serial and port of the attached device with lowest serial/port numbers of the given class and deviceID
 #   as well as a flag indicating if this is a remote channel
 # returned port is None for non VINT devices and serial is None if no matching device is attached
-    def getFirstMatchingPhidget(self,phidget_class_name,device_id):
+    def getFirstMatchingPhidget(self,phidget_class_name,device_id,channel=None):
         try:
             phidgets = []
             def attachHandler(e):
@@ -33540,7 +33555,7 @@ class serialport(object):
                 timeout = 2000
                 self.addPhidgetServer()
             else:
-                timeout = 1500 # NOTE: 500ms timeout is tight, for remote access choose a larger timeout
+                timeout = 1000 # NOTE: 500ms timeout is tight, for remote access choose a larger timeout
             while True:
                 constructor = globals()[phidget_class_name]
                 p = constructor()
@@ -33548,13 +33563,23 @@ class serialport(object):
                 if device_id in [DeviceID.PHIDID_HUB0000]:
                     # we are looking for HUB ports
                     hub = 1
-                    p.setIsHubPortDevice(1)
-                
+                    p.setIsHubPortDevice(1)                    
+                if channel is not None:
+                    if hub:
+                        p.setChannel(0)
+                        p.setHubPort(channel)
+                        p.setIsHubPortDevice(True)
+                    else:
+                        p.setChannel(channel)
+                        
                 ## setIsRemote and setIsLocal have both to be set with inverse argument or both not to be set
                 ## all channels from one physical device have either be accessed via remote or from local
-                if aw.qmc.phidgetRemoteOnlyFlag:
+                if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                     p.setIsRemote(True)
                     p.setIsLocal(False)
+                elif not aw.qmc.phidgetRemoteFlag:
+                    p.setIsRemote(False)
+                    p.setIsLocal(True)
                 
                 p.setOnAttachHandler(attachHandler)
                 p.setOnDetachHandler(detachHandler)
@@ -33692,7 +33717,7 @@ class serialport(object):
                         self.PhidgetIRSensor.setDeviceSerialNumber(ser)
                         self.PhidgetIRSensor.setChannel(0) # attache to the IR channel
                         try:
-                            if aw.qmc.phidgetRemoteOnlyFlag:
+                            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetIRSensor.setIsRemote(True)
                                 self.PhidgetIRSensor.setIsLocal(False)
                             self.PhidgetIRSensor.open() #.openWaitForAttachment(timeout)
@@ -33701,7 +33726,7 @@ class serialport(object):
                         if deviceType != DeviceID.PHIDID_TMP1200:
                             self.PhidgetIRSensorIC.setDeviceSerialNumber(ser)
                             self.PhidgetIRSensorIC.setChannel(1) # attache to the IC channel
-                            if aw.qmc.phidgetRemoteOnlyFlag:
+                            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetIRSensorIC.setIsRemote(True)
                                 self.PhidgetIRSensorIC.setIsLocal(False)
                             try:                            
@@ -33887,7 +33912,7 @@ class serialport(object):
                                 self.PhidgetTemperatureSensor[1].setHubPort(port)
                         self.PhidgetTemperatureSensor[0].setDeviceSerialNumber(ser)
                         self.PhidgetTemperatureSensor[0].setChannel(mode*2)
-                        if aw.qmc.phidgetRemoteOnlyFlag:
+                        if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                             self.PhidgetTemperatureSensor[0].setIsRemote(True)
                             self.PhidgetTemperatureSensor[0].setIsLocal(False)
                         try:
@@ -33897,14 +33922,17 @@ class serialport(object):
                         if mode != 2:
                             self.PhidgetTemperatureSensor[1].setDeviceSerialNumber(ser)
                             self.PhidgetTemperatureSensor[1].setChannel(mode*2 + 1)
-                            if aw.qmc.phidgetRemoteOnlyFlag:
+                            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetTemperatureSensor[1].setIsRemote(True)
                                 self.PhidgetTemperatureSensor[1].setIsLocal(False)
                             try:
                                 self.PhidgetTemperatureSensor[1].open() # .openWaitForAttachment(timeout)
                             except:
                                 pass
-                        libtime.sleep(.3)
+                        if aw.qmc.phidgetRemoteOnlyFlag:
+                            libtime.sleep(.5)
+                        else:
+                            libtime.sleep(.3)                        
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
                         #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -34122,14 +34150,17 @@ class serialport(object):
                                 self.PhidgetBridgeSensor[i].setHubPort(port)
                             self.PhidgetBridgeSensor[i].setDeviceSerialNumber(ser)
                             self.PhidgetBridgeSensor[i].setChannel(mode*2)
-                            if aw.qmc.phidgetRemoteOnlyFlag:
+                            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetBridgeSensor[i].setIsRemote(True)
                                 self.PhidgetBridgeSensor[i].setIsLocal(False)
                             try:
                                 self.PhidgetBridgeSensor[i].open() #.openWaitForAttachment(timeout)
                             except:
                                 pass
-                        libtime.sleep(.3)
+                        if aw.qmc.phidgetRemoteFlag:
+                            libtime.sleep(.5)
+                        else:
+                            libtime.sleep(.3)
 
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
@@ -34187,7 +34218,7 @@ class serialport(object):
 
     def phidgetBinaryOUTattach(self,channel):
         if not aw.ser.PhidgetBinaryOut:
-            ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1014)
+            ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1014,channel)
             ports = 4
             if ser is None:
                 ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1017)
@@ -34201,14 +34232,18 @@ class serialport(object):
                 for i in range(ports):
                     aw.ser.PhidgetBinaryOut[i].setChannel(i)
                     aw.ser.PhidgetBinaryOut[i].setDeviceSerialNumber(ser)
-                    if aw.qmc.phidgetRemoteOnlyFlag:
+                    if aw.qmc.phidgetRemoteFlag:
                         aw.ser.PhidgetBinaryOut[i].setIsRemote(True)
                         aw.ser.PhidgetBinaryOut[i].setIsLocal(False)
         try:
             if not aw.ser.PhidgetBinaryOut[channel].getAttached():
-                aw.ser.PhidgetBinaryOut[channel].openWaitForAttachment(500)
+                aw.ser.PhidgetBinaryOut[channel].openWaitForAttachment(1000)
         except:
             pass
+            
+    def phidgetBinaryOUTpulse(self,channel,millis):
+        self.phidgetBinaryOUTset(channel,1)
+        QTimer.singleShot(millis,lambda : self.phidgetBinaryOUTset(channel,0))            
                 
     # channel: 0-8
     # value: True or False
@@ -34255,7 +34290,7 @@ class serialport(object):
 #  commands: out(n,v) and toggle(n) with n channel number and value v from [0-100]
 #    toggle switches between last value != 0 and 0
 
-    def phidgetOUTattach(self):
+    def phidgetOUTattach(self,channel):
         if not aw.ser.PhidgetDigitalOut:
             # try to attach the 4 channels of the Phidget OUT1100 module
             ser,port = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_OUT1100)
@@ -34266,52 +34301,49 @@ class serialport(object):
                         aw.ser.PhidgetDigitalOut[i].setHubPort(port)
                     aw.ser.PhidgetDigitalOut[i].setChannel(i)
                     aw.ser.PhidgetDigitalOut[i].setDeviceSerialNumber(ser)
-                    if aw.qmc.phidgetRemoteOnlyFlag:
+                    if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                         aw.ser.PhidgetDigitalOut[i].setIsRemote(True)
                         aw.ser.PhidgetDigitalOut[i].setIsLocal(False)
-                    try:
-                        aw.ser.PhidgetDigitalOut[i].open() # we don't wait for the attach and might mis some data
-                    except:
-                        pass
-                libtime.sleep(.3)
+                    elif not aw.qmc.phidgetRemoteFlag:
+                        aw.ser.PhidgetDigitalOut[i].setIsRemote(False)
+                        aw.ser.PhidgetDigitalOut[i].setIsLocal(True)
+        try:
+            if not aw.ser.PhidgetDigitalOut[channel].getAttached():
+                aw.ser.PhidgetDigitalOut[channel].openWaitForAttachment(1000) # we don't wait for the attach and might mis some data
+        except:
+            pass                    
                         
     # channel: 0-3
     def phidgetOUTtogglePWM(self,channel):
-        lastToggle = aw.ser.PhidgetDigitalOutLastToggle[channel]
         lastPWM = aw.ser.PhidgetDigitalOutLastPWM[channel]
-        if lastToggle is None:  
-            if lastPWM == 0:
+        lastToggle = aw.ser.PhidgetDigitalOutLastToggle[channel]
+        if lastPWM == 0:
+            # we switch on
+            if lastToggle is None:
                 self.phidgetOUTsetPWM(channel,100)
-                aw.ser.PhidgetDigitalOutLastToggle[channel] = True
             else:
-                self.phidgetOUTsetPWM(channel,0)
-                aw.ser.PhidgetDigitalOutLastPWM[channel] = lastPWM # we recreate that last PWM
-                aw.ser.PhidgetDigitalOutLastToggle[channel] = False
-        elif lastToggle:
-            if lastPWM == 0:
-                self.phidgetOUTsetPWM(channel,100)
-                aw.ser.PhidgetDigitalOutLastToggle[channel] = True
-            else:
-                self.phidgetOUTsetPWM(channel,0)
-                aw.ser.PhidgetDigitalOutLastPWM[channel] = lastPWM # we recreate that last PWM
-                aw.ser.PhidgetDigitalOutLastToggle[channel] = False
+                # we have a lastPWM from before toggling off
+                self.phidgetOUTsetPWM(channel,lastToggle)
         else:
-            if lastPWM == 0:
-                self.phidgetOUTsetPWM(channel,100)
-            else:
-                self.phidgetOUTsetPWM(channel,lastPWM)
-            aw.ser.PhidgetDigitalOutLastToggle[channel] = True
+            # we switch off
+            self.phidgetOUTsetPWM(channel,0)
+            aw.ser.PhidgetDigitalOutLastToggle[channel] = lastPWM # remember lastPWM to be able to switch on again
+            
+    def phidgetOUTpulsePWM(self,channel,millis):
+        self.phidgetOUTsetPWM(channel,100)
+        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWM(channel,0))
 
     # channel: 0-3
     # value: 0-100
     def phidgetOUTsetPWM(self,channel,value): 
-        self.phidgetOUTattach()
+        self.phidgetOUTattach(channel)
         if aw.ser.PhidgetDigitalOut:
             # set PWM of the given channel
             try:
                 if len(aw.ser.PhidgetDigitalOut) > channel and aw.ser.PhidgetDigitalOut[channel].getAttached():
                     aw.ser.PhidgetDigitalOut[channel].setDutyCycle(value/100.)
                     aw.ser.PhidgetDigitalOutLastPWM[channel] = value
+                    aw.ser.PhidgetDigitalOutLastToggle[channel] = None # clears the lastToggle value
             except Exception:
                 pass
     
@@ -34331,7 +34363,7 @@ class serialport(object):
     def phidgetOUTattachHub(self,channel):
         if not aw.ser.PhidgetDigitalOutHub:
             # try to attach the 6 channels of the Phidget HUB0000 module
-            ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_HUB0000)
+            ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_HUB0000,channel)
             if ser is not None:
                 aw.ser.PhidgetDigitalOutHub = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
                 for i in range(6):
@@ -34339,12 +34371,12 @@ class serialport(object):
                     aw.ser.PhidgetDigitalOutHub[i].setHubPort(i)
                     aw.ser.PhidgetDigitalOutHub[i].setDeviceSerialNumber(ser)
                     aw.ser.PhidgetDigitalOutHub[i].setIsHubPortDevice(True)
-                    if aw.qmc.phidgetRemoteOnlyFlag:
+                    if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                         aw.ser.PhidgetDigitalOutHub[i].setIsRemote(True)
                         aw.ser.PhidgetDigitalOutHub[i].setIsLocal(False)
         try:
             if not aw.ser.PhidgetDigitalOutHub[channel].getAttached():
-                aw.ser.PhidgetDigitalOutHub[channel].openWaitForAttachment(500) # we don't wait for the attach and might mis some data
+                aw.ser.PhidgetDigitalOutHub[channel].openWaitForAttachment(1000) # we don't wait for the attach and might mis some data
         except:
             pass                        
                         
@@ -34352,29 +34384,22 @@ class serialport(object):
     def phidgetOUTtogglePWMhub(self,channel):
         lastToggle = aw.ser.PhidgetDigitalOutLastToggleHub[channel]
         lastPWM = aw.ser.PhidgetDigitalOutLastPWMhub[channel]
-        if lastToggle is None:  
-            if lastPWM == 0:
+        if lastPWM == 0:
+            # we switch on
+            if lastToggle is None:
                 self.phidgetOUTsetPWMhub(channel,100)
-                aw.ser.PhidgetDigitalOutLastToggleHub[channel] = True
             else:
-                self.phidgetOUTsetPWMhub(channel,0)
-                aw.ser.PhidgetDigitalOutLastPWMhub[channel] = lastPWM # we recreate that last PWM
-                aw.ser.PhidgetDigitalOutLastToggleHub[channel] = False
-        elif lastToggle:
-            if lastPWM == 0:
-                self.phidgetOUTsetPWMhub(channel,100)
-                aw.ser.PhidgetDigitalOutLastToggleHub[channel] = True
-            else:
-                self.phidgetOUTsetPWMhub(channel,0)
-                aw.ser.PhidgetDigitalOutLastPWMhub[channel] = lastPWM # we recreate that last PWM
-                aw.ser.PhidgetDigitalOutLastToggleHub[channel] = False
+                # we have a lastPWM from before toggling off
+                self.phidgetOUTsetPWMhub(channel,lastToggle)
         else:
-            if lastPWM == 0:
-                self.phidgetOUTsetPWMhub(channel,100)
-            else:
-                self.phidgetOUTsetPWMhub(channel,lastPWM)
-            aw.ser.PhidgetDigitalOutLastToggleHub[channel] = True
+            # we switch off
+            self.phidgetOUTsetPWMhub(channel,0)
+            aw.ser.PhidgetDigitalOutLastToggleHub[channel] = lastPWM # remember lastPWM to be able to switch on again
 
+    def phidgetOUTpulsePWMhub(self,channel,millis):
+        self.phidgetOUTsetPWMhub(channel,100)
+        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWMhub(channel,0))
+        
     # channel: 0-5
     # value: 0-100
     def phidgetOUTsetPWMhub(self,channel,value):
@@ -34403,7 +34428,7 @@ class serialport(object):
 #  only supporting 1 channel Phidget OUT1000, OUT1001 and OUT1002 modules as well as the 4 channel USB Phdiget 1002
 #  commands: out(n,v) with n channel number and value v voltage in V as a float
 
-    def phidgetVOUTattach(self):
+    def phidgetVOUTattach(self,channel):
         if not aw.ser.PhidgetAnalogOut:
             # try to attach the Phidget OUT100x module
             ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1000)
@@ -34423,19 +34448,19 @@ class serialport(object):
                     if port is not None:
                         aw.ser.PhidgetAnalogOut[i].setHubPort(port)
                     aw.ser.PhidgetAnalogOut[i].setDeviceSerialNumber(ser)
-                    if aw.qmc.phidgetRemoteOnlyFlag:
+                    if aw.qmc.phidgetRemoteOnlyFlag and phidgetRemoteFlag:
                         aw.ser.PhidgetAnalogOut[i].setIsRemote(True)
                         aw.ser.PhidgetAnalogOut[i].setIsLocal(False)
-                    try:
-                        aw.ser.PhidgetAnalogOut[i].open() # we don't wait for the attach and might mis some data
-                    except:
-                        pass
-                libtime.sleep(.3)
+        try:
+            if not aw.ser.PhidgetAnalogOut[channel].getAttached():
+                aw.ser.PhidgetAnalogOut[channel].openWaitForAttachment(1000) # we don't wait for the attach and might mis some data
+        except:
+            pass                    
                         
 
     # value: float
     def phidgetVOUTsetVOUT(self,channel,value): 
-        self.phidgetOUTattach()
+        self.phidgetVOUTattach(channel)
         if aw.ser.PhidgetAnalogOut:
             # set voltage output
             try:
@@ -34608,7 +34633,10 @@ class serialport(object):
                             self.PhidgetIO[1].open() #.openWaitForAttachment(timeout)
                         except:
                             pass
-                        libtime.sleep(.3)
+                        if aw.qmc.phidgetRemoteFlag:
+                            libtime.sleep(.5)
+                        else:
+                            libtime.sleep(.3)
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
                         #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1018values() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -38686,20 +38714,20 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 33 is +MODBUS_34 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Phidget 1048 4xTC":
+                elif meter == "Phidget 1048 4xTC 01":
                     aw.qmc.device = 34
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                ####  DEVICE 35 is +Phidget 1048 4xTC 34 but +DEVICE cannot be set as main device
+                ####  DEVICE 35 is +Phidget 1048 4xTC 23 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 36 is +Phidget 1048 4xTC AT but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Phidget 1046 RTD":
+                elif meter == "Phidget 1046 4xRTD 01":
                     aw.qmc.device = 37
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                ####  DEVICE 38 is +Phidget 1046 RTD 34 but +DEVICE cannot be set as main device
+                ####  DEVICE 38 is +Phidget 1046 4xRTD 23 but +DEVICE cannot be set as main device
                 ##########################
                 elif meter == "Mastech MS6514":
                     aw.qmc.device = 39
@@ -38711,17 +38739,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
-                elif meter == "Phidget IO":
+                elif meter == "Phidget IO 01":
                     aw.qmc.device = 40
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                ####  DEVICE 41 is +Phidget IO 34 but +DEVICE cannot be set as main device
+                ####  DEVICE 41 is +Phidget IO 23 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 42 is +Phidget IO 56 but +DEVICE cannot be set as main device
+                ####  DEVICE 42 is +Phidget IO 45 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 43 is +Phidget IO 78 but +DEVICE cannot be set as main device
+                ####  DEVICE 43 is +Phidget IO 67 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 44 is +ARDUINOTC4_78 but +DEVICE cannot be set as main device
@@ -38753,7 +38781,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 51 is +304_34 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Phidget 1051 TC":
+                elif meter == "Phidget 1051 1xTC 01":
                     aw.qmc.device = 52
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 elif meter == "Hottop BT/ET":
@@ -38800,33 +38828,33 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 ##########################
-                elif meter == "Phidget TMP1101 4xTC":
+                elif meter == "Phidget TMP1101 4xTC 01":
                     aw.qmc.device = 58
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                ####  DEVICE 59 is +Phidget TMP1101_34 TC but +DEVICE cannot be set as main device
+                ####  DEVICE 59 is +Phidget TMP1101 4xTC 23 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 60 is +Phidget TMP1101_AT TC but +DEVICE cannot be set as main device
+                ####  DEVICE 60 is +Phidget TMP1101 4xTC AT but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 elif meter == "Phidget TMP1100 1xTC":
                     aw.qmc.device = 61
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                elif meter == "Phidget 1011 IO":
+                elif meter == "Phidget 1011 IO 01":
                     aw.qmc.device = 62
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                elif meter == "Phidget HUB0000 IO":
+                elif meter == "Phidget HUB0000 IO 01":
                     aw.qmc.device = 63
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
                 ##########################
-                ####  DEVICE 64 is +Phidget HUB0000 IO 34 but +DEVICE cannot be set as main device
+                ####  DEVICE 64 is +Phidget HUB0000 IO 23 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 65 is +Phidget HUB0000 IO 56 but +DEVICE cannot be set as main device
+                ####  DEVICE 65 is +Phidget HUB0000 IO 45 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 66 is -HH806W but -DEVICE cannot be set as main device
@@ -38847,32 +38875,32 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.device = 68
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                elif meter == "Phidget IO Digital":
+                elif meter == "Phidget IO Digital 01":
                     aw.qmc.device = 69
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                ####  DEVICE 70 is +Phidget IO Digital 34 but +DEVICE cannot be set as main device
+                ####  DEVICE 70 is +Phidget IO Digital 23 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 71 is +Phidget IO Digital 56 but +DEVICE cannot be set as main device
+                ####  DEVICE 71 is +Phidget IO Digital 45 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 72 is +Phidget IO Digital 78 but +DEVICE cannot be set as main device
+                ####  DEVICE 72 is +Phidget IO Digital 67 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                elif meter == "Phidget 1011 IO Digital":
+                elif meter == "Phidget 1011 IO Digital 01":
                     aw.qmc.device = 73
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
-                elif meter == "Phidget HUB0000 IO Digital":
+                elif meter == "Phidget HUB0000 IO Digital 01":
                     aw.qmc.device = 74
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 ##########################
                 ##########################
-                ####  DEVICE 75 is +Phidget HUB0000 IO Digital 34 but +DEVICE cannot be set as main device
+                ####  DEVICE 75 is +Phidget HUB0000 IO Digital 23 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 76 is +Phidget HUB0000 IO Digital 56 but +DEVICE cannot be set as main device
+                ####  DEVICE 76 is +Phidget HUB0000 IO Digital 45 but +DEVICE cannot be set as main device
                 ##########################
                 
                 # ADD DEVICE:
