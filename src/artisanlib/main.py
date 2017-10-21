@@ -13038,9 +13038,9 @@ class ApplicationWindow(QMainWindow):
                         elif cmd_str.startswith('toggle(') and len(cmd_str)>8:
                             c = int(cmd_str[7:-1])
                             aw.ser.phidgetBinaryOUTtoggle(c)
-                        elif cmd_str.startswith('pulse(') and len(cmd_str)>9:
-                            c = int(cmd_str[6:-1])
-                            aw.ser.phidgetBinaryOUTpulse(c,t)
+                        elif cmd_str.startswith('pulse(') and len(cmd_str)>9 and len(cmd_str)<14:
+                            c,t = cmd_str[6:-1].split(',')
+                            aw.ser.phidgetOUTpulsePWM(int(c),int(t))
                     except Exception:
                         pass
                 elif action == 7: # slider call-program action
@@ -34260,7 +34260,7 @@ class serialport(object):
     # channel: 0-8
     # returns: True or False (default)
     def phidgetBinaryOUTget(self,channel):
-        self.phidgetBinaryOUTattach()
+        self.phidgetBinaryOUTattach(channel)
         res = False
         if aw.ser.PhidgetBinaryOut:
             # set PWM of the given channel
@@ -34448,7 +34448,7 @@ class serialport(object):
                     if port is not None:
                         aw.ser.PhidgetAnalogOut[i].setHubPort(port)
                     aw.ser.PhidgetAnalogOut[i].setDeviceSerialNumber(ser)
-                    if aw.qmc.phidgetRemoteOnlyFlag and phidgetRemoteFlag:
+                    if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
                         aw.ser.PhidgetAnalogOut[i].setIsRemote(True)
                         aw.ser.PhidgetAnalogOut[i].setIsLocal(False)
         try:
