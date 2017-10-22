@@ -120,6 +120,17 @@ else:
 import matplotlib as mpl
 from matplotlib import cm
 
+mpl_major_version = 1
+try:
+  mpl_major_version = int(mpl.__version__.split('.')[0])
+except:
+  pass
+mpl_minor_version = 0
+try:
+  mpl_minor_version = int(mpl.__version__.split('.')[1])
+except:
+  pass
+
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
 # (see Mac OS X specific notes in the PyQt5 documentation)
@@ -4588,7 +4599,10 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
                                     E4b_last = i
-    
+                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
+                                every = None
+                            else:
+                                every = 2                            
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if cool exists and last event was earlier
                                     self.E1backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4597,7 +4611,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.E1backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
+                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if cool exists and last event was earlier
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4606,7 +4620,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
+                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
                             if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if cool exists and last event was earlier
                                     self.E3backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4615,7 +4629,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.E3backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
+                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
                             if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if cool exists and last event was earlier
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4624,7 +4638,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                                            picker=2,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
+                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
                                                                               
                     #check backgroundDetails flag
                     if self.backgroundDetails:
@@ -4825,6 +4839,11 @@ class tgraphcanvas(FigureCanvas):
                                 self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E4_nonempty = True
                                 E4_last = i
+                                
+                        if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
+                            every = None
+                        else:
+                            every = 2
     
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
@@ -4837,11 +4856,15 @@ class tgraphcanvas(FigureCanvas):
                             E1y = self.E1values
                             ds = "steps-post"
                         else:
-                            E1x = []
-                            E1y = []
+                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
+                                E1x = []
+                                E1y = []
+                            else:
+                                E1x = [None]
+                                E1y = [None]
                             ds = "steps-post"
                         self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                              picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
+                                                              picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex): 
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
                                 self.E2timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -4853,11 +4876,15 @@ class tgraphcanvas(FigureCanvas):
                             E2y = self.E2values
                             ds = "steps-post"
                         else:
-                            E2x = []
-                            E2y = []
+                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
+                                E2x = []
+                                E2y = []
+                            else:
+                                E2x = [None]
+                                E2y = [None]
                             ds = "steps-post"
                         self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                              picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
+                                                              picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
                                 self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -4869,11 +4896,15 @@ class tgraphcanvas(FigureCanvas):
                             E3y = self.E3values
                             ds = "steps-post"
                         else:
-                            E3x = []
-                            E3y = []
+                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
+                                E3x = []
+                                E3y = []
+                            else:
+                                E3x = [None]
+                                E3y = [None]
                             ds = "steps-post"
                         self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                              picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
+                                                              picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -4885,11 +4916,16 @@ class tgraphcanvas(FigureCanvas):
                             E4y = self.E4values
                             ds = "steps-post"
                         else:
-                            E4x = []
-                            E4y = []
+                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
+                                E4x = []
+                                E4y = []
+                            else:
+                                E4x = [None]
+                                E4y = [None]
+                                every = 2
                             ds = "steps-post"
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                              picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                                                              picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:
