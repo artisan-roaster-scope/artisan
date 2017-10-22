@@ -4839,7 +4839,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             E1x = []
                             E1y = []
-                            ds = None
+                            ds = "steps-post"
                         self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                               picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex): 
@@ -4855,7 +4855,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             E2x = []
                             E2y = []
-                            ds = None
+                            ds = "steps-post"
                         self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                               picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
@@ -4871,7 +4871,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             E3x = []
                             E3y = []
-                            ds = None
+                            ds = "steps-post"
                         self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                               picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
@@ -4887,7 +4887,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             E4x = []
                             E4y = []
-                            ds = None
+                            ds = "steps-post"
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                               picker=2,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                             
