@@ -120,12 +120,12 @@ else:
 import matplotlib as mpl
 from matplotlib import cm
 
-mpl_major_version = 1
+mpl_major_version = 2
 try:
   mpl_major_version = int(mpl.__version__.split('.')[0])
 except:
   pass
-mpl_minor_version = 0
+mpl_minor_version = 1
 try:
   mpl_minor_version = int(mpl.__version__.split('.')[1])
 except:
@@ -1067,12 +1067,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.fig.patch.set_facecolor('None')
 
-        v = 2
-        try:
-            v = int(mpl.__version__.split('.')[0])
-        except:
-            pass
-        if v >= 2:
+        if mpl_major_version >= 2:
             self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
         else:
             self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
@@ -4230,12 +4225,7 @@ class tgraphcanvas(FigureCanvas):
     
                 self.fig.clf()   #wipe out figure. keep_observers=False
     
-                v = 2
-                try:
-                    v = int(mpl.__version__.split('.')[0])
-                except:
-                    pass
-                if v >= 2:
+                if mpl_major_version >= 2:
                     self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
                 else:
                     self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
@@ -5101,13 +5091,8 @@ class tgraphcanvas(FigureCanvas):
                     #frame.set_edgecolor('darkgrey')
                     frame.set_linewidth(0.5)
     
-                # we create here the project line plots to have the accurate time axis after CHARGE
-                v = 2
-                try:
-                    v = int(mpl.__version__.split('.')[0])
-                except:
-                    pass                
-                if v >= 2:
+                # we create here the project line plots to have the accurate time axis after CHARGE               
+                if mpl_major_version >= 2:
                     dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0
                 else:
                     dashes_setup = [3,4,1,4] # matplot 1.5 default
@@ -5591,12 +5576,7 @@ class tgraphcanvas(FigureCanvas):
             self.fig.clf()
             #create a new name ax1 instead of ax (ax is used when plotting profiles)
             
-            v = 2
-            try:
-                v = int(mpl.__version__.split('.')[0])
-            except:
-                pass
-            if v >= 2:
+            if mpl_major_version >= 2:
     #            self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor=self.backcolor) #) radar green facecolor='#d5de9c'
                 self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor='None') #) radar green facecolor='#d5de9c'
             else:
@@ -8792,12 +8772,7 @@ class tgraphcanvas(FigureCanvas):
             # same as redraw but using different axes
             self.fig.clf()
             #create a new name ax1 instead of ax
-            v = 2
-            try:
-                v = int(mpl.__version__.split('.')[0])
-            except:
-                pass
-            if v >= 2:
+            if mpl_major_version >= 2:
 #                self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor=self.backcolor)            
                 self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor='None')
 #                self.ax2 = self.fig.add_subplot(111, polar=True,facecolor='None')
@@ -9087,12 +9062,7 @@ class VMToolbar(NavigationToolbar):
 
 
 # add green flag menu on matplotlib v2.0 and later
-        v = 2
-        try:
-            v = int(mpl.__version__.split('.')[0])
-        except:
-            pass
-        if v >= 2:
+        if mpl_major_version >= 2:
             if len(self.actions()) > 0:
                 # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
                 if svgsupport:
@@ -9112,13 +9082,23 @@ class VMToolbar(NavigationToolbar):
 
     # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
     if not svgsupport:
-        figureoptions.get_icon = my_get_icon    
-    
+        figureoptions.get_icon = my_get_icon
+        
+    def zoom(self, *args):
+        if self._views() is None:
+            self.push_current()
+        super(VMToolbar, self).zoom(*args)
+        
+    def pan(self,*args):
+        if self._views() is None:
+            self.push_current()
+        super(VMToolbar, self).pan(*args)
+                
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def draw_new(self):
         self.draw_org()
         aw.qmc.updateBackground()
-
+        
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def update_view_new(self):
         self.update_view_org()
@@ -9126,10 +9106,15 @@ class VMToolbar(NavigationToolbar):
 
     def home(self, *args):
         """Restore the original view"""
+        if self._views() is None:
+            self.push_current()
+        #-- orginal code
         self._views.home()
         self._positions.home()
         self.set_history_buttons()
         self._update_view()
+        #--- end orginal code
+        
         # toggle zoom_follow if recording
         if aw.qmc.flagstart:
             aw.qmc.zoom_follow = not aw.qmc.zoom_follow
@@ -10012,12 +9997,8 @@ class ApplicationWindow(QMainWindow):
         self.defaultdpi = 120
         self.dpi = self.defaultdpi
         self.qmc = tgraphcanvas(self.main_widget)
-        v = 2
-        try:
-            v = int(mpl.__version__.split('.')[0])
-        except:
-            pass
-        if v >= 2 and pyqtversion >= 5:
+
+        if mpl_major_version >= 2 and pyqtversion >= 5:
             # on mpl >= v2 we assume hidpi support and consider the pixel ratio
             self.qmc.fig.set_dpi(self.defaultdpi*self.devicePixelRatio())
         else:
@@ -11048,6 +11029,7 @@ class ApplicationWindow(QMainWindow):
         self.button_17.clicked.connect(lambda x=-5: self.adjustPIDsv(-5))
 
         # NavigationToolbar VMToolbar
+        #self.ntb = NavigationToolbar(self.qmc, self.main_widget)        
         self.ntb = VMToolbar(self.qmc, self.main_widget)
         #self.ntb.setMinimumHeight(45)
 
@@ -12889,12 +12871,7 @@ class ApplicationWindow(QMainWindow):
     def setdpi(self,dpi,moveWindow=True):
         if aw:
             aw.dpi = dpi
-            v = 2
-            try:
-                v = int(mpl.__version__.split('.')[0])
-            except:
-                pass
-            if v >= 2 and pyqtversion >= 5:
+            if mpl_major_version >= 2 and pyqtversion >= 5:
                 # on mpl >= v2 we assume hidpi support and consider the pixel ratio
                 self.qmc.fig.set_dpi(dpi*aw.devicePixelRatio())
             else:
