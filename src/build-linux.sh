@@ -40,6 +40,7 @@ rm -rf usr/share/pixmaps/._*
 rm -rf usr/share/applications/._*
 
 /usr/local/bin/fpm -s dir -t rpm -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" \
+--vendor "Artisan GitHub" \
 --url "https://github.com/artisan-roaster-scope/artisan" \
 --description "This program or software helps coffee roasters record, analyze, and control
 roast profiles. With the help of a thermocouple data logger, or a
@@ -49,11 +50,29 @@ flavor." \
 --after-install DEBIAN/postinst \
 --before-remove DEBIAN/prerm \
 -v ${VERSION} --prefix / usr
+
+/usr/local/bin/fpm -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" \
+--vendor "Artisan GitHub" \
+--no-auto-depends \
+--url "https://github.com/artisan-roaster-scope/artisan" \
+--description "This program or software helps coffee roasters record, analyze, and control
+roast profiles. With the help of a thermocouple data logger, or a
+proportional–integral–derivative controller (PID controller), this software
+offers roasting metrics to help make decisions that influence the final coffee
+flavor." \
+--after-install DEBIAN/postinst \
+--before-remove DEBIAN/prerm \
+-v ${VERSION} --prefix / usr
+
+
 mv *.rpm ..
+mv *.deb ..
 cd ..
 
 
 # build Ubuntu amd64.deb
 
-rm -f ${DEB_NAME}*amd64.deb
-/usr/local/bin/fpm -t deb -s rpm ${RPM_NAME}-1.x86_64.rpm
+# rm -f ${DEB_NAME}*amd64.deb
+# /usr/local/bin/fpm -t deb -s rpm ${RPM_NAME}-1.x86_64.rpm
+
+

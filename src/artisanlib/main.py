@@ -122,14 +122,14 @@ from matplotlib import cm
 
 mpl_major_version = 2
 try:
-  mpl_major_version = int(mpl.__version__.split('.')[0])
+    mpl_major_version = int(mpl.__version__.split('.')[0])
 except:
-  pass
+    pass
 mpl_minor_version = 1
 try:
-  mpl_minor_version = int(mpl.__version__.split('.')[1])
+    mpl_minor_version = int(mpl.__version__.split('.')[1])
 except:
-  pass
+    pass
 
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
@@ -178,6 +178,7 @@ from Phidget22.Phidget import *
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
 from Phidget22.Devices.VoltageRatioInput import *
 from Phidget22.Devices.VoltageInput import *
+from Phidget22.Devices.DigitalInput import *
 from Phidget22.Devices.DigitalOutput import *
 from Phidget22.Devices.VoltageOutput import *
 
@@ -31785,26 +31786,16 @@ class serialport(object):
         self.PhidgetTemperatureSensor = None # either None or a list containing one PhidgetTemperatureSensor() object per channel
         self.Phidget1048values = [-1]*4 # the values gathered by registered change triggers
         # list of (serial,port) tuples filled on attaching the corresponding main device and consumed on attaching the other channel pairs
-        self.Phidget1048_34_serialports = []
-        self.Phidget1048_AT_serialports = []
-        self.PhidgetTMP1101_34_serialports = []
-        self.PhidgetTMP1101_AT_serialports = []
         #stores the Phidget 1045 TemperatureSensor object (None if not initialized)
         self.PhidgetIRSensor = None
         self.PhidgetIRSensorIC = None
         self.Phidget1045value = -1
         #stores the Phidget BridgeSensor object (None if not initialized)
-        self.Phidget1046_34_serialports = []
         self.PhidgetBridgeSensor = None
         self.Phidget1046values = [-1]*4 # the values gathered by registered change triggers
         #stores the Phidget IO object (None if not initialized)
         self.PhidgetIO = None
         self.PhidgetIOvalues = [-1]*8 # the values gathered by registered change triggers
-        self.Phidget1018_34_serialports = []
-        self.Phidget1018_56_serialports = []
-        self.Phidget1018_78_serialports = []
-        self.PhidgetHUB_34_serialports = []
-        self.PhidgetHUB_56_serialports = []
         #stores the Phidget Digital Output PMW objects (None if not initialized)      
         self.PhidgetDigitalOut = None
         self.PhidgetDigitalOutLastPWM = [0]*4 # 0-100
@@ -33573,6 +33564,7 @@ class serialport(object):
                 constructor = globals()[phidget_class_name]
                 p = constructor()
                 hub = 0 # we don't search for a hub port
+                
                 if device_id in [DeviceID.PHIDID_HUB0000]:
                     # we are looking for HUB ports
                     hub = 1
@@ -33873,40 +33865,13 @@ class serialport(object):
             if not self.PhidgetTemperatureSensor:
                 ser = None
                 port = None 
-                if mode == 0 or (deviceType == DeviceID.PHIDID_1048 and not aw.ser.Phidget1048_34_serialports) or \
-                    (deviceType != DeviceID.PHIDID_1048 and not aw.ser.PhidgetTMP1101_34_serialports):
-                    # we scan for available main device
-                    ser,port = self.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType)
-                    if ser is not None:
-                        if deviceType == DeviceID.PHIDID_1048:
-                            aw.ser.Phidget1048_34_serialports.append([ser,port])
-                            aw.ser.Phidget1048_AT_serialports.append([ser,port])
-                        else:
-                            aw.ser.PhidgetTMP1101_34_serialports.append([ser,port])
-                            aw.ser.PhidgetTMP1101_AT_serialports.append([ser,port])
+                if mode == 0:
+                    ser,port = self.getFirstMatchingPhidget("PhidgetTemperatureSensor",deviceType,0)
                 # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
                 elif mode == 1:
-                    if deviceType == DeviceID.PHIDID_1048:
-                        if aw.ser.Phidget1048_34_serialports:
-                            ser = aw.ser.Phidget1048_34_serialports[0][0]
-                            port = aw.ser.Phidget1048_34_serialports[0][1]
-                            aw.ser.Phidget1048_34_serialports = aw.ser.Phidget1048_34_serialports[1:]
-                    else:
-                        if aw.ser.PhidgetTMP1101_34_serialports:
-                            ser = aw.ser.PhidgetTMP1101_34_serialports[0][0]
-                            port = aw.ser.PhidgetTMP1101_34_serialports[0][1]
-                            aw.ser.PhidgetTMP1101_34_serialports = aw.ser.PhidgetTMP1101_34_serialports[1:]                        
+                    ser,port = self.getFirstMatchingPhidget("PhidgetTemperatureSensor",deviceType,2)                      
                 elif mode == 2:
-                    if deviceType == DeviceID.PHIDID_1048:
-                        if aw.ser.Phidget1048_34_serialports:
-                            ser = aw.ser.Phidget1048_AT_serialports[0][0]
-                            port = aw.ser.Phidget1048_AT_serialports[0][1]
-                            aw.ser.Phidget1048_AT_serialports = aw.ser.Phidget1048_AT_serialports[1:]
-                    else:
-                        if aw.ser.PhidgetTMP1101_34_serialports:
-                            ser = aw.ser.PhidgetTMP1101_AT_serialports[0][0]
-                            port = aw.ser.PhidgetTMP1101_AT_serialports[0][1]
-                            aw.ser.PhidgetTMP1101_AT_serialports = aw.ser.PhidgetTMP1101_AT_serialports[1:]  
+                    ser,port = self.getFirstMatchingPhidget("PhidgetTemperatureSensor",deviceType,4)
                 if ser:
                     self.PhidgetTemperatureSensor = [PhidgetTemperatureSensor()]
                     if mode != 2:
@@ -33958,7 +33923,7 @@ class serialport(object):
                             pass
                         self.Phidget1048values = [-1]*4
                         self.PhidgetTemperatureSensor = None
-            if self.PhidgetTemperatureSensor and ((mode != 2) or (len(self.PhidgetTemperatureSensor)>1 and self.PhidgetTemperatureSensor[0].getAttached() and self.PhidgetTemperatureSensor[1].getAttached())):
+            if self.PhidgetTemperatureSensor and ((mode == 2) or (len(self.PhidgetTemperatureSensor)>1 and self.PhidgetTemperatureSensor[0].getAttached() and self.PhidgetTemperatureSensor[1].getAttached())):
                 # now just harvest both temps (or one in case type is 2)
                 if mode in [0,1]:
                     probe1 = probe2 = -1
@@ -34140,17 +34105,12 @@ class serialport(object):
             if not aw.ser.PhidgetBridgeSensor:
                 ser = None
                 port = None 
-                if mode == 0 or not aw.ser.Phidget1046_34_serialports:
+                if mode == 0:
                     # we scan for available main device
-                    ser,port = self.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046)
-                    if ser is not None:
-                        aw.ser.Phidget1046_34_serialports.append([ser,port])
+                    ser,port = self.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,0)
                 # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
                 elif mode == 1:
-                    if aw.ser.Phidget1046_34_serialports:
-                        ser = aw.ser.Phidget1046_34_serialports[0][0]
-                        port = aw.ser.Phidget1046_34_serialports[0][1]
-                        aw.ser.Phidget1046_34_serialports = aw.ser.Phidget1046_34_serialports[1:]
+                    ser,port = self.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,2)
                 if ser:
                     self.PhidgetBridgeSensor = [VoltageRatioInput(),VoltageRatioInput()]
                     try:
@@ -34534,17 +34494,18 @@ class serialport(object):
                 self.PhidgetIO[idx].setDataInterval(aw.qmc.phidget1018_dataRates[channel])
             except Exception:
                 pass
-            if not digital and aw.qmc.phidget1018_async[channel]:
-                try:
-                    ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltage()),self.PhidgetIO[idx].getMinVoltage())
-                    self.PhidgetIO[idx].setVoltageChangeTrigger(ct)
-                except PhidgetException:
-                    #print("Phidget Exception %i: %s" % (e.code, e.details))
-                    pass
-                self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda e,t: self.phidget1018SensorChanged(e,t,channel,idx))
-            else:
-                self.PhidgetIO[idx].setVoltageChangeTrigger(0.0)
-                self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda e,t:None) 
+            if not digital:
+                if aw.qmc.phidget1018_async[channel]:
+                    try:
+                        ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltage()),self.PhidgetIO[idx].getMinVoltage())
+                        self.PhidgetIO[idx].setVoltageChangeTrigger(ct)
+                    except PhidgetException:
+                        #print("Phidget Exception %i: %s" % (e.code, e.details))
+                        pass
+                    self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda e,t: self.phidget1018SensorChanged(e,t,channel,idx))
+                else:
+                    self.PhidgetIO[idx].setVoltageChangeTrigger(0.0)
+                    self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda e,t:None) 
             self.PhidgetIOvalues[channel] = -1
 
     def phidget1018attached(self,deviceType,e,idx,digital=False):
@@ -34581,44 +34542,24 @@ class serialport(object):
             if not self.PhidgetIO:
                 ser = None
                 port = None 
-                if mode == 0 or (deviceType == DeviceID.PHIDID_1010_1013_1018_1019 and not aw.ser.Phidget1018_34_serialports) or \
-                    (deviceType == DeviceID.PHIDID_HUB0000 and not aw.ser.PhidgetHUB_34_serialports):
+                if digital:
+                    tp = "DigitalInput"
+                else:
+                    tp = "VoltageInput"
+                if mode == 0:
                     # we scan for available main device
-                    ser,port = self.getFirstMatchingPhidget('VoltageInput',deviceType)
-                    if ser is not None:
-                        if deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
-                            aw.ser.Phidget1018_34_serialports.append([ser,port])
-                            aw.ser.Phidget1018_56_serialports.append([ser,port])
-                            aw.ser.Phidget1018_78_serialports.append([ser,port])
-                        elif deviceType == DeviceID.PHIDID_HUB0000:
-                            aw.ser.PhidgetHUB_34_serialports.append([ser,port])
-                            aw.ser.PhidgetHUB_56_serialports.append([ser,port])
-                # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
+                    ser,port = self.getFirstMatchingPhidget(tp,deviceType,0)
                 elif mode == 1:
-                    if deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
-                        ser = aw.ser.Phidget1018_34_serialports[0][0]
-                        port = aw.ser.Phidget1018_34_serialports[0][1]
-                        aw.ser.Phidget1018_34_serialports = aw.ser.Phidget1018_34_serialports[1:]
-                    elif deviceType == DeviceID.PHIDID_HUB0000:
-                        ser = aw.ser.PhidgetHUB_34_serialports[0][0]
-                        port = aw.ser.PhidgetHUB_34_serialports[0][1]
-                        aw.ser.PhidgetHUB_34_serialports = aw.ser.PhidgetHUB_34_serialports[1:]
+                    ser,port = self.getFirstMatchingPhidget(tp,deviceType,2)
                 elif mode == 2:
-                    if deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
-                        ser = aw.ser.Phidget1018_56_serialports[0][0]
-                        port = aw.ser.Phidget1018_56_serialports[0][1]
-                        aw.ser.Phidget1018_56_serialports = aw.ser.Phidget1018_56_serialports[1:]
-                    elif deviceType == DeviceID.PHIDID_HUB0000:
-                        ser = aw.ser.PhidgetHUB_56_serialports[0][0]
-                        port = aw.ser.PhidgetHUB_56_serialports[0][1]
-                        aw.ser.PhidgetHUB_56_serialports = aw.ser.PhidgetHUB_56_serialports[1:]
+                    ser,port = self.getFirstMatchingPhidget(tp,deviceType,4)
                 elif mode == 3:
-                    if deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
-                        ser = aw.ser.Phidget1018_78_serialports[0][0]
-                        port = aw.ser.Phidget1018_78_serialports[0][1]
-                        aw.ser.Phidget1018_78_serialports = aw.ser.Phidget1018_78_serialports[1:]
-                if ser:        
-                    self.PhidgetIO = [VoltageInput(),VoltageInput()]
+                    ser,port = self.getFirstMatchingPhidget(tp,deviceType,6)
+                if ser:
+                    if digital:
+                        self.PhidgetIO = [DigitalInput(),DigitalInput()]
+                    else:      
+                        self.PhidgetIO = [VoltageInput(),VoltageInput()]
                     try: 
                         self.PhidgetIO[0].setOnAttachHandler(lambda e:self.phidget1018attached(deviceType,e,0,digital))
                         self.PhidgetIO[0].setOnDetachHandler(lambda e:self.phidget1018detached(deviceType,e,0))
@@ -34634,6 +34575,9 @@ class serialport(object):
                         else:
                             self.PhidgetIO[0].setChannel(mode*2)
                             self.PhidgetIO[1].setChannel(mode*2+1)
+                            if port is not None:
+                                self.PhidgetIO[0].setHubPort(port)
+                                self.PhidgetIO[1].setHubPort(port)
                         if aw.qmc.phidgetRemoteFlag:
                             self.addPhidgetServer()
                         self.PhidgetIO[0].setDeviceSerialNumber(ser)
@@ -41015,12 +40959,12 @@ class PXRpidDlgControl(ArtisanDialog):
         self.labelrs1.setContentsMargins(5,5,5,5)
         self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
         self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<BR>(1-4)",None) + "</b></font>")
-        self.labelrs1.setMaximumSize(120, 62)
+#        self.labelrs1.setMaximumSize(130, 62)
         self.labelrs2 = QLabel()
         self.labelrs2.setContentsMargins(5,5,5,5)
         self.labelrs2.setStyleSheet("background-color:'#CCCCCC';")
         self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<BR>(5-8)",None) + "</b></font>")
-        self.labelrs2.setMaximumSize(120, 62)
+#        self.labelrs2.setMaximumSize(130, 62)
         labelpattern = QLabel(QApplication.translate("Label", "Ramp/Soak Pattern",None))
         self.patternComboBox =  QComboBox()
         self.patternComboBox.addItems(["1-4","5-8","1-8"])
@@ -41039,11 +40983,17 @@ class PXRpidDlgControl(ArtisanDialog):
         self.paintlabels()
         #update button and exit button
         button_getall = QPushButton(QApplication.translate("Button","Read Ra/So values",None))
+        button_getall.setFocusPolicy(Qt.NoFocus)
         button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None))
+        button_rson.setFocusPolicy(Qt.NoFocus)
         button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None))
+        button_rsoff.setFocusPolicy(Qt.NoFocus)
         button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None))
+        button_standbyON.setFocusPolicy(Qt.NoFocus)
         button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None))
-        button_exit = QPushButton(QApplication.translate("Button","Close",None))
+        button_standbyOFF.setFocusPolicy(Qt.NoFocus)
+        button_exit = QPushButton(QApplication.translate("Button","OK",None))
+        button_exit.setFocus()
         self.patternComboBox.currentIndexChanged.connect(self.paintlabels)
         button_getall.clicked.connect(self.getallsegments)
         button_rson.clicked.connect(lambda flag=1: self.setONOFFrampsoak(1))
@@ -41053,24 +41003,21 @@ class PXRpidDlgControl(ArtisanDialog):
         button_exit.clicked.connect(lambda _:self.reject())
         #TAB 2
         tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None))
-        tab2cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None))
-        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","SV Buttons ON",None))
-        tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: #ffaaff}")
-        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","SV Buttons OFF",None))
-        tab2easyOFFsvbutton.setStyleSheet("QPushButton { background-color: lightblue}")
-        tab2easyONsvslider = QPushButton(QApplication.translate("Button","SV Slider ON",None))
-        tab2easyONsvslider.setStyleSheet("QPushButton { background-color: #ffccff}")
-        tab2easyOFFsvslider = QPushButton(QApplication.translate("Button","SV Slider OFF",None))
-        tab2easyOFFsvslider.setStyleSheet("QPushButton { background-color: #aaddff}")
+        tab2svbutton.setFocusPolicy(Qt.NoFocus)
+        
+        self.tab2easySVbuttonsFlag = QCheckBox(QApplication.translate("Label","SV Buttons",None))
+        self.tab2easySVbuttonsFlag.setChecked(aw.pidcontrol.svButtons)
+        self.tab2easySVbuttonsFlag.stateChanged.connect(lambda flag=1: self.setSVbuttons(flag))
+        self.tab2easySVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None))
+        self.tab2easySVsliderFlag.setChecked(aw.pidcontrol.svSlider)
+        self.tab2easySVsliderFlag.stateChanged.connect(lambda flag=1: self.setSVslider(flag))
+        
+        
         tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV",None))
+        tab2getsvbutton.setFocusPolicy(Qt.NoFocus)
         self.readsvedit = QLineEdit()
         tab2svbutton.clicked.connect(self.setsv)
         tab2getsvbutton.clicked.connect(self.getsv)
-        tab2cancelbutton.clicked.connect(self.reject)
-        tab2easyONsvbutton.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFeasySV(1))
-        tab2easyOFFsvbutton.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFeasySV(0))
-        tab2easyONsvslider.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFsliderSV(1))
-        tab2easyOFFsvslider.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFsliderSV(0))
         svwarning1 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None) + "</b><br>"
                             + QApplication.translate("Label", "Writing eeprom memory",None) + "<br>"
                             + QApplication.translate("Label", "<u>Max life</u> 10,000 writes",None) + "<br>"
@@ -41082,8 +41029,11 @@ class PXRpidDlgControl(ArtisanDialog):
         self.svedit.setValidator(QDoubleValidator(0., 999., 1, self.svedit))
         #TAB 3
         button_p = QPushButton(QApplication.translate("Button","Set p",None))
+        button_p.setFocusPolicy(Qt.NoFocus)
         button_i = QPushButton(QApplication.translate("Button","Set i",None))
+        button_i.setFocusPolicy(Qt.NoFocus)
         button_d = QPushButton(QApplication.translate("Button","Set d",None))
+        button_d.setFocusPolicy(Qt.NoFocus)
         plabel =  QLabel("p")
         ilabel =  QLabel("i")
         dlabel =  QLabel("d")
@@ -41097,15 +41047,16 @@ class PXRpidDlgControl(ArtisanDialog):
         self.iedit.setValidator(QIntValidator(0, 3200, self.iedit))
         self.dedit.setValidator(QDoubleValidator(0., 999.0, 1, self.dedit))
         button_autotuneON = QPushButton(QApplication.translate("Button","Autotune ON",None))
+        button_autotuneON.setFocusPolicy(Qt.NoFocus)
         button_autotuneOFF = QPushButton(QApplication.translate("Button","Autotune OFF",None))
+        button_autotuneOFF.setFocusPolicy(Qt.NoFocus)
         button_readpid = QPushButton(QApplication.translate("Button","Read PID Values",None))
-        tab3cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None))
+        button_readpid.setFocusPolicy(Qt.NoFocus)
         button_autotuneON.clicked.connect(lambda flag=1: self.setONOFFautotune(1))
         button_autotuneOFF.clicked.connect(lambda flag=0: self.setONOFFautotune(0))
         button_p.clicked.connect(lambda var="p": self.setpid("p"))
         button_i.clicked.connect(lambda var="i": self.setpid("i"))
         button_d.clicked.connect(lambda var="d": self.setpid("d"))
-        tab3cancelbutton.clicked.connect(self.reject)
         button_readpid.clicked.connect(self.getpid)
         #TAB4
         #table for setting segments
@@ -41189,9 +41140,13 @@ class PXRpidDlgControl(ArtisanDialog):
         if aw.fujipid.PXR["pvinputtype"][0] in self.PXRconversiontoindex:
             self.ETthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(aw.fujipid.PXR["pvinputtype"][0]))
         setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
+        setETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
         setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
+        setBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
         getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
+        getETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
         getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None))
+        getBTthermocouplebutton.setFocusPolicy(Qt.NoFocus)
         setETthermocouplebutton.setMaximumWidth(80)
         getETthermocouplebutton.setMaximumWidth(80)
         setBTthermocouplebutton.setMaximumWidth(80)
@@ -41263,8 +41218,12 @@ class PXRpidDlgControl(ArtisanDialog):
         buttonMasterLayout.addWidget(self.followBackground,5,0)
         buttonMasterLayout.addLayout(followLayout,5,1)
         buttonMasterLayout.addWidget(button_getall,6,0)
-        buttonMasterLayout.addWidget(button_exit,6,1)
 
+        ############################
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(button_exit)
         
                 
         #tab 2
@@ -41274,9 +41233,8 @@ class PXRpidDlgControl(ArtisanDialog):
         svlayout.addWidget(tab2getsvbutton,1,1)
         svlayout.addWidget(self.svedit,2,0)
         svlayout.addWidget(tab2svbutton,2,1)
-        svlayout.addWidget(tab2easyONsvbutton,3,0)
-        svlayout.addWidget(tab2easyOFFsvbutton,3,1)
-        svlayout.addWidget(tab2cancelbutton,4,1)
+        svlayout.addWidget(self.tab2easySVbuttonsFlag,3,0)
+        svlayout.addWidget(self.tab2easySVsliderFlag,3,1)
         #tab 3
         tab3layout.addWidget(plabel,0,0)
         tab3layout.addWidget(self.pedit,0,1)
@@ -41290,7 +41248,6 @@ class PXRpidDlgControl(ArtisanDialog):
         tab3layout.addWidget(button_autotuneON,3,1)
         tab3layout.addWidget(button_autotuneOFF,3,2)
         tab3layout.addWidget(button_readpid,4,1)
-        tab3layout.addWidget(tab3cancelbutton,4,2)
         #tab4
         tab4layout = QVBoxLayout()
         tab4layout.addWidget(self.segmenttable)
@@ -41327,8 +41284,16 @@ class PXRpidDlgControl(ArtisanDialog):
         C2Widget = QWidget()
         C2Widget.setLayout(svlayout)
         TabWidget.addTab(C2Widget,QApplication.translate("Tab","SV",None))
-        C3Widget = QWidget()
-        C3Widget.setLayout(tab3layout)
+        tab3Hlayout = QHBoxLayout()
+        tab3Hlayout.addStretch()
+        tab3Hlayout.addLayout(tab3layout)
+        tab3Hlayout.addStretch()
+        tab3Vlayout = QVBoxLayout()
+        tab3Vlayout.addStretch()
+        tab3Vlayout.addLayout(tab3Hlayout)
+        tab3Vlayout.addStretch()
+        C3Widget = QWidget()        
+        C3Widget.setLayout(tab3Vlayout)
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","PID",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4layout)
@@ -41340,7 +41305,14 @@ class PXRpidDlgControl(ArtisanDialog):
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(self.status,0)
         Mlayout.addWidget(TabWidget,1)
+        Mlayout.addLayout(buttonLayout,2)
         self.setLayout(Mlayout)
+        
+    def setSVbuttons(self,flag):
+        aw.pidcontrol.svButtons = bool(flag)
+        
+    def setSVslider(self,flag):
+        aw.pidcontrol.svSlider = bool(flag)
 
     def changeLookAhead(self):
         aw.fujipid.lookahead = int(self.pidSVLookahead.value())     
@@ -41488,14 +41460,14 @@ class PXRpidDlgControl(ArtisanDialog):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " readthermocoupletype(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def paintlabels(self):
-        str1 = "T = " + str(aw.fujipid.PXR["segment1sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment1ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment1soak"][0]))
-        str2 = "T = " + str(aw.fujipid.PXR["segment2sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment2ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment2soak"][0]))
-        str3 = "T = " + str(aw.fujipid.PXR["segment3sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment3ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment3soak"][0]))
-        str4 = "T = " + str(aw.fujipid.PXR["segment4sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment4ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment4soak"][0]))
-        str5 = "T = " + str(aw.fujipid.PXR["segment5sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment5ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment5soak"][0]))
-        str6 = "T = " + str(aw.fujipid.PXR["segment6sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment6ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment6soak"][0]))
-        str7 = "T = " + str(aw.fujipid.PXR["segment7sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment7ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment7soak"][0]))
-        str8 = "T = " + str(aw.fujipid.PXR["segment8sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment8ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment8soak"][0]))
+        str1 = "T = " + str(aw.fujipid.PXR["segment1sv"][0]) + ", Ramp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment1ramp"][0])) + ", Soak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment1soak"][0]))
+        str2 = "T = " + str(aw.fujipid.PXR["segment2sv"][0]) + ", Ramp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment2ramp"][0])) + ", Soak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment2soak"][0]))
+        str3 = "T = " + str(aw.fujipid.PXR["segment3sv"][0]) + ", Ramp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment3ramp"][0])) + ", Soak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment3soak"][0]))
+        str4 = "T = " + str(aw.fujipid.PXR["segment4sv"][0]) + ", Ramp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment4ramp"][0])) + ", Soak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment4soak"][0]))
+        str5 = "T = " + str(aw.fujipid.PXR["segment5sv"][0]) + ", Ramp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment5ramp"][0])) + ", Soak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment5soak"][0]))
+        str6 = "T = " + str(aw.fujipid.PXR["segment6sv"][0]) + ", Ramp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment6ramp"][0])) + ", Soak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment6soak"][0]))
+        str7 = "T = " + str(aw.fujipid.PXR["segment7sv"][0]) + ", Ramp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment7ramp"][0])) + ", Soak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment7soak"][0]))
+        str8 = "T = " + str(aw.fujipid.PXR["segment8sv"][0]) + ", Ramp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment8ramp"][0])) + ", Soak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment8soak"][0]))
         self.label_rs1.setText(u(str1))
         self.label_rs2.setText(u(str2))
         self.label_rs3.setText(u(str3))
@@ -41986,6 +41958,7 @@ class PXRpidDlgControl(ArtisanDialog):
             soakedit.setValidator(QRegExpValidator(regextime,self))
             setButton = QPushButton(QApplication.translate("Button","Set",None))
             setButton.clicked.connect(lambda idn = i:self.setsegment(idn))
+            setButton.setFocusPolicy(Qt.NoFocus)
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
             self.segmenttable.setCellWidget(i,1,rampedit)
@@ -42250,18 +42223,28 @@ class PXG4pidDlgControl(ArtisanDialog):
             self.radiosv7.setChecked(True)
         tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None))
         tab2svbutton.setFocusPolicy(Qt.NoFocus)
-        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","SV Buttons ON",None))
-        tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: 'lightblue'}")
-        tab2easyONsvbutton.setFocusPolicy(Qt.NoFocus)
-        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","SV Buttons OFF",None))
-        tab2easyOFFsvbutton.setFocusPolicy(Qt.NoFocus)
-        tab2easyOFFsvbutton.setStyleSheet("QPushButton { background-color:'#ffaaff' }")
-        tab2easyONsvslider = QPushButton(QApplication.translate("Button","SV Slider ON",None))
-        tab2easyONsvslider.setStyleSheet("QPushButton { background-color: #aaddff}")
-        tab2easyONsvslider.setFocusPolicy(Qt.NoFocus)
-        tab2easyOFFsvslider = QPushButton(QApplication.translate("Button","SV Slider OFF",None))
-        tab2easyOFFsvslider.setFocusPolicy(Qt.NoFocus)
-        tab2easyOFFsvslider.setStyleSheet("QPushButton { background-color:'#ffccff' }") 
+
+
+        self.tab2easySVbuttonsFlag = QCheckBox(QApplication.translate("Label","SV Buttons",None))
+        self.tab2easySVbuttonsFlag.setChecked(aw.pidcontrol.svButtons)
+        self.tab2easySVbuttonsFlag.stateChanged.connect(lambda flag=1: self.setSVbuttons(flag))
+        self.tab2easySVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None))
+        self.tab2easySVsliderFlag.setChecked(aw.pidcontrol.svSlider)
+        self.tab2easySVsliderFlag.stateChanged.connect(lambda flag=1: self.setSVslider(flag))
+        
+#        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","SV Buttons ON",None))
+#        tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: 'lightblue'}")
+#        tab2easyONsvbutton.setFocusPolicy(Qt.NoFocus)
+#        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","SV Buttons OFF",None))
+#        tab2easyOFFsvbutton.setFocusPolicy(Qt.NoFocus)
+#        tab2easyOFFsvbutton.setStyleSheet("QPushButton { background-color:'#ffaaff' }")
+#        tab2easyONsvslider = QPushButton(QApplication.translate("Button","SV Slider ON",None))
+#        tab2easyONsvslider.setStyleSheet("QPushButton { background-color: #aaddff}")
+#        tab2easyONsvslider.setFocusPolicy(Qt.NoFocus)
+#        tab2easyOFFsvslider = QPushButton(QApplication.translate("Button","SV Slider OFF",None))
+#        tab2easyOFFsvslider.setFocusPolicy(Qt.NoFocus)
+#        tab2easyOFFsvslider.setStyleSheet("QPushButton { background-color:'#ffccff' }") 
+       
        
         self.pidSVSliderMin = QSpinBox()
         self.pidSVSliderMin.setAlignment(Qt.AlignRight)
@@ -42291,10 +42274,10 @@ class PXG4pidDlgControl(ArtisanDialog):
         tab2svbutton.clicked.connect(self.setsv)
         tab2getsvbutton.clicked.connect(self.getallsv)
         tab2putsvbutton.clicked.connect(self.writeSetValues)
-        tab2easyONsvbutton.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFeasySV(1))
-        tab2easyOFFsvbutton.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFeasySV(0))
-        tab2easyONsvslider.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFsliderSV(1))
-        tab2easyOFFsvslider.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFsliderSV(0))
+#        tab2easyONsvbutton.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFeasySV(1))
+#        tab2easyOFFsvbutton.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFeasySV(0))
+#        tab2easyONsvslider.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFsliderSV(1))
+#        tab2easyOFFsvslider.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFsliderSV(0))
         self.radiosv1.clicked.connect(lambda sv=1: self.setNsv(1))
         self.radiosv2.clicked.connect(lambda sv=2: self.setNsv(2))
         self.radiosv3.clicked.connect(lambda sv=3: self.setNsv(3))
@@ -42592,16 +42575,16 @@ class PXG4pidDlgControl(ArtisanDialog):
         tab2Layout.addWidget(self.radiosv3,5,2)
         tab2Layout.addWidget(self.radiosv2,6,2)
         tab2Layout.addWidget(self.radiosv1,7,2)
-        tab2Layout.addWidget(tab2easyOFFsvbutton,8,0)
-        tab2Layout.addWidget(tab2easyONsvbutton,8,1)
+        tab2Layout.addWidget(self.tab2easySVbuttonsFlag,8,0)
+        tab2Layout.addWidget(self.tab2easySVsliderFlag,8,1)
         tab2Layout.addWidget(pidSVSliderMinLabel,8,3)
         tab2Layout.addWidget(self.pidSVSliderMin,8,4)
-        tab2Layout.addWidget(tab2easyOFFsvslider,9,0)
-        tab2Layout.addWidget(tab2easyONsvslider,9,1)
+#        tab2Layout.addWidget(tab2easyOFFsvslider,9,0)
+#        tab2Layout.addWidget(tab2easyONsvslider,9,1)
         tab2Layout.addWidget(pidSVSliderMaxLabel,9,3)
         tab2Layout.addWidget(self.pidSVSliderMax,9,4)
-        tab2Layout.addWidget(tab2getsvbutton,10,0)
-        tab2Layout.addWidget(tab2putsvbutton,10,1)
+        tab2Layout.addWidget(tab2getsvbutton,9,0)
+        tab2Layout.addWidget(tab2putsvbutton,9,1)
         tab3Layout = QGridLayout() #TAB3
         tab3Layout.setSpacing(10)
         tab3Layoutbutton = QGridLayout()
@@ -42722,6 +42705,12 @@ class PXG4pidDlgControl(ArtisanDialog):
         layout.addLayout(followLayout,2)
         layout.addLayout(buttonLayout,3)
         self.setLayout(layout)
+        
+    def setSVbuttons(self,flag):
+        aw.pidcontrol.svButtons = bool(flag)
+        
+    def setSVslider(self,flag):
+        aw.pidcontrol.svSlider = bool(flag)
 
     def changeLookAhead(self):
         aw.fujipid.lookahead = int(self.pidSVLookahead.value())     
@@ -45358,10 +45347,10 @@ class PID_DlgControl(ArtisanDialog):
         #
         aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
         aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
-        aw.pidcontrol.svSlider = self.pidSVsliderFlag.isChecked()
         aw.pidcontrol.svSliderMin = min(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.svSliderMax = max(self.pidSVSliderMin.value(),self.pidSVSliderMax.value())
         aw.pidcontrol.svValue = self.pidSV.value()
+        aw.pidcontrol.svSlider = self.pidSVsliderFlag.isChecked()
         aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider)
         aw.pidcontrol.svButtons = self.pidSVbuttonsFlag.isChecked()
         aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons)

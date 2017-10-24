@@ -79,6 +79,8 @@ ctrl left alt E = €
 # yum install libXext-devel blas-devel lapack-devel
 # yum install gstreamer*
 
+# yum install xdg-utils	
+
 
 2) Install Python 3.5.4
 
