@@ -13329,8 +13329,8 @@ class ApplicationWindow(QMainWindow):
             self.lastbuttonpressed = ee
         except Exception:
             pass
+        cmdvalue = self.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee])
         if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type "--" that does not add an event
-            cmdvalue = self.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee])
             if eventtype < 4: # absolute values
                 etype = eventtype
                 new_value = cmdvalue
@@ -13360,7 +13360,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.EventRecord(extraevent = ee)                 
         else:
             # just issue the eventaction (no cmd substitution here)
-            self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]))
+            self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
 
     def resetApplication(self):
         string = QApplication.translate("Message","Do you want to reset all settings?", None)
