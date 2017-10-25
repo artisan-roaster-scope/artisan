@@ -5872,8 +5872,6 @@ class tgraphcanvas(FigureCanvas):
         aw.ser.phidgetBinaryOUTclose()
         # close Phidget Analog Outputs
         aw.ser.phidgetVOUTclose()
-        # close Phidget Analog Outputs on Hub
-        aw.ser.phidgetVOUTcloseHub()
         
         
     def disconnectProbes(self):
@@ -18523,6 +18521,10 @@ class ApplicationWindow(QMainWindow):
             libtime.sleep(.1)
         try:
             self.closeserialports()
+        except Exception:
+            pass
+        try:            
+            aw.qmc.closePhidgetOUTPUTs()
         except Exception:
             pass
     
@@ -34426,7 +34428,7 @@ class serialport(object):
                         aw.ser.PhidgetAnalogOut[i].setIsLocal(False)
         try:
             if not aw.ser.PhidgetAnalogOut[channel].getAttached():
-                aw.ser.PhidgetAnalogOut[channel].openWaitForAttachment(1000) # we don't wait for the attach and might mis some data
+                aw.ser.PhidgetAnalogOut[channel].openWaitForAttachment(1000)
         except:
             pass                    
                         
@@ -41957,7 +41959,7 @@ class PXRpidDlgControl(ArtisanDialog):
             soakedit  = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXR[soakkey][0])))
             soakedit.setValidator(QRegExpValidator(regextime,self))
             setButton = QPushButton(QApplication.translate("Button","Set",None))
-            setButton.clicked.connect(lambda idn = i:self.setsegment(idn))
+            setButton.clicked.connect(lambda _,idx=i:self.setsegment(idx))
             setButton.setFocusPolicy(Qt.NoFocus)
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
@@ -44293,41 +44295,32 @@ class FujiPID(object):
     def setpidPXR(self,var,v):
         r = ""
         if var == "p":
-            if str(self.pedit.text()).isdigit():
-                p = int(v)*10
-                if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(aw.fujipid.PXR["p"][1],6)
-                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,p)
-                    r = "        "
-                else:
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["p"][1],p)
-                    r = aw.ser.sendFUJIcommand(command,8)
+            p = int(v)*10
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXR["p"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,p)
+                r = "        "
             else:
-                return -1
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["p"][1],p)
+                r = aw.ser.sendFUJIcommand(command,8)
         elif var == "i":
-            if str(self.iedit.text()).isdigit():
-                i = int(v)*10
-                if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(aw.fujipid.PXR["i"][1],6)
-                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,i)
-                    r = "        "
-                else:
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["i"][1],i)
-                    r = aw.ser.sendFUJIcommand(command,8)
+            i = int(v)*10
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXR["i"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,i)
+                r = "        "
             else:
-                return -1
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["i"][1],i)
+                r = aw.ser.sendFUJIcommand(command,8)
         elif var == "d":
-            if str(self.dedit.text()).isdigit():
-                d = int(v)*10
-                if aw.ser.useModbusPort:
-                    reg = aw.modbus.address2register(aw.fujipid.PXR["d"][1],6)
-                    aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,d)
-                    r = "        "
-                else:
-                    command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["d"][1],d)
-                    r = aw.ser.sendFUJIcommand(command,8)
+            d = int(v)*10
+            if aw.ser.useModbusPort:
+                reg = aw.modbus.address2register(aw.fujipid.PXR["d"][1],6)
+                aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,d)
+                r = "        "
             else:
-                return -1
+                command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["d"][1],d)
+                r = aw.ser.sendFUJIcommand(command,8)
 
         if len(r) == 8:
             message = QApplication.translate("StatusBar","{0} successfully sent to pid ",None).format(var)

@@ -40,7 +40,6 @@ v1.2.0 (xx.xx.2017)
 	- adds Hottop to the machine menu
    - adds "remote only" flag to the Phidget tab to force remote access also for locally connected Phidgets if local Phidget server is running. That way the local Phidget server can be use on the machine running Artisan to access the Phidgets from Artisan and any other software (incl. the Phidget Control Panel) in parallel.
    - adds support for MODBUS function 1 (Read Coil) and 2 (Read Discrete Input)
-   - most Phidgets device names have been renamed to reflect better its type. Channels are now counted zero-based as on the hardware
  * Changes
 	- drops support for OS X 10.9 and earlier
 	- extends special event lines to the drop time (by Dave)
@@ -59,8 +58,9 @@ v1.2.0 (xx.xx.2017)
 	- releases Hottop control on OFF
 	- adds coarse sliders stepping in multiples of 10 instead of 1
     - call program alarm actions interpret text after the comment delimiter # as a line comment
+   - most Phidgets device names have been renamed to better reflect its type. Channels are now counted zero-based as on the hardware
  * Bug Fixes
-	- fixes for Numpy v1.13
+	- fixes for Numpy v1.13 and Matplotlib 2.1
 	- fixes for the Probatone 7" setup
 	- fixes an RoR filtering issue
 	- improved RoR ramp up calculation avoiding initial hickups
@@ -70,7 +70,8 @@ v1.2.0 (xx.xx.2017)
 	- fixed washed out event annotations during recording
 	- fixes the wheel graph
 	- fixes "Call Program" for commands with parameters called from alarms on Windows
-   - fixes PID background-follow mode messing up as the end of the background profile is reached
+   - fixes PID background-follow mode messing up at the end of the background profile
+   - fixes Fuji PXR set p-i-d and set Ramp/Soaks
 
 ----
 v1.1.0 (10.06.2017)

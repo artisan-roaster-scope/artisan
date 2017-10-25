@@ -61,7 +61,7 @@ Features
       - 1x 12bit voltage out: VINT [OUT1000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=711)
       - 1x 12bit isolated voltage out: VINT [OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712)
       - 1x 16bit isolated voltage out: VINT [OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713)
-      - 4x 12bit analog out: [USB 1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2)
+      - 4x 12bit analog out: USB [1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2)
       - 8x digital out: USB [1017](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=15)
       - 4x digital out: USB [1014](https://www.phidgets.com/?tier=3&prodid=9)
       - 4x digital PWM out: VINT [OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714)
