@@ -12855,6 +12855,8 @@ class ApplicationWindow(QMainWindow):
             if len(self.seriallog) > 999:
                 self.seriallog = self.seriallog[1:]
             self.seriallog.append(timez + " " + serialstring)
+            if aw.serial_dlg:
+                aw.serial_dlg.update()
         except Exception:
             pass
         finally:
@@ -41888,7 +41890,7 @@ class PXRpidDlgControl(ArtisanDialog):
         if p == -1 :
             return -1
         else:
-            self.pedit.setText(str(p))
+            self.pedit.setText(str(int(p)))
             aw.fujipid.PXR["p"][0] = p
         #i is int range 0-3200
         if aw.ser.useModbusPort:
@@ -41911,7 +41913,7 @@ class PXRpidDlgControl(ArtisanDialog):
         if d == -1:
             return -1
         else:
-            self.dedit.setText(str(d))
+            self.dedit.setText(str(int(d)))
             aw.fujipid.PXR["d"][0] = d
             
         self.status.showMessage(QApplication.translate("StatusBar","Finished reading pid values",None),5000)
@@ -44295,7 +44297,7 @@ class FujiPID(object):
     def setpidPXR(self,var,v):
         r = ""
         if var == "p":
-            p = int(v)*10
+            p = int(v*10)
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXR["p"][1],6)
                 aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,p)
@@ -44304,7 +44306,7 @@ class FujiPID(object):
                 command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["p"][1],p)
                 r = aw.ser.sendFUJIcommand(command,8)
         elif var == "i":
-            i = int(v)*10
+            i = int(v*10)
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXR["i"][1],6)
                 aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,i)
@@ -44313,7 +44315,7 @@ class FujiPID(object):
                 command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["i"][1],i)
                 r = aw.ser.sendFUJIcommand(command,8)
         elif var == "d":
-            d = int(v)*10
+            d = int(v*10)
             if aw.ser.useModbusPort:
                 reg = aw.modbus.address2register(aw.fujipid.PXR["d"][1],6)
                 aw.modbus.writeSingleRegister(aw.ser.controlETpid[1],reg,d)
@@ -44326,11 +44328,11 @@ class FujiPID(object):
             message = QApplication.translate("StatusBar","{0} successfully sent to pid ",None).format(var)
             aw.sendmessage(message)
             if var == "p":
-                aw.fujipid.PXR["p"][0] = p
+                aw.fujipid.PXR["p"][0] = int(v)
             elif var == "i":
-                aw.fujipid.PXR["i"][0] = i
+                aw.fujipid.PXR["i"][0] = int(v)
             elif var == "d":
-                aw.fujipid.PXR["i"][0] = d
+                aw.fujipid.PXR["d"][0] = int(v)
         else:
             message = QApplication.translate("StatusBar","setpid(): There was a problem setting {0}",None).format(var)
             aw.sendmessage(message)
