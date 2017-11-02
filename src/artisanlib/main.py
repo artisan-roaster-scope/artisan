@@ -21762,7 +21762,11 @@ class ApplicationWindow(QMainWindow):
             pidstring = "ET pid = %i "%MVV
             ##### end of ET pid
             # QImage.Format_RGB32, QImage.Format_ARGB32
-            qImage = QImage(self.qmc.fig.canvas.buffer_rgba(), self.qmc.size().width(), self.qmc.size().height(), QImage.Format_ARGB32_Premultiplied).rgbSwapped()
+            w = self.qmc.size().width()*self.devicePixelRatio()
+            h = self.qmc.size().height()*self.devicePixelRatio()
+            qImage = QImage(self.qmc.fig.canvas.buffer_rgba(), w, h, QImage.Format_ARGB32_Premultiplied).rgbSwapped()
+            if hasattr(qImage, 'setDevicePixelRatio'):
+                qImage.setDevicePixelRatio(self.qmc.fig.canvas._dpi_ratio)
             img = QPixmap.fromImage(qImage)
             Wwidth = self.qmc.size().width()
             Wheight = self.qmc.size().height()
