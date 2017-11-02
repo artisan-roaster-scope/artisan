@@ -12855,8 +12855,6 @@ class ApplicationWindow(QMainWindow):
             if len(self.seriallog) > 999:
                 self.seriallog = self.seriallog[1:]
             self.seriallog.append(timez + " " + serialstring)
-            if aw.serial_dlg:
-                aw.serial_dlg.update()
         except Exception:
             pass
         finally:
@@ -45877,7 +45875,10 @@ class DtaPID(object):
     #command  string = ID (ADR)+ FUNCTION (CMD) + ADDRESS + NDATA + LRC_CHK 
     def writeDTE(self,value,DTAaddress):
         newsv = hex(int(abs(float(str(value)))))[2:].upper()
-        command = aw.dtapid.message2send(aw.ser.controlETpid[1],6,str(DTAaddress),newsv)
+        slaveID = aw.ser.controlETpid[1]
+        if aw.ser.controlETpid[0] != 2: # control pid is not a DTA PID
+            slaveID = aw.ser.readBTpid[1]
+        command = aw.dtapid.message2send(slaveID,6,str(DTAaddress),newsv)
         aw.ser.sendDTAcommand(command)
 
     def message2send(self,unitID,FUNCTION,ADDRESS, NDATA):
