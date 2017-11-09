@@ -40,6 +40,7 @@ v1.2.0 (xx.xx.2017)
 	- adds Hottop to the machine menu
    - adds "remote only" flag to the Phidget tab to force remote access also for locally connected Phidgets if local Phidget server is running. That way the local Phidget server can be use on the machine running Artisan to access the Phidgets from Artisan and any other software (incl. the Phidget Control Panel) in parallel.
    - adds support for MODBUS function 1 (Read Coil) and 2 (Read Discrete Input)
+   - sends DTA Commands to the BTread PID if the ETcontrol PID is not a DTA
  * Changes
 	- drops support for OS X 10.9 and earlier
 	- extends special event lines to the drop time (by Dave)

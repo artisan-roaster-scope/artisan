@@ -1716,6 +1716,7 @@ class tgraphcanvas(FigureCanvas):
         self.wheeledge = .02                        #overlaping decorative edge
         self.wheellinewidth = 1
         self.wheellinecolor = "black"               #initial color of lines
+        self.wheeltextcolor = "black"               #initial color of text
         self.wheelconnections = [0,0,0]
         self.wheelx,self.wheelz = 0,0                   #temp variables to pass index values
         self.wheellocationx,self.wheellocationz = 0.,0.  #temp vars to pass mouse location (angleX+radiusZ)
@@ -5546,7 +5547,7 @@ class tgraphcanvas(FigureCanvas):
                 self.palette[key] = palette2[key]
                 
         if color == 3:
-            dialog = graphColorDlg(self)
+            dialog = graphColorDlg(aw)
             if dialog.exec_():
                 self.palette["background"] = str(dialog.backgroundLabel.text())
                 self.palette["grid"] = str(dialog.gridLabel.text())
@@ -8526,7 +8527,7 @@ class tgraphcanvas(FigureCanvas):
 
     #launches designer config Window
     def desconfig(self):
-        dialog = designerconfigDlg(self)
+        dialog = designerconfigDlg(aw)
         dialog.show()
         dialog.setFixedSize(dialog.size())
 
@@ -8671,13 +8672,19 @@ class tgraphcanvas(FigureCanvas):
 
     def addTocuppingnotes(self):
         descriptor =  u(self.wheelnames[self.wheelx][self.wheelz]) 
-        self.cuppingnotes += "\n" + descriptor 
+        if self.cuppingnotes == "":
+            self.cuppingnotes = descriptor
+        else:    
+            self.cuppingnotes += "\n" + descriptor 
         string = u(QApplication.translate("Message", " added to cupping notes",None))
         aw.sendmessage(descriptor + string)
 
     def addToroastingnotes(self):
         descriptor =  u(self.wheelnames[self.wheelx][self.wheelz]) + " "
-        self.roastingnotes +=  "\n" + descriptor + " "
+        if self.roastingnotes == "":
+            self.roastingnotes = descriptor
+        else:
+            self.roastingnotes +=  "\n" + descriptor
         string = u(QApplication.translate("Message", " added to roasting notes",None))
         aw.sendmessage(descriptor + string)
 
@@ -8689,7 +8696,7 @@ class tgraphcanvas(FigureCanvas):
         self.wheelx = x
         self.wheelz = z
         aw.sendmessage(self.wheelnames[x][z])
-        self.segmentsalpha[x][z] += .3
+#        self.segmentsalpha[x][z] += .3
         self.drawWheel()
 
     def wheel_release(self,event):
@@ -8699,7 +8706,7 @@ class tgraphcanvas(FigureCanvas):
                 diff = math.degrees(self.wheellocationx - newlocz)
                 for i in range(len(self.startangle)):
                     self.startangle[i] -= diff
-                self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
+#                self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
                 self.drawWheel()
 
     def wheel_menu(self,event):
@@ -8709,7 +8716,7 @@ class tgraphcanvas(FigureCanvas):
             self.wheellocationz = event.ydata
 
         elif event.button == 3:                  #if right click
-            designermenu = QMenu(self)
+            designermenu = QMenu(aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
             cuppingAction = QAction(QApplication.translate("Contextual Menu", "Add to Cupping Notes",None),self)
             cuppingAction.triggered.connect(self.addTocuppingnotes)
             designermenu.addAction(cuppingAction)
@@ -8853,19 +8860,21 @@ class tgraphcanvas(FigureCanvas):
                     radii.append(Wradii[z])
                 
                 bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,
-                                        linewidth=self.wheellinewidth,picker=1))
+                                        linewidth=self.wheellinewidth,picker=3))
                 count = 0
                 #set color, alpha, and text
                 for _,bar[z] in zip(radii, bar[z]):
                     bar[z].set_facecolor(self.wheelcolor[z][count])
-                    bar[z].set_alpha(min(self.segmentsalpha[z][count],1))
+                    bar[z].set_alpha(max(min(self.segmentsalpha[z][count],1),0))
                     bar[z].set_url(str(z) + "-" + str(count))
+                    fontprop = aw.mpl_fontproperties.copy()
+                    fontprop.set_size(self.wheeltextsize[z])
                     self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
                         rotation=textangles[z][count],
                         horizontalalignment='center',
                         verticalalignment="center",
-                        fontsize=self.wheeltextsize[z],
-                        fontproperties=aw.mpl_fontproperties)
+                        color=aw.qmc.wheeltextcolor,
+                        fontproperties=fontprop)
                     count += 1
             self.fig.canvas.draw()
 
@@ -12061,14 +12070,16 @@ class ApplicationWindow(QMainWindow):
         if platform.system() == 'Darwin':
             if noButtons:
                 if parent is None:
-                    parent = self
+                    parent = aw
                 cd = QColorDialog(parent)
                 cd.setOption(QColorDialog.NoButtons,True)
+#                cd.setOption(QColorDialog.ShowAlphaChannel,True)
                 cd.setCurrentColor(c)
                 cd.exec_()
                 cr = cd.currentColor()
                 return cr
             else:
+#                return QColorDialog.getColor(c,aw,"Color",QColorDialog.ShowAlphaChannel)
                 return QColorDialog.getColor(c)
             #return QColorDialog.getColor(c,self,"Color",QColorDialog.DontUseNativeDialog) # works, but does not show native dialog
         else:
@@ -12765,14 +12776,19 @@ class ApplicationWindow(QMainWindow):
         action = self.eventslideractions[n]
         if action:
             try:
+            # before adaption:
                 # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command), =4 (Call Program [with argument])
+                #  =5 (Hottop Heater), =6 (Hottop Fan), =7 (Hottop Command), =8 (Fuji Command), =9 (PWM Command), =10 (VOUT Command)
                 action = (action+2 if action > 1 else action)
                 if action > 5:
                     action = action + 1 # skip the 6:IO Command
                     if action > 10:
                         action = action + 1 # skip the 11 p-i-d action
-                value = int(round((self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]))
-                if action in [8,9]:
+            # after adaption: (see eventaction)
+                value = (self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]
+                if action != 14: # only for VOUT Commands we keep the floats
+                    value = int(round(value))
+                if action in [8,9]: # for Hottop Heater or Fan, we just forward the value
                     cmd = value
                 else:
                     cmd = self.eventslidercommands[n]
@@ -12938,13 +12954,13 @@ class ApplicationWindow(QMainWindow):
                     except Exception as e:
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " eventaction() {0}").format(str(e)),exc_tb.tb_lineno)
-                elif action == 3:
+                elif action == 3: # Multiple Event
                     cmds = cmd_str.split(",")
                     for i in range(len(cmds)):
                         buttonnumber = int(cmds[i])-1
                         if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
                             self.recordextraevent(buttonnumber)
-                elif action == 4:
+                elif action == 4: # MODBUS Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         followupCmd = 0 # contains the required sleep time
@@ -21860,6 +21876,7 @@ class ApplicationWindow(QMainWindow):
         wheel["wheeledge"] = self.qmc.wheeledge
         wheel["wheellinewidth"] = self.qmc.wheellinewidth
         wheel["wheellinecolor"] = self.qmc.wheellinecolor
+        wheel["wheeltextcolor"] = self.qmc.wheeltextcolor
         wheel["wheelaspect"] = self.qmc.wheelaspect
         return wheel
 
@@ -21885,6 +21902,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.wheeledge = wheel["wheeledge"]
                 self.qmc.wheellinewidth = wheel["wheellinewidth"]
                 self.qmc.wheellinecolor = wheel["wheellinecolor"]
+                self.qmc.wheeltextcolor = wheel["wheeltextcolor"]
                 if "wheelaspect" in wheel:
                     self.qmc.wheelaspect = wheel["wheelaspect"]
                 else:
@@ -26493,13 +26511,19 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.scorching_flag = self.scorching.isChecked()
         aw.qmc.divots_flag = self.divots.isChecked()
         #update color
-        aw.qmc.whole_color = int(str(self.whole_color_edit.text()))
-        aw.qmc.ground_color = int(str(self.ground_color_edit.text()))
+        try:
+            aw.qmc.whole_color = int(str(self.whole_color_edit.text()))
+        except:
+            aw.qmc.whole_color = 0
+        try:
+            aw.qmc.ground_color = int(str(self.ground_color_edit.text()))
+        except:
+            aw.qmc.ground_color = 0
         aw.qmc.color_system_idx = self.colorSystemComboBox.currentIndex()
         #update beans temperature
         try:
             aw.qmc.greens_temp = float(str(self.greens_temp_edit.text()))
-        except Exception:
+        except:
             aw.qmc.greens_temp = 0.
         #update greens moisture
         try:
@@ -34444,22 +34468,23 @@ class serialport(object):
             # set voltage output
             try:
                 if len(aw.ser.PhidgetAnalogOut) > channel and aw.ser.PhidgetAnalogOut[channel] and aw.ser.PhidgetAnalogOut[channel].getAttached():
-                    if value > 0:
-                        aw.ser.PhidgetAnalogOut.setVoltage[channel](value)
-                        aw.ser.PhidgetAnalogOut.setEnabled(True)
+                    if value == 0:
+                        aw.ser.PhidgetAnalogOut[channel].setVoltage(0)
+                        aw.ser.PhidgetAnalogOut[channel].setEnabled(False)
                     else:
-                        aw.ser.PhidgetAnalogOut.setVoltage[channel](0)
-                        aw.ser.PhidgetAnalogOut.setEnabled(False)
+                        aw.ser.PhidgetAnalogOut[channel].setVoltage(value)
+                        aw.ser.PhidgetAnalogOut[channel].setEnabled(True)
             except Exception:
                 pass
     
     def phidgetVOUTclose(self):
-        if aw.ser.PhidgetAnalogOut and len(aw.ser.PhidgetAnalogOut)==4:
-            try:
-                for i in range(4):
-                    aw.ser.PhidgetAnalogOut[i].close()                        
-            except Exception:
-                pass
+        if aw.ser.PhidgetAnalogOut:
+            for i in range(4):
+                try:
+                    aw.ser.PhidgetAnalogOut[i].setEnabled(False)
+                    aw.ser.PhidgetAnalogOut[i].close()
+                except Exception:
+                    pass
             aw.ser.PhidgetAnalogOut = None
 
         
@@ -39840,7 +39865,10 @@ class WheelDlg(ArtisanDialog):
         self.linewidthSpinBox.valueChanged.connect(self.setlinewidth)
         linecolor = QPushButton(QApplication.translate("Button","Line Color",None))
         linecolor.setToolTip(QApplication.translate("Tooltip","Line color",None))
-        linecolor.clicked.connect(self.setlinecolor)
+        linecolor.clicked.connect(self.setlinecolor)        
+        textcolor = QPushButton(QApplication.translate("Button","Text Color",None))
+        textcolor.setToolTip(QApplication.translate("Tooltip","Text color",None))
+        textcolor.clicked.connect(self.settextcolor)        
         colorlabel = QLabel(QApplication.translate("Label","Color pattern",None))
         self.colorSpinBox = QSpinBox()
         self.colorSpinBox.setToolTip(QApplication.translate("Tooltip","Apply color pattern to whole graph",None))
@@ -39898,6 +39926,7 @@ class WheelDlg(ArtisanDialog):
         configlayout.addWidget(linewidthlabel)
         configlayout.addWidget(self.linewidthSpinBox)
         configlayout.addWidget(linecolor)
+        configlayout.addWidget(textcolor)
         configlayout.addWidget(txtlabel)
         configlayout.addWidget(txtButtonplus)
         configlayout.addWidget(txtButtonminus)
@@ -39959,7 +39988,7 @@ class WheelDlg(ArtisanDialog):
                 labelwidthSpinBox.setSuffix("%")
                 labelwidthSpinBox.valueChanged.connect(lambda z=1,x=x,u=i: self.setlabelwidth(z,x,u))
                 colorButton = QPushButton("Set Color")
-                colorButton.clicked.connect(lambda x =x,i=i: self.setsegmentcolor(x,i))
+                colorButton.clicked.connect(lambda b,y=x,z=i: self.setsegmentcolor(y,z))
                 alphaSpinBox = QSpinBox()
                 alphaSpinBox.setRange(0,10)
                 alphaSpinBox.setValue(int(aw.qmc.segmentsalpha[x][i]*10))
@@ -40076,7 +40105,17 @@ class WheelDlg(ArtisanDialog):
         colorf = aw.colordialog(QColor(aw.qmc.wheellinecolor))
         if colorf.isValid():
             colorname = str(colorf.name())
+            #aw.qmc.wheellinealpha = colorf.alphaF()
             aw.qmc.wheellinecolor = colorname      #add new color to label
+            aw.qmc.drawWheel()
+            
+    #sets text color
+    def settextcolor(self):
+        colorf = aw.colordialog(QColor(aw.qmc.wheeltextcolor))
+        if colorf.isValid():
+            colorname = str(colorf.name())
+            #aw.qmc.wheeltextalpha = colorf.alphaF()
+            aw.qmc.wheeltextcolor = colorname      #add new color to label
             aw.qmc.drawWheel()
 
     #makes not visible the wheel config table
