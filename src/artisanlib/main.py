@@ -32731,13 +32731,13 @@ class serialport(object):
 #                libtime.sleep(.1)
                 r = self.SP.read(18)
                 index = -1
-                if(len(r) == 18 and r[0] == "\x65" and r[1] == "\x14"):
+                if(len(r) == 18 and o(r[0]) == 101 and o(r[1]) == 20):  # 101="\x65"  20="\x14"
                     index = 0
                 else:
                     if(len(r) >= 9):
                         # find 0x65 0x14
                         for i in range(len(r)-1):
-                            if(r[i] == "\x65" and r[i+1] == "\x14"):
+                            if(o(r[i]) == 101 and o(r[i+1]) == 20): # "\x65" and "\x14"
                                 index = i
                                 break
                 
@@ -32749,12 +32749,12 @@ class serialport(object):
                         if(len(r) >= 9):
                             # find 0x65 0x14
                             for i in range(len(r)-1):
-                                if(r[i] == "\x65" and r[i+1] == "\x14"):
+                                if(o(r[i]) == 101 and o(r[i+1]) == 20):  # "\x65" and "\x14"
                                     index = i
                                     break
                 
                 if(index >= 0 and len(r) >= index+18):
-                    if(r[index+16] == "\x0d" and r[index+17] == "\x0a"):
+                    if(o(r[index+16]) == 13 and o(r[index+17]) == 10):  # 13="\x0d" and  10="\x0a"
                         #convert to binary to hex string
                         # Display [5-6] [7-8]  [11]                                          [12]
                         #   T1     T1    T2    T1: OK(08), NC(40)                            T2: OK(08), NC(40)
@@ -32764,31 +32764,32 @@ class serialport(object):
                         s1 = hex2int(r[index+5],r[index+6])/10.
                         s2 = hex2int(r[index+7],r[index+8])/10.
 
-                        if((r[index+11] >= "\x40" and r[index+11] <= "\x43") or (r[index+11] >= "\xC2" and r[index+11] <= "\xC3")):
+                        # 64="\x40"  67="\x43" 194="\xC2" 195="\xC3"
+                        if((o(r[index+11]) >= 64 and o(r[index+11]) <= 67) or (o(r[index+11]) >= 194 and o(r[index+11]) <= 195)):
                             s1 = -1
                     
-                        if(r[index+12] == "\x40"):
+                        if(o(r[index+12]) == 64): # 64="\x40"
                             s2 = -1
 
                         #return original T1 T2
-                        if(r[index+11] == "\x09" or r[index+11] == "\x41"):
+                        if(o(r[index+11]) == 9 or o(r[index+11]) == 65): # 9="\x09" 65="\x41"
                             temp = s2
                             s2 = s1
                             s1 = temp
-                        elif(r[index+11] == "\x0a"):
+                        elif(o(r[index+11]) == 10): # 10="\x0a"
                             temp = s2
                             s2 = s2-s1
                             s1 = temp
-                        elif(r[index+11] == "\x8a"):
+                        elif(o(r[index+11]) == 138): # 138="\x8a"
                             temp = s2
                             s2 = s2+s1
                             s1 = temp
-                        elif(r[index+11] == "\x42" or r[index+11] == "\xc2"):
+                        elif(o(r[index+11]) == 66 or o(r[index+11]) == 194):  # 66="\x42" and 194="\xc2"
                             s1 = s2
                             s2 = -1
-                        elif(r[index+11] == "\x0b"):
+                        elif(o(r[index+11]) == 11): # 11="\x0b"
                             s1 += s2
-                        elif(r[index+11] == "\x8b"):
+                        elif(o(r[index+11]) == 139): # 139="\x8b"
                             s1 = s2-s1
 
                         #we convert the strings to integers. Divide by 10.0 (decimal position)
