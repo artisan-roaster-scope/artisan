@@ -14,7 +14,8 @@ v1.2.0 (xx.xx.2017)
   		- to replay an event its event slider must be active (ticked) and the event name has to correspond to that of the background profile
 	- adds MET marker on ET curve inluding a picker to display MET details (by Dave Baxter)
 	- adds option to show events on BT instead of ET (by Dave Baxter)
-	- makes the display optional for of each of the four special events (Dave Baxter)
+	- adds option to show statistics summary (try it with Auto Axis enabled) (by Dave Baxter)
+	- makes the display optional for each of the four special events (by Dave Baxter)
 	- adds click-and-drag measurements (by Dave Baxter)
 	- adds support for Phidgets API v22
 	- adds support for new VINT devices
