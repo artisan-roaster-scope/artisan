@@ -5189,10 +5189,12 @@ class tgraphcanvas(FigureCanvas):
                 statstr += roastoftheday
                 if aw.qmc.roastertype:
                     statstr += '\n' + str(aw.qmc.roastertype)
+                if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [None,0]:
+                    statstr += '\n'
                 if aw.qmc.ambientTemp not in [None,0]:
-                    statstr += '\n' + str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode
+                    statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '   '
                 if aw.qmc.ambient_humidity not in [None,0]:
-                    statstr +=  '   ' + str(int(aw.qmc.ambient_humidity)) + '% ' + QApplication.translate("AddlInfo", "RH",None)
+                    statstr +=  str(int(aw.qmc.ambient_humidity)) + '% ' + QApplication.translate("AddlInfo", "RH",None)
                 if aw.qmc.greens_temp:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Bean Temp", None) + ': ' + str(int(aw.qmc.greens_temp)) + u'\u00b0' + aw.qmc.mode
                 if aw.qmc.weight[0]:
@@ -5201,9 +5203,9 @@ class tgraphcanvas(FigureCanvas):
                         statstr += '\n' + QApplication.translate("AddlInfo", "Weight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
 
                 if aw.qmc.density[0]:
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3]) + '\n'
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3])
                     if cp["roasted_density"]:
-                        statstr += QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(-aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%\n"
+                        statstr += '\n' + QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(-aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%"
 
                 if aw.qmc.volume[0]:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2])
