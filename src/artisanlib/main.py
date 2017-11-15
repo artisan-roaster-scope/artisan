@@ -31487,6 +31487,7 @@ class modbusport(object):
             r = decoder.decode_32bit_float()
             return r
         except Exception as ex:
+            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
@@ -31544,7 +31545,7 @@ class modbusport(object):
                 r = decoder.decode_16bit_uint()
                 return r
         except Exception as ex:
-#            self.disconnect()
+            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
