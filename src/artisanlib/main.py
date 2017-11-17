@@ -12781,11 +12781,14 @@ class ApplicationWindow(QMainWindow):
             # before adaption:
                 # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command), =4 (Call Program [with argument])
                 #  =5 (Hottop Heater), =6 (Hottop Fan), =7 (Hottop Command), =8 (Fuji Command), =9 (PWM Command), =10 (VOUT Command)
+                #  =11 (IO C
                 action = (action+2 if action > 1 else action)
                 if action > 5:
                     action = action + 1 # skip the 6:IO Command
                     if action > 10:
                         action = action + 1 # skip the 11 p-i-d action
+                        if action == 15:
+                            action = 6 # map IO Command back
             # after adaption: (see eventaction)
                 value = (self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]
                 if action != 14: # only for VOUT Commands we keep the floats
@@ -13070,7 +13073,7 @@ class ApplicationWindow(QMainWindow):
                             aw.ser.phidgetBinaryOUTtoggle(c)
                         elif cmd_str.startswith('pulse(') and len(cmd_str)>9 and len(cmd_str)<14:
                             c,t = cmd_str[6:-1].split(',')
-                            aw.ser.phidgetOUTpulsePWM(int(c),int(t))
+                            aw.ser.phidgetBinaryOUTpulse(int(c),int(t))
                     except Exception:
                         pass
                 elif action == 7: # slider call-program action
@@ -28024,7 +28027,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Hottop Command",None),
                        QApplication.translate("ComboBox", "Fuji Command",None),
                        QApplication.translate("ComboBox", "PWM Command",None),
-                       QApplication.translate("ComboBox", "VOUT Command",None)]
+                       QApplication.translate("ComboBox", "VOUT Command",None),
+                       QApplication.translate("ComboBox", "IO Command",None)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -31270,7 +31274,6 @@ class modbusport(object):
                 pass
 
     def connect(self):
-        
         if self.master and not self.master.socket:
             self.master = None
         if self.master is None:
@@ -31487,7 +31490,6 @@ class modbusport(object):
             r = decoder.decode_32bit_float()
             return r
         except Exception as ex:
-            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
@@ -31525,7 +31527,7 @@ class modbusport(object):
                         res = self.master.read_input_registers(int(register),1,unit=int(slave))
                     else: # code==3
                         res = self.master.read_holding_registers(int(register),1,unit=int(slave))
-                except:
+                except Exception:
                     res = None
                 if res is None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
                     if retry > 0:
@@ -31545,7 +31547,7 @@ class modbusport(object):
                 r = decoder.decode_16bit_uint()
                 return r
         except Exception as ex:
-            self.disconnect()
+#            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
