@@ -26,6 +26,8 @@ o Phidget22: 1.0.0
 o yoctopuce: 1.10.28707
 o pefile: 2017.9.3
 o PyInstaller: 3.3
+o openpyxl: 2.4.9
+
 
 1) Install CentOS7
 
@@ -173,17 +175,17 @@ download Python driver for the actual v22 API
 
 16) Yoctopuce driver
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install yoctopuce
+# sudo -H /usr/local/bin/python3.5 -m pip install yoctopuce
  => yoctopuce-1.10.28707
 
 17) pefile
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install pefile
+# sudo -H /usr/local/bin/python3.5 -m pip install pefile
  => pefile-2017.9.3
 
 18) pyinstaller
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install pyinstaller
+# sudo -H /usr/local/bin/python3.5 -m pip install pyinstaller
  => pyinstaller-3.3
 
 19) fpm
@@ -192,3 +194,7 @@ download Python driver for the actual v22 API
 # sudo gem install --no-ri --no-rdoc fpm
 # fpm --version
 1.6.3
+
+20) openpyxl
+
+# sudo -H /usr/local/bin/python3.5 -m pip install openpyxl==2.4.9

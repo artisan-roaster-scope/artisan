@@ -42,6 +42,7 @@ v1.2.0 (xx.xx.2017)
    - adds "remote only" flag to the Phidget tab to force remote access also for locally connected Phidgets if local Phidget server is running. That way the local Phidget server can be use on the machine running Artisan to access the Phidgets from Artisan and any other software (incl. the Phidget Control Panel) in parallel.
    - adds support for MODBUS function 1 (Read Coil) and 2 (Read Discrete Input)
    - sends DTA Commands to the BTread PID if the ETcontrol PID is not a DTA
+   - adds IO Commands action to sliders
  * Changes
 	- drops support for OS X 10.9 and earlier
 	- extends special event lines to the drop time (by Dave)
@@ -74,6 +75,8 @@ v1.2.0 (xx.xx.2017)
 	- fixes "Call Program" for commands with parameters called from alarms on Windows
    - fixes PID background-follow mode messing up at the end of the background profile
    - fixes Fuji PXR set p-i-d and set Ramp/Soaks
+
+
 
 ----
 v1.1.0 (10.06.2017)
@@ -112,6 +115,10 @@ v1.1.0 (10.06.2017)
     * various small fixes and improvements to the quantifier and clustering mechanisms
     * fixes a failure to load profiles caused by a NaN in the computed section of saved profiles
     * fixes a Fuji MODBUS decoding issue on Python3
+
+
+**Note**
+_This is the latest version supporting supporting Mac OS X 10.9, Windows XP/7 and 32bit OS versions_
         
 ----
 v1.0.0 (24.02.2017)

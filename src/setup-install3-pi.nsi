@@ -93,6 +93,7 @@ VIAddVersionKey ProductVersion "${PRODUCT_VERSION}"
 
 SetCompressor lzma
 
+!include x64.nsh
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
@@ -130,16 +131,21 @@ ShowInstDetails show
 ShowUnInstDetails show
 
 Function .onInit
+
+  ${If} ${RunningX64}
+    ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
+    "UninstallString"
+    StrCmp $R0 "" done  
  
-  ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
-  "UninstallString"
-  StrCmp $R0 "" done  
- 
-  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
-  "${PRODUCT_NAME} is already installed. $\n$\nClick `OK` to remove the \
-  previous version or `Cancel` to cancel this upgrade." /SD IDOK \
-  IDOK uninst
-  Abort
+    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+    "${PRODUCT_NAME} is already installed. $\n$\nClick `OK` to remove the \
+    previous version or `Cancel` to cancel this upgrade." /SD IDOK \
+    IDOK uninst
+    Abort
+  ${Else}
+    MessageBox MB_OK "x64 test only"
+    Abort
+  ${EndIf}
  
 ;Run the uninstaller
 uninst:

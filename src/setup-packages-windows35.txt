@@ -31,6 +31,7 @@ o win-inet-pton: 1.0.1
 o Phidget22: 1.0.0
 o yoctopuce: 1.10.28296
 o PyInstaller: 3.3.dev0+b20133197 (trunk)
+o openpyxl: 2.4.9
 
 
 Upgrade History:
@@ -161,6 +162,10 @@ Download the Visual C++ 2015 redistributable packages (x64 and x86 for CPython 3
   vc_redist.x64.exe
 
 put in the directory above the Artisan source code
+
+22) openpyxl
+
+# pip3 install openpyxl==2.4.9
 
 ----
 

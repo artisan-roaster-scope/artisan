@@ -18890,7 +18890,8 @@ class ApplicationWindow(QMainWindow):
                     # open file
                     from openpyxl import Workbook
                     from openpyxl.compat import range
-                    from openpyxl.cell import get_column_letter
+                    #from openpyxl.cell import get_column_letter
+                    from openpyxl.utils.cell import get_column_letter 
                     from openpyxl.styles import Font, Fill
                     wb = Workbook()
                     ws = wb.active # wb.create_sheet()
@@ -19519,7 +19520,8 @@ class ApplicationWindow(QMainWindow):
                     # open file
                     from openpyxl import Workbook
                     from openpyxl.compat import range
-                    from openpyxl.cell import get_column_letter
+                    #from openpyxl.cell import get_column_letter
+                    from openpyxl.utils.cell import get_column_letter 
                     from openpyxl.styles import Font, Fill
                     wb = Workbook()
                     ws = wb.active # wb.create_sheet()
