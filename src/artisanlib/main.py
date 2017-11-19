@@ -3956,7 +3956,7 @@ class tgraphcanvas(FigureCanvas):
                 #Add TP marker
                 if self.markTPflag and TP_index and TP_index > 0:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","{0}", None),u(self.stringfromseconds(timex[TP_index]-t0,False)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP {0}", None),u(self.stringfromseconds(timex[TP_index]-t0,False)))
                     a = 1.
                     e = 0
                     anno_artists += self.annotate(temp[TP_index],st1,timex[TP_index],stemp[TP_index],ystep_up,ystep_down,e,a)
