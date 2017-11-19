@@ -25661,7 +25661,7 @@ class editGraphDlg(ArtisanDialog):
                     wholeColor,
                     groundColor,
                     colorSystem,
-                    background                            
+                    background
                     )
                 aw.addRecentRoast(rr)
         except Exception as e:
