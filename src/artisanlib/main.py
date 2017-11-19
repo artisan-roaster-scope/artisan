@@ -25562,7 +25562,7 @@ class editGraphDlg(ArtisanDialog):
         
     def recentRoastActivated(self,n):
         # note, the first item is the edited text!
-        if n > 0:
+        if n > 0 and len(aw.recentRoasts) > 0:
             rr = aw.recentRoasts[n-1]
             self.titleedit.textEdited(rr["title"])
             self.titleedit.setEditText(rr["title"])
