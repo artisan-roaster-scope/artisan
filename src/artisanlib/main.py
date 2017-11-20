@@ -13692,7 +13692,7 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.timealign(redraw=False)
                         aw.qmc.redraw()  
                 elif key == 76:                       #L
-                    self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alrm")
+                    self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Alarms",None),ext="*.alrm")
                     if len(u(self.filename)) == 0:
                         return
                     try:
