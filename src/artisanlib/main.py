@@ -21927,7 +21927,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.wheeledge = wheel["wheeledge"]
                 self.qmc.wheellinewidth = wheel["wheellinewidth"]
                 self.qmc.wheellinecolor = wheel["wheellinecolor"]
-                self.qmc.wheeltextcolor = wheel["wheeltextcolor"]
+                if "wheeltextcolor" in wheel:
+                    self.qmc.wheeltextcolor = wheel["wheeltextcolor"]
                 if "wheelaspect" in wheel:
                     self.qmc.wheelaspect = wheel["wheelaspect"]
                 else:
@@ -39921,7 +39922,7 @@ class WheelDlg(ArtisanDialog):
         viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None))
         viewModeButton.clicked.connect(self.viewmode)
         openButton = QPushButton(QApplication.translate("Button","Open",None))
-        openButton.setToolTip(QApplication.translate("Tooltip","open graph file.wg",None))
+        openButton.setToolTip(QApplication.translate("Tooltip","open wheel graph file",None))
         openButton.clicked.connect(self.loadWheel)
         closeButton = QPushButton(QApplication.translate("Button","Close",None))
         closeButton.setToolTip(QApplication.translate("Tooltip","Close wheel graph editor",None))
