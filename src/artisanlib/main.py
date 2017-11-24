@@ -1686,23 +1686,7 @@ class tgraphcanvas(FigureCanvas):
         #data containers for wheel
         self.wheelnames,self.segmentlengths,self.segmentsalpha,self.wheellabelparent,self.wheelcolor = [],[],[],[],[]
 
-        #create starting wheel
-        wheels = [4,6,12,50]
-        for i in range(len(wheels)):
-            w,a,c,co = [],[],[],[]
-            for x in range(wheels[i]):
-                w.append("W%i %i"%(i+1,x+1))
-                a.append(0.3)
-                c.append(0)
-                color = QColor()
-                color.setHsv((360/wheels[i])*x,255,255,255)
-                co.append(str(color.name()))
-
-            self.wheelnames.append(w)
-            self.segmentsalpha.append(a)
-            self.segmentlengths.append([100./len(self.wheelnames[i])]*len(self.wheelnames[i]))
-            self.wheellabelparent.append(c)
-            self.wheelcolor.append(co)
+        
 
         #properties
         #store radius of each circle as percentage(sum of all must at all times add up to 100.0%)
@@ -1721,6 +1705,40 @@ class tgraphcanvas(FigureCanvas):
         self.wheelx,self.wheelz = 0,0                   #temp variables to pass index values
         self.wheellocationx,self.wheellocationz = 0.,0.  #temp vars to pass mouse location (angleX+radiusZ)
         self.wheelaspect = 1.0
+        
+        
+#        #create starting wheel
+#        wheels = [4,6,12,50]
+#        for i in range(len(wheels)):
+#            w,a,c,co = [],[],[],[]
+#            for x in range(wheels[i]):
+#                w.append("W%i %i"%(i+1,x+1))
+#                a.append(0.3)
+#                c.append(0)
+#                color = QColor()
+#                color.setHsv((360/wheels[i])*x,255,255,255)
+#                co.append(str(color.name()))
+#
+#            self.wheelnames.append(w)
+#            self.segmentsalpha.append(a)
+#            self.segmentlengths.append([100./len(self.wheelnames[i])]*len(self.wheelnames[i]))
+#            self.wheellabelparent.append(c)
+#            self.wheelcolor.append(co)
+        
+        # a nicer demo flavor wheel
+        self.wheelnames = [[''], ['Fruity', 'Sour', 'Green', 'Other', 'Roasted', 'Spices', 'Nutty', 'Sweet', 'Floral'], ['Floral', 'Berry', 'Dried fruit', 'Other fruit', 'Citrus fruit', 'Sour', 'Alcohol', 'Olive oil', 'Raw', 'Green', 'Beany', 'Musty', 'Chemical', 'Pipe tobaco', 'Tobaco', 'Burnt', 'Cereal', 'Pungent', 'Pepper', 'Brown spice', 'Nutty', 'Cocoa', 'Brown sugar', 'Vanilla', 'Vanillin', 'Overall sweet', 'Sweet Aromatics', 'Black Tea']]
+        self.segmentsalpha = [[0.09], [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9]]
+        self.segmentlengths = [[100.0], [11.86125, 11.86125, 11.86125, 11.86125, 11.86125, 11.86125, 11.86125, 11.86125, 5.109999999999999], [2.5549999999999997, 2.9653125, 2.9653125, 2.9653125, 2.9653125, 5.930625, 5.930625, 2.9653125, 2.9653125, 2.9653125, 2.9653125, 5.930625, 5.930625, 2.9653125, 2.9653125, 2.9653125, 2.9653125, 3.95375, 3.95375, 3.95375, 5.930625, 5.930625, 2.37225, 2.37225, 2.37225, 2.37225, 2.37225, 2.5549999999999997]]
+        self.wheellabelparent = [[0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [9, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8, 8, 8, 8, 8, 9]]
+        self.wheelcolor = [['#fdfffb'], ['#cd001b', '#dea20e', '#186923', '#1693a6', '#bb3424', '#9b0f2f', '#976751', '#de4126', '#cf0055'], ['#d6588a', '#d33440', '#bb3435', '#ed513b', '#d47e1d', '#d9b913', '#a08727', '#91a41f', '#5e7927', '#309543', '#4d8a6d', '#8ca3a9', '#65b4c0', '#be9452', '#d7b06b', '#b07351', '#d4a04f', '#653540', '#bf2732', '#9f3845', '#ba7456', '#ac623b', '#c84347', '#f4866d', '#ee5e61', '#df4255', '#c33d4d', '#844a5a']]
+        self.wheellinecolor = '#ffffff'
+        self.wheeltextcolor = '#ffffff'
+        self.wradii = [7.83, 30.9006201171875, 61.2693798828125]
+        self.startangle = [0, 42, 33]
+        self.wheeledge = 0.01
+        self.wheellinewidth = 2
+        self.projection = [1, 2, 2]
+        
 
         self.samplingsemaphore = QSemaphore(1)
         self.messagesemaphore = QSemaphore(1)
@@ -8699,7 +8717,7 @@ class tgraphcanvas(FigureCanvas):
         self.wheelz = z
         aw.sendmessage(self.wheelnames[x][z])
 #        self.segmentsalpha[x][z] += .3
-        self.drawWheel()
+#        self.drawWheel()
 
     def wheel_release(self,event):
         newlocz = event.xdata
@@ -8727,9 +8745,9 @@ class tgraphcanvas(FigureCanvas):
             roastingAction.triggered.connect(self.addToroastingnotes)
             designermenu.addAction(roastingAction)
 
-            cancelwheelAction = QAction(QApplication.translate("Contextual Menu", "Cancel selection",None),self)
-            cancelwheelAction.triggered.connect(self.cancelwheelselection)
-            designermenu.addAction(cancelwheelAction)
+#            cancelwheelAction = QAction(QApplication.translate("Contextual Menu", "Cancel selection",None),self)
+#            cancelwheelAction.triggered.connect(self.cancelwheelselection)
+#            designermenu.addAction(cancelwheelAction)
 
             editAction = QAction(QApplication.translate("Contextual Menu", "Edit Mode",None),self)
             editAction.triggered.connect(self.editmode)
