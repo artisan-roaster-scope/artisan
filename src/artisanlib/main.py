@@ -8761,7 +8761,7 @@ class tgraphcanvas(FigureCanvas):
             designermenu.exec_(QCursor.pos())
 
     def editmode(self):
-        self.disconnectWheel(buttomvisibility=False)
+        self.disconnectWheel()
         aw.wheeldialog.show()
 
     def exitviewmode(self):
@@ -8775,7 +8775,7 @@ class tgraphcanvas(FigureCanvas):
         self.wheelconnections[1] = self.fig.canvas.mpl_connect('button_press_event', self.wheel_menu)           #right click menu context
         self.wheelconnections[2] = self.fig.canvas.mpl_connect('button_release_event', self.wheel_release)
 
-    def disconnectWheel(self,buttomvisibility=True):
+    def disconnectWheel(self):
         self.wheelflag = False
         self.setCursor(Qt.ArrowCursor)
         self.fig.canvas.mpl_disconnect(self.wheelconnections[0])
@@ -13831,8 +13831,11 @@ class ApplicationWindow(QMainWindow):
                                 return
                         #if wheel graph ON
                         elif self.qmc.wheelflag:
-                            self.qmc.disconnectWheel()
-                            self.qmc.redraw(recomputeAllDeltas=False)
+                            self.qmc.wheelflag = False
+                            self.wheeleditorAction.setChecked(self.qmc.wheelflag)
+                            self.qmc.exitviewmode()
+                            aw.enableEditMenus()
+                            aw.showControls()
                         if self.minieventsflag:
                             self.releaseminieditor()
                 elif key == 16777234:               #MOVES CURRENT BUTTON LEFT

@@ -2,9 +2,9 @@ setup-packages-centos7.txt
 
 o CentOS: 7.4.1708 (gcc 4.8.5, glibc 2.17)
 o Python 3.5.4
-o Qt: 5.9.1
-o PyQt5: 5.9
-o sip: 4.19.3 (installed via PyQt5 package)
+o Qt: 5.9.3
+o PyQt5: 5.9.2
+o sip: 4.19.6 (installed via PyQt5 package)
 o pyserial: 3.4
 o numpy: 1.13.3
 o scipy: 0.19.1
@@ -28,6 +28,13 @@ o pefile: 2017.9.3
 o PyInstaller: 3.3
 o openpyxl: 2.4.9
 
+
+Upgrade History:
+
+- 2017-11-26:
+ . Qt 5.9.2 => 5.9.3
+ . Sip 4.19.4 => 4.19.6
+ . PyQt 5.9.1 => 5.9.2
 
 1) Install CentOS7
 

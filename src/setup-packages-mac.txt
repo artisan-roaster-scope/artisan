@@ -3,9 +3,9 @@ Current Versions:
 o XCode 4.5.2 + command line tools
 o Python 2.7.13 or 3.5.2 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial 3.3.0
-o QT 5.9.2
-o SIP 4.19.4
-o PyQt 5.9.1
+o QT 5.9.3
+o SIP 4.19.6
+o PyQt 5.9.2
 o numpy 1.12.1
 o scipy 0.19.0
 o matplotlib 2.0.0
@@ -59,6 +59,10 @@ open a terminal and type
 
 Upgrade History:
 
+- 2017-11-26:
+ . Qt 5.9.2 => 5.9.3
+ . Sip 4.19.4 => 4.19.6
+ . PyQt 5.9.1 => 5.9.2
 - 2017-11-04
  . Qt 5.9.1 => 5.9.2
  . PyQt 5.9 => 5.9.1

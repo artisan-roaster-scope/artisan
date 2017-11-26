@@ -5,9 +5,9 @@ Current Versions:
 
 o Windows: 8.1
 o Python: 3.5.3
-o Qt: 5.9.2 (installed via PyQt5 package)
-o PyQt5: 5.9.1
-o sip: 4.19.4 (installed via PyQt5 package)
+o Qt: 5.9.3 (installed via PyQt5 package)
+o PyQt5: 5.9.2
+o sip: 4.19.6 (installed via PyQt5 package)
 o pyserial: 3.4
 o numpy: 1.13.1+mkl
 o scip: 0.19.1
@@ -35,6 +35,11 @@ o openpyxl: 2.4.9
 
 
 Upgrade History:
+
+- 2017-11-26:
+ . Qt 5.9.2 => 5.9.3
+ . Sip 4.19.4 => 4.19.6
+ . PyQt 5.9.1 => 5.9.2
 - 2017-11-04:
  . Qt 5.9.1 => 5.9.2
  . PyQt 5.9 => 5.9.1
