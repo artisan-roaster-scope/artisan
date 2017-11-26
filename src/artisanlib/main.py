@@ -1630,6 +1630,7 @@ class tgraphcanvas(FigureCanvas):
         #server that spawns a thread dynamically to sample temperature (press button ON to make a thread press OFF button to kill it)
         self.threadserver = Athreadserver()
 
+        
         ##########################     Designer variables       #################################
         self.designerflag = False
         self.designerconnections = [0,0,0,0]   #mouse event ids
@@ -2446,6 +2447,8 @@ class tgraphcanvas(FigureCanvas):
                     except Exception:
                         pass
                     #####
+                    if aw.qmc.patheffects:
+                        rcParams['path.effects'] = []
 
                     #update phase lcds
                     if aw.qmc.phasesLCDflag:
@@ -3946,6 +3949,8 @@ class tgraphcanvas(FigureCanvas):
         #anotate time
         time_anno = self.ax.annotate(time_str,xy=(x,y),xytext=(x+e,y - ydown),
                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
+        if aw.qmc.patheffects:
+            rcParams['path.effects'] = []
         return [temp_anno, time_anno]
 
     def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,path_effects=None,TP_time=-1,TP_time_loaded=-1):
@@ -5110,6 +5115,8 @@ class tgraphcanvas(FigureCanvas):
                     #frame.set_linewidth(0)
                     #frame.set_edgecolor('darkgrey')
                     frame.set_linewidth(0.5)
+                    if aw.qmc.patheffects:
+                        rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]                    
     
                 # we create here the project line plots to have the accurate time axis after CHARGE               
                 if mpl_major_version >= 2:
@@ -5148,6 +5155,9 @@ class tgraphcanvas(FigureCanvas):
                     if len(self.timex):
                         self.xaxistosm()
                         self.redrawdesigner()
+                        
+                if aw.qmc.patheffects:
+                    rcParams['path.effects'] = []  
                         
             except Exception as ex:
 #                import traceback
@@ -8713,11 +8723,9 @@ class tgraphcanvas(FigureCanvas):
         loc = rect.get_url().split("-")
         x = int(loc[0])
         z = int(loc[1])
+        aw.sendmessage(self.wheelnames[x][z])
         self.wheelx = x
         self.wheelz = z
-        aw.sendmessage(self.wheelnames[x][z])
-#        self.segmentsalpha[x][z] += .3
-#        self.drawWheel()
 
     def wheel_release(self,event):
         newlocz = event.xdata
@@ -8726,7 +8734,6 @@ class tgraphcanvas(FigureCanvas):
                 diff = math.degrees(self.wheellocationx - newlocz)
                 for i in range(len(self.startangle)):
                     self.startangle[i] -= diff
-#                self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
                 self.drawWheel()
 
     def wheel_menu(self,event):
@@ -8745,31 +8752,19 @@ class tgraphcanvas(FigureCanvas):
             roastingAction.triggered.connect(self.addToroastingnotes)
             designermenu.addAction(roastingAction)
 
-#            cancelwheelAction = QAction(QApplication.translate("Contextual Menu", "Cancel selection",None),self)
-#            cancelwheelAction.triggered.connect(self.cancelwheelselection)
-#            designermenu.addAction(cancelwheelAction)
-
-            editAction = QAction(QApplication.translate("Contextual Menu", "Edit Mode",None),self)
+            designermenu.addSeparator()
+            
+            editAction = QAction(QApplication.translate("Contextual Menu", "Edit",None),self)
             editAction.triggered.connect(self.editmode)
             designermenu.addAction(editAction)
 
-            exitAction = QAction(QApplication.translate("Contextual Menu", "Exit",None),self)
-            exitAction.triggered.connect(self.exitviewmode)
-            designermenu.addAction(exitAction)
-
             designermenu.exec_(QCursor.pos())
 
-    def cancelwheelselection(self):
-        self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection
-        self.drawWheel()
-
     def editmode(self):
-        self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection
         self.disconnectWheel(buttomvisibility=False)
-        aw.graphwheel()
+        aw.wheeldialog.show()
 
     def exitviewmode(self):
-        self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
         self.disconnectWheel()
         self.redraw(recomputeAllDeltas=False)
 
@@ -8799,15 +8794,11 @@ class tgraphcanvas(FigureCanvas):
             self.fig.clf()
             #create a new name ax1 instead of ax
             if mpl_major_version >= 2:
-#                self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor=self.backcolor)            
                 self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor='None')
-#                self.ax2 = self.fig.add_subplot(111, polar=True,facecolor='None')
             else:
-#                self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg=self.backcolor)
                 self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg='None')
             self.ax2.set_rmax(1.)
             self.ax2.set_aspect(self.wheelaspect)
-#            self.ax2.set_autoscale_on(True) # fails on MPL2.1
             self.ax2.grid(False)
 
             #delete degrees ticks 
@@ -9988,6 +9979,9 @@ class ApplicationWindow(QMainWindow):
         self.resetqsettings = 0
         #path of last loadded QSettings
         self.settingspath = u("") # if empty string, the settingspath will be ignored, otherwise it will be used to update the batchcounter of those settings
+        
+        # path of last laoded WheelGraph
+        self.wheelpath = u("")
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month file-open/save will point to profilepath
         self.profilepath = ""
@@ -10039,6 +10033,8 @@ class ApplicationWindow(QMainWindow):
         
         #### Async Sampling Action
         self.AsyncSamplingAction = False
+        
+        self.wheeldialog = None
 
         ####    HUD
         self.HUD = QLabel()  #main canvas for hud widget
@@ -10413,15 +10409,15 @@ class ApplicationWindow(QMainWindow):
         self.pasteAction.triggered.connect(self.on_actionPaste_triggered)
 
         # ROAST menu
-        editGraphAction = QAction(UIconst.ROAST_MENU_PROPERTIES,self)
-        editGraphAction.triggered.connect(self.editgraph)
-        self.GraphMenu.addAction(editGraphAction)
-        editGraphAction.setShortcut("Ctrl+T")
+        self.editGraphAction = QAction(UIconst.ROAST_MENU_PROPERTIES,self)
+        self.editGraphAction.triggered.connect(self.editgraph)
+        self.GraphMenu.addAction(self.editGraphAction)
+        self.editGraphAction.setShortcut("Ctrl+T")
 
-        backgroundAction = QAction(UIconst.ROAST_MENU_BACKGROUND,self)
-        backgroundAction.triggered.connect(self.background)
-        self.GraphMenu.addAction(backgroundAction)
-        backgroundAction.setShortcut("Ctrl+B")
+        self.backgroundAction = QAction(UIconst.ROAST_MENU_BACKGROUND,self)
+        self.backgroundAction.triggered.connect(self.background)
+        self.GraphMenu.addAction(self.backgroundAction)
+        self.backgroundAction.setShortcut("Ctrl+B")
 
         self.flavorAction = QAction(UIconst.ROAST_MENU_CUPPROFILE,self)
         self.flavorAction.triggered.connect(self.flavorchart)
@@ -10490,17 +10486,29 @@ class ApplicationWindow(QMainWindow):
 
         self.ConfMenu.addSeparator()
 
-        eventsAction = QAction(UIconst.CONF_MENU_EVENTS,self)
-        eventsAction.triggered.connect(self.eventsconf)
-        self.ConfMenu.addAction(eventsAction)
-        eventsAction.setShortcut("Ctrl+E")
+        self.eventsAction = QAction(UIconst.CONF_MENU_EVENTS,self)
+        self.eventsAction.triggered.connect(self.eventsconf)
+        self.ConfMenu.addAction(self.eventsAction)
+        self.eventsAction.setShortcut("Ctrl+E")
 
         alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
         alarmAction.triggered.connect(self.alarmconfig)
         self.ConfMenu.addAction(alarmAction)
         
         self.ConfMenu.addSeparator()
-
+        
+        self.controlsAction = QAction(UIconst.CONF_MENU_CONTROLS,self)
+        self.controlsAction.triggered.connect(self.toggleControls)
+        self.controlsAction.setCheckable(True)
+        self.controlsAction.setChecked(True)
+        self.ConfMenu.addAction(self.controlsAction)
+        
+        self.readingsAction = QAction(UIconst.CONF_MENU_READINGS,self)
+        self.readingsAction.triggered.connect(self.toggleReadings)
+        self.readingsAction.setCheckable(True)
+        self.readingsAction.setChecked(False)
+        self.ConfMenu.addAction(self.readingsAction)
+        
         self.buttonsAction = QAction(UIconst.CONF_MENU_BUTTONS,self)
         self.buttonsAction.triggered.connect(self.toggleExtraButtons)
         self.buttonsAction.setCheckable(True)
@@ -10515,23 +10523,23 @@ class ApplicationWindow(QMainWindow):
         
         self.ConfMenu.addSeparator()
 
-        phasesGraphAction = QAction(UIconst.CONF_MENU_PHASES,self)
-        phasesGraphAction.triggered.connect(self.editphases)
-        self.ConfMenu.addAction(phasesGraphAction)
+        self.phasesGraphAction = QAction(UIconst.CONF_MENU_PHASES,self)
+        self.phasesGraphAction.triggered.connect(self.editphases)
+        self.ConfMenu.addAction(self.phasesGraphAction)
 
-        StatisticsAction = QAction(UIconst.CONF_MENU_STATISTICS,self)
-        StatisticsAction.triggered.connect(self.showstatistics)
-        self.ConfMenu.addAction(StatisticsAction)
+        self.StatisticsAction = QAction(UIconst.CONF_MENU_STATISTICS,self)
+        self.StatisticsAction.triggered.connect(self.showstatistics)
+        self.ConfMenu.addAction(self.StatisticsAction)
 
-        WindowconfigAction = QAction(UIconst.CONF_MENU_AXES,self)
-        WindowconfigAction.triggered.connect(self.Windowconfig)
-        self.ConfMenu.addAction(WindowconfigAction)
+        self.WindowconfigAction = QAction(UIconst.CONF_MENU_AXES,self)
+        self.WindowconfigAction.triggered.connect(self.Windowconfig)
+        self.ConfMenu.addAction(self.WindowconfigAction)
 
         self.ConfMenu.addSeparator()
 
-        colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
-        colorsAction.triggered.connect(lambda x=3:self.qmc.changeGColor(3))
-        self.ConfMenu.addAction(colorsAction)
+        self.colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
+        self.colorsAction.triggered.connect(lambda x=3:self.qmc.changeGColor(3))
+        self.ConfMenu.addAction(self.colorsAction)
 
         autosaveAction = QAction(UIconst.CONF_MENU_AUTOSAVE,self)
         autosaveAction.triggered.connect(self.autosaveconf)
@@ -10723,6 +10731,8 @@ class ApplicationWindow(QMainWindow):
 
         self.wheeleditorAction = QAction(UIconst.TOOLKIT_MENU_WHEELGRAPH,self)
         self.wheeleditorAction.triggered.connect(self.graphwheel)
+        self.wheeleditorAction.setCheckable(True)
+        self.wheeleditorAction.setChecked(self.qmc.wheelflag)
         self.ToolkitMenu.addAction(self.wheeleditorAction)
 
         self.lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
@@ -11281,7 +11291,9 @@ class ApplicationWindow(QMainWindow):
 
         ####################   APPLICATION WINDOW (AW) LAYOUT  ##############################################
 
-        level1layout = QHBoxLayout()   # matplotlib toolbox + HUD button + reset button + LCD Timer
+        self.level1frame = QFrame()
+        self.level1layout = QHBoxLayout()   # matplotlib toolbox + HUD button + reset button + LCD Timer
+        self.level1frame.setLayout(self.level1layout)
 
         level3layout = QHBoxLayout()   # PID buttons, graph, temperature LCDs
 
@@ -11431,25 +11443,25 @@ class ApplicationWindow(QMainWindow):
         self.phasesLCDs.hide()
 
         #level 1
-        level1layout.addWidget(self.ntb)
-        level1layout.addStretch()
-        level1layout.addWidget(self.phasesLCDs)
-        level1layout.addWidget(self.AUCLCD)
-        level1layout.addSpacing(20)
-        level1layout.addWidget(self.button_7)
-        level1layout.addSpacing(15)
-        level1layout.addWidget(self.button_1)
-        level1layout.addSpacing(15)
-        level1layout.addWidget(self.button_2)
-        level1layout.addSpacing(15)
-        level1layout.addWidget(self.button_10)
-        level1layout.addSpacing(15)
-        level1layout.addWidget(self.button_18)
-        level1layout.addSpacing(15)
-        level1layout.addWidget(self.lcd1)
-        level1layout.setContentsMargins(0,0,0,0)
-        level1layout.setSpacing(0)
-        level1layout.setContentsMargins(5,5,5,0)
+        self.level1layout.addWidget(self.ntb)
+        self.level1layout.addStretch()
+        self.level1layout.addWidget(self.phasesLCDs)
+        self.level1layout.addWidget(self.AUCLCD)
+        self.level1layout.addSpacing(20)
+        self.level1layout.addWidget(self.button_7)
+        self.level1layout.addSpacing(15)
+        self.level1layout.addWidget(self.button_1)
+        self.level1layout.addSpacing(15)
+        self.level1layout.addWidget(self.button_2)
+        self.level1layout.addSpacing(15)
+        self.level1layout.addWidget(self.button_10)
+        self.level1layout.addSpacing(15)
+        self.level1layout.addWidget(self.button_18)
+        self.level1layout.addSpacing(15)
+        self.level1layout.addWidget(self.lcd1)
+        self.level1layout.setContentsMargins(0,0,0,0)
+        self.level1layout.setSpacing(0)
+        self.level1layout.setContentsMargins(5,5,5,0)
 
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
@@ -11627,7 +11639,7 @@ class ApplicationWindow(QMainWindow):
         self.midlayout.setContentsMargins(0,0,0,0)
 
         mainlayout = QVBoxLayout(self.main_widget)
-        mainlayout.addLayout(level1layout)
+        mainlayout.addWidget(self.level1frame)
         mainlayout.addLayout(self.midlayout) 
         mainlayout.setContentsMargins(0,0,0,0)
         mainlayout.setSpacing(0)
@@ -13523,12 +13535,26 @@ class ApplicationWindow(QMainWindow):
             self.hideSliders()
         else:
             self.showSliders()
+            
+    def hideControls(self):
+        self.level1frame.hide()
+        aw.controlsAction.setChecked(False)
         
-    def toggleSlidersVisibility(self):
-        if self.sliderFrame.isVisible():
-            self.hideSliders()
+    def showControls(self):
+        self.level1frame.show()
+        aw.controlsAction.setChecked(True)
+        
+    def toggleControls(self):
+        if self.level1frame.isVisible():
+            self.hideControls()
         else:
-            self.showSliders()
+            self.showControls()
+        
+    def toggleReadings(self):
+        if self.lcdFrame.isVisible():
+            self.hideLCDs()
+        else:
+            self.showLCDs()
 
     def updateSlidersProperties(self):
         # update slider properties
@@ -13544,9 +13570,11 @@ class ApplicationWindow(QMainWindow):
 
     def hideLCDs(self):
         self.lcdFrame.setVisible(False)
+        aw.readingsAction.setChecked(False)
 
     def showLCDs(self):
         self.lcdFrame.setVisible(True)
+        aw.readingsAction.setChecked(True)
 
     def hideEventsMinieditor(self):
         self.EventsGroupLayout.setVisible(False)
@@ -13628,9 +13656,18 @@ class ApplicationWindow(QMainWindow):
         self.resetAction.setEnabled(True)
         self.switchAction.setEnabled(True)
         self.machineMenu.setEnabled(True)
+        self.editGraphAction.setEnabled(True)
+        self.backgroundAction.setEnabled(True)
+        self.switchETBTAction.setEnabled(True)
+        self.eventsAction.setEnabled(True)
+        self.phasesGraphAction.setEnabled(True)
+        self.StatisticsAction.setEnabled(True)
+        self.WindowconfigAction.setEnabled(True)
+        self.colorsAction.setEnabled(True)
+        
 
-    def disableEditMenus(self,designer=False):
-        if designer:
+    def disableEditMenus(self,designer=False,wheel=False):
+        if designer or wheel:
             self.newRoastMenu.setEnabled(False)
         else:
             self.newRoastMenu.setEnabled(True)
@@ -13640,7 +13677,8 @@ class ApplicationWindow(QMainWindow):
         self.fileSaveAction.setEnabled(False)
         self.fileSaveAsAction.setEnabled(False)
         self.exportMenu.setEnabled(False)
-        self.saveGraphMenu.setEnabled(False)
+        if not wheel:
+            self.saveGraphMenu.setEnabled(False)
         self.htmlAction.setEnabled(False)
         self.reportMenu.setEnabled(False)
         self.productionMenu.setEnabled(False)
@@ -13655,11 +13693,23 @@ class ApplicationWindow(QMainWindow):
             self.designerAction.setEnabled(False)
         else:
             self.designerAction.setEnabled(True)
-        self.wheeleditorAction.setEnabled(False)
-        if designer:
+        if not wheel:
+            self.wheeleditorAction.setEnabled(False)
+        else:
+            self.wheeleditorAction.setEnabled(True)
+        if designer or wheel:
             self.hudAction.setEnabled(False)
         else:
             self.hudAction.setEnabled(True)
+        if wheel:
+            self.editGraphAction.setEnabled(False)
+            self.backgroundAction.setEnabled(False)
+            self.switchETBTAction.setEnabled(False)
+            self.eventsAction.setEnabled(False)
+            self.phasesGraphAction.setEnabled(False)
+            self.StatisticsAction.setEnabled(False)
+            self.WindowconfigAction.setEnabled(False)
+            self.colorsAction.setEnabled(False)
         self.loadSettingsAction.setEnabled(False)
         self.openRecentSettingMenu.setEnabled(False)
         self.saveAsSettingsAction.setEnabled(False)
@@ -13809,8 +13859,12 @@ class ApplicationWindow(QMainWindow):
                     self.automaticsave()
                 elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
                     self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
+                elif key == 67:                     #letter C (controls)
+                    self.toggleControls()
+                elif key == 88:                     #letter X (readings)
+                    self.toggleReadings()
                 elif key == 83:                     #letter S (sliders)
-                    self.toggleSlidersVisibility()
+                    self.toggleSliders()
                 elif key == 84 and not self.qmc.flagon:  #letter T (mouse cross)
                     self.qmc.togglecrosslines()
                 elif key == 81:  #letter q (quick entry of custom event 1)
@@ -14095,6 +14149,8 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[CRTL N]</b></td><td>Autosave + Reset + START</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[t]</b></td><td>Toggle mouse cross lines</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[d]</b></td><td>Toggle xy scale (T/Delta)</td></tr>",None))
+        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[c]</b></td><td>Shows/Hides Controls</td></tr>",None))
+        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[x]</b></td><td>Shows/Hides LCD Readings</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[m]</b></td><td>Shows/Hides Event Buttons</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[b]</b></td><td>Shows/Hides Extra Event Buttons</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[s]</b></td><td>Shows/Hides Event Sliders</td></tr>",None))
@@ -17151,6 +17207,8 @@ class ApplicationWindow(QMainWindow):
             self.userprofilepath = toString(settings.value("profilepath",self.userprofilepath))
             if settings.contains("settingspath"):            
                 self.settingspath = toString(settings.value("settingspath",self.settingspath))
+            if settings.contains("wheelpath"):            
+                self.wheelpath = toString(settings.value("wheelpath",self.wheelpath))
             if settings.contains("autosavepath"):
                 self.qmc.autosavepath = toString(settings.value("autosavepath",self.qmc.autosavepath))
             if settings.contains("externalprogram"):
@@ -18174,6 +18232,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
             settings.setValue("settingspath",self.settingspath)
+            settings.setValue("wheelpath",self.wheelpath)
             settings.setValue("autosavepath",self.qmc.autosavepath)
             settings.setValue("externalprogram",self.ser.externalprogram)
             settings.setValue("externaloutprogram",self.ser.externaloutprogram)
@@ -21006,8 +21065,26 @@ class ApplicationWindow(QMainWindow):
     def graphwheel(self):
         if self.qmc.designerflag:
             self.stopdesigner()
-        wheeldialog = WheelDlg(self)
-        wheeldialog.show()
+        if self.wheeldialog == None:
+            self.wheeldialog = WheelDlg(self)
+        if self.qmc.wheelflag:
+            self.qmc.exitviewmode()
+            aw.enableEditMenus()
+            aw.showControls()
+        else:
+            aw.hideControls()
+            aw.hideLCDs()
+            aw.hideSliders()
+            aw.hideExtraButtons()
+            aw.disableEditMenus(wheel=True)
+            aw.qmc.connectWheel()
+            if aw.wheelpath and aw.wheelpath != "":
+                try:
+                    aw.loadWheel(aw.wheelpath)
+                    self.wheeldialog.createdatatable()
+                except Exception:
+                    aw.settingspath = u("") 
+            aw.qmc.drawWheel()
 
     def background(self):
         dialog = backgroundDlg(self)
@@ -21065,6 +21142,10 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
 
     def flavorchart(self):
+        self.hideControls()
+        self.hideLCDs()
+        self.hideSliders()
+        self.hideExtraButtons()
         dialog = flavorDlg(self)
         dialog.show()
         dialog.setFixedSize(dialog.size())
@@ -21937,7 +22018,7 @@ class ApplicationWindow(QMainWindow):
                 message = QApplication.translate("Message","Invalid Wheel graph format", None)
                 self.sendmessage(message)
                 return
-            message =QApplication.translate("Message","Wheel Graph succesfully open", None)
+            message =QApplication.translate("Message","Wheel Graph openend succesfully", None)
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
@@ -30215,6 +30296,7 @@ class flavorDlg(ArtisanDialog):
         self.savetable()
         aw.qmc.safesaveflag = True
         aw.qmc.redraw(recomputeAllDeltas=False)
+        aw.showControls()
         self.accept()
 
 #################################################################
@@ -39846,7 +39928,6 @@ class WheelDlg(ArtisanDialog):
             
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None))
-        self.viewmodeflag = False
         #table for alarms
         self.datatable = QTableWidget()
         self.createdatatable()
@@ -39918,15 +39999,15 @@ class WheelDlg(ArtisanDialog):
         saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None))
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
         saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(0,1))
-        viewModeButton = QPushButton(QApplication.translate("Button","View Mode",None))
+        viewModeButton = QPushButton(QApplication.translate("Button","Close",None))
         viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None))
         viewModeButton.clicked.connect(self.viewmode)
         openButton = QPushButton(QApplication.translate("Button","Open",None))
         openButton.setToolTip(QApplication.translate("Tooltip","open wheel graph file",None))
         openButton.clicked.connect(self.loadWheel)
-        closeButton = QPushButton(QApplication.translate("Button","Close",None))
-        closeButton.setToolTip(QApplication.translate("Tooltip","Close wheel graph editor",None))
-        closeButton.clicked.connect(self.close)
+#        closeButton = QPushButton(QApplication.translate("Button","Close",None))
+#        closeButton.setToolTip(QApplication.translate("Tooltip","Close wheel graph editor",None))
+#        closeButton.clicked.connect(self.close)
         aw.qmc.drawWheel()
         label1layout = QVBoxLayout()
         label2layout = QHBoxLayout()
@@ -39942,7 +40023,6 @@ class WheelDlg(ArtisanDialog):
         buttonlayout.addWidget(saveButton)
         buttonlayout.addWidget(saveImgButton)
         buttonlayout.addWidget(viewModeButton)
-        buttonlayout.addWidget(closeButton)
         configlayout =  QHBoxLayout()
         configlayout.addWidget(colorlabel)
         configlayout.addWidget(self.colorSpinBox)
@@ -39969,6 +40049,9 @@ class WheelDlg(ArtisanDialog):
         mainlayout.addLayout(configlayout)
         mainlayout.addLayout(buttonlayout)
         self.setLayout(mainlayout)
+        
+    def close(self):
+        self.accept()
 
     #creates config table for wheel with index x
     def createlabeltable(self,x):
@@ -40369,19 +40452,14 @@ class WheelDlg(ArtisanDialog):
         filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Open Wheel Graph",None),path = aw.getDefaultPath(),ext="*.wg")
         if filename:
             aw.loadWheel(filename)
+            aw.wheelpath = filename
             self.createdatatable()
             aw.qmc.drawWheel()
 
     def closeEvent(self, event):
-        #if switching to View-mode don't redraw() (faster)
-        if not self.viewmodeflag:
-            aw.qmc.disconnectWheel()
-            aw.qmc.redraw(recomputeAllDeltas=False)
-        else:
-            aw.qmc.disconnectWheel(buttomvisibility=False)
+        self.viewmode()
 
     def viewmode(self):
-        self.viewmodeflag = True
         self.close()
         aw.qmc.connectWheel()
         aw.qmc.drawWheel()
