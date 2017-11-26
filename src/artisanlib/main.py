@@ -5071,7 +5071,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.timeindex[6]:
                             self.writestatistics(TP_index)
 
-                if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.statssummary >0:
+                if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.statssummary:
                     self.statsSummary()
     
 # this seems to mess up the focus if sliders are shown, but mini editor not
@@ -8943,7 +8943,7 @@ class tgraphcanvas(FigureCanvas):
             for i in range(len(self.wheellabelparent[x])):
                 if self.wheellabelparent[x][i] == 0:
                     QMessageBox.information(aw,"Wheel Hierarchy Problem",
-                    "Please assign a  a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
+                    "Please assign a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
                     return
 
         #adjust top wheel and make all segments equal
