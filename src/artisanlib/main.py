@@ -22014,12 +22014,14 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.wheelaspect = wheel["wheelaspect"]
                 else:
                     self.qmc.wheelaspect = 1.0
+                message =QApplication.translate("Message","Wheel {0} loaded", None).format(str(filename))
+                self.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Invalid Wheel graph format", None)
                 self.sendmessage(message)
                 return
-            message =QApplication.translate("Message","Wheel Graph openend succesfully", None)
-            self.sendmessage(message)
+#            message =QApplication.translate("Message","Wheel Graph openend succesfully", None)
+#            self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " loadWheel() {0}").format(str(ex)),exc_tb.tb_lineno)

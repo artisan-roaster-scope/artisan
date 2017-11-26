@@ -43,6 +43,7 @@ v1.2.0 (xx.xx.2017)
    - adds support for MODBUS function 1 (Read Coil) and 2 (Read Discrete Input)
    - sends DTA Commands to the BTread PID if the ETcontrol PID is not a DTA
    - adds IO Commands action to sliders
+   - adds mechanism to show/hide the control bar as well as the readings LCDs
  * Changes
 	- drops support for OS X 10.9 and earlier
 	- extends special event lines to the drop time (by Dave)
@@ -62,6 +63,7 @@ v1.2.0 (xx.xx.2017)
 	- adds coarse sliders stepping in multiples of 10 instead of 1
     - call program alarm actions interpret text after the comment delimiter # as a line comment
    - most Phidgets device names have been renamed to better reflect its type. Channels are now counted zero-based as on the hardware
+   - wheel graph starts in view mode and remembers last loaded wheel
  * Bug Fixes
 	- fixes for Numpy v1.13 and Matplotlib 2.1
 	- fixes for the Probatone 7" setup
