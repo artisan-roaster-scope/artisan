@@ -70,9 +70,4 @@ mv *.deb ..
 cd ..
 
 
-# build Ubuntu amd64.deb
-
-# rm -f ${DEB_NAME}*amd64.deb
-# /usr/local/bin/fpm -t deb -s rpm ${RPM_NAME}-1.x86_64.rpm
-
 

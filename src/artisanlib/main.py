@@ -13730,10 +13730,11 @@ class ApplicationWindow(QMainWindow):
             try:
                 self.processingKeyEvent = True
                 key = int(event.key())
+                control_modifier = event.modifiers() == Qt.ControlModifier
                 #uncomment next line to find the integer value of a key
                 #print(key)
                 
-                shiftnumbers = [61,33,34,167,36,37,38,47,40,41] # int key vals for shifted number keys
+                numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
                 
                 if key == 70: # F SELECTS FULL SCREEN MODE
                     if self.full_screen_mode_active or self.isFullScreen():
@@ -13744,8 +13745,8 @@ class ApplicationWindow(QMainWindow):
                         self.full_screen_mode_active = True
                         self.showFullScreen()
                         aw.fullscreenAction.setChecked(True)
-                elif aw.buttonpalette_shortcuts and key in shiftnumbers: # palette switch via SHIFT-NUM-Keys
-                    self.setbuttonsfrom(shiftnumbers.index(key))
+                elif aw.buttonpalette_shortcuts and control_modifier and key in numberkeys: # palette switch via SHIFT-NUM-Keys
+                    self.setbuttonsfrom(numberkeys.index(key))
                 elif key == 72:                       #H
                     if not aw.qmc.designerflag:
                         self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
@@ -14163,7 +14164,7 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[h]</b></td><td>Load background profile</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[l]</b></td><td>Load alarms</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[+,-]</b></td><td>Inc/dec PID lookahead</td></tr>",None))
-        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[SHIFT 0-9]</b></td><td>Changes Event Button Palettes</td></tr>",None))
+        string += u(QApplication.translate("Message", "<tr><td align='right'><b>[CRTL 0-9]</b></td><td>Changes Event Button Palettes</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[;]</b></td><td>Application ScreenShot</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[:]</b></td><td>Desktop ScreenShot</td></tr>",None))
         string += u(QApplication.translate("Message", "<tr><td align='right'><b>[q,w,e,r + <i>nn</i>]</b></td><td>Quick Custom Event</td></tr>",None))
