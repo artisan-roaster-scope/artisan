@@ -16091,7 +16091,7 @@ class ApplicationWindow(QMainWindow):
             computedProfile["total_ts_BT"] = self.float2float(tsb,0)
         except Exception:
             pass
-        ######### AUC area #########  #Dave
+        ######### AUC area #########
         try:
             _,_,tsb = aw.ts()   
             computedProfile["AUC"] = self.float2float(tsb,0)
@@ -18409,7 +18409,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("ExtrasMoreInfo")
             settings.setValue("showmet",self.qmc.showmet)
-            settings.setValue("statssummary",self.qmc.statssummary)  #dave12            
+            settings.setValue("statssummary",self.qmc.statssummary)            
             settings.endGroup()
             try:
                 settings.setValue("appearance",str(aw.style().objectName()).lower())
@@ -19062,6 +19062,9 @@ class ApplicationWindow(QMainWindow):
     #  . "DRY_percent": float (first phase percentage)
     #  . "MAI_percent": float (second phase percentage)
     #  . "DEV_percent": float (third phase percentage)
+    #  . "DRY_time": int (in seconds) 
+    #  . "MAI_time": int (in seconds) 
+    #  . "DEV_time": int (in seconds) 
     #  . "AUC": int
     #  . "color": int
     #  . "cup": int
@@ -19099,17 +19102,20 @@ class ApplicationWindow(QMainWindow):
             dry_time = timex[timeindex[1]] - start
             # DRY_percent
             res["DRY_percent"] = (dry_time/total_time) * 100.
+            res["DRY_time"] = dry_time
         # MAI_time
         if timeindex[1] > 0 and timeindex[2] > 0:
             # MAI_time
             mai_time = timex[timeindex[2]] - timex[timeindex[1]]
             # MAI_percent
             res["MAI_percent"] = (mai_time/total_time) * 100.
+            res["MAI_time"] = mai_time
         if timeindex[2] > 0 and timeindex[6] > 0:
             # DEV_time
             dev_time = timex[timeindex[6]] - timex[timeindex[2]]
             # DEV_percent
             res["DEV_percent"] = (dev_time/total_time) * 100.
+            res["DEV_time"] = dev_time
         # AUC
         if "computed" in profile:
             comp = profile["computed"]
@@ -19282,7 +19288,7 @@ class ApplicationWindow(QMainWindow):
             cuppings_count = 0
             handles = []
             labels = []
-            color=iter(cm.Set1(numpy.linspace(0,1,len(profiles))))            
+            color=iter(cm.tab10(numpy.linspace(0,1,10)))
             # collect data
             c = 1
             foreground_profile_path = aw.curFile
@@ -19295,6 +19301,7 @@ class ApplicationWindow(QMainWindow):
                 max_end_time = aw.qmc.endofx
             first_profile = True
             first_profile_event_time = 0
+            max_drop_time = 0
             for p in profiles:
                 pd = self.profileProductionData(p,c)
                 c += 1
@@ -19314,6 +19321,8 @@ class ApplicationWindow(QMainWindow):
                     FCs_temp += aw.qmc.convertTemp(rd["FCs_temp"],rd["temp_unit"],aw.qmc.mode)
                     FCs_temp_count += 1
                 if "DROP_time" in rd:
+                    if rd["DROP_time"] > max_drop_time:
+                        max_drop_time = rd["DROP_time"]
                     DROP_time += rd["DROP_time"]
                     DROP_time_count += 1
                 if "DROP_temp" in rd:
@@ -19407,6 +19416,7 @@ class ApplicationWindow(QMainWindow):
                 
             tmpdir = u(QDir.tempPath() + "/")
             graph_image = ""
+            graph_image_pct = ''
 
             if len(profiles) < 11:
                 try:
@@ -19468,17 +19478,120 @@ class ApplicationWindow(QMainWindow):
                         else:
                             image = aw.qmc.grab().toImage()
                         #save GRAPH image
-#                        graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
-                        graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".png")))
+                        graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
                         try:
                             os.remove(graph_image)
                         except OSError:
                             pass
-                        image.save(graph_image)
+                        self.qmc.fig.savefig(graph_image)
                     #add some random number to force HTML reloading
                     graph_image = path2url(graph_image)
                     graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
                     graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
+
+                    # Create a roast phase visualization graph      
+                    import matplotlib.pyplot as plt
+
+                    fig_height = 3.2       # in inches when there are 10 profiles, will be scaled for number of profiles 
+                    fig_width = 10         # in inches
+
+                    # values that define the bars and spacing 
+                    barspacer =  2     # vertical space between bars
+                    barheight =  18    # height of each bar
+                    textoffset = 6     # shifts text annotations upward to toward middle of the bar 
+                    m = 10             # width of batch number field and drop time field 
+                    g = 2              # gap
+                    n = m + g          # start of horiz stacked bar
+                    ind = 7            # width of color legend indicator
+
+                    # setup the font 
+                    fontcolor = 'black'
+                    prop.set_family(mpl.rcParams['font.family'])
+
+                    # generate graph  ( not written to support MPL < v2.0 )
+                    fig = plt.figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
+                    ax = fig.add_subplot(111, frameon=False)
+                    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+                    
+                    # no grid or tick marks
+                    ax.grid(False)
+                    ax.axes.get_xaxis().set_ticks([])
+                    ax.axes.get_yaxis().set_ticks([])
+                    
+                    # set graph xy limits
+                    ylim = (barheight + barspacer) * (1 + len(profiles))
+                    xlim = m+g+100+g+m +1
+                    ax.set_ylim(0, ylim)   
+                    ax.set_xlim(0, xlim)     
+
+                    graph_image_pct = "roastlog-graph-pct"
+
+                    i = len(profiles)   # bar counter 
+
+                    # generate the legend at the top
+                    facecolors = ('#00b950', '#ffb347', '#9f7960')
+                    prop.set_size("medium")  
+                    ax.broken_barh( [ (n, g),                         #Dry indicator
+                                      (n+g+ind, g),                   #MAI indicator
+                                      (n+g+ind+g+ind, g)              #DEV indicator
+                                    ], 
+                                    (i*(barheight + barspacer), barheight*0.75), facecolors=facecolors
+                                  )                      
+                    ax.text(    m/2,             i*(barheight + barspacer) + textoffset/3, 'Nr', ha='center', color=fontcolor, fontproperties=prop)
+                    ax.text( 1+ n+g,             i*(barheight + barspacer) + textoffset/3, 'Dry', ha='left', color=fontcolor, fontproperties=prop)
+                    ax.text( 1+ n+g+ind+g,       i*(barheight + barspacer) + textoffset/3, 'Mai', ha='left', color=fontcolor, fontproperties=prop)
+                    ax.text( 1+ n+g+ind+g+ind+g, i*(barheight + barspacer) + textoffset/3, 'Dev', ha='left', color=fontcolor, fontproperties=prop)
+                    ax.text(    n+100 + 10/2,    i*(barheight + barspacer) + textoffset/3, 'Drop', ha='center', color=fontcolor, fontproperties=prop)
+                        
+                    # generate the bar graph 
+                    prop.set_size("small")  
+                    color=iter(cm.tab10(numpy.linspace(0,1,10)))      
+                    for p in profiles:
+                        i -= 1
+                        cl = (next(color),'#00b950', '#ffb347', '#9f7960')
+                        rd = self.profileRankingData(p)
+                        pd = self.profileProductionData(p,c)
+                        label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))[:8]
+                        if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
+                            ax.broken_barh( [ (0, m), 
+                                              (n, rd["DRY_percent"]), 
+                                              (n+rd["DRY_percent"], rd["MAI_percent"]), 
+                                              (n+rd["DRY_percent"] + rd["MAI_percent"], rd["DEV_percent"]),
+                                              (n+rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g, m*rd["DROP_time"]/max_drop_time)
+                                            ], 
+                                            (i*(barheight + barspacer), barheight), facecolors=cl
+                                          )                      
+                            ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
+                            ax.text( n + rd["DRY_percent"]/2,                                               i*(barheight + barspacer) + textoffset, str(round(rd["DRY_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DRY_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                            ax.text( n + rd["DRY_percent"] + rd["MAI_percent"]/2,                           i*(barheight + barspacer) + textoffset, str(round(rd["MAI_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["MAI_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                            ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"]/2,       i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                            ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
+                                                          
+                    # save graph                
+                    if platf == 'Darwin':
+                        graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
+                        try:
+                            os.remove(graph_image_pct)
+                        except OSError:
+                            pass
+                        fig.savefig(graph_image_pct)
+                    else:
+                        if pyqtversion < 5:
+                            image = QPixmap().grabWidget(aw.qmc).toImage()
+                        else:
+                            image = aw.qmc.grab().toImage()
+                        #save GRAPH image
+                        graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
+                        try:
+                            os.remove(graph_image_pct)
+                        except OSError:
+                            pass
+                        fig.savefig(graph_image_pct)                   
+                    #add some random number to force HTML reloading
+                    graph_image_pct = path2url(graph_image_pct)
+                    graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
+                    graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
+                    
                     # redraw original graph
                     if not foreground_profile_path and not aw.qmc.backgroundpath:
                         self.qmc.redraw(recomputeAllDeltas=False)
@@ -19513,6 +19626,7 @@ class ApplicationWindow(QMainWindow):
                 colors_avg = ("#" + '{0:.0f}'.format(colors / colors_count) if colors > 0 and colors_count > 0 else ""),
                 cup_avg = ('{0:.2f}'.format(cuppings / cuppings_count) if cuppings > 0 and cuppings_count > 0 else ""),
                 graph_image=graph_image,
+                graph_image_pct=graph_image_pct
             )
                 
             f = None
@@ -19809,12 +19923,12 @@ class ApplicationWindow(QMainWindow):
                 else:
                     image = aw.qmc.grab().toImage()
                 #save GRAPH image
-                graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".png")))
+                graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
                 try:
                     os.remove(graph_image)
                 except OSError:
                     pass
-                image.save(graph_image)
+                self.qmc.fig.savefig(graph_image)
             #add some random number to force HTML reloading
             graph_image = path2url(graph_image)
             graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
@@ -19835,12 +19949,12 @@ class ApplicationWindow(QMainWindow):
                     image = aw.qmc.grab().toImage()
                 #resize FLAVOR image to 550 pixels width
                 #save GRAPH image
-                flavor_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + ".png")))
+                flavor_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + ".svg")))
                 try:
                     os.remove(flavor_image)
                 except OSError:
                     pass
-                image.save(flavor_image)
+                self.qmc.fig.savefig(flavor_image)
             flavor_image = path2url(flavor_image)
             flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
             #return screen to GRAPH profile mode
@@ -20503,7 +20617,7 @@ class ApplicationWindow(QMainWindow):
             temp2 = self.qmc.temp2
             
         delta = ET = BT = 0.0
-        if (start == 0 and end == 0) or (start and (start < 0 or (start == 0 and timeindex[0] < 0))):
+        if (start == 0 and end == 0) or (start and (start < 0 or (start == 0 and timeindex[0] < 0))) or (len(timex) == 0):
             return 0,0,0
         else:
             try:
