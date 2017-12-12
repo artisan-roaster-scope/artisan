@@ -54,7 +54,7 @@ v1.2.0 (xx.xx.2017)
 	- adds tooltip translation for toolbar icon menus
 	- suppresses wrong readings caused by communication drop outs
 	- synchronizes background and foreground RoR smoothing to guarantee equal delay/shift
-	- SHIFT modifier now required to change palettes via number key shortcuts
+	- CRTL modifier now required to change palettes via number key shortcuts
 	- disallow placing (new) events during recording via the right-click popup menu to BT
 	- reduces initial window width from 811px to 800px to fit on the RPi 7" display
 	- all builds are now based on Python3.5 and Qt5.9.x
