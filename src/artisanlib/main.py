@@ -1241,6 +1241,7 @@ class tgraphcanvas(FigureCanvas):
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
         self.roastertype = ""
         self.operator = ""
+        self.drumspeed = ""   #dave33
         self.roastingnotes = ""
         self.cuppingnotes = ""
         self.roastdate = QDateTime.currentDateTime()
@@ -15675,6 +15676,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.operator = d(profile["operator"])
             else:
                 self.qmc.operator = ""
+            if "drumspeed" in profile:
+                self.qmc.drumspeed = d(profile["drumspeed"])
+            else:
+                self.qmc.drumspeed = ""
             if "beansize" in profile:
                 self.qmc.beansize = float(profile["beansize"])
             else:
@@ -16214,6 +16219,7 @@ class ApplicationWindow(QMainWindow):
             profile["density"] = [self.qmc.density[0],encodeLocal(self.qmc.density[1]),self.qmc.density[2],encodeLocal(self.qmc.density[3])]
             profile["roastertype"] = encodeLocal(self.qmc.roastertype)
             profile["operator"] = encodeLocal(self.qmc.operator)
+            profile["drumspeed"] = self.qmc.drumspeed
             profile["heavyFC"] = self.qmc.heavyFC_flag
             profile["lowFC"] = self.qmc.lowFC_flag
             profile["lightCut"] = self.qmc.lightCut_flag
@@ -17196,6 +17202,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoastProperties")
             self.qmc.operator = toString(settings.value("operator",self.qmc.operator))
             self.qmc.roastertype = toString(settings.value("roastertype",self.qmc.roastertype))
+            self.qmc.drumspeed = toString(settings.value("drumspeed",self.qmc.drumspeed))
             self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2]))
             if settings.contains("beansize"):
                 self.qmc.beansize = toDouble(settings.value("beansize",self.qmc.beansize))
@@ -18194,6 +18201,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("legendloc",self.qmc.legendloc)
             settings.endGroup()
             settings.beginGroup("RoastProperties")
+            settings.setValue("drumspeed",self.qmc.drumspeed)
             settings.setValue("operator",self.qmc.operator)
             settings.setValue("roastertype",self.qmc.roastertype)
             settings.setValue("densitySampleVolume",self.qmc.density[2])
@@ -18502,6 +18510,7 @@ class ApplicationWindow(QMainWindow):
         axes["zmin"]= str(self.qmc.zlimit_min)
         axes["resetmaxtime"] = str(self.qmc.stringfromseconds(self.qmc.resetmaxtime))
         axes["legendloc"] = str(self.qmc.legendloc)
+        roast["drumspeed"]= u(self.qmc.drumspeed)
         roast["operator"]= u(self.qmc.operator)
         roast["roastertype"] = u(self.qmc.roastertype)
         roast["densitySampleVolume"] = str(self.qmc.density[2])
@@ -25228,6 +25237,9 @@ class editGraphDlg(ArtisanDialog):
         self.roaster = QLineEdit(aw.qmc.roastertype)
         #operator
         self.operator = QLineEdit(aw.qmc.operator)
+        #drum speed
+        self.drumspeed = QLineEdit(aw.qmc.drumspeed)
+        self.drumspeed.setAlignment(Qt.AlignCenter)
         #weight
         weightlabel = QLabel("<b>" + u(QApplication.translate("Label", "Weight",None)) + "</b>")
         weightinlabel = QLabel(QApplication.translate("Label", " in",None))
@@ -25415,6 +25427,8 @@ class editGraphDlg(ArtisanDialog):
         roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Roaster",None)) + "</b>")
         operatorlabel = QLabel()
         operatorlabel.setText("<b> " + u(QApplication.translate("Label", "Operator",None)) + "</b>")
+        drumspeedlabel = QLabel()
+        drumspeedlabel.setText("<b> " + u(QApplication.translate("Label", "Drum Speed",None)) + "</b>")
         roastinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Roasting Notes",None)) + "</b>")
         self.roastingeditor = QTextEdit()
         self.roastingeditor.setMaximumHeight(125)
@@ -25554,11 +25568,14 @@ class editGraphDlg(ArtisanDialog):
         textLayout.addWidget(self.beansedit,3,1)        
         textLayout.addWidget(operatorlabel,4,0)
         roasteroperator = QHBoxLayout()
-        roasteroperator.addWidget(self.operator)
+        roasteroperator.addWidget(self.operator, stretch=3)
         roasteroperator.addSpacing(15)
         roasteroperator.addWidget(roastertypelabel)        
         roasteroperator.addSpacing(7)
-        roasteroperator.addWidget(self.roaster)
+        roasteroperator.addWidget(self.roaster,stretch=3)
+        roasteroperator.addWidget(drumspeedlabel)
+        roasteroperator.addSpacing(7)
+        roasteroperator.addWidget(self.drumspeed,stretch=1)
         textLayout.addLayout(roasteroperator,4,1)        
         weightLayout = QHBoxLayout()
         weightLayout.setSpacing(0)
@@ -26769,6 +26786,7 @@ class editGraphDlg(ArtisanDialog):
         #update notes
         aw.qmc.roastertype = u(self.roaster.text())
         aw.qmc.operator = u(self.operator.text())
+        aw.qmc.drumspeed = u(self.drumspeed.text())
         aw.qmc.roastingnotes = u(self.roastingeditor.toPlainText())
         aw.qmc.cuppingnotes = u(self.cuppingeditor.toPlainText())        
         if aw.superusermode and aw.qmc.batchcounter > -1:
