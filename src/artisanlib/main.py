@@ -9102,16 +9102,6 @@ class VMToolbar(NavigationToolbar):
     # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
     if not svgsupport:
         figureoptions.get_icon = my_get_icon
-        
-    def zoom(self, *args):
-        if self._views() is None:
-            self.push_current()
-        super(VMToolbar, self).zoom(*args)
-        
-    def pan(self,*args):
-        if self._views() is None:
-            self.push_current()
-        super(VMToolbar, self).pan(*args)
                 
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def draw_new(self):
@@ -9125,14 +9115,7 @@ class VMToolbar(NavigationToolbar):
 
     def home(self, *args):
         """Restore the original view"""
-        if self._views() is None:
-            self.push_current()
-        #-- orginal code
-        self._views.home()
-        self._positions.home()
-        self.set_history_buttons()
-        self._update_view()
-        #--- end orginal code
+        super(VMToolbar, self).home(*args) 
         
         # toggle zoom_follow if recording
         if aw.qmc.flagstart:
