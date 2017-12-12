@@ -5210,6 +5210,7 @@ class tgraphcanvas(FigureCanvas):
 
             cp = aw.computedProfileInformation()  # get all the computed proflie information
 
+            skipline = '\n'
             statstr = ''
             if self.statssummary:   
                 statstr += encodeLocal(aw.qmc.roastdate.date().toString()) + ' '
@@ -5226,28 +5227,36 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.greens_temp:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Bean Temp", None) + ': ' + str(int(aw.qmc.greens_temp)) + u'\u00b0' + aw.qmc.mode
                 if aw.qmc.weight[0]:
+                    statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ str(aw.float2float(aw.qmc.weight[0],2)) + aw.qmc.weight[2]
                     if aw.qmc.weight[1]:
                         statstr += '\n' + QApplication.translate("AddlInfo", "Weight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
 
                 if aw.qmc.density[0]:
+                    statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3])
                     if cp["roasted_density"]:
                         statstr += '\n' + QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(-aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%"
 
                 if aw.qmc.volume[0]:
+                    statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2])
                     if cp["volume_gain"]:
                         statstr += '\n' + 'Volume Gain: ' + str(aw.float2float(cp["volume_gain"],2)) + "%"
                         
                 if aw.qmc.beansize:
+                    statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Bean Size", None) + ': '+ str(aw.qmc.beansize) + 'mm'
 
+                if aw.qmc.moisture_greens or aw.qmc.moisture_roasted:
+                    statstr += skipline
                 if aw.qmc.moisture_greens:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Moisture Green", None) + ': '+ str(aw.float2float(aw.qmc.moisture_greens,1)) + "%"
                 if aw.qmc.moisture_roasted:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Moisture Roasted", None) + ': '+ str(aw.float2float(aw.qmc.moisture_roasted,1)) + "%"
                     
+                if aw.qmc.whole_color > 0 or aw.qmc.ground_color > 0:
+                    statstr += skipline
                 if aw.qmc.whole_color > 0:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Whole Color", None) + ': '+ str(aw.qmc.whole_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
                 if aw.qmc.ground_color > 0:
