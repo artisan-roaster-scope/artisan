@@ -12,8 +12,8 @@ v1.2.0 (xx.xx.2017)
   		- event replay is active only after CHARGE
   		- replay-by-temperature is active only after TP and before it falls back to replay-by-time
   		- to replay an event its event slider must be active (ticked) and the event name has to correspond to that of the background profile
-	- adds MET marker on ET curve inluding a picker to display MET details (by Dave Baxter)
-	- adds option to show events on BT instead of ET (by Dave Baxter)
+	- adds option to show MET marker on ET curve, click icon to display MET details (by Dave Baxter)
+	- adds option to show events markers on BT instead of ET (by Dave Baxter)
 	- adds option to show statistics summary (try it with Auto Axis enabled) (by Dave Baxter)
 	- makes the display optional for each of the four special events (by Dave Baxter)
 	- adds click-and-drag measurements (by Dave Baxter)
@@ -44,9 +44,11 @@ v1.2.0 (xx.xx.2017)
    - sends DTA Commands to the BTread PID if the ETcontrol PID is not a DTA
    - adds IO Commands action to sliders
    - adds mechanism to show/hide the control bar as well as the readings LCDs
+   - adds a roast phase statistics visualization to the ranking report (by Dave Baxter)
+   - adds drum speed field to roast properties (by Dave Baxter)
  * Changes
 	- drops support for OS X 10.9 and earlier
-	- extends special event lines to the drop time (by Dave)
+	- extends special event lines to the drop time (by Dave Baxter)
 	- drops support for Phidgets API v21
 	- Phidgets IO changes
  		- drops raw mode and ratio metric flag
