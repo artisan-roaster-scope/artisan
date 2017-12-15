@@ -5219,10 +5219,12 @@ class tgraphcanvas(FigureCanvas):
                 statstr += roastoftheday
                 if aw.qmc.roastertype:
                     statstr += '\n' + str(aw.qmc.roastertype)
+                if aw.qmc.drumspeed:
+                    statstr += '\n' + (QApplication.translate("Label", "Drum Speed",None)) + ': ' + str(aw.qmc.drumspeed)
                 if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [None,0]:
-                    statstr += '\n'
+                    statstr += '\n' + (QApplication.translate("HTML Report Template", "Ambient:",None)) + ' '
                 if aw.qmc.ambientTemp not in [None,0]:
-                    statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '   '
+                    statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '  '
                 if aw.qmc.ambient_humidity not in [None,0]:
                     statstr +=  str(int(aw.qmc.ambient_humidity)) + '% ' + QApplication.translate("AddlInfo", "RH",None)
                 if aw.qmc.greens_temp:
@@ -5243,7 +5245,7 @@ class tgraphcanvas(FigureCanvas):
                     statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2])
                     if cp["volume_gain"]:
-                        statstr += '\n' + 'Volume Gain: ' + str(aw.float2float(cp["volume_gain"],2)) + "%"
+                        statstr += '\n' + QApplication.translate("AddlInfo", "Volume Gain", None) + ': ' + str(aw.float2float(cp["volume_gain"],2)) + "%"
                         
                 if aw.qmc.beansize:
                     statstr += skipline
