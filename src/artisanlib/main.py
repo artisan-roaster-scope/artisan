@@ -31522,6 +31522,7 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
+                        retry_on_empty=True,
                         timeout=self.timeout)
                 elif self.type == 2: # Serial Binary
                     self.master = ModbusSerialClient(
@@ -31531,12 +31532,15 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
+                        retry_on_empty=True,
                         timeout=self.timeout)  
                 elif self.type == 3: # TCP
                     try:
                         self.master = ModbusTcpClient(
                                 host=self.host, 
                                 port=self.port,
+                                retry_on_empty=True,
+                                retries=2,
                                 timeout=0.1, #self.timeout
                                 )
                     except:
@@ -31549,7 +31553,7 @@ class modbusport(object):
                         self.master = ModbusUdpClient(
                             host=self.host, 
                             port=self.port,
-                            retry_on_empty=False,
+                            retry_on_empty=True,
                             retries=2,
                             timeout=0.1, #self.timeout
                             )
@@ -31566,6 +31570,7 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
+                        retry_on_empty=True,
                         timeout=self.timeout)          
                 self.master.connect()
                 libtime.sleep(.03) # avoid possible hickups on startup
