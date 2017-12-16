@@ -193,6 +193,14 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v1.2.0 (21.12.2017)
+ - adds replay by temperature, 
+ - support for Phidgets API v22
+ - drops support for Phidgets API v21
+ - adds support for Phidgets 1002, 1014, 1017, HUB0000, TMP1100, TMP1101, TMP1200, OUT1000, OUT1001, OUT1002, OUT1100
+ - adds support for VOLTCRAFT PL-125-T2
+ - improved RoR and dropout handling
+
 v1.1.0 (10.6.2017)
  - adds Recent Roast Properties
  - adds Aillio Bullet R1 profile import

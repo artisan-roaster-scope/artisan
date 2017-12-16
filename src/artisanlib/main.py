@@ -10478,17 +10478,6 @@ class ApplicationWindow(QMainWindow):
         self.oversamplingAction.setCheckable(True)
         self.oversamplingAction.setChecked(self.qmc.oversampling)
         self.ConfMenu.addAction(self.oversamplingAction)
-
-        self.ConfMenu.addSeparator()
-
-        self.eventsAction = QAction(UIconst.CONF_MENU_EVENTS,self)
-        self.eventsAction.triggered.connect(self.eventsconf)
-        self.ConfMenu.addAction(self.eventsAction)
-        self.eventsAction.setShortcut("Ctrl+E")
-
-        alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
-        alarmAction.triggered.connect(self.alarmconfig)
-        self.ConfMenu.addAction(alarmAction)
         
         self.ConfMenu.addSeparator()
         
@@ -10515,6 +10504,17 @@ class ApplicationWindow(QMainWindow):
         self.slidersAction.setCheckable(True)
         self.slidersAction.setChecked(False)
         self.ConfMenu.addAction(self.slidersAction)
+
+        self.ConfMenu.addSeparator()
+
+        self.eventsAction = QAction(UIconst.CONF_MENU_EVENTS,self)
+        self.eventsAction.triggered.connect(self.eventsconf)
+        self.ConfMenu.addAction(self.eventsAction)
+        self.eventsAction.setShortcut("Ctrl+E")
+
+        alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
+        alarmAction.triggered.connect(self.alarmconfig)
+        self.ConfMenu.addAction(alarmAction)
         
         self.ConfMenu.addSeparator()
 
@@ -19468,25 +19468,13 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.fig.canvas.draw()
                     
                     # save graph                
-                    if platf == 'Darwin':
-                        graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
-                        try:
-                            os.remove(graph_image)
-                        except OSError:
-                            pass
-                        self.qmc.fig.savefig(graph_image)
-                    else:
-                        if pyqtversion < 5:
-                            image = QPixmap().grabWidget(aw.qmc).toImage()
-                        else:
-                            image = aw.qmc.grab().toImage()
-                        #save GRAPH image
-                        graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
-                        try:
-                            os.remove(graph_image)
-                        except OSError:
-                            pass
-                        self.qmc.fig.savefig(graph_image)
+                    graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
+                    try:
+                        os.remove(graph_image)
+                    except OSError:
+                        pass
+                    self.qmc.fig.savefig(graph_image)
+                        
                     #add some random number to force HTML reloading
                     graph_image = path2url(graph_image)
                     graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
@@ -19570,26 +19558,13 @@ class ApplicationWindow(QMainWindow):
                             ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"]/2,       i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
                             ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
                                                           
-                    # save graph                
-                    if platf == 'Darwin':
-                        graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
-                        try:
-                            os.remove(graph_image_pct)
-                        except OSError:
-                            pass
-                        fig.savefig(graph_image_pct)
-                    else:
-                        if pyqtversion < 5:
-                            image = QPixmap().grabWidget(aw.qmc).toImage()
-                        else:
-                            image = aw.qmc.grab().toImage()
-                        #save GRAPH image
-                        graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
-                        try:
-                            os.remove(graph_image_pct)
-                        except OSError:
-                            pass
-                        fig.savefig(graph_image_pct)                   
+                    # save graph
+                    graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
+                    try:
+                        os.remove(graph_image_pct)
+                    except OSError:
+                        pass
+                    fig.savefig(graph_image_pct)                   
                     #add some random number to force HTML reloading
                     graph_image_pct = path2url(graph_image_pct)
                     graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
@@ -19913,51 +19888,24 @@ class ApplicationWindow(QMainWindow):
                     etbta += u(" [%d]"%(cp["AUCbase"]))
             tmpdir = u(QDir.tempPath() + "/")
             graph_image = "roastlog-graph"
-            if platf == 'Darwin':
-                graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
-                try:
-                    os.remove(graph_image)
-                except OSError:
-                    pass
-                self.qmc.fig.savefig(graph_image)
-            else:
-                if pyqtversion < 5:
-                    image = QPixmap().grabWidget(aw.qmc).toImage()
-                else:
-                    image = aw.qmc.grab().toImage()
-                #save GRAPH image
-                graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
-                try:
-                    os.remove(graph_image)
-                except OSError:
-                    pass
-                self.qmc.fig.savefig(graph_image)
+            graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
+            try:
+                os.remove(graph_image)
+            except OSError:
+                pass
+            self.qmc.fig.savefig(graph_image)
             #add some random number to force HTML reloading
             graph_image = path2url(graph_image)
             graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
             #obtain flavor chart image
             self.qmc.flavorchart()
             flavor_image = "roastlog-flavor"
-            if platf == 'Darwin':
-                flavor_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + ".svg")))
-                try:
-                    os.remove(flavor_image)
-                except OSError:
-                    pass
-                self.qmc.fig.savefig(flavor_image)
-            else:
-                if pyqtversion < 5:
-                    image = QPixmap().grabWidget(aw.qmc).toImage()
-                else:
-                    image = aw.qmc.grab().toImage()
-                #resize FLAVOR image to 550 pixels width
-                #save GRAPH image
-                flavor_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + ".svg")))
-                try:
-                    os.remove(flavor_image)
-                except OSError:
-                    pass
-                self.qmc.fig.savefig(flavor_image)
+            flavor_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + ".svg")))
+            try:
+                os.remove(flavor_image)
+            except OSError:
+                pass
+            self.qmc.fig.savefig(flavor_image)
             flavor_image = path2url(flavor_image)
             flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
             #return screen to GRAPH profile mode
@@ -20738,7 +20686,7 @@ class ApplicationWindow(QMainWindow):
         QApplication.processEvents()
 
     def helpAbout(self):
-        coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
+        coredevelopers = "<br>Rafael Cobo, Marko Luther &amp; David Baxter"
         contributors = u("<br>") + uchr(199) + u("etin Barut, Marcio Carnerio, Bradley Collins, ")
         contributors += u("Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall, ")
         contributors += u("Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo, ")
@@ -20750,10 +20698,10 @@ class ApplicationWindow(QMainWindow):
         contributors += u("Barrie Fairley, Ziv Sade, Nicholas Seckar, ")
         contributors += u("Morten M") + uchr(252) + u("nchow")
         contributors += u(", Andrzej Kie") + uchr(322) + u("basi") + uchr(324) + u("ski, Marco Cremonese, Josef Gander")
-        contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, David Baxter, Taras Prokopyuk")
+        contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
-        contributors += u(", Nicolas (Marvell Street Coffee Roasters)<br>")
+        contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -23308,23 +23256,6 @@ class HUDDlg(ArtisanDialog):
         tab5Layout.addWidget(WebLCDsGroupWidget)
         tab5Layout.addStretch()
         tab5Layout.addLayout(defresLayout)
-        ##### TAB 6
-        #show met 
-        self.ShowMet = QCheckBox(QApplication.translate("CheckBox", "Show MET",None))
-        self.ShowMet.setChecked(aw.qmc.showmet)
-        self.ShowMet.stateChanged.connect(self.changeShowMet)         #toggle        
-        #show stats summary 
-        self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Show Statistics Summary",None))
-        self.ShowStatsSummary.setChecked(aw.qmc.statssummary)
-        self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle        
-        moreInfoLayout = QGridLayout()
-        moreInfoLayout.addWidget(self.ShowMet,0,0)
-        moreInfoLayout.addWidget(self.ShowStatsSummary,1,0)
-        moreinfoGroupWidget = QGroupBox(QApplication.translate("GroupBox","More Info",None))
-        moreinfoGroupWidget.setLayout(moreInfoLayout)
-        tab6Layout = QVBoxLayout()
-        tab6Layout.addWidget(moreinfoGroupWidget)
-        tab6Layout.addStretch()
 
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
@@ -23347,9 +23278,6 @@ class HUDDlg(ArtisanDialog):
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
         TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None))
-        C6Widget = QWidget()
-        C6Widget.setLayout(tab6Layout)
-        TabWidget.addTab(C6Widget,QApplication.translate("Tab","More Info",None))
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(cancelButton)
@@ -24195,18 +24123,7 @@ class HUDDlg(ArtisanDialog):
     def changeInterpolationMode(self,i):
         aw.qmc.resetlines()
         aw.qmc.redraw(recomputeAllDeltas=False)
-        self.interpolation(i)
-
-    def changeShowMet(self):
-        aw.qmc.showmet = not aw.qmc.showmet
-        aw.qmc.redraw(recomputeAllDeltas=False)
-                
-    def changeStatsSummary(self):
-        aw.qmc.statssummary = not aw.qmc.statssummary
-        # IF Auto is set for the axis the recompute it
-        if aw.qmc.autotimex and not aw.qmc.statssummary:
-            aw.autoAdjustAxis()
-        aw.qmc.redraw(recomputeAllDeltas=False)                
+        self.interpolation(i)             
                         
     def closeEvent(self,_):
         self.close()
@@ -28147,6 +28064,11 @@ class EventsDlg(ArtisanDialog):
         self.markTP = QCheckBox(QApplication.translate("CheckBox","Mark TP",None))
         self.markTP.setChecked(aw.qmc.markTPflag)
         self.markTP.setFocusPolicy(Qt.NoFocus)
+        #show met 
+        self.ShowMet = QCheckBox(QApplication.translate("CheckBox", "Mark MET",None))
+        self.ShowMet.setChecked(aw.qmc.showmet)
+        self.ShowMet.setFocusPolicy(Qt.NoFocus)
+        self.ShowMet.stateChanged.connect(self.changeShowMet)         #toggle          
         okButton = QPushButton(QApplication.translate("Button","OK",None))
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
@@ -28497,6 +28419,8 @@ class EventsDlg(ArtisanDialog):
         FlagsLayout2.addWidget(self.autoDrop)
         FlagsLayout2.addSpacing(15)
         FlagsLayout2.addWidget(self.markTP)
+        FlagsLayout2.addSpacing(15)
+        FlagsLayout2.addWidget(self.ShowMet)
 
         typeLayout = QGridLayout()
         typeLayout.addWidget(typelabel1,0,0)
@@ -28918,6 +28842,10 @@ class EventsDlg(ArtisanDialog):
         mainLayout.setContentsMargins(5, 15, 5, 5)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        
+    def changeShowMet(self):
+        aw.qmc.showmet = not aw.qmc.showmet
+        aw.qmc.redraw(recomputeAllDeltas=False)
         
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
@@ -31125,6 +31053,9 @@ class StatisticsDlg(ArtisanDialog):
         self.ts = QCheckBox(QApplication.translate("CheckBox","AUC",None))
         self.flavor = QCheckBox(QApplication.translate("CheckBox","Evaluation",None))
         self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None))
+        self.ShowStatsSummary = QCheckBox(QApplication.translate("CheckBox", "Summary",None))
+        self.ShowStatsSummary.setChecked(aw.qmc.statssummary)
+        self.ShowStatsSummary.stateChanged.connect(self.changeStatsSummary)         #toggle                
         self.mindryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))
         self.mindryedit.setAlignment(Qt.AlignRight)
         self.mindryedit.setMinimumWidth(60)
@@ -31211,6 +31142,7 @@ class StatisticsDlg(ArtisanDialog):
         flagsLayout.addWidget(self.ts,0,3)
         flagsLayout.addWidget(self.flavor,0,4)
         flagsLayout.addWidget(self.area,0,5)
+        flagsLayout.addWidget(self.ShowStatsSummary,0,6)
         layout = QGridLayout()
         layout.addWidget(minf,0,1,Qt.AlignCenter)
         layout.addWidget(maxf,0,2,Qt.AlignCenter)
@@ -31325,7 +31257,14 @@ class StatisticsDlg(ArtisanDialog):
             self.targetedit.setEnabled(False)
         else:
             self.targetedit.setEnabled(True)
-        
+
+    def changeStatsSummary(self):
+        aw.qmc.statssummary = not aw.qmc.statssummary
+        # IF Auto is set for the axis the recompute it
+        if aw.qmc.autotimex and not aw.qmc.statssummary:
+            aw.autoAdjustAxis()
+        aw.qmc.redraw(recomputeAllDeltas=False)   
+                
     def changeStatisticsflag(self,value,i):
         aw.qmc.statisticsflags[i] = value
         aw.qmc.redraw(recomputeAllDeltas=False)
