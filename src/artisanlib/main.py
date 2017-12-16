@@ -20686,7 +20686,7 @@ class ApplicationWindow(QMainWindow):
         QApplication.processEvents()
 
     def helpAbout(self):
-        coredevelopers = "<br>Rafael Cobo, Marko Luther &amp; David Baxter"
+        coredevelopers = "<br>Rafael Cobo, Marko Luther &amp; Dave Baxter"
         contributors = u("<br>") + uchr(199) + u("etin Barut, Marcio Carnerio, Bradley Collins, ")
         contributors += u("Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall, ")
         contributors += u("Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo, ")

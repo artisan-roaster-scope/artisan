@@ -4,14 +4,14 @@
 Current Versions:
 
 o Windows: 8.1
-o Python: 3.5.3
+o Python: 3.5.4
 o Qt: 5.9.3 (installed via PyQt5 package)
 o PyQt5: 5.9.2
 o sip: 4.19.6 (installed via PyQt5 package)
-o pyserial: 3.4
+o pyserial: 3.4.0
 o numpy: 1.13.1+mkl
-o scip: 0.19.1
-o matplotlib: 2.0.2
+o scip: 1.0.0+mkl
+o matplotlib: 2.1.1
 o pymodbus: 1.3.0 (patched)
 o bottle: 0.12.13
 o gevent: 1.2.2
@@ -23,19 +23,26 @@ o python-dateutil: 2.6.1
 o pytz: 2017.2
 o pywin32: 221
 o qrcode: 5.3
-o requests: 2.18.3
+o requests: 2.18.4
 o six: 1.10.0
 o Unidecode: 0.4.21
 o urllib3: 1.22
 o win-inet-pton: 1.0.1
 o Phidget22: 1.0.0
 o yoctopuce: 1.10.28296
-o PyInstaller: 3.3.dev0+b20133197 (trunk)
+o PyInstaller: 3.3.1
 o openpyxl: 2.4.9
+o pip-review: 1.0
 
 
 Upgrade History:
 
+- 2017-12-16:
+ . scipy 0.19.1 => 1.0.0
+ . matplotlib 2.0.2 => 2.1.1
+ . PyInstaller 3.3.dev0+b20133197 => 3.3.1
+ . requests 2.18.3 => 2.18.4
+ . yoctopuce 1.10.28296 => 1.10.29.366
 - 2017-11-26:
  . Qt 5.9.2 => 5.9.3
  . Sip 4.19.4 => 4.19.6
@@ -47,12 +54,15 @@ Upgrade History:
 - 2017-08-07: initial install
 
 
+pip-review --local --interactive
+
+
 
 Installation Instructions
 
 1) install Windows 8.1
 
-2) install Python 3.5.3 
+2) install Python 3.5.4
 
 run installer for all users under c:\Program Files\Python35
 and add the path:
@@ -171,6 +181,10 @@ put in the directory above the Artisan source code
 22) openpyxl
 
 # pip3 install openpyxl==2.4.9
+
+23)
+
+# pip3 install pip-review
 
 ----
 
