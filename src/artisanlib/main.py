@@ -1032,6 +1032,8 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget HUB0000 IO Digital 01", #74
                        "+Phidget HUB0000 IO Digital 23",#75
                        "+Phidget HUB0000 IO Digital 45",#76
+                       "VOLTCRAFT PL-125-T4",   #77
+                       "+VOLTCRAFT PL-125-T4 34",   #78
                        ]
 
         #extra devices
@@ -32135,6 +32137,8 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_D,    #74
                                    self.PHIDGET_HUB0000_D_34, #75
                                    self.PHIDGET_HUB0000_D_56, #76
+                                   self.VOLTCRAFTPL125T4,   #77
+                                   self.VOLTCRAFTPL125T4_34,   #78
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -32699,6 +32703,15 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.VOLTCRAFTPL125T2temperature()
         return tx,t2,t1
+
+    def VOLTCRAFTPL125T4(self):
+        t2,t1 = self.VOLTCRAFTPL125T4temperature()
+        return aw.qmc.extraPL125T4TX,t2,t1
+
+    #especial function that collects extra T3 and T4 from Vol PL125-T4 while keeping compatibility
+    def VOLTCRAFTPL125T4_34(self):
+        #return saved readings collected at self.VOLTCRAFTPL125T4temperature()
+        return aw.qmc.extraPL125T4TX,aw.qmc.extraPL125T4T4,aw.qmc.extraPL125T4T3
 
     def EXTECH421509(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -33594,6 +33607,62 @@ class serialport(object):
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("VOLTCRAFTPL125T2 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+
+    def VOLTCRAFTPL125T4temperature(self,retry=2):
+        try:
+            command = bytearray([244, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            r = ""
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write(command)
+                self.SP.flush()
+                libtime.sleep(.05)
+                r = self.SP.read(26)
+                if len(r) == 26 and hex2int(r[0],r[1]) == 43605: # filter out bad/strange data
+                    aw.qmc.extraPL125T4TX = aw.qmc.timeclock.elapsed()/1000.
+                    #extract T1
+                    T1 = hex2int(r[23],r[22])/10.# select byte 23 and 22
+                    #extract T2
+                    T2 = hex2int(r[25],r[24])/10.# select byte 25 and 24
+                    aw.qmc.extraPL125T4T4 = hex2int(r[21],r[20])/10.# select byte 21 and 20
+                    aw.qmc.extraPL125T4T3 = hex2int(r[19],r[18])/10. # select byte 19 and 18
+                    bla = open("/tmp/blubb.log","a")
+                    bla.write(str(T1)+" "+str(T2)+" "+str(aw.qmc.extraPL125T4T3)+" "+str(aw.qmc.extraPL125T4T4))
+                    bla.write("\n")
+                    bla.flush()
+                    bla.close()
+                    return T1,T2
+                else:
+                    if retry:
+                        libtime.sleep(.05)
+                        return self.VOLTCRAFTPL125T4temperature(retry=retry-1)
+                    else:
+                        nbytes = len(r)
+                        error = QApplication.translate("Error Message","VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed",None).format(nbytes)
+                        timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
+                        _,_, exc_tb = sys.exc_info()
+                        aw.qmc.adderror(timez + " " + error)
+                        return -1,-1
+            else:
+                return -1,-1
+        except serial.SerialException:
+            error = QApplication.translate("Error Message","Serial Exception:",None) + " VOLTCRAFTPL125T4temperature()"
+            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " VOLTCRAFTPL125T4temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
+        finally:
+            self.closeport()
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("VOLTCRAFTPL125T4 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
 
     def CENTER306temperature(self,retry=2):
@@ -38759,6 +38828,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
+                elif meter == "VOLTCRAFT PL-125-T4":
+                    aw.qmc.device = 67
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1.0
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 elif meter == "VOLTCRAFT 300K":
                     aw.qmc.device = 13
                     #aw.ser.comport = "COM4"
@@ -39176,6 +39254,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 74
                 1, # 75
                 1, # 76
+                3, # 77
+                3, # 78
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):

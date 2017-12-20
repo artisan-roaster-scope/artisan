@@ -2094,6 +2094,11 @@ END</source>
         <translation type="unfinished">VOLTCRAFTPL125T2temperatura():{0}bytes ricevuti ma 26 necessari</translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="33644"/>
+        <source>VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed</source>
+        <translation type="unfinished">VOLTCRAFTPL125T4temperatura():{0}bytes ricevuti ma 26 necessari</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="32421"/>
         <source>DTAcommand(): {0} bytes received but 15 needed</source>
         <translation type="unfinished">ComandoDTA():{0}bytes ricevuti ma 15 necessari</translation>

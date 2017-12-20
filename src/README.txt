@@ -30,7 +30,7 @@ o ET/BT logging and PID control supporting the following devices
  - Modbus Serial ASCII/RTU/Binary, TCP and UDP
  - Omega HH309, HH506RA, HH802U, HH806AU, HHM28
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
- - VOLTCRAFT K201, K202, K204, 300K, 302KJ, PL-125-T2
+ - VOLTCRAFT K201, K202, K204, 300K, 302KJ, PL-125-T2, PL-125-T4
  - EXTECH 421509
  - Arduino/TC4 with PID
  - TE VA18B
@@ -198,7 +198,7 @@ v1.2.0 (21.12.2017)
  - support for Phidgets API v22
  - drops support for Phidgets API v21
  - adds support for Phidgets 1002, 1014, 1017, HUB0000, TMP1100, TMP1101, TMP1200, OUT1000, OUT1001, OUT1002, OUT1100
- - adds support for VOLTCRAFT PL-125-T2
+ - adds support for VOLTCRAFT PL-125-T2, VOLTCRAFT PL-125-T4
  - improved RoR and dropout handling
 
 v1.1.0 (10.6.2017)

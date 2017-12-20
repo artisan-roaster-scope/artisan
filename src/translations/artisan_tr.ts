@@ -2110,6 +2110,11 @@ END</source>
         <translation type="unfinished">VOLTCRAFTPL125T2 derecesi(): {0} bayt teslim oldu fakat 26 lazım</translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="33644"/>
+        <source>VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed</source>
+        <translation type="unfinished">VOLTCRAFTPL125T4 derecesi(): {0} bayt teslim oldu fakat 26 lazım</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="33827"/>
         <source>CENTER309temperature(): {0} bytes received but 45 needed</source>
         <translation type="unfinished">CENTER309 derecesi(): {0} bayt teslim oldu fakat 45 lazım</translation>
