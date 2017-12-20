@@ -37546,7 +37546,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
             changeTriggersCombo.setMinimumContentsLength(1)
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
-            changeTriggersCombo.setMaximumWidth(width)
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)
             phidgetBox1048.addWidget(changeTriggersCombo,3,i)
@@ -37571,7 +37570,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             probeTypeCombo.setMinimumContentsLength(1)
             width = probeTypeCombo.minimumSizeHint().width()
             probeTypeCombo.setMinimumWidth(width)
-            probeTypeCombo.setMaximumWidth(width)
+            if platf == 'Darwin':
+                probeTypeCombo.setMaximumWidth(width)
             
             self.probeTypeCombos.append(probeTypeCombo)
             phidgetBox1048.addWidget(probeTypeCombo,1,i)            
@@ -37591,7 +37591,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.dataRateCombo1048.setMinimumContentsLength(3)
         width = self.dataRateCombo1048.minimumSizeHint().width()
         self.dataRateCombo1048.setMinimumWidth(width)
-        self.dataRateCombo1048.setMaximumWidth(width)
+        if platf == 'Darwin':
+            self.dataRateCombo1048.setMaximumWidth(width)
         
         phidgetBox1048.addWidget(self.dataRateCombo1048,4,1,1,2)
         phidgetBox1048.setSpacing(5)
@@ -37677,7 +37678,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             gainCombo.setMinimumContentsLength(1)
             width = gainCombo.minimumSizeHint().width()
             gainCombo.setMinimumWidth(width)
-            gainCombo.setMaximumWidth(width)
+#            gainCombo.setMaximumWidth(width)
             
             self.gainCombos1046.append(gainCombo)
             phidgetBox1046.addWidget(gainCombo,1,i)
@@ -37696,7 +37697,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             formulaCombo.setMinimumContentsLength(1)
             width = formulaCombo.minimumSizeHint().width()
             formulaCombo.setMinimumWidth(width)
-            formulaCombo.setMaximumWidth(width)
+#            formulaCombo.setMaximumWidth(width)
                         
             self.formulaCombos1046.append(formulaCombo)
             phidgetBox1046.addWidget(formulaCombo,2,i)
@@ -37723,7 +37724,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.dataRateCombo1046.setMinimumContentsLength(3)
         width = self.dataRateCombo1046.minimumSizeHint().width()
         self.dataRateCombo1046.setMinimumWidth(width)
-        self.dataRateCombo1046.setMaximumWidth(width)
+        if platf == 'Darwin':
+            self.dataRateCombo1046.setMaximumWidth(width)
             
         phidgetBox1046.addWidget(self.dataRateCombo1046,4,1,1,2)
         phidgetBox1046.setSpacing(5)
@@ -37780,7 +37782,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.wireCombo1200.setMinimumContentsLength(3)
         width = self.wireCombo1200.minimumSizeHint().width()
         self.wireCombo1200.setMinimumWidth(width)
-        self.wireCombo1200.setMaximumWidth(width)
+#        self.wireCombo1200.setMaximumWidth(width)
             
         self.asyncCheckBoxe1200 = QCheckBox()
         self.asyncCheckBoxe1200.setFocusPolicy(Qt.NoFocus)
@@ -37800,7 +37802,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.changeTriggerCombo1200.setMinimumContentsLength(3)
         width = self.changeTriggerCombo1200.minimumSizeHint().width()
         self.changeTriggerCombo1200.setMinimumWidth(width)
-        self.changeTriggerCombo1200.setMaximumWidth(width) 
+#        self.changeTriggerCombo1200.setMaximumWidth(width) 
         self.changeTriggerCombo1200.setEnabled(aw.qmc.phidget1200_async)      
         
         self.rateCombo1200 = QComboBox()
@@ -37816,7 +37818,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.rateCombo1200.setMinimumContentsLength(3)
         width = self.rateCombo1200.minimumSizeHint().width()
         self.rateCombo1200.setMinimumWidth(width)
-        self.rateCombo1200.setMaximumWidth(width)
+#        self.rateCombo1200.setMaximumWidth(width)
         
         typeLabel = QLabel(QApplication.translate("Label","Type", None))
         wireLabel = QLabel(QApplication.translate("Label","Wiring", None))
@@ -37877,7 +37879,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             dataRatesCombo.setMinimumContentsLength(3)
             width = dataRatesCombo.minimumSizeHint().width()
             dataRatesCombo.setMinimumWidth(width)
-            dataRatesCombo.setMaximumWidth(width)
+#            dataRatesCombo.setMaximumWidth(width)
             
             self.dataRateCombos.append(dataRatesCombo)
             phidgetBox1018.addWidget(dataRatesCombo,4,i)
@@ -37892,15 +37894,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1018_changeTriggersValues.index(aw.qmc.phidget1018_changeTriggers[i-1])))
             except Exception:
                 pass
-            changeTriggersCombo.setMaximumSize(20,50)
+#            changeTriggersCombo.setMaximumSize(20,50)
+#            changeTriggersCombo.setMaximumHeight(50)
 
             changeTriggersCombo.setMinimumContentsLength(3)
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
-            changeTriggersCombo.setMaximumWidth(width)
+#            changeTriggersCombo.setMaximumWidth(width)
             
             self.changeTriggerCombos.append(changeTriggersCombo)
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
+            
+            
             asyncFlag = QCheckBox()
             asyncFlag.setFocusPolicy(Qt.NoFocus)
             asyncFlag.setChecked(True)

@@ -7,7 +7,7 @@ o PyQt5: 5.9.2
 o sip: 4.19.6 (installed via PyQt5 package)
 o pyserial: 3.4
 o numpy: 1.13.3
-o scipy: 0.19.1
+o scipy: 1.0.0
 o matplotlib: 2.0.2
 o pymodbus: 1.3.0 (patched)
 o unidecode: 0.4.21
@@ -25,12 +25,27 @@ o requests: 2.18.4
 o Phidget22: 1.0.0
 o yoctopuce: 1.10.28707
 o pefile: 2017.9.3
-o PyInstaller: 3.3
+o PyInstaller: 3.3.1
 o openpyxl: 2.4.9
 
+# sudo bash
+# cd
+# source .bash_profile
+# pip-review --local --interactive
+
+# cd src
+# ./build-centos-pi.sh
+# sudo ./build-linux.sh
+# cp *.deb *.rpm /media/sf_host/
+# 
 
 Upgrade History:
 
+- 2017-12-17:
+ . altgraph 0.15
+ . macholib 1.9
+ . scipy 0.19.1 => 1.0
+ . PyInstaller 3.3 => 3.3.1
 - 2017-11-26:
  . Qt 5.9.2 => 5.9.3
  . Sip 4.19.4 => 4.19.6
