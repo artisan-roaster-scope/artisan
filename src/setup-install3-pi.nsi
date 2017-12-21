@@ -256,6 +256,8 @@ Section Uninstall
   RMDir /r "$INSTDIR\Machines"
   RMDir /r "$INSTDIR\mpl-data"
   RMDir /r "$INSTDIR\pytz"
+  RMDir /r "$INSTDIR\openpyxl"
+  RMDir /r "$INSTDIR\PyQt5"
   RMDir /r "$INSTDIR\qt5_plugins"
   RMDir /r "$INSTDIR\tcl"
   RMDir /r "$INSTDIR\tk"
