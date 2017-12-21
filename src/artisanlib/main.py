@@ -33629,11 +33629,6 @@ class serialport(object):
                     T2 = hex2int(r[25],r[24])/10.# select byte 25 and 24
                     aw.qmc.extraPL125T4T4 = hex2int(r[21],r[20])/10.# select byte 21 and 20
                     aw.qmc.extraPL125T4T3 = hex2int(r[19],r[18])/10. # select byte 19 and 18
-#                    bla = open("/tmp/blubb.log","a")
-#                    bla.write(str(T1)+" "+str(T2)+" "+str(aw.qmc.extraPL125T4T3)+" "+str(aw.qmc.extraPL125T4T4))
-#                    bla.write("\n")
-#                    bla.flush()
-#                    bla.close()
                     return T1,T2
                 else:
                     if retry:
