@@ -37831,7 +37831,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.formulaCombo1200.setMinimumContentsLength(3)
         width = self.formulaCombo1200.minimumSizeHint().width()
         self.formulaCombo1200.setMinimumWidth(width)
-        self.formulaCombo1200.setMaximumWidth(width)   
+#        self.formulaCombo1200.setMaximumWidth(width)   
         
         self.wireCombo1200 = QComboBox()
         self.wireCombo1200.setFocusPolicy(Qt.NoFocus)
