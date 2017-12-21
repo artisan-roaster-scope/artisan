@@ -38823,15 +38823,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1.0
                     message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
-                elif meter == "VOLTCRAFT PL-125-T4":
-                    aw.qmc.device = 67
-                    #aw.ser.comport = "COM4"
-                    aw.ser.baudrate = 9600
-                    aw.ser.bytesize = 8
-                    aw.ser.parity= 'N'
-                    aw.ser.stopbits = 1
-                    aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 elif meter == "VOLTCRAFT 300K":
                     aw.qmc.device = 13
                     #aw.ser.comport = "COM4"
