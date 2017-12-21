@@ -32137,8 +32137,8 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_D,    #74
                                    self.PHIDGET_HUB0000_D_34, #75
                                    self.PHIDGET_HUB0000_D_56, #76
-                                   self.VOLTCRAFTPL125T4,   #77
-                                   self.VOLTCRAFTPL125T4_34,   #78
+                                   self.VOLTCRAFTPL125T4,     #77
+                                   self.VOLTCRAFTPL125T4_34,  #78
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -33629,11 +33629,11 @@ class serialport(object):
                     T2 = hex2int(r[25],r[24])/10.# select byte 25 and 24
                     aw.qmc.extraPL125T4T4 = hex2int(r[21],r[20])/10.# select byte 21 and 20
                     aw.qmc.extraPL125T4T3 = hex2int(r[19],r[18])/10. # select byte 19 and 18
-                    bla = open("/tmp/blubb.log","a")
-                    bla.write(str(T1)+" "+str(T2)+" "+str(aw.qmc.extraPL125T4T3)+" "+str(aw.qmc.extraPL125T4T4))
-                    bla.write("\n")
-                    bla.flush()
-                    bla.close()
+#                    bla = open("/tmp/blubb.log","a")
+#                    bla.write(str(T1)+" "+str(T2)+" "+str(aw.qmc.extraPL125T4T3)+" "+str(aw.qmc.extraPL125T4T4))
+#                    bla.write("\n")
+#                    bla.flush()
+#                    bla.close()
                     return T1,T2
                 else:
                     if retry:
@@ -39116,7 +39116,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ####  DEVICE 66 is -HH806W but -DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                elif meter == "VOLTCRAFTPL125T2":
+                elif meter == "VOLTCRAFT PL-125-T2":
                     aw.qmc.device = 67
                     #aw.ser.comport = "COM4"
                     aw.ser.baudrate = 9600
@@ -39157,6 +39157,20 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ##########################
                 ####  DEVICE 76 is +Phidget HUB0000 IO Digital 45 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                elif meter == "VOLTCRAFT PL-125-T4":
+                    aw.qmc.device = 77
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1.0
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
+                ##########################
+                ##########################
+                ####  DEVICE 78 is +VOLTCRAFT PL-125-T4 34 but +DEVICE cannot be set as main device
                 ##########################
                 
                 # ADD DEVICE:

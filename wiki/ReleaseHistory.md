@@ -35,7 +35,7 @@ v1.2.0 (21.12.2017)
    - adds Phidgets IO (1011, 1018,..) digital input support
 	- adds support for multiple Phidgets devices of one type
 	- adds keyboard shortcut to quickly load alarm file
-	- adds support for the VOLTCRAFT PL-125-T2 (by Andreas Bader)
+	- adds support for the VOLTCRAFT PL-125-T2 and VOLTCRAFT PL-125-T4 (by Andreas Bader)
 	- adds Exhaust Temperature to the Aillio Bullet import
 	- adds optional automatic saving of PDFs alongside alog profiles
 	- adds Hottop to the machine menu

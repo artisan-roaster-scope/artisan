@@ -32,15 +32,15 @@ Features
 - multi-platform (Mac, Windows, and Linux)
 - multi-language (English, German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norwegian, Finish, Hungarian, Hebrew, Polish, Greek, Turkish, Chinese, Russian, Thai, Indonesian, Korean,..)
 - multi-device (manual and automatic logging of roast temperatures via supported devices; see [Device Selection](http://artisan-roasterscope.blogspot.de/2013/06/device-selection.html))
-  * Fuji PXR/PXG 4 & 5 PID
-  * Delta DTA PID (works for DTB too)
+  * [Fuji PXR/PXG 4 & 5 PID](https://www.fujielectric.com/products/instruments/products/controller/top.html)
+  * [Delta DTA/DTB PID](http://www.deltaww.com/Products/CategoryListT1.aspx?CID=060405&PID=ALL&hl=en-US)
   * [Modbus](http://artisan-roasterscope.blogspot.de/2013/05/more-modbus.html) Serial ASCII/RTU/Binary, TCP and UDP (known to work with PIDs of Fuji, ENDA, Watlow, meters like myPCLab, as well as several variable frequency drives)
   * Omega HH309, HH506RA, HH802U, HH806AU, HHM28
-  * General Tools DT309DL
+  * [General Tools DT309DL](https://www.generaltools.com/4-channel-data-logging-k-thermocouple-thermometer)
   * CENTER 300, 301, 302, 303, 304, 305, 306, 309
   * VOLTCRAFT K201, K202, K204, 300K, 302KJ, PL-125-T2, PL-125-T4
-  * EXTECH 755, 421509
-  * Apollo DT301
+  * [EXTECH 755](http://www.extech.com/display/?id=14489) (differential pressure), [EXTECH 421509](http://www.extech.com/display/?id=14239)
+  * [Apollo DT301](http://www.ueitest.com/products/temperature-humidity/dt301)
   * [Arduino TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) with PID support
      - [aArtisan firmware v3.10](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan/tags/REL-310) from 1.7.2015 by Jim ([serial commands](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan/trunk/src/aArtisan/commands.txt), baudrate: 115200)
      - [aArtisanQ PID 6 firmware](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/branches/aArtisanQ_PID_6) by Brad ([configuration notes](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan_PID/tags/REL-aArtisanQ_PID_6_2_3/aArtisanQ_PID/Configuration%20Options.pdf), [serial commands](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan_PID/branches/aArtisanQ_PID_6/aArtisanQ_PID/commands.txt), baudrate: 115200)
@@ -84,7 +84,7 @@ Features
 - [phases LCDs predicting and counting developments per phase](https://artisan-roasterscope.blogspot.de/2017/02/roast-phases-statistics-and-phases-lcds.html)
 - automatic CHARGE/DROP event detection
 - [event quantifiers](https://artisan-roasterscope.blogspot.de/2014/04/event-quantifiers.html)
-- template/background profile with playback aid and replay functions for reproduction of roasts
+- [template/background profile with playback aid and replay functions for reproduction of roasts](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html)
 - configurable profile evaluations and statistics
 - weight input from digital scales ([Kern](http://www.kern-sohn.com/) and [Acaia](http://acaia.co/))
 - color input from color meters (supports for now [Tonino](http://my-tonino.com/))
@@ -140,7 +140,7 @@ Version History
 
 | Version | Date | Comment |
 |---------|------|---------|
-| v1.2.0 | 21.12.2017 | Adds replay by temperature, support for [Phidgets API v22](https://www.phidgets.com/docs/Operating_System_Support), Phidgets USB devices [USB 1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2), [1014](https://www.phidgets.com/?tier=3&prodid=9), [1017](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=15) and VINT devices [HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643), [TMP1100](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=725), [TMP1101](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=726), [TMP1200](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=968), [OUT1000](https://www.phidgets.com/?view=search&q=OUT1000),[OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712),[OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713),[OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714), [VOLTCRAFT PL-125-T2](https://www.conrad.de/de/temperatur-messgeraet-voltcraft-pl-125-t2-200-bis-1372-c-fuehler-typ-k-j-kalibriert-nach-werksstandard-ohne-zertifi-1012836.html), as well as the [VOLTCRAFT PL-125-T4](https://www.conrad.de/de/temperatur-messgeraet-voltcraft-pl-125-t4-200-bis-1372-c-fuehler-typ-k-j-kalibriert-nach-werksstandard-ohne-zertifi-1013036.html), improved RoR and dropout handling
+| v1.2.0 | 21.12.2017 | Adds [replay by temperature](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html), support for [Phidgets API v22](https://www.phidgets.com/docs/Operating_System_Support), Phidgets USB devices [USB 1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2), [1014](https://www.phidgets.com/?tier=3&prodid=9), [1017](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=15) and VINT devices [HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643), [TMP1100](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=725), [TMP1101](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=726), [TMP1200](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=968), [OUT1000](https://www.phidgets.com/?view=search&q=OUT1000),[OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712),[OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713),[OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714), [VOLTCRAFT PL-125-T2](https://www.conrad.de/de/temperatur-messgeraet-voltcraft-pl-125-t2-200-bis-1372-c-fuehler-typ-k-j-kalibriert-nach-werksstandard-ohne-zertifi-1012836.html), as well as the [VOLTCRAFT PL-125-T4](https://www.conrad.de/de/temperatur-messgeraet-voltcraft-pl-125-t4-200-bis-1372-c-fuehler-typ-k-j-kalibriert-nach-werksstandard-ohne-zertifi-1013036.html), improved RoR and dropout handling
 | v1.1.0 | 10.06.2017 | Adds [Recent Roast Properties](https://artisan-roasterscope.blogspot.de/2017/06/recent-roast-properties.html), [Aillio Bullet R1](https://aillio.com) profile import and support for [Probat Probatone 2](https://artisan-roasterscope.blogspot.de/2017/06/probat-probatone.html) (last version supporting OS X 10.9, Windows XP/7 and 32bit OS versions)|
 | v1.0.0 | 24.02.2017 | Adds [internal software PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html), external MODBUS PID control, Apollo DT301, Extech 755, fast MODBUS RTU, [AUC](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html), RPi build, additional translations, bug fixes and stability improvements |
 | v0.9.9 | 14.03.2016 | Adds [batch and ranking reports, batch conversions, follow-background for Fuji PIDs, additional keyboard short cuts, designer improvements, bug fixes](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html) (last version supporting OS X 10.7 and 10.8) |
