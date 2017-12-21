@@ -22,29 +22,32 @@ https://artisan-roasterscope.blogspot.de
 
 FEATURES
 
-o runs on Windows, Mac OS X (>=10.10) on Intel 64bit processor, and Linux (incl. Raspberry Pi)
+o runs on 64bit Windows 8 and newer, Mac OS X 10.10 and newer on Intel 64bit processor, and 64bit Redhat/Debian Linux (incl. Raspberry Pi)
 o UI translated in several languages (English, German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norwegian, Finish, Hungarian, Hebrew, Polish, Greek, Turkish, Chinese, Russian, Thai, Indonesian, Korean,..)
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
- - Delta DTA PID
+ - Delta DTA/DTB PID
  - Modbus Serial ASCII/RTU/Binary, TCP and UDP
  - Omega HH309, HH506RA, HH802U, HH806AU, HHM28
+ - General Tools DT309DL
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
  - VOLTCRAFT K201, K202, K204, 300K, 302KJ, PL-125-T2, PL-125-T4
- - EXTECH 421509
+ - EXTECH 755, 421509
+ - Apollo DT301
  - Arduino/TC4 with PID
  - TE VA18B
  - HHM28 multimeter
  - non-wireless Amprobe TMD-56 (same as Omega HH806AU)
- - Phidget USB and remote (1010, 1011, 1018, 1019, 1046, 1048, 1051, 1073)
+ - Phidget USB and remote (1002, 1010, 1011, 1013, 1014, 1018, 1019, 1045, 1046, 1048, 1051, 1073)
+ - Phidget VINT (HUB0000, TMP1100, TMP1101, TMP1200, OUT1000, OUT1001, OUT1002, OUT1100)
  - Mastech MS6514
  - virtual devices (symbolic devices)
  - device None (no device; manual input)
  - Yocto Thermocouple and PT100
- - Hottop KN-8828B-2K+
  - external program 
 and machines
  - Probat Probatone 2
+ - Hottop KN-8828B-2K+
 o unlimited number of devices/curves running at the same time
 o symbolic manipulation of device outputs
 o Fahrenheit and Celsius display and conversion
@@ -59,7 +62,7 @@ o background reference profile
 o user defined cup profiles and cup profile graphs
 o HTML report creation
 o CSV and JSON export
-o Omega HH506, K202, K204 CSV import
+o Omega HH506, K202, K204 CSV, RoastLogger, Probat Pilot, and Aillio Bullet R1 profile import
 o PID duty cycle
 o profile designer
 o wheel graph editor
@@ -87,7 +90,7 @@ INSTALLATION
 https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md)
 
 
-o Windows
+o 64bit Windows 8 and newer
 
 Artisan for Windows needs a Visual C++ runtime library (file) from Microsoft. This is automatically installed from v0.6 on by the Artisan installer. If Artisan cannot start it will open a Windows error. This is because your computer is missing this file. If you get a window error when you try to start Artisan, install this program:
 
@@ -98,7 +101,7 @@ http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A
 If artisan starts when clicking on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything. Newer OS like Windows 7 come with this file.
 
 
-o Mac OS X (>=10.10.x)
+o Mac OS X >=10.10.x
 
 - Install USB/serial driver for your meter
  . for Omega meters download and run the FTDI VCP OS X installer
@@ -117,7 +120,7 @@ o Mac OS X (>=10.10.x)
 - Drag the artisan application icon to your Applications directory
 
 
-o Linux
+o 64bit Linux
 
 The Linux package is compatible with Ubuntu/Debian and CentOS/Redhat (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually. This can be done by either double clicking the package icon from your file viewer or by entering the following commands in a shell.
 
