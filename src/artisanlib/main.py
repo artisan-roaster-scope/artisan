@@ -8339,7 +8339,7 @@ class tgraphcanvas(FigureCanvas):
                 offset = 0
                 if self.timeindex[0] > -1:
                     offset = self.timex[self.timeindex[0]]
-                dlg = pointDlg(parent=self,x=self.currentx-offset,y=self.currenty)
+                dlg = pointDlg(parent=aw,x=self.currentx-offset,y=self.currenty)
                 if dlg.exec_():
                     self.currentx = dlg.getX() + offset
                     self.currenty = dlg.getY()
