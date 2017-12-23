@@ -8,7 +8,7 @@ export QT_PATH=/usr/local/lib/python3.5/site-packages/PyQt5/Qt
 rm -rf build
 rm -rf dist
 
-pyinstaller -D -n artisan -y -c --log-level=WARN "artisan.py"
+pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN "artisan.py"
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist
