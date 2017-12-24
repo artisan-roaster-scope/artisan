@@ -36109,7 +36109,7 @@ class designerconfigDlg(ArtisanDialog):
                     self.fcs.setChecked(False)
             elif idi == 3:
                 if self.fce.isChecked():
-                    self.fes.setChecked(False)
+                    self.fce.setChecked(False)
             elif idi == 4:
                 if self.scs.isChecked():
                     self.scs.setChecked(False)
