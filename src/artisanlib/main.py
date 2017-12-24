@@ -222,6 +222,7 @@ from unidecode import unidecode
 
 from artisanlib.weblcds import startWeb, stopWeb
 from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopControl, releaseHottopControl, setHottop
+from artisanlib.aillio import AillioR1
 
 # maps Artisan thermocouple types (order as listed in the menu; see phidget1048_types) to Phdiget thermocouple types
 # 1 => k-type (default)
@@ -1034,6 +1035,9 @@ class tgraphcanvas(FigureCanvas):
                        "+Phidget HUB0000 IO Digital 45",#76
                        "VOLTCRAFT PL-125-T4",   #77
                        "+VOLTCRAFT PL-125-T4 34",   #78
+                       "Aillio Bullet R1 BT/ET",       # 79
+                       "+Aillio Bullet R1 Heater/Fan", # 80
+                       "+Aillio Bullet R1 Drum",       # 81
                        ]
 
         #extra devices
@@ -1765,7 +1769,14 @@ class tgraphcanvas(FigureCanvas):
         self.hottop_HEATER = 0 # 0-100
         self.hottop_MAIN_FAN = 0 # 0-10 (!)
         self.hottop_TX = 0.
-        
+
+        # temporary storage to pass values. Holds all values retrieved from an R1 roaster
+        self.r1_ET = -1
+        self.r1_BT = -1
+        self.r1_HEATER = 0 # 0-100
+        self.r1_MAIN_FAN = 0 # 0-10 (!)
+        self.r1_TX = 0.
+
         #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for MODBUS connected devices
         self.extraMODBUSt3 = -1
         self.extraMODBUSt4 = -1
@@ -32139,11 +32150,15 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_D_56, #76
                                    self.VOLTCRAFTPL125T4,     #77
                                    self.VOLTCRAFTPL125T4_34,  #78
+                                   self.R1_BTET,              #79
+                                   self.R1_HF,                #80
+                                   self.R1_DS,                #81
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
         self.externaloutprogram = "out.py" # this program is called with arguments <ET>,<BT>,<ETB>,<BTB> values on each sampling
         self.externaloutprogramFlag = False # if true the externaloutprogram will be called on each sample()
+        self.R1 = AillioR1()
 
 #####################  FUNCTIONS  ############################
     ######### functions used by Fuji PIDs
@@ -32589,6 +32604,18 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2)
         return tx,v1,v2        
+
+    def R1_BTET(self):
+        state = self.R1.getstate()
+        pass
+
+    def R1_HF(self):
+        state = self.R1.getstate()
+        pass
+
+    def R1_DS(self):
+        state = self.R1.getstate()
+        pass
 
     def HOTTOP_BTET(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -39149,6 +39176,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 78 is +VOLTCRAFT PL-125-T4 34 but +DEVICE cannot be set as main device
                 ##########################
+                elif meter == "Aillio Bullet R1 BT/ET":
+                    aw.qmc.device = 79
+                    aw.ser.baudrate = 115200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1.0
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose serial port", None).format(meter)
                 
                 # ADD DEVICE:
 
@@ -39247,6 +39282,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 76
                 3, # 77
                 3, # 78
+                8, # 79
+                8, # 80
+                8, # 81 
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
