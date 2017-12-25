@@ -8116,8 +8116,10 @@ class tgraphcanvas(FigureCanvas):
 
     #CONTEXT MENU  = Right click
     def on_press(self,event):
+        
         if event.inaxes != self.ax: return
         if event.button != 3: return   #select right click only
+        
 
         self.releaseMouse()
         self.mousepress = False
@@ -8161,6 +8163,11 @@ class tgraphcanvas(FigureCanvas):
         designermenu.exec_(QCursor.pos())
 
     def on_pick(self,event):
+        if self.currentx or self.currenty:
+            self.currentx = 0
+            self.currenty = 0
+            return
+        
         self.setCursor(Qt.ClosedHandCursor)
 
         if isinstance(event.ind, (int)):
@@ -8412,6 +8419,7 @@ class tgraphcanvas(FigureCanvas):
 
                 self.redrawdesigner()
                 return i
+                
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
