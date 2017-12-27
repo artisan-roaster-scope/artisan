@@ -9,10 +9,10 @@ import usb1
 #    4) 
 
 class AillioR1:
-    AILLIO_USB_VID = 0x1234
-    AILLIO_USB_PID = 0x4321
+    AILLIO_USB_VID = 0x0483
+    AILLIO_USB_PID = 0x5781
     AILLIO_USB_ENDPOINT = 0x12
-    AILLIO_USB_INTERFACE = 0x12
+    AILLIO_USB_INTERFACE = 0x1
     AILLIO_DEBUG = 1
 
     def __init__(self):
