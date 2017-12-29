@@ -37,7 +37,7 @@ import imp
 import sys
 import ast
 import platform
-import serial
+import serial  # @UnusedImport
 import serial.tools.list_ports
 import math
 import binascii
@@ -53,10 +53,10 @@ import subprocess
 import shlex
 
 if sys.version < '3':
-    import urlparse, urllib
+    import urlparse, urllib # @UnresolvedImport @UnusedImport
 else:
-    import urllib.parse as urlparse
-    import urllib.request as urllib
+    import urllib.parse as urlparse  # @Reimport
+    import urllib.request as urllib  # @Reimport
 
 import artisanlib.arabic_reshaper
 
@@ -83,39 +83,39 @@ sip.setapi('QVariant', 2)
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
 try:
-    from PyQt5.QtCore import QLibraryInfo
+    from PyQt5.QtCore import QLibraryInfo  # @UnusedImport
     pyqtversion = 5
 except Exception as e:
     pyqtversion = 4
 
 if pyqtversion < 5:
-    from PyQt4.QtGui import (QImageReader,QProgressDialog,
-                             QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
-                             QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange,
-                             QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
-                             QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView, QStandardItem, QButtonGroup,
-                             QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton,
-                             QPixmap, QImage, QColor, QColorDialog, QPalette, QFrame, QCheckBox, QDesktopServices, QIcon,
-                             QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QBrush, QRadialGradient,
-                             QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QCursor, QDoubleSpinBox, QTextDocument)
-    from PyQt4.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,
-                              QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,
-                              QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)
+    from PyQt4.QtGui import (QImageReader,QProgressDialog, # @UnresolvedImport @UnusedImport
+                             QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, # @UnresolvedImport @UnusedImport
+                             QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @UnresolvedImport @UnusedImport
+                             QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @UnresolvedImport @UnusedImport
+                             QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView, QStandardItem, # @UnresolvedImport @UnusedImport
+                             QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton, # @UnresolvedImport @UnusedImport
+                             QPixmap, QImage, QColor, QColorDialog, QPalette, QFrame, QCheckBox, QDesktopServices, QIcon, # @UnresolvedImport @UnusedImport
+                             QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QBrush, QRadialGradient, # @UnresolvedImport @UnusedImport
+                             QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QCursor, QDoubleSpinBox, QTextDocument) # @UnresolvedImport @UnusedImport
+    from PyQt4.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, # @UnresolvedImport @UnusedImport @Reimport
+                              QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @UnresolvedImport @UnusedImport
+                              QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore) # @UnresolvedImport @UnusedImport
 else:
-    from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
-                             QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange,
-                             QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
-                             QLCDNumber, QSpinBox, QComboBox, QHeaderView,QButtonGroup,
-                             QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton,
-                             QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog,
-                             QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox)
-    from PyQt5.QtGui import (QImageReader, 
-                                QKeySequence,QStandardItem,QImage,QPixmap,QColor,QPalette,QDesktopServices,QIcon,
-                                QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor,QTextDocument)
-    from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)
-    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,
-                              QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, 
-                              QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)
+    from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,  # @Reimport
+                             QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @Reimport
+                             QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @Reimport
+                             QLCDNumber, QSpinBox, QComboBox, QHeaderView, # @Reimport 
+                             QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton, # @Reimport
+                             QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
+                             QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox) # @Reimport
+    from PyQt5.QtGui import (QImageReader,  # @Reimport
+                                QKeySequence,QStandardItem,QImage,QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
+                                QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor,QTextDocument)  # @Reimport
+    from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
+    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,  # @Reimport
+                              QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
+                              QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
 
 import matplotlib as mpl
 from matplotlib import cm
@@ -156,31 +156,32 @@ import matplotlib.patheffects as PathEffects
 import qrcode
 
 if pyqtversion < 5:
-    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas # @UnresolvedImport @UnusedImport
+    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar # @UnresolvedImport @UnusedImport
 else:
-    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-    from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
+    from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
 
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions # for matplotlib >= v1.4
 except ImportError:
     import matplotlib.backends.qt4_editor.figureoptions as figureoptions # for matplotlib <v1.4
 
-from Phidget22.PhidgetException import *
+#from Phidget22.PhidgetException import * 
 from Phidget22.Net import Net as PhidgetNetwork
 from Phidget22.DeviceClass import DeviceClass
+from Phidget22.DeviceID import DeviceID
 from Phidget22.ThermocoupleType import ThermocoupleType
 from Phidget22.RTDType import RTDType
 from Phidget22.RTDWireSetup import RTDWireSetup
-from Phidget22.BridgeGain import BridgeGain
-from Phidget22.Phidget import *
+from Phidget22.BridgeGain import BridgeGain  # @UnusedImport
+#from Phidget22.Phidget import * 
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
-from Phidget22.Devices.VoltageRatioInput import *
-from Phidget22.Devices.VoltageInput import *
-from Phidget22.Devices.DigitalInput import *
-from Phidget22.Devices.DigitalOutput import *
-from Phidget22.Devices.VoltageOutput import *
+from Phidget22.Devices.VoltageRatioInput import *  # @UnusedWildImport
+from Phidget22.Devices.VoltageInput import * # @UnusedWildImport
+from Phidget22.Devices.DigitalInput import * # @UnusedWildImport
+from Phidget22.Devices.DigitalOutput import * # @UnusedWildImport 
+from Phidget22.Devices.VoltageOutput import * # @UnusedWildImport
 
 
 # import Yoctopuce Python library (installed form PyPI)
@@ -190,19 +191,19 @@ from yoctopuce.yocto_temperature import YTemperature
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
     if str(platform.system()).startswith("Windows"):
-        import win_inet_pton
+        import win_inet_pton # @UnresolvedImport @UnusedImport
 except:
     pass
 
-from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient, BaseModbusClient
+from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder, BinaryPayloadBuilder
 from pymodbus.pdu import ExceptionResponse
 from pymodbus.exceptions import ModbusException
 import socket
-from pymodbus.constants import Defaults
-from pymodbus.transaction import ModbusSocketFramer
-from pymodbus.factory import ClientDecoder
+#from pymodbus.constants import Defaults
+#from pymodbus.transaction import ModbusSocketFramer
+#from pymodbus.factory import ClientDecoder
 
 
 
@@ -217,7 +218,7 @@ from pymodbus.factory import ClientDecoder
 
 
 import json
-import unicodedata
+import unicodedata # @UnresolvedImport
 from unidecode import unidecode
 
 from artisanlib.weblcds import startWeb, stopWeb
@@ -290,15 +291,15 @@ if sys.version < '3':
     def decs2string(x):
         return "".join(chr(b) for b in x)
     def arange(x):
-        return xrange(x)
+        return xrange(x)  # @UndefinedVariable
     def stringp(x):
-        return isinstance(x, basestring)
+        return isinstance(x, basestring)  # @UndefinedVariable
     def uchr(x):
-        return unichr(x)
+        return unichr(x)  # @UndefinedVariable
     def o(x): # converts char to byte
         return ord(x)
     def u(x): # convert to unicode string
-        return unicode(x)
+        return unicode(x)  # @UndefinedVariable
     def d(x):
         if x is not None:
             try:
@@ -309,7 +310,7 @@ if sys.version < '3':
             return None
     def encodeLocal(x):
         if x is not None:
-            return codecs.unicode_escape_encode(unicode(x))[0]
+            return codecs.unicode_escape_encode(unicode(x))[0]  # @UndefinedVariable
         else:
             return None
     def hex2int(h1,h2=""):
@@ -454,7 +455,7 @@ else:
             return False
         else:
             if sys.version < '3':
-                if isinstance(x,unicode):
+                if isinstance(x,unicode):  # @UndefinedVariable
                     if str(x) in ["false","False"]:
                         return False
                     else:
@@ -478,7 +479,7 @@ else:
         return x
     def removeAll(l,s):
         if sys.version < '3':
-            for _ in xrange(l.count(s)):
+            for _ in xrange(l.count(s)):  # @UndefinedVariable
                 l.remove(s)
         else:
             for _ in range(l.count(s)):
@@ -553,7 +554,7 @@ if sys.platform.startswith("darwin"):
     # control app napping on OS X >= 10.9
     import appnope
     # to establish a thread pool on OS X
-    import objc
+    import objc  # @UnusedImport
     import Foundation
 #   list_ports module patched for P3k from new pyserial GitHub repository
     if serial.VERSION.split(".")[0].strip() == "2":
@@ -563,36 +564,34 @@ if sys.platform.startswith("darwin"):
 
 # to make py2exe happy with scipy >0.11
 def __dependencies_for_freezing():
-    import matplotlib.numerix # not to break bbfreeze 1.1.3 on Linux
-    from scipy.sparse.csgraph import _validation
-    from scipy.special import _ufuncs_cxx
-    from scipy import integrate
-    from scipy import interpolate
+    import matplotlib.numerix # not to break bbfreeze 1.1.3 on Linux  @UnresolvedImport @UnusedImport
+    from scipy.sparse.csgraph import _validation # @UnresolvedImport @UnusedImport
+    from scipy.special import _ufuncs_cxx # @UnresolvedImport @UnusedImport
+    from scipy import integrate # @UnresolvedImport @UnusedImport
+    from scipy import interpolate # @UnresolvedImport @UnusedImport
     # to make bbfreeze on Linux and py2exe on Win/Py3 happy with scipy > 0.17.0
-    import scipy.linalg.cython_blas
-    import scipy.linalg.cython_lapack
+    import scipy.linalg.cython_blas # @UnresolvedImport @UnusedImport
+    import scipy.linalg.cython_lapack # @UnresolvedImport @UnusedImport
     
-    import appdirs
-    import packaging
-    import packaging.version
-    import packaging.specifiers
-    import packaging.markers
-    import packaging.requirements
+    import appdirs # @UnresolvedImport @UnusedImport
+    import packaging # @UnresolvedImport @UnusedImport
+    import packaging.version # @UnresolvedImport @UnusedImport
+    import packaging.specifiers # @UnresolvedImport @UnusedImport
+    import packaging.markers # @UnresolvedImport @UnusedImport
+    import packaging.requirements # @UnresolvedImport @UnusedImport
     
     if pyqtversion < 5:
-        import PyQt4.QtSvg
-        import PyQt4.QtXml
-        import PyQt4.QtDBus
-        import PyQt4.QtPrintSupport # needed for by platform plugin libqcocoa
+        import PyQt4.QtSvg # @UnresolvedImport @UnusedImport
+        import PyQt4.QtXml # @UnresolvedImport @UnusedImport
+        import PyQt4.QtDBus # @UnresolvedImport @UnusedImport
+        import PyQt4.QtPrintSupport # needed for by platform plugin libqcocoa # @UnresolvedImport  @UnusedImport
     else:
-        import PyQt5.QtSvg
-        import PyQt5.QtXml
-        import PyQt5.QtDBus # needed for QT5 builds
-        import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa
+        import PyQt5.QtSvg  # @UnusedImport
+        import PyQt5.QtXml  # @UnusedImport
+        import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
+        import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
     # for gevent bundling
-    from gevent import core, resolver_thread, resolver_ares, socket,\
-        threadpool, thread, threading, select, subprocess,\
-        pywsgi, server, baseserver, event, hub
+    from gevent import core, resolver_thread, resolver_ares, socket, threadpool, thread, threading, select, subprocess, pywsgi, server, hub # @UnusedImport @Reimport 
 
 del __dependencies_for_freezing
 
@@ -632,7 +631,7 @@ supported_languages = [
 ]
 if len(locale) == 0:
     if platform.system() == 'Darwin':
-        from Cocoa import NSUserDefaults
+        from Cocoa import NSUserDefaults # @UnresolvedImport
         defs = NSUserDefaults.standardUserDefaults()
         langs = defs.objectForKey_("AppleLanguages")
         locale = langs.objectAtIndex_(0)
@@ -684,7 +683,7 @@ class ArtisanTime():
         else:
             self.clock = libtime.perf_counter()
 
-    def setHMS(self,a,b,c,d):
+    def setHMS(self,*_):
         self.start()
         
     def start(self):
@@ -2048,7 +2047,7 @@ class tgraphcanvas(FigureCanvas):
 
     # hook up to mpls event handling framework for draw events
     # this is emitted after the canvas has finished a full redraw
-    def _draw_event(self, evt):
+    def _draw_event(self, _):
         #self.fig.canvas.flush_events() # THIS prevents the black border on >Qt5.5, but slows down things (especially resizings) on redraw otherwise!!!
         self.ax_background = None
         
@@ -2721,18 +2720,20 @@ class tgraphcanvas(FigureCanvas):
                 # alarm event button
                 button_number = None
                 text = self.alarmstrings[alarmnumber].split('#')[0]
-                try:
-                    button_number = int(str(text)) - 1 # the event buttons presented to the user are numbered from 1 on
-                except Exception:
-                    aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(u(self.alarmstrings[alarmnumber])))
-                if button_number is not None:
-                    if button_number > -1 and button_number < len(aw.buttonlist):
-                        aw.recordextraevent(button_number)
+                bnrs = text.split(',')
+                for bnr in bnrs:
+                    try:
+                        button_number = int(str(bnr.strip())) - 1 # the event buttons presented to the user are numbered from 1 on
+                    except Exception:
+                        aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '{0}' not a number",None).format(u(self.alarmstrings[alarmnumber])))
+                    if button_number is not None:
+                        if button_number > -1 and button_number < len(aw.buttonlist):
+                            aw.recordextraevent(button_number)
             elif self.alarmaction[alarmnumber] in [3,4,5,6]:
                 # alarm slider 1-4
                 slidernr = None
                 try:
-                    text = self.alarmstrings[alarmnumber].split('#')[0]
+                    text = self.alarmstrings[alarmnumber].split('#')[0].strip()
                     slidervalue = max(0,min(100,int(str(text))))
                     if slidervalue < 0 or slidervalue > 100:
                         raise Exception()
@@ -3495,7 +3496,7 @@ class tgraphcanvas(FigureCanvas):
             return int(round(res))
 
     #used by xaxistosm(). Provides also negative time
-    def formtime(self,x,pos):
+    def formtime(self,x,_):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
             starttime = self.timex[self.timeindex[0]]
         else:
@@ -3967,7 +3968,7 @@ class tgraphcanvas(FigureCanvas):
             rcParams['path.effects'] = []
         return [temp_anno, time_anno]
 
-    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,path_effects=None,TP_time=-1,TP_time_loaded=-1):
+    def place_annotations(self,TP_index,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,TP_time=-1,TP_time_loaded=-1):
         ystep_down = ystep_up = 0
         anno_artists = []
         #Add markers for CHARGE
@@ -7593,7 +7594,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " univariateinfo() {0}").format(str(e)),exc_tb.tb_lineno)
             return
 
-    def polyfit(self,xarray,yarray,deg,startindex,endindex,deltacurvep):
+    def polyfit(self,xarray,yarray,deg,startindex,endindex):
         xa = xarray[startindex:endindex]
         ya = yarray[startindex:endindex]
         if len(xa) > 0 and len(xa) == len(ya) and not all(x == 0 for x in xa) and not all(x == 0 for x in ya):
@@ -8199,7 +8200,7 @@ class tgraphcanvas(FigureCanvas):
             self.workingline = 2
 
     #handles when releasing mouse
-    def on_release(self,event):
+    def on_release(self,_):
         self.mousepress = False
         self.setCursor(Qt.OpenHandCursor)
 
@@ -9316,7 +9317,7 @@ class SampleThread(QThread):
 
         # Remove NaNs from input
         if sys.version < '3':
-            r = xrange(n - 1, -1, -1)
+            r = xrange(n - 1, -1, -1)  # @UndefinedVariable
         else:
             r = range(n - 1, -1, -1)
         for i in r:
@@ -9884,7 +9885,7 @@ class SampleThread(QThread):
     def run(self):
         aw.qmc.flagsamplingthreadrunning = True
         if sys.platform.startswith("darwin"):
-            pool = Foundation.NSAutoreleasePool.alloc().init()
+            pool = Foundation.NSAutoreleasePool.alloc().init()  # @UndefinedVariable
         self.afterTP = False
         if not aw.qmc.flagon:
             return
@@ -10245,11 +10246,11 @@ class ApplicationWindow(QMainWindow):
 
         self.fileSaveAction = QAction(UIconst.FILE_MENU_SAVE,self)
         self.fileSaveAction.setShortcut(QKeySequence.Save)
-        self.fileSaveAction.triggered.connect(lambda b=0:self.fileSave(self.curFile))
+        self.fileSaveAction.triggered.connect(lambda _=0:self.fileSave(self.curFile))
         self.fileMenu.addAction(self.fileSaveAction)
 
         self.fileSaveAsAction = QAction(UIconst.FILE_MENU_SAVEAS,self)
-        self.fileSaveAsAction.triggered.connect(lambda b=0:self.fileSave(None))
+        self.fileSaveAsAction.triggered.connect(lambda _=0:self.fileSave(None))
         self.fileMenu.addAction(self.fileSaveAsAction)
 
         self.fileMenu.addSeparator()
@@ -10325,31 +10326,31 @@ class ApplicationWindow(QMainWindow):
         self.saveGraphMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_SAVEGRAPH)
 
         fullsizeAction = QAction(UIconst.FILE_MENU_SAVEGRAPH_FULL_SIZE,self)
-        fullsizeAction.triggered.connect(lambda x=0,y=1:self.resizeImg(0,1))
+        fullsizeAction.triggered.connect(lambda *_:self.resizeImg(0,1))
         self.saveGraphMenu.addAction(fullsizeAction)
 
         largeSizeAction = QAction(UIconst.FILE_MENU_SAVEGRAPH_Large,self)
-        largeSizeAction.triggered.connect(lambda x=1200,y=1:self.resizeImg(1200,1))
+        largeSizeAction.triggered.connect(lambda *_:self.resizeImg(1200,1))
         self.saveGraphMenu.addAction(largeSizeAction)
 
         KaffeeNetzAction = QAction("Kaffee-Netz.de (800x?)...",self)
-        KaffeeNetzAction.triggered.connect(lambda x=800,y=1:self.resizeImg(800,1))
+        KaffeeNetzAction.triggered.connect(lambda *_:self.resizeImg(800,1))
         self.saveGraphMenu.addAction(KaffeeNetzAction)
 
         HomeBaristaAction = QAction("Home-Barista.com (700x?)...",self)
-        HomeBaristaAction.triggered.connect(lambda x=700,y=1:self.resizeImg(700,1))
+        HomeBaristaAction.triggered.connect(lambda *_:self.resizeImg(700,1))
         self.saveGraphMenu.addAction(HomeBaristaAction)
 
         RiktigtKaffeAction = QAction("RiktigtKaffe.se (620x?)...",self)
-        RiktigtKaffeAction.triggered.connect(lambda x=620,y=1:self.resizeImg(620,1))
+        RiktigtKaffeAction.triggered.connect(lambda *_:self.resizeImg(620,1))
         self.saveGraphMenu.addAction(RiktigtKaffeAction)
 
         PlanetCafeAction = QAction("PlanetCafe.fr (600x?)...",self)
-        PlanetCafeAction.triggered.connect(lambda x=600,y=1:self.resizeImg(600,1))
+        PlanetCafeAction.triggered.connect(lambda *_:self.resizeImg(600,1))
         self.saveGraphMenu.addAction(PlanetCafeAction)
 
         CoffeeGeekAction = QAction("CoffeeGeek.com (500x?)...",self)
-        CoffeeGeekAction.triggered.connect(lambda x=500,y=1:self.resizeImg(500,1))
+        CoffeeGeekAction.triggered.connect(lambda *_:self.resizeImg(500,1))
         self.saveGraphMenu.addAction(CoffeeGeekAction)
         
         SVGAction = QAction("SVG...",self)
@@ -10444,11 +10445,11 @@ class ApplicationWindow(QMainWindow):
         self.temperatureMenu = self.GraphMenu.addMenu(UIconst.ROAST_MENU_TEMPERATURE)
 
         self.ConvertToFahrenheitAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_FAHRENHEIT,self)
-        self.ConvertToFahrenheitAction.triggered.connect(lambda t="F":self.qmc.convertTemperature("F"))
+        self.ConvertToFahrenheitAction.triggered.connect(lambda _:self.qmc.convertTemperature("F"))
         self.temperatureMenu.addAction(self.ConvertToFahrenheitAction)
 
         self.ConvertToCelsiusAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_CELSIUS,self)
-        self.ConvertToCelsiusAction.triggered.connect(lambda t="C":self.qmc.convertTemperature("C"))
+        self.ConvertToCelsiusAction.triggered.connect(lambda _:self.qmc.convertTemperature("C"))
         self.temperatureMenu.addAction(self.ConvertToCelsiusAction)
 
         self.FahrenheitAction = QAction(UIconst.ROAST_MENU_FAHRENHEIT_MODE,self)
@@ -10554,7 +10555,7 @@ class ApplicationWindow(QMainWindow):
         self.ConfMenu.addSeparator()
 
         self.colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
-        self.colorsAction.triggered.connect(lambda x=3:self.qmc.changeGColor(3))
+        self.colorsAction.triggered.connect(lambda _:self.qmc.changeGColor(3))
         self.ConfMenu.addAction(self.colorsAction)
 
         autosaveAction = QAction(UIconst.CONF_MENU_AUTOSAVE,self)
@@ -10571,147 +10572,147 @@ class ApplicationWindow(QMainWindow):
 
         self.ArabicLanguage = QAction(UIconst.CONF_MENU_ARABIC,self)
         self.ArabicLanguage.setCheckable(True)
-        self.ArabicLanguage.triggered.connect(lambda lang="ar":self.changelocale("ar"))
+        self.ArabicLanguage.triggered.connect(lambda _:self.changelocale("ar"))
         self.languageMenu.addAction(self.ArabicLanguage)
         if locale == "ar":
             self.ArabicLanguage.setChecked(True)
 
         self.GermanLanguage = QAction(UIconst.CONF_MENU_GERMAN,self)
         self.GermanLanguage.setCheckable(True)
-        self.GermanLanguage.triggered.connect(lambda lang="de":self.changelocale("de"))
+        self.GermanLanguage.triggered.connect(lambda _:self.changelocale("de"))
         self.languageMenu.addAction(self.GermanLanguage)
         if locale == "de":
             self.GermanLanguage.setChecked(True)
 
         self.GreekLanguage = QAction(UIconst.CONF_MENU_GREEK,self)
         self.GreekLanguage.setCheckable(True)
-        self.GreekLanguage.triggered.connect(lambda lang="el":self.changelocale("el"))
+        self.GreekLanguage.triggered.connect(lambda _:self.changelocale("el"))
         self.languageMenu.addAction(self.GreekLanguage)
         if locale == "el":
             self.GreekLanguage.setChecked(True)
 
         self.EnglishLanguage = QAction(UIconst.CONF_MENU_ENGLISH,self)
         self.EnglishLanguage.setCheckable(True)
-        self.EnglishLanguage.triggered.connect(lambda lang="en":self.changelocale("en"))
+        self.EnglishLanguage.triggered.connect(lambda _:self.changelocale("en"))
         self.languageMenu.addAction(self.EnglishLanguage)
         if locale == "en" or locale == "en_US":
             self.EnglishLanguage.setChecked(True)
 
         self.SpanishLanguage = QAction(UIconst.CONF_MENU_SPANISH,self)
         self.SpanishLanguage.setCheckable(True)
-        self.SpanishLanguage.triggered.connect(lambda lang="es":self.changelocale("es"))
+        self.SpanishLanguage.triggered.connect(lambda _:self.changelocale("es"))
         self.languageMenu.addAction(self.SpanishLanguage) 
         if locale == "es":
             self.SpanishLanguage.setChecked(True)
 
         self.FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
         self.FinishLanguage.setCheckable(True)
-        self.FinishLanguage.triggered.connect(lambda lang="fi":self.changelocale("fi"))
+        self.FinishLanguage.triggered.connect(lambda _:self.changelocale("fi"))
         self.languageMenu.addAction(self.FinishLanguage)
         if locale == "fi":
             self.FinishLanguage.setChecked(True)
 
         self.FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
         self.FrenchLanguage.setCheckable(True)
-        self.FrenchLanguage.triggered.connect(lambda lang="fr":self.changelocale("fr"))
+        self.FrenchLanguage.triggered.connect(lambda _:self.changelocale("fr"))
         self.languageMenu.addAction(self.FrenchLanguage)
         if locale == "fr":
             self.FrenchLanguage.setChecked(True)
 
         self.HebrewLanguage = QAction(UIconst.CONF_MENU_HEBREW,self)
         self.HebrewLanguage.setCheckable(True)
-        self.HebrewLanguage.triggered.connect(lambda lang="he":self.changelocale("he"))
+        self.HebrewLanguage.triggered.connect(lambda _:self.changelocale("he"))
         self.languageMenu.addAction(self.HebrewLanguage)
         if locale == "he":
             self.HebrewLanguage.setChecked(True)
 
         self.HungarianLanguage = QAction(UIconst.CONF_MENU_HUNGARIAN,self)
         self.HungarianLanguage.setCheckable(True)
-        self.HungarianLanguage.triggered.connect(lambda lang="hu":self.changelocale("hu"))
+        self.HungarianLanguage.triggered.connect(lambda _:self.changelocale("hu"))
         self.languageMenu.addAction(self.HungarianLanguage)
         if locale == "hu":
             self.HungarianLanguage.setChecked(True)
 
         self.IndonesianLanguage = QAction(UIconst.CONF_MENU_INDONESIAN,self)
         self.IndonesianLanguage.setCheckable(True)
-        self.IndonesianLanguage.triggered.connect(lambda lang="id":self.changelocale("id"))
+        self.IndonesianLanguage.triggered.connect(lambda _:self.changelocale("id"))
         self.languageMenu.addAction(self.IndonesianLanguage)
         if locale == "id":
             self.IndonesianLanguage.setChecked(True)
 
         self.ItalianLanguage = QAction(UIconst.CONF_MENU_ITALIAN,self)
         self.ItalianLanguage.setCheckable(True)
-        self.ItalianLanguage.triggered.connect(lambda lang="it":self.changelocale("it"))
+        self.ItalianLanguage.triggered.connect(lambda _:self.changelocale("it"))
         self.languageMenu.addAction(self.ItalianLanguage) 
         if locale == "it":
             self.ItalianLanguage.setChecked(True)
 
         self.JapaneseLanguage = QAction(UIconst.CONF_MENU_JAPANESE,self)
         self.JapaneseLanguage.setCheckable(True)
-        self.JapaneseLanguage.triggered.connect(lambda lang="ja":self.changelocale("ja"))
+        self.JapaneseLanguage.triggered.connect(lambda _:self.changelocale("ja"))
         self.languageMenu.addAction(self.JapaneseLanguage)
         if locale == "ja":
             self.JapaneseLanguage.setChecked(True)
 
         self.KoreanLanguage = QAction(UIconst.CONF_MENU_KOREAN,self)
         self.KoreanLanguage.setCheckable(True)
-        self.KoreanLanguage.triggered.connect(lambda lang="ko":self.changelocale("ko"))
+        self.KoreanLanguage.triggered.connect(lambda _:self.changelocale("ko"))
         self.languageMenu.addAction(self.KoreanLanguage)
         if locale == "ko":
             self.KoreanLanguage.setChecked(True)
 
         self.DutchLanguage = QAction(UIconst.CONF_MENU_DUTCH,self)
         self.DutchLanguage.setCheckable(True)
-        self.DutchLanguage.triggered.connect(lambda lang="nl":self.changelocale("nl"))
+        self.DutchLanguage.triggered.connect(lambda _:self.changelocale("nl"))
         self.languageMenu.addAction(self.DutchLanguage)
         if locale == "nl":
             self.DutchLanguage.setChecked(True)
 
         self.NorwegianLanguage = QAction(UIconst.CONF_MENU_NORWEGIAN,self)
         self.NorwegianLanguage.setCheckable(True)
-        self.NorwegianLanguage.triggered.connect(lambda lang="no":self.changelocale("no"))
+        self.NorwegianLanguage.triggered.connect(lambda _:self.changelocale("no"))
         self.languageMenu.addAction(self.NorwegianLanguage)
         if locale == "no":
             self.NorwegianLanguage.setChecked(True)
 
         self.PortugueseLanguage = QAction(UIconst.CONF_MENU_PORTUGUESE,self)
         self.PortugueseLanguage.setCheckable(True)
-        self.PortugueseLanguage.triggered.connect(lambda lang="pt":self.changelocale("pt"))
+        self.PortugueseLanguage.triggered.connect(lambda _:self.changelocale("pt"))
         self.languageMenu.addAction(self.PortugueseLanguage)
         if locale == "pt":
             self.PortugueseLanguage.setChecked(True)
 
         self.PolishLanguage = QAction(UIconst.CONF_MENU_POLISH,self)
         self.PolishLanguage.setCheckable(True)
-        self.PolishLanguage.triggered.connect(lambda lang="pl":self.changelocale("pl"))
+        self.PolishLanguage.triggered.connect(lambda _:self.changelocale("pl"))
         self.languageMenu.addAction(self.PolishLanguage)
         if locale == "pl":
             self.PolishLanguage.setChecked(True)
 
         self.RussianLanguage = QAction(UIconst.CONF_MENU_RUSSIAN,self)
         self.RussianLanguage.setCheckable(True)
-        self.RussianLanguage.triggered.connect(lambda lang="ru":self.changelocale("ru"))
+        self.RussianLanguage.triggered.connect(lambda _:self.changelocale("ru"))
         self.languageMenu.addAction(self.RussianLanguage)
         if locale == "ru":
             self.RussianLanguage.setChecked(True)
 
         self.SwedishLanguage = QAction(UIconst.CONF_MENU_SWEDISH,self)
         self.SwedishLanguage.setCheckable(True)
-        self.SwedishLanguage.triggered.connect(lambda lang="sv":self.changelocale("sv"))
+        self.SwedishLanguage.triggered.connect(lambda _:self.changelocale("sv"))
         self.languageMenu.addAction(self.SwedishLanguage) 
         if locale == "sv":
             self.SwedishLanguage.setChecked(True)
             
         self.ThaiLanguage = QAction(UIconst.CONF_MENU_THAI,self)
         self.ThaiLanguage.setCheckable(True)
-        self.ThaiLanguage.triggered.connect(lambda lang="th":self.changelocale("th"))
+        self.ThaiLanguage.triggered.connect(lambda _:self.changelocale("th"))
         self.languageMenu.addAction(self.ThaiLanguage)
         if locale == "th":
             self.ThaiLanguage.setChecked(True)
 
         self.TurkishLanguage = QAction(UIconst.CONF_MENU_TURKISH,self)
         self.TurkishLanguage.setCheckable(True)
-        self.TurkishLanguage.triggered.connect(lambda lang="tr":self.changelocale("tr"))
+        self.TurkishLanguage.triggered.connect(lambda _:self.changelocale("tr"))
         self.languageMenu.addAction(self.TurkishLanguage)
         if locale == "tr":
             self.TurkishLanguage.setChecked(True)
@@ -10719,7 +10720,7 @@ class ApplicationWindow(QMainWindow):
         # simplified Chinese
         self.ChineseChinaLanguage = QAction(UIconst.CONF_MENU_CHINESE_CN,self)
         self.ChineseChinaLanguage.setCheckable(True)
-        self.ChineseChinaLanguage.triggered.connect(lambda lang="zh_CN":self.changelocale("zh_CN"))
+        self.ChineseChinaLanguage.triggered.connect(lambda _:self.changelocale("zh_CN"))
         self.languageMenu.addAction(self.ChineseChinaLanguage) 
         if locale == "zh_CN":
             self.ChineseChinaLanguage.setChecked(True)
@@ -10727,7 +10728,7 @@ class ApplicationWindow(QMainWindow):
         # traditional Chinese
         self.ChineseTaiwanLanguage = QAction(UIconst.CONF_MENU_CHINESE_TW,self)
         self.ChineseTaiwanLanguage.setCheckable(True)
-        self.ChineseTaiwanLanguage.triggered.connect(lambda lang="zh_TW":self.changelocale("zh_TW"))
+        self.ChineseTaiwanLanguage.triggered.connect(lambda _:self.changelocale("zh_TW"))
         self.languageMenu.addAction(self.ChineseTaiwanLanguage) 
         if locale == "zh_TW":
             self.ChineseTaiwanLanguage.setChecked(True)
@@ -11075,12 +11076,12 @@ class ApplicationWindow(QMainWindow):
         self.button_20.clicked.connect(lambda _:self.qmc.markCoolEnd())
 
         #connect PID sv easy buttons
-        self.button_12.clicked.connect(lambda x=5: self.adjustPIDsv(5))
-        self.button_13.clicked.connect(lambda x=10: self.adjustPIDsv(10))
-        self.button_14.clicked.connect(lambda x=20: self.adjustPIDsv(20))
-        self.button_15.clicked.connect(lambda x=-20: self.adjustPIDsv(-20))
-        self.button_16.clicked.connect(lambda x=-10: self.adjustPIDsv(-10))
-        self.button_17.clicked.connect(lambda x=-5: self.adjustPIDsv(-5))
+        self.button_12.clicked.connect(lambda _: self.adjustPIDsv(5))
+        self.button_13.clicked.connect(lambda _: self.adjustPIDsv(10))
+        self.button_14.clicked.connect(lambda _: self.adjustPIDsv(20))
+        self.button_15.clicked.connect(lambda _: self.adjustPIDsv(-20))
+        self.button_16.clicked.connect(lambda _: self.adjustPIDsv(-10))
+        self.button_17.clicked.connect(lambda _: self.adjustPIDsv(-5))
 
         # NavigationToolbar VMToolbar
         #self.ntb = NavigationToolbar(self.qmc, self.main_widget)        
@@ -11528,7 +11529,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox1.setVisible(False)
         self.slider1.setTracking(False)
         self.slider1.sliderMoved.connect(lambda v=0:self.updateSliderLCD(0,v))
-        self.slider1.valueChanged.connect(lambda v=0:self.sliderReleased(0,updateLCD=True))
+        self.slider1.valueChanged.connect(lambda _:self.sliderReleased(0,updateLCD=True))
         self.slider1.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.slider2 = self.slider()
@@ -11548,7 +11549,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox2.setVisible(False)
         self.slider2.setTracking(False)
         self.slider2.sliderMoved.connect(lambda v=0:self.updateSliderLCD(1,v))
-        self.slider2.valueChanged.connect(lambda v=0:self.sliderReleased(1,updateLCD=True))
+        self.slider2.valueChanged.connect(lambda _:self.sliderReleased(1,updateLCD=True))
         self.slider2.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.slider3 = self.slider()
@@ -11568,7 +11569,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox3.setVisible(False)
         self.slider3.setTracking(False)
         self.slider3.sliderMoved.connect(lambda v=0:self.updateSliderLCD(2,v))
-        self.slider3.valueChanged.connect(lambda v=0:self.sliderReleased(2,updateLCD=True))
+        self.slider3.valueChanged.connect(lambda _:self.sliderReleased(2,updateLCD=True))
         self.slider3.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.slider4 = self.slider()
@@ -11588,7 +11589,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox4.setVisible(False)
         self.slider4.setTracking(False)
         self.slider4.sliderMoved.connect(lambda v=0:self.updateSliderLCD(3,v))
-        self.slider4.valueChanged.connect(lambda v=0:self.sliderReleased(3,updateLCD=True))
+        self.slider4.valueChanged.connect(lambda _:self.sliderReleased(3,updateLCD=True))
         self.slider4.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.sliderSV = self.slider()
@@ -11611,7 +11612,7 @@ class ApplicationWindow(QMainWindow):
         #self.sliderSV.setTracking(False)
         #self.sliderSV.sliderMoved.connect(lambda v=0:self.updateSVSliderLCD(v))
         self.sliderSV.valueChanged.connect(lambda v=0:self.updateSVSliderLCD(v))
-        self.sliderSV.sliderReleased.connect(lambda v=0:self.sliderSVreleased())
+        self.sliderSV.sliderReleased.connect(lambda _:self.sliderSVreleased())
         self.sliderSV.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         sliderGrp12 = QVBoxLayout()
@@ -11958,7 +11959,7 @@ class ApplicationWindow(QMainWindow):
         res_last = None
         try:
             if sys.version < '3':
-                r = xrange(len(aw.qmc.specialeventstype) - 1, -1, -1)
+                r = xrange(len(aw.qmc.specialeventstype) - 1, -1, -1)  # @UndefinedVariable
             else:
                 r = range(len(aw.qmc.specialeventstype) - 1, -1, -1)
             for i in r:
@@ -13318,10 +13319,10 @@ class ApplicationWindow(QMainWindow):
                     try:
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                     except AttributeError:
-                        startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW
+                        startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW  # @UndefinedVariable
                     if sys.version < '3':
-                        import locale
-                        prg_file = u(qd.absolutePath()).encode(locale.getpreferredencoding())
+                        import locale as locl
+                        prg_file = u(qd.absolutePath()).encode(locl.getpreferredencoding())
                     else:
                         prg_file = u(qd.absolutePath())
 #                    CREATE_NEW_PROCESS_GROUP = 0x00000200
@@ -13438,19 +13439,19 @@ class ApplicationWindow(QMainWindow):
         elif reply == QMessageBox.Cancel:
             return
 
-    def on_actionCut_triggered(self,checked=None):
+    def on_actionCut_triggered(self,_=None):
         try:
             app.activeWindow().focusWidget().cut()
         except Exception:
             pass
 
-    def on_actionCopy_triggered(self,checked=None):
+    def on_actionCopy_triggered(self,_=None):
         try:
             app.activeWindow().focusWidget().copy()
         except Exception:
             pass
 
-    def on_actionPaste_triggered(self,checked=None):
+    def on_actionPaste_triggered(self,_=None):
         try:
             app.activeWindow().focusWidget().paste()
         except Exception:
@@ -18817,7 +18818,7 @@ class ApplicationWindow(QMainWindow):
     #  . "roastdate": QDateTime
     #  . "beans": string
     #  . "weight": [<weight-in>:float,<weight-out>:float,<units>: string] or None
-    def profileProductionData(self,profile,c):
+    def profileProductionData(self,profile):
         res = {}
         # id ("prefix+nr (sequence)")
         if "roastbatchprefix" in profile:
@@ -18891,7 +18892,7 @@ class ApplicationWindow(QMainWindow):
                 # collect data
                 c = 1
                 for p in profiles:
-                    d = self.profileProductionData(p,c)
+                    d = self.profileProductionData(p)
                     last_unit = d["weight"][2]
                     total_in += aw.convertWeight(d["weight"][0],aw.qmc.weight_units.index(last_unit),aw.qmc.weight_units.index(unit))
                     total_out += aw.convertWeight(d["weight"][1],aw.qmc.weight_units.index(last_unit),aw.qmc.weight_units.index(unit))
@@ -18963,7 +18964,7 @@ class ApplicationWindow(QMainWindow):
                     c = 1
                     for p in profiles:
                         try:
-                            d = self.productionData2string(self.profileProductionData(self.deserialize(p),c),units=False)
+                            d = self.productionData2string(self.profileProductionData(self.deserialize(p)),units=False)
                             writer.writerow([
                                 s2a(d["id"]),
                                 s2a(d["time"]),
@@ -18994,10 +18995,10 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # open file
                     from openpyxl import Workbook
-                    from openpyxl.compat import range
+                    from openpyxl.compat import range  # @UnusedImport
                     #from openpyxl.cell import get_column_letter
-                    from openpyxl.utils.cell import get_column_letter 
-                    from openpyxl.styles import Font, Fill
+                    from openpyxl.utils.cell import get_column_letter  # @UnusedImport 
+                    from openpyxl.styles import Font, Fill  # @UnusedImport
                     wb = Workbook()
                     ws = wb.active # wb.create_sheet()
                     ws.title = u(QApplication.translate("HTML Report Template", "Production Report",None)) 
@@ -19028,7 +19029,7 @@ class ApplicationWindow(QMainWindow):
                     c = 1
                     for p in profiles:
                         try:
-                            raw_data = self.profileProductionData(self.deserialize(p),c)
+                            raw_data = self.profileProductionData(self.deserialize(p))
                             c += 1
                             d = self.productionData2string(raw_data,units=False)
                             ws['A{0}'.format(c)] = d["id"]
@@ -19312,10 +19313,10 @@ class ApplicationWindow(QMainWindow):
             cuppings_count = 0
             handles = []
             labels = []
-            color=iter(cm.tab10(numpy.linspace(0,1,10)))
+            color=iter(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable
             # collect data
             c = 1
-            foreground_profile_path = aw.curFile
+            foreground_profile_path = aw.curFile  # @UndefinedVariable
             # clear graph
             self.qmc.reset()
             min_start_time = aw.qmc.startofx
@@ -19327,7 +19328,7 @@ class ApplicationWindow(QMainWindow):
             first_profile_event_time = 0
             max_drop_time = 0
             for p in profiles:
-                pd = self.profileProductionData(p,c)
+                pd = self.profileProductionData(p)
                 c += 1
                 rd = self.profileRankingData(p)
                 i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
@@ -19557,12 +19558,12 @@ class ApplicationWindow(QMainWindow):
                         
                     # generate the bar graph 
                     prop.set_size("small")  
-                    color=iter(cm.tab10(numpy.linspace(0,1,10)))      
+                    color=iter(cm.tab10(numpy.linspace(0,1,10)))    # @UndefinedVariable   
                     for p in profiles:
                         i -= 1
                         cl = (next(color),'#00b950', '#ffb347', '#9f7960')
                         rd = self.profileRankingData(p)
-                        pd = self.profileProductionData(p,c)
+                        pd = self.profileProductionData(p)
                         label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))[:8]
                         if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
                             ax.broken_barh( [ (0, m), 
@@ -19671,7 +19672,7 @@ class ApplicationWindow(QMainWindow):
                     c = 1
                     for p in profiles:
                         try:
-                            pd = self.productionData2string(self.profileProductionData(self.deserialize(p),c),units=False)
+                            pd = self.productionData2string(self.profileProductionData(self.deserialize(p)),units=False)
                             c += 1
                             dct = self.profileRankingData(self.deserialize(p))
                             rd = self.rankingData2string(dct,units=False)
@@ -19713,10 +19714,10 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # open file
                     from openpyxl import Workbook
-                    from openpyxl.compat import range
+                    from openpyxl.compat import range  # @UnusedImport
                     #from openpyxl.cell import get_column_letter
-                    from openpyxl.utils.cell import get_column_letter 
-                    from openpyxl.styles import Font, Fill
+                    from openpyxl.utils.cell import get_column_letter  # @UnusedImport
+                    from openpyxl.styles import Font, Fill # @UnusedImport
                     wb = Workbook()
                     ws = wb.active # wb.create_sheet()
                     ws.title = u(QApplication.translate("HTML Report Template", "Production Report",None)) 
@@ -19764,7 +19765,7 @@ class ApplicationWindow(QMainWindow):
                     c = 1
                     for p in profiles:
                         try:
-                            raw_data = self.profileProductionData(self.deserialize(p),c)
+                            raw_data = self.profileProductionData(self.deserialize(p))
                             c += 1
                             rd = self.profileRankingData(self.deserialize(p))
                             d = self.productionData2string(raw_data,units=False)
@@ -22501,12 +22502,12 @@ class ArtisanMessageBox(QMessageBox):
         self.timeout = timeout # configured timeout, defaults to 0 (no timeout)
         self.currentTime = 0 # counts seconds after timer start
         
-    def showEvent(self,event):
+    def showEvent(self,_):
         self.currentTime = 0
         if (self.timeout and self.timeout != 0):
             self.startTimer(1000)
     
-    def timerEvent(self,event):
+    def timerEvent(self,_):
         self.currentTime = self.currentTime + 1
         if (self.currentTime >= self.timeout):
             self.done(0)
@@ -22587,7 +22588,7 @@ class HUDDlg(ArtisanDialog):
         self.DeltaFilter.setRange(0,40)
         self.DeltaFilter.setAlignment(Qt.AlignRight)
         self.DeltaFilter.setValue(aw.qmc.deltafilter/2)
-        self.DeltaFilter.editingFinished.connect(lambda x=0:self.changeDeltaFilter(0))
+        self.DeltaFilter.editingFinished.connect(lambda _=0:self.changeDeltaFilter())
         curvefilterlabel = QLabel(QApplication.translate("Label", "Smooth Curves",None))
         #Filter holds the number of pads in filter
         self.Filter = QSpinBox()
@@ -22595,7 +22596,7 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setRange(0,40)
         self.Filter.setAlignment(Qt.AlignRight)
         self.Filter.setValue(aw.qmc.curvefilter/2)
-        self.Filter.editingFinished.connect(lambda x=0:self.changeFilter(0))        
+        self.Filter.editingFinished.connect(lambda _=0:self.changeFilter())        
         windowlabel = QLabel(QApplication.translate("Label", "Window",None))
         #Window holds the number of pads in filter
         self.Window = QSpinBox()
@@ -22603,32 +22604,32 @@ class HUDDlg(ArtisanDialog):
         self.Window.setRange(0,40)
         self.Window.setAlignment(Qt.AlignRight)
         self.Window.setValue(aw.qmc.smoothingwindowsize)
-        self.Window.editingFinished.connect(lambda x=0:self.changeWindow(0))        
+        self.Window.editingFinished.connect(lambda _=0:self.changeWindow())
         #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None))
         self.FilterSpikes.setChecked(aw.qmc.filterDropOuts)
-        self.FilterSpikes.stateChanged.connect(lambda i=0:self.changeDropFilter(i))
+        self.FilterSpikes.stateChanged.connect(lambda _=0:self.changeDropFilter())
         self.FilterSpikes.setFocusPolicy(Qt.NoFocus)    
         #altsmoothing
         self.AltSmoothing = QCheckBox(QApplication.translate("CheckBox", "Smooth2",None))
         self.AltSmoothing.setChecked(aw.qmc.altsmoothing)
-        self.AltSmoothing.stateChanged.connect(lambda i=0:self.changeAltSmoothing(i))
+        self.AltSmoothing.stateChanged.connect(lambda _=0:self.changeAltSmoothing())
         self.AltSmoothing.setFocusPolicy(Qt.NoFocus)
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None))
         self.DropSpikes.setChecked(aw.qmc.dropSpikes)
-        self.DropSpikes.stateChanged.connect(lambda i=0:self.changeSpikeFilter(i))
+        self.DropSpikes.stateChanged.connect(lambda _=0:self.changeSpikeFilter())
         self.DropSpikes.setFocusPolicy(Qt.NoFocus)
         #min-max-limits
         self.MinMaxLimits = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
         self.MinMaxLimits.setChecked(aw.qmc.minmaxLimits)
-        self.MinMaxLimits.stateChanged.connect(lambda i=0:self.changeMinMaxLimits(i))
+        self.MinMaxLimits.stateChanged.connect(lambda _=0:self.changeMinMaxLimits())
         self.MinMaxLimits.setFocusPolicy(Qt.NoFocus)
         #swapETBT flag
         self.swapETBT = QCheckBox(QApplication.translate("Label", "ET", None) + " <-> " + QApplication.translate("Label", "BT", None))
         self.swapETBT.setChecked(aw.qmc.swapETBT)
         self.swapETBT.setFocusPolicy(Qt.NoFocus)
-        self.swapETBT.stateChanged.connect(lambda i=0:self.changeSwapETBT(i))
+        self.swapETBT.stateChanged.connect(lambda _=0:self.changeSwapETBT())
         #limits
         minlabel = QLabel(QApplication.translate("Label", "min",None))
         maxlabel = QLabel(QApplication.translate("Label", "max",None))
@@ -22656,9 +22657,9 @@ class HUDDlg(ArtisanDialog):
         self.projectionmodeComboBox.setCurrentIndex(aw.qmc.projectionmode)
         self.projectionmodeComboBox.currentIndexChanged.connect(lambda i=self.projectionmodeComboBox.currentIndex() :self.changeProjectionMode(i))
         self.projectCheck.setChecked(aw.qmc.projectFlag)
-        self.DeltaET.stateChanged.connect(lambda i=0:self.changeDeltaET(i))         #toggle
-        self.DeltaBT.stateChanged.connect(lambda i=0:self.changeDeltaBT(i))         #toggle
-        self.projectCheck.stateChanged.connect(lambda i=0:self.changeProjection(i)) #toggle
+        self.DeltaET.stateChanged.connect(lambda _=0:self.changeDeltaET())         #toggle
+        self.DeltaBT.stateChanged.connect(lambda _=0:self.changeDeltaBT())         #toggle
+        self.projectCheck.stateChanged.connect(lambda _=0:self.changeProjection()) #toggle
         
         deltaSpanLabel = QLabel(QApplication.translate("Label", "Delta Span",None))
         self.deltaSpan = QComboBox()
@@ -22741,9 +22742,9 @@ class HUDDlg(ArtisanDialog):
         self.DeltaBTlcd.setChecked(aw.qmc.DeltaBTlcdflag)
         self.DecimalPlaceslcd = QCheckBox(QApplication.translate("CheckBox", "Decimal Places",None))
         self.DecimalPlaceslcd.setChecked(aw.qmc.LCDdecimalplaces)
-        self.DeltaETlcd.stateChanged.connect(lambda i=0:self.changeDeltaETlcd(i))         #toggle
-        self.DeltaBTlcd.stateChanged.connect(lambda i=0:self.changeDeltaBTlcd(i))         #toggle
-        self.DecimalPlaceslcd.stateChanged.connect(lambda i=0:self.changeDecimalPlaceslcd(i))         #toggle
+        self.DeltaETlcd.stateChanged.connect(lambda _=0:self.changeDeltaETlcd())         #toggle
+        self.DeltaBTlcd.stateChanged.connect(lambda _=0:self.changeDeltaBTlcd())         #toggle
+        self.DecimalPlaceslcd.stateChanged.connect(lambda _=0:self.changeDecimalPlaceslcd())         #toggle
         lcdsLayout = QHBoxLayout()
         lcdsLayout.addWidget(self.DeltaETlcd)
         lcdsLayout.addSpacing(15)
@@ -22832,7 +22833,7 @@ class HUDDlg(ArtisanDialog):
         self.PathEffects.setRange(0,5)
         self.PathEffects.setAlignment(Qt.AlignRight)
         self.PathEffects.setValue(aw.qmc.patheffects)
-        self.PathEffects.editingFinished.connect(lambda x=0:self.changePathEffects())
+        self.PathEffects.editingFinished.connect(lambda _:self.changePathEffects())
         pathEffectsLayout = QHBoxLayout()
         pathEffectsLayout.addWidget(effectslabel)
         pathEffectsLayout.addWidget(self.PathEffects)
@@ -22915,31 +22916,31 @@ class HUDDlg(ArtisanDialog):
 
         color1Button = QPushButton(QApplication.translate("Button","Color",None))
         color1Button.setFocusPolicy(Qt.NoFocus)
-        color1Button.clicked.connect(lambda x=0: self.setcurvecolor(0))
+        color1Button.clicked.connect(lambda _: self.setcurvecolor(0))
         color2Button = QPushButton(QApplication.translate("Button","Color",None))
         color2Button.setFocusPolicy(Qt.NoFocus)
-        color2Button.clicked.connect(lambda x=1: self.setcurvecolor(1))
+        color2Button.clicked.connect(lambda _: self.setcurvecolor(1))
         color3Button = QPushButton(QApplication.translate("Button","Color",None))
         color3Button.setFocusPolicy(Qt.NoFocus)
-        color3Button.clicked.connect(lambda x=2: self.setcurvecolor(2))
+        color3Button.clicked.connect(lambda _: self.setcurvecolor(2))
         color4Button = QPushButton(QApplication.translate("Button","Color",None))
         color4Button.setFocusPolicy(Qt.NoFocus)
-        color4Button.clicked.connect(lambda x=3: self.setcurvecolor(3))
+        color4Button.clicked.connect(lambda _: self.setcurvecolor(3))
         color5Button = QPushButton(QApplication.translate("Button","Color",None))
         color5Button.setFocusPolicy(Qt.NoFocus)
-        color5Button.clicked.connect(lambda x=4: self.setcurvecolor(4))
+        color5Button.clicked.connect(lambda _: self.setcurvecolor(4))
         color6Button = QPushButton(QApplication.translate("Button","Color",None))
         color6Button.setFocusPolicy(Qt.NoFocus)
-        color6Button.clicked.connect(lambda x=5: self.setcurvecolor(5))
+        color6Button.clicked.connect(lambda _: self.setcurvecolor(5))
         color7Button = QPushButton(QApplication.translate("Button","Color",None))
         color7Button.setFocusPolicy(Qt.NoFocus)
-        color7Button.clicked.connect(lambda x=6: self.setcurvecolor(6))
+        color7Button.clicked.connect(lambda _: self.setcurvecolor(6))
         color8Button = QPushButton(QApplication.translate("Button","Color",None))
         color8Button.setFocusPolicy(Qt.NoFocus)
-        color8Button.clicked.connect(lambda x=7: self.setcurvecolor(7))
+        color8Button.clicked.connect(lambda _: self.setcurvecolor(7))
         color9Button = QPushButton(QApplication.translate("Button","Color",None))
         color9Button.setFocusPolicy(Qt.NoFocus)
-        color9Button.clicked.connect(lambda x=8: self.setcurvecolor(8))
+        color9Button.clicked.connect(lambda _: self.setcurvecolor(8))
         self.equc1colorlabel = QLabel("  ")
         self.equc2colorlabel = QLabel("  ")
         self.equc3colorlabel = QLabel("  ")
@@ -22977,7 +22978,7 @@ class HUDDlg(ArtisanDialog):
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
-        saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(0,1))
+        saveImgButton.clicked.connect(lambda *_:aw.resizeImg(0,1))
         helpcurveButton = QPushButton(QApplication.translate("Button","Help",None))
         helpcurveButton.setFocusPolicy(Qt.NoFocus)
         helpcurveButton.clicked.connect(lambda _:aw.showSymbolicHelp())
@@ -23042,7 +23043,7 @@ class HUDDlg(ArtisanDialog):
         ##### TAB 3
         self.interpCheck = QCheckBox(QApplication.translate("CheckBox","Show",None))
         self.interpCheck.setFocusPolicy(Qt.NoFocus)
-        self.interpCheck.stateChanged.connect(lambda i=0:self.interpolation(i)) #toggle
+        self.interpCheck.stateChanged.connect(lambda _=0:self.interpolation()) #toggle
         self.interpComboBox = QComboBox()
         self.interpComboBox.setMaximumWidth(100)
         self.interpComboBox.setMinimumWidth(55)
@@ -23051,7 +23052,7 @@ class HUDDlg(ArtisanDialog):
                                       QApplication.translate("ComboBox","nearest",None)])
         self.interpComboBox.setToolTip(QApplication.translate("Tooltip", "linear: linear interpolation\ncubic: 3rd order spline interpolation\nnearest: y value of the nearest point", None))
         self.interpComboBox.setFocusPolicy(Qt.NoFocus)
-        self.interpComboBox.currentIndexChanged.connect(lambda i=self.interpComboBox.currentIndex() :self.changeInterpolationMode(i))
+        self.interpComboBox.currentIndexChanged.connect(lambda _ :self.changeInterpolationMode())
 #         'linear'  : linear interpolation
 #         'cubic'   : 3rd order spline interpolation
 #         'nearest' : take the y value of the nearest point
@@ -23090,7 +23091,7 @@ class HUDDlg(ArtisanDialog):
         univarButton.clicked.connect(lambda _:self.showunivarinfo())
         self.polyfitCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None))
         self.polyfitCheck.setFocusPolicy(Qt.NoFocus)
-        self.polyfitCheck.clicked.connect(lambda i=0:self.polyfit(i)) #toggle
+        self.polyfitCheck.clicked.connect(lambda _=0:self.polyfit()) #toggle
         self.result = QLineEdit()
         self.result.setReadOnly(True)
         self.result.setStyleSheet("background-color:'lightgrey';")
@@ -23186,7 +23187,7 @@ class HUDDlg(ArtisanDialog):
             self.styleComboBox.setCurrentIndex(list(map(lambda x:x.lower(),available)).index(str(aw.style().objectName()).lower()))
         except Exception:
             pass
-        self.styleComboBox.currentIndexChanged.connect(lambda i:self.setappearance())
+        self.styleComboBox.currentIndexChanged.connect(lambda _:self.setappearance())
         self.resolutionSpinBox = QSpinBox()
         self.resolutionSpinBox.setRange(40,300)
         self.resolutionSpinBox.setSingleStep(5)
@@ -23217,7 +23218,7 @@ class HUDDlg(ArtisanDialog):
         self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None))
         self.soundCheck.setChecked(aw.soundflag) 
         self.soundCheck.setFocusPolicy(Qt.NoFocus)
-        self.soundCheck.stateChanged.connect(lambda i=0:self.soundset(i)) #toggle
+        self.soundCheck.stateChanged.connect(lambda _=0:self.soundset()) #toggle
         sLayout = QHBoxLayout()
         sLayout.addStretch()
         sLayout.addWidget(self.soundCheck)
@@ -23251,8 +23252,8 @@ class HUDDlg(ArtisanDialog):
         self.WebLCDsAlerts.setFocusPolicy(Qt.NoFocus)
         if not aw.WebLCDs:
             self.WebLCDsAlerts.setDisabled(True)
-        self.WebLCDsAlerts.stateChanged.connect(lambda i=0:self.toggleWebLCDsAlerts()) #toggle
-        self.WebLCDsPort.editingFinished.connect(lambda x=0:self.changeWebLCDsPort())
+        self.WebLCDsAlerts.stateChanged.connect(lambda _=0:self.toggleWebLCDsAlerts()) #toggle
+        self.WebLCDsPort.editingFinished.connect(lambda _=0:self.changeWebLCDsPort())
         self.WebLCDsFlag.clicked.connect(lambda i=0:self.toggleWebLCDs(i))
         WebLCDsLayout = QHBoxLayout()
         WebLCDsLayout.addWidget(self.WebLCDsFlag)
@@ -23317,11 +23318,11 @@ class HUDDlg(ArtisanDialog):
 
         self.updatePlotterleftlabels()  
          
-        self.startEdit.editingFinished.connect(lambda i=0:self.polyfitcurveschanged(1))
-        self.endEdit.editingFinished.connect(lambda i=0:self.polyfitcurveschanged(2))
-        self.polyfitdeg.valueChanged.connect(lambda i=0:self.polyfitcurveschanged(3))
-        self.c1ComboBox.currentIndexChanged.connect(lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(4))
-        self.c2ComboBox.currentIndexChanged.connect(lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))      
+        self.startEdit.editingFinished.connect(lambda _=0:self.polyfitcurveschanged(1))
+        self.endEdit.editingFinished.connect(lambda _=0:self.polyfitcurveschanged(2))
+        self.polyfitdeg.valueChanged.connect(lambda _=0:self.polyfitcurveschanged(3))
+        self.c1ComboBox.currentIndexChanged.connect(lambda _=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(4))
+        self.c2ComboBox.currentIndexChanged.connect(lambda _=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))      
             
     def toggleWebLCDsAlerts(self):
         aw.WebLCDsAlerts = not aw.WebLCDsAlerts
@@ -23730,7 +23731,7 @@ class HUDDlg(ArtisanDialog):
         else:
             aw.sendmessage(QApplication.translate("Univariate: no profile data available", None))
     
-    def lnvar(self,i):
+    def lnvar(self,_):
         if self.lnvarCheck.isChecked():
             #check for finished roast
             if aw.qmc.timeindex[0] > -1:
@@ -23746,7 +23747,7 @@ class HUDDlg(ArtisanDialog):
             self.redraw_enabled_math_curves()
 
     
-    def xxvar(self,i):
+    def xxvar(self,_):
         if self.xxvarCheck.isChecked():
             #check for finished roast
             if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
@@ -23761,7 +23762,7 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.resetlines()
             self.redraw_enabled_math_curves()
                                     
-    def univar(self,i):
+    def univar(self,_):
         if self.univarCheck.isChecked():
             #check for finished roast
             if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6]:
@@ -23886,7 +23887,7 @@ class HUDDlg(ArtisanDialog):
             self.result.setText("")
             return False
 
-    def polyfitcurveschanged(self,i):
+    def polyfitcurveschanged(self,_):
         self.polyfitdeg.blockSignals(True)
         self.polyfitdeg.setDisabled(True)
         self.startEdit.blockSignals(True)
@@ -23971,7 +23972,7 @@ class HUDDlg(ArtisanDialog):
         self.c1ComboBox.setCurrentIndex(idx)
         self.c2ComboBox.setCurrentIndex(idx+1)
 
-    def polyfit(self,i):
+    def polyfit(self):
         try:
             if self.polyfitCheck.isChecked():
                 #check for finished roast
@@ -23993,7 +23994,7 @@ class HUDDlg(ArtisanDialog):
 #            traceback.print_exc(file=sys.stdout)
             pass
 
-    def interpolation(self,i):
+    def interpolation(self):
         mode = str(self.interpComboBox.currentText())
         if self.interpCheck.isChecked():
             #check for finished roast
@@ -24006,7 +24007,7 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.resetlines()
             self.redraw_enabled_math_curves()
 
-    def soundset(self,i):
+    def soundset(self):
         if aw.soundflag == 0:
             aw.soundflag = 1
             aw.sendmessage(QApplication.translate("Message","Sound turned ON", None))
@@ -24015,7 +24016,7 @@ class HUDDlg(ArtisanDialog):
             aw.soundflag = 0
             aw.sendmessage(QApplication.translate("Message","Sound turned OFF", None))
 
-    def changeDeltaET(self,i):
+    def changeDeltaET(self):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
         if aw.qmc.crossmarker:
             aw.qmc.togglecrosslines() # turn crossmarks off to adjust for new coordinate system
@@ -24027,7 +24028,7 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.updateDeltaSamples()
             aw.qmc.redraw(recomputeAllDeltas=True)
         
-    def changeDecimalPlaceslcd(self,i):
+    def changeDecimalPlaceslcd(self):
         if self.DecimalPlaceslcd.isChecked():
             aw.qmc.LCDdecimalplaces = 1
             aw.setLCDsDigitCount(5)
@@ -24035,17 +24036,17 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.LCDdecimalplaces = 0
             aw.setLCDsDigitCount(3)
 
-    def changeDeltaBT(self,i):
+    def changeDeltaBT(self):
         aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
         if aw.qmc.crossmarker:
             aw.qmc.togglecrosslines() # turn crossmarks off to adjust for new coordinate system
         aw.qmc.redraw(recomputeAllDeltas=True)
 
-    def changeDeltaETlcd(self,i):
+    def changeDeltaETlcd(self):
         aw.qmc.DeltaETlcdflag = not aw.qmc.DeltaETlcdflag
         aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)
 
-    def changeDeltaBTlcd(self,i):
+    def changeDeltaBTlcd(self):
         aw.qmc.DeltaBTlcdflag = not aw.qmc.DeltaBTlcdflag
         aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
         
@@ -24072,7 +24073,7 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.graphfont = n
         aw.setFonts()
 
-    def changeDeltaFilter(self,i):
+    def changeDeltaFilter(self):
         try:
             v = self.DeltaFilter.value()*2 + 1
             if v != aw.qmc.deltafilter:
@@ -24089,24 +24090,24 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaFilter(): {0}").format(str(e)),exc_tb.tb_lineno)
 
-    def changeDropFilter(self,i):
+    def changeDropFilter(self):
         aw.qmc.filterDropOuts = not aw.qmc.filterDropOuts
         aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
         
-    def changeAltSmoothing(self,i):
+    def changeAltSmoothing(self):
         aw.qmc.altsmoothing = not aw.qmc.altsmoothing
         aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
 
-    def changeSpikeFilter(self,i):
+    def changeSpikeFilter(self):
         aw.qmc.dropSpikes = not aw.qmc.dropSpikes
 
-    def changeMinMaxLimits(self,i):
+    def changeMinMaxLimits(self):
         aw.qmc.minmaxLimits = not aw.qmc.minmaxLimits
         
-    def changeSwapETBT(self,i):
+    def changeSwapETBT(self):
         aw.qmc.swapETBT = not aw.qmc.swapETBT
 
-    def changeWindow(self,i):
+    def changeWindow(self):
         try:
             v = self.Window.value()
             if v != aw.qmc.smoothingwindowsize:
@@ -24119,7 +24120,7 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changeWindow(): {0}").format(str(e)),exc_tb.tb_lineno)
         
-    def changeFilter(self,i):
+    def changeFilter(self):
         try:
             v = self.Filter.value()*2 + 1
             if v != aw.qmc.curvefilter:
@@ -24132,7 +24133,7 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changeFilter(): {0}").format(str(e)),exc_tb.tb_lineno)
 
-    def changeProjection(self,i):
+    def changeProjection(self):
         aw.qmc.projectFlag = not aw.qmc.projectFlag
         if not aw.qmc.projectFlag:
             #erase old projections
@@ -24141,10 +24142,10 @@ class HUDDlg(ArtisanDialog):
     def changeProjectionMode(self,i):
         aw.qmc.projectionmode = i
 
-    def changeInterpolationMode(self,i):
+    def changeInterpolationMode(self):
         aw.qmc.resetlines()
         aw.qmc.redraw(recomputeAllDeltas=False)
-        self.interpolation(i)             
+        self.interpolation()             
                         
     def closeEvent(self,_):
         self.close()
@@ -24892,7 +24893,7 @@ class RoastsComboBox(QComboBox):
             except Exception:
                 pass
 
-    def eventFilter(self, obj, event):
+    def eventFilter(self, _, event):
 # the next prevents correct setSelection on Windows
 #        if event.type() == QEvent.FocusIn:
 #            self.setSelection(self.currentIndex())
@@ -25840,7 +25841,7 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " addRecentRoast(): {0}").format(str(e)),exc_tb.tb_lineno)
 
         
-    def closeEvent(self, event):
+    def closeEvent(self, _):
         settings = QSettings()
         #save window geometry
         if sip.getapi('QVariant') == 1:
@@ -27835,7 +27836,7 @@ class calculatorDlg(ArtisanDialog):
             inx = aw.convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
             self.VinEdit.setText("%.3f"%inx)
 
-    def closeEvent(self, event):
+    def closeEvent(self, _):
         settings = QSettings()
         #save window geometry
         if sip.getapi('QVariant') == 1:
@@ -27925,10 +27926,10 @@ class EventsDlg(ArtisanDialog):
         self.E3colorButton.setFocusPolicy(Qt.NoFocus)
         self.E4colorButton = QPushButton(aw.qmc.etypesf(3))
         self.E4colorButton.setFocusPolicy(Qt.NoFocus)
-        self.E1colorButton.clicked.connect(lambda b=0:self.setcoloreventline(0))
-        self.E2colorButton.clicked.connect(lambda b=1:self.setcoloreventline(1))
-        self.E3colorButton.clicked.connect(lambda b=2:self.setcoloreventline(2))
-        self.E4colorButton.clicked.connect(lambda b=3:self.setcoloreventline(3))
+        self.E1colorButton.clicked.connect(lambda _=0:self.setcoloreventline(0))
+        self.E2colorButton.clicked.connect(lambda _=1:self.setcoloreventline(1))
+        self.E3colorButton.clicked.connect(lambda _=2:self.setcoloreventline(2))
+        self.E4colorButton.clicked.connect(lambda _=3:self.setcoloreventline(3))
         #marker selection for comboboxes
         self.markers = ["",
                         QApplication.translate("Marker","Circle",None),
@@ -27951,7 +27952,7 @@ class EventsDlg(ArtisanDialog):
             self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
         else:
             self.marker1typeComboBox.setCurrentIndex(0) # set to first empty entry
-        self.marker1typeComboBox.currentIndexChanged.connect(lambda x=1,m=0:self.seteventmarker(x,0))
+        self.marker1typeComboBox.currentIndexChanged.connect(lambda x=1,_=0:self.seteventmarker(x,0))
         self.marker2typeComboBox =  QComboBox()
         self.marker2typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker2typeComboBox.addItems(self.markers)
@@ -27959,7 +27960,7 @@ class EventsDlg(ArtisanDialog):
             self.marker2typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[1]))
         else:
             self.marker2typeComboBox.setCurrentIndex(0) # set to first empty entry
-        self.marker2typeComboBox.currentIndexChanged.connect(lambda x=1,m=1:self.seteventmarker(x,1))
+        self.marker2typeComboBox.currentIndexChanged.connect(lambda x=1,_=0:self.seteventmarker(x,1))
         self.marker3typeComboBox =  QComboBox()
         self.marker3typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker3typeComboBox.addItems(self.markers)
@@ -27967,7 +27968,7 @@ class EventsDlg(ArtisanDialog):
             self.marker3typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[2]))
         else:
             self.marker3typeComboBox.setCurrentIndex(0) # set to first empty entry
-        self.marker3typeComboBox.currentIndexChanged.connect(lambda x=1,m=2:self.seteventmarker(x,2))
+        self.marker3typeComboBox.currentIndexChanged.connect(lambda x=1,_=0:self.seteventmarker(x,2))
         self.marker4typeComboBox =  QComboBox()
         self.marker4typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker4typeComboBox.addItems(self.markers)
@@ -27975,7 +27976,7 @@ class EventsDlg(ArtisanDialog):
             self.marker4typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[3]))
         else:
             self.marker4typeComboBox.setCurrentIndex(0) # set to first empty entry
-        self.marker4typeComboBox.currentIndexChanged.connect(lambda x=1,m=3:self.seteventmarker(x,3))
+        self.marker4typeComboBox.currentIndexChanged.connect(lambda x=1,_=0:self.seteventmarker(x,3))
         valuecolorlabel = QLabel(QApplication.translate("Label","Color",None))
         valuecolorlabel.setFont(titlefont)
         valuesymbollabel = QLabel(QApplication.translate("Label","Marker",None))
@@ -27997,56 +27998,56 @@ class EventsDlg(ArtisanDialog):
         self.E1thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1thicknessSpinBox.setRange(1,10)
         self.E1thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[0])
-        self.E1thicknessSpinBox.valueChanged.connect(lambda w=1, x=0:self.setElinethickness(w,0))
+        self.E1thicknessSpinBox.valueChanged.connect(lambda w=1,_=0:self.setElinethickness(w,0))
         self.E2thicknessSpinBox = QSpinBox()
         self.E2thicknessSpinBox.setAlignment(Qt.AlignRight)
         self.E2thicknessSpinBox.setSingleStep(1)
         self.E2thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2thicknessSpinBox.setRange(1,10)
         self.E2thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[1])
-        self.E2thicknessSpinBox.valueChanged.connect(lambda w =1,x=1:self.setElinethickness(w,1))
+        self.E2thicknessSpinBox.valueChanged.connect(lambda w =1,_=0:self.setElinethickness(w,1))
         self.E3thicknessSpinBox = QSpinBox()
         self.E3thicknessSpinBox.setAlignment(Qt.AlignRight)
         self.E3thicknessSpinBox.setSingleStep(1)
         self.E3thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3thicknessSpinBox.setRange(1,10)
         self.E3thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[2])
-        self.E3thicknessSpinBox.valueChanged.connect(lambda w=1,x=2:self.setElinethickness(w,2))
+        self.E3thicknessSpinBox.valueChanged.connect(lambda w=1,_=0:self.setElinethickness(w,2))
         self.E4thicknessSpinBox = QSpinBox()
         self.E4thicknessSpinBox.setAlignment(Qt.AlignRight)
         self.E4thicknessSpinBox.setSingleStep(1)
         self.E4thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4thicknessSpinBox.setRange(1,10)
         self.E4thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[3])
-        self.E4thicknessSpinBox.valueChanged.connect(lambda w=1,x=3:self.setElinethickness(w,3))
+        self.E4thicknessSpinBox.valueChanged.connect(lambda w=1,_=0:self.setElinethickness(w,3))
         self.E1alphaSpinBox = QDoubleSpinBox()
         self.E1alphaSpinBox.setAlignment(Qt.AlignRight)
         self.E1alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1alphaSpinBox.setRange(.1,1.)
         self.E1alphaSpinBox.setSingleStep(.1)
         self.E1alphaSpinBox.setValue(aw.qmc.Evaluealpha[0])
-        self.E1alphaSpinBox.valueChanged.connect(lambda w=1,x=0:self.setElinealpha(w,0))
+        self.E1alphaSpinBox.valueChanged.connect(lambda w=1,_=0:self.setElinealpha(w,0))
         self.E2alphaSpinBox = QDoubleSpinBox()
         self.E2alphaSpinBox.setAlignment(Qt.AlignRight)
         self.E2alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2alphaSpinBox.setRange(.1,1.)
         self.E2alphaSpinBox.setSingleStep(.1)
         self.E2alphaSpinBox.setValue(aw.qmc.Evaluealpha[1])
-        self.E1alphaSpinBox.valueChanged.connect(lambda w=1,x=1:self.setElinealpha(w,1))
+        self.E1alphaSpinBox.valueChanged.connect(lambda w=1,_=0:self.setElinealpha(w,1))
         self.E3alphaSpinBox = QDoubleSpinBox()
         self.E3alphaSpinBox.setAlignment(Qt.AlignRight)
         self.E3alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3alphaSpinBox.setRange(.1,1.)
         self.E3alphaSpinBox.setSingleStep(.1)
         self.E3alphaSpinBox.setValue(aw.qmc.Evaluealpha[2])
-        self.E3alphaSpinBox.valueChanged.connect(lambda w=1,x=2:self.setElinealpha(w,2))
+        self.E3alphaSpinBox.valueChanged.connect(lambda w=1,_=0:self.setElinealpha(w,2))
         self.E4alphaSpinBox = QDoubleSpinBox()
         self.E4alphaSpinBox.setAlignment(Qt.AlignRight)
         self.E4alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4alphaSpinBox.setRange(.1,1.)
         self.E4alphaSpinBox.setSingleStep(.1)
         self.E4alphaSpinBox.setValue(aw.qmc.Evaluealpha[3])
-        self.E4alphaSpinBox.valueChanged.connect(lambda w=1, x=3:self.setElinealpha(w,3))
+        self.E4alphaSpinBox.valueChanged.connect(lambda w=1,_=0:self.setElinealpha(w,3))
         #Marker size
         self.E1sizeSpinBox = QSpinBox()
         self.E1sizeSpinBox.setAlignment(Qt.AlignRight)
@@ -28054,28 +28055,28 @@ class EventsDlg(ArtisanDialog):
         self.E1sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1sizeSpinBox.setRange(1,14)
         self.E1sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[0])
-        self.E1sizeSpinBox.valueChanged.connect(lambda w=1,x=0:self.setEmarkersize(w,0))
+        self.E1sizeSpinBox.valueChanged.connect(lambda w=1,_=0:self.setEmarkersize(w,0))
         self.E2sizeSpinBox = QSpinBox()
         self.E2sizeSpinBox.setAlignment(Qt.AlignRight)
         self.E2sizeSpinBox.setSingleStep(1)
         self.E2sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2sizeSpinBox.setRange(1,14)
         self.E2sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[1])
-        self.E2sizeSpinBox.valueChanged.connect(lambda w=1,x=1:self.setEmarkersize(w,1))
+        self.E2sizeSpinBox.valueChanged.connect(lambda w=1,_=0:self.setEmarkersize(w,1))
         self.E3sizeSpinBox = QSpinBox()
         self.E3sizeSpinBox.setAlignment(Qt.AlignRight)
         self.E3sizeSpinBox.setSingleStep(1)
         self.E3sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3sizeSpinBox.setRange(1,14)
         self.E3sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[2])
-        self.E3sizeSpinBox.valueChanged.connect(lambda w=1,x=2:self.setEmarkersize(w,2))
+        self.E3sizeSpinBox.valueChanged.connect(lambda w=1,_=0:self.setEmarkersize(w,2))
         self.E4sizeSpinBox = QSpinBox()
         self.E4sizeSpinBox.setAlignment(Qt.AlignRight)
         self.E4sizeSpinBox.setSingleStep(1)
         self.E4sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4sizeSpinBox.setRange(1,14)
         self.E4sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[3])
-        self.E4sizeSpinBox.valueChanged.connect(lambda w=1,x=3:self.setEmarkersize(w,3))
+        self.E4sizeSpinBox.valueChanged.connect(lambda w=1,_=0:self.setEmarkersize(w,3))
         self.autoCharge = QCheckBox(QApplication.translate("CheckBox","Auto CHARGE",None))
         self.autoCharge.setChecked(aw.qmc.autoChargeFlag)
         self.autoCharge.setFocusPolicy(Qt.NoFocus)
@@ -29465,7 +29466,7 @@ class EventsDlg(ArtisanDialog):
         aw.buttonlist[bindex].setMinimumWidth(90)
         aw.buttonlist[bindex].setMinimumHeight(aw.standard_button_height)
         aw.buttonlist[bindex].setText(initialtext)
-        aw.buttonlist[bindex].clicked.connect(lambda ee=bindex:aw.recordextraevent(bindex))
+        aw.buttonlist[bindex].clicked.connect(lambda _=bindex:aw.recordextraevent(bindex))
         if False: # lowerbuttonvisiblebuttons < aw.buttonlistmaxlen:
             aw.lowerbuttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
         elif len(aw.e1buttondialog.buttons()) < aw.buttonlistmaxlen:
@@ -30161,10 +30162,10 @@ class flavorDlg(ArtisanDialog):
         self.createFlavorTable()
         leftButton = QPushButton("<")
         leftButton.setFocusPolicy(Qt.NoFocus)
-        leftButton.clicked.connect(lambda x=0:self.move(0))
+        leftButton.clicked.connect(lambda _:self.move(0))
         rightButton = QPushButton(">")
         rightButton.setFocusPolicy(Qt.NoFocus)
-        rightButton.clicked.connect(lambda x=1:self.move(1))
+        rightButton.clicked.connect(lambda _:self.move(1))
         addButton = QPushButton(QApplication.translate("Button","Add",None))
         addButton.setFocusPolicy(Qt.NoFocus)
         addButton.clicked.connect(self.addlabel)
@@ -30173,7 +30174,7 @@ class flavorDlg(ArtisanDialog):
         delButton.clicked.connect(self.poplabel)
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
-        saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(0,1))
+        saveImgButton.clicked.connect(lambda *_:aw.resizeImg(0,1))
         backButton = QPushButton(QApplication.translate("Button","OK",None))
         backButton.clicked.connect(lambda _:self.close())
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Background", None))
@@ -30251,7 +30252,7 @@ class flavorDlg(ArtisanDialog):
             #populate table
             for i in range(nflavors):
                 labeledit = QLineEdit(u(aw.qmc.flavorlabels[i]))
-                labeledit.textChanged.connect(lambda z=1,x=i: self.setlabel(x))
+                labeledit.textChanged.connect(lambda _,x=i: self.setlabel(x))
                 valueSpinBox = QDoubleSpinBox()
                 valueSpinBox.setRange(0.,10.)
                 valueSpinBox.setSingleStep(.25)
@@ -30520,16 +30521,16 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundETflag.clicked.connect(self.readChecks)
         self.backgroundBTflag.clicked.connect(self.readChecks)
         delButton.clicked.connect(self.delete)
-        self.upButton.clicked.connect(lambda m= "up": self.move("up"))
-        self.downButton.clicked.connect(lambda m="down": self.move("down"))
-        self.leftButton.clicked.connect(lambda m="left": self.move("left"))
-        self.rightButton.clicked.connect(lambda m="right": self.move("right"))
+        self.upButton.clicked.connect(lambda _: self.move("up"))
+        self.downButton.clicked.connect(lambda _: self.move("down"))
+        self.leftButton.clicked.connect(lambda _: self.move("left"))
+        self.rightButton.clicked.connect(lambda _: self.move("right"))
         self.intensitySpinBox.valueChanged.connect(self.adjustintensity)
-        self.xtcolorComboBox.currentIndexChanged.connect(lambda curve = "xt": self.adjustcolor("xt"))
-        self.btcolorComboBox.currentIndexChanged.connect(lambda curve = "bt": self.adjustcolor("bt"))
-        self.metcolorComboBox.currentIndexChanged.connect(lambda curve = "et": self.adjustcolor("et"))
-        self.deltabtcolorComboBox.currentIndexChanged.connect(lambda curve = "deltabt": self.adjustcolor("deltabt"))
-        self.deltaetcolorComboBox.currentIndexChanged.connect(lambda curve = "deltaet": self.adjustcolor("deltaet"))
+        self.xtcolorComboBox.currentIndexChanged.connect(lambda _ = "xt": self.adjustcolor("xt"))
+        self.btcolorComboBox.currentIndexChanged.connect(lambda _ = "bt": self.adjustcolor("bt"))
+        self.metcolorComboBox.currentIndexChanged.connect(lambda _ = "et": self.adjustcolor("et"))
+        self.deltabtcolorComboBox.currentIndexChanged.connect(lambda _ = "deltabt": self.adjustcolor("deltabt"))
+        self.deltaetcolorComboBox.currentIndexChanged.connect(lambda _ = "deltaet": self.adjustcolor("deltaet"))
         #TAB 2 EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
@@ -30671,7 +30672,7 @@ class backgroundDlg(ArtisanDialog):
         aw.qmc.backgroundmovespeed = self.speedSpinBox.value()
         self.close()
         
-    def closeEvent(self,event):
+    def closeEvent(self,_):
         settings = QSettings()
         #save window geometry
         if sip.getapi('QVariant') == 1:
@@ -31761,7 +31762,7 @@ class modbusport(object):
                 aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
 
 
-    def setTarget(self,sv,init=None):
+    def setTarget(self,sv):
         if self.PID_slave_ID:
             multiplier = 1.
             if aw.modbus.SVmultiplier == 1:
@@ -32395,8 +32396,8 @@ class serialport(object):
             if platf == 'Windows':
                 cmd_str = os.path.expanduser(aw.ser.externalprogram)
                 if sys.version < '3':
-                    import locale
-                    cmd_str = cmd_str.encode(locale.getpreferredencoding())
+                    import locale as locl
+                    cmd_str = cmd_str.encode(locl.getpreferredencoding())
                 p = subprocess.Popen(cmd_str,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo,shell=True)
             else:
                 p = subprocess.Popen([os.path.expanduser(c) for c in shlex.split(aw.ser.externalprogram)],env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
@@ -33929,7 +33930,7 @@ class serialport(object):
         
 #---
 
-    def phidget1045TemperatureChanged(self,e,t):
+    def phidget1045TemperatureChanged(self,_,t):
         if self.Phidget1045value != -1:
             self.Phidget1045value = (self.Phidget1045value + t)/2.0
         else:
@@ -33952,7 +33953,7 @@ class serialport(object):
                 if aw.qmc.phidget1045_async:
                     self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
                 else:
-                    self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e,t:None)
+                    self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda *_:None)
             except:
                 pass
             
@@ -33966,7 +33967,7 @@ class serialport(object):
         if aw.qmc.phidget1048_async[0]:
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
         else:
-            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e,t:None)
+            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda *_:None)
             
     def configureOneRTD(self):
         self.Phidget1045value = -1
@@ -33979,17 +33980,14 @@ class serialport(object):
         if aw.qmc.phidget1200_async:
             self.PhidgetIRSensor.setOnTemperatureChangeHandler(self.phidget1045TemperatureChanged)
         else:
-            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda e,t:None)
+            self.PhidgetIRSensor.setOnTemperatureChangeHandler(lambda *_:None)
         # set rate
         try:
             self.PhidgetIRSensor.setDataInterval(aw.qmc.phidget1200_dataRate)
         except Exception:
             pass
-        
-        
-        
 
-    def phidget1045attached(self,deviceType,e):
+    def phidget1045attached(self,deviceType):
         if deviceType == DeviceID.PHIDID_1045:
             self.configure1045()
             aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None))
@@ -34003,7 +34001,7 @@ class serialport(object):
             self.configureOneRTD()
             aw.sendmessage(QApplication.translate("Message","Phidget VINT RTD 1-input attached",None))
 
-    def phidget1045detached(self,deviceType,e):
+    def phidget1045detached(self,deviceType):
         if deviceType == DeviceID.PHIDID_1045:
             aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR detached",None))
         elif deviceType == DeviceID.PHIDID_1051:
@@ -34025,8 +34023,8 @@ class serialport(object):
                     else:
                         self.PhidgetIRSensorIC = PhidgetTemperatureSensor()
                     try:
-                        self.PhidgetIRSensor.setOnAttachHandler(lambda e:self.phidget1045attached(deviceType,e))
-                        self.PhidgetIRSensor.setOnDetachHandler(lambda e:self.phidget1045detached(deviceType,e))
+                        self.PhidgetIRSensor.setOnAttachHandler(lambda _:self.phidget1045attached(deviceType))
+                        self.PhidgetIRSensor.setOnDetachHandler(lambda _:self.phidget1045detached(deviceType))
                         if aw.qmc.phidgetRemoteFlag:
                             self.addPhidgetServer()
                         if port is not None:
@@ -34121,7 +34119,7 @@ class serialport(object):
 
 #----
 
-    def phidget1048TemperatureChanged(self,e,t,idx):
+    def phidget1048TemperatureChanged(self,t,idx):
         if self.PhidgetTemperatureSensor and len(self.PhidgetTemperatureSensor) > idx:
             channel = self.PhidgetTemperatureSensor[idx].getChannel()
             if aw.qmc.phidget1048_async[channel]:
@@ -34155,20 +34153,20 @@ class serialport(object):
                 try:
                     if aw.qmc.phidget1048_async[channel]:
                         self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(aw.qmc.phidget1048_changeTriggers[channel])
-                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda e,t: self.phidget1048TemperatureChanged(e,t,idx))
+                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda _,t: self.phidget1048TemperatureChanged(t,idx))
                     else:
                         self.PhidgetTemperatureSensor[idx].setTemperatureChangeTrigger(0)
-                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda e,t:None)
+                        self.PhidgetTemperatureSensor[idx].setOnTemperatureChangeHandler(lambda *_:None)
                 except:
                     pass
                 self.Phidget1048values[channel] = -1
 
-    def phidget1048attached(self,deviceType,e,idx):
+    def phidget1048attached(self,idx):
         self.configure1048(idx)
         if self.PhidgetTemperatureSensor and self.PhidgetTemperatureSensor[idx].getChannel() == 0:
             aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None))
         
-    def phidget1048detached(self,deviceType,e,idx):
+    def phidget1048detached(self,idx):
         if self.PhidgetTemperatureSensor and self.PhidgetTemperatureSensor[idx].getChannel() == 0:
             aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input detached",None))
 
@@ -34191,11 +34189,11 @@ class serialport(object):
                     if mode != 2:
                         self.PhidgetTemperatureSensor.append(PhidgetTemperatureSensor())
                     try:
-                        self.PhidgetTemperatureSensor[0].setOnAttachHandler(lambda e:self.phidget1048attached(deviceType,e,0))
-                        self.PhidgetTemperatureSensor[0].setOnDetachHandler(lambda e:self.phidget1048detached(deviceType,e,0))
+                        self.PhidgetTemperatureSensor[0].setOnAttachHandler(lambda _:self.phidget1048attached(0))
+                        self.PhidgetTemperatureSensor[0].setOnDetachHandler(lambda _:self.phidget1048detached(0))
                         if mode != 2:                            
-                            self.PhidgetTemperatureSensor[1].setOnAttachHandler(lambda e:self.phidget1048attached(deviceType,e,1))                        
-                            self.PhidgetTemperatureSensor[1].setOnDetachHandler(lambda e:self.phidget1048detached(deviceType,e,1))
+                            self.PhidgetTemperatureSensor[1].setOnAttachHandler(lambda _:self.phidget1048attached(1))                        
+                            self.PhidgetTemperatureSensor[1].setOnDetachHandler(lambda _:self.phidget1048detached(1))
                         if aw.qmc.phidgetRemoteFlag:
                             self.addPhidgetServer()
                         if port is not None:
@@ -34323,7 +34321,7 @@ class serialport(object):
 #        bvf = bv / (1000 - bv)
 #        return 4750.3 * bvf * bvf + 4615.6 * bvf - 242.615                
 
-    def phidget1046TemperatureChanged(self,e,v,idx):
+    def phidget1046TemperatureChanged(self,v,idx):
         if self.PhidgetBridgeSensor and len(self.PhidgetBridgeSensor) > idx:
             channel = self.PhidgetBridgeSensor[idx].getChannel()
             if self.phidget1046_async[channel]:        
@@ -34398,18 +34396,18 @@ class serialport(object):
                 except Exception:
                     pass
                 if aw.qmc.phidget1046_async[channel]:
-                    self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda e,v:self.phidget1046TemperatureChanged(e,v,idx))
+                    self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda _,v:self.phidget1046TemperatureChanged(v,idx))
                 else:
-                    self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda e,v:None)
+                    self.PhidgetBridgeSensor[idx].setOnVoltageRatioChangeHandler(lambda *_:None)
                 # reset async value
                 self.Phidget1046values[channel] = -1
 
-    def phidget1046attached(self,e,idx):
+    def phidget1046attached(self,idx):
         self.configure1046(idx)
         if self.PhidgetBridgeSensor and self.PhidgetBridgeSensor[idx].getChannel() == 0:
             aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None))
         
-    def phidget1046detached(self,e,idx):
+    def phidget1046detached(self,idx):
         if self.PhidgetBridgeSensor and self.PhidgetBridgeSensor[idx].getChannel() == 0:
             aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input detached",None))
 
@@ -34429,8 +34427,8 @@ class serialport(object):
                     self.PhidgetBridgeSensor = [VoltageRatioInput(),VoltageRatioInput()]
                     try:
                         for i in [0,1]:
-                            self.PhidgetBridgeSensor[i].setOnAttachHandler(lambda e:self.phidget1046attached(e,i))
-                            self.PhidgetBridgeSensor[i].setOnDetachHandler(lambda e:self.phidget1046detached(e,i))
+                            self.PhidgetBridgeSensor[i].setOnAttachHandler(lambda _:self.phidget1046attached(i))
+                            self.PhidgetBridgeSensor[i].setOnDetachHandler(lambda _:self.phidget1046detached(i))
                             if aw.qmc.phidgetRemoteFlag:
                                 self.addPhidgetServer()
                             if port is not None:
@@ -34774,7 +34772,7 @@ class serialport(object):
         
 #---
 
-    def phidget1018SensorChanged(self,e,v,channel,idx):
+    def phidget1018SensorChanged(self,v,channel,idx):
         if self.PhidgetIO and len(self.PhidgetIO) > idx:
             v = v * aw.qmc.phidget1018valueFactor
             if aw.qmc.phidget1018_async[channel]:
@@ -34817,13 +34815,13 @@ class serialport(object):
                     except PhidgetException:
                         #print("Phidget Exception %i: %s" % (e.code, e.details))
                         pass
-                    self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda e,t: self.phidget1018SensorChanged(e,t,channel,idx))
+                    self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx))
                 else:
                     self.PhidgetIO[idx].setVoltageChangeTrigger(0.0)
-                    self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda e,t:None) 
+                    self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda *_:None) 
             self.PhidgetIOvalues[channel] = -1
 
-    def phidget1018attached(self,deviceType,e,idx,digital=False):
+    def phidget1018attached(self,deviceType,idx,digital=False):
         self.configure1018(deviceType,idx,digital)
         if self.PhidgetIO and self.PhidgetIO[idx].getChannel() == 0:
             if deviceType == DeviceID.PHIDID_1011:
@@ -34835,7 +34833,7 @@ class serialport(object):
             else:
                 aw.sendmessage(QApplication.translate("Message","Phidget IO attached",None))
 
-    def phidget1018detached(self,deviceType,e,idx):
+    def phidget1018detached(self,deviceType,idx):
         if self.PhidgetIO and self.PhidgetIO[idx].getChannel() == 0:
             if deviceType == DeviceID.PHIDID_1011:
                 aw.sendmessage(QApplication.translate("Message","Phidget IO 2/2/2 detached",None))
@@ -34876,10 +34874,10 @@ class serialport(object):
                     else:      
                         self.PhidgetIO = [VoltageInput(),VoltageInput()]
                     try: 
-                        self.PhidgetIO[0].setOnAttachHandler(lambda e:self.phidget1018attached(deviceType,e,0,digital))
-                        self.PhidgetIO[0].setOnDetachHandler(lambda e:self.phidget1018detached(deviceType,e,0))
-                        self.PhidgetIO[1].setOnAttachHandler(lambda e:self.phidget1018attached(deviceType,e,1,digital))
-                        self.PhidgetIO[1].setOnDetachHandler(lambda e:self.phidget1018detached(deviceType,e,1))
+                        self.PhidgetIO[0].setOnAttachHandler(lambda _:self.phidget1018attached(deviceType,0,digital))
+                        self.PhidgetIO[0].setOnDetachHandler(lambda _:self.phidget1018detached(deviceType,0))
+                        self.PhidgetIO[1].setOnAttachHandler(lambda _:self.phidget1018attached(deviceType,1,digital))
+                        self.PhidgetIO[1].setOnDetachHandler(lambda _:self.phidget1018detached(deviceType,1))
                         if deviceType in [DeviceID.PHIDID_HUB0000]:
                             # we are looking to attach a HUB port
                             self.PhidgetIO[0].setIsHubPortDevice(1)
@@ -36332,7 +36330,7 @@ class PortComboBox(QComboBox):
             except Exception:
                 pass
 
-    def eventFilter(self, obj, event):
+    def eventFilter(self, _, event):
 # the next prevents correct setSelection on Windows
 #        if event.type() == QEvent.FocusIn:
 #            self.setSelection(self.currentIndex())
@@ -37506,7 +37504,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.outprogramedit = QLineEdit(aw.ser.externaloutprogram)
         self.outprogramFlag = QCheckBox(QApplication.translate("CheckBox", "Output",None))
         self.outprogramFlag.setChecked(aw.ser.externaloutprogramFlag)
-        self.outprogramFlag.stateChanged.connect(lambda i=0:self.changeOutprogramFlag(i))         #toggle
+        self.outprogramFlag.stateChanged.connect(lambda _:self.changeOutprogramFlag())         #toggle
         selectprogrambutton =  QPushButton(QApplication.translate("Button","Select",None))
         selectprogrambutton.setFocusPolicy(Qt.NoFocus)
         selectprogrambutton.clicked.connect(self.loadprogramname)
@@ -37733,7 +37731,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.asyncCheckBoxe1045 = QCheckBox()
         self.asyncCheckBoxe1045.setFocusPolicy(Qt.NoFocus)
         self.asyncCheckBoxe1045.setChecked(True)
-        self.asyncCheckBoxe1045.stateChanged.connect(lambda x,y=i-1 :self.asyncFlagStateChanged1045(y,x))
+        self.asyncCheckBoxe1045.stateChanged.connect(lambda x,_ :self.asyncFlagStateChanged1045(x))
         self.asyncCheckBoxe1045.setChecked(aw.qmc.phidget1045_async)
         phidgetBox1045.addWidget(self.asyncCheckBoxe1045,2,1)
         asyncLabel = QLabel(QApplication.translate("Label","Async", None))
@@ -37886,7 +37884,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.asyncCheckBoxe1200 = QCheckBox()
         self.asyncCheckBoxe1200.setFocusPolicy(Qt.NoFocus)
         self.asyncCheckBoxe1200.setChecked(aw.qmc.phidget1200_async)
-        self.asyncCheckBoxe1200.stateChanged.connect(lambda x,y=i-1 :self.asyncFlagStateChanged1200(y,x))
+        self.asyncCheckBoxe1200.stateChanged.connect(lambda x,_ :self.asyncFlagStateChanged1200(x))
             
         self.changeTriggerCombo1200 = QComboBox()
         self.changeTriggerCombo1200.setFocusPolicy(Qt.NoFocus)
@@ -38253,7 +38251,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout.setContentsMargins(0,0,0,0)
         self.setLayout(Mlayout)
         
-    def changeOutprogramFlag(self,i):
+    def changeOutprogramFlag(self):
         aw.ser.externaloutprogramFlag = not aw.ser.externaloutprogramFlag
 
     def asyncFlagStateChanged1048(self,i,x):
@@ -38264,7 +38262,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             # enable ChangeTrigger selection
             self.changeTriggerCombos1048[i].setEnabled(True)
 
-    def asyncFlagStateChanged1045(self,i,x):
+    def asyncFlagStateChanged1045(self,x):
         if x == 0:
             # disable ChangeTrigger selection
             self.changeTriggerCombos1045.setEnabled(False)
@@ -38272,7 +38270,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             # enable ChangeTrigger selection
             self.changeTriggerCombos1045.setEnabled(True)
             
-    def asyncFlagStateChanged1200(self,i,x):
+    def asyncFlagStateChanged1200(self,x):
         if x == 0:
             # disable ChangeTrigger selection
             self.changeTriggerCombo1200.setEnabled(False)
@@ -38361,10 +38359,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                             pass
                         color1Button = QPushButton(QApplication.translate("Button","Select",None))
                         color1Button.setFocusPolicy(Qt.NoFocus)
-                        color1Button.clicked.connect(lambda l = 1, c = i: self.setextracolor(1,c))
+                        color1Button.clicked.connect(lambda _, c = i: self.setextracolor(1,c))
                         color2Button = QPushButton(QApplication.translate("Button","Select",None))
                         color2Button.setFocusPolicy(Qt.NoFocus)
-                        color2Button.clicked.connect(lambda l = 2, c = i: self.setextracolor(2,c))
+                        color2Button.clicked.connect(lambda _, c = i: self.setextracolor(2,c))
                         name1edit = QLineEdit(u(aw.qmc.extraname1[i]))
                         name2edit = QLineEdit(u(aw.qmc.extraname2[i]))
                         mexpr1edit = QLineEdit(u(aw.qmc.extramathexpression1[i]))
@@ -38376,25 +38374,25 @@ class DeviceAssignmentDlg(ArtisanDialog):
                             LCD1visibilityComboBox.setCheckState(Qt.Checked)
                         else:
                             LCD1visibilityComboBox.setCheckState(Qt.Unchecked)
-                        LCD1visibilityComboBox.stateChanged.connect(lambda x=0,lcd=1, ind=i: self.updateLCDvisibility(x,1,ind))
+                        LCD1visibilityComboBox.stateChanged.connect(lambda x=0,_=0,ind=i: self.updateLCDvisibility(x,1,ind))
                         LCD2visibilityComboBox =  QCheckBox()
                         if aw.extraLCDvisibility2[i]:
                             LCD2visibilityComboBox.setCheckState(Qt.Checked)
                         else:
                             LCD2visibilityComboBox.setCheckState(Qt.Unchecked)
-                        LCD2visibilityComboBox.stateChanged.connect(lambda x=0,lcd=2, ind=i: self.updateLCDvisibility(x,2,ind))
+                        LCD2visibilityComboBox.stateChanged.connect(lambda x=0,_=0,ind=i: self.updateLCDvisibility(x,2,ind))
                         Curve1visibilityComboBox =  QCheckBox()
                         if aw.extraCurveVisibility1[i]:
                             Curve1visibilityComboBox.setCheckState(Qt.Checked)
                         else:
                             Curve1visibilityComboBox.setCheckState(Qt.Unchecked)
-                        Curve1visibilityComboBox.stateChanged.connect(lambda x=0,curve=1, ind=i: self.updateCurveVisibility(bool(x),1,ind))
+                        Curve1visibilityComboBox.stateChanged.connect(lambda x=0,_=0,ind=i: self.updateCurveVisibility(bool(x),1,ind))
                         Curve2visibilityComboBox =  QCheckBox()
                         if aw.extraCurveVisibility2[i]:
                             Curve2visibilityComboBox.setCheckState(Qt.Checked)
                         else:
                             Curve2visibilityComboBox.setCheckState(Qt.Unchecked)
-                        Curve2visibilityComboBox.stateChanged.connect(lambda x=0,curve=2, ind=i: self.updateCurveVisibility(bool(x),2,ind))
+                        Curve2visibilityComboBox.stateChanged.connect(lambda x=0,_=0,ind=i: self.updateCurveVisibility(bool(x),2,ind))
                         #add widgets to the table
                         self.devicetable.setCellWidget(i,0,typeComboBox)
                         self.devicetable.setCellWidget(i,1,color1Button)
@@ -39423,127 +39421,127 @@ class graphColorDlg(ArtisanDialog):
         self.backgroundButton = QPushButton(QApplication.translate("Button","Background", None))
         self.backgroundButton.setFocusPolicy(Qt.NoFocus)
         self.backgroundLabel.setFrameStyle(frameStyle)
-        self.backgroundButton.clicked.connect(lambda var=self.backgroundLabel,color="background": self.setColor("Background",self.backgroundLabel,"background"))
+        self.backgroundButton.clicked.connect(lambda *_: self.setColor("Background",self.backgroundLabel,"background"))
         self.gridLabel =QLabel(aw.qmc.palette["grid"])
         self.gridLabel.setPalette(QPalette(QColor(aw.qmc.palette["grid"])))
         self.gridLabel.setAutoFillBackground(True)
         self.gridButton = QPushButton(QApplication.translate("Button","Grid", None))
         self.gridButton.setFocusPolicy(Qt.NoFocus)
         self.gridLabel.setFrameStyle(frameStyle)
-        self.gridButton.clicked.connect(lambda var=self.gridLabel, color= "grid": self.setColor("Grid",self.gridLabel,"grid"))
+        self.gridButton.clicked.connect(lambda *_: self.setColor("Grid",self.gridLabel,"grid"))
         self.titleLabel =QLabel(aw.qmc.palette["title"])
         self.titleLabel.setPalette(QPalette(QColor(aw.qmc.palette["title"])))
         self.titleLabel.setAutoFillBackground(True)
         self.titleButton = QPushButton(QApplication.translate("Button","Title", None))
         self.titleButton.setFocusPolicy(Qt.NoFocus)
         self.titleLabel.setFrameStyle(frameStyle)
-        self.titleButton.clicked.connect(lambda var=self.titleLabel,color="title": self.setColor("Title",self.titleLabel,"title"))
+        self.titleButton.clicked.connect(lambda *_: self.setColor("Title",self.titleLabel,"title"))
         self.yLabel =QLabel(aw.qmc.palette["ylabel"])
         self.yLabel.setPalette(QPalette(QColor(aw.qmc.palette["ylabel"])))
         self.yLabel.setAutoFillBackground(True)
         self.yButton = QPushButton(QApplication.translate("Button","Y Label", None))
         self.yButton.setFocusPolicy(Qt.NoFocus)
         self.yLabel.setFrameStyle(frameStyle)
-        self.yButton.clicked.connect(lambda var=self.yLabel,color="ylabel": self.setColor("Y Label",self.yLabel,"ylabel"))
+        self.yButton.clicked.connect(lambda *_: self.setColor("Y Label",self.yLabel,"ylabel"))
         self.xLabel =QLabel(aw.qmc.palette["xlabel"])
         self.xLabel.setPalette(QPalette(QColor(aw.qmc.palette["xlabel"])))
         self.xLabel.setAutoFillBackground(True)
         self.xButton = QPushButton(QApplication.translate("Button","X Label", None))
         self.xButton.setFocusPolicy(Qt.NoFocus)
         self.xLabel.setFrameStyle(frameStyle)
-        self.xButton.clicked.connect(lambda var=self.xLabel,color="xlabel": self.setColor("X Label",self.xLabel,"xlabel"))
+        self.xButton.clicked.connect(lambda *_: self.setColor("X Label",self.xLabel,"xlabel"))
         self.rect1Label =QLabel(aw.qmc.palette["rect1"])
         self.rect1Label.setPalette(QPalette(QColor(aw.qmc.palette["rect1"])))
         self.rect1Label.setAutoFillBackground(True)
         self.rect1Button = QPushButton(QApplication.translate("Button","Drying Phase", None))
         self.rect1Button.setFocusPolicy(Qt.NoFocus)
         self.rect1Label.setFrameStyle(frameStyle)
-        self.rect1Button.clicked.connect(lambda var=self.rect1Label,color="rect1": self.setColor("Drying Phase",self.rect1Label,"rect1"))
+        self.rect1Button.clicked.connect(lambda *_: self.setColor("Drying Phase",self.rect1Label,"rect1"))
         self.rect2Label =QLabel(aw.qmc.palette["rect2"])
         self.rect2Label.setPalette(QPalette(QColor(aw.qmc.palette["rect2"])))
         self.rect2Label.setAutoFillBackground(True)
         self.rect2Button = QPushButton(QApplication.translate("Button","Maillard Phase", None))
         self.rect2Button.setFocusPolicy(Qt.NoFocus)
         self.rect2Label.setFrameStyle(frameStyle)
-        self.rect2Button.clicked.connect(lambda var=self.rect2Label,color="rect2": self.setColor("Maillard Phase",self.rect2Label,"rect2"))
+        self.rect2Button.clicked.connect(lambda *_: self.setColor("Maillard Phase",self.rect2Label,"rect2"))
         self.rect3Label =QLabel(aw.qmc.palette["rect3"])
         self.rect3Label.setPalette(QPalette(QColor(aw.qmc.palette["rect3"])))
         self.rect3Label.setAutoFillBackground(True)
         self.rect3Button = QPushButton(QApplication.translate("Button","Finishing Phase", None))
         self.rect3Button.setFocusPolicy(Qt.NoFocus)
         self.rect3Label.setFrameStyle(frameStyle)
-        self.rect3Button.clicked.connect(lambda var=self.rect3Label,color="rect3": self.setColor("Finishing Phase",self.rect3Label,"rect3"))
+        self.rect3Button.clicked.connect(lambda *_: self.setColor("Finishing Phase",self.rect3Label,"rect3"))
         self.rect4Label =QLabel(aw.qmc.palette["rect4"])
         self.rect4Label.setPalette(QPalette(QColor(aw.qmc.palette["rect4"])))
         self.rect4Label.setAutoFillBackground(True)
         self.rect4Button = QPushButton(QApplication.translate("Button","Cooling Phase", None))
         self.rect4Button.setFocusPolicy(Qt.NoFocus)
         self.rect4Label.setFrameStyle(frameStyle)
-        self.rect4Button.clicked.connect(lambda var=self.rect4Label,color="rect4": self.setColor("Cooling Phase",self.rect4Label,"rect4"))
+        self.rect4Button.clicked.connect(lambda *_: self.setColor("Cooling Phase",self.rect4Label,"rect4"))
         self.metLabel =QLabel(aw.qmc.palette["et"])
         self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["et"])))
         self.metLabel.setAutoFillBackground(True)
         self.metButton = QPushButton(QApplication.translate("Button","ET", None))
         self.metButton.setFocusPolicy(Qt.NoFocus)
         self.metLabel.setFrameStyle(frameStyle)
-        self.metButton.clicked.connect(lambda var=self.metLabel,color="et": self.setColor("ET",self.metLabel,"et"))
+        self.metButton.clicked.connect(lambda *_: self.setColor("ET",self.metLabel,"et"))
         self.btLabel =QLabel(aw.qmc.palette["bt"])
         self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
         self.btLabel.setAutoFillBackground(True)
         self.btButton = QPushButton(QApplication.translate("Button","BT", None))
         self.btButton.setFocusPolicy(Qt.NoFocus)
         self.btLabel.setFrameStyle(frameStyle)
-        self.btButton.clicked.connect(lambda var=self.btLabel,color="bt": self.setColor("BT",self.btLabel,"bt"))
+        self.btButton.clicked.connect(lambda *_: self.setColor("BT",self.btLabel,"bt"))
         self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
         self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
         self.deltametLabel.setAutoFillBackground(True)
         self.deltametButton = QPushButton(QApplication.translate("Button","DeltaET", None))
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
-        self.deltametButton.clicked.connect(lambda var=self.deltametLabel,color="deltaet": self.setColor("DeltaET",self.deltametLabel,"deltaet"))
+        self.deltametButton.clicked.connect(lambda *_: self.setColor("DeltaET",self.deltametLabel,"deltaet"))
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
         self.deltabtLabel.setAutoFillBackground(True)
         self.deltabtButton = QPushButton(QApplication.translate("Button","DeltaBT", None))
         self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtLabel.setFrameStyle(frameStyle)
-        self.deltabtButton.clicked.connect(lambda var=self.deltabtLabel,color="deltabt": self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
+        self.deltabtButton.clicked.connect(lambda *_: self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
         self.markersLabel =QLabel(aw.qmc.palette["markers"])
         self.markersLabel.setPalette(QPalette(QColor(aw.qmc.palette["markers"])))
         self.markersLabel.setAutoFillBackground(True)
         self.markersButton = QPushButton(QApplication.translate("Button","Markers", None))
         self.markersButton.setFocusPolicy(Qt.NoFocus)
         self.markersLabel.setFrameStyle(frameStyle)
-        self.markersButton.clicked.connect(lambda var=self.markersLabel,color="markers": self.setColor("Markers",self.markersLabel,"markers"))
+        self.markersButton.clicked.connect(lambda *_: self.setColor("Markers",self.markersLabel,"markers"))
         self.textLabel =QLabel(aw.qmc.palette["text"])
         self.textLabel.setPalette(QPalette(QColor(aw.qmc.palette["text"])))
         self.textLabel.setAutoFillBackground(True)
         self.textButton = QPushButton(QApplication.translate("Button","Text", None))
         self.textButton.setFocusPolicy(Qt.NoFocus)
         self.textLabel.setFrameStyle(frameStyle)
-        self.textButton.clicked.connect(lambda var=self.textLabel,color="text": self.setColor("Text",self.textLabel,"text"))
+        self.textButton.clicked.connect(lambda *_: self.setColor("Text",self.textLabel,"text"))
         self.watermarksLabel =QLabel(aw.qmc.palette["watermarks"])
         self.watermarksLabel.setPalette(QPalette(QColor(aw.qmc.palette["watermarks"])))
         self.watermarksLabel.setAutoFillBackground(True)
         self.watermarksButton = QPushButton(QApplication.translate("Button","Watermarks", None))
         self.watermarksButton.setFocusPolicy(Qt.NoFocus)
         self.watermarksLabel.setFrameStyle(frameStyle)
-        self.watermarksButton.clicked.connect(lambda var=self.watermarksLabel,color="watermarks": self.setColor("Watermarks",self.watermarksLabel,"watermarks"))
+        self.watermarksButton.clicked.connect(lambda *_: self.setColor("Watermarks",self.watermarksLabel,"watermarks"))
         self.ClineLabel =QLabel(aw.qmc.palette["Cline"])
         self.ClineLabel.setPalette(QPalette(QColor(aw.qmc.palette["Cline"])))
         self.ClineLabel.setAutoFillBackground(True)
         self.ClineButton = QPushButton(QApplication.translate("Button","C Lines", None))
         self.ClineButton.setFocusPolicy(Qt.NoFocus)
         self.ClineLabel.setFrameStyle(frameStyle)
-        self.ClineButton.clicked.connect(lambda var=self.ClineLabel,color="Cline": self.setColor("C Lines",self.ClineLabel,"Cline"))
+        self.ClineButton.clicked.connect(lambda *_: self.setColor("C Lines",self.ClineLabel,"Cline"))
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         okButton.clicked.connect(self.accept)
         defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
         defaultsButton.setFocusPolicy(Qt.NoFocus)
-        defaultsButton.clicked.connect(lambda x=1:self.recolor(1))
+        defaultsButton.clicked.connect(lambda _:self.recolor(1))
         greyButton = QPushButton(QApplication.translate("Button","Grey", None))
         greyButton.setFocusPolicy(Qt.NoFocus)
-        greyButton.clicked.connect(lambda x=2:self.recolor(2))
+        greyButton.clicked.connect(lambda _:self.recolor(2))
         #TAB 2
         #use indexes to translate
         self.lcdcolors = ["","grey","darkGrey","slateGrey","lightGray","black","white","transparent"]     #this one is not to be translated as arguments need to be in English
@@ -39558,81 +39556,81 @@ class graphColorDlg(ArtisanDialog):
         self.lcd1colorComboBox =  QComboBox()
         self.lcd1colorComboBox.setMaximumWidth(100)
         self.lcd1colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd1colorComboBox.currentIndexChanged.connect(lambda text = self.lcd1colorComboBox.currentText(),flag = 2,x=1:self.paintlcds(text,2,1))
+        self.lcd1colorComboBox.currentIndexChanged.connect(lambda text = self.lcd1colorComboBox.currentText(),*_:self.paintlcds(text,2,1))
         self.lcd2colorComboBox =  QComboBox()
         self.lcd2colorComboBox.setMaximumWidth(100)
         self.lcd2colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd2colorComboBox.currentIndexChanged.connect(lambda text = self.lcd2colorComboBox.currentText(),flag = 2,x=2:self.paintlcds(text,2,2))
+        self.lcd2colorComboBox.currentIndexChanged.connect(lambda text = self.lcd2colorComboBox.currentText(),*_:self.paintlcds(text,2,2))
         self.lcd3colorComboBox =  QComboBox()
         self.lcd3colorComboBox.setMaximumWidth(100)
         self.lcd3colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd3colorComboBox.currentIndexChanged.connect(lambda text = self.lcd3colorComboBox.currentText(),flag = 2,x=3:self.paintlcds(text,2,3))
+        self.lcd3colorComboBox.currentIndexChanged.connect(lambda text = self.lcd3colorComboBox.currentText(),*_:self.paintlcds(text,2,3))
         self.lcd4colorComboBox =  QComboBox()
         self.lcd4colorComboBox.setMaximumWidth(100)
         self.lcd4colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd4colorComboBox.currentIndexChanged.connect(lambda text = self.lcd4colorComboBox.currentText(),flag = 2,x=4:self.paintlcds(text,2,4))
+        self.lcd4colorComboBox.currentIndexChanged.connect(lambda text = self.lcd4colorComboBox.currentText(),*_:self.paintlcds(text,2,4))
         self.lcd5colorComboBox =  QComboBox()
         self.lcd5colorComboBox.setMaximumWidth(100)
         self.lcd5colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd5colorComboBox.currentIndexChanged.connect(lambda text = self.lcd5colorComboBox.currentText(),flag = 2,x=5:self.paintlcds(text,2,5))
+        self.lcd5colorComboBox.currentIndexChanged.connect(lambda text = self.lcd5colorComboBox.currentText(),*_:self.paintlcds(text,2,5))
         self.lcd6colorComboBox =  QComboBox()
         self.lcd6colorComboBox.setMaximumWidth(100)
         self.lcd6colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd6colorComboBox.currentIndexChanged.connect(lambda text = self.lcd6colorComboBox.currentText(),flag = 2,x=6:self.paintlcds(text,2,6))
+        self.lcd6colorComboBox.currentIndexChanged.connect(lambda text = self.lcd6colorComboBox.currentText(),*_:self.paintlcds(text,2,6))
         lcd1backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd1backButton.clicked.connect(lambda text =0,flag=0,x=1:self.paintlcds(text,0,1))
+        lcd1backButton.clicked.connect(lambda text =0,*_:self.paintlcds(text,0,1))
         lcd2backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd2backButton.clicked.connect(lambda text =0,flag=0,x=2:self.paintlcds(text,0,2))
+        lcd2backButton.clicked.connect(lambda text =0,*_:self.paintlcds(text,0,2))
         lcd3backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd3backButton.clicked.connect(lambda text =0,flag=0,x=3:self.paintlcds(text,0,3))
+        lcd3backButton.clicked.connect(lambda text =0,*_:self.paintlcds(text,0,3))
         lcd4backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd4backButton.clicked.connect(lambda text =0,flag=0,x=4:self.paintlcds(text,0,4))
+        lcd4backButton.clicked.connect(lambda text =0,*_:self.paintlcds(text,0,4))
         lcd5backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd5backButton.clicked.connect(lambda text =0,flag=0,x=5:self.paintlcds(text,0,5))
+        lcd5backButton.clicked.connect(lambda text =0,*_:self.paintlcds(text,0,5))
         lcd6backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd6backButton.clicked.connect(lambda text =0,flag=0,x=6:self.paintlcds(text,0,6))
+        lcd6backButton.clicked.connect(lambda text =0,*_:self.paintlcds(text,0,6))
         lcd1LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd1LEDButton.clicked.connect(lambda text =0,flag=1,x=1:self.paintlcds(text,1,1))
+        lcd1LEDButton.clicked.connect(lambda *_:self.paintlcds(0,1,1))
         lcd2LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd2LEDButton.clicked.connect(lambda text =0,flag=1,x=2:self.paintlcds(text,1,2))
+        lcd2LEDButton.clicked.connect(lambda *_:self.paintlcds(0,1,2))
         lcd3LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd3LEDButton.clicked.connect(lambda text =0,flag=1,x=3:self.paintlcds(text,1,3))
+        lcd3LEDButton.clicked.connect(lambda *_:self.paintlcds(0,1,3))
         lcd4LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd4LEDButton.clicked.connect(lambda text =0,flag=1,x=4:self.paintlcds(text,1,4))
+        lcd4LEDButton.clicked.connect(lambda *_:self.paintlcds(0,1,4))
         lcd5LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd5LEDButton.clicked.connect(lambda text =0,flag=1,x=5:self.paintlcds(text,1,5))
+        lcd5LEDButton.clicked.connect(lambda *_:self.paintlcds(0,1,5))
         lcd6LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd6LEDButton.clicked.connect(lambda text =0,flag=1,x=6:self.paintlcds(text,1,6))
+        lcd6LEDButton.clicked.connect(lambda *_:self.paintlcds(0,1,6))
         self.lcd1spinbox = QSpinBox()
         self.lcd1spinbox.setSingleStep(10)
         self.lcd1spinbox.setMaximum(359)
         self.lcd1spinbox.setWrapping(True)
-        self.lcd1spinbox.valueChanged.connect(lambda val=self.lcd1spinbox.value(),lcd=1:self.setLED(val,1))
+        self.lcd1spinbox.valueChanged.connect(lambda val=self.lcd1spinbox.value(),_=0:self.setLED(val,1))
         self.lcd2spinbox = QSpinBox()
         self.lcd2spinbox.setSingleStep(10)
         self.lcd2spinbox.setWrapping(True)
         self.lcd2spinbox.setMaximum(359)
-        self.lcd2spinbox.valueChanged.connect(lambda val=self.lcd2spinbox.value(),lcd=2:self.setLED(val,2))
+        self.lcd2spinbox.valueChanged.connect(lambda val=self.lcd2spinbox.value(),_=0:self.setLED(val,2))
         self.lcd3spinbox = QSpinBox()
         self.lcd3spinbox.setSingleStep(10)
         self.lcd3spinbox.setWrapping(True)
         self.lcd3spinbox.setMaximum(359)
-        self.lcd3spinbox.valueChanged.connect(lambda val=self.lcd3spinbox.value(),lcd=3:self.setLED(val,3))
+        self.lcd3spinbox.valueChanged.connect(lambda val=self.lcd3spinbox.value(),_=0:self.setLED(val,3))
         self.lcd4spinbox = QSpinBox()
         self.lcd4spinbox.setSingleStep(10)
         self.lcd4spinbox.setWrapping(True)
         self.lcd4spinbox.setMaximum(359)
-        self.lcd4spinbox.valueChanged.connect(lambda val=self.lcd4spinbox.value(),lcd=4:self.setLED(val,4))
+        self.lcd4spinbox.valueChanged.connect(lambda val=self.lcd4spinbox.value(),_=0:self.setLED(val,4))
         self.lcd5spinbox = QSpinBox()
         self.lcd5spinbox.setSingleStep(10)
         self.lcd5spinbox.setWrapping(True)
         self.lcd5spinbox.setMaximum(359)
-        self.lcd5spinbox.valueChanged.connect(lambda val=self.lcd5spinbox.value(),lcd=5:self.setLED(val,5))
+        self.lcd5spinbox.valueChanged.connect(lambda val=self.lcd5spinbox.value(),_=0:self.setLED(val,5))
         self.lcd6spinbox = QSpinBox()
         self.lcd6spinbox.setSingleStep(10)
         self.lcd6spinbox.setWrapping(True)
         self.lcd6spinbox.setMaximum(359)
-        self.lcd6spinbox.valueChanged.connect(lambda val=self.lcd6spinbox.value(),lcd=6:self.setLED(val,6))
+        self.lcd6spinbox.valueChanged.connect(lambda val=self.lcd6spinbox.value(),_=0:self.setLED(val,6))
         LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None))
         LCDdefaultButton.clicked.connect(self.setLCDdefaults)
         #LAYOUTS
@@ -40103,7 +40101,7 @@ class LargeLCDs(ArtisanDialog):
         else:
             self.resized = True
         
-    def closeEvent(self, event):
+    def closeEvent(self, _):
         settings = QSettings()
         #save window geometry
         if sip.getapi('QVariant') == 1:
@@ -40153,10 +40151,10 @@ class WheelDlg(ArtisanDialog):
         txtlabel = QLabel(QApplication.translate("Label","Text",None))
         txtButtonplus = QPushButton(QApplication.translate("Button","+",None))
         txtButtonplus.setToolTip(QApplication.translate("Tooltip","Increase size of text in all the graph",None))
-        txtButtonplus.clicked.connect(lambda x = 1: self.changetext(1))
+        txtButtonplus.clicked.connect(lambda _: self.changetext(1))
         txtButtonminus = QPushButton(QApplication.translate("Button","-",None))
         txtButtonminus.setToolTip(QApplication.translate("Tooltip","Decrease size of text in all the graph",None))
-        txtButtonminus.clicked.connect(lambda x = 0: self.changetext(0))
+        txtButtonminus.clicked.connect(lambda _: self.changetext(0))
         edgelabel = QLabel(QApplication.translate("Label","Edge",None))
         self.edgeSpinBox = QSpinBox()
         self.edgeSpinBox.setToolTip(QApplication.translate("Tooltip","Decorative edge beween wheels",None))
@@ -40187,16 +40185,16 @@ class WheelDlg(ArtisanDialog):
         addButton.clicked.connect(self.insertwheel)
         rotateLeftButton = QPushButton(QApplication.translate("Button","<",None))
         rotateLeftButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree counter clockwise",None))
-        rotateLeftButton.clicked.connect(lambda x = 1: self.rotatewheels(1))
+        rotateLeftButton.clicked.connect(lambda _: self.rotatewheels(1))
         rotateRightButton = QPushButton(QApplication.translate("Button",">",None))
         rotateRightButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree clockwise",None))
-        rotateRightButton.clicked.connect(lambda x = 0: self.rotatewheels(0))
+        rotateRightButton.clicked.connect(lambda _: self.rotatewheels(0))
         saveButton = QPushButton(QApplication.translate("Button","Save File",None))
         saveButton.clicked.connect(self.fileSave)
         saveButton.setToolTip(QApplication.translate("Tooltip","Save graph to a text file.wg",None))
         saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None))
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None))
-        saveImgButton.clicked.connect(lambda x=0,i=1:aw.resizeImg(0,1))
+        saveImgButton.clicked.connect(lambda *_:aw.resizeImg(0,1))
         viewModeButton = QPushButton(QApplication.translate("Button","Close",None))
         viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None))
         viewModeButton.clicked.connect(self.viewmode)
@@ -40296,7 +40294,7 @@ class WheelDlg(ArtisanDialog):
                 labelwidthSpinBox.setSuffix("%")
                 labelwidthSpinBox.valueChanged.connect(lambda z=1,x=x,u=i: self.setlabelwidth(z,x,u))
                 colorButton = QPushButton("Set Color")
-                colorButton.clicked.connect(lambda b,y=x,z=i: self.setsegmentcolor(y,z))
+                colorButton.clicked.connect(lambda _,y=x,z=i: self.setsegmentcolor(y,z))
                 alphaSpinBox = QSpinBox()
                 alphaSpinBox.setRange(0,10)
                 alphaSpinBox.setValue(int(aw.qmc.segmentsalpha[x][i]*10))
@@ -40327,7 +40325,7 @@ class WheelDlg(ArtisanDialog):
         aw.qmc.drawWheel()
 
     #sets color pattern (many colors) in wheel
-    def setwheelcolorpattern(self,z,x):
+    def setwheelcolorpattern(self,x):
         wsb =  self.datatable.cellWidget(x,9)
         wpattern = wsb.value()
         wlen = len(aw.qmc.wheelcolor[x])
@@ -40472,29 +40470,29 @@ class WheelDlg(ArtisanDialog):
                 widthSpinBox.setRange(1.,100.)
                 widthSpinBox.setValue(aw.qmc.wradii[i])
                 widthSpinBox.setSuffix("%")
-                widthSpinBox.valueChanged.connect(lambda z=1,x=i: self.setwidth(z,x))
+                widthSpinBox.valueChanged.connect(lambda _,x=i: self.setwidth(x))
                 angleSpinBox = QSpinBox()
                 angleSpinBox.setSuffix(QApplication.translate("Label"," dg",None))
                 angleSpinBox.setRange(0,359)
                 angleSpinBox.setWrapping(True)
                 angleSpinBox.setValue(aw.qmc.startangle[i])
-                angleSpinBox.valueChanged.connect(lambda z=1,x=i: self.setangle(z,x))
+                angleSpinBox.valueChanged.connect(lambda _,x=i: self.setangle(x))
                 projectionComboBox =  QComboBox()
                 projectionComboBox.addItems([QApplication.translate("ComboBox","Flat",None),
                                              QApplication.translate("ComboBox","Perpendicular",None),
                                              QApplication.translate("ComboBox","Radial",None)])
                 projectionComboBox.setCurrentIndex(aw.qmc.projection[i])
-                projectionComboBox.currentIndexChanged.connect(lambda z=1,x=i:self.setprojection(z,x))
+                projectionComboBox.currentIndexChanged.connect(lambda _,x=i:self.setprojection(x))
                 txtSpinBox = QSpinBox()
                 txtSpinBox.setRange(1,30)
                 txtSpinBox.setValue(aw.qmc.wheeltextsize[i])
-                txtSpinBox.valueChanged.connect(lambda z=1,x=i: self.setTextsizeX(z,x))
+                txtSpinBox.valueChanged.connect(lambda _,x=i: self.setTextsizeX(x))
                 colorButton = QPushButton(QApplication.translate("Button","Set Color",None))
                 colorButton.clicked.connect(lambda _,x=i: self.setwheelcolor(x))
                 colorSpinBox = QSpinBox()
                 colorSpinBox.setRange(0,255)
                 colorSpinBox.setWrapping(True)
-                colorSpinBox.valueChanged.connect(lambda z=1,x=i,: self.setwheelcolorpattern(z,x))
+                colorSpinBox.valueChanged.connect(lambda _,x=i,: self.setwheelcolorpattern(x))
                 #add widgets to the table
                 self.datatable.setCellWidget(i,0,delButton)
                 self.datatable.setCellWidget(i,1,labelsedit)
@@ -40527,7 +40525,7 @@ class WheelDlg(ArtisanDialog):
         aw.qmc.drawWheel()
 
     #sets radii for a wheel. z is a variable dummy with no meaning but passed by the Qt inner workings
-    def setwidth(self,z,x):
+    def setwidth(self,x):
         widthSpinBox = self.datatable.cellWidget(x,4)
         newwidth = widthSpinBox.value()
         oldwidth = aw.qmc.wradii[x]
@@ -40553,19 +40551,19 @@ class WheelDlg(ArtisanDialog):
         aw.qmc.drawWheel()
 
     #sets starting angle (rotation) for a wheel with index x
-    def setangle(self,z,x):
+    def setangle(self,x):
         angleSpinBox = self.datatable.cellWidget(x,5)
         aw.qmc.startangle[x] = angleSpinBox.value()
         aw.qmc.drawWheel()
 
     #sets text projection style for a wheel with index x
-    def setprojection(self,z,x):
+    def setprojection(self,x):
         projectionComboBox = self.datatable.cellWidget(x,6)
         aw.qmc.projection[x] = projectionComboBox.currentIndex()
         aw.qmc.drawWheel()
 
     #chages text size in wheel with index x
-    def setTextsizeX(self,z,x):
+    def setTextsizeX(self,x):
         txtSpinBox = self.datatable.cellWidget(x,7)
         aw.qmc.wheeltextsize[x] = txtSpinBox.value()
         aw.qmc.drawWheel()
@@ -40654,7 +40652,7 @@ class WheelDlg(ArtisanDialog):
             self.createdatatable()
             aw.qmc.drawWheel()
 
-    def closeEvent(self, event):
+    def closeEvent(self, _):
         self.viewmode()
 
     def viewmode(self):
@@ -40738,10 +40736,10 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable = QTableWidget()
         self.createalarmtable()
         allonButton = QPushButton(QApplication.translate("Button","All On",None))
-        allonButton.clicked.connect(lambda flag=1: self.alarmson(1))
+        allonButton.clicked.connect(lambda _=1: self.alarmson(1))
         allonButton.setFocusPolicy(Qt.NoFocus)
         alloffButton = QPushButton(QApplication.translate("Button","All Off",None))
-        alloffButton.clicked.connect(lambda flag=0: self.alarmson(0))
+        alloffButton.clicked.connect(lambda _=0: self.alarmson(0))
         alloffButton.setFocusPolicy(Qt.NoFocus)
         addButton = QPushButton(QApplication.translate("Button","Add",None))
         addButton.clicked.connect(self.addalarm)
@@ -41003,7 +41001,7 @@ class AlarmDlg(ArtisanDialog):
             settings.setValue("AlarmsGeometry",self.saveGeometry())  
         self.accept()
     
-    def closeEvent(self, event):
+    def closeEvent(self, _):
         self.closealarms()
 
     def showAlarmbuttonhelp(self):
@@ -41344,10 +41342,10 @@ class PXRpidDlgControl(ArtisanDialog):
         button_exit.setFocus()
         self.patternComboBox.currentIndexChanged.connect(self.paintlabels)
         button_getall.clicked.connect(self.getallsegments)
-        button_rson.clicked.connect(lambda flag=1: self.setONOFFrampsoak(1))
-        button_rsoff.clicked.connect(lambda flag=0: self.setONOFFrampsoak(0))
-        button_standbyON.clicked.connect(lambda flag=1: self.setONOFFstandby(1))
-        button_standbyOFF.clicked.connect(lambda flag=0: self.setONOFFstandby(0))
+        button_rson.clicked.connect(lambda _=1: self.setONOFFrampsoak(1))
+        button_rsoff.clicked.connect(lambda _=0: self.setONOFFrampsoak(0))
+        button_standbyON.clicked.connect(lambda _=1: self.setONOFFstandby(1))
+        button_standbyOFF.clicked.connect(lambda _=0: self.setONOFFstandby(0))
         button_exit.clicked.connect(lambda _:self.reject())
         #TAB 2
         tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None))
@@ -41400,11 +41398,11 @@ class PXRpidDlgControl(ArtisanDialog):
         button_autotuneOFF.setFocusPolicy(Qt.NoFocus)
         button_readpid = QPushButton(QApplication.translate("Button","Read PID Values",None))
         button_readpid.setFocusPolicy(Qt.NoFocus)
-        button_autotuneON.clicked.connect(lambda flag=1: self.setONOFFautotune(1))
-        button_autotuneOFF.clicked.connect(lambda flag=0: self.setONOFFautotune(0))
-        button_p.clicked.connect(lambda var="p": self.setpid("p"))
-        button_i.clicked.connect(lambda var="i": self.setpid("i"))
-        button_d.clicked.connect(lambda var="d": self.setpid("d"))
+        button_autotuneON.clicked.connect(lambda _=1: self.setONOFFautotune(1))
+        button_autotuneOFF.clicked.connect(lambda _=0: self.setONOFFautotune(0))
+        button_p.clicked.connect(lambda _: self.setpid("p"))
+        button_i.clicked.connect(lambda _: self.setpid("i"))
+        button_d.clicked.connect(lambda _: self.setpid("d"))
         button_readpid.clicked.connect(self.getpid)
         #TAB4
         #table for setting segments
@@ -41499,10 +41497,10 @@ class PXRpidDlgControl(ArtisanDialog):
         getETthermocouplebutton.setMaximumWidth(80)
         setBTthermocouplebutton.setMaximumWidth(80)
         getBTthermocouplebutton.setMaximumWidth(80)
-        setETthermocouplebutton.clicked.connect(lambda PID="ET": self.setthermocoupletype("ET"))
-        setBTthermocouplebutton.clicked.connect(lambda PID="BT": self.setthermocoupletype("BT"))
-        getETthermocouplebutton.clicked.connect(lambda PID="ET": self.readthermocoupletype("ET"))
-        getBTthermocouplebutton.clicked.connect(lambda PID="BT": self.readthermocoupletype("BT"))
+        setETthermocouplebutton.clicked.connect(lambda _: self.setthermocoupletype("ET"))
+        setBTthermocouplebutton.clicked.connect(lambda _: self.setthermocoupletype("BT"))
+        getETthermocouplebutton.clicked.connect(lambda _: self.readthermocoupletype("ET"))
+        getBTthermocouplebutton.clicked.connect(lambda _: self.readthermocoupletype("BT"))
         PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None))
         PointButtonET.setFocusPolicy(Qt.NoFocus)
         PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None))
@@ -41518,7 +41516,7 @@ class PXRpidDlgControl(ArtisanDialog):
         self.followBackground = QCheckBox(QApplication.translate("CheckBox", "Follow Background",None))
         self.followBackground.setChecked(aw.fujipid.followBackground)
         self.followBackground.setFocusPolicy(Qt.NoFocus)
-        self.followBackground.stateChanged.connect(lambda i=0:self.changeFollowBackground(i))         #toggle
+        self.followBackground.stateChanged.connect(lambda _:self.changeFollowBackground())         #toggle
         # Follow Background Lookahead
         self.pidSVLookahead = QSpinBox()
         self.pidSVLookahead.setAlignment(Qt.AlignRight)
@@ -41665,7 +41663,7 @@ class PXRpidDlgControl(ArtisanDialog):
     def changeLookAhead(self):
         aw.fujipid.lookahead = int(self.pidSVLookahead.value())     
         
-    def changeFollowBackground(self,i):
+    def changeFollowBackground(self):
         aw.fujipid.followBackground = not aw.fujipid.followBackground
 
     def setpoint(self,PID):
@@ -42441,10 +42439,10 @@ class PXG4pidDlgControl(ArtisanDialog):
         button_standbyOFF.setFocusPolicy(Qt.NoFocus)
         button_getall.clicked.connect(self.getallsegments)
         button_writeallrs.clicked.connect(self.writeRSValues)
-        button_rson.clicked.connect(lambda flag=1: self.setONOFFrampsoak(1))
-        button_rsoff.clicked.connect(lambda flag=0: self.setONOFFrampsoak(0))
-        button_standbyON.clicked.connect(lambda flag=1: self.setONOFFstandby(1))
-        button_standbyOFF.clicked.connect(lambda flag=0: self.setONOFFstandby(0))
+        button_rson.clicked.connect(lambda _=1: self.setONOFFrampsoak(1))
+        button_rsoff.clicked.connect(lambda _=0: self.setONOFFrampsoak(0))
+        button_standbyON.clicked.connect(lambda _=1: self.setONOFFstandby(1))
+        button_standbyOFF.clicked.connect(lambda _=0: self.setONOFFstandby(0))
         button_exit.clicked.connect(self.accept)
         button_load.clicked.connect(lambda : self.load())
         button_save.clicked.connect(lambda : self.save())
@@ -42480,7 +42478,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.followBackground = QCheckBox(QApplication.translate("CheckBox", "Follow Background",None))
         self.followBackground.setChecked(aw.fujipid.followBackground)
         self.followBackground.setFocusPolicy(Qt.NoFocus)
-        self.followBackground.stateChanged.connect(lambda i=0:self.changeFollowBackground(i))         #toggle
+        self.followBackground.stateChanged.connect(lambda _:self.changeFollowBackground())         #toggle
         # Follow Background Lookahead
         self.pidSVLookahead = QSpinBox()
         self.pidSVLookahead.setAlignment(Qt.AlignRight)
@@ -42519,13 +42517,13 @@ class PXG4pidDlgControl(ArtisanDialog):
         button_sv6.setFocusPolicy(Qt.NoFocus)
         button_sv7 =QPushButton(QApplication.translate("Button","Write SV7",None))
         button_sv7.setFocusPolicy(Qt.NoFocus)
-        button_sv1.clicked.connect(lambda v=1: self.setsv(1))
-        button_sv2.clicked.connect(lambda v=2: self.setsv(2))
-        button_sv3.clicked.connect(lambda v=3: self.setsv(3))
-        button_sv4.clicked.connect(lambda v=4: self.setsv(4))
-        button_sv5.clicked.connect(lambda v=5: self.setsv(5))
-        button_sv6.clicked.connect(lambda v=6: self.setsv(6))
-        button_sv7.clicked.connect(lambda v=7: self.setsv(7))
+        button_sv1.clicked.connect(lambda _: self.setsv(1))
+        button_sv2.clicked.connect(lambda _: self.setsv(2))
+        button_sv3.clicked.connect(lambda _: self.setsv(3))
+        button_sv4.clicked.connect(lambda _: self.setsv(4))
+        button_sv5.clicked.connect(lambda _: self.setsv(5))
+        button_sv6.clicked.connect(lambda _: self.setsv(6))
+        button_sv7.clicked.connect(lambda _: self.setsv(7))
         self.sv1edit = QLineEdit(u(str(aw.fujipid.PXG4["sv1"][0])))
         self.sv2edit = QLineEdit(u(str(aw.fujipid.PXG4["sv2"][0])))
         self.sv3edit = QLineEdit(u(str(aw.fujipid.PXG4["sv3"][0])))
@@ -42626,13 +42624,13 @@ class PXG4pidDlgControl(ArtisanDialog):
 #        tab2easyOFFsvbutton.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFeasySV(0))
 #        tab2easyONsvslider.clicked.connect(lambda flag=1: aw.fujipid.activateONOFFsliderSV(1))
 #        tab2easyOFFsvslider.clicked.connect(lambda flag=0: aw.fujipid.activateONOFFsliderSV(0))
-        self.radiosv1.clicked.connect(lambda sv=1: self.setNsv(1))
-        self.radiosv2.clicked.connect(lambda sv=2: self.setNsv(2))
-        self.radiosv3.clicked.connect(lambda sv=3: self.setNsv(3))
-        self.radiosv4.clicked.connect(lambda sv=4: self.setNsv(4))
-        self.radiosv5.clicked.connect(lambda sv=5: self.setNsv(5))
-        self.radiosv6.clicked.connect(lambda sv=6: self.setNsv(6))
-        self.radiosv7.clicked.connect(lambda sv=7: self.setNsv(7))
+        self.radiosv1.clicked.connect(lambda _: self.setNsv(1))
+        self.radiosv2.clicked.connect(lambda _: self.setNsv(2))
+        self.radiosv3.clicked.connect(lambda _: self.setNsv(3))
+        self.radiosv4.clicked.connect(lambda _: self.setNsv(4))
+        self.radiosv5.clicked.connect(lambda _: self.setNsv(5))
+        self.radiosv6.clicked.connect(lambda _: self.setNsv(6))
+        self.radiosv7.clicked.connect(lambda _: self.setNsv(7))
         #****************   TAB 3 WIDGETS
         plabel = QLabel()
         plabel.setContentsMargins(10,10,10,10)
@@ -42757,23 +42755,23 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.radiopid7 = QRadioButton()
         pidreadallbutton.clicked.connect(self.getallpid)
         pidwriteallbutton.clicked.connect(self.writePIDValues)
-        self.radiopid1.clicked.connect(lambda pid=1: self.setNpid(1))
-        self.radiopid2.clicked.connect(lambda pid=2: self.setNpid(2))
-        self.radiopid3.clicked.connect(lambda pid=3: self.setNpid(3))
-        self.radiopid4.clicked.connect(lambda pid=4: self.setNpid(4))
-        self.radiopid5.clicked.connect(lambda pid=5: self.setNpid(5))
-        self.radiopid6.clicked.connect(lambda pid=6: self.setNpid(6))
-        self.radiopid7.clicked.connect(lambda pid=7: self.setNpid(7))
-        pid1button.clicked.connect(lambda v=1: self.setpid(1))
-        pid2button.clicked.connect(lambda v=2: self.setpid(2))
-        pid3button.clicked.connect(lambda v=3: self.setpid(3))
-        pid4button.clicked.connect(lambda v=4: self.setpid(4))
-        pid5button.clicked.connect(lambda v=5: self.setpid(5))
-        pid6button.clicked.connect(lambda v=6: self.setpid(6))
-        pid7button.clicked.connect(lambda v=7: self.setpid(7))
+        self.radiopid1.clicked.connect(lambda _: self.setNpid(1))
+        self.radiopid2.clicked.connect(lambda _: self.setNpid(2))
+        self.radiopid3.clicked.connect(lambda _: self.setNpid(3))
+        self.radiopid4.clicked.connect(lambda _: self.setNpid(4))
+        self.radiopid5.clicked.connect(lambda _: self.setNpid(5))
+        self.radiopid6.clicked.connect(lambda _: self.setNpid(6))
+        self.radiopid7.clicked.connect(lambda _: self.setNpid(7))
+        pid1button.clicked.connect(lambda _: self.setpid(1))
+        pid2button.clicked.connect(lambda _: self.setpid(2))
+        pid3button.clicked.connect(lambda _: self.setpid(3))
+        pid4button.clicked.connect(lambda _: self.setpid(4))
+        pid5button.clicked.connect(lambda _: self.setpid(5))
+        pid6button.clicked.connect(lambda _: self.setpid(6))
+        pid7button.clicked.connect(lambda _: self.setpid(7))
         cancel3button.clicked.connect(self.reject)
-        autotuneONbutton.clicked.connect(lambda flag=1: self.setONOFFautotune(1))
-        autotuneOFFbutton.clicked.connect(lambda flag=0: self.setONOFFautotune(0))
+        autotuneONbutton.clicked.connect(lambda _=1: self.setONOFFautotune(1))
+        autotuneOFFbutton.clicked.connect(lambda _=0: self.setONOFFautotune(0))
         #****************************   TAB4 WIDGETS
         #table for setting segments
         self.segmenttable = QTableWidget()
@@ -42868,10 +42866,10 @@ class PXG4pidDlgControl(ArtisanDialog):
         getETthermocouplebutton.setMaximumWidth(80)
         setBTthermocouplebutton.setMaximumWidth(80)
         getBTthermocouplebutton.setMaximumWidth(80)
-        setETthermocouplebutton.clicked.connect(lambda PID="ET": self.setthermocoupletype("ET"))
-        setBTthermocouplebutton.clicked.connect(lambda PID="BT": self.setthermocoupletype("BT"))
-        getETthermocouplebutton.clicked.connect(lambda PID="ET": self.readthermocoupletype("ET"))
-        getBTthermocouplebutton.clicked.connect(lambda PID="BT": self.readthermocoupletype("BT"))
+        setETthermocouplebutton.clicked.connect(lambda _: self.setthermocoupletype("ET"))
+        setBTthermocouplebutton.clicked.connect(lambda _: self.setthermocoupletype("BT"))
+        getETthermocouplebutton.clicked.connect(lambda _: self.readthermocoupletype("ET"))
+        getBTthermocouplebutton.clicked.connect(lambda _: self.readthermocoupletype("BT"))
         PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None))
         PointButtonET.setFocusPolicy(Qt.NoFocus)
         PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None))
@@ -42880,8 +42878,8 @@ class PXG4pidDlgControl(ArtisanDialog):
         timeunitsbutton.setFocusPolicy(Qt.NoFocus)
         pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None))
         timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None))
-        PointButtonET.clicked.connect(lambda PID="ET": self.setpoint("ET"))
-        PointButtonBT.clicked.connect(lambda PID="BT": self.setpoint("BT"))
+        PointButtonET.clicked.connect(lambda _: self.setpoint("ET"))
+        PointButtonBT.clicked.connect(lambda _: self.setpoint("BT"))
         timeunitsbutton.clicked.connect(self.settimeunits)
         # LAYOUTS
         tab1Layout = QGridLayout() #TAB1
@@ -43063,7 +43061,7 @@ class PXG4pidDlgControl(ArtisanDialog):
     def changeLookAhead(self):
         aw.fujipid.lookahead = int(self.pidSVLookahead.value())     
         
-    def changeFollowBackground(self,i):
+    def changeFollowBackground(self):
         aw.fujipid.followBackground = not aw.fujipid.followBackground
         
     def load(self):
@@ -45703,7 +45701,7 @@ class PID_DlgControl(ArtisanDialog):
         #
         self.closeEvent(None)        
 
-    def closeEvent(self,event):
+    def closeEvent(self,_):
         settings = QSettings()
         #save window geometry
         if sip.getapi('QVariant') == 1:
@@ -46071,7 +46069,7 @@ class PIDcontrol(object):
 
     def setDutySteps(self,dutySteps):
         if aw.qmc.Controlbuttonflag and not aw.pidcontrol.externalPIDControl():
-            aw.qmc.pid.setDutySteps(aw.pidcontrol.dutySteps)
+            aw.qmc.pid.setDutySteps(dutySteps)
 
     
     def setSV(self,sv,move=True,init=False):
@@ -46259,7 +46257,7 @@ class DtaPID(object):
 # the following avoids the "No document could be created" dialog and the Console message
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
 if sys.platform.startswith("darwin"):
-    from Cocoa import NSDocument
+    from Cocoa import NSDocument  # @UnresolvedImport
     class Document(NSDocument):
 #        def windowNibName(self):
 #            return None #"Document"
