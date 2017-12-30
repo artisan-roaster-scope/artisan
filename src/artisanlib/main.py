@@ -21647,32 +21647,49 @@ class ApplicationWindow(QMainWindow):
             infile = io.open(filename, 'r', encoding='utf-8')
             obj = json.load(infile)
             infile.close()
+            if not self.qmc.reset():
+                return
+            self.qmc.celsiusMode()
+            self.qmc.drumspeed = ""
             bt = obj["beanTemperature"]
             dt = obj["drumTemperature"]
-            ex = obj["exitTemperature"]
+            try:
+                ex = obj["exitTemperature"]
+            except:
+                ex = None
             sr = obj["sampleRate"]
-            d = obj["dateTime"] # RFC 3339 date time
             tx = [x*1.0/sr for x in range(len(bt))]
             
-            # add extra device if exitTemperatures are given and no extra device is configured
+            # add extra device if exitTemperatures are given and this extra device is not configured
             try:
-                if ex is not None and ex != [] and len(self.qmc.extradevices) < 1:
+                if ex is not None and ex != [] and aw.qmc.extraname1 != ["exitTemperature"]:
                     string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
                     reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                     if reply == QMessageBox.Yes:
                         if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
+                            if len(self.qmc.extradevices) > 0:
+                                aw.resetExtraDevices()
                             aw.addDevice()
                             aw.qmc.resetlinecountcaches()
+                            aw.qmc.extraname1[0] = "exitTemperature"
+                            aw.extraCurveVisibility1[0] = toBool(True)
+                            aw.extraCurveVisibility2[0] = toBool(False)
                         else:
                             return False
                     else:
                         return False
-            except:
-                pass
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " importBullet(): {0}").format(str(e)),exc_tb.tb_lineno)
 
             if len(tx) == len(bt) == len(dt):
-                self.roastertype = u("Aillio Bullet R1")
+                self.qmc.roastertype = "Aillio Bullet R1"
                 try:
+                    self.qmc.operator = u(obj["roastMasterName"])
+                except:
+                    pass
+                try:
+                    d = obj["dateTime"] # RFC 3339 date time
                     self.qmc.roastdate = QDateTime.fromString(d,Qt.ISODate)
                 except:
                     pass
@@ -21692,57 +21709,68 @@ class ApplicationWindow(QMainWindow):
                 
                 try:
                     self.qmc.title = obj["beanName"]
-                    try:
-                        self.qmc.beans = obj["bean"]["beanName"]
-                    except:
-                        pass
-                    self.qmc.ground_color = int(round(obj["agtron"]))
-                    if "Agtron" in self.qmc.color_systems:
-                        self.qmc.color_system_idx = self.qmc.color_systems.index("Agtron")
-                    else:
-                        self.qmc.color_system_idx = 0
-                    wunit = self.qmc.weight_units.index(self.qmc.weight[2])
-                    if wunit in [1,3]: # turn Kg into g, and lb into oz
-                        wunit = wunit -1
-                    self.qmc.weight = [obj["weightGreen"],obj["weightRoasted"],self.qmc.weight_units[wunit]]
-                    self.qmc.ambientTemp = obj["ambient"]
-                    self.qmc.ambient_humidity = obj["humidity"]
-                    self.qmc.roastingnotes = obj["comments"]
-                    self.qmc.roastbatchnr = obj["roastNumber"] 
-                    try:
-                        aw.qmc.timeindex = [0,
-                             obj["indexYellowingStart"],
-                             obj["indexFirstCrackStart"],
-                             obj["indexFirstCrackEnd"],
-                             obj["indexSecondCrackStart"],
-                             obj["indexSecondCrackEnd"],
-                             len(tx) - 1,
-                             0
-                             ]
-                    except:
-                        pass   
-                        
-                    try:
-                        eventtypes = ["blowerSetting","drumSpeedSetting","","inductionPowerSetting"]
-                        for j in range(len(eventtypes)):
-                            eventname = eventtypes[j]
-                            if eventname != "":
-                                last = None
-                                ip = obj[eventname]
-                                for i in range(len(ip)):
-                                    v = ip[i]+1
-                                    if last is None or last != v:
-                                        aw.qmc.specialevents.append(i)
-                                        aw.qmc.specialeventstype.append(j)
-                                        aw.qmc.specialeventsvalue.append(v)
-                                        aw.qmc.specialeventsStrings.append("")
-                                        last = v
-                    except:
-                        pass
                 except:
                     pass
-            aw.autoAdjustAxis()
-            self.qmc.redraw()                
+                try:
+                    self.qmc.beans = obj["bean"]["beanName"]
+                except:
+                    pass
+                self.qmc.ground_color = int(round(obj["agtron"]))
+                if "Agtron" in self.qmc.color_systems:
+                    self.qmc.color_system_idx = self.qmc.color_systems.index("Agtron")
+                else:
+                    self.qmc.color_system_idx = 0
+                wunit = self.qmc.weight_units.index(self.qmc.weight[2])
+                if wunit in [1,3]: # turn Kg into g, and lb into oz
+                    wunit = wunit -1
+                self.qmc.weight = [obj["weightGreen"],obj["weightRoasted"],self.qmc.weight_units[wunit]]
+                self.qmc.ambientTemp = obj["ambient"]
+                self.qmc.ambient_humidity = obj["humidity"]
+                self.qmc.roastingnotes = obj["comments"]
+                self.qmc.roastbatchnr = obj["roastNumber"] 
+                try:  
+                    indexYellowingStart = obj["indexYellowingStart"] # early profiles did not include indexYellowingStart
+                except:
+                    indexYellowingStart = 0
+                try:
+                    aw.qmc.timeindex = [0,
+                         indexYellowingStart,
+                         obj["indexFirstCrackStart"],
+                         obj["indexFirstCrackEnd"],
+                         obj["indexSecondCrackStart"],
+                         obj["indexSecondCrackEnd"],
+                         len(tx) - 1,
+                         0
+                         ]
+                    for j in range(len(aw.qmc.timeindex)):
+                        if aw.qmc.timeindex[j] > len(tx):
+                            aw.qmc.timeindex[j] = 0
+                            aw.sendmessage(QApplication.translate("Message","Warning! Deleted an event that occurs after the end of profile.", None))
+                except:
+                    pass                        
+                try:
+                    aw.qmc.etypes = eventtypes = ["blowerSetting","drumSpeedSetting","--","inductionPowerSetting"]
+                    for j in range(len(eventtypes)):
+                        eventname = eventtypes[j]
+                        if eventname != "--":
+                            last = None
+                            ip = obj[eventname]
+                            for i in range(len(ip)):
+                                v = ip[i]+1
+                                if last is None or last != v:
+                                    aw.qmc.specialevents.append(i)
+                                    aw.qmc.specialeventstype.append(j)
+                                    aw.qmc.specialeventsvalue.append(v)
+                                    aw.qmc.specialeventsStrings.append("")
+                                    last = v
+                    aw.orderEvents()
+                except:
+                    pass
+                aw.autoAdjustAxis()
+                self.qmc.redraw()                
+                aw.sendmessage(QApplication.translate("Message","Imported {0}", None).format(u(filename)))
+            else:
+                aw.sendmessage(QApplication.translate("Message","Unable to import. Inconsistent number of samples", None))
         except IOError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None) + " self.importBullet(): {0}").format(str(ex)))
         except ValueError as ex:
