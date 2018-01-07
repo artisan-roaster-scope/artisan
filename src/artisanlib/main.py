@@ -4609,7 +4609,8 @@ class tgraphcanvas(FigureCanvas):
                                     st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])) 
                                 else:
                                     st1 = u("E") 
-                                if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
+                                # plot events on BT when showeventsonbt is true
+                                if not aw.qmc.showeventsonbt and self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
                                     temp = self.temp1B[self.backgroundEvents[p]]
                                 else:
                                     temp = self.temp2B[self.backgroundEvents[p]]
@@ -4743,7 +4744,8 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     height = 20
                                 #some times ET is not drawn (ET = 0) when using device NONE
-                                if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
+                                # plot events on BT when showeventsonbt is true
+                                if not aw.qmc.showeventsonbt and self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
                                     if aw.qmc.flagon:
                                         temp = self.temp1[int(self.specialevents[i])]
                                     else:
@@ -4836,7 +4838,14 @@ class tgraphcanvas(FigureCanvas):
                                 secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 if aw.qmc.ETcurve or aw.qmc.BTcurve:
-                                    if (aw.qmc.ETcurve and self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]) or (not aw.qmc.BTcurve):
+                                    # plot events on BT when showeventsonbt is true
+                                    if aw.qmc.showeventsonbt and aw.qmc.BTcurve:
+                                        col = self.palette["bt"]
+                                        if aw.qmc.flagon:
+                                            temps = self.temp2
+                                        else:
+                                            temps = self.stemp2
+                                    elif (aw.qmc.ETcurve and self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]) or (not aw.qmc.BTcurve):
                                         col = self.palette["et"]
                                         if aw.qmc.flagon:
                                             temps = self.temp1
@@ -6957,7 +6966,8 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     height = 20
                                 #some times ET is not drawn (ET = 0) when using device NONE
-                                if self.temp1[index] > self.temp2[index]:
+                                # plot events on BT when showeventsonbt is true
+                                if not aw.qmc.showeventsonbt and self.temp1[index] > self.temp2[index]:
                                     temp = self.temp1[index]
                                 else:
                                     temp = self.temp2[index]
@@ -7003,7 +7013,8 @@ class tgraphcanvas(FigureCanvas):
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 fontprop_small = aw.mpl_fontproperties.copy()
                                 fontprop_small.set_size("xx-small")
-                                if self.temp1[index] >= self.temp2[index]:
+                                # plot events on BT when showeventsonbt is true
+                                if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
                                     self.ax.annotate(firstletter + secondletter, 
                                         xy=(self.timex[index], 
                                         self.temp1[index]),xytext=(self.timex[index],row[firstletter]),
@@ -7112,7 +7123,8 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 height = 20
                             #some times ET is not drawn (ET = 0) when using device NONE
-                            if self.temp1[index] > self.temp2[index]:
+                            # plot events on BT when showeventsonbt is true
+                            if not aw.qmc.showeventsonbt and self.temp1[index] > self.temp2[index]:
                                 temp = self.temp1[index]
                             else:
                                 temp = self.temp2[index]
@@ -7129,7 +7141,8 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
                             #some times ET is not drawn (ET = 0) when using device NONE
-                            if self.temp1[index] >= self.temp2[index]:
+                            # plot events on BT when showeventsonbt is true
+                            if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
                                 self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
                                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
                             else:
