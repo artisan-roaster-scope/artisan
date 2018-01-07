@@ -1625,6 +1625,7 @@ class tgraphcanvas(FigureCanvas):
         self.l_eventtype4dots = None
         
         self.l_annotations = []
+        self.l_background_annotations = []
 
         ###########################  TIME  CLOCK     ##########################
         # create an object time to measure and record time (in miliseconds)
@@ -3810,6 +3811,7 @@ class tgraphcanvas(FigureCanvas):
                 self.autoFCsIdx = 0
                 
                 self.l_annotations = [] # initiate the event annotations
+                self.l_background_annotations = [] # initiate the event annotations
 
                 aw.hideDefaultButtons()
                 aw.hideExtraButtons(changeDefault=False)
@@ -4209,7 +4211,16 @@ class tgraphcanvas(FigureCanvas):
         skip = -1
         for i,e in enumerate(l):
             if i >= skip:
-                if e == -1 and last_val != -1:
+                if e == -1 and last_val == -1:            
+                    # a prefix of -1 will be replaced by the first value in l that is not -1
+                    s = -1
+                    for e in l:
+                      if e != -1:
+                        s = e
+                        break
+                    res.append(s)
+                    last_val = s
+                elif e == -1 and last_val != -1:
                     next_val = None
                     next_idx = None # first index of an element beyond i of a value different to -1
                     for j in range(i+1,len(l)):
@@ -4522,6 +4533,7 @@ class tgraphcanvas(FigureCanvas):
                 
                 #check BACKGROUND flag
                 if self.background: 
+                    self.l_background_annotations = []
                     #check to see if there is both a profile loaded and a background loaded
                     if self.backmoveflag:
                         self.timealign(redraw=False,recompute=False)
@@ -4603,10 +4615,11 @@ class tgraphcanvas(FigureCanvas):
                                     temp = self.temp2B[self.backgroundEvents[p]]
                                 if not aw.qmc.showEtypes[self.backgroundEtypes[p]]:
                                     continue
-                                self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),path_effects=[],
+                                anno = self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),path_effects=[],
                                                     xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
                                                     fontsize="x-small",fontproperties=aw.mpl_fontproperties,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
                                                     alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)
+                                self.l_background_annotations.append(anno)
                         #background events by value
                         else:
                             self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
@@ -4706,7 +4719,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.flagon:  # we don't smooth, but remove the dropouts
                         self.stemp2 = self.fill_gaps(self.temp2)
                     else:                    
-                        self.stemp2 = self.smooth_list(self.timex,self.fill_gaps(self.temp2),window_len=self.curvefilter)                            
+                        self.stemp2 = self.smooth_list(self.timex,self.fill_gaps(self.temp2),window_len=self.curvefilter)
     
                 if self.eventsshowflag:
                     Nevents = len(self.specialevents)
@@ -19384,7 +19397,7 @@ class ApplicationWindow(QMainWindow):
                         label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]
-                        stemp = self.qmc.smooth_list(timex,temp,window_len=self.qmc.curvefilter)
+                        stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter)
                         charge = max(0,rd["charge_idx"]-15) # start of visible data
                         drop = rd["drop_idx"] # end of visible data
                         stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
@@ -19447,7 +19460,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # remove annotations, lines and artists from background profile
                     try:
-                        for l in aw.qmc.l_annotations:
+                        for l in aw.qmc.l_annotations + aw.qmc.l_background_annotations:
                             if l:
                                 l.remove()
                         for l in [
@@ -21198,6 +21211,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.TP_time_B = -1
         self.qmc.TP_time_B_loaded = -1
         self.qmc.AUCbackground = -1
+        self.qmc.l_background_annotations = []
 
     def switchETBT(self):
         t2 = aw.qmc.temp2
@@ -38695,6 +38709,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.ser.ArduinoFILT = [sb.value() for sb in self.FILTspinBoxes]
             
             aw.ser.externalprogram = u(self.programedit.text())
+            aw.ser.externaloutprogram = u(self.outprogramedit.text())
             
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA
