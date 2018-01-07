@@ -1242,7 +1242,7 @@ class tgraphcanvas(FigureCanvas):
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
         self.roastertype = ""
         self.operator = ""
-        self.drumspeed = ""   #dave33
+        self.drumspeed = ""
         self.roastingnotes = ""
         self.cuppingnotes = ""
         self.roastdate = QDateTime.currentDateTime()
@@ -19321,18 +19321,25 @@ class ApplicationWindow(QMainWindow):
             foreground_profile_path = aw.curFile  # @UndefinedVariable
             # clear graph
             self.qmc.reset()
-            min_start_time = aw.qmc.startofx
-            if aw.qmc.autotimex:
-                max_end_time = 0
-            else:
-                max_end_time = aw.qmc.endofx
+            min_start_time = max_end_time = 0
             first_profile = True
             first_profile_event_time = 0
             max_drop_time = 0
             for p in profiles:
                 pd = self.profileProductionData(p)
                 c += 1
-                rd = self.profileRankingData(p)
+                try:
+                    cl = next(color) # here to keep colors in sync with the pct graph colors
+                except Exception as e:
+                    pass
+                try:
+                    rd = self.profileRankingData(p)
+                except Exception as e:
+#                        import traceback
+#                        traceback.print_exc(file=sys.stdout)
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                    continue
                 i = aw.convertWeight(pd["weight"][0],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
                 o = aw.convertWeight(pd["weight"][1],aw.qmc.weight_units.index(pd["weight"][2]),aw.qmc.weight_units.index(aw.qmc.weight[2]))
                 if i > 0:
@@ -19381,13 +19388,12 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # add BT curve to graph
                     try:
-                        cl = next(color)
                         entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"                    
                         label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]
                         stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter)
-                        charge = max(0,rd["charge_idx"]-15) # start of visible data
+                        charge = max(0,rd["charge_idx"]) # start of visible data
                         drop = rd["drop_idx"] # end of visible data
                         stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
                         timeindex = p["timeindex"]
@@ -19438,8 +19444,6 @@ class ApplicationWindow(QMainWindow):
 #                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
-
-                            
                 
             tmpdir = u(QDir.tempPath() + "/")
             graph_image = ""
@@ -19475,7 +19479,7 @@ class ApplicationWindow(QMainWindow):
                     except Exception:
                         pass
                         
-                    aw.qmc.ax.set_xlim(min_start_time-60,max_end_time+60) # we adjust the min, max time scale to ensure all data is visible
+                    aw.qmc.ax.set_xlim(min_start_time-15,max_end_time+15) # we adjust the min, max time scale to ensure all data is visible
                     graph_image = "roastlog-graph"
                     self.qmc.ax.set_title("")
                     self.qmc.fig.suptitle("")           
@@ -19521,6 +19525,7 @@ class ApplicationWindow(QMainWindow):
 
                     # setup the font 
                     fontcolor = 'black'
+                    lightfontcolor = 'grey'
                     prop.set_family(mpl.rcParams['font.family'])
 
                     # generate graph  ( not written to support MPL < v2.0 )
@@ -19563,8 +19568,16 @@ class ApplicationWindow(QMainWindow):
                     color=iter(cm.tab10(numpy.linspace(0,1,10)))    # @UndefinedVariable   
                     for p in profiles:
                         i -= 1
-                        cl = (next(color),'#00b950', '#ffb347', '#9f7960')
-                        rd = self.profileRankingData(p)
+                        cl = next(color),'#00b950', '#ffb347', '#9f7960'
+                        try:
+                            rd = self.profileRankingData(p)
+                        except Exception as e:
+        #                        import traceback
+        #                        traceback.print_exc(file=sys.stdout)
+                            _, _, exc_tb = sys.exc_info()
+                            aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                            i += 1   #avoid a blank line
+                            continue
                         pd = self.profileProductionData(p)
                         label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))[:8]
                         if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
@@ -19581,6 +19594,32 @@ class ApplicationWindow(QMainWindow):
                             ax.text( n + rd["DRY_percent"] + rd["MAI_percent"]/2,                           i*(barheight + barspacer) + textoffset, str(round(rd["MAI_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["MAI_time"]), ha='center', color=fontcolor, fontproperties=prop)
                             ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"]/2,       i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
                             ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
+                        elif "DEV_percent" in rd:   # has FCs but no Dry event
+                            cl = cl[0],'white',cl[3]     
+                            missingDryevent = u(QApplication.translate("Messages", "Profile missing Dry event",None))
+                            ax.broken_barh( [ (0, m), 
+                                              (n, 100 - rd["DEV_percent"]),
+                                              (n+ 100 - rd["DEV_percent"], rd["DEV_percent"]),
+                                              (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
+                                            ], 
+                                            (i*(barheight + barspacer), barheight), facecolors=cl
+                                          )                      
+                            ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
+                            ax.text( n + (100 - rd["DEV_percent"])/2,                                       i*(barheight + barspacer) + textoffset, missingDryevent, ha='center', color=lightfontcolor, fontproperties=prop)
+                            ax.text( n + 100 - rd["DEV_percent"] + rd["DEV_percent"]/2,                     i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                            ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
+                        else:    # no useful events
+                            cl = cl[0],'white'
+                            missingPhaseevents = u(QApplication.translate("Messages", "Profile missing phase events",None))
+                            ax.broken_barh( [ (0, m),
+                                              (n, 100),
+                                              (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
+                                            ], 
+                                            (i*(barheight + barspacer), barheight), facecolors=cl
+                                          )                      
+                            ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
+                            ax.text( n + 100/2,                                                             i*(barheight + barspacer) + textoffset, missingPhaseevents, ha='center', color=lightfontcolor, fontproperties=prop)
+                            ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
                                                           
                     # save graph
                     graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
@@ -19607,7 +19646,6 @@ class ApplicationWindow(QMainWindow):
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
-                
             
             weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb"] else '{0:.0f}')
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
