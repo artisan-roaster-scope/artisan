@@ -19479,7 +19479,10 @@ class ApplicationWindow(QMainWindow):
                     try:
                         for l in aw.qmc.l_annotations + aw.qmc.l_background_annotations:
                             if l:
-                                l.remove()
+                                try:
+                                    l.remove()
+                                except:
+                                    pass
                         for l in [
                                 aw.qmc.l_back1,
                                 aw.qmc.l_back2,
@@ -19488,7 +19491,10 @@ class ApplicationWindow(QMainWindow):
                                 aw.qmc.l_delta2B
                                 ]:
                             if l:
-                                aw.qmc.ax.lines.remove(l)
+                                try:
+                                    aw.qmc.ax.lines.remove(l)
+                                except:
+                                    pass
                         for a in [
                                 aw.qmc.l_eventtype1dots,
                                 aw.qmc.l_eventtype2dots,
@@ -19499,7 +19505,11 @@ class ApplicationWindow(QMainWindow):
                                 aw.qmc.l_backgroundeventtype3dots,
                                 aw.qmc.l_backgroundeventtype4dots]:
                             if a:
-                                a.remove()
+                                try:
+                                    a.remove()
+                                    #aw.qmc.ax.lines.remove(a) # corresponds to a.remove()
+                                except Exception as e:
+                                    pass
                     except Exception:
                         pass
                         
