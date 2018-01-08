@@ -4204,9 +4204,9 @@ class tgraphcanvas(FigureCanvas):
                     # a prefix of -1 will be replaced by the first value in l that is not -1
                     s = -1
                     for e in l:
-                      if e != -1:
-                        s = e
-                        break
+                        if e != -1:
+                            s = e
+                            break
                     res.append(s)
                     last_val = s
                 elif e == -1 and last_val != -1:
@@ -15976,11 +15976,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.background = True
                     aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
                 else:
-                    self.qmc.backgroundpath = ""
-                    self.qmc.titleB = ""
-                    self.qmc.roastbatchnrB = 0
-                    self.qmc.roastbatchprefixB = u("")
-                    self.qmc.roastbatchposB = 1                    
+                    self.deleteBackground() # delete a loaded background if any                 
             aw.autoAdjustAxis()
                     
             return True
@@ -21246,6 +21242,7 @@ class ApplicationWindow(QMainWindow):
         #dialog.setFixedSize(dialog.size())
         
     def deleteBackground(self):
+        self.qmc.background = False
         self.qmc.backgroundpath = ""
         self.qmc.titleB = ""
         self.qmc.roastbatchnrB = 0
