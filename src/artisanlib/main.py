@@ -11318,10 +11318,11 @@ class ApplicationWindow(QMainWindow):
         # list of buttons that can be controlled via the keyboard
         # RESET -> HUD -> ON/OFF -> .. -> EVENT (RESET at index 0 is never used)
         self.keyboardButtonList = [self.button_7, self.button_18,self.button_1,self.button_8,self.button_19,self.button_3,self.button_4,self.button_5,self.button_6,self.button_9,self.button_20,self.button_11]
+        # 0:RESET,1:HUD,2:ON/OFF,3:CHARGE,4:DRY,5:FCs,6:FCe,7:SCs,8:SCe,9:DROP,10:COOL,11:EVENT
         self.keyboardButtonStyles = ["RESET","HUD_ON","ON","CHARGE","DRY END","FC START","FC END","SC START","SC END","DROP","COOL END","EVENT"]
 
         #current function above
-        self.keyboardmoveindex = 0
+        self.keyboardmoveindex = 3
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
         #time stamp of last keyboard event SPACE to prevent multiple recognitions
@@ -14014,7 +14015,10 @@ class ApplicationWindow(QMainWindow):
             if aw.eventsbuttonflag:
                 return 11 # next: EVENT
             else:
-                return 1 # next: HUD
+                if aw.qmc.HUDbuttonflag:
+                    return 1 # next: HUD
+                else:
+                    return 2 # next: ON/OFF
         else:
             # we check if the next button is visible, else we recurse (the index of buttonvisibility starts from 0:CHARGE and leads to 7:COOL)
             # there is an offset of 3
@@ -14027,12 +14031,14 @@ class ApplicationWindow(QMainWindow):
         if currentButtonIndex == 2 and aw.qmc.HUDbuttonflag: # current: ON/OFF
             # the current button index is the ON/OFF button, we move to the HUD button (if visible)
             return 1
+        elif currentButtonIndex == 2 and not aw.qmc.HUDbuttonflag:
+            return self.previousActiveButton(1)
         elif currentButtonIndex == 1 or (currentButtonIndex == 2 and not aw.qmc.HUDbuttonflag): # current: HUD
             # check if the EVENT button is active, else move to the HUD
             if aw.eventsbuttonflag:
                 return 11 # move to EVENT
             else:
-                return self.previousActiveButton(10) # move to prev(EVENT)
+                return self.previousActiveButton(11) # move to prev(EVENT)
         elif currentButtonIndex == 3: # current: CHARGE
             return 2 # next: ON/OFF
         else:
@@ -14065,6 +14071,20 @@ class ApplicationWindow(QMainWindow):
         else:
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
 
+    def ignoreFlatButtons(self,moveindex):
+        if self.keyboardButtonList[moveindex].isFlat() or not aw.qmc.buttonvisibility[moveindex - 3]:
+            # we search forward for the next non-flat button
+            if moveindex < 10:
+                m = moveindex + 1
+                # we jump over invisible buttons
+                while m < 10 and (not aw.qmc.buttonvisibility[m - 3] or self.keyboardButtonList[m].isFlat()):
+                    m = m + 1
+                return m
+            else:
+                return moveindex
+        else:
+            return moveindex
+            
     def moveKbutton(self,kcommand):
         #"Enter" toggles ON/OFF keyboard    
         if kcommand =="enter" and self.qmc.flagstart:
@@ -14074,7 +14094,7 @@ class ApplicationWindow(QMainWindow):
                 # deactivate slider keyboard control
                 self.setSliderFocusPolicy(Qt.NoFocus)
                 self.sendmessage(QApplication.translate("Message","Keyboard moves turned ON", None))
-                self.keyboardmoveindex = self.previousActiveButton(self.keyboardmoveindex)
+                self.keyboardmoveindex = self.ignoreFlatButtons(self.keyboardmoveindex) - 1
             elif self.keyboardmoveflag == 1:
                 # turn off 
                 self.keyboardmoveflag = 0
