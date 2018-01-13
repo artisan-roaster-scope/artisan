@@ -39,7 +39,7 @@ Installation Mac OS X
    NOTE: OS X 10.9 and later contain already support for the FTDI hardware and therefore no additional driver needs to be installed on those systems
    + for Omega HH309A meters (with USB cable) download and run the VCP OS X installer to install the [CP210x CP210x driver from Silicon Labs](http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx)
    + for the original Voltkraft USB cable it is the [CP210x driver from Silicon Labs](http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx)
-   + some other serial2USB dongles use the [http://prolificusa.com/pl-2303hx-drivers/](Prolific PL2303 driver) 
+   + some other serial2USB dongles use the [Prolific PL2303 driver](http://prolificusa.com/pl-2303hx-drivers/)
 
 2. Download and run the [Artisan OS X installer](http://code.google.com/p/artisan/downloads/list)
 3. on OS X 10.8 Mountain Lion and later you need to (temporarily during installation) tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app.
