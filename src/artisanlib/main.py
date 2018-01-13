@@ -200,11 +200,42 @@ from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder, BinaryPayloadBuilder
 from pymodbus.pdu import ExceptionResponse
 from pymodbus.exceptions import ModbusException
-import socket
-#from pymodbus.constants import Defaults
-#from pymodbus.transaction import ModbusSocketFramer
-#from pymodbus.factory import ClientDecoder
+import pymodbus.version as pymodbus_version
 
+import socket
+
+if pymodbus_version.version.major > 1 or pymodbus_version.version.major == 1 and pymodbus_version.version.minor > 3:
+    def getBinaryPayloadBuilder(byteorderLittle=True,wordorderLittle=False):
+        if byteorderLittle:
+            byteorder = Endian.Little
+        else:
+            byteorder = Endian.Big
+        if wordorderLittle:
+            wordorder = Endian.Little
+        else:
+            wordorder = Endian.Big
+        return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
+    def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorderLittle=False):
+        if byteorderLittle:
+            byteorder = Endian.Little
+        else:
+            byteorder = Endian.Big
+        if wordorderLittle:
+            wordorder = Endian.Little
+        else:
+            wordorder = Endian.Big
+        return BinaryPayloadDecoder.fromRegisters(registers, byteorder=byteorder, wordorder=wordorder)
+else:
+    def getBinaryPayloadBuilder(byteorderLittle=True,_=False):
+        if byteorderLittle:
+            return BinaryPayloadBuilder(endian=Endian.Little)
+        else:
+            return BinaryPayloadBuilder(endian=Endian.Big)
+    def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,_=False):
+        if byteorderLittle:
+            return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Little)
+        else:
+            return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Big)
 
 
 #---------------------------------------------------------------------------# 
@@ -836,7 +867,7 @@ class tgraphcanvas(FigureCanvas):
         # default delay between readings in miliseconds
         self.default_delay = 3000 # default 3s
         self.delay = self.default_delay
-        self.min_delay = 1000
+        self.min_delay = 500 # 1000
         
         # oversampling flag
         self.oversampling = True
@@ -1857,7 +1888,7 @@ class tgraphcanvas(FigureCanvas):
             interval = self.delay / 1000.
         else:
             interval = self.profile_sampling_interval
-        self.deltasamples = int(max(1,self.deltaspan / int(interval)))    
+        self.deltasamples = int(max(1,self.deltaspan / interval))
     
     # hack to make self.ax receive onPick events although it is drawn behind self.delta_ax
     # NOTE: this hack slows down redraw!
@@ -9934,12 +9965,15 @@ class SampleThread(QThread):
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
                     
-                    min_delay = aw.qmc.delay
+                    min_delay = aw.qmc.delay # was aw.qmc.min_delay, but for now rela
                     if sys.version < '3':
                         now = libtime.time()
                     else:
                         now = libtime.perf_counter()
                     dt = max(0.05,min(min_delay,aw.qmc.delay)/1000. - now + start) # min of 1sec to allow for refresh the display
+                    
+                    print(min_delay,aw.qmc.delay,aw.qmc.min_delay,dt,now-start,min(min_delay,aw.qmc.delay)/1000., - now + start)
+                    
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     if aw.qmc.flagon:
@@ -16981,7 +17015,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("input6code"):
                 self.modbus.input6code = toInt(settings.value("input6code",self.modbus.input6code))
             if settings.contains("littleEndianFloats"):
-                self.modbus.littleEndianFloats = bool(toBool(settings.value("littleEndianFloats",self.modbus.littleEndianFloats)))
+                self.modbus.byteorderLittle = bool(toBool(settings.value("littleEndianFloats",self.modbus.byteorderLittle)))
+            if settings.contains("wordorderLittle"):
+                self.modbus.wordorderLittle = bool(toBool(settings.value("wordorderLittle",self.modbus.wordorderLittle)))
             if settings.contains("input1mode"):
                 self.modbus.input1mode = s2a(toString(settings.value("input1mode",self.modbus.input1mode)))
                 self.modbus.input2mode = s2a(toString(settings.value("input2mode",self.modbus.input2mode)))
@@ -18133,7 +18169,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input6mode",self.modbus.input6mode)
             settings.setValue("PIDmultiplier",self.modbus.PIDmultiplier)
             settings.setValue("SVmultiplier",self.modbus.SVmultiplier)
-            settings.setValue("littleEndianFloats",self.modbus.littleEndianFloats)
+            settings.setValue("littleEndianFloats",self.modbus.byteorderLittle)
+            settings.setValue("wordorderLittle",self.modbus.wordorderLittle)
             settings.setValue("type",self.modbus.type)
             settings.setValue("host",self.modbus.host)
             settings.setValue("port",self.modbus.port)
@@ -20983,7 +21020,8 @@ class ApplicationWindow(QMainWindow):
             self.modbus.input6mode = str(dialog.modbus_input6mode.currentText())
             self.modbus.SVmultiplier = dialog.modbus_SVmultiplier.currentIndex()
             self.modbus.PIDmultiplier = dialog.modbus_PIDmultiplier.currentIndex()
-            self.modbus.littleEndianFloats = bool(dialog.modbus_littleEndianFloats.isChecked())
+            self.modbus.byteorderLittle = bool(dialog.modbus_littleEndianBytes.isChecked())
+            self.modbus.wordorderLittle = bool(dialog.modbus_littleEndianWords.isChecked())
             self.modbus.type = int(dialog.modbus_type.currentIndex())
             self.modbus.host = str(dialog.modbus_hostEdit.text())
             try:
@@ -31545,7 +31583,8 @@ class modbusport(object):
         self.input6mode = "C"
         self.SVmultiplier = 1
         self.PIDmultiplier = 0
-        self.littleEndianFloats = False
+        self.byteorderLittle = False
+        self.wordorderLittle = False
         self.master = None
         self.COMsemaphore = QSemaphore(1)
         self.host = '127.0.0.1' # the TCP/UDP host
@@ -31769,10 +31808,7 @@ class modbusport(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.littleEndianFloats:
-                builder = BinaryPayloadBuilder(endian=Endian.Little)
-            else:
-                builder = BinaryPayloadBuilder(endian=Endian.Big)
+            builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
             builder.add_32bit_float(float(value))
             payload = builder.build() # .tolist()
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
@@ -31805,10 +31841,7 @@ class modbusport(object):
                         raise Exception("Exception response")
                 else:
                     break
-            if self.littleEndianFloats:
-                decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Little)
-            else:
-                decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
+            decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
             r = decoder.decode_32bit_float()
             return r
         except Exception as ex:
@@ -31865,7 +31898,7 @@ class modbusport(object):
                 else:
                     return 0                
             else:
-                decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_16bit_uint()
                 return r
         except Exception as ex:
@@ -36732,9 +36765,16 @@ class comportDlg(ArtisanDialog):
         self.modbus_input6mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input6mode)))
         self.modbus_input6mode.setFixedWidth(70)
                         
-        self.modbus_littleEndianFloats = QCheckBox(QApplication.translate("ComboBox","little-endian",None))
-        self.modbus_littleEndianFloats.setChecked(aw.modbus.littleEndianFloats)
-        self.modbus_littleEndianFloats.setFocusPolicy(Qt.NoFocus)
+                        
+        modbus_endianlabel = QLabel(QApplication.translate("Label", "little-endian",None))
+        
+        self.modbus_littleEndianBytes = QCheckBox(QApplication.translate("ComboBox","bytes",None))
+        self.modbus_littleEndianBytes.setChecked(aw.modbus.byteorderLittle)
+        self.modbus_littleEndianBytes.setFocusPolicy(Qt.NoFocus)
+
+        self.modbus_littleEndianWords = QCheckBox(QApplication.translate("ComboBox","words",None))
+        self.modbus_littleEndianWords.setChecked(aw.modbus.wordorderLittle)
+        self.modbus_littleEndianWords.setFocusPolicy(Qt.NoFocus)
 
         # type
         self.modbus_type = QComboBox()
@@ -36743,6 +36783,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_type.setFocusPolicy(Qt.NoFocus)
         self.modbus_type.addItems(["Serial RTU", "Serial ASCII", "Serial Binary", "TCP", "UDP"])
         self.modbus_type.setCurrentIndex(aw.modbus.type)
+        
         # host (IP or hostname)
         modbus_hostlabel = QLabel(QApplication.translate("Label", "Host",None))
         self.modbus_hostEdit = QLineEdit(str(aw.modbus.host))
@@ -37089,7 +37130,13 @@ class comportDlg(ArtisanDialog):
         modbus_setup = QHBoxLayout()
         modbus_setup.addWidget(scanButton)
         modbus_setup.addStretch()
-        modbus_setup.addWidget(self.modbus_littleEndianFloats)
+        modbus_setup.addSpacing(7)
+        modbus_setup.addWidget(modbus_endianlabel)
+        modbus_setup.addSpacing(5)
+        modbus_setup.addWidget(self.modbus_littleEndianBytes)
+        modbus_setup.addSpacing(5)
+        modbus_setup.addWidget(self.modbus_littleEndianWords)
+        modbus_setup.addSpacing(7)
         modbus_setup.addStretch()
         modbus_setup.addWidget(modbus_typelabel)
         modbus_setup.addWidget(self.modbus_type)
@@ -37505,7 +37552,7 @@ class scanModbusDlg(ArtisanDialog):
                 except:
                     res = None
                 if res is not None and  not isinstance(res,ExceptionResponse):
-                    decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                     r = decoder.decode_16bit_uint()
                     result += str(register) + "(4)," + str(r) + "<br>"
                     self.modbusEdit.setHtml(result)
@@ -37518,7 +37565,7 @@ class scanModbusDlg(ArtisanDialog):
                 except:
                     res = None    
                 if res is not None and  not isinstance(res,ExceptionResponse):
-                    decoder = BinaryPayloadDecoder.fromRegisters(res.registers, endian=Endian.Big)
+                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                     r = decoder.decode_16bit_uint()
                     result += str(register) + "(3)," + str(r) + "<br>"
                     self.modbusEdit.setHtml(result)
