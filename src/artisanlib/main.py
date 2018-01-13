@@ -5234,10 +5234,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.endofx += addtox  #provide room for the stats
                 self.xaxistosm()
 
+            xlim = self.ax.get_xlim()
             if  platf == 'Windows':
-                xdist = 0.80 * (aw.qmc.endofx - aw.qmc.startofx)
+                xdist = 0.82 * (xlim[1] - xlim[0]) + xlim[0]
             else:
-                xdist = 0.77*(aw.qmc.endofx - aw.qmc.startofx)
+                xdist = 0.82*(aw.qmc.endofx - aw.qmc.startofx)
             ydist = aw.qmc.ylimit - aw.qmc.ylimit_min
             
             if aw.qmc.legendloc != 1:
@@ -5321,7 +5322,10 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.ground_color > 0:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Ground Color", None) + ': '+ str(aw.qmc.ground_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
 
-                self.ax.text(xdist, statsheight, statstr.strip(), verticalalignment='top')
+                prop = aw.mpl_fontproperties.copy()
+                prop.set_size(11)
+
+                self.ax.text(xdist, statsheight, statstr, verticalalignment='top',fontproperties=prop)
                 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
