@@ -9961,8 +9961,6 @@ class SampleThread(QThread):
                         now = libtime.perf_counter()
                     dt = max(0.05,min(min_delay,aw.qmc.delay)/1000. - now + start) # min of 1sec to allow for refresh the display
                     
-                    print(min_delay,aw.qmc.delay,aw.qmc.min_delay,dt,now-start,min(min_delay,aw.qmc.delay)/1000., - now + start)
-                    
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     if aw.qmc.flagon:
