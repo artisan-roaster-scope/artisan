@@ -5336,7 +5336,22 @@ class tgraphcanvas(FigureCanvas):
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size(11)
 
-                self.ax.text(xdist, statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                #t = self.ax.text(xdist, statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                
+                if aw.qmc.timeindex[0] != -1:
+                    start = aw.qmc.timex[aw.qmc.timeindex[0]]
+                else:
+                    start = 0
+                # startofx is the first recorded value, to find the 0s we have to shift this by CHARGE
+                t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                f = self.ax.get_figure()
+                r = f.canvas.get_renderer()
+                bb = t.get_window_extent(renderer=r) # bounding box in display space
+                bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
+                from matplotlib.transforms import Bbox
+                bbox = Bbox(bbox_data)   
+                t.remove()
+                self.ax.text(aw.qmc.endofx+start-bbox.width,statsheight, statstr, verticalalignment='top',fontproperties=prop)
                 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -22019,7 +22034,10 @@ class ApplicationWindow(QMainWindow):
                 
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None),ext="*.png")
             if filename:
-
+                
+                ##aw.qmc.fig.canvas.setStyleSheet("background-color:transparent;") # original in setup
+                #aw.qmc.fig.canvas.setAttribute(Qt.WA_TranslucentBackground) # additional?
+                #aw.qmc.fig.canvas.setStyleSheet("background-color:white;") # makes background white for windows
                 if pyqtversion < 5:
                     self.image = QPixmap.grabWidget(aw.qmc)
                 else:
@@ -24326,6 +24344,7 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.patheffects = self.org_patheffects
         aw.qmc.graphstyle = self.org_graphstyle
         aw.qmc.graphfont = self.org_graphfont
+        aw.setFonts(False)
         aw.qmc.resetlinecountcaches()
         aw.qmc.resetdeltalines()
         aw.qmc.resetlines()        
