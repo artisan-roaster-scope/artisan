@@ -5239,26 +5239,6 @@ class tgraphcanvas(FigureCanvas):
     #add stats summmary to graph 
     def statsSummary(self):
         try:
-            if (aw.qmc.autotimex):
-                aw.autoAdjustAxis()
-                addtox = 0.20 * (aw.qmc.endofx - aw.qmc.startofx)
-                aw.qmc.endofx += addtox  #provide room for the stats
-                self.xaxistosm()
-
-            xlim = self.ax.get_xlim()
-            if  platf == 'Windows':
-                xdist = 0.82 * (xlim[1] - xlim[0]) + xlim[0]
-            else:
-                xdist = 0.82*(aw.qmc.endofx - aw.qmc.startofx)
-            ydist = aw.qmc.ylimit - aw.qmc.ylimit_min
-            
-            if aw.qmc.legendloc != 1:
-                # legend not in upper right
-                statsheight = aw.qmc.ylimit - (0.08 * ydist) # standard positioning
-            else:
-                # legend in upper right
-                statsheight = aw.qmc.ylimit - (0.13 * ydist)
-
             # build roast of the day string
             if aw.qmc.roastbatchpos != None and aw.qmc.roastbatchpos != 0:
                 roastoftheday = '\n' + str(aw.qmc.roastbatchpos)
@@ -5334,24 +5314,66 @@ class tgraphcanvas(FigureCanvas):
                     statstr += '\n' + QApplication.translate("AddlInfo", "Ground Color", None) + ': '+ str(aw.qmc.ground_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
 
                 prop = aw.mpl_fontproperties.copy()
-                prop.set_size(11)
+                if aw.qmc.graphfont == 1:
+                    prop.set_size("small")
+                else:
+                    prop.set_size("medium")
 
-                #t = self.ax.text(xdist, statsheight, statstr, verticalalignment='top',fontproperties=prop)
-                
+                if aw.qmc.legendloc != 1:
+                    # legend not in upper right
+                    statsheight = aw.qmc.ylimit - (0.08 * (aw.qmc.ylimit - aw.qmc.ylimit_min)) # standard positioning
+                else:
+                    # legend in upper right
+                    statsheight = aw.qmc.ylimit - (0.13 * (aw.qmc.ylimit - aw.qmc.ylimit_min))
+
+                # startofx is the first recorded value, to find the 0s we have to shift this by CHARGE
                 if aw.qmc.timeindex[0] != -1:
                     start = aw.qmc.timex[aw.qmc.timeindex[0]]
                 else:
                     start = 0
-                # startofx is the first recorded value, to find the 0s we have to shift this by CHARGE
+                from matplotlib.transforms import Bbox
                 t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop)
                 f = self.ax.get_figure()
                 r = f.canvas.get_renderer()
                 bb = t.get_window_extent(renderer=r) # bounding box in display space
                 bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
-                from matplotlib.transforms import Bbox
                 bbox = Bbox(bbox_data)   
                 t.remove()
-                self.ax.text(aw.qmc.endofx+start-bbox.width,statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                
+                if (aw.qmc.autotimex):
+                    aw.autoAdjustAxis()
+                    orig_endofx = aw.qmc.endofx
+                    aw.qmc.endofx += bbox.width+10  #provide room for the stats
+                    self.xaxistosm()
+                    aw.qmc.endofx = orig_endofx
+ 
+                    # rinse and repeat, so the bbox values get affected by the auto axis scaling 
+                    t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                    f = self.ax.get_figure()
+                    r = f.canvas.get_renderer()
+                    bb = t.get_window_extent(renderer=r) # bounding box in display space
+                    bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
+                    bbox = Bbox(bbox_data)   
+                    t.remove()
+                
+                    if aw.qmc.graphfont == 1:
+                        # do it all again to get better positioning when the font is Humor 
+                        aw.autoAdjustAxis()
+                        orig_endofx = aw.qmc.endofx
+                        aw.qmc.endofx += bbox.width+10  #provide room for the stats
+                        self.xaxistosm()
+                        aw.qmc.endofx = orig_endofx
+     
+                        # rinse and repeat, so the bbox values get affected by the auto axis scaling 
+                        t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                        f = self.ax.get_figure()
+                        r = f.canvas.get_renderer()
+                        bb = t.get_window_extent(renderer=r) # bounding box in display space
+                        bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
+                        bbox = Bbox(bbox_data)   
+                        t.remove()
+
+                self.ax.text(self.ax.get_xlim()[1]-bbox.width-20, statsheight, statstr, verticalalignment='top',fontproperties=prop)
                 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -10053,6 +10075,11 @@ class ApplicationWindow(QMainWindow):
         # this is None if inactive, or holds a tuple (n,s) with n a number {1,..,4} indicating the custom event number
         # and s a string of length 0 (no digit yet), length 1 (if first digit is typed) or 2 (both digits are typed) indicating the value (00-99)
         
+        # a timer that is triggered by resizing the main window
+        self.redrawTimer = QTimer()
+        self.redrawTimer.setSingleShot(True)
+        self.redrawTimer.timeout.connect(lambda : aw.qmc.redraw(False,False))
+
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
         self.MaxRecentFiles = 20
@@ -13008,6 +13035,8 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.serialsemaphore.release(1)
 
     def resizeEvent(self, event):
+        if aw.qmc.statssummary and len(aw.qmc.timex) > 3:
+          self.redrawTimer.start(500) # (re-) start the redraw time to be fired in one second
         #if HUD is ON when resizing application. No drawing should be done inside this handler
         if self.qmc.HUDflag:
             self.qmc.hudresizeflag = True
