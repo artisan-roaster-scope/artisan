@@ -27902,6 +27902,21 @@ class calculatorDlg(ArtisanDialog):
         self.VoutEdit.setValidator(QDoubleValidator(0., 99999., 2, self.VoutEdit))
         self.VinEdit.editingFinished.connect(lambda :self.convertVolume("ItoO"))
         self.VoutEdit.editingFinished.connect(lambda :self.convertVolume("OtoI"))
+        #EXTRACTION YIELD
+        yieldlabel = QLabel(QApplication.translate("Label", "Yield (%)",None))
+        groundslabel = QLabel(QApplication.translate("Label", "Grounds (g)",None))
+        tdslabel = QLabel(QApplication.translate("Label", "TDS (%)",None))
+        coffeelabel = QLabel(QApplication.translate("Label", "Coffee (g)",None))
+        self.groundsEdit = QLineEdit()
+        self.coffeeEdit = QLineEdit()
+        self.tdsEdit = QLineEdit()
+        self.yieldEdit = QLineEdit()
+        self.yieldEdit.setReadOnly(True)
+        self.groundsEdit.setValidator(QDoubleValidator(1., 999., 2, self.groundsEdit))
+        self.coffeeEdit.setValidator(QDoubleValidator(1., 999., 2, self.coffeeEdit))
+        self.tdsEdit.setValidator(QDoubleValidator(0., 100., 2, self.tdsEdit))
+        for e in [self.groundsEdit, self.coffeeEdit, self.tdsEdit]:
+            e.editingFinished.connect(self.calculateYield)
         #LAYOUTS
         #Rate of chage
         calrcLayout = QGridLayout()
@@ -27933,6 +27948,17 @@ class calculatorDlg(ArtisanDialog):
         volumeLayout.addWidget(self.VinEdit)
         volumeLayout.addWidget(self.VoutEdit)
         volumeLayout.addWidget(self.VoutComboBox)
+        #extraction yield
+        extractionLayout = QGridLayout()
+        extractionLayout.addWidget(groundslabel,0,0)
+        extractionLayout.addWidget(self.groundsEdit,1,0)
+        extractionLayout.addWidget(coffeelabel,0,1)
+        extractionLayout.addWidget(self.coffeeEdit,1,1)
+        extractionLayout.addWidget(tdslabel,0,2)
+        extractionLayout.addWidget(self.tdsEdit,1,2)
+        extractionLayout.addWidget(yieldlabel,0,3)
+        extractionLayout.addWidget(self.yieldEdit,1,3)
+        
         RoCGroup = QGroupBox(QApplication.translate("GroupBox","Rate of Change",None))
         RoCGroup.setLayout(rclayout)
         tempConvGroup = QGroupBox(QApplication.translate("GroupBox","Temperature Conversion",None))
@@ -27941,6 +27967,8 @@ class calculatorDlg(ArtisanDialog):
         weightConvGroup.setLayout(weightLayout)
         volumeConvGroup = QGroupBox(QApplication.translate("GroupBox","Volume Conversion",None))
         volumeConvGroup.setLayout(volumeLayout)
+        extractionYieldGroup = QGroupBox(QApplication.translate("GroupBox","Extraction Yield",None))
+        extractionYieldGroup.setLayout(extractionLayout)
         #main
         mainlayout = QVBoxLayout()
         mainlayout.setSpacing(10)
@@ -27948,6 +27976,7 @@ class calculatorDlg(ArtisanDialog):
         mainlayout.addWidget(tempConvGroup)
         mainlayout.addWidget(weightConvGroup)
         mainlayout.addWidget(volumeConvGroup)
+        mainlayout.addWidget(extractionYieldGroup)
         mainlayout.addStretch()
         self.setLayout(mainlayout)
 
@@ -28033,6 +28062,19 @@ class calculatorDlg(ArtisanDialog):
             outx = float(str(self.VoutEdit.text()))
             inx = aw.convertVolume(outx,self.VoutComboBox.currentIndex(),self.VinComboBox.currentIndex())
             self.VinEdit.setText("%.3f"%inx)
+
+
+    def calculateYield(self):
+        # Extraction yield % = Brewed Coffee[g] x TDS[%] / Coffee Grounds[g]
+        if self.groundsEdit.text() == "" or self.tdsEdit.text() == "" or self.coffeeEdit.text == "":
+            return
+        grounds = float(str(self.groundsEdit.text()))
+        tds = float(str(self.tdsEdit.text()))
+        coffee = float(str(self.coffeeEdit.text()))
+        if grounds == 0:
+            return
+        cyield = coffee * tds / grounds
+        self.yieldEdit.setText("%.1f" % cyield)
 
     def closeEvent(self, _):
         settings = QSettings()
