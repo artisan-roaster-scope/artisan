@@ -27991,15 +27991,19 @@ class calculatorDlg(ArtisanDialog):
         leftSide.addStretch()
         #right side
         rightSide = QVBoxLayout()
-        rightSide.addWidget(volumeConvGroup)
         rightSide.addWidget(tempConvGroup)
+        rightSide.addWidget(extractionYieldGroup)
+        #rightSide.addStretch()
         topLayout = QHBoxLayout()
         topLayout.addLayout(leftSide)
         topLayout.addLayout(rightSide)
+        botLayout = QHBoxLayout()
+        botLayout.addWidget(weightConvGroup)
+        botLayout.addWidget(volumeConvGroup)
         #main
         mainlayout = QVBoxLayout()
         mainlayout.addLayout(topLayout)
-        mainlayout.addWidget(extractionYieldGroup)
+        mainlayout.addLayout(botLayout)
         self.setLayout(mainlayout)
 
     def calcEventRC(self):
