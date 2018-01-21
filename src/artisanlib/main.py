@@ -13025,7 +13025,7 @@ class ApplicationWindow(QMainWindow):
 
     def resizeEvent(self, event):
         if aw.qmc.statssummary and len(aw.qmc.timex) > 3:
-          self.redrawTimer.start(500) # (re-) start the redraw time to be fired in one second
+          self.redrawTimer.start(500) # (re-) start the redraw time to be fired in half a second
         #if HUD is ON when resizing application. No drawing should be done inside this handler
         if self.qmc.HUDflag:
             self.qmc.hudresizeflag = True
@@ -20885,7 +20885,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
-        contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell<br>")
+        contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell, Rui Paulo<br>")
         box = QMessageBox(self)
         
         #create a html QString
