@@ -21193,7 +21193,7 @@ class ApplicationWindow(QMainWindow):
         dialog = calculatorDlg(self)
         dialog.setModal(False)
         dialog.show()
-        dialog.setFixedSize(dialog.size())
+#        dialog.setFixedSize(dialog.size())
         QApplication.processEvents()
         
     def loadSettings(self,fn=None,remember=True):
@@ -27980,15 +27980,21 @@ class calculatorDlg(ArtisanDialog):
         volumeConvGroup.setLayout(volumeLayout)
         extractionYieldGroup = QGroupBox(QApplication.translate("GroupBox","Extraction Yield",None))
         extractionYieldGroup.setLayout(extractionLayout)
+        #left side
+        leftSide = QVBoxLayout()
+        leftSide.addWidget(RoCGroup)
+        leftSide.addStretch()
+        #right side
+        rightSide = QVBoxLayout()
+        rightSide.addWidget(volumeConvGroup)
+        rightSide.addWidget(tempConvGroup)
+        topLayout = QHBoxLayout()
+        topLayout.addLayout(leftSide)
+        topLayout.addLayout(rightSide)
         #main
         mainlayout = QVBoxLayout()
-        mainlayout.setSpacing(10)
-        mainlayout.addWidget(RoCGroup)
-        mainlayout.addWidget(tempConvGroup)
-        mainlayout.addWidget(weightConvGroup)
-        mainlayout.addWidget(volumeConvGroup)
+        mainlayout.addLayout(topLayout)
         mainlayout.addWidget(extractionYieldGroup)
-        mainlayout.addStretch()
         self.setLayout(mainlayout)
 
     def calcEventRC(self):
