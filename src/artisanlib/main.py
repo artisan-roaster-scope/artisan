@@ -1677,14 +1677,14 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventstypecopy = []
         self.currentx = 0               #used to add point when right click
         self.currenty = 0               #used to add point when right click
-        self.designertimeinit = [50,300,540,560,660,700,800,900]
-        if self.mode == "C":
-#                                     #CH, DE, Fcs,Fce,Scs,Sce,Drop
-            self.designertemp1init = [290,290,290,290,290,290,290,290]
-            self.designertemp2init = [200,150,200,210,220,225,240,240]   #CHARGE,DRY END,FCs, FCe,SCs,SCe,DROP,COOL
-        elif self.mode == "F":
-            self.designertemp1init = [500,500,500,500,500,500,500,500]
-            self.designertemp2init = [380,300,390,395,410,412,420,420]
+#        self.designertimeinit = [50,300,540,560,660,700,800,900]
+#        if self.mode == "C":
+##                                     #CH, DE, Fcs,Fce,Scs,Sce,Drop
+#            self.designertemp1init = [290,290,290,290,290,290,290,290]
+#            self.designertemp2init = [200,150,200,210,220,225,240,240]   #CHARGE,DRY END,FCs, FCe,SCs,SCe,DROP,COOL
+#        elif self.mode == "F":
+#            self.designertemp1init = [500,500,500,500,500,500,500,500]
+#            self.designertemp2init = [380,300,390,395,410,412,420,420]
         self.BTsplinedegree = 3
         self.ETsplinedegree = 3
         self.reproducedesigner = 0      #flag to add events to help reproduce (replay) the profile: 0 = none; 1 = sv; 2 = ramp
@@ -3724,7 +3724,12 @@ class tgraphcanvas(FigureCanvas):
                 self.specialevents = []
                 self.specialeventstype = []
                 self.specialeventsStrings = []
-                self.specialeventsvalue = []                
+                self.specialeventsvalue = []
+                
+                # reset also the special event copy held for the designer
+                self.specialeventsStringscopy = []
+                self.specialeventsvaluecopy = []
+                self.specialeventstypecopy = []
                 
                 self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                 self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
@@ -8038,7 +8043,7 @@ class tgraphcanvas(FigureCanvas):
     #used to start designer from scratch (not from a loaded profile)
     def designerinit(self):
         #init start vars        #CH, DE,      Fcs,      Fce,       Scs,         Sce,         Drop,      COOL
-        self.designertimeinit = [50,(5*60+50),(8*60+50),(10*60+50),(10.5*60+50),(11.5*60+50),(12*60+50),(16*60+50)]
+        self.designertimeinit = [0,(5*60),(8*60),(10*60),(10.5*60),(11.5*60),(12*60),(16*60)]
         if self.mode == "C":
             self.designertemp1init = [290.,290.,290.,290.,290.,290.,290.,290.]   #CHARGE,DE,FCs,FCe,SCs,SCe,Drop
             self.designertemp2init = [230.,150.,190.,210.,220.,225.,230.,230.]   #CHARGE,DE,FCs,FCe,SCs,SCe,DROP
@@ -13025,7 +13030,7 @@ class ApplicationWindow(QMainWindow):
 
     def resizeEvent(self, event):
         if aw.qmc.statssummary and len(aw.qmc.timex) > 3:
-          self.redrawTimer.start(500) # (re-) start the redraw time to be fired in half a second
+            self.redrawTimer.start(500) # (re-) start the redraw time to be fired in half a second
         #if HUD is ON when resizing application. No drawing should be done inside this handler
         if self.qmc.HUDflag:
             self.qmc.hudresizeflag = True
@@ -36101,6 +36106,7 @@ class designerconfigDlg(ArtisanDialog):
         closeButton.setFocusPolicy(Qt.NoFocus)
         closeButton.clicked.connect(lambda _:self.accept())
         buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
         buttonLayout.addWidget(closeButton)
         marksLayout = QGridLayout()
         marksLayout.addWidget(markersettinglabel,0,0)
@@ -36136,8 +36142,11 @@ class designerconfigDlg(ArtisanDialog):
         marksLayout.addWidget(self.Edit6bt,7,2)
         marksLayout.addWidget(self.Edit6et,7,3)
         updateLayout = QHBoxLayout()
+        updateLayout.addStretch()
         updateLayout.addWidget(defaultButton)
+        updateLayout.addStretch()
         updateLayout.addWidget(updateButton)
+        updateLayout.addStretch()
         settingsLayout = QVBoxLayout()
         settingsLayout.addLayout(marksLayout)
         settingsLayout.addLayout(updateLayout)
