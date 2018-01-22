@@ -3737,11 +3737,6 @@ class tgraphcanvas(FigureCanvas):
                 self.specialeventsStrings = []
                 self.specialeventsvalue = []
                 
-                # reset also the special event copy held for the designer
-                self.specialeventsStringscopy = []
-                self.specialeventsvaluecopy = []
-                self.specialeventstypecopy = []
-                
                 self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                 self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                 aw.eNumberSpinBox.setValue(0)
@@ -8004,6 +7999,13 @@ class tgraphcanvas(FigureCanvas):
                 aw.designerAction.setChecked(False)
         else:
             #if no profile found
+            #                
+            # reset also the special event copy held for the designer
+            self.eventtimecopy = []
+            self.specialeventsStringscopy = []
+            self.specialeventsvaluecopy = []
+            self.specialeventstypecopy = []
+            #
             self.reset(redraw=False,soundOn=False)
             self.connect_designer()
             self.designerinit()
