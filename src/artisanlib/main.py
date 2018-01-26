@@ -10231,7 +10231,7 @@ class ApplicationWindow(QMainWindow):
         self.block_quantification_sampling_ticks = [0,0,0,0]
         # by default we block quantification for sampling_ticks_to_block_quantifiction sampling intervals after
         # a button/slider event
-        self.sampling_ticks_to_block_quantifiction = 15
+        self.sampling_ticks_to_block_quantifiction = 5
                         
         self.extraeventsactionslastvalue = [None,None,None,None]
 
