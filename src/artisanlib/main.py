@@ -27979,7 +27979,6 @@ class calculatorDlg(ArtisanDialog):
         #left side
         leftSide = QVBoxLayout()
         leftSide.addWidget(RoCGroup)
-        leftSide.addStretch()
         #right side
         rightSide = QVBoxLayout()
         rightSide.addWidget(tempConvGroup)
