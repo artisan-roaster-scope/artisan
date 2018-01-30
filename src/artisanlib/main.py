@@ -1841,6 +1841,8 @@ class tgraphcanvas(FigureCanvas):
         #message string for plotter 
         self.plottermessage = ""
         
+        self.alarm_popup_timout = 10
+        
 
         #buffers for real time symbolic evaluation
         self.RTtemp1=0.
@@ -2698,7 +2700,7 @@ class tgraphcanvas(FigureCanvas):
                 # alarm popup message
                 #QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None),self.alarmstrings[alarmnumber])
                 # alarm popup message with 10sec timeout
-                amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=10)
+                amb = ArtisanMessageBox(aw,QApplication.translate("Message", "Alarm notice",None),u(self.alarmstrings[alarmnumber]),timeout=aw.qmc.alarm_popup_timout)
                 amb.show()
                 #send alarm also to connected WebLCDs clients
                 if aw.WebLCDs and aw.WebLCDsAlerts:
@@ -17162,6 +17164,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.loadalarmsfromprofile = bool(toBool(settings.value("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)))
                 if settings.contains("alarmsfile"):
                     self.qmc.alarmsfile = toString(settings.value("alarmsfile",self.qmc.loadalarmsfromprofile))
+                if settings.contains("alarm_popup_timout"):
+                    self.qmc.alarm_popup_timout = toInt(settings.value("alarm_popup_timout",aw.qmc.alarm_popup_timout))
             settings.endGroup()
             #restore TC4/Arduino PID settings
             settings.beginGroup("ArduinoPID")
@@ -18378,6 +18382,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("alarmstrings",self.qmc.alarmstrings)
             settings.setValue("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)
             settings.setValue("alarmsfile",self.qmc.alarmsfile)
+            settings.setValue("alarm_popup_timout",self.qmc.alarm_popup_timout)
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
             settings.setValue("settingspath",self.settingspath)
@@ -41007,13 +41012,22 @@ class AlarmDlg(ArtisanDialog):
         clearButton.setToolTip(QApplication.translate("Tooltip","Clear alarms table",None))
         clearButton.setFocusPolicy(Qt.NoFocus)
         clearButton.setMinimumWidth(80)
-        self.loadAlarmsFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load alarms from profile",None))
+        self.loadAlarmsFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile",None))
         self.loadAlarmsFromProfile.setChecked(aw.qmc.loadalarmsfromprofile)
         clearButton.clicked.connect(lambda _:self.clearalarms())
+        
+        self.popupTimoutSpinBox = QSpinBox()
+        self.popupTimoutSpinBox.setSuffix("s")
+        self.popupTimoutSpinBox.setSingleStep(1)
+        self.popupTimoutSpinBox.setRange(0,120)
+        self.popupTimoutSpinBox.setAlignment(Qt.AlignRight)
+        self.popupTimoutSpinBox.setValue(aw.qmc.alarm_popup_timout)
+        popupTimeoutLabel = QLabel(QApplication.translate("Label", "PopUp TimeOut",None))
+        
         self.alarmsfile = QLabel(aw.qmc.alarmsfile)
         self.alarmsfile.setAlignment(Qt.AlignRight)
-        self.alarmsfile.setMinimumWidth(500)
-        self.alarmsfile.setMaximumWidth(500)
+        self.alarmsfile.setMinimumWidth(300)
+        self.alarmsfile.setMaximumWidth(300)
         tablelayout = QVBoxLayout()
         buttonlayout = QHBoxLayout()
         okbuttonlayout = QHBoxLayout()
@@ -41036,6 +41050,9 @@ class AlarmDlg(ArtisanDialog):
         buttonlayout.addSpacing(15)
         buttonlayout.addWidget(helpButton)
         okbuttonlayout.addWidget(self.loadAlarmsFromProfile)
+        okbuttonlayout.addSpacing(15)
+        okbuttonlayout.addWidget(popupTimeoutLabel)
+        okbuttonlayout.addWidget(self.popupTimoutSpinBox)
         okbuttonlayout.addStretch()
         okbuttonlayout.addWidget(self.alarmsfile)
         okbuttonlayout.addSpacing(15)
@@ -41232,6 +41249,7 @@ class AlarmDlg(ArtisanDialog):
 
     def closealarms(self):
         self.savealarms()
+        aw.qmc.alarm_popup_timout = int(self.popupTimoutSpinBox.value())
         settings = QSettings()
         #save window geometry
         if sip.getapi('QVariant') == 1:
