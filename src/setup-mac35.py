@@ -54,6 +54,7 @@ DATA_FILES = [
 #    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
 #    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
     ("../Resources/qt_plugins/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # qt5/# standard     
+    ("../Resources/qt_plugins/styles", [QTDIR + r'/plugins/styles/libqmacstyle.dylib']), # QT 5.10 requires this
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
     ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
