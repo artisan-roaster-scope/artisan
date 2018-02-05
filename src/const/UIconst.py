@@ -109,6 +109,7 @@ CONF_MENU = QApplication.translate("Menu", "Config", None)
 if platf != 'Darwin':
     CONF_MENU = "&" + CONF_MENU
 CONF_MENU_MACHINE = QApplication.translate("Menu", "Machine", None)
+CONF_MENU_THEMES = QApplication.translate("Menu", "Themes", None)
 CONF_MENU_DEVICE = QApplication.translate("Menu", "Device...", None)
 CONF_MENU_SERIALPORT = QApplication.translate("Menu", "Serial Port...", None)
 CONF_MENU_SAMPLING = QApplication.translate("Menu", "Sampling Interval...", None)
@@ -169,8 +170,9 @@ TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None)
 SETTINGS_MENU_LOAD = QApplication.translate("Menu", "Load Settings...", None)    
 SETTINGS_MENU_LOADRECENT = QApplication.translate("Menu", "Load Recent Settings", None)
 SETTINGS_MENU_SAVEAS = QApplication.translate("Menu", "Save Settings...", None)
+SETTINGS_MENU_SAVETHEME = QApplication.translate("Menu", "Save Theme...", None)
 
-    
+
 #Help menu items
 HELP_MENU = QApplication.translate("Menu", "Help", None)
 if platf != 'Darwin':

@@ -742,7 +742,8 @@ class tgraphcanvas(FigureCanvas):
         self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
                         "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
                         "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
-                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue'}
+                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue',
+                        "canvas":'None',"legendbg":'white',"legendborder":'darkgrey'}
 
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Aftertaste",None),
@@ -4081,7 +4082,7 @@ class tgraphcanvas(FigureCanvas):
                         e = -80
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                     #add a water mark if FCs
-                    if timeindex[2] and not timeindex2:
+                    if timeindex[2] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
                 #Add 2Cs markers
                 if timeindex[4]:
@@ -4115,7 +4116,7 @@ class tgraphcanvas(FigureCanvas):
                         e = 0
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                     #do water mark if SCs
-                    if timeindex[4] and not timeindex2:
+                    if timeindex[4] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
                 #Add DROP markers
                 if timeindex[6]:
@@ -4149,16 +4150,16 @@ class tgraphcanvas(FigureCanvas):
                     anno_artists += self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                     
                     #do water mark if FCs, but no FCe nor SCs nor SCe
-                    if timeindex[2] and not timeindex[3] and not timeindex[4] and not timeindex[5] and not timeindex2:
+                    if timeindex[2] and not timeindex[3] and not timeindex[4] and not timeindex[5] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
                     #do water mark if SCs, but no SCe
-                    if timeindex[4] and not timeindex[5] and not timeindex2:
+                    if timeindex[4] and not timeindex[5] and not timeindex2 and self.watermarksflag:
                         self.ax.axvspan(timex[timeindex[4]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
                 # add COOL mark
                 if timeindex[7] and not timeindex2:
                     tidx = timeindex[7]
                     endidx = self.ax.get_xlim()[1] # or timex[-1]
-                    if timex[tidx] < endidx:
+                    if timex[tidx] < endidx and self.watermarksflag:
                         self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None)#,lod=False)                        
                 aw.qmc.l_annotations = anno_artists
         except Exception as e:
@@ -4805,7 +4806,7 @@ class tgraphcanvas(FigureCanvas):
                                     elif self.specialeventstype[i] == 4:
                                         boxstyle = 'square,pad=0.2'
                                         boxcolor = 'yellow'
-                                        textcolor = self.palette["text"]
+                                        textcolor = 'black'
                                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
                                                  xytext=(self.timex[int(self.specialevents[i])],temp+height),
                                                  alpha=0.9,
@@ -4883,7 +4884,7 @@ class tgraphcanvas(FigureCanvas):
                                                      xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
                                                      bbox=dict(boxstyle='square,pad=0.1', fc='yellow', ec='none'),
                                                      path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
-                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
+                                                     color='black',arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
                                                      fontsize="xx-small",
                                                      fontproperties=fontprop_small)
     
@@ -5170,10 +5171,12 @@ class tgraphcanvas(FigureCanvas):
                     leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
                     leg.draggable(state=True)
                     frame = leg.get_frame()
-                    frame.set_facecolor('white')
+                    frame.set_facecolor(self.palette["legendbg"])
                     #frame.set_linewidth(0)
                     #frame.set_edgecolor('darkgrey')
                     frame.set_linewidth(0.5)
+                    for line,text in zip(leg.get_lines(), leg.get_texts()):
+                        text.set_color(line.get_color())
                     if aw.qmc.patheffects:
                         rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]                    
     
@@ -5309,6 +5312,7 @@ class tgraphcanvas(FigureCanvas):
                     prop.set_size("small")
                 else:
                     prop.set_size("medium")
+                fc = aw.qmc.palette["text"]
 
                 if aw.qmc.legendloc != 1:
                     # legend not in upper right
@@ -5323,7 +5327,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     start = 0
                 from matplotlib.transforms import Bbox
-                t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop,color=fc)
                 f = self.ax.get_figure()
                 r = f.canvas.get_renderer()
                 bb = t.get_window_extent(renderer=r) # bounding box in display space
@@ -5339,7 +5343,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.endofx = orig_endofx
  
                     # rinse and repeat, so the bbox values get affected by the auto axis scaling 
-                    t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                    t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop,color=fc)
                     f = self.ax.get_figure()
                     r = f.canvas.get_renderer()
                     bb = t.get_window_extent(renderer=r) # bounding box in display space
@@ -5356,7 +5360,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.endofx = orig_endofx
      
                         # rinse and repeat, so the bbox values get affected by the auto axis scaling 
-                        t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                        t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop,color=fc)
                         f = self.ax.get_figure()
                         r = f.canvas.get_renderer()
                         bb = t.get_window_extent(renderer=r) # bounding box in display space
@@ -5364,7 +5368,7 @@ class tgraphcanvas(FigureCanvas):
                         bbox = Bbox(bbox_data)   
                         t.remove()
 
-                self.ax.text(self.ax.get_xlim()[1]-bbox.width-20, statsheight, statstr, verticalalignment='top',fontproperties=prop)
+                self.ax.text(self.ax.get_xlim()[1]-bbox.width-20, statsheight, statstr, verticalalignment='top',fontproperties=prop,color=fc)
                 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -5669,12 +5673,14 @@ class tgraphcanvas(FigureCanvas):
         #COLOR (option 1) Default
         palette1 = {"background":'white',"grid":'green',"ylabel":'black',"xlabel":'black',"title":'black',"rect1":'green',
                         "rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"et":'red',"bt":'#00007f',"deltaet":'orange',
-                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue'}
+                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue',
+                        "canvas":'None',"legendbg":'white',"legendborder":'darkgrey'}
 
         #BLACK & WHITE (option 2) best for printing
         palette2 = {"background":'white',"grid":'grey',"ylabel":'black',"xlabel":'black',"title":'black',"rect1":'lightgrey',
                    "rect2":'darkgrey',"rect3":'grey',"rect4":'lightgrey',"et":'black',"bt":'black',"deltaet":'grey',
-                   "deltabt":'grey',"markers":'grey',"text":'black',"watermarks":'lightgrey',"Cline":'grey'}
+                   "deltabt":'grey',"markers":'grey',"text":'black',"watermarks":'lightgrey',"Cline":'grey',
+                   "canvas":'None',"legendbg":'white',"legendborder":'darkgrey'}
 
         #load selected dictionary
         if color == 1:
@@ -5686,7 +5692,7 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Colors set to grey", None))
             for key in list(palette1.keys()):
                 self.palette[key] = palette2[key]
-                
+               
         if color == 3:
             dialog = graphColorDlg(aw)
             if dialog.exec_():
@@ -5707,8 +5713,12 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["text"] = str(dialog.textLabel.text())
                 self.palette["watermarks"] = str(dialog.watermarksLabel.text())
                 self.palette["Cline"] = str(dialog.ClineLabel.text())
+                self.palette["canvas"] = str(dialog.canvasLabel.text())
+                self.palette["legendbg"] = str(dialog.legendbgLabel.text())
+                self.palette["legendborder"] = str(dialog.legendborderLabel.text())
 
         #update screen with new colors
+        aw.qmc.fig.patch.set_facecolor(aw.qmc.palette["canvas"])
         self.fig.canvas.redraw()
 
     #draws a polar star graph to score cupping. It does not delete any profile data.
@@ -7053,9 +7063,8 @@ class tgraphcanvas(FigureCanvas):
                                 elif self.specialeventstype[-1] == 4:
                                     boxstyle = 'square,pad=0.2'
                                     boxcolor = 'yellow'
-                                    textcolor = self.palette["text"]
+                                    textcolor = 'black'
                                 self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                                 #color=self.palette["text"],
                                                  color=textcolor,
                                                  arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
                                                  bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
@@ -7251,7 +7260,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         height = 0
                     boxstyle = 'round4,pad=0.3,rounding_size=0.15'
-                    boxcolor = '#58dc00' #match the ET color
+                    boxcolor = aw.qmc.palette["et"] #match the ET color
                     textcolor = 'white'
                     fontprop_small = aw.mpl_fontproperties.copy()
                     fontprop_small.set_size("xx-small")
@@ -7316,7 +7325,7 @@ class tgraphcanvas(FigureCanvas):
                                     u(int(tsb)))
                         if det is not None:
                             strline = strline + "   " + u(QApplication.translate("Label", "CM", None) + ("=%.1f/%.1f" % (det,dbt)) + self.mode)
-                    self.ax.set_xlabel(strline,color = aw.qmc.palette["text"],fontproperties=statsprop)
+                    self.ax.set_xlabel(strline,color = aw.qmc.palette["xlabel"],fontproperties=statsprop)
                 else:
                     sep = u"   "
                     msg = aw.qmc.roastdate.date().toString(Qt.SystemLocaleShortDate)
@@ -7335,7 +7344,7 @@ class tgraphcanvas(FigureCanvas):
                         msg += sep + u"#" + str(aw.qmc.whole_color) + u"/" +  str(aw.qmc.ground_color)
                     elif aw.qmc.ground_color:
                         msg += sep + u"#" + str(aw.qmc.ground_color)
-                    self.ax.set_xlabel(msg,color = aw.qmc.palette["text"],fontproperties=statsprop)
+                    self.ax.set_xlabel(msg,color = aw.qmc.palette["xlabel"],fontproperties=statsprop)
             else:
                 fontprop_medium = aw.mpl_fontproperties.copy()
                 fontprop_medium.set_size("medium")
@@ -10584,6 +10593,9 @@ class ApplicationWindow(QMainWindow):
         self.machineMenu = QMenu(UIconst.CONF_MENU_MACHINE) # self.ConfMenu.addMenu(UIconst.CONF_MENU_MACHINE)
         self.populateMachineMenu()
         
+        self.themeMenu = QMenu(UIconst.CONF_MENU_THEMES)
+        self.populateThemeMenu()
+          
         self.deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
         self.deviceAction.triggered.connect(self.deviceassigment)
         self.ConfMenu.addAction(self.deviceAction)
@@ -10932,6 +10944,11 @@ class ApplicationWindow(QMainWindow):
         self.saveAsSettingsAction.triggered.connect(self.saveSettings)
         self.saveAsSettingsAction.setMenuRole(QAction.NoRole)  # avoid specific handling of settings menu
         self.helpMenu.addAction(self.saveAsSettingsAction)
+        
+        self.saveAsThemeAction = QAction(UIconst.SETTINGS_MENU_SAVETHEME,self)
+        self.saveAsThemeAction.triggered.connect(self.saveSettings_theme)
+        self.saveAsThemeAction.setMenuRole(QAction.NoRole)  # avoid specific handling of settings menu
+        self.helpMenu.addAction(self.saveAsThemeAction)
 
         self.helpMenu.addSeparator()
 
@@ -11956,7 +11973,39 @@ class ApplicationWindow(QMainWindow):
                         except:
                             pass
                     
+    def populateThemeMenu(self):
+        one_added = False
+        for root,_,files in os.walk(os.path.join(self.getResourcePath(),"Themes")):
+            for fl in files:
+                if fl.endswith(".athm"): 
+                    d = os.path.split(root)
+                    p = os.path.join(root,fl)
+                    f = fl.replace(".athm","").replace("_"," ")
+                    if len(d) > 0:
+                        a = QAction(self, visible=True,
+                            triggered=self.openThemeSettings)
+                        a.setData(p)
+                        if d[-1] == "Themes":
+                            a.setText(u(f)) # + u("...")
+                        else:
+                            a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
+                        self.themeMenu.addAction(a)
+                        one_added = True
+        if one_added:
+            self.ConfMenu.addMenu(self.themeMenu)
 
+    def openThemeSettings(self):
+        action = self.sender()
+        if action:
+            string = QApplication.translate("Message", "Load theme {0}?",None).format(action.text())
+            reply = QMessageBox.question(aw,QApplication.translate("Message", "Adjust Theme Related Settings",None),string,
+                QMessageBox.Yes|QMessageBox.Cancel)
+            if reply == QMessageBox.Cancel:
+                return 
+            elif reply == QMessageBox.Yes:
+                aw.loadSettings(fn=action.data(),remember=False)
+
+                    
     def process_active_quantifiers(self):
         # called every sampling interval
         for i in range(4):
@@ -13786,6 +13835,7 @@ class ApplicationWindow(QMainWindow):
         self.StatisticsAction.setEnabled(True)
         self.WindowconfigAction.setEnabled(True)
         self.colorsAction.setEnabled(True)
+        self.themeMenu.setEnabled(True)
         
 
     def disableEditMenus(self,designer=False,wheel=False):
@@ -13838,6 +13888,7 @@ class ApplicationWindow(QMainWindow):
         self.resetAction.setEnabled(False)
         self.switchAction.setEnabled(False)
         self.machineMenu.setEnabled(False)
+        self.themeMenu.setEnabled(False)
 
 
     def update_minieventline_visibility(self):
@@ -16913,7 +16964,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Delay"):
                 self.qmc.delay = max(self.qmc.min_delay,toInt(settings.value("Delay",int(self.qmc.delay))))
             else:
-                self.qmc.delay = self.qmc.default_delay
+                #self.qmc.delay = self.qmc.default_delay
+                pass
             # restore oversampling
             if settings.contains("Oversampling"):
                 self.qmc.oversampling = bool(toBool(settings.value("Oversampling",self.qmc.oversampling)))
@@ -16923,6 +16975,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extra_event_sampling_delay = toInt(settings.value("ExtraEventSamplingDelay",int(self.qmc.extra_event_sampling_delay)))
             #restore colors
             if settings.contains("Colors"):
+                self.qmc.palette["canvas"] = 'None'  #revert the canvas element to default if it does not exist in the settings.
                 for (k, v) in list(toMap(settings.value("Colors")).items()):
                     self.qmc.palette[str(k)] = s2a(toString(v))
                 if self.qmc.palette["et"]:
@@ -16941,6 +16994,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgrounddeltaetcolor = s2a(toString(settings.value("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)))
             if settings.contains("BTBdeltaColor"):
                 self.qmc.backgrounddeltabtcolor = s2a(toString(settings.value("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)))
+            if settings.contains("BackgroundAlpha"):
+                self.qmc.backgroundalpha = aw.float2float(toFloat(settings.value("BackgroundAlpha",self.qmc.backgroundalpha)))
             if settings.contains("LCDColors"):
                 for (k, v) in list(toMap(settings.value("LCDColors")).items()):
                     self.lcdpaletteB[str(k)] = s2a(toString(v))
@@ -17720,6 +17775,8 @@ class ApplicationWindow(QMainWindow):
             #update visibility of main event button
             self.applyStandardButtonVisibility()
             aw.setFonts()
+            if "canvas" in aw.qmc.palette:
+                aw.qmc.fig.patch.set_facecolor(aw.qmc.palette["canvas"])
             
             # set window appearances (style)
             if settings.contains("appearance"):
@@ -18141,6 +18198,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("BTBColor",self.qmc.backgroundbtcolor)
             settings.setValue("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)
             settings.setValue("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)
+            settings.setValue("BackgroundAlpha",self.qmc.backgroundalpha)
             #save flavors
             settings.setValue("Flavors",self.qmc.flavorlabels)
             settings.setValue("flavorstartangle",self.qmc.flavorstartangle)
@@ -18568,6 +18626,53 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("dpi",aw.dpi)
             
             settings.setValue("recentRoasts",self.recentRoasts)
+
+        except Exception:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info() 
+            QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEvent()  @line " + str(exc_tb.tb_lineno))
+
+    def closeEventSettings_theme(self, filename=None):
+        try:
+            if filename:
+                settings = QSettings(filename,QSettings.IniFormat)
+            else:
+                settings = QSettings()
+            #save Events settings
+            settings.beginGroup("events")
+            settings.setValue("showEtypes",self.qmc.showEtypes)            
+            settings.setValue("EvalueColor",self.qmc.EvalueColor)
+            settings.setValue("EvalueMarker",self.qmc.EvalueMarker)
+            settings.setValue("Evaluelinethickness",self.qmc.Evaluelinethickness)
+            settings.setValue("EvalueMarkerSize",self.qmc.EvalueMarkerSize)
+            settings.setValue("Evaluealpha",self.qmc.Evaluealpha)
+            settings.endGroup()
+            #save phases watermarks flag
+            settings.setValue("watermarks",self.qmc.watermarksflag)
+            #save colors
+            settings.setValue("Colors",self.qmc.palette)
+            settings.setValue("LCDColors",self.lcdpaletteB)
+            settings.setValue("LEDColors",self.lcdpaletteF)
+            settings.setValue("ETBColor",self.qmc.backgroundmetcolor)
+            settings.setValue("BTBColor",self.qmc.backgroundbtcolor)
+            settings.setValue("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)
+            settings.setValue("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)
+            settings.setValue("BackgroundAlpha",self.qmc.backgroundalpha)
+            settings.beginGroup("Style")
+            settings.setValue("patheffects",self.qmc.patheffects)
+            settings.setValue("graphstyle",self.qmc.graphstyle)
+            settings.setValue("graphfont",self.qmc.graphfont)
+            settings.endGroup()
+            settings.beginGroup("XT")
+            settings.setValue("color",self.qmc.backgroundxtcolor)
+            settings.setValue("index",self.qmc.xtcurveidx)
+            settings.endGroup()
+#            #save extra devices
+#            settings.beginGroup("ExtraDev")
+#            settings.setValue("extradevicecolor1",self.qmc.extradevicecolor1)
+#            settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
+#            settings.endGroup()
 
         except Exception:
 #            import traceback
@@ -21315,6 +21420,20 @@ class ApplicationWindow(QMainWindow):
             for widget in QApplication.topLevelWidgets():
                 if isinstance(widget, ApplicationWindow):
                     widget.updateRecentSettingActions()            
+        else:
+            self.sendmessage(QApplication.translate("Message","Cancelled", None))
+
+    def saveSettings_theme(self):
+        path = QDir()
+        path.setPath(self.getDefaultPath())
+        path.setPath(os.path.join(self.getResourcePath(),"Themes","User"))
+        fname = path.absoluteFilePath(QApplication.translate("Message","artisan-theme", None))
+        filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Theme",None), path=fname, ext="*.athm")
+        if filename:
+            aw.closeEventSettings_theme(filename)
+            self.sendmessage(QApplication.translate("Message","Theme saved", None))
+            self.themeMenu.clear()
+            self.populateThemeMenu()
         else:
             self.sendmessage(QApplication.translate("Message","Cancelled", None))
         
@@ -37549,7 +37668,7 @@ class scanModbusDlg(ArtisanDialog):
         self.slaveEdit.setAlignment(Qt.AlignRight)
         self.min_register = 0
         self.registerLabel = QLabel(QApplication.translate("Label", "Register",None))
-        self.toLabel = QLabel(QApplication.translate("Label", "–",None))
+        self.toLabel = QLabel(QApplication.translate("Label", "-",None))
         self.minRegisterEdit = QLineEdit(str(self.min_register))
         self.minRegisterEdit.setValidator(QIntValidator(0,65536,self.minRegisterEdit))
         self.minRegisterEdit.setFixedWidth(65)
@@ -39781,6 +39900,27 @@ class graphColorDlg(ArtisanDialog):
         self.ClineButton.setFocusPolicy(Qt.NoFocus)
         self.ClineLabel.setFrameStyle(frameStyle)
         self.ClineButton.clicked.connect(lambda _: self.setColor("C Lines",self.ClineLabel,"Cline"))
+        self.legendbgLabel = QLabel(aw.qmc.palette["legendbg"])
+        self.legendbgLabel.setPalette(QPalette(QColor(aw.qmc.palette["legendbg"])))
+        self.legendbgLabel.setAutoFillBackground(True)
+        self.legendbgButton = QPushButton(QApplication.translate("Button","Legend bkgnd", None))
+        self.legendbgButton.setFocusPolicy(Qt.NoFocus)
+        self.legendbgLabel.setFrameStyle(frameStyle)
+        self.legendbgButton.clicked.connect(lambda _: self.setColor("legendbg",self.legendbgLabel,"legendbg"))
+        self.legendborderLabel = QLabel(aw.qmc.palette["legendborder"])
+        self.legendborderLabel.setPalette(QPalette(QColor(aw.qmc.palette["legendborder"])))
+        self.legendborderLabel.setAutoFillBackground(True)
+        self.legendborderButton = QPushButton(QApplication.translate("Button","Legend border", None))
+        self.legendborderButton.setFocusPolicy(Qt.NoFocus)
+        self.legendborderLabel.setFrameStyle(frameStyle)
+        self.legendborderButton.clicked.connect(lambda _: self.setColor("legendborder",self.legendborderLabel,"legendborder"))
+        self.canvasLabel = QLabel(aw.qmc.palette["canvas"])
+        self.canvasLabel.setPalette(QPalette(QColor(aw.qmc.palette["canvas"])))
+        self.canvasLabel.setAutoFillBackground(True)
+        self.canvasButton = QPushButton(QApplication.translate("Button","Canvas", None))
+        self.canvasButton.setFocusPolicy(Qt.NoFocus)
+        self.canvasLabel.setFrameStyle(frameStyle)
+        self.canvasButton.clicked.connect(lambda _: self.setColor("canvas",self.canvasLabel,"canvas"))
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         okButton.clicked.connect(lambda _:self.accept())
         defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
@@ -39883,8 +40023,8 @@ class graphColorDlg(ArtisanDialog):
         #LAYOUTS
         #tab1 layout
         grid = QGridLayout()
-        grid.setColumnStretch(1,10)
-        grid.setColumnStretch(3,10)
+        grid.setColumnStretch(1,12)   
+        grid.setColumnStretch(3,12)   
         grid.setVerticalSpacing(1)
         grid.setColumnMinimumWidth(1,80)
         grid.setColumnMinimumWidth(3,80)
@@ -39920,14 +40060,20 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.textLabel,5,3)
         grid.addWidget(self.watermarksButton,6,2)
         grid.addWidget(self.watermarksLabel,6,3)
-        grid.addWidget(self.ClineButton,7,2)
-        grid.addWidget(self.ClineLabel,7,3)
+        grid.addWidget(self.ClineButton,9,0)
+        grid.addWidget(self.ClineLabel,9,1)
+        grid.addWidget(self.legendbgButton,7,2) 
+        grid.addWidget(self.legendbgLabel,7,3) 
+        grid.addWidget(self.legendborderButton,8,2)
+        grid.addWidget(self.legendborderLabel,8,3) 
+        grid.addWidget(self.canvasButton,9,2) 
+        grid.addWidget(self.canvasLabel,9,3) 
         defaultsLayout = QHBoxLayout()
         defaultsLayout.addStretch()
         defaultsLayout.addWidget(greyButton)
         defaultsLayout.addWidget(defaultsButton)
         defaultsLayout.addWidget(okButton)
-        grid.addLayout(defaultsLayout,9,3)
+        grid.addLayout(defaultsLayout,10,3)
         graphLayout = QVBoxLayout()
         graphLayout.addLayout(grid)
         #tab 2
@@ -40204,12 +40350,19 @@ class graphColorDlg(ArtisanDialog):
         self.watermarksLabel.setPalette(QPalette(QColor(aw.qmc.palette["watermarks"])))
         self.ClineLabel.setText(aw.qmc.palette["Cline"])
         self.ClineLabel.setPalette(QPalette(QColor(aw.qmc.palette["Cline"])))
+        self.legendbgLabel.setText(aw.qmc.palette["legendbg"])
+        self.legendbgLabel.setPalette(QPalette(QColor(aw.qmc.palette["legendbg"])))
+        self.legendborderLabel.setText(aw.qmc.palette["legendborder"])
+        self.legendborderLabel.setPalette(QPalette(QColor(aw.qmc.palette["legendborder"])))
+        self.canvasLabel.setText(aw.qmc.palette["canvas"])
+        self.canvasLabel.setPalette(QPalette(QColor(aw.qmc.palette["canvas"])))
 
     def setColor(self,title,var,color):
         labelcolor = QColor(aw.qmc.palette[color])
         colorf = aw.colordialog(labelcolor)
         if colorf.isValid():
             aw.qmc.palette[color] = str(colorf.name())
+            aw.qmc.fig.patch.set_facecolor(aw.qmc.palette["canvas"])
             var.setText(colorf.name())
             var.setPalette(QPalette(colorf))
             var.setAutoFillBackground(True)
