@@ -11020,7 +11020,7 @@ class ApplicationWindow(QMainWindow):
             self.button_1.setMinimumWidth(120)
         else:
             self.button_1.setMinimumWidth(100)
-        self.button_1.setMinimumHeight(45)
+        self.button_1.setMinimumHeight(50)
         self.button_1.clicked.connect(lambda _:self.qmc.ToggleMonitor())
 
         #create START/STOP buttons
@@ -11032,7 +11032,7 @@ class ApplicationWindow(QMainWindow):
             self.button_2.setMinimumWidth(120)
         else:
             self.button_2.setMinimumWidth(100)
-        self.button_2.setMinimumHeight(45)            
+        self.button_2.setMinimumHeight(50)            
         self.button_2.clicked.connect(lambda _:self.qmc.ToggleRecorder())
         
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
@@ -11079,7 +11079,7 @@ class ApplicationWindow(QMainWindow):
             self.button_7.setMinimumWidth(120)
         else:
             self.button_7.setMinimumWidth(100)
-        self.button_7.setMinimumHeight(45)
+        self.button_7.setMinimumHeight(50)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
         self.button_7.clicked.connect(lambda _: self.qmc.reset())
 
@@ -11103,7 +11103,7 @@ class ApplicationWindow(QMainWindow):
         self.button_10 = QPushButton(QApplication.translate("Button", "Control", None))
         self.button_10.setFocusPolicy(Qt.NoFocus)
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
-        self.button_10.setMinimumSize(90, 45)
+        self.button_10.setMinimumSize(90, 50)
         self.button_10.clicked.connect(lambda _:self.PIDcontrol())
 
         #create EVENT record button
@@ -11170,7 +11170,7 @@ class ApplicationWindow(QMainWindow):
             self.button_18.setMinimumWidth(100)
         else:
             self.button_18.setMinimumWidth(80)
-        self.button_18.setMinimumHeight(45)
+        self.button_18.setMinimumHeight(50)
         self.button_18.setContentsMargins(0,0,0,0)
         self.button_18.clicked.connect(lambda _:self.qmc.toggleHUD())
         self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None))
@@ -11205,7 +11205,7 @@ class ApplicationWindow(QMainWindow):
         # NavigationToolbar VMToolbar
         #self.ntb = NavigationToolbar(self.qmc, self.main_widget)        
         self.ntb = VMToolbar(self.qmc, self.main_widget)
-        #self.ntb.setMinimumHeight(45)
+        #self.ntb.setMinimumHeight(50)
 
         #create LCD displays
         #RIGHT COLUMN
@@ -37668,7 +37668,7 @@ class scanModbusDlg(ArtisanDialog):
         self.slaveEdit.setAlignment(Qt.AlignRight)
         self.min_register = 0
         self.registerLabel = QLabel(QApplication.translate("Label", "Register",None))
-        self.toLabel = QLabel(QApplication.translate("Label", "-",None))
+        self.toLabel = QLabel(u(uchr(8212)))
         self.minRegisterEdit = QLineEdit(str(self.min_register))
         self.minRegisterEdit.setValidator(QIntValidator(0,65536,self.minRegisterEdit))
         self.minRegisterEdit.setFixedWidth(65)
@@ -46700,6 +46700,7 @@ def main():
     
 #    aw.setStyleSheet("QMainWindow {background: 'white';}")
     
+    
     # only here deactivating the app napping seems to have an effect
     if sys.platform.startswith("darwin"):
         appnope.nope()
@@ -46739,6 +46740,9 @@ def main():
                 aw.loadPalettes(u(argv_file))
             elif file_suffix == "aset":
                 # load Artisan setings on double-click on *.aset file
+                aw.loadSettings(fn=u(argv_file))
+            elif file_suffix == "athm":
+                # load Artisan setings on double-click on *.athm file
                 aw.loadSettings(fn=u(argv_file))
     except Exception:
         pass

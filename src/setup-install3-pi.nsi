@@ -216,6 +216,9 @@ Section -Post
   !insertmacro APP_ASSOCIATE "apal" "Artisan.Palettes" "Artisan Palettes" \
      "$INSTDIR\artisanPalettes.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
      
+  !insertmacro APP_ASSOCIATE "aset" "Artisan.Theme" "Artisan Theme" \
+     "$INSTDIR\artisanTheme.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
+     
   !insertmacro APP_ASSOCIATE "aset" "Artisan.Settings" "Artisan Settings" \
      "$INSTDIR\artisanSettings.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
      
@@ -254,6 +257,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\lib"
   RMDir /r "$INSTDIR\lib2to3"
   RMDir /r "$INSTDIR\Machines"
+  RMDir /r "$INSTDIR\Themes"
   RMDir /r "$INSTDIR\mpl-data"
   RMDir /r "$INSTDIR\pytz"
   RMDir /r "$INSTDIR\openpyxl"
@@ -270,6 +274,7 @@ Section Uninstall
   Delete "$INSTDIR\artisanAlarms.ico"
   Delete "$INSTDIR\artisanProfile.ico"
   Delete "$INSTDIR\artisanPalettes.ico"
+  Delete "$INSTDIR\artisanTheme.ico"
   Delete "$INSTDIR\artisanWheel.ico"
   Delete "$INSTDIR\artisanSettings.ico"
   Delete "$INSTDIR\Humor-Sans.ttf"
@@ -307,6 +312,7 @@ Section Uninstall
   !insertmacro APP_UNASSOCIATE "alog" "Artisan.Profile"
   !insertmacro APP_UNASSOCIATE "alrm" "Artisan.Alarms"
   !insertmacro APP_UNASSOCIATE "apal" "Artisan.Palettes"
+  !insertmacro APP_UNASSOCIATE "aset" "Artisan.Theme"
   !insertmacro APP_UNASSOCIATE "aset" "Artisan.Settings"
   !insertmacro APP_UNASSOCIATE "wg" "Artisan.Wheel"
   

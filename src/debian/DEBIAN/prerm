@@ -34,6 +34,12 @@ xdg-icon-resource uninstall --size 64  application-x-artisan-aset
 xdg-icon-resource uninstall --size 128 application-x-artisan-aset
 xdg-icon-resource uninstall --size 256 application-x-artisan-aset
 xdg-mime uninstall /usr/share/artisan/artisan-aset.xml
+xdg-icon-resource uninstall --size 16  application-x-artisan-athm
+xdg-icon-resource uninstall --size 32  application-x-artisan-athm
+xdg-icon-resource uninstall --size 64  application-x-artisan-athm
+xdg-icon-resource uninstall --size 128 application-x-artisan-athm
+xdg-icon-resource uninstall --size 256 application-x-artisan-athm
+xdg-mime uninstall /usr/share/artisan/artisan-athm.xml
 xdg-icon-resource uninstall --size 16  application-x-artisan-wg
 xdg-icon-resource uninstall --size 32  application-x-artisan-wg
 xdg-icon-resource uninstall --size 64  application-x-artisan-wg

@@ -44,6 +44,7 @@ rm -rf dist/mpl-data/sample_data
 cp artisan-alog.xml dist
 cp artisan-alrm.xml dist
 cp artisan-apal.xml dist
+cp artisan-athm.xml dist
 cp artisan-aset.xml dist
 cp artisan-wg.xml dist
 cp includes/Humor-Sans.ttf dist
@@ -62,9 +63,14 @@ cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist
 cp LICENSE.txt dist
+
 mkdir dist/Machines
 find includes/Machines -name '.*.aset' -exec rm -r {} \;
 cp -R includes/Machines/* dist/Machines
+
+mkdir dist/Themes
+find includes/Themes -name '.*.athm' -exec rm -r {} \;
+cp -R includes/Themes/* dist/Themes
 
 cp $PYTHON_PATH/site-packages/yoctopuce/cdll/* dist
 

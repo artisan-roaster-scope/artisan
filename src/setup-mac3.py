@@ -100,6 +100,7 @@ DATA_FILES = [
     ("../Resources", [r"artisanAlarms.icns"]),
     ("../Resources", [r"artisanPalettes.icns"]),
     ("../Resources", [r"artisanSettings.icns"]),
+    ("../Resources", [r"artisanTheme.icns"]),
     ("../Resources", [r"artisanWheel.icns"]),
     ("../Resources", [r"includes/alarmclock.eot"]),
     ("../Resources", [r"includes/alarmclock.svg"]),
@@ -114,6 +115,7 @@ DATA_FILES = [
     ("../Resources", [r"includes/Humor-Sans.ttf"]),
     ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
     ("../Resources", [r"includes/Machines"]),
+    ("../Resources", [r"includes/Themes"]),
   ]
   
 plist = Plist.fromFile('Info.plist')

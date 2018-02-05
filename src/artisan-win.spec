@@ -101,6 +101,7 @@ for fn in [
     'artisanAlarms.ico',
     'artisanProfile.ico',
     'artisanPalettes.ico',
+    'artisanTheme.ico',
     'artisanSettings.ico',
     'artisanWheel.ico',
     r'includes\Humor-Sans.ttf',
@@ -120,6 +121,9 @@ for fn in [
 
 os.system(r'mkdir ' +  TARGET + 'Machines')
 os.system(r'xcopy includes\Machines ' + TARGET + 'Machines /y /S')
+
+os.system(r'mkdir ' +  TARGET + 'Themes')
+os.system(r'xcopy includes\Themes ' + TARGET + 'Themes /y /S')
 
 
 

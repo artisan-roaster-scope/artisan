@@ -179,6 +179,7 @@ for e in [
     'artisanPalettes.ico',
     'artisanSettings.ico',
     'artisanWheel.ico',
+    'artisanTheme.ico',
     ]:
   os.system('copy ' + e + ' dist')
 
@@ -200,6 +201,8 @@ for e in [
 
 os.system(r'mkdir dist\Machines')
 os.system(r'xcopy includes\Machines dist\Machines /y /S')
+os.system(r'mkdir dist\Themes')
+os.system(r'xcopy includes\Themes dist\Themes /y /S')
 # assumes the Microsoft Visual C++ 2015 Redistributable Package (x64), vc_redist.x64.exe, is located above the source directory
 os.system(r'copy ..\vc_redist.x64.exe ' + 'dist\\')
 

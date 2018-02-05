@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+  <mime-type type="application/x-artisan-alrm">
+    <comment>Artisan themes</comment>
+    <glob pattern="*.athm"/>
+  </mime-type>
+</mime-info>
