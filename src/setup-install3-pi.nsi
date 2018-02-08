@@ -216,7 +216,7 @@ Section -Post
   !insertmacro APP_ASSOCIATE "apal" "Artisan.Palettes" "Artisan Palettes" \
      "$INSTDIR\artisanPalettes.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
      
-  !insertmacro APP_ASSOCIATE "aset" "Artisan.Theme" "Artisan Theme" \
+  !insertmacro APP_ASSOCIATE "athm" "Artisan.Theme" "Artisan Theme" \
      "$INSTDIR\artisanTheme.ico" "Open with Artisan" "$INSTDIR\artisan.exe $\"%1$\""
      
   !insertmacro APP_ASSOCIATE "aset" "Artisan.Settings" "Artisan Settings" \
@@ -312,7 +312,7 @@ Section Uninstall
   !insertmacro APP_UNASSOCIATE "alog" "Artisan.Profile"
   !insertmacro APP_UNASSOCIATE "alrm" "Artisan.Alarms"
   !insertmacro APP_UNASSOCIATE "apal" "Artisan.Palettes"
-  !insertmacro APP_UNASSOCIATE "aset" "Artisan.Theme"
+  !insertmacro APP_UNASSOCIATE "athm" "Artisan.Theme"
   !insertmacro APP_UNASSOCIATE "aset" "Artisan.Settings"
   !insertmacro APP_UNASSOCIATE "wg" "Artisan.Wheel"
   
