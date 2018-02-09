@@ -11978,7 +11978,7 @@ class ApplicationWindow(QMainWindow):
                         aw.modbus.host = host
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                elif aw.qmc.device == 53: # Hottop
+                elif aw.qmc.device == 53 or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Hottop or MODBUS serial
                     comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                     if platf == 'Darwin':
                         ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
@@ -12003,7 +12003,10 @@ class ApplicationWindow(QMainWindow):
                     if res:
                         try:
                             pos = items.index(port_name)
-                            aw.ser.comport = ports[pos][0]
+                            if aw.qmc.device == 29: # MODBUS serial
+                                aw.modbus.port = ports[pos][0]
+                            else: # HOTTOP
+                                aw.ser.comport = ports[pos][0]
                         except:
                             pass
                     
