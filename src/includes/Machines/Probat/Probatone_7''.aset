@@ -7,6 +7,18 @@ ETlcd=true
 ExtraEventSamplingDelay=0
 Oversampling=true
 
+[CurveStyles]
+extradrawstyles1=default, default
+extradrawstyles2=default, default
+extralinestyles1=-, -
+extralinestyles2=-, -
+extralinewidths1=1, 1
+extralinewidths2=1, 1
+extramarkers1=None, None
+extramarkers2=None, None
+extramarkersizes1=6, 6
+extramarkersizes2=6, 6
+
 [DefaultButtons]
 buttonactions=0, 0, 0, 0, 0, 0, 0, 0
 buttonactionstrings="write(1,12318,1)", , , , , , "write(1,12290,3000);write(1,12318,4)", 
@@ -70,36 +82,42 @@ baudrate=115200
 bytesize=8
 comport=COM2
 host=127.0.0.1
+input1bcd=false
 input1code=3
 input1div=2
 input1float=false
 input1mode=C
 input1register=12392
 input1slave=1
+input2bcd=false
 input2code=3
 input2div=2
 input2float=false
 input2mode=C
 input2register=12393
 input2slave=1
+input3bcd=false
 input3code=3
 input3div=0
 input3float=false
 input3mode=
 input3register=12394
 input3slave=1
+input4bcd=false
 input4code=3
 input4div=1
 input4float=false
 input4mode=
 input4register=12465
 input4slave=1
+input5bcd=false
 input5code=3
 input5div=0
 input5float=false
 input5mode=
 input5register=12462
 input5slave=1
+input6bcd=false
 input6code=3
 input6div=0
 input6float=false
@@ -112,6 +130,7 @@ port=502
 stopbits=1
 timeout=0.5
 type=4
+wordorderLittle=true
 
 [Quantifiers]
 clusterEventsFlag=false
@@ -129,6 +148,7 @@ DeltaETlcd=false
 roastertype=Probatone
 
 [Sliders]
+eventslidercoarse=0, 0, 0, 0
 eventslidersflag=1
 slideractions=2, 2, 0, 2
 slidercommands="write(1,12363,{})", "write(1,12362,{})", , "write(1,12290,{});mwrite(1,12318,65531,4)"

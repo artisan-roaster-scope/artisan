@@ -15736,6 +15736,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2 + ["black"]*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor2)) 
     
+    
     #called by fileLoad()
     def setProfile(self,filename,profile,quiet=False):
         try:
@@ -17572,7 +17573,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ETBdeltalinewidth = toInt(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))
                 self.qmc.ETBdeltamarker = s2a(toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker)))
                 self.qmc.ETBdeltamarkersize = toInt(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))
+                
             settings.endGroup()
+            
             ndevices = len(self.qmc.extradevices)
             if ndevices != len(self.qmc.extralinestyles1) or \
                ndevices != len(self.qmc.extralinestyles2) or \
@@ -17584,11 +17587,16 @@ class ApplicationWindow(QMainWindow):
                ndevices != len(self.qmc.extramarkers2) or \
                ndevices != len(self.qmc.extramarkersizes1) or \
                ndevices != len(self.qmc.extramarkersizes2):
-                self.qmc.extralinestyles1 = self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*ndevices
-                self.qmc.extradrawstyles1 = self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*ndevices
-                self.qmc.extralinewidths1 = self.qmc.extralinewidths2 = [self.qmc.extra_linewidth_default]*ndevices
-                self.qmc.extramarkers1 = self.qmc.extramarkers2 = [self.qmc.marker_default]*ndevices
-                self.qmc.extramarkersizes1 = self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*ndevices
+                self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*ndevices
+                self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*ndevices
+                self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*ndevices
+                self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*ndevices
+                self.qmc.extralinewidths1 = [self.qmc.extra_linewidth_default]*ndevices
+                self.qmc.extralinewidths2 = [self.qmc.extra_linewidth_default]*ndevices
+                self.qmc.extramarkers1 = [self.qmc.marker_default]*ndevices
+                self.qmc.extramarkers2 = [self.qmc.marker_default]*ndevices
+                self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*ndevices
+                self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*ndevices
             self.qmc.extratemp1 = []
             self.qmc.extratemp2 = []
             self.qmc.extratimex = []
@@ -31915,7 +31923,7 @@ class modbusport(object):
         self.SVmultiplier = 1
         self.PIDmultiplier = 0
         self.byteorderLittle = False
-        self.wordorderLittle = False
+        self.wordorderLittle = True
         self.master = None
         self.COMsemaphore = QSemaphore(1)
         self.host = '127.0.0.1' # the TCP/UDP host
