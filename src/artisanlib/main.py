@@ -194,6 +194,9 @@ try:
         import win_inet_pton # @UnresolvedImport @UnusedImport
 except:
     pass
+    
+import snap7
+from snap7.util import *
 
 from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient
 from pymodbus.constants import Endian
@@ -1094,8 +1097,11 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget HUB0000 IO Digital 01", #74
                        "+Phidget HUB0000 IO Digital 23",#75
                        "+Phidget HUB0000 IO Digital 45",#76
-                       "VOLTCRAFT PL-125-T4",   #77
+                       "VOLTCRAFT PL-125-T4",       #77
                        "+VOLTCRAFT PL-125-T4 34",   #78
+                       "S7",                        #79
+                       "+S7 34",                    #80
+                       "+S7 56",                    #81
                        ]
 
         #extra devices
@@ -1828,6 +1834,13 @@ class tgraphcanvas(FigureCanvas):
         self.hottop_HEATER = 0 # 0-100
         self.hottop_MAIN_FAN = 0 # 0-10 (!)
         self.hottop_TX = 0.
+        
+        #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for S7 connected devices
+        self.extraS7t3 = -1
+        self.extraS7t4 = -1
+        self.extraS7t5 = -1
+        self.extraS7t6 = -1
+        self.extraS7tx = 0.
         
         #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for MODBUS connected devices
         self.extraMODBUSt3 = -1
@@ -4911,11 +4924,14 @@ class tgraphcanvas(FigureCanvas):
                                             temps = self.temp2
                                         else:
                                             temps = self.stemp2
+                                    fcolor=self.EvalueColor[self.specialeventstype[i]]
                                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temps[int(self.specialevents[i])]),
-                                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                                     bbox=dict(boxstyle='square,pad=0.1', fc='yellow', ec='none'),
+                                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),
+                                                     alpha=1.,
+                                                     bbox=dict(boxstyle='square,pad=0.1', fc=fcolor, ec='none'),
                                                      path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
-                                                     color='black',arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
+                                                     color='white',
+                                                     arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
                                                      fontsize="xx-small",
                                                      fontproperties=fontprop_small)
     
@@ -4927,22 +4943,34 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(Nevents):
                             if self.specialeventstype[i] == 0 and aw.qmc.showEtypes[0]:           
                                 self.E1timex.append(self.timex[self.specialevents[i]])
-                                self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
+                                if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                    self.E1values.append(int(round((self.specialeventsvalue[i]-1)*10)))
+                                else:
+                                    self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E1_nonempty = True
                                 E1_last = i
                             elif self.specialeventstype[i] == 1 and aw.qmc.showEtypes[1]:
                                 self.E2timex.append(self.timex[self.specialevents[i]])
-                                self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
+                                if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                    self.E2values.append(int(round((self.specialeventsvalue[i]-1)*10)))
+                                else:
+                                    self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E2_nonempty = True
                                 E2_last = i
                             elif self.specialeventstype[i] == 2 and aw.qmc.showEtypes[2]:
                                 self.E3timex.append(self.timex[self.specialevents[i]])
-                                self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
+                                if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                    self.E3values.append(int(round((self.specialeventsvalue[i]-1)*10)))
+                                else:
+                                    self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E3_nonempty = True
                                 E3_last = i
                             elif self.specialeventstype[i] == 3 and aw.qmc.showEtypes[3]:
                                 self.E4timex.append(self.timex[self.specialevents[i]])
-                                self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
+                                if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                                    self.E4values.append(int(round((self.specialeventsvalue[i]-1)*10)))
+                                else:
+                                    self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[i]-1)*10))))])
                                 E4_nonempty = True
                                 E4_last = i
                                 
@@ -6060,8 +6088,10 @@ class tgraphcanvas(FigureCanvas):
     def disconnectProbes(self):
         # close ports of main device
         self.disconnectProbesFromSerialDevice(aw.ser)
-        # close serial port of Modbus device
+        # close (serial) port of Modbus device
         aw.modbus.disconnect()
+        # close port of S7 device
+        aw.s7.disconnect()
         # close ports of extra devices
         for i in range(len(aw.extraser)):
             self.disconnectProbesFromSerialDevice(aw.extraser[i])
@@ -7043,18 +7073,23 @@ class tgraphcanvas(FigureCanvas):
                             self.specialeventsvalue[-1] = eventvalue
                             self.specialeventsStrings[-1] = eventdescription
                         etype = self.specialeventstype[-1]
+                        tx = self.timex[self.specialevents[-1]]
+                        if self.clampEvents: # in clamp mode we render also event values higher than 100:
+                            val = int(round((self.specialeventsvalue[-1]-1)*10))
+                        else:
+                            val = self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))]
                         if etype == 0:
-                            self.E1timex.append(self.timex[self.specialevents[-1]])
-                            self.E1values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
+                            self.E1timex.append(tx)
+                            self.E1values.append(val)
                         elif etype == 1:
-                            self.E2timex.append(self.timex[self.specialevents[-1]])
-                            self.E2values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
+                            self.E2timex.append(tx)
+                            self.E2values.append(val)
                         elif etype == 2:
-                            self.E3timex.append(self.timex[self.specialevents[-1]])
-                            self.E3values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
+                            self.E3timex.append(tx)
+                            self.E3values.append(val)
                         elif etype == 3:
-                            self.E4timex.append(self.timex[self.specialevents[-1]])
-                            self.E4values.append(self.eventpositionbars[min(110,max(0,int(round((self.specialeventsvalue[-1]-1)*10))))])
+                            self.E4timex.append(tx)
+                            self.E4values.append(val)
                         #if Event show flag
                         if self.eventsshowflag and aw.qmc.showEtypes[etype]:
                             index = self.specialevents[-1]
@@ -10219,6 +10254,8 @@ class ApplicationWindow(QMainWindow):
         self.ser = serialport()
         #create a modbus port object (main modbus device)
         self.modbus = modbusport()
+        #create an s7 port object (main s7 device)
+        self.s7 = s7port()
         #create scale port object
         self.scale = scaleport()
         #create color port object
@@ -10285,6 +10322,7 @@ class ApplicationWindow(QMainWindow):
         self.eventslideroffsets = [0,0,0,0]
         self.eventsliderfactors = [1.0,1.0,1.0,1.0]
         self.eventslidermin = [0,0,0,0]
+        self.eventsMaxValue = 999
         self.eventslidermax = [100,100,100,100]
         self.eventslidersflag = 1  #shows/hides sliders  1/0; records the user choice, not the actual state!
         self.eventslidercoarse = [0,0,0,0] # if 1, sliders step in multiples of 10, otherwise 1
@@ -11919,8 +11957,7 @@ class ApplicationWindow(QMainWindow):
     def recentRoastsMenuList(self):
         return [self.recentRoastLabel(rr) for rr in self.recentRoasts]
         
-    def settypedefault(self):
-        aw.qmc.etypes = aw.qmc.etypesdefault
+    def establish_etypes(self):
         # update extra LCD label substitutions
         for i in range(len(aw.qmc.extradevices)):
             if i < len(aw.qmc.extraname1):
@@ -11968,14 +12005,24 @@ class ApplicationWindow(QMainWindow):
             if reply == QMessageBox.Cancel:
                 return 
             elif reply == QMessageBox.Yes:
+                aw.qmc.etypes = aw.qmc.etypesdefault
                 aw.loadSettings(fn=action.data(),remember=False)
-                aw.settypedefault()
+                aw.establish_etypes()
+                aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(action.text()))
                 if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
                     host,res = QInputDialog.getText(self,
                         QApplication.translate("Message", "Machine",None),
                         QApplication.translate("Message", "Network name or IP address",None),text=aw.modbus.host) #"127.0.0.1"
                     if res:
                         aw.modbus.host = host
+                    else:
+                        aw.sendmessage(QApplication.translate("Message","Action canceled",None))
+                elif aw.qmc.device == 79:
+                    host,res = QInputDialog.getText(self,
+                        QApplication.translate("Message", "Machine",None),
+                        QApplication.translate("Message", "Network name or IP address",None),text=aw.s7.host) #"127.0.0.1"
+                    if res:
+                        aw.s7.host = host
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
                 elif aw.qmc.device == 53 or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Hottop or MODBUS serial
@@ -12332,9 +12379,9 @@ class ApplicationWindow(QMainWindow):
     # compute the 12 or 102 event quantifier linespace for type n in [0,3]
     def computeLinespace(self,n):
         if self.eventquantifiercoarse[n]:
-            num = 12
+            num = int(round((self.eventquantifiermax[n] - self.eventquantifiermin[n])/2.)) + 2
         else:
-            num = 102
+            num = self.eventquantifiermax[n] - self.eventquantifiermin[n] + 2
         return numpy.linspace(self.eventquantifiermin[n], self.eventquantifiermax[n], num=num)
         
     # update all 4 event quantifier linespaces
@@ -12364,14 +12411,14 @@ class ApplicationWindow(QMainWindow):
                     temp = aw.qmc.extratemp2[x // 2]
         return temp,timex
         
-    # returns min/max 0/10 for values outside of the given linespace ls defining the interval
+    # returns min/max 0/(aw.eventsMaxValue / 10) for values outside of the given linespace ls defining the interval
     # otherwise the bin number from [0-self.eventquantifiersteps]
     def digitize(self,v,ls,coarse):
         if coarse:
-            r = numpy.digitize([v],ls)[0] - 1
+            r = numpy.digitize([v],ls)[0]+ls[0] - 1
         else:
-            r = (numpy.digitize([v],ls)[0] - 1) / 10.
-        return max(0,min(10,r))
+            r = (numpy.digitize([v],ls)[0]+ls[0] - 1) / 10.
+        return max(0,min(aw.eventsMaxValue / 10,r))
         
     
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
@@ -12968,11 +13015,12 @@ class ApplicationWindow(QMainWindow):
     # if updateLCD=True, call moveslider() which in turn updates the LCD
     def sliderReleased(self,n,force=False, updateLCD=False):
         if n == 0:
-            if force or self.slider1.value() != self.eventslidervalues[0]:
+            sv = self.slider1.value()
+            if force or sv != self.eventslidervalues[0]:
                 if aw.eventslidercoarse[0]:
-                    v = int(round(self.slider1.value() / 10.))*10
+                    v = int(round(sv / 10.))*10
                 else:
-                    v = self.slider1.value()
+                    v = sv
                 self.eventslidervalues[0] = v
                 if updateLCD:
                     self.moveslider(0,v,forceLCDupdate=True) # move slider if need and update slider LCD
@@ -13021,7 +13069,7 @@ class ApplicationWindow(QMainWindow):
                 action = (action+2 if action > 1 else action)
                 if action > 5:
                     action = action + 1 # skip the 6:IO Command
-                    if action > 10:
+                    if action > 10 and action < 15:
                         action = action + 1 # skip the 11 p-i-d action
                         if action == 15:
                             action = 6 # map IO Command back
@@ -13165,7 +13213,7 @@ class ApplicationWindow(QMainWindow):
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
-    #         13= PWM Command; 14 VOUT Command
+    #         13= PWM Command; 14 VOUT Command; 15 S7 Command
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -13302,18 +13350,22 @@ class ApplicationWindow(QMainWindow):
                     except Exception:
                         pass
                 elif action == 6:
-                    try:
-                        if cmd_str.startswith('set(') and len(cmd_str)>7:
-                            c,v = cmd_str[4:-1].split(',')
-                            aw.ser.phidgetBinaryOUTset(int(c),bool(int(v)))
-                        elif cmd_str.startswith('toggle(') and len(cmd_str)>8:
-                            c = int(cmd_str[7:-1])
-                            aw.ser.phidgetBinaryOUTtoggle(c)
-                        elif cmd_str.startswith('pulse(') and len(cmd_str)>9 and len(cmd_str)<14:
-                            c,t = cmd_str[6:-1].split(',')
-                            aw.ser.phidgetBinaryOUTpulse(int(c),int(t))
-                    except Exception:
-                        pass
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:
+                            cs = c.strip()
+                            try:
+                                if cs.startswith('set(') and len(cs)>7:
+                                    c,v = cs[4:-1].split(',')
+                                    aw.ser.phidgetBinaryOUTset(int(c),bool(int(v)))
+                                elif cs.startswith('toggle(') and len(cs)>8:
+                                    c = int(cs[7:-1])
+                                    aw.ser.phidgetBinaryOUTtoggle(c)
+                                elif cs.startswith('pulse(') and len(cs)>9 and len(cs)<14:
+                                    c,t = cs[6:-1].split(',')
+                                    aw.ser.phidgetBinaryOUTpulse(int(c),int(t))
+                            except Exception:
+                                pass
                 elif action == 7: # slider call-program action
                     try:
                         self.call_prog_with_args(cmd_str)
@@ -13439,34 +13491,61 @@ class ApplicationWindow(QMainWindow):
                     ## togglehub(<channel>)
                     ## pulse(<channel>,<millis>)
                     ## pulsehub(<channel>,<millis>)
-                    try:
-                        if cmd_str.startswith('out(') and len(cmd_str)>7 and len(cmd_str)<11:
-                            c,v = cmd_str[4:-1].split(',')
-                            aw.ser.phidgetOUTsetPWM(int(c),int(v))                            
-                        elif cmd_str.startswith('toggle(') and len(cmd_str)==9:
-                            c = cmd_str[7:8]
-                            aw.ser.phidgetOUTtogglePWM(int(c))
-                        elif cmd_str.startswith('outhub(') and len(cmd_str)>10 and len(cmd_str)<14:
-                            c,v = cmd_str[7:-1].split(',')
-                            aw.ser.phidgetOUTsetPWMhub(int(c),int(v))
-                        elif cmd_str.startswith('togglehub(') and len(cmd_str)==12:
-                            c = cmd_str[10:11]
-                            aw.ser.phidgetOUTtogglePWMhub(int(c))
-                        elif cmd_str.startswith('pulse(') and len(cmd_str)>9 and len(cmd_str)<14:
-                            c,t = cmd_str[6:-1].split(',')
-                            aw.ser.phidgetOUTpulsePWM(int(c),int(t))
-                        elif cmd_str.startswith('pulsehub(') and len(cmd_str)>12 and len(cmd_str)<17:
-                            c,t = cmd_str[9:-1].split(',')
-                            aw.ser.phidgetOUTpulsePWMhub(int(c),int(t))
-                    except Exception:
-                        pass
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:
+                            cs = c.strip()
+                            try:
+                                if cs.startswith('out(') and len(cs)>7 and len(cs)<11:
+                                    c,v = cs[4:-1].split(',')
+                                    aw.ser.phidgetOUTsetPWM(int(c),int(v))                            
+                                elif cs.startswith('toggle(') and len(cs)==9:
+                                    c = cs[7:8]
+                                    aw.ser.phidgetOUTtogglePWM(int(c))
+                                elif cs.startswith('outhub(') and len(cs)>10 and len(cs)<14:
+                                    c,v = cs[7:-1].split(',')
+                                    aw.ser.phidgetOUTsetPWMhub(int(c),int(v))
+                                elif cs.startswith('togglehub(') and len(cs)==12:
+                                    c = cs[10:11]
+                                    aw.ser.phidgetOUTtogglePWMhub(int(c))
+                                elif cs.startswith('pulse(') and len(cs)>9 and len(cs)<14:
+                                    c,t = cs[6:-1].split(',')
+                                    aw.ser.phidgetOUTpulsePWM(int(c),int(t))
+                                elif cs.startswith('pulsehub(') and len(cs)>12 and len(cs)<17:
+                                    c,t = cs[9:-1].split(',')
+                                    aw.ser.phidgetOUTpulsePWMhub(int(c),int(t))
+                            except Exception:
+                                pass
                 elif action == 14: # VOUT Command (currently only "out(<channel>,<value>)" with <value> a float
-                    try:
-                        if cmd_str.startswith('out(') and len(cmd_str)>7:
-                            c,v = cmd_str[4:-1].split(',')
-                            aw.ser.phidgetVOUTsetVOUT(int(c),float(v))
-                    except Exception:
-                        pass                        
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:
+                            cs = c.strip()
+                            try:
+                                if cs.startswith('out(') and len(cs)>7:
+                                    c,v = cs[4:-1].split(',')
+                                    aw.ser.phidgetVOUTsetVOUT(int(c),float(v))
+                            except Exception:
+                                pass
+                elif action == 15: # S7 Command
+                    # setDBint(<dbnumber>,<start>,<value>)
+                    # setDBfloat(<dbnumber>,<start>,<value>)
+                    if cmd_str:
+                        cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
+                        for c in cmds:                        
+                            cs = c.strip()
+                            if cs.startswith("setDBint(") and len(cs) > 14:
+                                try:
+                                    dbnr,s,v = cs[len("setDBint("):-1].split(',')
+                                    aw.s7.writeInt(5,int(dbnr),int(s),v)
+                                except Exception:
+                                    pass
+                            elif cs.startswith("setDBfloat(") and len(cs) > 16:
+                                try:
+                                    dbnr,s,v = cs[len("setDBfloat("):-1].split(',')
+                                    aw.s7.writeInt(5,int(dbnr),int(s),v)
+                                except Exception:
+                                    pass
             except Exception:
                 pass
                 
@@ -13550,7 +13629,7 @@ class ApplicationWindow(QMainWindow):
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     # updates corresponding eventslidervalues
     def moveslider(self,n,v,forceLCDupdate=False):
-        if v >= 0 and v <= 100:
+        if v >= self.eventslidermin[n] and v <= self.eventslidermax[n]: #v >= 0 and v <= 100:
             self.eventslidervalues[n] = v
             # first update slider LCDs if needed
             if n == 0 and (forceLCDupdate or self.slider1.value() != v):
@@ -17094,6 +17173,20 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("timeout"):
                 self.ser.timeout = aw.float2float(toFloat(settings.value("timeout",self.ser.timeout)))
             settings.endGroup()
+            #restore s7 port
+            settings.beginGroup("S7")
+            if settings.contains("area"):
+                self.s7.area = [toInt(x) for x in toList(settings.value("area",self.s7.area))]
+                self.s7.db_nr = [toInt(x) for x in toList(settings.value("db_nr",self.s7.db_nr))]
+                self.s7.start = [toInt(x) for x in toList(settings.value("start",self.s7.start))]
+                self.s7.type = [toInt(x) for x in toList(settings.value("type",self.s7.type))]
+                self.s7.mode = [toInt(x) for x in toList(settings.value("mode",self.s7.mode))]
+                self.s7.div = [toInt(x) for x in toList(settings.value("div",self.s7.div))]
+                self.s7.host = toString(settings.value("host",self.s7.host))
+                self.s7.port = toInt(settings.value("port",self.s7.port))
+                self.s7.rack = toInt(settings.value("rack",self.s7.rack))
+                self.s7.slot = toInt(settings.value("slot",self.s7.slot))
+            settings.endGroup()
             #restore modbus port
             settings.beginGroup("Modbus")
             self.modbus.comport = s2a(toString(settings.value("comport",self.modbus.comport)))
@@ -18221,7 +18314,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
             settings.setValue("minieventsflag",self.minieventsflag)
             settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
-            # we only store etype names if they have be modified by the user to allow automatic translations otherwise
+            # we only store etype names if they have been modified by the user to allow automatic translations otherwise
             if ((self.qmc.etypes[0] != QApplication.translate("ComboBox", "Air",None)) or
                 (self.qmc.etypes[1] != QApplication.translate("ComboBox", "Drum",None)) or
                 (self.qmc.etypes[2] != QApplication.translate("ComboBox", "Damper",None)) or
@@ -18280,6 +18373,19 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("stopbits",self.ser.stopbits)
             settings.setValue("parity",self.ser.parity)
             settings.setValue("timeout",self.ser.timeout)
+            settings.endGroup()
+            #save s7 port
+            settings.beginGroup("S7")
+            settings.setValue("area",self.s7.area)
+            settings.setValue("db_nr",self.s7.db_nr)
+            settings.setValue("start",self.s7.start)
+            settings.setValue("type",self.s7.type)
+            settings.setValue("mode",self.s7.mode)
+            settings.setValue("div",self.s7.div)
+            settings.setValue("host",self.s7.host)
+            settings.setValue("port",self.s7.port)
+            settings.setValue("rack",self.s7.rack)
+            settings.setValue("slot",self.s7.slot)
             settings.endGroup()
             #save modbus port
             settings.beginGroup("Modbus")
@@ -18974,6 +19080,8 @@ class ApplicationWindow(QMainWindow):
                 pass
         # close modbus port
         aw.modbus.disconnect()
+        # close s7 port
+        aw.s7.disconnect()
         # close scale port
         try:
             if aw.scale:
@@ -21295,6 +21403,20 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.port = int(str(dialog.modbus_portEdit.text()))
             except Exception:
                 pass
+                
+            # S7 Setup
+            self.s7.host = str(dialog.s7_hostEdit.text())
+            self.s7.port = int(str(dialog.s7_portEdit.text()))
+            self.s7.rack = int(str(dialog.s7_rackEdit.text()))
+            self.s7.slot = int(str(dialog.s7_slotEdit.text()))
+            for i in range(self.s7.channels):
+                self.s7.area[i] = dialog.s7_areaCombos[i].currentIndex()
+                self.s7.db_nr[i] = int(str(dialog.s7_dbEdits[i].text()))
+                self.s7.start[i] = int(str(dialog.s7_startEdits[i].text()))
+                self.s7.type[i] = dialog.s7_typeCombos[i].currentIndex()
+                self.s7.div[i] = dialog.s7_divCombos[i].currentIndex()
+                self.s7.mode[i] = dialog.s7_modeCombos[i].currentIndex()
+                
             # set scale port
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
             self.scale.comport = str(dialog.scale_comportEdit.getSelection())
@@ -25631,7 +25753,7 @@ class editGraphDlg(ArtisanDialog):
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
-        self.weightinedit.setValidator(QDoubleValidator(0., 99999., 1, self.weightinedit))
+        self.weightinedit.setValidator(QDoubleValidator(0., 99999.9, 1, self.weightinedit))
         self.weightinedit.setMinimumWidth(70)
         self.weightinedit.setMaximumWidth(70)
         self.weightinedit.setAlignment(Qt.AlignRight)
@@ -26646,13 +26768,13 @@ class editGraphDlg(ArtisanDialog):
         else:
             self.eventtable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
-        regexvalue = QRegExp(r"^100|\d?\d?$")
+#        regexvalue = QRegExp(r"^100|\d?\d?$")
         self.eventtable.setShowGrid(True) 
         etypes = aw.qmc.getetypes()
         #populate table
         for i in range(nevents):
             #create widgets
-            typeComboBox = QComboBox()
+            typeComboBox = MyQComboBox()
             typeComboBox.addItems(etypes)
             typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
 
@@ -26675,7 +26797,7 @@ class editGraphDlg(ArtisanDialog):
             
             valueEdit = QLineEdit()
             valueEdit.setAlignment(Qt.AlignRight)
-            valueEdit.setValidator(QRegExpValidator(regexvalue,self))
+#            valueEdit.setValidator(QRegExpValidator(regexvalue,self))
             valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[i]))
             
             timeline = QLineEdit()
@@ -26695,6 +26817,7 @@ class editGraphDlg(ArtisanDialog):
             self.eventtable.setCellWidget(i,3,stringline)
             self.eventtable.setCellWidget(i,4,typeComboBox)
             self.eventtable.setCellWidget(i,5,valueEdit)
+            valueEdit.setValidator(QIntValidator(0,aw.eventsMaxValue,self.eventtable.cellWidget(i,5)))
         header = self.eventtable.horizontalHeader()
         #header.setStretchLastSection(True)
         if pyqtversion < 5:
@@ -28701,7 +28824,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Fuji Command",None),
                        QApplication.translate("ComboBox", "PWM Command",None),
                        QApplication.translate("ComboBox", "VOUT Command",None),
-                       QApplication.translate("ComboBox", "IO Command",None)]
+                       QApplication.translate("ComboBox", "IO Command",None),
+                       QApplication.translate("ComboBox", "S7 Command",None)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -28768,35 +28892,35 @@ class EventsDlg(ArtisanDialog):
         self.E4factor.setMaximumWidth(70)
         self.E1_min = QSpinBox()
         self.E1_min.setAlignment(Qt.AlignRight)
-        self.E1_min.setRange(0,100)
+        self.E1_min.setRange(0,aw.eventsMaxValue)
         self.E1_min.setValue(aw.eventslidermin[0])
         self.E2_min = QSpinBox()
         self.E2_min.setAlignment(Qt.AlignRight)
-        self.E2_min.setRange(0,100)
+        self.E2_min.setRange(0,aw.eventsMaxValue)
         self.E2_min.setValue(aw.eventslidermin[1])
         self.E3_min = QSpinBox()
         self.E3_min.setAlignment(Qt.AlignRight)
-        self.E3_min.setRange(0,100)
+        self.E3_min.setRange(0,aw.eventsMaxValue)
         self.E3_min.setValue(aw.eventslidermin[2])
         self.E4_min = QSpinBox()
         self.E4_min.setAlignment(Qt.AlignRight)
-        self.E4_min.setRange(0,100)
+        self.E4_min.setRange(0,aw.eventsMaxValue)
         self.E4_min.setValue(aw.eventslidermin[3])
         self.E1_max = QSpinBox()
         self.E1_max.setAlignment(Qt.AlignRight)
-        self.E1_max.setRange(0,100)
+        self.E1_max.setRange(0,aw.eventsMaxValue)
         self.E1_max.setValue(aw.eventslidermax[0])
         self.E2_max = QSpinBox()
         self.E2_max.setAlignment(Qt.AlignRight)
-        self.E2_max.setRange(0,100)
+        self.E2_max.setRange(0,aw.eventsMaxValue)
         self.E2_max.setValue(aw.eventslidermax[1])
         self.E3_max = QSpinBox()
         self.E3_max.setAlignment(Qt.AlignRight)
-        self.E3_max.setRange(0,100)
+        self.E3_max.setRange(0,aw.eventsMaxValue)
         self.E3_max.setValue(aw.eventslidermax[2])
         self.E4_max = QSpinBox()
         self.E4_max.setAlignment(Qt.AlignRight)
-        self.E4_max.setRange(0,100)
+        self.E4_max.setRange(0,aw.eventsMaxValue)
         self.E4_max.setValue(aw.eventslidermax[3])
         self.E1slider_coarse = QCheckBox()
         self.E1slider_coarse.setFocusPolicy(Qt.NoFocus)
@@ -28975,7 +29099,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "p-i-d",None),
                        QApplication.translate("ComboBox", "Fuji Command",None),
                        QApplication.translate("ComboBox", "PWM Command",None),
-                       QApplication.translate("ComboBox", "VOUT Command",None)]
+                       QApplication.translate("ComboBox", "VOUT Command",None),
+                       QApplication.translate("ComboBox", "S7 Command",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -29752,7 +29877,7 @@ class EventsDlg(ArtisanDialog):
             valueEdit.editingFinished.connect(lambda i=i:self.setvalueeventbutton(1,i))
             #action
             actionComboBox = QComboBox()
-            actionComboBox.addItems([QApplication.translate("ComboBox","None",None),
+            actionComboBox.addItems(["",
                                      QApplication.translate("ComboBox","Serial Command",None),
                                      QApplication.translate("ComboBox","Call Program",None),
                                      QApplication.translate("ComboBox","Multiple Event",None),
@@ -29765,7 +29890,8 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","p-i-d",None),
                                      QApplication.translate("ComboBox","Fuji Command",None),
                                      QApplication.translate("ComboBox","PWM Command",None),
-                                     QApplication.translate("ComboBox","VOUT Command",None)])
+                                     QApplication.translate("ComboBox","VOUT Command",None),
+                                     QApplication.translate("ComboBox","S7 Command",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1
@@ -30344,8 +30470,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.startfinish.setMinimumWidth(80)
         self.endfinish = QSpinBox()
         self.endfinish.setAlignment(Qt.AlignRight)
-        self.endfinish.setMinimumWidth(80)        
-        self.events2phases()
+        self.endfinish.setMinimumWidth(80) 
         if aw.qmc.mode == "F":
             self.startdry.setSuffix(" F")
             self.enddry.setSuffix(" F")
@@ -30441,6 +30566,8 @@ class phasesGraphDlg(ArtisanDialog):
         self.startmidEspresso.valueChanged.connect(self.enddryEspresso.setValue)
         self.endmidEspresso.valueChanged.connect(self.startfinishEspresso.setValue)
         self.startfinishEspresso.valueChanged.connect(self.endmidEspresso.setValue)
+               
+        self.events2phases()
         
         if aw.qmc.mode == "F":
             self.startdryEspresso.setSuffix(" F")
@@ -30523,12 +30650,16 @@ class phasesGraphDlg(ArtisanDialog):
             # adjust phases by DryEnd and FCs events
             if aw.qmc.timeindex[1]:
                 aw.qmc.phases[1] = int(round(aw.qmc.temp2[aw.qmc.timeindex[1]]))
-                self.enddry.setDisabled(True)
-                self.startmid.setDisabled(True)
+            self.enddry.setDisabled(True)
+            self.startmid.setDisabled(True)
+            self.enddryEspresso.setDisabled(True)
+            self.startmidEspresso.setDisabled(True)
             if aw.qmc.timeindex[2]:
                 aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
-                self.endmid.setDisabled(True)
-                self.startfinish.setDisabled(True)
+            self.endmid.setDisabled(True)
+            self.startfinish.setDisabled(True)
+            self.endmidEspresso.setDisabled(True)
+            self.startfinishEspresso.setDisabled(True)
 
     def watermarksflagChanged(self,_):
         aw.qmc.watermarksflag = not aw.qmc.watermarksflag
@@ -30564,6 +30695,10 @@ class phasesGraphDlg(ArtisanDialog):
             self.startmid.setEnabled(True)
             self.endmid.setEnabled(True)
             self.startfinish.setEnabled(True)
+            self.enddryEspresso.setEnabled(True)
+            self.startmidEspresso.setEnabled(True)
+            self.endmidEspresso.setEnabled(True)
+            self.startfinishEspresso.setEnabled(True)
         if aw.qmc.phasesbuttonflag:
             self.autoDRYflag.setChecked(False)
             self.autoFCsFlag.setChecked(False)
@@ -31857,6 +31992,231 @@ class StatisticsDlg(ArtisanDialog):
             self.close()
 
 ###########################################################################################
+##################### S7 PORT #########################################################
+###########################################################################################
+
+# Define a context manager to suppress stdout and stderr.
+class suppress_stdout_stderr(object):
+    '''
+    A context manager for doing a "deep suppression" of stdout and stderr in 
+    Python, i.e. will suppress all print, even if the print originates in a 
+    compiled C/Fortran sub-function.
+       This will not suppress raised exceptions, since exceptions are printed
+    to stderr just before a script exits, and after the context manager has
+    exited (at least, I think that is why it lets exceptions through).      
+
+    '''
+    def __init__(self):
+        # Open a pair of null files
+        self.null_fds =  [os.open(os.devnull,os.O_RDWR) for _ in range(2)]
+        # Save the actual stdout (1) and stderr (2) file descriptors.
+        self.save_fds = [os.dup(1), os.dup(2)]
+
+    def __enter__(self):
+        # Assign the null pointers to stdout and stderr.
+        os.dup2(self.null_fds[0],1)
+        os.dup2(self.null_fds[1],2)
+
+    def __exit__(self, *_):
+        # Re-assign the real stdout/stderr back to (1) and (2)
+        os.dup2(self.save_fds[0],1)
+        os.dup2(self.save_fds[1],2)
+        # Close all file descriptors
+        for fd in self.null_fds + self.save_fds:
+            os.close(fd)
+
+class s7port(object):
+    def __init__(self):
+        self.readRetries = 1
+        self.channels = 6 # maximal number of S7 channels
+        self.host = '127.0.0.1' # the TCP host
+        self.port = 102 # the TCP port
+        self.rack = 0 # 0,..,7
+        self.slot = 0 # 0,..,31
+        
+        self.area = [0]*self.channels
+        self.db_nr = [1]*self.channels
+        self.start = [0]*self.channels
+        self.type = [0]*self.channels
+        self.mode = [0]*self.channels
+        self.div = [0]*self.channels
+        
+        self.COMsemaphore = QSemaphore(1)
+        
+        self.areas = [
+            0x81, # PE
+            0x82, # PA
+            0x83, # MK
+            0x1C, # CT
+            0x1D, # TM
+            0x84, # DB
+        ]
+        
+        self.plc = None
+        
+    def isConnected(self):
+        return not (self.plc is None) and self.plc.get_connected()
+        
+    def disconnect(self):
+        if self.isConnected():
+            try:
+                self.plc.disconnect()
+                self.plc.destroy()
+                self.plc = None
+            except Exception:
+                pass
+        
+    def connect(self):
+        if self.plc and not self.plc.get_connected():
+            self.plc = None
+        if self.plc is None:
+            try:
+                self.plc = snap7.client.Client()
+                libtime.sleep(0.3)
+                with suppress_stdout_stderr():
+                    self.plc.connect(self.host,self.rack,self.slot,self.port)
+                if self.plc.get_connected():
+                    aw.sendmessage(QApplication.translate("Message","S7 connected", None))
+                    libtime.sleep(0.7)
+                else:
+                    # we try a second time
+                    libtime.sleep(0.3)
+                    with suppress_stdout_stderr():
+                        self.plc.connect(self.host,self.rack,self.slot,self.port)
+                    if self.plc.get_connected():
+                        aw.sendmessage(QApplication.translate("Message","S7 connected", None))
+                        libtime.sleep(0.7)
+            except Exception as ex:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
+                
+                
+    def writeFloat(self,area,dbnumber,start,value):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            if self.plc.get_connected():
+                with suppress_stdout_stderr():
+                    ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                    set_real(ba, 0, float(value))
+                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+            else:
+                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeFloat() connecting to PLC failed"))               
+        except Exception as ex:
+            self.disconnect()
+            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeFloat() {0}").format(str(ex)))
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+
+    def writeInt(self,area,dbnumber,start,value):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            if self.plc.get_connected():
+                with suppress_stdout_stderr():
+                    ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                    set_int(ba, 0, int(value))
+                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
+            else:
+                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeInt() connecting to PLC failed"))               
+        except Exception as ex:
+            self.disconnect()
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+                    
+    def readFloat(self,area,dbnumber,start):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            if self.plc.get_connected():
+                retry = self.readRetries   
+                res = None             
+                while True:
+                    try:
+                        with suppress_stdout_stderr():
+                            res = self.plc.read_area(self.areas[area],dbnumber,start,4)
+                    except:
+                        res = None
+                    if res is None:
+                        if retry > 0:
+                            retry = retry - 1
+                        else:
+                            raise Exception("Communication error")
+                    else:
+                        break
+                if res is None:
+                    return -1
+                else:
+                    return get_real(res,0)
+            else:
+                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() connecting to PLC failed"))                                 
+                return -1
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+#            self.disconnect()
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+            return -1
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                aw.addserial("S7 readFloat")
+                
+    def readInt(self,area,dbnumber,start):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            if self.plc.get_connected():
+                retry = self.readRetries   
+                res = None             
+                while True:
+                    try:
+                        with suppress_stdout_stderr():
+                            res = self.plc.read_area(self.areas[area],dbnumber,start,2)
+                    except:
+                        res = None
+                    if res is None:
+                        if retry > 0:
+                            retry = retry - 1
+                        else:
+                            raise Exception("Communication error")
+                    else:
+                        break
+                if res is None:
+                    return -1
+                else:
+                    return get_int(res,0)
+            else:
+                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() connecting to PLC failed"))   
+                return -1
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+#            self.disconnect()
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() {0}").format(str(ex)),exc_tb.tb_lineno)
+            return -1
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                aw.addserial("S7 readInt")                
+
+
+
+###########################################################################################
 ##################### MODBUS PORT #########################################################
 ###########################################################################################
 
@@ -32693,6 +33053,9 @@ class serialport(object):
                                    self.PHIDGET_HUB0000_D_56, #76
                                    self.VOLTCRAFTPL125T4,     #77
                                    self.VOLTCRAFTPL125T4_34,  #78
+                                   self.S7,                   #79
+                                   self.S7_34,                #80
+                                   self.S7_56,                #81
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -33153,6 +33516,17 @@ class serialport(object):
     def HOTTOP_HF(self):
         return aw.qmc.hottop_TX,aw.qmc.hottop_MAIN_FAN,aw.qmc.hottop_HEATER # time, Fan (chan2), Heater (chan1)
 
+    def S7(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.S7read()
+        return tx,t2,t1
+    
+    def S7_34(self):
+        return aw.qmc.extraS7tx,aw.qmc.extraS7t4,aw.qmc.extraS7t3
+        
+    def S7_56(self):
+        return aw.qmc.extraS7tx,aw.qmc.extraS7t6,aw.qmc.extraS7t5
+        
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.MODBUSread()
@@ -33803,6 +34177,25 @@ class serialport(object):
             elif m == "F" and aw.qmc.mode == "C":
                 res = aw.qmc.fromFtoC(res)
         return res
+        
+    #returns v1,v2 from a connected S7 device
+    def S7read(self):
+        res = []
+        for i in range(aw.s7.channels):
+            if aw.s7.area[i]:
+                if aw.s7.type[i]:
+                    res.append(aw.s7.readFloat(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i]))
+                else:
+                    res.append(aw.s7.readInt(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i]))
+            else:
+                res.append(-1)
+                          
+        aw.qmc.extraS7t3 = res[2]
+        aw.qmc.extraS7t4 = res[3]
+        aw.qmc.extraS7t5 = res[4]
+        aw.qmc.extraS7t6 = res[5]
+        aw.qmc.extraS7tx = aw.qmc.timeclock.elapsed()/1000.
+        return res[1], res[0]
 
     #returns v1,v2 from a connected MODBUS device
     def MODBUSread(self):
@@ -37214,7 +37607,7 @@ class comportDlg(ArtisanDialog):
         # port (default 502)
         modbus_portlabel = QLabel(QApplication.translate("Label", "Port",None))
         self.modbus_portEdit = QLineEdit(str(aw.modbus.port))
-        self.modbus_portEdit.setValidator(QIntValidator(1,65535,self.modbus_input4slaveEdit))        
+        self.modbus_portEdit.setValidator(QIntValidator(1,65535,self.modbus_portEdit))        
         self.modbus_portEdit.setFixedWidth(60)
         self.modbus_portEdit.setAlignment(Qt.AlignRight)
         
@@ -37460,7 +37853,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -37570,12 +37963,146 @@ class comportDlg(ArtisanDialog):
         modbus_setup.addWidget(self.modbus_portEdit)
         tab3Layout = QVBoxLayout()
         tab3Layout.addLayout(modbus_gridVLayout)
-        tab3Layout.addLayout(modbus_sv_layout)#(modbus_input_grid)
+        tab3Layout.addLayout(modbus_sv_layout)#
         tab3Layout.addLayout(modbus_setup)
         tab3Layout.addStretch()
         tab3Layout.setContentsMargins(0,0,0,0)
         tab3Layout.setSpacing(5)
+        
         #LAYOUT TAB 4
+        # host (IP or hostname)
+        s7_hostlabel = QLabel(QApplication.translate("Label", "Host",None))
+        self.s7_hostEdit = QLineEdit(str(aw.s7.host))
+        self.s7_hostEdit.setFixedWidth(120)
+        self.s7_hostEdit.setAlignment(Qt.AlignRight)
+        # port (default 102)
+        s7_portlabel = QLabel(QApplication.translate("Label", "Port",None))
+        self.s7_portEdit = QLineEdit(str(aw.s7.port))
+        self.s7_portEdit.setValidator(QIntValidator(1,65535,self.s7_portEdit))        
+        self.s7_portEdit.setFixedWidth(60)
+        self.s7_portEdit.setAlignment(Qt.AlignRight)
+        # rack (default 0)
+        s7_racklabel = QLabel(QApplication.translate("Label", "Rack",None))
+        self.s7_rackEdit = QLineEdit(str(aw.s7.rack))
+        self.s7_rackEdit.setValidator(QIntValidator(0,7,self.s7_rackEdit))        
+        self.s7_rackEdit.setFixedWidth(60)
+        self.s7_rackEdit.setAlignment(Qt.AlignRight)
+        # slot (default 0)
+        s7_slotlabel = QLabel(QApplication.translate("Label", "Slot",None))
+        self.s7_slotEdit = QLineEdit(str(aw.s7.slot))
+        self.s7_slotEdit.setValidator(QIntValidator(0,31,self.s7_slotEdit))        
+        self.s7_slotEdit.setFixedWidth(60)
+        self.s7_slotEdit.setAlignment(Qt.AlignRight)
+
+        s7_areaLabel = QLabel(QApplication.translate("Label", "Area",None))
+        s7_dbLabel = QLabel(QApplication.translate("Label", "DB#",None))
+        s7_startLabel = QLabel(QApplication.translate("Label", "Start",None))
+        s7_typeLabel = QLabel(QApplication.translate("Label", "Type",None))
+        s7_modeLabel = QLabel(QApplication.translate("Label", "Mode",None))
+        s7_divLabel = QLabel(QApplication.translate("Label", "Factor",None))
+        
+        self.s7_channelLabels = []
+        self.s7_areaCombos = []
+        self.s7_dbEdits = []
+        self.s7_startEdits = []
+        self.s7_typeCombos = []
+        self.s7_modeCombos = []
+        self.s7_divCombos = []
+        
+        s7_areas = [" ","PE","PA","MK","CT","TM","DB"]
+        s7_types = ["Int", "Float"]
+        
+        s7_grid = QGridLayout()
+        
+        s7_grid.addWidget(s7_areaLabel,1,0,Qt.AlignRight)
+        s7_grid.addWidget(s7_dbLabel,2,0,Qt.AlignRight)
+        s7_grid.addWidget(s7_startLabel,3,0,Qt.AlignRight)
+        s7_grid.addWidget(s7_typeLabel,4,0,Qt.AlignRight)
+        s7_grid.addWidget(s7_divLabel,5,0,Qt.AlignRight)
+        s7_grid.addWidget(s7_modeLabel,6,0,Qt.AlignRight)
+        
+        for i in range(aw.s7.channels):
+            # channel label
+            label = QLabel(QApplication.translate("Label", "Input",None) + " " + str(i+1))
+            self.s7_channelLabels.append(label)
+            s7_grid.addWidget(label,0,i+1,Qt.AlignRight)
+            # area combo
+            area = QComboBox()
+            area.setFocusPolicy(Qt.NoFocus)
+            area.addItems(s7_areas)
+            area.setCurrentIndex(aw.s7.area[i])
+            area.setFixedWidth(70)
+            self.s7_areaCombos.append(area) 
+            s7_grid.addWidget(area,1,i+1,Qt.AlignRight)                       
+            # db edit: 1-16000
+            dbEdit = QLineEdit(str(aw.s7.db_nr[i]))
+            dbEdit.setFixedWidth(65)
+            dbEdit.setAlignment(Qt.AlignRight)
+            self.s7_dbEdits.append(dbEdit)
+            dbEdit.setValidator(QIntValidator(1,16000,self.s7_dbEdits[i]))
+            s7_grid.addWidget(dbEdit,2,i+1,Qt.AlignRight)
+            # start edit:
+            startEdit = QLineEdit(str(aw.s7.start[i]))
+            startEdit.setFixedWidth(65)
+            startEdit.setAlignment(Qt.AlignRight)
+            self.s7_startEdits.append(startEdit)
+            startEdit.setValidator(QIntValidator(0,65536,self.s7_startEdits[i]))
+            s7_grid.addWidget(startEdit,3,i+1,Qt.AlignRight)
+            # type combo: Int, Float
+            tp = QComboBox()
+            tp.setFocusPolicy(Qt.NoFocus)
+            tp.addItems(s7_types)
+            tp.setCurrentIndex(aw.s7.type[i])
+            tp.setFixedWidth(70)
+            self.s7_typeCombos.append(tp)
+            s7_grid.addWidget(tp,4,i+1,Qt.AlignRight)
+            # div combo: -,1/10,1/100
+            div = QComboBox()
+            div.setFocusPolicy(Qt.NoFocus)
+            div.addItems(modbus_divs)
+            div.setCurrentIndex(aw.s7.div[i])
+            div.setFixedWidth(70)
+            self.s7_divCombos.append(div)
+            s7_grid.addWidget(div,5,i+1,Qt.AlignRight)
+            # mode combo: -,C,F
+            mode = QComboBox()
+            mode.setFocusPolicy(Qt.NoFocus)
+            mode.addItems(modbus_modes)
+            mode.setCurrentIndex(aw.s7.mode[i])
+            mode.setFixedWidth(70) 
+            self.s7_modeCombos.append(mode)
+            s7_grid.addWidget(mode,6,i+1,Qt.AlignRight)
+        
+        s7_gridHLayout = QHBoxLayout()
+        s7_gridHLayout.addStretch()
+        s7_gridHLayout.addLayout(s7_grid)
+        s7_gridHLayout.addStretch()
+        
+        s7_setup = QHBoxLayout()
+        s7_setup.addStretch()
+        s7_setup.addWidget(s7_hostlabel)
+        s7_setup.addWidget(self.s7_hostEdit)
+        s7_setup.addSpacing(7)
+        s7_setup.addWidget(s7_portlabel)
+        s7_setup.addWidget(self.s7_portEdit)
+        s7_setup.addStretch()
+        s7_setup.addWidget(s7_racklabel)
+        s7_setup.addWidget(self.s7_rackEdit)
+        s7_setup.addSpacing(7)
+        s7_setup.addWidget(s7_slotlabel)
+        s7_setup.addWidget(self.s7_slotEdit)
+        s7_setup.addStretch()
+        
+        tab4Layout = QVBoxLayout()
+        tab4Layout.addStretch()
+        tab4Layout.addLayout(s7_gridHLayout)
+        tab4Layout.addStretch()
+        tab4Layout.addLayout(s7_setup)
+        tab4Layout.addStretch()
+        tab4Layout.setContentsMargins(0,0,0,0)
+        tab4Layout.setSpacing(5)
+        
+        #LAYOUT TAB 5
         scale_grid = QGridLayout()
         scale_grid.addWidget(scale_devicelabel,0,0,Qt.AlignRight)
         scale_grid.addWidget(self.scale_deviceEdit,0,1)
@@ -37594,10 +38121,11 @@ class comportDlg(ArtisanDialog):
         scaleH = QHBoxLayout()
         scaleH.addLayout(scale_grid)
         scaleH.addStretch()
-        tab4Layout = QVBoxLayout()
-        tab4Layout.addLayout(scaleH)
-        tab4Layout.addStretch()
-        #LAYOUT TAB 5
+        tab5Layout = QVBoxLayout()
+        tab5Layout.addLayout(scaleH)
+        tab5Layout.addStretch()
+        
+        #LAYOUT TAB 6
         color_grid = QGridLayout()
         color_grid.addWidget(color_devicelabel,0,0,Qt.AlignRight)
         color_grid.addWidget(self.color_deviceEdit,0,1)
@@ -37616,9 +38144,9 @@ class comportDlg(ArtisanDialog):
         colorH = QHBoxLayout()
         colorH.addLayout(color_grid)
         colorH.addStretch()
-        tab5Layout = QVBoxLayout()
-        tab5Layout.addLayout(colorH)
-        tab5Layout.addStretch()
+        tab6Layout = QVBoxLayout()
+        tab6Layout.addLayout(colorH)
+        tab6Layout.addStretch()
         #tab widget
         TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -37632,10 +38160,14 @@ class comportDlg(ArtisanDialog):
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","Modbus",None))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Scale",None))
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","S7",None))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Color",None))
+        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Scale",None))
+        C6Widget = QWidget()
+        C6Widget.setLayout(tab6Layout)
+        TabWidget.addTab(C6Widget,QApplication.translate("Tab","Color",None))
+        
         if devid == 29 or (devid == 0 and aw.ser.useModbusPort) : # switch to MODBUS tab if MODBUS device was selected as main device
             # or if PID and "Use ModbusPort" was selected
             TabWidget.setCurrentIndex(2)
@@ -37727,7 +38259,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -37819,7 +38351,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -38937,7 +39469,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 devices = sorted(map(lambda x:(x[1:] if x.startswith("+") else x),dev), key=lambda x: (x[1:] if x.startswith("+") else x))
                 for i in range(nddevices):
                     try:
-                        typeComboBox =  QComboBox()
+                        typeComboBox =  MyQComboBox()
                         typeComboBox.addItems(devices[:])
                         try:
                             dev_name = aw.qmc.devices[max(0,aw.qmc.extradevices[i]-1)]
@@ -39772,6 +40304,22 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 78 is +VOLTCRAFT PL-125-T4 34 but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                elif meter == "S7":
+                    aw.qmc.device = 79
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 115200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1.0
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ####  DEVICE 80 is +S7 34 but no serial setup
+                ##########################
+                ##########################
+                ####  DEVICE 81 is +S7 56 but no serial setup
+                ##########################
                 
                 # ADD DEVICE:
 
@@ -39870,6 +40418,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 76
                 3, # 77
                 3, # 78
+                1, # 79
+                1, # 80
+                1, # 81
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -39975,7 +40526,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81]):
                 aw.setcommport()
             #self.close()
             self.accept()
@@ -41274,6 +41825,15 @@ class WheelDlg(ArtisanDialog):
 #######################  ALARM DIALOG  #####################
 ############################################################
 
+class MyQComboBox(QComboBox):
+    def __init__(self, *args, **kwargs):
+        super(MyQComboBox, self).__init__(*args, **kwargs)
+        self.setFocusPolicy(Qt.StrongFocus)
+
+    def wheelEvent(self, *args, **kwargs):
+        if self.hasFocus():
+            return QComboBox.wheelEvent(self, *args, **kwargs)
+
 class MyTableWidgetItemQLineEdit(QTableWidgetItem):
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
@@ -41694,7 +42254,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
                 temp = self.alarmtable.cellWidget(i,8)
                 try:
-                    aw.qmc.alarmtemperature[i] = int(str(temp.text()))
+                    aw.qmc.alarmtemperature[i] = float(str(temp.text()))
                 except Exception:
                     aw.qmc.alarmtemperature[i] = 0
                 action = self.alarmtable.cellWidget(i,9)
@@ -41747,7 +42307,7 @@ class AlarmDlg(ArtisanDialog):
         negguardedit.setValidator(QIntValidator(0, 999,negguardedit))
         negguardedit.setAlignment(Qt.AlignRight)
         #Effective time from
-        timeComboBox = QComboBox()
+        timeComboBox = MyQComboBox()
         timeComboBox.addItems([QApplication.translate("ComboBox","ON",None), # qmc.alarmtime 9
                                QApplication.translate("ComboBox","START",None), # qmc.alarmtime -1
                                QApplication.translate("ComboBox","CHARGE",None), # qmc.alarmtime 0
@@ -41767,7 +42327,7 @@ class AlarmDlg(ArtisanDialog):
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
         timeoffsetedit.setValidator(QRegExpValidator(regextime,self))
         #type/source
-        typeComboBox = QComboBox()
+        typeComboBox = MyQComboBox()
         aitems = self.buildAlarmSourceList()
         typeComboBox.addItems(aitems)
         if aw.qmc.alarmsource[i] + 3 < len(aitems):
@@ -41775,7 +42335,7 @@ class AlarmDlg(ArtisanDialog):
         else:
             typeComboBox.setCurrentIndex(3)
         #condition
-        condComboBox = QComboBox()
+        condComboBox = MyQComboBox()
         condComboBox.addItems([QApplication.translate("ComboBox","below",None),
                                QApplication.translate("ComboBox","above",None)])
         condComboBox.setCurrentIndex(aw.qmc.alarmcond[i])
@@ -41783,9 +42343,10 @@ class AlarmDlg(ArtisanDialog):
         tempedit = QLineEdit(str(aw.qmc.alarmtemperature[i]))
         tempedit.setAlignment(Qt.AlignRight)
         tempedit.setMaximumWidth(100)
-        tempedit.setValidator(QIntValidator(0, 999,tempedit))
+#        tempedit.setValidator(QIntValidator(0, 999,tempedit))
+        tempedit.setValidator(QDoubleValidator(0., 999.9,1,tempedit))
         #action
-        actionComboBox = QComboBox()
+        actionComboBox = MyQComboBox()
         actionComboBox.addItems(["",
                                  QApplication.translate("ComboBox","Pop Up",None),
                                  QApplication.translate("ComboBox","Call Program",None),
@@ -41874,7 +42435,7 @@ class AlarmDlg(ArtisanDialog):
                                                            QApplication.translate("Table","Time",None),
                                                            QApplication.translate("Table","Source",None),
                                                            QApplication.translate("Table","Condition",None),
-                                                           QApplication.translate("Table","Temp",None),
+                                                           QApplication.translate("Table","Value",None),
                                                            QApplication.translate("Table","Action",None),
                                                            QApplication.translate("Table","Beep",None),
                                                            QApplication.translate("Table","Description",None)])

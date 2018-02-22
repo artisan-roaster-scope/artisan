@@ -30,6 +30,7 @@ PYQT_QT = PYTHON_PACKAGES + r'\PyQt5\Qt'
 PYQT_QT_TRANSLATIONS = PYQT_QT + '\\translations\\'
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 NUMPY_BIN = PYTHON_PACKAGES + '\\numpy\\core\\'
+SNAP7_BIN = r'C:\Windows'
 
 
 # Remove the build folder, a bit slower but ensures that build contains the latest
@@ -171,6 +172,10 @@ os.system('rmdir /q /s dist\\mpl-data\\sample_data')
 os.system('copy "' + YOCTO_BIN + r'\yapi.dll" dist\lib')
 os.system('copy "' + YOCTO_BIN + r'\yapi64.dll" dist\lib')
 # YOCTO HACK END
+
+# copy Snap7 lib
+os.system('copy "' + SNAP7_BIN + r'\snap7.dll" dist\lib')
+
 
 for e in [
     'artisan.png',

@@ -32,6 +32,9 @@ o unidecode 0.4.21
 o pillow 4.3.0
 o PyInstaller 3.3.1
 o pytz 2017.3
+o snap7 1.4.2
+o python-snap7 0.9
+
 
 CHECK FOR UPDATES
 # pip install --upgrade pip
@@ -878,3 +881,13 @@ https://github.com/lincolnloop/python-qrcode
 # sudo -H python -m pip install appdirs --upgrade
 # sudo -H python -m pip install packaging --upgrade
 # sudo -H python -m pip install unidecode --upgrade
+
+31) snap7 + python-snap7
+
+# cd snap7-full-1.4.2/build/osx
+# make -f x86_64_osx.mk all
+# sudo make -f x86_64_osx.mk install
+
+# cd python-snap7-0.9
+# python3 setup.py build
+# python3 setup.py install

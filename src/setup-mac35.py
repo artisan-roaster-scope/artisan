@@ -202,6 +202,9 @@ os.system(r'mkdir Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matpl
 os.system(r'cp -R /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matplotlib/.dylibs')
 os.system(r'cp /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
 
+# copy snap7 dylib
+os.system(r'cp /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
+
 # for Qt5
 print('*** Removing unused Qt frameworks ***')
 for fw in [

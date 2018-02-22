@@ -13,6 +13,7 @@ PYQT_QT = PYTHON_PACKAGES + r'\PyQt5\Qt'
 PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
+SNAP7_BIN = r'C:\Windows'
 
 #os.system(PYTHON35 + r'\Scripts\pylupdate5 artisan.pro')
 
@@ -95,6 +96,10 @@ os.system(r'mkdir ' + TARGET + 'lib')
 os.system(r'copy "' + YOCTO_BIN + r'\yapi.dll" ' + TARGET + 'lib')
 os.system(r'copy "' + YOCTO_BIN + r'\yapi64.dll" ' + TARGET + 'lib')
 # YOCTO HACK END
+
+# copy Snap7 lib
+os.system('copy "' + SNAP7_BIN + r'\snap7.dll" dist\lib')
+
 
 for fn in [
     'artisan.png',
