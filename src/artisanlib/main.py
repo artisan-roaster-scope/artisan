@@ -7054,12 +7054,18 @@ class tgraphcanvas(FigureCanvas):
     def EventRecord(self,extraevent=None):
         try:
             if extraevent!=None:
-                if aw.extraeventstypes[extraevent] <=4:
+                if aw.extraeventstypes[extraevent] <= 4:
                     self.EventRecordAction(
                         extraevent=extraevent,
                         eventtype=aw.extraeventstypes[extraevent],
                         eventvalue=aw.extraeventsvalues[extraevent],
                         eventdescription=aw.extraeventsdescriptions[extraevent])
+                elif aw.extraeventstypes[extraevent] == 9:
+                    self.EventRecordAction(
+                        extraevent=extraevent,
+                        eventtype=4,  # we map back to the untyped event type
+                        eventvalue=aw.extraeventsvalues[extraevent],
+                        eventdescription=aw.extraeventsdescriptions[extraevent])                
                 else: # on "relative" event values, we take the last value set per event via the recordextraevent call before
                     self.EventRecordAction(
                         extraevent=extraevent,
@@ -7217,7 +7223,7 @@ class tgraphcanvas(FigureCanvas):
                                         boxstyle = 'round4,pad=0.3,rounding_size=0.15'
                                         boxcolor = self.EvalueColor[3]
                                         textcolor = 'white'
-                                    elif self.specialeventstype[-1] == 4:
+                                    else: # self.specialeventstype[-1] == 4:
                                         boxstyle = 'square,pad=0.1'
                                         boxcolor = 'yellow'
                                         textcolor = 'black'
@@ -13724,34 +13730,41 @@ class ApplicationWindow(QMainWindow):
         except Exception:
             pass
         cmdvalue = self.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee])
-        if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type "--" that does not add an event
-            if eventtype < 4: # absolute values
-                etype = eventtype
-                new_value = cmdvalue
-            elif eventtype > 4: # relative values for +/- actions
-                etype = eventtype-5 # the real event type has a offset of 5 in this case
-                p = self.extraeventsactionslastvalue[etype]
-                if p is None:
-                    new_value = cmdvalue
-                else:
-                    new_value = p + cmdvalue
-                
-            # limit value w.r.t. the event slider min/max specification
-            new_value = min(aw.eventslidermax[etype],max(aw.eventslidermin[etype],new_value))
-                
-            # the new_value is combined with the event factor and offset as specified in the slider definition
-            actionvalue = int(round((self.eventsliderfactors[etype] * new_value) + self.eventslideroffsets[etype]))
-            if self.extraeventsactions[ee] in [8,9]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
-                self.eventaction(self.extraeventsactions[ee],u(int(new_value)))
+        if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type "--" that does not add an event; if eventtype == 9 we have an untyped event
+            if eventtype == 9: # an untyped event
+                # we just fire the action
+                self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
+                # and record the event
+                if self.qmc.flagstart:
+                    self.qmc.EventRecord(extraevent = ee)      
             else:
-                self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(actionvalue))
-            # remember the new value as the last value set for this event
-            self.block_quantification_sampling_ticks[etype] = self.sampling_ticks_to_block_quantifiction
-            self.extraeventsactionslastvalue[etype] = new_value
-            # move corresponding slider to new value:
-            self.moveslider(etype,new_value)
-            if self.qmc.flagstart:
-                self.qmc.EventRecord(extraevent = ee)                 
+                if eventtype < 4: # absolute values
+                    etype = eventtype
+                    new_value = cmdvalue
+                elif eventtype > 4: # relative values for +/- actions
+                    etype = eventtype-5 # the real event type has a offset of 5 in this case
+                    p = self.extraeventsactionslastvalue[etype]
+                    if p is None:
+                        new_value = cmdvalue
+                    else:
+                        new_value = p + cmdvalue
+                    
+                # limit value w.r.t. the event slider min/max specification
+                new_value = min(aw.eventslidermax[etype],max(aw.eventslidermin[etype],new_value))
+                    
+                # the new_value is combined with the event factor and offset as specified in the slider definition
+                actionvalue = int(round((self.eventsliderfactors[etype] * new_value) + self.eventslideroffsets[etype]))
+                if self.extraeventsactions[ee] in [8,9]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
+                    self.eventaction(self.extraeventsactions[ee],u(int(new_value)))
+                else:
+                    self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(actionvalue))
+                # remember the new value as the last value set for this event
+                self.block_quantification_sampling_ticks[etype] = self.sampling_ticks_to_block_quantifiction
+                self.extraeventsactionslastvalue[etype] = new_value
+                # move corresponding slider to new value:
+                self.moveslider(etype,new_value)
+                if self.qmc.flagstart:
+                    self.qmc.EventRecord(extraevent = ee)                 
         else:
             # just issue the eventaction (no cmd substitution here)
             self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
@@ -29935,6 +29948,9 @@ class EventsDlg(ArtisanDialog):
             self.eventbuttontable.verticalHeader().setSectionResizeMode(2)
         visibility = [QApplication.translate("ComboBox","OFF",None),
                       QApplication.translate("ComboBox","ON",None)]
+        std_extra_events = [self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),"--"]
+        std_extra_events += [uchr(177) + e for e in std_extra_events[:-1]] # chr(241)
+        std_extra_events.insert(0,QApplication.translate("Label", "")) # we prepend the empty item that does not create an event entry
         for i in range(nbuttons):
             #label
             labeledit = QLineEdit(u(aw.extraeventslabels[i]).replace(chr(10),"\\n"))
@@ -29944,10 +29960,14 @@ class EventsDlg(ArtisanDialog):
             descriptionedit.editingFinished.connect(lambda i=i:self.setdescriptioneventbutton(1,i))
             #type
             typeComboBox = QComboBox()
-            std_extra_events = [self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),""]
-            std_extra_events += [uchr(177) + e for e in std_extra_events[:-1]] # chr(241)
             typeComboBox.addItems(std_extra_events)
-            typeComboBox.setCurrentIndex(aw.extraeventstypes[i])
+            if aw.extraeventstypes[i] == 9:  # we add an offset of +1 here to jump over the new EVENT entry
+                idx = 5
+            elif aw.extraeventstypes[i] == 4:
+                idx = 0
+            else:
+                idx = aw.extraeventstypes[i]+1
+            typeComboBox.setCurrentIndex(idx)
             typeComboBox.currentIndexChanged.connect(lambda z=1,i=i:self.settypeeventbutton(z,i))
             #value
             valueEdit = QLineEdit()
@@ -30039,15 +30059,15 @@ class EventsDlg(ArtisanDialog):
             aw.extraeventslabels[i] = label            
             # event type et
             et = self.extraeventstypes[i]
-            if et > 4:
+            if et > 4 and et < 9:
                 et = et - 5
             if et < 4:
                 label = label.replace("\\t",aw.qmc.etypes[et])
             aw.buttonlist[i].setText(label)
             descriptionedit = self.eventbuttontable.cellWidget(i,1)
             aw.extraeventsdescriptions[i] = u(descriptionedit.text())
-            typecombobox = self.eventbuttontable.cellWidget(i,2)
-            aw.extraeventstypes[i] = typecombobox.currentIndex()
+#            typecombobox = self.eventbuttontable.cellWidget(i,2)
+#            aw.extraeventstypes[i] = typecombobox.currentIndex()
             valueedit = self.eventbuttontable.cellWidget(i,3)
             aw.extraeventsvalues[i] = aw.qmc.str2eventsvalue(str(valueedit.text()))
             actioncombobox = self.eventbuttontable.cellWidget(i,4)
@@ -30101,10 +30121,16 @@ class EventsDlg(ArtisanDialog):
 
     def settypeeventbutton(self,_,i):
         typecombobox = self.eventbuttontable.cellWidget(i,2)
-        aw.extraeventstypes[i] = typecombobox.currentIndex()
+        aw.extraeventstypes[i] = typecombobox.currentIndex() - 1 # we remove again the offset of 1 here to jump over the new EVENT entry
+        if aw.extraeventstypes[i] == -1:
+            aw.extraeventstypes[i] = 4 # and map the first entry to 4
+        elif aw.extraeventstypes[i] == 4:
+            aw.extraeventstypes[i] = 9 # and map the entry 4 to 9
         etype_char = ""
-        if aw.extraeventstypes[i] < 4 or aw.extraeventstypes[i] > 4:
+        if aw.extraeventstypes[i] < 4 or (aw.extraeventstypes[i] > 4 and aw.extraeventstypes[i] < 9):
             etype_char = str(aw.qmc.etypesf(aw.extraeventstypes[i])[0])
+        elif aw.extraeventstypes[i] == 9:
+            etype_char = "E"
         aw.buttonlist[i].setText(etype_char+str(aw.qmc.eventsvalues(aw.extraeventsvalues[i])))
         aw.settooltip()
 
