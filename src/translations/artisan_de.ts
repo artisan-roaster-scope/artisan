@@ -826,17 +826,17 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="40779"/>
         <source>Legend bkgnd</source>
-        <translation type="unfinished"></translation>
+        <translation>Legende Hintergnd</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40786"/>
         <source>Legend border</source>
-        <translation type="unfinished"></translation>
+        <translation>Legende Rand</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40793"/>
         <source>Canvas</source>
-        <translation type="unfinished"></translation>
+        <translation>Hintergrund</translation>
     </message>
 </context>
 <context>
@@ -1269,7 +1269,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="42050"/>
         <source>Load from profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Von Vorlage laden</translation>
     </message>
 </context>
 <context>
@@ -1837,17 +1837,17 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="37693"/>
         <source>bytes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37697"/>
         <source>words</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29960"/>
         <source>S7 Command</source>
-        <translation type="unfinished"></translation>
+        <translation>S7 Kommando</translation>
     </message>
 </context>
 <context>
@@ -2146,12 +2146,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="20059"/>
         <source>Exception (probably due to an empty profile):</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32291"/>
         <source>S7 Error:</source>
-        <translation type="unfinished"></translation>
+        <translation>S7 Fehler:</translation>
     </message>
 </context>
 <context>
@@ -2700,7 +2700,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="28419"/>
         <source>Extraction Yield</source>
-        <translation type="unfinished"></translation>
+        <translation>Extraktions Ausbeute</translation>
     </message>
 </context>
 <context>
@@ -4391,62 +4391,62 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="37691"/>
         <source>little-endian</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28355"/>
         <source>Yield (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausbeute (%)</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28356"/>
         <source>Grounds (g)</source>
-        <translation type="unfinished"></translation>
+        <translation>Mehl (g)</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28357"/>
         <source>TDS (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>TDS (%)</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="28358"/>
         <source>Coffee (g)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaffee (g)</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="42060"/>
         <source>PopUp TimeOut</source>
-        <translation type="unfinished"></translation>
+        <translation>Dialog TimeOut</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37483"/>
         <source>Decode</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodierung</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38092"/>
         <source>Rack</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38098"/>
         <source>Slot</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38104"/>
         <source>Area</source>
-        <translation type="unfinished"></translation>
+        <translation>Bereich</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38105"/>
         <source>DB#</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="38133"/>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingang</translation>
     </message>
 </context>
 <context>
@@ -4620,7 +4620,7 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>Serieller Anschluss...</translation>
+        <translation type="obsolete">Serieller Anschluss...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -4975,12 +4975,17 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="112"/>
         <source>Themes</source>
-        <translation type="unfinished"></translation>
+        <translation>Schemata</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -6621,22 +6626,22 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="9366"/>
         <source>follow on</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9368"/>
         <source>follow off</source>
-        <translation type="unfinished"></translation>
+        <translation>follow aus</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12375"/>
         <source>super on</source>
-        <translation type="unfinished"></translation>
+        <translation>super an</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12377"/>
         <source>super off</source>
-        <translation type="unfinished"></translation>
+        <translation>super aus</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8118"/>
@@ -7231,26 +7236,23 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="21736"/>
         <source>Save Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Schema Speichern</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="21739"/>
         <source>Theme saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Schema gespeichert</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12050"/>
         <source>Artisan configured for {0}</source>
-        <translation type="unfinished"></translation>
+        <translation>Artisan konfiguriert für {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="32170"/>
         <source>S7 connected</source>
-        <translation type="unfinished"></translation>
+        <translation>S7 Verbunden</translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>
@@ -7854,7 +7856,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="38270"/>
         <source>S7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

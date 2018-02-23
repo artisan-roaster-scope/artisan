@@ -4725,7 +4725,7 @@ VÉGE</translation>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>Soros Port...</translation>
+        <translation type="obsolete">Soros Port...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -5006,6 +5006,11 @@ VÉGE</translation>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation>Port...</translation>
     </message>
 </context>
 <context>
@@ -7234,9 +7239,6 @@ Repeat Operation at the end: {0}</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>

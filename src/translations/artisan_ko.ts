@@ -3977,7 +3977,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="41745"/>
         <source> dg</source>
-        <translation type="unfinished">dg</translation>
+        <translation> dg</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="42145"/>
@@ -4731,7 +4731,7 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>시리얼...</translation>
+        <translation type="obsolete">시리얼...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -5007,6 +5007,11 @@ END</source>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation>시리얼...</translation>
     </message>
 </context>
 <context>
@@ -7235,9 +7240,6 @@ Proceed?</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>

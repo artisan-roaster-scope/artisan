@@ -195,8 +195,8 @@ try:
 except:
     pass
     
-import snap7
-from snap7.util import *
+import snap7.client
+from snap7.util import set_real, get_real, set_int, get_int
 
 from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient
 from pymodbus.constants import Endian
@@ -1446,9 +1446,11 @@ class tgraphcanvas(FigureCanvas):
         #stores the value for each event
         self.specialeventsvalue = []
         #flag that makes the events location type bars (horizontal bars) appear on the plot. flag read on redraw()
-        # 0 = no event bars; 1 = type bars (4 bars); 2 = value bars (10 bars)
+        # 0 = no event bars; 1 = type bars (4 bars); 2 = value bars; 3 = split (combination of 0 and 2); merge (as 2, values rendered on lines)
         self.eventsGraphflag = 2
         self.clampEvents = True # if True, custom events are drawn w.r.t. the temperature scale
+        self.renderEventsDescr = False # if True, descriptions are rendered instead of type/value tags
+        self.eventslabelschars = 4 # maximal number of chars to render as events label
         #flag that shows events in the graph
         self.eventsshowflag = 1
         #flag that shows major event annotations in the graph
@@ -2468,11 +2470,12 @@ class tgraphcanvas(FigureCanvas):
                                 if self.ax_background:
                                     self.fig.canvas.restore_region(self.ax_background)
                                     # draw eventtypes
-                                    if self.eventsshowflag and self.eventsGraphflag == 2:
-                                        aw.qmc.ax.draw_artist(self.l_eventtype1dots)
-                                        aw.qmc.ax.draw_artist(self.l_eventtype2dots)
-                                        aw.qmc.ax.draw_artist(self.l_eventtype3dots)
-                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
+# this seems not to be needed and hides partially event by value "merged" annotations
+#                                    if self.eventsshowflag and self.eventsGraphflag in [2,3,4]:
+#                                        aw.qmc.ax.draw_artist(self.l_eventtype1dots)
+#                                        aw.qmc.ax.draw_artist(self.l_eventtype2dots)
+#                                        aw.qmc.ax.draw_artist(self.l_eventtype3dots)
+#                                        aw.qmc.ax.draw_artist(self.l_eventtype4dots)
                                     # draw delta lines
                                     if self.DeltaETflag and self.l_delta1 is not None:
                                         aw.qmc.ax.draw_artist(self.l_delta1)
@@ -2695,9 +2698,9 @@ class tgraphcanvas(FigureCanvas):
                 n3 = idx3 // 2
                 if len(self.stemp1BX) > n3 and len(self.stemp2BX) > n3 and len(self.extratimexB) > n3:
                     c += 1
-            if aw.qmc.backgroundeventsflag and aw.qmc.eventsGraphflag == 2:
+            if aw.qmc.backgroundeventsflag and aw.qmc.eventsGraphflag in [2,3,4]:
                 c += len(set(aw.qmc.backgroundEtypes))
-        if aw.qmc.eventsshowflag and aw.qmc.eventsGraphflag == 2:
+        if aw.qmc.eventsshowflag and aw.qmc.eventsGraphflag in [2,3,4]:
             c += 4 # always 4 ax lines are added as new events might have to be drawn of each of the 4 types
         return c
 
@@ -4550,7 +4553,7 @@ class tgraphcanvas(FigureCanvas):
                             jump -= 20
     
                 #plot events bars by value
-                elif self.eventsGraphflag == 2:
+                elif self.eventsGraphflag in [2,3,4]:
                     # make blended transformations to help identify EVENT types
                     if self.clampEvents:
                         step = 10
@@ -4665,7 +4668,7 @@ class tgraphcanvas(FigureCanvas):
     
                     #check backgroundevents flag
                     if self.backgroundeventsflag:
-                        if self.eventsGraphflag != 2:
+                        if self.eventsGraphflag not in [2,4]:
                             if self.mode == "F":
                                 height = 50
                             else:
@@ -4675,7 +4678,9 @@ class tgraphcanvas(FigureCanvas):
                                 if self.backgroundEtypes[p] < 4: 
                                     st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p])) 
                                 else:
-                                    st1 = u("E") 
+                                    st1 = u(self.backgroundEStrings[p].strip()[:4])
+                                    if len(st1) == 0:
+                                        st1 = u("E")
                                 # plot events on BT when showeventsonbt is true
                                 if not aw.qmc.showeventsonbt and self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
                                     temp = self.temp1B[self.backgroundEvents[p]]
@@ -4689,7 +4694,7 @@ class tgraphcanvas(FigureCanvas):
                                                     alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)
                                 self.l_background_annotations.append(anno)
                         #background events by value
-                        else:
+                        if self.eventsGraphflag in [2,3,4]:
                             self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
                             self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
                             E1b_last = E2b_last = E3b_last = E4b_last = 0  #not really necessary but guarantees that Exb_last is defined 
@@ -4796,70 +4801,7 @@ class tgraphcanvas(FigureCanvas):
                     # The second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
                     # the third mode plots the events by value. They are not annotations but actual lines.
         
-                    if Nevents:
-                        for i in range(Nevents):
-                            if self.specialeventstype[i] == 4 or self.eventsGraphflag == 0:
-                                if self.specialeventstype[i] < 4:
-                                    etype = self.etypesf(self.specialeventstype[i])
-                                    firstletter = u(etype[0])
-                                    secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
-                                else:
-                                    firstletter = "E"
-                                    secondletter = ""
-                                if self.mode == "F":
-                                    height = 50
-                                else:
-                                    height = 20
-                                #some times ET is not drawn (ET = 0) when using device NONE
-                                # plot events on BT when showeventsonbt is true
-                                if not aw.qmc.showeventsonbt and self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
-                                    if aw.qmc.flagon:
-                                        temp = self.temp1[int(self.specialevents[i])]
-                                    else:
-                                        temp = self.stemp1[int(self.specialevents[i])]
-                                elif aw.qmc.BTcurve:
-                                    if aw.qmc.flagon:
-                                        temp = self.temp2[int(self.specialevents[i])]
-                                    else:
-                                        temp = self.stemp2[int(self.specialevents[i])]
-                                else:
-                                    temp = None
-                                # plot events on BT when showeventsonbt is true
-                                if aw.qmc.showeventsonbt and temp != None and aw.qmc.BTcurve:
-                                    if aw.qmc.flagon:
-                                        temp = self.temp2[int(self.specialevents[i])]
-                                    else:
-                                        temp = self.stemp2[int(self.specialevents[i])]                                
-                                if temp != None and aw.qmc.showEtypes[self.specialeventstype[i]]:
-                                    if self.specialeventstype[i] == 0:
-                                        boxstyle = 'square,pad=0.2'
-                                        boxcolor = self.EvalueColor[0]
-                                        textcolor = 'white'
-                                    elif self.specialeventstype[i] == 1:
-                                        boxstyle = 'circle,pad=0.1'
-                                        boxcolor = self.EvalueColor[1]
-                                        textcolor = 'white'
-                                    elif self.specialeventstype[i] == 2:
-                                        boxstyle = 'sawtooth,pad=0.4,tooth_size=0.8'
-                                        boxcolor = self.EvalueColor[2]
-                                        textcolor = 'white'
-                                    elif self.specialeventstype[i] == 3:
-                                        boxstyle = 'round4,pad=0.3,rounding_size=0.15'
-                                        boxcolor = self.EvalueColor[3]
-                                        textcolor = 'white'
-                                    elif self.specialeventstype[i] == 4:
-                                        boxstyle = 'square,pad=0.2'
-                                        boxcolor = 'yellow'
-                                        textcolor = 'black'
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                                 xytext=(self.timex[int(self.specialevents[i])],temp+height),
-                                                 alpha=0.9,
-                                                 color=textcolor,
-                                                 arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
-                                                 bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
-                                                 fontproperties=fontprop_small,
-                                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
-                                                 )
+
     
                     if self.eventsGraphflag == 1 and Nevents:
                         
@@ -4903,6 +4845,7 @@ class tgraphcanvas(FigureCanvas):
                             elif aw.qmc.showEtypes[self.specialeventstype[i]]:
                                 firstletter = self.etypes[self.specialeventstype[i]][0]
                                 secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
+                                
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 if aw.qmc.ETcurve or aw.qmc.BTcurve:
                                     # plot events on BT when showeventsonbt is true
@@ -4925,9 +4868,12 @@ class tgraphcanvas(FigureCanvas):
                                         else:
                                             temps = self.stemp2
                                     fcolor=self.EvalueColor[self.specialeventstype[i]]
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temps[int(self.specialevents[i])]),
-                                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),
+                                    self.ax.annotate(firstletter + secondletter, 
+                                                     xy=(self.timex[int(self.specialevents[i])], 
+                                                     temps[int(self.specialevents[i])]),
+                                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]+2.5),
                                                      alpha=1.,
+                                                     va="center", ha="left",
                                                      bbox=dict(boxstyle='square,pad=0.1', fc=fcolor, ec='none'),
                                                      path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
                                                      color='white',
@@ -4935,7 +4881,7 @@ class tgraphcanvas(FigureCanvas):
                                                      fontsize="xx-small",
                                                      fontproperties=fontprop_small)
     
-                    elif self.eventsGraphflag == 2: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
+                    elif self.eventsGraphflag in [2,3,4]: # in this mode we have to generate the plots even if Nevents=0 to avoid redraw issues resulting from an incorrect number of plot count
                         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                         E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
@@ -5061,6 +5007,93 @@ class tgraphcanvas(FigureCanvas):
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                               picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                             
+                    if Nevents:
+                        if self.eventsGraphflag == 4:
+                            # we prepare copies of the Evalues
+                            evalues = [self.E1values[:],self.E2values[:],self.E3values[:],self.E4values[:]]
+                        for i in range(Nevents):
+                            if self.specialeventstype[i] == 4 or self.eventsGraphflag in [0,3,4]:
+                                if self.specialeventstype[i] < 4 and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[i].strip()) == 0):
+                                    etype = self.etypesf(self.specialeventstype[i])
+                                    firstletter = u(etype[0])
+                                    secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
+                                else:
+                                    firstletter = self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars]
+                                    secondletter = ""
+                                if self.mode == "F":
+                                    height = 50
+                                else:
+                                    height = 20
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                # plot events on BT when showeventsonbt is true
+                                if not aw.qmc.showeventsonbt and self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
+                                    if aw.qmc.flagon:
+                                        temp = self.temp1[int(self.specialevents[i])]
+                                    else:
+                                        temp = self.stemp1[int(self.specialevents[i])]
+                                elif aw.qmc.BTcurve:
+                                    if aw.qmc.flagon:
+                                        temp = self.temp2[int(self.specialevents[i])]
+                                    else:
+                                        temp = self.stemp2[int(self.specialevents[i])]
+                                else:
+                                    temp = None
+                                    
+                                # plot events on BT when showeventsonbt is true
+                                if aw.qmc.showeventsonbt and temp != None and aw.qmc.BTcurve:
+                                    if aw.qmc.flagon:
+                                        temp = self.temp2[int(self.specialevents[i])]
+                                    else:
+                                        temp = self.stemp2[int(self.specialevents[i])]  
+                                    
+                                if self.eventsGraphflag == 4 and self.specialeventstype[i] < 4 and aw.qmc.showEtypes[self.specialeventstype[i]]:
+                                    temp = evalues[self.specialeventstype[i]][0]
+                                    evalues[self.specialeventstype[i]] = evalues[self.specialeventstype[i]][1:]
+                                                                  
+                                if temp != None and aw.qmc.showEtypes[self.specialeventstype[i]]:
+                                    if self.specialeventstype[i] == 0:
+                                        boxstyle = 'roundtooth,pad=0.4'
+                                        boxcolor = self.EvalueColor[0]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[i] == 1:
+                                        boxstyle = 'round,pad=0.3,rounding_size=0.8'
+                                        boxcolor = self.EvalueColor[1]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[i] == 2:
+                                        boxstyle = 'sawtooth,pad=0.3,tooth_size=0.2'
+                                        boxcolor = self.EvalueColor[2]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[i] == 3:
+                                        boxstyle = 'round4,pad=0.3,rounding_size=0.15'
+                                        boxcolor = self.EvalueColor[3]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[i] == 4:
+                                        boxstyle = 'square,pad=0.1'
+                                        boxcolor = 'yellow'
+                                        textcolor = 'black'
+                                    if self.eventsGraphflag in [0,3] or self.specialeventstype[i] > 3:
+                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                                     xytext=(self.timex[int(self.specialevents[i])],temp+height),
+                                                     alpha=0.9,
+                                                     color=textcolor,
+                                                     va="center", ha="center",
+                                                     arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4), # ,relpos=(0,0)
+                                                     bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                                     fontproperties=fontprop_small,
+                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                     )
+                                    elif self.eventsGraphflag == 4:
+                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                                     xytext=(self.timex[int(self.specialevents[i])],temp),
+                                                     alpha=0.9,
+                                                     color=textcolor,
+                                                     va="center", ha="center",
+    #                                                 arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4,relpos=(0.5,1)),
+                                                     bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                                     fontproperties=fontprop_small,
+                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                     )                            
+                            
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
                 if self.DeltaETflag or self.DeltaBTflag:
                     if recomputeAllDeltas and not self.flagstart: # during recording we don't recompute the deltas
@@ -5166,7 +5199,7 @@ class tgraphcanvas(FigureCanvas):
                             l2 = self.extraname2[i]
                             labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
     
-                if self.eventsshowflag and self.eventsGraphflag == 2 and Nevents:
+                if self.eventsshowflag and self.eventsGraphflag in [2,3,4] and Nevents:
                     if E1_nonempty and aw.qmc.showEtypes[0]:
                         handles.append(self.l_eventtype1dots)
                         labels.append(aw.arabicReshape(self.etypesf(0)))
@@ -7093,53 +7126,14 @@ class tgraphcanvas(FigureCanvas):
                         #if Event show flag
                         if self.eventsshowflag and aw.qmc.showEtypes[etype]:
                             index = self.specialevents[-1]
-                            if etype < 4:
+                            if etype < 4  and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[-1].strip()) == 0):
                                 firstletter = self.etypesf(self.specialeventstype[-1])[0]
                                 secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1]) 
                             else:
-                                firstletter = "E"
-                                secondletter = "" 
-                            if self.specialeventstype[-1] == 4 or ( self.eventsGraphflag == 0 and aw.qmc.showEtypes[self.specialeventstype[-1]] ): 
-                                if self.mode == "F":
-                                    height = 50
-                                else:
-                                    height = 20
-                                #some times ET is not drawn (ET = 0) when using device NONE
-                                # plot events on BT when showeventsonbt is true
-                                if not aw.qmc.showeventsonbt and self.temp1[index] > self.temp2[index]:
-                                    temp = self.temp1[index]
-                                else:
-                                    temp = self.temp2[index]
-                                if self.specialeventstype[-1] == 0:
-                                    boxstyle = 'square,pad=0.2'
-                                    boxcolor = self.EvalueColor[0]
-                                    textcolor = 'white'
-                                elif self.specialeventstype[-1] == 1:
-                                    boxstyle = 'circle,pad=0.1'
-                                    boxcolor = self.EvalueColor[1]
-                                    textcolor = 'white'
-                                elif self.specialeventstype[-1] == 2:
-                                    boxstyle = 'sawtooth,pad=0.4,tooth_size=0.8'
-                                    boxcolor = self.EvalueColor[2]
-                                    textcolor = 'white'
-                                elif self.specialeventstype[-1] == 3:
-                                    boxstyle = 'round4,pad=0.3,rounding_size=0.15'
-                                    boxcolor = self.EvalueColor[3]
-                                    textcolor = 'white'
-                                elif self.specialeventstype[-1] == 4:
-                                    boxstyle = 'square,pad=0.2'
-                                    boxcolor = 'yellow'
-                                    textcolor = 'black'
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                                 color=textcolor,
-                                                 arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
-                                                 bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
-                                                 fontsize="xx-small",
-                                                 fontproperties=aw.mpl_fontproperties,
-                                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
-                                                 backgroundcolor='yellow')
+                                firstletter = self.specialeventsStrings[-1].strip()[:aw.qmc.eventslabelschars]
+                                secondletter = ""
                             #if Event Type-Bars flag
-                            elif self.eventsGraphflag == 1 and etype < 4:
+                            if self.eventsGraphflag == 1 and etype < 4:
                                 char1 = self.etypesf(0)[0]
                                 char2 = self.etypesf(1)[0]
                                 char3 = self.etypesf(2)[0]
@@ -7174,7 +7168,7 @@ class tgraphcanvas(FigureCanvas):
                                             arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
                                             fontsize="xx-small",
                                             fontproperties=fontprop_small)
-                            elif self.eventsGraphflag == 2 and etype < 4:
+                            elif self.eventsGraphflag in [2,3,4] and etype < 4:
                                 # update lines data using the lists with new data
                                 if etype == 0 and aw.qmc.showEtypes[0]:
                                     self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
@@ -7184,6 +7178,70 @@ class tgraphcanvas(FigureCanvas):
                                     self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
                                 elif etype == 3 and aw.qmc.showEtypes[3]:
                                     self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
+                            if self.specialeventstype[-1] == 4 or ( self.eventsGraphflag in [0,3,4] and aw.qmc.showEtypes[self.specialeventstype[-1]] ): 
+                                if self.mode == "F":
+                                    height = 50
+                                else:
+                                    height = 20
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                # plot events on BT when showeventsonbt is true
+                                if not aw.qmc.showeventsonbt and self.temp1[index] > self.temp2[index]:
+                                    temp = self.temp1[index]
+                                else:
+                                    temp = self.temp2[index]                                    
+                                    
+                                if self.eventsGraphflag == 4:
+                                    if self.specialeventstype[-1] == 0:
+                                        temp = self.E1values[-1]
+                                    elif self.specialeventstype[-1] == 1:
+                                        temp = self.E2values[-1]
+                                    elif self.specialeventstype[-1] == 2:
+                                        temp = self.E3values[-1]
+                                    elif self.specialeventstype[-1] == 3:
+                                        temp = self.E4values[-1]
+                                    
+                                if temp != None:
+                                    if self.specialeventstype[-1] == 0:
+                                        boxstyle = 'roundtooth,pad=0.4'
+                                        boxcolor = self.EvalueColor[0]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[-1] == 1:
+                                        boxstyle = 'round,pad=0.3,rounding_size=0.8'
+                                        boxcolor = self.EvalueColor[1]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[-1] == 2:
+                                        boxstyle = 'sawtooth,pad=0.3,tooth_size=0.2'
+                                        boxcolor = self.EvalueColor[2]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[-1] == 3:
+                                        boxstyle = 'round4,pad=0.3,rounding_size=0.15'
+                                        boxcolor = self.EvalueColor[3]
+                                        textcolor = 'white'
+                                    elif self.specialeventstype[-1] == 4:
+                                        boxstyle = 'square,pad=0.1'
+                                        boxcolor = 'yellow'
+                                        textcolor = 'black'
+                                    if self.eventsGraphflag in [0,3] or self.specialeventstype[-1] > 3:
+                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                                         color=textcolor,
+                                                         va="center", ha="center",
+                                                         arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4,relpos=(0,0)),
+                                                         bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                                         fontsize="xx-small",
+                                                         fontproperties=aw.mpl_fontproperties,
+                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                         backgroundcolor='yellow')
+                                    elif self.eventsGraphflag == 4:
+                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
+                                                         color=textcolor,
+                                                         va="center", ha="center",
+#                                                         arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4,relpos=(0,0)),
+                                                         bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
+                                                         fontsize="xx-small",
+                                                         fontproperties=aw.mpl_fontproperties,
+                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                         backgroundcolor='yellow')
+                                    
                         self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBacground() needed
                         temp = "%.1f "%self.temp2[i]            
                         if aw.qmc.timeindex[0] != -1:
@@ -7286,7 +7344,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
                                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
-                        if self.eventsGraphflag == 2:
+                        if self.eventsGraphflag in [2,3,4]:
                             # update lines data using the lists with new data
                             etype = self.specialeventstype[-1]
                             if etype == 0:
@@ -17029,6 +17087,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.eventsshowflag = toInt(settings.value("eventsshowflag",int(self.qmc.eventsshowflag)))
             if settings.contains("clampEvents"):
                 self.qmc.clampEvents = toInt(settings.value("clampEvents",int(self.qmc.clampEvents)))
+            if settings.contains("renderEventsDescr"):
+                self.qmc.renderEventsDescr = toInt(settings.value("renderEventsDescr",int(self.qmc.renderEventsDescr)))
+            if settings.contains("eventslabelschars"):
+                self.qmc.eventslabelschars = toInt(settings.value("eventslabelschars",int(self.qmc.eventslabelschars)))
             if settings.contains("annotationsflag"):
                 self.qmc.annotationsflag = toInt(settings.value("annotationsflag",int(self.qmc.annotationsflag)))
             if settings.contains("showeventsonbt"):
@@ -18175,7 +18237,7 @@ class ApplicationWindow(QMainWindow):
                     aw.setLabelColor(aw.extraLCDlabel2[i],QColor(aw.qmc.extradevicecolor2[i]))
                     aw.qmc.extraname2[i] = l2.get_label()
                     x2 = x2 + 1
-            if self.qmc.eventsGraphflag == 2:
+            if self.qmc.eventsGraphflag in [2,3,4]:
                 m = self.qmc.l_eventtype1dots.get_marker()
                 if not isinstance(m, (int)):
                     self.qmc.EvalueMarker[0] = m
@@ -18324,6 +18386,8 @@ class ApplicationWindow(QMainWindow):
                 settings.remove("etypes")
             settings.setValue("eventsshowflag",self.qmc.eventsshowflag)
             settings.setValue("clampEvents",self.qmc.clampEvents)
+            settings.setValue("renderEventsDescr",self.qmc.renderEventsDescr)
+            settings.setValue("eventslabelschars",self.qmc.eventslabelschars)
             settings.setValue("annotationsflag",self.qmc.annotationsflag)
             settings.setValue("showeventsonbt",self.qmc.showeventsonbt)
             settings.setValue("showEtypes",self.qmc.showEtypes)            
@@ -20010,7 +20074,7 @@ class ApplicationWindow(QMainWindow):
                             ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
                         elif "DEV_percent" in rd:   # has FCs but no Dry event
                             cl = cl[0],'white',cl[3]     
-                            missingDryevent = u(QApplication.translate("Messages", "Profile missing Dry event",None))
+                            missingDryevent = u(QApplication.translate("Message", "Profile missing Dry event",None))
                             ax.broken_barh( [ (0, m), 
                                               (n, 100 - rd["DEV_percent"]),
                                               (n+ 100 - rd["DEV_percent"], rd["DEV_percent"]),
@@ -20024,7 +20088,7 @@ class ApplicationWindow(QMainWindow):
                             ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
                         else:    # no useful events
                             cl = cl[0],'white'
-                            missingPhaseevents = u(QApplication.translate("Messages", "Profile missing phase events",None))
+                            missingPhaseevents = u(QApplication.translate("Message", "Profile missing phase events",None))
                             ax.broken_barh( [ (0, m),
                                               (n, 100),
                                               (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
@@ -28488,11 +28552,21 @@ class EventsDlg(ArtisanDialog):
         self.showeventsonbtbox.stateChanged.connect(lambda _:self.showeventsonbtChanged())
         self.eventsshowflagbox = QCheckBox(QApplication.translate("CheckBox","Events",None))
         self.eventsshowflagbox.setChecked(bool(aw.qmc.eventsshowflag))
-        self.eventsshowflagbox.stateChanged.connect(lambda _:self.eventsshowflagChanged())        
+        self.eventsshowflagbox.stateChanged.connect(lambda _:self.eventsshowflagChanged())
         self.eventsclampflag = QCheckBox(QApplication.translate("CheckBox","Snap",None))
         self.eventsclampflag.setChecked(bool(aw.qmc.clampEvents))
         self.eventsclampflag.stateChanged.connect(lambda _:self.eventsclampflagChanged())
-        if aw.qmc.eventsGraphflag!=2:
+        self.eventslabelsflag = QCheckBox(QApplication.translate("CheckBox","Descr.",None))
+        self.eventslabelsflag.setChecked(bool(aw.qmc.renderEventsDescr))
+        self.eventslabelsflag.stateChanged.connect(lambda _:self.eventslabelsflagChanged())
+        self.eventslabelscharsSpinner = QSpinBox()
+        self.eventslabelscharsSpinner.setAlignment(Qt.AlignRight)
+        self.eventslabelscharsSpinner.setSingleStep(1)
+        self.eventslabelscharsSpinner.setFocusPolicy(Qt.NoFocus)
+        self.eventslabelscharsSpinner.setRange(1,20)
+        self.eventslabelscharsSpinner.setValue(aw.qmc.eventslabelschars)
+        
+        if aw.qmc.eventsGraphflag not in [2,3,4]:
             self.eventsclampflag.setEnabled(False)
         self.minieventsflag = QCheckBox(QApplication.translate("CheckBox","Mini Editor",None))
         self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event",None))
@@ -28501,7 +28575,9 @@ class EventsDlg(ArtisanDialog):
         barstylelabel = QLabel(QApplication.translate("Label","Bars",None))
         barstyles = ["",
                     QApplication.translate("ComboBox","Type",None),
-                    QApplication.translate("ComboBox","Value",None)]
+                    QApplication.translate("ComboBox","Value",None),
+                    QApplication.translate("ComboBox","Split",None),
+                    QApplication.translate("ComboBox","Merge",None)]
         self.bartypeComboBox =  QComboBox()
         self.bartypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.bartypeComboBox.setMaximumWidth(80)
@@ -29052,6 +29128,10 @@ class EventsDlg(ArtisanDialog):
         FlagsLayout.addLayout(bartypeLayout)
         FlagsLayout.addSpacing(10)
         FlagsLayout.addWidget(self.eventsclampflag)
+        FlagsLayout.addSpacing(5)
+        FlagsLayout.addWidget(self.eventslabelsflag)
+        FlagsLayout.addSpacing(5)
+        FlagsLayout.addWidget(self.eventslabelscharsSpinner)
         FlagsLayout.addStretch()
         
         FlagsLayout2 = QHBoxLayout()
@@ -29203,7 +29283,7 @@ class EventsDlg(ArtisanDialog):
         buttonActionIntervals = ["sync", "1.0s", "1.5s", "2.0s", "2.5s", "3.0s", "3.5s", "4.0s", "4.5s", "5.0s"]
         self.sampling_delays = [0,1000,1500,2000,2500,3000,3500,4000,4500,5000]
         self.SAMPLINGbuttonActionInterval.addItems(buttonActionIntervals)
-        self.SAMPLINGbuttonActionInterval.setMaximumWidth(60)
+        self.SAMPLINGbuttonActionInterval.setMaximumWidth(70)
         try:
             self.SAMPLINGbuttonActionInterval.setCurrentIndex(self.sampling_delays.index(aw.qmc.extra_event_sampling_delay))
         except Exception:
@@ -30126,6 +30206,13 @@ class EventsDlg(ArtisanDialog):
         else:
             aw.qmc.clampEvents = False
         aw.qmc.redraw(recomputeAllDeltas=False)
+
+    def eventslabelsflagChanged(self):
+        if self.eventslabelsflag.isChecked():
+            aw.qmc.renderEventsDescr = True
+        else:
+            aw.qmc.renderEventsDescr = False
+        aw.qmc.redraw(recomputeAllDeltas=False)
         
     def annotationsflagChanged(self):
         if self.annotationsflagbox.isChecked():
@@ -30371,6 +30458,8 @@ class EventsDlg(ArtisanDialog):
                 pass
             aw.qmc.xextrabuttonactionstrings[0] = u(self.RESETbuttonActionString.text())
             aw.qmc.xextrabuttonactionstrings[1] = u(self.STARTbuttonActionString.text())
+            
+            aw.qmc.eventslabelschars = self.eventslabelscharsSpinner.value()
             
             aw.buttonpalette_shortcuts = self.switchPaletteByNumberKey.isChecked()
             #save etypes

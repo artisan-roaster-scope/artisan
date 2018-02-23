@@ -4766,7 +4766,7 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>Port Serial...</translation>
+        <translation type="obsolete">Port Serial...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -4977,6 +4977,11 @@ END</source>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation>Port...</translation>
     </message>
 </context>
 <context>
@@ -7205,9 +7210,6 @@ Proceed?</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>

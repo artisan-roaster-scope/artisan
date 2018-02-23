@@ -2493,7 +2493,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="29348"/>
         <source>Default Buttons</source>
-        <translation type="unfinished">Кнопки по умолчанию </translation>
+        <translation>Кнопки по умолчанию</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="29406"/>
@@ -4711,11 +4711,6 @@ END</source>
         <translation type="unfinished">Устройство...</translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="114"/>
-        <source>Serial Port...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../const/UIconst.py" line="115"/>
         <source>Sampling Interval...</source>
         <translation type="unfinished">Интервал выборки...</translation>
@@ -4995,6 +4990,11 @@ END</source>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Message</name>
@@ -5011,7 +5011,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="2769"/>
         <source>Alarm notice</source>
-        <translation type="unfinished">Уведомление сигналом тревоги </translation>
+        <translation>Уведомление сигналом тревоги</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3634"/>
@@ -5146,7 +5146,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="7753"/>
         <source>No finished profile found</source>
-        <translation type="unfinished">Не найден готовый профиль </translation>
+        <translation>Не найден готовый профиль</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7771"/>
@@ -5238,12 +5238,12 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="8951"/>
         <source> added to cupping notes</source>
-        <translation type="unfinished">добавлено cupping примечания</translation>
+        <translation> добавлено cupping примечания</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8960"/>
         <source> added to roasting notes</source>
-        <translation type="unfinished">добавлено примечание по обжарке</translation>
+        <translation> добавлено примечание по обжарке</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="9220"/>
@@ -5535,7 +5535,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="25256"/>
         <source>Return the logarithm of x to the given base. </source>
-        <translation type="unfinished">Вернуть логарифм х по данному основанию.</translation>
+        <translation>Вернуть логарифм х по данному основанию. </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25257"/>
@@ -5872,7 +5872,9 @@ Continue?</source>
         <source>Use the Parameter Loader Software by Fuji if you need to
 
 </source>
-        <translation type="unfinished">Используйте параметр загрузчика программного обеспечения фирмы Fuji, если вам нужно</translation>
+        <translation>Используйте параметр загрузчика программного обеспечения фирмы Fuji, если вам нужно
+
+</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43368"/>
@@ -7269,9 +7271,6 @@ Repeat Operation at the end: {0}</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>
@@ -8609,7 +8608,7 @@ Pungency</source>
     <message>
         <location filename="../artisanlib/main.py" line="11448"/>
         <source>Number of events found</source>
-        <translation type="unfinished">Найденное количество событий </translation>
+        <translation type="unfinished">Найденное количество событий</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="11458"/>
@@ -8903,10 +8902,11 @@ Set P2 as BT background B2</source>
 1 to Extra device virtual if a profile is loaded
 2 or set to ET and BT if profile is not loaded
 </source>
-        <translation type="unfinished">Добавить P1 и P2 как:
+        <translation>Добавить P1 и P2 как:
 
 1 для дополнительных виртуальных устройств , если профиль загружен
-2 или значение ET и БТ если профиль не загружен</translation>
+2 или значение ET и БТ если профиль не загружен
+</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37797"/>

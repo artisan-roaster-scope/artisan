@@ -3302,7 +3302,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22574"/>
         <source> at {0}</source>
-        <translation type="unfinished">عند {0}</translation>
+        <translation> عند {0}</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15138"/>
@@ -4931,7 +4931,7 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>منفذ تسلسلي ...</translation>
+        <translation type="obsolete">منفذ تسلسلي ...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -5212,6 +5212,11 @@ END</source>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation>منفذ تسلسلي ...</translation>
     </message>
 </context>
 <context>
@@ -7440,9 +7445,6 @@ Repeat Operation at the end: {0}</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>

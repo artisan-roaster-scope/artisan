@@ -3357,7 +3357,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22574"/>
         <source> at {0}</source>
-        <translation type="unfinished">ved {0}</translation>
+        <translation> ved {0}</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15138"/>
@@ -4991,7 +4991,7 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>Serieport...</translation>
+        <translation type="obsolete">Serieport...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -5277,6 +5277,11 @@ END</source>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation>Port...</translation>
     </message>
 </context>
 <context>
@@ -5770,7 +5775,7 @@ Profil savnet [DROPP INN] eller[DROPP UT]</translation>
     <message>
         <location filename="../artisanlib/main.py" line="14802"/>
         <source>{0}  loaded </source>
-        <translation type="unfinished">{0} lastet inn</translation>
+        <translation>{0} lastet inn </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14940"/>
@@ -6607,7 +6612,8 @@ Continue?</source>
         <location filename="../artisanlib/main.py" line="43363"/>
         <source>
 Repeat Operation at the end: {0}</source>
-        <translation type="unfinished">Gjenta Operasjon ved slutt:{0}</translation>
+        <translation>
+Gjenta Operasjon ved slutt:{0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43365"/>
@@ -7772,9 +7778,6 @@ Continue?</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>
@@ -8135,7 +8138,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="44885"/>
         <source>setNpid(): Unable to set pid {0} </source>
-        <translation type="unfinished">setNpid(): Ikke mulig å sette pid {0}</translation>
+        <translation>setNpid(): Ikke mulig å sette pid {0} </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44962"/>

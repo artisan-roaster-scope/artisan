@@ -4841,7 +4841,7 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>Puerto Serie...</translation>
+        <translation type="obsolete">Puerto Serie...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -5212,6 +5212,11 @@ END</source>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation>Puerto...</translation>
     </message>
 </context>
 <context>
@@ -5640,7 +5645,7 @@ No existe [CARGA] or [DESCAR] en el perfil</translation>
     <message>
         <location filename="../artisanlib/main.py" line="14802"/>
         <source>{0}  loaded </source>
-        <translation type="unfinished">{0} abierto</translation>
+        <translation>{0} abierto </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14940"/>
@@ -6100,7 +6105,7 @@ No existe [CARGA] or [DESCAR] en el perfil</translation>
     <message>
         <location filename="../artisanlib/main.py" line="37007"/>
         <source>Incorrect time format. Please recheck {0} time</source>
-        <translation type="unfinished">Formato de tiempo incorrecto. Corrije {0} </translation>
+        <translation>Formato de tiempo incorrecto. Corrije {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37194"/>
@@ -6135,7 +6140,7 @@ No existe [CARGA] or [DESCAR] en el perfil</translation>
     <message>
         <location filename="../artisanlib/main.py" line="40164"/>
         <source>Device set to {0}. Now, check Serial Port settings</source>
-        <translation type="unfinished">Dispositivo seleccionado {0}. Ahora elije puerto serial </translation>
+        <translation>Dispositivo seleccionado {0}. Ahora elije puerto serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40411"/>
@@ -6150,27 +6155,27 @@ No existe [CARGA] or [DESCAR] en el perfil</translation>
     <message>
         <location filename="../artisanlib/main.py" line="40070"/>
         <source>Device set to {0}, which is equivalent to CENTER 309. Now, chose serial port</source>
-        <translation type="unfinished">Dispositivo seleccionado {0}, que es equivalente a CENTER 309. Ahora elije puerto serial </translation>
+        <translation>Dispositivo seleccionado {0}, que es equivalente a CENTER 309. Ahora elije puerto serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40097"/>
         <source>Device set to {0}, which is equivalent to CENTER 303. Now, chose serial port</source>
-        <translation type="unfinished">Dispositivo seleccionado {0}, que es equivalente a CENTER 303. Ahora elije puerto serial </translation>
+        <translation>Dispositivo seleccionado {0}, que es equivalente a CENTER 303. Ahora elije puerto serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40079"/>
         <source>Device set to {0}, which is equivalent to CENTER 306. Now, chose serial port</source>
-        <translation type="unfinished">Dispositivo seleccionado {0}, que es equivalente a CENTER 306. Ahora elije puerto serial </translation>
+        <translation>Dispositivo seleccionado {0}, que es equivalente a CENTER 306. Ahora elije puerto serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40106"/>
         <source>Device set to {0}, which is equivalent to Omega HH506RA. Now, chose serial port</source>
-        <translation type="unfinished">Dispositivo seleccionado {0}, que es equivalente a Omega HH505RA. Ahora elije puerto serial </translation>
+        <translation>Dispositivo seleccionado {0}, que es equivalente a Omega HH505RA. Ahora elije puerto serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40207"/>
         <source>Device set to {0}, which is equivalent to Omega HH806AU. Now, chose serial port</source>
-        <translation type="unfinished">Dispositivo seleccionado {0}, que es equivalente a Omega HH806AU. Ahora elije puerto serial </translation>
+        <translation>Dispositivo seleccionado {0}, que es equivalente a Omega HH806AU. Ahora elije puerto serial</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40425"/>
@@ -7568,9 +7573,6 @@ Continue?</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>
@@ -7861,7 +7863,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="44885"/>
         <source>setNpid(): Unable to set pid {0} </source>
-        <translation type="unfinished">No se pudo cambiar pid{0} en setNpid()</translation>
+        <translation>No se pudo cambiar pid{0} en setNpid() </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44962"/>
@@ -8041,7 +8043,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="45977"/>
         <source>{0} successfully sent to pid </source>
-        <translation type="unfinished">{0} enviado satisfactoriamente al pid</translation>
+        <translation>{0} enviado satisfactoriamente al pid </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44850"/>

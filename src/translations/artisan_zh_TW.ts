@@ -2819,7 +2819,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="20538"/>
         <source>Degree:</source>
-        <translation type="unfinished">溫度</translation>
+        <translation>溫度:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="20538"/>
@@ -3367,12 +3367,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="25860"/>
         <source> in</source>
-        <translation type="unfinished">烘焙前</translation>
+        <translation type="unfinished"> 烘焙前</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25861"/>
         <source> out</source>
-        <translation type="unfinished">烘焙後</translation>
+        <translation type="unfinished"> 烘焙後</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25874"/>
@@ -4829,11 +4829,6 @@ END</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../const/UIconst.py" line="114"/>
-        <source>Serial Port...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../const/UIconst.py" line="115"/>
         <source>Sampling Interval...</source>
         <translation type="unfinished"></translation>
@@ -5106,6 +5101,11 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7325,9 +7325,6 @@ Repeat Operation at the end: {0}</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>

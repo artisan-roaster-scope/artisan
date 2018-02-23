@@ -3363,7 +3363,7 @@ END</translation>
     <message>
         <location filename="../artisanlib/main.py" line="22574"/>
         <source> at {0}</source>
-        <translation type="unfinished">{0} で</translation>
+        <translation> {0} で</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15138"/>
@@ -4987,7 +4987,7 @@ END</translation>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>シリアルポート...</translation>
+        <translation type="obsolete">シリアルポート...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -5273,6 +5273,11 @@ END</translation>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation>シリアルポート...</translation>
     </message>
 </context>
 <context>
@@ -5766,7 +5771,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="14802"/>
         <source>{0}  loaded </source>
-        <translation type="unfinished">{0}  はロードされました</translation>
+        <translation>{0}  はロードされました </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14940"/>
@@ -7768,9 +7773,6 @@ Continue?</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>

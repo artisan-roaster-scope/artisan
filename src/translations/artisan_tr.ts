@@ -3312,7 +3312,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22574"/>
         <source> at {0}</source>
-        <translation type="unfinished">{0} de</translation>
+        <translation> {0} de</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15138"/>
@@ -4918,7 +4918,7 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>Serial koneksiyon...</translation>
+        <translation type="obsolete">Serial koneksiyon...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -5199,6 +5199,11 @@ END</source>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation>Koneksiyon...</translation>
     </message>
 </context>
 <context>
@@ -5684,7 +5689,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="14802"/>
         <source>{0}  loaded </source>
-        <translation type="unfinished">{0} okundu</translation>
+        <translation>{0} okundu </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14940"/>
@@ -6025,7 +6030,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="27062"/>
         <source> Event #{0} deleted</source>
-        <translation type="unfinished">Olay #{0} silindi</translation>
+        <translation type="unfinished"> Olay #{0} silindi</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27068"/>
@@ -6516,7 +6521,8 @@ Continue?</source>
         <location filename="../artisanlib/main.py" line="43363"/>
         <source>
 Repeat Operation at the end: {0}</source>
-        <translation type="unfinished">Komando sondan tekrarlamak: {0}</translation>
+        <translation>
+Komando sondan tekrarlamak: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43365"/>
@@ -7676,9 +7682,6 @@ Continue?</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>
@@ -8029,7 +8032,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="44885"/>
         <source>setNpid(): Unable to set pid {0} </source>
-        <translation type="unfinished">yerleştir Npid(): pid {0} yerleştirmesi olmıyor</translation>
+        <translation>yerleştir Npid(): pid {0} yerleştirmesi olmıyor </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44962"/>
@@ -8049,7 +8052,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="45930"/>
         <source>pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) </source>
-        <translation type="unfinished">pid komando olmıyor. Hatalı veriler burada pid{0}(888):({1},{2},{3})</translation>
+        <translation>pid komando olmıyor. Hatalı veriler burada pid{0}(888):({1},{2},{3}) </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="45177"/>
@@ -8149,7 +8152,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/main.py" line="45977"/>
         <source>{0} successfully sent to pid </source>
-        <translation type="unfinished">{0} başarılı pid ye gönderildi</translation>
+        <translation>{0} başarılı pid ye gönderildi </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="44850"/>

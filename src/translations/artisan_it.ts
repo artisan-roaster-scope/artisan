@@ -2041,7 +2041,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="34439"/>
         <source>HH506RAtemperature(): Unable to get id from HH506RA device </source>
-        <translation type="unfinished">HH506RAtemperatura():non identificabile da dispositivo HH506RA</translation>
+        <translation>HH506RAtemperatura():non identificabile da dispositivo HH506RA </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="34462"/>
@@ -3881,7 +3881,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22574"/>
         <source> at {0}</source>
-        <translation type="unfinished">a {0}</translation>
+        <translation> a {0}</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15138"/>
@@ -4870,7 +4870,7 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="114"/>
         <source>Serial Port...</source>
-        <translation>Interfaccia Seriale...</translation>
+        <translation type="obsolete">Interfaccia Seriale...</translation>
     </message>
     <message>
         <location filename="../const/UIconst.py" line="115"/>
@@ -5195,7 +5195,7 @@ END</source>
     <message>
         <location filename="../const/UIconst.py" line="111"/>
         <source>Machine</source>
-        <translation type="unfinished">Macchina</translation>
+        <translation>Macchina</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10510"/>
@@ -5231,6 +5231,11 @@ END</source>
         <location filename="../const/UIconst.py" line="173"/>
         <source>Save Theme...</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../const/UIconst.py" line="114"/>
+        <source>Port...</source>
+        <translation type="unfinished">Interfaccia...</translation>
     </message>
 </context>
 <context>
@@ -5684,7 +5689,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="14802"/>
         <source>{0}  loaded </source>
-        <translation type="unfinished">{0} caricato</translation>
+        <translation>{0} caricato </translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="14940"/>
@@ -5974,7 +5979,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="27062"/>
         <source> Event #{0} deleted</source>
-        <translation type="unfinished">Evento#{0} eliminato</translation>
+        <translation> Evento#{0} eliminato</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27068"/>
@@ -6164,7 +6169,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="37194"/>
         <source>Times need to be in ascending order. Please recheck {0} time</source>
-        <translation type="unfinished">Tempi devono essere in ordine crescente. Prego ricontrollo tempo {0} </translation>
+        <translation>Tempi devono essere in ordine crescente. Prego ricontrollo tempo {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="37159"/>
@@ -6355,7 +6360,8 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../artisanlib/main.py" line="43363"/>
         <source>
 Repeat Operation at the end: {0}</source>
-        <translation type="unfinished">Ripetizione operazione al termine: {0}</translation>
+        <translation>
+Ripetizione operazione al termine: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43365"/>
@@ -6372,7 +6378,9 @@ Repeat Operation at the end: {0}</source>
         <source>Use the Parameter Loader Software by Fuji if you need to
 
 </source>
-        <translation type="unfinished">Utilizza il Parametro Caricatore Software da Fuji se necessario</translation>
+        <translation>Utilizza il Parametro Caricatore Software da Fuji se necessario
+
+</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="43368"/>
@@ -6505,7 +6513,7 @@ Proceed?</source>
     <message>
         <location filename="../artisanlib/main.py" line="31421"/>
         <source>Playback Aid set ON at {0} secs</source>
-        <translation type="unfinished">Aiuto riproduzione acceso a secondi {0} </translation>
+        <translation>Aiuto riproduzione acceso a secondi {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="26650"/>
@@ -7664,9 +7672,6 @@ Continue?</source>
         <source>S7 connected</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Messages</name>
     <message>
         <location filename="../artisanlib/main.py" line="20080"/>
         <source>Profile missing Dry event</source>
