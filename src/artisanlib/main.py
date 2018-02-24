@@ -13488,7 +13488,7 @@ class ApplicationWindow(QMainWindow):
                                     pass
                 elif action == 11: # p-i-d, expects 3 float numbers separated by semicolon
                     if cmd_str:
-                        cmds = filter(None, cmd_str.split(";")) # "<p>;<i>;<d>"
+                        cmds = list(filter(None, cmd_str.split(";"))) # "<p>;<i>;<d>"
                         if len(cmds) == 3:
                             kp = float(cmds[0])
                             ki = float(cmds[1])
@@ -30176,14 +30176,14 @@ class EventsDlg(ArtisanDialog):
         if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
             return
         aw.extraeventsdescriptions.append("")
-        aw.extraeventstypes.append(0)
+        aw.extraeventstypes.append(4)
         aw.extraeventsvalues.append(0)
         aw.extraeventsactions.append(0)
         aw.extraeventsactionstrings.append("")
         aw.extraeventsvisibility.append(1)
         aw.extraeventbuttoncolor.append("yellow")
         aw.extraeventbuttontextcolor.append("black")
-        initialtext = u(aw.qmc.etypesf(aw.extraeventstypes[-1])[0])+str(aw.qmc.eventsvalues(aw.extraeventsvalues[-1]))
+        initialtext = u("E")
         aw.extraeventslabels.append(initialtext)
         self.createEventbuttonTable() 
         aw.buttonlist.append(QPushButton())
@@ -47461,6 +47461,9 @@ class PIDcontrol(object):
                         aw.ser.SP.flushInput()
                         aw.ser.SP.flushOutput()
                         aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
+                        self.pidKp = kp
+                        self.pidKi = ki
+                        self.pidKd = kd
                         if source is not None:
                             libtime.sleep(.03)
                             aw.ser.SP.write(str2cmd("PID;CHAN;" + str(source) + "\n"))
@@ -47473,9 +47476,15 @@ class PIDcontrol(object):
                         aw.ser.COMsemaphore.release(1)
         elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and (external) Control ticked
             aw.modbus.setPID(kp,ki,kd)
+            self.pidKp = kp
+            self.pidKi = ki
+            self.pidKd = kd
             aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
         elif aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
             aw.qmc.pid.setPID(kp,ki,kd)
+            self.pidKp = kp
+            self.pidKi = ki
+            self.pidKd = kd
             aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
             aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
 
