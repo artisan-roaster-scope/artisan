@@ -34,6 +34,7 @@ o PyInstaller 3.3.1
 o pytz 2017.3
 o snap7 1.4.2
 o python-snap7 0.9
+o colorspacious 1.1.0
 
 
 CHECK FOR UPDATES
@@ -66,6 +67,9 @@ open a terminal and type
 
 Upgrade History:
 
+- 2018-02-25
+ . python snap7 0.9
+ . colorspacious 1.1.0
 - 2018-01-30:
  . Qt 5.9.3 => 5.10.0
  . PyQt 5.9.2 => 5.10.0
@@ -889,5 +893,9 @@ https://github.com/lincolnloop/python-qrcode
 # sudo make -f x86_64_osx.mk install
 
 # cd python-snap7-0.9
-# python3 setup.py build
-# python3 setup.py install
+# python setup.py build
+# python setup.py install
+
+32) colorspacious
+
+# sudo -H python -m pip install colorspacious

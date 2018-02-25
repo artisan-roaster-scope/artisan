@@ -12229,7 +12229,7 @@ class ApplicationWindow(QMainWindow):
         
 
     def colorDifference(self,color1,color2):
-        cDiff = 100
+        cieDiff = 100
         try:
             from colorspacious import deltaE
             if color1 == None or color1 == "None":
