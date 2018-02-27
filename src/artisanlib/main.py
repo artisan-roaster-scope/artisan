@@ -11860,7 +11860,6 @@ class ApplicationWindow(QMainWindow):
         self.e2buttondialog.setVisible(False)
         self.e3buttondialog.setVisible(False)
         self.e4buttondialog.setVisible(False)
-
         
         self.extrabuttondialogs = QFrame()
         self.extrabuttondialogs.setLayout(extrabuttonsLayout)
@@ -11885,60 +11884,6 @@ class ApplicationWindow(QMainWindow):
         sliderGrp1.setAlignment(Qt.AlignCenter)
         sliderGrp1.setContentsMargins(0,7,0,0)
         sliderGrp1.setSpacing(0)
-    
-    
-        self.slider1.setStyleSheet("""
-            QSlider::groove:vertical {
-                background: #ddd;
-                border: 0.5px solid #ccc;
-                width: 3px;
-                border-radius: 5px;
-            }
-            QSlider::sub-page:vertical {
-                background: #ddd;
-                border: 0.5px solid #ccc;
-                width: 85px;
-                border-radius: 5px;
-            }
-            QSlider::add-page:vertical {
-                background: #A72926;
-                border: 1px solid #A72926;
-                width: 5px;
-                border-radius: 5px;
-            }
-            QSlider::handle:vertical {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #eee);
-                border: 0.5px solid #ddd;
-                height: 8px;
-                margin-top: -1px;
-                margin-bottom: -1px;
-                margin-left: -10px;
-                margin-right: -10px;
-                border-radius: 5px;
-            }
-            QSlider::handle:vertical:hover {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #eee, stop:1 #ccc);
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }
-            QSlider::sub-page:vertical:disabled {
-                background: #bbb;
-                border-color: #999;
-            }
-            QSlider::add-page:vertical:disabled {
-                background: #eee;
-                border-color: #999;
-            }
-            QSlider::handle:vertical:disabled {
-                background: #eee;
-                border: 1px solid #aaa;
-                border-radius: 5px;
-            }        
-""")
-
-
-       
-        
         self.sliderGrpBox1 = QGroupBox()
         self.sliderGrpBox1.setLayout(sliderGrp1)
         self.sliderGrpBox1.setAlignment(Qt.AlignCenter)
@@ -12491,18 +12436,14 @@ class ApplicationWindow(QMainWindow):
         whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
         aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
         aw.ntb.setMinimumHeight(50)
-        if (whitep):
+        if (whitep) or str(aw.qmc.palette["canvas"]) != 'None':
+            aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
+                                        + "}" )
             # ensure x/y coordinates are readable
             aw.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                        + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
                                         + "color: " + str(aw.qmc.palette["title"]) + ";"
                                         + "}" )
-            # make QToolBar background transparent
-            aw.ntb.setStyleSheet("QToolBar {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                        + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
-                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
-                                        + "}" )
-        elif str(aw.qmc.palette["canvas"]) != 'None':  # black icons, but canvas not transparent (Clean theme!)
             # make QToolBar background transparent
             aw.ntb.setStyleSheet("QToolBar {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                         + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
