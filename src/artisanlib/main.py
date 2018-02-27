@@ -5246,10 +5246,10 @@ class tgraphcanvas(FigureCanvas):
     
                 if self.DeltaETflag: 
                     handles.append(self.l_delta1)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "\u0394ET", None)))
                 if self.DeltaBTflag:
                     handles.append(self.l_delta2)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "\u0394BT", None)))
     
     
                 nrdevices = len(self.extradevices)
@@ -12469,6 +12469,7 @@ class ApplicationWindow(QMainWindow):
 
                     
     def process_active_quantifiers(self):
+        print("process_active_quantifiers")
         # called every sampling interval
         for i in range(4):
             if aw.eventquantifieractive[i]:
@@ -12764,7 +12765,7 @@ class ApplicationWindow(QMainWindow):
     # compute the 12 or 102 event quantifier linespace for type n in [0,3]
     def computeLinespace(self,n):
         if self.eventquantifiercoarse[n]:
-            num = int(round((self.eventquantifiermax[n] - self.eventquantifiermin[n])/2.)) + 2
+            num = int(round((self.eventquantifiermax[n] - self.eventquantifiermin[n])/10.)) + 2
         else:
             num = self.eventquantifiermax[n] - self.eventquantifiermin[n] + 2
         return numpy.linspace(self.eventquantifiermin[n], self.eventquantifiermax[n], num=num)
