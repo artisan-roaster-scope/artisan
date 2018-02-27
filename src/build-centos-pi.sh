@@ -72,7 +72,13 @@ mkdir dist/Themes
 find includes/Themes -name '.*.athm' -exec rm -r {} \;
 cp -R includes/Themes/* dist/Themes
 
+mkdir dist/Icons
+find includes/Icons -name '.*.aset' -exec rm -r {} \;
+cp -R includes/Icons/* dist/Icons
+
 cp $PYTHON_PATH/site-packages/yoctopuce/cdll/* dist
+
+cp /usr/lib/libsnap7.so dist
 
 
 cp README.txt dist

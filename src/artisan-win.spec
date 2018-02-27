@@ -98,7 +98,7 @@ os.system(r'copy "' + YOCTO_BIN + r'\yapi64.dll" ' + TARGET + 'lib')
 # YOCTO HACK END
 
 # copy Snap7 lib
-os.system('copy "' + SNAP7_BIN + r'\snap7.dll" dist\lib')
+os.system('copy "' + SNAP7_BIN + r'\snap7.dll" ' + TARGET)
 
 
 for fn in [
@@ -129,6 +129,9 @@ os.system(r'xcopy includes\Machines ' + TARGET + 'Machines /y /S')
 
 os.system(r'mkdir ' +  TARGET + 'Themes')
 os.system(r'xcopy includes\Themes ' + TARGET + 'Themes /y /S')
+
+os.system(r'mkdir ' +  TARGET + 'Icons')
+os.system(r'xcopy includes\Icons ' + TARGET + 'Icons /y /S')
 
 
 

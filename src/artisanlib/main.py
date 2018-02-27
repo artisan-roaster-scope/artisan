@@ -118,6 +118,7 @@ else:
                               QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
 
 import matplotlib as mpl
+
 from matplotlib import cm
 
 mpl_major_version = 2
@@ -197,6 +198,7 @@ except:
     
 import snap7.client
 from snap7.util import set_real, get_real, set_int, get_int
+from snap7.common import load_library as load_snap7_library
 
 from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient
 from pymodbus.constants import Endian
@@ -257,6 +259,60 @@ from unidecode import unidecode
 
 from artisanlib.weblcds import startWeb, stopWeb
 from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopControl, releaseHottopControl, setHottop
+
+
+
+artisan_slider_style = """
+            QSlider::groove:vertical {{
+                background: #ddd;
+                border: 0.5px solid #aaa;
+                width: 3px;
+                border-radius: 5px;
+            }}
+            QSlider::sub-page:vertical {{
+                background: #ddd;
+                border: 0.5px solid #aaa;
+                width: 85px;
+                border-radius: 5px;
+            }}
+            QSlider::add-page:vertical {{
+                background: {color};
+                border: 1px solid {color};
+                width: 5px;
+                border-radius: 2px;
+            }}
+            QSlider::handle:vertical {{
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #eee);
+                border: 0.5px solid #ddd;
+                height: 8px;
+                margin-top: -1px;
+                margin-bottom: -1px;
+                margin-left: -10px;
+                margin-right: -10px;
+                border-radius: 5px;
+            }}
+            QSlider::handle:vertical:hover {{
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #eee, stop:1 #ccc);
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }}
+            QSlider::sub-page:vertical:disabled {{
+                background: #bbb;
+                border-color: #999;
+            }}
+            QSlider::add-page:vertical:disabled {{
+                background: #eee;
+                border-color: #999;
+            }}
+            QSlider::handle:vertical:disabled {{
+                background: #eee;
+                border: 1px solid #aaa;
+                border-radius: 5px;
+            }}       
+"""
+
+
+
 
 # maps Artisan thermocouple types (order as listed in the menu; see phidget1048_types) to Phdiget thermocouple types
 # 1 => k-type (default)
@@ -554,6 +610,16 @@ else:
 platf = str(platform.system())
 
 
+# patch S7 client
+
+class S7Client(snap7.client.Client):
+    def __init__(self):
+        super(S7Client, self).__init__()
+            
+    # avoiding an exception on __del__ as self.library might not yet be set if loading of shared lib failed!
+    def destroy(self):
+        return super(S7Client, self).destroy()
+    
 #######################################################################################
 #################### Main Application  ################################################
 #######################################################################################
@@ -2455,7 +2521,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ax_background = None
                     
                     if aw.qmc.patheffects:
-                        rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
+                        rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette["background"])]
                     else:
                         rcParams['path.effects'] = []
 
@@ -2475,7 +2541,7 @@ class tgraphcanvas(FigureCanvas):
                                 if self.ax_background:
                                     self.fig.canvas.restore_region(self.ax_background)
                                     # draw eventtypes
-# this seems not to be needed and hides partially event by value "merged" annotations
+# this seems not to be needed and hides partially event by value "Combo-type" annotations
 #                                    if self.eventsshowflag and self.eventsGraphflag in [2,3,4]:
 #                                        aw.qmc.ax.draw_artist(self.l_eventtype1dots)
 #                                        aw.qmc.ax.draw_artist(self.l_eventtype2dots)
@@ -3679,7 +3745,7 @@ class tgraphcanvas(FigureCanvas):
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
-    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):
+    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):        
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget:
@@ -4028,7 +4094,7 @@ class tgraphcanvas(FigureCanvas):
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):                
         if aw.qmc.patheffects:
-            rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
+            rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette["background"])]
         else:
             rcParams['path.effects'] = []
         #annotate temp
@@ -4783,7 +4849,7 @@ class tgraphcanvas(FigureCanvas):
                     #END of Background
                     
                 if aw.qmc.patheffects:
-                    rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
+                    rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette["background"])]
                     
                 handles = []
                 labels = []
@@ -4872,7 +4938,7 @@ class tgraphcanvas(FigureCanvas):
                                             temps = self.temp2
                                         else:
                                             temps = self.stemp2
-                                    fcolor=self.EvalueColor[self.specialeventstype[i]]
+#                                    fcolor=self.EvalueColor[self.specialeventstype[i]]
                                     self.ax.annotate(firstletter + secondletter, 
                                                      xy=(self.timex[int(self.specialevents[i])], 
                                                      temps[int(self.specialevents[i])]),
@@ -4880,7 +4946,7 @@ class tgraphcanvas(FigureCanvas):
                                                      alpha=1.,
                                                      va="center", ha="left",
                                                      bbox=dict(boxstyle='square,pad=0.1', fc=self.palette["specialeventbox"], ec='none'),
-                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                      color=self.palette["specialeventtext"],
                                                      arrowprops=dict(arrowstyle='-',color=col,alpha=0.4,relpos=(0,0)),
                                                      fontsize="xx-small",
@@ -5082,10 +5148,10 @@ class tgraphcanvas(FigureCanvas):
                                                      alpha=0.9,
                                                      color=textcolor,
                                                      va="center", ha="center",
-                                                     arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4), # ,relpos=(0,0)
+                                                     arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4), # ,relpos=(0,0)
                                                      bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                                      fontproperties=fontprop_small,
-                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                      )
                                     elif self.eventsGraphflag == 4:
                                         self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
@@ -5093,10 +5159,9 @@ class tgraphcanvas(FigureCanvas):
                                                      alpha=0.9,
                                                      color=textcolor,
                                                      va="center", ha="center",
-    #                                                 arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4,relpos=(0.5,1)),
                                                      bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                                      fontproperties=fontprop_small,
-                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                     path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                      )                            
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
@@ -5119,11 +5184,11 @@ class tgraphcanvas(FigureCanvas):
                             trans = self.delta_ax.transData #=self.delta_ax.transScale + (self.delta_ax.transLimits + self.delta_ax.transAxes)
                             if self.DeltaETflag:
                                 self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
                             if self.DeltaBTflag:           
                                 self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))    
     
                 ##### Extra devices-curves
@@ -5132,44 +5197,44 @@ class tgraphcanvas(FigureCanvas):
                     if aw.extraCurveVisibility1[i]:
                         if False and aw.qmc.flagon:
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
                         else:
                             if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
                                 self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=self.extraname1[i])[0])
                     if aw.extraCurveVisibility2[i]:
                         if False and aw.qmc.flagon:
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
                         else:
                             if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
                                 self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter)
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground="w")],
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
                 
                 ##### ET,BT curves
                 if aw.qmc.ETcurve:
                     if False and aw.qmc.flagon:
                         self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                         linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
                     else:
                         self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground="w")],
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                         linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None)))
                 if aw.qmc.BTcurve:
                     if False and aw.qmc.flagon:
                         self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                         linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
                     else:
                         self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,
-                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground="w")],
+                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                         linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
     
                 if aw.qmc.ETcurve:
@@ -5275,7 +5340,7 @@ class tgraphcanvas(FigureCanvas):
                     for line,text in zip(leg.get_lines(), leg.get_texts()):
                         text.set_color(line.get_color())
                     if aw.qmc.patheffects:
-                        rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]                    
+                        rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette["background"])]                    
     
                 # we create here the project line plots to have the accurate time axis after CHARGE               
                 if mpl_major_version >= 2:
@@ -7183,7 +7248,8 @@ class tgraphcanvas(FigureCanvas):
                                         self.temp1[index]),xytext=(self.timex[index],row[firstletter]),
                                         alpha=1.,
                                         bbox=dict(boxstyle='square,pad=0.1', fc=self.EvalueColor[etype], ec='none'),
-                                        path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+#                                        path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                        path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                         color=self.EvalueTextColor[etype],
                                         arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),
                                         fontsize="xx-small",
@@ -7194,7 +7260,8 @@ class tgraphcanvas(FigureCanvas):
                                             self.temp2[index]),xytext=(self.timex[index],row[firstletter]),
                                             alpha=1.,
                                             bbox=dict(boxstyle='square,pad=0.1', fc=self.EvalueColor[etype], ec='none'),
-                                            path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+#                                            path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                            path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                             color=self.EvalueTextColor[etype],
                                             arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
                                             fontsize="xx-small",
@@ -7260,17 +7327,16 @@ class tgraphcanvas(FigureCanvas):
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                                          fontsize="xx-small",
                                                          fontproperties=aw.mpl_fontproperties,
-                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          backgroundcolor=boxcolor)
                                     elif self.eventsGraphflag == 4:
                                         self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp),alpha=0.9,
                                                          color=textcolor,
                                                          va="center", ha="center",
-#                                                         arrowprops=dict(arrowstyle='-',color=boxcolor,alpha=0.4,relpos=(0,0)),
                                                          bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                                          fontsize="xx-small",
                                                          fontproperties=aw.mpl_fontproperties,
-                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                                          backgroundcolor=boxcolor)
                                     
                         self.updateBackground() # call to canvas.draw() not needed as self.annotate does the (partial) redraw, but updateBacground() needed
@@ -7427,7 +7493,8 @@ class tgraphcanvas(FigureCanvas):
                                  #arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
                                  bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                  fontproperties=fontprop_small,
-                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+#                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
+                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                  picker=True,
                                  )
 
@@ -8354,7 +8421,7 @@ class tgraphcanvas(FigureCanvas):
                 funcDelta = func.derivative()
                 deltabtvals = [x*60 for x in funcDelta(timez).tolist()]
                 self.ax.plot(timez,deltabtvals,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],
                     label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
                     
@@ -8362,7 +8429,7 @@ class tgraphcanvas(FigureCanvas):
                 funcDelta2 = func2.derivative()
                 deltaetvals = [x*60 for x in funcDelta2(timez).tolist()]
                 self.ax.plot(timez,deltaetvals,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
-                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                     linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],
                     label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                          
             
@@ -9358,9 +9425,10 @@ def my_get_icon(name):
         return QIcon(p)
     else:
         None
+           
         
 class VMToolbar(NavigationToolbar):
-    def __init__(self, plotCanvas, parent):
+    def __init__(self, plotCanvas, parent,white_icons=False):
         self.toolitems = (
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
             ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -9370,9 +9438,12 @@ class VMToolbar(NavigationToolbar):
 #            ('Subplots', QApplication.translate("Tooltip", 'Configure subplots', None), 'subplots', 'configure_subplots'),
             ('Zoom', QApplication.translate("Tooltip", 'Zoom to rectangle', None), 'zoom_to_rect', 'zoom'),
         )
+        
+        # if true, we render Artisan-specific white versions of the icons
+        self.white_icons = white_icons
 
         NavigationToolbar.__init__(self, plotCanvas, parent)
-
+        
 
 # add green flag menu on matplotlib v2.0 and later
         if mpl_major_version >= 2:
@@ -9384,18 +9455,17 @@ class VMToolbar(NavigationToolbar):
                     a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
                 a.triggered.connect(self.edit_parameters)     
                 a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
-                self.insertAction(self.actions()[-1],a)
-        
+                self.insertAction(self.actions()[-1],a)        
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
         self.draw_org = self.draw
         self.draw = self.draw_new
 
-
-    # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
-    if not svgsupport:
-        figureoptions.get_icon = my_get_icon
+        # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
+        if not svgsupport:
+            figureoptions.get_icon = my_get_icon
+            
                 
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def draw_new(self):
@@ -9410,7 +9480,7 @@ class VMToolbar(NavigationToolbar):
     def home(self, *args):
         """Restore the original view"""
         super(VMToolbar, self).home(*args) 
-        
+                
         # toggle zoom_follow if recording
         if aw.qmc.flagstart:
             aw.qmc.zoom_follow = not aw.qmc.zoom_follow
@@ -9424,15 +9494,25 @@ class VMToolbar(NavigationToolbar):
             self.push_current()
 
     def _icon(self, name):
+        if self.white_icons:
+            name = 'white_' + name
+            basedir = os.path.join(aw.getResourcePath(),"Icons")
+        else:
+            basedir = self.basedir     
         #dirty hack to prefer .svg over .png Toolbar icons
         if not svgsupport:
-            p = os.path.join(self.basedir, name.replace('.svg','.png'))
+            name = name.replace('.svg','.png')
         else:
-            p = os.path.join(self.basedir, name.replace('.png','.svg'))
-        if os.path.exists(p):
-            return QIcon(p)
-        else:
-            return QIcon(os.path.join(self.basedir, name))
+            name = name.replace('.png','.svg')
+        # large png icons introduced in MPL 2.1
+        if pyqtversion == 5:
+            name = name.replace('.png', '_large.png')                        
+        p = os.path.join(basedir, name)
+        pm = QPixmap(p)
+        if hasattr(pm, 'setDevicePixelRatio'):
+            pm.setDevicePixelRatio(self.canvas._dpi_ratio)
+        return QIcon(pm)
+
         
     def edit_parameters(self):
         try:
@@ -9455,7 +9535,7 @@ class VMToolbar(NavigationToolbar):
                     if line.get_drawstyle() == "steps-post":
                         steps_post_lines.append(line)
                         line.set_drawstyle("steps")
-                figureoptions.figure_edit(axes, self)
+                figureoptions.figure_edit(axes)
                 for line in steps_post_lines:
                     line.set_drawstyle("steps-post")
             except Exception as e:
@@ -10301,6 +10381,9 @@ class ApplicationWindow(QMainWindow):
         #resolution
         self.defaultdpi = 120
         self.dpi = self.defaultdpi
+        
+        #mpl.rc_context({'toolbar': None}) # this does not work to remove the default toolbar
+        #mpl.rcParams['toolbar'] == None # this does not work to remove the default toolbar
         self.qmc = tgraphcanvas(self.main_widget)
 
         if mpl_major_version >= 2 and pyqtversion >= 5:
@@ -11740,7 +11823,7 @@ class ApplicationWindow(QMainWindow):
         self.phasesLCDs.hide()
 
         #level 1
-        self.level1layout.addWidget(self.ntb)
+#        self.level1layout.addWidget(self.ntb)
         self.level1layout.addStretch()
         self.level1layout.addWidget(self.phasesLCDs)
         self.level1layout.addWidget(self.AUCLCD)
@@ -11800,17 +11883,74 @@ class ApplicationWindow(QMainWindow):
         sliderGrp1.addWidget(self.sliderLCD1)
         sliderGrp1.addWidget(self.slider1)
         sliderGrp1.setAlignment(Qt.AlignCenter)
-        sliderGrp1.setContentsMargins(2,2,2,2)
+        sliderGrp1.setContentsMargins(0,7,0,0)
+        sliderGrp1.setSpacing(0)
+    
+    
+        self.slider1.setStyleSheet("""
+            QSlider::groove:vertical {
+                background: #ddd;
+                border: 0.5px solid #ccc;
+                width: 3px;
+                border-radius: 5px;
+            }
+            QSlider::sub-page:vertical {
+                background: #ddd;
+                border: 0.5px solid #ccc;
+                width: 85px;
+                border-radius: 5px;
+            }
+            QSlider::add-page:vertical {
+                background: #A72926;
+                border: 1px solid #A72926;
+                width: 5px;
+                border-radius: 5px;
+            }
+            QSlider::handle:vertical {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #eee);
+                border: 0.5px solid #ddd;
+                height: 8px;
+                margin-top: -1px;
+                margin-bottom: -1px;
+                margin-left: -10px;
+                margin-right: -10px;
+                border-radius: 5px;
+            }
+            QSlider::handle:vertical:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #eee, stop:1 #ccc);
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            QSlider::sub-page:vertical:disabled {
+                background: #bbb;
+                border-color: #999;
+            }
+            QSlider::add-page:vertical:disabled {
+                background: #eee;
+                border-color: #999;
+            }
+            QSlider::handle:vertical:disabled {
+                background: #eee;
+                border: 1px solid #aaa;
+                border-radius: 5px;
+            }        
+""")
+
+
+       
+        
         self.sliderGrpBox1 = QGroupBox()
         self.sliderGrpBox1.setLayout(sliderGrp1)
         self.sliderGrpBox1.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox1.setMinimumWidth(55) 
         self.sliderGrpBox1.setMaximumWidth(55)
         self.sliderGrpBox1.setVisible(False)
+        self.sliderGrpBox1.setFlat(True)
         self.slider1.setTracking(False)
         self.slider1.sliderMoved.connect(lambda v=0:self.updateSliderLCD(0,v))
         self.slider1.valueChanged.connect(lambda _:self.sliderReleased(0,updateLCD=True))
         self.slider1.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
+        
 
         self.slider2 = self.slider()
         self.sliderLCD2 = self.sliderLCD() 
@@ -11820,17 +11960,24 @@ class ApplicationWindow(QMainWindow):
         sliderGrp2.addWidget(self.sliderLCD2)
         sliderGrp2.addWidget(self.slider2)
         sliderGrp2.setAlignment(Qt.AlignCenter)
-        sliderGrp2.setContentsMargins(2,2,2,2)
+        sliderGrp2.setContentsMargins(0,7,0,0)
+        sliderGrp2.setSpacing(0)
         self.sliderGrpBox2 = QGroupBox()
         self.sliderGrpBox2.setLayout(sliderGrp2)
         self.sliderGrpBox2.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox2.setMinimumWidth(55) 
         self.sliderGrpBox2.setMaximumWidth(55) 
         self.sliderGrpBox2.setVisible(False)
+        self.sliderGrpBox2.setFlat(True)
         self.slider2.setTracking(False)
         self.slider2.sliderMoved.connect(lambda v=0:self.updateSliderLCD(1,v))
         self.slider2.valueChanged.connect(lambda _:self.sliderReleased(1,updateLCD=True))
         self.slider2.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
+        
+        
+#        sliderGrp1.setSpacing(10)
+#        self.sliderGrpBox2.setStyleSheet("QGroupBox { background-color: red; border: 18px solid gray; border-radius: 10px;}")
+        sliderGrp2.setContentsMargins(0,7,0,0)
 
         self.slider3 = self.slider()
         self.sliderLCD3 = self.sliderLCD()
@@ -11840,13 +11987,15 @@ class ApplicationWindow(QMainWindow):
         sliderGrp3.addWidget(self.sliderLCD3)
         sliderGrp3.addWidget(self.slider3)
         sliderGrp3.setAlignment(Qt.AlignCenter)
-        sliderGrp3.setContentsMargins(2,2,2,2)
+        sliderGrp3.setContentsMargins(0,7,0,0)
+        sliderGrp3.setSpacing(0)
         self.sliderGrpBox3 = QGroupBox()
         self.sliderGrpBox3.setLayout(sliderGrp3)
         self.sliderGrpBox3.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox3.setMinimumWidth(55) 
         self.sliderGrpBox3.setMaximumWidth(55) 
         self.sliderGrpBox3.setVisible(False)
+        self.sliderGrpBox3.setFlat(True)
         self.slider3.setTracking(False)
         self.slider3.sliderMoved.connect(lambda v=0:self.updateSliderLCD(2,v))
         self.slider3.valueChanged.connect(lambda _:self.sliderReleased(2,updateLCD=True))
@@ -11860,13 +12009,15 @@ class ApplicationWindow(QMainWindow):
         sliderGrp4.addWidget(self.sliderLCD4)
         sliderGrp4.addWidget(self.slider4)
         sliderGrp4.setAlignment(Qt.AlignCenter)
-        sliderGrp4.setContentsMargins(2,2,2,2)
+        sliderGrp4.setContentsMargins(0,7,0,0)
+        sliderGrp4.setSpacing(0)
         self.sliderGrpBox4 = QGroupBox()
         self.sliderGrpBox4.setLayout(sliderGrp4)
         self.sliderGrpBox4.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox4.setMinimumWidth(55) 
         self.sliderGrpBox4.setMaximumWidth(55) 
         self.sliderGrpBox4.setVisible(False)
+        self.sliderGrpBox4.setFlat(True)
         self.slider4.setTracking(False)
         self.slider4.sliderMoved.connect(lambda v=0:self.updateSliderLCD(3,v))
         self.slider4.valueChanged.connect(lambda _:self.sliderReleased(3,updateLCD=True))
@@ -11881,7 +12032,8 @@ class ApplicationWindow(QMainWindow):
         sliderGrpSV.addWidget(self.sliderLCDSV)
         sliderGrpSV.addWidget(self.sliderSV)
         sliderGrpSV.setAlignment(Qt.AlignCenter)
-        sliderGrpSV.setContentsMargins(2,2,2,2)
+        sliderGrpSV.setContentsMargins(0,7,0,0)
+        sliderGrpSV.setSpacing(0)
         self.sliderGrpBoxSV = QGroupBox()
         self.sliderGrpBoxSV.setLayout(sliderGrpSV)
         self.sliderGrpBoxSV.setAlignment(Qt.AlignCenter)
@@ -11889,10 +12041,11 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBoxSV.setMaximumWidth(55) 
         self.sliderGrpBoxSV.setVisible(False)
         self.sliderGrpBoxSV.setTitle("SV")
+        self.sliderGrpBoxSV.setFlat(True)
         #self.sliderSV.setTracking(False)
         #self.sliderSV.sliderMoved.connect(lambda v=0:self.updateSVSliderLCD(v))
         self.sliderSV.valueChanged.connect(lambda v=0:self.updateSVSliderLCD(v))
-        self.sliderSV.sliderReleased.connect(lambda _:self.sliderSVreleased())
+        self.sliderSV.sliderReleased.connect(lambda :self.sliderSVreleased())
         self.sliderSV.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         sliderGrp12 = QVBoxLayout()
@@ -11940,7 +12093,11 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addLayout(self.midlayout) 
         mainlayout.setContentsMargins(0,0,0,0)
         mainlayout.setSpacing(0)
-
+        
+        self.qmc.toolbar.hide() # we need to hide the default navigation toolbar that we don't use
+        self.qmc.toolbar.destroy()
+        
+        
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
@@ -12063,27 +12220,53 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel2[i].setText(l2)
         aw.settooltip()
 
-    def populateMachineMenu(self):
+    def populateListMenu(self,resourceName,ext,triggered,menu):
         one_added = False
-        for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),"Machines")):
+        for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),resourceName)):
             dirs.sort()
+            files.sort()
             for fl in files:
-                if fl.endswith(".aset"): 
+                if fl.endswith(ext): 
                     d = os.path.split(root)
                     p = os.path.join(root,fl)
-                    f = fl.replace(".aset","").replace("_"," ")
+                    f = fl.replace(ext,"").replace("_"," ")
                     if len(d) > 0:
                         a = QAction(self, visible=True,
-                            triggered=self.openMachineSettings)
+                            triggered=triggered)
                         a.setData(p)
-                        if d[-1] == "Machines":
+                        if d[-1] == resourceName:
                             a.setText(u(f)) # + u("...")
                         else:
                             a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
-                        self.machineMenu.addAction(a)
+                        menu.addAction(a)
                         one_added = True
         if one_added:
-            self.ConfMenu.addMenu(self.machineMenu)
+            self.ConfMenu.addMenu(menu)
+            
+    def populateMachineMenu(self):
+        self.populateListMenu("Machines",".aset",self.openMachineSettings,self.machineMenu)
+        
+#    def populateMachineMenu(self):
+#        one_added = False
+#        for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),"Machines")):
+#            dirs.sort()
+#            for fl in files:
+#                if fl.endswith(".aset"): 
+#                    d = os.path.split(root)
+#                    p = os.path.join(root,fl)
+#                    f = fl.replace(".aset","").replace("_"," ")
+#                    if len(d) > 0:
+#                        a = QAction(self, visible=True,
+#                            triggered=self.openMachineSettings)
+#                        a.setData(p)
+#                        if d[-1] == "Machines":
+#                            a.setText(u(f)) # + u("...")
+#                        else:
+#                            a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
+#                        self.machineMenu.addAction(a)
+#                        one_added = True
+#        if one_added:
+#            self.ConfMenu.addMenu(self.machineMenu)
 
     def openMachineSettings(self):
         action = self.sender()
@@ -12106,7 +12289,7 @@ class ApplicationWindow(QMainWindow):
                         aw.modbus.host = host
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                elif aw.qmc.device == 79:
+                elif aw.qmc.device == 79: # S7
                     host,res = QInputDialog.getText(self,
                         QApplication.translate("Message", "Machine",None),
                         QApplication.translate("Message", "Network name or IP address",None),text=aw.s7.host) #"127.0.0.1"
@@ -12119,6 +12302,7 @@ class ApplicationWindow(QMainWindow):
                     if platf == 'Darwin':
                         ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
                             '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',"/dev/cu.Bluetooth-Incoming-Port","/dev/tty.Bluetooth-Incoming-Port"])])
+                        ports = list(filter (lambda x: 'Bluetooth-Inc' not in x[0],ports))
                     else:
                         ports = list(comports)
                     if aw.ser.comport not in [p[0] for p in ports]:
@@ -12130,6 +12314,11 @@ class ApplicationWindow(QMainWindow):
                         current = [p[0] for p in ports].index(aw.ser.comport)
                     except Exception:
                         pass
+                    if aw.qmc.device == 53: # Hottop 2k+
+                        try:
+                            current = [p[0] for p in ports].index("FT230X Basic UART")
+                        except Exception:
+                            pass
                     port_name,res = QInputDialog.getItem(self,
                         QApplication.translate("Message", "Serial Port Configuration",None),
                         QApplication.translate("Message", "Comm Port",None),
@@ -12145,27 +12334,10 @@ class ApplicationWindow(QMainWindow):
                                 aw.ser.comport = ports[pos][0]
                         except:
                             pass
-                    
+
+                                
     def populateThemeMenu(self):
-        one_added = False
-        for root,_,files in os.walk(os.path.join(self.getResourcePath(),"Themes")):
-            for fl in files:
-                if fl.endswith(".athm"): 
-                    d = os.path.split(root)
-                    p = os.path.join(root,fl)
-                    f = fl.replace(".athm","").replace("_"," ")
-                    if len(d) > 0:
-                        a = QAction(self, visible=True,
-                            triggered=self.openThemeSettings)
-                        a.setData(p)
-                        if d[-1] == "Themes":
-                            a.setText(u(f)) # + u("...")
-                        else:
-                            a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
-                        self.themeMenu.addAction(a)
-                        one_added = True
-        if one_added:
-            self.ConfMenu.addMenu(self.themeMenu)
+        self.populateListMenu("Themes",".athm",self.openThemeSettings,self.themeMenu)
 
     def openThemeSettings(self):
         action = self.sender()
@@ -12255,14 +12427,13 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " colorDifference() {0}").format(str(e)),exc_tb.tb_lineno)
 
         return cieDiff
 
         
     def checkColors(self,colorPairsToCheck=[]):
         val = -1
-        colorpairstring = ''
         try:
             for c in colorPairsToCheck:
                 val = self.colorDifference(c[1],c[3]) 
@@ -12305,33 +12476,50 @@ class ApplicationWindow(QMainWindow):
         aw.qmc.fig.patch.set_facecolor(str(aw.qmc.palette["canvas"]))
         aw.setStyleSheet("QMainWindow{background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                    + "border: 0px solid black;"
-                                   + "}" )    
-        aw.ntb.setStyleSheet("QWidget {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                    + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
-                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
-                                    + "}" )
+                                   + "}" )
+        
+        # update navigationbar
+        aw.level1layout.removeWidget(aw.ntb) # remove current bar
+        if aw.ntb._active == 'PAN':
+            aw.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
+        if aw.ntb._active == 'ZOOM':
+            aw.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
+        
+        aw.removeToolBar(aw.ntb)
+#        aw.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
+        aw.ntb.destroy()
+        whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
+        aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
+        aw.ntb.setMinimumHeight(50)
+        if (whitep):
+            # ensure x/y coordinates are readable
+            aw.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                        + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
+                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
+                                        + "}" )
+            # make QToolBar background transparent
+            aw.ntb.setStyleSheet("QToolBar {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                        + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
+                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
+                                        + "}" )
+        elif str(aw.qmc.palette["canvas"]) != 'None':  # black icons, but canvas not transparent (Clean theme!)
+            # make QToolBar background transparent
+            aw.ntb.setStyleSheet("QToolBar {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                        + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
+                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
+                                        + "}" )
+            
+        aw.level1layout.insertWidget(0,aw.ntb)
+        
         if str(aw.qmc.palette["canvas"]) == 'None':
             aw.qmc.fig.canvas.setStyleSheet("background-color:transparent;") 
-            aw.ntb.setStyleSheet("background-color:transparent;") 
+            aw.ntb.setStyleSheet("QToolBar {background-color:transparent;}")
 
-        # there seems to be no way to properly control the slider border or its color 
-        aw.sliderGrpBox1.setStyleSheet("QWidget {background-color: " + str(aw.qmc.palette["canvas"]) + ";"
-                                              + "color: " + str(aw.qmc.palette['title']) + ";" 
-                                              + "}" )
-        aw.sliderGrpBox2.setStyleSheet("QWidget {background-color: " + str(aw.qmc.palette["canvas"]) + ";"
-                                              + "color: " + str(aw.qmc.palette['title']) + ";" 
-                                              + "}" )
-        aw.sliderGrpBox3.setStyleSheet("QWidget {background-color: " + str(aw.qmc.palette["canvas"]) + ";"
-                                              + "color: " + str(aw.qmc.palette['title']) + ";" 
-                                              + "}" )
-        aw.sliderGrpBox4.setStyleSheet("QWidget {background-color: " + str(aw.qmc.palette["canvas"]) + ";"
-                                              + "color: " + str(aw.qmc.palette['title']) + ";" 
-                                              + "}" )
-        aw.sliderGrpBoxSV.setStyleSheet("QWidget {background-color: " + str(aw.qmc.palette["canvas"]) + ";"
-                                              + "color: " + str(aw.qmc.palette['title']) + ";" 
-                                              + "}" )
+        aw.updateSliderColors()
+                         
         colorPairsToCheck = self.getcolorPairsToCheck()
         self.checkColors(colorPairsToCheck)
+        
 
                     
     def process_active_quantifiers(self):
@@ -12366,12 +12554,18 @@ class ApplicationWindow(QMainWindow):
                                         # we set the last value to be used for relative +- button action as base
                                         aw.extraeventsactionslastvalue[i] = int(round(v))
                                         aw.qmc.quantifiedEvent.append([i,v])
-                                                                        
+                                        
     def updateSliderColors(self):
         self.sliderLCD1.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[0])
         self.sliderLCD2.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[1])
         self.sliderLCD3.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[2])
         self.sliderLCD4.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[3])
+        self.sliderLCDSV.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.palette['title'])
+        self.slider1.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[0]))
+        self.slider2.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[1]))
+        self.slider3.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[2]))
+        self.slider4.setStyleSheet(artisan_slider_style.format(color=self.qmc.EvalueColor[3]))
+        self.sliderSV.setStyleSheet(artisan_slider_style.format(color=self.qmc.palette['title']))
 
     def autoAdjustAxis(self,background=False):
         if aw.qmc.autotimex:
@@ -12603,6 +12797,7 @@ class ApplicationWindow(QMainWindow):
                 cd = QColorDialog(parent)
                 cd.setOption(QColorDialog.NoButtons,True)
 #                cd.setOption(QColorDialog.ShowAlphaChannel,True)
+#                cd.setOption(QColorDialog.NoButtons | QColorDialog.ShowAlphaChannel,True)
                 cd.setCurrentColor(c)
                 cd.exec_()
                 cr = cd.currentColor()
@@ -20082,7 +20277,7 @@ class ApplicationWindow(QMainWindow):
                         max_end_time = max(max_end_time,timex[drop])
                         # cut-out only CHARGE to DROP
                         self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground="w")],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
                         handles.append(self.l_temp)
                         labels.append(label)
@@ -20100,7 +20295,7 @@ class ApplicationWindow(QMainWindow):
                                 delta = numpy.concatenate(([None]*(ch),s,[None]*(len(tx)-drop)))
                                 trans = self.qmc.delta_ax.transData
                                 self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 linewidth=self.qmc.BTdeltalinewidth,linestyle=self.qmc.BTdeltalinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl)
                         first_profile = False
                     except Exception as e:
@@ -28746,9 +28941,11 @@ class EventsDlg(ArtisanDialog):
         self.showeventsonbtbox = QCheckBox(QApplication.translate("CheckBox","Show on BT",None))
         self.showeventsonbtbox.setChecked(bool(aw.qmc.showeventsonbt))
         self.showeventsonbtbox.stateChanged.connect(lambda _:self.showeventsonbtChanged())
-        self.eventsshowflagbox = QCheckBox(QApplication.translate("CheckBox","Events",None))
-        self.eventsshowflagbox.setChecked(bool(aw.qmc.eventsshowflag))
-        self.eventsshowflagbox.stateChanged.connect(lambda _:self.eventsshowflagChanged())
+        
+#        self.eventsshowflagbox = QCheckBox(QApplication.translate("CheckBox","Events",None))
+#        self.eventsshowflagbox.setChecked(bool(aw.qmc.eventsshowflag))
+#        self.eventsshowflagbox.stateChanged.connect(lambda _:self.eventsshowflagChanged())
+        
         self.eventsclampflag = QCheckBox(QApplication.translate("CheckBox","Snap",None))
         self.eventsclampflag.setChecked(bool(aw.qmc.clampEvents))
         self.eventsclampflag.stateChanged.connect(lambda _:self.eventsclampflagChanged())
@@ -28768,17 +28965,27 @@ class EventsDlg(ArtisanDialog):
         self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event",None))
         self.minieventsflag.setChecked(bool(aw.minieventsflag))
         self.minieventsflag.stateChanged.connect(lambda _:self.minieventsflagChanged())
-        barstylelabel = QLabel(QApplication.translate("Label","Bars",None))
+        barstylelabel = QLabel(QApplication.translate("Label","Events",None))
+#        barstyles = ["",
+#                    QApplication.translate("ComboBox","Type",None),
+#                    QApplication.translate("ComboBox","Value",None),
+#                    QApplication.translate("ComboBox","Split",None),
+#                    QApplication.translate("ComboBox","Merge",None)]
         barstyles = ["",
-                    QApplication.translate("ComboBox","Type",None),
-                    QApplication.translate("ComboBox","Value",None),
-                    QApplication.translate("ComboBox","Split",None),
-                    QApplication.translate("ComboBox","Merge",None)]
+                    QApplication.translate("ComboBox","Flag",None),
+                    QApplication.translate("ComboBox","Bar",None),
+                    QApplication.translate("ComboBox","Step",None),
+                    QApplication.translate("ComboBox","Step+",None),
+                    QApplication.translate("ComboBox","Combo",None)]
+                    
         self.bartypeComboBox =  QComboBox()
         self.bartypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.bartypeComboBox.setMaximumWidth(80)
         self.bartypeComboBox.addItems(barstyles)
-        self.bartypeComboBox.setCurrentIndex(aw.qmc.eventsGraphflag)
+        if not aw.qmc.eventsshowflag:
+            self.bartypeComboBox.setCurrentIndex(0)
+        else:
+            self.bartypeComboBox.setCurrentIndex(aw.qmc.eventsGraphflag+1)
         self.bartypeComboBox.currentIndexChanged.connect(self.eventsGraphTypeflagChanged)
         typelabel1 = QLabel("0")
         typelabel2 = QLabel("1")
@@ -29319,8 +29526,8 @@ class EventsDlg(ArtisanDialog):
         FlagsLayout.addSpacing(5)
         FlagsLayout.addWidget(self.annotationsflagbox)
         FlagsLayout.addStretch()
-        FlagsLayout.addWidget(self.eventsshowflagbox)
-        FlagsLayout.addSpacing(10)
+#        FlagsLayout.addWidget(self.eventsshowflagbox)
+#        FlagsLayout.addSpacing(10)
         FlagsLayout.addLayout(bartypeLayout)
         FlagsLayout.addSpacing(10)
         FlagsLayout.addWidget(self.eventsclampflag)
@@ -30450,11 +30657,16 @@ class EventsDlg(ArtisanDialog):
             aw.update_minieventline_visibility()
 
     def eventsGraphTypeflagChanged(self):
-        aw.qmc.eventsGraphflag = self.bartypeComboBox.currentIndex()
-        if self.bartypeComboBox.currentIndex() > 1:
+        aw.qmc.eventsGraphflag = self.bartypeComboBox.currentIndex() - 1
+        if aw.qmc.eventsGraphflag > 1:
             self.eventsclampflag.setEnabled(True)
         else:
             self.eventsclampflag.setEnabled(False)
+        if aw.qmc.eventsGraphflag == -1:
+            aw.qmc.eventsGraphflag = 0
+            aw.qmc.eventsshowflag = 0
+        else:
+            aw.qmc.eventsshowflag = 1
         aw.qmc.redraw(recomputeAllDeltas=False)
 
     def saveSliderSettings(self):
@@ -32365,21 +32577,30 @@ class s7port(object):
                 pass
         
     def connect(self):
+        # first load shared lib if needed
+        if platf == 'Windows' and aw.appFrozen():
+            libpath = os.path.dirname(sys.executable)
+            snap7dll = libpath + "\\snap7.dll"
+            load_snap7_library(snap7dll) # will ensure to load it only once
+        # next reset client instance if not yet connected to ensure a fresh start
         if self.plc and not self.plc.get_connected():
             self.plc = None
+        # connect if not yet connected
         if self.plc is None:
             try:
-                self.plc = snap7.client.Client()
-                libtime.sleep(0.3)
+                self.plc = S7Client()
                 with suppress_stdout_stderr():
+                    libtime.sleep(0.3)
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
                 if self.plc.get_connected():
                     aw.sendmessage(QApplication.translate("Message","S7 connected", None))
                     libtime.sleep(0.7)
                 else:
+                    libtime.sleep(0.5)
+                    self.plc = S7Client()
                     # we try a second time
-                    libtime.sleep(0.3)
                     with suppress_stdout_stderr():
+                        libtime.sleep(0.3)
                         self.plc.connect(self.host,self.rack,self.slot,self.port)
                     if self.plc.get_connected():
                         aw.sendmessage(QApplication.translate("Message","S7 connected", None))
@@ -32394,7 +32615,7 @@ class s7port(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.plc.get_connected():
+            if self.plc is not None and self.plc.get_connected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
                     set_real(ba, 0, float(value))
@@ -32413,7 +32634,7 @@ class s7port(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.plc.get_connected():
+            if self.plc is not None and self.plc.get_connected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                     set_int(ba, 0, int(value))
@@ -32433,7 +32654,7 @@ class s7port(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.plc.get_connected():
+            if self.plc is not None and self.plc.get_connected():
                 retry = self.readRetries   
                 res = None             
                 while True:
@@ -32475,7 +32696,7 @@ class s7port(object):
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
-            if self.plc.get_connected():
+            if self.plc is not None and self.plc.get_connected():
                 retry = self.readRetries   
                 res = None             
                 while True:
@@ -37589,7 +37810,7 @@ class PortComboBox(QComboBox):
 class comportDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(comportDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Serial Ports Configuration",None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Ports Configuration",None))
         self.setModal(True)
         ##########################    TAB 1 WIDGETS
         comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None))
@@ -41326,15 +41547,6 @@ class graphColorDlg(ArtisanDialog):
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
 
-    
-    
-    def setcolor(self,palette,disj_palette,select):
-        res = aw.colordialog(QColor(palette[select]))
-        if QColor.isValid(res):
-            nc = str(res.name())
-            if nc != disj_palette[select]:
-                palette[select] = nc
-
     def paintlcds(self,text,flag,lcdnumber):
         if lcdnumber ==1:
             if flag == 0:
@@ -41459,6 +41671,13 @@ class graphColorDlg(ArtisanDialog):
         self.mettextLabel.setText(aw.qmc.palette["mettext"])
         self.mettextLabel.setPalette(QPalette(QColor(aw.qmc.palette["mettext"])))
 
+    def setcolor(self,palette,disj_palette,select):
+        res = aw.colordialog(QColor(palette[select]))
+        if QColor.isValid(res):
+            nc = str(res.name())
+            if nc != disj_palette[select]:
+                palette[select] = nc
+                
     def setColor(self,title,var,color):
         labelcolor = QColor(aw.qmc.palette[color])
         colorf = aw.colordialog(labelcolor)
@@ -41466,8 +41685,8 @@ class graphColorDlg(ArtisanDialog):
             aw.qmc.palette[color] = str(colorf.name())
             aw.updateCanvasColors()
             var.setText(colorf.name())
-            var.setPalette(QPalette(colorf))
-            var.setAutoFillBackground(True)
+            var.setStyleSheet("QLabel { background-color: " + aw.qmc.palette[color] + " }");
+#            var.setPalette(QPalette(colorf))
             aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
             if title == "ET":
                 aw.setLabelColor(aw.label2,QColor(aw.qmc.palette[color]))
@@ -47798,6 +48017,7 @@ def main():
     global aw
     global app
     aw = None # this is to ensure that the variable aw is already defined during application initialization
+    
     
     # font fix for OS X 10.9
     try:

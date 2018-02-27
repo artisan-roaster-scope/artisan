@@ -258,6 +258,7 @@ Section Uninstall
   RMDir /r "$INSTDIR\lib2to3"
   RMDir /r "$INSTDIR\Machines"
   RMDir /r "$INSTDIR\Themes"
+  RMDir /r "$INSTDIR\Icons"
   RMDir /r "$INSTDIR\mpl-data"
   RMDir /r "$INSTDIR\pytz"
   RMDir /r "$INSTDIR\openpyxl"

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with matplotlib (http://matplotlib.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="72pt"
+   version="1.1"
+   viewBox="0 0 72 72"
+   width="72pt"
+   id="svg13"
+   inkscape:version="0.91+devel r14842"
+   sodipodi:docname="back_white.svg">
+  <metadata
+     id="metadata17">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1075"
+     inkscape:window-height="602"
+     id="namedview15"
+     showgrid="false"
+     inkscape:zoom="2.4583333"
+     inkscape:cx="19.205962"
+     inkscape:cy="48"
+     inkscape:window-x="38"
+     inkscape:window-y="74"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg13" />
+  <defs
+     id="defs4">
+    <style
+       type="text/css"
+       id="style2">
+*{stroke-linecap:butt;stroke-linejoin:round;}
+  </style>
+  </defs>
+  <g
+     id="g4236">
+    <g
+       id="patch_1"
+       style="stroke-linecap:butt;stroke-linejoin:round">
+      <path
+         d="M 0,72 H 72 V 0 H 0 Z"
+         style="opacity:0;fill:none;stroke-linecap:butt;stroke-linejoin:round"
+         id="path6"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="text_1"
+       style="stroke-linecap:butt;stroke-linejoin:round;fill:#ffffff">
+      <path
+         d="m 65.144375,35.006875 c 0,-2.581875 -1.710625,-4.855625 -4.44125,-4.855625 H 33.991875 L 45.105625,19.0375 c 0.91375,-0.91375 1.445,-2.1675 1.445,-3.453125 0,-1.29625 -0.53125,-2.55 -1.445,-3.453125 l -2.8475,-2.815625 C 41.344375,8.4125 40.133125,7.88125 38.8475,7.88125 c -1.29625,0 -2.55,0.53125 -3.453125,1.434375 L 10.69125,33.986875 C 9.82,34.900625 9.28875,36.14375 9.28875,37.44 c 0,1.285625 0.53125,2.539375 1.4025,3.410625 L 35.394375,65.59625 c 0.903125,0.87125 2.156875,1.4025 3.453125,1.4025 1.285625,0 2.539375,-0.53125 3.410625,-1.4025 l 2.8475,-2.89 c 0.91375,-0.87125 1.445,-2.125 1.445,-3.410625 0,-1.285625 -0.53125,-2.539375 -1.445,-3.410625 L 33.991875,44.72875 h 26.71125 c 2.730625,0 4.44125,-2.284375 4.44125,-4.86625 z"
+         id="path9"
+         inkscape:connector-curvature="0"
+         style="stroke-linecap:butt;stroke-linejoin:round;fill:#ffffff" />
+    </g>
+  </g>
+</svg>

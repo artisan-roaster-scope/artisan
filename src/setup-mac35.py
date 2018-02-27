@@ -116,6 +116,7 @@ DATA_FILES = [
     ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
     ("../Resources", [r"includes/Machines"]),
     ("../Resources", [r"includes/Themes"]),
+    ("../Resources", [r"includes/Icons"]),
   ]
   
 plist = Plist.fromFile('Info.plist')

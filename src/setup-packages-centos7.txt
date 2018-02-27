@@ -27,6 +27,8 @@ o yoctopuce: 1.10.28707
 o pefile: 2017.9.3
 o PyInstaller: 3.3.1
 o openpyxl: 2.4.9
+o python-snap7 0.9
+o colorspacious 1.1.0
 
 # sudo bash
 # cd
@@ -41,6 +43,9 @@ o openpyxl: 2.4.9
 
 Upgrade History:
 
+- 2018-02-25
+ . python snap7 0.9
+ . colorspacious 1.1.0
 - 2017-12-17:
  . altgraph 0.15
  . macholib 1.9
@@ -220,3 +225,23 @@ download Python driver for the actual v22 API
 20) openpyxl
 
 # sudo -H /usr/local/bin/python3.5 -m pip install openpyxl==2.4.9
+
+21) snap7 + python-snap7
+
+# wget https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
+
+# cd snap7-full-1.4.2/build/unix
+# make -f x86_64_linux.mk all
+# sudo make -f x86_64_linux.mk install
+  => installs in /usr/lib
+
+# cd python-snap7-0.9
+# python3.5 setup.py build
+# sudo bash
+# python3.5 setup.py install
+
+
+22) colorspacious
+
+# sudo bash
+# python3.5 -m pip install colorspacious
