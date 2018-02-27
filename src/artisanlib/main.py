@@ -12469,7 +12469,6 @@ class ApplicationWindow(QMainWindow):
 
                     
     def process_active_quantifiers(self):
-        print("process_active_quantifiers")
         # called every sampling interval
         for i in range(4):
             if aw.eventquantifieractive[i]:
@@ -41565,59 +41564,44 @@ class graphColorDlg(ArtisanDialog):
             aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.updateExtraLCDvisibility()
 
+    def setColorLabels(self):
+        for l,t in [
+                (self.canvasLabel,"canvas"),
+                (self.backgroundLabel,"background"),
+                (self.titleLabel,"title"),
+                (self.gridLabel,"grid"),
+                (self.metLabel,"et"),
+                (self.btLabel,"bt"),
+                (self.deltametLabel,"deltaet"),
+                (self.deltabtLabel,"deltabt"),
+                (self.yLabel,"ylabel"),
+                (self.ClineLabel,"Cline"),
+                (self.watermarksLabel,"watermarks"),
+                (self.rect1Label,"rect1"),
+                (self.rect2Label,"rect2"),
+                (self.rect3Label,"rect3"),
+                (self.rect4Label,"rect4"),
+                (self.markersLabel,"markers"),
+                (self.textLabel,"text"),
+                (self.legendbgLabel,"legendbg"),
+                (self.legendborderLabel,"legendborder"),
+                (self.specialeventboxLabel,"specialeventbox"),
+                (self.specialeventtextLabel,"specialeventtext"),
+                (self.mettextLabel,"mettext"),
+                ]:
+            self.setColorLabel(l,t)
+        if str(aw.qmc.palette["canvas"]) == 'None':
+            self.canvasLabel.setStyleSheet("QLabel { background-color: #f0f0f0 }")
+            
+    def setColorLabel(self,label,tag):
+        c = aw.qmc.palette[tag]
+        label.setText(c)
+        label.setStyleSheet("QLabel { background-color: " + c + " }");
+
     # adds a new event to the Dlg
     def recolor(self, x):
         aw.qmc.changeGColor(x)
-        self.gridLabel.setText(aw.qmc.palette["grid"])
-        self.gridLabel.setPalette(QPalette(QColor(aw.qmc.palette["grid"])))
-        self.backgroundLabel.setText(aw.qmc.palette["background"])
-        self.backgroundLabel.setPalette(QPalette(QColor(aw.qmc.palette["background"])))
-        self.titleLabel.setText(aw.qmc.palette["title"])
-        self.titleLabel.setPalette(QPalette(QColor(aw.qmc.palette["title"])))
-        self.yLabel.setText(aw.qmc.palette["ylabel"])
-        self.yLabel.setPalette(QPalette(QColor(aw.qmc.palette["ylabel"])))
-        self.xLabel.setText(aw.qmc.palette["xlabel"])
-        self.xLabel.setPalette(QPalette(QColor(aw.qmc.palette["xlabel"])))
-        self.rect1Label.setText(aw.qmc.palette["rect1"])
-        self.rect1Label.setPalette(QPalette(QColor(aw.qmc.palette["rect1"])))
-        self.rect2Label.setText(aw.qmc.palette["rect2"])
-        self.rect2Label.setPalette(QPalette(QColor(aw.qmc.palette["rect2"])))
-        self.rect3Label.setText(aw.qmc.palette["rect3"])
-        self.rect3Label.setPalette(QPalette(QColor(aw.qmc.palette["rect3"])))
-        self.rect4Label.setText(aw.qmc.palette["rect4"])
-        self.rect4Label.setPalette(QPalette(QColor(aw.qmc.palette["rect4"])))
-        self.metLabel.setText(aw.qmc.palette["et"])
-        self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["et"])))
-        self.btLabel.setText(aw.qmc.palette["bt"])
-        self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
-        self.deltametLabel.setText(aw.qmc.palette["deltaet"])
-        self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
-        self.deltabtLabel.setText(aw.qmc.palette["deltabt"])
-        self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
-        self.markersLabel.setText(aw.qmc.palette["markers"])
-        self.markersLabel.setPalette(QPalette(QColor(aw.qmc.palette["markers"])))
-        self.textLabel.setText(aw.qmc.palette["text"])
-        self.textLabel.setPalette(QPalette(QColor(aw.qmc.palette["text"])))
-        self.watermarksLabel.setText(aw.qmc.palette["watermarks"])
-        self.watermarksLabel.setPalette(QPalette(QColor(aw.qmc.palette["watermarks"])))
-        self.ClineLabel.setText(aw.qmc.palette["Cline"])
-        self.ClineLabel.setPalette(QPalette(QColor(aw.qmc.palette["Cline"])))
-        self.legendbgLabel.setText(aw.qmc.palette["legendbg"])
-        self.legendbgLabel.setPalette(QPalette(QColor(aw.qmc.palette["legendbg"])))
-        self.legendborderLabel.setText(aw.qmc.palette["legendborder"])
-        self.legendborderLabel.setPalette(QPalette(QColor(aw.qmc.palette["legendborder"])))
-        self.canvasLabel.setText(aw.qmc.palette["canvas"])
-        self.canvasLabel.setPalette(QPalette(QColor(aw.qmc.palette["canvas"])))
-        if str(aw.qmc.palette["canvas"]) == 'None':
-            self.canvasLabel.setPalette(QPalette(QColor("#f0f0f0")))
-        else:
-            self.canvasLabel.setPalette(QPalette(QColor(aw.qmc.palette["canvas"])))
-        self.specialeventboxLabel.setText(aw.qmc.palette["specialeventbox"])
-        self.specialeventboxLabel.setPalette(QPalette(QColor(aw.qmc.palette["specialeventbox"])))
-        self.specialeventtextLabel.setText(aw.qmc.palette["specialeventtext"])
-        self.specialeventtextLabel.setPalette(QPalette(QColor(aw.qmc.palette["specialeventtext"])))
-        self.mettextLabel.setText(aw.qmc.palette["mettext"])
-        self.mettextLabel.setPalette(QPalette(QColor(aw.qmc.palette["mettext"])))
+        self.setColorLabels()
 
     def setcolor(self,palette,disj_palette,select):
         res = aw.colordialog(QColor(palette[select]))
