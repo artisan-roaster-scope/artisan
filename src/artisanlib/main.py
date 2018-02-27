@@ -11918,11 +11918,6 @@ class ApplicationWindow(QMainWindow):
         self.slider2.sliderMoved.connect(lambda v=0:self.updateSliderLCD(1,v))
         self.slider2.valueChanged.connect(lambda _:self.sliderReleased(1,updateLCD=True))
         self.slider2.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
-        
-        
-#        sliderGrp1.setSpacing(10)
-#        self.sliderGrpBox2.setStyleSheet("QGroupBox { background-color: red; border: 18px solid gray; border-radius: 10px;}")
-        sliderGrp2.setContentsMargins(0,7,0,0)
 
         self.slider3 = self.slider()
         self.sliderLCD3 = self.sliderLCD()
@@ -12439,7 +12434,18 @@ class ApplicationWindow(QMainWindow):
         if (whitep) or str(aw.qmc.palette["canvas"]) != 'None':
             aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                         + "color: " + str(aw.qmc.palette["title"]) + ";"
-                                        + "}" )
+                                        + "border: 0px solid gray;"
+                                        + "border-width: 0px;"
+                                        + "padding-top: 12px;"
+                                        + "padding-bottom: 5px;"
+                                        + "padding-left: 0px;"
+                                        + "padding-right: 0px;"
+                                        + "}"
+                                        + "QGroupBox::title {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                        + "subcontrol-origin: margin;" # or border or margin
+                                        + "subcontrol-position: top center;" #/* position at the top center */
+                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
+                                        + "}" )                        
             # ensure x/y coordinates are readable
             aw.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                         + "color: " + str(aw.qmc.palette["title"]) + ";"
@@ -12460,7 +12466,6 @@ class ApplicationWindow(QMainWindow):
                          
         colorPairsToCheck = self.getcolorPairsToCheck()
         self.checkColors(colorPairsToCheck)
-        
 
                     
     def process_active_quantifiers(self):
@@ -18323,7 +18328,7 @@ class ApplicationWindow(QMainWindow):
             #update visibility of main event button
             self.applyStandardButtonVisibility()
             aw.setFonts()
-            if "canvas" in aw.qmc.palette:
+            if "canvas" in aw.qmc.palette and filename is not None:
                 aw.updateCanvasColors()
             
             # set window appearances (style)
@@ -18347,6 +18352,7 @@ class ApplicationWindow(QMainWindow):
                 self.restoreGeometry(settings.value("Geometry"))
             if filename: # only if an external settings file is loaded
                 FigureCanvas.updateGeometry(aw.stack)
+                            
         except Exception:
             res = False
 #            import traceback
@@ -47997,7 +48003,7 @@ def main():
     except:
         pass
 
-    aw.settingsLoad()
+    aw.settingsLoad()    
     
     # swap BT/ET lcds on startup
     if aw.qmc.swaplcds:
@@ -48036,6 +48042,7 @@ def main():
             pass
 
     aw.show()
+    aw.updateCanvasColors()
         
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
