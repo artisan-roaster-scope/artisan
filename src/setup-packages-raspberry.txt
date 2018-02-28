@@ -141,6 +141,7 @@ snap7 + python-snap7
 # cd snap7-full-1.4.2/build/linux
 # make -f arm_v7_linux.mk all
 # sudo make -f arm_v7_linux.mk install
+# sudo ldconfig
 
 # cd python-snap7-0.9
 # python setup.py build

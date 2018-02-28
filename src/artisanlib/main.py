@@ -618,7 +618,8 @@ class S7Client(snap7.client.Client):
             
     # avoiding an exception on __del__ as self.library might not yet be set if loading of shared lib failed!
     def destroy(self):
-        return super(S7Client, self).destroy()
+        if hasattr(self, 'library'):
+            return super(S7Client, self).destroy()
     
 #######################################################################################
 #################### Main Application  ################################################
@@ -4045,6 +4046,9 @@ class tgraphcanvas(FigureCanvas):
     def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1,toIndex=0):  # default 'hanning'
         #pylint: disable=E1103        
         win_len = max(0,window_len)
+        # filter spikes
+        if aw.qmc.filterDropOuts and len(a) == len(b) and len(a) > 1:
+            b = self.medfilt(numpy.array(b),7).tolist()  # k=3 seems not to catch all spikes in all cases
         if win_len != 1: # at the lowest level we turn smoothing completely off
             if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
                 if toIndex==0: # no limit
@@ -4056,11 +4060,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
         else:
-            # filter spikes
-            if aw.qmc.filterDropOuts and len(a) == len(b) and len(a) > 1:
-                return self.medfilt(numpy.array(b),5).tolist() # k=3 seems not to catch all spikes in all cases
-            else:
-                return b
+            return b
                 
     # ignore -1 readings in averaging and ensure a good ramp up
     def decay_smooth_list(self, l, window_len=7, decay_weights=None):
@@ -4328,8 +4328,8 @@ class tgraphcanvas(FigureCanvas):
             # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
             if aw.qmc.RoRlimitFlag:
                 # remove values beyond the RoRlimit
-                delta1 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
-                delta2 = [d if d and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
+                delta1 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
+                delta2 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
             if isinstance(delta1, (numpy.ndarray, numpy.generic)):
                 delta1 = delta1.tolist()
             if isinstance(delta2, (numpy.ndarray, numpy.generic)):
@@ -21579,7 +21579,8 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
-        contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell, Rui Paulo<br>")
+        contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell, Rui Paulo")
+        contributors += u(", Morris Beume, Michael Herbert<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -23629,7 +23630,7 @@ class HUDDlg(ArtisanDialog):
         
         deltaSpanLabel = QLabel(QApplication.translate("Label", "Delta Span",None))
         self.deltaSpan = QComboBox()
-        self.spanitems = range(1,16)
+        self.spanitems = range(1,31)
         self.deltaSpan.addItems([str(i) + "s" for i in self.spanitems])
         try:
             self.deltaSpan.setCurrentIndex(self.spanitems.index(aw.qmc.deltaspan))
@@ -32525,9 +32526,12 @@ class s7port(object):
         
     def connect(self):
         # first load shared lib if needed
-        if platf == 'Windows' and aw.appFrozen():
+        if platf in ['Windows','Linux'] and aw.appFrozen():
             libpath = os.path.dirname(sys.executable)
-            snap7dll = libpath + "\\snap7.dll"
+            if platf == 'Linux':
+                snap7dll = os.path.join(libpath,"libsnap7.so")
+            else: # Windows:
+                snap7dll = os.path.join(libpath,"snap7.dll")                
             load_snap7_library(snap7dll) # will ensure to load it only once
         # next reset client instance if not yet connected to ensure a fresh start
         if self.plc and not self.plc.get_connected():
