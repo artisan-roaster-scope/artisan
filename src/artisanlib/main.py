@@ -12413,6 +12413,7 @@ class ApplicationWindow(QMainWindow):
         return nc
         
     def updateCanvasColors(self):
+        print("updateCanvasColors")
         aw.qmc.fig.patch.set_facecolor(str(aw.qmc.palette["canvas"]))
         aw.setStyleSheet("QMainWindow{background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                    + "border: 0px solid black;"
@@ -12431,30 +12432,29 @@ class ApplicationWindow(QMainWindow):
         whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
         aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
         aw.ntb.setMinimumHeight(50)
-        if (whitep) or str(aw.qmc.palette["canvas"]) != 'None':
-            aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
-                                        + "border: 0px solid gray;"
-                                        + "border-width: 0px;"
-                                        + "padding-top: 12px;"
-                                        + "padding-bottom: 5px;"
-                                        + "padding-left: 0px;"
-                                        + "padding-right: 0px;"
-                                        + "}"
-                                        + "QGroupBox::title {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                        + "subcontrol-origin: margin;" # or border or margin
-                                        + "subcontrol-position: top center;" #/* position at the top center */
-                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
-                                        + "}" )                        
-            # ensure x/y coordinates are readable
-            aw.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
-                                        + "}" )
-            # make QToolBar background transparent
-            aw.ntb.setStyleSheet("QToolBar {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
-                                        + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
-                                        + "color: " + str(aw.qmc.palette["title"]) + ";"
-                                        + "}" )
+        aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+                                    + "border: 0px solid gray;"
+                                    + "border-width: 0px;"
+                                    + "padding-top: 12px;"
+                                    + "padding-bottom: 5px;"
+                                    + "padding-left: 0px;"
+                                    + "padding-right: 0px;"
+                                    + "}"
+                                    + "QGroupBox::title {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                    + "subcontrol-origin: margin;" # or border or margin
+                                    + "subcontrol-position: top center;" #/* position at the top center */
+                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+                                    + "}" ) 
+        # ensure x/y coordinates are readable
+        aw.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+                                    + "}" )
+        # make QToolBar background transparent
+        aw.ntb.setStyleSheet("QToolBar {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+                                    + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
+                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+                                    + "}" )
             
         aw.level1layout.insertWidget(0,aw.ntb)
         
@@ -20224,7 +20224,7 @@ class ApplicationWindow(QMainWindow):
                         max_end_time = max(max_end_time,timex[drop])
                         # cut-out only CHARGE to DROP
                         self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
                                 linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
                         handles.append(self.l_temp)
                         labels.append(label)
@@ -20242,7 +20242,7 @@ class ApplicationWindow(QMainWindow):
                                 delta = numpy.concatenate(([None]*(ch),s,[None]*(len(tx)-drop)))
                                 trans = self.qmc.delta_ax.transData
                                 self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
                                 linewidth=self.qmc.BTdeltalinewidth,linestyle=self.qmc.BTdeltalinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl)
                         first_profile = False
                     except Exception as e:
