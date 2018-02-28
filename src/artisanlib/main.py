@@ -1661,6 +1661,12 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit_min_C_default = -5
         self.zgrid_C_default = 5
         
+        # maximum accepted min/max settings for y and z axis
+        self.zlimit_max = 500
+        self.zlimit_min_max = -500
+        self.ylimit_max = 9999
+        self.ylimit_min_max = -9999
+        
         #----
         # set limits to F defaults
         
@@ -16498,13 +16504,13 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.temp2 = profile["temp2"]
             if self.qmc.mode != old_mode:
                 if "zmax" in profile:
-                    self.qmc.zlimit = min(int(profile["zmax"]),500)
+                    self.qmc.zlimit = min(int(profile["zmax"]),self.qmc.zlimit_max)
                 if "zmin" in profile:
-                    self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),-200)
+                    self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),self.qmc.zlimit_min_max)
                 if "ymax" in profile:
-                    self.qmc.ylimit = min(int(profile["ymax"]),850)
+                    self.qmc.ylimit = min(int(profile["ymax"]),self.qmc.ylimit_max)
                 if "ymin" in profile:
-                    self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),-150)
+                    self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),self.qmc.ylimit_min_max)
             # otherwise don't let the users y/z min/max axis limits be overwritten by loading a profile
             if "xmin" in profile:
                 self.qmc.startofx = float(profile["xmin"])
@@ -17931,10 +17937,10 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.endofx = 60
             except:
                 pass
-            self.qmc.ylimit = min(toInt(settings.value("ymax",self.qmc.ylimit)),850)
-            self.qmc.ylimit_min = max(min(toInt(settings.value("ymin",self.qmc.ylimit_min)),self.qmc.ylimit),-150)
-            self.qmc.zlimit = min(toInt(settings.value("zmax",self.qmc.zlimit)),500)
-            self.qmc.zlimit_min = max(min(toInt(settings.value("zmin",self.qmc.zlimit_min)),self.qmc.zlimit),-200)
+            self.qmc.ylimit = min(toInt(settings.value("ymax",self.qmc.ylimit)),self.qmc.ylimit_max)
+            self.qmc.ylimit_min = max(min(toInt(settings.value("ymin",self.qmc.ylimit_min)),self.qmc.ylimit),self.qmc.ylimit_min_max)
+            self.qmc.zlimit = min(toInt(settings.value("zmax",self.qmc.zlimit)),self.qmc.zlimit_max)
+            self.qmc.zlimit_min = max(min(toInt(settings.value("zmin",self.qmc.zlimit_min)),self.qmc.zlimit),self.qmc.zlimit_min_max)
             if settings.contains("resetmaxtime"):
                 self.qmc.resetmaxtime = toInt(settings.value("resetmaxtime",self.qmc.resetmaxtime))
             if settings.contains("lockmax"):
@@ -28228,16 +28234,16 @@ class WindowsDlg(ArtisanDialog):
         self.ylimitEdit.setMaximumWidth(60)
         self.ylimitEdit_min = QLineEdit()
         self.ylimitEdit_min.setMaximumWidth(60)
-        self.ylimitEdit.setValidator(QIntValidator(0, 9999, self.ylimitEdit))
-        self.ylimitEdit_min.setValidator(QIntValidator(-150, 500, self.ylimitEdit_min))
+        self.ylimitEdit.setValidator(QIntValidator(aw.qmc.ylimit_min_max, aw.qmc.ylimit_max, self.ylimitEdit))
+        self.ylimitEdit_min.setValidator(QIntValidator(aw.qmc.ylimit_min_max, aw.qmc.ylimit_max, self.ylimitEdit_min))
         self.ylimitEdit.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.ylimitEdit_min.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.zlimitEdit = QLineEdit()
         self.zlimitEdit.setMaximumWidth(60)
         self.zlimitEdit_min = QLineEdit()
         self.zlimitEdit_min.setMaximumWidth(60)
-        self.zlimitEdit.setValidator(QIntValidator(0, 500, self.zlimitEdit))
-        self.zlimitEdit_min.setValidator(QIntValidator(-200, 250, self.zlimitEdit_min))
+        self.zlimitEdit.setValidator(QIntValidator(aw.qmc.zlimit_min_max, aw.qmc.zlimit_max, self.zlimitEdit))
+        self.zlimitEdit_min.setValidator(QIntValidator(aw.qmc.zlimit_min_max, aw.qmc.zlimit_max, self.zlimitEdit_min))
         self.zlimitEdit.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.zlimitEdit_min.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx))
