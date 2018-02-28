@@ -12413,7 +12413,6 @@ class ApplicationWindow(QMainWindow):
         return nc
         
     def updateCanvasColors(self):
-        print("updateCanvasColors")
         aw.qmc.fig.patch.set_facecolor(str(aw.qmc.palette["canvas"]))
         aw.setStyleSheet("QMainWindow{background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                    + "border: 0px solid black;"
