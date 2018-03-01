@@ -1420,8 +1420,8 @@ class tgraphcanvas(FigureCanvas):
         self.profile_sampling_interval = None # will be updated on loading a profile
         self.background_profile_sampling_interval = None # will be updated on loading a profile into the background
         
-        self.altsmoothing = False # toggle between standard and alternative smoothing approach
-        self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
+#        self.altsmoothing = False # toggle between standard and alternative smoothing approach
+#        self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
 
         self.patheffects = 2
         self.graphstyle = 0
@@ -4071,7 +4071,7 @@ class tgraphcanvas(FigureCanvas):
     # ignore -1 readings in averaging and ensure a good ramp up
     def decay_smooth_list(self, l, window_len=7, decay_weights=None):
         try:
-            if l is not None and ((isinstance(l,(numpy.ndarray,numpy.generic)) and l.size) or l) and aw.qmc.deltafilter and not aw.qmc.altsmoothing:
+            if l is not None and ((isinstance(l,(numpy.ndarray,numpy.generic)) and l.size) or l) and aw.qmc.deltafilter: # and not aw.qmc.altsmoothing:
                 if decay_weights is None:
                     decay_weights = numpy.arange(1,window_len+1)
                 else:
@@ -4324,7 +4324,7 @@ class tgraphcanvas(FigureCanvas):
                 delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
                 delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
             else:
-                user_filter = int(round(self.deltafilter/2))
+                user_filter = int(round(self.deltafilter))
                 delta1 = self.decay_smooth_list(z1,window_len=user_filter)
                 delta2 = self.decay_smooth_list(z2,window_len=user_filter)
                           
@@ -9932,14 +9932,14 @@ class SampleThread(QThread):
                             else:
                                 aw.qmc.rateofchange1 = 0.
                         else: # normal data received
-                            if aw.qmc.altsmoothing:
-                                # Use numpy to compute a linear approximation for deltas:
-                                aw.qmc.rateofchange1 = self.compute_delta(aw.qmc.timex, aw.qmc.temp1, aw.qmc.smoothingwindowsize)
-                            else:
-                                #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                                left_index = min(len(aw.qmc.ctimex1),max(2,(aw.qmc.deltasamples + 1)))
-                                timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
-                                aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
+#                            if aw.qmc.altsmoothing:
+#                                # Use numpy to compute a linear approximation for deltas:
+#                                aw.qmc.rateofchange1 = self.compute_delta(aw.qmc.timex, aw.qmc.temp1, aw.qmc.smoothingwindowsize)
+#                            else:
+                            #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                            left_index = min(len(aw.qmc.ctimex1),max(2,(aw.qmc.deltasamples + 1)))
+                            timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
+                            aw.qmc.rateofchange1 = ((aw.qmc.tstemp1[-1] - aw.qmc.tstemp1[-left_index])/timed)*60.  #delta ET (degress/minute)
                         # compute T2 RoR
                         if t2_final == -1:  # we repeat the last RoR if underlying temperature dropped
                             if aw.qmc.unfiltereddelta2:
@@ -9947,22 +9947,22 @@ class SampleThread(QThread):
                             else:
                                 aw.qmc.rateofchange2 = 0.
                         else: # normal data received
-                            if aw.qmc.altsmoothing:
-                                # Use numpy to compute a linear approximation for deltas:
-                                aw.qmc.rateofchange2 = self.compute_delta(aw.qmc.timex, aw.qmc.temp2, aw.qmc.smoothingwindowsize)
-                            else:
-                                #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                                left_index = min(len(aw.qmc.ctimex2),max(2,(aw.qmc.deltasamples + 1)))
-                                timed = aw.qmc.ctimex2[-1] - aw.qmc.ctimex2[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
-                                aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
+#                            if aw.qmc.altsmoothing:
+#                                # Use numpy to compute a linear approximation for deltas:
+#                                aw.qmc.rateofchange2 = self.compute_delta(aw.qmc.timex, aw.qmc.temp2, aw.qmc.smoothingwindowsize)
+#                            else:
+                            #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                            left_index = min(len(aw.qmc.ctimex2),max(2,(aw.qmc.deltasamples + 1)))
+                            timed = aw.qmc.ctimex2[-1] - aw.qmc.ctimex2[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
+                            aw.qmc.rateofchange2 = ((aw.qmc.tstemp2[-1] - aw.qmc.tstemp2[-left_index])/timed)*60.  #delta BT (degress/minute)
 
                         aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                         aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
                         
                         #######   filter deltaBT deltaET
                         # decay smoothing
-                        if aw.qmc.deltafilter and not aw.qmc.altsmoothing:
-                            user_filter = int(round(aw.qmc.deltafilter/2))
+                        if aw.qmc.deltafilter: # and not aw.qmc.altsmoothing:
+                            user_filter = int(round(aw.qmc.deltafilter))
                             if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
                                     self.decay_weights = numpy.arange(1,user_filter+1)
@@ -10543,11 +10543,13 @@ class ApplicationWindow(QMainWindow):
         #######################    MENUS SECTION ##################################################
         ###############  create Top MENUS
 
+        
         self.fileMenu = self.menuBar().addMenu(UIconst.FILE_MENU)
         self.editMenu = self.menuBar().addMenu(UIconst.EDIT_MENU)
         self.GraphMenu = self.menuBar().addMenu(UIconst.ROAST_MENU)
         self.ConfMenu = self.menuBar().addMenu(UIconst.CONF_MENU)
         self.ToolkitMenu = self.menuBar().addMenu(UIconst.TOOLKIT_MENU)
+        self.viewMenu = self.menuBar().addMenu(UIconst.VIEW_MENU)
         self.helpMenu = self.menuBar().addMenu(UIconst.HELP_MENU)
 
         #FILE menu
@@ -10800,33 +10802,6 @@ class ApplicationWindow(QMainWindow):
 
         self.GraphMenu.addSeparator()
 
-        self.temperatureMenu = self.GraphMenu.addMenu(UIconst.ROAST_MENU_TEMPERATURE)
-
-        self.ConvertToFahrenheitAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_FAHRENHEIT,self)
-        self.ConvertToFahrenheitAction.triggered.connect(lambda _:self.qmc.convertTemperature("F"))
-        self.temperatureMenu.addAction(self.ConvertToFahrenheitAction)
-
-        self.ConvertToCelsiusAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_CELSIUS,self)
-        self.ConvertToCelsiusAction.triggered.connect(lambda _:self.qmc.convertTemperature("C"))
-        self.temperatureMenu.addAction(self.ConvertToCelsiusAction)
-
-        self.FahrenheitAction = QAction(UIconst.ROAST_MENU_FAHRENHEIT_MODE,self)
-        self.FahrenheitAction.triggered.connect(self.qmc.fahrenheitModeRedraw)
-        self.temperatureMenu.addAction(self.FahrenheitAction)
-
-        self.CelsiusAction = QAction(UIconst.ROAST_MENU_CELSIUS_MODE,self)
-        self.CelsiusAction.triggered.connect(self.qmc.celsiusModeRedraw)
-        self.temperatureMenu.addAction(self.CelsiusAction)
-
-        if self.qmc.mode == "F":
-            self.FahrenheitAction.setDisabled(True)
-            self.ConvertToFahrenheitAction.setDisabled(True)
-        else:
-            self.CelsiusAction.setDisabled(True)
-            self.ConvertToCelsiusAction.setDisabled(True)
-
-        self.GraphMenu.addSeparator()
-
         self.switchAction = QAction(UIconst.ROAST_MENU_SWITCH,self)
         self.switchAction.setShortcut(QKeySequence.Close)
         self.switchAction.triggered.connect(self.switch)
@@ -10848,6 +10823,8 @@ class ApplicationWindow(QMainWindow):
         self.commportAction = QAction(UIconst.CONF_MENU_SERIALPORT,self)
         self.commportAction.triggered.connect(self.setcommport)
         self.ConfMenu.addAction(self.commportAction)
+        
+        self.ConfMenu.addSeparator()
 
         self.calibrateDelayAction = QAction(UIconst.CONF_MENU_SAMPLING,self)
         self.calibrateDelayAction.triggered.connect(self.calibratedelay)
@@ -10859,32 +10836,6 @@ class ApplicationWindow(QMainWindow):
         self.oversamplingAction.setChecked(self.qmc.oversampling)
         self.ConfMenu.addAction(self.oversamplingAction)
         
-        self.ConfMenu.addSeparator()
-        
-        self.controlsAction = QAction(UIconst.CONF_MENU_CONTROLS,self)
-        self.controlsAction.triggered.connect(self.toggleControls)
-        self.controlsAction.setCheckable(True)
-        self.controlsAction.setChecked(True)
-        self.ConfMenu.addAction(self.controlsAction)
-        
-        self.readingsAction = QAction(UIconst.CONF_MENU_READINGS,self)
-        self.readingsAction.triggered.connect(self.toggleReadings)
-        self.readingsAction.setCheckable(True)
-        self.readingsAction.setChecked(False)
-        self.ConfMenu.addAction(self.readingsAction)
-        
-        self.buttonsAction = QAction(UIconst.CONF_MENU_BUTTONS,self)
-        self.buttonsAction.triggered.connect(self.toggleExtraButtons)
-        self.buttonsAction.setCheckable(True)
-        self.buttonsAction.setChecked(False)
-        self.ConfMenu.addAction(self.buttonsAction)
-
-        self.slidersAction = QAction(UIconst.CONF_MENU_SLIDERS,self)
-        self.slidersAction.triggered.connect(self.toggleSliders)
-        self.slidersAction.setCheckable(True)
-        self.slidersAction.setChecked(False)
-        self.ConfMenu.addAction(self.slidersAction)
-
         self.ConfMenu.addSeparator()
 
         self.eventsAction = QAction(UIconst.CONF_MENU_EVENTS,self)
@@ -10931,6 +10882,31 @@ class ApplicationWindow(QMainWindow):
 
         self.ConfMenu.addSeparator()
 
+        self.temperatureMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_TEMPERATURE)
+        
+        self.ConvertToFahrenheitAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_FAHRENHEIT,self)
+        self.ConvertToFahrenheitAction.triggered.connect(lambda _:self.qmc.convertTemperature("F"))
+        self.temperatureMenu.addAction(self.ConvertToFahrenheitAction)
+
+        self.ConvertToCelsiusAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_CELSIUS,self)
+        self.ConvertToCelsiusAction.triggered.connect(lambda _:self.qmc.convertTemperature("C"))
+        self.temperatureMenu.addAction(self.ConvertToCelsiusAction)
+
+        self.FahrenheitAction = QAction(UIconst.ROAST_MENU_FAHRENHEIT_MODE,self)
+        self.FahrenheitAction.triggered.connect(self.qmc.fahrenheitModeRedraw)
+        self.temperatureMenu.addAction(self.FahrenheitAction)
+
+        self.CelsiusAction = QAction(UIconst.ROAST_MENU_CELSIUS_MODE,self)
+        self.CelsiusAction.triggered.connect(self.qmc.celsiusModeRedraw)
+        self.temperatureMenu.addAction(self.CelsiusAction)
+
+        if self.qmc.mode == "F":
+            self.FahrenheitAction.setDisabled(True)
+            self.ConvertToFahrenheitAction.setDisabled(True)
+        else:
+            self.CelsiusAction.setDisabled(True)
+            self.ConvertToCelsiusAction.setDisabled(True)
+            
         self.languageMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_LANGUAGE)
 
         self.ArabicLanguage = QAction(UIconst.CONF_MENU_ARABIC,self)
@@ -11115,24 +11091,53 @@ class ApplicationWindow(QMainWindow):
         self.wheeleditorAction.setChecked(self.qmc.wheelflag)
         self.ToolkitMenu.addAction(self.wheeleditorAction)
 
-        self.lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
-        self.lcdsAction.triggered.connect(self.largeLCDs)
-        self.ToolkitMenu.addAction(self.lcdsAction)
-        self.lcdsAction.setShortcut("Ctrl+L")
-
-        self.fullscreenAction = QAction(UIconst.TOOLKIT_MENU_FULLSCREEN,self)
-        self.fullscreenAction.triggered.connect(self.toggleFullscreen)
-        self.fullscreenAction.setCheckable(True)
-        self.fullscreenAction.setChecked(False)
-        self.ToolkitMenu.addAction(self.fullscreenAction)
-        self.fullscreenAction.setShortcut("Ctrl+F")
-
         self.ToolkitMenu.addSeparator()
 
         self.hudAction = QAction(UIconst.TOOLKIT_MENU_EXTRAS,self)
         self.hudAction.triggered.connect(self.hudset)
         self.ToolkitMenu.addAction(self.hudAction)
         
+        # VIEW menu
+        
+        self.controlsAction = QAction(UIconst.CONF_MENU_CONTROLS,self)
+        self.controlsAction.triggered.connect(self.toggleControls)
+        self.controlsAction.setCheckable(True)
+        self.controlsAction.setChecked(True)
+        self.viewMenu.addAction(self.controlsAction)
+        
+        self.readingsAction = QAction(UIconst.CONF_MENU_READINGS,self)
+        self.readingsAction.triggered.connect(self.toggleReadings)
+        self.readingsAction.setCheckable(True)
+        self.readingsAction.setChecked(False)
+        self.viewMenu.addAction(self.readingsAction)
+        
+        self.buttonsAction = QAction(UIconst.CONF_MENU_BUTTONS,self)
+        self.buttonsAction.triggered.connect(self.toggleExtraButtons)
+        self.buttonsAction.setCheckable(True)
+        self.buttonsAction.setChecked(False)
+        self.viewMenu.addAction(self.buttonsAction)
+
+        self.slidersAction = QAction(UIconst.CONF_MENU_SLIDERS,self)
+        self.slidersAction.triggered.connect(self.toggleSliders)
+        self.slidersAction.setCheckable(True)
+        self.slidersAction.setChecked(False)
+        self.viewMenu.addAction(self.slidersAction)
+
+        self.viewMenu.addSeparator()
+
+        self.lcdsAction = QAction(UIconst.TOOLKIT_MENU_LCDS,self)
+        self.lcdsAction.triggered.connect(self.largeLCDs)
+        self.lcdsAction.setShortcut("Ctrl+L")
+        self.viewMenu.addAction(self.lcdsAction)
+
+        if platf != 'Darwin': # MacOS X automatically adds the fullscreen action
+            self.fullscreenAction = QAction(UIconst.VIEW_MENU_FULLSCREEN,self)
+            self.fullscreenAction.triggered.connect(self.toggleFullscreen)
+            self.fullscreenAction.setCheckable(True)
+            self.fullscreenAction.setChecked(False)
+            self.fullscreenAction.setShortcut("Ctrl+F")
+            self.fullscreenAction.setMenuRole(QAction.NoRole)
+            self.viewMenu.addAction(self.fullscreenAction)        
 
         # HELP menu
         helpAboutAction = QAction(UIconst.HELP_MENU_ABOUT,self)
@@ -12542,9 +12547,11 @@ class ApplicationWindow(QMainWindow):
         if self.full_screen_mode_active or self.isFullScreen():
             self.full_screen_mode_active = False
             self.showNormal()
+            aw.fullscreenAction.setChecked(False)
         else:
             self.full_screen_mode_active = True
             self.showFullScreen()
+            aw.fullscreenAction.setChecked(True)
 
     # returns time axis min and max
     # min to be 1min before CHARGE or first recording if no CHARGE
@@ -14424,14 +14431,15 @@ class ApplicationWindow(QMainWindow):
                 numberkeys = [48,49,50,51,52,53,54,55,56,57] # keycodes for number keys 0,1,...,9
                 
                 if key == 70: # F SELECTS FULL SCREEN MODE
-                    if self.full_screen_mode_active or self.isFullScreen():
-                        self.full_screen_mode_active = False
-                        self.showNormal()
-                        aw.fullscreenAction.setChecked(False)
-                    else:
-                        self.full_screen_mode_active = True
-                        self.showFullScreen()
-                        aw.fullscreenAction.setChecked(True)
+                    aw.toggleFullscreen()
+#                    if self.full_screen_mode_active or self.isFullScreen():
+#                        self.full_screen_mode_active = False
+#                        self.showNormal()
+#                        aw.fullscreenAction.setChecked(False)
+#                    else:
+#                        self.full_screen_mode_active = True
+#                        self.showFullScreen()
+#                        aw.fullscreenAction.setChecked(True)
                 elif aw.buttonpalette_shortcuts and control_modifier and key in numberkeys: # palette switch via SHIFT-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(key))
                 elif key == 72:                       #H
@@ -17843,8 +17851,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.filterDropOuts = bool(toBool(settings.value("filterDropOuts",self.qmc.filterDropOuts)))
             if settings.contains("dropSpikes"):
                 self.qmc.dropSpikes = bool(toBool(settings.value("dropSpikes",self.qmc.dropSpikes)))
-            if settings.contains("altSmoothing"):
-                self.qmc.altsmoothing = bool(toBool(settings.value("altSmoothing",self.qmc.altsmoothing)))
+#            if settings.contains("altSmoothing"):
+#                self.qmc.altsmoothing = bool(toBool(settings.value("altSmoothing",self.qmc.altsmoothing)))
             if settings.contains("swapETBT"):
                 self.qmc.swapETBT = bool(toBool(settings.value("swapETBT",self.qmc.swapETBT)))
             if settings.contains("minmaxLimits"):
@@ -17869,8 +17877,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()    
             if settings.contains("curvefilter"):
                 self.qmc.curvefilter = toInt(settings.value("curvefilter",self.qmc.curvefilter))
-            if settings.contains("smoothingwindowsize"):
-                self.qmc.smoothingwindowsize = toInt(settings.value("smoothingwindowsize",self.qmc.smoothingwindowsize))
+#            if settings.contains("smoothingwindowsize"):
+#                self.qmc.smoothingwindowsize = toInt(settings.value("smoothingwindowsize",self.qmc.smoothingwindowsize))
             if settings.contains("ETcurve"):
                 self.qmc.ETcurve = bool(toBool(settings.value("ETcurve",self.qmc.ETcurve)))
             if settings.contains("BTcurve"):
@@ -18193,6 +18201,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("eventslidercoarse"):
                 self.eventslidercoarse = [toInt(x) for x in toList(settings.value("eventslidercoarse",self.eventslidercoarse))]                
             settings.endGroup()
+            aw.slidersAction.setEnabled(any(aw.eventslidervisibilities) or aw.pidcontrol.svSlider)
             #restore quantifier
             settings.beginGroup("Quantifiers")
             if settings.contains("quantifieractive"):
@@ -18921,7 +18930,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("filterDropOuts",self.qmc.filterDropOuts)
             settings.setValue("dropSpikes",self.qmc.dropSpikes)
-            settings.setValue("altSmoothing",self.qmc.altsmoothing)
+#            settings.setValue("altSmoothing",self.qmc.altsmoothing)
             settings.setValue("swapETBT",self.qmc.swapETBT)
             settings.setValue("minmaxLimits",self.qmc.minmaxLimits)
             settings.setValue("minLimit",self.qmc.filterDropOut_tmin)
@@ -18939,7 +18948,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("GraphOthers")
             settings.endGroup()
             settings.setValue("curvefilter",self.qmc.curvefilter)
-            settings.setValue("smoothingwindowsize",self.qmc.smoothingwindowsize)
+#            settings.setValue("smoothingwindowsize",self.qmc.smoothingwindowsize)
             settings.setValue("ETcurve",self.qmc.ETcurve)
             settings.setValue("BTcurve",self.qmc.BTcurve)
             settings.setValue("ETlcd",self.qmc.ETlcd)
@@ -19325,7 +19334,7 @@ class ApplicationWindow(QMainWindow):
         extras["DeltaBTlcd"]= str(self.qmc.DeltaBTlcdflag)
         extras["deltafilter"]= str(self.qmc.deltafilter)
         extras["curvefilter"]= str(self.qmc.curvefilter)
-        extras["smoothingwindowsize"]= str(self.qmc.smoothingwindowsize)
+#        extras["smoothingwindowsize"]= str(self.qmc.smoothingwindowsize)
         extras["Projection"]= str(self.qmc.projectFlag)
         extras["ProjectionMode"]= str(self.qmc.projectionmode)
         extras["ETtarget"]= str(self.qmc.ETtarget)
@@ -20136,6 +20145,7 @@ class ApplicationWindow(QMainWindow):
             first_profile = True
             first_profile_event_time = 0
             max_drop_time = 0
+            label_chr_nr = 0
             for p in profiles:
                 pd = self.profileProductionData(p)
                 c += 1
@@ -20199,8 +20209,20 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # add BT curve to graph
                     try:
-                        entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"                    
-                        label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))
+                        
+                        if pd["batchnr"] > 0:
+                            label = u(pd["batchprefix"]) + u(pd["batchnr"])
+                        elif label_chr_nr < 26:
+                            label = u(libstring.ascii_uppercase[label_chr_nr])
+                            pd["batchnr"] = ""
+                            pd["batchprefix"] = label
+                            label_chr_nr = label_chr_nr + 1
+                        # surpress default description
+                        if pd["title"] == QApplication.translate("Scope Title", "Roaster Scope",None):
+                            pd["title"] = u("")
+                        
+                        entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
+                        
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]
                         stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter)
@@ -23171,6 +23193,7 @@ class ApplicationWindow(QMainWindow):
                 self.e4buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
                 self.e4buttondialog.setVisible(True)
         self.settooltip()
+        aw.buttonsAction.setEnabled(bool(len(aw.extraeventslabels) > 0))
         self.update_extraeventbuttons_visibility()
 
     #assigns tooltips to extra event buttons
@@ -23569,24 +23592,24 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setAlignment(Qt.AlignRight)
         self.Filter.setValue(aw.qmc.curvefilter/2)
         self.Filter.editingFinished.connect(lambda :self.changeFilter())        
-        windowlabel = QLabel(QApplication.translate("Label", "Window",None))
-        #Window holds the number of pads in filter
-        self.Window = QSpinBox()
-        self.Window.setSingleStep(1)
-        self.Window.setRange(0,40)
-        self.Window.setAlignment(Qt.AlignRight)
-        self.Window.setValue(aw.qmc.smoothingwindowsize)
-        self.Window.editingFinished.connect(lambda :self.changeWindow())
+#        windowlabel = QLabel(QApplication.translate("Label", "Window",None))
+#        #Window holds the number of pads in filter
+#        self.Window = QSpinBox()
+#        self.Window.setSingleStep(1)
+#        self.Window.setRange(0,40)
+#        self.Window.setAlignment(Qt.AlignRight)
+#        self.Window.setValue(aw.qmc.smoothingwindowsize)
+#        self.Window.editingFinished.connect(lambda :self.changeWindow())
         #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None))
         self.FilterSpikes.setChecked(aw.qmc.filterDropOuts)
         self.FilterSpikes.stateChanged.connect(lambda _:self.changeDropFilter())
         self.FilterSpikes.setFocusPolicy(Qt.NoFocus)    
-        #altsmoothing
-        self.AltSmoothing = QCheckBox(QApplication.translate("CheckBox", "Smooth2",None))
-        self.AltSmoothing.setChecked(aw.qmc.altsmoothing)
-        self.AltSmoothing.stateChanged.connect(lambda _:self.changeAltSmoothing())
-        self.AltSmoothing.setFocusPolicy(Qt.NoFocus)
+#        #altsmoothing
+#        self.AltSmoothing = QCheckBox(QApplication.translate("CheckBox", "Smooth2",None))
+#        self.AltSmoothing.setChecked(aw.qmc.altsmoothing)
+#        self.AltSmoothing.stateChanged.connect(lambda _:self.changeAltSmoothing())
+#        self.AltSmoothing.setFocusPolicy(Qt.NoFocus)
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None))
         self.DropSpikes.setChecked(aw.qmc.dropSpikes)
@@ -23699,12 +23722,11 @@ class HUDDlg(ArtisanDialog):
         hudLayout.addWidget(self.modeComboBox,3,1)
         hudLayout.addWidget(self.showHUDbutton,3,3)
         rorLayout = QGridLayout()
-        rorLayout.addWidget(self.projectCheck,0,0)
-        rorLayout.addWidget(self.projectionmodeComboBox,0,1)
-        rorLayout.addWidget(self.DeltaET,1,0)
-        rorLayout.addWidget(self.DeltaBT,1,1)
-        rorLayout.addWidget(deltaSpanLabel,1,2)
-        rorLayout.addWidget(self.deltaSpan,1,3)
+        rorLayout.addWidget(self.DeltaET,0,0)
+        rorLayout.addWidget(self.DeltaBT,0,1)
+        rorLayout.addWidget(self.projectCheck,0,3)
+        rorLayout.addWidget(self.projectionmodeComboBox,0,4)
+        rorLayout.setColumnMinimumWidth(2, 20)
         rorBoxLayout = QHBoxLayout()
         rorBoxLayout.addLayout(rorLayout)
         rorBoxLayout.addStretch()
@@ -23725,19 +23747,21 @@ class HUDDlg(ArtisanDialog):
         lcdsLayout.addWidget(self.DecimalPlaceslcd)
         lcdsLayout.addStretch()
         sensitivityLayout = QHBoxLayout()
-        sensitivityLayout.addWidget(curvefilterlabel)
-        sensitivityLayout.addWidget(self.Filter)
-        sensitivityLayout.addSpacing(30)
         sensitivityLayout.addWidget(filterlabel)
         sensitivityLayout.addWidget(self.DeltaFilter)
+        sensitivityLayout.addSpacing(30)
+        sensitivityLayout.addWidget(deltaSpanLabel)
+        sensitivityLayout.addWidget(self.deltaSpan)
         sensitivityLayout.addStretch()
         spikesLayout = QHBoxLayout()
-        spikesLayout.addWidget(self.FilterSpikes)
+        spikesLayout.addWidget(curvefilterlabel)
+        spikesLayout.addWidget(self.Filter)
         spikesLayout.addSpacing(30)
-        spikesLayout.addWidget(self.AltSmoothing)
+#        spikesLayout.addWidget(self.AltSmoothing)
         spikesLayout.addStretch()
-        spikesLayout.addWidget(windowlabel)
-        spikesLayout.addWidget(self.Window)
+        spikesLayout.addWidget(self.FilterSpikes)
+#        spikesLayout.addWidget(windowlabel)
+#        spikesLayout.addWidget(self.Window)
         curvesLayout = QVBoxLayout()
         curvesLayout.addLayout(rorBoxLayout)
         curvesLayout.addLayout(sensitivityLayout)
@@ -25066,9 +25090,9 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.filterDropOuts = not aw.qmc.filterDropOuts
         aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
         
-    def changeAltSmoothing(self):
-        aw.qmc.altsmoothing = not aw.qmc.altsmoothing
-        aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
+#    def changeAltSmoothing(self):
+#        aw.qmc.altsmoothing = not aw.qmc.altsmoothing
+#        aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
 
     def changeSpikeFilter(self):
         aw.qmc.dropSpikes = not aw.qmc.dropSpikes
@@ -25079,18 +25103,18 @@ class HUDDlg(ArtisanDialog):
     def changeSwapETBT(self):
         aw.qmc.swapETBT = not aw.qmc.swapETBT
 
-    def changeWindow(self):
-        try:
-            v = self.Window.value()
-            if v != aw.qmc.smoothingwindowsize:
-                self.Window.setDisabled(True)
-                aw.qmc.smoothingwindowsize = v
-                aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
-                self.Window.setDisabled(False)
-                self.Window.setFocus()
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changeWindow(): {0}").format(str(e)),exc_tb.tb_lineno)
+#    def changeWindow(self):
+#        try:
+#            v = self.Window.value()
+#            if v != aw.qmc.smoothingwindowsize:
+#                self.Window.setDisabled(True)
+#                aw.qmc.smoothingwindowsize = v
+#                aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+#                self.Window.setDisabled(False)
+#                self.Window.setFocus()
+#        except Exception as e:
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changeWindow(): {0}").format(str(e)),exc_tb.tb_lineno)
         
     def changeFilter(self):
         try:
@@ -25152,7 +25176,7 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.RoRlimitm = int(self.rorminLimit.value())
         aw.qmc.RoRlimit = int(self.rormaxLimit.value())
         aw.qmc.filterDropOuts = self.FilterSpikes.isChecked()
-        aw.qmc.altsmoothing = self.AltSmoothing.isChecked()
+#        aw.qmc.altsmoothing = self.AltSmoothing.isChecked()
         aw.qmc.dropSpikes = self.DropSpikes.isChecked()
         aw.qmc.minmaxLimits = self.MinMaxLimits.isChecked()
         aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
@@ -30664,6 +30688,7 @@ class EventsDlg(ArtisanDialog):
         aw.eventslidercoarse[2] = int(self.E3slider_coarse.isChecked())
         aw.eventslidercoarse[3] = int(self.E4slider_coarse.isChecked())
         aw.updateSliderMinMax()
+        aw.slidersAction.setEnabled(any(aw.eventslidervisibilities) or aw.pidcontrol.svSlider)
 
     def saveQuantifierSettings(self):
         aw.clusterEventsFlag = bool(self.clusterEventsFlag.isChecked())
@@ -43038,7 +43063,7 @@ class PXRpidDlgControl(ArtisanDialog):
         self.tab2easySVbuttonsFlag.stateChanged.connect(lambda flag=1: self.setSVbuttons(flag))
         self.tab2easySVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None))
         self.tab2easySVsliderFlag.setChecked(aw.pidcontrol.svSlider)
-        self.tab2easySVsliderFlag.stateChanged.connect(lambda flag=1: self.setSVslider(flag))
+        self.tab2easySVsliderFlag.stateChanged.connect(lambda flag=1: [self.setSVslider(flag),aw.pidcontrol.activateSVSlider(flag)])
         
         
         tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV",None))
@@ -44258,7 +44283,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.tab2easySVbuttonsFlag.stateChanged.connect(lambda flag=1: self.setSVbuttons(flag))
         self.tab2easySVsliderFlag = QCheckBox(QApplication.translate("Label","SV Slider",None))
         self.tab2easySVsliderFlag.setChecked(aw.pidcontrol.svSlider)
-        self.tab2easySVsliderFlag.stateChanged.connect(lambda flag=1: self.setSVslider(flag))
+        self.tab2easySVsliderFlag.stateChanged.connect(lambda flag=1: [self.setSVslider(flag),aw.pidcontrol.activateSVSlider(flag)])
         
 #        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","SV Buttons ON",None))
 #        tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: 'lightblue'}")
@@ -47799,12 +47824,13 @@ class PIDcontrol(object):
                 sv = self.svSliderMin
             aw.updateSVSliderLCD(sv)
             aw.sliderSV.setValue(sv)
-            
             aw.sliderSV.blockSignals(False)
             self.svSlider = True
+            aw.slidersAction.setEnabled(True)
         else:
             aw.sliderGrpBoxSV.setVisible(False)
             self.svSlider = False
+            aw.slidersAction.setEnabled(any(aw.eventslidervisibilities))
 
     def activateONOFFeasySV(self,flag):
         if flag:
