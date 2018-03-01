@@ -20135,6 +20135,9 @@ class ApplicationWindow(QMainWindow):
             cuppings_count = 0
             handles = []
             labels = []
+            timex_list = []
+            stemp_list = []
+            cl_list = []
             color=iter(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable
             # collect data
             c = 1
@@ -20250,15 +20253,27 @@ class ApplicationWindow(QMainWindow):
                         min_start_time = min(min_start_time,timex[charge])
                         max_end_time = max(max_end_time,timex[drop])
                         # cut-out only CHARGE to DROP
-                        self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
-                                linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
-                        handles.append(self.l_temp)
+                        
                         labels.append(label)
+                        timex_list.append(timex)
+                        stemp_list.append(stemp)
+                        cl_list.append(cl)
+                        
                         if self.qmc.DeltaBTflag and self.qmc.delta_ax:
                             tx = numpy.array(timex)
                             ch = max(0,rd["charge_idx"])
                             tx_roast = numpy.array(timex[ch:drop]) # just the part from CHARGE TO DROP
+                            
+                            try:
+                                if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
+                                    dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
+                                    dlinestyle = self.qmc.BTdeltalinestyle
+                                else:
+                                    dlinewidth = self.qmc.BTdeltalinewidth
+                                    if self.qmc.BTdeltalinestyle == "-" and self.qmc.BTlinestyle == "-":
+                                        dlinestyle = ':' # dotted
+                            except Exception as e:
+                                print(e)
                             with numpy.errstate(divide='ignore'):
                                 nt = numpy.array(stemp[ch:drop])
                                 z = (nt[aw.qmc.deltasamples:] - nt[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)                        
@@ -20270,8 +20285,20 @@ class ApplicationWindow(QMainWindow):
                                 trans = self.qmc.delta_ax.transData
                                 self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
-                                linewidth=self.qmc.BTdeltalinewidth,linestyle=self.qmc.BTdeltalinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl)
+                                linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
                         first_profile = False
+                        
+                        # draw BT curves on top of all others
+                        for i in range(len(timex_list)):
+                            label = labels[i]
+                            timex = timex_list[i]
+                            stemp = stemp_list[i]
+                            cl = cl_list[i]
+                            self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
+                                linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
+                            handles.append(self.l_temp)
+                                                
                     except Exception as e:
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
