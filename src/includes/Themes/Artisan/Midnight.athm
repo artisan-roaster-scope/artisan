@@ -1,6 +1,7 @@
 [events]
 showEtypes=true, true, true, true, true
 EvalueColor=#a52a2a, #215fe5, #1aa39f, #3fb936
+EvalueTextColor=white, white, white, white
 EvalueMarker=o, s, *, D
 Evaluelinethickness=2, 2, 2, 2
 EvalueMarkerSize=5, 5, 5, 5

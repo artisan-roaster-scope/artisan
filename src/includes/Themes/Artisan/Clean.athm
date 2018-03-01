@@ -20,6 +20,7 @@ index=0
 
 [events]
 EvalueColor=#4895CE, #49B160, #800080, #910113
+EvalueTextColor=white, white, white, white
 EvalueMarker=o, s, h, D
 EvalueMarkerSize=4, 4, 4, 4
 Evaluealpha=0.8, 0.8, 0.8, 0.8

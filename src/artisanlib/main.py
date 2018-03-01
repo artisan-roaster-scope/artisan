@@ -5131,19 +5131,19 @@ class tgraphcanvas(FigureCanvas):
                                     if self.specialeventstype[i] == 0:
                                         boxstyle = 'roundtooth,pad=0.4'
                                         boxcolor = self.EvalueColor[0]
-                                        textcolor = 'white'
+                                        textcolor = self.EvalueTextColor[0]
                                     elif self.specialeventstype[i] == 1:
                                         boxstyle = 'round,pad=0.3,rounding_size=0.8'
                                         boxcolor = self.EvalueColor[1]
-                                        textcolor = 'white'
+                                        textcolor = self.EvalueTextColor[1]
                                     elif self.specialeventstype[i] == 2:
                                         boxstyle = 'sawtooth,pad=0.3,tooth_size=0.2'
                                         boxcolor = self.EvalueColor[2]
-                                        textcolor = 'white'
+                                        textcolor = self.EvalueTextColor[2]
                                     elif self.specialeventstype[i] == 3:
                                         boxstyle = 'round4,pad=0.3,rounding_size=0.15'
                                         boxcolor = self.EvalueColor[3]
-                                        textcolor = 'white'
+                                        textcolor = self.EvalueTextColor[3]
                                     elif self.specialeventstype[i] == 4:
                                         boxstyle = 'square,pad=0.1'
                                         boxcolor = self.palette["specialeventbox"]
@@ -5252,7 +5252,7 @@ class tgraphcanvas(FigureCanvas):
     
                 if self.DeltaETflag: 
                     handles.append(self.l_delta1)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "\u0394ET", None)))
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "\u0394\u200aET", None)))
                 if self.DeltaBTflag:
                     handles.append(self.l_delta2)
                     labels.append(aw.arabicReshape(QApplication.translate("Label", "\u0394BT", None)))
@@ -12330,16 +12330,19 @@ class ApplicationWindow(QMainWindow):
             for i in range(len(aw.qmc.extradevices)):
                 if  aw.extraCurveVisibility1[i]:
                     colorPairsToCheck.append(
-                        (aw.qmc.extraname1[i],  aw.qmc.extradevicecolor1[i],  'Background',        aw.qmc.palette['background']),
+                        (aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], 'Background', aw.qmc.palette['background']),
                     )                           
                 if  aw.extraCurveVisibility2[i]:
                     colorPairsToCheck.append(   
-                        (aw.qmc.extraname2[i],  aw.qmc.extradevicecolor2[i],  'Background',        aw.qmc.palette['background']),
+                        (aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], 'Background', aw.qmc.palette['background']),
                     )
 
             for i in range(len(aw.qmc.EvalueColor)):
                 colorPairsToCheck.append(
-                    (aw.qmc.etypes[i],  aw.qmc.EvalueColor[i],  'Background',        aw.qmc.palette['background']),
+                    (aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i], 'Background', aw.qmc.palette['background']),
+                )                           
+                colorPairsToCheck.append(
+                    (aw.qmc.etypes[i] + " Text", aw.qmc.EvalueTextColor[i], aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i]),
                 )                           
             
         except Exception as e:        
@@ -17460,6 +17463,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.EvalueColor = list(map(str,list(toStringList(settings.value("EvalueColor",self.qmc.EvalueColor)))))
                 aw.updateSliderColors()
                 self.qmc.EvalueMarker = list(map(str,list(toStringList(settings.value("EvalueMarker",self.qmc.EvalueMarker)))))
+            if settings.contains("EvalueTextColor"):
+                self.qmc.EvalueTextColor = list(map(str,list(toStringList(settings.value("EvalueTextColor",self.qmc.EvalueTextColor)))))
+                aw.updateSliderColors()
             if settings.contains("Evaluelinethickness"):
                 self.qmc.Evaluelinethickness = [toInt(x) for x in toList(settings.value("Evaluelinethickness",self.qmc.Evaluelinethickness))]
                 self.qmc.Evaluealpha = [toDouble(x) for x in toList(settings.value("Evaluealpha",self.qmc.Evaluealpha))]
@@ -18747,6 +18753,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("autoDrop",self.qmc.autoDropFlag)
             settings.setValue("markTP",self.qmc.markTPflag)
             settings.setValue("EvalueColor",self.qmc.EvalueColor)
+            settings.setValue("EvalueTextColor",self.qmc.EvalueTextColor)
             settings.setValue("EvalueMarker",self.qmc.EvalueMarker)
             settings.setValue("Evaluelinethickness",self.qmc.Evaluelinethickness)
             settings.setValue("EvalueMarkerSize",self.qmc.EvalueMarkerSize)
@@ -19232,6 +19239,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("events")
             settings.setValue("showEtypes",self.qmc.showEtypes)            
             settings.setValue("EvalueColor",self.qmc.EvalueColor)
+            settings.setValue("EvalueTextColor",self.qmc.EvalueTextColor)
             settings.setValue("EvalueMarker",self.qmc.EvalueMarker)
             settings.setValue("Evaluelinethickness",self.qmc.Evaluelinethickness)
             settings.setValue("EvalueMarkerSize",self.qmc.EvalueMarkerSize)
@@ -19306,6 +19314,7 @@ class ApplicationWindow(QMainWindow):
         events["autoDrop"] = str(self.qmc.autoDropFlag)
         events["markTP"] = str(self.qmc.markTPflag)
         events["EvalueColor"] = str(self.qmc.EvalueColor)
+        events["EvalueTextColor"] = str(self.qmc.EvalueTextColor)
         events["EvalueMarker"] = str(self.qmc.EvalueMarker)
         events["Evaluelinethickness"] = str(self.qmc.Evaluelinethickness)
         events["Evaluealpha"] = str(self.qmc.Evaluealpha)
@@ -29031,6 +29040,18 @@ class EventsDlg(ArtisanDialog):
         self.E2colorButton.clicked.connect(lambda _:self.setcoloreventline(1))
         self.E3colorButton.clicked.connect(lambda _:self.setcoloreventline(2))
         self.E4colorButton.clicked.connect(lambda _:self.setcoloreventline(3))
+        self.E1textcolorButton = QPushButton(aw.qmc.etypesf(0))
+        self.E1textcolorButton.setFocusPolicy(Qt.NoFocus)
+        self.E2textcolorButton = QPushButton(aw.qmc.etypesf(1))
+        self.E2textcolorButton.setFocusPolicy(Qt.NoFocus)
+        self.E3textcolorButton = QPushButton(aw.qmc.etypesf(2))
+        self.E3textcolorButton.setFocusPolicy(Qt.NoFocus)
+        self.E4textcolorButton = QPushButton(aw.qmc.etypesf(3))
+        self.E4textcolorButton.setFocusPolicy(Qt.NoFocus)
+        self.E1textcolorButton.clicked.connect(lambda _:self.setcoloreventtext(0))
+        self.E2textcolorButton.clicked.connect(lambda _:self.setcoloreventtext(1))
+        self.E3textcolorButton.clicked.connect(lambda _:self.setcoloreventtext(2))
+        self.E4textcolorButton.clicked.connect(lambda _:self.setcoloreventtext(3))
         #marker selection for comboboxes
         self.markers = ["",
                         QApplication.translate("Marker","Circle",None),
@@ -29080,6 +29101,8 @@ class EventsDlg(ArtisanDialog):
         self.marker4typeComboBox.currentIndexChanged.connect(lambda x=1:self.seteventmarker(x,3))
         valuecolorlabel = QLabel(QApplication.translate("Label","Color",None))
         valuecolorlabel.setFont(titlefont)
+        valuetextcolorlabel = QLabel(QApplication.translate("Label","Text Color",None))
+        valuetextcolorlabel.setFont(titlefont)
         valuesymbollabel = QLabel(QApplication.translate("Label","Marker",None))
         valuesymbollabel.setFont(titlefont)
         valuethicknesslabel = QLabel(QApplication.translate("Label","Thickness",None))
@@ -29089,6 +29112,7 @@ class EventsDlg(ArtisanDialog):
         valuesizelabel = QLabel(QApplication.translate("Label","Size",None))
         valuesizelabel.setFont(titlefont)
         valuecolorlabel.setMaximumSize(80,20)
+        valuetextcolorlabel.setMaximumSize(80,20)
         valuesymbollabel.setMaximumSize(70,20)
         valuethicknesslabel.setMaximumSize(80,20)
         valuealphalabel.setMaximumSize(80,20)
@@ -29681,7 +29705,8 @@ class EventsDlg(ArtisanDialog):
         self.SAMPLINGbuttonActionType.setFocusPolicy(Qt.NoFocus)
         self.SAMPLINGbuttonActionType.addItems(self.buttonActionTypes)
         self.SAMPLINGbuttonActionType.setCurrentIndex(aw.qmc.extrabuttonactions[2])
-        self.SAMPLINGbuttonActionType.setMaximumWidth(80)
+        self.SAMPLINGbuttonActionType.setMinimumContentsLength(3)
+        self.SAMPLINGbuttonActionType.setMinimumWidth(self.SAMPLINGbuttonActionType.minimumSizeHint().width())        
         self.SAMPLINGbuttonActionString = QLineEdit(aw.qmc.extrabuttonactionstrings[2])
         self.SAMPLINGbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None))      
         self.SAMPLINGbuttonActionInterval = QComboBox()
@@ -29823,30 +29848,35 @@ class EventsDlg(ArtisanDialog):
         ### tab5 layout
         valueLayout = QGridLayout()
         valueLayout.addWidget(valuecolorlabel,0,0)
-        valueLayout.addWidget(valuesymbollabel,0,1)
-        valueLayout.addWidget(valuethicknesslabel,0,2)
-        valueLayout.addWidget(valuealphalabel,0,3)
-        valueLayout.addWidget(valuesizelabel,0,4)
+        valueLayout.addWidget(valuetextcolorlabel,0,1)
+        valueLayout.addWidget(valuesymbollabel,0,2)
+        valueLayout.addWidget(valuethicknesslabel,0,3)
+        valueLayout.addWidget(valuealphalabel,0,4)
+        valueLayout.addWidget(valuesizelabel,0,5)
         valueLayout.addWidget(self.E1colorButton,1,0)
-        valueLayout.addWidget(self.marker1typeComboBox,1,1)
-        valueLayout.addWidget(self.E1thicknessSpinBox,1,2)
-        valueLayout.addWidget(self.E1alphaSpinBox,1,3)
-        valueLayout.addWidget(self.E1sizeSpinBox,1,4)
+        valueLayout.addWidget(self.E1textcolorButton,1,1)
+        valueLayout.addWidget(self.marker1typeComboBox,1,2)
+        valueLayout.addWidget(self.E1thicknessSpinBox,1,3)
+        valueLayout.addWidget(self.E1alphaSpinBox,1,4)
+        valueLayout.addWidget(self.E1sizeSpinBox,1,5)
         valueLayout.addWidget(self.E2colorButton,2,0)
-        valueLayout.addWidget(self.marker2typeComboBox,2,1)
-        valueLayout.addWidget(self.E2thicknessSpinBox,2,2)
-        valueLayout.addWidget(self.E2alphaSpinBox,2,3)
-        valueLayout.addWidget(self.E2sizeSpinBox,2,4)
+        valueLayout.addWidget(self.E2textcolorButton,2,1)
+        valueLayout.addWidget(self.marker2typeComboBox,2,2)
+        valueLayout.addWidget(self.E2thicknessSpinBox,2,3)
+        valueLayout.addWidget(self.E2alphaSpinBox,2,4)
+        valueLayout.addWidget(self.E2sizeSpinBox,2,5)
         valueLayout.addWidget(self.E3colorButton,3,0)
-        valueLayout.addWidget(self.marker3typeComboBox,3,1)
-        valueLayout.addWidget(self.E3thicknessSpinBox,3,2)
-        valueLayout.addWidget(self.E3alphaSpinBox,3,3)
-        valueLayout.addWidget(self.E3sizeSpinBox,3,4)
+        valueLayout.addWidget(self.E3textcolorButton,3,1)
+        valueLayout.addWidget(self.marker3typeComboBox,3,2)
+        valueLayout.addWidget(self.E3thicknessSpinBox,3,3)
+        valueLayout.addWidget(self.E3alphaSpinBox,3,4)
+        valueLayout.addWidget(self.E3sizeSpinBox,3,5)
         valueLayout.addWidget(self.E4colorButton,4,0)
-        valueLayout.addWidget(self.marker4typeComboBox,4,1)
-        valueLayout.addWidget(self.E4thicknessSpinBox,4,2)
-        valueLayout.addWidget(self.E4alphaSpinBox,4,3)
-        valueLayout.addWidget(self.E4sizeSpinBox,4,4)
+        valueLayout.addWidget(self.E4textcolorButton,4,1)
+        valueLayout.addWidget(self.marker4typeComboBox,4,2)
+        valueLayout.addWidget(self.E4thicknessSpinBox,4,3)
+        valueLayout.addWidget(self.E4alphaSpinBox,4,4)
+        valueLayout.addWidget(self.E4sizeSpinBox,4,5)
         valueHLayout = QHBoxLayout()
         valueHLayout.addStretch()
         valueHLayout.addLayout(valueLayout)
@@ -30108,6 +30138,15 @@ class EventsDlg(ArtisanDialog):
         self.E2colorButton.setText(self.etype1.text())
         self.E3colorButton.setText(self.etype2.text())
         self.E4colorButton.setText(self.etype3.text())
+        self.E1textcolorButton.setText(self.etype0.text())
+        self.E2textcolorButton.setText(self.etype1.text())
+        self.E3textcolorButton.setText(self.etype2.text())
+        self.E4textcolorButton.setText(self.etype3.text())
+        self.E1colorButton.setMinimumWidth(self.E1textcolorButton.minimumSizeHint().width())                
+        self.E1colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[0] + "; color: " + aw.qmc.EvalueTextColor[0] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.E2colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[1] + "; color: " + aw.qmc.EvalueTextColor[1] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.E3colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[2] + "; color: " + aw.qmc.EvalueTextColor[2] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.E4colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[3] + "; color: " + aw.qmc.EvalueTextColor[3] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
         # update markers
         if aw.qmc.EvalueMarker[0] in self.markervals:
             self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
@@ -30310,6 +30349,16 @@ class EventsDlg(ArtisanDialog):
             colorname = str(colorf.name())
             aw.qmc.EvalueColor[b] = colorname
             aw.updateSliderColors()
+            self.updateStyleTab()
+            aw.qmc.redraw()
+
+    def setcoloreventtext(self,b):
+        colorf = aw.colordialog(QColor(aw.qmc.EvalueTextColor[b]))
+        if colorf.isValid():
+            colorname = str(colorf.name())
+            aw.qmc.EvalueTextColor[b] = colorname
+            aw.updateSliderColors()
+            self.updateStyleTab()
             aw.qmc.redraw()
 
     def realignbuttons(self):
