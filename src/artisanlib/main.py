@@ -47575,8 +47575,8 @@ class PIDcontrol(object):
         self.dutyMin = -100
         self.dutyMax = 100
         self.pidKp = 20.0
-        self.pidKi = 0.04
-        self.pidKd = 0.0
+        self.pidKi = 0.01
+        self.pidKd = 3.0
         self.lastEnergy = None
         # pidSource
         #   either the TC4 input channel from [1,..,4] if self.qmc.device == 19 (Arduino/TC4)

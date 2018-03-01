@@ -30,7 +30,7 @@ LICENSE = 'GNU General Public License (GPL)'
 try:
     QTDIR = os.environ["QT_PATH"] + r'/'
 except:
-    QTDIR = r'/Users/luther/Qt5.10.0/5.10.0/clang_64/' # qt5
+    QTDIR = r'/Users/luther/Qt5.10.1/5.10.1/clang_64/' # qt5
 
 APP = ['artisan.py']
 

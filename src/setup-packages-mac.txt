@@ -3,9 +3,9 @@ Current Versions:
 o XCode 4.5.2 + command line tools
 o Python 3.5.4 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial 3.3.4
-o QT 5.10.0
+o QT 5.10.1
 o SIP 4.19.6
-o PyQt 5.9.2
+o PyQt 5.10.1
 o numpy 1.12.1
 o scipy 1.0.0
 o matplotlib 2.1.1
@@ -67,6 +67,9 @@ open a terminal and type
 
 Upgrade History:
 
+- 2018-03-01
+ . Qt 5.10.0 => 5.10.1
+ . PyQt 5.10.0 => 5.10.1
 - 2018-02-25
  . snap7 1.4.2
  . python snap7 0.9
@@ -470,8 +473,14 @@ export PATH=/Users/luther/Qt5.9.1/5.9.1/clang_64/bin/:/Users/luther/Qt5.9.1/5.9/
 ---
 
 
+Using pip wheels:
+
+# sudo -H python3 -m pip install PyQt5 --upgrade
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/PyQt5/uic/port_v2
 
 If installed from the newer wheels, one needs to manually delete the site-packages/PyQt5/uic/port_v2 (on Python3) and port_v3 (on Python2) subdirectories to avoid build problems.
+
+
 
 
 7) Install Numpy
