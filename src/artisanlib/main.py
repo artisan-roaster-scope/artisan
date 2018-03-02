@@ -4324,7 +4324,7 @@ class tgraphcanvas(FigureCanvas):
                 delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
                 delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
             else:
-                user_filter = int(round(self.deltafilter))
+                user_filter = int(round(self.deltafilter/2.))
                 delta1 = self.decay_smooth_list(z1,window_len=user_filter)
                 delta2 = self.decay_smooth_list(z2,window_len=user_filter)
                           
@@ -5096,6 +5096,8 @@ class tgraphcanvas(FigureCanvas):
                                     secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
                                 else:
                                     firstletter = self.specialeventsStrings[i].strip()[:aw.qmc.eventslabelschars]
+                                    if firstletter == "":
+                                        firstletter = "E"
                                     secondletter = ""
                                 if self.mode == "F":
                                     height = 50
@@ -7233,6 +7235,8 @@ class tgraphcanvas(FigureCanvas):
                                 secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1]) 
                             else:
                                 firstletter = self.specialeventsStrings[-1].strip()[:aw.qmc.eventslabelschars]
+                                if firstletter == "":
+                                    firstletter = "E"
                                 secondletter = ""
                             #if Event Type-Bars flag
                             if self.eventsGraphflag == 1 and etype < 4:
@@ -7525,6 +7529,16 @@ class tgraphcanvas(FigureCanvas):
                         ETmax = lcdformat%temp1_values_max + aw.qmc.mode
                     else:
                         ETmax = "--"
+                    
+                    FCperiod = None
+                    try:
+                        if self.timeindex[2] > 0 and self.timeindex[3] > 0:
+                            FCperiod = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[2]])[1:]
+                        elif self.timeindex[2] > 0 and self.timeindex[6] > 0:
+                            FCperiod = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])[1:]
+                    except:
+                        pass
+                        
                     ror = "%.1f"%(((self.temp2[self.timeindex[6]]-LP)/(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))*60.)
                     _,_,tsb = aw.ts(tp=TP_index)
                     
@@ -7541,7 +7555,9 @@ class tgraphcanvas(FigureCanvas):
                                     u(ror), \
                                     u(int(tsb)))
                         if det is not None:
-                            strline = u(("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None) + " ") + strline
+                            strline = u(("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None) + " ") + strline                            
+                        if FCperiod is not None:
+                            strline = u("min%s=" % FCperiod + QApplication.translate("Label", "FC", None) + "   ") + strline
                     else:
                         strline = u("")
                         if temp1_values_max and temp1_values_max > 0:
@@ -7552,7 +7568,9 @@ class tgraphcanvas(FigureCanvas):
                                     .format(u(ror), \
                                     u(int(tsb)))
                         if det is not None:
-                            strline = strline + "   " + u(QApplication.translate("Label", "CM", None) + ("=%.1f/%.1f" % (det,dbt)) + self.mode)
+                            strline = strline + u("   " + QApplication.translate("Label", "CM", None) + ("=%.1f/%.1f" % (det,dbt)) + self.mode)                            
+                        if FCperiod is not None:
+                            strline = strline + u("   " + QApplication.translate("Label", "FC", None) + "=%smin" % FCperiod)                           
                     self.ax.set_xlabel(strline,color = aw.qmc.palette["xlabel"],fontproperties=statsprop)
                 else:
                     sep = u"   "
@@ -9962,7 +9980,7 @@ class SampleThread(QThread):
                         #######   filter deltaBT deltaET
                         # decay smoothing
                         if aw.qmc.deltafilter: # and not aw.qmc.altsmoothing:
-                            user_filter = int(round(aw.qmc.deltafilter))
+                            user_filter = int(round(aw.qmc.deltafilter/2.))
                             if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
                                     self.decay_weights = numpy.arange(1,user_filter+1)
@@ -10001,7 +10019,7 @@ class SampleThread(QThread):
                     # append new data to the rateofchange arrays
                     if local_flagstart:
                         # only if we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
-                        if length_of_qmc_timex > int(round(aw.qmc.deltafilter/2)) + max(2,(aw.qmc.deltasamples + 1)):
+                        if length_of_qmc_timex > int(round(aw.qmc.deltafilter/2.)) + max(2,(aw.qmc.deltasamples + 1)):
                             aw.qmc.delta1.append(rateofchange1plot)
                             aw.qmc.delta2.append(rateofchange2plot)
                         else:
@@ -12497,8 +12515,8 @@ class ApplicationWindow(QMainWindow):
                             linespacethreshold = abs(linespace[1] - linespace[0]) * aw.eventquantifierthresholdfine
                         t = temp[-1]
                         if t != -1: # -1 is an error value
-                            d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
-                            ld = aw.lastdigitizedvalue[i] # in internal format so 0.8 representing 70%
+                            d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i],i)
+                            ld = aw.lastdigitizedvalue[i] # in internal format so 8 representing 70%
                             lt = aw.lastdigitizedtemp[i] # last digitized raw value corresponding to ld
                             if d is not None and (ld is None or ld != d):
                                 if ld is None or lt is None or linespacethreshold < abs(t - lt): # and only if significantly different than previous to avoid fluktuation
@@ -12779,9 +12797,9 @@ class ApplicationWindow(QMainWindow):
     # compute the 12 or 102 event quantifier linespace for type n in [0,3]
     def computeLinespace(self,n):
         if self.eventquantifiercoarse[n]:
-            num = int(round((self.eventquantifiermax[n] - self.eventquantifiermin[n])/10.)) + 2
+            num = int(round((self.eventslidermax[n] - self.eventslidermin[n])/10.)) + 1
         else:
-            num = self.eventquantifiermax[n] - self.eventquantifiermin[n] + 2
+            num = self.eventslidermax[n] - self.eventslidermin[n] + 1
         return numpy.linspace(self.eventquantifiermin[n], self.eventquantifiermax[n], num=num)
         
     # update all 4 event quantifier linespaces
@@ -12812,13 +12830,14 @@ class ApplicationWindow(QMainWindow):
         return temp,timex
         
     # returns min/max 0/(aw.eventsMaxValue / 10) for values outside of the given linespace ls defining the interval
+    # note that the value returned is the event value divided by 10, but not with the internal offset of +1 !!
     # otherwise the bin number from [0-self.eventquantifiersteps]
-    def digitize(self,v,ls,coarse):
+    def digitize(self,v,ls,coarse,i):
         if coarse:
-            r = numpy.digitize([v],ls)[0]+ls[0] - 1
+            r = ((numpy.digitize([v],ls)[0] - 1) * 10. + aw.eventslidermin[i]) / 10.
         else:
-            r = (numpy.digitize([v],ls)[0]+ls[0] - 1) / 10.
-        return max(0,min(aw.eventsMaxValue / 10,r))
+            r = (numpy.digitize([v],ls)[0]+aw.eventslidermin[i] - 1) / 10.
+        return max(aw.eventslidermin[i]/10, min(aw.eventslidermax[i] / 10,r))
         
     
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
@@ -19256,10 +19275,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)
             settings.setValue("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)
             settings.setValue("BackgroundAlpha",self.qmc.backgroundalpha)
-            settings.beginGroup("Style")
-            settings.setValue("patheffects",self.qmc.patheffects)
-            settings.setValue("graphstyle",self.qmc.graphstyle)
-            settings.setValue("graphfont",self.qmc.graphfont)
+#            settings.beginGroup("Style")
+#            settings.setValue("patheffects",self.qmc.patheffects)
+#            settings.setValue("graphstyle",self.qmc.graphstyle)
+#            settings.setValue("graphfont",self.qmc.graphfont)
             settings.endGroup()
             settings.beginGroup("XT")
             settings.setValue("color",self.qmc.backgroundxtcolor)
@@ -20273,16 +20292,13 @@ class ApplicationWindow(QMainWindow):
                             ch = max(0,rd["charge_idx"])
                             tx_roast = numpy.array(timex[ch:drop]) # just the part from CHARGE TO DROP
                             
-                            try:
-                                if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
-                                    dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
-                                    dlinestyle = self.qmc.BTdeltalinestyle
-                                else:
-                                    dlinewidth = self.qmc.BTdeltalinewidth
-                                    if self.qmc.BTdeltalinestyle == "-" and self.qmc.BTlinestyle == "-":
-                                        dlinestyle = ':' # dotted
-                            except Exception as e:
-                                print(e)
+                            if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
+                                dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
+                                dlinestyle = self.qmc.BTdeltalinestyle
+                            else:
+                                dlinewidth = self.qmc.BTdeltalinewidth
+                                if self.qmc.BTdeltalinestyle == "-" and self.qmc.BTlinestyle == "-":
+                                    dlinestyle = ':' # dotted
                             with numpy.errstate(divide='ignore'):
                                 nt = numpy.array(stemp[ch:drop])
                                 z = (nt[aw.qmc.deltasamples:] - nt[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)                        
@@ -23757,15 +23773,13 @@ class HUDDlg(ArtisanDialog):
         hudLayout.addWidget(modeLabel,3,0)
         hudLayout.addWidget(self.modeComboBox,3,1)
         hudLayout.addWidget(self.showHUDbutton,3,3)
-        rorLayout = QGridLayout()
-        rorLayout.addWidget(self.DeltaET,0,0)
-        rorLayout.addWidget(self.DeltaBT,0,1)
-        rorLayout.addWidget(self.projectCheck,0,3)
-        rorLayout.addWidget(self.projectionmodeComboBox,0,4)
-        rorLayout.setColumnMinimumWidth(2, 20)
         rorBoxLayout = QHBoxLayout()
-        rorBoxLayout.addLayout(rorLayout)
+        rorBoxLayout.addWidget(self.DeltaET)
+        rorBoxLayout.addSpacing(15)
+        rorBoxLayout.addWidget(self.DeltaBT)
         rorBoxLayout.addStretch()
+        rorBoxLayout.addWidget(self.projectCheck)
+        rorBoxLayout.addWidget(self.projectionmodeComboBox)
         self.DeltaETlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None))
         self.DeltaETlcd.setChecked(aw.qmc.DeltaETlcdflag)
         self.DeltaBTlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None))
@@ -23779,50 +23793,47 @@ class HUDDlg(ArtisanDialog):
         lcdsLayout.addWidget(self.DeltaETlcd)
         lcdsLayout.addSpacing(15)
         lcdsLayout.addWidget(self.DeltaBTlcd)
-        lcdsLayout.addSpacing(15)
-        lcdsLayout.addWidget(self.DecimalPlaceslcd)
         lcdsLayout.addStretch()
         sensitivityLayout = QHBoxLayout()
         sensitivityLayout.addWidget(filterlabel)
         sensitivityLayout.addWidget(self.DeltaFilter)
-        sensitivityLayout.addSpacing(30)
+        sensitivityLayout.addStretch()
         sensitivityLayout.addWidget(deltaSpanLabel)
         sensitivityLayout.addWidget(self.deltaSpan)
-        sensitivityLayout.addStretch()
         spikesLayout = QHBoxLayout()
         spikesLayout.addWidget(curvefilterlabel)
         spikesLayout.addWidget(self.Filter)
         spikesLayout.addSpacing(30)
-#        spikesLayout.addWidget(self.AltSmoothing)
         spikesLayout.addStretch()
         spikesLayout.addWidget(self.FilterSpikes)
-#        spikesLayout.addWidget(windowlabel)
-#        spikesLayout.addWidget(self.Window)
-        curvesLayout = QVBoxLayout()
-        curvesLayout.addLayout(rorBoxLayout)
-        curvesLayout.addLayout(sensitivityLayout)
-        curvesLayout.addLayout(spikesLayout)
-        rorGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curves",None))
-        rorGroupLayout.setLayout(curvesLayout)
-        rorLCDGroupLayout = QGroupBox(QApplication.translate("GroupBox","LCDs",None))
+        rorGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Curves",None))
+        rorGroupLayout.setLayout(rorBoxLayout)
+        rorLCDGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise LCDs",None))
         rorLCDGroupLayout.setLayout(lcdsLayout)
+        hudHBox = QHBoxLayout()
+        hudHBox.addStretch()
+        hudHBox.addLayout(hudLayout)
+        hudHBox.addStretch()
         hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","HUD",None))
-        hudGroupLayout.setLayout(hudLayout)
-        inputFilterGrid = QGridLayout()
-        inputFilterGrid.setColumnMinimumWidth(3,20)
-        inputFilterGrid.addWidget(self.swapETBT,0,0)
-        inputFilterGrid.addWidget(self.MinMaxLimits,1,0)
-        inputFilterGrid.addWidget(minlabel,1,1)
-        inputFilterGrid.addWidget(self.minLimit,1,2)
-        inputFilterGrid.addWidget(maxlabel,1,4)
-        inputFilterGrid.addWidget(self.maxLimit,1,5)
-        inputFilterGrid.addWidget(self.DropSpikes,2,0)
-        inputFilterHBox = QHBoxLayout()
-        inputFilterHBox.addLayout(inputFilterGrid)
-        inputFilterHBox.addStretch()
+        hudGroupLayout.setLayout(hudHBox)        
+        inputFilter1 = QHBoxLayout()
+        inputFilter1.addWidget(self.DropSpikes)
+        inputFilter1.addStretch()
+        inputFilter1.addWidget(self.swapETBT)        
+        inputFilter2 = QHBoxLayout()
+        inputFilter2.addWidget(self.MinMaxLimits)
+        inputFilter2.addStretch()
+        inputFilter2.addWidget(minlabel)
+        inputFilter2.addWidget(self.minLimit)
+        inputFilter2.addSpacing(20)
+        inputFilter2.addWidget(maxlabel)
+        inputFilter2.addWidget(self.maxLimit)        
+        inputFilterVBox = QVBoxLayout()
+        inputFilterVBox.addLayout(inputFilter1)
+        inputFilterVBox.addLayout(inputFilter2)        
+        inputFilterVBox.addLayout(spikesLayout)
         inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filters",None))
-        inputFilterGroupLayout.setLayout(inputFilterHBox)
-        
+        inputFilterGroupLayout.setLayout(inputFilterVBox)        
         #swapETBT flag
         self.rorFilter = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
         self.rorFilter.setChecked(aw.qmc.RoRlimitFlag)
@@ -23845,19 +23856,19 @@ class HUDDlg(ArtisanDialog):
         elif aw.qmc.mode == "C":
             self.rorminLimit.setSuffix(" C")
             self.rormaxLimit.setSuffix(" C")
-        rorFilterGrid = QGridLayout()
-        rorFilterGrid.setColumnMinimumWidth(3,40)
-        rorFilterGrid.addWidget(self.rorFilter,0,0)
-        rorFilterGrid.addWidget(QLabel(),0,1)
-        rorFilterGrid.addWidget(rorminlabel,0,2)
-        rorFilterGrid.addWidget(self.rorminLimit,0,3)
-        rorFilterGrid.addWidget(rormaxlabel,0,4)
-        rorFilterGrid.addWidget(self.rormaxLimit,0,5)
         rorFilterHBox = QHBoxLayout()
-        rorFilterHBox.addLayout(rorFilterGrid)
+        rorFilterHBox.addWidget(self.rorFilter)
         rorFilterHBox.addStretch()
-        rorFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","RoR Filter",None))
-        rorFilterGroupLayout.setLayout(rorFilterHBox)
+        rorFilterHBox.addWidget(rorminlabel)
+        rorFilterHBox.addWidget(self.rorminLimit)
+        rorFilterHBox.addSpacing(20)
+        rorFilterHBox.addWidget(rormaxlabel)
+        rorFilterHBox.addWidget(self.rormaxLimit)
+        rorFilterVBox = QVBoxLayout()
+        rorFilterVBox.addLayout(rorFilterHBox)
+        rorFilterVBox.addLayout(sensitivityLayout)
+        rorFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Filter",None))
+        rorFilterGroupLayout.setLayout(rorFilterVBox)
         # path effects
         effectslabel = QLabel(QApplication.translate("Label", "Path Effects",None))
         self.PathEffects = QSpinBox()
@@ -23869,7 +23880,6 @@ class HUDDlg(ArtisanDialog):
         pathEffectsLayout = QHBoxLayout()
         pathEffectsLayout.addWidget(effectslabel)
         pathEffectsLayout.addWidget(self.PathEffects)
-        pathEffectsLayout.addWidget(effectslabel)
         pathEffectsLayout.addStretch()
         # graph style
         stylelabel = QLabel(QApplication.translate("Label", "Style",None))
@@ -23894,26 +23904,23 @@ class HUDDlg(ArtisanDialog):
         graphLayout = QHBoxLayout()
         graphLayout.addWidget(stylelabel)
         graphLayout.addWidget(self.GraphStyle)
-        graphLayout.addStretch()
-        graphLayout.addWidget(fontlabel)
-        graphLayout.addWidget(self.GraphFont)
         # styles group
-        stylesLayout = QVBoxLayout()
-        stylesLayout.addLayout(pathEffectsLayout)
-        stylesLayout.addLayout(graphLayout)
-        styleGroupLayout = QGroupBox(QApplication.translate("GroupBox","Look",None))
-        styleGroupLayout.setLayout(stylesLayout)
+#        stylesLayout = QVBoxLayout()
+#        stylesLayout.addLayout(pathEffectsLayout)
+#        stylesLayout.addLayout(graphLayout)
+#        styleGroupLayout = QGroupBox(QApplication.translate("GroupBox","Look",None))
+#        styleGroupLayout.setLayout(stylesLayout)
         #tab0
         tab0Layout = QVBoxLayout()
         tab0Layout.addWidget(rorGroupLayout)
         tab0Layout.addWidget(rorLCDGroupLayout)
-        tab0Layout.addWidget(styleGroupLayout)
+        tab0Layout.addStretch()
+        tab0Layout.addWidget(hudGroupLayout)
         tab0Layout.addStretch()
         #tab1
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(inputFilterGroupLayout)
         tab1Layout.addWidget(rorFilterGroupLayout)
-        tab1Layout.addWidget(hudGroupLayout)
         tab1Layout.addStretch()
         #tab2
         #Equation plotter
@@ -24169,12 +24176,20 @@ class HUDDlg(ArtisanDialog):
         lnLayout = QHBoxLayout()
         lnLayout.addWidget(self.lnvarCheck)
         lnLayout.addWidget(self.lnresult)
+        lnVLayout = QVBoxLayout()
+        lnVLayout.addLayout(lnLayout)
+        lnVLayout.addStretch()
         lnvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","ln()",None))
-        lnvarGroupLayout.setLayout(lnLayout)        
-        xxLayout = QHBoxLayout()
-        xxLayout.addWidget(self.xxvarCheck)
-        xxLayout.addWidget(self.xxresult)
-        xxLayout.addWidget(self.TPCheck)
+        lnvarGroupLayout.setLayout(lnVLayout)
+        xxHLayout1 = QHBoxLayout()        
+        xxHLayout1.addWidget(self.xxvarCheck)
+        xxHLayout1.addWidget(self.xxresult)        
+        xxHLayout2 = QHBoxLayout()        
+        xxHLayout2.addWidget(self.TPCheck)
+        xxHLayout2.addStretch()
+        xxLayout = QVBoxLayout()
+        xxLayout.addLayout(xxHLayout1)
+        xxLayout.addLayout(xxHLayout2)
         xxvarGroupLayout = QGroupBox(QApplication.translate("GroupBox","x^3",None))
         xxvarGroupLayout.setLayout(xxLayout)
         polytimes = QHBoxLayout()
@@ -24204,9 +24219,11 @@ class HUDDlg(ArtisanDialog):
         interUniLayout = QHBoxLayout()
         interUniLayout.addWidget(interGroupLayout)
         interUniLayout.addWidget(univarGroupLayout)
+        lnvarxxvarLayout = QHBoxLayout()
+        lnvarxxvarLayout.addWidget(lnvarGroupLayout)
+        lnvarxxvarLayout.addWidget(xxvarGroupLayout)        
         tab3Layout.addLayout(interUniLayout)
-        tab3Layout.addWidget(lnvarGroupLayout)
-        tab3Layout.addWidget(xxvarGroupLayout)
+        tab3Layout.addLayout(lnvarxxvarLayout)
         tab3Layout.addWidget(polyfitGroupLayout)
         tab3Layout.addStretch()
         ##### TAB 4
@@ -24228,34 +24245,36 @@ class HUDDlg(ArtisanDialog):
         resButton = QPushButton(QApplication.translate("Button","Set",None))
         resButton.setFocusPolicy(Qt.NoFocus)
         resButton.clicked.connect(lambda _:self.changedpi())
-        defresButton = QPushButton(QApplication.translate("Button","Defaults",None))
-        defresButton.setFocusPolicy(Qt.NoFocus)
-        defresButton.clicked.connect(lambda _:self.setdefaults())
-        appLayout = QHBoxLayout()
-        appLayout.addStretch()
-        appLayout.addWidget(self.styleComboBox)
-        appearanceGroupWidget = QGroupBox(QApplication.translate("GroupBox","Appearance",None))
-        appearanceGroupWidget.setLayout(appLayout)
-        setresLayout = QHBoxLayout()
-        setresLayout.addStretch()
-        setresLayout.addWidget(self.resolutionSpinBox)
-        setresLayout.addWidget(resButton)
-        resLayout = QVBoxLayout()
-        resLayout.addLayout(setresLayout)
-        resolutionGroupWidget = QGroupBox(QApplication.translate("GroupBox","Resolution",None))
-        resolutionGroupWidget.setLayout(resLayout)
-        defresLayout = QHBoxLayout()
-        defresLayout.addStretch()
-        defresLayout.addWidget(defresButton)
         self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None))
         self.soundCheck.setChecked(aw.soundflag) 
         self.soundCheck.setFocusPolicy(Qt.NoFocus)
         self.soundCheck.stateChanged.connect(lambda _:self.soundset()) #toggle
-        sLayout = QHBoxLayout()
-        sLayout.addStretch()
-        sLayout.addWidget(self.soundCheck)
-        soundGroupWidget = QGroupBox(QApplication.translate("GroupBox","Sound",None))
-        soundGroupWidget.setLayout(sLayout)
+        appLayout1 = QHBoxLayout()
+        appLayout1.addLayout(pathEffectsLayout)
+        appLayout1.addStretch()
+        appLayout1.addWidget(self.soundCheck)
+        appLayout1.addStretch()
+        appLayout1.addWidget(self.styleComboBox)
+        appLayout2 = QHBoxLayout()
+        appLayout2.addLayout(graphLayout)
+        appLayout2.addStretch()
+        appLayout2.addWidget(fontlabel)
+        appLayout2.addWidget(self.GraphFont)
+        appLayout = QVBoxLayout()
+        appLayout.addLayout(appLayout1)
+        appLayout.addLayout(appLayout2)
+        appearanceGroupWidget = QGroupBox(QApplication.translate("GroupBox","Appearance",None))
+        appearanceGroupWidget.setLayout(appLayout)
+        graphLabel = QLabel(QApplication.translate("Tab","Graph",None))
+        setresLayout = QHBoxLayout()
+        setresLayout.addWidget(self.DecimalPlaceslcd)
+        setresLayout.addSpacing(25)
+        setresLayout.addStretch()
+        setresLayout.addWidget(graphLabel)
+        setresLayout.addWidget(self.resolutionSpinBox)
+        setresLayout.addWidget(resButton)
+        resolutionGroupWidget = QGroupBox(QApplication.translate("GroupBox","Resolution",None))
+        resolutionGroupWidget.setLayout(setresLayout)
         # tick
         # port
         self.WebLCDsURL = QLabel()
@@ -24289,13 +24308,15 @@ class HUDDlg(ArtisanDialog):
         self.WebLCDsFlag.clicked.connect(lambda i=0:self.toggleWebLCDs(i))
         WebLCDsLayout = QHBoxLayout()
         WebLCDsLayout.addWidget(self.WebLCDsFlag)
-        WebLCDsLayout.addSpacing(20)
         WebLCDsLayout.addWidget(self.WebLCDsPortLabel)
         WebLCDsLayout.addWidget(self.WebLCDsPort)
         WebLCDsLayout.addStretch()
         WebLCDsLayout.addWidget(self.WebLCDsURL)
+        WebLCDsVLayout = QVBoxLayout()
+        WebLCDsVLayout.addWidget(self.WebLCDsAlerts)
+        WebLCDsVLayout.addStretch()
         WebLCDsLayoutHLayout = QHBoxLayout()
-        WebLCDsLayoutHLayout.addWidget(self.WebLCDsAlerts)
+        WebLCDsLayoutHLayout.addLayout(WebLCDsVLayout)
         WebLCDsLayoutHLayout.addStretch()
         WebLCDsLayoutHLayout.addWidget(self.QRpic)
         WebLCDsLayoutVLayout = QVBoxLayout()
@@ -24306,16 +24327,14 @@ class HUDDlg(ArtisanDialog):
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(appearanceGroupWidget)
         tab5Layout.addWidget(resolutionGroupWidget)
-        tab5Layout.addWidget(soundGroupWidget)
         tab5Layout.addWidget(WebLCDsGroupWidget)
         tab5Layout.addStretch()
-        tab5Layout.addLayout(defresLayout)
 
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
         C0Widget = QWidget()
         C0Widget.setLayout(tab0Layout)
-        TabWidget.addTab(C0Widget,QApplication.translate("Tab","Graph",None))
+        TabWidget.addTab(C0Widget,QApplication.translate("Tab","RoR/HUD",None))
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         TabWidget.addTab(C1Widget,QApplication.translate("Tab","Filters",None))
@@ -24425,10 +24444,6 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changedpi(): {0}").format(str(e)),exc_tb.tb_lineno)
 
-    def setdefaults(self):
-        self.resolutionSpinBox.setValue(80)
-        self.changedpi()
-        app.setStyle(aw.defaultAppearance)
 
     def setcurvecolor(self,x):
         try:
@@ -28979,11 +28994,6 @@ class EventsDlg(ArtisanDialog):
         self.minieventsflag.setChecked(bool(aw.minieventsflag))
         self.minieventsflag.stateChanged.connect(lambda _:self.minieventsflagChanged())
         barstylelabel = QLabel(QApplication.translate("Label","Events",None))
-#        barstyles = ["",
-#                    QApplication.translate("ComboBox","Type",None),
-#                    QApplication.translate("ComboBox","Value",None),
-#                    QApplication.translate("ComboBox","Split",None),
-#                    QApplication.translate("ComboBox","Merge",None)]
         barstyles = ["",
                     QApplication.translate("ComboBox","Flag",None),
                     QApplication.translate("ComboBox","Bar",None),
@@ -29216,13 +29226,13 @@ class EventsDlg(ArtisanDialog):
         self.ShowMet.setChecked(aw.qmc.showmet)
         self.ShowMet.setFocusPolicy(Qt.NoFocus)
         self.ShowMet.stateChanged.connect(lambda _:self.changeShowMet())         #toggle          
-        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        self.okButton = QPushButton(QApplication.translate("Button","OK",None))
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
         closeButton.clicked.connect(lambda _:self.restoreState())
-        okButton.clicked.connect(lambda _:self.updatetypes())
+        self.okButton.clicked.connect(lambda _:self.updatetypes())
         defaultButton.clicked.connect(lambda _:self.settypedefault())
         ###  TAB 2
         #number of buttons per row
@@ -29276,7 +29286,7 @@ class EventsDlg(ArtisanDialog):
         self.transferpalettecombobox.setMaximumWidth(120)
         self.transferpalettecombobox.addItems(palettelist)
         transferpalettebutton.clicked.connect(lambda _:self.transferbuttonsto())
-        self.switchPaletteByNumberKey = QCheckBox(QApplication.translate("CheckBox","Switch Using Number Keys",None))
+        self.switchPaletteByNumberKey = QCheckBox(QApplication.translate("CheckBox","Switch Using Number Keys + Cmd",None))
         self.switchPaletteByNumberKey.setChecked(aw.buttonpalette_shortcuts)
         self.switchPaletteByNumberKey.setFocusPolicy(Qt.NoFocus)
         
@@ -29591,7 +29601,7 @@ class EventsDlg(ArtisanDialog):
         buttonLayout.addLayout(FlagsLayout2)
         buttonLayout.addStretch()
         buttonLayout.addWidget(closeButton)
-        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(self.okButton)
         typeHBox = QHBoxLayout()
         typeHBox.addLayout(typeLayout)
         typeHBox.addStretch()
@@ -30080,7 +30090,7 @@ class EventsDlg(ArtisanDialog):
                     for ii in arange(len(temp)):
                         t = temp[ii]
                         if t != -1: # -1 is an error value
-                            d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i])
+                            d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i],aw.eventslidermin[i])
                             if d is not None and (ld is None or ld != d):
                                 # take only changes
                                 # and only if significantly different than previous to avoid fluktuation
@@ -30142,11 +30152,17 @@ class EventsDlg(ArtisanDialog):
         self.E2textcolorButton.setText(self.etype1.text())
         self.E3textcolorButton.setText(self.etype2.text())
         self.E4textcolorButton.setText(self.etype3.text())
-        self.E1colorButton.setMinimumWidth(self.E1textcolorButton.minimumSizeHint().width())                
+        self.E1colorButton.setMinimumWidth(max(self.okButton.width(),self.E1textcolorButton.minimumSizeHint().width()))
+        self.E1textcolorButton.setMinimumWidth(max(self.okButton.width(),self.E1textcolorButton.minimumSizeHint().width()))
         self.E1colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[0] + "; color: " + aw.qmc.EvalueTextColor[0] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
         self.E2colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[1] + "; color: " + aw.qmc.EvalueTextColor[1] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
         self.E3colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[2] + "; color: " + aw.qmc.EvalueTextColor[2] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
         self.E4colorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[3] + "; color: " + aw.qmc.EvalueTextColor[3] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.E1textcolorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[0] + "; color: " + aw.qmc.EvalueTextColor[0] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.E2textcolorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[1] + "; color: " + aw.qmc.EvalueTextColor[1] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.E3textcolorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[2] + "; color: " + aw.qmc.EvalueTextColor[2] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.E4textcolorButton.setStyleSheet("background-color: " + aw.qmc.EvalueColor[3] + "; color: " + aw.qmc.EvalueTextColor[3] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        
         # update markers
         if aw.qmc.EvalueMarker[0] in self.markervals:
             self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
@@ -32900,16 +32916,15 @@ class modbusport(object):
         return not (self.master is None) and self.master.socket
         
     def disconnect(self):
-        if self.isConnected():
-            try:
-                self.master.close()
-                self.master = None
-            except Exception:
-                pass
+        try:
+            self.master.close()
+        except Exception:
+            pass
+        self.master = None
 
     def connect(self):
-        if self.master and not self.master.socket:
-            self.master = None
+#        if self.master and not self.master.socket:
+#            self.master = None
         if self.master is None:
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
@@ -38747,6 +38762,8 @@ class comportDlg(ArtisanDialog):
         if devid == 29 or (devid == 0 and aw.ser.useModbusPort) : # switch to MODBUS tab if MODBUS device was selected as main device
             # or if PID and "Use ModbusPort" was selected
             TabWidget.setCurrentIndex(2)
+        elif devid == 79: # switch to S7 tab if S7 device was selected as main device
+            TabWidget.setCurrentIndex(3)
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)

@@ -18,11 +18,6 @@ ETBdeltaColor=orange
 BTBdeltaColor=blue
 BackgroundAlpha=0.3
 
-[Style]
-patheffects=2
-graphstyle=0
-graphfont=0
-
 [XT]
 color=green
 index=0
