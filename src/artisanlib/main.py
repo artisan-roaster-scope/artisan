@@ -17326,7 +17326,6 @@ class ApplicationWindow(QMainWindow):
         try: 
             if filename:
                 settings = QSettings(filename,QSettings.IniFormat)
-                self.settingspath = filename
             else:
                 settings = QSettings()
             if settings.contains("resetqsettings"):
@@ -17337,6 +17336,15 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.redraw()
                     return  #don't load any more settings. They could be bad (corrupted). Stop here.
                     
+            # we remember from which location we loaded the last settings file
+            # to be able to update the batch counter in this file from incBatchCounter()/decBatchCounter()
+            # but not for loading of settings fragments like themes or machines
+            if filename:
+              settings.beginGroup("Batch")
+              if settings.contains("batchcounter"):
+                self.settingspath = filename
+              settings.endGroup()
+                      
             #restore mode
             old_mode = self.qmc.mode
             self.qmc.mode = str(settings.value("Mode",self.qmc.mode))
@@ -18656,8 +18664,12 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fetchCurveStyles() {0}").format(str(e)),exc_tb.tb_lineno)
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
-    def closeEvent(self,_):
-        self.closeApp()
+    def closeEvent(self,event):
+        res = self.closeApp()
+        if res:
+            event.accept()
+        else:
+            event.ignore()
     
     def closeEventSettings(self, filename=None):
         #save window geometry and position. See QSettings documentation.
@@ -19509,6 +19521,7 @@ class ApplicationWindow(QMainWindow):
         except Exception:
             pass
     
+    # returns True if confirmed, False if canceled by the user
     def closeApp(self):
         if aw.qmc.checkSaved(): # if not canceled
             self.stopActivities()
@@ -19516,6 +19529,9 @@ class ApplicationWindow(QMainWindow):
             import gc
             gc.collect()
             QApplication.exit()
+            return True
+        else:
+            return False
 
     def closeserialports(self):
         # close main instrument port
