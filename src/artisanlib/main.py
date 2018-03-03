@@ -10360,6 +10360,10 @@ class ApplicationWindow(QMainWindow):
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         
+        # used on startup to reload previous loaded profiles
+        self.lastLoadedProfile = None
+        self.lastLoadedBackground = None
+        
         # large LCDs
         self.largeLCDs_dialog = None
         self.LargeLCDs = False
@@ -18366,6 +18370,13 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.endofx = self.qmc.resetmaxtime
             if self.qmc.endofx < 1:
                 self.qmc.endofx = 60
+
+            
+            # used on startup to reload previous loaded profiles
+            if settings.contains("lastLoadedProfile"):
+                aw.lastLoadedProfile = toString(settings.value("lastLoadedProfile",aw.curFile))
+            if settings.contains("lastLoadedBackground"):
+                aw.lastLoadedBackground = toString(settings.value("lastLoadedBackground",aw.qmc.backgroundpath))
             
             res = True
             
@@ -19259,6 +19270,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("dpi",aw.dpi)
             
             settings.setValue("recentRoasts",self.recentRoasts)
+            settings.setValue("lastLoadedProfile",aw.curFile)
+            settings.setValue("lastLoadedBackground",aw.qmc.backgroundpath)
 
         except Exception:
 #            import traceback
@@ -48177,6 +48190,20 @@ def main():
             elif file_suffix == "athm":
                 # load Artisan setings on double-click on *.athm file
                 aw.loadSettings(fn=u(argv_file))
+        else:
+            # we try to reload the last loaded profile or background
+            if aw.lastLoadedProfile:
+                try:
+                    aw.loadFile(u(aw.lastLoadedProfile))
+                except:
+                    pass
+            if aw.lastLoadedBackground and not aw.curFile:
+                try:
+                    aw.loadbackground(u(aw.lastLoadedBackground))
+                    aw.qmc.background = True
+                    aw.qmc.timealign(redraw=True)
+                except:
+                    aw.qmc.background = False
     except Exception:
         pass
         
