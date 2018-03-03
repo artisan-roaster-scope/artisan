@@ -844,9 +844,10 @@ class tgraphcanvas(FigureCanvas):
                         "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
                         "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue',
-                        "canvas":None,"legendbg":'white',"legendborder":'darkgrey', 
+                        "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
                         "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'black'} 
-
+        self.palette1 = self.palette.copy()
+        
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Aftertaste",None),
                                             QApplication.translate("Textbox", "Clean Cup",None),
@@ -5841,12 +5842,12 @@ class tgraphcanvas(FigureCanvas):
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
     def changeGColor(self,color):
         #COLOR (option 1) Default
-        palette1 = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
-                    "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
-                    "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
-                    "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue',
-                    "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
-                    "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'black'} 
+#        palette1 = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
+#                    "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
+#                    "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
+#                    "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue',
+#                    "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
+#                    "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'black'} 
 
         #BLACK & WHITE (option 2) best for printing
 #        palette2 = {"background":'white',"grid":'grey',"ylabel":'black',"xlabel":'black',"title":'black',
@@ -5859,8 +5860,13 @@ class tgraphcanvas(FigureCanvas):
         #load selected dictionary
         if color == 1:
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
-            for key in list(palette1.keys()):
-                self.palette[key] = palette1[key]
+            fname = os.path.join(aw.getResourcePath(),"Themes","Artisan","Default.athm")
+#            print(aw.lcdpaletteB)
+            if os.path.isfile(fname):
+                aw.loadSettings(fn=fname)
+            else:
+                for key in list(self.palette1.keys()):
+                    self.palette[key] = self.palette1[key]
             
         if color == 2:
             aw.sendmessage(QApplication.translate("Message","Colors set to grey", None))
@@ -12367,13 +12373,13 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " getcolorPairsToCheck() {0}").format(str(e)),exc_tb.tb_lineno)
 
         return colorPairsToCheck
         
 
     def colorDifference(self,color1,color2):
-        cieDiff = 100
+        cDiff = 100
         try:
             from colorspacious import deltaE
             if color1 == None or color1 == "None":
@@ -12394,14 +12400,14 @@ class ApplicationWindow(QMainWindow):
             c2 = str(QColor(color2).name())
             c1_rgb = tuple(int(c1[i:i+2], 16) for i in (1, 3 ,5))
             c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
-            cieDiff = deltaE(c1_rgb, c2_rgb, input_space="sRGB255", uniform_space="CIELab")
+            cDiff = deltaE(c1_rgb, c2_rgb, input_space="sRGB255", uniform_space="CIELab")
         except Exception as e:        
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " colorDifference() {0}").format(str(e)),exc_tb.tb_lineno)
 
-        return cieDiff
+        return cDiff
 
         
     def checkColors(self,colorPairsToCheck=[]):
@@ -12416,7 +12422,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " checkColors() {0}").format(str(e)),exc_tb.tb_lineno)
 
         return val
     
@@ -12440,7 +12446,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updatePhasesLCDs() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " convertToGreyscale() {0}").format(str(e)),exc_tb.tb_lineno)
 
         return nc
         
@@ -30959,6 +30965,15 @@ class EventsDlg(ArtisanDialog):
                 aw.qmc.etypes[1] = u(self.etype1.text())
                 aw.qmc.etypes[2] = u(self.etype2.text())
                 aw.qmc.etypes[3] = u(self.etype3.text())
+                colorPairsToCheck = []
+                for i in range(len(aw.qmc.EvalueColor)):
+                    colorPairsToCheck.append(
+                        (aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i], 'Background', aw.qmc.palette['background']),
+                    )                           
+                    colorPairsToCheck.append(
+                        (aw.qmc.etypes[i] + " Text", aw.qmc.EvalueTextColor[i], aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i]),
+                    )   
+                aw.checkColors(colorPairsToCheck)                        
                 # update minieditor event type ComboBox
                 aw.etypeComboBox.clear()
                 aw.etypeComboBox.addItems(aw.qmc.etypes)
@@ -41409,6 +41424,8 @@ class graphColorDlg(ArtisanDialog):
         grid.setVerticalSpacing(1)
         grid.setColumnMinimumWidth(1,80)
         grid.setColumnMinimumWidth(3,80)
+        grid.addWidget(self.canvasButton,0,0) 
+        grid.addWidget(self.canvasLabel,0,1) 
         grid.addWidget(self.backgroundButton,1,0)
         grid.addWidget(self.backgroundLabel,1,1)
         grid.addWidget(self.titleButton,2,0)
@@ -41427,6 +41444,10 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.yLabel,8,1)
         grid.addWidget(self.xButton,9,0)
         grid.addWidget(self.xLabel,9,1)
+        grid.addWidget(self.ClineButton,10,0)
+        grid.addWidget(self.ClineLabel,10,1)
+        grid.addWidget(self.watermarksButton,11,0)
+        grid.addWidget(self.watermarksLabel,11,1)
         grid.addWidget(self.rect1Button,0,2)
         grid.addWidget(self.rect1Label,0,3)
         grid.addWidget(self.rect2Button,1,2)
@@ -41439,16 +41460,10 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.markersLabel,4,3)
         grid.addWidget(self.textButton,5,2)
         grid.addWidget(self.textLabel,5,3)
-        grid.addWidget(self.watermarksButton,10,0)
-        grid.addWidget(self.watermarksLabel,10,1)
-        grid.addWidget(self.ClineButton,9,0)
-        grid.addWidget(self.ClineLabel,9,1)
         grid.addWidget(self.legendbgButton,6,2) 
         grid.addWidget(self.legendbgLabel,6,3) 
         grid.addWidget(self.legendborderButton,7,2)
         grid.addWidget(self.legendborderLabel,7,3) 
-        grid.addWidget(self.canvasButton,0,0) 
-        grid.addWidget(self.canvasLabel,0,1) 
         grid.addWidget(self.specialeventboxButton,8,2) 
         grid.addWidget(self.specialeventboxLabel,8,3) 
         grid.addWidget(self.specialeventtextButton,9,2) 
@@ -41460,7 +41475,7 @@ class graphColorDlg(ArtisanDialog):
         defaultsLayout.addWidget(greyButton)
         defaultsLayout.addWidget(defaultsButton)
         defaultsLayout.addWidget(okButton)
-        grid.addLayout(defaultsLayout,11,3)
+        grid.addLayout(defaultsLayout,12,3)
         graphLayout = QVBoxLayout()
         graphLayout.addLayout(grid)
         #tab 2
@@ -41702,6 +41717,7 @@ class graphColorDlg(ArtisanDialog):
                 (self.deltametLabel,"deltaet"),
                 (self.deltabtLabel,"deltabt"),
                 (self.yLabel,"ylabel"),
+                (self.yLabel,"xlabel"),
                 (self.ClineLabel,"Cline"),
                 (self.watermarksLabel,"watermarks"),
                 (self.rect1Label,"rect1"),
