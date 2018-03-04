@@ -8,7 +8,9 @@ export QT_PATH=/usr/local/lib/python3.5/site-packages/PyQt5/Qt
 rm -rf build
 rm -rf dist
 
-pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN "artisan.py"
+# pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN "artisan.py"
+
+pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN artisan-linux.spec
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist
@@ -42,6 +44,7 @@ rm -rf dist/mpl-data/sample_data
 cp artisan-alog.xml dist
 cp artisan-alrm.xml dist
 cp artisan-apal.xml dist
+cp artisan-athm.xml dist
 cp artisan-aset.xml dist
 cp artisan-wg.xml dist
 cp includes/Humor-Sans.ttf dist
@@ -60,11 +63,22 @@ cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist
 cp LICENSE.txt dist
+
 mkdir dist/Machines
 find includes/Machines -name '.*.aset' -exec rm -r {} \;
 cp -R includes/Machines/* dist/Machines
 
+mkdir dist/Themes
+find includes/Themes -name '.*.athm' -exec rm -r {} \;
+cp -R includes/Themes/* dist/Themes
+
+mkdir dist/Icons
+find includes/Icons -name '.*.aset' -exec rm -r {} \;
+cp -R includes/Icons/* dist/Icons
+
 cp $PYTHON_PATH/site-packages/yoctopuce/cdll/* dist
+
+cp /usr/lib/libsnap7.so dist
 
 
 cp README.txt dist

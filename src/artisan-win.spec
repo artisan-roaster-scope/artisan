@@ -13,6 +13,7 @@ PYQT_QT = PYTHON_PACKAGES + r'\PyQt5\Qt'
 PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
+SNAP7_BIN = r'C:\Windows'
 
 #os.system(PYTHON35 + r'\Scripts\pylupdate5 artisan.pro')
 
@@ -96,11 +97,16 @@ os.system(r'copy "' + YOCTO_BIN + r'\yapi.dll" ' + TARGET + 'lib')
 os.system(r'copy "' + YOCTO_BIN + r'\yapi64.dll" ' + TARGET + 'lib')
 # YOCTO HACK END
 
+# copy Snap7 lib
+os.system('copy "' + SNAP7_BIN + r'\snap7.dll" ' + TARGET)
+
+
 for fn in [
     'artisan.png',
     'artisanAlarms.ico',
     'artisanProfile.ico',
     'artisanPalettes.ico',
+    'artisanTheme.ico',
     'artisanSettings.ico',
     'artisanWheel.ico',
     r'includes\Humor-Sans.ttf',
@@ -120,6 +126,12 @@ for fn in [
 
 os.system(r'mkdir ' +  TARGET + 'Machines')
 os.system(r'xcopy includes\Machines ' + TARGET + 'Machines /y /S')
+
+os.system(r'mkdir ' +  TARGET + 'Themes')
+os.system(r'xcopy includes\Themes ' + TARGET + 'Themes /y /S')
+
+os.system(r'mkdir ' +  TARGET + 'Icons')
+os.system(r'xcopy includes\Icons ' + TARGET + 'Icons /y /S')
 
 
 

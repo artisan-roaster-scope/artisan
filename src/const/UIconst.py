@@ -96,7 +96,6 @@ if platf != 'Darwin':
 ROAST_MENU_PROPERTIES = QApplication.translate("Menu", "Properties...", None)
 ROAST_MENU_BACKGROUND = QApplication.translate("Menu", "Background...", None)
 ROAST_MENU_CUPPROFILE = QApplication.translate("Menu", "Cup Profile...", None)
-ROAST_MENU_TEMPERATURE = QApplication.translate("Menu", "Temperature", None)
 ROAST_MENU_CONVERT_TO_FAHRENHEIT = QApplication.translate("Menu", "Convert to Fahrenheit", None)
 ROAST_MENU_CONVERT_TO_CELSIUS = QApplication.translate("Menu", "Convert to Celsius", None)
 ROAST_MENU_FAHRENHEIT_MODE = QApplication.translate("Menu", "Fahrenheit Mode", None)
@@ -109,8 +108,9 @@ CONF_MENU = QApplication.translate("Menu", "Config", None)
 if platf != 'Darwin':
     CONF_MENU = "&" + CONF_MENU
 CONF_MENU_MACHINE = QApplication.translate("Menu", "Machine", None)
+CONF_MENU_THEMES = QApplication.translate("Menu", "Themes", None)
 CONF_MENU_DEVICE = QApplication.translate("Menu", "Device...", None)
-CONF_MENU_SERIALPORT = QApplication.translate("Menu", "Serial Port...", None)
+CONF_MENU_SERIALPORT = QApplication.translate("Menu", "Port...", None)
 CONF_MENU_SAMPLING = QApplication.translate("Menu", "Sampling Interval...", None)
 CONF_MENU_OVERSAMPLING = QApplication.translate("Menu", "Oversampling", None)
 CONF_MENU_OVERSAMPLING = QApplication.translate("Menu", "Oversampling", None)
@@ -126,6 +126,7 @@ CONF_MENU_AXES = QApplication.translate("Menu", "Axes...", None)
 CONF_MENU_AUTOSAVE = QApplication.translate("Menu", "Autosave...", None)
 CONF_MENU_BATCH = QApplication.translate("Menu", "Batch...", None)
 CONF_MENU_ALARMS = QApplication.translate("Menu", "Alarms...", None)
+CONF_MENU_TEMPERATURE = QApplication.translate("Menu", "Temperature", None)
 CONF_MENU_LANGUAGE = QApplication.translate("Menu", "Language", None)
 
 #Languages
@@ -161,7 +162,6 @@ TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None)
 TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None)
 TOOLKIT_MENU_WHEELGRAPH = QApplication.translate("Menu", "Wheel Graph", None)
 TOOLKIT_MENU_LCDS = QApplication.translate("Menu", "LCDs", None)
-TOOLKIT_MENU_FULLSCREEN = QApplication.translate("Menu", "Fullscreen", None)
 TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None)
 
 
@@ -169,8 +169,15 @@ TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None)
 SETTINGS_MENU_LOAD = QApplication.translate("Menu", "Load Settings...", None)    
 SETTINGS_MENU_LOADRECENT = QApplication.translate("Menu", "Load Recent Settings", None)
 SETTINGS_MENU_SAVEAS = QApplication.translate("Menu", "Save Settings...", None)
+SETTINGS_MENU_SAVETHEME = QApplication.translate("Menu", "Save Theme...", None)
 
-    
+
+#View menu items
+VIEW_MENU = QApplication.translate("Menu", "View", None)
+if platf != 'Darwin':
+    VIEW_MENU = "&" + VIEW_MENU
+VIEW_MENU_FULLSCREEN = QApplication.translate("Menu", "Full Screen", None) # "Enter Full Screen"
+
 #Help menu items
 HELP_MENU = QApplication.translate("Menu", "Help", None)
 if platf != 'Darwin':

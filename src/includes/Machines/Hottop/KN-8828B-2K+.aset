@@ -1,7 +1,44 @@
 [General]
 Delay=2000
-ExtraEventSamplingDelay=1000
 Oversampling=true
+
+[ArduinoPID]
+dutyMax=100
+dutyMin=-100
+dutySteps=1
+invertControl=false
+loadRampSoakFromProfile=false
+pidCooling=false
+pidCycle=1000
+pidKd=5
+pidKi=0.01
+pidKp=36
+pidNegativeTarget=0
+pidOnCHARGE=false
+pidPositiveTarget=4
+pidSource=1
+svButtons=false
+svLookahead=0
+svMode=0
+svRamps=0, 0, 0, 0, 0, 0, 0, 0
+svSlider=false
+svSliderMax=480
+svSliderMin=0
+svSoaks=0, 0, 0, 0, 0, 0, 0, 0
+svValue=100
+svValues=0, 0, 0, 0, 0, 0, 0, 0
+
+[CurveStyles]
+extradrawstyles1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0\x64\0\x65\0\x66\0\x61\0u\0l\0t)
+extradrawstyles2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\xe\0\x64\0\x65\0\x66\0\x61\0u\0l\0t)
+extralinestyles1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x2\0-)
+extralinestyles2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\x2\0-)
+extralinewidths1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
+extralinewidths2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
+extramarkers1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0N\0o\0n\0\x65)
+extramarkers2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0N\0o\0n\0\x65)
+extramarkersizes1=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x6)
+extramarkersizes2=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x6)
 
 [DefaultButtons]
 buttonactions=0, 0, 0, 0, 0, 0, 8, 0
@@ -66,7 +103,7 @@ DeltaET=false
 DeltaETlcd=false
 
 [RoastProperties]
-roastertype=Probat LG3
+roastertype=Hottop 2K+
 
 [SerialPort]
 baudrate=115200

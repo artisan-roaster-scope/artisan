@@ -27,6 +27,8 @@ o yoctopuce: 1.10.28707
 o pefile: 2017.9.3
 o PyInstaller: 3.3.1
 o openpyxl: 2.4.9
+o python-snap7 0.9
+o colorspacious 1.1.0
 
 # sudo bash
 # cd
@@ -41,6 +43,9 @@ o openpyxl: 2.4.9
 
 Upgrade History:
 
+- 2018-02-25
+ . python snap7 0.9
+ . colorspacious 1.1.0
 - 2017-12-17:
  . altgraph 0.15
  . macholib 1.9
@@ -51,7 +56,7 @@ Upgrade History:
  . Sip 4.19.4 => 4.19.6
  . PyQt 5.9.1 => 5.9.2
 
-1) Install CentOS7
+1) Install CentOS7 (25GB Disk, 4GB Mem)
 
 
 see https://www.youtube.com/watch?v=O1nF7HQAJGw
@@ -60,7 +65,7 @@ see https://www.youtube.com/watch?v=O1nF7HQAJGw
 - in the installer
  . set keyboard to German-Mac
  . time/date to Berlin
- . installation to "Server with GUI" and tick the development tools
+ . installation to "Gnome Desktop" and tick the development tools
  . turn networking on and set hostname to centos7
  . user account as adminstrator
 - install guest additions
@@ -99,91 +104,104 @@ ctrl left alt ^ = |
 ctrl left alt E = €
 
 
-# yum install zlib-devel bzip2-devel sqlite sqlite-devel openssl-devel ncurses-devel readline-devel tk-devel
-# yum install libXext-devel blas-devel lapack-devel
-# yum install gstreamer*
-
-# yum install xdg-utils	
+# sudo yum install zlib-devel bzip2-devel sqlite sqlite-devel openssl-devel ncurses-devel readline-devel tk-devel
+# sudo yum install libXext-devel blas-devel lapack-devel
+# sudo yum install gstreamer*
+# sudo yum install xdg-utils	
 
 
 2) Install Python 3.5.4
 
 # sudo yum -y update
 # sudo yum groupinstall "Development tools"
-# wget https://www.python.org/ftp/python/3.5.4/Python-3.5.4.tgz
-# tar xzf Python-3.5.4.tgz
-# cd Python-3.5.4
+# wget https://www.python.org/ftp/python/3.5.5/Python-3.5.5.tgz
+# tar xzf Python-3.5.5.tgz
+# cd Python-3.5.5
 # ./configure --enable-optimizations --enable-shared --prefix=/usr/local
 # sudo make altinstall
 # python3.5 -V
 
+# cd
+# vi .bashrc
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
-# yum install python3-dev
+# sudo visudo
+Defaults  secure_path = ...:/usr/local/bin
+
+# vi .bashrc
+alias sudo='sudo LD_LIBRARY_PATH=/mypath'
+
+
+%%% does not work: # sudo yum install python3-dev
+
 
 3) PyQt5
 
-# sudo -H /usr/local/bin/python3.5 -m pip install PyQt5
- => installs PyQt 5.9.1 (includes Qt 5.9)
+# sudo -H python3.5 -m pip install PyQt5
+ => installs PyQt 5.10.1 (includes Qt 5.10.1)
 
 4) pyserial
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install pyserial
+# sudo -H python3.5 -m pip  install pyserial
  => pyserial-3.4
 
 5) numpy
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install numpy
- => numpy-1.13.3
+# sudo -H python3.5 -m pip  install numpy
+ => numpy-1.14.1
 
 6) scipy
 
 # sudo -H /usr/local/bin/python3.5 -m pip  install scipy
- => scipy-0.19.1
+ => scipy-1.0.0
 
 7) matplotlib
 
 # sudo -H /usr/local/bin/python3.5 -m pip  install matplotlib
- => matplotlib-2.0.2
+ => matplotlib-2.1.2
 
 8) pymodbus
 
-own patched pymodbus 1.3 (copy also the folder manually to site-packages!)
-# sudo -H /usr/local/bin/python3.5 setup.py install
+# sudo -H /usr/local/bin/python3.5 -m pip  install pymodbus
+ => pymodbus 1.4.0
+
+## own patched pymodbus 1.3 (copy also the folder manually to site-packages!)
+## # sudo -H python3.5 setup.py install
 
 9) unidecode
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install unidecode
- => unidecode-0.4.21
+# sudo -H python3.5 -m pip  install unidecode
+ => unidecode-1.0.22
 
 9) bottle
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install bottle
+# sudo -H python3.5 -m pip  install bottle
  => bottle-0.12.13
 
 10) gevent
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install gevent
+# sudo -H python3.5 -m pip  install gevent
  => gevent-1.2.2
- => greenlet-04.12
+ => greenlet-04.13
 
 11) gevent-websocket
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install gevent-websocket
+# sudo -H python3.5 -m pip  install gevent-websocket
  => gevent-websocket-0.10.1
 
 12) qrcode
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install qrcode
+# sudo -H python3.5 -m pip  install qrcode
  => qrcode-5.3
 
 13) urllib3
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install urllib3
+# sudo -H python3.5 -m pip  install urllib3
  => urllib3-1.22
 
 14) requests
 
-# sudo -H /usr/local/bin/python3.5 -m pip  install requests
+# sudo -H python3.5 -m pip  install requests
  => requests-2.18.4
 
 15) Phidgets driver
@@ -191,32 +209,55 @@ own patched pymodbus 1.3 (copy also the folder manually to site-packages!)
 download Python driver for the actual v22 API
 # wget https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
 
-# sudo -H /usr/local/bin/python3.5 setup.py install
+# sudo -H python3.5 setup.py install
  (download python module Phidget22Python_1.0.0.20170727.zip)
  => Phidget22-1.0.0
 
 16) Yoctopuce driver
 
-# sudo -H /usr/local/bin/python3.5 -m pip install yoctopuce
- => yoctopuce-1.10.28707
+# sudo -H python3.5 -m pip install yoctopuce
+ => yoctopuce-1.10.29837
 
 17) pefile
 
-# sudo -H /usr/local/bin/python3.5 -m pip install pefile
- => pefile-2017.9.3
+# sudo -H python3.5 -m pip install pefile
+ => pefile-2017.11.5
 
 18) pyinstaller
 
-# sudo -H /usr/local/bin/python3.5 -m pip install pyinstaller
- => pyinstaller-3.3
+# sudo -H python3.5 -m pip install pyinstaller
+ => pyinstaller-3.3-1
 
 19) fpm
 
 # sudo yum install ruby-devel gcc make rpm-build rubygems
 # sudo gem install --no-ri --no-rdoc fpm
 # fpm --version
-1.6.3
+1.9.3
 
 20) openpyxl
 
-# sudo -H /usr/local/bin/python3.5 -m pip install openpyxl==2.4.9
+# sudo -H python3.5 -m pip install openpyxl==2.4.9
+
+21) snap7 + python-snap7
+
+# wget https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
+
+# sudo yum install epel-release
+# sudo yum install p7zip
+
+# 7za x snap7-full-1.4.2.7z
+
+# cd snap7-full-1.4.2/build/unix
+# make -f x86_64_linux.mk all
+# sudo make -f x86_64_linux.mk install
+  => installs in /usr/lib
+update lib cache
+# sudo ldconfig
+
+# sudo -H python3.5 -m pip install python-snap7
+ => python-snap7-0.9
+
+22) colorspacious
+
+# sudo -H python3.5 -m pip install colorspacious

@@ -3,9 +3,9 @@ Current Versions:
 o XCode 4.5.2 + command line tools
 o Python 3.5.4 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial 3.3.4
-o QT 5.9.3
+o QT 5.10.1
 o SIP 4.19.6
-o PyQt 5.9.2
+o PyQt 5.10.1
 o numpy 1.12.1
 o scipy 1.0.0
 o matplotlib 2.1.1
@@ -32,6 +32,10 @@ o unidecode 0.4.21
 o pillow 4.3.0
 o PyInstaller 3.3.1
 o pytz 2017.3
+o snap7 1.4.2
+o python-snap7 0.9
+o colorspacious 1.1.0
+
 
 CHECK FOR UPDATES
 # pip install --upgrade pip
@@ -63,6 +67,17 @@ open a terminal and type
 
 Upgrade History:
 
+- 2018-03-01
+ . Qt 5.10.0 => 5.10.1
+ . PyQt 5.10.0 => 5.10.1
+- 2018-02-25
+ . snap7 1.4.2
+ . python snap7 0.9
+ . colorspacious 1.1.0
+- 2018-01-30:
+ . Qt 5.9.3 => 5.10.0
+ . PyQt 5.9.2 => 5.10.0
+ . matplotlib 2.1.1 => 2.1.2
 - 2017-12-16:
  . Python 2.7 => 3.5.4
  . scipy 0.19.0 => 1.0.0
@@ -458,8 +473,14 @@ export PATH=/Users/luther/Qt5.9.1/5.9.1/clang_64/bin/:/Users/luther/Qt5.9.1/5.9/
 ---
 
 
+Using pip wheels:
+
+# sudo -H python3 -m pip install PyQt5 --upgrade
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/PyQt5/uic/port_v2
 
 If installed from the newer wheels, one needs to manually delete the site-packages/PyQt5/uic/port_v2 (on Python3) and port_v3 (on Python2) subdirectories to avoid build problems.
+
+
 
 
 7) Install Numpy
@@ -874,3 +895,17 @@ https://github.com/lincolnloop/python-qrcode
 # sudo -H python -m pip install appdirs --upgrade
 # sudo -H python -m pip install packaging --upgrade
 # sudo -H python -m pip install unidecode --upgrade
+
+31) snap7 + python-snap7
+
+# cd snap7-full-1.4.2/build/osx
+# make -f x86_64_osx.mk all
+# sudo make -f x86_64_osx.mk install
+
+# cd python-snap7-0.9
+# python setup.py build
+# python setup.py install
+
+32) colorspacious
+
+# sudo -H python -m pip install colorspacious

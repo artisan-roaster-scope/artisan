@@ -30,7 +30,7 @@ LICENSE = 'GNU General Public License (GPL)'
 try:
     QTDIR = os.environ["QT_PATH"] + r'/'
 except:
-    QTDIR = r'/Users/luther/Qt5.9.3/5.9.3/clang_64/' # qt5
+    QTDIR = r'/Users/luther/Qt5.10.1/5.10.1/clang_64/' # qt5
 
 APP = ['artisan.py']
 
@@ -54,6 +54,7 @@ DATA_FILES = [
 #    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
 #    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
     ("../Resources/qt_plugins/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # qt5/# standard     
+    ("../Resources/qt_plugins/styles", [QTDIR + r'/plugins/styles/libqmacstyle.dylib']), # QT 5.10 requires this
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
     ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
@@ -99,6 +100,7 @@ DATA_FILES = [
     ("../Resources", [r"artisanAlarms.icns"]),
     ("../Resources", [r"artisanPalettes.icns"]),
     ("../Resources", [r"artisanSettings.icns"]),
+    ("../Resources", [r"artisanTheme.icns"]),
     ("../Resources", [r"artisanWheel.icns"]),
     ("../Resources", [r"includes/alarmclock.eot"]),
     ("../Resources", [r"includes/alarmclock.svg"]),
@@ -113,6 +115,8 @@ DATA_FILES = [
     ("../Resources", [r"includes/Humor-Sans.ttf"]),
     ("../Resources", [r"includes/jquery-1.11.1.min.js"]),
     ("../Resources", [r"includes/Machines"]),
+    ("../Resources", [r"includes/Themes"]),
+    ("../Resources", [r"includes/Icons"]),
   ]
   
 plist = Plist.fromFile('Info.plist')
@@ -198,6 +202,9 @@ os.chdir('./dist')
 os.system(r'mkdir Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matplotlib/.dylibs')
 os.system(r'cp -R /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matplotlib/.dylibs')
 os.system(r'cp /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
+
+# copy snap7 dylib
+os.system(r'cp /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
 
 # for Qt5
 print('*** Removing unused Qt frameworks ***')

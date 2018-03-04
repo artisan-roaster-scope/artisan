@@ -33,10 +33,16 @@ o yoctopuce: 1.10.28296
 o PyInstaller: 3.3.1
 o openpyxl: 2.4.9
 o pip-review: 1.0
+o snap7 1.4.2
+o python snap7 0.9
+o colorspacious 1.1.0
 
 
 Upgrade History:
 
+- 2018-02-25
+ . python snap7 0.9
+ . colorspacious 1.1.0
 - 2017-12-16:
  . scipy 0.19.1 => 1.0.0
  . matplotlib 2.0.2 => 2.1.1
@@ -182,9 +188,20 @@ put in the directory above the Artisan source code
 
 # pip3 install openpyxl==2.4.9
 
-23)
+23) pip-review
 
 # pip3 install pip-review
+
+24) snap7 / Python snap7
+
+# cd snap7-full-1.4.2\release\Windows\Win64
+# copy snap7.dll c:\WINDOWS
+
+# pip3 install python-snap7
+
+25) colorspacious
+
+# pip3 install colorspacious
 
 ----
 

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with matplotlib (http://matplotlib.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="72pt"
+   version="1.1"
+   viewBox="0 0 72 72"
+   width="72pt"
+   id="svg13"
+   inkscape:version="0.91+devel r14842"
+   sodipodi:docname="move_white.svg">
+  <metadata
+     id="metadata17">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1127"
+     inkscape:window-height="690"
+     id="namedview15"
+     showgrid="false"
+     inkscape:zoom="2.4583333"
+     inkscape:cx="48"
+     inkscape:cy="48"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg13" />
+  <defs
+     id="defs4">
+    <style
+       type="text/css"
+       id="style2">
+*{stroke-linecap:butt;stroke-linejoin:round;}
+  </style>
+  </defs>
+  <g
+     id="g4236">
+    <g
+       id="patch_1"
+       style="stroke-linecap:butt;stroke-linejoin:round">
+      <path
+         d="M 0,72 H 72 V 0 H 0 Z"
+         style="opacity:0;fill:none;stroke-linecap:butt;stroke-linejoin:round"
+         id="path6"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       id="text_1"
+       style="stroke-linecap:butt;stroke-linejoin:round;fill:#ffffff">
+      <path
+         d="m 70,37.44 c 0,-0.6375 -0.265625,-1.25375 -0.7225,-1.7 l -9.71125,-9.721875 c -0.456875,-0.456875 -1.0625,-0.7225 -1.710625,-0.7225 -1.328125,0 -2.4225,1.105 -2.4225,2.433125 v 4.855625 h -14.5775 V 18.0175 h 4.855625 c 1.328125,0 2.433125,-1.105 2.433125,-2.433125 0,-0.648125 -0.265625,-1.25375 -0.7225,-1.710625 L 37.710625,4.1625 C 37.25375,3.705625 36.648125,3.44 36,3.44 c -0.648125,0 -1.25375,0.265625 -1.710625,0.7225 l -9.71125,9.71125 c -0.456875,0.456875 -0.7225,1.0625 -0.7225,1.710625 0,1.328125 1.105,2.433125 2.433125,2.433125 h 4.855625 v 14.566875 h -14.5775 V 27.72875 c 0,-1.328125 -1.094375,-2.433125 -2.4225,-2.433125 -0.648125,0 -1.25375,0.265625 -1.710625,0.7225 L 2.7225,35.74 C 2.265625,36.18625 2,36.8025 2,37.44 c 0,0.648125 0.265625,1.25375 0.7225,1.710625 l 9.71125,9.71125 c 0.456875,0.456875 1.0625,0.7225 1.710625,0.7225 1.328125,0 2.4225,-1.094375 2.4225,-2.4225 v -4.86625 h 14.5775 v 14.5775 H 26.28875 c -1.328125,0 -2.433125,1.094375 -2.433125,2.4225 0,0.648125 0.265625,1.25375 0.7225,1.710625 l 9.71125,9.71125 C 34.74625,71.174375 35.351875,71.44 36,71.44 c 0.648125,0 1.25375,-0.265625 1.710625,-0.7225 l 9.71125,-9.71125 c 0.456875,-0.456875 0.7225,-1.0625 0.7225,-1.710625 0,-1.328125 -1.105,-2.4225 -2.433125,-2.4225 h -4.855625 v -14.5775 h 14.5775 v 4.86625 c 0,1.328125 1.094375,2.4225 2.4225,2.4225 0.648125,0 1.25375,-0.265625 1.710625,-0.7225 l 9.71125,-9.71125 C 69.734375,38.69375 70,38.088125 70,37.44"
+         id="path9"
+         inkscape:connector-curvature="0"
+         style="stroke-linecap:butt;stroke-linejoin:round;fill:#ffffff" />
+    </g>
+  </g>
+</svg>
