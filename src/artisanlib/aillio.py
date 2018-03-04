@@ -31,10 +31,10 @@ class AillioR1:
         self.dt = 0
         self.heater = 0
         self.fan = 0
-        self.dt_ror = 0
         self.bt_ror = 0
         self.drum = 0
         self.voltage = 0
+        self.exitt = 0
 
     def __del__(self):
         self.__close__()
@@ -154,13 +154,13 @@ class AillioR1:
         self.__getstate__()
         return self.voltage
 
-    def get_dt_ror(self):
-        self.__getstate__()
-        return self.dt_ror
-
     def get_bt_ror(self):
         self.__getstate__()
         return self.bt_ror
+
+    def get_exit_temperature(self):
+        self.__getstate__()
+        return self.exitt
 
     def __getstate__(self):
         self.__open__()
@@ -179,7 +179,6 @@ class AillioR1:
         self.bt = round(unpack('f', state[0:4])[0], 1)
         self.bt_ror = round(unpack('f', state[4:8])[0], 1)
         self.dt = round(unpack('f', state[8:12])[0], 1)
-        self.dt_ror = round(unpack('f', state[12:16])[0], 1)
         self.exitt = round(unpack('f', state[16:20])[0], 1)
         self.pcbt = round(unpack('f', state[32:36])[0], 1)
         self.irt = round(unpack('f', state[36:40])[0], 1)
@@ -195,7 +194,6 @@ class AillioR1:
         self.__dbg__('BT: ' + str(self.bt))
         self.__dbg__('BT RoR: ' + str(self.bt_ror))
         self.__dbg__('DT: ' + str(self.dt))
-        self.__dbg__('DT RoR: ' + str(self.dt_ror))
         self.__dbg__('exit temperature ' + str(self.exitt))
         self.__dbg__('PCB temperature: ' + str(self.irt))
         self.__dbg__('IR temperature: ' + str(self.pcbt))

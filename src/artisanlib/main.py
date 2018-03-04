@@ -1173,10 +1173,10 @@ class tgraphcanvas(FigureCanvas):
                        "S7",                        #79
                        "+S7 34",                    #80
                        "+S7 56",                    #81
-                       "Aillio Bullet R1 BT/DT",          #82
-                       "+Aillio Bullet R1 Heater/Fan",    #83
-                       "+Aillio Bullet R1 BT RoR/DT RoR", #84
-                       "+Aillio Bullet R1 Drum/Voltage",  #85
+                       "Aillio Bullet R1 BT/DT",                      #82
+                       "+Aillio Bullet R1 Heater/Fan",                #83
+                       "+Aillio Bullet R1 BT RoR/Drum",               #84
+                       "+Aillio Bullet R1 Voltage/Exit Temperature",  #85
                        ]
 
         #extra devices
@@ -1922,8 +1922,8 @@ class tgraphcanvas(FigureCanvas):
         #temporary storage to pass values. Holds all values retrieved from an R1 roaster
         self.R1_DT = -1
         self.R1_BT = -1
-        self.R1_DT_ROR = -1
         self.R1_BT_ROR = -1
+        self.R1_EXIT_TEMP = -1
         self.R1_HEATER = 0 # 0-10
         self.R1_FAN = 0 # 0-12
         self.R1_DRUM = 0 # 0-9
@@ -33711,8 +33711,8 @@ class serialport(object):
                                    self.S7_56,                #81
                                    self.R1_BTDT,              #82
                                    self.R1_HF,                #83
-                                   self.R1_BTDT_ROR,          #84
-                                   self.R1_DSV,               #85
+                                   self.R1_DRUM_BTROR,        #84
+                                   self.R1_EXIT_TEMP_VOLT,    #85
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -34194,22 +34194,22 @@ class serialport(object):
         aw.qmc.R1_VOLTAGE = self.R1.get_voltage()
         aw.qmc.R1_HEATER = self.R1.get_heater()
         aw.qmc.R1_FAN = self.R1.get_fan()
-        aw.qmc.R1_DT_ROR = self.R1.get_dt_ror()
         aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
+        aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
         aw.qmc.R1_TX = tx
         return tx, aw.qmc.R1_BT, aw.qmc.R1_DT
 
-    def R1_BTDT_ROR(self):
+    def R1_DRUM_BTROR(self):
         tx = aw.qmc.R1_TX
-        return tx, aw.qmc.R1_DT_ROR, aw.qmc.R1_BT_ROR
+        return tx, aw.qmc.R1_DRUM, aw.qmc.R1_BT_ROR
 
     def R1_HF(self):
         tx = aw.qmc.R1_TX
         return tx, aw.qmc.R1_FAN, aw.qmc.R1_HEATER
 
-    def R1_DSV(self):
+    def R1_EXIT_TEMP_VOLT(self):
         tx = aw.qmc.R1_TX
-        return tx, aw.qmc.R1_VOLTAGE, aw.qmc.R1_DRUM
+        return tx, aw.qmc.R1_EXIT_TEMP, aw.qmc.R1_VOLTAGE
     
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
