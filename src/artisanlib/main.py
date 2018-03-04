@@ -679,6 +679,10 @@ if platf == 'Windows':
             app.setAttribute(Qt.AA_UseHighDpiPixmaps)
     except Exception as e:
         pass
+        
+        
+deltaLabelPrefix = u("\u03B4") # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
+
 
 # platform dependent imports:
 if sys.platform.startswith("darwin"):
@@ -1519,7 +1523,7 @@ class tgraphcanvas(FigureCanvas):
         self.eventsGraphflag = 2
         self.clampEvents = True # if True, custom events are drawn w.r.t. the temperature scale
         self.renderEventsDescr = False # if True, descriptions are rendered instead of type/value tags
-        self.eventslabelschars = 4 # maximal number of chars to render as events label
+        self.eventslabelschars = 6 # maximal number of chars to render as events label
         #flag that shows events in the graph
         self.eventsshowflag = 1
         #flag that shows major event annotations in the graph
@@ -5194,11 +5198,11 @@ class tgraphcanvas(FigureCanvas):
                             if self.DeltaETflag:
                                 self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
+                                linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "ET", None)))                    
                             if self.DeltaBTflag:           
                                 self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))    
+                                linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "BT", None)))    
     
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
@@ -5255,10 +5259,10 @@ class tgraphcanvas(FigureCanvas):
     
                 if self.DeltaETflag: 
                     handles.append(self.l_delta1)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "\u0394\u200aET", None)))
+                    labels.append(aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "ET", None)))
                 if self.DeltaBTflag:
                     handles.append(self.l_delta2)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "\u0394BT", None)))
+                    labels.append(aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "BT", None)))
     
     
                 nrdevices = len(self.extradevices)
@@ -8453,7 +8457,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.plot(timez,deltabtvals,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],
-                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
+                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "T", None)))
                     
             if self.DeltaETflag:
                 funcDelta2 = func2.derivative()
@@ -8461,7 +8465,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.plot(timez,deltaetvals,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                     linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],
-                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                          
+                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "ET", None)))                          
             
             #add curves
             if self.ETcurve:
@@ -11549,12 +11553,12 @@ class ApplicationWindow(QMainWindow):
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label4.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
+        self.label4.setText("<big><b>" + deltaLabelPrefix + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
         self.setLabelColor(self.label4,QColor(self.qmc.palette["deltaet"]))
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label5.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
+        self.label5.setText("<big><b>" + deltaLabelPrefix + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
         self.setLabelColor(self.label5,QColor(self.qmc.palette["deltabt"]))
         # pid sv
         self.label6 = QLabel()
@@ -23658,10 +23662,10 @@ class HUDDlg(ArtisanDialog):
         modeLabel.setAlignment(Qt.AlignRight)
         ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None))
         #delta ET
-        self.DeltaET = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None))
+        self.DeltaET = QCheckBox(QApplication.translate("CheckBox", deltaLabelPrefix+"ET",None))
         self.DeltaET.setChecked(aw.qmc.DeltaETflag)
         #delta BT
-        self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None))
+        self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", deltaLabelPrefix+"BT",None))
         self.DeltaBT.setChecked(aw.qmc.DeltaBTflag)
         filterlabel = QLabel(QApplication.translate("Label", "Smooth Deltas",None))
         #DeltaFilter holds the number of pads in filter
@@ -23815,9 +23819,9 @@ class HUDDlg(ArtisanDialog):
         rorBoxLayout.addStretch()
         rorBoxLayout.addWidget(self.projectCheck)
         rorBoxLayout.addWidget(self.projectionmodeComboBox)
-        self.DeltaETlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None))
+        self.DeltaETlcd = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox", "ET",None))
         self.DeltaETlcd.setChecked(aw.qmc.DeltaETlcdflag)
-        self.DeltaBTlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None))
+        self.DeltaBTlcd = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox", "BT",None))
         self.DeltaBTlcd.setChecked(aw.qmc.DeltaBTlcdflag)
         self.DecimalPlaceslcd = QCheckBox(QApplication.translate("CheckBox", "Decimal Places",None))
         self.DecimalPlaceslcd.setChecked(aw.qmc.LCDdecimalplaces)
@@ -25021,12 +25025,12 @@ class HUDDlg(ArtisanDialog):
         self.curvenames = []
         self.deltacurves = [] # list of flags. True if delta curve, False otherwise
         if aw.qmc.DeltaETflag:
-            self.curvenames.append(QApplication.translate("ComboBox","DeltaET",None))
+            self.curvenames.append(deltaLabelPrefix + QApplication.translate("ComboBox","ET",None))
             self.curves.append(aw.qmc.delta1)
             self.deltacurves.append(True)
             idx = idx + 1
         if aw.qmc.DeltaBTflag:
-            self.curvenames.append(QApplication.translate("ComboBox","DeltaBT",None))
+            self.curvenames.append(deltaLabelPrefix + QApplication.translate("ComboBox","BT",None))
             self.curves.append(aw.qmc.delta2)
             self.deltacurves.append(True)
             idx = idx + 1
@@ -27171,8 +27175,8 @@ class editGraphDlg(ArtisanDialog):
         columns = [QApplication.translate("Table", "Time",None),
                                                   QApplication.translate("Table", "ET",None),
                                                   QApplication.translate("Table", "BT",None),
-                                                  QApplication.translate("Table", "DeltaET",None),
-                                                  QApplication.translate("Table", "DeltaBT",None)]
+                                                  deltaLabelPrefix + QApplication.translate("Table", "ET",None),
+                                                  deltaLabelPrefix + QApplication.translate("Table", "BT",None)]
         for i in range(len(aw.qmc.extratimex)):
             columns.append(aw.qmc.extraname1[i])
             columns.append(aw.qmc.extraname2[i])
@@ -28537,7 +28541,7 @@ class WindowsDlg(ArtisanDialog):
         xGroupLayout.setLayout(xlayout)
         yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None))
         yGroupLayout.setLayout(ylayoutHbox)
-        zGroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT/DeltaET Axis",None))
+        zGroupLayout = QGroupBox(deltaLabelPrefix + " " + QApplication.translate("GroupBox","Axis",None))
         zGroupLayout.setLayout(zlayoutHbox)
         legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None))
         legendLayout.setLayout(legentlayout)
@@ -31657,8 +31661,8 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Show", None))
         self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Annotations", None))
         self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None))
-        self.backgroundDeltaETflag = QCheckBox(QApplication.translate("CheckBox","DeltaET", None))
-        self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None)) 
+        self.backgroundDeltaETflag = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox","ET", None))
+        self.backgroundDeltaBTflag = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox","BT", None)) 
         self.backgroundETflag = QCheckBox(QApplication.translate("CheckBox","ET", None))
         self.backgroundBTflag = QCheckBox(QApplication.translate("CheckBox","BT", None))        
         self.backgroundCheck.setChecked(aw.qmc.background)
@@ -31709,7 +31713,7 @@ class backgroundDlg(ArtisanDialog):
         for key in cnames:
             self.colors.append(str(key))
         self.colors.sort()
-        self.defaultcolors = ["ET","BT","DeltaET","DeltaBT"]
+        self.defaultcolors = ["ET","BT",deltaLabelPrefix + "ET", deltaLabelPrefix + "BT"]
         self.defaultcolorsmapped = [aw.qmc.palette["et"],aw.qmc.palette["bt"],aw.qmc.palette["deltaet"],aw.qmc.palette["deltabt"]]
         metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None))
         metcolorlabel.setAlignment(Qt.AlignRight)
@@ -31745,14 +31749,14 @@ class backgroundDlg(ArtisanDialog):
         if aw.qmc.xtcurveidx < len(curvenames):
             self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
         self.xtcurveComboBox.currentIndexChanged.connect(lambda i=self.xtcurveComboBox.currentIndex() :self.changeXTcurveidx(i))
-        deltaetcolorlabel = QLabel(QApplication.translate("Label", "DeltaET Color",None))
+        deltaetcolorlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET Color",None))
         deltaetcolorlabel.setAlignment(Qt.AlignRight)
         self.deltaetcolorComboBox = QComboBox()
         self.deltaetcolorComboBox.addItems(self.defaultcolors)
         self.deltaetcolorComboBox.insertSeparator(4)
         self.deltaetcolorComboBox.addItems(self.colors)
         self.deltaetcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltaetcolor))
-        deltabtcolorlabel = QLabel(QApplication.translate("Label", "DeltaBT Color",None))
+        deltabtcolorlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "BT Color",None))
         deltabtcolorlabel.setAlignment(Qt.AlignRight)
         self.deltabtcolorComboBox = QComboBox()
         self.deltabtcolorComboBox.addItems(self.defaultcolors)
@@ -32190,8 +32194,8 @@ class backgroundDlg(ArtisanDialog):
             headers = [QApplication.translate("Table","Time",None),
                                                       QApplication.translate("Table","ET",None),
                                                       QApplication.translate("Table","BT",None),
-                                                      QApplication.translate("Table","DeltaET",None),
-                                                      QApplication.translate("Table","DeltaBT",None)]
+                                                      deltaLabelPrefix + QApplication.translate("Table","ET",None),
+                                                      deltaLabelPrefix + QApplication.translate("Table","BT",None)]
             xtcurve = False # no XT curve
             if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
                 idx3 = aw.qmc.xtcurveidx - 1
@@ -37416,8 +37420,8 @@ class designerconfigDlg(ArtisanDialog):
         reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None))
         self.reproduceComboBox = QComboBox()
         self.reproduceComboBox.addItems(["",
-                                         QApplication.translate("ComboBox","DeltaBT",None),
-                                         QApplication.translate("ComboBox","DeltaET",None),
+                                         deltaLabelPrefix + QApplication.translate("ComboBox","BT",None),
+                                         deltaLabelPrefix + QApplication.translate("ComboBox","ET",None),
                                          QApplication.translate("ComboBox","SV Commands",None),
                                          QApplication.translate("ComboBox","Ramp Commands",None)])
         self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
@@ -41262,14 +41266,14 @@ class graphColorDlg(ArtisanDialog):
         self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
         self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
         self.deltametLabel.setAutoFillBackground(True)
-        self.deltametButton = QPushButton(QApplication.translate("Button","DeltaET", None))
+        self.deltametButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","ET", None))
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
         self.deltametButton.clicked.connect(lambda _: self.setColor("DeltaET",self.deltametLabel,"deltaet"))
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
         self.deltabtLabel.setAutoFillBackground(True)
-        self.deltabtButton = QPushButton(QApplication.translate("Button","DeltaBT", None))
+        self.deltabtButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","BT", None))
         self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtLabel.setFrameStyle(frameStyle)
         self.deltabtButton.clicked.connect(lambda _: self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
@@ -41547,10 +41551,10 @@ class graphColorDlg(ArtisanDialog):
         LCD3GroupLayout = QGroupBox(QApplication.translate("GroupBox","BT LCD",None))
         LCD3GroupLayout.setLayout(lcd3layout)
         lcd3layout.setContentsMargins(0,0,0,0)
-        LCD4GroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaET LCD",None))
+        LCD4GroupLayout = QGroupBox(deltaLabelPrefix + QApplication.translate("GroupBox","ET LCD",None))
         LCD4GroupLayout.setLayout(lcd4layout)
         lcd4layout.setContentsMargins(0,0,0,0)
-        LCD5GroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT LCD",None))
+        LCD5GroupLayout = QGroupBox(deltaLabelPrefix + QApplication.translate("GroupBox","BT LCD",None))
         LCD5GroupLayout.setLayout(lcd5layout)
         lcd5layout.setContentsMargins(0,0,0,0)
         LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV LCD",None))
@@ -41796,9 +41800,9 @@ class graphColorDlg(ArtisanDialog):
                 aw.setLabelColor(aw.label2,QColor(aw.qmc.palette[color]))
             elif title == "BT":
                 aw.setLabelColor(aw.label3,QColor(aw.qmc.palette[color]))
-            elif title == "DeltaET":
+            elif title == deltaLabelPrefix + "ET":
                 aw.setLabelColor(aw.label4,QColor(aw.qmc.palette[color]))
-            elif title == "DeltaBT":
+            elif title == deltaLabelPrefix + "BT":
                 aw.setLabelColor(aw.label5,QColor(aw.qmc.palette[color]))
             aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(aw.qmc.palette[color])))
 
@@ -42936,8 +42940,8 @@ class AlarmDlg(ArtisanDialog):
             extra_names.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
             extra_names.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
         return ["",
-             QApplication.translate("ComboBox","DeltaET",None),
-             QApplication.translate("ComboBox","DeltaBT",None),
+             deltaLabelPrefix + QApplication.translate("ComboBox","ET",None),
+             deltaLabelPrefix + QApplication.translate("ComboBox","BT",None),
              QApplication.translate("ComboBox","ET",None),
              QApplication.translate("ComboBox","BT",None)] + extra_names
 
