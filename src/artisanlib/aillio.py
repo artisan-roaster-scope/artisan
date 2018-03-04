@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import usb1
-import hexdump
 import time
 from struct import pack, unpack
 
@@ -23,7 +22,8 @@ class AillioR1:
     AILLIO_STATE_ROASTING = 0x06
     AILLIO_STATE_COOLING = 0x08
 
-    def __init__(self):
+    def __init__(self, debug=True):
+        self.AILLIO_DEBUG = debug
         self.__dbg__('init')
         self.usbctx = usb1.USBContext()
         self.usbhandle = None
@@ -31,6 +31,10 @@ class AillioR1:
         self.dt = 0
         self.heater = 0
         self.fan = 0
+        self.dt_ror = 0
+        self.bt_ror = 0
+        self.drum = 0
+        self.voltage = 0
 
     def __del__(self):
         self.__close__()
@@ -235,8 +239,7 @@ class AillioR1:
 
 
 if __name__ == "__main__":
-    R1 = AillioR1()
+    R1 = AillioR1(debug=True)
     while True:
         R1.get_bt()
         time.sleep(1)
-        print 'heater: ' + str(R1.get_heater())
