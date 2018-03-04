@@ -80,7 +80,8 @@ class AillioR1:
             self.usbhandle.close()
 
     def setstate(self, heater=None, fan=None, drum=None):
-        self.__dbg__('setstate')
+        # Increase drum speed to 0x9
+        # self.__sendcmd__([0x32, 0x01, 0x9, 0x00])
         pass
 
     def get_bt(self):
@@ -179,6 +180,7 @@ class AillioR1:
         self.bt_ror = round(unpack('f', state[4:8])[0], 1)
         self.dt = round(unpack('f', state[8:12])[0], 1)
         self.dt_ror = round(unpack('f', state[12:16])[0], 1)
+        self.exitt = round(unpack('f', state[16:20])[0], 1)
         self.pcbt = round(unpack('f', state[32:36])[0], 1)
         self.irt = round(unpack('f', state[36:40])[0], 1)
         self.seconds = unpack('h', state[42:44])[0]
@@ -189,10 +191,12 @@ class AillioR1:
         self.voltage = unpack('h', state[48:50])[0]
         self.heater = unpack('H', state[50:52])[0]
         self.coil_fan = round(unpack('i', state[52:56])[0], 1)
+
         self.__dbg__('BT: ' + str(self.bt))
         self.__dbg__('BT RoR: ' + str(self.bt_ror))
         self.__dbg__('DT: ' + str(self.dt))
         self.__dbg__('DT RoR: ' + str(self.dt_ror))
+        self.__dbg__('exit temperature ' + str(self.exitt))
         self.__dbg__('PCB temperature: ' + str(self.irt))
         self.__dbg__('IR temperature: ' + str(self.pcbt))
         self.__dbg__('voltage: ' + str(self.voltage))
@@ -202,15 +206,6 @@ class AillioR1:
         self.__dbg__('drum speed: ' + str(self.drum))
         self.__dbg__('time: ' + str(self.minutes) + ':' + str(self.seconds))
 
-#        print "1---------------"
- #       for i in range(16, 32, 4):
-  #          uk1 = round(unpack('i', state[i:i+4])[0], 1)
-   #         uk2 = round(unpack('f', state[i:i+4])[0], 1)
-    #        print str(i) + ': ' + hexdump.dump(state[i:i+4])
-     #   print '40: ' + hexdump.dump(state[40:42])
-#        print '46: ' + hexdump.dump(state[46:48])
- #       print '56: ' + hexdump.dump(state[56:60])
-  #      print '60: ' + hexdump.dump(state[60:64])
         self.__sendcmd__(self.AILLIO_CMD_STATUS2)
         state = self.__readreply__(64)
         self.coil_fan2 = round(unpack('i', state[32:36])[0], 1)
@@ -228,6 +223,7 @@ class AillioR1:
         elif self.r1state == self.AILLIO_STATE_COOLING:
             self.__dbg__('state: cooling')
         self.__dbg__('second coil fan: ' + str(self.coil_fan2))
+
 
     def __sendcmd__(self, cmd):
         self.__dbg__('sending command: ' + str(cmd))
