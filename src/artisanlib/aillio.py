@@ -29,7 +29,7 @@ class AillioR1:
         self.usbhandle = None
         self.bt = 0
         self.dt = 0
-        self.power = 0
+        self.heater = 0
         self.fan = 0
 
     def __del__(self):
@@ -87,26 +87,26 @@ class AillioR1:
         self.__getstate__()
         return self.dt
 
-    def get_power(self):
-        self.__dbg__('get_power')
+    def get_heater(self):
+        self.__dbg__('get_heater')
         self.__getstate__()
-        if self.power < 100:
+        if self.heater < 100:
             return 0
-        elif self.power < 300:
+        elif self.heater < 300:
             return 1
-        elif self.power < 600:
+        elif self.heater < 600:
             return 2
-        elif self.power < 800:
+        elif self.heater < 800:
             return 3
-        elif self.power < 1250:
+        elif self.heater < 1250:
             return 4
-        elif self.power < 1400:
+        elif self.heater < 1400:
             return 5
-        elif self.power < 1600:
+        elif self.heater < 1600:
             return 6
-        elif self.power < 1900:
+        elif self.heater < 1900:
             return 7
-        elif self.power < 2000:
+        elif self.heater < 2000:
             return 8
         else:
             return 9
@@ -141,6 +141,22 @@ class AillioR1:
         else:
             return 12
 
+    def get_drum(self):
+        self.__getstate__()
+        return self.drum
+    
+    def get_voltage(self):
+        self.__getstate__()
+        return self.voltage
+
+    def get_dt_ror(self):
+        self.__getstate__()
+        return self.dt_ror
+
+    def get_bt_ror(self):
+        self.__getstate__()
+        return self.bt_ror
+
     def __getstate__(self):
         self.__open__()
         self.__dbg__('getstate')
@@ -167,7 +183,7 @@ class AillioR1:
         self.fan = unpack('h', state[44:46])[0]
         self.drum = 0
         self.voltage = unpack('h', state[48:50])[0]
-        self.power = unpack('H', state[50:52])[0]
+        self.heater = unpack('H', state[50:52])[0]
         self.coil_fan = round(unpack('i', state[52:56])[0], 1)
         self.__dbg__('BT: ' + str(self.bt))
         self.__dbg__('BT RoR: ' + str(self.bt_ror))
@@ -178,7 +194,7 @@ class AillioR1:
         self.__dbg__('voltage: ' + str(self.voltage))
         self.__dbg__('coil fan: ' + str(self.coil_fan))
         self.__dbg__('fan: ' + str(self.fan))
-        self.__dbg__('power: ' + str(self.power))
+        self.__dbg__('heater: ' + str(self.heater))
         self.__dbg__('drum speed: ' + str(self.drum))
         self.__dbg__('time: ' + str(self.minutes) + ':' + str(self.seconds))
 
@@ -223,4 +239,4 @@ if __name__ == "__main__":
     while True:
         R1.get_bt()
         time.sleep(1)
-        print 'power: ' + str(R1.get_power())
+        print 'heater: ' + str(R1.get_heater())
