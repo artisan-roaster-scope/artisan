@@ -4468,6 +4468,21 @@ class tgraphcanvas(FigureCanvas):
                     title = aw.qmc.abbrevString(title,stl)
                     self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                         fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
+                
+                # extra event names with substitution of event names applied
+                extraname1_subst = aw.qmc.extraname1[:]
+                extraname2_subst = aw.qmc.extraname2[:]
+                for i in range(len(aw.qmc.extratimex)):
+                    try:
+                        extraname1_subst[i] = extraname1_subst[i].format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+                    except:
+                        pass
+                    try:
+                        extraname2_subst[i] = extraname2_subst[i].format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+                    except:
+                        pass
+                    
+
 
                 if aw.qmc.flagstart:
                     self.ax.set_ylabel("")
@@ -5211,24 +5226,24 @@ class tgraphcanvas(FigureCanvas):
                         if False and aw.qmc.flagon:
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
+                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= extraname1_subst[i])[0])
                         else:
                             if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
                                 self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=self.extraname1[i])[0])
+                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
                     if aw.extraCurveVisibility2[i]:
                         if False and aw.qmc.flagon:
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                         else:
                             if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
                                 self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter)
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                 
                 ##### ET,BT curves
                 if aw.qmc.ETcurve:
@@ -5274,12 +5289,12 @@ class tgraphcanvas(FigureCanvas):
                         if aw.extraCurveVisibility1[i]:
                             handles.append(self.extratemp1lines[xtmpl1idx])
                             xtmpl1idx = xtmpl1idx + 1
-                            l1 = self.extraname1[i]
+                            l1 = extraname1_subst[i]
                             labels.append(aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
                         if aw.extraCurveVisibility2[i]:
                             handles.append(self.extratemp2lines[xtmpl2idx])
                             xtmpl2idx = xtmpl2idx + 1
-                            l2 = self.extraname2[i]
+                            l2 = extraname2_subst[i]
                             labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
     
                 if self.eventsshowflag and self.eventsGraphflag in [2,3,4] and Nevents:
@@ -8457,7 +8472,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.plot(timez,deltabtvals,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],
-                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "T", None)))
+                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "BT", None)))
                     
             if self.DeltaETflag:
                 funcDelta2 = func2.derivative()
@@ -12303,7 +12318,7 @@ class ApplicationWindow(QMainWindow):
                         except Exception:
                             pass
                     port_name,res = QInputDialog.getItem(self,
-                        QApplication.translate("Message", "Serial Port Configuration",None),
+                        QApplication.translate("Message", "Port Configuration",None),
                         QApplication.translate("Message", "Comm Port",None),
                         items,
                         current,
@@ -17348,10 +17363,10 @@ class ApplicationWindow(QMainWindow):
             # to be able to update the batch counter in this file from incBatchCounter()/decBatchCounter()
             # but not for loading of settings fragments like themes or machines
             if filename:
-              settings.beginGroup("Batch")
-              if settings.contains("batchcounter"):
-                self.settingspath = filename
-              settings.endGroup()
+                settings.beginGroup("Batch")
+                if settings.contains("batchcounter"):
+                    self.settingspath = filename
+                settings.endGroup()
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -22375,19 +22390,22 @@ class ApplicationWindow(QMainWindow):
             self.PolishLanguage.setChecked(value)
         elif locale == "pl":
             self.HebrewLanguage.setChecked(value)
-    
+                               
     def changelocale(self,languagelocale):
         if locale != languagelocale:
-            # switch old flag off
-            self.switchLanguageFlag(locale,False)
-            # check if etypes are unmodified by user and in that case, remove etypes from settings to avoid overwriting of translations:
-            # switch new flag on
-            self.switchLanguageFlag(languagelocale,True)
-            settings = QSettings()
-            settings.setValue('locale', languagelocale)
-            QMessageBox.information(aw,QApplication.translate("Message", "Switch Language",None),
-                                    QApplication.translate("Message","Language successfully changed. Restart the application.",None))
-
+            string = QApplication.translate("Message","Switching the language needs a restart. Restart now?", None)
+            reply = QMessageBox.warning(aw,QApplication.translate("Message","Restart", None),string,
+                              QMessageBox.Cancel | QMessageBox.Yes)
+            if reply == QMessageBox.Yes:
+                # switch old flag off
+                self.switchLanguageFlag(locale,False)
+                # check if etypes are unmodified by user and in that case, remove etypes from settings to avoid overwriting of translations:
+                # switch new flag on
+                self.switchLanguageFlag(languagelocale,True)
+                settings = QSettings()
+                settings.setValue('locale', languagelocale)
+                self.close()
+                                    
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loss in percentage as float
     def weight_loss(self,green,roasted):
@@ -27178,8 +27196,15 @@ class editGraphDlg(ArtisanDialog):
                                                   deltaLabelPrefix + QApplication.translate("Table", "ET",None),
                                                   deltaLabelPrefix + QApplication.translate("Table", "BT",None)]
         for i in range(len(aw.qmc.extratimex)):
-            columns.append(aw.qmc.extraname1[i])
-            columns.append(aw.qmc.extraname2[i])
+            en1 = aw.qmc.extraname1[i]
+            en2 = aw.qmc.extraname2[i]
+            try:
+                en1 = en1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+                en2 = en2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+            except:
+                pass
+            columns.append(en1)
+            columns.append(en2)
         columns.append("") # add a last dummy table that extends
         self.datatable.setColumnCount(len(columns))
         self.datatable.setHorizontalHeaderLabels(columns)

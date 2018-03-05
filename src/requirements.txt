@@ -19,3 +19,4 @@ altgraph==0.15
 macholib==1.9
 python-snap7==0.9
 colorspacious==1.1.0
+libusb1==1.6.4
