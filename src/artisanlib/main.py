@@ -5880,7 +5880,6 @@ class tgraphcanvas(FigureCanvas):
         if color == 1:
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
             fname = os.path.join(aw.getResourcePath(),"Themes","Artisan","Default.athm")
-#            print(aw.lcdpaletteB)
             if os.path.isfile(fname):
                 aw.loadSettings(fn=fname)
             else:
@@ -20277,9 +20276,28 @@ class ApplicationWindow(QMainWindow):
                 if "DEV_percent" in rd:
                     DEV_percent += rd["DEV_percent"]
                     DEV_percent_count += 1
+                # -- recompute AUC with actual settings
+                try:
+                    AUCidx = max(0,aw.AUCstartidx(p["timeindex"],p["computed"]["TP_time"]))
+                    if aw.qmc.AUCbaseFlag:
+                        # we take the base temperature from the BT at st
+                        rtbt = p["temp2"][AUCidx]
+                    else:
+                        rtbt = aw.qmc.AUCbase
+                    rtbt = aw.qmc.convertTemp(rtbt,aw.qmc.mode,"C")
+                    ed = min(len(p["timex"]),p["timeindex"][6])
+                    BT_AUC = 0
+                    for i in range(AUCidx,ed):
+                        BT_AUC += self.calcAUC(rtbt,p["timex"],p["temp2"],i)
+                    BT_AUC = int(round(BT_AUC/60.))
+                    rd["AUC"] = BT_AUC
+                except:
+                    pass
+                # -- 
                 if "AUC" in rd:
                     AUC += rd["AUC"]
                     AUC_count += 1
+                    
                 if i > 0 and o > 0:
                     loss += aw.weight_loss(i,o)
                     loss_count += 1
@@ -21289,31 +21307,34 @@ class ApplicationWindow(QMainWindow):
 
     #returns the index of the lowest point in BT; return -1 if no such value found
     def findTP(self):
+        return self.findTPint(aw.qmc.timeindex, aw.qmc.timex, aw.qmc.temp2)
+        
+    def findTPint(self,timeindex,timex,temp):
         TP = 1000
         idx = 0
         start = 0
-        end = len(self.qmc.timex)
+        end = len(timex)
         # try to consider only indices until the roast end and not beyond
         EOR_index = end
-        if self.qmc.timeindex[6]:
-            EOR_index = self.qmc.timeindex[6]
+        if timeindex[6]:
+            EOR_index = timeindex[6]
         if EOR_index > start and EOR_index < end:
             end = EOR_index
         # try to consider only indices until FCs and not beyond
         FCs_index = end
-        if self.qmc.timeindex[2]:
-            FCs_index = self.qmc.timeindex[2]
+        if timeindex[2]:
+            FCs_index = timeindex[2]
         if FCs_index > start and FCs_index < end:
             end = FCs_index
         # try to consider only indices from start of roast on and not before
         SOR_index = start
-        if self.qmc.timeindex[0] != -1:
-            SOR_index = self.qmc.timeindex[0] 
+        if timeindex[0] != -1:
+            SOR_index = timeindex[0] 
         if SOR_index > start and SOR_index < end:
             start = SOR_index
         for i in range(end - 1, start -1, -1):
-            if self.qmc.temp2[i] > 0 and self.qmc.temp2[i] < TP:
-                TP = self.qmc.temp2[i]
+            if temp[i] > 0 and temp[i] < TP:
+                TP = temp[i]
                 idx = i
         return idx
 
@@ -21499,26 +21520,33 @@ class ApplicationWindow(QMainWindow):
                                 else:
                                     aw.qmc.l_AUCguide.set_data([],[])
     
-    # updates the running AUC variables aw.qmc.AUCvalue and aw.qmc.AUCsinceFCs during recording
-    def updateAUC(self):
-        if aw.qmc.AUCbegin == 0 and aw.qmc.timeindex[0] > -1: # start after CHARGE
-            idx = aw.qmc.timeindex[0]
-        elif aw.qmc.AUCbegin == 1 and aw.qmc.TPalarmtimeindex: # start ater TP
-            idx = aw.qmc.TPalarmtimeindex
-        elif aw.qmc.AUCbegin == 2 and self.qmc.timeindex[1] > 0: # DRY END
-            idx = self.qmc.timeindex[1]
-        elif aw.qmc.AUCbegin == 3 and self.qmc.timeindex[2] > 0: # FC START
-            idx = self.qmc.timeindex[2]
+    def AUCstartidx(self,timeindex,TPindex):
+        if aw.qmc.AUCbegin == 0 and timeindex[0] > -1: # start after CHARGE
+            idx = timeindex[0]
+        elif aw.qmc.AUCbegin == 1 and TPindex: # start ater TP
+            idx = TPindex
+        elif aw.qmc.AUCbegin == 2 and timeindex[1] > 0: # DRY END
+            idx = timeindex[1]
+        elif aw.qmc.AUCbegin == 3 and timeindex[2] > 0: # FC START
+            idx = timeindex[2]
         else:
             idx = -1
+        return idx
+
+    def thisAUC(self,idx,timex,temp,mode):
+        if aw.qmc.AUCbaseFlag:
+            # we take the base temperature from the BT at st
+            tbase = temp[idx]
+        else:
+            tbase = aw.qmc.AUCbase
+        tbase = aw.qmc.convertTemp(tbase,mode,"C")
+        return self.calcAUC(tbase,timex,temp)/60.
+
+    # updates the running AUC variables aw.qmc.AUCvalue and aw.qmc.AUCsinceFCs during recording
+    def updateAUC(self):
+        idx = self.AUCstartidx(aw.qmc.timeindex,aw.qmc.TPalarmtimeindex)
         if idx > -1: # we passed the AUCbegin event
-            if aw.qmc.AUCbaseFlag:
-                # we take the base temperature from the BT at st
-                tbase = self.qmc.temp2[idx]
-            else:
-                tbase = aw.qmc.AUCbase
-            tbase = aw.qmc.convertTemp(tbase,aw.qmc.mode,"C")
-            thisAUC = self.calcAUC(tbase,self.qmc.timex,self.qmc.temp2)/60.
+            thisAUC = self.thisAUC(idx,self.qmc.timex,self.qmc.temp2,aw.qmc.mode)
             aw.qmc.AUCvalue += thisAUC
             if aw.qmc.timeindex[2] > 0:
                 aw.qmc.AUCsinceFCs += thisAUC
@@ -21577,7 +21605,9 @@ class ApplicationWindow(QMainWindow):
             timex = self.qmc.timex
             temp1 = self.qmc.temp1
             temp2 = self.qmc.temp2
-            
+        return self.profileAUC(timeindex,timex,temp1,temp2,start,end,tp)
+    
+    def profileAUC(self,timeindex,timex,temp1,temp2,start=None,end=None,tp=None):            
         delta = ET = BT = 0.0
         if (start == 0 and end == 0) or (start and (start < 0 or (start == 0 and timeindex[0] < 0))) or (len(timex) == 0):
             return 0,0,0
@@ -21590,7 +21620,7 @@ class ApplicationWindow(QMainWindow):
                         if aw.qmc.TPalarmtimeindex:
                             TP_index = aw.qmc.TPalarmtimeindex
                         else:
-                            TP_index = aw.findTP()
+                            TP_index = aw.findTP(timeindex,timex,temp2)
                     else:
                         TP_index = -1
                 
