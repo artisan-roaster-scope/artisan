@@ -34188,15 +34188,21 @@ class serialport(object):
         if self.R1 is None:
             self.R1 = AillioR1()
         tx = aw.qmc.timeclock.elapsed()/1000.
-        aw.qmc.R1_BT = self.R1.get_bt()
-        aw.qmc.R1_DT = self.R1.get_dt()
-        aw.qmc.R1_DRUM = self.R1.get_drum()
-        aw.qmc.R1_VOLTAGE = self.R1.get_voltage()
-        aw.qmc.R1_HEATER = self.R1.get_heater()
-        aw.qmc.R1_FAN = self.R1.get_fan()
-        aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
-        aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
-        aw.qmc.R1_TX = tx
+        try:
+            aw.qmc.R1_BT = self.R1.get_bt()
+            aw.qmc.R1_DT = self.R1.get_dt()
+            aw.qmc.R1_DRUM = self.R1.get_drum()
+            aw.qmc.R1_VOLTAGE = self.R1.get_voltage()
+            aw.qmc.R1_HEATER = self.R1.get_heater()
+            aw.qmc.R1_FAN = self.R1.get_fan()
+            aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
+            aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
+            aw.qmc.R1_TX = tx
+        except IOError as exception:
+            error = QApplication.translate("Error Message", "Aillio R1: " + str(exception), None)
+            aw.qmc.adderror(error)
+
+            
         return tx, aw.qmc.R1_BT, aw.qmc.R1_DT
 
     def R1_DRUM_BTROR(self):

@@ -44,9 +44,6 @@ class AillioR1:
         if self.AILLIO_DEBUG:
             print('AillioR1: ' + msg)
 
-    def __msg__(self, msg):
-        print('AillioR1: ' + msg)
-        
     def __open__(self):
         if self.usbhandle is not None:
             return
@@ -54,15 +51,17 @@ class AillioR1:
             self.AILLIO_VID, self.AILLIO_PID,
             skip_on_error=True)
         if self.usbhandle is None:
-            self.__msg__('device NOT found')
-            return
+            raise IOError("not found or no permission")
         self.__dbg__('device found!')
         try:
             self.usbhandle.detachKernelDriver(self.AILLIO_INTERFACE)
         except:
             pass
-        self.usbhandle.setConfiguration(1)
-        self.usbhandle.claimInterface(self.AILLIO_INTERFACE)
+        try:
+            self.usbhandle.setConfiguration(1)
+            self.usbhandle.claimInterface(self.AILLIO_INTERFACE)
+        except:
+            raise IOError("unable to configure")
         self.__sendcmd__(self.AILLIO_CMD_INFO1)
         reply = self.__readreply__(32)
         sn = unpack('h', reply[0:2])[0]
