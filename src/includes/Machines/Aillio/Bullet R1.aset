@@ -4,7 +4,7 @@ Oversampling=true
 
 [Device]
 Controlbuttonflag=true
-id=82
+id=83
 
 [ExtraComm]
 extrabaudrate=19200, 19200, 19200
@@ -21,11 +21,11 @@ extraLCDvisibility1=true, true, true, false, false, false, false, false, false, 
 extraLCDvisibility2=true, true, true, false, false, false, false, false, false, false
 extradevicecolor1=black, black, black
 extradevicecolor2=black, black, black
-extradevices=84, 83, 85
+extradevices=84, 85, 86
 extramathexpression1=, , 
 extramathexpression2=, , 
-extraname1=BT RoR, Heater, Voltage
-extraname2=Drum, Fan, Exit temp
+extraname1=Heater, BT RoR, Voltage
+extraname2=Fan, Drum, Exhaust
 
 [RoastProperties]
 roastertype=Aillio Bullet R1
