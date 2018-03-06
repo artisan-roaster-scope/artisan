@@ -1175,6 +1175,7 @@ class tgraphcanvas(FigureCanvas):
                        "S7",                        #79
                        "+S7 34",                    #80
                        "+S7 56",                    #81
+                       "+S7 78",                    #82
                        ]
 
         #extra devices
@@ -17652,11 +17653,17 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("S7")
             if settings.contains("area"):
                 self.s7.area = [toInt(x) for x in toList(settings.value("area",self.s7.area))]
+                self.s7.area = self.s7.area + [0]*(max(0,aw.s7.channels - len(self.s7.area)))
                 self.s7.db_nr = [toInt(x) for x in toList(settings.value("db_nr",self.s7.db_nr))]
+                self.s7.db_nr = self.s7.db_nr + [1]*(max(0,aw.s7.channels - len(self.s7.db_nr)))
                 self.s7.start = [toInt(x) for x in toList(settings.value("start",self.s7.start))]
+                self.s7.start = self.s7.start + [0]*(max(0,aw.s7.channels - len(self.s7.start)))
                 self.s7.type = [toInt(x) for x in toList(settings.value("type",self.s7.type))]
+                self.s7.type = self.s7.type + [0]*(max(0,aw.s7.channels - len(self.s7.type)))
                 self.s7.mode = [toInt(x) for x in toList(settings.value("mode",self.s7.mode))]
+                self.s7.mode = self.s7.mode + [0]*(max(0,aw.s7.channels - len(self.s7.mode)))
                 self.s7.div = [toInt(x) for x in toList(settings.value("div",self.s7.div))]
+                self.s7.div = self.s7.div + [0]*(max(0,aw.s7.channels - len(self.s7.div)))
                 self.s7.host = toString(settings.value("host",self.s7.host))
                 self.s7.port = toInt(settings.value("port",self.s7.port))
                 self.s7.rack = toInt(settings.value("rack",self.s7.rack))
@@ -32720,7 +32727,7 @@ class suppress_stdout_stderr(object):
 class s7port(object):
     def __init__(self):
         self.readRetries = 1
-        self.channels = 6 # maximal number of S7 channels
+        self.channels = 8 # maximal number of S7 channels
         self.host = '127.0.0.1' # the TCP host
         self.port = 102 # the TCP port
         self.rack = 0 # 0,..,7
@@ -33759,6 +33766,7 @@ class serialport(object):
                                    self.S7,                   #79
                                    self.S7_34,                #80
                                    self.S7_56,                #81
+                                   self.S7_78,                #82
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -34229,6 +34237,9 @@ class serialport(object):
         
     def S7_56(self):
         return aw.qmc.extraS7tx,aw.qmc.extraS7t6,aw.qmc.extraS7t5
+        
+    def S7_78(self):
+        return aw.qmc.extraS7tx,aw.qmc.extraS7t8,aw.qmc.extraS7t7
         
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -34897,6 +34908,8 @@ class serialport(object):
         aw.qmc.extraS7t4 = res[3]
         aw.qmc.extraS7t5 = res[4]
         aw.qmc.extraS7t6 = res[5]
+        aw.qmc.extraS7t7 = res[6]
+        aw.qmc.extraS7t8 = res[7]
         aw.qmc.extraS7tx = aw.qmc.timeclock.elapsed()/1000.
         return res[1], res[0]
 
@@ -38556,7 +38569,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -38964,7 +38977,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -39056,7 +39069,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -41025,6 +41038,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 81 is +S7 56 but no serial setup
                 ##########################
+                ##########################
+                ####  DEVICE 81 is +S7 78 but no serial setup
+                ##########################
                 
                 # ADD DEVICE:
 
@@ -41126,6 +41142,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 79
                 1, # 80
                 1, # 81
+                1, # 82
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -41231,7 +41248,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82]):
                 aw.setcommport()
             #self.close()
             self.accept()
