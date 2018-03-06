@@ -681,6 +681,10 @@ if platf == 'Windows':
             app.setAttribute(Qt.AA_UseHighDpiPixmaps)
     except Exception as e:
         pass
+        
+        
+deltaLabelPrefix = u("\u03B4") # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
+
 
 # platform dependent imports:
 if sys.platform.startswith("darwin"):
@@ -1173,10 +1177,12 @@ class tgraphcanvas(FigureCanvas):
                        "S7",                        #79
                        "+S7 34",                    #80
                        "+S7 56",                    #81
-                       "Aillio Bullet R1 BT/DT",                      #82
-                       "+Aillio Bullet R1 Heater/Fan",                #83
-                       "+Aillio Bullet R1 BT RoR/Drum",               #84
-                       "+Aillio Bullet R1 Voltage/Exit Temperature",  #85
+                       "+S7 78",                    #82
+                       "Aillio Bullet R1 BT/DT",                      #83
+                       "+Aillio Bullet R1 Heater/Fan",                #84
+                       "+Aillio Bullet R1 BT RoR/Drum",               #85
+                       "+Aillio Bullet R1 Voltage/Exit Temperature",  #86
+
                        ]
 
         #extra devices
@@ -1525,7 +1531,7 @@ class tgraphcanvas(FigureCanvas):
         self.eventsGraphflag = 2
         self.clampEvents = True # if True, custom events are drawn w.r.t. the temperature scale
         self.renderEventsDescr = False # if True, descriptions are rendered instead of type/value tags
-        self.eventslabelschars = 4 # maximal number of chars to render as events label
+        self.eventslabelschars = 6 # maximal number of chars to render as events label
         #flag that shows events in the graph
         self.eventsshowflag = 1
         #flag that shows major event annotations in the graph
@@ -2479,6 +2485,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.largeLCDs_dialog:
                         self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
                 
+                    
                 #check setSV
                 if self.temporarysetsv is not None:
                     if aw.qmc.device == 0 and aw.fujipid.followBackground:
@@ -2502,7 +2509,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.fireslideraction(slidernr) # fire action
                         self.temporayslider_force_move = False
                 self.temporarymovenegativeslider = None
-                
+                        
                 #write error message
                 if self.temporary_error is not None:
                     aw.sendmessage(self.temporary_error)
@@ -2513,7 +2520,7 @@ class tgraphcanvas(FigureCanvas):
                         
                 #update serial_dlg
                 if aw.serial_dlg:
-                    aw.serial_dlg.update()
+                    aw.serial_dlg.update()                        
                     
                 #update message_dlg
                 if aw.message_dlg:
@@ -2555,6 +2562,7 @@ class tgraphcanvas(FigureCanvas):
                         self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
                         self.autoChargeIdx = 0
 
+        
                     ##### updated canvas
                     try:
                         if not self.block_update:
@@ -2626,6 +2634,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.qmc.playbackevent()
                     except Exception:
                         pass
+                        
                     #####
                     if aw.qmc.patheffects:
                         rcParams['path.effects'] = []
@@ -2655,8 +2664,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoDropIdx != 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
                         self.autoDropIdx = 0
-
-
+                
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
                     i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
@@ -3770,7 +3778,7 @@ class tgraphcanvas(FigureCanvas):
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
-    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):        
+    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget:
@@ -3888,11 +3896,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.resetKeyboardButtonMarks()
                 
                 if not (aw.qmc.autotimex and aw.qmc.background):
-                    if not self.locktimex:
-                        self.startofx = self.startofx_default
-                    else:
+                    if self.locktimex:
                         self.startofx = self.locktimex_start
                         self.endofx = self.resetmaxtime
+                    else:
+                        self.startofx = self.startofx_default
                 if self.endofx < 1:
                     self.endofx = 60
 
@@ -4481,6 +4489,21 @@ class tgraphcanvas(FigureCanvas):
                     title = aw.qmc.abbrevString(title,stl)
                     self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                         fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
+                
+                # extra event names with substitution of event names applied
+                extraname1_subst = aw.qmc.extraname1[:]
+                extraname2_subst = aw.qmc.extraname2[:]
+                for i in range(len(aw.qmc.extratimex)):
+                    try:
+                        extraname1_subst[i] = extraname1_subst[i].format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+                    except:
+                        pass
+                    try:
+                        extraname2_subst[i] = extraname2_subst[i].format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+                    except:
+                        pass
+                    
+
 
                 if aw.qmc.flagstart:
                     self.ax.set_ylabel("")
@@ -5211,11 +5234,11 @@ class tgraphcanvas(FigureCanvas):
                             if self.DeltaETflag:
                                 self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                    
+                                linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "ET", None)))                    
                             if self.DeltaBTflag:           
                                 self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))    
+                                linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "BT", None)))    
     
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
@@ -5224,24 +5247,24 @@ class tgraphcanvas(FigureCanvas):
                         if False and aw.qmc.flagon:
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
+                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= extraname1_subst[i])[0])
                         else:
                             if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
                                 self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=self.extraname1[i])[0])
+                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
                     if aw.extraCurveVisibility2[i]:
                         if False and aw.qmc.flagon:
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                         else:
                             if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
                                 self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter)
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                 
                 ##### ET,BT curves
                 if aw.qmc.ETcurve:
@@ -5272,10 +5295,10 @@ class tgraphcanvas(FigureCanvas):
     
                 if self.DeltaETflag: 
                     handles.append(self.l_delta1)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "\u0394\u200aET", None)))
+                    labels.append(aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "ET", None)))
                 if self.DeltaBTflag:
                     handles.append(self.l_delta2)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "\u0394BT", None)))
+                    labels.append(aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "BT", None)))
     
     
                 nrdevices = len(self.extradevices)
@@ -5287,12 +5310,12 @@ class tgraphcanvas(FigureCanvas):
                         if aw.extraCurveVisibility1[i]:
                             handles.append(self.extratemp1lines[xtmpl1idx])
                             xtmpl1idx = xtmpl1idx + 1
-                            l1 = self.extraname1[i]
+                            l1 = extraname1_subst[i]
                             labels.append(aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
                         if aw.extraCurveVisibility2[i]:
                             handles.append(self.extratemp2lines[xtmpl2idx])
                             xtmpl2idx = xtmpl2idx + 1
-                            l2 = self.extraname2[i]
+                            l2 = extraname2_subst[i]
                             labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
     
                 if self.eventsshowflag and self.eventsGraphflag in [2,3,4] and Nevents:
@@ -5878,7 +5901,6 @@ class tgraphcanvas(FigureCanvas):
         if color == 1:
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
             fname = os.path.join(aw.getResourcePath(),"Themes","Artisan","Default.athm")
-#            print(aw.lcdpaletteB)
             if os.path.isfile(fname):
                 aw.loadSettings(fn=fname)
             else:
@@ -8470,7 +8492,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.plot(timez,deltabtvals,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],
-                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None)))
+                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "BT", None)))
                     
             if self.DeltaETflag:
                 funcDelta2 = func2.derivative()
@@ -8478,7 +8500,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.plot(timez,deltaetvals,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                     linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],
-                    label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None)))                          
+                    label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "ET", None)))                          
             
             #add curves
             if self.ETcurve:
@@ -10378,8 +10400,8 @@ class ApplicationWindow(QMainWindow):
         super(ApplicationWindow, self).__init__(parent)
         
         # used on startup to reload previous loaded profiles
-        self.lastLoadedProfile = None
-        self.lastLoadedBackground = None
+        self.lastLoadedProfile = ""
+        self.lastLoadedBackground = ""
         
         # large LCDs
         self.largeLCDs_dialog = None
@@ -11566,12 +11588,12 @@ class ApplicationWindow(QMainWindow):
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label4.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
+        self.label4.setText("<big><b>" + deltaLabelPrefix + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
         self.setLabelColor(self.label4,QColor(self.qmc.palette["deltaet"]))
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label5.setText("<big><b>&Delta;" + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
+        self.label5.setText("<big><b>" + deltaLabelPrefix + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
         self.setLabelColor(self.label5,QColor(self.qmc.palette["deltabt"]))
         # pid sv
         self.label6 = QLabel()
@@ -12316,7 +12338,7 @@ class ApplicationWindow(QMainWindow):
                         except Exception:
                             pass
                     port_name,res = QInputDialog.getItem(self,
-                        QApplication.translate("Message", "Serial Port Configuration",None),
+                        QApplication.translate("Message", "Port Configuration",None),
                         QApplication.translate("Message", "Comm Port",None),
                         items,
                         current,
@@ -17361,10 +17383,10 @@ class ApplicationWindow(QMainWindow):
             # to be able to update the batch counter in this file from incBatchCounter()/decBatchCounter()
             # but not for loading of settings fragments like themes or machines
             if filename:
-              settings.beginGroup("Batch")
-              if settings.contains("batchcounter"):
-                self.settingspath = filename
-              settings.endGroup()
+                settings.beginGroup("Batch")
+                if settings.contains("batchcounter"):
+                    self.settingspath = filename
+                settings.endGroup()
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -17649,11 +17671,17 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("S7")
             if settings.contains("area"):
                 self.s7.area = [toInt(x) for x in toList(settings.value("area",self.s7.area))]
+                self.s7.area = self.s7.area + [0]*(max(0,aw.s7.channels - len(self.s7.area)))
                 self.s7.db_nr = [toInt(x) for x in toList(settings.value("db_nr",self.s7.db_nr))]
+                self.s7.db_nr = self.s7.db_nr + [1]*(max(0,aw.s7.channels - len(self.s7.db_nr)))
                 self.s7.start = [toInt(x) for x in toList(settings.value("start",self.s7.start))]
+                self.s7.start = self.s7.start + [0]*(max(0,aw.s7.channels - len(self.s7.start)))
                 self.s7.type = [toInt(x) for x in toList(settings.value("type",self.s7.type))]
+                self.s7.type = self.s7.type + [0]*(max(0,aw.s7.channels - len(self.s7.type)))
                 self.s7.mode = [toInt(x) for x in toList(settings.value("mode",self.s7.mode))]
+                self.s7.mode = self.s7.mode + [0]*(max(0,aw.s7.channels - len(self.s7.mode)))
                 self.s7.div = [toInt(x) for x in toList(settings.value("div",self.s7.div))]
+                self.s7.div = self.s7.div + [0]*(max(0,aw.s7.channels - len(self.s7.div)))
                 self.s7.host = toString(settings.value("host",self.s7.host))
                 self.s7.port = toInt(settings.value("port",self.s7.port))
                 self.s7.rack = toInt(settings.value("rack",self.s7.rack))
@@ -19287,8 +19315,16 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("dpi",aw.dpi)
             
             settings.setValue("recentRoasts",self.recentRoasts)
-            settings.setValue("lastLoadedProfile",aw.curFile)
-            settings.setValue("lastLoadedBackground",aw.qmc.backgroundpath)
+            
+            if aw.curFile:
+                settings.setValue("lastLoadedProfile",aw.curFile)
+            else:
+                settings.setValue("lastLoadedProfile","")
+            if aw.qmc.backgroundpath:
+                settings.setValue("lastLoadedBackground",aw.qmc.backgroundpath)
+            else:
+                settings.setValue("lastLoadedBackground","")
+                
 
         except Exception:
 #            import traceback
@@ -20275,9 +20311,28 @@ class ApplicationWindow(QMainWindow):
                 if "DEV_percent" in rd:
                     DEV_percent += rd["DEV_percent"]
                     DEV_percent_count += 1
+                # -- recompute AUC with actual settings
+                try:
+                    AUCidx = max(0,aw.AUCstartidx(p["timeindex"],p["computed"]["TP_time"]))
+                    if aw.qmc.AUCbaseFlag:
+                        # we take the base temperature from the BT at st
+                        rtbt = p["temp2"][AUCidx]
+                    else:
+                        rtbt = aw.qmc.AUCbase
+                    rtbt = aw.qmc.convertTemp(rtbt,aw.qmc.mode,"C")
+                    ed = min(len(p["timex"]),p["timeindex"][6])
+                    BT_AUC = 0
+                    for i in range(AUCidx,ed):
+                        BT_AUC += self.calcAUC(rtbt,p["timex"],p["temp2"],i)
+                    BT_AUC = int(round(BT_AUC/60.))
+                    rd["AUC"] = BT_AUC
+                except:
+                    pass
+                # -- 
                 if "AUC" in rd:
                     AUC += rd["AUC"]
                     AUC_count += 1
+                    
                 if i > 0 and o > 0:
                     loss += aw.weight_loss(i,o)
                     loss_count += 1
@@ -21287,31 +21342,34 @@ class ApplicationWindow(QMainWindow):
 
     #returns the index of the lowest point in BT; return -1 if no such value found
     def findTP(self):
+        return self.findTPint(aw.qmc.timeindex, aw.qmc.timex, aw.qmc.temp2)
+        
+    def findTPint(self,timeindex,timex,temp):
         TP = 1000
         idx = 0
         start = 0
-        end = len(self.qmc.timex)
+        end = len(timex)
         # try to consider only indices until the roast end and not beyond
         EOR_index = end
-        if self.qmc.timeindex[6]:
-            EOR_index = self.qmc.timeindex[6]
+        if timeindex[6]:
+            EOR_index = timeindex[6]
         if EOR_index > start and EOR_index < end:
             end = EOR_index
         # try to consider only indices until FCs and not beyond
         FCs_index = end
-        if self.qmc.timeindex[2]:
-            FCs_index = self.qmc.timeindex[2]
+        if timeindex[2]:
+            FCs_index = timeindex[2]
         if FCs_index > start and FCs_index < end:
             end = FCs_index
         # try to consider only indices from start of roast on and not before
         SOR_index = start
-        if self.qmc.timeindex[0] != -1:
-            SOR_index = self.qmc.timeindex[0] 
+        if timeindex[0] != -1:
+            SOR_index = timeindex[0] 
         if SOR_index > start and SOR_index < end:
             start = SOR_index
         for i in range(end - 1, start -1, -1):
-            if self.qmc.temp2[i] > 0 and self.qmc.temp2[i] < TP:
-                TP = self.qmc.temp2[i]
+            if temp[i] > 0 and temp[i] < TP:
+                TP = temp[i]
                 idx = i
         return idx
 
@@ -21497,26 +21555,33 @@ class ApplicationWindow(QMainWindow):
                                 else:
                                     aw.qmc.l_AUCguide.set_data([],[])
     
-    # updates the running AUC variables aw.qmc.AUCvalue and aw.qmc.AUCsinceFCs during recording
-    def updateAUC(self):
-        if aw.qmc.AUCbegin == 0 and aw.qmc.timeindex[0] > -1: # start after CHARGE
-            idx = aw.qmc.timeindex[0]
-        elif aw.qmc.AUCbegin == 1 and aw.qmc.TPalarmtimeindex: # start ater TP
-            idx = aw.qmc.TPalarmtimeindex
-        elif aw.qmc.AUCbegin == 2 and self.qmc.timeindex[1] > 0: # DRY END
-            idx = self.qmc.timeindex[1]
-        elif aw.qmc.AUCbegin == 3 and self.qmc.timeindex[2] > 0: # FC START
-            idx = self.qmc.timeindex[2]
+    def AUCstartidx(self,timeindex,TPindex):
+        if aw.qmc.AUCbegin == 0 and timeindex[0] > -1: # start after CHARGE
+            idx = timeindex[0]
+        elif aw.qmc.AUCbegin == 1 and TPindex: # start ater TP
+            idx = TPindex
+        elif aw.qmc.AUCbegin == 2 and timeindex[1] > 0: # DRY END
+            idx = timeindex[1]
+        elif aw.qmc.AUCbegin == 3 and timeindex[2] > 0: # FC START
+            idx = timeindex[2]
         else:
             idx = -1
+        return idx
+
+    def thisAUC(self,idx,timex,temp,mode):
+        if aw.qmc.AUCbaseFlag:
+            # we take the base temperature from the BT at st
+            tbase = temp[idx]
+        else:
+            tbase = aw.qmc.AUCbase
+        tbase = aw.qmc.convertTemp(tbase,mode,"C")
+        return self.calcAUC(tbase,timex,temp)/60.
+
+    # updates the running AUC variables aw.qmc.AUCvalue and aw.qmc.AUCsinceFCs during recording
+    def updateAUC(self):
+        idx = self.AUCstartidx(aw.qmc.timeindex,aw.qmc.TPalarmtimeindex)
         if idx > -1: # we passed the AUCbegin event
-            if aw.qmc.AUCbaseFlag:
-                # we take the base temperature from the BT at st
-                tbase = self.qmc.temp2[idx]
-            else:
-                tbase = aw.qmc.AUCbase
-            tbase = aw.qmc.convertTemp(tbase,aw.qmc.mode,"C")
-            thisAUC = self.calcAUC(tbase,self.qmc.timex,self.qmc.temp2)/60.
+            thisAUC = self.thisAUC(idx,self.qmc.timex,self.qmc.temp2,aw.qmc.mode)
             aw.qmc.AUCvalue += thisAUC
             if aw.qmc.timeindex[2] > 0:
                 aw.qmc.AUCsinceFCs += thisAUC
@@ -21575,7 +21640,9 @@ class ApplicationWindow(QMainWindow):
             timex = self.qmc.timex
             temp1 = self.qmc.temp1
             temp2 = self.qmc.temp2
-            
+        return self.profileAUC(timeindex,timex,temp1,temp2,start,end,tp)
+    
+    def profileAUC(self,timeindex,timex,temp1,temp2,start=None,end=None,tp=None):            
         delta = ET = BT = 0.0
         if (start == 0 and end == 0) or (start and (start < 0 or (start == 0 and timeindex[0] < 0))) or (len(timex) == 0):
             return 0,0,0
@@ -21588,7 +21655,7 @@ class ApplicationWindow(QMainWindow):
                         if aw.qmc.TPalarmtimeindex:
                             TP_index = aw.qmc.TPalarmtimeindex
                         else:
-                            TP_index = aw.findTP()
+                            TP_index = aw.findTP(timeindex,timex,temp2)
                     else:
                         TP_index = -1
                 
@@ -22388,19 +22455,22 @@ class ApplicationWindow(QMainWindow):
             self.PolishLanguage.setChecked(value)
         elif locale == "pl":
             self.HebrewLanguage.setChecked(value)
-    
+                               
     def changelocale(self,languagelocale):
         if locale != languagelocale:
-            # switch old flag off
-            self.switchLanguageFlag(locale,False)
-            # check if etypes are unmodified by user and in that case, remove etypes from settings to avoid overwriting of translations:
-            # switch new flag on
-            self.switchLanguageFlag(languagelocale,True)
-            settings = QSettings()
-            settings.setValue('locale', languagelocale)
-            QMessageBox.information(aw,QApplication.translate("Message", "Switch Language",None),
-                                    QApplication.translate("Message","Language successfully changed. Restart the application.",None))
-
+            string = QApplication.translate("Message","Switching the language needs a restart. Restart now?", None)
+            reply = QMessageBox.warning(aw,QApplication.translate("Message","Restart", None),string,
+                              QMessageBox.Cancel | QMessageBox.Yes)
+            if reply == QMessageBox.Yes:
+                # switch old flag off
+                self.switchLanguageFlag(locale,False)
+                # check if etypes are unmodified by user and in that case, remove etypes from settings to avoid overwriting of translations:
+                # switch new flag on
+                self.switchLanguageFlag(languagelocale,True)
+                settings = QSettings()
+                settings.setValue('locale', languagelocale)
+                self.close()
+                                    
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loss in percentage as float
     def weight_loss(self,green,roasted):
@@ -23569,6 +23639,7 @@ class ApplicationWindow(QMainWindow):
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None):
         super(ArtisanDialog,self).__init__(parent)
+
 #        if platf == 'Windows':
 # setting those Windows flags could be the reason for some instabilities on Windows
 #        #self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -23580,7 +23651,6 @@ class ArtisanDialog(QDialog):
 #        windowFlags |= Qt.WindowSystemMenuHint  # Adds a window system menu, and possibly a close button
 #            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
 #            self.setWindowFlags(windowFlags)
-    
                               
     def keyPressEvent(self,event):
         key = int(event.key())
@@ -23675,10 +23745,10 @@ class HUDDlg(ArtisanDialog):
         modeLabel.setAlignment(Qt.AlignRight)
         ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None))
         #delta ET
-        self.DeltaET = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None))
+        self.DeltaET = QCheckBox(QApplication.translate("CheckBox", deltaLabelPrefix+"ET",None))
         self.DeltaET.setChecked(aw.qmc.DeltaETflag)
         #delta BT
-        self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None))
+        self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", deltaLabelPrefix+"BT",None))
         self.DeltaBT.setChecked(aw.qmc.DeltaBTflag)
         filterlabel = QLabel(QApplication.translate("Label", "Smooth Deltas",None))
         #DeltaFilter holds the number of pads in filter
@@ -23832,9 +23902,9 @@ class HUDDlg(ArtisanDialog):
         rorBoxLayout.addStretch()
         rorBoxLayout.addWidget(self.projectCheck)
         rorBoxLayout.addWidget(self.projectionmodeComboBox)
-        self.DeltaETlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None))
+        self.DeltaETlcd = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox", "ET",None))
         self.DeltaETlcd.setChecked(aw.qmc.DeltaETlcdflag)
-        self.DeltaBTlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None))
+        self.DeltaBTlcd = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox", "BT",None))
         self.DeltaBTlcd.setChecked(aw.qmc.DeltaBTlcdflag)
         self.DecimalPlaceslcd = QCheckBox(QApplication.translate("CheckBox", "Decimal Places",None))
         self.DecimalPlaceslcd.setChecked(aw.qmc.LCDdecimalplaces)
@@ -25038,12 +25108,12 @@ class HUDDlg(ArtisanDialog):
         self.curvenames = []
         self.deltacurves = [] # list of flags. True if delta curve, False otherwise
         if aw.qmc.DeltaETflag:
-            self.curvenames.append(QApplication.translate("ComboBox","DeltaET",None))
+            self.curvenames.append(deltaLabelPrefix + QApplication.translate("ComboBox","ET",None))
             self.curves.append(aw.qmc.delta1)
             self.deltacurves.append(True)
             idx = idx + 1
         if aw.qmc.DeltaBTflag:
-            self.curvenames.append(QApplication.translate("ComboBox","DeltaBT",None))
+            self.curvenames.append(deltaLabelPrefix + QApplication.translate("ComboBox","BT",None))
             self.curves.append(aw.qmc.delta2)
             self.deltacurves.append(True)
             idx = idx + 1
@@ -26022,8 +26092,7 @@ class editGraphDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))
-        
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))        
 
         settings = QSettings()
         if settings.contains("RoastGeometry"):
@@ -27188,11 +27257,18 @@ class editGraphDlg(ArtisanDialog):
         columns = [QApplication.translate("Table", "Time",None),
                                                   QApplication.translate("Table", "ET",None),
                                                   QApplication.translate("Table", "BT",None),
-                                                  QApplication.translate("Table", "DeltaET",None),
-                                                  QApplication.translate("Table", "DeltaBT",None)]
+                                                  deltaLabelPrefix + QApplication.translate("Table", "ET",None),
+                                                  deltaLabelPrefix + QApplication.translate("Table", "BT",None)]
         for i in range(len(aw.qmc.extratimex)):
-            columns.append(aw.qmc.extraname1[i])
-            columns.append(aw.qmc.extraname2[i])
+            en1 = aw.qmc.extraname1[i]
+            en2 = aw.qmc.extraname2[i]
+            try:
+                en1 = en1.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+                en2 = en2.format(aw.qmc.etypes[0],aw.qmc.etypes[1],aw.qmc.etypes[2],aw.qmc.etypes[3])
+            except:
+                pass
+            columns.append(en1)
+            columns.append(en2)
         columns.append("") # add a last dummy table that extends
         self.datatable.setColumnCount(len(columns))
         self.datatable.setHorizontalHeaderLabels(columns)
@@ -28554,7 +28630,7 @@ class WindowsDlg(ArtisanDialog):
         xGroupLayout.setLayout(xlayout)
         yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None))
         yGroupLayout.setLayout(ylayoutHbox)
-        zGroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT/DeltaET Axis",None))
+        zGroupLayout = QGroupBox(deltaLabelPrefix + " " + QApplication.translate("GroupBox","Axis",None))
         zGroupLayout.setLayout(zlayoutHbox)
         legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None))
         legendLayout.setLayout(legentlayout)
@@ -31674,8 +31750,8 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Show", None))
         self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Annotations", None))
         self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None))
-        self.backgroundDeltaETflag = QCheckBox(QApplication.translate("CheckBox","DeltaET", None))
-        self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None)) 
+        self.backgroundDeltaETflag = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox","ET", None))
+        self.backgroundDeltaBTflag = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox","BT", None)) 
         self.backgroundETflag = QCheckBox(QApplication.translate("CheckBox","ET", None))
         self.backgroundBTflag = QCheckBox(QApplication.translate("CheckBox","BT", None))        
         self.backgroundCheck.setChecked(aw.qmc.background)
@@ -31726,7 +31802,7 @@ class backgroundDlg(ArtisanDialog):
         for key in cnames:
             self.colors.append(str(key))
         self.colors.sort()
-        self.defaultcolors = ["ET","BT","DeltaET","DeltaBT"]
+        self.defaultcolors = ["ET","BT",deltaLabelPrefix + "ET", deltaLabelPrefix + "BT"]
         self.defaultcolorsmapped = [aw.qmc.palette["et"],aw.qmc.palette["bt"],aw.qmc.palette["deltaet"],aw.qmc.palette["deltabt"]]
         metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None))
         metcolorlabel.setAlignment(Qt.AlignRight)
@@ -31762,14 +31838,14 @@ class backgroundDlg(ArtisanDialog):
         if aw.qmc.xtcurveidx < len(curvenames):
             self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
         self.xtcurveComboBox.currentIndexChanged.connect(lambda i=self.xtcurveComboBox.currentIndex() :self.changeXTcurveidx(i))
-        deltaetcolorlabel = QLabel(QApplication.translate("Label", "DeltaET Color",None))
+        deltaetcolorlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET Color",None))
         deltaetcolorlabel.setAlignment(Qt.AlignRight)
         self.deltaetcolorComboBox = QComboBox()
         self.deltaetcolorComboBox.addItems(self.defaultcolors)
         self.deltaetcolorComboBox.insertSeparator(4)
         self.deltaetcolorComboBox.addItems(self.colors)
         self.deltaetcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltaetcolor))
-        deltabtcolorlabel = QLabel(QApplication.translate("Label", "DeltaBT Color",None))
+        deltabtcolorlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "BT Color",None))
         deltabtcolorlabel.setAlignment(Qt.AlignRight)
         self.deltabtcolorComboBox = QComboBox()
         self.deltabtcolorComboBox.addItems(self.defaultcolors)
@@ -32207,8 +32283,8 @@ class backgroundDlg(ArtisanDialog):
             headers = [QApplication.translate("Table","Time",None),
                                                       QApplication.translate("Table","ET",None),
                                                       QApplication.translate("Table","BT",None),
-                                                      QApplication.translate("Table","DeltaET",None),
-                                                      QApplication.translate("Table","DeltaBT",None)]
+                                                      deltaLabelPrefix + QApplication.translate("Table","ET",None),
+                                                      deltaLabelPrefix + QApplication.translate("Table","BT",None)]
             xtcurve = False # no XT curve
             if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
                 idx3 = aw.qmc.xtcurveidx - 1
@@ -32669,7 +32745,7 @@ class suppress_stdout_stderr(object):
 class s7port(object):
     def __init__(self):
         self.readRetries = 1
-        self.channels = 6 # maximal number of S7 channels
+        self.channels = 8 # maximal number of S7 channels
         self.host = '127.0.0.1' # the TCP host
         self.port = 102 # the TCP port
         self.rack = 0 # 0,..,7
@@ -33709,10 +33785,11 @@ class serialport(object):
                                    self.S7,                   #79
                                    self.S7_34,                #80
                                    self.S7_56,                #81
-                                   self.R1_BTDT,              #82
-                                   self.R1_HF,                #83
-                                   self.R1_DRUM_BTROR,        #84
-                                   self.R1_EXIT_TEMP_VOLT,    #85
+                                   self.S7_78,                #82
+                                   self.R1_BTDT,              #83
+                                   self.R1_HF,                #84
+                                   self.R1_DRUM_BTROR,        #85
+                                   self.R1_EXIT_TEMP_VOLT,    #86
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -34184,6 +34261,9 @@ class serialport(object):
     def S7_56(self):
         return aw.qmc.extraS7tx,aw.qmc.extraS7t6,aw.qmc.extraS7t5
 
+    def S7_78(self):
+        return aw.qmc.extraS7tx,aw.qmc.extraS7t8,aw.qmc.extraS7t7
+
     def R1_BTDT(self):
         if self.R1 is None:
             self.R1 = AillioR1()
@@ -34201,8 +34281,6 @@ class serialport(object):
         except IOError as exception:
             error = QApplication.translate("Error Message", "Aillio R1: " + str(exception), None)
             aw.qmc.adderror(error)
-
-            
         return tx, aw.qmc.R1_BT, aw.qmc.R1_DT
 
     def R1_DRUM_BTROR(self):
@@ -34884,6 +34962,8 @@ class serialport(object):
         aw.qmc.extraS7t4 = res[3]
         aw.qmc.extraS7t5 = res[4]
         aw.qmc.extraS7t6 = res[5]
+        aw.qmc.extraS7t7 = res[6]
+        aw.qmc.extraS7t8 = res[7]
         aw.qmc.extraS7tx = aw.qmc.timeclock.elapsed()/1000.
         return res[1], res[0]
 
@@ -36027,7 +36107,7 @@ class serialport(object):
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4
     def PHIDGET1046temperature(self,mode=0,retry=True):
         try:
-            if not aw.ser.PhidgetBridgeSensor:
+            if not self.PhidgetBridgeSensor:
                 ser = None
                 port = None 
                 if mode == 0:
@@ -37471,8 +37551,8 @@ class designerconfigDlg(ArtisanDialog):
         reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None))
         self.reproduceComboBox = QComboBox()
         self.reproduceComboBox.addItems(["",
-                                         QApplication.translate("ComboBox","DeltaBT",None),
-                                         QApplication.translate("ComboBox","DeltaET",None),
+                                         deltaLabelPrefix + QApplication.translate("ComboBox","BT",None),
+                                         deltaLabelPrefix + QApplication.translate("ComboBox","ET",None),
                                          QApplication.translate("ComboBox","SV Commands",None),
                                          QApplication.translate("ComboBox","Ramp Commands",None)])
         self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
@@ -38543,7 +38623,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -38951,7 +39031,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -39043,7 +39123,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -41013,10 +41093,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ####  DEVICE 81 is +S7 56 but no serial setup
                 ##########################
                 ##########################
-                ####  DEVICE 82-85 are Aillio R1 and have no serial setup
+                ####  DEVICE 82 is +S7 78 but no serial setup
+                ##########################
+                ##########################
+                ####  DEVICE 83-85 are Aillio R1 and have no serial setup
                 ##########################
                 elif meter == "Aillio Bullet R1 BT/DT":
-                    aw.qmc.device = 82
+                    aw.qmc.device = 83
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 
                 # ADD DEVICE:
@@ -41123,6 +41206,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 83
                 1, # 84
                 1, # 85
+                1, # 86
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -41228,7 +41312,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]):
                 aw.setcommport()
             #self.close()
             self.accept()
@@ -41327,14 +41411,14 @@ class graphColorDlg(ArtisanDialog):
         self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
         self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
         self.deltametLabel.setAutoFillBackground(True)
-        self.deltametButton = QPushButton(QApplication.translate("Button","DeltaET", None))
+        self.deltametButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","ET", None))
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
         self.deltametButton.clicked.connect(lambda _: self.setColor("DeltaET",self.deltametLabel,"deltaet"))
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
         self.deltabtLabel.setAutoFillBackground(True)
-        self.deltabtButton = QPushButton(QApplication.translate("Button","DeltaBT", None))
+        self.deltabtButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","BT", None))
         self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtLabel.setFrameStyle(frameStyle)
         self.deltabtButton.clicked.connect(lambda _: self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
@@ -41612,10 +41696,10 @@ class graphColorDlg(ArtisanDialog):
         LCD3GroupLayout = QGroupBox(QApplication.translate("GroupBox","BT LCD",None))
         LCD3GroupLayout.setLayout(lcd3layout)
         lcd3layout.setContentsMargins(0,0,0,0)
-        LCD4GroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaET LCD",None))
+        LCD4GroupLayout = QGroupBox(deltaLabelPrefix + QApplication.translate("GroupBox","ET LCD",None))
         LCD4GroupLayout.setLayout(lcd4layout)
         lcd4layout.setContentsMargins(0,0,0,0)
-        LCD5GroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT LCD",None))
+        LCD5GroupLayout = QGroupBox(deltaLabelPrefix + QApplication.translate("GroupBox","BT LCD",None))
         LCD5GroupLayout.setLayout(lcd5layout)
         lcd5layout.setContentsMargins(0,0,0,0)
         LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV LCD",None))
@@ -41861,9 +41945,9 @@ class graphColorDlg(ArtisanDialog):
                 aw.setLabelColor(aw.label2,QColor(aw.qmc.palette[color]))
             elif title == "BT":
                 aw.setLabelColor(aw.label3,QColor(aw.qmc.palette[color]))
-            elif title == "DeltaET":
+            elif title == deltaLabelPrefix + "ET":
                 aw.setLabelColor(aw.label4,QColor(aw.qmc.palette[color]))
-            elif title == "DeltaBT":
+            elif title == deltaLabelPrefix + "BT":
                 aw.setLabelColor(aw.label5,QColor(aw.qmc.palette[color]))
             aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(aw.qmc.palette[color])))
 
@@ -43001,8 +43085,8 @@ class AlarmDlg(ArtisanDialog):
             extra_names.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
             extra_names.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
         return ["",
-             QApplication.translate("ComboBox","DeltaET",None),
-             QApplication.translate("ComboBox","DeltaBT",None),
+             deltaLabelPrefix + QApplication.translate("ComboBox","ET",None),
+             deltaLabelPrefix + QApplication.translate("ComboBox","BT",None),
              QApplication.translate("ComboBox","ET",None),
              QApplication.translate("ComboBox","BT",None)] + extra_names
 
@@ -48211,7 +48295,6 @@ def main():
     
 #    aw.setStyleSheet("QMainWindow {background: 'white';}")
     
-    
     # only here deactivating the app napping seems to have an effect
     if sys.platform.startswith("darwin"):
         appnope.nope()
@@ -48262,7 +48345,7 @@ def main():
                     aw.loadFile(u(aw.lastLoadedProfile))
                 except:
                     pass
-            if aw.lastLoadedBackground and not aw.curFile:
+            if aw.lastLoadedBackground and aw.lastLoadedBackground != "" and not aw.curFile:
                 try:
                     aw.loadbackground(u(aw.lastLoadedBackground))
                     aw.qmc.background = True
