@@ -2466,6 +2466,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.largeLCDs_dialog:
                         self.updateLargeLCDs(bt=btstr,et=etstr,time=timestr)
                 
+                    
                 #check setSV
                 if self.temporarysetsv is not None:
                     if aw.qmc.device == 0 and aw.fujipid.followBackground:
@@ -2489,7 +2490,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.fireslideraction(slidernr) # fire action
                         self.temporayslider_force_move = False
                 self.temporarymovenegativeslider = None
-                
+                        
                 #write error message
                 if self.temporary_error is not None:
                     aw.sendmessage(self.temporary_error)
@@ -2500,7 +2501,7 @@ class tgraphcanvas(FigureCanvas):
                         
                 #update serial_dlg
                 if aw.serial_dlg:
-                    aw.serial_dlg.update()
+                    aw.serial_dlg.update()                        
                     
                 #update message_dlg
                 if aw.message_dlg:
@@ -2542,6 +2543,7 @@ class tgraphcanvas(FigureCanvas):
                         self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
                         self.autoChargeIdx = 0
 
+        
                     ##### updated canvas
                     try:
                         if not self.block_update:
@@ -2613,6 +2615,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.qmc.playbackevent()
                     except Exception:
                         pass
+                        
                     #####
                     if aw.qmc.patheffects:
                         rcParams['path.effects'] = []
@@ -2642,8 +2645,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoDropIdx != 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
                         self.autoDropIdx = 0
-
-
+                
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
                     i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
@@ -3757,7 +3759,7 @@ class tgraphcanvas(FigureCanvas):
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     # returns False if action was canceled, True otherwise
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
-    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):        
+    def reset(self,redraw=True,soundOn=True,sampling=False,keepProperties=False):
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget:
@@ -3875,11 +3877,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.resetKeyboardButtonMarks()
                 
                 if not (aw.qmc.autotimex and aw.qmc.background):
-                    if not self.locktimex:
-                        self.startofx = self.startofx_default
-                    else:
+                    if self.locktimex:
                         self.startofx = self.locktimex_start
                         self.endofx = self.resetmaxtime
+                    else:
+                        self.startofx = self.startofx_default
                 if self.endofx < 1:
                     self.endofx = 60
 
@@ -10379,8 +10381,8 @@ class ApplicationWindow(QMainWindow):
         super(ApplicationWindow, self).__init__(parent)
         
         # used on startup to reload previous loaded profiles
-        self.lastLoadedProfile = None
-        self.lastLoadedBackground = None
+        self.lastLoadedProfile = ""
+        self.lastLoadedBackground = ""
         
         # large LCDs
         self.largeLCDs_dialog = None
@@ -19288,8 +19290,16 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("dpi",aw.dpi)
             
             settings.setValue("recentRoasts",self.recentRoasts)
-            settings.setValue("lastLoadedProfile",aw.curFile)
-            settings.setValue("lastLoadedBackground",aw.qmc.backgroundpath)
+            
+            if aw.curFile:
+                settings.setValue("lastLoadedProfile",aw.curFile)
+            else:
+                settings.setValue("lastLoadedProfile","")
+            if aw.qmc.backgroundpath:
+                settings.setValue("lastLoadedBackground",aw.qmc.backgroundpath)
+            else:
+                settings.setValue("lastLoadedBackground","")
+                
 
         except Exception:
 #            import traceback
@@ -23604,6 +23614,7 @@ class ApplicationWindow(QMainWindow):
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None):
         super(ArtisanDialog,self).__init__(parent)
+
 #        if platf == 'Windows':
 # setting those Windows flags could be the reason for some instabilities on Windows
 #        #self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -23615,7 +23626,6 @@ class ArtisanDialog(QDialog):
 #        windowFlags |= Qt.WindowSystemMenuHint  # Adds a window system menu, and possibly a close button
 #            windowFlags |= Qt.WindowMinMaxButtonsHint  # add min/max combo
 #            self.setWindowFlags(windowFlags)
-    
                               
     def keyPressEvent(self,event):
         key = int(event.key())
@@ -26057,8 +26067,7 @@ class editGraphDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))
-        
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))        
 
         settings = QSettings()
         if settings.contains("RoastGeometry"):
@@ -36031,7 +36040,7 @@ class serialport(object):
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4
     def PHIDGET1046temperature(self,mode=0,retry=True):
         try:
-            if not aw.ser.PhidgetBridgeSensor:
+            if not self.PhidgetBridgeSensor:
                 ser = None
                 port = None 
                 if mode == 0:
@@ -48205,7 +48214,6 @@ def main():
     
 #    aw.setStyleSheet("QMainWindow {background: 'white';}")
     
-    
     # only here deactivating the app napping seems to have an effect
     if sys.platform.startswith("darwin"):
         appnope.nope()
@@ -48256,7 +48264,7 @@ def main():
                     aw.loadFile(u(aw.lastLoadedProfile))
                 except:
                     pass
-            if aw.lastLoadedBackground and not aw.curFile:
+            if aw.lastLoadedBackground and aw.lastLoadedBackground != "" and not aw.curFile:
                 try:
                     aw.loadbackground(u(aw.lastLoadedBackground))
                     aw.qmc.background = True
