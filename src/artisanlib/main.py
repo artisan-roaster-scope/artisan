@@ -259,6 +259,8 @@ from unidecode import unidecode
 
 from artisanlib.weblcds import startWeb, stopWeb
 from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopControl, releaseHottopControl, setHottop
+from artisanlib.aillio import AillioR1
+
 
 
 
@@ -1176,6 +1178,11 @@ class tgraphcanvas(FigureCanvas):
                        "+S7 34",                    #80
                        "+S7 56",                    #81
                        "+S7 78",                    #82
+                       "Aillio Bullet R1 BT/DT",             #83
+                       "+Aillio Bullet R1 Heater/Fan",       #84
+                       "+Aillio Bullet R1 BT RoR/Drum",      #85
+                       "+Aillio Bullet R1 Voltage/Exhaust",  #86
+
                        ]
 
         #extra devices
@@ -1917,7 +1924,19 @@ class tgraphcanvas(FigureCanvas):
         self.hottop_HEATER = 0 # 0-100
         self.hottop_MAIN_FAN = 0 # 0-10 (!)
         self.hottop_TX = 0.
-        
+
+        #temporary storage to pass values. Holds all values retrieved from an R1 roaster
+        self.R1_DT = -1
+        self.R1_BT = -1
+        self.R1_BT_ROR = -1
+        self.R1_EXIT_TEMP = -1
+        self.R1_HEATER = 0 # 0-10
+        self.R1_FAN = 0 # 0-12
+        self.R1_DRUM = 0 # 0-9
+        self.R1_VOLTAGE = 0 # 0-300
+        self.R1_TX = 0.
+        self.R1_STATE = ""
+
         #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for S7 connected devices
         self.extraS7t3 = -1
         self.extraS7t4 = -1
@@ -33677,6 +33696,7 @@ class serialport(object):
         self.ArduinoIsInitialized = 0
         self.ArduinoFILT = [70,70,70,70] # Arduino Filter settings per channel in %
         self.HH806Winitflag = 0
+        self.R1 = None
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
         # device 1 (with index 1 bellow) is Omega HH806
@@ -33767,6 +33787,10 @@ class serialport(object):
                                    self.S7_34,                #80
                                    self.S7_56,                #81
                                    self.S7_78,                #82
+                                   self.R1_BTDT,              #83
+                                   self.R1_HF,                #84
+                                   self.R1_DRUM_BTROR,        #85
+                                   self.R1_EXIT_TEMP_VOLT,    #86
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -34237,10 +34261,45 @@ class serialport(object):
         
     def S7_56(self):
         return aw.qmc.extraS7tx,aw.qmc.extraS7t6,aw.qmc.extraS7t5
-        
+
     def S7_78(self):
         return aw.qmc.extraS7tx,aw.qmc.extraS7t8,aw.qmc.extraS7t7
-        
+
+    def R1_BTDT(self):
+        if self.R1 is None:
+            self.R1 = AillioR1()
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        try:
+            aw.qmc.R1_BT = self.R1.get_bt()
+            aw.qmc.R1_DT = self.R1.get_dt()
+            aw.qmc.R1_DRUM = self.R1.get_drum()
+            aw.qmc.R1_VOLTAGE = self.R1.get_voltage()
+            aw.qmc.R1_HEATER = self.R1.get_heater()
+            aw.qmc.R1_FAN = self.R1.get_fan()
+            aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
+            aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
+            aw.qmc.R1_TX = tx
+            newstate = self.R1.get_state_string()
+            if newstate != aw.qmc.R1_STATE:
+                aw.qmc.R1_STATE = newstate
+                aw.sendmessage(QApplication.translate("Message", "R1 state: " + newstate, None))
+        except IOError as exception:
+            error = QApplication.translate("Error Message", "Aillio R1: " + str(exception), None)
+            aw.qmc.adderror(error)
+        return tx, aw.qmc.R1_BT, aw.qmc.R1_DT
+
+    def R1_DRUM_BTROR(self):
+        tx = aw.qmc.R1_TX
+        return tx, aw.qmc.R1_DRUM, aw.qmc.R1_BT_ROR
+
+    def R1_HF(self):
+        tx = aw.qmc.R1_TX
+        return tx, aw.qmc.R1_FAN, aw.qmc.R1_HEATER
+
+    def R1_EXIT_TEMP_VOLT(self):
+        tx = aw.qmc.R1_TX
+        return tx, aw.qmc.R1_EXIT_TEMP, aw.qmc.R1_VOLTAGE
+    
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.MODBUSread()
@@ -38569,7 +38628,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -38977,7 +39036,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -39069,7 +39128,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -41039,8 +41098,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ####  DEVICE 81 is +S7 56 but no serial setup
                 ##########################
                 ##########################
-                ####  DEVICE 81 is +S7 78 but no serial setup
+                ####  DEVICE 82 is +S7 78 but no serial setup
                 ##########################
+                ##########################
+                ####  DEVICE 83-85 are Aillio R1 and have no serial setup
+                ##########################
+                elif meter == "Aillio Bullet R1 BT/DT":
+                    aw.qmc.device = 83
+                    message = QApplication.translate("Message","Device set to {0}", None).format(meter)
                 
                 # ADD DEVICE:
 
@@ -41143,6 +41208,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 80
                 1, # 81
                 1, # 82
+                1, # 83
+                1, # 84
+                1, # 85
+                1, # 86
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -41248,7 +41317,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]):
                 aw.setcommport()
             #self.close()
             self.accept()
