@@ -1178,10 +1178,10 @@ class tgraphcanvas(FigureCanvas):
                        "+S7 34",                    #80
                        "+S7 56",                    #81
                        "+S7 78",                    #82
-                       "Aillio Bullet R1 BT/DT",                      #83
-                       "+Aillio Bullet R1 Heater/Fan",                #84
-                       "+Aillio Bullet R1 BT RoR/Drum",               #85
-                       "+Aillio Bullet R1 Voltage/Exit Temperature",  #86
+                       "Aillio Bullet R1 BT/DT",             #83
+                       "+Aillio Bullet R1 Heater/Fan",       #84
+                       "+Aillio Bullet R1 BT RoR/Drum",      #85
+                       "+Aillio Bullet R1 Voltage/Exhaust",  #86
 
                        ]
 
