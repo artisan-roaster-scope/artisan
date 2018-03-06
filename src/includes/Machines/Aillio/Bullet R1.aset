@@ -3,21 +3,29 @@ Delay=1000
 Oversampling=true
 
 [Device]
-id=82
 Controlbuttonflag=true
+id=82
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200
+extrabytesize=8, 8, 8
+extracomport=COM1, COM1, COM1
+extraparity=E, E, E
+extrastopbits=1, 1, 1
+extratimeout=1, 1, 1
+
+[ExtraDev]
+extraCurveVisibility1=true, true, true, true, true, true, true, true, true, true
+extraCurveVisibility2=true, true, true, true, true, true, true, true, true, true
+extraLCDvisibility1=true, true, true, false, false, false, false, false, false, false
+extraLCDvisibility2=true, true, true, false, false, false, false, false, false, false
+extradevicecolor1=black, black, black
+extradevicecolor2=black, black, black
+extradevices=84, 83, 85
+extramathexpression1=, , 
+extramathexpression2=, , 
+extraname1=BT RoR, Heater, Voltage
+extraname2=Drum, Fan, Exit temp
 
 [RoastProperties]
-drumspeed=
-operator=
 roastertype=Aillio Bullet R1
-densitySampleVolume=1
-beansize=0
-
-#[ExtraDev]
-#extradevices=84, 85, 83
-#extradevicecolor1=black, black, black
-#extradevicecolor2=black, black, black
-#extraname1=BT RoR, Drum, Heater
-#extraname2=DT RoR, Voltage, Fan
-
-
