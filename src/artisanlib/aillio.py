@@ -58,9 +58,13 @@ class AillioR1:
                 raise IOError("unable to detach kernel driver")
         try:
             self.usbhandle.set_configuration(configuration=1)
-            self.usbhandle.claim_interface(self.AILLIO_INTERFACE)
         except:
             raise IOError("unable to configure")
+
+        try:
+            usb.util.claim_interface(self.usbhandle, self.AILLIO_INTERFACE)
+        except:
+            raise IOError("unable to claim interface")
         self.__sendcmd__(self.AILLIO_CMD_INFO1)
         reply = self.__readreply__(32)
         sn = unpack('h', reply[0:2])[0]
@@ -74,8 +78,13 @@ class AillioR1:
         
     def __close__(self):
         if self.usbhandle is not None:
-            self.usbhandle.release_interface(self.AILLIO_INTERFACE)
-            self.usbhandle.dipose_resources()
+            try:
+                usb.util.release_interface(self.usbhandle,
+                                           self.AILLIO_INTERFACE)
+                usb.util.dispose_resources(self.usbhandle)
+            except:
+                pass
+            self.usbhandle = None
 
     def setstate(self, heater=None, fan=None, drum=None):
         # Increase drum speed to 0x9
@@ -223,11 +232,20 @@ class AillioR1:
 
     def __sendcmd__(self, cmd):
         self.__dbg__('sending command: ' + str(cmd))
-        self.usbhandle.write(self.AILLIO_ENDPOINT_WR, cmd)
+        try:
+            self.usbhandle.write(self.AILLIO_ENDPOINT_WR, cmd)
+        except:
+            self.__close__()
+            self.__open__()
 
     def __readreply__(self, length):
-        return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length,
-                                   timeout=1000)
+        try:
+            return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length,
+                                       timeout=1000)
+        except:
+            self.__close__()
+            self.__open__()
+
 
 
 if __name__ == "__main__":
