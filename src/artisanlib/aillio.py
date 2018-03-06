@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import usb1
+import usb.core
+import usb.util
 import time
 from struct import pack, unpack
 
@@ -25,7 +26,6 @@ class AillioR1:
     def __init__(self, debug=True):
         self.AILLIO_DEBUG = debug
         self.__dbg__('init')
-        self.usbctx = usb1.USBContext()
         self.usbhandle = None
         self.bt = 0
         self.dt = 0
@@ -38,7 +38,6 @@ class AillioR1:
 
     def __del__(self):
         self.__close__()
-        self.usbctx.close()
 
     def __dbg__(self, msg):
         if self.AILLIO_DEBUG:
@@ -47,19 +46,19 @@ class AillioR1:
     def __open__(self):
         if self.usbhandle is not None:
             return
-        self.usbhandle = self.usbctx.openByVendorIDAndProductID(
-            self.AILLIO_VID, self.AILLIO_PID,
-            skip_on_error=True)
+        self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
+                                       idProduct=self.AILLIO_PID)
         if self.usbhandle is None:
             raise IOError("not found or no permission")
         self.__dbg__('device found!')
+        if self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
+            try:
+                self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
+            except:
+                raise IOError("unable to detach kernel driver")
         try:
-            self.usbhandle.detachKernelDriver(self.AILLIO_INTERFACE)
-        except:
-            pass
-        try:
-            self.usbhandle.setConfiguration(1)
-            self.usbhandle.claimInterface(self.AILLIO_INTERFACE)
+            self.usbhandle.set_configuration(configuration=1)
+            self.usbhandle.claim_interface(self.AILLIO_INTERFACE)
         except:
             raise IOError("unable to configure")
         self.__sendcmd__(self.AILLIO_CMD_INFO1)
@@ -75,8 +74,8 @@ class AillioR1:
         
     def __close__(self):
         if self.usbhandle is not None:
-            self.usbhandle.releaseInterface(self.AILLIO_INTERFACE)
-            self.usbhandle.close()
+            self.usbhandle.release_interface(self.AILLIO_INTERFACE)
+            self.usbhandle.dipose_resources()
 
     def setstate(self, heater=None, fan=None, drum=None):
         # Increase drum speed to 0x9
@@ -224,11 +223,11 @@ class AillioR1:
 
     def __sendcmd__(self, cmd):
         self.__dbg__('sending command: ' + str(cmd))
-        self.usbhandle.bulkWrite(self.AILLIO_ENDPOINT_WR, cmd)
+        self.usbhandle.write(self.AILLIO_ENDPOINT_WR, cmd)
 
     def __readreply__(self, length):
-        return self.usbhandle.bulkRead(self.AILLIO_ENDPOINT_RD, length,
-                                       timeout=1000)
+        return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length,
+                                   timeout=1000)
 
 
 if __name__ == "__main__":
