@@ -1935,6 +1935,7 @@ class tgraphcanvas(FigureCanvas):
         self.R1_DRUM = 0 # 0-9
         self.R1_VOLTAGE = 0 # 0-300
         self.R1_TX = 0.
+        self.R1_STATE = ""
 
         #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for S7 connected devices
         self.extraS7t3 = -1
@@ -34278,6 +34279,10 @@ class serialport(object):
             aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
             aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
             aw.qmc.R1_TX = tx
+            newstate = self.R1.get_state_string()
+            if newstate != aw.qmc.R1_STATE:
+                aw.qmc.R1_STATE = newstate
+                aw.sendmessage(QApplication.translate("Message", "R1 state: " + newstate, None))
         except IOError as exception:
             error = QApplication.translate("Error Message", "Aillio R1: " + str(exception), None)
             aw.qmc.adderror(error)

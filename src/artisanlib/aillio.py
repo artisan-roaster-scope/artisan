@@ -35,6 +35,7 @@ class AillioR1:
         self.drum = 0
         self.voltage = 0
         self.exitt = 0
+        self.state_str = ""
 
     def __del__(self):
         self.__close__()
@@ -169,6 +170,10 @@ class AillioR1:
         self.__getstate__()
         return self.exitt
 
+    def get_state_string(self):
+        self.__getstate__()
+        return self.state_str
+    
     def __getstate__(self):
         self.__open__()
         self.__dbg__('getstate')
@@ -218,15 +223,16 @@ class AillioR1:
         self.r1state = unpack('B', state[42:43])[0]
         self.__dbg__('pre-heat temperature: ' + str(self.pht))
         if self.r1state == self.AILLIO_STATE_OFF:
-            self.__dbg__('state: off')
+            self.state_str = "off"
         elif self.r1state == self.AILLIO_STATE_PH:
-            self.__dbg__('state: pre-heating')
+            self.state_str = "pre-heating"
         elif self.r1state == self.AILLIO_STATE_CHARGE:
-            self.__dbg__('state: charge')
+            self.state_str = "charge"
         elif self.r1state == self.AILLIO_STATE_ROASTING:
-            self.__dbg__('state: roasting')
+            self.state_str = "roasting"
         elif self.r1state == self.AILLIO_STATE_COOLING:
-            self.__dbg__('state: cooling')
+            self.state_str = "cooling"
+        self.__dbg__('state: ' + self.state_str)
         self.__dbg__('second coil fan: ' + str(self.coil_fan2))
 
 
