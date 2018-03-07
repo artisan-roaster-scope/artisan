@@ -168,6 +168,23 @@ which means that the channel and ID has been set to
 
 Artisan uses one decimal point. You have to manually configure your pid so that it outputs one digit after the  decimal point. See page 42 in the [instruction manual](http://www.instrumart.com/assets/PXR459_manual.pdf).
 
+### Aillio Bullet R1
+
+On Linux, Artisan needs read/write access to the USB device.
+The easiest way to make sure permissions are always setup is to create
+a udev rule.
+
+Create a file in `/etc/udev/rules.d` named `60-aillio-r1.rules` containing
+the following line:
+
+```
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5741", MODE="0660", GROUP="you-group-name"
+```
+
+Make sure GROUP is set correctly based on your group.  Most of the
+time your group name matches your user name, but you can confirm that
+by running `id' on a terminal.
+
 
 Serial Configuration
 --------------------
