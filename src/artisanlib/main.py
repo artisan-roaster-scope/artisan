@@ -13615,9 +13615,10 @@ class ApplicationWindow(QMainWindow):
         self.slider4.blockSignals(False)        
 
     def setLabelColor(self,label,color):
-        palette = QPalette(label.palette()) # make a copy of the palette
-        palette.setColor(QPalette.Foreground, color)
-        label.setPalette(palette) # assign new palette
+#        palette = QPalette(label.palette()) # make a copy of the palette
+#        palette.setColor(QPalette.Foreground, color)
+#        label.setPalette(palette) # assign new palette
+        label.setStyleSheet("QLabel { color: %s; }" % color.name())
 
     #adds errors
     def addserial(self,serialstring):
@@ -14357,6 +14358,7 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
                 except:
                     aw.extraLCDlabel1[i].setText(l1)
+                self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
             aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             self.extraLCDframe2[i].setVisible(bool(aw.extraLCDvisibility2[i])) 
             if i < len(aw.qmc.extraname2):
@@ -14365,6 +14367,7 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
                 except:
                     aw.extraLCDlabel2[i].setText(l2)
+                self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
             aw.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         #hide the rest (just in case)
         for i in range(ndev,aw.nLCDS):
@@ -16410,7 +16413,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extradrawstyles2 = [d(x) for x in profile["extradrawstyles2"]] + self.qmc.extradrawstyles2[len(profile["extradrawstyles2"]):]
                 else:
                     self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp2)
-                self.updateExtraLCDvisibility()
+            self.updateExtraLCDvisibility()
 
             old_mode = self.qmc.mode
             if "mode" in profile:
@@ -19544,6 +19547,7 @@ class ApplicationWindow(QMainWindow):
                     if i < len(self.qmc.extraname1):
                         l1 = "<b>" + self.qmc.extraname1[i] + "</b>"
                         self.extraLCDlabel1[i].setText(l1.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                        self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
                     self.extraLCDframe1[i].setVisible(True)
                     self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
                 else:
@@ -19552,6 +19556,7 @@ class ApplicationWindow(QMainWindow):
                     if i < len(self.qmc.extraname2):
                         l2 = "<b>" + self.qmc.extraname2[i] + "</b>"
                         self.extraLCDlabel2[i].setText(l2.format(self.qmc.etypes[0],self.qmc.etypes[1],self.qmc.etypes[2],self.qmc.etypes[3]))
+                        self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i]))
                     self.extraLCDframe2[i].setVisible(True)
                     self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
                 else:

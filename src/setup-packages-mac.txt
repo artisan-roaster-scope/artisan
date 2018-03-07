@@ -35,6 +35,7 @@ o pytz 2017.3
 o snap7 1.4.2
 o python-snap7 0.9
 o colorspacious 1.1.0
+o pyusb 1.0.2
 
 
 CHECK FOR UPDATES
@@ -68,8 +69,9 @@ open a terminal and type
 Upgrade History:
 
 - 2018-03-01
- . Qt 5.10.0 => 5.10.1
- . PyQt 5.10.0 => 5.10.1
+ . pyusb 1.0.2
+ . Qt 5.10.0 => 5.10.1 (has an issue with resizing QDialog)
+ . PyQt 5.10.0 => 5.10.1 (has an issue with resizing QDialog)
 - 2018-02-25
  . snap7 1.4.2
  . python snap7 0.9
@@ -909,3 +911,8 @@ https://github.com/lincolnloop/python-qrcode
 32) colorspacious
 
 # sudo -H python -m pip install colorspacious
+
+33) pyusb
+
+# sudo -H python3 -m pip install pyusb
+# port install libusb
