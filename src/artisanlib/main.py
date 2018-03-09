@@ -4557,18 +4557,18 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.tick_params(\
                     axis='x',           # changes apply to the x-axis
                     which='both',       # both major and minor ticks are affected
-                    bottom='on',        # ticks along the bottom edge are on
-                    top='off',          # ticks along the top edge are off
+                    bottom=True,        # ticks along the bottom edge are on
+                    top=False,          # ticks along the top edge are off
                     direction=tick_dir,
-                    labelbottom='on')   # labels along the bottom edge are on
+                    labelbottom=True)   # labels along the bottom edge are on
                 self.ax.tick_params(\
                     axis='y',           # changes apply to the y-axis
                     which='both',       # both major and minor ticks are affected
-                    right='off',
-                    bottom='on',        # ticks along the bottom edge are on
-                    top='off',          # ticks along the top edge are off
+                    right=False,
+                    bottom=True,        # ticks along the bottom edge are on
+                    top=False,          # ticks along the top edge are off
                     direction=tick_dir,
-                    labelbottom='on')   # labels along the bottom edge are on 
+                    labelbottom=True)   # labels along the bottom edge are on 
                 prop = aw.mpl_fontproperties.copy()
                 prop.set_size("medium")
                 for label in self.ax.get_xticklabels() :
@@ -4586,13 +4586,13 @@ class tgraphcanvas(FigureCanvas):
                     self.delta_ax.tick_params(\
                         axis='y',           # changes apply to the x-axis
                         which='both',       # both major and minor ticks are affected
-                        left='off',         # ticks along the left edge are off                        
-                        bottom='off',       # ticks along the bottom edge are off
-                        top='off',          # ticks along the top edge are off
+                        left=False,         # ticks along the left edge are off                        
+                        bottom=False,       # ticks along the bottom edge are off
+                        top=False,          # ticks along the top edge are off
                         direction="inout", # tick_dir # this does not work as ticks are not drawn at all in ON mode with this!?
-                        labelright='on',
-                        labelleft='off',
-                        labelbottom='off')   # labels along the bottom edge are on                      
+                        labelright=True,
+                        labelleft=False,
+                        labelbottom=False)   # labels along the bottom edge are on                      
                         
                     self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
                                     
@@ -4625,8 +4625,8 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.tick_params(\
                         axis='y', 
                         which='both',
-                        right='off',
-                        labelright='off')
+                        right=False,
+                        labelright=False)
     
                 self.ax.spines['top'].set_color("0.40")
                 self.ax.spines['bottom'].set_color("0.40")
@@ -5243,11 +5243,11 @@ class tgraphcanvas(FigureCanvas):
                             if self.DeltaETflag:
                                 self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "ET", None)))                    
+                                linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "ET", None)))                    
                             if self.DeltaBTflag:           
                                 self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "BT", None)))    
+                                linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None)))    
     
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
@@ -24925,6 +24925,7 @@ class HUDDlg(ArtisanDialog):
         try:
             app.setStyle(str(self.styleComboBox.currentText()))
             aw.appearance = str(self.styleComboBox.currentText()).lower()
+            print("set",aw.appearance)
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setappearance(): {0}").format(str(e)),exc_tb.tb_lineno)
