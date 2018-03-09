@@ -1441,6 +1441,8 @@ class tgraphcanvas(FigureCanvas):
 #        self.altsmoothing = False # toggle between standard and alternative smoothing approach
 #        self.smoothingwindowsize = 3 # window size of the alternative smoothing approach
 
+        self.optimalSmoothing = True
+
         self.patheffects = 2
         self.graphstyle = 0
         self.graphfont = 0
@@ -17960,6 +17962,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.dropSpikes = bool(toBool(settings.value("dropSpikes",self.qmc.dropSpikes)))
 #            if settings.contains("altSmoothing"):
 #                self.qmc.altsmoothing = bool(toBool(settings.value("altSmoothing",self.qmc.altsmoothing)))
+            if settings.contains("optimalSmoothing"):
+                self.qmc.optimalSmoothing = bool(toBool(settings.value("optimalSmoothing",self.qmc.optimalSmoothing)))
             if settings.contains("swapETBT"):
                 self.qmc.swapETBT = bool(toBool(settings.value("swapETBT",self.qmc.swapETBT)))
             if settings.contains("minmaxLimits"):
@@ -19053,6 +19057,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("filterDropOuts",self.qmc.filterDropOuts)
             settings.setValue("dropSpikes",self.qmc.dropSpikes)
 #            settings.setValue("altSmoothing",self.qmc.altsmoothing)
+            settings.setValue("optimalSmoothing",self.qmc.optimalSmoothing)
             settings.setValue("swapETBT",self.qmc.swapETBT)
             settings.setValue("minmaxLimits",self.qmc.minmaxLimits)
             settings.setValue("minLimit",self.qmc.filterDropOut_tmin)
@@ -21804,7 +21809,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
         contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell, Rui Paulo")
-        contributors += u(", Morris Beume, Michael Herbert<br>")
+        contributors += u(", Morris Beume, Michael Herbert, Chistopher Feran<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -23793,7 +23798,12 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setRange(0,40)
         self.Filter.setAlignment(Qt.AlignRight)
         self.Filter.setValue(aw.qmc.curvefilter/2)
-        self.Filter.editingFinished.connect(lambda :self.changeFilter())        
+        self.Filter.editingFinished.connect(lambda :self.changeFilter())
+        self.OptimalSmoothingFlag = QCheckBox(QApplication.translate("CheckBox", "Optimal Smoothing",None))
+        self.OptimalSmoothingFlag.setToolTip(QApplication.translate("Tooltip", "Use an optimal smoothing algorithm (only applicable offline, after recording)", None))        
+        self.OptimalSmoothingFlag.setChecked(aw.qmc.optimalSmoothing)
+        self.OptimalSmoothingFlag.stateChanged.connect(lambda _:self.changeOptimalSmoothingFlag())
+             
 #        windowlabel = QLabel(QApplication.translate("Label", "Window",None))
 #        #Window holds the number of pads in filter
 #        self.Window = QSpinBox()
@@ -23959,7 +23969,6 @@ class HUDDlg(ArtisanDialog):
         spikesLayout = QHBoxLayout()
         spikesLayout.addWidget(curvefilterlabel)
         spikesLayout.addWidget(self.Filter)
-        spikesLayout.addSpacing(30)
         spikesLayout.addStretch()
         spikesLayout.addWidget(self.FilterSpikes)
         rorGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Curves",None))
@@ -24020,9 +24029,13 @@ class HUDDlg(ArtisanDialog):
         rorFilterHBox.addSpacing(20)
         rorFilterHBox.addWidget(rormaxlabel)
         rorFilterHBox.addWidget(self.rormaxLimit)
+        rorRoRAlgo = QHBoxLayout()
+        rorRoRAlgo.addStretch()
+        rorRoRAlgo.addWidget(self.OptimalSmoothingFlag)
         rorFilterVBox = QVBoxLayout()
         rorFilterVBox.addLayout(rorFilterHBox)
         rorFilterVBox.addLayout(sensitivityLayout)
+        rorFilterVBox.addLayout(rorRoRAlgo)
         rorFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Filter",None))
         rorFilterGroupLayout.setLayout(rorFilterVBox)
         # path effects
@@ -24925,7 +24938,6 @@ class HUDDlg(ArtisanDialog):
         try:
             app.setStyle(str(self.styleComboBox.currentText()))
             aw.appearance = str(self.styleComboBox.currentText()).lower()
-            print("set",aw.appearance)
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setappearance(): {0}").format(str(e)),exc_tb.tb_lineno)
@@ -25295,6 +25307,10 @@ class HUDDlg(ArtisanDialog):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + "changeDeltaFilter(): {0}").format(str(e)),exc_tb.tb_lineno)
 
+    def changeOptimalSmoothingFlag(self):
+        aw.qmc.optimalSmoothing = not aw.qmc.optimalSmoothing
+        aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+        
     def changeDropFilter(self):
         aw.qmc.filterDropOuts = not aw.qmc.filterDropOuts
         aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
