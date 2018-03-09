@@ -183,7 +183,7 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5741", MODE="0660
 
 Make sure GROUP is set correctly based on your group.  Most of the
 time your group name matches your user name, but you can confirm that
-by running `id' on a terminal.
+by running `id` on a terminal.
 
 
 Serial Configuration
