@@ -33787,7 +33787,7 @@ class serialport(object):
                                    self.S7_34,                #80
                                    self.S7_56,                #81
                                    self.S7_78,                #82
-                                   self.R1_BTDT,              #83
+                                   self.R1_DTBT,              #83
                                    self.R1_HF,                #84
                                    self.R1_DRUM_BTROR,        #85
                                    self.R1_EXIT_TEMP_VOLT,    #86
@@ -34265,7 +34265,7 @@ class serialport(object):
     def S7_78(self):
         return aw.qmc.extraS7tx,aw.qmc.extraS7t8,aw.qmc.extraS7t7
 
-    def R1_BTDT(self):
+    def R1_DTBT(self):
         if self.R1 is None:
             self.R1 = AillioR1()
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -34286,7 +34286,7 @@ class serialport(object):
         except IOError as exception:
             error = QApplication.translate("Error Message", "Aillio R1: " + str(exception), None)
             aw.qmc.adderror(error)
-        return tx, aw.qmc.R1_BT, aw.qmc.R1_DT
+        return tx, aw.qmc.R1_DT, aw.qmc.R1_BT
 
     def R1_DRUM_BTROR(self):
         tx = aw.qmc.R1_TX
