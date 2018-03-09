@@ -10386,8 +10386,9 @@ class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
     
         self.superusermode = False
-
-        self.defaultAppearance = None
+        
+        self.appearance = ""
+        
         # matplotlib font properties:
         self.mpl_fontproperties = mpl.font_manager.FontProperties()
         self.full_screen_mode_active = False
@@ -13479,10 +13480,13 @@ class ApplicationWindow(QMainWindow):
         self.sliderLCDSV.display(v)
 
     def sliderSVreleased(self):
-        if aw.qmc.device == 0:
-            aw.fujipid.setsv(self.sliderSV.value(),silent=True)
-        else:
-            aw.pidcontrol.setSV(self.sliderSV.value(),False)
+        try:
+            if aw.qmc.device == 0:
+                aw.fujipid.setsv(self.sliderSV.value(),silent=True)
+            else:
+                aw.pidcontrol.setSV(self.sliderSV.value(),False)
+        except:
+            pass
 
     # if setValue=False, the slider is only moved without a change signal being issued
     def moveSVslider(self,v,setValue=True):
@@ -18463,6 +18467,7 @@ class ApplicationWindow(QMainWindow):
                     available = list(map(str, list(QStyleFactory.keys())))
                     i = list(map(lambda x:x.lower(),available)).index(toString(settings.value("appearance")))
                     app.setStyle(available[i])
+                    aw.appearance = available[i].lower()
                 except Exception:
                     pass
             # set dpi
@@ -19328,8 +19333,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("statssummary",self.qmc.statssummary)            
             settings.endGroup()
             try:
-                settings.setValue("appearance",str(aw.style().objectName()).lower())
-            except Exception:
+                settings.setValue("appearance",aw.appearance)
+            except:
                 pass
             settings.setValue("dpi",aw.dpi)
             
@@ -24384,7 +24389,7 @@ class HUDDlg(ArtisanDialog):
         self.styleComboBox.setFocusPolicy(Qt.NoFocus)
         try:
             #pylint: disable=E1102
-            self.styleComboBox.setCurrentIndex(list(map(lambda x:x.lower(),available)).index(str(aw.style().objectName()).lower()))
+            self.styleComboBox.setCurrentIndex(list(map(lambda x:x.lower(),available)).index(aw.appearance.lower()))
         except Exception:
             pass
         self.styleComboBox.currentIndexChanged.connect(lambda _:self.setappearance())
@@ -24919,6 +24924,7 @@ class HUDDlg(ArtisanDialog):
     def setappearance(self):
         try:
             app.setStyle(str(self.styleComboBox.currentText()))
+            aw.appearance = str(self.styleComboBox.currentText()).lower()
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setappearance(): {0}").format(str(e)),exc_tb.tb_lineno)
@@ -48437,10 +48443,6 @@ def main():
     else:
         QApplication.setLayoutDirection(Qt.LeftToRight)
 
-    try:
-        aw.defaultAppearance = str(aw.style().objectName()).lower()
-    except:
-        pass
 
     aw.settingsLoad()    
     
