@@ -225,7 +225,7 @@ class AillioR1:
         if self.r1state == self.AILLIO_STATE_OFF:
             self.state_str = "off"
         elif self.r1state == self.AILLIO_STATE_PH:
-            self.state_str = "pre-heating"
+            self.state_str = "pre-heating to " + str(self.pht) + "C"
         elif self.r1state == self.AILLIO_STATE_CHARGE:
             self.state_str = "charge"
         elif self.r1state == self.AILLIO_STATE_ROASTING:

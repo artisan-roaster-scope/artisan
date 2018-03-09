@@ -72,6 +72,7 @@ Features
 - and machines
   * [Probat Probatone 2](https://artisan-roasterscope.blogspot.de/2017/06/probat-probatone.html)
   * [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html)
+  * Aillio Bullet R1
 - multi-format (import and export of various file formats: HTML, PDF, SVG, CSV, JSON, Omega HH506RA, K202, K204, [RoastLogger](http://roastlogger.co.uk/coffee/roastlogger/roastlogger.htm), [Probat Pilot](http://www.probat-shoproaster.com/en/plants-equipment/control-software/general-features/), [Aillio Bullet R1](https://aillio.com))
 - unlimited number of temperature and [virtual curves](https://artisan-roasterscope.blogspot.de/2014/04/virtual-devices-and-symbolic-assignments.html) incl. rate-of-rise curves for ET and BT
 - [spike filter](http://artisan-roasterscope.blogspot.de/2013/05/fighting-spikes.html) and [curve smoothing](https://artisan-roasterscope.blogspot.de/2014/01/sampling-interval-smoothing-and-rate-of.html)
