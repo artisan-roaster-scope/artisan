@@ -681,9 +681,14 @@ if platf == 'Windows':
             app.setAttribute(Qt.AA_UseHighDpiPixmaps)
     except Exception as e:
         pass
-        
-        
-deltaLabelPrefix = u("\u03B4") # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
+
+deltaLabelPrefix = "<html>&Delta;&thinsp;</html>" # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
+if platf == 'Linux':
+    deltaLabelUTF8 = u("Delta")
+else:
+    deltaLabelUTF8 = u("\u0394\u2009") # u("\u03B4") # prefix for non HTML Qt Widgets like QPushbuttons
+deltaLabelBigPrefix = u("<big><b>&Delta;</b></big>&thinsp;<big><b>") # same as above for big/bold use cases
+deltaLabelMathPrefix = u("$\Delta\/$")  # prefix for labels in matplibgraphs to compose DeltaET/BT by prepending this prefix to ET/BT labels
 
 
 # platform dependent imports:
@@ -1699,11 +1704,13 @@ class tgraphcanvas(FigureCanvas):
         # axis limits
         self.endofx = self.endofx_default
         self.startofx = self.startofx_default
-        self.resetmaxtime = 600  #time when pressing reset: 10min*60
+        self.resetmaxtime = 600  #time when pressing RESET: 10min*60
+        self.chargemintime = self.startofx_default  #time when pressing CHARGE: -30sec
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
         self.locktimex = True # if true, do not set time axis min and max from profile on load
         self.autotimex = True # automatically set time axis min and max from profile CHARGE/DROP on load
         self.locktimex_start = self.startofx_default # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
+        self.locktimex_end = self.endofx_default # seconds of x-axis max as locked by locktimex (needs to be interpreted wrt. CHARGE index)
         self.xgrid = 120   #initial time separation; 60 = 1 minute
         self.ygrid = self.ygrid_F_default  #initial temperature separation
         self.zgrid = self.zgrid_F_default   #initial RoR separation
@@ -3899,9 +3906,10 @@ class tgraphcanvas(FigureCanvas):
                 if not (aw.qmc.autotimex and aw.qmc.background):
                     if self.locktimex:
                         self.startofx = self.locktimex_start
-                        self.endofx = self.resetmaxtime
+                        self.endofx = self.locktimex_end
                     else:
-                        self.startofx = self.startofx_default
+                        self.startofx = self.chargemintime
+                        self.endofx = self.resetmaxtime
                 if self.endofx < 1:
                     self.endofx = 60
 
@@ -5296,11 +5304,10 @@ class tgraphcanvas(FigureCanvas):
     
                 if self.DeltaETflag: 
                     handles.append(self.l_delta1)
-                    labels.append(aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "ET", None)))
+                    labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "ET", None)))
                 if self.DeltaBTflag:
                     handles.append(self.l_delta2)
-                    labels.append(aw.arabicReshape(deltaLabelPrefix + QApplication.translate("Label", "BT", None)))
-    
+                    labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "BT", None)))
     
                 nrdevices = len(self.extradevices)
                 
@@ -6421,7 +6428,10 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[0] = -1
                             self.xaxistosm(redraw=False)
                             removed = True
-                    else:       
+                    else:
+                        if not aw.qmc.locktimex:
+                            aw.qmc.startofx = aw.qmc.chargemintime + self.timex[self.timeindex[0]] # we set the min x-axis limit to the CHARGE Min time
+
                         if self.device == 18: #manual mode
                             tx,et,bt = aw.ser.NONE()
                             if bt != 1 and et != -1:  #cancel
@@ -6439,6 +6449,7 @@ class tgraphcanvas(FigureCanvas):
                                     message = QApplication.translate("Message","Not enough data collected yet. Try again in a few seconds", None)
                             if aw.pidcontrol.pidOnCHARGE and not aw.pidcontrol.pidActive: # Arduino/TC4, Hottop, MODBUS
                                 aw.pidcontrol.pidOn()
+                                
                         self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
@@ -10087,7 +10098,7 @@ class SampleThread(QThread):
                         if aw.qmc.DeltaBTflag:
                             aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
                         #readjust xlimit of plot if needed
-                        if  not aw.qmc.fixmaxtime and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                        if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
                             aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
                             aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
                             aw.qmc.tempory_sample_trigger_redraw = True # we enfore a full redraw within updategraphics
@@ -10259,7 +10270,7 @@ class SampleThread(QThread):
                 else:
                     tx = int(aw.qmc.timeclock.elapsed()/1000.)
                     #readjust xlimit of plot if needed
-                    if  not aw.qmc.fixmaxtime and tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
+                    if  not aw.qmc.fixmaxtime and not aw.qmc.locktimex and tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
                         aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
                         aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
                         aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
@@ -11589,12 +11600,12 @@ class ApplicationWindow(QMainWindow):
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label4.setText("<big><b>" + deltaLabelPrefix + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
+        self.label4.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", "ET",None)) + "</b></big>")
         self.setLabelColor(self.label4,QColor(self.qmc.palette["deltaet"]))
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label5.setText("<big><b>" + deltaLabelPrefix + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
+        self.label5.setText(deltaLabelBigPrefix + u(QApplication.translate("Label", "BT",None)) + "</b></big>")
         self.setLabelColor(self.label5,QColor(self.qmc.palette["deltabt"]))
         # pid sv
         self.label6 = QLabel()
@@ -16594,10 +16605,10 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ylimit = min(int(profile["ymax"]),self.qmc.ylimit_max)
                 if "ymin" in profile:
                     self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),self.qmc.ylimit_min_max)
-            # otherwise don't let the users y/z min/max axis limits be overwritten by loading a profile
-            if "xmin" in profile:
-                self.qmc.startofx = float(profile["xmin"])
             if  not self.qmc.locktimex:
+                # otherwise don't let the users y/z min/max axis limits be overwritten by loading a profile
+                if "xmin" in profile:
+                    self.qmc.startofx = float(profile["xmin"])
                 if "xmax" in profile:
                     self.qmc.endofx = float(profile["xmax"])
                 else:
@@ -18027,7 +18038,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Sound")
             self.soundflag = toInt(settings.value("Beep",self.soundflag))
             settings.endGroup()
-            #saves max-min temp limits of graph
+            #loads max-min temp limits of graph
             settings.beginGroup("Axis")
             try: # prevents some random exceptions in Windows!?
                 self.qmc.startofx = toFloat(settings.value("xmin",self.qmc.startofx))
@@ -18051,6 +18062,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.autotimex = bool(toBool(settings.value("autotimex",self.qmc.autotimex)))
             if settings.contains("locktimex_start"):
                 self.qmc.locktimex_start = toInt(settings.value("locktimex_start",self.qmc.locktimex_start))
+            if settings.contains("locktimex_end"):
+                self.qmc.locktimex_end = toInt(settings.value("locktimex_end",self.qmc.locktimex_end))
+            if settings.contains("chargemintime"):
+                self.qmc.chargemintime = toInt(settings.value("chargemintime",self.qmc.chargemintime))
             self.qmc.legendloc = toInt(settings.value("legendloc",self.qmc.legendloc))
             settings.endGroup()
             settings.beginGroup("RoastProperties")
@@ -18264,7 +18279,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ygrid = max(10,toInt(settings.value("ygrid",self.qmc.ygrid)))
                 self.qmc.zgrid = max(1,toInt(settings.value("zgrid",self.qmc.zgrid)))
                 self.qmc.gridthickness = toInt(settings.value("gridthickness",self.qmc.gridthickness))
-                self.qmc.xrotation = toInt(settings.value("xrotation",self.qmc.xrotation))
+#                self.qmc.xrotation = toInt(settings.value("xrotation",self.qmc.xrotation))
                 self.qmc.gridlinestyle = toInt(settings.value("gridlinestyle",self.qmc.gridlinestyle))
                 self.qmc.gridalpha = toDouble(settings.value("gridalpha",self.qmc.gridalpha))
             settings.endGroup()
@@ -18411,14 +18426,12 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass
             
-            #update axis limits
-            if not self.qmc.locktimex:
-                self.qmc.startofx = self.qmc.startofx_default
-            else:
-                self.qmc.startofx = self.qmc.locktimex_start
-                self.qmc.endofx = self.qmc.resetmaxtime
-            if self.qmc.endofx < 1:
-                self.qmc.endofx = 60
+#            #update axis limits
+#            if not self.qmc.locktimex:
+#                self.qmc.startofx = self.qmc.chargemintime # self.qmc.locktimex_start
+#                self.qmc.endofx = self.qmc.locktimex_end
+#            if self.qmc.endofx < 1:
+#                self.qmc.endofx = 60
 
             
             # used on startup to reload previous loaded profiles
@@ -19098,7 +19111,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("locktimex",self.qmc.locktimex)
             settings.setValue("autotimex",self.qmc.autotimex)
             settings.setValue("locktimex_start",self.qmc.locktimex_start)
+            settings.setValue("locktimex_end",self.qmc.locktimex_end)
             settings.setValue("legendloc",self.qmc.legendloc)
+            settings.setValue("chargemintime",self.qmc.chargemintime)
             settings.endGroup()
             settings.beginGroup("RoastProperties")
             settings.setValue("drumspeed",self.qmc.drumspeed)
@@ -19277,7 +19292,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("gridlinestyle",self.qmc.gridlinestyle)
             settings.setValue("gridthickness",self.qmc.gridthickness)
             settings.setValue("gridalpha",self.qmc.gridalpha)
-            settings.setValue("xrotation",self.qmc.xrotation)
+#            settings.setValue("xrotation",self.qmc.xrotation)
             settings.endGroup()
             settings.beginGroup("Sliders")
             settings.setValue("slidervisibilities",self.eventslidervisibilities)
@@ -23751,11 +23766,13 @@ class HUDDlg(ArtisanDialog):
         modeLabel.setAlignment(Qt.AlignRight)
         ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None))
         #delta ET
-        self.DeltaET = QCheckBox(QApplication.translate("CheckBox", deltaLabelPrefix+"ET",None))
+        self.DeltaET = QCheckBox()
         self.DeltaET.setChecked(aw.qmc.DeltaETflag)
+        DeltaETlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET",None))
         #delta BT
-        self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", deltaLabelPrefix+"BT",None))
+        self.DeltaBT = QCheckBox()
         self.DeltaBT.setChecked(aw.qmc.DeltaBTflag)
+        DeltaBTlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "BT",None))
         filterlabel = QLabel(QApplication.translate("Label", "Smooth Deltas",None))
         #DeltaFilter holds the number of pads in filter
         self.DeltaFilter = QSpinBox()
@@ -23903,15 +23920,19 @@ class HUDDlg(ArtisanDialog):
         hudLayout.addWidget(self.showHUDbutton,3,3)
         rorBoxLayout = QHBoxLayout()
         rorBoxLayout.addWidget(self.DeltaET)
+        rorBoxLayout.addWidget(DeltaETlabel)
         rorBoxLayout.addSpacing(15)
         rorBoxLayout.addWidget(self.DeltaBT)
+        rorBoxLayout.addWidget(DeltaBTlabel)
         rorBoxLayout.addStretch()
         rorBoxLayout.addWidget(self.projectCheck)
         rorBoxLayout.addWidget(self.projectionmodeComboBox)
-        self.DeltaETlcd = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox", "ET",None))
+        self.DeltaETlcd = QCheckBox()
         self.DeltaETlcd.setChecked(aw.qmc.DeltaETlcdflag)
-        self.DeltaBTlcd = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox", "BT",None))
+        DeltaETlcdLabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET",None))
+        self.DeltaBTlcd = QCheckBox()
         self.DeltaBTlcd.setChecked(aw.qmc.DeltaBTlcdflag)
+        DeltaBTlcdLabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "BT",None))
         self.DecimalPlaceslcd = QCheckBox(QApplication.translate("CheckBox", "Decimal Places",None))
         self.DecimalPlaceslcd.setChecked(aw.qmc.LCDdecimalplaces)
         self.DeltaETlcd.stateChanged.connect(lambda _:self.changeDeltaETlcd())         #toggle
@@ -23919,8 +23940,10 @@ class HUDDlg(ArtisanDialog):
         self.DecimalPlaceslcd.stateChanged.connect(lambda _:self.changeDecimalPlaceslcd())         #toggle
         lcdsLayout = QHBoxLayout()
         lcdsLayout.addWidget(self.DeltaETlcd)
+        lcdsLayout.addWidget(DeltaETlcdLabel)
         lcdsLayout.addSpacing(15)
         lcdsLayout.addWidget(self.DeltaBTlcd)
+        lcdsLayout.addWidget(DeltaBTlcdLabel)
         lcdsLayout.addStretch()
         sensitivityLayout = QHBoxLayout()
         sensitivityLayout.addWidget(filterlabel)
@@ -25114,12 +25137,12 @@ class HUDDlg(ArtisanDialog):
         self.curvenames = []
         self.deltacurves = [] # list of flags. True if delta curve, False otherwise
         if aw.qmc.DeltaETflag:
-            self.curvenames.append(deltaLabelPrefix + QApplication.translate("ComboBox","ET",None))
+            self.curvenames.append(deltaLabelUTF8 + QApplication.translate("Label","ET",None))
             self.curves.append(aw.qmc.delta1)
             self.deltacurves.append(True)
             idx = idx + 1
         if aw.qmc.DeltaBTflag:
-            self.curvenames.append(deltaLabelPrefix + QApplication.translate("ComboBox","BT",None))
+            self.curvenames.append(deltaLabelUTF8 + QApplication.translate("Label","BT",None))
             self.curves.append(aw.qmc.delta2)
             self.deltacurves.append(True)
             idx = idx + 1
@@ -27263,8 +27286,8 @@ class editGraphDlg(ArtisanDialog):
         columns = [QApplication.translate("Table", "Time",None),
                                                   QApplication.translate("Table", "ET",None),
                                                   QApplication.translate("Table", "BT",None),
-                                                  deltaLabelPrefix + QApplication.translate("Table", "ET",None),
-                                                  deltaLabelPrefix + QApplication.translate("Table", "BT",None)]
+                                                  deltaLabelUTF8 + QApplication.translate("Label", "ET",None),
+                                                  deltaLabelUTF8 + QApplication.translate("Label", "BT",None)]
         for i in range(len(aw.qmc.extratimex)):
             en1 = aw.qmc.extraname1[i]
             en2 = aw.qmc.extraname2[i]
@@ -28429,12 +28452,12 @@ class WindowsDlg(ArtisanDialog):
         zlimitLabel = QLabel(QApplication.translate("Label", "Max",None))
         zlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None))
         self.xlimitEdit = QLineEdit()
-        self.xlimitEdit.setMaximumWidth(60)
-        self.xlimitEdit.setMinimumWidth(60)
+        self.xlimitEdit.setMaximumWidth(50)
+        self.xlimitEdit.setMinimumWidth(50)
         self.xlimitEdit.setAlignment(Qt.AlignRight)
         self.xlimitEdit_min = QLineEdit()
-        self.xlimitEdit_min.setMaximumWidth(60)
-        self.xlimitEdit_min.setMinimumWidth(60)
+        self.xlimitEdit_min.setMaximumWidth(55)
+        self.xlimitEdit_min.setMinimumWidth(55)
         self.xlimitEdit_min.setAlignment(Qt.AlignRight)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.xlimitEdit.setValidator(QRegExpValidator(regextime,self))
@@ -28464,14 +28487,14 @@ class WindowsDlg(ArtisanDialog):
         self.ylimitEdit_min.setText(str(aw.qmc.ylimit_min))
         self.zlimitEdit.setText(str(aw.qmc.zlimit))
         self.zlimitEdit_min.setText(str(aw.qmc.zlimit_min))
-        xrotationlabel = QLabel(QApplication.translate("Label", "Rotation",None))
-        self.xrotationSpinBox = QSpinBox()
-        self.xrotationSpinBox.setRange(0,90)
-        self.xrotationSpinBox.setSingleStep(5)
-        self.xrotationSpinBox.setValue(aw.qmc.xrotation)
-        self.xrotationSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-        self.xrotationSpinBox.valueChanged.connect(self.changexrotation)
-        self.xrotationSpinBox.setMaximumWidth(40)
+#        xrotationlabel = QLabel(QApplication.translate("Label", "Rotation",None))
+#        self.xrotationSpinBox = QSpinBox()
+#        self.xrotationSpinBox.setRange(0,90)
+#        self.xrotationSpinBox.setSingleStep(5)
+#        self.xrotationSpinBox.setValue(aw.qmc.xrotation)
+#        self.xrotationSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+#        self.xrotationSpinBox.valueChanged.connect(self.changexrotation)
+#        self.xrotationSpinBox.setMaximumWidth(40)
         self.legendComboBox = QComboBox()
         self.legendComboBox.setMaximumWidth(160)
         legendlocs = ["",#QApplication.translate("ComboBox", "none",None),
@@ -28488,19 +28511,29 @@ class WindowsDlg(ArtisanDialog):
         self.legendComboBox.addItems(legendlocs)
         self.legendComboBox.setCurrentIndex(aw.qmc.legendloc)
         self.legendComboBox.currentIndexChanged.connect(self.changelegendloc)
-        resettimelabel = QLabel(QApplication.translate("Label", "Initial Max",None))
+        resettimelabel = QLabel(QApplication.translate("Label", "Max",None))
         self.resetEdit = QLineEdit()
-        self.resetEdit.setMaximumWidth(60)
-        self.resetEdit.setMinimumWidth(60)
+        self.resetEdit.setMaximumWidth(50)
+        self.resetEdit.setMinimumWidth(50)
         self.resetEdit.setAlignment(Qt.AlignRight)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.resetEdit.setValidator(QRegExpValidator(regextime,self))
         self.resetEdit.setText(aw.qmc.stringfromseconds(aw.qmc.resetmaxtime))
-        self.resetEdit.setToolTip(QApplication.translate("Tooltip", "Initial time axis max on RESET if LOCK is ticked", None))
+        self.resetEdit.setToolTip(QApplication.translate("Tooltip", "Time axis max on RESET", None))
+        # CHARGE min
+        chargeminlabel = QLabel(QApplication.translate("Label", "RESET",None) + " " + QApplication.translate("Label", "Min",None))
+        self.chargeminEdit = QLineEdit()
+        self.chargeminEdit.setMaximumWidth(50)
+        self.chargeminEdit.setMinimumWidth(50)
+        self.chargeminEdit.setAlignment(Qt.AlignRight)
+        self.chargeminEdit.setValidator(QRegExpValidator(regextime,self))
+        self.chargeminEdit.setText(aw.qmc.stringfromseconds(aw.qmc.chargemintime))
+        self.chargeminEdit.setToolTip(QApplication.translate("Tooltip", "Time axis min on RESET", None))
+        
         # fixmaxtime flag
-        self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Lock Max",None))
-        self.fixmaxtimeFlag.setChecked(aw.qmc.fixmaxtime)
-        self.fixmaxtimeFlag.setToolTip(QApplication.translate("Tooltip", "Do not automatically extend the time max limit by 3min on need", None))
+        self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Expand",None))
+        self.fixmaxtimeFlag.setChecked(not aw.qmc.fixmaxtime)
+        self.fixmaxtimeFlag.setToolTip(QApplication.translate("Tooltip", "Automatically extend the time axis by 3min on need", None))        
         # locktimex flag
         self.locktimexFlag = QCheckBox(QApplication.translate("CheckBox", "Lock",None))
         self.locktimexFlag.setChecked(aw.qmc.locktimex)
@@ -28508,7 +28541,9 @@ class WindowsDlg(ArtisanDialog):
         # locktimex flag
         self.autotimexFlag = QCheckBox(QApplication.translate("CheckBox", "Auto",None))
         self.autotimexFlag.setChecked(aw.qmc.autotimex)
-        self.autotimexFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set time axis min and max from profile CHARGE/DROP on load and OFF", None))
+        self.autotimexFlag.stateChanged.connect(lambda n:self.autoTimexFlagChanged(n))
+        self.locktimexFlag.stateChanged.connect(lambda n:self.lockTimexFlagChanged(n))
+        self.autotimexFlag.setToolTip(QApplication.translate("Tooltip", "Automatically set time axis min and max from profile CHARGE/DROP events", None))
         autoButton = QPushButton(QApplication.translate("Button","Calc",None))
         autoButton.setFocusPolicy(Qt.NoFocus)
         autoButton.clicked.connect(lambda _:self.autoAxis())
@@ -28526,6 +28561,14 @@ class WindowsDlg(ArtisanDialog):
                       QApplication.translate("ComboBox", "30 minutes",None),
                       QApplication.translate("ComboBox", "1 hour",None)]
         self.xaxislencombobox.addItems(timelocs)
+        
+        self.xaxislencombobox.setMinimumContentsLength(6)
+        width = self.xaxislencombobox.minimumSizeHint().width()
+        self.xaxislencombobox.setMinimumWidth(width)
+        if platf == 'Darwin':
+            self.xaxislencombobox.setMaximumWidth(width)
+#        self.xaxislencombobox.setMaximumWidth(120)
+        
         self.timeconversion = [60,120,180,240,300,600,1800,3600]
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(aw.qmc.xgrid))
@@ -28580,21 +28623,43 @@ class WindowsDlg(ArtisanDialog):
         cancelButton.clicked.connect(lambda _:self.close())
         okButton.clicked.connect(lambda _:self.updatewindow())
         resetButton.clicked.connect(lambda _:self.reset())
-        xlayout = QGridLayout()
-        xlayout.addWidget(self.locktimexFlag,0,0)
-        xlayout.addWidget(self.autotimexFlag,0,2)
-        xlayout.addWidget(autoButton,0,3)
-        xlayout.addWidget(xlimitLabel_min,1,0)
-        xlayout.addWidget(self.xlimitEdit_min,1,1)
-        xlayout.addWidget(xlimitLabel,1,2)
-        xlayout.addWidget(self.xlimitEdit,1,3)
-        xlayout.addWidget(timegridlabel,2,0)
-        xlayout.addWidget(self.xaxislencombobox,2,1)
-        xlayout.addWidget(resettimelabel,2,2)
-        xlayout.addWidget(self.resetEdit,2,3)
-        xlayout.addWidget(xrotationlabel,3,0)
-        xlayout.addWidget(self.fixmaxtimeFlag,3,2,1,2,Qt.AlignRight)
-        xlayout.addWidget(self.xrotationSpinBox,3,1)
+        
+        hline = QFrame()
+        hline.setFrameShape(QFrame.HLine)
+        hline.setFrameShadow(QFrame.Sunken)
+        
+        
+        xlayout1 = QHBoxLayout()
+        xlayout1.addWidget(self.autotimexFlag)
+        xlayout1.addWidget(autoButton)
+        xlayout1.addStretch()
+        xlayout1.addWidget(self.locktimexFlag)
+        xlayout2 = QHBoxLayout()
+        xlayout2.addWidget(xlimitLabel_min)
+        xlayout2.addWidget(self.xlimitEdit_min)
+        xlayout2.addSpacing(10)
+        xlayout2.addWidget(xlimitLabel)
+        xlayout2.addWidget(self.xlimitEdit)
+        xlayout2.addStretch()
+        xlayout2.addWidget(timegridlabel)
+        xlayout2.addWidget(self.xaxislencombobox)
+        xlayout3 = QHBoxLayout()
+        xlayout3.addWidget(chargeminlabel)
+        xlayout3.addWidget(self.chargeminEdit)
+        xlayout3.addSpacing(7)
+        xlayout3.addWidget(resettimelabel)
+        xlayout3.addWidget(self.resetEdit)
+        xlayout3.addSpacing(7)
+        xlayout3.addStretch()
+        xlayout3.addWidget(self.fixmaxtimeFlag)
+        xlayout = QVBoxLayout()
+        xlayout.addLayout(xlayout1)
+        xlayout.addLayout(xlayout2) 
+        xlayout.addWidget(hline)
+        xlayout.addLayout(xlayout3)
+        
+        
+        
         ylayout = QGridLayout()
         ylayout.addWidget(ylimitLabel_min,0,0,Qt.AlignRight)
         ylayout.addWidget(self.ylimitEdit_min,0,1)
@@ -28603,7 +28668,7 @@ class WindowsDlg(ArtisanDialog):
         ylayout.addWidget(ygridlabel,0,6,Qt.AlignRight)
         ylayout.addWidget(self.ygridSpinBox,0,7)
         ylayout.setColumnMinimumWidth(2,10)
-        ylayout.setColumnMinimumWidth(5,10)
+        ylayout.setColumnMinimumWidth(5,10)        
         ylayoutHbox = QHBoxLayout()
         ylayoutHbox.addStretch()
         ylayoutHbox.addLayout(ylayout)
@@ -28636,7 +28701,7 @@ class WindowsDlg(ArtisanDialog):
         xGroupLayout.setLayout(xlayout)
         yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None))
         yGroupLayout.setLayout(ylayoutHbox)
-        zGroupLayout = QGroupBox(deltaLabelPrefix + " " + QApplication.translate("GroupBox","Axis",None))
+        zGroupLayout = QGroupBox(deltaLabelUTF8 + " " + QApplication.translate("GroupBox","Axis",None))
         zGroupLayout.setLayout(zlayoutHbox)
         legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None))
         legendLayout.setLayout(legentlayout)
@@ -28664,6 +28729,38 @@ class WindowsDlg(ArtisanDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
+        
+        if aw.qmc.locktimex:
+            self.disableXAxisControls()
+        else:
+            self.enableXAxisControls()
+            
+            
+    def enableXAxisControls(self):
+        self.xlimitEdit.setEnabled(True)
+        self.xlimitEdit_min.setEnabled(True)
+        self.chargeminEdit.setEnabled(True)
+        self.resetEdit.setEnabled(True)
+        self.fixmaxtimeFlag.setEnabled(True)
+    
+    def disableXAxisControls(self):
+        self.xlimitEdit.setEnabled(False)
+        self.xlimitEdit_min.setEnabled(False)
+        self.chargeminEdit.setEnabled(False)
+        self.resetEdit.setEnabled(False)
+        self.fixmaxtimeFlag.setEnabled(False)
+        
+    def lockTimexFlagChanged(self,n):
+        if n:
+            self.autotimexFlag.setChecked(False)
+            self.disableXAxisControls()
+        else:
+            self.enableXAxisControls()
+        
+    def autoTimexFlagChanged(self,n):
+        if n:
+            self.locktimexFlag.setChecked(False) 
+            self.enableXAxisControls()
 
     def autoAxis(self):
         t_min,t_max = aw.calcAutoAxis()
@@ -28752,9 +28849,17 @@ class WindowsDlg(ArtisanDialog):
             aw.qmc.togglecrosslines()
             aw.qmc.togglecrosslines()
             
-        aw.qmc.endofx = aw.qmc.stringtoseconds(str(self.xlimitEdit.text()))
-        resettime = aw.qmc.stringtoseconds(str(self.resetEdit.text()))
-        startedittime_str = str(self.xlimitEdit_min.text())
+        
+        endedittime_str = str(self.xlimitEdit.text())
+        if endedittime_str is not None and endedittime_str != "":
+            endeditime = aw.qmc.stringtoseconds(endedittime_str)
+            aw.qmc.endofx = endeditime
+            aw.qmc.locktimex_end = endeditime
+        else:
+            aw.qmc.endofx = aw.qmc.endofx_default
+            aw.qmc.locktimex_end = aw.qmc.endofx_default
+        
+        startedittime_str = str(self.xlimitEdit_min.text())        
         if startedittime_str is not None and startedittime_str != "":
             starteditime = aw.qmc.stringtoseconds(startedittime_str)
             if starteditime >= 0 and aw.qmc.timeindex[0] != -1:
@@ -28768,10 +28873,17 @@ class WindowsDlg(ArtisanDialog):
             aw.qmc.locktimex_start = starteditime
         else:
             aw.qmc.startofx = aw.qmc.startofx_default
-            aw.qmc.locktimex_start = 0
+            aw.qmc.locktimex_start = aw.qmc.startofx_default
+            
+        resettime = aw.qmc.stringtoseconds(str(self.resetEdit.text()))
         if resettime > 0:
             aw.qmc.resetmaxtime = resettime
-        aw.qmc.fixmaxtime = self.fixmaxtimeFlag.isChecked()
+            
+        chargetime = aw.qmc.stringtoseconds(str(self.chargeminEdit.text()))
+        if chargetime <= 0:
+            aw.qmc.chargemintime = chargetime
+            
+        aw.qmc.fixmaxtime = not self.fixmaxtimeFlag.isChecked()
         aw.qmc.locktimex = self.locktimexFlag.isChecked()
         aw.qmc.autotimex = self.autotimexFlag.isChecked()
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -31756,8 +31868,10 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Show", None))
         self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Annotations", None))
         self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None))
-        self.backgroundDeltaETflag = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox","ET", None))
-        self.backgroundDeltaBTflag = QCheckBox(deltaLabelPrefix + QApplication.translate("CheckBox","BT", None)) 
+        self.backgroundDeltaETflag = QCheckBox()
+        backgroundDeltaETflagLabel = QLabel(deltaLabelPrefix + QApplication.translate("Label","ET", None))
+        self.backgroundDeltaBTflag = QCheckBox()
+        backgroundDeltaBTflagLabel = QLabel(deltaLabelPrefix + QApplication.translate("Label","BT", None))
         self.backgroundETflag = QCheckBox(QApplication.translate("CheckBox","ET", None))
         self.backgroundBTflag = QCheckBox(QApplication.translate("CheckBox","BT", None))        
         self.backgroundCheck.setChecked(aw.qmc.background)
@@ -31808,7 +31922,8 @@ class backgroundDlg(ArtisanDialog):
         for key in cnames:
             self.colors.append(str(key))
         self.colors.sort()
-        self.defaultcolors = ["ET","BT",deltaLabelPrefix + "ET", deltaLabelPrefix + "BT"]
+        self.defaultcolors = [QApplication.translate("Label", "ET", None),QApplication.translate("Label", "BT", None),
+            deltaLabelUTF8 + QApplication.translate("Label", "ET", None), deltaLabelUTF8 + QApplication.translate("Label", "BT", None)]
         self.defaultcolorsmapped = [aw.qmc.palette["et"],aw.qmc.palette["bt"],aw.qmc.palette["deltaet"],aw.qmc.palette["deltabt"]]
         metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None))
         metcolorlabel.setAlignment(Qt.AlignRight)
@@ -31929,12 +32044,20 @@ class backgroundDlg(ArtisanDialog):
         checkslayout1 = QHBoxLayout()
         checkslayout1.addStretch()
         checkslayout1.addWidget(self.backgroundCheck)
+        checkslayout1.addSpacing(5)
         checkslayout1.addWidget(self.backgroundDetails)
+        checkslayout1.addSpacing(5)
         checkslayout1.addWidget(self.backgroundeventsflag)
+        checkslayout1.addSpacing(5)
         checkslayout1.addWidget(self.backgroundETflag)
+        checkslayout1.addSpacing(5)
         checkslayout1.addWidget(self.backgroundBTflag)
+        checkslayout1.addSpacing(5)
         checkslayout1.addWidget(self.backgroundDeltaETflag)
+        checkslayout1.addWidget(backgroundDeltaETflagLabel)
+        checkslayout1.addSpacing(5)
         checkslayout1.addWidget(self.backgroundDeltaBTflag)
+        checkslayout1.addWidget(backgroundDeltaBTflagLabel)
         checkslayout1.addStretch()
         checkslayout1.setSpacing(15)
         layout = QGridLayout()
@@ -32289,8 +32412,8 @@ class backgroundDlg(ArtisanDialog):
             headers = [QApplication.translate("Table","Time",None),
                                                       QApplication.translate("Table","ET",None),
                                                       QApplication.translate("Table","BT",None),
-                                                      deltaLabelPrefix + QApplication.translate("Table","ET",None),
-                                                      deltaLabelPrefix + QApplication.translate("Table","BT",None)]
+                                                      deltaLabelUTF8 + QApplication.translate("Table","ET",None),
+                                                      deltaLabelUTF8 + QApplication.translate("Table","BT",None)]
             xtcurve = False # no XT curve
             if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
                 idx3 = aw.qmc.xtcurveidx - 1
@@ -33098,7 +33221,7 @@ class modbusport(object):
                                 port=self.port,
                                 retry_on_empty=True,
                                 retries=2,
-                                timeout=0.1, #self.timeout
+                                timeout=0.8, #self.timeout
                                 )
                     except:
                         self.master = ModbusTcpClient(
@@ -33112,7 +33235,7 @@ class modbusport(object):
                             port=self.port,
                             retry_on_empty=True,
                             retries=2,
-                            timeout=0.1, #self.timeout
+                            timeout=0.8, #self.timeout
                             )
                     except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
                         self.master = ModbusUdpClient(
@@ -37558,15 +37681,15 @@ class designerconfigDlg(ArtisanDialog):
         self.BTsplineComboBox.addItems(["1","2","3","4","5"])
         self.BTsplineComboBox.setCurrentIndex(aw.qmc.BTsplinedegree - 1)
         self.BTsplineComboBox.currentIndexChanged.connect(self.redrawcurviness)
-        reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None))
-        self.reproduceComboBox = QComboBox()
-        self.reproduceComboBox.addItems(["",
-                                         deltaLabelPrefix + QApplication.translate("ComboBox","BT",None),
-                                         deltaLabelPrefix + QApplication.translate("ComboBox","ET",None),
-                                         QApplication.translate("ComboBox","SV Commands",None),
-                                         QApplication.translate("ComboBox","Ramp Commands",None)])
-        self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
-        self.reproduceComboBox.currentIndexChanged.connect(self.changereproducemode)
+#        reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None))
+#        self.reproduceComboBox = QComboBox()
+#        self.reproduceComboBox.addItems(["",
+#                                         deltaLabelPrefix + QApplication.translate("ComboBox","BT",None),
+#                                         deltaLabelPrefix + QApplication.translate("ComboBox","ET",None),
+#                                         QApplication.translate("ComboBox","SV Commands",None),
+#                                         QApplication.translate("ComboBox","Ramp Commands",None)])
+#        self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
+#        self.reproduceComboBox.currentIndexChanged.connect(self.changereproducemode)
         updateButton = QPushButton(QApplication.translate("Button","Update",None))
         updateButton.setFocusPolicy(Qt.NoFocus)
         updateButton.clicked.connect(lambda _:self.settimes())
@@ -37629,12 +37752,12 @@ class designerconfigDlg(ArtisanDialog):
         curvinessLayout.addWidget(self.ETsplineComboBox)
         curvinessLayout.addWidget(btcurviness)
         curvinessLayout.addWidget(self.BTsplineComboBox)
-        reproduceLayout = QHBoxLayout()
-        reproduceLayout.addWidget(reproducelabel)
-        reproduceLayout.addWidget(self.reproduceComboBox)
+#        reproduceLayout = QHBoxLayout()
+#        reproduceLayout.addWidget(reproducelabel)
+#        reproduceLayout.addWidget(self.reproduceComboBox)
         modLayout = QVBoxLayout()
         modLayout.addLayout(curvinessLayout)
-        modLayout.addLayout(reproduceLayout)
+#        modLayout.addLayout(reproduceLayout)
         marksGroupLayout = QGroupBox(QApplication.translate("GroupBox","Initial Settings",None))
         marksGroupLayout.setLayout(settingsLayout)
         mainLayout = QVBoxLayout()
@@ -37643,8 +37766,8 @@ class designerconfigDlg(ArtisanDialog):
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
 
-    def changereproducemode(self):
-        aw.qmc.reproducedesigner = self.reproduceComboBox.currentIndex()
+#    def changereproducemode(self):
+#        aw.qmc.reproducedesigner = self.reproduceComboBox.currentIndex()
 
     def redrawcurviness(self):
         ETcurviness = int(str(self.ETsplineComboBox.currentText()))
@@ -41421,14 +41544,14 @@ class graphColorDlg(ArtisanDialog):
         self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
         self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
         self.deltametLabel.setAutoFillBackground(True)
-        self.deltametButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","ET", None))
+        self.deltametButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Button","ET", None))
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
         self.deltametButton.clicked.connect(lambda _: self.setColor("DeltaET",self.deltametLabel,"deltaet"))
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
         self.deltabtLabel.setAutoFillBackground(True)
-        self.deltabtButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","BT", None))
+        self.deltabtButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Button","BT", None))
         self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtLabel.setFrameStyle(frameStyle)
         self.deltabtButton.clicked.connect(lambda _: self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
@@ -41706,10 +41829,10 @@ class graphColorDlg(ArtisanDialog):
         LCD3GroupLayout = QGroupBox(QApplication.translate("GroupBox","BT LCD",None))
         LCD3GroupLayout.setLayout(lcd3layout)
         lcd3layout.setContentsMargins(0,0,0,0)
-        LCD4GroupLayout = QGroupBox(deltaLabelPrefix + QApplication.translate("GroupBox","ET LCD",None))
+        LCD4GroupLayout = QGroupBox(deltaLabelUTF8 + QApplication.translate("GroupBox","ET LCD",None))
         LCD4GroupLayout.setLayout(lcd4layout)
         lcd4layout.setContentsMargins(0,0,0,0)
-        LCD5GroupLayout = QGroupBox(deltaLabelPrefix + QApplication.translate("GroupBox","BT LCD",None))
+        LCD5GroupLayout = QGroupBox(deltaLabelUTF8 + QApplication.translate("GroupBox","BT LCD",None))
         LCD5GroupLayout.setLayout(lcd5layout)
         lcd5layout.setContentsMargins(0,0,0,0)
         LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV LCD",None))
@@ -41955,9 +42078,9 @@ class graphColorDlg(ArtisanDialog):
                 aw.setLabelColor(aw.label2,QColor(aw.qmc.palette[color]))
             elif title == "BT":
                 aw.setLabelColor(aw.label3,QColor(aw.qmc.palette[color]))
-            elif title == deltaLabelPrefix + "ET":
+            elif title == "DeltaET":
                 aw.setLabelColor(aw.label4,QColor(aw.qmc.palette[color]))
-            elif title == deltaLabelPrefix + "BT":
+            elif title == "DeltaBT":
                 aw.setLabelColor(aw.label5,QColor(aw.qmc.palette[color]))
             aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(aw.qmc.palette[color])))
 
@@ -43095,8 +43218,8 @@ class AlarmDlg(ArtisanDialog):
             extra_names.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
             extra_names.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
         return ["",
-             deltaLabelPrefix + QApplication.translate("ComboBox","ET",None),
-             deltaLabelPrefix + QApplication.translate("ComboBox","BT",None),
+             deltaLabelUTF8 + QApplication.translate("Label","ET",None),
+             deltaLabelUTF8 + QApplication.translate("Label","BT",None),
              QApplication.translate("ComboBox","ET",None),
              QApplication.translate("ComboBox","BT",None)] + extra_names
 
@@ -48359,7 +48482,7 @@ def main():
                 try:
                     aw.loadbackground(u(aw.lastLoadedBackground))
                     aw.qmc.background = True
-                    aw.qmc.timealign(redraw=True)
+                    aw.qmc.timealign(redraw=True,recompute=True)
                 except:
                     aw.qmc.background = False
     except Exception:
