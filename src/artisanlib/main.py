@@ -4330,54 +4330,71 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),exc_tb.tb_lineno)
 
-
+        
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
-    def recomputeDeltas(self,timex,timeindex,t1,t2,optimalSmoothing=True):
+    # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
+    def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True):
         try:
             tx = numpy.array(timex)
-            if timeindex[0] > -1:
-                roast_start_idx = timeindex[0]
+            if CHARGEidx > -1:
+                roast_start_idx = CHARGEidx
             else:
                 roast_start_idx = 0
-            if timeindex[6] > 0:
-                roast_end_idx = timeindex[6]
+            if DROPidx > 0:
+                roast_end_idx = DROPidx
             else:
                 roast_end_idx = len(tx)
             tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
-            with numpy.errstate(divide='ignore'):
-                nt1 = numpy.array(t1[roast_start_idx:roast_end_idx]) # ERROR None Type object not scriptable! t==None on ON
-                z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
-            with numpy.errstate(divide='ignore'):
-                nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
-                z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
-            lt,ld1,ld2 = len(tx_roast),len(z1),len(z2)
-            # make lists equal in length
-            if lt > ld1:
-                #z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
-                z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
-            if lt > ld2:
-                #z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
-            if optimalSmoothing:
-                delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
-                delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
+            lt = len(tx_roast)
+            if t1 is not None:
+                with numpy.errstate(divide='ignore'):
+                    nt1 = numpy.array(t1[roast_start_idx:roast_end_idx]) # ERROR None Type object not scriptable! t==None on ON
+                    z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+                    ld1 = len(z1)
+                    
+                # make lists equal in length
+                if lt > ld1:
+                    z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
+                if optimalSmoothing:
+                    delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
+                else:
+                    user_filter = int(round(self.deltafilter/2.))
+                    delta1 = self.decay_smooth_list(z1,window_len=user_filter)
+                # add None for parts before and after CHARGE/DROP
+                delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx))) # ERROR: all input arrays must have the same number of dimensions
+                # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
+                if aw.qmc.RoRlimitFlag:
+                    # remove values beyond the RoRlimit
+                    delta1 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
+                if isinstance(delta1, (numpy.ndarray, numpy.generic)):
+                    delta1 = delta1.tolist()
             else:
-                user_filter = int(round(self.deltafilter/2.))
-                delta1 = self.decay_smooth_list(z1,window_len=user_filter)
-                delta2 = self.decay_smooth_list(z2,window_len=user_filter)
-                          
-            # add None for parts before and after CHARGE/DROP
-            delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx))) # ERROR: all input arrays must have the same number of dimensions
-            delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))
-            # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
-            if aw.qmc.RoRlimitFlag:
-                # remove values beyond the RoRlimit
-                delta1 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
-                delta2 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
-            if isinstance(delta1, (numpy.ndarray, numpy.generic)):
-                delta1 = delta1.tolist()
-            if isinstance(delta2, (numpy.ndarray, numpy.generic)):
-                delta2 = delta2.tolist()
+                delta1 = None
+
+            if t2 is not None:
+                with numpy.errstate(divide='ignore'):
+                    nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
+                    z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+                    ld2 = len(z2)
+                # make lists equal in length
+                if lt > ld2:
+                    z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
+                if optimalSmoothing:
+                    delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
+                else:
+                    user_filter = int(round(self.deltafilter/2.))
+                    delta2 = self.decay_smooth_list(z2,window_len=user_filter)                          
+                # add None for parts before and after CHARGE/DROP
+                delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))                
+                # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
+                if aw.qmc.RoRlimitFlag:
+                    # remove values beyond the RoRlimit
+                    delta2 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
+                if isinstance(delta2, (numpy.ndarray, numpy.generic)):
+                    delta2 = delta2.tolist()
+            else:
+                delta2 = None
+                    
             return delta1, delta2
         except Exception as e:
 #            import traceback
@@ -4775,14 +4792,18 @@ class tgraphcanvas(FigureCanvas):
                         if recomputeAllDeltas:
                             # we populate temporary smoothed ET/BT data arrays
                             cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                            if sampling or aw.qmc.flagon:
+                            if (not aw.qmc.optimalSmoothing) or sampling or aw.qmc.flagon:
                                 temp_decay_weights = numpy.arange(1,cf+1)
-                                st1 = self.decay_smooth_list(self.fill_gaps(self.temp1B),decay_weights=temp_decay_weights)
-                                st2 = self.decay_smooth_list(self.fill_gaps(self.temp2B),decay_weights=temp_decay_weights)
+#                                st1 = self.decay_smooth_list(self.fill_gaps(self.temp1B),decay_weights=temp_decay_weights)
+#                                st2 = self.decay_smooth_list(self.fill_gaps(self.temp2B),decay_weights=temp_decay_weights)
+                                st1 = self.decay_smooth_list(self.fill_gaps(temp_etb),decay_weights=temp_decay_weights)
+                                st2 = self.decay_smooth_list(self.fill_gaps(temp_btb),decay_weights=temp_decay_weights)
                             else: # we use optimal smoothing in the offline case
-                                st1 = self.smooth_list(self.timeB,self.fill_gaps(self.temp1B),window_len=cf)
-                                st2 = self.smooth_list(self.timeB,self.fill_gaps(self.temp2B),window_len=cf)
-                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB,st1,st2,optimalSmoothing=(not (sampling or aw.qmc.flagon)))
+#                                st1 = self.smooth_list(self.timeB,self.fill_gaps(self.temp1B),window_len=cf)
+#                                st2 = self.smooth_list(self.timeB,self.fill_gaps(self.temp2B),window_len=cf)
+                                st1 = self.smooth_list(self.timeB,self.fill_gaps(temp_etb),window_len=cf)
+                                st2 = self.smooth_list(self.timeB,self.fill_gaps(temp_btb),window_len=cf)
+                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB[0],aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=(aw.qmc.optimalSmoothing and (not (sampling or aw.qmc.flagon))))
                         
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
@@ -4914,12 +4935,12 @@ class tgraphcanvas(FigureCanvas):
                 labels = []
                 
                 if smooth or len(self.stemp1) != len(self.timex):
-                    if aw.qmc.flagon: # we don't smooth, but remove the dropouts
+                    if (not aw.qmc.optimalSmoothing) or aw.qmc.flagon: # we don't smooth, but remove the dropouts
                         self.stemp1 = self.fill_gaps(self.temp1)
                     else:
                         self.stemp1 = self.smooth_list(self.timex,self.fill_gaps(self.temp1),window_len=self.curvefilter)
                 if smooth or len(self.stemp2) != len(self.timex):
-                    if aw.qmc.flagon:  # we don't smooth, but remove the dropouts
+                    if (not aw.qmc.optimalSmoothing) or aw.qmc.flagon:  # we don't smooth, but remove the dropouts
                         self.stemp2 = self.fill_gaps(self.temp2)
                     else:                    
                         self.stemp2 = self.smooth_list(self.timex,self.fill_gaps(self.temp2),window_len=self.curvefilter)
@@ -5229,15 +5250,23 @@ class tgraphcanvas(FigureCanvas):
                 if self.DeltaETflag or self.DeltaBTflag:
                     if recomputeAllDeltas and not self.flagstart: # during recording we don't recompute the deltas
                         cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                        if aw.qmc.flagon or len(self.timex) != len(self.stemp1):
-                            t1 = self.temp1
+                        if not aw.qmc.optimalSmoothing or aw.qmc.flagon:
+                            if len(self.temp1):
+                                temp_decay_weights = numpy.arange(1,cf+1)
+                                t1 = self.decay_smooth_list(self.fill_gaps(self.temp1),decay_weights=temp_decay_weights)
+                            else:
+                                t1 = self.temp1
                         else:
                             t1 = self.smooth_list(self.timex,self.fill_gaps(self.temp1),window_len=cf)
-                        if aw.qmc.flagon or len(self.timex) != len(self.stemp2):
-                            t2 = self.temp2
+                        if not aw.qmc.optimalSmoothing or aw.qmc.flagon:
+                            if len(self.temp2):
+                                temp_decay_weights = numpy.arange(1,cf+1)
+                                t2 = self.decay_smooth_list(self.fill_gaps(self.temp2),decay_weights=temp_decay_weights)
+                            else:
+                                t2 = self.temp2
                         else:
                             t2 = self.smooth_list(self.timex,self.fill_gaps(self.temp2),window_len=cf)
-                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,aw.qmc.timeindex,t1,t2,optimalSmoothing=(not aw.qmc.flagon))
+                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,aw.qmc.timeindex[0],aw.qmc.timeindex[6],t1,t2,optimalSmoothing=(aw.qmc.optimalSmoothing and (not aw.qmc.flagon)))
                                                     
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
@@ -5261,23 +5290,32 @@ class tgraphcanvas(FigureCanvas):
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= extraname1_subst[i])[0])
                         else:
-                            if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
-                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
-                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
+                            if aw.qmc.optimalSmoothing:
+                                if (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
+                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
+                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
+                            else:
+                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],                        
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
                     if aw.extraCurveVisibility2[i]:
                         if False and aw.qmc.flagon:
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                         else:
-                            if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
-                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter)
-                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
-                
+                            if aw.qmc.optimalSmoothing:
+                                if (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
+                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter)
+                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
+                            else:
+                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extratemp2[i],color=self.extradevicecolor2[i],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])                                            
                 ##### ET,BT curves
                 if aw.qmc.ETcurve:
                     if False and aw.qmc.flagon:
@@ -15342,15 +15380,23 @@ class ApplicationWindow(QMainWindow):
                 timex = profile["extratimex"]
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.extratimexB = timex
-                b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter)
-                b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter)
+                if aw.qmc.optimalSmoothing:
+                    b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter)
+                    b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter)
+                else: # temperature curves are unsmoothed if optimalSmoothing is not ticked as in the online case
+                    b1 = self.qmc.fill_gaps(t1)
+                    b2 = self.qmc.fill_gaps(t2)
                 
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
                 b1x = []
                 b2x = []
                 for i in range(min(len(t1x),len(t2x))):
-                    b1x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter))
-                    b2x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter))
+                    if aw.qmc.optimalSmoothing:
+                        b1x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter))
+                        b2x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter))
+                    else:
+                        b1x.append(self.qmc.fill_gaps(t1x[i]))
+                        b2x.append(self.qmc.fill_gaps(t2x[i]))
                 # NOTE: parallel assignment after time intensive smoothing is necessary to avoid redraw failure!
                 self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = b1,b2,b1x,b2x
                 self.qmc.backgroundEvents = profile["specialevents"]
@@ -20426,7 +20472,12 @@ class ApplicationWindow(QMainWindow):
                         
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]
-                        stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter)
+                        if aw.qmc.optimalSmoothing:
+                            stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter)
+                        else:
+                            # we use the non-optimal smoothing filter with double the smoothing factor as in other places
+                            temp_decay_weights = numpy.arange(1,(self.qmc.curvefilter*2)+1)
+                            stemp = self.qmc.decay_smooth_list(self.qmc.fill_gaps(temp),decay_weights=temp_decay_weights)
                         charge = max(0,rd["charge_idx"]) # start of visible data
                         drop = rd["drop_idx"] # end of visible data
                         stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
@@ -20459,9 +20510,7 @@ class ApplicationWindow(QMainWindow):
                         
                         if self.qmc.DeltaBTflag and self.qmc.delta_ax:
                             tx = numpy.array(timex)
-                            ch = max(0,rd["charge_idx"])
-                            tx_roast = numpy.array(timex[ch:drop]) # just the part from CHARGE TO DROP
-                            
+                            delta,_ = self.qmc.recomputeDeltas(tx,rd["charge_idx"],drop,stemp,None,optimalSmoothing=aw.qmc.optimalSmoothing)
                             if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
                                 dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
                                 dlinestyle = self.qmc.BTdeltalinestyle
@@ -20469,18 +20518,11 @@ class ApplicationWindow(QMainWindow):
                                 dlinewidth = self.qmc.BTdeltalinewidth
                                 if self.qmc.BTdeltalinestyle == "-" and self.qmc.BTlinestyle == "-":
                                     dlinestyle = ':' # dotted
-                            with numpy.errstate(divide='ignore'):
-                                nt = numpy.array(stemp[ch:drop])
-                                z = (nt[aw.qmc.deltasamples:] - nt[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)                        
-                                lt,ld = len(tx_roast),len(z)
-                                if lt > ld:
-                                    z = numpy.append(z,[z[-1] if ld else 0.]*(lt - ld))
-                                s = self.qmc.smooth_list(tx_roast,z,window_len=self.qmc.deltafilter)
-                                delta = numpy.concatenate(([None]*(ch),s,[None]*(len(tx)-drop)))
-                                trans = self.qmc.delta_ax.transData
-                                self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
-                                linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
+                            trans = self.qmc.delta_ax.transData
+                            self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
+                            linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
+                                
                         first_profile = False
                         
                         # draw BT curves on top of all others
@@ -23826,6 +23868,12 @@ class HUDDlg(ArtisanDialog):
         self.DeltaFilter.setAlignment(Qt.AlignRight)
         self.DeltaFilter.setValue(aw.qmc.deltafilter/2)
         self.DeltaFilter.editingFinished.connect(lambda :self.changeDeltaFilter())
+
+        self.OptimalSmoothingFlag = QCheckBox(QApplication.translate("CheckBox", "Optimal Smoothing",None))
+        self.OptimalSmoothingFlag.setToolTip(QApplication.translate("Tooltip", "Use an optimal smoothing algorithm (only applicable offline, after recording)", None))        
+        self.OptimalSmoothingFlag.setChecked(aw.qmc.optimalSmoothing)
+        self.OptimalSmoothingFlag.stateChanged.connect(lambda _:self.changeOptimalSmoothingFlag())
+        
         curvefilterlabel = QLabel(QApplication.translate("Label", "Smooth Curves",None))
         #Filter holds the number of pads in filter
         self.Filter = QSpinBox()
@@ -23834,10 +23882,7 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setAlignment(Qt.AlignRight)
         self.Filter.setValue(aw.qmc.curvefilter/2)
         self.Filter.editingFinished.connect(lambda :self.changeFilter())
-        self.OptimalSmoothingFlag = QCheckBox(QApplication.translate("CheckBox", "Optimal Smoothing",None))
-        self.OptimalSmoothingFlag.setToolTip(QApplication.translate("Tooltip", "Use an optimal smoothing algorithm (only applicable offline, after recording)", None))        
-        self.OptimalSmoothingFlag.setChecked(aw.qmc.optimalSmoothing)
-        self.OptimalSmoothingFlag.stateChanged.connect(lambda _:self.changeOptimalSmoothingFlag())
+        self.Filter.setEnabled(aw.qmc.optimalSmoothing)
              
 #        windowlabel = QLabel(QApplication.translate("Label", "Window",None))
 #        #Window holds the number of pads in filter
@@ -23851,7 +23896,8 @@ class HUDDlg(ArtisanDialog):
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None))
         self.FilterSpikes.setChecked(aw.qmc.filterDropOuts)
         self.FilterSpikes.stateChanged.connect(lambda _:self.changeDropFilter())
-        self.FilterSpikes.setFocusPolicy(Qt.NoFocus)    
+        self.FilterSpikes.setFocusPolicy(Qt.NoFocus)
+        self.FilterSpikes.setEnabled(aw.qmc.optimalSmoothing)
 #        #altsmoothing
 #        self.AltSmoothing = QCheckBox(QApplication.translate("CheckBox", "Smooth2",None))
 #        self.AltSmoothing.setChecked(aw.qmc.altsmoothing)
@@ -24015,7 +24061,10 @@ class HUDDlg(ArtisanDialog):
         hudHBox.addLayout(hudLayout)
         hudHBox.addStretch()
         hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","HUD",None))
-        hudGroupLayout.setLayout(hudHBox)        
+        hudGroupLayout.setLayout(hudHBox)  
+        rorRoRAlgo = QHBoxLayout()
+        rorRoRAlgo.addWidget(self.OptimalSmoothingFlag) 
+        rorRoRAlgo.addStretch()     
         inputFilter1 = QHBoxLayout()
         inputFilter1.addWidget(self.DropSpikes)
         inputFilter1.addStretch()
@@ -24030,7 +24079,8 @@ class HUDDlg(ArtisanDialog):
         inputFilter2.addWidget(self.maxLimit)        
         inputFilterVBox = QVBoxLayout()
         inputFilterVBox.addLayout(inputFilter1)
-        inputFilterVBox.addLayout(inputFilter2)        
+        inputFilterVBox.addLayout(inputFilter2) 
+        inputFilterVBox.addLayout(rorRoRAlgo)       
         inputFilterVBox.addLayout(spikesLayout)
         inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filters",None))
         inputFilterGroupLayout.setLayout(inputFilterVBox)        
@@ -24064,13 +24114,9 @@ class HUDDlg(ArtisanDialog):
         rorFilterHBox.addSpacing(20)
         rorFilterHBox.addWidget(rormaxlabel)
         rorFilterHBox.addWidget(self.rormaxLimit)
-        rorRoRAlgo = QHBoxLayout()
-        rorRoRAlgo.addStretch()
-        rorRoRAlgo.addWidget(self.OptimalSmoothingFlag)
         rorFilterVBox = QVBoxLayout()
         rorFilterVBox.addLayout(rorFilterHBox)
         rorFilterVBox.addLayout(sensitivityLayout)
-        rorFilterVBox.addLayout(rorRoRAlgo)
         rorFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Filter",None))
         rorFilterGroupLayout.setLayout(rorFilterVBox)
         # path effects
@@ -25344,6 +25390,8 @@ class HUDDlg(ArtisanDialog):
 
     def changeOptimalSmoothingFlag(self):
         aw.qmc.optimalSmoothing = not aw.qmc.optimalSmoothing
+        self.FilterSpikes.setEnabled(aw.qmc.optimalSmoothing)
+        self.Filter.setEnabled(aw.qmc.optimalSmoothing)
         aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
         
     def changeDropFilter(self):
