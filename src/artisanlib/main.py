@@ -10993,6 +10993,7 @@ class ApplicationWindow(QMainWindow):
         
         self.themeMenu = QMenu(UIconst.CONF_MENU_THEMES)
         self.populateThemeMenu()
+        self.ConfMenu.addMenu(self.themeMenu)
 
         self.colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
         self.colorsAction.triggered.connect(lambda _:self.qmc.changeGColor(3))
@@ -12299,7 +12300,7 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel2[i].setText(l2)
         aw.settooltip()
 
-    def populateListMenu(self,resourceName,ext,triggered,menu):
+    def populateListMenu(self,resourceName,ext,triggered,menu,addMenu = True):
         one_added = False
         for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),resourceName)):
             dirs.sort()
@@ -12319,7 +12320,7 @@ class ApplicationWindow(QMainWindow):
                             a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
                         menu.addAction(a)
                         one_added = True
-        if one_added:
+        if one_added and addMenu:
             self.ConfMenu.addMenu(menu)
             
     def populateMachineMenu(self):
@@ -12416,7 +12417,7 @@ class ApplicationWindow(QMainWindow):
 
                                 
     def populateThemeMenu(self):
-        self.populateListMenu("Themes",".athm",self.openThemeSettings,self.themeMenu)
+        self.populateListMenu("Themes",".athm",self.openThemeSettings,self.themeMenu, False)
 
     def openThemeSettings(self):
         action = self.sender()
