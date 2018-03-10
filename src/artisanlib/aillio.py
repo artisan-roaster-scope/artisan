@@ -200,6 +200,11 @@ class AillioR1:
             value = 9 
         self.__open__()
         self.__sendcmd__([0x32, 0x01, value, 0x00])
+
+    def prs(self):
+        self.__dbg__('PRS')
+        self.__open__()
+        self.__sendcmd__(AILLIO_CMD_PRS)
         
     def __getstate__(self):
         self.__open__()
