@@ -17,6 +17,10 @@ class AillioR1:
     AILLIO_CMD_STATUS1 = [ 0x30, 0x01 ]
     AILLIO_CMD_STATUS2 = [ 0x30, 0x03 ]
     AILLIO_CMD_PRS = [ 0x30, 0x01, 0x00, 0x00 ]
+    AILLIO_CMD_HEATER_INCR = [0x34, 0x01, 0xaa, 0xaa]
+    AILLIO_CMD_HEATER_DECR = [0x34, 0x02, 0xaa, 0xaa]
+    AILLIO_CMD_FAN_INCR = [0x31, 0x01, 0xaa, 0xaa]
+    AILLIO_CMD_FAN_DECR = [0x31, 0x02, 0xaa, 0xaa]
     AILLIO_STATE_OFF = 0x00
     AILLIO_STATE_PH  = 0x02
     AILLIO_STATE_CHARGE = 0x04
@@ -36,6 +40,7 @@ class AillioR1:
         self.voltage = 0
         self.exitt = 0
         self.state_str = ""
+        self.last_getstate = 0
 
     def __del__(self):
         self.__close__()
@@ -176,21 +181,51 @@ class AillioR1:
 
     def set_heater(self, value):
         self.__dbg__('set_heater ' + str(value))
-        if value < 1:
-            value = 1
+        value = int(value)
+        if value < 0:
+            value = 0
         elif value > 9:
             value = 9
         self.__open__()
-        self.__sendcmd__([0x32, 0x01, value, 0x00])
+        h = self.get_heater()
+        d = abs(h - value)
+        if d <= 0:
+            return
+        if d > 9:
+            d = 9
+
+        if h > value:
+            for i in range(0, d):
+                self.__sendcmd__(self.AILLIO_CMD_HEATER_DECR)
+                time.sleep(0.1)
+        else:
+            for i in range(0, d):
+                self.__sendcmd__(self.AILLIO_CMD_HEATER_INCR)
+                time.sleep(0.1)
 
     def set_fan(self, value):
         self.__dbg__('set_fan ' + str(value))
+        value = int(value)
         if value < 1:
             value = 1
         elif value > 12:
             value = 12 
         self.__open__()
-        self.__sendcmd__([0x32, 0x01, value, 0x00])
+        f = self.get_fan()
+        d = abs(f - value)
+        if d <= 0:
+            return
+        if d > 11:
+            d = 11
+        if f > value:
+            for i in range(0, d):
+                self.__sendcmd__(self.AILLIO_CMD_FAN_DECR)
+                time.sleep(0.1)
+        else:
+            for i in range(0, d):
+                self.__sendcmd__(self.AILLIO_CMD_FAN_INCR)
+                time.sleep(0.1)
+
 
     def set_drum(self, value):
         self.__dbg__('set_drum ' + str(value))
@@ -204,9 +239,13 @@ class AillioR1:
     def prs(self):
         self.__dbg__('PRS')
         self.__open__()
-        self.__sendcmd__(AILLIO_CMD_PRS)
+        self.__sendcmd__(self.AILLIO_CMD_PRS)
+        self.__dbg__('done')
         
     def __getstate__(self):
+        if self.last_getstate != 0 and time.time() - self.last_getstate < 0.1:
+            return
+        self.last_getstate = time.time()
         self.__open__()
         self.__dbg__('getstate')
         self.__sendcmd__(self.AILLIO_CMD_STATUS1)
@@ -230,7 +269,7 @@ class AillioR1:
         self.minutes = self.seconds / 60
         self.seconds = self.seconds % 60
         self.fan = unpack('h', state[44:46])[0]
-        self.drum = 0
+        self.drum = 8
         self.voltage = unpack('h', state[48:50])[0]
         self.heater = unpack('H', state[50:52])[0]
         self.coil_fan = round(unpack('i', state[52:56])[0], 1)
@@ -288,7 +327,10 @@ class AillioR1:
 
 if __name__ == "__main__":
     R1 = AillioR1(debug=True)
-    while True:
-        R1.set_heater(1)
+    R1.set_heater(0)
+    R1.set_fan(0)
+    R1.set_drum(5)
+    while False:
+        R1.set_heater(9)
         R1.get_bt()
         time.sleep(1)
