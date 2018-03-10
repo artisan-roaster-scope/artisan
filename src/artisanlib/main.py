@@ -854,9 +854,10 @@ class tgraphcanvas(FigureCanvas):
         self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
                         "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
                         "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
-                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue',
+                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
                         "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
-                        "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'black'} 
+                        "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'black',"metbox":'red',
+                        "aucguide":'#00007f',"messages":'black'} 
         self.palette1 = self.palette.copy()
         
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
@@ -5427,7 +5428,7 @@ class tgraphcanvas(FigureCanvas):
                                                 linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                                                 
                 if aw.qmc.AUCguideFlag:
-                    self.l_AUCguide, = self.ax.plot([], [],color = self.palette["bt"],
+                    self.l_AUCguide, = self.ax.plot([], [],color = self.palette["aucguide"],
                                                 label=aw.arabicReshape(QApplication.translate("Label", "AUCguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
     
@@ -5891,31 +5892,24 @@ class tgraphcanvas(FigureCanvas):
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
     def changeGColor(self,color):
-        #COLOR (option 1) Default
-#        palette1 = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
-#                    "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
-#                    "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
-#                    "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue',
-#                    "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
-#                    "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'black'} 
-
-        #BLACK & WHITE (option 2) best for printing
-#        palette2 = {"background":'white',"grid":'grey',"ylabel":'black',"xlabel":'black',"title":'black',
-#                   "rect1":'lightgrey',"rect2":'darkgrey',"rect3":'grey',"rect4":'lightgrey',"rect5":'lightgrey',
-#                   "et":'black',"bt":'black',"xt":'darkgrey',"deltaet":'grey',
-#                   "deltabt":'grey',"markers":'grey',"text":'black',"watermarks":'lightgrey',"Cline":'grey',
-#                   "canvas":None,"legendbg":'white',"legendborder":'darkgrey',
-#                   "specialeventbox":'grey',"specialeventtext":'black',"mettext":'white'} 
-
         #load selected dictionary
         if color == 1:
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
             fname = os.path.join(aw.getResourcePath(),"Themes","Artisan","Default.athm")
-            if os.path.isfile(fname):
+#            print(aw.lcdpaletteB)  #debugprint
+            if os.path.isfile(fname) and not self.flagon:
                 aw.loadSettings(fn=fname)
+                aw.sendmessage(QApplication.translate("Message","Colors set to Default Theme", None))
             else:
                 for key in list(self.palette1.keys()):
                     self.palette[key] = self.palette1[key]
+                self.backgroundmetcolor     = self.palette["et"]
+                self.backgroundbtcolor      = self.palette["bt"]
+                self.backgrounddeltaetcolor = self.palette["deltaet"]
+                self.backgrounddeltabtcolor = self.palette["deltabt"]
+                self.backgroundxtcolor      = self.palette["xt"]
+                aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
+                
             
         if color == 2:
             aw.sendmessage(QApplication.translate("Message","Colors set to grey", None))
@@ -5930,7 +5924,12 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.extradevicecolor2[i] = aw.convertToGreyscale(c)       
             for i in range(len(aw.qmc.EvalueColor)):
                 c = aw.qmc.EvalueColor[i]
-                aw.qmc.EvalueColor[i] = aw.convertToGreyscale(c)       
+                aw.qmc.EvalueColor[i] = aw.convertToGreyscale(c)
+            aw.qmc.backgroundmetcolor     = aw.convertToGreyscale(aw.qmc.backgroundmetcolor)
+            aw.qmc.backgroundbtcolor      = aw.convertToGreyscale(aw.qmc.backgroundbtcolor)
+            aw.qmc.backgrounddeltaetcolor = aw.convertToGreyscale(aw.qmc.backgrounddeltaetcolor)
+            aw.qmc.backgrounddeltabtcolor = aw.convertToGreyscale(aw.qmc.backgrounddeltabtcolor)
+            aw.qmc.backgroundxtcolor      = aw.convertToGreyscale(aw.qmc.backgroundxtcolor)
                
         if color == 3:
             dialog = graphColorDlg(aw)
@@ -5944,6 +5943,7 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["rect2"] = str(dialog.rect2Label.text())
                 self.palette["rect3"] = str(dialog.rect3Label.text())
                 self.palette["rect4"] = str(dialog.rect4Label.text())
+                self.palette["rect5"] = str(dialog.rect5Label.text())
                 self.palette["et"] = str(dialog.metLabel.text())
                 self.palette["bt"] = str(dialog.btLabel.text())
                 self.palette["deltaet"] = str(dialog.deltametLabel.text())
@@ -5951,7 +5951,8 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["markers"] = str(dialog.markersLabel.text())
                 self.palette["text"] = str(dialog.textLabel.text())
                 self.palette["watermarks"] = str(dialog.watermarksLabel.text())
-                self.palette["Cline"] = str(dialog.ClineLabel.text())
+                self.palette["timeguide"] = str(dialog.timeguideLabel.text())
+                self.palette["aucguide"] = str(dialog.aucguideLabel.text())
                 self.palette["canvas"] = str(dialog.canvasLabel.text())
                 self.palette["legendbg"] = str(dialog.legendbgLabel.text())
                 self.palette["legendborder"] = str(dialog.legendborderLabel.text())
@@ -5961,6 +5962,12 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["specialeventbox"] = str(dialog.specialeventboxLabel.text())
                 self.palette["specialeventtext"] = str(dialog.specialeventtextLabel.text())
                 self.palette["mettext"] = str(dialog.mettextLabel.text())
+                self.palette["metbox"] = str(dialog.metboxLabel.text())
+                self.backgroundmetcolor = str(dialog.bgmetLabel.text())
+                self.backgroundbtcolor  = str(dialog.bgbtLabel.text())
+                self.backgrounddeltaetcolor = str(dialog.bgdeltametLabel.text())
+                self.backgrounddeltabtcolor = str(dialog.bgdeltabtLabel.text())
+                self.backgroundxtcolor = str(dialog.bgextraLabel.text())
 
         #update screen with new colors
         aw.updateCanvasColors()
@@ -7550,7 +7557,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         height = 0
                     boxstyle = 'round4,pad=0.3,rounding_size=0.15'
-                    boxcolor = aw.qmc.palette["et"] #match the ET color
+                    boxcolor = aw.qmc.palette["metbox"] #match the ET color
                     textcolor = self.palette["mettext"]
                     fontprop_small = aw.mpl_fontproperties.copy()
                     fontprop_small.set_size("xx-small")
@@ -10278,7 +10285,7 @@ class SampleThread(QThread):
                         aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
                     #aw.qmc.resetlines()
                     #add to plot a vertical time line
-                    aw.qmc.l_timeline, = aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
+                    aw.qmc.l_timeline, = aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["timeguide"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
                     # also in the manual case we check for TP
                     if local_flagstart:
                         # check for TP event if already CHARGEed and not yet recognized
@@ -12392,8 +12399,12 @@ class ApplicationWindow(QMainWindow):
                 ('DeltaET',          aw.qmc.palette['deltaet'],          'Background',              aw.qmc.palette['background']),       
                 ('Markers',          aw.qmc.palette['markers'],          'Background',              aw.qmc.palette['background']),       
                 ('Text',             aw.qmc.palette['text'],             'Background',              aw.qmc.palette['background']),       
-                ('Cline',            aw.qmc.palette['Cline'],            'Background',              aw.qmc.palette['background']),       
-                ('xt',               aw.qmc.palette['xt'],               'Background',              aw.qmc.palette['background']),       
+                ('Time Guide',       aw.qmc.palette['timeguide'],        'Background',              aw.qmc.palette['background']),       
+                ('Background ET',    aw.qmc.backgroundmetcolor,          'Background',              aw.qmc.palette['background']),       
+                ('Background BT',    aw.qmc.backgroundbtcolor,           'Background',              aw.qmc.palette['background']),       
+                ('Background '+deltaLabelPrefix+'ET',aw.qmc.backgrounddeltaetcolor,'Background',    aw.qmc.palette['background']),       
+                ('Background '+deltaLabelPrefix+'BT',aw.qmc.backgrounddeltabtcolor,'Background',    aw.qmc.palette['background']),       
+                ('Background Extra', aw.qmc.palette['xt'],               'Background',              aw.qmc.palette['background']),       
                 ('X Label',          aw.qmc.palette['xlabel'],           'Canvas',                  aw.qmc.palette['canvas']),         
                 ('Y Label',          aw.qmc.palette['ylabel'],           'Canvas',                  aw.qmc.palette['canvas']),         
                 ('Title',            aw.qmc.palette['title'],            'Canvas',                  aw.qmc.palette['canvas']),           
@@ -12406,22 +12417,36 @@ class ApplicationWindow(QMainWindow):
                 ('Extra/PID LCD LED',aw.lcdpaletteF['sv'],               'Extra/PID LCD Background',aw.lcdpaletteB['sv']), 
                 ('BT',               aw.qmc.palette['bt'],               'Legend bkgnd',            aw.qmc.palette['legendbg']),         
                 ('ET',               aw.qmc.palette['et'],               'Legend bkgnd',            aw.qmc.palette['legendbg']),         
-                ('DeltaBT',          aw.qmc.palette['deltabt'],          'Legend bkgnd',            aw.qmc.palette['legendbg']),         
-                ('DeltaET',          aw.qmc.palette['deltaet'],          'Legend bkgnd',            aw.qmc.palette['legendbg']),         
+                ('MET Text',         aw.qmc.palette['mettext'],          'MET Box',                 aw.qmc.palette['metbox']),         
+                ('MET Box',          aw.qmc.palette['metbox'],           'Background',              aw.qmc.palette['background']),       
+                (deltaLabelPrefix+'BT',aw.qmc.palette['deltabt'],        'Legend bkgnd',            aw.qmc.palette['legendbg']),         
+                (deltaLabelPrefix+'ET',aw.qmc.palette['deltaet'],        'Legend bkgnd',            aw.qmc.palette['legendbg']),         
                ]
             for i in range(len(aw.qmc.extradevices)):
                 if  aw.extraCurveVisibility1[i]:
                     colorPairsToCheck.append(
-                        (aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], 'Background', aw.qmc.palette['background']),
+                        (aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], 'Background',   aw.qmc.palette['background']),
+                    )                           
+                    colorPairsToCheck.append(
+                        (aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], 'Legend bkgnd', aw.qmc.palette['background']),
                     )                           
                 if  aw.extraCurveVisibility2[i]:
                     colorPairsToCheck.append(   
-                        (aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], 'Background', aw.qmc.palette['background']),
+                        (aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], 'Background',   aw.qmc.palette['background']),
+                    )
+                    colorPairsToCheck.append(   
+                        (aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], 'Legend bkgnd', aw.qmc.palette['background']),
                     )
 
             for i in range(len(aw.qmc.EvalueColor)):
                 colorPairsToCheck.append(
-                    (aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i], 'Background', aw.qmc.palette['background']),
+                    (aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i], 'Background',   aw.qmc.palette['background']),
+                )                           
+                colorPairsToCheck.append(
+                    (aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i], 'Legend bkgnd', aw.qmc.palette['background']),
+                )                           
+                colorPairsToCheck.append(
+                    (aw.qmc.etypes[i] + " Slider",aw.qmc.EvalueColor[i], 'Canvas',       aw.qmc.palette['canvas']),
                 )                           
                 colorPairsToCheck.append(
                     (aw.qmc.etypes[i] + " Text", aw.qmc.EvalueTextColor[i], aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i]),
@@ -12476,6 +12501,9 @@ class ApplicationWindow(QMainWindow):
                 if val < aw.qmc.colorDifferenceThreshold :
                     val = aw.float2float(val,1)
                     aw.sendmessage(u(QApplication.translate("Message","{0!s} color ({1!s}) is very similar to {2!s} color ({3!s}) and may be hard to see. (deltaE={4:.1f})\n",None).format(c[0], c[1], c[2], c[3],val)))
+#                    print("checkColors", str(c[0]), "/", str(c[2]), "  Too similar", str(c[1]), str(c[3]), str(val)) #debugprint
+#                else: #debugprint
+#                    print("checkColors", str(c[0]), "/", str(c[2]), "  Okay", str(c[1]), str(c[3]), str(val))  #debugprint
         except Exception as e:        
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -12526,6 +12554,10 @@ class ApplicationWindow(QMainWindow):
         aw.ntb.destroy()
         whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
         aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
+        if whitep:
+            aw.qmc.palette["messages"] = 'white'
+        else:
+            aw.qmc.palette["messages"] = 'black'
         aw.ntb.setMinimumHeight(50)
         aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                     + "color: " + str(aw.qmc.palette["title"]) + ";"
@@ -14230,7 +14262,7 @@ class ApplicationWindow(QMainWindow):
                 aw.messagelabel.setStyleSheet(style)
             else:
                 aw.messagelabel.setStyleSheet("background-color:'transparent';")
-                aw.messagelabel.setStyleSheet("color: " + aw.qmc.palette["title"] + ";")
+                aw.messagelabel.setStyleSheet("color: " + aw.qmc.palette["messages"] + ";")
             message = aw.arabicReshape(message)
             #keep a max of 100 messages
             if append:
@@ -19392,7 +19424,7 @@ class ApplicationWindow(QMainWindow):
 #            settings.setValue("patheffects",self.qmc.patheffects)
 #            settings.setValue("graphstyle",self.qmc.graphstyle)
 #            settings.setValue("graphfont",self.qmc.graphfont)
-            settings.endGroup()
+#            settings.endGroup()
             settings.beginGroup("XT")
             settings.setValue("color",self.qmc.backgroundxtcolor)
             settings.setValue("index",self.qmc.xtcurveidx)
@@ -31937,68 +31969,67 @@ class backgroundDlg(ArtisanDialog):
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
         self.speedSpinBox.setValue(aw.qmc.backgroundmovespeed)
-        intensitylabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
-        intensitylabel.setAlignment(Qt.AlignRight)
-        self.intensitySpinBox = QSpinBox()
-        self.intensitySpinBox.setAlignment(Qt.AlignRight)
-        self.intensitySpinBox.setRange(1,9)
-        self.intensitySpinBox.setSingleStep(1)
-        self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
-        self.colors = []
-        for key in cnames:
-            self.colors.append(str(key))
-        self.colors.sort()
-        self.defaultcolors = [QApplication.translate("Label", "ET", None),QApplication.translate("Label", "BT", None),
-            deltaLabelUTF8 + QApplication.translate("Label", "ET", None), deltaLabelUTF8 + QApplication.translate("Label", "BT", None)]
-        self.defaultcolorsmapped = [aw.qmc.palette["et"],aw.qmc.palette["bt"],aw.qmc.palette["deltaet"],aw.qmc.palette["deltabt"]]
-        metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None))
-        metcolorlabel.setAlignment(Qt.AlignRight)
-        self.metcolorComboBox = QComboBox()
-        self.metcolorComboBox.addItems(self.defaultcolors)
-        self.metcolorComboBox.insertSeparator(4)
-        self.metcolorComboBox.addItems(self.colors)
-        self.metcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundmetcolor))
-        btcolorlabel = QLabel(QApplication.translate("Label", "BT Color",None))
-        btcolorlabel.setAlignment(Qt.AlignRight)
-        self.btcolorComboBox = QComboBox()
-        self.btcolorComboBox.addItems(self.defaultcolors)
-        self.btcolorComboBox.insertSeparator(4)
-        self.btcolorComboBox.addItems(self.colors)
-        self.btcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundbtcolor))
-        xtcolorlabel = QLabel(QApplication.translate("Label", "Extra Color",None))
-        xtcolorlabel.setAlignment(Qt.AlignRight)
-        self.xtcolorComboBox = QComboBox()
-        self.xtcolorComboBox.addItems(self.defaultcolors)
-        self.xtcolorComboBox.insertSeparator(4)
-        self.xtcolorComboBox.addItems(self.colors)
-        self.xtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundxtcolor))
-        xtcurvelabel = QLabel(QApplication.translate("Label", "Extra",None))
-        xtcurvelabel.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
-        xtcurvelabel.setAlignment(Qt.AlignRight)
-        self.xtcurveComboBox = QComboBox()
-        self.xtcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
-        curvenames = [""] # first entry is the empty one, no extra curve displayed
-        for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
-            curvenames.append("B" + str(2*i+3) + ": " + aw.qmc.extraname1B[i])
-            curvenames.append("B" + str(2*i+4) + ": " + aw.qmc.extraname2B[i])       
-        self.xtcurveComboBox.addItems(curvenames)
-        if aw.qmc.xtcurveidx < len(curvenames):
-            self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
-        self.xtcurveComboBox.currentIndexChanged.connect(lambda i=self.xtcurveComboBox.currentIndex() :self.changeXTcurveidx(i))
-        deltaetcolorlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET Color",None))
-        deltaetcolorlabel.setAlignment(Qt.AlignRight)
-        self.deltaetcolorComboBox = QComboBox()
-        self.deltaetcolorComboBox.addItems(self.defaultcolors)
-        self.deltaetcolorComboBox.insertSeparator(4)
-        self.deltaetcolorComboBox.addItems(self.colors)
-        self.deltaetcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltaetcolor))
-        deltabtcolorlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "BT Color",None))
-        deltabtcolorlabel.setAlignment(Qt.AlignRight)
-        self.deltabtcolorComboBox = QComboBox()
-        self.deltabtcolorComboBox.addItems(self.defaultcolors)
-        self.deltabtcolorComboBox.insertSeparator(4)
-        self.deltabtcolorComboBox.addItems(self.colors)
-        self.deltabtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltabtcolor))
+#        intensitylabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
+#        intensitylabel.setAlignment(Qt.AlignRight)
+#        self.intensitySpinBox = QSpinBox()
+#        self.intensitySpinBox.setAlignment(Qt.AlignRight)
+#        self.intensitySpinBox.setRange(1,9)
+#        self.intensitySpinBox.setSingleStep(1)
+#        self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
+#        self.colors = []
+#        for key in cnames:
+#            self.colors.append(str(key))
+#        self.colors.sort()
+#        self.defaultcolors = ["ET","BT",deltaLabelPrefix + "ET", deltaLabelPrefix + "BT"]
+#        self.defaultcolorsmapped = [aw.qmc.palette["et"],aw.qmc.palette["bt"],aw.qmc.palette["deltaet"],aw.qmc.palette["deltabt"]]
+#        metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None))
+#        metcolorlabel.setAlignment(Qt.AlignRight)
+#        self.metcolorComboBox = QComboBox()
+#        self.metcolorComboBox.addItems(self.defaultcolors)
+#        self.metcolorComboBox.insertSeparator(4)
+#        self.metcolorComboBox.addItems(self.colors)
+#        self.metcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundmetcolor))
+#        btcolorlabel = QLabel(QApplication.translate("Label", "BT Color",None))
+#        btcolorlabel.setAlignment(Qt.AlignRight)
+#        self.btcolorComboBox = QComboBox()
+#        self.btcolorComboBox.addItems(self.defaultcolors)
+#        self.btcolorComboBox.insertSeparator(4)
+#        self.btcolorComboBox.addItems(self.colors)
+#        self.btcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundbtcolor))
+#        xtcolorlabel = QLabel(QApplication.translate("Label", "Extra Color",None))
+#        xtcolorlabel.setAlignment(Qt.AlignRight)
+#        self.xtcolorComboBox = QComboBox()
+#        self.xtcolorComboBox.addItems(self.defaultcolors)
+#        self.xtcolorComboBox.insertSeparator(4)
+#        self.xtcolorComboBox.addItems(self.colors)
+#        self.xtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundxtcolor))
+#        xtcurvelabel = QLabel(QApplication.translate("Label", "Extra",None))
+#        xtcurvelabel.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
+#        xtcurvelabel.setAlignment(Qt.AlignRight)
+#        self.xtcurveComboBox = QComboBox()
+#        self.xtcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
+#        curvenames = [""] # first entry is the empty one, no extra curve displayed
+#        for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
+#            curvenames.append("B" + str(2*i+3) + ": " + aw.qmc.extraname1B[i])
+#            curvenames.append("B" + str(2*i+4) + ": " + aw.qmc.extraname2B[i])       
+#        self.xtcurveComboBox.addItems(curvenames)
+#        if aw.qmc.xtcurveidx < len(curvenames):
+#            self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
+#        self.xtcurveComboBox.currentIndexChanged.connect(lambda i=self.xtcurveComboBox.currentIndex() :self.changeXTcurveidx(i))
+#        deltaetcolorlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET Color",None))
+#        deltaetcolorlabel.setAlignment(Qt.AlignRight)
+#        self.deltaetcolorComboBox = QComboBox()
+#        self.deltaetcolorComboBox.addItems(self.defaultcolors)
+#        self.deltaetcolorComboBox.insertSeparator(4)
+#        self.deltaetcolorComboBox.addItems(self.colors)
+#        self.deltaetcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltaetcolor))
+#        deltabtcolorlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "BT Color",None))
+#        deltabtcolorlabel.setAlignment(Qt.AlignRight)
+#        self.deltabtcolorComboBox = QComboBox()
+#        self.deltabtcolorComboBox.addItems(self.defaultcolors)
+#        self.deltabtcolorComboBox.insertSeparator(4)
+#        self.deltabtcolorComboBox.addItems(self.colors)
+#        self.deltabtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltabtcolor))
         self.upButton = QPushButton(QApplication.translate("Button","Up",None))
         self.upButton.setFocusPolicy(Qt.NoFocus)
         self.downButton = QPushButton(QApplication.translate("Button","Down",None))
@@ -32019,12 +32050,12 @@ class backgroundDlg(ArtisanDialog):
         self.downButton.clicked.connect(lambda _: self.move("down"))
         self.leftButton.clicked.connect(lambda _: self.move("left"))
         self.rightButton.clicked.connect(lambda _: self.move("right"))
-        self.intensitySpinBox.valueChanged.connect(self.adjustintensity)
-        self.xtcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("xt"))
-        self.btcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("bt"))
-        self.metcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("et"))
-        self.deltabtcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("deltabt"))
-        self.deltaetcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("deltaet"))
+#        self.intensitySpinBox.valueChanged.connect(self.adjustintensity)
+#        self.xtcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("xt"))
+#        self.btcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("bt"))
+#        self.metcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("et"))
+#        self.deltabtcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("deltabt"))
+#        self.deltaetcolorComboBox.currentIndexChanged.connect(lambda _: self.adjustcolor("deltaet"))
         #TAB 2 EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
@@ -32087,28 +32118,28 @@ class backgroundDlg(ArtisanDialog):
         checkslayout1.addStretch()
         checkslayout1.setSpacing(15)
         layout = QGridLayout()
-        layout.addWidget(intensitylabel,0,2)
-        layout.addWidget(self.intensitySpinBox,0,3)
-        self.intensitySpinBox.setMaximumWidth(100)        
-        layout.addWidget(metcolorlabel,1,2)
-        layout.addWidget(self.metcolorComboBox,1,3)
-        self.metcolorComboBox.setMaximumWidth(100)        
-        layout.addWidget(btcolorlabel,2,2)
-        layout.addWidget(self.btcolorComboBox,2,3)
-        self.btcolorComboBox.setMaximumWidth(100)      
-        layout.addWidget(xtcurvelabel,3,0)
-        layout.addWidget(self.xtcurveComboBox,3,1)
-        self.xtcurveComboBox.setMinimumWidth(80)
-        self.xtcurveComboBox.setMaximumWidth(80)        
-        layout.addWidget(xtcolorlabel,3,2)
-        layout.addWidget(self.xtcolorComboBox,3,3)
-        self.xtcolorComboBox.setMaximumWidth(100)        
-        layout.addWidget(deltaetcolorlabel,4,2)
-        layout.addWidget(self.deltaetcolorComboBox,4,3)
-        self.deltaetcolorComboBox.setMaximumWidth(100)        
-        layout.addWidget(deltabtcolorlabel,5,2)
-        layout.addWidget(self.deltabtcolorComboBox,5,3)
-        self.deltabtcolorComboBox.setMaximumWidth(100)        
+#        layout.addWidget(intensitylabel,0,2)
+#        layout.addWidget(self.intensitySpinBox,0,3)
+#        self.intensitySpinBox.setMaximumWidth(100)        
+#        layout.addWidget(metcolorlabel,1,2)
+#        layout.addWidget(self.metcolorComboBox,1,3)
+#        self.metcolorComboBox.setMaximumWidth(100)        
+#        layout.addWidget(btcolorlabel,2,2)
+#        layout.addWidget(self.btcolorComboBox,2,3)
+#        self.btcolorComboBox.setMaximumWidth(100)      
+#        layout.addWidget(xtcurvelabel,3,0)
+#        layout.addWidget(self.xtcurveComboBox,3,1)
+#        self.xtcurveComboBox.setMinimumWidth(80)
+#        self.xtcurveComboBox.setMaximumWidth(80)        
+#        layout.addWidget(xtcolorlabel,3,2)
+#        layout.addWidget(self.xtcolorComboBox,3,3)
+#        self.xtcolorComboBox.setMaximumWidth(100)        
+#        layout.addWidget(deltaetcolorlabel,4,2)
+#        layout.addWidget(self.deltaetcolorComboBox,4,3)
+#        self.deltaetcolorComboBox.setMaximumWidth(100)        
+#        layout.addWidget(deltabtcolorlabel,5,2)
+#        layout.addWidget(self.deltabtcolorComboBox,5,3)
+#        self.deltabtcolorComboBox.setMaximumWidth(100)        
         layoutBoxedH = QHBoxLayout()
         layoutBoxedH.addStretch()
         layoutBoxedH.addLayout(movelayout)
@@ -32258,13 +32289,13 @@ class backgroundDlg(ArtisanDialog):
                 
         aw.qmc.redraw(recomputeAllDeltas=False)
 
-    def adjustintensity(self):
-        #block button
-        self.intensitySpinBox.setDisabled(True)
-        aw.qmc.backgroundalpha = self.intensitySpinBox.value()/10.
-        aw.qmc.redraw(recomputeAllDeltas=False)
-        #reactivate button
-        self.intensitySpinBox.setDisabled(False)
+#    def adjustintensity(self):
+#        #block button
+#        self.intensitySpinBox.setDisabled(True)
+#        aw.qmc.backgroundalpha = self.intensitySpinBox.value()/10.
+#        aw.qmc.redraw(recomputeAllDeltas=False)
+#        #reactivate button
+#        self.intensitySpinBox.setDisabled(False)
 
     def delete(self):
         self.pathedit.setText("")
@@ -40299,8 +40330,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(buttonLayout)
-        Mlayout.setSpacing(0)
-        Mlayout.setContentsMargins(0,0,0,0)
+        #Mlayout.setSpacing(0)
+        #Mlayout.setContentsMargins(0,0,0,0)
+        Mlayout.setContentsMargins(10,10,10,10)
         self.setLayout(Mlayout)
         
     def changeOutprogramFlag(self):
@@ -41489,6 +41521,111 @@ class graphColorDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Colors", None))
         frameStyle = QFrame.Sunken | QFrame.Panel
+        titlefont = QFont()
+        titlefont.setBold(True)
+        titlefont.setWeight(75)
+        
+        #TAB0
+        profilecolorlabel = QLabel(QApplication.translate("Label","Profile Colors",None))
+        profilecolorlabel.setFont(titlefont)
+        bgcolorlabel = QLabel(QApplication.translate("Label","Background Profile Colors",None))
+        bgcolorlabel.setFont(titlefont)
+        profilecolorlabel.setMaximumSize(2180,20)
+        bgcolorlabel.setMaximumSize(2180,20)
+        profilecolorlabel.setMinimumSize(80,20)
+        bgcolorlabel.setMinimumSize(80,20)
+        
+        self.metLabel =QLabel(aw.qmc.palette["et"])
+        self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["et"])))
+        self.metLabel.setAutoFillBackground(True)
+        self.metButton = QPushButton(QApplication.translate("Button","ET", None))
+        self.metButton.setFocusPolicy(Qt.NoFocus)
+        self.metLabel.setFrameStyle(frameStyle)
+        self.metButton.clicked.connect(lambda _: self.setColor("ET",self.metLabel,"et"))
+        self.btLabel =QLabel(aw.qmc.palette["bt"])
+        self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
+        self.btLabel.setAutoFillBackground(True)
+        self.btButton = QPushButton(QApplication.translate("Button","BT", None))
+        self.btButton.setFocusPolicy(Qt.NoFocus)
+        self.btLabel.setFrameStyle(frameStyle)
+        self.btButton.clicked.connect(lambda _: self.setColor("BT",self.btLabel,"bt"))
+        self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
+        self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
+        self.deltametLabel.setAutoFillBackground(True)
+        self.deltametButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","ET", None))
+        self.deltametButton.setFocusPolicy(Qt.NoFocus)
+        self.deltametLabel.setFrameStyle(frameStyle)
+        self.deltametButton.clicked.connect(lambda _: self.setColor("DeltaET",self.deltametLabel,"deltaet"))
+        self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
+        self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
+        self.deltabtLabel.setAutoFillBackground(True)
+        self.deltabtButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","BT", None))
+        self.deltabtButton.setFocusPolicy(Qt.NoFocus)
+        self.deltabtLabel.setFrameStyle(frameStyle)
+        self.deltabtButton.clicked.connect(lambda _: self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
+
+#        self.backgroundmetcolor = self.palette["et"]
+#        self.backgroundbtcolor = self.palette["bt"]
+#        self.backgroundxtcolor = self.palette["xt"]
+#        self.backgrounddeltaetcolor = self.palette["deltaet"]
+#        self.backgrounddeltabtcolor = self.palette["deltabt"]
+
+        self.bgmetLabel =QLabel(aw.qmc.backgroundmetcolor)
+        self.bgmetLabel.setPalette(QPalette(QColor(aw.qmc.backgroundmetcolor)))
+        self.bgmetLabel.setAutoFillBackground(True)
+        self.bgmetButton = QPushButton(QApplication.translate("Button","ET", None))
+        self.bgmetButton.setFocusPolicy(Qt.NoFocus)
+        self.bgmetLabel.setFrameStyle(frameStyle)
+        self.bgmetButton.clicked.connect(lambda _: self.setbgColor("ET",self.bgmetLabel,aw.qmc.backgroundmetcolor))
+        self.bgbtLabel =QLabel(aw.qmc.backgroundbtcolor)
+        self.bgbtLabel.setPalette(QPalette(QColor(aw.qmc.backgroundbtcolor)))
+        self.bgbtLabel.setAutoFillBackground(True)
+        self.bgbtButton = QPushButton(QApplication.translate("Button","BT", None))
+        self.bgbtButton.setFocusPolicy(Qt.NoFocus)
+        self.bgbtLabel.setFrameStyle(frameStyle)
+        self.bgbtButton.clicked.connect(lambda _: self.setbgColor("BT",self.bgbtLabel,"aw.qmc.backgroundbtcolor"))
+        self.bgdeltametLabel =QLabel(aw.qmc.backgrounddeltaetcolor)
+        self.bgdeltametLabel.setPalette(QPalette(QColor(aw.qmc.backgrounddeltaetcolor)))
+        self.bgdeltametLabel.setAutoFillBackground(True)
+        self.bgdeltametButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","ET", None))
+        self.bgdeltametButton.setFocusPolicy(Qt.NoFocus)
+        self.bgdeltametLabel.setFrameStyle(frameStyle)
+        self.bgdeltametButton.clicked.connect(lambda _: self.setbgColor("DeltaET",self.bgdeltametLabel,aw.qmc.backgrounddeltaetcolor))
+        self.bgdeltabtLabel =QLabel(aw.qmc.backgrounddeltabtcolor)
+        self.bgdeltabtLabel.setPalette(QPalette(QColor(aw.qmc.backgrounddeltabtcolor)))
+        self.bgdeltabtLabel.setAutoFillBackground(True)
+        self.bgdeltabtButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","BT", None))
+        self.bgdeltabtButton.setFocusPolicy(Qt.NoFocus)
+        self.bgdeltabtLabel.setFrameStyle(frameStyle)
+        self.bgdeltabtButton.clicked.connect(lambda _: self.setbgColor("DeltaBT",self.bgdeltabtLabel,aw.qmc.backgrounddeltabtcolor))
+
+        self.bgextraLabel =QLabel(aw.qmc.backgroundxtcolor)
+        self.bgextraLabel.setPalette(QPalette(QColor(aw.qmc.backgroundxtcolor)))
+        self.bgextraLabel.setAutoFillBackground(True)
+        self.bgextraButton = QPushButton(QApplication.translate("Button","Extra", None))
+        self.bgextraButton.setFocusPolicy(Qt.NoFocus)
+        self.bgextraLabel.setFrameStyle(frameStyle)
+        self.bgextraButton.clicked.connect(lambda _: self.setbgColor("Extra",self.bgextraLabel,aw.qmc.backgroundxtcolor))
+            
+        intensitylabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
+        intensitylabel.setAlignment(Qt.AlignRight)
+        self.intensitySpinBox = QSpinBox()
+        self.intensitySpinBox.setAlignment(Qt.AlignRight)
+        self.intensitySpinBox.setRange(1,9)
+        self.intensitySpinBox.setSingleStep(1)
+        self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
+        self.intensitySpinBox.valueChanged.connect(self.adjustintensity)        
+            
+
+        oklinesButton = QPushButton(QApplication.translate("Button","OK", None))
+        oklinesButton.clicked.connect(lambda _:self.accept())
+        defaultslinesButton = QPushButton(QApplication.translate("Button","Defaults", None))
+        defaultslinesButton.setFocusPolicy(Qt.NoFocus)
+        defaultslinesButton.clicked.connect(lambda _:self.recolor(1))
+        greylinesButton = QPushButton(QApplication.translate("Button","Grey", None))
+        greylinesButton.setFocusPolicy(Qt.NoFocus)
+        greylinesButton.clicked.connect(lambda _:self.recolor(2))
+
         #TAB1
         self.backgroundLabel = QLabel(aw.qmc.palette["background"])
         self.backgroundLabel.setPalette(QPalette(QColor(aw.qmc.palette["background"])))
@@ -41553,34 +41690,13 @@ class graphColorDlg(ArtisanDialog):
         self.rect4Button.setFocusPolicy(Qt.NoFocus)
         self.rect4Label.setFrameStyle(frameStyle)
         self.rect4Button.clicked.connect(lambda _: self.setColor("Cooling Phase",self.rect4Label,"rect4"))
-        self.metLabel =QLabel(aw.qmc.palette["et"])
-        self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["et"])))
-        self.metLabel.setAutoFillBackground(True)
-        self.metButton = QPushButton(QApplication.translate("Button","ET", None))
-        self.metButton.setFocusPolicy(Qt.NoFocus)
-        self.metLabel.setFrameStyle(frameStyle)
-        self.metButton.clicked.connect(lambda _: self.setColor("ET",self.metLabel,"et"))
-        self.btLabel =QLabel(aw.qmc.palette["bt"])
-        self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
-        self.btLabel.setAutoFillBackground(True)
-        self.btButton = QPushButton(QApplication.translate("Button","BT", None))
-        self.btButton.setFocusPolicy(Qt.NoFocus)
-        self.btLabel.setFrameStyle(frameStyle)
-        self.btButton.clicked.connect(lambda _: self.setColor("BT",self.btLabel,"bt"))
-        self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
-        self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
-        self.deltametLabel.setAutoFillBackground(True)
-        self.deltametButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Button","ET", None))
-        self.deltametButton.setFocusPolicy(Qt.NoFocus)
-        self.deltametLabel.setFrameStyle(frameStyle)
-        self.deltametButton.clicked.connect(lambda _: self.setColor("DeltaET",self.deltametLabel,"deltaet"))
-        self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
-        self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
-        self.deltabtLabel.setAutoFillBackground(True)
-        self.deltabtButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Button","BT", None))
-        self.deltabtButton.setFocusPolicy(Qt.NoFocus)
-        self.deltabtLabel.setFrameStyle(frameStyle)
-        self.deltabtButton.clicked.connect(lambda _: self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
+        self.rect5Label =QLabel(aw.qmc.palette["rect5"])
+        self.rect5Label.setPalette(QPalette(QColor(aw.qmc.palette["rect5"])))
+        self.rect5Label.setAutoFillBackground(True)
+        self.rect5Button = QPushButton(QApplication.translate("Button","Bars Bkgnd", None))
+        self.rect5Button.setFocusPolicy(Qt.NoFocus)
+        self.rect5Label.setFrameStyle(frameStyle)
+        self.rect5Button.clicked.connect(lambda _: self.setColor("Bars Bkgnd",self.rect5Label,"rect5"))
         self.markersLabel =QLabel(aw.qmc.palette["markers"])
         self.markersLabel.setPalette(QPalette(QColor(aw.qmc.palette["markers"])))
         self.markersLabel.setAutoFillBackground(True)
@@ -41602,13 +41718,20 @@ class graphColorDlg(ArtisanDialog):
         self.watermarksButton.setFocusPolicy(Qt.NoFocus)
         self.watermarksLabel.setFrameStyle(frameStyle)
         self.watermarksButton.clicked.connect(lambda _: self.setColor("Watermarks",self.watermarksLabel,"watermarks"))
-        self.ClineLabel =QLabel(aw.qmc.palette["Cline"])
-        self.ClineLabel.setPalette(QPalette(QColor(aw.qmc.palette["Cline"])))
-        self.ClineLabel.setAutoFillBackground(True)
-        self.ClineButton = QPushButton(QApplication.translate("Button","C Lines", None))
-        self.ClineButton.setFocusPolicy(Qt.NoFocus)
-        self.ClineLabel.setFrameStyle(frameStyle)
-        self.ClineButton.clicked.connect(lambda _: self.setColor("C Lines",self.ClineLabel,"Cline"))
+        self.timeguideLabel =QLabel(aw.qmc.palette["timeguide"])
+        self.timeguideLabel.setPalette(QPalette(QColor(aw.qmc.palette["timeguide"])))
+        self.timeguideLabel.setAutoFillBackground(True)
+        self.timeguideButton = QPushButton(QApplication.translate("Button","Time Guide", None))
+        self.timeguideButton.setFocusPolicy(Qt.NoFocus)
+        self.timeguideLabel.setFrameStyle(frameStyle)
+        self.timeguideButton.clicked.connect(lambda _: self.setColor("Time Guide",self.timeguideLabel,"timeguide"))
+        self.aucguideLabel =QLabel(aw.qmc.palette["aucguide"])
+        self.aucguideLabel.setPalette(QPalette(QColor(aw.qmc.palette["aucguide"])))
+        self.aucguideLabel.setAutoFillBackground(True)
+        self.aucguideButton = QPushButton(QApplication.translate("Button","AUC Guide", None))
+        self.aucguideButton.setFocusPolicy(Qt.NoFocus)
+        self.aucguideLabel.setFrameStyle(frameStyle)
+        self.aucguideButton.clicked.connect(lambda _: self.setColor("AUC Guide",self.aucguideLabel,"aucguide"))
         self.legendbgLabel = QLabel(aw.qmc.palette["legendbg"])
         self.legendbgLabel.setPalette(QPalette(QColor(aw.qmc.palette["legendbg"])))
         self.legendbgLabel.setAutoFillBackground(True)
@@ -41654,6 +41777,14 @@ class graphColorDlg(ArtisanDialog):
         self.mettextButton.setFocusPolicy(Qt.NoFocus)
         self.mettextLabel.setFrameStyle(frameStyle)
         self.mettextButton.clicked.connect(lambda _: self.setColor("mettext",self.mettextLabel,"mettext"))
+        self.metboxLabel = QLabel(aw.qmc.palette["metbox"])
+        self.metboxLabel.setPalette(QPalette(QColor(aw.qmc.palette["metbox"])))
+        self.metboxLabel.setAutoFillBackground(True)
+        self.metboxButton = QPushButton(QApplication.translate("Button","MET Box", None))
+        self.metboxButton.setFocusPolicy(Qt.NoFocus)
+        self.metboxLabel.setFrameStyle(frameStyle)
+        self.metboxButton.clicked.connect(lambda _: self.setColor("metbox",self.metboxLabel,"metbox"))
+
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         okButton.clicked.connect(lambda _:self.accept())
         defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
@@ -41753,7 +41884,54 @@ class graphColorDlg(ArtisanDialog):
         self.lcd6spinbox.valueChanged.connect(lambda val:self.setLED(val,6))
         LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None))
         LCDdefaultButton.clicked.connect(lambda _:self.setLCDdefaults())
+            
         #LAYOUTS
+        #tab0 layout
+        lines = QGridLayout()
+        lines.setColumnStretch(1,12)   
+        lines.setColumnStretch(3,12)   
+        lines.setColumnStretch(0,0)   
+        lines.setColumnStretch(2,0)   
+        lines.setVerticalSpacing(1)
+        lines.setColumnMinimumWidth(0,80)
+        lines.setColumnMinimumWidth(1,80)
+        lines.setColumnMinimumWidth(2,80)
+        lines.setColumnMinimumWidth(3,80)
+        lines.addWidget(profilecolorlabel,0,1)
+       
+        lines.addWidget(self.metButton,1,0)
+        lines.addWidget(self.metLabel,1,1)
+        lines.addWidget(self.btButton,2,0)
+        lines.addWidget(self.btLabel,2,1)
+        lines.addWidget(self.deltametButton,3,0)
+        lines.addWidget(self.deltametLabel,3,1)
+        lines.addWidget(self.deltabtButton,4,0)
+        lines.addWidget(self.deltabtLabel,4,1)
+
+        lines.addWidget(bgcolorlabel,0,3)
+        lines.addWidget(self.bgmetButton,1,2)
+        lines.addWidget(self.bgmetLabel,1,3)
+        lines.addWidget(self.bgbtButton,2,2)
+        lines.addWidget(self.bgbtLabel,2,3)
+        lines.addWidget(self.bgdeltametButton,3,2)
+        lines.addWidget(self.bgdeltametLabel,3,3)
+        lines.addWidget(self.bgdeltabtButton,4,2)
+        lines.addWidget(self.bgdeltabtLabel,4,3)
+        lines.addWidget(self.bgextraButton,5,2)
+        lines.addWidget(self.bgextraLabel,5,3)
+        lines.addWidget(intensitylabel,6,2)
+        lines.addWidget(self.intensitySpinBox,6,3)
+        self.intensitySpinBox.setMaximumWidth(100)        
+
+        defaultslinesLayout = QHBoxLayout()
+        defaultslinesLayout.addStretch()
+        defaultslinesLayout.addWidget(greylinesButton)
+        defaultslinesLayout.addWidget(defaultslinesButton)
+#        defaultslinesLayout.addWidget(oklinesButton)
+        lines.addLayout(defaultslinesLayout,8,3)
+        graphlinesLayout = QVBoxLayout()
+        graphlinesLayout.addLayout(lines)
+        
         #tab1 layout
         grid = QGridLayout()
         grid.setColumnStretch(1,12)   
@@ -41769,22 +41947,28 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.titleLabel,2,1)
         grid.addWidget(self.gridButton,3,0)
         grid.addWidget(self.gridLabel,3,1)
-        grid.addWidget(self.metButton,4,0)
-        grid.addWidget(self.metLabel,4,1)
-        grid.addWidget(self.btButton,5,0)
-        grid.addWidget(self.btLabel,5,1)
-        grid.addWidget(self.deltametButton,6,0)
-        grid.addWidget(self.deltametLabel,6,1)
-        grid.addWidget(self.deltabtButton,7,0)
-        grid.addWidget(self.deltabtLabel,7,1)
-        grid.addWidget(self.yButton,8,0)
-        grid.addWidget(self.yLabel,8,1)
-        grid.addWidget(self.xButton,9,0)
-        grid.addWidget(self.xLabel,9,1)
-        grid.addWidget(self.ClineButton,10,0)
-        grid.addWidget(self.ClineLabel,10,1)
-        grid.addWidget(self.watermarksButton,11,0)
-        grid.addWidget(self.watermarksLabel,11,1)
+#        grid.addWidget(self.metButton,4,0)
+#        grid.addWidget(self.metLabel,4,1)
+#        grid.addWidget(self.btButton,5,0)
+#        grid.addWidget(self.btLabel,5,1)
+#        grid.addWidget(self.deltametButton,6,0)
+#        grid.addWidget(self.deltametLabel,6,1)
+#        grid.addWidget(self.deltabtButton,7,0)
+#        grid.addWidget(self.deltabtLabel,7,1)
+        grid.addWidget(self.yButton,4,0)
+        grid.addWidget(self.yLabel,4,1)
+        grid.addWidget(self.xButton,5,0)
+        grid.addWidget(self.xLabel,5,1)
+        grid.addWidget(self.markersButton,6,0)
+        grid.addWidget(self.markersLabel,6,1)
+        grid.addWidget(self.textButton,7,0)
+        grid.addWidget(self.textLabel,7,1)
+        grid.addWidget(self.legendbgButton,8,0) 
+        grid.addWidget(self.legendbgLabel,8,1) 
+        grid.addWidget(self.legendborderButton,9,0)
+        grid.addWidget(self.legendborderLabel,9,1) 
+        grid.addWidget(self.watermarksButton,10,0)
+        grid.addWidget(self.watermarksLabel,10,1)
         grid.addWidget(self.rect1Button,0,2)
         grid.addWidget(self.rect1Label,0,3)
         grid.addWidget(self.rect2Button,1,2)
@@ -41793,20 +41977,20 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.rect3Label,2,3)
         grid.addWidget(self.rect4Button,3,2)
         grid.addWidget(self.rect4Label,3,3)
-        grid.addWidget(self.markersButton,4,2)
-        grid.addWidget(self.markersLabel,4,3)
-        grid.addWidget(self.textButton,5,2)
-        grid.addWidget(self.textLabel,5,3)
-        grid.addWidget(self.legendbgButton,6,2) 
-        grid.addWidget(self.legendbgLabel,6,3) 
-        grid.addWidget(self.legendborderButton,7,2)
-        grid.addWidget(self.legendborderLabel,7,3) 
-        grid.addWidget(self.specialeventboxButton,8,2) 
-        grid.addWidget(self.specialeventboxLabel,8,3) 
-        grid.addWidget(self.specialeventtextButton,9,2) 
-        grid.addWidget(self.specialeventtextLabel,9,3) 
-        grid.addWidget(self.mettextButton,10,2) 
-        grid.addWidget(self.mettextLabel,10,3) 
+        grid.addWidget(self.rect5Button,4,2)
+        grid.addWidget(self.rect5Label,4,3)
+        grid.addWidget(self.specialeventboxButton,5,2) 
+        grid.addWidget(self.specialeventboxLabel,5,3) 
+        grid.addWidget(self.specialeventtextButton,6,2) 
+        grid.addWidget(self.specialeventtextLabel,6,3) 
+        grid.addWidget(self.metboxButton,7,2) 
+        grid.addWidget(self.metboxLabel,7,3) 
+        grid.addWidget(self.mettextButton,8,2) 
+        grid.addWidget(self.mettextLabel,8,3) 
+        grid.addWidget(self.timeguideButton,9,2)
+        grid.addWidget(self.timeguideLabel,9,3)
+        grid.addWidget(self.aucguideButton,10,2)
+        grid.addWidget(self.aucguideLabel,10,3)
         defaultsLayout = QHBoxLayout()
         defaultsLayout.addStretch()
         defaultsLayout.addWidget(greyButton)
@@ -41815,6 +41999,7 @@ class graphColorDlg(ArtisanDialog):
         grid.addLayout(defaultsLayout,12,3)
         graphLayout = QVBoxLayout()
         graphLayout.addLayout(grid)
+
         #tab 2
         lcd1layout = QHBoxLayout()
         lcd1layout.addWidget(lcd1backButton,0)
@@ -41886,8 +42071,13 @@ class graphColorDlg(ArtisanDialog):
         lllayout.addLayout(buttonlayout)
         lllayout.setContentsMargins(0,0,0,0)
         lllayout.setSpacing(5)
+        #tab 3
+
         ###################################
         TabWidget = QTabWidget()
+        C0Widget = QWidget()
+        C0Widget.setLayout(graphlinesLayout)
+        TabWidget.addTab(C0Widget,QApplication.translate("Tab","Graph Lines",None))
         C1Widget = QWidget()
         C1Widget.setLayout(graphLayout)
         TabWidget.addTab(C1Widget,QApplication.translate("Tab","Graph",None))
@@ -41899,6 +42089,7 @@ class graphColorDlg(ArtisanDialog):
         okLayout.addWidget(okButton)
         okLayout.setContentsMargins(0, 0, 0, 0)
         TabWidget.setContentsMargins(0, 0, 0, 0)
+        C0Widget.setContentsMargins(0, 0, 0, 0)
         C1Widget.setContentsMargins(0, 0, 0, 0)
         C2Widget.setContentsMargins(0, 0, 0, 0)
         graphLayout.setContentsMargins(0,0,0,0)
@@ -42055,12 +42246,14 @@ class graphColorDlg(ArtisanDialog):
                 (self.deltabtLabel,"deltabt"),
                 (self.yLabel,"ylabel"),
                 (self.yLabel,"xlabel"),
-                (self.ClineLabel,"Cline"),
+                (self.timeguideLabel,"timeguide"),
+                (self.aucguideLabel,"aucguide"),
                 (self.watermarksLabel,"watermarks"),
                 (self.rect1Label,"rect1"),
                 (self.rect2Label,"rect2"),
                 (self.rect3Label,"rect3"),
                 (self.rect4Label,"rect4"),
+                (self.rect5Label,"rect5"),
                 (self.markersLabel,"markers"),
                 (self.textLabel,"text"),
                 (self.legendbgLabel,"legendbg"),
@@ -42068,8 +42261,23 @@ class graphColorDlg(ArtisanDialog):
                 (self.specialeventboxLabel,"specialeventbox"),
                 (self.specialeventtextLabel,"specialeventtext"),
                 (self.mettextLabel,"mettext"),
+                (self.metboxLabel,"metbox"),
                 ]:
             self.setColorLabel(l,t)
+            
+            # set background colors and alpha
+            self.bgmetLabel.setText(aw.qmc.backgroundmetcolor)
+            self.bgbtLabel.setText(aw.qmc.backgroundbtcolor)
+            self.bgdeltametLabel.setText(aw.qmc.backgrounddeltaetcolor)
+            self.bgdeltabtLabel.setText(aw.qmc.backgrounddeltabtcolor)
+            self.bgextraLabel.setText(aw.qmc.backgroundxtcolor)
+            self.bgmetLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundmetcolor + " ;}")
+            self.bgbtLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundbtcolor + " ;}")
+            self.bgdeltametLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgrounddeltaetcolor + " ;}")
+            self.bgdeltabtLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgrounddeltabtcolor + " ;}")
+            self.bgextraLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundxtcolor + " ;}")
+            self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
+            
         if str(aw.qmc.palette["canvas"]) == 'None':
             self.canvasLabel.setStyleSheet("QLabel { background-color: #f0f0f0 }")
             
@@ -42082,6 +42290,46 @@ class graphColorDlg(ArtisanDialog):
     def recolor(self, x):
         aw.qmc.changeGColor(x)
         self.setColorLabels()
+
+    def adjustintensity(self):
+        #block button
+        self.intensitySpinBox.setDisabled(True)
+        aw.qmc.backgroundalpha = self.intensitySpinBox.value()/10.
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        #reactivate button
+        self.intensitySpinBox.setDisabled(False)
+
+#    def setbgcolor(self,bgcolor,disj_palette,select):
+#        res = aw.colordialog(QColor(bgcolor))
+#        if QColor.isValid(res):
+#            nc = str(res.name())
+#            if nc != disj_palette[select]:
+#                bgcolor = nc
+#                print(bgcolor)
+
+                
+    def setbgColor(self,title,var,color):
+        #print("title,var,color",title,var,color)  #debugprint
+        labelcolor = QColor(color)
+        colorf = aw.colordialog(labelcolor)
+        if colorf.isValid():
+            color = str(colorf.name())
+            aw.updateCanvasColors()
+            var.setText(colorf.name())
+            var.setStyleSheet("QLabel { background-color: " + color + " }");
+            var.setPalette(QPalette(colorf))
+            aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
+            if title == "ET":
+                aw.qmc.backgroundmetcolor = color
+            elif title == "BT":
+                aw.qmc.backgroundbtcolor = color
+            elif title == "DeltaET":
+                aw.qmc.backgrounddeltaetcolor = color
+            elif title == "DeltaBT":
+                aw.qmc.backgrounddeltabtcolor = color
+            elif title == "Extra":
+                aw.qmc.backgroundextracolor = color
+            aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(color)))
 
     def setcolor(self,palette,disj_palette,select):
         res = aw.colordialog(QColor(palette[select]))
