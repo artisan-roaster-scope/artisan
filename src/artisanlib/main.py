@@ -1941,9 +1941,9 @@ class tgraphcanvas(FigureCanvas):
         self.R1_BT = -1
         self.R1_BT_ROR = -1
         self.R1_EXIT_TEMP = -1
-        self.R1_HEATER = 0 # 0-10
+        self.R1_HEATER = 0 # 0-9
         self.R1_FAN = 0 # 0-12
-        self.R1_DRUM = 0 # 0-9
+        self.R1_DRUM = 0 # 1-9
         self.R1_VOLTAGE = 0 # 0-300
         self.R1_TX = 0.
         self.R1_STATE = ""
@@ -12641,6 +12641,7 @@ class ApplicationWindow(QMainWindow):
             if aw.eventquantifieractive[i]:
                 # we reduce the block values by one for each channel
                 aw.block_quantification_sampling_ticks[i] = max(0, aw.block_quantification_sampling_ticks[i] - 1)
+
                 if not aw.block_quantification_sampling_ticks[i]:
                     temp,_ = aw.quantifier2tempandtime(i)
                     if temp: # corresponding curve is available
@@ -12973,7 +12974,8 @@ class ApplicationWindow(QMainWindow):
             r = ((numpy.digitize([v],ls)[0] - 1) * 10. + aw.eventslidermin[i]) / 10.
         else:
             r = (numpy.digitize([v],ls)[0]+aw.eventslidermin[i] - 1) / 10.
-        return max(aw.eventslidermin[i]/10, min(aw.eventslidermax[i] / 10,r))
+            
+        return max(aw.eventslidermin[i]/10., min(aw.eventslidermax[i] / 10.,r))
         
     
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
