@@ -22928,7 +22928,7 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass                        
                 try:
-                    aw.qmc.etypes = eventtypes = ["blowerSetting","drumSpeedSetting","--","inductionPowerSetting"]
+                    eventtypes = ["blowerSetting","drumSpeedSetting","--","inductionPowerSetting"]
                     for j in range(len(eventtypes)):
                         eventname = eventtypes[j]
                         if eventname != "--":
