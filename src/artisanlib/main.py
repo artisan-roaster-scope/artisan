@@ -14107,9 +14107,6 @@ class ApplicationWindow(QMainWindow):
                                     pass
 
                 elif action == 16:
-                    print 'hi'
-                    print self.ser
-                    print self.ser.R1
                     if cmd:
                         self.ser.R1.set_heater(cmd)
                 elif action == 17:
@@ -14119,7 +14116,8 @@ class ApplicationWindow(QMainWindow):
                     if cmd:
                         self.ser.R1.set_drum(cmd)
                 elif action == 19:
-                    pass
+                    if cmd_str == "PRS":
+                        self.ser.R1.prs()
 
             except Exception:
                 pass
@@ -14265,7 +14263,7 @@ class ApplicationWindow(QMainWindow):
                     
                 # the new_value is combined with the event factor and offset as specified in the slider definition
                 actionvalue = int(round((self.eventsliderfactors[etype] * new_value) + self.eventslideroffsets[etype]))
-                if self.extraeventsactions[ee] in [8,9]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
+                if self.extraeventsactions[ee] in [8,9,16,17,18]: # for Hottop Heater/Fan/CoolingFan action we take the event value instead of the event string as cmd action
                     self.eventaction(self.extraeventsactions[ee],u(int(new_value)))
                 else:
                     self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(actionvalue))
@@ -29995,6 +29993,9 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "PWM Command",None),
                        QApplication.translate("ComboBox", "VOUT Command",None),
                        QApplication.translate("ComboBox", "S7 Command",None),
+                       QApplication.translate("ComboBox", "Aillio R1 Heater",None),
+                       QApplication.translate("ComboBox", "Aillio R1 Fan",None),
+                       QApplication.translate("ComboBox", "Aillio R1 Drum",None),
                        QApplication.translate("ComboBox", "Aillio R1 Command",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
@@ -30825,7 +30826,10 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","PWM Command",None),
                                      QApplication.translate("ComboBox","VOUT Command",None),
                                      QApplication.translate("ComboBox","S7 Command",None),
-                                     QApplication.translate("ComboBox", "Aillio R1 Command",None)])
+                                     QApplication.translate("ComboBox","Aillio R1 Heater",None),
+                                     QApplication.translate("ComboBox","Aillio R1 Fan",None),
+                                     QApplication.translate("ComboBox","Aillio R1 Drum",None),
+                                     QApplication.translate("ComboBox","Aillio R1 Command",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1

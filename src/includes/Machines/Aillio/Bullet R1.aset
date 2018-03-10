@@ -29,3 +29,35 @@ extraname2={0}, {1}, Exhaust
 
 [RoastProperties]
 roastertype=Aillio Bullet R1
+
+[ExtraEventButtons]
+buttonlistmaxlen=11
+extraeventstypes=4, 5, 5, 8, 8
+extraeventsvalues=1, 1.1, -1.1, 1.1, -1.1
+extraeventsactionstrings=PRS, , , , 
+extraeventsactions=19, 17, 17, 16, 16
+extraeventsdescriptions=PRS button, , , , 
+extraeventsvisibility=1, 1, 1, 1, 1
+extraeventslabels=PRS, Fan +1, Fan -1, Heater +1, Heater -1
+extraeventbuttoncolor=yellow, yellow, yellow, yellow, yellow
+extraeventbuttontextcolor=black, black, black, black, black
+extraeventsbuttonsflag=1
+
+[Sliders]
+slidervisibilities=1, 1, 0, 1
+slideractions=14, 15, 0, 13
+slidercommands=, , , 
+slideroffsets=0, 0, 0, 0
+sliderfactors=1, 1, 1, 1
+slidermin=0, 1, 0, 0
+slidermax=12, 9, 100, 9
+eventslidersflag=1
+eventslidercoarse=0, 0, 0, 0
+
+[Quantifiers]
+quantifieractive=1, 1, 0, 1
+quantifiersource=3, 5, 0, 2
+quantifiermin=0, 1, 0, 0
+quantifiermax=12, 9, 100, 9
+quantifiercoarse=0, 0, 0, 0
+clusterEventsFlag=false
