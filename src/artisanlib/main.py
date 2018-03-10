@@ -13635,7 +13635,7 @@ class ApplicationWindow(QMainWindow):
                 value = (self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]
                 if action != 14: # only for VOUT Commands we keep the floats
                     value = int(round(value))
-                if action in [8,9]: # for Hottop Heater or Fan, we just forward the value
+                if action in [8,9,16,17,18]: # for Hottop/R1 Heater or Fan, we just forward the value
                     cmd = value
                 else:
                     cmd = self.eventslidercommands[n]
@@ -13772,7 +13772,7 @@ class ApplicationWindow(QMainWindow):
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
-    #         13= PWM Command; 14 VOUT Command; 15 S7 Command
+    #         13= PWM Command; 14 VOUT Command; 15 S7 Command; 16 Aillio R1 Heater; 17 Aillio R1 Fan; 18 Aillio R1 Drum; 19 Aillio R1 Command
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -14105,6 +14105,22 @@ class ApplicationWindow(QMainWindow):
                                     aw.s7.writeInt(5,int(dbnr),int(s),v)
                                 except Exception:
                                     pass
+
+                elif action == 16:
+                    print 'hi'
+                    print self.ser
+                    print self.ser.R1
+                    if cmd:
+                        self.ser.R1.set_heater(cmd)
+                elif action == 17:
+                    if cmd:
+                        self.ser.R1.set_fan(cmd)
+                elif action == 18:
+                    if cmd:
+                        self.ser.R1.set_drum(cmd)
+                elif action == 19:
+                    pass
+
             except Exception:
                 pass
                 
@@ -29696,7 +29712,10 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "PWM Command",None),
                        QApplication.translate("ComboBox", "VOUT Command",None),
                        QApplication.translate("ComboBox", "IO Command",None),
-                       QApplication.translate("ComboBox", "S7 Command",None)]
+                       QApplication.translate("ComboBox", "S7 Command",None),
+                       QApplication.translate("ComboBox", "Aillio R1 Heater",None),
+                       QApplication.translate("ComboBox", "Aillio R1 Fan",None),
+                       QApplication.translate("ComboBox", "Aillio R1 Drum",None)]
         self.E1action = QComboBox()
         self.E1action.setToolTip(QApplication.translate("Tooltip", "Action Type", None))
         self.E1action.setFocusPolicy(Qt.NoFocus)
@@ -29975,7 +29994,8 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Fuji Command",None),
                        QApplication.translate("ComboBox", "PWM Command",None),
                        QApplication.translate("ComboBox", "VOUT Command",None),
-                       QApplication.translate("ComboBox", "S7 Command",None)]
+                       QApplication.translate("ComboBox", "S7 Command",None),
+                       QApplication.translate("ComboBox", "Aillio R1 Command",None)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None))
         self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
@@ -30804,7 +30824,8 @@ class EventsDlg(ArtisanDialog):
                                      QApplication.translate("ComboBox","Fuji Command",None),
                                      QApplication.translate("ComboBox","PWM Command",None),
                                      QApplication.translate("ComboBox","VOUT Command",None),
-                                     QApplication.translate("ComboBox","S7 Command",None)])
+                                     QApplication.translate("ComboBox","S7 Command",None),
+                                     QApplication.translate("ComboBox", "Aillio R1 Command",None)])
             act = aw.extraeventsactions[i]
             if act > 7:
                 act = act - 1

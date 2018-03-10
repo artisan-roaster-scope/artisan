@@ -173,7 +173,34 @@ class AillioR1:
     def get_state_string(self):
         self.__getstate__()
         return self.state_str
-    
+
+    def set_heater(self, value):
+        self.__dbg__('set_heater ' + str(value))
+        if value < 1:
+            value = 1
+        elif value > 9:
+            value = 9
+        self.__open__()
+        self.__sendcmd__([0x32, 0x01, value, 0x00])
+
+    def set_fan(self, value):
+        self.__dbg__('set_fan ' + str(value))
+        if value < 1:
+            value = 1
+        elif value > 12:
+            value = 12 
+        self.__open__()
+        self.__sendcmd__([0x32, 0x01, value, 0x00])
+
+    def set_drum(self, value):
+        self.__dbg__('set_drum ' + str(value))
+        if value < 1:
+            value = 1
+        elif value > 9:
+            value = 9 
+        self.__open__()
+        self.__sendcmd__([0x32, 0x01, value, 0x00])
+        
     def __getstate__(self):
         self.__open__()
         self.__dbg__('getstate')
@@ -257,5 +284,6 @@ class AillioR1:
 if __name__ == "__main__":
     R1 = AillioR1(debug=True)
     while True:
+        R1.set_heater(1)
         R1.get_bt()
         time.sleep(1)
