@@ -22819,7 +22819,7 @@ class ApplicationWindow(QMainWindow):
 
     def importBullet(self):
         try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import HH506RA CSV", None))
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import Aillio R1 JSON", None))
             if len(filename) == 0:
                 return
             import io
@@ -22841,7 +22841,7 @@ class ApplicationWindow(QMainWindow):
             
             # add extra device if exitTemperatures are given and this extra device is not configured
             try:
-                if ex is not None and ex != [] and aw.qmc.extraname1 != ["exitTemperature"]:
+                if ex is not None and ex != [] and aw.qmc.extraname1 != ['Exhaust'] and (len(aw.qmc.extraname2) < 2 or aw.qmc.extraname2[2] != "Exhaust"):
                     string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
                     reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                     if reply == QMessageBox.Yes:
@@ -22850,7 +22850,7 @@ class ApplicationWindow(QMainWindow):
                                 aw.resetExtraDevices()
                             aw.addDevice()
                             aw.qmc.resetlinecountcaches()
-                            aw.qmc.extraname1[0] = "exitTemperature"
+                            aw.qmc.extraname1[0] = "Exhaust"
                             aw.extraCurveVisibility1[0] = toBool(True)
                             aw.extraCurveVisibility2[0] = toBool(False)
                         else:
@@ -22881,11 +22881,14 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extratimex[x] = tx
                     self.qmc.extratemp1[x] = [-1]*len(tx)
                     self.qmc.extratemp2[x] = [-1]*len(tx)
-                    
-                # add exhaust data to first extra device
+
+                # add exhaust data to first/third extra device
                 if ex is not None and ex != [] and len(self.qmc.extradevices) > 0:
-                    self.qmc.extratemp1[0] = ex
-                
+                    if len(aw.qmc.extraname2) >= 2 and aw.qmc.extraname2[2] == "Exhaust":
+                        self.qmc.extratemp2[2] = ex
+                    else:
+                        self.qmc.extratemp1[0] = ex
+
                 try:
                     self.qmc.title = obj["beanName"]
                 except:
