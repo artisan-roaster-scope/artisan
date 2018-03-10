@@ -1425,7 +1425,7 @@ class tgraphcanvas(FigureCanvas):
         self.LCDdecimalplaces = 0
         self.DeltaETflag = False
         self.DeltaBTflag = True
-        self.DeltaETlcdflag = True
+        self.DeltaETlcdflag = False
         self.DeltaBTlcdflag = True
         self.HUDbuttonflag = False
         self.PIDbuttonflag = True # TC4 PID firmware available?
@@ -1564,6 +1564,7 @@ class tgraphcanvas(FigureCanvas):
         self.linestyle_default = "-"
         self.drawstyle_default = "default"
         self.linewidth_default = 2
+        self.delta_linewidth_default = 1
         self.extra_linewidth_default = 1
         self.marker_default = None
         self.markersize_default = 6
@@ -1580,12 +1581,12 @@ class tgraphcanvas(FigureCanvas):
         self.ETmarkersize = self.markersize_default
         self.BTdeltalinestyle = self.linestyle_default
         self.BTdeltadrawstyle = self.drawstyle_default
-        self.BTdeltalinewidth = self.linewidth_default
+        self.BTdeltalinewidth = self.delta_linewidth_default
         self.BTdeltamarker = self.marker_default
         self.BTdeltamarkersize = self.markersize_default
         self.ETdeltalinestyle = self.linestyle_default
         self.ETdeltadrawstyle = self.drawstyle_default
-        self.ETdeltalinewidth = self.linewidth_default
+        self.ETdeltalinewidth = self.delta_linewidth_default
         self.ETdeltamarker = self.marker_default
         self.ETdeltamarkersize = self.markersize_default
         self.BTbacklinestyle = self.linestyle_default
@@ -1605,12 +1606,12 @@ class tgraphcanvas(FigureCanvas):
         self.XTbackmarkersize = self.markersize_default                
         self.BTBdeltalinestyle = self.linestyle_default
         self.BTBdeltadrawstyle = self.drawstyle_default
-        self.BTBdeltalinewidth = self.linewidth_default
+        self.BTBdeltalinewidth = self.delta_linewidth_default
         self.BTBdeltamarker = self.marker_default
         self.BTBdeltamarkersize = self.markersize_default
         self.ETBdeltalinestyle = self.linestyle_default
         self.ETBdeltadrawstyle = self.drawstyle_default
-        self.ETBdeltalinewidth = self.linewidth_default
+        self.ETBdeltalinewidth = self.delta_linewidth_default
         self.ETBdeltamarker = self.marker_default
         self.ETBdeltamarkersize = self.markersize_default
         self.BTBdeltalinestyle = self.linestyle_default
@@ -32146,6 +32147,7 @@ class backgroundDlg(ArtisanDialog):
         movelayout.addWidget(self.speedSpinBox,1,1)
         movelayout.addWidget(self.rightButton,1,2)
         movelayout.addWidget(self.downButton,2,1)
+        movelayout.setSpacing(20)
         checkslayout1 = QHBoxLayout()
         checkslayout1.addStretch()
         checkslayout1.addWidget(self.backgroundCheck)
@@ -32196,6 +32198,7 @@ class backgroundDlg(ArtisanDialog):
         layoutBoxed = QVBoxLayout()
         layoutBoxed.addStretch()
         layoutBoxed.addLayout(checkslayout1)
+        layoutBoxed.addStretch()
         layoutBoxed.addLayout(layoutBoxedH)
         layoutBoxed.addStretch()
         alignButtonBoxed = QHBoxLayout()
@@ -32215,7 +32218,7 @@ class backgroundDlg(ArtisanDialog):
         tab4content.addWidget(self.replayComboBox)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(layoutBoxed)
-        tab1layout.addStretch()
+#        tab1layout.addStretch()
         tab1layout.addLayout(alignButtonBoxed)
         tab1layout.addLayout(tab4content)
         tab1layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
@@ -41600,14 +41603,14 @@ class graphColorDlg(ArtisanDialog):
         self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
         self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
         self.deltametLabel.setAutoFillBackground(True)
-        self.deltametButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","ET", None))
+        self.deltametButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Label","ET", None))
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
         self.deltametButton.clicked.connect(lambda _: self.setColor("DeltaET",self.deltametLabel,"deltaet"))
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
         self.deltabtLabel.setAutoFillBackground(True)
-        self.deltabtButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","BT", None))
+        self.deltabtButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Label","BT", None))
         self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtLabel.setFrameStyle(frameStyle)
         self.deltabtButton.clicked.connect(lambda _: self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
@@ -41635,14 +41638,14 @@ class graphColorDlg(ArtisanDialog):
         self.bgdeltametLabel =QLabel(aw.qmc.backgrounddeltaetcolor)
         self.bgdeltametLabel.setPalette(QPalette(QColor(aw.qmc.backgrounddeltaetcolor)))
         self.bgdeltametLabel.setAutoFillBackground(True)
-        self.bgdeltametButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","ET", None))
+        self.bgdeltametButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Label","ET", None))
         self.bgdeltametButton.setFocusPolicy(Qt.NoFocus)
         self.bgdeltametLabel.setFrameStyle(frameStyle)
         self.bgdeltametButton.clicked.connect(lambda _: self.setbgColor("DeltaET",self.bgdeltametLabel,aw.qmc.backgrounddeltaetcolor))
         self.bgdeltabtLabel =QLabel(aw.qmc.backgrounddeltabtcolor)
         self.bgdeltabtLabel.setPalette(QPalette(QColor(aw.qmc.backgrounddeltabtcolor)))
         self.bgdeltabtLabel.setAutoFillBackground(True)
-        self.bgdeltabtButton = QPushButton(deltaLabelPrefix + QApplication.translate("Button","BT", None))
+        self.bgdeltabtButton = QPushButton(deltaLabelUTF8 + QApplication.translate("Label","BT", None))
         self.bgdeltabtButton.setFocusPolicy(Qt.NoFocus)
         self.bgdeltabtLabel.setFrameStyle(frameStyle)
         self.bgdeltabtButton.clicked.connect(lambda _: self.setbgColor("DeltaBT",self.bgdeltabtLabel,aw.qmc.backgrounddeltabtcolor))
@@ -42125,7 +42128,7 @@ class graphColorDlg(ArtisanDialog):
         TabWidget = QTabWidget()
         C0Widget = QWidget()
         C0Widget.setLayout(graphlinesLayout)
-        TabWidget.addTab(C0Widget,QApplication.translate("Tab","Graph Lines",None))
+        TabWidget.addTab(C0Widget,QApplication.translate("Tab","Curves",None))
         C1Widget = QWidget()
         C1Widget.setLayout(graphLayout)
         TabWidget.addTab(C1Widget,QApplication.translate("Tab","Graph",None))
