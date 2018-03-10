@@ -24,8 +24,8 @@ extradevicecolor2=black, black, black
 extradevices=84, 85, 86
 extramathexpression1=, , 
 extramathexpression2=, , 
-extraname1=Heater, BT RoR, Voltage
-extraname2=Fan, Drum, Exhaust
+extraname1={3}, BT RoR, Voltage
+extraname2={0}, {1}, Exhaust
 
 [RoastProperties]
 roastertype=Aillio Bullet R1
