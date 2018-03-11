@@ -92,11 +92,6 @@ class AillioR1:
                 pass
             self.usbhandle = None
 
-    def setstate(self, heater=None, fan=None, drum=None):
-        # Increase drum speed to 0x9
-        # self.__sendcmd__([0x32, 0x01, 0x9, 0x00])
-        pass
-
     def get_bt(self):
         self.__getstate__()
         return self.bt
@@ -108,56 +103,12 @@ class AillioR1:
     def get_heater(self):
         self.__dbg__('get_heater')
         self.__getstate__()
-        if self.heater < 100:
-            return 0
-        elif self.heater < 300:
-            return 1
-        elif self.heater < 600:
-            return 2
-        elif self.heater < 800:
-            return 3
-        elif self.heater < 1250:
-            return 4
-        elif self.heater < 1400:
-            return 5
-        elif self.heater < 1600:
-            return 6
-        elif self.heater < 1900:
-            return 7
-        elif self.heater < 2000:
-            return 8
-        else:
-            return 9
-
+        return self.heater
+    
     def get_fan(self):
         self.__dbg__('get_fan')
         self.__getstate__()
-        if self.fan == 0:
-            return 0
-        elif self.fan < 800:
-            return 1
-        elif self.fan < 1000:
-            return 2
-        elif self.fan < 1200:
-            return 3
-        elif self.fan < 1400:
-            return 4
-        elif self.fan < 1600:
-            return 5
-        elif self.fan < 1800:
-            return 6
-        elif self.fan < 1900:
-            return 7
-        elif self.fan < 2050:
-            return 8
-        elif self.fan < 2300:
-            return 9
-        elif self.fan < 3100:
-            return 10
-        elif self.fan < 3600:
-            return 11
-        else:
-            return 12
+        return self.fan
 
     def get_drum(self):
         self.__getstate__()
@@ -263,15 +214,15 @@ class AillioR1:
         self.bt_ror = round(unpack('f', state[4:8])[0], 1)
         self.dt = round(unpack('f', state[8:12])[0], 1)
         self.exitt = round(unpack('f', state[16:20])[0], 1)
+        self.minutes = state[24]
+        self.seconds = state[25]
+        self.fan = state[26]
+        self.heater = state[27]
+        self.drum = state[28]
         self.irt = round(unpack('f', state[32:36])[0], 1)
         self.pcbt = round(unpack('f', state[36:40])[0], 1)
-        self.seconds = unpack('h', state[42:44])[0]
-        self.minutes = self.seconds / 60
-        self.seconds = self.seconds % 60
-        self.fan = unpack('h', state[44:46])[0]
-        self.drum = 8
+        self.fan_rpm = unpack('h', state[44:46])[0]
         self.voltage = unpack('h', state[48:50])[0]
-        self.heater = unpack('H', state[50:52])[0]
         self.coil_fan = round(unpack('i', state[52:56])[0], 1)
 
         self.__dbg__('BT: ' + str(self.bt))
@@ -328,5 +279,5 @@ class AillioR1:
 if __name__ == "__main__":
     R1 = AillioR1(debug=True)
     while True:
-        print(R1.get_heater())
+        R1.get_heater()
         time.sleep(0.5)
