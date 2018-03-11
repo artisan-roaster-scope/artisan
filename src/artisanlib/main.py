@@ -16420,23 +16420,46 @@ class ApplicationWindow(QMainWindow):
             #extra devices load and check
             if "extratimex" in profile and len(profile["extratimex"]) > 0:
                 if "extradevices" in profile:
+#                    if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
+#                        string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
+#                        if quiet:
+#                            reply = QMessageBox.Yes
+#                        else:
+#                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
+#                        if reply == QMessageBox.Yes:
+#                            if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
+#                                aw.qmc.resetlinecountcaches()
+#                                self.qmc.extradevices = profile["extradevices"]
+#                            else:
+#                                return False
+#                        else:
+#                            return False
+
                     if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
-                        string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
+                        string = u(QApplication.translate("Message","To fully load this profile the extra device configuration needs to modified?\nModify your setup?",None))
                         if quiet:
                             reply = QMessageBox.Yes
                         else:
-#                            string = u(QApplication.translate("To fully load this profile the extra device configuration needs to modified?\nModify your setup?",None))
-#                            res = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None), string, 
-#                                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.No)
-                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
+                            print("string",string)
+                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None), string, 
+                                    QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.No)
                         if reply == QMessageBox.Yes:
                             if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
                                 aw.qmc.resetlinecountcaches()
                                 self.qmc.extradevices = profile["extradevices"]
                             else:
                                 return False
+                        elif reply == QMessageBox.No:
+                            # we remove the extra device elements that do not fit
+                            l = len(self.qmc.extradevices)
+                            for k in ["extradevices","extratimex","extratemp1","extratemp2","extraname1","extraname2",
+                                    "extramathexpression1","extramathexpression2","extradevicecolor1","extradevicecolor2",
+                                    "extramarkersizes1","extramarkersizes2","extramarkers1","extramarkers2","extralinewidths1",
+                                    "extralinewidths2","extralinestyles1","extralinestyles2","extradrawstyles1","extradrawstyles2"]:
+                                profile[k] = profile[k][:l]
                         else:
                             return False
+
                 # adjust extra serial device table
                 # a) remove superfluous extra serial settings
                 self.extraser = self.extraser[:len(self.qmc.extradevices)]
@@ -16452,12 +16475,12 @@ class ApplicationWindow(QMainWindow):
                 # c) set extra temp curves and prepare empty extra smoothed temp curves
                 if "extratimex" in profile:
                     self.qmc.extratimex = profile["extratimex"] + [profile["timex"]]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
-                if "extratemp1" in profile:
+                if "extratemp1" in profile and len(self.qmc.extratimex) > 0:
                     self.qmc.extratemp1 = profile["extratemp1"] + [[-1]*len(self.qmc.extratimex[0])]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp1 = [[]]*len(self.qmc.extratemp1)
                     self.qmc.extractemp1 = [[]]*len(self.qmc.extratemp1)
                     self.qmc.extractimex1 = [[]]*len(self.qmc.extratemp1)
-                if "extratemp2" in profile:
+                if "extratemp2" in profile and len(self.qmc.extratimex) > 0:
                     self.qmc.extratemp2 = profile["extratemp2"] + [[-1]*len(self.qmc.extratimex[0])]*(len(self.qmc.extradevices) - len(profile["extratimex"]))
                     self.qmc.extrastemp2 = [[]]*len(self.qmc.extratemp2)
                     self.qmc.extractemp2 = [[]]*len(self.qmc.extratemp2)
