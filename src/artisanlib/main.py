@@ -19730,6 +19730,8 @@ class ApplicationWindow(QMainWindow):
         while aw.qmc.flagsamplingthreadrunning:
             QApplication.processEvents()
             libtime.sleep(.1)
+        if self.ser.R1 is not None:
+            self.ser.R1 = None
         try:
             self.closeserialports()
         except Exception:
