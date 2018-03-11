@@ -20536,32 +20536,33 @@ class ApplicationWindow(QMainWindow):
                                 dlinestyle = self.qmc.BTdeltalinestyle
                             else:
                                 dlinewidth = self.qmc.BTdeltalinewidth
-                                if self.qmc.BTdeltalinestyle == "-" and self.qmc.BTlinestyle == "-":
-                                    dlinestyle = ':' # dotted
+                                dlinestyle = self.qmc.BTdeltalinestyle
+#                                if self.qmc.BTdeltalinestyle == "-" and self.qmc.BTlinestyle == "-":
+#                                    dlinestyle = ':' # dotted
                             trans = self.qmc.delta_ax.transData
                             self.l_delta, = self.qmc.ax.plot(tx, delta,transform=trans,markersize=self.qmc.BTdeltamarkersize,marker=self.qmc.BTdeltamarker,
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
                             linewidth=dlinewidth,linestyle=dlinestyle,drawstyle=self.qmc.BTdeltadrawstyle,color=cl,alpha=0.7)
                                 
                         first_profile = False
-                        
-                        # draw BT curves on top of all others
-                        for i in range(len(timex_list)):
-                            label = labels[i]
-                            timex = timex_list[i]
-                            stemp = stemp_list[i]
-                            cl = cl_list[i]
-                            self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
-                                linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
-                            handles.append(self.l_temp)
-                                                
+                               
                     except Exception as e:
 #                        import traceback
 #                        traceback.print_exc(file=sys.stdout)
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
                 
+            # draw BT curves on top of all others
+            for i in range(len(timex_list)):
+                label = labels[i]
+                timex = timex_list[i]
+                stemp = stemp_list[i]
+                cl = cl_list[i]
+                self.l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
+                    sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+aw.qmc.patheffects,foreground=self.qmc.palette["background"])],
+                    linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
+                handles.append(self.l_temp)
+                    
             tmpdir = u(QDir.tempPath() + "/")
             graph_image = ""
             graph_image_pct = ''
@@ -21887,7 +21888,7 @@ class ApplicationWindow(QMainWindow):
         QApplication.processEvents()
 
     def helpAbout(self):
-        coredevelopers = "<br>Rafael Cobo, Marko Luther &amp; Dave Baxter"
+        coredevelopers = "<br>Rafael Cobo, Marko Luther, Dave Baxter &amp; Rui Paulo"
         contributors = u("<br>") + uchr(199) + u("etin Barut, Marcio Carnerio, Bradley Collins, ")
         contributors += u("Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall, ")
         contributors += u("Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo, ")
