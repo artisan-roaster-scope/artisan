@@ -12974,7 +12974,6 @@ class ApplicationWindow(QMainWindow):
             r = ((numpy.digitize([v],ls)[0] - 1) * 10. + aw.eventslidermin[i]) / 10.
         else:
             r = (numpy.digitize([v],ls)[0]+aw.eventslidermin[i] - 1) / 10.
-            
         return max(aw.eventslidermin[i]/10., min(aw.eventslidermax[i] / 10.,r))
         
     
@@ -16426,6 +16425,9 @@ class ApplicationWindow(QMainWindow):
                         if quiet:
                             reply = QMessageBox.Yes
                         else:
+#                            string = u(QApplication.translate("To fully load this profile the extra device configuration needs to modified?\nModify your setup?",None))
+#                            res = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None), string, 
+#                                QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.No)
                             reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
                         if reply == QMessageBox.Yes:
                             if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
@@ -16842,7 +16844,7 @@ class ApplicationWindow(QMainWindow):
             # reset linecount caches
             aw.qmc.resetlinecountcaches()
             # try to reload background profile
-            if (not quiet) and "backgroundpath" in profile:
+            if (not quiet) and "backgroundpath" in profile and d(profile["backgroundpath"]) != "":
                 self.qmc.backgroundpath = d(profile["backgroundpath"])
                 if os.path.isfile(self.qmc.backgroundpath):
                     aw.loadbackground(u(self.qmc.backgroundpath))
@@ -29815,15 +29817,19 @@ class EventsDlg(ArtisanDialog):
         self.E1slider_coarse = QCheckBox()
         self.E1slider_coarse.setFocusPolicy(Qt.NoFocus)
         self.E1slider_coarse.setChecked(bool(aw.eventslidercoarse[0]))
+        self.E1slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None))        
         self.E2slider_coarse = QCheckBox()
         self.E2slider_coarse.setFocusPolicy(Qt.NoFocus)
         self.E2slider_coarse.setChecked(bool(aw.eventslidercoarse[1]))
+        self.E2slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None)) 
         self.E3slider_coarse = QCheckBox()
         self.E3slider_coarse.setFocusPolicy(Qt.NoFocus)
         self.E3slider_coarse.setChecked(bool(aw.eventslidercoarse[2]))
+        self.E3slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None)) 
         self.E4slider_coarse = QCheckBox()
         self.E4slider_coarse.setFocusPolicy(Qt.NoFocus)
         self.E4slider_coarse.setChecked(bool(aw.eventslidercoarse[3]))
+        self.E4slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None)) 
         helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         helpsliderbutton.clicked.connect(lambda _:self.showSliderHelp())
@@ -32083,16 +32089,16 @@ class backgroundDlg(ArtisanDialog):
 #        xtcurvelabel = QLabel(QApplication.translate("Label", "Extra",None))
 #        xtcurvelabel.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
 #        xtcurvelabel.setAlignment(Qt.AlignRight)
-#        self.xtcurveComboBox = QComboBox()
-#        self.xtcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
-#        curvenames = [""] # first entry is the empty one, no extra curve displayed
-#        for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
-#            curvenames.append("B" + str(2*i+3) + ": " + aw.qmc.extraname1B[i])
-#            curvenames.append("B" + str(2*i+4) + ": " + aw.qmc.extraname2B[i])       
-#        self.xtcurveComboBox.addItems(curvenames)
-#        if aw.qmc.xtcurveidx < len(curvenames):
-#            self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
-#        self.xtcurveComboBox.currentIndexChanged.connect(lambda i=self.xtcurveComboBox.currentIndex() :self.changeXTcurveidx(i))
+        self.xtcurveComboBox = QComboBox()
+        self.xtcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
+        curvenames = [""] # first entry is the empty one, no extra curve displayed
+        for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
+            curvenames.append("B" + str(2*i+3) + ": " + aw.qmc.extraname1B[i])
+            curvenames.append("B" + str(2*i+4) + ": " + aw.qmc.extraname2B[i])       
+        self.xtcurveComboBox.addItems(curvenames)
+        if aw.qmc.xtcurveidx < len(curvenames):
+            self.xtcurveComboBox.setCurrentIndex(aw.qmc.xtcurveidx)
+        self.xtcurveComboBox.currentIndexChanged.connect(lambda i=self.xtcurveComboBox.currentIndex() :self.changeXTcurveidx(i))
 #        deltaetcolorlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET Color",None))
 #        deltaetcolorlabel.setAlignment(Qt.AlignRight)
 #        self.deltaetcolorComboBox = QComboBox()
@@ -32230,6 +32236,7 @@ class backgroundDlg(ArtisanDialog):
         layoutBoxed.addLayout(layoutBoxedH)
         layoutBoxed.addStretch()
         alignButtonBoxed = QHBoxLayout()
+        alignButtonBoxed.addWidget(self.xtcurveComboBox)
         alignButtonBoxed.addStretch()
         alignButtonBoxed.addWidget(alignButton)
         alignButtonBoxed.addWidget(self.alignComboBox)
