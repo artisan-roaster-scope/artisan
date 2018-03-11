@@ -140,15 +140,15 @@ class AillioR1:
             return 2
         elif self.fan < 1200:
             return 3
-        elif self.fan < 1450:
+        elif self.fan < 1400:
             return 4
-        elif self.fan < 1650:
+        elif self.fan < 1600:
             return 5
         elif self.fan < 1800:
             return 6
-        elif self.fan < 2000:
+        elif self.fan < 1900:
             return 7
-        elif self.fan < 2100:
+        elif self.fan < 2050:
             return 8
         elif self.fan < 2300:
             return 9
@@ -327,10 +327,6 @@ class AillioR1:
 
 if __name__ == "__main__":
     R1 = AillioR1(debug=True)
-    R1.set_heater(0)
-    R1.set_fan(0)
-    R1.set_drum(5)
-    while False:
-        R1.set_heater(9)
-        R1.get_bt()
-        time.sleep(1)
+    while True:
+        print(R1.get_fan())
+        time.sleep(0.5)
