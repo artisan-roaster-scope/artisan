@@ -263,8 +263,8 @@ class AillioR1:
         self.bt_ror = round(unpack('f', state[4:8])[0], 1)
         self.dt = round(unpack('f', state[8:12])[0], 1)
         self.exitt = round(unpack('f', state[16:20])[0], 1)
-        self.pcbt = round(unpack('f', state[32:36])[0], 1)
-        self.irt = round(unpack('f', state[36:40])[0], 1)
+        self.irt = round(unpack('f', state[32:36])[0], 1)
+        self.pcbt = round(unpack('f', state[36:40])[0], 1)
         self.seconds = unpack('h', state[42:44])[0]
         self.minutes = self.seconds / 60
         self.seconds = self.seconds % 60
@@ -328,5 +328,5 @@ class AillioR1:
 if __name__ == "__main__":
     R1 = AillioR1(debug=True)
     while True:
-        print(R1.get_fan())
+        print(R1.get_heater())
         time.sleep(0.5)
