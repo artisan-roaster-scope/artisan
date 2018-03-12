@@ -5363,12 +5363,14 @@ class tgraphcanvas(FigureCanvas):
                             handles.append(self.extratemp1lines[xtmpl1idx])
                             xtmpl1idx = xtmpl1idx + 1
                             l1 = extraname1_subst[i]
-                            labels.append(aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                            if not l1.startswith("_"):
+                                labels.append(aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
                         if aw.extraCurveVisibility2[i]:
                             handles.append(self.extratemp2lines[xtmpl2idx])
                             xtmpl2idx = xtmpl2idx + 1
                             l2 = extraname2_subst[i]
-                            labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                            if not l2.startswith("_"):
+                                labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
     
                 if self.eventsshowflag and self.eventsGraphflag in [2,3,4] and Nevents:
                     if E1_nonempty and aw.qmc.showEtypes[0]:
@@ -36215,7 +36217,7 @@ class serialport(object):
                         if aw.qmc.phidgetRemoteOnlyFlag:
                             libtime.sleep(.5)
                         else:
-                            libtime.sleep(.3)                        
+                            libtime.sleep(.3)
                     except Exception as ex:
                         #_, _, exc_tb = sys.exc_info()
                         #aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " PHIDGET1048temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -36352,7 +36354,7 @@ class serialport(object):
             v = self.bridgeValue2Temperature(i,bv)
             if aw.qmc.mode == "F" and aw.qmc.phidget1046_formula[i] != 2:
                 v = aw.qmc.fromCtoF(v)
-        except Exception:
+        except Exception as e:
             v = -1
         return v
                         
@@ -36418,19 +36420,21 @@ class serialport(object):
                     ser,port = self.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,2)
                 if ser:
                     self.PhidgetBridgeSensor = [VoltageRatioInput(),VoltageRatioInput()]
+                
                     try:
                         for i in [0,1]:
-                            self.PhidgetBridgeSensor[i].setOnAttachHandler(lambda _:self.phidget1046attached(i))
-                            self.PhidgetBridgeSensor[i].setOnDetachHandler(lambda _:self.phidget1046detached(i))
                             if aw.qmc.phidgetRemoteFlag:
                                 self.addPhidgetServer()
                             if port is not None:
                                 self.PhidgetBridgeSensor[i].setHubPort(port)
                             self.PhidgetBridgeSensor[i].setDeviceSerialNumber(ser)
-                            self.PhidgetBridgeSensor[i].setChannel(mode*2)
+                            self.PhidgetBridgeSensor[i].setChannel(mode*2+i)
                             if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetBridgeSensor[i].setIsRemote(True)
                                 self.PhidgetBridgeSensor[i].setIsLocal(False)
+                            self.PhidgetBridgeSensor[i].setOnAttachHandler(lambda _,x=i:self.phidget1046attached(x))
+                            self.PhidgetBridgeSensor[i].setOnDetachHandler(lambda _,x=i:self.phidget1046detached(x))
+                            libtime.sleep(.1)
                             try:
                                 self.PhidgetBridgeSensor[i].open() #.openWaitForAttachment(timeout)
                             except:
@@ -48822,7 +48826,8 @@ def main():
         QApplication.setLayoutDirection(Qt.LeftToRight)
 
 
-    aw.settingsLoad()    
+    aw.settingsLoad()
+    
     
     # swap BT/ET lcds on startup
     if aw.qmc.swaplcds:
