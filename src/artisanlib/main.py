@@ -14108,14 +14108,11 @@ class ApplicationWindow(QMainWindow):
                                     pass
 
                 elif action == 16:
-                    if cmd:
-                        self.ser.R1.set_heater(cmd)
+                    self.ser.R1.set_heater(cmd)
                 elif action == 17:
-                    if cmd:
-                        self.ser.R1.set_fan(cmd)
+                    self.ser.R1.set_fan(cmd)
                 elif action == 18:
-                    if cmd:
-                        self.ser.R1.set_drum(cmd)
+                    self.ser.R1.set_drum(cmd)
                 elif action == 19:
                     if cmd_str == "PRS":
                         self.ser.R1.prs()

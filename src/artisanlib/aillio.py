@@ -194,18 +194,20 @@ class AillioR1:
 
     def __updatestate__(self, p):
         while True:
-            self.__dbg__('updatestate')
-            self.__sendcmd__(self.AILLIO_CMD_STATUS1)
-            state1 = self.__readreply__(64)
-            self.__sendcmd__(self.AILLIO_CMD_STATUS2)
-            state2 = self.__readreply__(64)
+            try:
+                self.__dbg__('updatestate')
+                self.__sendcmd__(self.AILLIO_CMD_STATUS1)
+                state1 = self.__readreply__(64)
+                self.__sendcmd__(self.AILLIO_CMD_STATUS2)
+                state2 = self.__readreply__(64)
+            except:
+                pass
             if p.poll():
                 cmd = p.recv()
                 self.__sendcmd__(cmd)
             if len(state1) + len(state2) == 128:
                 p.send(state1 + state2)
             time.sleep(0.1)
-        pipe.close()
 
         
     def __getstate__(self):
