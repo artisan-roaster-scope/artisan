@@ -450,22 +450,22 @@ else:
     def s2a(s):
         return s.encode('ascii','ignore').decode("ascii")   
 
-#def convert_to_bcd(decimal):
-#    ''' Converts a decimal value to a bcd value
-#
-#    :param value: The decimal value to to pack into bcd
-#    :returns: The number in bcd form
-#    '''
-#    place, bcd = 0, 0
-#    while decimal > 0:
-#        nibble = decimal % 10
-#        bcd += nibble << place
-#        if sys.version < '3':
-#            decimal = decimal / 10
-#        else:
-#            decimal = decimal // 10
-#        place += 4
-#    return bcd
+def convert_to_bcd(decimal):
+    ''' Converts a decimal value to a bcd value
+
+    :param value: The decimal value to to pack into bcd
+    :returns: The number in bcd form
+    '''
+    place, bcd = 0, 0
+    while decimal > 0:
+        nibble = decimal % 10
+        bcd += nibble << place
+        if sys.version < '3':
+            decimal = decimal / 10
+        else:
+            decimal = decimal // 10
+        place += 4
+    return bcd
 
 
 def convert_from_bcd(bcd):
@@ -13836,23 +13836,44 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.08
                                 except Exception:
                                     pass
+                            elif cs.startswith("writeBCD"):
+                                try:
+                                    cmds = eval(cs[len('writeBCD'):])
+                                    if isinstance(cmds,tuple):
+                                        if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                            # cmd has format "writeBCD(s,r,v)"
+                                            aw.modbus.writeBCD(*cmds)
+                                            followupCmd = 0.08
+                                        else:
+                                        # cmd has format "writeBCD([s,r,v],..,[s,r,v])"
+                                            for cmd in cmds:
+                                                if followupCmd:
+                                                    libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
+                                                aw.modbus.writeBCD(*cmd)
+                                                followupCmd = 0.08
+                                    else:
+                                        # cmd has format "writeBCD([s,r,v])"
+                                        aw.modbus.writeBCD(*cmds)
+                                        followupCmd = 0.08
+                                except Exception:
+                                    pass                            
                             elif cs.startswith('write'):
                                 try:
                                     cmds = eval(cs[len('write'):])
                                     if isinstance(cmds,tuple):
                                         if len(cmds) == 3 and not isinstance(cmds[0],list):
-                                            # cmd has format "mwrite(s,r,v)"
+                                            # cmd has format "write(s,r,v)"
                                             aw.modbus.writeRegister(*cmds)
                                             followupCmd = 0.08
                                         else:
-                                        # cmd has format "mwrite([s,r,v],..,[s,r,v])"
+                                        # cmd has format "write([s,r,v],..,[s,r,v])"
                                             for cmd in cmds:
                                                 if followupCmd:
                                                     libtime.sleep(followupCmd) # respect the MODBUS timing (a MODBUS command might have preceeded)
                                                 aw.modbus.writeRegister(*cmd)
                                                 followupCmd = 0.08
                                     else:
-                                        # cmd has format "mwrite([s,r,v])"
+                                        # cmd has format "write([s,r,v])"
                                         aw.modbus.writeRegister(*cmds)
                                         followupCmd = 0.08
                                 except Exception:
@@ -30466,6 +30487,7 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<li><b>wcoils</b>(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])<br>write coils: <i>MODBUS function 15</i>",None))
         string += u(QApplication.translate("Message", "<li><b>mwrite</b>(slaveId,register,andMask,orMask)<br>mask write register: <i>MODBUS function 22</i>",None))
         string += u(QApplication.translate("Message", "<li><b>writem</b>(slaveId,register,value) or <b>writem</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write registers: <i>MODBUS function 16</i>",None))
+        string += u(QApplication.translate("Message", "<li><b>writeBCD</b>(slaveId,register,value) or <b>writeBCD</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write BCD encoded int register: <i>MODBUS function 16 (BCD)</i>",None))
         string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given id",None))
         string += u(QApplication.translate("Message", "<li>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None)) + "</ul>"
         string += u(QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None)) + "<br>"
@@ -33549,6 +33571,26 @@ class modbusport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
 
+    # translates given int value int a 16bit BCD and writes it into one register
+    def writeBCD(self,slave,register,value):
+        try:
+            #### lock shared resources #####
+            self.COMsemaphore.acquire(1)
+            self.connect()
+            builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
+            r = convert_to_bcd(int(value))
+            builder.add_16bit_uint(r)
+            payload = builder.build() # .tolist()
+            self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
+            libtime.sleep(.03)
+        except Exception as ex:
+            self.disconnect()
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+                
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     def readFloat(self,slave,register,code=3):
         try:
@@ -33607,7 +33649,7 @@ class modbusport(object):
                 else:
                     break
             decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)            
-            r = decoder.decode_16bit_int()
+            r = decoder.decode_16bit_uint()
             return convert_from_bcd(r)
         except Exception as ex:
 #            import traceback
