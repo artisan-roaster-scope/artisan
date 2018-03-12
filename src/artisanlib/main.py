@@ -42440,7 +42440,7 @@ class graphColorDlg(ArtisanDialog):
             elif title == "DeltaBT":
                 aw.qmc.backgrounddeltabtcolor = color
             elif title == "Extra":
-                aw.qmc.backgroundextracolor = color
+                aw.qmc.backgroundxtcolor = color
             aw.sendmessage(QApplication.translate("Message","Color of {0} set to {1}", None).format(title,str(color)))
 
     def setcolor(self,palette,disj_palette,select):
