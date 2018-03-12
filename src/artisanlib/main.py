@@ -3046,21 +3046,24 @@ class tgraphcanvas(FigureCanvas):
             if len(self.timex):
                 #find time or temp distances
                 slider_events = {} # keep event type value pairs to move sliders (but only once per slider and per interval!)
+                next_byTemp_checked = False # we take care to reply events by temperature in order!
                 for i in range(len(self.backgroundEvents)):
                     if i not in aw.qmc.replayedBackgroundEvents: # never replay one event twice
                         timed = self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.
                         if aw.qmc.replayType == 0: # replay by time
                             delta = timed
-                        elif aw.qmc.replayType == 1: # replay by BT (after TP)
+                        elif not next_byTemp_checked and aw.qmc.replayType == 1: # replay by BT (after TP)
                             if aw.qmc.TPalarmtimeindex:
                                 delta = self.stemp2B[self.backgroundEvents[i]] - self.ctemp2[-1]
                             else: # before TP we switch back to time-based
                                 delta = timed
-                        elif aw.qmc.replayType == 2: # replay by ET (after TP)
+                            next_byTemp_checked = True
+                        elif not next_byTemp_checked and aw.qmc.replayType == 2: # replay by ET (after TP)
                             if aw.qmc.TPalarmtimeindex:
                                 delta = self.stemp1B[self.backgroundEvents[i]] - self.ctemp1[-1]
                             else: # before TP we switch back to time-based
                                 delta = timed
+                            next_byTemp_checked = True
                         else:
                             delta = 1 # don't trigger this one
                         if reproducing is None and aw.qmc.backgroundReproduce and timed > 0 and timed < self.detectBackgroundEventTime:
@@ -3116,13 +3119,12 @@ class tgraphcanvas(FigureCanvas):
                             if aw.qmc.backgroundPlaybackEvents and self.backgroundEtypes[i] < 4 and \
                                 (u(self.etypesf(self.backgroundEtypes[i]) == u(self.Betypesf(self.backgroundEtypes[i])))) and \
                                 aw.eventslidervisibilities[self.backgroundEtypes[i]]: #  and aw.eventslideractions[self.backgroundEtypes[i]]
-                                
                                 aw.qmc.replayedBackgroundEvents.append(i)
                                 slider_events[self.backgroundEtypes[i]] = self.eventsInternal2ExternalValue(self.backgroundEvalues[i]) # add to dict (later overwrite earlier slider moves!)
                                 # we move sliders only after processing all pending events (from the collected dict)
                                 #aw.moveslider(self.backgroundEtypes[i],self.eventsInternal2ExternalValue(self.backgroundEvalues[i])) # move slider and update slider LCD
-                                #aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event     
-                                      
+                                #aw.sliderReleased(self.backgroundEtypes[i],force=True) # record event 
+
                 # now move the sliders to the new values (if any)     
                 for k in slider_events.keys():
                     aw.moveslider(k,slider_events[k])
@@ -16437,7 +16439,6 @@ class ApplicationWindow(QMainWindow):
                         if quiet:
                             reply = QMessageBox.Yes
                         else:
-                            print("string",string)
                             reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None), string, 
                                     QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.No)
                         if reply == QMessageBox.Yes:
