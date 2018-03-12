@@ -48828,7 +48828,7 @@ def main():
 
     aw.settingsLoad()
     
-    
+
     # swap BT/ET lcds on startup
     if aw.qmc.swaplcds:
         tmp = QWidget()

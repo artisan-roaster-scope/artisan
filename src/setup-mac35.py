@@ -206,6 +206,9 @@ os.system(r'cp /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/s
 # copy snap7 dylib
 os.system(r'cp /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
 
+# copy brew installed libusb (note the slight name change of the dylib!)
+os.system(r'cp /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib')
+
 # for Qt5
 print('*** Removing unused Qt frameworks ***')
 for fw in [
