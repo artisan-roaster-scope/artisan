@@ -31,7 +31,7 @@ class AillioR1:
 
     def __init__(self, debug=True):
         self.AILLIO_DEBUG = debug
-        self.__dbg__('init')
+        self.__dbg('init')
         self.usbhandle = None
         self.bt = 0
         self.dt = 0
@@ -46,20 +46,20 @@ class AillioR1:
         self.worker_thread_run = True
 
     def __del__(self):
-        self.__close__()
+        self.__close()
 
-    def __dbg__(self, msg):
+    def __dbg(self, msg):
         if self.AILLIO_DEBUG:
             print('AillioR1: ' + msg)
 
-    def __open__(self):
+    def __open(self):
         if self.usbhandle is not None:
             return
         self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
                                        idProduct=self.AILLIO_PID)
         if self.usbhandle is None:
             raise IOError("not found or no permission")
-        self.__dbg__('device found!')
+        self.__dbg('device found!')
         if self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
             try:
                 self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
@@ -77,22 +77,22 @@ class AillioR1:
         except:
             self.usbhandle = None
             raise IOError("unable to claim interface")
-        self.__sendcmd__(self.AILLIO_CMD_INFO1)
-        reply = self.__readreply__(32)
+        self.__sendcmd(self.AILLIO_CMD_INFO1)
+        reply = self.__readreply(32)
         sn = unpack('h', reply[0:2])[0]
         firmware = unpack('h', reply[24:26])[0]
-        self.__dbg__('serial number: ' + str(sn))
-        self.__dbg__('firmware version: ' + str(firmware))
-        self.__sendcmd__(self.AILLIO_CMD_INFO2)
-        reply = self.__readreply__(36)
+        self.__dbg('serial number: ' + str(sn))
+        self.__dbg('firmware version: ' + str(firmware))
+        self.__sendcmd(self.AILLIO_CMD_INFO2)
+        reply = self.__readreply(36)
         roast_number = unpack('>I', reply[27:31])[0]
-        self.__dbg__('number of roasts: ' + str(roast_number))
+        self.__dbg('number of roasts: ' + str(roast_number))
         self.parent_pipe, self.child_pipe = Pipe()
-        self.worker_thread = threading.Thread(target=self.__updatestate__,
+        self.worker_thread = threading.Thread(target=self.__updatestate,
                                               args=(self.child_pipe,))
         self.worker_thread.start()
         
-    def __close__(self):
+    def __close(self):
         if self.usbhandle is not None:
             try:
                 usb.util.release_interface(self.usbhandle,
@@ -110,45 +110,45 @@ class AillioR1:
             self.worker_thread = None
 
     def get_bt(self):
-        self.__getstate__()
+        self.__getstate()
         return self.bt
 
     def get_dt(self):
-        self.__getstate__()
+        self.__getstate()
         return self.dt
 
     def get_heater(self):
-        self.__dbg__('get_heater')
-        self.__getstate__()
+        self.__dbg('get_heater')
+        self.__getstate()
         return self.heater
     
     def get_fan(self):
-        self.__dbg__('get_fan')
-        self.__getstate__()
+        self.__dbg('get_fan')
+        self.__getstate()
         return self.fan
 
     def get_drum(self):
-        self.__getstate__()
+        self.__getstate()
         return self.drum
     
     def get_voltage(self):
-        self.__getstate__()
+        self.__getstate()
         return self.voltage
 
     def get_bt_ror(self):
-        self.__getstate__()
+        self.__getstate()
         return self.bt_ror
 
     def get_exit_temperature(self):
-        self.__getstate__()
+        self.__getstate()
         return self.exitt
 
     def get_state_string(self):
-        self.__getstate__()
+        self.__getstate()
         return self.state_str
 
     def set_heater(self, value):
-        self.__dbg__('set_heater ' + str(value))
+        self.__dbg('set_heater ' + str(value))
         value = int(value)
         if value < 0:
             value = 0
@@ -168,7 +168,7 @@ class AillioR1:
                 self.parent_pipe.send(self.AILLIO_CMD_HEATER_INCR)
 
     def set_fan(self, value):
-        self.__dbg__('set_fan ' + str(value))
+        self.__dbg('set_fan ' + str(value))
         value = int(value)
         if value < 1:
             value = 1
@@ -189,7 +189,7 @@ class AillioR1:
  
 
     def set_drum(self, value):
-        self.__dbg__('set_drum ' + str(value))
+        self.__dbg('set_drum ' + str(value))
         if value < 1:
             value = 1
         elif value > 9:
@@ -197,31 +197,31 @@ class AillioR1:
         self.parent_pipe.send([0x32, 0x01, value, 0x00])
 
     def prs(self):
-        self.__dbg__('PRS')
+        self.__dbg('PRS')
         self.parent_pipe.send(self.AILLIO_CMD_PRS)
 
-    def __updatestate__(self, p):
+    def __updatestate(self, p):
         while self.worker_thread_run:
             state1 = state2 = []
             try:
-                self.__dbg__('updatestate')
-                self.__sendcmd__(self.AILLIO_CMD_STATUS1)
-                state1 = self.__readreply__(64)
-                self.__sendcmd__(self.AILLIO_CMD_STATUS2)
-                state2 = self.__readreply__(64)
+                self.__dbg('updatestate')
+                self.__sendcmd(self.AILLIO_CMD_STATUS1)
+                state1 = self.__readreply(64)
+                self.__sendcmd(self.AILLIO_CMD_STATUS2)
+                state2 = self.__readreply(64)
             except:
                 pass
             if p.poll():
                 cmd = p.recv()
-                self.__sendcmd__(cmd)
+                self.__sendcmd(cmd)
             if len(state1) + len(state2) == 128:
                 p.send(state1 + state2)
             time.sleep(0.1)
 
         
-    def __getstate__(self):
-        self.__dbg__('getstate')
-        self.__open__()
+    def __getstate(self):
+        self.__dbg('getstate')
+        self.__open()
         if not self.parent_pipe.poll():
             return
         state = self.parent_pipe.recv()
@@ -244,24 +244,24 @@ class AillioR1:
             self.fan_rpm = unpack('h', state[44:46])[0]
             self.voltage = unpack('h', state[48:50])[0]
             self.coil_fan = round(unpack('i', state[52:56])[0], 1)
-            self.__dbg__('BT: ' + str(self.bt))
-            self.__dbg__('BT RoR: ' + str(self.bt_ror))
-            self.__dbg__('DT: ' + str(self.dt))
-            self.__dbg__('exit temperature ' + str(self.exitt))
-            self.__dbg__('PCB temperature: ' + str(self.irt))
-            self.__dbg__('IR temperature: ' + str(self.pcbt))
-            self.__dbg__('voltage: ' + str(self.voltage))
-            self.__dbg__('coil fan: ' + str(self.coil_fan))
-            self.__dbg__('fan: ' + str(self.fan))
-            self.__dbg__('heater: ' + str(self.heater))
-            self.__dbg__('drum speed: ' + str(self.drum))
-            self.__dbg__('time: ' + str(self.minutes) + ':' + str(self.seconds))
+            self.__dbg('BT: ' + str(self.bt))
+            self.__dbg('BT RoR: ' + str(self.bt_ror))
+            self.__dbg('DT: ' + str(self.dt))
+            self.__dbg('exit temperature ' + str(self.exitt))
+            self.__dbg('PCB temperature: ' + str(self.irt))
+            self.__dbg('IR temperature: ' + str(self.pcbt))
+            self.__dbg('voltage: ' + str(self.voltage))
+            self.__dbg('coil fan: ' + str(self.coil_fan))
+            self.__dbg('fan: ' + str(self.fan))
+            self.__dbg('heater: ' + str(self.heater))
+            self.__dbg('drum speed: ' + str(self.drum))
+            self.__dbg('time: ' + str(self.minutes) + ':' + str(self.seconds))
 
         state = state[64:]
         self.coil_fan2 = round(unpack('i', state[32:36])[0], 1)
         self.pht = unpack('B', state[40:41])[0]
         self.r1state = unpack('B', state[42:43])[0]
-        self.__dbg__('pre-heat temperature: ' + str(self.pht))
+        self.__dbg('pre-heat temperature: ' + str(self.pht))
         if self.r1state == self.AILLIO_STATE_OFF:
             self.state_str = "off"
         elif self.r1state == self.AILLIO_STATE_PH:
@@ -272,15 +272,15 @@ class AillioR1:
             self.state_str = "roasting"
         elif self.r1state == self.AILLIO_STATE_COOLING:
             self.state_str = "cooling"
-        self.__dbg__('state: ' + self.state_str)
-        self.__dbg__('second coil fan: ' + str(self.coil_fan2))
+        self.__dbg('state: ' + self.state_str)
+        self.__dbg('second coil fan: ' + str(self.coil_fan2))
 
 
-    def __sendcmd__(self, cmd):
-        self.__dbg__('sending command: ' + str(cmd))
+    def __sendcmd(self, cmd):
+        self.__dbg('sending command: ' + str(cmd))
         self.usbhandle.write(self.AILLIO_ENDPOINT_WR, cmd)
 
-    def __readreply__(self, length):
+    def __readreply(self, length):
         return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length)
 
 
