@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import usb.core
 import usb.util
 import time
 from struct import pack, unpack
-from multiprocessing import Process, Pipe
+from multiprocessing import Pipe
+import threading
 
 class AillioR1:
     AILLIO_VID = 0x0483
@@ -41,7 +42,8 @@ class AillioR1:
         self.voltage = 0
         self.exitt = 0
         self.state_str = ""
-        self.p = None
+        self.worker_thread = None
+        self.worker_thread_run = True
 
     def __del__(self):
         self.__close__()
@@ -62,15 +64,18 @@ class AillioR1:
             try:
                 self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
             except:
+                self.usbhandle = None
                 raise IOError("unable to detach kernel driver")
         try:
             self.usbhandle.set_configuration(configuration=1)
         except:
+            self.usbhandle = None
             raise IOError("unable to configure")
 
         try:
             usb.util.claim_interface(self.usbhandle, self.AILLIO_INTERFACE)
         except:
+            self.usbhandle = None
             raise IOError("unable to claim interface")
         self.__sendcmd__(self.AILLIO_CMD_INFO1)
         reply = self.__readreply__(32)
@@ -83,8 +88,9 @@ class AillioR1:
         roast_number = unpack('>I', reply[27:31])[0]
         self.__dbg__('number of roasts: ' + str(roast_number))
         self.parent_pipe, self.child_pipe = Pipe()
-        self.p = Process(target=self.__updatestate__, args=(self.child_pipe,))
-        self.p.start()
+        self.worker_thread = threading.Thread(target=self.__updatestate__,
+                                              args=(self.child_pipe,))
+        self.worker_thread.start()
         
     def __close__(self):
         if self.usbhandle is not None:
@@ -96,10 +102,12 @@ class AillioR1:
                 pass
             self.usbhandle = None
 
-        if self.p:
-            self.p.terminate()
+        if self.worker_thread:
+            self.worker_thread_run = False
+            self.worker_thread.join()
             self.parent_pipe.close()
             self.child_pipe.close()
+            self.worker_thread = None
 
     def get_bt(self):
         self.__getstate__()
@@ -193,7 +201,8 @@ class AillioR1:
         self.parent_pipe.send(self.AILLIO_CMD_PRS)
 
     def __updatestate__(self, p):
-        while True:
+        while self.worker_thread_run:
+            state1 = state2 = []
             try:
                 self.__dbg__('updatestate')
                 self.__sendcmd__(self.AILLIO_CMD_STATUS1)
@@ -211,8 +220,8 @@ class AillioR1:
 
         
     def __getstate__(self):
-        self.__open__()
         self.__dbg__('getstate')
+        self.__open__()
         if not self.parent_pipe.poll():
             return
         state = self.parent_pipe.recv()
