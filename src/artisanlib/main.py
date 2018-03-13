@@ -12304,29 +12304,81 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel2[i].setText(l2)
         aw.settooltip()
 
+#    def populateListMenu(self,resourceName,ext,triggered,menu,addMenu = True):
+#        one_added = False
+#        for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),resourceName)):
+#            dirs.sort()
+#            files.sort()
+#            for fl in files:
+#                if fl.endswith(ext): 
+#                    d = os.path.split(root)
+#                    p = os.path.join(root,fl)
+#                    f = fl.replace(ext,"").replace("_"," ")
+#                    if len(d) > 0:
+#                        a = QAction(self, visible=True,
+#                            triggered=triggered)
+#                        a.setData(p)
+#                        if d[-1] == resourceName:
+#                            a.setText(u(f)) # + u("...")
+#                        else:
+#                            a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
+#                        menu.addAction(a)
+#                        one_added = True
+#        if one_added and addMenu:
+#            self.ConfMenu.addMenu(menu)
+
+
     def populateListMenu(self,resourceName,ext,triggered,menu,addMenu = True):
         one_added = False
+        res = {}
         for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),resourceName)):
             dirs.sort()
             files.sort()
             for fl in files:
                 if fl.endswith(ext): 
-                    d = os.path.split(root)
+                    d = os.path.split(root)[-1]
                     p = os.path.join(root,fl)
                     f = fl.replace(ext,"").replace("_"," ")
                     if len(d) > 0:
-                        a = QAction(self, visible=True,
-                            triggered=triggered)
-                        a.setData(p)
-                        if d[-1] == resourceName:
-                            a.setText(u(f)) # + u("...")
+                        if not d in res:
+                            res[d] = []
+                        res[d].append((f,p))
+        keys = list(res.keys())
+        keys.sort()
+        for k in keys:
+            if len(res[k]) > 1:
+                if len(keys) == 1:
+                    for e in res[k]:
+                        a = QAction(self, visible=True, triggered=triggered)
+                        a.setData(e[1])
+                        if k == resourceName:
+                            a.setText(u(e[0])) # + u("...")
                         else:
-                            a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
-                        menu.addAction(a)
+                            a.setText(u(k) + u(" ") + u(e[0])) # + u("...")
+                            menu.addAction(a)
+                    one_added = True
+                else:
+                    submenu = menu.addMenu(k)
+                    for e in res[k]:
+                        a = QAction(self, visible=True, triggered=triggered)
+                        a.setData(e[1])
+                        a.setText(u(e[0]))
+                        submenu.addAction(a)
                         one_added = True
+            else:
+                entry = res[k][0]
+                a = QAction(self, visible=True, triggered=triggered)
+                a.setData(entry[1])
+                if k == resourceName:
+                    a.setText(u(entry[0])) # + u("...")
+                else:
+                    a.setText(u(k) + u(" ") + u(entry[0])) # + u("...")
+                    menu.addAction(a)
+                one_added = True
         if one_added and addMenu:
             self.ConfMenu.addMenu(menu)
             
+                        
     def populateMachineMenu(self):
         self.populateListMenu("Machines",".aset",self.openMachineSettings,self.machineMenu)
         
