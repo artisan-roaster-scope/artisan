@@ -5438,7 +5438,7 @@ class tgraphcanvas(FigureCanvas):
                     frame = leg.get_frame()
                     frame.set_facecolor(self.palette["legendbg"])
                     #frame.set_linewidth(0)
-                    #frame.set_edgecolor('darkgrey')
+                    frame.set_edgecolor(self.palette["legendborder"])
                     frame.set_linewidth(0.5)
                     for line,text in zip(leg.get_lines(), leg.get_texts()):
                         text.set_color(line.get_color())
