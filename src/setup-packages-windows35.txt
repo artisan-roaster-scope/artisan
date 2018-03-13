@@ -36,10 +36,13 @@ o pip-review: 1.0
 o snap7 1.4.2
 o python snap7 0.9
 o colorspacious 1.1.0
+o pyusb 1.0.2
 
 
 Upgrade History:
 
+- 2018-03-12
+ . pyusb 1.0.2
 - 2018-02-25
  . python snap7 0.9
  . colorspacious 1.1.0
@@ -202,6 +205,10 @@ put in the directory above the Artisan source code
 25) colorspacious
 
 # pip3 install colorspacious
+
+26) pyusb
+
+# pip3 install pyusb
 
 ----
 
