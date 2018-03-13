@@ -12413,7 +12413,7 @@ class ApplicationWindow(QMainWindow):
                         try:
                             pos = items.index(port_name)
                             if aw.qmc.device == 29: # MODBUS serial
-                                aw.modbus.port = ports[pos][0]
+                                aw.modbus.comport = ports[pos][0]
                             else: # HOTTOP
                                 aw.ser.comport = ports[pos][0]
                         except:

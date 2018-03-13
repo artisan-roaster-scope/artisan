@@ -24,7 +24,7 @@ buttonactions=0, 0, 0, 0, 0, 0, 0, 0
 buttonactionstrings="write(1,12318,1)", , , , , , "write(1,12290,3000);write(1,12318,4)", 
 buttonvisibility=true, true, true, true, false, false, true, true
 extrabuttonactions=3, 3, 3
-extrabuttonactionstrings="mwrite(1,12288,65532,2)", "mwrite(1,12288,65532,3)", "read(1,12390);write(1,12289,_)"
+extrabuttonactionstrings="mwrite(1,12288,65532,2);read(1,12458);write(1,12358,_)", "mwrite(1,12288,65532,3)", "read(1,12390);write(1,12289,_)"
 xextrabuttonactions=0, 0
 xextrabuttonactionstrings=, 
 
