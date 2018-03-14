@@ -6,6 +6,7 @@ import time
 from struct import pack, unpack
 from multiprocessing import Pipe
 import threading
+from platform import system
 
 class AillioR1:
     AILLIO_VID = 0x0483
@@ -60,12 +61,13 @@ class AillioR1:
         if self.usbhandle is None:
             raise IOError("not found or no permission")
         self.__dbg('device found!')
-        if self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
-            try:
-                self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
-            except:
-                self.usbhandle = None
-                raise IOError("unable to detach kernel driver")
+        if not system().startswith("Windows"):
+            if self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
+                try:
+                    self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
+                except:
+                    self.usbhandle = None
+                    raise IOError("unable to detach kernel driver")
         try:
             self.usbhandle.set_configuration(configuration=1)
         except:
