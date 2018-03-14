@@ -35325,7 +35325,6 @@ class serialport(object):
     # input: value x; divider d; mode m
     # returns processed value
     def processChannelData(self,x,d,m):
-        print("processChannelData",x,d,m)
         if x is None:
             res = -1
         else:            
