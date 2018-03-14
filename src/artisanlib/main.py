@@ -35351,7 +35351,6 @@ class serialport(object):
                     v = aw.s7.readFloat(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
                 else:
                     v = aw.s7.readInt(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
-                print(i,aw.s7.mode[i])
                 v = self.processChannelData(v,aw.s7.div[i],("C" if aw.s7.mode[i]==1 else ("F" if aw.s7.mode[i]==2 else "")))         
                 res.append(v)
             else:
