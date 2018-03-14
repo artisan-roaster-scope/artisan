@@ -33127,7 +33127,7 @@ class s7port(object):
         self.db_nr = [1]*self.channels
         self.start = [0]*self.channels
         self.type = [0]*self.channels
-        self.mode = [0]*self.channels
+        self.mode = [0]*self.channels # temp mode is an int here, 0:F, C:1 (this is different than other places)
         self.div = [0]*self.channels
         
         self.COMsemaphore = QSemaphore(1)
@@ -35325,6 +35325,7 @@ class serialport(object):
     # input: value x; divider d; mode m
     # returns processed value
     def processChannelData(self,x,d,m):
+        print("processChannelData",x,d,m)
         if x is None:
             res = -1
         else:            
@@ -35348,9 +35349,11 @@ class serialport(object):
         for i in range(aw.s7.channels):
             if aw.s7.area[i]:
                 if aw.s7.type[i]:
-                    res.append(aw.s7.readFloat(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i]))
+                    v = aw.s7.readFloat(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
                 else:
-                    res.append(aw.s7.readInt(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i]))
+                    v = aw.s7.readInt(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])                    
+                v = self.processChannelData(v,aw.s7.div[i],("C" if aw.s7.mode[i] else "F"))
+                res.append(v)
             else:
                 res.append(-1)
                           
