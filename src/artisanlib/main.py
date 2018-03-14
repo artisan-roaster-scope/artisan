@@ -34674,6 +34674,11 @@ class serialport(object):
             if newstate != aw.qmc.R1_STATE:
                 aw.qmc.R1_STATE = newstate
                 aw.sendmessage(QApplication.translate("Message", "R1 state: " + newstate, None))
+            if aw.qmc.mode == "F":
+                aw.qmc.R1_DT = aw.qmc.fromCtoF(aw.qmc.R1_DT)
+                aw.qmc.R1_BT = aw.qmc.fromCtoF(aw.qmc.R1_BT)
+                aw.qmc.R1_EXIT_TEMP = aw.qmc.fromCtoF(aw.qmc.R1_EXIT_TEMP)
+                aw.qmc.R1_BT_ROR = aw.qmc.RoRfromCtoF(aw.qmc.R1_BT_ROR)
         except IOError as exception:
             error = QApplication.translate("Error Message", "Aillio R1: " + str(exception), None)
             aw.qmc.adderror(error)
