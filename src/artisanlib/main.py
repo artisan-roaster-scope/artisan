@@ -21879,7 +21879,7 @@ class ApplicationWindow(QMainWindow):
                         if aw.qmc.TPalarmtimeindex:
                             TP_index = aw.qmc.TPalarmtimeindex
                         else:
-                            TP_index = aw.findTP(timeindex,timex,temp2)
+                            TP_index = aw.findTPint(timeindex,timex,temp2)
                     else:
                         TP_index = -1
                 
