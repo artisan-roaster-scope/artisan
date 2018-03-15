@@ -134,7 +134,7 @@ setup(
     )
 
 os.system('copy README.txt dist')
-os.system('copy LICENSE.txt dist')
+os.system(r'copy ..\\LICENSE dist\\LICENSE.txt')
 #Appears to be not needed, not used: os.system('copy qt-win.conf dist\\qt.conf')
 os.system(r'mkdir dist\Wheels')
 os.system(r'mkdir dist\Wheels\Cupping')

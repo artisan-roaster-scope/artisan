@@ -116,7 +116,7 @@ setup(
 os.system('mkdir dist')
 os.system('mkdir build')
 os.system('copy README.txt dist')
-os.system('copy LICENSE.txt dist')
+os.system('copy ..\\LICENSE dist\\LICENSE.txt')
 os.system('copy qt-win.conf dist\\qt.conf')
 os.system('mkdir dist\\Wheels')
 os.system('mkdir dist\\Wheels\\Cupping')

@@ -37,7 +37,7 @@ except:
 APP = ['artisan.py']
 
 DATA_FILES = [
-    "LICENSE.txt",
+    ("./LICENSE.txt", [r"../LICENSE"]),
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated    
     ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
@@ -178,7 +178,7 @@ setup(
 
             
 os.system(r'cp README.txt dist')
-os.system(r'cp LICENSE.txt dist')
+os.system(r'cp ../LICENSE dist/LICENSE.txt')
 os.system(r'mkdir dist/Wheels')
 os.system(r'mkdir dist/Wheels/Cupping')
 os.system(r'mkdir dist/Wheels/Other')

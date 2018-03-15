@@ -58,6 +58,7 @@ os.system(r'copy ..\vc_redist.x64.exe ' + TARGET)
 
 os.system('copy README.txt ' + TARGET)
 os.system('copy LICENSE.txt ' + TARGET)
+os.system(r'copy ..\LICENSE ' + TARGET + r'\LICENSE.txt')
 #os.system('copy qt-win.conf ' + TARGET + 'qt.conf')
 os.system('mkdir ' + TARGET + 'Wheels')
 os.system('mkdir ' + TARGET + r'Wheels\Cupping')

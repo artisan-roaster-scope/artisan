@@ -45,7 +45,7 @@ cp includes/jquery-1.11.1.min.js dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist
-cp LICENSE.txt dist
+cp ../LICENSE dist/LICENSE.txt
 mkdir dist/Resources
 mkdir dist/Resources/qt_plugins
 mkdir dist/Resources/qt_plugins/imageformats

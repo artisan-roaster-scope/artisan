@@ -73,7 +73,7 @@ cp includes/jquery-1.11.1.min.js dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist
-cp LICENSE.txt dist
+cp ../LICENSE dist/LICENSE.txt
 
 mkdir dist/Machines
 find includes/Machines -name '.*.aset' -exec rm -r {} \;
@@ -91,9 +91,6 @@ cp /usr/local/lib/python2.7/dist-packages/yoctopuce/cdll/* dist
 
 cp /usr/lib/libsnap7.so dist
 
-
-cp README.txt dist
-cp LICENSE.txt dist
 
 
 ## generate the .deb package

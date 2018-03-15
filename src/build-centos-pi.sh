@@ -62,7 +62,7 @@ cp includes/jquery-1.11.1.min.js dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist
-cp LICENSE.txt dist
+cp ../LICENSE dist/LICENSE.txt
 
 mkdir dist/Machines
 find includes/Machines -name '.*.aset' -exec rm -r {} \;

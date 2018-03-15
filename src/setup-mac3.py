@@ -38,7 +38,7 @@ except:
 APP = ['artisan.py']
 
 DATA_FILES = [
-    "LICENSE.txt",
+    ("./LICENSE.txt", [r"../LICENSE"]),
     ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqdds.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqgif.dylib']),
@@ -187,7 +187,7 @@ setup(
 
             
 os.system(r'cp README.txt dist')
-os.system(r'cp LICENSE.txt dist')
+os.system(r'cp ../LICENSE dist/LICENSE.txt')
 os.system(r'mkdir dist/Wheels')
 os.system(r'mkdir dist/Wheels/Cupping')
 os.system(r'mkdir dist/Wheels/Other')

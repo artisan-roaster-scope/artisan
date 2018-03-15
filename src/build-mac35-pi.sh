@@ -66,7 +66,7 @@ cp includes/jquery-1.11.1.min.js dist/Artisan.app/Contents/Resources
 
 
 cp README.txt dist
-cp LICENSE.txt dist
+cp ../LICENSE dist/LICENSE.txt
 
 # remove the executable 
 rm dist/Artisan
