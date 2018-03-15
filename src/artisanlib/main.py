@@ -211,7 +211,7 @@ import socket
 
 if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 and pymodbus_version.version.minor > 3):
     def getBinaryPayloadBuilder(byteorderLittle=True,wordorderLittle=False):
-        if byteorderLittle:
+        if byteorderLittle: 
             byteorder = Endian.Little
         else:
             byteorder = Endian.Big
@@ -221,7 +221,7 @@ if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 an
             wordorder = Endian.Big
         return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
     def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorderLittle=False):
-        if byteorderLittle:
+        if not byteorderLittle:
             byteorder = Endian.Little
         else:
             byteorder = Endian.Big
@@ -12419,28 +12419,6 @@ class ApplicationWindow(QMainWindow):
                         
     def populateMachineMenu(self):
         self.populateListMenu("Machines",".aset",self.openMachineSettings,self.machineMenu)
-        
-#    def populateMachineMenu(self):
-#        one_added = False
-#        for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),"Machines")):
-#            dirs.sort()
-#            for fl in files:
-#                if fl.endswith(".aset"): 
-#                    d = os.path.split(root)
-#                    p = os.path.join(root,fl)
-#                    f = fl.replace(".aset","").replace("_"," ")
-#                    if len(d) > 0:
-#                        a = QAction(self, visible=True,
-#                            triggered=self.openMachineSettings)
-#                        a.setData(p)
-#                        if d[-1] == "Machines":
-#                            a.setText(u(f)) # + u("...")
-#                        else:
-#                            a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
-#                        self.machineMenu.addAction(a)
-#                        one_added = True
-#        if one_added:
-#            self.ConfMenu.addMenu(self.machineMenu)
 
     def openMachineSettings(self):
         action = self.sender()
@@ -12471,7 +12449,7 @@ class ApplicationWindow(QMainWindow):
                         aw.s7.host = host
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                elif aw.qmc.device == 53 or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Hottop or MODBUS serial
+                elif aw.qmc.device == 0  or aw.qmc.device == 53 or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Hottop or MODBUS serial
                     comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                     if platf == 'Darwin':
                         ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
@@ -12504,7 +12482,7 @@ class ApplicationWindow(QMainWindow):
                             pos = items.index(port_name)
                             if aw.qmc.device == 29: # MODBUS serial
                                 aw.modbus.comport = ports[pos][0]
-                            else: # HOTTOP
+                            else: # Fuji or HOTTOP
                                 aw.ser.comport = ports[pos][0]
                         except:
                             pass
