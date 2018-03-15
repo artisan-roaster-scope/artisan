@@ -221,7 +221,7 @@ if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 an
             wordorder = Endian.Big
         return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
     def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorderLittle=False):
-        if not byteorderLittle:
+        if byteorderLittle:
             byteorder = Endian.Little
         else:
             byteorder = Endian.Big
