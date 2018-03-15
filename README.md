@@ -105,8 +105,7 @@ Documentation and Support
 - [Installation](wiki/Installation.md)
 - [Artisan Blog](http://artisan-roasterscope.blogspot.de/) ([Overview](https://artisan-roasterscope.blogspot.de/p/contents.html))
 - [User Mailing List](https://mailman.ghostdub.de/mailman/listinfo/artisan-user) (you need to subscribe to send and receive messages)
-  * NOTES: 
-     - you will receive a warning on sign up that "the site is not secure". This is because the SSL-certificate to sign up for this list has expired. Just ignore this warning. The sign up and the use of the list IS secure. We currently don't have a way to fix that on the server. Sorry.
+  * NOTES:
      - Only subscribers can send messages to the list. Messages from others are deleted by the system
      - Messages with large attachments (images) will be deleted by the system
 - Documentation (written by users)
