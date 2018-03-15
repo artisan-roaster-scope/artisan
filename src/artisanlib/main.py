@@ -13866,7 +13866,7 @@ class ApplicationWindow(QMainWindow):
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
-    #         13= PWM Command; 14 VOUT Command; 15 S7 Command; 16 Aillio R1 Heater; 17 Aillio R1 Fan; 18 Aillio R1 Drum; 19 Aillio R1 Command
+    #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command
     def eventaction(self,action,cmd):
         if action:
             try:
@@ -14011,7 +14011,7 @@ class ApplicationWindow(QMainWindow):
                                 try:
                                     cmds = eval(cs[len('read'):])
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
-                                        # cmd has format "read(s,r)"                    
+                                        # cmd has format "read(s,r)" 
                                         aw.modbus.lastReadResult = aw.modbus.readSingleRegister(*cmds)
                                         followupCmd = 0.03
                                 except Exception:
@@ -14202,16 +14202,24 @@ class ApplicationWindow(QMainWindow):
                             except Exception:
                                 pass
                 elif action == 15: # S7 Command
+                    # getDBint(<dbnumber>,<start>)
+                    # getDBfloat(<dbnumber>,<start>)
                     # setDBint(<dbnumber>,<start>,<value>)
                     # setDBfloat(<dbnumber>,<start>,<value>)
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:                        
-                            cs = c.strip()
+                            cs = c.strip().replace("_",str(aw.S7.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             if cs.startswith("setDBint(") and len(cs) > 14:
                                 try:
                                     dbnr,s,v = cs[len("setDBint("):-1].split(',')
                                     aw.s7.writeInt(5,int(dbnr),int(s),v)
+                                except Exception:
+                                    pass
+                            elif cs.startswith("getDBint(") and len(cs) > 14:
+                                try:
+                                    dbnr,s,v = cs[len("getDBint("):-1].split(',')
+                                    aw.s7.lastReadResult = aw.s7.getInt(5,int(dbnr),int(s))
                                 except Exception:
                                     pass
                             elif cs.startswith("setDBfloat(") and len(cs) > 16:
@@ -14220,7 +14228,12 @@ class ApplicationWindow(QMainWindow):
                                     aw.s7.writeInt(5,int(dbnr),int(s),v)
                                 except Exception:
                                     pass
-
+                            elif cs.startswith("getDBfloat(") and len(cs) > 16:
+                                try:
+                                    dbnr,s,v = cs[len("getDBfloat("):-1].split(',')
+                                    aw.s7.lastReadResult = aw.s7.writeFloat(5,int(dbnr),int(s))
+                                except Exception:
+                                    pass
                 elif action == 16:
                     self.ser.R1.set_heater(cmd)
                 elif action == 17:
@@ -17938,6 +17951,17 @@ class ApplicationWindow(QMainWindow):
                 self.s7.port = toInt(settings.value("port",self.s7.port))
                 self.s7.rack = toInt(settings.value("rack",self.s7.rack))
                 self.s7.slot = toInt(settings.value("slot",self.s7.slot))
+            if settings.contains("PIDmultiplier"):
+                self.s7.PID_area = toInt(settings.value("PID_area",self.s7.PID_area))
+                self.s7.PID_db_nr = toInt(settings.value("PID_db_nr",self.s7.PID_db_nr))
+                self.s7.PID_SV_register = toInt(settings.value("PID_SV_register",self.s7.PID_SV_register))
+                self.s7.PID_p_register = toInt(settings.value("PID_p_register",self.s7.PID_p_register))
+                self.s7.PID_i_register = toInt(settings.value("PID_i_register",self.s7.PID_i_register))
+                self.s7.PID_d_register = toInt(settings.value("PID_d_register",self.s7.PID_d_register))
+                self.s7.PID_OFF_action = s2a(toString(settings.value("PID_OFF_action",self.s7.PID_OFF_action)))
+                self.s7.PID_ON_action = s2a(toString(settings.value("PID_ON_action",self.s7.PID_ON_action)))
+                self.s7.PIDmultiplier = toInt(settings.value("PIDmultiplier",self.s7.PIDmultiplier))
+                self.s7.SVmultiplier = toInt(settings.value("SVmultiplier",self.s7.SVmultiplier))                                
             settings.endGroup()
             #restore modbus port
             settings.beginGroup("Modbus")
@@ -19159,6 +19183,16 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("port",self.s7.port)
             settings.setValue("rack",self.s7.rack)
             settings.setValue("slot",self.s7.slot)
+            settings.setValue("PID_area",self.s7.PID_area)
+            settings.setValue("PID_db_nr",self.s7.PID_db_nr)
+            settings.setValue("PID_SV_register",self.s7.PID_SV_register)
+            settings.setValue("PID_p_register",self.s7.PID_p_register)
+            settings.setValue("PID_i_register",self.s7.PID_i_register)
+            settings.setValue("PID_d_register",self.s7.PID_d_register)
+            settings.setValue("PID_OFF_action",self.s7.PID_OFF_action)
+            settings.setValue("PID_ON_action",self.s7.PID_ON_action)
+            settings.setValue("PIDmultiplier",self.s7.PIDmultiplier)
+            settings.setValue("SVmultiplier",self.s7.SVmultiplier)
             settings.endGroup()
             #save modbus port
             settings.beginGroup("Modbus")
@@ -22278,6 +22312,16 @@ class ApplicationWindow(QMainWindow):
                 self.s7.type[i] = dialog.s7_typeCombos[i].currentIndex()
                 self.s7.div[i] = dialog.s7_divCombos[i].currentIndex()
                 self.s7.mode[i] = dialog.s7_modeCombos[i].currentIndex()
+            self.s7.PID_area = dialog.s7_PIDarea.currentIndex()
+            self.s7.PID_db_nr = int(str(dialog.s7_PIDdb_nr_Edit.text()))
+            self.s7.PID_SV_register = int(str(dialog.s7_SVregister_Edit.text()))
+            self.s7.SVmultiplier = dialog.s7_SVmultiplier.currentIndex()
+            self.s7.PIDmultiplier = dialog.s7_PIDmultiplier.currentIndex()
+            self.s7.PID_p_register = int(str(dialog.s7_Pregister_Edit.text()))
+            self.s7.PID_i_register = int(str(dialog.s7_Iregister_Edit.text()))
+            self.s7.PID_d_register = int(str(dialog.s7_Dregister_Edit.text()))
+            self.s7.PID_OFF_action = s2a(toString(dialog.s7_pid_off.text()))
+            self.s7.PID_ON_action = s2a(toString(dialog.s7_pid_on.text()))
                 
             # set scale port
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
@@ -31521,8 +31565,8 @@ class EventsDlg(ArtisanDialog):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatetypes(): {0}").format(str(e)),exc_tb.tb_lineno)
 
     def showEventbuttonhelp(self):
-        string = u(QApplication.translate("Message", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None)) + "<br>"
-        string += u(QApplication.translate("Message", "Enter \\t to be substituted by the event type.",None)) + "<br>"
+        string = u(QApplication.translate("Message", "<small><b>Button Label</b> Enter \\n to create labels with multiple lines.",None))
+        string += u(QApplication.translate("Message", " \\t is substituted by the event type.",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Event Description</b> Description of the Event to be recorded.",None)) + "<br>"  
         string += u(QApplication.translate("Message", "<b>Event type</b> Type of event to be recorded.",None)) + "<br>"
         string += u(QApplication.translate("Message", "<b>Event value</b> Value of event (1-100) to be recorded",None)) + "<br>"
@@ -31537,6 +31581,10 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<li><b>mwrite</b>(slaveId,register,andMask,orMask)<br>mask write register: <i>MODBUS function 22</i>",None))
         string += u(QApplication.translate("Message", "<li><b>writem</b>(slaveId,register,value) or <b>writem</b>(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])<br>write registers: <i>MODBUS function 16</i>",None))
         string += u(QApplication.translate("Message", "</ul>writes values to the registers in slaves specified by the given id",None))
+        string += u(QApplication.translate("Message", "<LI>S7 Command: <ul><li><b>getDBint</b>(&lt;dbnumber&gt;,&lt;start&gt;): read int from S7 DB",None))
+        string += u(QApplication.translate("Message", "<li><b>getDBfloat</b>(&lt;dbnumber&gt;,&lt;start&gt;): read float from S7 DB",None))
+        string += u(QApplication.translate("Message", "<li><b>setDBint</b>(&lt;dbnumber&gt;,&lt;start&gt;,&lt;value&gt;): write int to S7 DB",None))
+        string += u(QApplication.translate("Message", "<li><b>setDBfloat</b>(&lt;dbnumber&gt;,&lt;start&gt;,&lt;value&gt;): write float to S7 DB</ul>",None))
         string += u(QApplication.translate("Message", "<LI>DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None))
         string += u(QApplication.translate("Message", "<LI>IO Command: set(n,0), set(n,1), toggle(n), pulse(n,t) to set Phidget IO digital output n",None))
         string += u(QApplication.translate("Message", "<LI>PWM Command: out(n,v), toggle(n), pulse(n,t) set digital output channel n to PWM value v (0-100) on a Phidget OUT1100; outhub(n,v), togglehub(n), pulsehub(n,t) on a Phidget HUB0000",None))
@@ -31545,7 +31593,7 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<LI>Hottop Fan: sets fan to value",None))
         string += u(QApplication.translate("Message", "<LI>Hottop Command: motor(n),solenoid(n),stirrer(n),heater(h),fan(f) with n={0,1},h={0,..100},f={0,..10}",None))
         string += u(QApplication.translate("Message", "<LI>p-i-d: configures PID to the values &lt;p&gt;;&lt;i&gt;;&lt;d&gt;",None)) + "</UL>"
-        string += u(QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button",None))
+        string += u(QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button</small>",None))
         msgbox = QMessageBox(self)
         msgbox.setWindowTitle(QApplication.translate("Message", "Event custom buttons",None))
         msgbox.setInformativeText(string)
@@ -33159,6 +33207,8 @@ class s7port(object):
         self.port = 102 # the TCP port
         self.rack = 0 # 0,..,7
         self.slot = 0 # 0,..,31
+                
+        self.lastReadResult = 0 # this is set by eventaction following some custom button/slider S/ actions with "read" command
         
         self.area = [0]*self.channels
         self.db_nr = [1]*self.channels
@@ -33166,6 +33216,17 @@ class s7port(object):
         self.type = [0]*self.channels
         self.mode = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F (this is different than other places)
         self.div = [0]*self.channels
+        
+        self.PID_area = 0
+        self.PID_db_nr = 0
+        self.PID_SV_register = 0
+        self.PID_p_register = 0
+        self.PID_i_register = 0
+        self.PID_d_register = 0
+        self.PID_ON_action = ""
+        self.PID_OFF_action = ""
+        self.SVmultiplier = 0
+        self.PIDmultiplier = 0
         
         self.COMsemaphore = QSemaphore(1)
         
@@ -33180,6 +33241,26 @@ class s7port(object):
         
         self.plc = None
         
+    def setPID(self,p,i,d):
+        if self.PID_area and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
+            multiplier = 1.
+            if aw.s7.PIDmultiplier == 1:
+                multiplier = 10.
+            elif aw.s7.PIDmultiplier == 2:
+                multiplier = 100.
+            self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_p_register,p*multiplier)
+            self.writeInt(self.PID_area-1,self.PID_area,self.PID_db_nr,self.PID_i_register,i*multiplier)
+            self.writeInt(self.PID_area-1,self.PID_area,self.PID_db_nr,self.PID_d_register,d*multiplier)
+        
+    def setTarget(self,sv):
+        if self.PID_area:
+            multiplier = 1.
+            if aw.s7.SVmultiplier == 1:
+                multiplier = 10.
+            elif aw.s7.SVmultiplier == 2:
+                multiplier = 100.
+            self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_SV_register,int(round(sv*multiplier)))
+                    
     def isConnected(self):
         return not (self.plc is None) and self.plc.get_connected()
         
@@ -33263,7 +33344,7 @@ class s7port(object):
         except Exception as ex:
             self.disconnect()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeINT() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -33421,7 +33502,7 @@ class modbusport(object):
         self.input6code = 3
         self.input6div = 0
         self.input6mode = "C"
-        self.SVmultiplier = 1
+        self.SVmultiplier = 0
         self.PIDmultiplier = 0
         self.byteorderLittle = False
         self.wordorderLittle = True
@@ -38922,17 +39003,10 @@ class comportDlg(ArtisanDialog):
         modbus_pid.addWidget(modbus_pid_commands_box)
         modbus_pid.addStretch()
 
-        
         modbus_pidgroup = QGroupBox(QApplication.translate("GroupBox", "PID",None))
         modbus_pidgroup.setLayout(modbus_pid)
         modbus_pid.setContentsMargins(0,10,0,0)
         modbus_pidgroup.setContentsMargins(0,20,0,3)
-        
-        modbus_sv_layout = QVBoxLayout()
-        modbus_sv_layout.addStretch()
-        modbus_sv_layout.addWidget(modbus_pidgroup)
-        modbus_sv_layout.addStretch()
-        
         
         helpButton = QPushButton(QApplication.translate("Button","Help",None))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
@@ -39152,7 +39226,7 @@ class comportDlg(ArtisanDialog):
         modbus_gridVLayout = QHBoxLayout()
         modbus_gridVLayout.addLayout(modbus_gridV)
         modbus_gridVLayout.addStretch()
-        modbus_gridVLayout.addLayout(modbus_input_grid)#(modbus_sv_layout)
+        modbus_gridVLayout.addLayout(modbus_input_grid)
         modbus_gridVLayout.addStretch()
         modbus_setup = QHBoxLayout()
         modbus_setup.addWidget(scanButton)
@@ -39175,7 +39249,7 @@ class comportDlg(ArtisanDialog):
         modbus_setup.addWidget(self.modbus_portEdit)
         tab3Layout = QVBoxLayout()
         tab3Layout.addLayout(modbus_gridVLayout)
-        tab3Layout.addLayout(modbus_sv_layout)#
+        tab3Layout.addWidget(modbus_pidgroup)
         tab3Layout.addLayout(modbus_setup)
         tab3Layout.addStretch()
         tab3Layout.setContentsMargins(0,0,0,0)
@@ -39284,6 +39358,128 @@ class comportDlg(ArtisanDialog):
             mode.setFixedWidth(70) 
             self.s7_modeCombos.append(mode)
             s7_grid.addWidget(mode,6,i+1,Qt.AlignRight)
+          
+        # s7 external PID conf
+        
+        s7_PIDareaLabel = QLabel(QApplication.translate("Label", "Area",None))
+        self.s7_PIDarea = QComboBox()
+        self.s7_PIDarea.setFocusPolicy(Qt.NoFocus)
+        self.s7_PIDarea.addItems(s7_areas)
+        self.s7_PIDarea.setCurrentIndex(aw.s7.PID_area)
+        self.s7_PIDarea.setFixedWidth(70)                    
+        s7_PIDdb_nr_label = QLabel(QApplication.translate("Label", "DB#",None))
+        self.s7_PIDdb_nr_Edit = QLineEdit(str(aw.s7.PID_db_nr))
+        self.s7_PIDdb_nr_Edit.setValidator(QIntValidator(0,65536,self.s7_PIDdb_nr_Edit))
+        self.s7_PIDdb_nr_Edit.setFixedWidth(50)
+        self.s7_PIDdb_nr_Edit.setAlignment(Qt.AlignRight)       
+        s7_SVregister_label = QLabel(QApplication.translate("Label", "SV",None))
+        self.s7_SVregister_Edit = QLineEdit(str(aw.s7.PID_SV_register))
+        self.s7_SVregister_Edit.setValidator(QIntValidator(0,65536,self.s7_SVregister_Edit))
+        self.s7_SVregister_Edit.setFixedWidth(50)
+        self.s7_SVregister_Edit.setAlignment(Qt.AlignRight)
+        
+        s7_multis = ["", "10","100"]
+        
+        s7_SVmultiplier_label = QLabel(QApplication.translate("Label", "SV Multiplier",None))
+        self.s7_SVmultiplier = QComboBox()
+        self.s7_SVmultiplier.setFocusPolicy(Qt.NoFocus)
+        self.s7_SVmultiplier.addItems(s7_multis)
+        self.s7_SVmultiplier.setCurrentIndex(aw.s7.SVmultiplier)
+        self.s7_SVmultiplier.setFixedWidth(70)
+        
+        s7_PIDmultiplier_label = QLabel(QApplication.translate("Label", "p-i-d Multiplier",None))
+        self.s7_PIDmultiplier = QComboBox()
+        self.s7_PIDmultiplier.setFocusPolicy(Qt.NoFocus)
+        self.s7_PIDmultiplier.addItems(s7_multis)
+        self.s7_PIDmultiplier.setCurrentIndex(aw.s7.PIDmultiplier)
+        self.s7_PIDmultiplier.setFixedWidth(70)
+                
+        s7_Pregister_label = QLabel(QApplication.translate("Label", "P",None))
+        self.s7_Pregister_Edit = QLineEdit(str(aw.s7.PID_p_register))
+        self.s7_Pregister_Edit.setValidator(QIntValidator(0,65536,self.s7_Pregister_Edit))
+        self.s7_Pregister_Edit.setFixedWidth(50)
+        self.s7_Pregister_Edit.setAlignment(Qt.AlignRight)
+                
+        s7_Iregister_label = QLabel(QApplication.translate("Label", "I",None))
+        self.s7_Iregister_Edit = QLineEdit(str(aw.s7.PID_i_register))
+        self.s7_Iregister_Edit.setValidator(QIntValidator(0,65536,self.s7_Iregister_Edit))
+        self.s7_Iregister_Edit.setFixedWidth(50)
+        self.s7_Iregister_Edit.setAlignment(Qt.AlignRight)
+                
+        s7_Dregister_label = QLabel(QApplication.translate("Label", "D",None))
+        self.s7_Dregister_Edit = QLineEdit(str(aw.s7.PID_d_register))
+        self.s7_Dregister_Edit.setValidator(QIntValidator(0,65536,self.s7_Dregister_Edit))
+        self.s7_Dregister_Edit.setFixedWidth(50)
+        self.s7_Dregister_Edit.setAlignment(Qt.AlignRight)
+        
+        s7_pid_registers = QHBoxLayout()
+        s7_pid_registers.addWidget(s7_SVregister_label)
+        s7_pid_registers.addWidget(self.s7_SVregister_Edit)
+        s7_pid_registers.addSpacing(35)
+        s7_pid_registers.addWidget(s7_Pregister_label)
+        s7_pid_registers.addWidget(self.s7_Pregister_Edit)
+        s7_pid_registers.addSpacing(15)
+        s7_pid_registers.addWidget(s7_Iregister_label)
+        s7_pid_registers.addWidget(self.s7_Iregister_Edit)
+        s7_pid_registers.addSpacing(15)
+        s7_pid_registers.addWidget(s7_Dregister_label)
+        s7_pid_registers.addWidget(self.s7_Dregister_Edit)
+        
+        s7_pid_multipliers = QHBoxLayout()
+        s7_pid_multipliers.addWidget(self.s7_SVmultiplier)
+        s7_pid_multipliers.addWidget(s7_SVmultiplier_label)
+        s7_pid_multipliers.addStretch()
+        s7_pid_multipliers.addWidget(s7_PIDmultiplier_label)
+        s7_pid_multipliers.addWidget(self.s7_PIDmultiplier)
+        
+        s7_pid_regmulti = QVBoxLayout()
+        s7_pid_regmulti.addLayout(s7_pid_registers)
+        s7_pid_regmulti.addLayout(s7_pid_multipliers)
+        
+        s7_pid_registers_box = QGroupBox(QApplication.translate("GroupBox","Registers",None))
+        s7_pid_registers_box.setLayout(s7_pid_regmulti)
+        s7_pid_regmulti.setContentsMargins(2,2,20,2)
+        
+        s7_pid_off_label = QLabel(QApplication.translate("Label", "OFF", None))
+        self.s7_pid_off = QLineEdit(aw.s7.PID_OFF_action)
+        self.s7_pid_off.setToolTip(QApplication.translate("Tooltip", "OFF Action String", None))        
+        s7_pid_on_label = QLabel(QApplication.translate("Label", "ON", None))
+        self.s7_pid_on = QLineEdit(aw.s7.PID_ON_action)
+        self.s7_pid_on.setToolTip(QApplication.translate("Tooltip", "ON Action String", None))
+                  
+        s7_pid_commands = QGridLayout()
+        s7_pid_commands.addWidget(s7_pid_on_label,0,0)
+        s7_pid_commands.addWidget(self.s7_pid_on,0,1)
+        s7_pid_commands.addWidget(s7_pid_off_label,1,0)
+        s7_pid_commands.addWidget(self.s7_pid_off,1,1)
+        
+        s7_pid_commands_box = QGroupBox(QApplication.translate("GroupBox","Commands",None))
+        s7_pid_commands_box.setLayout(s7_pid_commands)
+        s7_pid_commands.setContentsMargins(2,2,20,2)
+        
+        s7_pid_area = QHBoxLayout()
+        s7_pid_area.addWidget(s7_PIDareaLabel)
+        s7_pid_area.addWidget(self.s7_PIDarea)
+        
+        s7_pid_dbnr = QHBoxLayout()
+        s7_pid_dbnr.addWidget(s7_PIDdb_nr_label)
+        s7_pid_dbnr.addWidget(self.s7_PIDdb_nr_Edit)
+        
+        s7_pid_base = QVBoxLayout()
+        s7_pid_base.addLayout(s7_pid_area)
+        s7_pid_base.addLayout(s7_pid_dbnr)
+        
+        s7_pid = QHBoxLayout()
+        s7_pid.addStretch()
+        s7_pid.addLayout(s7_pid_base)
+        s7_pid.addWidget(s7_pid_registers_box)
+        s7_pid.addWidget(s7_pid_commands_box)
+        s7_pid.addStretch()
+                                    
+        s7_pidgroup = QGroupBox(QApplication.translate("GroupBox", "PID",None))
+        s7_pidgroup.setLayout(s7_pid)
+        s7_pid.setContentsMargins(0,10,0,0)
+        s7_pidgroup.setContentsMargins(0,20,0,3)
         
         s7_gridHLayout = QHBoxLayout()
         s7_gridHLayout.addStretch()
@@ -39308,6 +39504,7 @@ class comportDlg(ArtisanDialog):
         tab4Layout = QVBoxLayout()
         tab4Layout.addStretch()
         tab4Layout.addLayout(s7_gridHLayout)
+        tab4Layout.addWidget(s7_pidgroup)
         tab4Layout.addStretch()
         tab4Layout.addLayout(s7_setup)
         tab4Layout.addStretch()
@@ -48014,7 +48211,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pidSV.setRange(0,999)
         self.pidSV.setSingleStep(10)
         self.pidSV.setValue(aw.pidcontrol.svValue)
-        pidSVLabel = QLabel(QApplication.translate("Label","Set",None))
+        pidSVLabel = QLabel(QApplication.translate("Label","SV",None))
         
         self.pidSVLookahead = QSpinBox()
         self.pidSVLookahead.setAlignment(Qt.AlignRight)
@@ -48466,10 +48663,21 @@ class PIDcontrol(object):
 
     # returns True if an external PID controller is in use (MODBUS or TC4 PID firmware)
     # and False if the internal software PID is in charge
+    # the returned value indicates the type of external PID control:
+    #  0: internal PID
+    #  1: MODBUS
+    #  2: S7
+    #  3: TC4
     def externalPIDControl(self):
-        # TC4 with PID firmware or MODBUS and SV register set
-        return ((aw.qmc.device == 19 and aw.qmc.PIDbuttonflag) or 
-                (aw.qmc.device == 29 and aw.modbus.PID_slave_ID != 0))
+        # TC4 with PID firmware or MODBUS and SV register set or S7 and SV area set
+        if aw.modbus.PID_slave_ID != 0:
+            return 1
+        elif aw.s7.PID_area != 0:
+            return 2
+        elif (aw.qmc.device == 19 and aw.qmc.PIDbuttonflag):
+            return 3
+        else:
+            return 0
              
     # v is from [-min,max]
     def setEnergy(self,v):
@@ -48499,6 +48707,9 @@ class PIDcontrol(object):
             self.svValue = int(round(aw.qmc.fromFtoC(self.svValue)))
             self.svSliderMin = int(round(aw.qmc.fromFtoC(self.svSliderMin)))
             self.svSliderMax = int(round(aw.qmc.fromFtoC(self.svSliderMax)))
+            # establish ne limits on sliders
+            aw.sliderSV.setMinimum(self.svSliderMin)
+            aw.sliderSV.setMaximum(self.svSliderMax)            
             self.pidKp = self.pidKp * (9/5.)
             self.pidKi = self.pidKi * (9/5.)
             self.pidKd = self.pidKd * (9/5.)
@@ -48512,6 +48723,9 @@ class PIDcontrol(object):
             self.svValue = aw.qmc.fromCtoF(self.svValue)
             self.svSliderMin = aw.qmc.fromCtoF(self.svSliderMin)
             self.svSliderMax = aw.qmc.fromCtoF(self.svSliderMax)
+            # establish ne limits on sliders
+            aw.sliderSV.setMinimum(self.svSliderMin)
+            aw.sliderSV.setMaximum(self.svSliderMax)            
             self.pidKp = self.pidKp / (9/5.)
             self.pidKi = self.pidKi / (9/5.)
             self.pidKd = self.pidKd / (9/5.)
@@ -48538,7 +48752,17 @@ class PIDcontrol(object):
             aw.qmc.temporayslider_force_move = True
             self.lastEnergy = None
             # TC4 hardware PID
-            if aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
+            # MODBUS hardware PID
+            if (aw.pidcontrol.externalPIDControl() == 1 and aw.modbus.PID_ON_action and aw.modbus.PID_ON_action != ""):
+                aw.eventaction(4,aw.modbus.PID_ON_action)
+                self.pidActive = True
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])  
+            # S7 hardware PID
+            elif (aw.pidcontrol.externalPIDControl() == 2 and aw.s7.PID_ON_action and aw.s7.PID_ON_action != ""):
+                aw.eventaction(15,aw.s7.PID_ON_action)
+                self.pidActive = True
+                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"]) 
+            elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
                 if aw.ser.ArduinoIsInitialized:
                     self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle) # first configure PID according to the actual settings
                     try:
@@ -48551,12 +48775,7 @@ class PIDcontrol(object):
                             aw.sendmessage(QApplication.translate("Message","PID turned on", None))
                     finally:
                         if aw.ser.COMsemaphore.available() < 1:
-                            aw.ser.COMsemaphore.release(1)
-            # MODBUS hardware PID
-            elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl() and aw.modbus.PID_ON_action and aw.modbus.PID_ON_action != ""):
-                aw.eventaction(4,aw.modbus.PID_ON_action)
-                self.pidActive = True
-                aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])       
+                            aw.ser.COMsemaphore.release(1)     
             # software PID
             elif aw.qmc.Controlbuttonflag:
                 aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
@@ -48573,8 +48792,18 @@ class PIDcontrol(object):
                 aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])
 
     def pidOff(self):
+        # MODBUS hardware PID
+        if (aw.pidcontrol.externalPIDControl() == 1 and aw.modbus.PID_OFF_action and aw.modbus.PID_OFF_action != ""):
+            aw.eventaction(4,aw.modbus.PID_OFF_action)
+            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            self.pidActive = False  
+        # S7 hardware PID
+        elif (aw.pidcontrol.externalPIDControl() == 2 and aw.s7.PID_OFF_action and aw.s7.PID_OFF_action != ""):
+            aw.eventaction(15,aw.s7.PID_OFF_action)
+            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
+            self.pidActive = False   
         # TC4 hardware PID
-        if aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
+        elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
             if aw.ser.ArduinoIsInitialized:
                 try:
                     #### lock shared resources #####
@@ -48589,11 +48818,7 @@ class PIDcontrol(object):
                         aw.ser.COMsemaphore.release(1)
                 aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
                 self.pidActive = False
-        # MODBUS hardware PID
-        elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl() and aw.modbus.PID_OFF_action and aw.modbus.PID_OFF_action != ""):
-            aw.eventaction(4,aw.modbus.PID_OFF_action)
-            aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
-            self.pidActive = False
+
         # software PID
         elif aw.qmc.Controlbuttonflag:
             aw.qmc.pid.setControl(lambda _: _)
@@ -48724,7 +48949,19 @@ class PIDcontrol(object):
     def setSV(self,sv,move=True,init=False):
 #        if not move:            
 #            aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv, None))
-        if aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
+        if (aw.pidcontrol.externalPIDControl() == 1): # MODBUS PID and Control ticked
+            self.sv = max(0,sv)
+            if move:
+                aw.moveSVslider(sv,setValue=True)
+            aw.modbus.setTarget(sv)
+            self.sv = sv # remember last sv
+        elif (aw.pidcontrol.externalPIDControl() == 2): # S7 PID and Control ticked
+            self.sv = max(0,sv)
+            if move:
+                aw.moveSVslider(sv,setValue=True)
+            aw.s7.setTarget(sv)
+            self.sv = sv # remember last sv
+        elif aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
             if aw.ser.ArduinoIsInitialized:
                 sv = max(0,aw.float2float(sv,2))
                 if self.sv != sv: # nothing to do (avoid loops via moveslider!)
@@ -48742,12 +48979,6 @@ class PIDcontrol(object):
                     finally:
                         if aw.ser.COMsemaphore.available() < 1:
                             aw.ser.COMsemaphore.release(1)
-        elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and Control ticked
-            self.sv = max(0,sv)
-            if move:
-                aw.moveSVslider(sv,setValue=True)
-            aw.modbus.setTarget(sv)
-            self.sv = sv # remember last sv
         elif aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
             if move and aw.pidcontrol.svSlider:
                 aw.moveSVslider(sv,setValue=True)
@@ -48807,7 +49038,19 @@ class PIDcontrol(object):
     
     # send conf to connected PID
     def confPID(self,kp,ki,kd,source=None,cycle=None):
-        if aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
+        if (aw.pidcontrol.externalPIDControl() == 1): # MODBUS (external) Control active
+            aw.modbus.setPID(kp,ki,kd)
+            self.pidKp = kp
+            self.pidKi = ki
+            self.pidKd = kd
+            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
+        elif (aw.pidcontrol.externalPIDControl() == 2): # S7 (external) Control active
+            aw.s7.setPID(kp,ki,kd)
+            self.pidKp = kp
+            self.pidKi = ki
+            self.pidKd = kd
+            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
+        elif aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
             if aw.ser.ArduinoIsInitialized:
                 try:
                     #### lock shared resources #####
@@ -48829,12 +49072,6 @@ class PIDcontrol(object):
                 finally:
                     if aw.ser.COMsemaphore.available() < 1:
                         aw.ser.COMsemaphore.release(1)
-        elif (aw.qmc.device == 29 and aw.pidcontrol.externalPIDControl()): # MODBUS meter and (external) Control ticked
-            aw.modbus.setPID(kp,ki,kd)
-            self.pidKp = kp
-            self.pidKi = ki
-            self.pidKd = kd
-            aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
         elif aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
             aw.qmc.pid.setPID(kp,ki,kd)
             self.pidKp = kp
