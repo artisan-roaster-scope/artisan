@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-import usb.core
-import usb.util
 import time
-from struct import pack, unpack
+from struct import unpack
 from multiprocessing import Pipe
 import threading
 from platform import system
+import usb.core
+import usb.util
+
 
 class AillioR1:
     AILLIO_VID = 0x0483
@@ -15,17 +16,17 @@ class AillioR1:
     AILLIO_ENDPOINT_RD = 0x81
     AILLIO_INTERFACE = 0x1
     AILLIO_DEBUG = 1
-    AILLIO_CMD_INFO1 = [ 0x30, 0x02 ]
-    AILLIO_CMD_INFO2 = [ 0x89, 0x01 ]
-    AILLIO_CMD_STATUS1 = [ 0x30, 0x01 ]
-    AILLIO_CMD_STATUS2 = [ 0x30, 0x03 ]
-    AILLIO_CMD_PRS = [ 0x30, 0x01, 0x00, 0x00 ]
+    AILLIO_CMD_INFO1 = [0x30, 0x02]
+    AILLIO_CMD_INFO2 = [0x89, 0x01]
+    AILLIO_CMD_STATUS1 = [0x30, 0x01]
+    AILLIO_CMD_STATUS2 = [0x30, 0x03]
+    AILLIO_CMD_PRS = [0x30, 0x01, 0x00, 0x00]
     AILLIO_CMD_HEATER_INCR = [0x34, 0x01, 0xaa, 0xaa]
     AILLIO_CMD_HEATER_DECR = [0x34, 0x02, 0xaa, 0xaa]
     AILLIO_CMD_FAN_INCR = [0x31, 0x01, 0xaa, 0xaa]
     AILLIO_CMD_FAN_DECR = [0x31, 0x02, 0xaa, 0xaa]
     AILLIO_STATE_OFF = 0x00
-    AILLIO_STATE_PH  = 0x02
+    AILLIO_STATE_PH = 0x02
     AILLIO_STATE_CHARGE = 0x04
     AILLIO_STATE_ROASTING = 0x06
     AILLIO_STATE_COOLING = 0x08
@@ -65,18 +66,18 @@ class AillioR1:
             if self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
                 try:
                     self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
-                except:
+                except Exception:
                     self.usbhandle = None
                     raise IOError("unable to detach kernel driver")
         try:
             self.usbhandle.set_configuration(configuration=1)
-        except:
+        except Exception:
             self.usbhandle = None
             raise IOError("unable to configure")
 
         try:
             usb.util.claim_interface(self.usbhandle, self.AILLIO_INTERFACE)
-        except:
+        except Exception:
             self.usbhandle = None
             raise IOError("unable to claim interface")
         self.__sendcmd(self.AILLIO_CMD_INFO1)
@@ -93,14 +94,14 @@ class AillioR1:
         self.worker_thread = threading.Thread(target=self.__updatestate,
                                               args=(self.child_pipe,))
         self.worker_thread.start()
-        
+
     def __close(self):
         if self.usbhandle is not None:
             try:
                 usb.util.release_interface(self.usbhandle,
                                            self.AILLIO_INTERFACE)
                 usb.util.dispose_resources(self.usbhandle)
-            except:
+            except Exception:
                 pass
             self.usbhandle = None
 
@@ -123,7 +124,7 @@ class AillioR1:
         self.__dbg('get_heater')
         self.__getstate()
         return self.heater
-    
+
     def get_fan(self):
         self.__dbg('get_fan')
         self.__getstate()
@@ -132,7 +133,7 @@ class AillioR1:
     def get_drum(self):
         self.__getstate()
         return self.drum
-    
+
     def get_voltage(self):
         self.__getstate()
         return self.voltage
@@ -175,7 +176,7 @@ class AillioR1:
         if value < 1:
             value = 1
         elif value > 12:
-            value = 12 
+            value = 12
         f = self.get_fan()
         d = abs(f - value)
         if d <= 0:
@@ -188,14 +189,13 @@ class AillioR1:
         else:
             for i in range(0, d+1):
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_INCR)
- 
 
     def set_drum(self, value):
         self.__dbg('set_drum ' + str(value))
         if value < 1:
             value = 1
         elif value > 9:
-            value = 9 
+            value = 9
         self.parent_pipe.send([0x32, 0x01, value, 0x00])
 
     def prs(self):
@@ -211,7 +211,7 @@ class AillioR1:
                 state1 = self.__readreply(64)
                 self.__sendcmd(self.AILLIO_CMD_STATUS2)
                 state2 = self.__readreply(64)
-            except:
+            except Exception:
                 pass
             if p.poll():
                 cmd = p.recv()
@@ -220,7 +220,6 @@ class AillioR1:
                 p.send(state1 + state2)
             time.sleep(0.1)
 
-        
     def __getstate(self):
         self.__dbg('getstate')
         self.__open()
@@ -276,7 +275,6 @@ class AillioR1:
             self.state_str = "cooling"
         self.__dbg('state: ' + self.state_str)
         self.__dbg('second coil fan: ' + str(self.coil_fan2))
-
 
     def __sendcmd(self, cmd):
         self.__dbg('sending command: ' + str(cmd))
