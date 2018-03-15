@@ -2439,6 +2439,35 @@ class tgraphcanvas(FigureCanvas):
         except Exception:
             pass
 
+    # returns True if the extra device n, channel c, is of type MODBUS or S7, has no factor defined and is of type int
+    # channel c is either 0 or 1
+    def intChannel(self,n,c):
+        if aw.qmc.extradevices[n] == 29: # MODBUS
+            if c == 0:
+                return not aw.modbus.input1float and aw.modbus.input1div == 0 and aw.modbus.input1mode == ""
+            else:
+                return not aw.modbus.input2float and aw.modbus.input2div == 0 and aw.modbus.input2mode == ""    
+        elif aw.qmc.extradevices[n] == 33: # MODBUS_34
+            if c == 0:
+                return not aw.modbus.input3float and aw.modbus.input3div == 0 and aw.modbus.input3mode == ""
+            else:
+                return not aw.modbus.input4float and aw.modbus.input4div == 0 and aw.modbus.input4mode == ""  
+        elif aw.qmc.extradevices[n] == 55: # MODBUS_56
+            if c == 0:
+                return not aw.modbus.input5float and aw.modbus.input5div == 0 and aw.modbus.input5mode == ""
+            else:
+                return not aw.modbus.input6float and aw.modbus.input6div == 0 and aw.modbus.input6mode == ""  
+        elif aw.qmc.extradevices[n] == 70: # S7
+            return aw.s7.type[0+c] == 0 and aw.s7.mode[0+c] == 0 and aw.s7.div[0+c] == 0
+        elif aw.qmc.extradevices[n] == 80: # S7_34
+            return aw.s7.type[2+c] == 0 and aw.s7.mode[2+c] == 0 and aw.s7.div[2+c] == 0
+        elif aw.qmc.extradevices[n] == 81: # S7_56
+            return aw.s7.type[4+c] == 0 and aw.s7.mode[4+c] == 0 and aw.s7.div[4+c] == 0
+        elif aw.qmc.extradevices[n] == 82: # S7_78
+            return aw.s7.type[6+c] == 0 and aw.s7.mode[6+c] == 0 and aw.s7.div[6+c] == 0
+        else:
+            False
+
     # runs from GUI thread.
     # this function is called by a signal at the end of the thread sample()
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
@@ -2475,13 +2504,21 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(ndev):
                         if i < aw.nLCDS:
                             if self.extratemp1[i]:
-                                if -100 < self.extratemp1[i][-1] < 1000:
-                                    aw.extraLCD1[i].display(lcdformat%float(self.extratemp1[i][-1]))
+                                fmt = lcdformat
+                                v = float(self.extratemp1[i][-1])
+                                if -100 < v < 1000:
+                                    if v.is_integer() and self.intChannel(i,0):
+                                        fmt = "%.0f" # we display this value without decimals
+                                    aw.extraLCD1[i].display(fmt%v)
                                 else:
                                     aw.extraLCD1[i].display("--")
                             if self.extratemp2[i]:
-                                if -100 < self.extratemp2[i][-1] < 1000:
-                                    aw.extraLCD2[i].display(lcdformat%float(self.extratemp2[i][-1]))
+                                fmt = lcdformat
+                                v = float(self.extratemp2[i][-1])
+                                if -100 < v < 1000:
+                                    if v.is_integer() and self.intChannel(i,1):
+                                        fmt = "%.0f" # we display this value without decimals
+                                    aw.extraLCD2[i].display(fmt%v)
                                 else:
                                     aw.extraLCD2[i].display("--")
                                     
