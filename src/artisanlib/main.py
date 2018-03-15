@@ -9713,6 +9713,7 @@ class VMToolbar(NavigationToolbar):
 #                traceback.print_exc(file=sys.stdout)
                 pass
             aw.fetchCurveStyles()
+            aw.fetchAxisLimits()
             # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
@@ -18812,6 +18813,21 @@ class ApplicationWindow(QMainWindow):
             c = mpl.colors.rgb2hex(c)
         return c
         
+    def fetchAxisLimits(self):
+        try:
+            # x-axis min/max (in standard units)
+            xmin, xmax = map(float, aw.qmc.ax.get_xlim())
+            aw.qmc.startofx = xmin
+            aw.qmc.endofx = xmax
+            # y-axis min/max
+            ymin, ymax = map(float, aw.qmc.ax.get_ylim())
+            aw.qmc.ylimit_min = ymin
+            aw.qmc.ylimit = ymax
+            # title            
+            aw.qmc.title = aw.qmc.ax.get_title()
+        except:
+            pass
+
     def fetchCurveStyles(self):
         try:
             if aw.qmc.l_temp1:
