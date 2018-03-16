@@ -8352,6 +8352,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.timeindexB[i] = 0
 
+    
     #adds errors (can be called also outside the GUI thread, eg. from the sampling thread as actuall message is written by updategraphics in the GUI thread)
     def adderror(self,error,line=None):
         try:
@@ -33234,6 +33235,7 @@ class s7port(object):
         ]
         
         self.plc = None
+        self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
         
     def setPID(self,p,i,d):
         if self.PID_area and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
@@ -33282,12 +33284,13 @@ class s7port(object):
         # connect if not yet connected
         if self.plc is None:
             try:
+                self.commError = False
                 self.plc = S7Client()
                 with suppress_stdout_stderr():
                     libtime.sleep(0.3)
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
                 if self.plc.get_connected():
-                    aw.sendmessage(QApplication.translate("Message","S7 connected", None))
+                    aw.sendmessage(QApplication.translate("Message","S7 Connected", None))
                     libtime.sleep(0.7)
                 else:
                     libtime.sleep(0.5)
@@ -33297,9 +33300,10 @@ class s7port(object):
                         libtime.sleep(0.3)
                         self.plc.connect(self.host,self.rack,self.slot,self.port)
                     if self.plc.get_connected():
-                        aw.sendmessage(QApplication.translate("Message","S7 connected", None))
+                        aw.sendmessage(QApplication.translate("Message","S7 Connected", None))
                         libtime.sleep(0.7)
             except Exception as ex:
+                self.commError = True
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
                 
@@ -33367,16 +33371,23 @@ class s7port(object):
                 if res is None:
                     return -1
                 else:
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                     return get_real(res,0)
             else:
-                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() connecting to PLC failed"))                                 
+                self.commError = True
+#                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() connecting to PLC failed"))   
+                aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))                                   
                 return -1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
+            self.commError = True
             return -1
         finally:
             if self.COMsemaphore.available() < 1:
@@ -33409,16 +33420,23 @@ class s7port(object):
                 if res is None:
                     return -1
                 else:
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
                     return get_int(res,0)
             else:
-                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() connecting to PLC failed"))   
+                self.commError = True
+#                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() connecting to PLC failed"))  
+                aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))   
                 return -1
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
+            self.commError = True
             return -1
         finally:
             if self.COMsemaphore.available() < 1:
@@ -33513,6 +33531,8 @@ class modbusport(object):
         #    4: UDP
         self.lastReadResult = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
         
+        self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
+        
     # this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     def sleepBetween(self,write=False):
         pass # handled in MODBUS lib
@@ -33547,6 +33567,7 @@ class modbusport(object):
 #        if self.master and not self.master.socket:
 #            self.master = None
         if self.master is None:
+            self.commError = False
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 if self.type == 1: # Serial ASCII
@@ -33608,6 +33629,7 @@ class modbusport(object):
                         retry_on_empty=True,
                         timeout=self.timeout)          
                 self.master.connect()
+                aw.qmc.adderror(QApplication.translate("Error Message","Connected via MODBUS",None))
                 libtime.sleep(.03) # avoid possible hickups on startup
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
@@ -33777,13 +33799,17 @@ class modbusport(object):
                     break
             decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
             r = decoder.decode_32bit_float()
+            if self.commError: # we clear the previous error and send a message
+                self.commError = False
+                aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
             return r
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -33814,13 +33840,17 @@ class modbusport(object):
                     break
             decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)            
             r = decoder.decode_16bit_uint()
+            if self.commError: # we clear the previous error and send a message
+                self.commError = False
+                aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
             return convert_from_bcd(r)
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCD() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCD() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -33872,13 +33902,18 @@ class modbusport(object):
             else:
                 decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_16bit_uint()
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
                 return r
         except Exception as ex:
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
+#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
+            self.commError = True
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
