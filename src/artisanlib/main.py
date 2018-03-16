@@ -34791,7 +34791,7 @@ class serialport(object):
                 aw.qmc.R1_BT = aw.qmc.fromCtoF(aw.qmc.R1_BT)
                 aw.qmc.R1_EXIT_TEMP = aw.qmc.fromCtoF(aw.qmc.R1_EXIT_TEMP)
                 aw.qmc.R1_BT_ROR = aw.qmc.RoRfromCtoF(aw.qmc.R1_BT_ROR)
-        except IOError as exception:
+        except Exception as exception:
             error = QApplication.translate("Error Message", "Aillio R1: " + str(exception), None)
             aw.qmc.adderror(error)
         return tx, aw.qmc.R1_DT, aw.qmc.R1_BT
