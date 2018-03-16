@@ -15,6 +15,7 @@ class AillioR1:
     AILLIO_ENDPOINT_WR = 0x3
     AILLIO_ENDPOINT_RD = 0x81
     AILLIO_INTERFACE = 0x1
+    AILLIO_CONFIGURATION = 0x1
     AILLIO_DEBUG = 1
     AILLIO_CMD_INFO1 = [0x30, 0x02]
     AILLIO_CMD_INFO2 = [0x89, 0x01]
@@ -70,7 +71,9 @@ class AillioR1:
                     self.usbhandle = None
                     raise IOError("unable to detach kernel driver")
         try:
-            self.usbhandle.set_configuration(configuration=1)
+            config = self.usbhandle.get_active_configuration()
+            if config.bConfigurationValue != self.AILLIO_CONFIGURATION:
+                self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION)
         except Exception:
             self.usbhandle = None
             raise IOError("unable to configure")
