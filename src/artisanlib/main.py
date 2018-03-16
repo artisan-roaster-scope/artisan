@@ -10196,7 +10196,7 @@ class SampleThread(QThread):
                             aw.qmc.updateProjection()
                         
                         # autodetect CHARGE event
-                        # only if BT > 170F/77C
+                        # only if BT > 77C/170F
                         if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
                             ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 77) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 170)):
                             if aw.BTbreak(length_of_qmc_timex - 1):
@@ -10212,7 +10212,7 @@ class SampleThread(QThread):
                             except:
                                 pass
                         # autodetect DROP event
-                        # only if 9min into roast and BT>180C/356F
+                        # only if 8min into roast and BT>160C/320F
                         if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
                             length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 160) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 320)) and\
                             ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 480):
