@@ -14,6 +14,7 @@ PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 SNAP7_BIN = r'C:\Windows'
+LIBUSB_BIN = r'C:\Windows\SysWOW64'
 
 #os.system(PYTHON35 + r'\Scripts\pylupdate5 artisan.pro')
 
@@ -99,6 +100,10 @@ os.system(r'copy "' + YOCTO_BIN + r'\yapi64.dll" ' + TARGET + 'lib')
 
 # copy Snap7 lib
 os.system('copy "' + SNAP7_BIN + r'\snap7.dll" ' + TARGET)
+
+# copy libusb 1.0 lib
+
+os.system('copy "' + LIBUSB_BIN + r'\libusb-1.0.dll" ' + TARGET)
 
 
 for fn in [
