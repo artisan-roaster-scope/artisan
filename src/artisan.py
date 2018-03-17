@@ -88,6 +88,12 @@ if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
 
 if __name__ == '__main__':
     freeze_support()
+    if os.environ.get('TRAVIS'):
+        # Hack to exit inside Travis CI
+        # Ideally we would use pytest-qt.
+        import threading
+        t = threading.Timer(30, lambda: os._exit(0))
+        t.start()
     main.main()
 
 

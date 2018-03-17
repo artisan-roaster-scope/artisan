@@ -6,11 +6,10 @@ python:
 install:
   - pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip3 install requests gevent gevent-websocket qrcode openpyxl unidecode
-  - pip3 install colorspacious pyusb python-snap7 bottle
+  - pip3 install colorspacious pyusb python-snap7 bottle pyinstaller
   - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - unzip Phidget22Python.zip
   - (cd Phidget22Python && python3 setup.py install)
   
 script:
-  - (sleep 30; pkill python3) &
   - xvfb-run --server-args="-screen 0 1024x768x24" python3 src/artisan.py
