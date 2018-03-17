@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 VERSION=$(python -c 'import artisanlib; print(artisanlib.__version__)')
 NAME=artisan-linux-${VERSION}
 RPM_NAME=artisan-${VERSION}

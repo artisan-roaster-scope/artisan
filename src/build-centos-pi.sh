@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
 export PATH=$PATH:$HOME/.local/bin
 
