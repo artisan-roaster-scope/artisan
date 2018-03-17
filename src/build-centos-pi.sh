@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -ex
 
 export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
 export PATH=$PATH:$HOME/.local/bin
@@ -46,7 +46,7 @@ cp $QT_PATH/translations/qt_zh_TW.qm dist/translations
 cp translations/*.qm dist/translations
 
 # copy data
-cp -R $PYTHON_PATH/matplotlib/mpl-data/ dist
+cp -R $PYTHON_PATH/matplotlib/mpl-data dist
 rm -rf dist/mpl-data/sample_data
 
 # copy file icon and other includes
