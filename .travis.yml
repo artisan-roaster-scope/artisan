@@ -5,7 +5,7 @@ python:
 
 install:
   - sudo apt-get update
-  - sudo apt-get install ruby-dev build-essential
+  - sudo apt-get install ruby-dev build-essential p7zip
   - sudo gem install fpm
   - pip install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip install requests gevent gevent-websocket qrcode openpyxl unidecode
@@ -13,6 +13,9 @@ install:
   - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - unzip Phidget22Python.zip
   - (cd Phidget22Python && python setup.py install)
+  - curl -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
+  - 7za x snap7-full-1.4.2.7z
+  - (cd snap7-full-1.4.2/build/unix && make -f x86_64_linux.mk all && sudo make -f x86_64_linux.mk install)
   
 script:
   - cd src
