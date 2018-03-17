@@ -5,7 +5,7 @@ set -e
 export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
 export PATH=$PATH:$HOME/.local/bin
 
-export PYTHON_PATH=`python -c "import site; print(site.getusersitepackages())"`
+export PYTHON_PATH=`python -m site --user-site`
 export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 
 rm -rf build
