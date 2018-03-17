@@ -1,7 +1,7 @@
 language: python
 
 python:
-  - "3.6"
+  - "3.5"
 
 install:
   - pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
@@ -14,4 +14,5 @@ install:
 script:
   - cd src
   - xvfb-run --server-args="-screen 0 1024x768x24" python3 artisan.py
-  - pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=INFO artisan-linux.spec
+  - build-centos-pi.sh
+  - build-linux.sh
