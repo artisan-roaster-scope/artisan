@@ -6,7 +6,7 @@ export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
 export PATH=$PATH:$HOME/.local/bin
 
 if [ ! -z $TRAVIS ]; then
-    export PYTHON_PATH=/home/travis/virtualenv/python*/lib/python*/site-packages
+    export PYTHON_PATH=/home/travis/virtualenv/python3.5/lib/python3.5/site-packages
 else
     export PYTHON_PATH=`python -m site --user-site`
 fi
