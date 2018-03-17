@@ -9,7 +9,7 @@ install:
   - pip3 install colorspacious pyusb
   - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - unzip Phidget22Python.zip
-  - cd Phidget22Python && python3 setup.py install
+  - (cd Phidget22Python && python3 setup.py install)
   
 script:
   - python3 src/artisan.py
