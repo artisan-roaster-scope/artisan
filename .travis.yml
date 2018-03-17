@@ -12,5 +12,6 @@ install:
   - (cd Phidget22Python && python3 setup.py install)
   
 script:
-  - xvfb-run --server-args="-screen 0 1024x768x24" python3 src/artisan.py
+  - cd src
+  - xvfb-run --server-args="-screen 0 1024x768x24" python3 artisan.py
   - pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=INFO artisan-linux.spec
