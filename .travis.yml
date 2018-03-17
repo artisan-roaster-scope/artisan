@@ -14,5 +14,5 @@ install:
 script:
   - cd src
   - xvfb-run --server-args="-screen 0 1024x768x24" python3 artisan.py
-  - build-centos-pi.sh
-  - build-linux.sh
+  - ./build-centos-pi.sh
+  - ./build-linux.sh
