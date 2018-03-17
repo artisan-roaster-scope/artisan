@@ -3,12 +3,10 @@ language: python
 python:
   - "3.5"
 
-addons:
-  apt:
-    packages:
-      - fpm
-  
 install:
+  - sudo apt-get update
+  - sudo apt-get install ruby-dev build-essential
+  - sudo gem install fpm
   - pip install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip install requests gevent gevent-websocket qrcode openpyxl unidecode
   - pip install colorspacious pyusb python-snap7 bottle pyinstaller
