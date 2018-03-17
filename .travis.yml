@@ -7,7 +7,7 @@ install:
   - pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip3 install requests gevent gevent-websocket qrcode openpyxl unidecode
   - pip3 install colorspacious pyusb
-  - curl https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
+  - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - unzip Phidget22Python.zip
   - cd Phidget22Python && python3 setup.py install
   
