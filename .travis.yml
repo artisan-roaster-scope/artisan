@@ -5,7 +5,7 @@ python:
 
 install:
   - sudo apt-get update
-  - sudo apt-get install ruby-dev build-essential p7zip-full
+  - sudo apt-get install ruby-dev build-essential p7zip-full rpm
   - gem install fpm
   - pip install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip install requests gevent gevent-websocket qrcode openpyxl unidecode
