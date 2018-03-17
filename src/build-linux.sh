@@ -23,9 +23,9 @@ rm -rf debian/usr/share/artisan
 tar -xf dist-centos64.tar -C debian/usr/share
 mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
-chown -R root:root debian
-chmod -R go-w debian
-chmod 0644 debian/usr/share/artisan/*.so*
+sudo chown -R root:root debian
+sudo chmod -R go-w debian
+sudo chmod 0644 debian/usr/share/artisan/*.so*
 rm -f ${RPM_NAME}*x86_64.rpm
 
 cd debian
@@ -40,9 +40,6 @@ rm -rf usr/share/man/._*
 rm -rf usr/share/man/man1/._*
 rm -rf usr/share/pixmaps/._*
 rm -rf usr/share/applications/._*
-
-ls /usr/*/fpm /usr/local/*/fpm || exit 0
-find /var/lib/gems
 
 fpm -s dir -t rpm -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" \
 --vendor "Artisan GitHub" \
