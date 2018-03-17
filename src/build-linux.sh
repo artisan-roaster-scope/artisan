@@ -41,7 +41,7 @@ rm -rf usr/share/man/man1/._*
 rm -rf usr/share/pixmaps/._*
 rm -rf usr/share/applications/._*
 
-/usr/local/bin/fpm -s dir -t rpm -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" \
+fpm -s dir -t rpm -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" \
 --vendor "Artisan GitHub" \
 --url "https://github.com/artisan-roaster-scope/artisan" \
 --description "This program or software helps coffee roasters record, analyze, and control
@@ -53,7 +53,7 @@ flavor." \
 --before-remove DEBIAN/prerm \
 -v ${VERSION} --prefix / usr
 
-/usr/local/bin/fpm -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" \
+fpm -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" \
 --vendor "Artisan GitHub" \
 --no-auto-depends \
 --url "https://github.com/artisan-roaster-scope/artisan" \
@@ -70,6 +70,6 @@ flavor." \
 mv *.rpm ..
 mv *.deb ..
 cd ..
-
+ls
 
 

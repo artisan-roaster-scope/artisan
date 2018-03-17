@@ -4,6 +4,7 @@
 ==========
 Visual scope for coffee roasters
 
+[![Build Status](https://travis-ci.org/artisan-roaster-scope/artisan.svg?branch=master)](https://travis-ci.org/artisan-roaster-scope/artisan)
 
 Summary
 -------
