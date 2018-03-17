@@ -1947,13 +1947,6 @@ class tgraphcanvas(FigureCanvas):
         self.R1_VOLTAGE = 0 # 0-300
         self.R1_TX = 0.
         self.R1_STATE = ""
-
-        #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for S7 connected devices
-        self.extraS7t3 = -1
-        self.extraS7t4 = -1
-        self.extraS7t5 = -1
-        self.extraS7t6 = -1
-        self.extraS7tx = 0.
         
         #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for MODBUS connected devices
         self.extraMODBUSt3 = -1
@@ -14194,7 +14187,7 @@ class ApplicationWindow(QMainWindow):
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:                        
-                            cs = c.strip().replace("_",str(aw.S7.lastReadResult)) # the last read value can be accessed via the "_" symbol
+                            cs = c.strip().replace("_",str(aw.s7.lastReadResult)) # the last read value can be accessed via the "_" symbol
                             if cs.startswith("setDBint(") and len(cs) > 14:
                                 try:
                                     dbnr,s,v = cs[len("setDBint("):-1].split(',')
@@ -33385,11 +33378,11 @@ class s7port(object):
 #                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() connecting to PLC failed"))   
                 aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))                                   
                 return -1
-        except Exception as ex:
+        except Exception: # as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
+#            _, _, exc_tb = sys.exc_info()
 #            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
             aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
             self.commError = True
@@ -33434,11 +33427,11 @@ class s7port(object):
 #                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() connecting to PLC failed"))  
                 aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))   
                 return -1
-        except Exception as ex:
+        except Exception: # as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
+#            _, _, exc_tb = sys.exc_info()
 #            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() {0}").format(str(ex)),exc_tb.tb_lineno)
             aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
             self.commError = True
@@ -33808,11 +33801,11 @@ class modbusport(object):
                 self.commError = False
                 aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
             return r
-        except Exception as ex:
+        except Exception: # as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
+#            _, _, exc_tb = sys.exc_info()
 #            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
             aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
         finally:
@@ -33849,11 +33842,11 @@ class modbusport(object):
                 self.commError = False
                 aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
             return convert_from_bcd(r)
-        except Exception as ex:
+        except Exception: # as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
 #            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
+#            _, _, exc_tb = sys.exc_info()
 #            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCD() {0}").format(str(ex)),exc_tb.tb_lineno)
             aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
         finally:
@@ -33911,11 +33904,11 @@ class modbusport(object):
                     self.commError = False
                     aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
                 return r
-        except Exception as ex:
+        except Exception: # as ex:
 #            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
+#            _, _, exc_tb = sys.exc_info()
 #            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
             aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
             self.commError = True
@@ -34796,17 +34789,23 @@ class serialport(object):
 
     def S7(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.S7read()
+        t2,t1 = self.S7read(0)
         return tx,t2,t1
     
     def S7_34(self):
-        return aw.qmc.extraS7tx,aw.qmc.extraS7t4,aw.qmc.extraS7t3
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.S7read(1)
+        return tx,t2,t1
         
     def S7_56(self):
-        return aw.qmc.extraS7tx,aw.qmc.extraS7t6,aw.qmc.extraS7t5
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.S7read(2)
+        return tx,t2,t1
 
     def S7_78(self):
-        return aw.qmc.extraS7tx,aw.qmc.extraS7t8,aw.qmc.extraS7t7
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.S7read(3)
+        return tx,t2,t1
 
     def R1_DTBT(self):
         if self.R1 is None:
@@ -35500,9 +35499,13 @@ class serialport(object):
         return res
         
     #returns v1,v2 from a connected S7 device
-    def S7read(self):
+    # mode=0 to read ch1+2
+    # mode=1 to read ch3+4
+    # mode=2 to read ch5+6
+    # mode=3 to read ch7+8
+    def S7read(self,mode):
         res = []
-        for i in range(aw.s7.channels):
+        for i in range(mode*2,mode*2+2):
             if aw.s7.area[i]:
                 if aw.s7.type[i]:
                     v = aw.s7.readFloat(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
@@ -35512,14 +35515,6 @@ class serialport(object):
                 res.append(v)
             else:
                 res.append(-1)
-                          
-        aw.qmc.extraS7t3 = res[2]
-        aw.qmc.extraS7t4 = res[3]
-        aw.qmc.extraS7t5 = res[4]
-        aw.qmc.extraS7t6 = res[5]
-        aw.qmc.extraS7t7 = res[6]
-        aw.qmc.extraS7t8 = res[7]
-        aw.qmc.extraS7tx = aw.qmc.timeclock.elapsed()/1000.
         return res[1], res[0]
 
     #returns v1,v2 from a connected MODBUS device

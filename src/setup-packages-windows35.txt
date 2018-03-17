@@ -210,6 +210,12 @@ put in the directory above the Artisan source code
 
 # pip3 install pyusb
 
+download libusb-win32-bin-1.2.6.0.zip from
+
+https://sourceforge.net/projects/libusb-win32/files/latest/download?source=files
+
+copy bin/amd64/libusb0.dll to  c:\Windows\SysWOW64
+
 ----
 
 Notes

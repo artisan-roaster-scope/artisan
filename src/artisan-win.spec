@@ -103,7 +103,7 @@ os.system('copy "' + SNAP7_BIN + r'\snap7.dll" ' + TARGET)
 
 # copy libusb 1.0 lib
 
-os.system('copy "' + LIBUSB_BIN + r'\libusb-1.0.dll" ' + TARGET)
+os.system('copy "' + LIBUSB_BIN + r'\libusb0.dll" ' + TARGET)
 
 
 for fn in [
