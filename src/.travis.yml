@@ -1,0 +1,7 @@
+language: python
+
+before_script:
+  - pip3 install sip pyserial serial-tools pyqt5 
+
+script:
+  - python3 src/artisan.py
