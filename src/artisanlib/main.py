@@ -4200,23 +4200,28 @@ class tgraphcanvas(FigureCanvas):
         anno_artists = []
         #Add markers for CHARGE
         try: 
-            if timeindex[0] != -1 and len(timex) > timeindex[0]:
-                t0idx = timeindex[0]
-                t0 = timex[t0idx]
-                y = stemp[t0idx]
-                ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
-                if startB is not None:
-                    #st1 = str(self.stringfromseconds(t0 - startB))
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
-                    e = 60
-                    a = aw.qmc.backgroundalpha
+            if len(timex) > 0:
+                if timeindex[0] != -1 and len(timex) > timeindex[0]:
+                    t0idx = timeindex[0]
+                    t0 = timex[t0idx]
                 else:
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
-                    if aw.qmc.graphfont == 1:
-                        st1 = toASCII(st1)
-                    e = 0
-                    a = 1.  
-                anno_artists += self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
+                    t0idx = 0
+                    t0 = timex[0]
+                if timeindex[0] != -1:
+                    y = stemp[t0idx]
+                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
+                    if startB is not None:
+                        #st1 = str(self.stringfromseconds(t0 - startB))
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
+                        e = 60
+                        a = aw.qmc.backgroundalpha
+                    else:
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE", None))
+                        if aw.qmc.graphfont == 1:
+                            st1 = toASCII(st1)
+                        e = 0
+                        a = 1.  
+                    anno_artists += self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
                 
                 #Add TP marker
                 if self.markTPflag and TP_index and TP_index > 0:
