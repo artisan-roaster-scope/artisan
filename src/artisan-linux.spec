@@ -5,8 +5,14 @@ block_cipher = None
 additionalLibs = [] 
 additionalLibs.append( ("libGL.so.1", "/usr/lib64/libGL.so.1", 'BINARY') )
 
+import os
+
+path=os.environ['HOME'] + '/artisan-master/src'
+if not os.path.isdir(path):
+    path=os.environ['HOME'] + '/artisan/src'
+
 a = Analysis(['artisan.py'],
-             pathex=['/home/luther/artisan-master/src'],
+             pathex=[path],
              binaries=[],
              datas=[],
              hiddenimports=['scipy._lib.messagestream'],

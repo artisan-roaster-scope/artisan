@@ -1,16 +1,26 @@
 #!/bin/sh
 
 export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
+export PATH=$PATH:$HOME/.local/bin
 
 export PYTHON_PATH=/usr/local/lib/python3.5
+if [ ! -d $PYTHON_PATH/site-packages/matplotlib ]; then
+    export PYTHON_PATH=$HOME/.local/lib/python3.6
+fi
+
 export QT_PATH=/usr/local/lib/python3.5/site-packages/PyQt5/Qt
+if [ ! -d $QT_PATH ]; then
+    export QT_PATH=$HOME/.local/lib/python3.6/site-packages/PyQt5/Qt
+fi
 
 rm -rf build
 rm -rf dist
 
+ln -s /lib/x86_64-linux-gnu/libusb-1.0.so.0
+
 # pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN "artisan.py"
 
-pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN artisan-linux.spec
+pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=INFO artisan-linux.spec
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist
@@ -82,8 +92,9 @@ cp /usr/lib/libsnap7.so dist
 
 
 cp README.txt dist
-cp LICENSE.txt dist
+cp ../LICENSE dist/LICENSE.txt
 
+rm libusb-1.0.so.0
 
 tar -cf dist-centos64.tar dist
 
