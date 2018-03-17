@@ -5,7 +5,10 @@ set -e
 export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
 export PATH=$PATH:$HOME/.local/bin
 
-export PYTHON_PATH=`python -m site`
+if [ ! -z $TRAVIS ]; then
+    export PYTHON_PATH=/home/travis/virtualenv/python*/lib/python*/site-packages
+fi
+export PYTHON_PATH=`python -m site --user-site`
 export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 
 rm -rf build
