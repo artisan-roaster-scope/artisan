@@ -1,19 +1,12 @@
 #!/bin/sh
 
-set -x
+set -e
 
 export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
 export PATH=$PATH:$HOME/.local/bin
 
-export PYTHON_PATH=/usr/local/lib/python3.5
-if [ ! -d $PYTHON_PATH/site-packages/matplotlib ]; then
-    export PYTHON_PATH=$HOME/.local/lib/python3.6
-fi
-
-export QT_PATH=/usr/local/lib/python3.5/site-packages/PyQt5/Qt
-if [ ! -d $QT_PATH ]; then
-    export QT_PATH=$HOME/.local/lib/python3.6/site-packages/PyQt5/Qt
-fi
+export PYTHON_PATH=`python -c "import site; print(site.getusersitepackages())"`
+export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 
 rm -rf build
 rm -rf dist
@@ -49,7 +42,7 @@ cp $QT_PATH/translations/qt_zh_TW.qm dist/translations
 cp translations/*.qm dist/translations
 
 # copy data
-cp -R $PYTHON_PATH/site-packages/matplotlib/mpl-data/ dist
+cp -R $PYTHON_PATH/matplotlib/mpl-data/ dist
 rm -rf dist/mpl-data/sample_data
 
 # copy file icon and other includes
@@ -88,7 +81,7 @@ mkdir dist/Icons
 find includes/Icons -name '.*.aset' -exec rm -r {} \;
 cp -R includes/Icons/* dist/Icons
 
-cp $PYTHON_PATH/site-packages/yoctopuce/cdll/* dist
+cp $PYTHON_PATH/yoctopuce/cdll/* dist
 
 cp /usr/lib/libsnap7.so dist
 

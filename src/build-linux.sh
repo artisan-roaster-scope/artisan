@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -x
+set -e
 
 VERSION=$(python -c 'import artisanlib; print(artisanlib.__version__)')
 NAME=artisan-linux-${VERSION}
