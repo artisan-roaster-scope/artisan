@@ -7,8 +7,9 @@ export PATH=$PATH:$HOME/.local/bin
 
 if [ ! -z $TRAVIS ]; then
     export PYTHON_PATH=/home/travis/virtualenv/python*/lib/python*/site-packages
+else
+    export PYTHON_PATH=`python -m site --user-site`
 fi
-export PYTHON_PATH=`python -m site --user-site`
 export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 
 rm -rf build
