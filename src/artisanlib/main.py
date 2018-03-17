@@ -5520,6 +5520,8 @@ class tgraphcanvas(FigureCanvas):
                         
                 if aw.qmc.patheffects:
                     rcParams['path.effects'] = []  
+                                    
+                aw.qmc.repaint() # a bug in Qt/PyQt/mpl cause the canvas not to be repainted on load/switch/reset in fullscreen mode without this
                         
             except Exception as ex:
 #                import traceback

@@ -229,5 +229,3 @@ download and extract pytz-2015.6.tar.gz
 
 # py -3 setup.py build
 # py -3 setup.py install
-
-20
