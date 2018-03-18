@@ -856,8 +856,8 @@ class tgraphcanvas(FigureCanvas):
                         "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
                         "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
-                        "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'black',"metbox":'red',
-                        "aucguide":'#00007f',"messages":'black'} 
+                        "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'white',"metbox":'red',
+                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'} 
         self.palette1 = self.palette.copy()
         
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
@@ -1029,6 +1029,7 @@ class tgraphcanvas(FigureCanvas):
         self.AUCvalue = 0 # the running AUC value calculated during recording
         self.AUCsinceFCs = 0 # the running AUC since FCs calculated during recording
         self.AUCguideTime = 0 # the expected time in seconds the AUC target is reached (calculated by the AUC guide mechanism)
+        self.AUCshowFlag = False
 
         #DEVICES
         self.device = 18                                    # default device selected to None (18). Calls appropiate function
@@ -4485,6 +4486,53 @@ class tgraphcanvas(FigureCanvas):
         return res
         
 
+    def bisection(self,array,value):
+        #Algorithm presumes 'array' is monotonic increasing.  This is not guaranteed for profiles so there
+        #may be results that are not strictly correct.
+        n = len(array)
+        if (value < array[0]):
+            return -1
+        elif (value > array[n-1]):
+            return n
+        elif (value == array[0]): # edge cases at bottom
+            return 0
+        elif (value == array[n-1]): # and top
+            return n-1
+        jl = 0   # Initialize lower
+        ju = n-1 # and upper limits.
+        while (ju-jl > 1):# If we are not yet done,
+            jm=(ju+jl) >> 1 # compute a midpoint with a bitshift
+            if (value >= array[jm]):
+                jl=jm # and replace either the lower limit
+            else:
+                ju=jm # or the upper limit, as appropriate.
+            # Repeat until the test condition is satisfied.
+        if (abs(value - array[jl]) > abs(array[ju] - value)):
+            return ju
+        else:
+            return jl
+            
+    def drawAUC(self):
+        TP_Index = aw.findTP()
+        if aw.qmc.AUCbaseFlag:
+            _,_,_,idx = aw.ts()
+            idx = TP_Index + self.bisection(self.temp2[TP_Index:self.timeindex[6]],aw.qmc.temp2[idx])
+        else:
+            idx = TP_Index + self.bisection(self.temp2[TP_Index:self.timeindex[6]],aw.qmc.AUCbase)
+        rtbt = aw.qmc.convertTemp(aw.qmc.temp2[idx],"C",aw.qmc.mode)
+        rtbt = aw.qmc.temp2[idx]
+                
+        ix = self.timex[idx:self.timeindex[6]+1]
+        iy = self.temp2[idx:self.timeindex[6]+1]
+
+        # Create the shaded region
+        from matplotlib.patches import Polygon
+        a = ix[0]
+        b = ix[-1]
+        verts = [ xy for xy in [(a, rtbt)] + list(zip(ix, iy)) + [(b, rtbt)] if xy[1] > 0 ]
+        poly = Polygon(verts, facecolor=self.palette["aucarea"], edgecolor='0.5', alpha=0.3)
+        self.ax.add_patch(poly)
+
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
     def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
@@ -5433,6 +5481,9 @@ class tgraphcanvas(FigureCanvas):
 
                 if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.statssummary:
                     self.statsSummary()
+
+                if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.AUCshowFlag:
+                    self.drawAUC()
     
 # this seems to mess up the focus if sliders are shown, but mini editor not
 #                    #if recorder on
@@ -6039,6 +6090,7 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["watermarks"] = str(dialog.watermarksLabel.text())
                 self.palette["timeguide"] = str(dialog.timeguideLabel.text())
                 self.palette["aucguide"] = str(dialog.aucguideLabel.text())
+                self.palette["aucarea"] = str(dialog.aucareaLabel.text())
                 self.palette["canvas"] = str(dialog.canvasLabel.text())
                 self.palette["legendbg"] = str(dialog.legendbgLabel.text())
                 self.palette["legendborder"] = str(dialog.legendborderLabel.text())
@@ -7696,7 +7748,7 @@ class tgraphcanvas(FigureCanvas):
                         pass
                         
                     ror = "%.1f"%(((self.temp2[self.timeindex[6]]-LP)/(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))*60.)
-                    _,_,tsb = aw.ts(tp=TP_index)
+                    _,_,tsb,_ = aw.ts(tp=TP_index)
                     
                     #curveSimilarity
                     det,dbt = aw.curveSimilarity(aw.qmc.phases[1]) # we analyze from DRY-END as specified in the phases dialog to DROP
@@ -7902,9 +7954,9 @@ class tgraphcanvas(FigureCanvas):
                             st1 += u("  ")
                             st2 += u("  ")
                             st3 += u("  ")
-                        _,_,ts1b = aw.ts(self.timeindex[0],dryEndIndex,TP_index)
-                        _,_,ts2b = aw.ts(dryEndIndex,self.timeindex[2],TP_index)
-                        _,_,ts3b = aw.ts(self.timeindex[2],self.timeindex[6],TP_index)
+                        _,_,ts1b,_ = aw.ts(self.timeindex[0],dryEndIndex,TP_index)
+                        _,_,ts2b,_ = aw.ts(dryEndIndex,self.timeindex[2],TP_index)
+                        _,_,ts3b,_ = aw.ts(self.timeindex[2],self.timeindex[6],TP_index)
                         st1 += u(ts1b) + u("C*min")
                         st2 += u(ts2b) + u("C*min")
                         st3 += u(ts3b) + u("C*min")
@@ -8811,9 +8863,9 @@ class tgraphcanvas(FigureCanvas):
                         midramp = self.temp2[self.timeindex[2]] - self.temp2[self.timeindex[1]]
                         finishramp = self.temp2[self.timeindex[6]] - self.temp2[self.timeindex[2]]
 
-                        ts1,_,_ = aw.ts(self.timeindex[0],self.timeindex[1])
-                        ts2,_,_ = aw.ts(self.timeindex[1],self.timeindex[2])
-                        ts3,_,_ = aw.ts(self.timeindex[2],self.timeindex[6])
+                        ts1,_,_,_ = aw.ts(self.timeindex[0],self.timeindex[1])
+                        ts2,_,_,_ = aw.ts(self.timeindex[1],self.timeindex[2])
+                        ts3,_,_,_ = aw.ts(self.timeindex[2],self.timeindex[6])
                         etbt1 = "%i"%(ts1)
                         etbt2 = "%i"%(ts2)
                         etbt3 = "%i"%(ts3)
@@ -15641,7 +15693,7 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.TP_time_B = 0
                         else:
                             self.qmc.TP_time_B = None
-                    _,_,auc = aw.ts(tp=aw.qmc.backgroundtime2index(self.qmc.TP_time_B),background=True)
+                    _,_,auc,_ = aw.ts(tp=aw.qmc.backgroundtime2index(self.qmc.TP_time_B),background=True)
                     aw.qmc.AUCbackground = auc
                 except Exception:
                     pass
@@ -17178,7 +17230,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)
         ######### ETBTarea #########
         try:
-            ts,tse,tsb = aw.ts(self.qmc.timeindex[0],self.qmc.timeindex[6])
+            ts,tse,tsb,_ = aw.ts(self.qmc.timeindex[0],self.qmc.timeindex[6])
             computedProfile["total_ts"] = self.float2float(ts,0)
             computedProfile["total_ts_ET"] = self.float2float(tse,0)
             computedProfile["total_ts_BT"] = self.float2float(tsb,0)
@@ -17186,7 +17238,7 @@ class ApplicationWindow(QMainWindow):
             pass
         ######### AUC area #########
         try:
-            _,_,tsb = aw.ts()   
+            _,_,tsb,_ = aw.ts()   
             computedProfile["AUC"] = self.float2float(tsb,0)
             computedProfile["AUCbegin"] = ""
             computedProfile["AUCbase"] = self.float2float(aw.qmc.AUCbase,0)
@@ -17210,17 +17262,17 @@ class ApplicationWindow(QMainWindow):
         except Exception:
             pass
         try:
-            _,_,ts1b = aw.ts(self.qmc.timeindex[0],DRY_time_idx)
+            _,_,ts1b,_ = aw.ts(self.qmc.timeindex[0],DRY_time_idx)
             computedProfile["dry_phase_AUC"] = self.float2float(ts1b,0)
         except Exception:
             pass
         try:
-            _,_,ts2b = aw.ts(DRY_time_idx,self.qmc.timeindex[2])
+            _,_,ts2b,_ = aw.ts(DRY_time_idx,self.qmc.timeindex[2])
             computedProfile["mid_phase_AUC"] = self.float2float(ts2b,0)
         except Exception:
             pass
         try:
-            _,_,ts3b = aw.ts(self.qmc.timeindex[2],self.qmc.timeindex[6])
+            _,_,ts3b,_ = aw.ts(self.qmc.timeindex[2],self.qmc.timeindex[6])
             computedProfile["finish_phase_AUC"] = self.float2float(ts3b,0)
         except Exception:
             pass
@@ -17873,6 +17925,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.AUCguideFlag = bool(toBool(settings.value("AUCguideFlag",self.qmc.AUCguideFlag)))
                 self.qmc.AUClcdFlag = bool(toBool(settings.value("AUClcdFlag",self.qmc.AUClcdFlag)))
                 self.qmc.AUCLCDmode = toInt(settings.value("AUCLCDmode",self.qmc.AUCLCDmode))
+            if settings.contains("AUCshowFlag"):
+                self.qmc.AUCshowFlag = bool(toBool(settings.value("AUCshowFlag",self.qmc.AUCshowFlag)))  
             #restore ambient temperature source
             if settings.contains("AmbientTempSource"):
                 aw.qmc.ambientTempSource = toInt(settings.value("AmbientTempSource",int()))
@@ -19162,6 +19216,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("AUCguideFlag",self.qmc.AUCguideFlag)
             settings.setValue("AUClcdFlag",self.qmc.AUClcdFlag)
             settings.setValue("AUCLCDmode",self.qmc.AUCLCDmode)
+            settings.setValue("AUCshowFlag",self.qmc.AUCshowFlag)
             #save Events settings
             settings.beginGroup("events")
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
@@ -19726,6 +19781,9 @@ class ApplicationWindow(QMainWindow):
 #            settings.setValue("extradevicecolor1",self.qmc.extradevicecolor1)
 #            settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
 #            settings.endGroup()
+            settings.beginGroup("grid")
+            settings.setValue("gridalpha",self.qmc.gridalpha)
+            settings.endGroup()
 
         except Exception:
 #            import traceback
@@ -19758,6 +19816,7 @@ class ApplicationWindow(QMainWindow):
         phases["autoFCs"] = str(self.qmc.autoFCsFlag)
         statistics["Statistics"] = str(self.qmc.statisticsflags)
         statistics["StatisticsConds"] = str(self.qmc.statisticsconditions)
+        statistics["AUCshowFlag"] = str(self.qmc.AUCshowFlag)
         events["eventsbuttonflag"] = str(self.eventsbuttonflag)
         events["minieventsflag"] = str(self.minieventsflag)
         events["eventsGraphflag"] = str(self.qmc.eventsGraphflag)
@@ -21982,7 +22041,7 @@ class ApplicationWindow(QMainWindow):
     # from "start" to "end" (defaults to CHARGE to DROP)
     # and use "rt" as reference temperature (area above "rt" and below ET/BT)
     # if background=True, use the background time and temperature values
-    # returns AUC(ET-BT), AUC(ET), AUC(BT)
+    # returns AUC(ET-BT), AUC(ET), AUC(BT), AUCbegin_idx
     def ts(self,start=None,end=None,tp=None,background=False):
         if background:
             timeindex = self.qmc.timeindexB
@@ -22039,7 +22098,7 @@ class ApplicationWindow(QMainWindow):
                     rtet = rtbt = aw.qmc.AUCbase
                 rtet = aw.qmc.convertTemp(rtet,aw.qmc.mode,"C")
                 rtbt = aw.qmc.convertTemp(rtbt,aw.qmc.mode,"C")
-                
+
                 for i in range(st,ed):
                     ET += self.calcAUC(rtet,timex,temp1,i)
                     BT += self.calcAUC(rtbt,timex,temp2,i)
@@ -22049,7 +22108,7 @@ class ApplicationWindow(QMainWindow):
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ts() {0}").format(str(e)),exc_tb.tb_lineno)
-            return int(round(delta/60.)), int(round(ET/60.)), int(round(BT/60.))
+            return int(round(delta/60.)), int(round(ET/60.)), int(round(BT/60.)), AUCbegin_idx
 
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
     #Note: For the dryphase, the RoR for the dryphase is calculated for the segment starting from TP ending at DE
@@ -33090,6 +33149,9 @@ class StatisticsDlg(ArtisanDialog):
         self.AUClcdFlag = QCheckBox(QApplication.translate("CheckBox","LCD", None))
         self.AUClcdFlag.setChecked(aw.qmc.AUClcdFlag)
         self.AUClcdFlag.stateChanged.connect(self.AUCLCFflagChanged)
+        self.AUCshowFlag = QCheckBox(QApplication.translate("CheckBox","Show Area", None))
+        self.AUCshowFlag.setChecked(aw.qmc.AUCshowFlag)
+        self.AUCshowFlag.stateChanged.connect(self.changeAUCshowFlag)
         
         AUCgrid = QGridLayout()
         AUCgrid.addWidget(beginlabel,0,0)
@@ -33102,6 +33164,7 @@ class StatisticsDlg(ArtisanDialog):
         AUCgrid.addWidget(self.targetFlag,2,2)
         AUCgrid.addWidget(self.AUClcdFlag,4,1)
         AUCgrid.addWidget(self.guideFlag,4,2)
+        AUCgrid.addWidget(self.AUCshowFlag,5,1)
         AUCgrid.setRowMinimumHeight(3, 20)
         AUCvertical = QVBoxLayout()
         AUCvertical.addLayout(AUCgrid)
@@ -33132,6 +33195,10 @@ class StatisticsDlg(ArtisanDialog):
                 aw.AUCLCD.show()
             else:
                 aw.AUCLCD.hide()
+
+    def changeAUCshowFlag(self,_):
+        aw.qmc.AUCshowFlag = not aw.qmc.AUCshowFlag
+        aw.qmc.redraw(recomputeAllDeltas=False)        
 
     def switchAUCbase(self,i):
         if i:
@@ -33180,9 +33247,9 @@ class StatisticsDlg(ArtisanDialog):
             aw.qmc.AUClcdFlag = self.AUClcdFlag.isChecked()
             try:
                 if aw.qmc.TP_time_B:
-                    _,_,auc = aw.ts(tp=aw.qmc.backgroundtime2index(aw.qmc.TP_time_B),background=True)
+                    _,_,auc,_ = aw.ts(tp=aw.qmc.backgroundtime2index(aw.qmc.TP_time_B),background=True)
                 else:
-                    _,_,auc = aw.ts(tp=0,background=True)
+                    _,_,auc,_ = aw.ts(tp=0,background=True)
                 aw.qmc.AUCbackground = auc
             except:
                 pass
@@ -42278,6 +42345,13 @@ class graphColorDlg(ArtisanDialog):
         self.aucguideButton.setFocusPolicy(Qt.NoFocus)
         self.aucguideLabel.setFrameStyle(frameStyle)
         self.aucguideButton.clicked.connect(lambda _: self.setColor("AUC Guide",self.aucguideLabel,"aucguide"))
+        self.aucareaLabel =QLabel(aw.qmc.palette["aucarea"])
+        self.aucareaLabel.setPalette(QPalette(QColor(aw.qmc.palette["aucarea"])))
+        self.aucareaLabel.setAutoFillBackground(True)
+        self.aucareaButton = QPushButton(QApplication.translate("Button","AUC Area", None))
+        self.aucareaButton.setFocusPolicy(Qt.NoFocus)
+        self.aucareaLabel.setFrameStyle(frameStyle)
+        self.aucareaButton.clicked.connect(lambda _: self.setColor("AUC Area",self.aucareaLabel,"aucarea"))
         self.legendbgLabel = QLabel(aw.qmc.palette["legendbg"])
         self.legendbgLabel.setPalette(QPalette(QColor(aw.qmc.palette["legendbg"])))
         self.legendbgLabel.setAutoFillBackground(True)
@@ -42537,6 +42611,8 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.timeguideLabel,9,3)
         grid.addWidget(self.aucguideButton,10,2)
         grid.addWidget(self.aucguideLabel,10,3)
+        grid.addWidget(self.aucareaButton,11,2)
+        grid.addWidget(self.aucareaLabel,11,3)
         defaultsLayout = QHBoxLayout()
         defaultsLayout.addStretch()
         defaultsLayout.addWidget(greyButton)
@@ -42782,18 +42858,21 @@ class graphColorDlg(ArtisanDialog):
 
     def setColorLabels(self):
         for l,t in [
-                (self.canvasLabel,"canvas"),
-                (self.backgroundLabel,"background"),
-                (self.titleLabel,"title"),
-                (self.gridLabel,"grid"),
+                # Curves
                 (self.metLabel,"et"),
                 (self.btLabel,"bt"),
                 (self.deltametLabel,"deltaet"),
                 (self.deltabtLabel,"deltabt"),
+                # Graph
+                (self.canvasLabel,"canvas"),
+                (self.backgroundLabel,"background"),
+                (self.titleLabel,"title"),
+                (self.gridLabel,"grid"),
                 (self.yLabel,"ylabel"),
                 (self.yLabel,"xlabel"),
                 (self.timeguideLabel,"timeguide"),
                 (self.aucguideLabel,"aucguide"),
+                (self.aucareaLabel,"aucarea"),
                 (self.watermarksLabel,"watermarks"),
                 (self.rect1Label,"rect1"),
                 (self.rect2Label,"rect2"),
@@ -42811,7 +42890,7 @@ class graphColorDlg(ArtisanDialog):
                 ]:
             self.setColorLabel(l,t)
             
-            # set background colors and alpha
+            # Curves, set background colors and alpha
             self.bgmetLabel.setText(aw.qmc.backgroundmetcolor)
             self.bgbtLabel.setText(aw.qmc.backgroundbtcolor)
             self.bgdeltametLabel.setText(aw.qmc.backgrounddeltaetcolor)
