@@ -1,15 +1,25 @@
 #!/bin/sh
+
+set -ex
+
 export MACOSX_DEPLOYMENT_TARGET=10.10
 
-export PYTHON=/Library/Frameworks/Python.framework/Versions/3.5
+if [ ! -z $TRAVIS ]; then
+    export PYTHON=/usr/local
+    export PYTHONPATH=$PYTHON/lib/python3.6/site-packages
+    export PYTHON_V=3.6
+else
+    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.5
+    export PYTHONPATH=$PYTHON/lib/python3.5/site-packages
+    export PYTHON_V=3.5
+fi
 
-export PYTHONPATH=$PYTHON/lib/python3.5/site-packages
 export QT_PATH=~/Qt5.9.3/5.9.3/clang_64
 
 export PATH=$PYTHON/bin:$PYTHON/lib:$PATH
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 #export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
-export DYLD_LIBRARY_PATH=$PYTHON/lib/python3.5/site-packages/PIL/.dylibs/:$DYLD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=$PYTHON/lib/python$PYTHON_V/site-packages/PIL/.dylibs/:$DYLD_LIBRARY_PATH
 
 # translations
 $PYTHON/bin/pylupdate5 artisan.pro
@@ -71,4 +81,8 @@ cp ../LICENSE dist/LICENSE.txt
 # remove the executable 
 rm dist/Artisan
 
-$PYTHON/bin/python3.5 create_dmg.py
+if [ ! -z $TRAVIS ]; then
+    python3 create_dmg.py
+else
+    $PYTHON/bin/python3.5 create_dmg.py
+fi
