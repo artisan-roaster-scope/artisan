@@ -1,12 +1,21 @@
 #!/bin/sh
-export MACOSX_DEPLOYMENT_TARGET=10.10
-export PYTHON=/Library/Frameworks/Python.framework/Versions/3.5
 
-export PYTHONPATH=$PYTHON/lib/python3.5/site-packages
+set -ex
+export MACOSX_DEPLOYMENT_TARGET=10.10
+
+if [ ! -z $TRAVIS ]; then
+    export PYTHON=/usr/local
+    export PYTHONPATH=$PYTHON/lib/python3.6/site-packages
+    export PYTHON_V=3.6
+    export QT_PATH=/usr/local/Cellar/qt/*
+else
+    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.5
+    export PYTHONPATH=$PYTHON/lib/python3.5/site-packages
+    export QT_PATH=~/Qt5.10.1/5.10.1/clang_64
+    export PYTHON_V=3.5
+fi
 
 export PATH=$PYTHON/bin:$PYTHON:/lib:$PATH
-
-export QT_PATH=~/Qt5.10.1/5.10.1/clang_64
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 
@@ -16,4 +25,4 @@ $QT_PATH/bin/lrelease -verbose artisan.pro
 
 # distribution
 rm -rf build dist
-$PYTHON/bin/python3.5 setup-mac35.py py2app
+$PYTHON/bin/python$PYTHON_V setup-mac35.py py2app

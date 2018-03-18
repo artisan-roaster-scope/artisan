@@ -9,9 +9,9 @@ matrix:
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade python; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb qt py2app; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm libusb-1.0; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb qt; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
   - pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip3 install requests gevent gevent-websocket qrcode openpyxl unidecode
@@ -27,11 +27,13 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/macos/Phidget22.dmg; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then hdiutil attach Phidget22.dmg; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -pkg /Volumes/Phidgets22/Phidgets.pkg -target / ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo rm -rf /usr/local/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data; fi
 
+  
 script:
   - cd src
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-mac35-pi.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-mac35.sh; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run --server-args="-screen 0 1024x768x24" python artisan.py; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 artisan.py; fi
   - cd ..

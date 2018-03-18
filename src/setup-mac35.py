@@ -198,10 +198,21 @@ os.system(r'cp Wheels/Other/* dist/Wheels/Other')
 os.system(r'cp Wheels/Roasting/* dist/Wheels/Roasting')
 os.chdir('./dist')
 
+try:
+    PYTHONPATH = os.environ["PYTHONPATH"] + r'/'
+except:
+    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5'
+
+try:
+    PYTHON_V = os.environ["PYTHON_V"]
+except:
+    PYTHON_V = '3.5'
+    
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
-os.system(r'mkdir Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matplotlib/.dylibs')
-os.system(r'cp -R /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python3.5/lib-dynload/matplotlib/.dylibs')
-os.system(r'cp /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
+os.system(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs')
+
+os.system(r'cp -R ' + PYTHONPATH + r'/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs')
+os.system(r'cp ' + PYTHONPATH + r'/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
 
 # copy snap7 dylib
 os.system(r'cp /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
