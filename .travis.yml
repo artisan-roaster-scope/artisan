@@ -14,13 +14,13 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm libusb-1.0; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip; fi
-  - gem install fpm
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
   - pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip3 install requests gevent gevent-websocket qrcode openpyxl unidecode
   - pip3 install colorspacious pyusb python-snap7 bottle pyinstaller
   - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - unzip Phidget22Python.zip
-  - (cd Phidget22Python && python setup.py install)
+  - (cd Phidget22Python && python3 setup.py install)
   - curl -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
   - 7za x snap7-full-1.4.2.7z
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd snap7-full-1.4.2/build/unix && make -f x86_64_linux.mk all && sudo make -f x86_64_linux.mk install); fi
@@ -28,6 +28,9 @@ install:
 
 script:
   - cd src
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-mac35-pi.sh; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run --server-args="-screen 0 1024x768x24" python artisan.py; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 artisan.py; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh; fi
+
+
