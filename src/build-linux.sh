@@ -68,8 +68,7 @@ flavor." \
 --before-remove DEBIAN/prerm \
 -v ${VERSION} --prefix / usr
 
-
 cd ..
-ls
+ls *.deb *.rpm
 
 
