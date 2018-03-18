@@ -121,6 +121,7 @@ CONF_MENU_BUTTONS = QApplication.translate("Menu", "Buttons", None)
 CONF_MENU_SLIDERS = QApplication.translate("Menu", "Sliders", None)
 CONF_MENU_PHASES = QApplication.translate("Menu", "Phases...", None)
 CONF_MENU_EVENTS = QApplication.translate("Menu", "Events...", None)
+CONF_MENU_CURVES = QApplication.translate("Menu", "Curves...", None)
 CONF_MENU_STATISTICS = QApplication.translate("Menu", "Statistics...", None)
 CONF_MENU_AXES = QApplication.translate("Menu", "Axes...", None)
 CONF_MENU_AUTOSAVE = QApplication.translate("Menu", "Autosave...", None)
@@ -162,7 +163,6 @@ TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None)
 TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None)
 TOOLKIT_MENU_WHEELGRAPH = QApplication.translate("Menu", "Wheel Graph", None)
 TOOLKIT_MENU_LCDS = QApplication.translate("Menu", "LCDs", None)
-TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None)
 
 
 #Settings menu

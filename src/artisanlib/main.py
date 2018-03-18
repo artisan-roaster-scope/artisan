@@ -11016,6 +11016,12 @@ class ApplicationWindow(QMainWindow):
         self.oversamplingAction.setCheckable(True)
         self.oversamplingAction.setChecked(self.qmc.oversampling)
         self.ConfMenu.addAction(self.oversamplingAction)
+
+        self.ConfMenu.addSeparator()
+
+        self.hudAction = QAction(UIconst.CONF_MENU_CURVES,self)
+        self.hudAction.triggered.connect(self.hudset)
+        self.ConfMenu.addAction(self.hudAction)
         
         self.ConfMenu.addSeparator()
 
@@ -11272,12 +11278,6 @@ class ApplicationWindow(QMainWindow):
         self.wheeleditorAction.setCheckable(True)
         self.wheeleditorAction.setChecked(self.qmc.wheelflag)
         self.ToolkitMenu.addAction(self.wheeleditorAction)
-
-        self.ToolkitMenu.addSeparator()
-
-        self.hudAction = QAction(UIconst.TOOLKIT_MENU_EXTRAS,self)
-        self.hudAction.triggered.connect(self.hudset)
-        self.ToolkitMenu.addAction(self.hudAction)
         
         # VIEW menu
         
@@ -12788,11 +12788,13 @@ class ApplicationWindow(QMainWindow):
         if self.full_screen_mode_active or self.isFullScreen():
             self.full_screen_mode_active = False
             self.showNormal()
-            aw.fullscreenAction.setChecked(False)
+            if platf != 'Darwin':
+                aw.fullscreenAction.setChecked(False)
         else:
             self.full_screen_mode_active = True
             self.showFullScreen()
-            aw.fullscreenAction.setChecked(True)
+            if platf != 'Darwin':
+                aw.fullscreenAction.setChecked(True)
 
     # returns time axis min and max
     # min to be 1min before CHARGE or first recording if no CHARGE
@@ -14769,14 +14771,6 @@ class ApplicationWindow(QMainWindow):
                 
                 if key == 70: # F SELECTS FULL SCREEN MODE
                     aw.toggleFullscreen()
-#                    if self.full_screen_mode_active or self.isFullScreen():
-#                        self.full_screen_mode_active = False
-#                        self.showNormal()
-#                        aw.fullscreenAction.setChecked(False)
-#                    else:
-#                        self.full_screen_mode_active = True
-#                        self.showFullScreen()
-#                        aw.fullscreenAction.setChecked(True)
                 elif aw.buttonpalette_shortcuts and control_modifier and key in numberkeys: # palette switch via SHIFT-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(key))
                 elif key == 72:                       #H
@@ -14849,10 +14843,22 @@ class ApplicationWindow(QMainWindow):
                 elif key == 16777216:                 #ESCAPE
                     self.quickEventShortCut = None
                     aw.sendmessage("")
-                    if self.full_screen_mode_active or self.isFullScreen():
+                    macfullscreen = False
+                    try:
+                        if platf == 'Darwin' and app.allWindows()[0].visibility() == QWindow.FullScreen:
+                            macfullscreen = True
+                    except:
+                        pass
+                    if self.full_screen_mode_active or self.isFullScreen() or macfullscreen:
                         self.full_screen_mode_active = False
-                        aw.fullscreenAction.setChecked(False)
+                        if platf != 'Darwin':
+                            aw.fullscreenAction.setChecked(False)
                         self.showNormal()
+                        try:
+                            if macfullscreen and platf == 'Darwin':
+                                app.allWindows()[0].setVisibility(QWindow.Windowed)
+                        except:
+                            pass
                     else:
                         #if designer ON
                         if self.qmc.designerflag:
@@ -24313,7 +24319,7 @@ class HUDDlg(ArtisanDialog):
         hudHBox.addStretch()
         hudHBox.addLayout(hudLayout)
         hudHBox.addStretch()
-        hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","HUD",None))
+        hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","Head Up Display",None))
         hudGroupLayout.setLayout(hudHBox)  
         rorRoRAlgo = QHBoxLayout()
         rorRoRAlgo.addWidget(self.OptimalSmoothingFlag) 
@@ -24418,13 +24424,15 @@ class HUDDlg(ArtisanDialog):
         tab0Layout.addWidget(rorGroupLayout)
         tab0Layout.addWidget(rorLCDGroupLayout)
         tab0Layout.addStretch()
-        tab0Layout.addWidget(hudGroupLayout)
-        tab0Layout.addStretch()
         #tab1
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(inputFilterGroupLayout)
         tab1Layout.addWidget(rorFilterGroupLayout)
         tab1Layout.addStretch()
+        #tab11
+        tab11Layout = QVBoxLayout()
+        tab11Layout.addWidget(hudGroupLayout)
+        tab11Layout.addStretch()
         #tab2
         #Equation plotter
         self.equlabel = QLabel(QApplication.translate("Label", "Y(x)",None))
@@ -24837,10 +24845,13 @@ class HUDDlg(ArtisanDialog):
         TabWidget = QTabWidget()
         C0Widget = QWidget()
         C0Widget.setLayout(tab0Layout)
-        TabWidget.addTab(C0Widget,QApplication.translate("Tab","RoR/HUD",None))
+        TabWidget.addTab(C0Widget,QApplication.translate("Tab","RoR",None))
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         TabWidget.addTab(C1Widget,QApplication.translate("Tab","Filters",None))
+        C11Widget = QWidget()
+        C11Widget.setLayout(tab11Layout)
+        TabWidget.addTab(C11Widget,QApplication.translate("Tab","HUD",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         tab2Layout.setContentsMargins(10,0,10,0)
