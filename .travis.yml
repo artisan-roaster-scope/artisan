@@ -1,8 +1,5 @@
 language: python
 
-python:
-  - "3.5"
-
 matrix:
   allow_failures:
     - os: osx
