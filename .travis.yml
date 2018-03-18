@@ -1,38 +1,47 @@
 language: python
-
 matrix:
   include:
-    - os: linux
-      python: 3.5
-    - os: osx
-      language: generic
-   
+  - os: linux
+    python: 3.5
+  - os: osx
+    language: generic
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade python; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm libusb-1.0; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb qt; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
-  - pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
-  - pip3 install requests gevent gevent-websocket qrcode openpyxl unidecode
-  - pip3 install colorspacious pyusb python-snap7 bottle pyinstaller
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install appnope pyobjc; fi
-  - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
-  - unzip Phidget22Python.zip
-  - (cd Phidget22Python && python3 setup.py install)
-  - curl -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-  - 7za x snap7-full-1.4.2.7z
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd snap7-full-1.4.2/build/unix && make -f x86_64_linux.mk all && sudo make -f x86_64_linux.mk install); fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then (cd snap7-full-1.4.2/build/osx && make -f x86_64_osx.mk all && sudo make -f x86_64_osx.mk LibInstall=/usr/local/lib install); fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/macos/Phidget22.dmg; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then hdiutil attach Phidget22.dmg; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -pkg /Volumes/Phidgets22/Phidgets.pkg -target / ; fi
-
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade python; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential
+  p7zip-full rpm libusb-1.0; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb qt; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
+- pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
+- pip3 install requests gevent gevent-websocket qrcode openpyxl unidecode
+- pip3 install colorspacious pyusb python-snap7 bottle pyinstaller
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install appnope pyobjc; fi
+- curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
+- unzip Phidget22Python.zip
+- "(cd Phidget22Python && python3 setup.py install)"
+- curl -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
+- 7za x snap7-full-1.4.2.7z
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd snap7-full-1.4.2/build/unix && make
+  -f x86_64_linux.mk all && sudo make -f x86_64_linux.mk install); fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then (cd snap7-full-1.4.2/build/osx && make
+  -f x86_64_osx.mk all && sudo make -f x86_64_osx.mk LibInstall=/usr/local/lib install);
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/macos/Phidget22.dmg;
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then hdiutil attach Phidget22.dmg; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -pkg /Volumes/Phidgets22/Phidgets.pkg
+  -target / ; fi
 script:
-  - cd src
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-mac35-pi.sh; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run --server-args="-screen 0 1024x768x24" python artisan.py; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 artisan.py; fi
-
-
+- cd src
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh;
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-mac35-pi.sh; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run --server-args="-screen 0 1024x768x24"
+  python artisan.py; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 artisan.py; fi
+deploy:
+  provider: gcs
+  access_key_id: GOOGZKP5KKGIJDOFLQIP
+  secret_access_key:
+    secure: PZfINjzHY9kOrL2hQp+KWMoi1KYsmD6UZJs6W7bt9DybRNxlayhK2z4Uiur3gQHsLFUIgYlPNX3FjwNO/+jYra8n9zdY7RLOcuAUwCPLblSk14Rgmjzp42CpgHAo6bvkT3tIcEgpTafEWQ3sWkmeSlIpfY3AgN0WM+k34meuptKQpFdcn+n2s1tm+PTbnwR+GcoXcEXyTfRUaXUQKhKTrqsE1uWg4HMsy++JU2wNsX1RnwxYgUvuZPT5hK93xv0mRKTF1/Mw9dGfB1e+zR2GmFcsRTvPrl+dKAvLtbtNDCqWBCCw+SwTiod09GOxnxzkBmIEsCzL9PYyCK2uLPY4bYwLX0BKtukVh2KMKKfCijq16A2oObvtF6l1IuQmEoSRjvPsapD7jxNGGqmjztMfNu7YY5L9m9sNjl8XVlU28Jct6G8QhCGTuelvsruQPyRYLdepFz0QncWOP9FyRgAWtq1SFPiJE4LcMb920lK+8fspF1nL5nYdQvQPswDFtO76tnmPG5kmJw6NGVR0ivjs3eMYkT+KmWFYuZO1in1nB/H2E4Lhn2vhJ8Du6sMvGStT56fMQh25xYHiQfWSqk9kgIB/tQzElxpHmakih3kNzi4+rdZFrT5vZn3xsZ7xujy1PuCsEv16sX3dplJKXxL9RAXBQB7psCm4KcNHy7Dqjys=
+  bucket: artisan-artifacts
