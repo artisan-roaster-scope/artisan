@@ -216,6 +216,7 @@ os.system(r'cp ' + PYTHONPATH + r'/site-packages/matplotlib/.dylibs/* Artisan.ap
 
 # copy snap7 dylib
 os.system(r'cp /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
+os.system(r'cp /usr/local/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
 
 # copy brew installed libusb (note the slight name change of the dylib!)
 os.system(r'cp /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib')
