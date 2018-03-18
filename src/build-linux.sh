@@ -53,7 +53,7 @@ flavor." \
 --before-remove DEBIAN/prerm \
 -v ${VERSION} --prefix / usr
 
-fpm -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" -p .. \
+sudo fpm -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" -p .. \
 --vendor "Artisan GitHub" \
 --no-auto-depends \
 --url "https://github.com/artisan-roaster-scope/artisan" \
