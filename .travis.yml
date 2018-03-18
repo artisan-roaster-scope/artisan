@@ -9,14 +9,14 @@ matrix:
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade python; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb qt py2app; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb qt; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm libusb-1.0; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
   - pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip3 install requests gevent gevent-websocket qrcode openpyxl unidecode
   - pip3 install colorspacious pyusb python-snap7 bottle pyinstaller
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install appnope pyobjc; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install appnope pyobjc py2app; fi
   - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - unzip Phidget22Python.zip
   - "(cd Phidget22Python && python3 setup.py install)"
