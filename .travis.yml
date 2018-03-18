@@ -39,7 +39,10 @@ script:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run --server-args="-screen 0 1024x768x24"
   python artisan.py; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 artisan.py; fi
+- cd ..
+
 deploy:
+  skip_cleanup: true
   provider: bintray
   user: rpaulo
   file: .bintray.json
