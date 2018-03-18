@@ -11,7 +11,7 @@ else:
 phidget="/Library/Frameworks/Phidget22.framework/Versions/Current/Phidget22"
 
 a = Analysis(['artisan.py'],
-             pathex=path
+             pathex=path,
              binaries=[],
              datas=[],
              hiddenimports=['scipy._lib.messagestream'],
