@@ -16,11 +16,14 @@
     "files":
         [
             {"includePattern": "src/(.*\\.rpm)",
-	     "uploadPattern": "$1"},
+	     "uploadPattern": "$1",
+	     "matrixParams": {"override": 1}},
 	    {"includePattern": "src/(.*\\.deb)",
-	     "uploadPattern": "$1"},
+	     "uploadPattern": "$1",
+	     "matrixParams": {"override": 1}},
 	    {"includePattern": "src/(.*\\.dmg)",
-	     "uploadPattern": "$1"}
+	     "uploadPattern": "$1",
+	     "matrixParams": {"override": 1}}
         ],
     "publish": true
 }
