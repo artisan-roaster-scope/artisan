@@ -1,0 +1,29 @@
+{
+    "package": {
+        "name": "artisan",
+        "repo": "artisan-artifacts",
+        "subject": "rpaulo",
+        "vcs_url": "https://github.com/artisan-roaster-scope/artisan.git",
+        "licenses": ["GPLv3"],
+        "public_download_numbers": false,
+        "public_stats": false
+    },
+
+    "version": {
+        "name": "master"
+    },
+
+    "files":
+        [
+            {"includePattern": "src/dist/(.*\\.rpm)",
+	     "uploadPattern": "$1"},
+	    {"includePattern": "src/dist/(.*\\.deb)",
+	     "uploadPattern": "$1"},
+	    {"includePattern": "src/dist/(.*\\.dmg)",
+	     "uploadPattern": "$1"},
+	    "matrixParams": {
+		"override": 1
+	    }
+        ],
+    "publish": true
+}
