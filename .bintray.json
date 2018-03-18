@@ -1,8 +1,8 @@
 {
     "package": {
-        "name": "artisan",
+        "name": "artisan-linux",
         "repo": "artisan-artifacts",
-        "subject": "rpaulo",
+        "subject": "artisan",
         "vcs_url": "https://github.com/artisan-roaster-scope/artisan.git",
         "licenses": ["GPLv3"],
         "public_download_numbers": false,
@@ -18,9 +18,8 @@
             {"includePattern": "src/dist/(.*\\.rpm)",
 	     "uploadPattern": "$1"},
 	    {"includePattern": "src/dist/(.*\\.deb)",
-	     "uploadPattern": "$1"},
-	    {"includePattern": "src/dist/(.*\\.dmg)",
 	     "uploadPattern": "$1"}
         ],
     "publish": true
 }
+
