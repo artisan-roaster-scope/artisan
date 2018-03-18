@@ -6000,8 +6000,11 @@ class tgraphcanvas(FigureCanvas):
                             nextra = len(aw.qmc.extratemp1)
                             if nextra:
                                 for e in range(nextra):
-                                    aw.qmc.extratemp1[e][i] = self.fromFtoC(aw.qmc.extratemp1[e][i])
-                                    aw.qmc.extratemp2[e][i] = self.fromFtoC(aw.qmc.extratemp2[e][i])
+                                    try:
+                                        aw.qmc.extratemp1[e][i] = self.fromFtoC(aw.qmc.extratemp1[e][i])
+                                        aw.qmc.extratemp2[e][i] = self.fromFtoC(aw.qmc.extratemp2[e][i])
+                                    except Exception:
+                                        pass
 
                         self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
 
