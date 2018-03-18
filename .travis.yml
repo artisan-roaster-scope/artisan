@@ -3,9 +3,14 @@ language: python
 python:
   - "3.5"
 
+os:
+  - linux
+  - mac
+
 install:
-  - sudo apt-get update
-  - sudo apt-get install ruby-dev build-essential p7zip-full rpm
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm libusb; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip; fi
   - gem install fpm
   - pip install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip install requests gevent gevent-websocket qrcode openpyxl unidecode
@@ -15,9 +20,10 @@ install:
   - (cd Phidget22Python && python setup.py install)
   - curl -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
   - 7za x snap7-full-1.4.2.7z
-  - (cd snap7-full-1.4.2/build/unix && make -f x86_64_linux.mk all && sudo make -f x86_64_linux.mk install)
-  
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd snap7-full-1.4.2/build/unix && make -f x86_64_linux.mk all && sudo make -f x86_64_linux.mk install); fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then (cd snap7-full-1.4.2/build/osx && make -f x86_64_osx.mk all && sudo make -f x86_64_osx.mk install); fi
+
 script:
   - cd src
-  - xvfb-run --server-args="-screen 0 1024x768x24" python artisan.py
-  - ./build-centos-pi.sh && ./build-linux.sh
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run --server-args="-screen 0 1024x768x24" python artisan.py; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh; fi
