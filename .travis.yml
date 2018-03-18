@@ -1,5 +1,9 @@
 language: python
 
+os:
+  - linux
+  - osx
+
 matrix:
   allow_failures:
     - os: osx
