@@ -46,5 +46,5 @@ deploy:
   provider: bintray
   user: rpaulo
   file: .bintray.json
-  key:
-    secure: wF/zDhgQPkwv642jXY2ZhC+E//UsuRdmoCgrbEakMXMIfFQS6pWplpFbAA31/wi9g6mWe9+BsMOwGmsPcT03bx7AUz3f/hiliM1MxyGcM8Nze6eHGdVIGcShMQk9qLbHIzoc4YjiyEVjKPFwVyiSbEJMzbNvM6UD7quAJcBySHQRVCXC1r0wb5HQ6Tf1e1t0uml8Alzo9XqBH5l20665lqHcKQddHGYpd+UqzcMj/ATjCXACpn1facbt5TidutF3z2uYS+SJbpX2Oe0NIKY+6kNfnVLPzZGUA9ONYIkUvYPApcYo4RbCVgOfvx+ckwwe35j5eGLz8sES6TJkEybFh+qIisxCxESA5P2jt4uW83O3axQa1BaCZu0CriuXO0YT6ccGhsEJvcX9haRT8c9By/KmWfh+5a4Wij8iYCvyE35+LpbKhr1TkywneGyjfVAa+JMyB8WMBtq70aFM018DPMpAi22cE+iWa1Jj4W7H0wHwGWP+wJ3p/XIZYwgEZjGonSUGU173/g7HzlJD/60bc5dqH2AXUHtNzStSKds3frRmKe/bw2Ie8ehBBPpVDqL1r1cp5X/ql4R/z6uH5no/lG9o8hetP3yzxjgzOBd/P6DdClGYaoUzEOHKDvJ/cNRPlxIf0Tk5zG7jYbgoQ3qIKl16V+HNE2XJEOME6AjpYPs=
+  key: 4005e1999dd646549423dc16da995d1448d60596
+
