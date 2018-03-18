@@ -97,7 +97,7 @@ if pyqtversion < 5:
                              QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton, # @UnresolvedImport @UnusedImport
                              QPixmap, QImage, QColor, QColorDialog, QPalette, QFrame, QCheckBox, QDesktopServices, QIcon, # @UnresolvedImport @UnusedImport
                              QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QBrush, QRadialGradient, # @UnresolvedImport @UnusedImport
-                             QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QCursor, QDoubleSpinBox, QTextDocument) # @UnresolvedImport @UnusedImport
+                             QStyleFactory, QWindow, QTableWidget, QTableWidgetItem, QMenu, QCursor, QDoubleSpinBox, QTextDocument) # @UnresolvedImport @UnusedImport
     from PyQt4.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, # @UnresolvedImport @UnusedImport @Reimport
                               QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @UnresolvedImport @UnusedImport
                               QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore) # @UnresolvedImport @UnusedImport
@@ -109,7 +109,7 @@ else:
                              QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton, # @Reimport
                              QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
                              QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox) # @Reimport
-    from PyQt5.QtGui import (QImageReader,  # @Reimport
+    from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
                                 QKeySequence,QStandardItem,QImage,QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
                                 QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor,QTextDocument)  # @Reimport
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
@@ -5521,7 +5521,13 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.patheffects:
                     rcParams['path.effects'] = []  
                                     
-                aw.qmc.repaint() # a bug in Qt/PyQt/mpl cause the canvas not to be repainted on load/switch/reset in fullscreen mode without this
+                # HACK
+                # a bug in Qt/PyQt/mpl cause the canvas not to be repainted on load/switch/reset in fullscreen mode without this
+                try:
+                    if platf == 'Darwin' and app.allWindows()[0].visibility() == QWindow.FullScreen:
+                        aw.qmc.repaint()
+                except:
+                    pass
                         
             except Exception as ex:
 #                import traceback
