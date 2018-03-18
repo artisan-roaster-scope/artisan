@@ -20,10 +20,7 @@
 	    {"includePattern": "src/dist/(.*\\.deb)",
 	     "uploadPattern": "$1"},
 	    {"includePattern": "src/dist/(.*\\.dmg)",
-	     "uploadPattern": "$1"},
-	    "matrixParams": {
-		"override": 1
-	    }
+	     "uploadPattern": "$1"}
         ],
     "publish": true
 }
