@@ -2,9 +2,16 @@
 
 block_cipher = None
 
+import os
+if os.environ.get('TRAVIS'):
+    path=['/Users/travis/build/artisan-roaster-scope/artisan/src']
+else:
+    path=['/Users/luther/Documents/Projects/Artisan/RepositoryGIT/src']
+    
+phidget="/Library/Frameworks/Phidget22.framework/Versions/Current/Phidget22"
 
 a = Analysis(['artisan.py'],
-             pathex=['/Users/luther/Documents/Projects/Artisan/RepositoryGIT/src'],
+             pathex=path
              binaries=[],
              datas=[],
              hiddenimports=['scipy._lib.messagestream'],
@@ -15,7 +22,7 @@ a = Analysis(['artisan.py'],
              win_private_assemblies=False,
              cipher=block_cipher)
 
-a.binaries = [x for x in a.binaries if not x[0].startswith("/Library/Frameworks/Phidget22.framework/Versions/Current/Phidget22")]
+a.binaries = [x for x in a.binaries if not x[0].startswith(phidget)]
 
 pyz = PYZ(a.pure, a.zipped_data,cipher=block_cipher)
 
