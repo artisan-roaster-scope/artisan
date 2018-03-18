@@ -36601,7 +36601,7 @@ class serialport(object):
     def phidget1046getTemperature(self,i,idx):
         v = -1
         try:
-            bv = self.PhidgetBridgeSensor[idx].getVoltageRatio()
+            bv = self.PhidgetBridgeSensor[idx].getVoltageRatio() * 1000 # Note in Phidgets API v22 this factor 1000 has to be added
             
 # test values for the bridge value to temperature conversion
 #            bv = 51.77844 # about room temperature for Voltage Divider wiring
