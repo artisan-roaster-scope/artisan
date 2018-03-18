@@ -8,13 +8,13 @@ if [ ! -z $TRAVIS ]; then
     export PYTHON=/usr/local
     export PYTHONPATH=$PYTHON/lib/python3.6/site-packages
     export PYTHON_V=3.6
+    export QT_PATH=/usr/local/qt
 else
     export PYTHON=/Library/Frameworks/Python.framework/Versions/3.5
     export PYTHONPATH=$PYTHON/lib/python3.5/site-packages
     export PYTHON_V=3.5
+    export QT_PATH=~/Qt5.9.3/5.9.3/clang_64
 fi
-
-export QT_PATH=~/Qt5.9.3/5.9.3/clang_64
 
 export PATH=$PYTHON/bin:$PYTHON/lib:$PATH
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH

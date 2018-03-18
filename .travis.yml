@@ -13,7 +13,7 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade python; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm libusb-1.0; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb qt; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
   - pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
   - pip3 install requests gevent gevent-websocket qrcode openpyxl unidecode
