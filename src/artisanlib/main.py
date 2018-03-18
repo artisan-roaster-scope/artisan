@@ -4035,7 +4035,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.hideDefaultButtons()
                 aw.hideExtraButtons(changeDefault=False)
                 aw.hideLCDs()
-                aw.hideSliders(changeDefault=False)
+#                aw.hideSliders(changeDefault=False)
                 aw.enableEditMenus()
                 
                 aw.pidcontrol.pidActive = False
@@ -6219,12 +6219,10 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setText(QApplication.translate("Button", "OFF",None)) # text means click to turn OFF (it is ON)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None))
             aw.button_2.setEnabled(True) # ensure that the START button is enabled
-            if aw.eventslidersflag:
-                aw.showSliders()
             aw.disableEditMenus()
-            if aw.extraeventsbuttonsflag:
-                aw.update_extraeventbuttons_visibility()
-                aw.showExtraButtons()
+            aw.update_extraeventbuttons_visibility()
+            aw.updateExtraButtonsVisibility()
+            aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             aw.pidcontrol.activateONOFFeasySV(aw.pidcontrol.svButtons and aw.button_10.isVisible())
             aw.pidcontrol.activateSVSlider(aw.pidcontrol.svSlider and aw.button_10.isVisible())
             self.block_update = False # unblock the updating of the bitblit canvas            
@@ -6281,8 +6279,9 @@ class tgraphcanvas(FigureCanvas):
             if aw.largeLCDs_dialog:
                 self.updateLargeLCDs(bt=resLCD,et=resLCD)
             if not aw.HottopControlActive:
-                aw.hideSliders(changeDefault=False)
                 aw.hideExtraButtons(changeDefault=False)
+            aw.updateSlidersVisibility() # update visibility of sliders based on the users preference    
+            aw.updateExtraButtonsVisibility()            
             aw.pidcontrol.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
             aw.enableEditMenus()
@@ -6430,6 +6429,11 @@ class tgraphcanvas(FigureCanvas):
             self.updateLCDtime()
             aw.lowerbuttondialog.setVisible(True)
             aw.applyStandardButtonVisibility()
+
+            aw.update_extraeventbuttons_visibility()
+            aw.updateExtraButtonsVisibility() 
+                       
+            aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             if aw.qmc.phasesLCDflag:
                 aw.phasesLCDs.show()
             if aw.qmc.AUClcdFlag:
@@ -10651,7 +10655,7 @@ class ApplicationWindow(QMainWindow):
             }
 
         #user defined event buttons
-        self.extraeventsbuttonsflag = 1  #shows/hides rows of buttons  1/0; records the user choice, not the actual state!
+        self.extraeventsbuttonsflags = [0,1,1] # slider visibility per state OFF, ON, START
         self.extraeventslabels,self.extraeventsdescriptions, self.extraeventstypes,self.extraeventsvalues = [],[],[],[]  #hold string,string,index,index
         # extraeventtypes: 
         #  0-3: custom event types (absolute value assignments)
@@ -10679,7 +10683,7 @@ class ApplicationWindow(QMainWindow):
         self.eventslidermin = [0,0,0,0]
         self.eventsMaxValue = 999
         self.eventslidermax = [100,100,100,100]
-        self.eventslidersflag = 1  #shows/hides sliders  1/0; records the user choice, not the actual state!
+        self.eventslidersflags = [0,1,1] # slider visibility per state OFF, ON, START
         self.eventslidercoarse = [0,0,0,0] # if 1, sliders step in multiples of 10, otherwise 1
         
         #event quantifiers        
@@ -14448,36 +14452,69 @@ class ApplicationWindow(QMainWindow):
     def showDefaultButtons(self):
         self.lowerbuttondialog.setVisible(True)
 
+    # update the visibility of the sliders based on the users preference for the current state
+    def updateExtraButtonsVisibility(self):
+        # update visibility (based on the app state)
+        if aw.qmc.flagstart:
+            visible = aw.extraeventsbuttonsflags[2]
+        elif aw.qmc.flagon:
+            visible = aw.extraeventsbuttonsflags[1]
+        else:
+            visible = aw.extraeventsbuttonsflags[0]
+        if visible:
+            self.showExtraButtons(False)
+        else:
+            self.hideExtraButtons(False)
+            
     def hideExtraButtons(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
         if focused_widget:
             focused_widget.clearFocus()
         self.extrabuttondialogs.setVisible(False)
-        if changeDefault:
-            self.extraeventsbuttonsflag = 0
         aw.buttonsAction.setChecked(False)
+        # remember state
+        if changeDefault:
+            if aw.qmc.flagstart:
+                aw.extraeventsbuttonsflags[2] = 0
+            elif aw.qmc.flagon:
+                aw.extraeventsbuttonsflags[1] = 0
+            else:
+                aw.extraeventsbuttonsflags[0] = 0
 
     def showExtraButtons(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
         if focused_widget:
             focused_widget.clearFocus()
         self.extrabuttondialogs.setVisible(True)
-        if changeDefault:
-            self.extraeventsbuttonsflag = 1
         aw.buttonsAction.setChecked(True)
+        # remember state
+        if changeDefault:
+            if aw.qmc.flagstart:
+                aw.extraeventsbuttonsflags[2] = 1
+            elif aw.qmc.flagon:
+                aw.extraeventsbuttonsflags[1] = 1
+            else:
+                aw.extraeventsbuttonsflags[0] = 1
         
     def toggleExtraButtons(self):
         if self.extrabuttondialogs.isVisible():
             self.hideExtraButtons()
         else:
             self.showExtraButtons()
-
-    def updateSliders(self):
+    
+    # update the visibility of the sliders based on the users preference for the current state
+    def updateSlidersVisibility(self):
         # update visibility (based on the app state)
-        if self.qmc.flagon:
-            self.showSliders()
+        if aw.qmc.flagstart:
+            visible = aw.eventslidersflags[2]
+        elif aw.qmc.flagon:
+            visible = aw.eventslidersflags[1]
         else:
-            self.hideSliders()
+            visible = aw.eventslidersflags[0]
+        if visible:
+            self.showSliders(False)
+        else:
+            self.hideSliders(False)
 
     def hideSliders(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
@@ -14490,9 +14527,15 @@ class ApplicationWindow(QMainWindow):
         self.slider4.setVisible(False)
         self.sliderSV.setVisible(False)
         self.sliderFrame.setVisible(False)
-        if changeDefault:
-            aw.eventslidersflag = 0
         aw.slidersAction.setChecked(False)
+        # remember state
+        if changeDefault:
+            if aw.qmc.flagstart:
+                aw.eventslidersflags[2] = 0
+            elif aw.qmc.flagon:
+                aw.eventslidersflags[1] = 0
+            else:
+                aw.eventslidersflags[0] = 0
 
     def showSliders(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
@@ -14505,9 +14548,14 @@ class ApplicationWindow(QMainWindow):
         self.slider4.setVisible(True)
         self.sliderSV.setVisible(True)
         self.setSliderFocusPolicy(Qt.StrongFocus)
-        if changeDefault:
-            aw.eventslidersflag = 1
         aw.slidersAction.setChecked(True)
+        if changeDefault:
+            if aw.qmc.flagstart:
+                aw.eventslidersflags[2] = 1
+            elif aw.qmc.flagon:
+                aw.eventslidersflags[1] = 1
+            else:
+                aw.eventslidersflags[0] = 1
         
     def toggleSliders(self):
         if self.sliderFrame.isVisible():
@@ -18552,8 +18600,8 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidermin = [toInt(x) for x in toList(settings.value("slidermin",self.eventslidermin))]
                 self.eventslidermax = [toInt(x) for x in toList(settings.value("slidermax",self.eventslidermax))]
                 aw.updateSliderMinMax()
-            if settings.contains("eventslidersflag"):
-                self.eventslidersflag = toInt(settings.value("eventslidersflag",self.eventslidersflag))
+            if settings.contains("eventslidersflags"):
+                self.eventslidersflags = [toInt(x) for x in toList(settings.value("eventslidersflags",self.eventslidersflags))]
             if settings.contains("eventslidercoarse"):
                 self.eventslidercoarse = [toInt(x) for x in toList(settings.value("eventslidercoarse",self.eventslidercoarse))]                
             settings.endGroup()
@@ -18619,8 +18667,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("extraeventsactions"):
                 if settings.contains("buttonlistmaxlen"):
                     self.buttonlistmaxlen = toInt(settings.value("buttonlistmaxlen",self.buttonlistmaxlen))
-                if settings.contains("extraeventsbuttonsflag"):
-                    self.extraeventsbuttonsflag = toInt(settings.value("extraeventsbuttonsflag",self.extraeventsbuttonsflag))
+                if settings.contains("extraeventsbuttonsflags"):
+                    self.extraeventsbuttonsflags = [toInt(x) for x in toList(settings.value("extraeventsbuttonsflags",self.extraeventsbuttonsflags))]
                 self.extraeventstypes = [toInt(x) for x in toList(settings.value("extraeventstypes",self.extraeventstypes))]
                 self.extraeventsvalues = [toFloat(x) for x in toList(settings.value("extraeventsvalues",self.extraeventsvalues))]
                 self.extraeventsactions = [toInt(x) for x in toList(settings.value("extraeventsactions",self.extraeventsactions))]
@@ -18700,8 +18748,12 @@ class ApplicationWindow(QMainWindow):
 
 #--------------------------------
         try:
-            #update visibility of main event button
+            #update visibility of main event button, extra event buttons and 
             self.applyStandardButtonVisibility()
+            aw.update_extraeventbuttons_visibility()
+            aw.updateExtraButtonsVisibility()
+            aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            
             aw.setFonts()
             if "canvas" in aw.qmc.palette and filename is not None:
                 aw.updateCanvasColors()
@@ -19551,7 +19603,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraeventslabels",self.extraeventslabels)
             settings.setValue("extraeventbuttoncolor",self.extraeventbuttoncolor)
             settings.setValue("extraeventbuttontextcolor",self.extraeventbuttontextcolor)
-            settings.setValue("extraeventsbuttonsflag",self.extraeventsbuttonsflag)
+            settings.setValue("extraeventsbuttonsflags",self.extraeventsbuttonsflags)
             settings.setValue("buttonpalette",self.buttonpalette)
             settings.setValue("buttonpalettemaxlen",self.buttonpalettemaxlen)
             settings.setValue("buttonpalette_shortcuts",self.buttonpalette_shortcuts)
@@ -19578,7 +19630,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("sliderfactors",self.eventsliderfactors)
             settings.setValue("slidermin",self.eventslidermin)
             settings.setValue("slidermax",self.eventslidermax)
-            settings.setValue("eventslidersflag",self.eventslidersflag)
+            settings.setValue("eventslidersflags",self.eventslidersflags)
             settings.setValue("eventslidercoarse",self.eventslidercoarse)
             settings.endGroup()
             settings.beginGroup("Quantifiers")
@@ -19810,7 +19862,7 @@ class ApplicationWindow(QMainWindow):
         events["extraeventslabels"]= u(self.extraeventslabels)
         events["extraeventbuttoncolor"]= str(self.extraeventbuttoncolor)
         events["extraeventbuttontextcolor"]= str(self.extraeventbuttontextcolor)
-        events["extraeventsbuttonsflag"]= str(self.extraeventsbuttonsflag)
+        events["extraeventsbuttonsflags"]= str(self.extraeventsbuttonsflags)
         events["buttonpalettemaxlen"]= str(self.buttonpalettemaxlen)
         events["buttonpalette"]= str(self.buttonpalette)
         axes["xgrid"]= str(self.qmc.xgrid)
@@ -22073,7 +22125,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
-        contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell, Rui Paulo")
+        contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell")
         contributors += u(", Morris Beume, Michael Herbert, Chistopher Feran<br>")
         box = QMessageBox(self)
         
@@ -22603,7 +22655,7 @@ class ApplicationWindow(QMainWindow):
         else:
             aw.hideControls()
             aw.hideLCDs()
-            aw.hideSliders()
+            aw.hideSliders(False)
             aw.hideExtraButtons()
             aw.disableEditMenus(wheel=True)
             aw.qmc.connectWheel()
@@ -22675,7 +22727,7 @@ class ApplicationWindow(QMainWindow):
     def flavorchart(self):
         self.hideControls()
         self.hideLCDs()
-        self.hideSliders()
+        self.hideSliders(False)
         self.hideExtraButtons()
         dialog = flavorDlg(self)
         dialog.show()
@@ -23626,7 +23678,7 @@ class ApplicationWindow(QMainWindow):
             aw.messagelabel.setVisible(True)
 
     def toggleextraeventrows(self):
-        if aw.extrabuttondialogs.isVisible(): # self.extraeventsbuttonsflag:            
+        if aw.extrabuttondialogs.isVisible():         
             aw.hideExtraButtons()
         else:
             aw.showExtraButtons()
@@ -30908,9 +30960,6 @@ class EventsDlg(ArtisanDialog):
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[i],aw.extraeventbuttoncolor[i])
             aw.buttonlist[i].setStyleSheet(style)
         self.createEventbuttonTable()
-        #check visibility
-        if not aw.extraeventsbuttonsflag:
-            self.extrabuttonsshowCheck.setChecked(True)
         self.changingcolorflag = False
 
     def seteventmarker(self,_,m):
