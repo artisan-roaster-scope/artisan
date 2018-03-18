@@ -15,9 +15,9 @@
 
     "files":
         [
-            {"includePattern": "src/dist/(.*\\.rpm)",
+            {"includePattern": "src/(.*\\.rpm)",
 	     "uploadPattern": "$1"},
-	    {"includePattern": "src/dist/(.*\\.deb)",
+	    {"includePattern": "src/(.*\\.deb)",
 	     "uploadPattern": "$1"}
         ],
     "publish": true
