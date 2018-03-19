@@ -11,7 +11,7 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade python; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb qt; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget -qO- http://www.phidgets.com/gpgkey/pubring.gpg | sudo apt-key add -; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash -c "echo 'deb http://www.phidgets.com/debian stretch main' > /etc/apt/sources.list.d/phidgets.list"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo bash -c "echo 'deb http://www.phidgets.com/debian stable main' > /etc/apt/sources.list.d/phidgets.list"; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm libusb-1.0 libphidget22 libphidget22-dev; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
