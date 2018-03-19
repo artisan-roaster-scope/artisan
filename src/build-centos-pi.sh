@@ -15,6 +15,7 @@ export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 rm -rf build
 rm -rf dist
 
+rm -f libusb-1.0.so.0
 ln -s /lib/x86_64-linux-gnu/libusb-1.0.so.0
 
 # pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN "artisan.py"
