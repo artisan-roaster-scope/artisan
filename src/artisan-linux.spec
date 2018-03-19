@@ -10,6 +10,9 @@ import os
 path=os.environ['HOME'] + '/artisan-master/src'
 if not os.path.isdir(path):
     path=os.environ['HOME'] + '/artisan/src'
+# For Travis
+if not os.path.isdir(path):
+    path=os.getcwd()
 
 a = Analysis(['artisan.py'],
              pathex=[path],
