@@ -24146,7 +24146,7 @@ class HUDDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(HUDDlg,self).__init__(parent)
         
-        self.setWindowTitle(QApplication.translate("Form Caption","Extras", None))
+        self.setWindowTitle(QApplication.translate("Form Caption","Curves", None))
         self.setModal(True)
         # keep old values to be restored on Cancel
         self.org_DeltaET = aw.qmc.DeltaETflag
