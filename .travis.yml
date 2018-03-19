@@ -16,8 +16,8 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar -xzf libphidget22.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd libphidget22-* && ./configure --prefix=/usr && make && sudo make install); fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
-  - pip3 install -r requirements.txt
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install appnope pyobjc py2app; fi
+  - pip3 install -r src/requirements.txt
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install -r src/requirements-osx.txt; fi
   - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - unzip Phidget22Python.zip
   - (cd Phidget22Python && python3 setup.py install)
