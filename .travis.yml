@@ -16,9 +16,7 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar -xzf libphidget22.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd libphidget22-* && ./configure --prefix=/usr && make && sudo make install); fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
-  - pip3 install sip pyserial pyqt5 numpy scipy matplotlib pymodbus yoctopuce
-  - pip3 install requests gevent gevent-websocket qrcode openpyxl unidecode
-  - pip3 install colorspacious pyusb python-snap7 bottle pyinstaller
+  - pip3 install -r requirements.txt
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install appnope pyobjc py2app; fi
   - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - unzip Phidget22Python.zip
