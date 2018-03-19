@@ -19,7 +19,7 @@ ln -s /lib/x86_64-linux-gnu/libusb-1.0.so.0
 
 # pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN "artisan.py"
 
-pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=INFO artisan-linux.spec
+pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=DEBUG artisan-linux.spec
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist
