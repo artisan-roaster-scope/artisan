@@ -6,7 +6,7 @@ export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
 export PATH=$PATH:$HOME/.local/bin
 
 if [ ! -z $TRAVIS ]; then
-    export PYTHON_PATH=/home/travis/virtualenv/python3.6/lib/python3.6/site-packages
+    export PYTHON_PATH=/home/travis/virtualenv/python3.5/lib/python3.5/site-packages
 else
     export PYTHON_PATH=`python -m site --user-site`
 fi
@@ -15,12 +15,12 @@ export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 rm -rf build
 rm -rf dist
 
-rm -f libusb-1.0.so.0
-ln -s /lib/x86_64-linux-gnu/libusb-1.0.so.0
+#rm -f libusb-1.0.so.0
+#ln -s /lib/x86_64-linux-gnu/libusb-1.0.so.0
 
 # pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN "artisan.py"
 
-pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=INFO artisan-linux.spec
+pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=DEBUG artisan-linux.spec
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist
@@ -94,7 +94,7 @@ cp /usr/lib/libsnap7.so dist
 cp README.txt dist
 cp ../LICENSE dist/LICENSE.txt
 
-rm -f libusb-1.0.so.0
+#rm -f libusb-1.0.so.0
 
 tar -cf dist-centos64.tar dist
 
