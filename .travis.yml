@@ -33,7 +33,7 @@ install:
   
 script:
   - cd src
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh; fi
+#  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-mac35.sh; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run --server-args="-screen 0 1024x768x24" python artisan.py; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 artisan.py; fi
