@@ -12,7 +12,7 @@ if [ ! -z $TRAVIS ]; then
 else
     export PYTHON=/Library/Frameworks/Python.framework/Versions/3.5
     export PYTHONPATH=$PYTHON/lib/python3.5/site-packages
-    export QT_PATH=~/Qt5.10.1/5.10.1/clang_64
+    export QT_PATH=~/Qt5.10.0/5.10.0/clang_64
     export PYTHON_V=3.5
     export MACOSX_DEPLOYMENT_TARGET=10.10
 fi
