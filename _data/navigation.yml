@@ -1,9 +1,9 @@
 main:
   - title: "Features"
-    url: /Features/
+    url: /features/
   - title: "Suported Machines"
-    url: /Machines/
+    url: /machines/
   - title: "Suported Devices"
-    url: /Devices/
+    url: /devices/
   - title: "About"
     url: /about/
