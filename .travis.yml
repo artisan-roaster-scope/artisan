@@ -12,7 +12,7 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade python; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip libusb qt; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm libusb-1.0 libusb-1.0-0-dev; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm libusb-1.0 libusb-1.0-0-dev gdb; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget22.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar -xzf libphidget22.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd libphidget22-* && ./configure --prefix=/usr && make && sudo make install); fi
@@ -31,7 +31,15 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -pkg /Volumes/Phidgets22/Phidgets.pkg -target / ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo rm -rf /usr/local/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data; fi
 
-  
+
+before_script:
+  - ulimit -c unlimited -S
+
+after_failure:
+- COREFILE=$(find . -maxdepth 1 -name "core*" | head -n 1)
+- if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" example -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
+
+
 script:
   - cd src
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh; fi
