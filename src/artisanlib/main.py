@@ -14282,11 +14282,11 @@ class ApplicationWindow(QMainWindow):
                                 except Exception:
                                     pass
                 elif action == 16:
-                    self.ser.R1.set_heater(cmd)
+                    self.ser.R1.set_heater(int(cmd)/10)
                 elif action == 17:
-                    self.ser.R1.set_fan(cmd)
+                    self.ser.R1.set_fan(int(cmd)/10)
                 elif action == 18:
-                    self.ser.R1.set_drum(cmd)
+                    self.ser.R1.set_drum(int(cmd)/10)
                 elif action == 19:
                     if cmd_str == "PRS":
                         self.ser.R1.prs()
@@ -34952,10 +34952,10 @@ class serialport(object):
         try:
             aw.qmc.R1_BT = self.R1.get_bt()
             aw.qmc.R1_DT = self.R1.get_dt()
-            aw.qmc.R1_DRUM = self.R1.get_drum()
+            aw.qmc.R1_DRUM = self.R1.get_drum() * 10
             aw.qmc.R1_VOLTAGE = self.R1.get_voltage()
-            aw.qmc.R1_HEATER = self.R1.get_heater()
-            aw.qmc.R1_FAN = self.R1.get_fan()
+            aw.qmc.R1_HEATER = self.R1.get_heater() * 10
+            aw.qmc.R1_FAN = self.R1.get_fan() * 10
             aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
             aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
             aw.qmc.R1_TX = tx

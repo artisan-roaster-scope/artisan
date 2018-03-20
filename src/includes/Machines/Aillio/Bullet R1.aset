@@ -36,7 +36,7 @@ etypes=Fan, Drum, Damper, Heater, --
 [ExtraEventButtons]
 buttonlistmaxlen=11
 extraeventstypes=4, 5, 5, 8, 8
-extraeventsvalues=1, 1.1, -1.1, 1.1, -1.1
+extraeventsvalues=1, 2, -2, 2, -2
 extraeventsactionstrings=PRS, , , , 
 extraeventsactions=19, 17, 17, 16, 16
 extraeventsdescriptions=PRS button, , , , 
@@ -52,15 +52,15 @@ slideractions=14, 15, 0, 13
 slidercommands=, , , 
 slideroffsets=0, 0, 0, 0
 sliderfactors=1, 1, 1, 1
-slidermin=1, 1, 0, 0
-slidermax=12, 9, 100, 9
+slidermin=10, 10, 0, 0
+slidermax=120, 90, 100, 90
 eventslidersflag=1
-eventslidercoarse=0, 0, 0, 0
+eventslidercoarse=1, 1, 0, 1
 
 [Quantifiers]
 quantifieractive=1, 1, 0, 1
 quantifiersource=3, 5, 0, 2
-quantifiermin=1, 1, 0, 0
-quantifiermax=12, 9, 100, 9
-quantifiercoarse=0, 0, 0, 0
+quantifiermin=10, 10, 0, 0
+quantifiermax=120, 90, 100, 90
+quantifiercoarse=1, 1, 0, 1
 clusterEventsFlag=false
