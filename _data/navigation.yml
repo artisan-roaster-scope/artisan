@@ -1,0 +1,9 @@
+main:
+  - title: "Features"
+    url: /Features/
+  - title: "Suported Machines"
+    url: /Machines/
+  - title: "Suported Devices"
+    url: /Devices/
+  - title: "About"
+    url: /about/
