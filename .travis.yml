@@ -36,7 +36,7 @@ before_script:
   - ulimit -c unlimited -S
 
 after_failure:
-- COREFILE=$(find . -name "core*" | head -n 1)
+- COREFILE=$(find . -maxdepth 3 -name "core*" | head -n 1)
 - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" example -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
 
 
