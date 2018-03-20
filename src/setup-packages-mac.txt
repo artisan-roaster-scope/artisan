@@ -593,6 +593,10 @@ Artisan.app/Contents/Resources/lib/python2.7/lib-dynload/matplotlib/ft2font.so:
 # sudo pip install matplotlib
 
 
+Installer seems to bundle libpng from brew install /usr/local/Cellar/libpng/ to Frameworks. So its version has to agree to the one of MPL which was upgraded in v2.2.2 from 46.0.0 to 51.0.0. A
+# brew upgrade libpng
+should do
+
 
 
 9.2) Install matplotlib library
