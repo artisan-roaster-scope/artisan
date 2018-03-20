@@ -24,7 +24,7 @@ fi
 
 # pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN "artisan.py"
 
-pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=DEBUG artisan-linux.spec
+pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=INFO artisan-linux.spec
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist
