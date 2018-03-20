@@ -15,8 +15,12 @@ export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 rm -rf build
 rm -rf dist
 
-#rm -f libusb-1.0.so.0
-#ln -s /lib/x86_64-linux-gnu/libusb-1.0.so.0
+rm -f libusb-1.0.so.0
+if [ -f /lib/x86_64-linux-gnu/libusb-1.0.so.0 ]; then
+    ln -s /lib/x86_64-linux-gnu/libusb-1.0.so.0
+else
+    ln -s /usr/lib/libusb-1.0.so.0
+fi
 
 # pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=WARN "artisan.py"
 
@@ -94,7 +98,7 @@ cp /usr/lib/libsnap7.so dist
 cp README.txt dist
 cp ../LICENSE dist/LICENSE.txt
 
-#rm -f libusb-1.0.so.0
+rm -f libusb-1.0.so.0
 
 tar -cf dist-centos64.tar dist
 
