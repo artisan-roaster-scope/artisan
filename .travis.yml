@@ -36,8 +36,9 @@ before_script:
   - ulimit -c unlimited -S
 
 after_failure:
-- find .  -name "core*" 
-
+  - find .  -name "core*"
+  - file src/core
+  - gdb -c src/core `which python3` -ex "thread apply all bt" -ex "set pagination 0" -batch
 
 script:
   - cd src
