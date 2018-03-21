@@ -9,7 +9,7 @@ install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
   - pip install pyinstaller
 
-build:
+build_script:
   - cmd: cd src
   - cmd: build-win3-pi.bat
 
