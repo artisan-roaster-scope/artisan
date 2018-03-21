@@ -22,8 +22,7 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd libphidget22-* && ./configure --prefix=/usr && make && sudo make install); fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
   - pip3 install -r src/requirements.txt
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip3 uninstall -y pyqt5 && pip3 install pyqt5==5.10.1; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install -r src/requirements-osx.txt; fi
+  - pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
   - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - unzip Phidget22Python.zip
   - (cd Phidget22Python && python3 setup.py install)
