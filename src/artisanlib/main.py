@@ -2103,7 +2103,7 @@ class tgraphcanvas(FigureCanvas):
         if len(self.Betypes) == 4:
             self.Betypes.append("--")
         if prefix and i < 4:
-            return u("Background")+self.Betypes[i]
+            return '_nolegend_' #u("Background")+self.Betypes[i] # lines with _nolegend_ labels are hidden from the figureoptions dialog
         else:
             return self.Betypes[i]
 
@@ -9763,7 +9763,9 @@ class VMToolbar(NavigationToolbar):
                     two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
                     if two_ax_mode and aw.qmc.delta_ax:
                         aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
+ 
             axes = allaxes[0]
+            
             try:
                 # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
                 steps_post_lines = []
