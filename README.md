@@ -5,6 +5,7 @@
 Visual scope for coffee roasters
 
 [![Build Status](https://travis-ci.org/artisan-roaster-scope/artisan.svg?branch=master)](https://travis-ci.org/artisan-roaster-scope/artisan)
+[![Build status](https://ci.appveyor.com/api/projects/status/u76acxmph3k978sn?svg=true)](https://ci.appveyor.com/project/rpaulo/artisan)
 
 Build artifacts available at [bintray](https://dl.bintray.com/artisan/artisan-artifacts/).
 
