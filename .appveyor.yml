@@ -10,7 +10,7 @@ install:
   - pip install -r src\requirements.txt
   - pip install -r src\requirements-win.txt
   - curl -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-  - 7za x snap7-full-1.4.2.7z
+  - 7z x snap7-full-1.4.2.7z
   - copy snap7-full-1.4.2\build\bin\win64\snap7.dll c:\windows
   
 build_script:
