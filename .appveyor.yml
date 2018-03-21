@@ -14,4 +14,7 @@ build_script:
   - cmd: cd src
   - cmd: build-win3-pi.bat
 
+
+artifacts:
+  - path: 'src\*.exe'
   

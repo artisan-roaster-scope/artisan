@@ -2,8 +2,14 @@
 
 block_cipher = None
 
-ARTISAN_SRC = r'C:\Users\luther\Desktop\src'
-PYTHON35 = r'C:\Program Files\Python35'
+
+import os
+if os.environ.get('APPVEYOR'):
+  ARTISAN_SRC = r'C:\projects\artisan\src'
+  PYTHON35 = r'c:\python35-x64'
+else:
+  ARTISAN_SRC = r'C:\Users\luther\Desktop\src'
+  PYTHON35 = r'C:\Program Files\Python35'
 NAME = 'artisan'
 
 ##
@@ -101,7 +107,7 @@ os.system(r'copy "' + YOCTO_BIN + r'\yapi64.dll" ' + TARGET + 'lib')
 # copy Snap7 lib
 os.system('copy "' + SNAP7_BIN + r'\snap7.dll" ' + TARGET)
 
-# copy libusb 1.0 lib
+# copy libusb0.1 lib
 
 os.system('copy "' + LIBUSB_BIN + r'\libusb0.dll" ' + TARGET)
 
