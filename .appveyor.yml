@@ -17,4 +17,17 @@ build_script:
 
 artifacts:
   - path: 'src\*.exe'
+
+deploy:
+  provider: BinTray
+  username: rpaulo
+  api_key:
+    secure: CZTTHkcD4MGQO6Gqc5UoPdsDdiyiYfhTI6LI9eqyAzgiIAJlD5U9MctwgICalT6q
+  subject: artisan
+  repo: artisan-artifacts
+  package: artisan
+  version: master
+  publish: true
+  override: true
+  explode: false
   
