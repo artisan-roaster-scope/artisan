@@ -13,6 +13,9 @@ install:
   - curl -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
   - 7z x snap7-full-1.4.2.7z
   - copy snap7-full-1.4.2\build\bin\win64\snap7.dll c:\windows
+  - curl -L -O https://cfhcable.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip
+  - 7z x libusb-win32-bin-1.2.6.0.zip
+  - copy libusb-win32-bin-1.2.6.0\bin\amd64\libusb0.dll C:\Windows\SysWOW64
   
 build_script:
   - cmd: cd src
