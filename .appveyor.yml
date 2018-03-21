@@ -8,7 +8,8 @@ environment:
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
   - pip install -r src\requirements.txt
-
+  - pip install -r src\requirements-win.txt
+  
 build_script:
   - cmd: cd src
   - cmd: build-win3-pi.bat
