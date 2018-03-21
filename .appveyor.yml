@@ -1,0 +1,16 @@
+version: '1.3.0.{build}'
+
+environment:
+  matrix:
+    - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: 3.5
+
+install:
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - pip install pyinstaller
+
+script:
+  - cd src
+  - build-win3-pi.bat
+
+  
