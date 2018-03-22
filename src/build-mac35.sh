@@ -14,7 +14,7 @@ else
     export PYTHONPATH=$PYTHON/lib/python3.5/site-packages
     export QT_PATH=~/Qt5.10.0/5.10.0/clang_64
     export PYTHON_V=3.5
-    export MACOSX_DEPLOYMENT_TARGET=10.10
+    export MACOSX_DEPLOYMENT_TARGET=10.11
 fi
 
 export PATH=$PYTHON/bin:$PYTHON:/lib:$PATH

@@ -22196,7 +22196,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
         contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell")
-        contributors += u(", Morris Beume (Morris.Coffee), Michael Herbert, Chistopher Feran, Bill (San Franciscan Roaster)<br>")
+        contributors += u(", Morris Beume (Morris.Coffee), Michael Herbert, Bill (San Franciscan Roaster), Chistopher Feran")
         box = QMessageBox(self)
         
         #create a html QString

@@ -2,7 +2,7 @@
 
 set -ex
 
-export MACOSX_DEPLOYMENT_TARGET=10.10
+export MACOSX_DEPLOYMENT_TARGET=10.11
 
 if [ ! -z $TRAVIS ]; then
     export PYTHON=/usr/local
@@ -13,7 +13,7 @@ else
     export PYTHON=/Library/Frameworks/Python.framework/Versions/3.5
     export PYTHONPATH=$PYTHON/lib/python3.5/site-packages
     export PYTHON_V=3.5
-    export QT_PATH=~/Qt5.9.3/5.9.3/clang_64
+    export QT_PATH=~/Qt5.10.0/5.10.0/clang_64
 fi
 
 export PATH=$PYTHON/bin:$PYTHON/lib:$PATH
