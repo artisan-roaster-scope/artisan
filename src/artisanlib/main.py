@@ -977,6 +977,8 @@ class tgraphcanvas(FigureCanvas):
                     self.mode = "C"
             except:
                 pass
+                
+        self.mode_tempsliders = self.mode # the temperature mode of event slider to convert min/max limits
         
         self.errorlog = []
 
@@ -5832,7 +5834,21 @@ class tgraphcanvas(FigureCanvas):
                 return self.fromFtoC(t)
         else:
             return t
-
+            
+    # adjust min/max limits of temperature sliders to the actual temperature mode
+    def adjustTempSliders(self):
+        if self.mode != self.mode_tempsliders:
+            for i in range(4):
+                if aw.eventslidertemp[i]:
+                    if self.mode == "C":
+                        aw.eventslidermin[i] = int(round(self.fromFtoC(aw.eventslidermin[i])))
+                        aw.eventslidermax[i] = int(round(self.fromFtoC(aw.eventslidermax[i])))
+                    else:
+                        aw.eventslidermin[i] = int(round(self.fromCtoF(aw.eventslidermin[i])))
+                        aw.eventslidermax[i] = int(round(self.fromCtoF(aw.eventslidermax[i])))
+            aw.updateSliderMinMax()
+            self.mode_tempsliders = self.mode    
+            
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
         # just set it to the defaults to avoid strange conversion issues
@@ -5869,6 +5885,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.filterDropOut_tmin = aw.qmc.filterDropOut_tmin_F_default
             aw.qmc.filterDropOut_tmax = aw.qmc.filterDropOut_tmax_F_default
             aw.qmc.filterDropOut_spikeRoR_dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit_F_default
+            self.adjustTempSliders()
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
@@ -5905,6 +5922,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.filterDropOut_tmin = aw.qmc.filterDropOut_tmin_C_default
             aw.qmc.filterDropOut_tmax = aw.qmc.filterDropOut_tmax_C_default
             aw.qmc.filterDropOut_spikeRoR_dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit_C_default
+            self.adjustTempSliders()
 
     def fahrenheitModeRedraw(self):
         self.fahrenheitMode()
@@ -5912,7 +5930,7 @@ class tgraphcanvas(FigureCanvas):
 
     def celsiusModeRedraw(self):
         self.celsiusMode()
-        self.redraw()
+        self.redraw()                        
 
     #converts a loaded profile to a different temperature scale. t input is the requested mode (F or C).
     def convertTemperature(self,t,silent=False):
@@ -10744,6 +10762,7 @@ class ApplicationWindow(QMainWindow):
         self.eventslidermax = [100,100,100,100]
         self.eventslidersflags = [0,1,1] # slider visibility per state OFF, ON, START
         self.eventslidercoarse = [0,0,0,0] # if 1, sliders step in multiples of 10, otherwise 1
+        self.eventslidertemp = [0,0,0,0] # if 1, slider values are interpreted as temperatures and min/max limit are converted with the temp mode
         
         #event quantifiers        
         self.eventquantifieractive = [0,0,0,0]
@@ -18674,7 +18693,12 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidersflags = [toInt(x) for x in toList(settings.value("eventslidersflags",self.eventslidersflags))]
             if settings.contains("eventslidercoarse"):
                 self.eventslidercoarse = [toInt(x) for x in toList(settings.value("eventslidercoarse",self.eventslidercoarse))]                
+            if settings.contains("eventslidertemp"):
+                self.eventslidertemp = [toInt(x) for x in toList(settings.value("eventslidertemp",self.eventslidertemp))]
+            if settings.contains("ModeTempSliders"):
+                self.qmc.mode_tempsliders = str(settings.value("ModeTempSliders",self.qmc.mode_tempsliders))              
             settings.endGroup()
+            self.qmc.adjustTempSliders() # adjust min/max slider limits of temperature sliders to correspond to the current temp mode
             aw.slidersAction.setEnabled(any(aw.eventslidervisibilities) or aw.pidcontrol.svSlider)
             #restore quantifier
             settings.beginGroup("Quantifiers")
@@ -19702,6 +19726,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("slidermax",self.eventslidermax)
             settings.setValue("eventslidersflags",self.eventslidersflags)
             settings.setValue("eventslidercoarse",self.eventslidercoarse)
+            settings.setValue("eventslidertemp",self.eventslidertemp)
+            settings.setValue("ModeTempSliders",self.qmc.mode_tempsliders)
             settings.endGroup()
             settings.beginGroup("Quantifiers")
             settings.setValue("quantifieractive",self.eventquantifieractive)
@@ -22232,7 +22258,7 @@ class ApplicationWindow(QMainWindow):
         QApplication.instance().aboutQt()
         
     def helpHelp(self):
-        QDesktopServices.openUrl(QUrl("https://artisan-roasterscope.blogspot.com", QUrl.TolerantMode))
+        QDesktopServices.openUrl(QUrl("https://artisan-scope.org/doc/", QUrl.TolerantMode))
 
     def applicationscreenshot(self):
         if pyqtversion < 5:
@@ -23854,6 +23880,8 @@ class ApplicationWindow(QMainWindow):
         copy.append(self.eventslidermax[:])
         # added slider coarse
         copy.append(self.eventslidercoarse[:])
+        # added slider temp
+        copy.append(self.eventslidertemp[:])
               
         self.buttonpalette[pindex] = copy[:]
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
@@ -23926,6 +23954,10 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidercoarse = copy[21][:]
             else:
                 self.eventslidercoarse = [0,0,0,0]
+            if len(copy)>22 and len(copy[22]) == 4:
+                self.eventslidertemp = copy[22][:]
+            else:
+                self.eventslidertemp = [0,0,0,0]
                 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
@@ -30002,6 +30034,8 @@ class EventsDlg(ArtisanDialog):
         max_titlelabel.setFont(titlefont)
         slidercoarsetitlelabel = QLabel(QApplication.translate("Label","Coarse", None))
         slidercoarsetitlelabel.setFont(titlefont)
+        slidertemptitlelabel = QLabel(QApplication.translate("Label","Temp", None))
+        slidertemptitlelabel.setFont(titlefont)
         self.E1visibility = QCheckBox(aw.qmc.etypesf(0))
         self.E1visibility.setFocusPolicy(Qt.NoFocus)
         self.E1visibility.setChecked(bool(aw.eventslidervisibilities[0]))
@@ -30141,7 +30175,23 @@ class EventsDlg(ArtisanDialog):
         self.E4slider_coarse = QCheckBox()
         self.E4slider_coarse.setFocusPolicy(Qt.NoFocus)
         self.E4slider_coarse.setChecked(bool(aw.eventslidercoarse[3]))
-        self.E4slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None)) 
+        self.E4slider_coarse.setToolTip(QApplication.translate("Tooltip", "Slider steps in multiple of 10 otherwise 1", None))         
+        self.E1slider_temp = QCheckBox()
+        self.E1slider_temp.setFocusPolicy(Qt.NoFocus)
+        self.E1slider_temp.setChecked(bool(aw.eventslidertemp[0]))
+        self.E1slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None))        
+        self.E2slider_temp = QCheckBox()
+        self.E2slider_temp.setFocusPolicy(Qt.NoFocus)
+        self.E2slider_temp.setChecked(bool(aw.eventslidertemp[1]))
+        self.E2slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None)) 
+        self.E3slider_temp = QCheckBox()
+        self.E3slider_temp.setFocusPolicy(Qt.NoFocus)
+        self.E3slider_temp.setChecked(bool(aw.eventslidertemp[2]))
+        self.E3slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None)) 
+        self.E4slider_temp = QCheckBox()
+        self.E4slider_temp.setFocusPolicy(Qt.NoFocus)
+        self.E4slider_temp.setChecked(bool(aw.eventslidertemp[3]))
+        self.E4slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None))                 
         helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         helpsliderbutton.clicked.connect(lambda _:self.showSliderHelp())
@@ -30596,6 +30646,7 @@ class EventsDlg(ArtisanDialog):
         tab5Layout.addWidget(min_titlelabel,0,5)
         tab5Layout.addWidget(max_titlelabel,0,6)
         tab5Layout.addWidget(slidercoarsetitlelabel,0,7)
+        tab5Layout.addWidget(slidertemptitlelabel,0,8)
         tab5Layout.addWidget(self.E1visibility,1,0)
         tab5Layout.addWidget(self.E2visibility,2,0)
         tab5Layout.addWidget(self.E3visibility,3,0)
@@ -30628,6 +30679,10 @@ class EventsDlg(ArtisanDialog):
         tab5Layout.addWidget(self.E2slider_coarse,2,7,Qt.AlignCenter)
         tab5Layout.addWidget(self.E3slider_coarse,3,7,Qt.AlignCenter)
         tab5Layout.addWidget(self.E4slider_coarse,4,7,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E1slider_temp,1,8,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E2slider_temp,2,8,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E3slider_temp,3,8,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E4slider_temp,4,8,Qt.AlignCenter)
         SliderHelpHBox = QHBoxLayout()
         SliderHelpHBox.addStretch()
         SliderHelpHBox.addWidget(helpsliderbutton)
@@ -30938,6 +30993,11 @@ class EventsDlg(ArtisanDialog):
         self.E2slider_coarse.setChecked(bool(aw.eventslidercoarse[1]))
         self.E3slider_coarse.setChecked(bool(aw.eventslidercoarse[2]))
         self.E4slider_coarse.setChecked(bool(aw.eventslidercoarse[3]))
+        # set slider temp
+        self.E1slider_temp.setChecked(bool(aw.eventslidertemp[0]))
+        self.E2slider_temp.setChecked(bool(aw.eventslidertemp[1]))
+        self.E3slider_temp.setChecked(bool(aw.eventslidertemp[2]))
+        self.E4slider_temp.setChecked(bool(aw.eventslidertemp[3]))
 
     def setElinethickness(self,_,val):
         self.E1thicknessSpinBox.setDisabled(True)
@@ -31476,6 +31536,10 @@ class EventsDlg(ArtisanDialog):
         aw.eventslidercoarse[1] = int(self.E2slider_coarse.isChecked())
         aw.eventslidercoarse[2] = int(self.E3slider_coarse.isChecked())
         aw.eventslidercoarse[3] = int(self.E4slider_coarse.isChecked())
+        aw.eventslidertemp[0] = int(self.E1slider_temp.isChecked())
+        aw.eventslidertemp[1] = int(self.E2slider_temp.isChecked())
+        aw.eventslidertemp[2] = int(self.E3slider_temp.isChecked())
+        aw.eventslidertemp[3] = int(self.E4slider_temp.isChecked())
         aw.updateSliderMinMax()
         aw.slidersAction.setEnabled(any(aw.eventslidervisibilities) or aw.pidcontrol.svSlider)
 
@@ -31538,6 +31602,7 @@ class EventsDlg(ArtisanDialog):
         self.eventslidermin = aw.eventslidermin
         self.eventslidermax = aw.eventslidermax
         self.eventslidercoarse = aw.eventslidercoarse
+        self.eventslidertemp = aw.eventslidertemp
         # palettes
         self.buttonpalette = aw.buttonpalette
         # styles
@@ -31582,6 +31647,7 @@ class EventsDlg(ArtisanDialog):
         aw.eventslidermin = self.eventslidermin
         aw.eventslidermax = self.eventslidermax
         aw.eventslidercoarse = self.eventslidercoarse
+        aw.eventslidertemp = self.eventslidertemp
         # palettes
         aw.buttonpalette = self.buttonpalette
         # styles
