@@ -848,7 +848,7 @@ class ArtisanTime():
 #######################################################################################
 
 class tgraphcanvas(FigureCanvas):
-    def __init__(self,parent):
+    def __init__(self,parent,dpi):
 
         #default palette of colors
         self.palette = {"background":'white',"grid":'#808080',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',
@@ -1213,7 +1213,7 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=[""]*9
         self.plotcurvecolor = ["black"]*9
 
-        self.fig = Figure(tight_layout={"pad":.2},frameon=True) # ,"h_pad":0.0,"w_pad":0.0
+        self.fig = Figure(tight_layout={"pad":.2},frameon=True,dpi=dpi) # ,"h_pad":0.0,"w_pad":0.0
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
         
 #        #figure back color
@@ -10628,13 +10628,15 @@ class ApplicationWindow(QMainWindow):
         
         #mpl.rc_context({'toolbar': None}) # this does not work to remove the default toolbar
         #mpl.rcParams['toolbar'] == None # this does not work to remove the default toolbar
-        self.qmc = tgraphcanvas(self.main_widget)
-
-        if mpl_major_version >= 2 and pyqtversion >= 5:
-            # on mpl >= v2 we assume hidpi support and consider the pixel ratio
-            self.qmc.fig.set_dpi(self.defaultdpi*self.devicePixelRatio())
-        else:
-            self.qmc.fig.set_dpi(self.defaultdpi)
+                
+        settings = QSettings()
+        if settings.contains("dpi"):
+            try:
+                self.dpi = toInt(settings.value("dpi",self.dpi))
+            except:
+                pass                           
+        
+        self.qmc = tgraphcanvas(self.main_widget,self.dpi)        
         
         #self.qmc.setAttribute(Qt.WA_NoSystemBackground)
         
@@ -13876,6 +13878,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.hudresizeflag = True
         super(ApplicationWindow,self).resizeEvent(event)
 
+#    def setdpi(self,dpi,moveWindow=True):
+#        QTimer.singleShot(1,lambda : aw.setdpi_internal(dpi,True))
+        
     def setdpi(self,dpi,moveWindow=True):
         if aw:
             aw.dpi = dpi
@@ -18794,8 +18799,7 @@ class ApplicationWindow(QMainWindow):
 #                self.qmc.endofx = self.qmc.locktimex_end
 #            if self.qmc.endofx < 1:
 #                self.qmc.endofx = 60
-
-            
+                
             # used on startup to reload previous loaded profiles
             if settings.contains("lastLoadedProfile"):
                 aw.lastLoadedProfile = toString(settings.value("lastLoadedProfile",aw.curFile))
@@ -18833,7 +18837,7 @@ class ApplicationWindow(QMainWindow):
                 except Exception:
                     pass
             # set dpi
-            if settings.contains("dpi"):
+            if filename is not None and settings.contains("dpi"):
                 try:
                     aw.dpi = toInt(settings.value("dpi",aw.dpi))
                     if aw.dpi != aw.defaultdpi:
@@ -49380,8 +49384,7 @@ def main():
         QApplication.setLayoutDirection(Qt.RightToLeft)
     else:
         QApplication.setLayoutDirection(Qt.LeftToRight)
-
-
+    
     aw.settingsLoad()
     
 
