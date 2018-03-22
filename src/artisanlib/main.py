@@ -4519,7 +4519,6 @@ class tgraphcanvas(FigureCanvas):
             idx = TP_Index + self.bisection(self.temp2[TP_Index:self.timeindex[6]],aw.qmc.temp2[idx])
         else:
             idx = TP_Index + self.bisection(self.temp2[TP_Index:self.timeindex[6]],aw.qmc.AUCbase)
-        rtbt = aw.qmc.convertTemp(aw.qmc.temp2[idx],"C",aw.qmc.mode)
         rtbt = aw.qmc.temp2[idx]
                 
         ix = self.timex[idx:self.timeindex[6]+1]
