@@ -751,7 +751,7 @@ supported_languages = [
     "ar",
     "de",
     "el",
-    "en"
+    "en",
     "es",
     "fi",
     "fr",
@@ -776,11 +776,12 @@ if len(locale) == 0:
         from Cocoa import NSUserDefaults # @UnresolvedImport
         defs = NSUserDefaults.standardUserDefaults()
         langs = defs.objectForKey_("AppleLanguages")
-        locale = langs.objectAtIndex_(0)
+        locale = langs.objectAtIndex_(0)[:2]
     else:
         locale = QLocale.system().name()[:2]
     if locale in supported_languages:
         QSettings().setValue('locale', locale)
+
 
 qtTranslator = QTranslator()
 #load Qt default translations from QLibrary
