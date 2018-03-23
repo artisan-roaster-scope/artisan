@@ -1,6 +1,12 @@
 ---
-layout: single
-permalink: /devices/
 title: "Supported Devices"
-modified: 2016-04-18T16:39:37-04:00
+layout: single
+classes: wide
+permalink: /devices/
+header:
+  overlay_image: /assets/images/teaser-small.jpg
+  image: /assets/images/teaser-small.jpg
+sort_by: title
 ---
+
+Artisan can communicate with a large number of devices.

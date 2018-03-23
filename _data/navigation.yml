@@ -1,9 +1,13 @@
 main:
-  - title: "Features"
-    url: /features/
   - title: "Suported Machines"
-    url: /machines/
+    url: /machines/index/
   - title: "Suported Devices"
     url: /devices/
   - title: "About"
     url: /about/
+    
+machines:
+  - title: "Aillio"
+    url: /machines/aillio/
+  - title: "Probat"
+    url: /machines/probat/

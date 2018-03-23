@@ -4,39 +4,36 @@ permalink: /
 header:
   overlay_color: "#5e616c"
   overlay_image: /assets/images/teaser.jpg
+  show_overlay_title: false
   caption: #'doubleshot'
-excerpt: 'v1.3{::nomarkdown}<iframe style="display: inline-block;"  frameborder="0" scrolling="0" width="60px" height="200px">v1.3</iframe>{:/nomarkdown}'
+excerpt: 'v1.3{::nomarkdown}<iframe style="display: inline-block;"  frameborder="0" scrolling="0" width="60px" height="120px">v1.3</iframe>{:/nomarkdown}'
 feature_row:
   - image_path: /assets/images/sliders.png
     alt: "customizable"
     title: "Logging + Control"
-    excerpt: "Log process data and control your roast using sliders, alarms, and PID"
-    url: "/Features/"
+    excerpt: "Log and control your roast using sliders, alarms, and PID"
+    url: "/About/#notable-features"
     btn_label: "Learn More"
     btn_class: "btn--inverse"
   - image_path: /assets/images/onebean.png
     alt: "open"
-    title: "Open & Adjustable"
-    excerpt: "50+ Devices, 20+ Machines, 20+ Languages, 4 Platforms"
-    url: "/Configuration/"
+    title: "Open Platform"
+    excerpt: "18+ Machines, 50+ Devices, 20+ Languages, 4 Operating Systems"
+    url: "/About"
     btn_label: "Learn More"
     btn_class: "btn--inverse"
   - image_path: /assets/images/wheel.png
     alt: "100% free"
     title: "100% Free"
-    excerpt: "Free for personal and commercial use. [Donations](https://www.paypal.me/MarkoLuther) are welcome!"
-    url: "/License/"
+    excerpt: "Help keep Artisan free for personal and commercial use by [sending a donation](https://www.paypal.me/MarkoLuther)" 
+    url: "/About/#supporters"
     btn_label: "Learn More"
     btn_class: "btn--inverse"
 intro:
-  - excerpt: '[Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--twitter} &emsp; [Documentation](/doc/){: .btn .btn--twitter}'
+  - excerpt: '[Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large} &emsp; [Documentation](/doc/){: .btn .btn--success .btn--large}'
+share: true
 ---
 
 {% include feature_row id="intro" type="center" %}
 
 {% include feature_row %}
-
-
-**Summary** 
-
-Artisan is a software that helps coffee roasters record, analyze, and control roast profiles. When used in conjunction with a thermocouple data logger or a proportional–integral–derivative controller (PID controller), this software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
