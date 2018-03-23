@@ -6,7 +6,7 @@ header:
   overlay_image: /assets/images/teaser.jpg
   show_overlay_title: false
   caption: #'doubleshot'
-excerpt: 'v1.3{::nomarkdown}<iframe style="display: inline-block;"  frameborder="0" scrolling="0" width="60px" height="120px">v1.3</iframe>{:/nomarkdown}'
+excerpt: '{::nomarkdown}<iframe style="display: inline-block;"  frameborder="0" scrolling="0" width="60px" height="120px">v1.3</iframe>{:/nomarkdown}'
 feature_row:
   - image_path: /assets/images/sliders.png
     alt: "customizable"
