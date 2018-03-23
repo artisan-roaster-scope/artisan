@@ -51,7 +51,7 @@ set_mime()
 
 case "$1" in
    configure)
-   if dpkg-query -W xdg-utils;
+   if dpkg-query -W xdg-utils 2>&1 >/dev/null;
        then set_mime;
    fi
    ;;
