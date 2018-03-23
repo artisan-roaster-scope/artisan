@@ -1,6 +1,6 @@
 main:
   - title: "Suported Machines"
-    url: /machines/index
+    url: /machines/
   - title: "Suported Devices"
     url: /devices/
   - title: "About"
