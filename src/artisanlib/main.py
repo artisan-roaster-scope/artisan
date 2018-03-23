@@ -22225,8 +22225,9 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Paolo Scimone, Google, eightbit11, Phidgets, Hottop, Yoctopuce, Taras Prokopyuk")
         contributors += u(", Reiss Gunson (Londinium), Ram Evgi (Coffee-Tech), Rob Gardner, Jaroslav Tu") + uchr(269) + u("ek (doubleshot)")
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
-        contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeyecoffe), Moshe Spinell")
+        contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeye Coffee), Moshe Spinell")
         contributors += u(", Morris Beume (Morris.Coffee), Michael Herbert, Bill (San Franciscan Roaster), Chistopher Feran")
+        contributors += u(", Coffed<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -29080,7 +29081,7 @@ class WindowsDlg(ArtisanDialog):
         self.gridwidthSpinBox.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         gridalphalabel = QLabel(QApplication.translate("Label", "Opaqueness",None))
         self.gridalphaSpinBox = QSpinBox()
-        self.gridalphaSpinBox.setRange(1,10)
+        self.gridalphaSpinBox.setRange(1,5)
         self.gridalphaSpinBox.setValue(int(aw.qmc.gridalpha*10))
         self.gridalphaSpinBox.valueChanged.connect(self.changegridalpha)
         self.gridalphaSpinBox.setMaximumWidth(40)
