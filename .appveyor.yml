@@ -20,7 +20,7 @@ install:
 build_script:
   - cmd: cd src
   - cmd: build-win3-pi.bat
-  - cmd: copy LICENSE LICENSE.txt
+  - cmd: copy ..\LICENSE LICENSE.txt
   - cmd: 7z a artisan-win-1.3.0.zip Setup*.exe LICENSE.txt README.txt
 
 
