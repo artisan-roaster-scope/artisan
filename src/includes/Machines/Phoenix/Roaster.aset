@@ -1,0 +1,20 @@
+[General]
+Delay=3000
+Oversampling=true
+
+[Device]
+controlETpid=1, 2
+id=0
+readBTpid=1, 1
+showFujiLCDs=false
+
+[RoastProperties]
+roastertype=Phoenix Roaster
+
+[SerialPort]
+baudrate=9600
+bytesize=8
+comport=COM4
+parity=O
+stopbits=1
+timeout=1

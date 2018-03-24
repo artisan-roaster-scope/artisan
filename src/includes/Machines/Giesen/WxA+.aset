@@ -1,0 +1,117 @@
+[General]
+Delay=1000
+Oversampling=true
+
+[ArduinoPID]
+dutyMax=100
+dutyMin=-100
+dutySteps=1
+invertControl=false
+loadRampSoakFromProfile=false
+pidCycle=1000
+pidKd=3
+pidKi=0.01
+pidKp=20
+pidNegativeTarget=0
+pidOnCHARGE=false
+pidPositiveTarget=4
+pidSource=1
+svButtons=false
+svLookahead=0
+svMode=0
+svRamps=0, 0, 0, 0, 0, 0, 0, 0
+svSlider=false
+svSliderMax=250
+svSliderMin=0
+svSoaks=0, 0, 0, 0, 0, 0, 0, 0
+svValue=280
+svValues=0, 0, 0, 0, 0, 0, 0, 0
+
+[Device]
+id=79
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200
+extrabytesize=8, 8, 8
+extracomport=COM1, COM1, COM1
+extraparity=E, E, E
+extrastopbits=1, 1, 1
+extratimeout=1, 1, 1
+
+[ExtraDev]
+extraCurveVisibility1=false, false, false, true, true, true, true, true, true, true
+extraCurveVisibility2=false, false, false, true, true, true, true, true, true, true
+extraLCDvisibility1=true, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
+extradevicecolor1=#7f0011, #3ca74c, #7f0011
+extradevicecolor2=#3680c6, #650067, #3680c6
+extradevices=80, 81, 82
+extramathexpression1=, , x-1
+extramathexpression2=, , 
+extraname1={3}, {1}, {3}
+extraname2={0}, {2}, {0}
+
+[ExtraEventButtons]
+buttonlistmaxlen=11
+buttonpalette="@Variant(\0\0\0\t\0\0\0\x17\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x4\0\0\0\t\0\0\0\x1\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\xf\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0 \0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x34\0,\0\x30\0)\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0\x41\0U\0T\0O\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\f\0y\0\x65\0l\0l\0o\0w\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\f\0\0\0\x2\0\0\0\f\0\0\0\x2\0\0\0\f\0\0\0\x2\0\0\0\f\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\"\0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x36\0,\0{\0}\0)\0\0\0\n\0\0\0\"\0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x38\0,\0{\0}\0)\0\0\0\n\0\0\0\"\0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x30\0,\0{\0}\0)\0\0\0\n\0\0\0\"\0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x34\0,\0{\0}\0)\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\a\0\0\0\x2\0\0\0\x4\0\0\0\x2\0\0\0\x5\0\0\0\x2\0\0\0\x6\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0P\0\0\0\x2\0\0\0#\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\xb4\0\0\0\x2\0\0\0<\0\0\0\x2\0\0\0\xfa\0\0\0\x2\0\0\0\x64\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0P\0\0\0\x2\0\0\0#\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\xb4\0\0\0\x2\0\0\0<\0\0\0\x2\0\0\0\xfa\0\0\0\x2\0\0\0\x64\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\0)", "@Variant(\0\0\0\t\0\0\0\x16\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x4\0\0\0\t\0\0\0\x1\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\xf\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0 \0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x34\0,\0\x30\0)\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0\x41\0U\0T\0O\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\f\0y\0\x65\0l\0l\0o\0w\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\f\0\0\0\x2\0\0\0\f\0\0\0\x2\0\0\0\f\0\0\0\x2\0\0\0\f\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\"\0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x36\0,\0{\0}\0)\0\0\0\n\0\0\0\"\0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x38\0,\0{\0}\0)\0\0\0\n\0\0\0\"\0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x30\0,\0{\0}\0)\0\0\0\n\0\0\0\"\0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x34\0,\0{\0}\0)\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\a\0\0\0\x2\0\0\0\x4\0\0\0\x2\0\0\0\x5\0\0\0\x2\0\0\0\x6\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0P\0\0\0\x2\0\0\0#\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\xb4\0\0\0\x2\0\0\0<\0\0\0\x2\0\0\0\xfa\0\0\0\x2\0\0\0\x64\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0P\0\0\0\x2\0\0\0#\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\xb4\0\0\0\x2\0\0\0<\0\0\0\x2\0\0\0\xfa\0\0\0\x2\0\0\0\x64\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0)", @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0)
+buttonpalette_shortcuts=true
+buttonpalettemaxlen=11, 11, 14, 14, 14, 14, 14, 14, 14, 14
+extraeventbuttoncolor=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\f\0y\0\x65\0l\0l\0o\0w)
+extraeventbuttontextcolor=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\n\0\x62\0l\0\x61\0\x63\0k)
+extraeventsactions=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\xf)
+extraeventsactionstrings="@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0 \0s\0\x65\0t\0\x44\0\x42\0i\0n\0t\0(\0\x32\0,\0\x31\0\x34\0,\0\x30\0))"
+extraeventsbuttonsflags=0, 1, 1
+extraeventsdescriptions=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\0)
+extraeventslabels=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\n\0\0\0\b\0\x41\0U\0T\0O)
+extraeventstypes=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x4)
+extraeventsvalues=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x6?\xf0\0\0\0\0\0\0)
+extraeventsvisibility=@Variant(\0\0\0\t\0\0\0\x1\0\0\0\x2\0\0\0\x1)
+
+[Quantifiers]
+clusterEventsFlag=false
+quantifieractive=1, 1, 1, 1
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=180, 60, 250, 100
+quantifiermin=80, 35, 0, 0
+quantifiersource=7, 4, 5, 6
+
+[RoastProperties]
+roastertype=Giesen
+
+[S7]
+PID_OFF_action="getDBint(2,48);setDBint(2,14,_)"
+PID_ON_action="setDBint(2,14,0)"
+PID_SV_register=10
+PID_area=0
+PID_d_register=0
+PID_db_nr=2
+PID_i_register=0
+PID_p_register=0
+PIDmultiplier=0
+SVmultiplier=0
+area=6, 6, 6, 6, 6, 6, 6, 6
+db_nr=4, 4, 2, 2, 2, 2, 2, 2
+div=0, 0, 0, 0, 0, 0, 0, 0
+host=192.168.2.180
+mode=1, 1, 0, 0, 0, 1, 0, 0
+port=102
+rack=0
+slot=0
+start=10, 6, 48, 52, 18, 10, 14, 16
+type=1, 1, 0, 0, 0, 0, 0, 0
+
+[Sliders]
+ModeTempSliders=C
+eventslidercoarse=0, 0, 0, 0
+eventslidersflags=0, 1, 1
+eventslidertemp=0, 0, 1, 0
+slideractions=12, 12, 12, 12
+slidercommands="setDBint(2,16,{})", "setDBint(2,18,{})", "setDBint(2,10,{})", "setDBint(2,14,{})"
+sliderfactors=1, 1, 1, 1
+slidermax=180, 60, 250, 100
+slidermin=80, 35, 0, 0
+slideroffsets=0, 0, 0, 1
+slidervisibilities=1, 1, 1, 1
+
+[events]
+etypes=Air, Drum, SP, Burner, --
