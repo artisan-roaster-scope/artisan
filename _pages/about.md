@@ -86,7 +86,7 @@ __Marko Luther__ –– current maintainer
 
 __Dave Baxter__ –– design wizard
 
-__Rui Paolo__ –– Aillio master & CI
+__Rui Paulo__ –– Aillio master & CI
 
 
 ## Supporters
