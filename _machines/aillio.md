@@ -1,5 +1,5 @@
 ---
-layout: splash
+layout: single
 permalink: /machines/aillio/
 title: "Aillio"
 excerpt: "Bullet R1"

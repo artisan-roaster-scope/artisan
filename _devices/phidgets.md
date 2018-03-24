@@ -1,5 +1,5 @@
 ---
-layout: splash
+layout: single
 permalink: /devices/phidgets/
 title: "Phidgets"
 excerpt: "Various modules"

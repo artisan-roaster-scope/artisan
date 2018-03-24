@@ -1,5 +1,5 @@
 ---
-layout: splash
+layout: single
 permalink: /machines/probat/
 title: "Probat"
 excerpt: "Probatone 5/12/25"
