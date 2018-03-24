@@ -1,13 +1,13 @@
-*.pyc
-/.svn/
-/build/
-/dist/
-/artisan.py.bak
-/artisan.py.org.py
-/artisan.py.python2.py
-/artisan.py.zip
-/*.DS_Store
-/Artisan.app/
-/.settings/
-/translations copy/
-/Artisan-10.6.app/
+src/*.pyc
+.svn/
+src/build/
+src/dist/
+src/artisan.py.bak
+src/artisan.py.org.py
+src/artisan.py.python2.py
+src/artisan.py.zip
+**/*.DS_Store
+src/Artisan.app/
+src/.settings/
+src/translations copy/
+src/Artisan-10.6.app/
