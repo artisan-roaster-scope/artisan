@@ -4,9 +4,9 @@
 ==========
 Visual scope for coffee roasters
 
-![Linux/Mac build](https://img.shields.io/travis/artisan-roaster-scope/artisan.svg?label=Linux/Mac%20build)
-![AppVeyor](https://img.shields.io/appveyor/ci/rpaulo/artisan.svg?label=Windows%20build)
-[![Download](https://api.bintray.com/packages/artisan/artisan-artifacts/artisan/images/download.svg?version=master) ](https://bintray.com/artisan/artisan-artifacts/artisan/master/link) 
+[![Linux/Mac build](https://img.shields.io/travis/artisan-roaster-scope/artisan.svg?label=Linux/Mac%20build)](https://travis-ci.org/artisan-roaster-scope/artisan)
+[![AppVeyor](https://img.shields.io/appveyor/ci/rpaulo/artisan.svg?label=Windows%20build)](https://ci.appveyor.com/project/rpaulo/artisan)
+[![Bintray](https://img.shields.io/bintray/v/artisan/artisan-artifacts/artisan.svg) ](https://bintray.com/artisan/artisan-artifacts/artisan/master/link#files) 
 
 Summary
 -------
