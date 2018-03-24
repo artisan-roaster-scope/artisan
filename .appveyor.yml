@@ -21,6 +21,10 @@ install:
   - cd pyinstaller-develop
   - python setup.py install
   - cd ..
+  - curl -L -O https://download.lfd.uci.edu/pythonlibs/u2yrk7ps/numpy-1.13.3+mkl-cp35-cp35m-win_amd64.whl
+  - curl -L -O https://download.lfd.uci.edu/pythonlibs/u2yrk7ps/scipy-1.0.0-cp35-cp35m-win_amd64.whl
+  - pip install numpy-1.13.3+mkl-cp35-cp35m-win_amd64.whl
+  - pip install scipy-1.0.0-cp35-cp35m-win_amd64.whl
   
 build_script:
   - cmd: cd src
