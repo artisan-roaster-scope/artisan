@@ -3,9 +3,8 @@
 [Artisan](https://github.com/MAKOMO/artisan/blob/master/README.md) 
 ==========
 Visual scope for coffee roasters
-
-[![Build Status](https://travis-ci.org/artisan-roaster-scope/artisan.svg?branch=master)](https://travis-ci.org/artisan-roaster-scope/artisan)
-[![Build status](https://ci.appveyor.com/api/projects/status/u76acxmph3k978sn?svg=true)](https://ci.appveyor.com/project/rpaulo/artisan)
+![Linux/Mac build](https://img.shields.io/travis/artisan-roaster-scope/artisan.svg?label=Linux/Mac%20build)
+![AppVeyor](https://img.shields.io/appveyor/ci/rpaulo/artisan.svg?label=Windows%20build)
 [![Download](https://api.bintray.com/packages/artisan/artisan-artifacts/artisan/images/download.svg?version=master) ](https://bintray.com/artisan/artisan-artifacts/artisan/master/link) 
 
 Summary
