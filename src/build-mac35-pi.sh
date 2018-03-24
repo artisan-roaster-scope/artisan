@@ -2,7 +2,7 @@
 
 set -ex
 
-export MACOSX_DEPLOYMENT_TARGET=10.11
+export MACOSX_DEPLOYMENT_TARGET=10.13
 
 if [ ! -z $TRAVIS ]; then
     export PYTHON=/usr/local

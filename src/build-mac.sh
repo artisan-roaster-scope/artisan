@@ -1,5 +1,5 @@
 #!/bin/sh
-export MACOSX_DEPLOYMENT_TARGET=10.11
+export MACOSX_DEPLOYMENT_TARGET=10.13
 export PYTHON=/Library/Frameworks/Python.framework/Versions/2.7
 export PYTHONPATH=$PYTHON/lib/python2.7/site-packages
 

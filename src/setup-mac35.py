@@ -125,7 +125,7 @@ plist.update({ 'CFBundleDisplayName': 'Artisan',
                     'CFBundleIdentifier': 'com.google.code.p.Artisan',
                     'CFBundleShortVersionString': VERSION,
                     'CFBundleVersion': 'Artisan ' + VERSION,
-                    'LSMinimumSystemVersion': '10.11',
+                    'LSMinimumSystemVersion': '10.13',
                     'LSMultipleInstancesProhibited': 'false',
                     'LSPrefersPPC': False,
                     'LSArchitecturePriority': 'x86_64',
@@ -223,31 +223,24 @@ os.system(r'cp /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib Artisan.ap
 
 # for Qt5
 print('*** Removing unused Qt frameworks ***')
-for fw in [
-            'QtDeclarative.framework',
-            'QtHelp.framework',
-            'QtMultimedia.framework',
-            'QtNetwork.framework',
-            'QtOpenGL.framework',
-            'QtScript.framework',
-            'QtScriptTools.framework',
-            'QtSql.framework',
-            'QtDesigner.framework',
-            'QtTest.framework',
-            'QtWebKit.framework',
-            'QtWebKitWidgets.framework',
-            'QtXMLPatterns.framework',
-            'QtCLucene.framework',
-            'QtPositioning.framework',
-            'QtQml.framework',
-            'QtSensors.framework',
-            'QtWebChannel.framework',
-            'QtQuick.framework',
-            'QtMultimediaWidgets.framework',]:
-    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw):
-        for file in files:
-#            print('Deleting', file)
-            os.remove(os.path.join(root,file))
+Qt_frameworks = [
+    'QtWidgets.framework',
+    'QtCore.framework',
+    'QtGui.framework',
+    'QtSvg.framework',
+    'QtPrintSupport.framework',
+#    'QtXml.framework',
+#    'QtMacExtras.framework',
+]
+for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
+    for d in dirs:
+        if d.startswith("Qt") and d.endswith(".framework") and d not in Qt_frameworks:
+#            print("dir",os.path.join(root,d))
+            os.system("rm -rf " + os.path.join(root,d))
+
+# remove doublicate Qt installation
+
+os.system("rm -rf ./Artisan.app/Contents/Resources/lib/python3.6/PyQt5/Qt")
 
 print('*** Removing unused files ***')
 for root, dirs, files in os.walk('.'):
