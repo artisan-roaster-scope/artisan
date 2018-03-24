@@ -187,10 +187,10 @@ class AillioR1:
         if d > 11:
             d = 11
         if f > value:
-            for i in range(0, d+1):
+            for i in range(0, d):
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_DECR)
         else:
-            for i in range(0, d+1):
+            for i in range(0, d):
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_INCR)
 
     def set_drum(self, value):
