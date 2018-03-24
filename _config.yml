@@ -18,8 +18,8 @@ minimal_mistakes_skin    : "default" # "default" "air", "aqua", "contrast", "dar
 locale                   : "en-US"
 title                    : "Artisan"
 title_separator          : "-"
-name                     : "Marko Luther"
-description              : "visual scope for coffee roasters"
+name                     : &name "Marko Luther"
+description              : &description "visual scope for coffee roasters"
 url                      : "https://artisan-scope.org" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "artisan-roaster-scope/artisan" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -87,8 +87,8 @@ social:
   type                   : # Person or Organization (defaults to Person)
   name                   : # If the user or organization name differs from the site's name
   links: # An array of links to social media profiles
-    - "https://twitter.com/mmistakes"
-    - "https://facebook.com/michaelrose"
+    - "https://twitter.com/mluther"
+    - "https://facebook.com/marko.luther"
 
 # Analytics
 analytics:
@@ -99,9 +99,9 @@ analytics:
 
 # Site Author
 author:
-  name             : "Marko Luther"
+  name             : *name
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "I am an amazing person."
+  bio              : "Artisan maintainer"
   location         : "Germany"
   email            :
   uri              :
@@ -110,7 +110,7 @@ author:
   codepen          :
   dribbble         :
   flickr           :
-  facebook         : "Artisan Scope"
+  facebook         : *facebook
   foursquare       :
   github           : "artisan-roaster-scope"
   gitlab           :
@@ -229,6 +229,15 @@ defaults:
     values:
       layout: single
       author_profile: false
+      
+defaults:
+  # devices
+  - scope:
+      path: ""
+      type: devices
+    values:
+      layout: single
+      author_profile: false
 
 # Sass/SCSS
 sass:
@@ -238,9 +247,9 @@ sass:
 
 # Outputting
 permalink: /:categories/:title/
-paginate: 5 # amount of posts to show
-paginate_path: /page:num/
-timezone: # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+#paginate: 5 # amount of posts to show
+#paginate_path: /page:num/
+timezone: Europe/Berlin # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
 # Plugins (previously gems:)
