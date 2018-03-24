@@ -20,6 +20,7 @@ install:
   - 7z x develop.zip
   - cd pyinstaller-develop
   - python setup.py install
+  - cd ..
   
 build_script:
   - cmd: cd src
