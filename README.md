@@ -8,6 +8,7 @@ Visual scope for coffee roasters
 [![AppVeyor](https://img.shields.io/appveyor/ci/rpaulo/artisan.svg?label=Windows%20build)](https://ci.appveyor.com/project/rpaulo/artisan)
 [![Bintray](https://img.shields.io/bintray/v/artisan/artisan-artifacts/artisan.svg) ](https://bintray.com/artisan/artisan-artifacts/artisan/master/link#files) 
 [![Latest release](https://img.shields.io/github/release/artisan-roaster-scope/artisan.svg)](https://github.com/artisan-roaster-scope/artisan/releases)
+
 Summary
 -------
 
