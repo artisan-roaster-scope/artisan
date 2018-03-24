@@ -1,4 +1,4 @@
-version: '1.3.0.{build}'
+version: '1.3.0'
 
 environment:
   matrix:
@@ -22,16 +22,16 @@ install:
   - python setup.py install
   - cd ..
   - curl -L -O https://download.lfd.uci.edu/pythonlibs/u2yrk7ps/numpy-1.13.3+mkl-cp35-cp35m-win_amd64.whl
-  - curl -L -O https://download.lfd.uci.edu/pythonlibs/u2yrk7ps/scipy-1.0.0-cp35-cp35m-win_amd64.whl
+#  - curl -L -O https://download.lfd.uci.edu/pythonlibs/u2yrk7ps/scipy-1.0.0-cp35-cp35m-win_amd64.whl
   - pip install numpy-1.13.3+mkl-cp35-cp35m-win_amd64.whl
-  - pip install scipy-1.0.0-cp35-cp35m-win_amd64.whl
+#  - pip install scipy-1.0.0-cp35-cp35m-win_amd64.whl
   
 build_script:
   - cmd: cd src
   - cmd: build-win3-pi.bat
   - cmd: copy ..\LICENSE LICENSE.txt
-  - cmd: 7z a artisan-win-1.3.0.zip Setup*.exe LICENSE.txt README.txt
-  - cmd: 7z a dist.zip dist
+  - cmd: 7z a artisan-win-%APPVEYOR_BUILD_VERSION%.zip Setup*.exe LICENSE.txt README.txt
+#  - cmd: 7z a dist.zip dist
 
 artifacts:
   - path: 'src\artisan-*.zip'
