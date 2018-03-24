@@ -31,7 +31,7 @@ build_script:
 
 artifacts:
   - path: 'src\artisan-*.zip'
-  - path: 'src\dist.zip'
+#  - path: 'src\dist.zip'
 
 deploy:
   provider: BinTray
