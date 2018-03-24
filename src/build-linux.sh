@@ -4,8 +4,6 @@ set -ex
 
 VERSION=$(python -c 'import artisanlib; print(artisanlib.__version__)')
 NAME=artisan-linux-${VERSION}
-RPM_NAME=artisan-${VERSION}
-DEB_NAME=artisan_${VERSION}
 
 # fix debian/DEBIAN/control _VERSION_
 sed -i "s/_VERSION_/${VERSION}/g" debian/DEBIAN/control
@@ -26,7 +24,7 @@ find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 sudo chown -R root:root debian
 sudo chmod -R go-w debian
 sudo chmod 0644 debian/usr/share/artisan/*.so*
-rm -f ${RPM_NAME}*x86_64.rpm
+rm -f ${NAME}*.rpm
 
 cd debian
 
@@ -69,6 +67,6 @@ flavor." \
 -v ${VERSION} --prefix / usr
 
 cd ..
+mv *.rpm ${NAME}.rpm
+mv *.deb ${NAME}.deb
 ls *.deb *.rpm
-
-
