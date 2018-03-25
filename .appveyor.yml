@@ -20,9 +20,11 @@ install:
   - git clone https://github.com/pyinstaller/pyinstaller.git
   - cd pyinstaller
   - git checkout bb5d04ef8303950fa2c49767f7d909c205059c5e
+  - pip uninstall -y pyinstaller
   - python setup.py install
   - cd ..
   - curl -L -O https://www.dropbox.com/s/uoh3bo5q6bi0rxo/numpy-1.14.2%2Bmkl-cp35-cp35m-win_amd64.whl
+  - pip uninstall -y numpy
   - pip install numpy-1.14.2%2Bmkl-cp35-cp35m-win_amd64.whl
   - curl -L -O https://www.dropbox.com/s/l9m8ug8odqb6goy/scipy-1.0.1-cp35-cp35m-win_amd64.whl
   - pip uninstall -y scipy
@@ -33,11 +35,11 @@ build_script:
   - cmd: build-win3-pi.bat
   - cmd: copy ..\LICENSE LICENSE.txt
   - cmd: 7z a artisan-win-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
-#  - cmd: 7z a dist.zip dist
+  - cmd: 7z a dist.zip dist
 
 artifacts:
   - path: 'src\artisan-*.zip'
-#  - path: 'src\dist.zip'
+  - path: 'src\dist.zip'
 
 deploy:
   provider: BinTray
