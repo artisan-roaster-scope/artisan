@@ -21,19 +21,18 @@ PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
 YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 SNAP7_BIN = r'C:\Windows'
 LIBUSB_BIN = r'C:\Windows\SysWOW64'
+SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\extra-dll'
 
 #os.system(PYTHON + r'\Scripts\pylupdate5 artisan.pro')
 
 a = Analysis(['artisan.py'],
-             pathex=[PYQT_QT_BIN, ARTISAN_SRC],
+             pathex=[PYQT_QT_BIN, ARTISAN_SRC, SCIPY_BIN],
              binaries=[],
              datas=[],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],
-             hiddenimports=['scipy._lib.messagestream',
-                            'scipy.optimise',
-                            'scipy.interpolate'],
+             hiddenimports=['scipy._lib.messagestream'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
