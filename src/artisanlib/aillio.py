@@ -178,7 +178,8 @@ class AillioR1:
         else:
             for i in range(d):
                 self.parent_pipe.send(self.AILLIO_CMD_HEATER_INCR)
-
+        self.heater = value
+        
     def set_fan(self, value):
         self.__dbg('set_fan ' + str(value))
         value = int(value)
@@ -198,15 +199,18 @@ class AillioR1:
         else:
             for i in range(0, d):
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_INCR)
-
+        self.fan = value
+        
     def set_drum(self, value):
         self.__dbg('set_drum ' + str(value))
+        value = int(value)
         if value < 1:
             value = 1
         elif value > 9:
             value = 9
         self.parent_pipe.send([0x32, 0x01, value, 0x00])
-
+        self.drum = value
+        
     def prs(self):
         self.__dbg('PRS')
         self.parent_pipe.send(self.AILLIO_CMD_PRS)
