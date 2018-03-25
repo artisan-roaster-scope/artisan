@@ -29,6 +29,9 @@ install:
   - curl -L -O https://www.dropbox.com/s/l9m8ug8odqb6goy/scipy-1.0.1-cp35-cp35m-win_amd64.whl
   - pip uninstall -y scipy
   - pip install scipy-1.0.1-cp35-cp35m-win_amd64.whl
+  - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
+  - 7z x Phidget22Python.zip
+  - (cd Phidget22Python && python setup.py install)
 
 build_script:
   - cmd: cd src
