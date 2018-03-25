@@ -91,7 +91,7 @@ __Rui Paulo__ –– Aillio master & CI
 
 ## Supporters
 
-The development of Artisan is supported by a growing number of companies and individuals that recognize its values for their customers and endeavors.
+The development of Artisan is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors.
 
 {% include gallery %}
 
