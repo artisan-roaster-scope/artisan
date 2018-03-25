@@ -9,7 +9,7 @@ header:
   teaser: assets/images/FZ94-1.jpg
 ---
 * __Producer:__ [Coffee-Tech Engineering Ltd.](https://www.coffee-tech.com), Israel
-* __Machines:__ FZ-94 Lab Roaster
+* __Machine:__ FZ-94 Lab Roaster
 * __Connection:__ MODBUS RTU via USB-2-RS485 interface; requires the installation of a serial driver
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT), drum temperature (DT), set value (SV), fan speed and drum speed.
 

@@ -10,7 +10,7 @@ header:
 ---
 
 * __Producer:__ [Aillio Limited](https://aillio.com), Taiwan
-* __Machines:__ Bullet R1
+* __Machine:__ Bullet R1
 * __Connection:__ vendor specific USB protocol
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT), exhaust temperautre, BT rate-of-rise curves, and voltage

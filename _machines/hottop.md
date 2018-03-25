@@ -10,7 +10,7 @@ header:
 ---
 
 * __Producer:__ [Hottop](https://www.hottopusa.com), USA/Taiwan
-* __Machines:__ KN-8828B-2K+
+* __Machine:__ KN-8828B-2K+
 * __Connection:__ vendor specific serial protocol
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
