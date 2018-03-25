@@ -17,14 +17,17 @@ install:
   - curl -L -O https://cfhcable.dl.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip
   - 7z x libusb-win32-bin-1.2.6.0.zip
   - copy libusb-win32-bin-1.2.6.0\bin\amd64\libusb0.dll C:\Windows\SysWOW64
-  - curl -L -O https://github.com/pyinstaller/pyinstaller/archive/develop.zip
-  - 7z x develop.zip
-  - cd pyinstaller-develop
+  - git clone https://github.com/pyinstaller/pyinstaller.git
+  - cd pyinstaller
+  - git co bb5d04ef8303950fa2c49767f7d909c205059c5e
   - python setup.py install
   - cd ..
-#  - curl -L -O https://download.lfd.uci.edu/pythonlibs/u2yrk7ps/numpy-1.13.3+mkl-cp35-cp35m-win_amd64.whl
-#  - pip install numpy-1.13.3+mkl-cp35-cp35m-win_amd64.whl
-  
+  - curl -L -O https://download.lfd.uci.edu/pythonlibs/u2yrk7ps/numpy-1.13.3+mkl-cp35-cp35m-win_amd64.whl
+  - pip install numpy-1.13.3+mkl-cp35-cp35m-win_amd64.whl
+  - curl -L -O https://download.lfd.uci.edu/pythonlibs/u2yrk7ps/scipy-1.0.0-cp35-cp35m-win_amd64.whl
+  - pip uninstall scipy
+  - pip install scipy-1.0.0-cp35-cp35m-win_amd64.whl
+
 build_script:
   - cmd: cd src
   - cmd: build-win3-pi.bat
