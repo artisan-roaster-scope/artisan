@@ -95,6 +95,23 @@ The development of Artisan is supported by a growing number of companies and ind
 
 {% include gallery %}
 
+## Enablers
+
+Artisan builds on a large number of excellent open-source software.
+
+* [matplotlib](https://matplotlib.org)
+* [numpy/scipy](https://www.scipy.org)
+* [PyQt](https://riverbankcomputing.com)
+* [py2app](https://bitbucket.org/ronaldoussoren/py2app)
+* [pyinstaller](https://www.pyinstaller.org)
+* [pymodbus](https://github.com/riptideio/pymodbus)
+* [pyserial](https://github.com/pyserial/pyserial)
+* [python-s7](https://github.com/gijzelaerr/python-snap7)
+* [pyusb](https://github.com/pyusb/pyusb)
+* [Qt](https://www.qt.io)
+
+..and many other packages. Thanks for releasing your work as open-source!
+
 ## Licence
 
 Artisan is developed and distributed under the [GPLv3.0 License](http://www.gnu.org/copyleft/gpl.html)
