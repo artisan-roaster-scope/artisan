@@ -52,6 +52,9 @@ import requests
 import subprocess
 import shlex
 
+import scipy.interpolate
+import scipy.optimize
+
 if sys.version < '3':
     import urlparse, urllib # @UnresolvedImport @UnusedImport
 else:
