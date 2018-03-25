@@ -1,6 +1,6 @@
 @echo off
 
-pyinstaller --noconfirm artisan-win.spec
+pyinstaller -d -c --noconfirm artisan-win.spec
 
 rem #
 rem # Don't make assumptions as to where the 'makensis.exe' is - look in the obvious places
