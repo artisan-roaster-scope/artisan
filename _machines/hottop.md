@@ -13,6 +13,6 @@ header:
 * __Machines:__ KN-8828B-2K+
 * __Connection:__ vendor specific serial protocol
 * __Features:__ 
-  - logging of ET, BT
-  - slider control of fan, heater
+  - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
+  - slider control of fan and heater
   - button control of motor, door solenoid, and stirrer 

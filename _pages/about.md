@@ -62,7 +62,7 @@ Artisan supports only 64bit operating systems
 * Windows 8
 * Linux glibc 2.17
 
-There are also experimental builds for the Raspberry Pi platform.
+There are also experimental builds for the Raspberry Pi platform
 
 ## Notable Features
 
@@ -72,10 +72,10 @@ There are also experimental builds for the Raspberry Pi platform.
 - projection lines and head-up-display (HUD)
 - roast profile evaluation and statistics
 - roast-, production- and ranking reports
-- automated reproduction of roasts via alarm programs, reply of events or PID control (incl. internal software PID)
+- automated reproduction of roasts via alarm programs, replay of events or PID control
 - batch counter
-- profile designer, cupping editor, spider and wheel graph
-- user defined button and sliders with programable actions
+- profile designer, cupping editor, spider- and wheel graph
+- user defined buttons and sliders with programable actions
 - many import and export formats
 
 ## Cast
@@ -106,6 +106,7 @@ Artisan builds on a large number of excellent open-source software.
 * [pyinstaller](https://www.pyinstaller.org)
 * [pymodbus](https://github.com/riptideio/pymodbus)
 * [pyserial](https://github.com/pyserial/pyserial)
+* [Python](https://www.python.org)
 * [python-s7](https://github.com/gijzelaerr/python-snap7)
 * [pyusb](https://github.com/pyusb/pyusb)
 * [Qt](https://www.qt.io)
