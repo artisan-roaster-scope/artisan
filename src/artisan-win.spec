@@ -6,15 +6,15 @@ block_cipher = None
 import os
 if os.environ.get('APPVEYOR'):
   ARTISAN_SRC = r'C:\projects\artisan\src'
-  PYTHON35 = r'c:\python35-x64'
+  PYTHON = r'c:\python36-x64'
 else:
   ARTISAN_SRC = r'C:\Users\luther\Desktop\src'
-  PYTHON35 = r'C:\Program Files\Python35'
+  PYTHON = r'C:\Program Files\Python35'
 NAME = 'artisan'
 
 ##
 TARGET = 'dist\\' + NAME + '\\'
-PYTHON_PACKAGES = PYTHON35 + r'\Lib\site-packages'
+PYTHON_PACKAGES = PYTHON + r'\Lib\site-packages'
 PYQT_QT = PYTHON_PACKAGES + r'\PyQt5\Qt'
 PYQT_QT_BIN = PYQT_QT + r'\bin'
 PYQT_QT_TRANSLATIONS = PYQT_QT + r'\translations'
@@ -22,7 +22,7 @@ YOCTO_BIN = PYTHON_PACKAGES + r'\yoctopuce\cdll'
 SNAP7_BIN = r'C:\Windows'
 LIBUSB_BIN = r'C:\Windows\SysWOW64'
 
-#os.system(PYTHON35 + r'\Scripts\pylupdate5 artisan.pro')
+#os.system(PYTHON + r'\Scripts\pylupdate5 artisan.pro')
 
 a = Analysis(['artisan.py'],
              pathex=[PYQT_QT_BIN, ARTISAN_SRC],
