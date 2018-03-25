@@ -25,7 +25,7 @@ install:
   - curl -L -O https://www.dropbox.com/s/uoh3bo5q6bi0rxo/numpy-1.14.2%2Bmkl-cp35-cp35m-win_amd64.whl
   - pip install numpy-1.14.2%2Bmkl-cp35-cp35m-win_amd64.whl
   - curl -L -O https://www.dropbox.com/s/l9m8ug8odqb6goy/scipy-1.0.1-cp35-cp35m-win_amd64.whl
-  - pip uninstall scipy
+  - pip uninstall -y scipy
   - pip install scipy-1.0.1-cp35-cp35m-win_amd64.whl
 
 build_script:
