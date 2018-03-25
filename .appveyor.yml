@@ -27,9 +27,6 @@ install:
   - pip uninstall -y numpy
   - pip install numpy-1.14.2%2Bmkl-cp35-cp35m-win_amd64.whl
   - curl -L -O https://www.dropbox.com/s/l9m8ug8odqb6goy/scipy-1.0.1-cp35-cp35m-win_amd64.whl
-  - pip uninstall -y scipy
-  - pip install scipy-1.0.1-cp35-cp35m-win_amd64.whl
-  - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
   - 7z x Phidget22Python.zip
   - cd Phidget22Python
   - python setup.py install
@@ -40,11 +37,9 @@ build_script:
   - cmd: build-win3-pi.bat
   - cmd: copy ..\LICENSE LICENSE.txt
   - cmd: 7z a artisan-win-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
-  - cmd: 7z a dist.zip dist
 
 artifacts:
   - path: 'src\artisan-*.zip'
-  - path: 'src\dist.zip'
 
 deploy:
   provider: BinTray
