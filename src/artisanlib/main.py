@@ -14478,7 +14478,7 @@ class ApplicationWindow(QMainWindow):
             self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
 
     def resetApplication(self):
-        string = QApplication.translate("Message","Do you want to reset all settings? This requires a restart of the app!", None)
+        string = QApplication.translate("Message","Do you want to reset all settings?<br> Artisan has to be restarted!", None)
         reply = QMessageBox.warning(aw,QApplication.translate("Message","Factory Reset", None),string,
                             QMessageBox.Cancel | QMessageBox.Reset)
         if reply == QMessageBox.Reset :

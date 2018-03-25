@@ -1,0 +1,42 @@
+[General]
+Delay=1000
+Oversampling=true
+
+[Device]
+id=79
+
+[ExtraComm]
+extrabaudrate=19200, 19200
+extrabytesize=8, 8
+extracomport=COM1, COM1
+extraparity=E, E
+extrastopbits=1, 1
+extratimeout=1, 1
+
+[ExtraDev]
+extraCurveVisibility1=true, true, true, true, true, true, true, true, true, true
+extraCurveVisibility2=true, true, true, true, true, true, true, true, true, true
+extraLCDvisibility1=true, true, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, true, false, false, false, false, false, false, false, false
+extradevicecolor1=black, black
+extradevicecolor2=black, black
+extradevices=80, 81
+extramathexpression1=, 
+extramathexpression2=, 
+extraname1=IT, Power
+extraname2=Drum, Air
+
+[RoastProperties]
+roastertype=K+M UG retro
+
+[S7]
+area=6, 6, 6, 6, 6, 6
+db_nr=100, 100, 100, 100, 100, 100
+div=0, 0, 0, 0, 0, 0
+host=10.32.176.124
+mode=1, 1, 1, 0, 0, 0
+port=102
+rack=0
+slot=0
+start=4, 8, 0, 22, 28, 30
+type=1, 1, 1, 0, 0, 0
