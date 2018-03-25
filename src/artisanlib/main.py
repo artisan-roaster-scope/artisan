@@ -12513,7 +12513,8 @@ class ApplicationWindow(QMainWindow):
     def openMachineSettings(self):
         action = self.sender()
         if action:
-            string = QApplication.translate("Message", "Configure for {0}?",None).format(action.text())
+            string = QApplication.translate("Message", "Configure for {0}?<br>Your current settings will be overwritten!<br><br>"+
+                    "It is adviced to save your current settings beforhand via menu Help >> Save Settings.",None).format(action.text())
             reply = QMessageBox.question(aw,QApplication.translate("Message", "Adjust Settings",None),string,
                 QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Cancel:
