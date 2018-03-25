@@ -4,7 +4,7 @@ Version: _VERSION_
 Section: misc
 Depends: libc6 (>= 2.3), libc6 (>= 2.3.6-6~)
 Priority: extra
-Architecture: i386
+Architecture: x86_64
 Installed-Size: 67510
 Maintainer: Marko Luther <marko.luther@gmx.net>
 Homepage: https://github.com/artisan-roaster-scope/artisan
