@@ -31,6 +31,7 @@ class AillioR1:
     AILLIO_STATE_CHARGE = 0x04
     AILLIO_STATE_ROASTING = 0x06
     AILLIO_STATE_COOLING = 0x08
+    AILLIO_STATE_SHUTDOWN = 0x09
 
     def __init__(self, debug=True):
         self.AILLIO_DEBUG = debug
@@ -45,6 +46,7 @@ class AillioR1:
         self.voltage = 0
         self.exitt = 0
         self.state_str = ""
+        self.r1state = 0
         self.worker_thread = None
         self.worker_thread_run = True
 
@@ -152,6 +154,10 @@ class AillioR1:
     def get_state_string(self):
         self.__getstate()
         return self.state_str
+
+    def get_state(self):
+        self.__getstate()
+        return self.r1state
 
     def set_heater(self, value):
         self.__dbg('set_heater ' + str(value))
@@ -276,6 +282,8 @@ class AillioR1:
             self.state_str = "roasting"
         elif self.r1state == self.AILLIO_STATE_COOLING:
             self.state_str = "cooling"
+        elif self.r1state == self.AILLIO_STATE_SHUTDOWN:
+            self.state_str = "shutdown"
         self.__dbg('state: ' + self.state_str)
         self.__dbg('second coil fan: ' + str(self.coil_fan2))
 

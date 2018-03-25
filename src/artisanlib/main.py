@@ -1192,7 +1192,7 @@ class tgraphcanvas(FigureCanvas):
                        "+Aillio Bullet R1 Heater/Fan",       #84
                        "+Aillio Bullet R1 BT RoR/Drum",      #85
                        "+Aillio Bullet R1 Voltage/Exhaust",  #86
-
+                       "+Aillio Bullet R1 State",            #87
                        ]
 
         #extra devices
@@ -1950,7 +1950,8 @@ class tgraphcanvas(FigureCanvas):
         self.R1_DRUM = 0 # 1-9
         self.R1_VOLTAGE = 0 # 0-300
         self.R1_TX = 0.
-        self.R1_STATE = ""
+        self.R1_STATE = 0
+        self.R1_STATE_STR = ""
         
         #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for MODBUS connected devices
         self.extraMODBUSt3 = -1
@@ -34538,6 +34539,7 @@ class serialport(object):
                                    self.R1_HF,                #84
                                    self.R1_DRUM_BTROR,        #85
                                    self.R1_EXIT_TEMP_VOLT,    #86
+                                   self.R1_STATE,             #87
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -35031,10 +35033,11 @@ class serialport(object):
             aw.qmc.R1_FAN = self.R1.get_fan() * 10
             aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
             aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
+            aw.qmc.R1_STATE = self.R1.get_state()
             aw.qmc.R1_TX = tx
             newstate = self.R1.get_state_string()
-            if newstate != aw.qmc.R1_STATE:
-                aw.qmc.R1_STATE = newstate
+            if newstate != aw.qmc.R1_STATE_STR:
+                aw.qmc.R1_STATE_STR = newstate
                 aw.sendmessage(QApplication.translate("Message", "R1 state: " + newstate, None))
             if aw.qmc.mode == "F":
                 aw.qmc.R1_DT = aw.qmc.fromCtoF(aw.qmc.R1_DT)
@@ -35057,6 +35060,10 @@ class serialport(object):
     def R1_EXIT_TEMP_VOLT(self):
         tx = aw.qmc.R1_TX
         return tx, aw.qmc.R1_EXIT_TEMP, aw.qmc.R1_VOLTAGE
+
+    def R1_STATE(self):
+        tx = aw.qmc.R1_TX
+        return tx, 0, aw.qmc.R1_STATE
     
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -41976,7 +41983,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ####  DEVICE 82 is +S7 78 but no serial setup
                 ##########################
                 ##########################
-                ####  DEVICE 83-85 are Aillio R1 and have no serial setup
+                ####  DEVICE 83-87 are Aillio R1 and have no serial setup
                 ##########################
                 elif meter == "Aillio Bullet R1 BT/DT":
                     aw.qmc.device = 83
