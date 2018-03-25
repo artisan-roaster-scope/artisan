@@ -1715,7 +1715,7 @@ class tgraphcanvas(FigureCanvas):
         self.resetmaxtime = 600  #time when pressing RESET: 10min*60
         self.chargemintime = self.startofx_default  #time when pressing CHARGE: -30sec
         self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
-        self.locktimex = True # if true, do not set time axis min and max from profile on load
+        self.locktimex = False # if true, do not set time axis min and max from profile on load
         self.autotimex = True # automatically set time axis min and max from profile CHARGE/DROP on load
         self.locktimex_start = self.startofx_default # seconds of x-axis min as locked by locktimex (needs to be interpreted wrt. CHARGE index)
         self.locktimex_end = self.endofx_default # seconds of x-axis max as locked by locktimex (needs to be interpreted wrt. CHARGE index)
@@ -14478,7 +14478,7 @@ class ApplicationWindow(QMainWindow):
             self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
 
     def resetApplication(self):
-        string = QApplication.translate("Message","Do you want to reset all settings?", None)
+        string = QApplication.translate("Message","Do you want to reset all settings? This requires a restart of the app!", None)
         reply = QMessageBox.warning(aw,QApplication.translate("Message","Factory Reset", None),string,
                             QMessageBox.Cancel | QMessageBox.Reset)
         if reply == QMessageBox.Reset :
