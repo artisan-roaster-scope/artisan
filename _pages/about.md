@@ -56,13 +56,13 @@ Artisan is a software that helps coffee roasters record, analyze, and control ro
 
 ## Supported Platforms
 
-Artisan supports only 64bit operating systems
+Artisan supports only 64bit operating systems.
 
 * Mac OS X 10.13
 * Windows 8
 * Linux glibc 2.17
 
-There are also experimental builds for the Raspberry Pi platform
+There are also experimental builds for the Raspberry Pi platform.
 
 ## Notable Features
 

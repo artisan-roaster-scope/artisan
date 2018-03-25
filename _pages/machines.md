@@ -13,4 +13,4 @@ sort_by: title
 #  nav: "machines"
 ---
 
-Artisan features quick setups for a number of commercial roasting machines
+Artisan supports a number of commercial roasting machines with a simple one click configuration and without any additional hardware setup
