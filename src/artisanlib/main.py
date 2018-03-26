@@ -49226,7 +49226,8 @@ def excepthook(excType, excValue, tracebackobj):
     separator = '-' * 80
     logFile = "simple.log"
     notice = \
-        """An unhandled exception occurred. Please report the problem!\n"""\
+        """An unhandled exception occurred. Please report the problem on Github!\n"""\
+        """https://github.com/artisan-roaster-scope/artisan/issues\n"""\
         """An entry has been written to the error log (menu Help >> Error).\n\nError information:\n"""
     versionInfo="0.0.1"
     timeString = libtime.strftime("%Y-%m-%d, %H:%M:%S")
