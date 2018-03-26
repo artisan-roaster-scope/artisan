@@ -23363,23 +23363,24 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ambientTemp = obj["ambient"]
                 self.qmc.ambient_humidity = obj["humidity"]
                 self.qmc.roastingnotes = obj["comments"]
-                self.qmc.roastbatchnr = obj["roastNumber"] 
-                try:  
-                    indexYellowingStart = obj["indexYellowingStart"] # early profiles did not include indexYellowingStart
-                except:
-                    indexYellowingStart = 0
+                self.qmc.roastbatchnr = obj["roastNumber"]
+                
+                dropIdx = 0
+                if len(tx) > 0:
+                    dropIdx = len(tx) - 1
+                aw.qmc.timeindex = [0,0,0,0,0,0,dropIdx,0]
+                labels = ["indexYellowingStart","indexFirstCrackStart","indexFirstCrackEnd","indexSecondCrackStart","indexSecondCrackEnd"]
+                for i in range(1,6):
+                    try:
+                        idx = obj[labels[i-1]]
+                        # RoastTime seems to interpret all index values 1 based, while Artisan takes the 0 based approach. We substruct 1
+                        if idx > 1:
+                            aw.qmc.timeindex[i] = idx - 1
+                    except:
+                        pass           
                 try:
-                    aw.qmc.timeindex = [0,
-                         indexYellowingStart,
-                         obj["indexFirstCrackStart"],
-                         obj["indexFirstCrackEnd"],
-                         obj["indexSecondCrackStart"],
-                         obj["indexSecondCrackEnd"],
-                         len(tx) - 1,
-                         0
-                         ]
                     for j in range(len(aw.qmc.timeindex)):
-                        if aw.qmc.timeindex[j] > len(tx):
+                        if aw.qmc.timeindex[j] >= len(tx):
                             aw.qmc.timeindex[j] = 0
                             aw.sendmessage(QApplication.translate("Message","Warning! Deleted an event that occurs after the end of profile.", None))
                 except:
@@ -26667,7 +26668,7 @@ class editGraphDlg(ArtisanDialog):
         drylabel = QLabel("<b>" + u(QApplication.translate("Label", "DRY END",None)) + "</b>")
         drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
-        if aw.qmc.timeindex[1] < len(aw.qmc.timex):
+        if aw.qmc.timeindex[1] and aw.qmc.timeindex[1] < len(aw.qmc.timex):
             t2 = int(aw.qmc.timex[aw.qmc.timeindex[1]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t2 = 0
@@ -26681,7 +26682,7 @@ class editGraphDlg(ArtisanDialog):
         Cstartlabel = QLabel("<b>" + u(QApplication.translate("Label","FC START",None)) + "</b>")
         Cstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cstartlabel.setStyleSheet("background-color:'orange';")
-        if aw.qmc.timeindex[2] < len(aw.qmc.timex):
+        if aw.qmc.timeindex[2] and aw.qmc.timeindex[2] < len(aw.qmc.timex):
             t3 = int(aw.qmc.timex[aw.qmc.timeindex[2]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t3 = 0
@@ -26696,7 +26697,7 @@ class editGraphDlg(ArtisanDialog):
         Cendlabel = QLabel("<b>" + u(QApplication.translate("Label","FC END",None)) + "</b>")
         Cendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cendlabel.setStyleSheet("background-color:'orange';")
-        if aw.qmc.timeindex[3] < len(aw.qmc.timex):
+        if aw.qmc.timeindex[3] and aw.qmc.timeindex[3] < len(aw.qmc.timex):
             t4 = int(aw.qmc.timex[aw.qmc.timeindex[3]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t4 = 0
@@ -26710,7 +26711,7 @@ class editGraphDlg(ArtisanDialog):
         CCstartlabel = QLabel("<b>" + u(QApplication.translate("Label","SC START",None)) + "</b>")
         CCstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCstartlabel.setStyleSheet("background-color:'orange';")
-        if aw.qmc.timeindex[4]:
+        if aw.qmc.timeindex[4] and aw.qmc.timeindex[4] < len(aw.qmc.timex):
             t5 = int(aw.qmc.timex[aw.qmc.timeindex[4]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t5 = 0
@@ -26724,7 +26725,7 @@ class editGraphDlg(ArtisanDialog):
         CCendlabel = QLabel("<b>" + u(QApplication.translate("Label","SC END",None)) + "</b>")
         CCendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCendlabel.setStyleSheet("background-color:'orange';")
-        if aw.qmc.timeindex[5]:
+        if aw.qmc.timeindex[5] and aw.qmc.timeindex[5] < len(aw.qmc.timex):
             t6 = int(aw.qmc.timex[aw.qmc.timeindex[5]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t6 = 0
@@ -26738,7 +26739,7 @@ class editGraphDlg(ArtisanDialog):
         droplabel = QLabel("<b>" + u(QApplication.translate("Label", "DROP",None)) + "</b>")
         droplabel.setStyleSheet("background-color:'#f07800';")
         droplabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        if aw.qmc.timeindex[6]:
+        if aw.qmc.timeindex[6] and aw.qmc.timeindex[6] < len(aw.qmc.timex):
             t7 = int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t7 = 0
@@ -26753,7 +26754,7 @@ class editGraphDlg(ArtisanDialog):
         coollabel = QLabel("<b>" + u(QApplication.translate("Label", "COOL",None)) + "</b>")
         coollabel.setStyleSheet("background-color:'#6666ff';")
         coollabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        if aw.qmc.timeindex[7]:
+        if aw.qmc.timeindex[7] and aw.qmc.timeindex[7] < len(aw.qmc.timex):
             t8 = int(aw.qmc.timex[aw.qmc.timeindex[7]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t8 = 0
