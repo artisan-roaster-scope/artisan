@@ -25,9 +25,9 @@ install:
 
 build_script:
   - cmd: cd src
-  - cmd: set GIT_VERSION="???"
-  - cmd: for /f "delims=" %%a in ('git rev-parse --verify --short HEAD') do @set GIT_VERSION=%%a
-  - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '0'", "__revision__ = '%GIT_VERSION%'" } 
+  - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
+  - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '0'", "__revision__ = '$GIT_VERSION'" } > newfile
+  - ps: move newfile artisanlib/__init__.py
   - cmd: build-win3-pi.bat
   - cmd: copy ..\LICENSE LICENSE.txt
   - cmd: 7z a artisan-win-%ARTISAN_VERSION%.zip Setup*.exe LICENSE.txt README.txt
