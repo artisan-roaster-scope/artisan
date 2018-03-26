@@ -147,7 +147,6 @@ else:
     mpl.use('Qt5Agg')
 
 from matplotlib.figure import Figure
-from matplotlib.colors import cnames as cnames
 from matplotlib import rcParams
 import matplotlib.patches as patches
 import matplotlib.transforms as transforms
