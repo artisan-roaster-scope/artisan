@@ -6055,7 +6055,6 @@ class tgraphcanvas(FigureCanvas):
         if color == 1:
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
             fname = os.path.join(aw.getResourcePath(),"Themes","Artisan","Default.athm")
-#            print(aw.lcdpaletteB)  #debugprint
             if os.path.isfile(fname) and not self.flagon:
                 aw.loadSettings(fn=fname)
                 aw.sendmessage(QApplication.translate("Message","Colors set to Default Theme", None))
@@ -6089,7 +6088,8 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.backgrounddeltaetcolor = aw.convertToGreyscale(aw.qmc.backgrounddeltaetcolor)
             aw.qmc.backgrounddeltabtcolor = aw.convertToGreyscale(aw.qmc.backgrounddeltabtcolor)
             aw.qmc.backgroundxtcolor      = aw.convertToGreyscale(aw.qmc.backgroundxtcolor)
-               
+            aw.setLCDsBW()
+              
         if color == 3:
             dialog = graphColorDlg(aw)
             if dialog.exec_():
@@ -12703,7 +12703,7 @@ class ApplicationWindow(QMainWindow):
                 val = self.colorDifference(c[1],c[3]) 
                 if val < aw.qmc.colorDifferenceThreshold :
                     val = aw.float2float(val,1)
-                    aw.sendmessage(u(QApplication.translate("Message","{0!s} color ({1!s}) is very similar to {2!s} color ({3!s}) and may be hard to see. (deltaE={4:.1f})\n",None).format(c[0], c[1], c[2], c[3],val)))
+                    aw.sendmessage(u(QApplication.translate("Message","{0!s} color ({1!s}) is very similar to {2!s} color ({3!s}) and may be hard to see. (deltaE={4:.1f})",None).format(c[0], c[1], c[2], c[3],val)))
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Too similar", str(c[1]), str(c[3]), str(val)) #debugprint
 #                else: #debugprint
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Okay", str(c[1]), str(c[3]), str(val))  #debugprint
@@ -12738,6 +12738,29 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " convertToGreyscale() {0}").format(str(e)),exc_tb.tb_lineno)
 
         return nc
+
+    def setLCDsBW(self):
+        aw.lcdpaletteB["timer"] = "black"
+        aw.lcdpaletteF["timer"] = "white"
+        aw.lcdpaletteB["et"] = "black"
+        aw.lcdpaletteF["et"] = "white"
+        aw.lcdpaletteB["bt"] = "black"
+        aw.lcdpaletteF["bt"] = "white"
+        aw.lcdpaletteB["deltaet"] = "black"
+        aw.lcdpaletteF["deltaet"] = "white"
+        aw.lcdpaletteB["deltabt"] = "black"
+        aw.lcdpaletteF["deltabt"] = "white"
+        aw.lcdpaletteB["sv"] = "black"
+        aw.lcdpaletteF["sv"] = "white"
+        aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+        aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
+        aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
+        aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
+        aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
+        aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+        aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+        aw.updateExtraLCDvisibility()
+
         
     def updateCanvasColors(self):
         aw.qmc.fig.patch.set_facecolor(str(aw.qmc.palette["canvas"]))
@@ -42261,12 +42284,6 @@ class graphColorDlg(ArtisanDialog):
         self.deltabtLabel.setFrameStyle(frameStyle)
         self.deltabtButton.clicked.connect(lambda _: self.setColor("DeltaBT",self.deltabtLabel,"deltabt"))
 
-#        self.backgroundmetcolor = self.palette["et"]
-#        self.backgroundbtcolor = self.palette["bt"]
-#        self.backgroundxtcolor = self.palette["xt"]
-#        self.backgrounddeltaetcolor = self.palette["deltaet"]
-#        self.backgrounddeltabtcolor = self.palette["deltabt"]
-
         self.bgmetLabel =QLabel(aw.qmc.backgroundmetcolor)
         self.bgmetLabel.setPalette(QPalette(QColor(aw.qmc.backgroundmetcolor)))
         self.bgmetLabel.setAutoFillBackground(True)
@@ -42280,7 +42297,7 @@ class graphColorDlg(ArtisanDialog):
         self.bgbtButton = QPushButton(QApplication.translate("Button","BT", None))
         self.bgbtButton.setFocusPolicy(Qt.NoFocus)
         self.bgbtLabel.setFrameStyle(frameStyle)
-        self.bgbtButton.clicked.connect(lambda _: self.setbgColor("BT",self.bgbtLabel,"aw.qmc.backgroundbtcolor"))
+        self.bgbtButton.clicked.connect(lambda _: self.setbgColor("BT",self.bgbtLabel,aw.qmc.backgroundbtcolor))
         self.bgdeltametLabel =QLabel(aw.qmc.backgrounddeltaetcolor)
         self.bgdeltametLabel.setPalette(QPalette(QColor(aw.qmc.backgrounddeltaetcolor)))
         self.bgdeltametLabel.setAutoFillBackground(True)
@@ -42313,16 +42330,6 @@ class graphColorDlg(ArtisanDialog):
         self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
         self.intensitySpinBox.valueChanged.connect(self.adjustintensity)        
             
-
-        oklinesButton = QPushButton(QApplication.translate("Button","OK", None))
-        oklinesButton.clicked.connect(lambda _:self.accept())
-        defaultslinesButton = QPushButton(QApplication.translate("Button","Defaults", None))
-        defaultslinesButton.setFocusPolicy(Qt.NoFocus)
-        defaultslinesButton.clicked.connect(lambda _:self.recolor(1))
-        greylinesButton = QPushButton(QApplication.translate("Button","Grey", None))
-        greylinesButton.setFocusPolicy(Qt.NoFocus)
-        greylinesButton.clicked.connect(lambda _:self.recolor(2))
-
         #TAB1
         self.backgroundLabel = QLabel(aw.qmc.palette["background"])
         self.backgroundLabel.setPalette(QPalette(QColor(aw.qmc.palette["background"])))
@@ -42489,105 +42496,39 @@ class graphColorDlg(ArtisanDialog):
         self.metboxLabel.setFrameStyle(frameStyle)
         self.metboxButton.clicked.connect(lambda _: self.setColor("metbox",self.metboxLabel,"metbox"))
 
-        okButton = QPushButton(QApplication.translate("Button","OK", None))
-        okButton.clicked.connect(lambda _:self.accept())
-        defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
-        defaultsButton.setFocusPolicy(Qt.NoFocus)
-        defaultsButton.clicked.connect(lambda _:self.recolor(1))
-        greyButton = QPushButton(QApplication.translate("Button","Grey", None))
-        greyButton.setFocusPolicy(Qt.NoFocus)
-        greyButton.clicked.connect(lambda _:self.recolor(2))
-        #TAB 2
-        #use indexes to translate
-        self.lcdcolors = ["","grey","darkGrey","slateGrey","lightGray","black","white","transparent"]     #this one is not to be translated as arguments need to be in English
-        lcdcolorstranslate = ["",
-                              QApplication.translate("ComboBox","grey",None),
-                              QApplication.translate("ComboBox","Dark Grey",None),
-                              QApplication.translate("ComboBox","Slate Grey",None),
-                              QApplication.translate("ComboBox","Light Gray",None),
-                              QApplication.translate("ComboBox","Black",None),
-                              QApplication.translate("ComboBox","White",None),
-                              QApplication.translate("ComboBox","Transparent",None)]  # translated
-        self.lcd1colorComboBox =  QComboBox()
-        self.lcd1colorComboBox.setMaximumWidth(100)
-        self.lcd1colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd1colorComboBox.currentIndexChanged.connect(lambda text = self.lcd1colorComboBox.currentText(),*_:self.paintlcds(text,2,1))
-        self.lcd2colorComboBox =  QComboBox()
-        self.lcd2colorComboBox.setMaximumWidth(100)
-        self.lcd2colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd2colorComboBox.currentIndexChanged.connect(lambda text = self.lcd2colorComboBox.currentText(),*_:self.paintlcds(text,2,2))
-        self.lcd3colorComboBox =  QComboBox()
-        self.lcd3colorComboBox.setMaximumWidth(100)
-        self.lcd3colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd3colorComboBox.currentIndexChanged.connect(lambda text = self.lcd3colorComboBox.currentText(),*_:self.paintlcds(text,2,3))
-        self.lcd4colorComboBox =  QComboBox()
-        self.lcd4colorComboBox.setMaximumWidth(100)
-        self.lcd4colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd4colorComboBox.currentIndexChanged.connect(lambda text = self.lcd4colorComboBox.currentText(),*_:self.paintlcds(text,2,4))
-        self.lcd5colorComboBox =  QComboBox()
-        self.lcd5colorComboBox.setMaximumWidth(100)
-        self.lcd5colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd5colorComboBox.currentIndexChanged.connect(lambda text = self.lcd5colorComboBox.currentText(),*_:self.paintlcds(text,2,5))
-        self.lcd6colorComboBox =  QComboBox()
-        self.lcd6colorComboBox.setMaximumWidth(100)
-        self.lcd6colorComboBox.addItems(lcdcolorstranslate)
-        self.lcd6colorComboBox.currentIndexChanged.connect(lambda text = self.lcd6colorComboBox.currentText(),*_:self.paintlcds(text,2,6))
-        lcd1backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd1backButton.clicked.connect(lambda text =0:self.paintlcds(text,0,1))
-        lcd2backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd2backButton.clicked.connect(lambda text =0:self.paintlcds(text,0,2))
-        lcd3backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd3backButton.clicked.connect(lambda text =0:self.paintlcds(text,0,3))
-        lcd4backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd4backButton.clicked.connect(lambda text =0:self.paintlcds(text,0,4))
-        lcd5backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd5backButton.clicked.connect(lambda text =0:self.paintlcds(text,0,5))
-        lcd6backButton = QPushButton(QApplication.translate("Button","Background",None))
-        lcd6backButton.clicked.connect(lambda text =0:self.paintlcds(text,0,6))
-        lcd1LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd1LEDButton.clicked.connect(lambda _:self.paintlcds(0,1,1))
-        lcd2LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd2LEDButton.clicked.connect(lambda _:self.paintlcds(0,1,2))
-        lcd3LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd3LEDButton.clicked.connect(lambda _:self.paintlcds(0,1,3))
-        lcd4LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd4LEDButton.clicked.connect(lambda _:self.paintlcds(0,1,4))
-        lcd5LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd5LEDButton.clicked.connect(lambda _:self.paintlcds(0,1,5))
-        lcd6LEDButton = QPushButton(QApplication.translate("Button","LED",None))
-        lcd6LEDButton.clicked.connect(lambda _:self.paintlcds(0,1,6))
-        self.lcd1spinbox = QSpinBox()
-        self.lcd1spinbox.setSingleStep(10)
-        self.lcd1spinbox.setMaximum(359)
-        self.lcd1spinbox.setWrapping(True)
-        self.lcd1spinbox.valueChanged.connect(lambda val:self.setLED(val,1))
-        self.lcd2spinbox = QSpinBox()
-        self.lcd2spinbox.setSingleStep(10)
-        self.lcd2spinbox.setWrapping(True)
-        self.lcd2spinbox.setMaximum(359)
-        self.lcd2spinbox.valueChanged.connect(lambda val:self.setLED(val,2))
-        self.lcd3spinbox = QSpinBox()
-        self.lcd3spinbox.setSingleStep(10)
-        self.lcd3spinbox.setWrapping(True)
-        self.lcd3spinbox.setMaximum(359)
-        self.lcd3spinbox.valueChanged.connect(lambda val:self.setLED(val,3))
-        self.lcd4spinbox = QSpinBox()
-        self.lcd4spinbox.setSingleStep(10)
-        self.lcd4spinbox.setWrapping(True)
-        self.lcd4spinbox.setMaximum(359)
-        self.lcd4spinbox.valueChanged.connect(lambda val:self.setLED(val,4))
-        self.lcd5spinbox = QSpinBox()
-        self.lcd5spinbox.setSingleStep(10)
-        self.lcd5spinbox.setWrapping(True)
-        self.lcd5spinbox.setMaximum(359)
-        self.lcd5spinbox.valueChanged.connect(lambda val:self.setLED(val,5))
-        self.lcd6spinbox = QSpinBox()
-        self.lcd6spinbox.setSingleStep(10)
-        self.lcd6spinbox.setWrapping(True)
-        self.lcd6spinbox.setMaximum(359)
-        self.lcd6spinbox.valueChanged.connect(lambda val:self.setLED(val,6))
+        self.lcd1LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd1LEDButton.clicked.connect(lambda _:self.paintlcds(1,1))
+        self.lcd2LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd2LEDButton.clicked.connect(lambda _:self.paintlcds(1,2))
+        self.lcd3LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd3LEDButton.clicked.connect(lambda _:self.paintlcds(1,3))
+        self.lcd4LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd4LEDButton.clicked.connect(lambda _:self.paintlcds(1,4))
+        self.lcd5LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd5LEDButton.clicked.connect(lambda _:self.paintlcds(1,5))
+        self.lcd6LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd6LEDButton.clicked.connect(lambda _:self.paintlcds(1,6))
+        self.lcd1backButton = QPushButton(QApplication.translate("Button","Background",None))
+        self.lcd1backButton.clicked.connect(lambda _:self.paintlcds(0,1))
+        self.lcd2backButton = QPushButton(QApplication.translate("Button","Background",None))
+        self.lcd2backButton.clicked.connect(lambda _:self.paintlcds(0,2))
+        self.lcd3backButton = QPushButton(QApplication.translate("Button","Background",None))
+        self.lcd3backButton.clicked.connect(lambda _:self.paintlcds(0,3))
+        self.lcd4backButton = QPushButton(QApplication.translate("Button","Background",None))
+        self.lcd4backButton.clicked.connect(lambda _:self.paintlcds(0,4))
+        self.lcd5backButton = QPushButton(QApplication.translate("Button","Background",None))
+        self.lcd5backButton.clicked.connect(lambda _:self.paintlcds(0,5))
+        self.lcd6backButton = QPushButton(QApplication.translate("Button","Background",None))
+        self.lcd6backButton.clicked.connect(lambda _:self.paintlcds(0,6))
+        self.lcd1LEDButton.setMinimumWidth(80)
+        self.lcd2LEDButton.setMinimumWidth(80)
+        self.lcd3LEDButton.setMinimumWidth(80)
+        self.lcd4LEDButton.setMinimumWidth(80)
+        self.lcd5LEDButton.setMinimumWidth(80)
+        self.lcd6LEDButton.setMinimumWidth(80)
+
         LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None))
-        LCDdefaultButton.clicked.connect(lambda _:self.setLCDdefaults())
+        LCDdefaultButton.clicked.connect(lambda _:self.setLCD_bw())
             
         #LAYOUTS
         #tab0 layout
@@ -42627,12 +42568,6 @@ class graphColorDlg(ArtisanDialog):
         lines.addWidget(self.intensitySpinBox,6,3)
         self.intensitySpinBox.setMaximumWidth(100)        
 
-        defaultslinesLayout = QHBoxLayout()
-        defaultslinesLayout.addStretch()
-        defaultslinesLayout.addWidget(greylinesButton)
-        defaultslinesLayout.addWidget(defaultslinesButton)
-#        defaultslinesLayout.addWidget(oklinesButton)
-        lines.addLayout(defaultslinesLayout,8,3)
         graphlinesLayout = QVBoxLayout()
         graphlinesLayout.addLayout(lines)
         
@@ -42651,14 +42586,6 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.titleLabel,2,1)
         grid.addWidget(self.gridButton,3,0)
         grid.addWidget(self.gridLabel,3,1)
-#        grid.addWidget(self.metButton,4,0)
-#        grid.addWidget(self.metLabel,4,1)
-#        grid.addWidget(self.btButton,5,0)
-#        grid.addWidget(self.btLabel,5,1)
-#        grid.addWidget(self.deltametButton,6,0)
-#        grid.addWidget(self.deltametLabel,6,1)
-#        grid.addWidget(self.deltabtButton,7,0)
-#        grid.addWidget(self.deltabtLabel,7,1)
         grid.addWidget(self.yButton,4,0)
         grid.addWidget(self.yLabel,4,1)
         grid.addWidget(self.xButton,5,0)
@@ -42697,46 +42624,28 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.aucguideLabel,10,3)
         grid.addWidget(self.aucareaButton,11,2)
         grid.addWidget(self.aucareaLabel,11,3)
-        defaultsLayout = QHBoxLayout()
-        defaultsLayout.addStretch()
-        defaultsLayout.addWidget(greyButton)
-        defaultsLayout.addWidget(defaultsButton)
-        defaultsLayout.addWidget(okButton)
-        grid.addLayout(defaultsLayout,12,3)
         graphLayout = QVBoxLayout()
         graphLayout.addLayout(grid)
 
         #tab 2
         lcd1layout = QHBoxLayout()
-        lcd1layout.addWidget(lcd1backButton,0)
-        lcd1layout.addWidget(self.lcd1colorComboBox,1)
-        lcd1layout.addWidget(lcd1LEDButton,2)
-        lcd1layout.addWidget(self.lcd1spinbox,3)
+        lcd1layout.addWidget(self.lcd1LEDButton,0)
+        lcd1layout.addWidget(self.lcd1backButton,1)
         lcd2layout = QHBoxLayout()
-        lcd2layout.addWidget(lcd2backButton,0)
-        lcd2layout.addWidget(self.lcd2colorComboBox,1)
-        lcd2layout.addWidget(lcd2LEDButton,2)
-        lcd2layout.addWidget(self.lcd2spinbox,3)
+        lcd2layout.addWidget(self.lcd2LEDButton,0)
+        lcd2layout.addWidget(self.lcd2backButton,1)
         lcd3layout = QHBoxLayout()
-        lcd3layout.addWidget(lcd3backButton,0)
-        lcd3layout.addWidget(self.lcd3colorComboBox,1)
-        lcd3layout.addWidget(lcd3LEDButton,2)
-        lcd3layout.addWidget(self.lcd3spinbox,3)
+        lcd3layout.addWidget(self.lcd3LEDButton,0)
+        lcd3layout.addWidget(self.lcd3backButton,1)
         lcd4layout = QHBoxLayout()
-        lcd4layout.addWidget(lcd4backButton,0)
-        lcd4layout.addWidget(self.lcd4colorComboBox,1)
-        lcd4layout.addWidget(lcd4LEDButton,2)
-        lcd4layout.addWidget(self.lcd4spinbox,3)
+        lcd4layout.addWidget(self.lcd4LEDButton,0)
+        lcd4layout.addWidget(self.lcd4backButton,1)
         lcd5layout = QHBoxLayout()
-        lcd5layout.addWidget(lcd5backButton,0)
-        lcd5layout.addWidget(self.lcd5colorComboBox,1)
-        lcd5layout.addWidget(lcd5LEDButton,2)
-        lcd5layout.addWidget(self.lcd5spinbox,3)
+        lcd5layout.addWidget(self.lcd5LEDButton,0)
+        lcd5layout.addWidget(self.lcd5backButton,1)
         lcd6layout = QHBoxLayout()
-        lcd6layout.addWidget(lcd6backButton,0)
-        lcd6layout.addWidget(self.lcd6colorComboBox,1)
-        lcd6layout.addWidget(lcd6LEDButton,2)
-        lcd6layout.addWidget(self.lcd6spinbox,3)
+        lcd6layout.addWidget(self.lcd6LEDButton,0)
+        lcd6layout.addWidget(self.lcd6backButton,1)
         LCD1GroupLayout = QGroupBox(QApplication.translate("GroupBox","Timer LCD",None))
         LCD1GroupLayout.setLayout(lcd1layout)
         lcd1layout.setContentsMargins(0,0,0,0)
@@ -42777,60 +42686,54 @@ class graphColorDlg(ArtisanDialog):
         lllayout.addLayout(buttonlayout)
         lllayout.setContentsMargins(0,0,0,0)
         lllayout.setSpacing(5)
-        #tab 3
 
         ###################################
-        TabWidget = QTabWidget()
+        self.TabWidget = QTabWidget()
         C0Widget = QWidget()
         C0Widget.setLayout(graphlinesLayout)
-        TabWidget.addTab(C0Widget,QApplication.translate("Tab","Curves",None))
+        self.TabWidget.addTab(C0Widget,QApplication.translate("Tab","Curves",None))
         C1Widget = QWidget()
         C1Widget.setLayout(graphLayout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Graph",None))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Graph",None))
         C2Widget = QWidget()
         C2Widget.setLayout(lllayout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","LCDs",None))
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","LCDs",None))
+
+        okButton = QPushButton(QApplication.translate("Button","OK", None))
+        okButton.clicked.connect(lambda _:self.accept())
+        defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
+        defaultsButton.setFocusPolicy(Qt.NoFocus)
+        defaultsButton.clicked.connect(lambda _:self.recolor(1))
+        greyButton = QPushButton(QApplication.translate("Button","Grey", None))
+        greyButton.setFocusPolicy(Qt.NoFocus)
+        greyButton.clicked.connect(lambda _:self.recolor(2))
+
         okLayout = QHBoxLayout()
         okLayout.addStretch()
+        okLayout.addWidget(defaultsButton)
+        okLayout.addWidget(greyButton)
         okLayout.addWidget(okButton)
         okLayout.setContentsMargins(0, 0, 0, 0)
-        TabWidget.setContentsMargins(0, 0, 0, 0)
+        self.TabWidget.setContentsMargins(0, 0, 0, 0)
         C0Widget.setContentsMargins(0, 0, 0, 0)
         C1Widget.setContentsMargins(0, 0, 0, 0)
         C2Widget.setContentsMargins(0, 0, 0, 0)
         graphLayout.setContentsMargins(0,0,0,0)
         #incorporate layouts
         Mlayout = QVBoxLayout()
-        Mlayout.addWidget(TabWidget)
+        Mlayout.addWidget(self.TabWidget)
         Mlayout.addLayout(okLayout)
         Mlayout.setContentsMargins(5,10,5,0)
         self.setLayout(Mlayout)
+        self.setColorLabels()
         
     def accept(self):
         self.close()
         
-    def setLCDdefaults(self):
-        aw.lcdpaletteB["timer"] = "black"
-        aw.lcdpaletteF["timer"] = "white"
-        aw.lcdpaletteB["et"] = "black"
-        aw.lcdpaletteF["et"] = "white"
-        aw.lcdpaletteB["bt"] = "black"
-        aw.lcdpaletteF["bt"] = "white"
-        aw.lcdpaletteB["deltaet"] = "black"
-        aw.lcdpaletteF["deltaet"] = "white"
-        aw.lcdpaletteB["deltabt"] = "black"
-        aw.lcdpaletteF["deltabt"] = "white"
-        aw.lcdpaletteB["sv"] = "black"
-        aw.lcdpaletteF["sv"] = "white"
-        aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-        aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
-        aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
-        aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
-        aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
-        aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-        aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
-        aw.updateExtraLCDvisibility()
-
+    def setLCD_bw(self):
+        aw.setLCDsBW()
+        self.setColorLabels()
+        
     def setLED(self,hue,lcd):
         if lcd == 1:
             color = QColor(aw.lcdpaletteF["timer"])
@@ -42870,16 +42773,12 @@ class graphColorDlg(ArtisanDialog):
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
 
-    def paintlcds(self,text,flag,lcdnumber):
+    def paintlcds(self,flag,lcdnumber):
         if lcdnumber ==1:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"timer")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"timer")
-            elif flag == 2 and text:
-                nc = self.lcdcolors[self.lcd1colorComboBox.currentIndex()]
-                if nc != aw.lcdpaletteF["timer"]:
-                    aw.lcdpaletteB["timer"] = nc
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
@@ -42888,10 +42787,6 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"et")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"et")
-            elif flag == 2 and text:
-                nc = self.lcdcolors[self.lcd2colorComboBox.currentIndex()]
-                if nc != aw.lcdpaletteF["et"]:
-                    aw.lcdpaletteB["et"] = nc
             aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
@@ -42900,10 +42795,6 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"bt")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"bt")
-            elif flag == 2 and text:
-                nc = self.lcdcolors[self.lcd3colorComboBox.currentIndex()]
-                if nc != aw.lcdpaletteF["bt"]:
-                    aw.lcdpaletteB["bt"] = nc
             aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
             if aw.largeLCDs_dialog:
                 aw.largeLCDs_dialog.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
@@ -42912,33 +42803,22 @@ class graphColorDlg(ArtisanDialog):
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltaet")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltaet")
-            elif flag == 2 and text:
-                nc = self.lcdcolors[self.lcd4colorComboBox.currentIndex()]
-                if nc != aw.lcdpaletteF["deltaet"]:
-                    aw.lcdpaletteB["deltaet"] = nc
             aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
         if lcdnumber ==5:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"deltabt")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"deltabt")
-            elif flag == 2 and text:
-                nc = self.lcdcolors[self.lcd5colorComboBox.currentIndex()]
-                if nc != aw.lcdpaletteF["deltabt"]:
-                    aw.lcdpaletteB["deltabt"] = nc
             aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
         if lcdnumber ==6:
             if flag == 0:
                 self.setcolor(aw.lcdpaletteB,aw.lcdpaletteF,"sv")
             elif flag == 1:
                 self.setcolor(aw.lcdpaletteF,aw.lcdpaletteB,"sv")
-            elif flag == 2 and text:
-                nc = self.lcdcolors[self.lcd6colorComboBox.currentIndex()]
-                if nc != aw.lcdpaletteF["sv"]:
-                    aw.lcdpaletteB["sv"] = nc
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             aw.updateExtraLCDvisibility()
+        self.setColorLabels()
 
     def setColorLabels(self):
         for l,t in [
@@ -42974,18 +42854,32 @@ class graphColorDlg(ArtisanDialog):
                 ]:
             self.setColorLabel(l,t)
             
-            # Curves, set background colors and alpha
-            self.bgmetLabel.setText(aw.qmc.backgroundmetcolor)
-            self.bgbtLabel.setText(aw.qmc.backgroundbtcolor)
-            self.bgdeltametLabel.setText(aw.qmc.backgrounddeltaetcolor)
-            self.bgdeltabtLabel.setText(aw.qmc.backgrounddeltabtcolor)
-            self.bgextraLabel.setText(aw.qmc.backgroundxtcolor)
-            self.bgmetLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundmetcolor + " ;}")
-            self.bgbtLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundbtcolor + " ;}")
-            self.bgdeltametLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgrounddeltaetcolor + " ;}")
-            self.bgdeltabtLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgrounddeltabtcolor + " ;}")
-            self.bgextraLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundxtcolor + " ;}")
-            self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
+        # Curves, set background colors and alpha
+        self.bgmetLabel.setText(aw.qmc.backgroundmetcolor)
+        self.bgbtLabel.setText(aw.qmc.backgroundbtcolor)
+        self.bgdeltametLabel.setText(aw.qmc.backgrounddeltaetcolor)
+        self.bgdeltabtLabel.setText(aw.qmc.backgrounddeltabtcolor)
+        self.bgextraLabel.setText(aw.qmc.backgroundxtcolor)
+        self.bgmetLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundmetcolor + " ;}")
+        self.bgbtLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundbtcolor + " ;}")
+        self.bgdeltametLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgrounddeltaetcolor + " ;}")
+        self.bgdeltabtLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgrounddeltabtcolor + " ;}")
+        self.bgextraLabel.setStyleSheet("QLabel { background-color: " + aw.qmc.backgroundxtcolor + " ;}")
+        self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
+
+        # LEDs
+        self.lcd1backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['timer'] + "; color: " + aw.lcdpaletteF['timer'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd1LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['timer'] + "; color: " + aw.lcdpaletteF['timer'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd2backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['et'] + "; color: " + aw.lcdpaletteF['et'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd2LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['et'] + "; color: " + aw.lcdpaletteF['et'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd3backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['bt'] + "; color: " + aw.lcdpaletteF['bt'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd3LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['bt'] + "; color: " + aw.lcdpaletteF['bt'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd4backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltaet'] + "; color: " + aw.lcdpaletteF['deltaet'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd4LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltaet'] + "; color: " + aw.lcdpaletteF['deltaet'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd5backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltabt'] + "; color: " + aw.lcdpaletteF['deltabt'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd5LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['deltabt'] + "; color: " + aw.lcdpaletteF['deltabt'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd6backButton.setStyleSheet("background-color: " + aw.lcdpaletteB['sv'] + "; color: " + aw.lcdpaletteF['sv'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
+        self.lcd6LEDButton.setStyleSheet("background-color: " + aw.lcdpaletteB['sv'] + "; color: " + aw.lcdpaletteF['sv'] + "; border-style: solid; border-width: 1px; border-radius: 4px; border-color: black; padding: 4px;")
             
         if str(aw.qmc.palette["canvas"]) == 'None':
             self.canvasLabel.setStyleSheet("QLabel { background-color: #f0f0f0 }")
@@ -43008,17 +42902,7 @@ class graphColorDlg(ArtisanDialog):
         #reactivate button
         self.intensitySpinBox.setDisabled(False)
 
-#    def setbgcolor(self,bgcolor,disj_palette,select):
-#        res = aw.colordialog(QColor(bgcolor))
-#        if QColor.isValid(res):
-#            nc = str(res.name())
-#            if nc != disj_palette[select]:
-#                bgcolor = nc
-#                print(bgcolor)
-
-                
     def setbgColor(self,title,var,color):
-        #print("title,var,color",title,var,color)  #debugprint
         labelcolor = QColor(color)
         colorf = aw.colordialog(labelcolor)
         if colorf.isValid():
