@@ -10837,7 +10837,7 @@ class ApplicationWindow(QMainWindow):
         
         self.importMenu.addSeparator()
 
-        importBulletAction = QAction(QApplication.translate("Menu", "Aillio Bullet R1...",None),self)
+        importBulletAction = QAction(QApplication.translate("Menu", "Aillio Roastime...",None),self)
         importBulletAction.triggered.connect(self.importBullet)
         self.importMenu.addAction(importBulletAction)
 
@@ -23249,7 +23249,7 @@ class ApplicationWindow(QMainWindow):
 
     def importBullet(self):
         try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import Aillio R1 JSON", None))
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import Aillio Roastime JSON", None))
             if len(filename) == 0:
                 return
             import io
