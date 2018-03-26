@@ -34,11 +34,11 @@ gallery:
     alt: "Coffed"
     title: "Coffed"
   - url: http://www.buckeyecoffee.com/
-    image_path: /assets/images/bc-logo.png
+    image_path: /assets/images/bc-logo.jpg
     alt: "Buckeye Coffee"
     title: "Buckeye Coffee"
   - url: https://www.phidgets.com/
-    image_path: /assets/images/phidgets-logo.png
+    image_path: /assets/images/phidgets-logo.jpg
     alt: "Phidgets"
     title: "Phidgets"
   - url: https://www.coffee-tech.com/
@@ -60,7 +60,7 @@ Artisan supports only 64bit operating systems.
 
 * Mac OS X 10.13
 * Windows 8
-* Linux glibc 2.17
+* Linux glibc 2.18
 
 There are also experimental builds for the Raspberry Pi platform.
 
