@@ -6055,7 +6055,7 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
             fname = os.path.join(aw.getResourcePath(),"Themes","Artisan","Default.athm")
             if os.path.isfile(fname) and not self.flagon:
-                aw.loadSettings(fn=fname)
+                aw.loadSettings(fn=fname,remember=False,reset=False)
                 aw.sendmessage(QApplication.translate("Message","Colors set to Default Theme", None))
             else:
                 for key in list(self.palette1.keys()):
@@ -12590,7 +12590,7 @@ class ApplicationWindow(QMainWindow):
             if reply == QMessageBox.Cancel:
                 return 
             elif reply == QMessageBox.Yes:
-                aw.loadSettings(fn=action.data(),remember=False)
+                aw.loadSettings(fn=action.data(),remember=False,reset=False)
 
     def getcolorPairsToCheck(self):
         try:
@@ -22624,7 +22624,7 @@ class ApplicationWindow(QMainWindow):
 #        dialog.setFixedSize(dialog.size())
         QApplication.processEvents()
         
-    def loadSettings(self,fn=None,remember=True):
+    def loadSettings(self,fn=None,remember=True,reset=True):
         try:
             if fn:
                 filename = fn
@@ -22634,7 +22634,8 @@ class ApplicationWindow(QMainWindow):
                 try:
                     aw.stopActivities()
                     res = aw.settingsLoad(filename)
-                    aw.qmc.reset(soundOn=False)
+                    if reset:
+                        aw.qmc.reset(soundOn=False)
                     if res and remember:
                         # update recentSettings menu
                         settings = QSettings()
@@ -49288,7 +49289,7 @@ def main():
                 aw.loadSettings(fn=u(argv_file))
             elif file_suffix == "athm":
                 # load Artisan setings on double-click on *.athm file
-                aw.loadSettings(fn=u(argv_file))
+                aw.loadSettings(fn=u(argv_file),reset=False)
         else:
             # we try to reload the last loaded profile or background
             if aw.lastLoadedProfile:
