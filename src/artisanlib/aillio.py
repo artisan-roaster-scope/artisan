@@ -49,6 +49,7 @@ class AillioR1:
         self.r1state = 0
         self.worker_thread = None
         self.worker_thread_run = True
+        self.roast_number = -1
 
     def __del__(self):
         self.__close()
@@ -93,8 +94,8 @@ class AillioR1:
         self.__dbg('firmware version: ' + str(firmware))
         self.__sendcmd(self.AILLIO_CMD_INFO2)
         reply = self.__readreply(36)
-        roast_number = unpack('>I', reply[27:31])[0]
-        self.__dbg('number of roasts: ' + str(roast_number))
+        self.roast_number = unpack('>I', reply[27:31])[0]
+        self.__dbg('number of roasts: ' + str(self.roast_number))
         self.parent_pipe, self.child_pipe = Pipe()
         self.worker_thread = threading.Thread(target=self.__updatestate,
                                               args=(self.child_pipe,))
@@ -117,6 +118,10 @@ class AillioR1:
             self.child_pipe.close()
             self.worker_thread = None
 
+    def get_roast_number(self):
+        self.__getstate()
+        return self.roast_number
+    
     def get_bt(self):
         self.__getstate()
         return self.bt

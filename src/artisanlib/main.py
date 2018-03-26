@@ -35049,6 +35049,7 @@ class serialport(object):
             self.R1 = AillioR1()
         tx = aw.qmc.timeclock.elapsed()/1000.
         try:
+            aw.qmc.roastbatchnr = self.R1.get_roast_number()
             aw.qmc.R1_BT = self.R1.get_bt()
             aw.qmc.R1_DT = self.R1.get_dt()
             aw.qmc.R1_DRUM = self.R1.get_drum() * 10
