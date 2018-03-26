@@ -2,6 +2,56 @@ Detailed Release History
 ========================
 
 ----
+v1.3.0 (xx.4.2018)
+------------------
+
+ * New Features 
+   - improves location calc for statssummary
+   - adds extraction yield calculator by Rui Paulo
+   - adds configurable alarm popup timeout
+   - adds MODBUS BCD decoding
+   - adds support for the Siemens S7 protocol
+   - adds support for custom event values larger than 100 up to 999
+   - adds new custom event rendering options and the option  to render event descriptions instead of values
+   - adds the new custom event button type "--" that adds an event (compared to the pure action button of type "  ") 
+  and can be used to add labels to the graph rendering its button description
+   - adds color themes
+   - adds FC duration to characteristics
+   - adds reload of last load profiles on app start
+   - adds possibility to define left time axis limit on CHARGE/RESET
+   - adds a flag to disable the (offline) optimal smoothing algorithm such that online (during recording) and offline curve and RoR representation should be equal.
+  Note that without optimal smoothing active, temperature curves are not smoothed at all.
+   - adds rendering of the AUC
+   - adds sliders with min/max limits adjusting to the actual temperature unit
+   - adds direct support for [Aillio Bullet R1](https://aillio.com/), [BC Roasters](http://www.buckeyecoffee.com/), [Bühler Roastmaster](http://www.buhlergroup.com/), [Coffed SR5/SR25](http://coffed.pl/), [Coffee-Tech FZ-94](https://www.coffee-tech.com/), [Coffeetool R500/3/5/15](http://coffeetool.gr/), [Giesen W1A/W6A/W15A](http://www.giesencoffeeroasters.eu/), [IMF RM5/RM15](http://www.imf-srl.com/), [K+M UG15/UG22](https://www.kirschundmausser.de/), [Loring S7/15/35/70](https://loring.com/), [Phoenix ORO](http://www.buckeyecoffee.com/), [Proaster](http://proaster.coffee/), [San Franciscan SF1-75](http://www.sanfranroaster.com/), [Sedona Elite](http://www.buckeyecoffee.com/), [Toper TKM-SX](http://www.toper.com/), [US Roaster Corp](http://www.usroastercorp.com/)
+ * Changes
+   - allow alarm button action to trigger several buttons at once via a list. The following string is now valid: "1,2,3 # docu"
+   - imports a broader range of aillio bullet r1 profiles
+   - various ranking report graph improvements
+   - statistic summary layout improvements
+   - enhances "Show on BT" to include all special events
+   - keyboard mode jumps to the first non-flat button automatically
+   - allow for 0.5s sampling rate
+   - Hottop default setup adds DROP action to put fan to 100% and heater to 0% and open the door and event quantifier definition
+   - deactivates mouse-over scroll wheel events on combo-boxes inside scrolling areas
+   - allows one decimal in alarm value limits
+   - redesigned slider style
+   - reorganized some menus and dialogs
+   - cleaned up time axis setup and introduced
+   - changes some defaults (DeltaET lcd hidden, render delta curves thinner than temperature curves)
+   - siders and buttons remember their visibility per state (OFF/ON/START)
+ * Bug Fixes
+   - fixes a bug that made the background RoR curves disappear on START
+   - fixes a crasher on clicking the SV slider
+   - fixes designer reset issue
+   - fixes p-i-d button action that never triggered
+   - fixes coarse quantifiers
+   - recomputes AUC in ranking reports based on actual AUC settings
+   - fixes an issue where closing a confirmation dialog via its close box could lead to losing the recorded profile instead of canceling the activity
+   - ensures that the persisted graph dpi is applied on startup and loading settings
+
+
+----
 v1.2.0 (21.12.2017)
 ------------------
 

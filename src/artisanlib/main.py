@@ -18885,6 +18885,7 @@ class ApplicationWindow(QMainWindow):
                     aw.appearance = available[i].lower()
                 except Exception:
                     pass
+                    
             # set dpi
             if filename is not None and settings.contains("dpi"):
                 try:
