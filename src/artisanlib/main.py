@@ -26643,7 +26643,7 @@ class editGraphDlg(ArtisanDialog):
         drylabel = QLabel("<b>" + u(QApplication.translate("Label", "DRY END",None)) + "</b>")
         drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
-        if aw.qmc.timeindex[1]:
+        if aw.qmc.timeindex[1] < len(aw.qmc.timex):
             t2 = int(aw.qmc.timex[aw.qmc.timeindex[1]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t2 = 0
@@ -26657,7 +26657,7 @@ class editGraphDlg(ArtisanDialog):
         Cstartlabel = QLabel("<b>" + u(QApplication.translate("Label","FC START",None)) + "</b>")
         Cstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cstartlabel.setStyleSheet("background-color:'orange';")
-        if aw.qmc.timeindex[2]:
+        if aw.qmc.timeindex[2] < len(aw.qmc.timex):
             t3 = int(aw.qmc.timex[aw.qmc.timeindex[2]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t3 = 0
@@ -26672,7 +26672,7 @@ class editGraphDlg(ArtisanDialog):
         Cendlabel = QLabel("<b>" + u(QApplication.translate("Label","FC END",None)) + "</b>")
         Cendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cendlabel.setStyleSheet("background-color:'orange';")
-        if aw.qmc.timeindex[3]:
+        if aw.qmc.timeindex[3] < len(aw.qmc.timex):
             t4 = int(aw.qmc.timex[aw.qmc.timeindex[3]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t4 = 0
