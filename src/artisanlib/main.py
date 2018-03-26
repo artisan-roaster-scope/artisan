@@ -42245,6 +42245,7 @@ class graphColorDlg(ArtisanDialog):
         self.intensitySpinBox.setSingleStep(1)
         self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
         self.intensitySpinBox.valueChanged.connect(self.adjustintensity)        
+        self.intensitySpinBox.setFocusPolicy(Qt.NoFocus)      
             
         #TAB1
         self.backgroundLabel = QLabel(aw.qmc.palette["background"])
@@ -42617,6 +42618,9 @@ class graphColorDlg(ArtisanDialog):
 
         okButton = QPushButton(QApplication.translate("Button","OK", None))
         okButton.clicked.connect(lambda _:self.accept())
+#        okButton.setFocus()
+#        okButton.setFocusPolicy(Qt.ClickFocus)
+        
         defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None))
         defaultsButton.setFocusPolicy(Qt.NoFocus)
         defaultsButton.clicked.connect(lambda _:self.recolor(1))
@@ -49209,6 +49213,52 @@ class DtaPID(object):
 
 ###########################################################################################################################################
 ###########################################################################################################################################
+
+
+def excepthook(excType, excValue, tracebackobj):
+    """
+    Global function to catch unhandled exceptions.
+    
+    @param excType exception type
+    @param excValue exception value
+    @param tracebackobj traceback object
+    """
+    separator = '-' * 80
+    logFile = "simple.log"
+    notice = \
+        """An unhandled exception occurred. Please report the problem!\n"""\
+        """An entry has been written to the error log (menu Help >> Error).\n\nError information:\n"""
+    versionInfo="0.0.1"
+    timeString = libtime.strftime("%Y-%m-%d, %H:%M:%S")
+    
+    if sys.version < '3':
+        import cStringIO
+        tbinfofile = cStringIO.StringIO()
+    else:
+        import io
+        tbinfofile = io.StringIO()
+    
+    import traceback
+    traceback.print_tb(tracebackobj, None, tbinfofile)
+    tbinfofile.seek(0)
+    tbinfo = tbinfofile.read()
+    errmsg = '%s: \n%s' % (str(excType), str(excValue))
+    sections = [separator, timeString, separator, errmsg, separator, tbinfo]
+    msg = '\n'.join(sections)
+    aw.qmc.adderror(msg)
+    try:
+        f = open(logFile, "w")
+        f.write(msg)
+        f.write(versionInfo)
+        f.close()
+    except IOError:
+        pass
+    errorbox = QMessageBox()
+    errorbox.setText(str(notice)+str(msg)+str(versionInfo))
+    errorbox.exec_()
+
+sys.excepthook = excepthook
+
 
 # the following avoids the "No document could be created" dialog and the Console message
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
