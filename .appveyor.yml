@@ -28,7 +28,7 @@ build_script:
   - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
   - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '0'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
   - ps: move -force newfile artisanlib/__init__.py
-  - ps: gc setup-install3-pi.nsi | %{ $_ -replace "!define PRODUCT_VERSION.*", "!define PRODUCT_VERSION ""$Env:ARTISAN_VERSION"".0" } | out-file newfile -encoding ascii -force
+  - ps: gc setup-install3-pi.nsi | %{ $_ -replace "!define PRODUCT_VERSION.*", "!define PRODUCT_VERSION ""$Env:ARTISAN_VERSION.0""" } | out-file newfile -encoding ascii -force
   - ps: move -force newfile setup-install3-pi.nsi
   - cmd: build-win3-pi.bat
   - cmd: copy ..\LICENSE LICENSE.txt
