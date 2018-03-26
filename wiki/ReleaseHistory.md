@@ -130,7 +130,8 @@ v1.2.0 (21.12.2017)
    - fixes PID background-follow mode messing up at the end of the background profile
    - fixes Fuji PXR set p-i-d and set Ramp/Soaks
 
-
+**Note**
+_This is the latest version supporting supporting Mac OS X 10.12 and Linux glibc 2.17_
 
 ----
 v1.1.0 (10.06.2017)
