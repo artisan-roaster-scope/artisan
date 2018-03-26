@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/imf/
 title: "IMF"
-excerpt: "RM 5/15"
+excerpt: "RM5/RM15"
 header:
   overlay_image: /assets/images/IMF.jpg
   image: /assets/images/IMF.jpg

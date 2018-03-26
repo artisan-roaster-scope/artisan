@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/coffed/
 title: "Coffed"
-excerpt: "SR5/25"
+excerpt: "SR5/SR25"
 header:
   overlay_image: /assets/images/coffed.jpg
   image: /assets/images/coffed.jpg

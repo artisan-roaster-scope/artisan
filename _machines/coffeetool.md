@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/coffeetool/
 title: "Coffeetool"
-excerpt: "R500/3/5/15"
+excerpt: "R500/R3/R5/R15"
 header:
   overlay_image: /assets/images/coffeetool.jpg
   image: /assets/images/coffeetool.jpg
