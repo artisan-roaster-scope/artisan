@@ -2842,7 +2842,7 @@ class tgraphcanvas(FigureCanvas):
         curves = aw.extraCurveVisibility1[0:active_curves] + aw.extraCurveVisibility2[0:active_curves] + [aw.qmc.ETcurve,aw.qmc.BTcurve]
         c = curves.count(True)
         if aw.qmc.background:
-            c += 2 # those are alwyays populated
+            c += 2
             if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
                 idx3 = aw.qmc.xtcurveidx - 1
                 n3 = idx3 // 2
@@ -3186,14 +3186,14 @@ class tgraphcanvas(FigureCanvas):
                 if self.projectionmode == 0:
                     #calculate the temperature endpoint at endofx acording to the latest rate of change
                     if self.l_BTprojection is not None:
-                        if aw.qmc.BTcurve and len(aw.qmc.delta2) > 0 and aw.qmc.delta2[-1] is not None and len(self.ctemp2) > 0:
+                        if aw.qmc.BTcurve and len(aw.qmc.delta2) > 0 and aw.qmc.delta2[-1] is not None:
                             BTprojection = self.ctemp2[-1] + aw.qmc.delta2[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
                             #plot projections
                             self.l_BTprojection.set_data([self.timex[-1],self.endofx+starttime], [self.ctemp2[-1], BTprojection])
                         elif self.l_BTprojection:
                             self.l_BTprojection.set_data([],[])
                     if self.l_ETprojection is not None:
-                        if aw.qmc.ETcurve and len(aw.qmc.delta1) > 0 and aw.qmc.delta1[-1] is not None and len(self.ctemp1) > 0:
+                        if aw.qmc.ETcurve and len(aw.qmc.delta1) > 0 and aw.qmc.delta1[-1] is not None:
                             ETprojection = self.ctemp1[-1] + aw.qmc.delta1[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
                             self.l_ETprojection.set_data([self.timex[-1],self.endofx+starttime], [self.ctemp1[-1], ETprojection])
                         elif self.l_ETprojection:
@@ -4092,10 +4092,7 @@ class tgraphcanvas(FigureCanvas):
             if len(x) == len(y) and len(x) > 1:
                 # filter spikes
                 if aw.qmc.filterDropOuts:
-                    try:
-                        y = self.medfilt(y,5) # k=3 seems not to catch all spikes in all cases
-                    except:
-                        pass
+                    y = self.medfilt(y,5) # k=3 seems not to catch all spikes in all cases
                 if window_len > 2 and len(x) == len(y) and len(x) > 1:
                     # smooth curves
                     #s = numpy.r_[2*x[0]-y[window_len:1:-1],y,2*y[-1]-y[-1:-window_len:-1]]
@@ -4104,10 +4101,7 @@ class tgraphcanvas(FigureCanvas):
                         w = numpy.ones(window_len,'d')
                     else:
                         w = eval('numpy.'+window+'(window_len)')
-                    try:
-                        ys = numpy.convolve(w/w.sum(),s,mode='valid')
-                    except:
-                        return y
+                    ys = numpy.convolve(w/w.sum(),s,mode='valid')
                     hwl = int((window_len/2))
                     res = ys[hwl:-hwl]
                     if len(res)+1 == len(y) and len(res) > 0:
@@ -4135,10 +4129,7 @@ class tgraphcanvas(FigureCanvas):
         win_len = max(0,window_len)
         # filter spikes
         if aw.qmc.filterDropOuts and len(a) == len(b) and len(a) > 1:
-            try:
-                b = self.medfilt(numpy.array(b),7).tolist()  # k=3 seems not to catch all spikes in all cases
-            except:
-                pass
+            b = self.medfilt(numpy.array(b),7).tolist()  # k=3 seems not to catch all spikes in all cases
         if win_len != 1: # at the lowest level we turn smoothing completely off
             if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
                 if toIndex==0: # no limit
@@ -4399,7 +4390,7 @@ class tgraphcanvas(FigureCanvas):
             lt = len(tx_roast)
             if t1 is not None:
                 with numpy.errstate(divide='ignore'):
-                    nt1 = numpy.array([0 if x is None else x for x in t1[roast_start_idx:roast_end_idx]]) # ERROR None Type object not scriptable! t==None on ON
+                    nt1 = numpy.array(t1[roast_start_idx:roast_end_idx]) # ERROR None Type object not scriptable! t==None on ON
                     z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
                     ld1 = len(z1)
                     
@@ -4424,7 +4415,7 @@ class tgraphcanvas(FigureCanvas):
 
             if t2 is not None:
                 with numpy.errstate(divide='ignore'):
-                    nt2 = numpy.array([0 if x is None else x for x in t2[roast_start_idx:roast_end_idx]])
+                    nt2 = numpy.array(t2[roast_start_idx:roast_end_idx])
                     z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
                     ld2 = len(z2)
                 # make lists equal in length
@@ -4976,9 +4967,6 @@ class tgraphcanvas(FigureCanvas):
                                     self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                                             picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
-                            else:                                                                            
-                                self.l_backgroundeventtype1dots, = self.ax.plot([], [], color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if cool exists and last event was earlier
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4987,9 +4975,6 @@ class tgraphcanvas(FigureCanvas):
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
-                            else:                                                                            
-                                self.l_backgroundeventtype2dots, = self.ax.plot([], [], color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                                             picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
                             if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if cool exists and last event was earlier
@@ -5000,9 +4985,6 @@ class tgraphcanvas(FigureCanvas):
                                     self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                                             picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
-                            else:
-                                self.l_backgroundeventtype3dots, = self.ax.plot([], [], color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
                             if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if cool exists and last event was earlier
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -5011,9 +4993,6 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
-                            else:
-                                self.l_backgroundeventtype4dots, = self.ax.plot([], [], color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                                             picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
                                                                               
                     #check backgroundDetails flag
