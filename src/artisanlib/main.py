@@ -857,7 +857,7 @@ class tgraphcanvas(FigureCanvas):
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
                         "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
                         "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'white',"metbox":'red',
-                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'} 
+                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676',"Cline":'blue',"legend":'#131313'} 
         self.palette1 = self.palette.copy()
         
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
@@ -49228,10 +49228,11 @@ def excepthook(excType, excValue, tracebackobj):
     separator = '-' * 80
     logFile = "simple.log"
     notice = \
-        """An unhandled exception occurred. Please report the problem on Github!\n"""\
+        """An unhandled exception occurred. Please report the problem on Github\n"""\
         """https://github.com/artisan-roaster-scope/artisan/issues\n"""\
+        """and include your settings file (export via menu Help >> Save Settings)!\n"""\
         """An entry has been written to the error log (menu Help >> Error).\n\nError information:\n"""
-    versionInfo="0.0.1"
+    versionInfo="revision: " + str(__revision__)
     timeString = libtime.strftime("%Y-%m-%d, %H:%M:%S")
     
     if sys.version < '3':
