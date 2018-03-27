@@ -857,7 +857,7 @@ class tgraphcanvas(FigureCanvas):
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
                         "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
                         "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'white',"metbox":'red',
-                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676',"Cline":'blue',"legend":'#131313'} 
+                        "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'} 
         self.palette1 = self.palette.copy()
         
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
@@ -12582,6 +12582,7 @@ class ApplicationWindow(QMainWindow):
         self.populateListMenu("Themes",".athm",self.openThemeSettings,self.themeMenu, False)
 
     def openThemeSettings(self):
+        print(len(aw.qmc.palette))
         action = self.sender()
         if action:
             string = QApplication.translate("Message", "Load theme {0}?",None).format(action.text())
@@ -12591,6 +12592,7 @@ class ApplicationWindow(QMainWindow):
                 return 
             elif reply == QMessageBox.Yes:
                 aw.loadSettings(fn=action.data(),remember=False,reset=False)
+                print(len(aw.qmc.palette))
                 libtime.sleep(.8)
                 aw.qmc.redraw(True)
 
