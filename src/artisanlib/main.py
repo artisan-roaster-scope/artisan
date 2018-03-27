@@ -49245,7 +49245,7 @@ def excepthook(excType, excValue, tracebackobj):
     
     if sys.version < '3':
         import cStringIO
-        tbinfofile = cStringIO.StringIO()  # @UnusedImport
+        tbinfofile = cStringIO.StringIO()  # @UndefinedVariable @UnresolvedImport @UnusedImport
     else:
         import io
         tbinfofile = io.StringIO()
