@@ -42450,17 +42450,13 @@ class graphColorDlg(ArtisanDialog):
         #LAYOUTS
         #tab0 layout
         lines = QGridLayout()
-        lines.setColumnStretch(1,12)   
-        lines.setColumnStretch(3,12)   
-        lines.setColumnStretch(0,0)   
-        lines.setColumnStretch(2,0)   
         lines.setVerticalSpacing(1)
         lines.setColumnMinimumWidth(0,80)
-        lines.setColumnMinimumWidth(1,80)
+        lines.setColumnMinimumWidth(1,180)
         lines.setColumnMinimumWidth(2,80)
-        lines.setColumnMinimumWidth(3,80)
+        lines.setColumnMinimumWidth(3,180)
+
         lines.addWidget(profilecolorlabel,0,1)
-       
         lines.addWidget(self.metButton,1,0)
         lines.addWidget(self.metLabel,1,1)
         lines.addWidget(self.btButton,2,0)
