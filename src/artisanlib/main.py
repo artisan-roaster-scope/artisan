@@ -12591,6 +12591,8 @@ class ApplicationWindow(QMainWindow):
                 return 
             elif reply == QMessageBox.Yes:
                 aw.loadSettings(fn=action.data(),remember=False,reset=False)
+                libtime.sleep(.8)
+                aw.qmc.redraw(True)
 
     def getcolorPairsToCheck(self):
         try:
@@ -14537,8 +14539,7 @@ class ApplicationWindow(QMainWindow):
             if style:
                 aw.messagelabel.setStyleSheet(style)
             else:
-                aw.messagelabel.setStyleSheet("background-color:'transparent';")
-                aw.messagelabel.setStyleSheet("color: " + aw.qmc.palette["messages"] + ";")
+                aw.messagelabel.setStyleSheet("background-color:'transparent'; color: " + aw.qmc.palette["messages"] + ";")
             message = aw.arabicReshape(message)
             #keep a max of 100 messages
             if append:
@@ -18001,13 +18002,15 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.palette["canvas"] = None  #revert the canvas element to default if it does not exist in the settings.
                 for (k, v) in list(toMap(settings.value("Colors")).items()):
                     self.qmc.palette[str(k)] = s2a(toString(v))
-                if self.qmc.palette["et"]:
+                if "messages" in self.qmc.palette:
+                    self.setLabelColor(aw.messagelabel,QColor(self.qmc.palette["messages"]))
+                if "et" in self.qmc.palette:
                     self.setLabelColor(aw.label2,QColor(self.qmc.palette["et"]))
-                if self.qmc.palette["bt"]:    
+                if "bt" in self.qmc.palette:    
                     self.setLabelColor(aw.label3,QColor(self.qmc.palette["bt"]))
-                if self.qmc.palette["deltaet"]:    
+                if "deltaet" in self.qmc.palette:
                     self.setLabelColor(aw.label4,QColor(self.qmc.palette["deltaet"]))
-                if self.qmc.palette["deltabt"]:    
+                if "deltabt" in self.qmc.palette:
                     self.setLabelColor(aw.label5,QColor(self.qmc.palette["deltabt"]))
             if settings.contains("ETBColor"):
                 self.qmc.backgroundmetcolor = s2a(toString(settings.value("ETBColor",self.qmc.backgroundmetcolor)))
@@ -49230,7 +49233,7 @@ def excepthook(excType, excValue, tracebackobj):
     
     if sys.version < '3':
         import cStringIO
-        tbinfofile = cStringIO.StringIO()
+        tbinfofile = cStringIO.StringIO()  # @UnusedImport
     else:
         import io
         tbinfofile = io.StringIO()
