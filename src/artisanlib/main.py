@@ -6122,6 +6122,7 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["specialeventtext"] = str(dialog.specialeventtextLabel.text())
                 self.palette["mettext"] = str(dialog.mettextLabel.text())
                 self.palette["metbox"] = str(dialog.metboxLabel.text())
+                self.palette["messages"] = str(dialog.messagesLabel.text())
                 self.backgroundmetcolor = str(dialog.bgmetLabel.text())
                 self.backgroundbtcolor  = str(dialog.bgbtLabel.text())
                 self.backgrounddeltaetcolor = str(dialog.bgdeltametLabel.text())
@@ -12623,6 +12624,7 @@ class ApplicationWindow(QMainWindow):
                 ('ET',               aw.qmc.palette['et'],               'Legend bkgnd',            aw.qmc.palette['legendbg']),         
                 ('MET Text',         aw.qmc.palette['mettext'],          'MET Box',                 aw.qmc.palette['metbox']),         
                 ('MET Box',          aw.qmc.palette['metbox'],           'Background',              aw.qmc.palette['background']),       
+                ('Messages',         aw.qmc.palette['messages'],         'Canvas',                  aw.qmc.palette['canvas']),       
                 (deltaLabelPrefix+'BT',aw.qmc.palette['deltabt'],        'Legend bkgnd',            aw.qmc.palette['legendbg']),         
                 (deltaLabelPrefix+'ET',aw.qmc.palette['deltaet'],        'Legend bkgnd',            aw.qmc.palette['legendbg']),         
                ]
@@ -12781,10 +12783,10 @@ class ApplicationWindow(QMainWindow):
         aw.ntb.destroy()
         whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
         aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
-        if whitep:
-            aw.qmc.palette["messages"] = 'white'
-        else:
-            aw.qmc.palette["messages"] = 'black'
+#        if whitep:
+#            aw.qmc.palette["messages"] = 'white'
+#        else:
+#            aw.qmc.palette["messages"] = 'black'
         aw.ntb.setMinimumHeight(50)
         aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                     + "color: " + str(aw.qmc.palette["title"]) + ";"
@@ -42415,18 +42417,25 @@ class graphColorDlg(ArtisanDialog):
         self.metboxButton.setFocusPolicy(Qt.NoFocus)
         self.metboxLabel.setFrameStyle(frameStyle)
         self.metboxButton.clicked.connect(lambda _: self.setColor("metbox",self.metboxLabel,"metbox"))
+        self.messagesLabel = QLabel(aw.qmc.palette["messages"])
+        self.messagesLabel.setPalette(QPalette(QColor(aw.qmc.palette["messages"])))
+        self.messagesLabel.setAutoFillBackground(True)
+        self.messagesButton = QPushButton(QApplication.translate("Button","Messages", None))
+        self.messagesButton.setFocusPolicy(Qt.NoFocus)
+        self.messagesLabel.setFrameStyle(frameStyle)
+        self.messagesButton.clicked.connect(lambda _: self.setColor("messages",self.messagesLabel,"messages"))
 
-        self.lcd1LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd1LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd1LEDButton.clicked.connect(lambda _:self.paintlcds(1,1))
-        self.lcd2LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd2LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd2LEDButton.clicked.connect(lambda _:self.paintlcds(1,2))
-        self.lcd3LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd3LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd3LEDButton.clicked.connect(lambda _:self.paintlcds(1,3))
-        self.lcd4LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd4LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd4LEDButton.clicked.connect(lambda _:self.paintlcds(1,4))
-        self.lcd5LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd5LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd5LEDButton.clicked.connect(lambda _:self.paintlcds(1,5))
-        self.lcd6LEDButton = QPushButton(QApplication.translate("Button","LED",None))
+        self.lcd6LEDButton = QPushButton(QApplication.translate("Button","Digits",None))
         self.lcd6LEDButton.clicked.connect(lambda _:self.paintlcds(1,6))
         self.lcd1backButton = QPushButton(QApplication.translate("Button","Background",None))
         self.lcd1backButton.clicked.connect(lambda _:self.paintlcds(0,1))
@@ -42516,6 +42525,8 @@ class graphColorDlg(ArtisanDialog):
         grid.addWidget(self.legendborderLabel,9,1) 
         grid.addWidget(self.watermarksButton,10,0)
         grid.addWidget(self.watermarksLabel,10,1)
+        grid.addWidget(self.messagesButton,11,0)
+        grid.addWidget(self.messagesLabel,11,1)
         grid.addWidget(self.rect1Button,0,2)
         grid.addWidget(self.rect1Label,0,3)
         grid.addWidget(self.rect2Button,1,2)
@@ -42770,6 +42781,7 @@ class graphColorDlg(ArtisanDialog):
                 (self.specialeventtextLabel,"specialeventtext"),
                 (self.mettextLabel,"mettext"),
                 (self.metboxLabel,"metbox"),
+                (self.messagesLabel,"messages"),
                 ]:
             self.setColorLabel(l,t)
             
