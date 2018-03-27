@@ -42,7 +42,7 @@ gallery:
     alt: "Phidgets"
     title: "Phidgets"
   - url: https://www.coffee-tech.com/
-    image_path: /assets/images/cte-logo.png
+    image_path: /assets/images/cte-logo.jpg
     alt: "COFFEE-TECH ENGINEERING"
     title: "COFFEE-TECH ENGINEERING"
 modified: 2016-04-18T16:39:37-04:00
