@@ -6530,6 +6530,8 @@ class tgraphcanvas(FigureCanvas):
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             if aw.qmc.phasesLCDflag:
                 aw.phasesLCDs.show()
+                aw.TP2DRYlabel.setStyleSheet("background-color:'transparent'; color: " + aw.qmc.palette["messages"] + ";")
+                aw.DRY2FCslabel.setStyleSheet("background-color:'transparent'; color: " + aw.qmc.palette["messages"] + ";")
             if aw.qmc.AUClcdFlag:
                 aw.AUCLCD.show()
                 
