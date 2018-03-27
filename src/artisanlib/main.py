@@ -42849,7 +42849,7 @@ class graphColorDlg(ArtisanDialog):
             nc = str(res.name())
             if nc != disj_palette[select]:
                 palette[select] = nc
-             else:
+            else:
                 QMessageBox.question(aw,QApplication.translate("Message", "Config LCD colors",None),
                     "Digits color and Background color cannot be the same.", QMessageBox.Ok)
                
