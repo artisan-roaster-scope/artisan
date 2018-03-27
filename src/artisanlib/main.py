@@ -16721,11 +16721,25 @@ class ApplicationWindow(QMainWindow):
                         elif reply == QMessageBox.No:
                             # we remove the extra device elements that do not fit
                             l = len(self.qmc.extradevices)
-                            for k in ["extradevices","extratimex","extratemp1","extratemp2","extraname1","extraname2",
-                                    "extramathexpression1","extramathexpression2","extradevicecolor1","extradevicecolor2",
-                                    "extramarkersizes1","extramarkersizes2","extramarkers1","extramarkers2","extralinewidths1",
-                                    "extralinewidths2","extralinestyles1","extralinestyles2","extradrawstyles1","extradrawstyles2"]:
+                            for k in ["extratimex","extratemp1","extratemp2"]:
                                 profile[k] = profile[k][:l]
+                            profile["extradevices"] = self.qmc.extradevices
+                            profile["extraname1"] = self.qmc.extraname1
+                            profile["extraname2"] = self.qmc.extraname2
+                            profile["extramathexpression1"] = self.qmc.extramathexpression1
+                            profile["extramathexpression2"] = self.qmc.extramathexpression2
+                            profile["extradevicecolor1"] = self.qmc.extradevicecolor1
+                            profile["extradevicecolor2"] = self.qmc.extradevicecolor2
+                            profile["extramarkersizes1"] = self.qmc.extramarkersizes1
+                            profile["extramarkersizes2"] = self.qmc.extramarkersizes2
+                            profile["extramarkers1"] = self.qmc.extramarkers1
+                            profile["extramarkers2"] = self.qmc.extramarkers2
+                            profile["extralinewidths1"] = self.qmc.extralinewidths1
+                            profile["extralinewidths2"] = self.qmc.extralinewidths2
+                            profile["extralinestyles1"] = self.qmc.extralinestyles1
+                            profile["extralinestyles2"] = self.qmc.extralinestyles2
+                            profile["extradrawstyles1"] = self.qmc.extradrawstyles1
+                            profile["extradrawstyles2"] = self.qmc.extradrawstyles2
                         else:
                             return False
 
