@@ -16393,7 +16393,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmcond.append(1)
                                     aw.qmc.alarmstate.append(0)
                                     aw.qmc.alarmsource.append(1)    #BT
-                                    aw.qmc.alarmtemperature.append(int(fields_action[0]))
+                                    aw.qmc.alarmtemperature.append(float(fields_action[0]))
                                     aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
                                     aw.qmc.alarmbeep.append(0)
                                     aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None))
@@ -16486,7 +16486,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmcond.insert(2,1)
                                     aw.qmc.alarmstate.insert(2,0)
                                     aw.qmc.alarmsource.insert(2,1)    #BT
-                                    aw.qmc.alarmtemperature.insert(2,int(fields_action[0])-10)
+                                    aw.qmc.alarmtemperature.insert(2,float(fields_action[0])-10)
                                     aw.qmc.alarmaction.insert(2,7)    #inititate 7 (START)
                                     aw.qmc.alarmbeep.insert(2,0)
                                     aw.qmc.alarmstrings.insert(2,QApplication.translate("Label","Start recording",None))
@@ -16500,7 +16500,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmcond.insert(3,1)
                                     aw.qmc.alarmstate.insert(3,0)
                                     aw.qmc.alarmsource.insert(3,1)    #BT
-                                    aw.qmc.alarmtemperature.insert(3,int(fields_action[0]))
+                                    aw.qmc.alarmtemperature.insert(3,float(fields_action[0]))
                                     aw.qmc.alarmaction.insert(3,0)    #POPUP
                                     aw.qmc.alarmbeep.insert(3,1)      #do beep for charge
                                     aw.qmc.alarmstrings.insert(3,QApplication.translate("Label","Charge the beans",None))
@@ -17069,7 +17069,7 @@ class ApplicationWindow(QMainWindow):
                 if "alarmtemperature" in profile:
                     self.qmc.alarmtemperature = profile["alarmtemperature"]
                 else:
-                    self.qmc.alarmtemperature = [500]*len(self.qmc.alarmflag)
+                    self.qmc.alarmtemperature = [500.]*len(self.qmc.alarmflag)
                 if "alarmaction" in profile:
                     self.qmc.alarmaction = profile["alarmaction"]
                 else:
@@ -18269,9 +18269,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.alarmsource = [1]*len(self.qmc.alarmflag)
                 if settings.contains("alarmtemperature"):
-                    self.qmc.alarmtemperature = [toInt(x) for x in toList(settings.value("alarmtemperature",self.qmc.alarmtemperature))]
+                    self.qmc.alarmtemperature = [toFloat(x) for x in toList(settings.value("alarmtemperature",self.qmc.alarmtemperature))]
                 else:
-                    self.qmc.alarmtemperature = [500]*len(self.qmc.alarmflag)
+                    self.qmc.alarmtemperature = [500.]*len(self.qmc.alarmflag)
                 if settings.contains("alarmaction"):
                     self.qmc.alarmaction = [toInt(x) for x in toList(settings.value("alarmaction",self.qmc.alarmaction))]
                 else:
@@ -28011,7 +28011,7 @@ class editGraphDlg(ArtisanDialog):
                 aw.qmc.alarmcond.append(1) # rises above (we assume that BT always rises after TP)
                 aw.qmc.alarmstate.append(0) # not yet triggered
                 aw.qmc.alarmsource.append(1) # 1=BT
-                aw.qmc.alarmtemperature.append(int(round(aw.qmc.temp2[aw.qmc.specialevents[r]]))) # the BT trigger temperature
+                aw.qmc.alarmtemperature.append(float(round(aw.qmc.temp2[aw.qmc.specialevents[r]]))) # the BT trigger temperature
                 aw.qmc.alarmaction.append(aw.qmc.specialeventstype[r] + 3) # 3,4,5,6 for slider 0-3
                 aw.qmc.alarmbeep.append(0)
                 aw.qmc.alarmstrings.append(str(int(aw.qmc.specialeventsvalue[r]*10 - 10)))
@@ -43755,7 +43755,7 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmcond.append(1)
         aw.qmc.alarmstate.append(0)
         aw.qmc.alarmsource.append(1)
-        aw.qmc.alarmtemperature.append(500)
+        aw.qmc.alarmtemperature.append(500.)
         aw.qmc.alarmaction.append(0)
         aw.qmc.alarmbeep.append(0)
         aw.qmc.alarmstrings.append(QApplication.translate("Label","Enter description",None))
@@ -43944,7 +43944,7 @@ class AlarmDlg(ArtisanDialog):
             aw.qmc.alarmoffset = [0]*nalarms
             aw.qmc.alarmcond = [1]*nalarms
             aw.qmc.alarmsource = [1]*nalarms
-            aw.qmc.alarmtemperature = [500]*nalarms
+            aw.qmc.alarmtemperature = [500.]*nalarms
             aw.qmc.alarmaction = [0]*nalarms
             aw.qmc.alarmbeep = [0]*nalarms
             aw.qmc.alarmstrings = [""]*nalarms
@@ -43982,7 +43982,7 @@ class AlarmDlg(ArtisanDialog):
                 try:
                     aw.qmc.alarmtemperature[i] = float(str(temp.text()))
                 except Exception:
-                    aw.qmc.alarmtemperature[i] = 0
+                    aw.qmc.alarmtemperature[i] = 0.0
                 action = self.alarmtable.cellWidget(i,9)
                 aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
                 beepWidget = self.alarmtable.cellWidget(i,10)
