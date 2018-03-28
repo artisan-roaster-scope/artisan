@@ -7728,7 +7728,9 @@ class tgraphcanvas(FigureCanvas):
             if self.statisticsflags[3] and self.timeindex[0]>-1 and self.temp1 and self.temp2 and self.temp1[self.timeindex[0]:self.timeindex[6]+1] and self.temp2[self.timeindex[0]:self.timeindex[6]+1]:
                 # MET temp and time relative to FCs
                 if TP_index is not None:
-                    met_temp = max(self.temp1[TP_index:self.timeindex[6]])
+                    min_et = min(self.temp1[self.timeindex[0]:self.timeindex[6]])
+                    idx_min_et = self.temp1.index(min_et)
+                    met_temp = max(self.temp1[idx_min_et:self.timeindex[6]])
                     self.idx_met = self.temp1.index(met_temp)
                     if self.idx_met and self.timeindex[2]:
                         # time between MET and FCs
@@ -7737,7 +7739,7 @@ class tgraphcanvas(FigureCanvas):
                         met_delta = None    
                     self.met_timex_temp1_delta = [(self.timex[self.idx_met]-self.timex[self.timeindex[0]]), met_temp, met_delta ] #used in onpick() to display the MET temp and time
                 # plot a MET marker
-                if self.showmet and TP_index is not None and aw.qmc.ETcurve:
+                if self.showmet and aw.qmc.ETcurve:
                     if self.mode == "F":
                         height = 0
                     else:
