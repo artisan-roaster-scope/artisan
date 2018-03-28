@@ -855,7 +855,7 @@ class tgraphcanvas(FigureCanvas):
                         "rect1":'green',"rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"rect5":'lightgrey',
                         "et":'red',"bt":'#00007f',"xt":'green',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"timeguide":'blue',
-                        "canvas":'None',"legendbg":'white',"legendborder":'darkgrey', 
+                        "canvas":'#f0f0f0',"legendbg":'white',"legendborder":'darkgrey', 
                         "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'white',"metbox":'red',
                         "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'} 
         self.palette1 = self.palette.copy()
@@ -18038,7 +18038,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extra_event_sampling_delay = toInt(settings.value("ExtraEventSamplingDelay",int(self.qmc.extra_event_sampling_delay)))
             #restore colors
             if settings.contains("Colors"):
-                self.qmc.palette["canvas"] = None  #revert the canvas element to default if it does not exist in the settings.
+                self.qmc.palette["canvas"] = "#f0f0f0"  #revert the canvas element to default if it does not exist in the settings.
                 for (k, v) in list(toMap(settings.value("Colors")).items()):
                     self.qmc.palette[str(k)] = s2a(toString(v))
                 if "messages" in self.qmc.palette:
@@ -18051,6 +18051,8 @@ class ApplicationWindow(QMainWindow):
                     self.setLabelColor(aw.label4,QColor(self.qmc.palette["deltaet"]))
                 if "deltabt" in self.qmc.palette:
                     self.setLabelColor(aw.label5,QColor(self.qmc.palette["deltabt"]))
+                if aw.qmc.palette["canvas"] == None or aw.qmc.palette["canvas"] == "None":
+                    self.qmc.palette["canvas"] = "#f0f0f0"
             if settings.contains("ETBColor"):
                 self.qmc.backgroundmetcolor = s2a(toString(settings.value("ETBColor",self.qmc.backgroundmetcolor)))
             if settings.contains("BTBColor"):
