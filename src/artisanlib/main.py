@@ -859,6 +859,8 @@ class tgraphcanvas(FigureCanvas):
                         "specialeventbox":'yellow',"specialeventtext":'black',"mettext":'white',"metbox":'red',
                         "aucguide":'#00007f',"messages":'black',"aucarea":'#767676'} 
         self.palette1 = self.palette.copy()
+        self.EvalueColor_default = ['#4895CE','#49B160','#800080','#910113'] #["brown","blue","purple","grey"]
+        self.EvalueTextColor_default = ['white','white','white','white']
         
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Aftertaste",None),
@@ -1554,8 +1556,8 @@ class tgraphcanvas(FigureCanvas):
         #plot events by value
         self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
-        self.EvalueColor = ['#4895CE','#49B160','#800080','#910113'] #["brown","blue","purple","grey"]
-        self.EvalueTextColor = ['white','white','white','white']
+        self.EvalueColor = self.EvalueColor_default.copy()
+        self.EvalueTextColor = self.EvalueTextColor_default.copy()
         self.EvalueMarker = ["o","s","h","D"]
         self.EvalueMarkerSize = [4,4,4,4]
         self.Evaluelinethickness = [1,1,1,1]
@@ -6086,6 +6088,8 @@ class tgraphcanvas(FigureCanvas):
                 self.backgrounddeltaetcolor = self.palette["deltaet"]
                 self.backgrounddeltabtcolor = self.palette["deltabt"]
                 self.backgroundxtcolor      = self.palette["xt"]
+                self.EvalueColor = self.EvalueColor_default.copy()
+                self.EvalueTextColor = self.EvalueTextColor_default.copy()
                 aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
                 
             
