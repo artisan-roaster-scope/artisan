@@ -49267,11 +49267,12 @@ def excepthook(excType, excValue, tracebackobj):
     separator = '-' * 80
     logFile = "simple.log"
     notice = \
-        """An unhandled exception occurred. Please report the problem on Github\n"""\
+        """An unhandled exception occurred. Please report the problem on Github:\n"""\
         """https://github.com/artisan-roaster-scope/artisan/issues\n"""\
-        """and include your settings file (export via menu Help >> Save Settings)!\n"""\
-        """An entry has been written to the error log (menu Help >> Error).\n\nError information:\n"""
-    versionInfo="revision: " + str(__revision__)
+        """When reporting this issue, please include your settings file (export \n"""\
+        """via menu Help >> Save Settings) and the details below.\n\n"""\
+        """An entry has been written to the error log (menu Help >> Error).\n\n"""
+    versionInfo= "Version: " + str(__version__) + ", revision: " + str(__revision__) + "\n"
     timeString = libtime.strftime("%Y-%m-%d, %H:%M:%S")
     
     if sys.version < '3':
@@ -49286,18 +49287,40 @@ def excepthook(excType, excValue, tracebackobj):
     tbinfofile.seek(0)
     tbinfo = tbinfofile.read()
     errmsg = '%s: \n%s' % (str(excType), str(excValue))
-    sections = [separator, timeString, separator, errmsg, separator, tbinfo]
+    stack = []
+    variables = ""
+    tb = tracebackobj
+    while tb:
+        stack.append(tb.tb_frame)
+        tb = tb.tb_next
+
+    for frame in stack:
+        variables += "%s::%s:%s\n" % (frame.f_code.co_filename,
+                                      frame.f_code.co_name,
+                                      frame.f_lineno)
+        for key, value in frame.f_locals.items():
+            variables += "\t%20s = " % key
+            try:                   
+                s = str(value)
+            except:
+                s = "<???>"
+            variables += "%s\n" % s
+    sections = [timeString, separator, errmsg]
     msg = '\n'.join(sections)
+    detailedmsg = '\n'.join([tbinfo, separator, variables])
     aw.qmc.adderror(msg)
     try:
         f = open(logFile, "w")
         f.write(msg)
+        f.write(detailedmsg)
         f.write(versionInfo)
         f.close()
     except IOError:
         pass
     errorbox = QMessageBox()
-    errorbox.setText(str(notice)+str(msg)+str(versionInfo))
+    errorbox.setIcon(QMessageBox.Critical)
+    errorbox.setText(str(notice)+str(versionInfo)+str(msg))
+    errorbox.setDetailedText(detailedmsg)
     errorbox.exec_()
 
 sys.excepthook = excepthook
@@ -49408,7 +49431,7 @@ def main():
 
     aw.show()
     aw.updateCanvasColors()
-        
+
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
         app.exec_()
