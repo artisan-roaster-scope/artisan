@@ -2059,9 +2059,6 @@ class tgraphcanvas(FigureCanvas):
         else:
             return s
 
-    def delayedUpdateBackground(self):
-        self.updateBackground()
-
     def updateBackground(self):
         if not self.block_update:
             self.block_update = True
@@ -2829,16 +2826,23 @@ class tgraphcanvas(FigureCanvas):
                         self.redraw(recompute)
                 elif redraw and force: # ensure that we at least redraw the canvas
                     self.updateBackground()
-                    #self.delayedUpdateBackground()
             elif redraw and force: # only on aligning with CHARGE we redraw even if nothing is moved to redraw the time axis
                     self.updateBackground()
-                    #self.delayedUpdateBackground()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " timealign() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    # we count
+    # - foreground curves
+    # . ET/BT, even if not visible
+    # . all visible extra curves
+    # . all foreground event curves
+    # - background curves
+    # . background ET/BT, even if not visible
+    # . 3rd background curve only if visible
+    # . background event curves if not empty
     def lenaxlines(self):
         active_curves = len(self.extratimex)
         curves = aw.extraCurveVisibility1[0:active_curves] + aw.extraCurveVisibility2[0:active_curves] + [aw.qmc.ETcurve,aw.qmc.BTcurve]
@@ -2851,11 +2855,18 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.stemp1BX) > n3 and len(self.stemp2BX) > n3 and len(self.extratimexB) > n3:
                     c += 1
             if aw.qmc.backgroundeventsflag and aw.qmc.eventsGraphflag in [2,3,4]:
-                c += len(set(aw.qmc.backgroundEtypes))
+                unique_etypes = set(aw.qmc.backgroundEtypes)
+                unique_etypes.remove(4) # we remove the "untyped" event as this is only drawn as annotation
+                c += len(unique_etypes)
         if aw.qmc.eventsshowflag and aw.qmc.eventsGraphflag in [2,3,4]:
             c += 4 # always 4 ax lines are added as new events might have to be drawn of each of the 4 types
         return c
 
+    # we count
+    # - deltaET if visible
+    # - deltaBT if visible
+    # - background deltaET if visible
+    # - background deltaBT if visible
     def lendeltaaxlines(self):
         linecount = 0 
         if self.DeltaETflag:
@@ -4978,9 +4989,6 @@ class tgraphcanvas(FigureCanvas):
                                     self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                                             picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
-#                            else:                                                                            
-#                                self.l_backgroundeventtype1dots, = self.ax.plot([], [], color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-#                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if cool exists and last event was earlier
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4990,9 +4998,6 @@ class tgraphcanvas(FigureCanvas):
                                     self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                                             picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
-#                            else:                                                                            
-#                                self.l_backgroundeventtype2dots, = self.ax.plot([], [], color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-#                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
                             if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if cool exists and last event was earlier
                                     self.E3backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -5002,9 +5007,6 @@ class tgraphcanvas(FigureCanvas):
                                     self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                                             picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
-#                            else:
-#                                self.l_backgroundeventtype3dots, = self.ax.plot([], [], color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-#                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
                             if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if cool exists and last event was earlier
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -5014,9 +5016,6 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                                             picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
-#                            else:
-#                                self.l_backgroundeventtype4dots, = self.ax.plot([], [], color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-#                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
                                                                               
                     #check backgroundDetails flag
                     if self.backgroundDetails:
@@ -6794,7 +6793,7 @@ class tgraphcanvas(FigureCanvas):
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.button_19.isFlat():
                 if removed:
-                    self.delayedUpdateBackground()
+                    self.updateBackground()
                     aw.button_19.setFlat(False)
                     if self.timeindex[0] == -1: # reactivate the CHARGE button if not yet set
                         aw.button_8.setFlat(False)
@@ -6877,7 +6876,7 @@ class tgraphcanvas(FigureCanvas):
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.button_3.isFlat():
                 if removed:
-                    self.delayedUpdateBackground()
+                    self.updateBackground()
                     aw.button_3.setFlat(False)
                     if self.timeindex[1] == 0: # reactivate the DRY button if not yet set
                         aw.button_19.setFlat(False)
@@ -6955,7 +6954,7 @@ class tgraphcanvas(FigureCanvas):
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.button_4.isFlat():
                 if removed:
-                    self.delayedUpdateBackground()
+                    self.updateBackground()
                     aw.button_4.setFlat(False)
                     if self.timeindex[2] == 0: # reactivate the FCs button if not yet set
                         aw.button_3.setFlat(False)
@@ -7034,7 +7033,7 @@ class tgraphcanvas(FigureCanvas):
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.button_5.isFlat():
                 if removed:
-                    self.delayedUpdateBackground()
+                    self.updateBackground()
                     aw.button_5.setFlat(False)
                     if self.timeindex[3] == 0: # reactivate the FCe button if not yet set
                         aw.button_4.setFlat(False)
@@ -7113,7 +7112,7 @@ class tgraphcanvas(FigureCanvas):
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.button_6.isFlat():
                 if removed:
-                    self.delayedUpdateBackground()
+                    self.updateBackground()
                     aw.button_6.setFlat(False)
                     if self.timeindex[4] == 0: # reactivate the SCs button if not yet set
                         aw.button_5.setFlat(False)
@@ -7218,7 +7217,7 @@ class tgraphcanvas(FigureCanvas):
             try:
                 if aw.button_9.isFlat():
                     if removed:
-                        self.delayedUpdateBackground()
+                        self.updateBackground()
                         aw.button_9.setFlat(False)
                         if self.timeindex[5] == 0: # reactivate the SCe button if not yet set
                             aw.button_6.setFlat(False)
@@ -7373,7 +7372,7 @@ class tgraphcanvas(FigureCanvas):
             # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
             if aw.button_20.isFlat():
                 if removed:
-                    self.delayedUpdateBackground()
+                    self.updateBackground()
                     aw.button_20.setFlat(False)
                     if self.timeindex[6] == 0: # reactivate the DROP button if not yet set
                         aw.button_9.setFlat(False)
@@ -9616,7 +9615,7 @@ class tgraphcanvas(FigureCanvas):
             #turn ON
             self.l_horizontalcrossline = None
             self.l_verticalcrossline = None
-            self.delayedUpdateBackground() # update bitlblit backgrounds
+            self.updateBackground() # update bitlblit backgrounds
             self.crossmarker = True
             message = QApplication.translate("Message", "Mouse Cross ON: move mouse around",None)
             aw.sendmessage(message)
@@ -9629,7 +9628,7 @@ class tgraphcanvas(FigureCanvas):
                 self.resetdeltalines()
             else:
                 self.resetlines()
-            self.delayedUpdateBackground() # update bitlblit backgrounds
+            self.updateBackground() # update bitlblit backgrounds
             message = QApplication.translate("Message", "Mouse cross OFF",None)
             aw.sendmessage(message)
             self.fig.canvas.mpl_disconnect(self.crossmouseid)
@@ -18065,7 +18064,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("BTBdeltaColor"):
                 self.qmc.backgrounddeltabtcolor = s2a(toString(settings.value("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)))
             if settings.contains("BackgroundAlpha"):
-                self.qmc.backgroundalpha = aw.float2float(toFloat(settings.value("BackgroundAlpha",self.qmc.backgroundalpha)))
+                self.qmc.backgroundalpha = min(0.5,aw.float2float(toFloat(settings.value("BackgroundAlpha",self.qmc.backgroundalpha))))
             if settings.contains("LCDColors"):
                 for (k, v) in list(toMap(settings.value("LCDColors")).items()):
                     self.lcdpaletteB[str(k)] = s2a(toString(v))
@@ -33792,9 +33791,10 @@ class modbusport(object):
                                 host=self.host, 
                                 port=self.port,
                                 retry_on_empty=True,
-                                retries=2,
-                                timeout=0.8, #self.timeout
+                                retries=1,
+                                timeout=0.9, #self.timeout
                                 )
+                        self.readRetries = 0
                     except:
                         self.master = ModbusTcpClient(
                                 host=self.host, 
@@ -33807,7 +33807,7 @@ class modbusport(object):
                             port=self.port,
                             retry_on_empty=True,
                             retries=2,
-                            timeout=0.8, #self.timeout
+                            timeout=0.7, #self.timeout
                             )
                     except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
                         self.master = ModbusUdpClient(
@@ -34039,6 +34039,7 @@ class modbusport(object):
             if self.commError: # we clear the previous error and send a message
                 self.commError = False
                 aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
+            libtime.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
             return convert_from_bcd(r)
         except Exception: # as ex:
 #            import traceback
