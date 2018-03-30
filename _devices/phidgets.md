@@ -11,7 +11,7 @@ modified: 2016-04-18T16:39:37-04:00
 ---
 Artisan supports a large number of Phidgets that gather temperature and other data. It also supports Phidgets that can generate external output triggered by Artisan actions.
 
-All Phidgets can be connected either directly via USB or remotely via network connection by using a [Phidgets SBC](http://www.phidgets.com/products.php?category=21&product_id=1073_0) as gateway.
+All Phidgets can be connected either directly via USB or remotely via network connection by using a [Phidgets SBC](http://www.phidgets.com/products.php?category=21&product_id=1073_0) as gateway. Phidgets don't need any additional power supply.
 
 There are Phidgets that feature a direct USB connection as well as the more recent [VINT Phidgets](https://www.phidgets.com/docs/What_is_VINT%3F) that are connected via a [VINT USB hub](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643) to the USB port. Some are electrically isolated and thus more resistant against electrical noise.
 
@@ -26,7 +26,7 @@ For more information read the posts [Roasting with Phidgets](https://artisan-roa
 
 ## Thermocouples
 
-All of these devices support J, K, E and T thermocouples. The type of thermocouples used has to be configured in the Phidgets tab on the Artisan side (menu `Config >> Device, Phidgets tab`).
+All of these devices support J, K, E and T type thermocouples. The type of thermocouples used has to be configured in the Phidgets tab on the Artisan side (menu `Config >> Device, Phidgets tab`).
 
 ### 1 Channel
 

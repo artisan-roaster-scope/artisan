@@ -89,6 +89,8 @@ __Dave Baxter__ –– design wizard
 __Rui Paulo__ –– Aillio master & CI
 
 
+Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.it/p/contact-me.html) on the [Artisan blog](https://artisan-roasterscope.blogspot.it).
+
 ## Supporters
 
 The development of Artisan is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors.

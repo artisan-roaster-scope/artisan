@@ -9,3 +9,10 @@ header:
   teaser: assets/images/arduino-TC4-logo.jpg
 modified: 2016-04-18T16:39:37-04:00
 ---
+Artisan implements the [serial protocol](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan/trunk/src/aArtisan/commands.txt) of the Arduino TC4/TC4C with PID support.
+
+* [aArtisan firmware v3.10](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan/tags/REL-310) from 1.7.2015 by Jim (baudrate: 115200)
+* [aArtisanQ PID](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/branches/aArtisanQ_PID_6) 6 firmware by Brad ([configuration notes](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan_PID/tags/REL-aArtisanQ_PID_6_2_3/aArtisanQ_PID/Configuration%20Options.pdf), baudrate: 115200)
+
+**Watch out!** Older TC4 firmware versions operated at the lower 19200 baudrate.
+{: .notice--primary}
