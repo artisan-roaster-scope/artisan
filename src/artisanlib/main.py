@@ -2856,7 +2856,7 @@ class tgraphcanvas(FigureCanvas):
                     c += 1
             if aw.qmc.backgroundeventsflag and aw.qmc.eventsGraphflag in [2,3,4]:
                 unique_etypes = set(aw.qmc.backgroundEtypes)
-                unique_etypes.remove(4) # we remove the "untyped" event as this is only drawn as annotation
+                unique_etypes.discard(4) # we remove the "untyped" event as this is only drawn as annotation
                 c += len(unique_etypes)
         if aw.qmc.eventsshowflag and aw.qmc.eventsGraphflag in [2,3,4]:
             c += 4 # always 4 ax lines are added as new events might have to be drawn of each of the 4 types
