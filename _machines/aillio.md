@@ -13,5 +13,5 @@ header:
 * __Machine:__ Bullet R1
 * __Connection:__ vendor specific USB protocol
 * __Features:__ 
-  - logging of environmental temperature (ET), bean temperature (BT), exhaust temperautre, BT rate-of-rise curves, and voltage
+  - logging of drum temperature (DT), bean temperature (BT), exhaust temperature, BT rate-of-rise curves, and voltage
   - control of fan, heater and drum speed
