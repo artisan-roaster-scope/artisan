@@ -2,10 +2,10 @@ Source: artisan
 Package: artisan
 Version: _VERSION_
 Section: misc
-Depends: libc6 (>= 2.3), libc6 (>= 2.3.6-6~)
+Depends: libc6 (>= 2.17)
 Priority: extra
 Architecture: x86_64
-Installed-Size: 67510
+Installed-Size: 305144
 Maintainer: Marko Luther <marko.luther@gmx.net>
 Homepage: https://github.com/artisan-roaster-scope/artisan
 Description: Visual Scope for Coffee Roasters
