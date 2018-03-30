@@ -50,7 +50,8 @@ All of these devices support J, K, E and T thermocouples. The type of thermocoup
 
 * [Phidget 1046](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=35) (USB)
 
-**Watch out!** The Phidget 1046 requires either a [Voltage Divider](http://www.phidgets.com/docs/3175_User_Guide#Using_a_Voltage_Divider) or a [Wheatstone Bridge](http://www.phidgets.com/docs/3175_User_Guide#Using_a_Wheatstone_Bridge) to connect a RTD). The applied wiring has to be configured within Artisan (menu `Config >> Device, Phidgets tab`){: .notice--primary}
+**Watch out!** The Phidget 1046 requires either a [Voltage Divider](http://www.phidgets.com/docs/3175_User_Guide#Using_a_Voltage_Divider) or a [Wheatstone Bridge](http://www.phidgets.com/docs/3175_User_Guide#Using_a_Wheatstone_Bridge) to connect a RTD). The applied wiring has to be configured within Artisan (menu `Config >> Device, Phidgets tab`)
+{: .notice--primary}
 
 
 ## Infrared
