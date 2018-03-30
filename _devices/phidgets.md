@@ -59,8 +59,6 @@ Single channel IR with integrated sensor
 
 * [Phidget IR 1045](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=34) (USB)
 
-# Analog Input
 
-# Digital Input
-# Analog Output
-# Digital Output
+# Analog/Digital Input/Output
+
