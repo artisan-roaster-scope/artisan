@@ -68,14 +68,14 @@ There are also experimental builds for the Raspberry Pi platform.
 
 - extensive [machine](/machines/) and [device](/devices/) support
 - unlimited number of curves
-- rate-of-rise (RoR), area-under-the-curve (AUC), development-time-ratio (DTR) calculations
+- rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html), [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.de/2017/02/roast-phases-statistics-and-phases-lcds.html) calculations
 - projection lines and head-up-display (HUD)
 - roast profile evaluation and statistics
-- roast-, production- and ranking reports
-- automated reproduction of roasts via alarm programs, replay of events or PID control
-- batch counter
+- [roast-, production- and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html)
+- automated reproduction of roasts via [alarm programs](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html), [replay of events](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html) or [PID control](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html)
+- [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html)
 - profile designer, cupping editor, spider- and wheel graph
-- user defined buttons and sliders with programable actions
+- [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html) with programable actions
 - many import and export formats
 
 ## Cast
