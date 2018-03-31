@@ -54,11 +54,17 @@ case "$1" in
    if dpkg-query -W xdg-utils 2>&1 >/dev/null;
        then set_mime;
    fi
+   if dpkg-query -W udev 2>&1 >/dev/null;
+      udevadm control -R
+   fi
    ;;
 
    1)
    if rpm -q xdg-utils;
        then set_mime;
+   fi
+   if dpkg-query -W udev 2>&1 >/dev/null;
+      udevadm control -R
    fi
    ;;
 
