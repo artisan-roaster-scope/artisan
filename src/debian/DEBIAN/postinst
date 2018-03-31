@@ -51,19 +51,19 @@ set_mime()
 
 case "$1" in
    configure)
-   if dpkg-query -W xdg-utils 2>&1 >/dev/null;
-       then set_mime;
+   if dpkg-query -W xdg-utils 2>&1 >/dev/null; then
+       set_mime;
    fi
-   if dpkg-query -W udev 2>&1 >/dev/null;
+   if dpkg-query -W udev 2>&1 >/dev/null; then
       udevadm control -R
    fi
    ;;
 
    1)
-   if rpm -q xdg-utils;
-       then set_mime;
+   if rpm -q xdg-utils; then
+       set_mime;
    fi
-   if dpkg-query -W udev 2>&1 >/dev/null;
+   if dpkg-query -W udev 2>&1 >/dev/null; then
       udevadm control -R
    fi
    ;;
