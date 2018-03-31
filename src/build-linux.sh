@@ -69,4 +69,4 @@ flavor." \
 cd ..
 mv *.rpm ${NAME}.rpm
 mv *.deb ${NAME}.deb
-ls *.deb *.rpm
+ls -lh *.deb *.rpm
