@@ -10612,6 +10612,7 @@ class ApplicationWindow(QMainWindow):
         self.MaxRecentFiles = 20
         self.recentFileActs = []        
         self.recentSettingActs = []
+        self.recentThemeActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         
@@ -10818,6 +10819,11 @@ class ApplicationWindow(QMainWindow):
             self.recentSettingActs.append(
                     QAction(self, visible=False,
                             triggered=self.openRecentSetting))
+        # populate recent themes menu 
+        for i in range(self.MaxRecentFiles):
+            self.recentThemeActs.append(
+                    QAction(self, visible=False,
+                            triggered=self.openRecentTheme))
 
         #records serial comm (Help menu)
         self.seriallogflag = False
@@ -11158,6 +11164,7 @@ class ApplicationWindow(QMainWindow):
         self.themeMenu = QMenu(UIconst.CONF_MENU_THEMES)
         self.populateThemeMenu()
         self.ConfMenu.addMenu(self.themeMenu)
+        self.updateRecentThemeActions()
 
         self.colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
         self.colorsAction.triggered.connect(lambda _:self.qmc.changeGColor(3))
@@ -12483,7 +12490,7 @@ class ApplicationWindow(QMainWindow):
 #            self.ConfMenu.addMenu(menu)
 
 
-    def populateListMenu(self,resourceName,ext,triggered,menu,addMenu = True):
+    def populateListMenu(self,resourceName,ext,triggered,menu,addMenu = True,forceSubmenu=False):
         one_added = False
         res = {}
         for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),resourceName)):
@@ -12502,7 +12509,7 @@ class ApplicationWindow(QMainWindow):
         keys.sort()
         for k in keys:
             if len(res[k]) > 1:
-                if len(keys) == 1:
+                if len(keys) == 1 and not forceSubmenu:
                     for e in res[k]:
                         a = QAction(self, visible=True, triggered=triggered)
                         a.setData(e[1])
@@ -12607,7 +12614,16 @@ class ApplicationWindow(QMainWindow):
 
                                 
     def populateThemeMenu(self):
-        self.populateListMenu("Themes",".athm",self.openThemeSettings,self.themeMenu, False)
+        self.themeMenu.clear()
+        self.populateListMenu("Themes",".athm",self.openThemeSettings,self.themeMenu, False, True)
+        submenu = self.themeMenu.addMenu("User")
+        for i in range(self.MaxRecentFiles):
+            submenu.addAction(self.recentThemeActs[i])
+
+        self.loadThemeAction = QAction(QApplication.translate("Menu", "Load Theme...", None),self)
+        self.loadThemeAction.triggered.connect(self.loadSettings_theme)
+        self.loadThemeAction.setMenuRole(QAction.NoRole) # avoid specific handling of settings menu
+        submenu.addAction(self.loadThemeAction)
 
     def openThemeSettings(self):
         action = self.sender()
@@ -22806,6 +22822,45 @@ class ApplicationWindow(QMainWindow):
         else:
             self.sendmessage(QApplication.translate("Message","Cancelled", None))
 
+    def updateRecentThemeActions(self):
+        settings = QSettings()
+        files = toStringList(settings.value('recentThemeList'))
+        files.sort()
+        strippedNames = list(map(self.strippedName,files))
+        numRecentThemes = min(len(files), self.MaxRecentFiles)
+ 
+        for i in range(numRecentThemes):
+            strippedName = self.strippedName(files[i])
+            if strippedNames.count(strippedName) > 1:
+                text = "&%s (%s)" % (strippedName, self.strippedDir(files[i]))
+            else:
+                text = "&%s" % strippedName
+            self.recentThemeActs[i].setText(text)
+            self.recentThemeActs[i].setData(files[i])
+            self.recentThemeActs[i].setVisible(True)
+ 
+        for j in range(numRecentThemes, self.MaxRecentFiles):
+            self.recentThemeActs[j].setVisible(False)
+ 
+    def openRecentTheme(self):
+        action = self.sender()
+        if action:
+            fname = toString(action.data())
+            if os.path.isfile(fname):
+                self.loadSettings(fn=fname)
+            else:
+                settings = QSettings()
+                files = toStringList(settings.value('recentThemeList'))
+                try:
+                    removeAll(files,fname)
+                except ValueError:
+                    pass
+                settings.setValue('recentThemeList', files)
+                for widget in QApplication.topLevelWidgets():
+                    if isinstance(widget, ApplicationWindow):
+                        widget.updateRecentThemeActions()
+                self.sendmessage(QApplication.translate("Message","Settings not found", None))
+
     def saveSettings_theme(self):
         path = QDir()
         path.setPath(self.getDefaultPath())
@@ -22815,10 +22870,89 @@ class ApplicationWindow(QMainWindow):
         if filename:
             aw.closeEventSettings_theme(filename)
             self.sendmessage(QApplication.translate("Message","Theme saved", None))
+            # update recentTheme menu
+            settings = QSettings()
+            files = toStringList(settings.value('recentThemeList'))
+            try:
+                removeAll(files,filename)
+            except ValueError:
+                pass
+            files.insert(0, filename)
+            del files[self.MaxRecentFiles:]
+            settings.setValue('recentThemeList', files)
+            for widget in QApplication.topLevelWidgets():
+                if isinstance(widget, ApplicationWindow):
+                    widget.updateRecentThemeActions()            
             self.themeMenu.clear()
             self.populateThemeMenu()
         else:
             self.sendmessage(QApplication.translate("Message","Cancelled", None))
+        
+    def loadSettings_theme(self,fn=None,remember=True,reset=False):
+        try:
+            if fn:
+                filename = fn
+            else:
+                filename = self.ArtisanOpenFileDialog()
+            if filename:
+                try:
+#                    aw.stopActivities()
+                    res = aw.settingsLoad(filename)
+                    if reset:
+                        aw.qmc.reset(soundOn=False)
+                    if res and remember:
+                        # update recentSettings menu
+                        settings = QSettings()
+                        files = toStringList(settings.value('recentThemeList'))
+                        try:
+                            removeAll(files,filename)
+                        except ValueError:
+                            pass
+                        files.insert(0, filename)
+                        del files[self.MaxRecentFiles:]
+                        settings.setValue('recentThemeList', files)
+                        for widget in QApplication.topLevelWidgets():
+                            if isinstance(widget, ApplicationWindow):
+                                widget.updateRecentThemeActions()
+                                self.sendmessage(QApplication.translate("Message","Theme loaded", None))
+                        self.themeMenu.clear()
+                        self.populateThemeMenu()
+                    else:
+                        # remove file from the recent file list
+                        settings = QSettings()
+                        files = toStringList(settings.value('recentThemeList'))
+                        try:
+                            removeAll(files,filename)
+                        except ValueError:
+                            pass
+                        settings.setValue('recentThemeList', files)
+                        for widget in QApplication.topLevelWidgets():
+                            if isinstance(widget, ApplicationWindow):
+                                widget.updateRecentThemeActions()
+                        self.themeMenu.clear()
+                        self.populateThemeMenu()
+                except Exception:
+                    # remove file from the recent file list
+                    settings = QSettings()
+                    files = toStringList(settings.value('recentThemeList'))
+                    try:
+                        removeAll(files,filename)
+                    except ValueError:
+                        pass
+                    settings.setValue('recentThemeList', files)
+                    for widget in QApplication.topLevelWidgets():
+                        if isinstance(widget, ApplicationWindow):
+                            widget.updateRecentThemeActions()
+                    self.themeMenu.clear()
+                    self.populateThemeMenu()
+
+            else:
+                self.sendmessage(QApplication.translate("Message","Cancelled", None))
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() {0}").format(str(ex)),exc_tb.tb_lineno)
         
     def largeLCDs(self):
         if not self.largeLCDs_dialog:
