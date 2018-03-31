@@ -7734,7 +7734,6 @@ class tgraphcanvas(FigureCanvas):
                 idx_min_et = self.temp1.index(min_et)
                 met_temp = max(self.temp1[idx_min_et:self.timeindex[6]])
                 self.idx_met = idx_min_et + self.temp1[idx_min_et:self.timeindex[6]].index(met_temp)
-                idx2_met = self.temp1.index(met_temp)
                 if self.idx_met and self.timeindex[2]:
                     # time between MET and FCs
                     met_delta = aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.idx_met],0)
