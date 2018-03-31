@@ -13637,7 +13637,10 @@ class ApplicationWindow(QMainWindow):
                             drytarget = self.qmc.phases[1] # Drying max phases definition
                         if drytarget > self.qmc.temp2[-1]:
                             dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
-                            tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime)))
+                            if aw.qmc.phasesLCDmode == 0:
+                                tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime)))
+                            else:
+                                tstring = u(self.qmc.stringfromseconds(int(dryexpectedtime)))
                             self.DRYlcd.display(tstring)
                         else:
                             self.DRYlcd.display(u("--:--"))
@@ -13697,7 +13700,10 @@ class ApplicationWindow(QMainWindow):
                             fcstarget = self.qmc.phases[2] # FCs min phases definition
                         if fcstarget > self.qmc.temp2[-1]:
                             fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
-                            tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime)))
+                            if aw.qmc.phasesLCDmode == 0:
+                                tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime)))
+                            else:
+                                tstring = u(self.qmc.stringfromseconds(int(fcsexpectedtime)))
                             self.FCslcd.display(tstring)
                         else:
                             self.FCslcd.display(u("--:--"))
