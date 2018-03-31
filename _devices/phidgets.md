@@ -7,6 +7,9 @@ header:
   overlay_image: /assets/images/phidgets-logo.jpg
   image: /assets/images/phidgets-logo.jpg
   teaser: assets/images/phidgets-logo.jpg
+toc: true
+toc_label: "On this page"
+toc_icon: "cog"
 modified: 2016-04-18T16:39:37-04:00
 ---
 Artisan supports a large number of Phidgets that gather temperature and other data. It also supports Phidgets that can generate external output triggered by Artisan actions.
@@ -22,32 +25,34 @@ Any number of Phidgets, of one type or mixed types, can be used in combination w
 
 For more information read the posts [Roasting with Phidgets](https://artisan-roasterscope.blogspot.it/2017/12/roasting-with-phidgets.html) and [More Phidgets!](https://artisan-roasterscope.blogspot.it/2017/12/more-phidgets.html) on the [Artisan blog](https://artisan-roasterscope.blogspot.it/)
 
-# Temperature Input
+## Temperature Input
 
-## Thermocouples
+### Thermocouples
 
 All of these devices support J, K, E and T type thermocouples. The type of thermocouples used has to be configured in the Phidgets tab on the Artisan side (menu `Config >> Device, Phidgets tab`).
 
-### 1 Channel
+#### 1 Channel
 
 * [Phidget 1051](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=43) (USB)
 * [Phidget TMP1100](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=725) (VINT, isolated)
 
-### 4 Channel
+#### 4 Channel
 
-* [Phidget IR 1048](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=38) (USB)
+* [Phidget 1048](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=38) (USB)
 * [Phidget TMP1101](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=726) (VINT)
 
-## Resistive Thermal Devices (RTDs)
+### RTDs
 
-### 1 Channel
+Resistive Thermal Devices
+
+#### 1 Channel
 
 * [Phidget TMP1200](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=968) (VINT)
  
 **Watch out!** The TMP1200 supports 2-, 3- and 4-wire PT100 and PT1000 RTDs to be connected directly. The type of RTD used has to be configured on the Artisan side (menu `Config >> Device, Phidgets tab`)
 {: .notice--primary}
 
-### 4 Channel
+#### 4 Channel
 
 * [Phidget 1046](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=35) (USB)
 
@@ -55,14 +60,14 @@ All of these devices support J, K, E and T type thermocouples. The type of therm
 {: .notice--primary}
 
 
-## Infrared
+### Infrared
 
 Single channel IR with integrated sensor
 
 * [Phidget IR 1045](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=34) (USB)
 
 
-# Analog & Digital Input & Output
+## Analog/Digital Input & Output
 
 Artisan can attach to all Phidgets IO ports. The input ports are configured as (extra) devices and are handled as temperature curves. Phidgets output can be activated via `IO Command`, `PWM Command` or `VOUT Command` button or slider actions configured in the Events tab (menu `Config >> Events`). Note that buttons and sliders themself can be triggered autoamtically via alarm actions.
 
