@@ -54,8 +54,6 @@ script:
   - cd ..
 
 deploy:
-  edge:
-    branch: bintray-unauth
   skip_cleanup: true
   provider: bintray
   file: ".bintray.json"
