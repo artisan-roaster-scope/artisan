@@ -111,7 +111,7 @@ Artisan builds on a large number of excellent open-source software.
 * [pymodbus](https://github.com/riptideio/pymodbus)
 * [pyserial](https://github.com/pyserial/pyserial)
 * [Python](https://www.python.org)
-* [python-s7](https://github.com/gijzelaerr/python-snap7)
+* [python-snap7](https://github.com/gijzelaerr/python-snap7)
 * [pyusb](https://github.com/pyusb/pyusb)
 * [Qt](https://www.qt.io)
 

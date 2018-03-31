@@ -50,7 +50,12 @@ The Artisan users are supporting the project by writeups on specific topics.
   - [ARTISAN #2 Configure the Events (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2cnNaMDVFbmZqVVk/view?usp=sharing)
   - [ARTISAN #3 Configure the Axes (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2X3h4MjE4X3Z3RFE/view?usp=sharing)
   - [ARTISAN #4 Configure Tools Extras (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SmZua2VSd2FjZFE/view?usp=sharing)
- 
+* Artisan on Raspberry Pi 3 and Zero by Tsai Sam
+  - [Install Phidgets22 Drivers on Raspberry Pi 3 and Zero](https://wbcoffee.blogspot.de)
+  - [Building a Phidget Network server on Raspberry Pi](https://wbcoffee.blogspot.tw/2018/03/building-phidgets-network-server-on.html)
+  - [Using Phidget Network Server](https://wbcoffee.blogspot.tw/2018/03/using-phidgets-network-server.html)
+*  [Using a Raspberry Pi to control my Hottop Roaster with Artisan Software](https://dew-itwebservices.com.au/using-a-raspberry-pi-to-control-my-hottop-roaster-with-artisan-software/) by David Williams
+
 
 ### Tutorial Videos
 
