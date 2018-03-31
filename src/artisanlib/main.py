@@ -15625,8 +15625,9 @@ class ApplicationWindow(QMainWindow):
             firstChar = stream.read(1)
             if firstChar == "{":
                 f.close()
-                aw.qmc.reset(redraw=False,soundOn=False)
-                res = self.setProfile(filename,self.deserialize(filename))
+                res = aw.qmc.reset(redraw=False,soundOn=False)
+                if res:
+                    res = self.setProfile(filename,self.deserialize(filename))
             else:
                 self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
                 res = False
@@ -22872,26 +22873,27 @@ class ApplicationWindow(QMainWindow):
         aw.qmc.safesaveflag = True
         
     def switch(self):
+        if aw.qmc.checkSaved() == False:
+            return
         try:
-            if aw.qmc.checkSaved():
-                foreground_profile_path = aw.curFile
-                background_profile_path = aw.qmc.backgroundpath
-                if background_profile_path:
-                    # load background into foreground
-                    aw.loadFile(background_profile_path)
-                else:
-                    # reset
-                    aw.qmc.reset(soundOn=False)
-                if foreground_profile_path:
-                    # load foreground into background
-                    aw.loadbackground(u(foreground_profile_path))
-                    aw.qmc.background = True
-                    aw.qmc.timealign(redraw=True,recompute=True)
-                else:
-                    # delete background
-                    self.deleteBackground()
-                if foreground_profile_path or background_profile_path:
-                    aw.qmc.redraw(recomputeAllDeltas=True)
+            foreground_profile_path = aw.curFile
+            background_profile_path = aw.qmc.backgroundpath
+            if background_profile_path:
+            # load background into foreground
+                aw.loadFile(background_profile_path)
+            else:
+                # reset
+                aw.qmc.reset(soundOn=False)
+            if foreground_profile_path:
+                # load foreground into background
+                aw.loadbackground(u(foreground_profile_path))
+                aw.qmc.background = True
+                aw.qmc.timealign(redraw=True,recompute=True)
+            else:
+                # delete background
+                self.deleteBackground()
+            if foreground_profile_path or background_profile_path:
+                aw.qmc.redraw(recomputeAllDeltas=True)
         except Exception:
             pass
 #            import traceback
