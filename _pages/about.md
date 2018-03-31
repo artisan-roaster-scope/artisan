@@ -51,7 +51,7 @@ modified: 2016-04-18T16:39:37-04:00
 Artisan is a software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
 
 
-[Install Now]("https://github.com/artisan-roaster-scope/artisan/releases/latest"){: .btn .btn--success .btn--large}
+[Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large}
 &emsp; [Documentation](/doc/){: .btn .btn--success .btn--large}
 
 ## Platforms
