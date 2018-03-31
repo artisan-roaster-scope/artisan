@@ -9,7 +9,7 @@ Visual scope for coffee roasters
 [![Bintray binaries](https://img.shields.io/bintray/v/artisan/artisan-artifacts/artisan.svg) ](https://bintray.com/artisan/artisan-artifacts/artisan/master/link#files) 
 [![Latest release](https://img.shields.io/github/release/artisan-roaster-scope/artisan.svg)](https://github.com/artisan-roaster-scope/artisan/releases)
 ![Github All Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/total.svg)
-
+![License](https://img.shields.io/github/license/artisan-roaster-scope/artisan.svg)
 
 Summary
 -------
