@@ -19,7 +19,7 @@ Artisan is a software that helps coffee roasters record, analyze, and control ro
 Donations
 ---------
 
-This software is open-source and absolutely free, even for commercial use.
+This software is open-source and absolutely free, also for commercial use.
 
 If you think Artisan is useful to you, contribute financially to its further development. Send any amount via my [PayPal.Me page](https://www.paypal.me/MarkoLuther). Thanks!
 
@@ -70,23 +70,6 @@ Version History
 | v0.1.0 | 20.12.2010 | Initial release |
 
 [Detailed Release History](wiki/ReleaseHistory.md)
-
-
-----
-Related Software
-----------------
-- [RoastLogger](http://roastlogger.co.uk/coffee/roastlogger/roastlogger.htm)
-- [RoasterThing](http://www.roasterthing.com)
-- [Typica](http://www.randomfield.com/programs/typica/)
-- [Roast Monitor](http://coffeesnobs.com.au/RoastMonitor/)
-
-if you need commercial support
-
-- [Cropster](https://www.cropster.com/products/roast/)
-- [roastlog](http://roastlog.com)
-- [Profiling Dynamics™](http://www.roasterdynamics.com/Profiling_Dynamics.html)
-- [Probat Pilot](http://www.probat-shoproaster.com/en/plants-equipment/control-software/general-features/)
-
 
 ----
 License
