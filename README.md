@@ -6,7 +6,7 @@ Visual scope for coffee roasters
 
 [![Linux/Mac build](https://img.shields.io/travis/artisan-roaster-scope/artisan.svg?label=Linux/Mac%20build)](https://travis-ci.org/artisan-roaster-scope/artisan)
 [![Windows build](https://img.shields.io/appveyor/ci/rpaulo/artisan.svg?label=Windows%20build)](https://ci.appveyor.com/project/rpaulo/artisan)
-<a href="#" onclick="window.alert('WARNING: pre-release Artisan builds may not work.  Use at your own risk.'); window.location='https://bintray.com/artisan/artisan-artifacts/artisan/master/link#files'" alt="Bintray binaries"><img src="https://img.shields.io/bintray/v/artisan/artisan-artifacts/artisan.svg"></a>
+<a href="javascript:;" onClick="javascript:window.alert('WARNING: pre-release Artisan builds may not work.  Use at your own risk.'); javascript:window.location='https://bintray.com/artisan/artisan-artifacts/artisan/master/link#files'" alt="Bintray binaries"><img src="https://img.shields.io/bintray/v/artisan/artisan-artifacts/artisan.svg"></a>
 [![Latest release](https://img.shields.io/github/release/artisan-roaster-scope/artisan.svg)](https://github.com/artisan-roaster-scope/artisan/releases)
 ![Github All Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/total.svg)
 ![License](https://img.shields.io/github/license/artisan-roaster-scope/artisan.svg)
