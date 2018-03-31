@@ -49,7 +49,7 @@ offers roasting metrics to help make decisions that influence the final coffee
 flavor." \
 --after-install DEBIAN/postinst \
 --before-remove DEBIAN/prerm \
--v ${VERSION} --prefix / usr
+-v ${VERSION} --prefix / usr etc
 
 # Allow FPM to write some temporary files
 sudo chmod o+w .
@@ -64,7 +64,7 @@ offers roasting metrics to help make decisions that influence the final coffee
 flavor." \
 --after-install DEBIAN/postinst \
 --before-remove DEBIAN/prerm \
--v ${VERSION} --prefix / usr
+-v ${VERSION} --prefix / usr etc
 
 cd ..
 mv *.rpm ${NAME}.rpm
