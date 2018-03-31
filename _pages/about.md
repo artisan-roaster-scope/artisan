@@ -54,7 +54,7 @@ Artisan is a software that helps coffee roasters record, analyze, and control ro
 [Install Now]("https://github.com/artisan-roaster-scope/artisan/releases/latest"){: .btn .btn--success .btn--large}
 &emsp; [Documentation](/doc/){: .btn .btn--success .btn--large}
 
-## Supported Platforms
+## Platforms
 
 Artisan supports only 64bit operating systems.
 
@@ -87,6 +87,8 @@ __Marko Luther__ –– current maintainer
 __Dave Baxter__ –– design wizard
 
 __Rui Paulo__ –– Aillio master & CI
+
+__Michael Herbert__ –– documentation
 
 
 Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.it/p/contact-me.html) on the [Artisan blog](https://artisan-roasterscope.blogspot.it).
