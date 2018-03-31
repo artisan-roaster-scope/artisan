@@ -211,8 +211,6 @@ defaults:
       comments: false # true
       share: true
       related: true
-
-defaults:
   # _pages
   - scope:
       path: ""
@@ -220,8 +218,15 @@ defaults:
     values:
       layout: single
       author_profile: false
-      
-defaults:
+  # _devices
+  - scope:
+      path: ""
+      type: devices
+    values:
+      layout: single
+      author_profile: false
+      sidebar:
+        nav: "devices"
   # _machines
   - scope:
       path: ""
@@ -229,15 +234,9 @@ defaults:
     values:
       layout: single
       author_profile: false
+      sidebar:
+        nav: "machines"
       
-defaults:
-  # devices
-  - scope:
-      path: ""
-      type: devices
-    values:
-      layout: single
-      author_profile: false
 
 # Sass/SCSS
 sass:

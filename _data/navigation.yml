@@ -5,3 +5,63 @@ main:
     url: /devices/index
   - title: "About"
     url: /about/
+
+machines:
+  - title: "Machines"
+    url: /machines/
+    children:
+      - title: "Aillio"
+        url: /machines/aillio/
+      - title: "BC Roasters"
+        url: /machines/bc/
+      - title: "Bühler"
+        url: /machines/buhler/
+      - title: "Coffeed"
+        url: /machines/coffed/
+      - title: "Coffee Tech"
+        url: /machines/coffeetech/
+      - title: "Coffeetool"
+        url: /machines/coffeetool/
+      - title: "Giesen"
+        url: /machines/giesen/
+      - title: "Hottop"
+        url: /machines/hottop/
+      - title: "IMF"
+        url: /machines/imf/
+      - title: "Kirsch & Mausser"
+        url: /machines/kirsch/
+      - title: "Loring"
+        url: /machines/loring/
+      - title: "Phoenix"
+        url: /machines/phoenix/
+      - title: "Proaster"
+        url: /machines/proaster/
+      - title: "Probat"
+        url: /machines/probat/
+      - title: "San Franciscan"
+        url: /machines/sf/
+      - title: "Sedona"
+        url: /machines/sedona/
+      - title: "Toper"
+        url: /machines/toper/
+      - title: "US Roaster Corp"
+        url: /machines/usroaster/
+
+devices:
+  - title: "Devices"
+    url: /devices/
+    children:
+      - title: "Arduino"
+        url: /devices/arduino/
+      - title: "Modbus"
+        url: /devices/modbus/
+      - title: "Meters"
+        url: /devices/meters/
+      - title: "PID"
+        url: /devices/pid/
+      - title: "Phidgets"
+        url: /devices/phidgets/
+      - title: "S7"
+        url: /devices/s7/
+      - title: "Yoctopuce"
+        url: /devices/yoctopuce/
