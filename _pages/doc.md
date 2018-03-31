@@ -16,11 +16,11 @@ toc_icon: "cog"
 
 ### Installation
 
-Installation of Artisan is quite simple on all platforms. Still we give some hints on specific setups in the [Installation Instructions](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md).
+The setup of Artisan is quite simple on all platforms. The necessary steps and some hints on specific setups are detailed in the [Installation Instructions](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md).
 
 ### Getting Started
 
-The Artisan team is maintaining a [Getting Started](http://bit.ly/ArtisanGetStarted) guide.
+The Artisan team is maintaining a [Getting Started](http://bit.ly/ArtisanGetStarted) guide to ease the on-boarding.
 
 ### Blog
 

@@ -11,4 +11,4 @@ entries_layout: grid
 sort_by: title
 ---
 
-Artisan can communicate with a large number of devices out-of-the box and can be extended programatically by calling external programs.
+Artisan can communicate with a large number of devices out-of-the box and can call external programs to be extended programatically.
