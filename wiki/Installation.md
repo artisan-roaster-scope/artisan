@@ -1,4 +1,4 @@
-Setup Artisan
+Installation Instructions
 =============
 
 Introduction

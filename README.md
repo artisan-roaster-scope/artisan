@@ -1,6 +1,6 @@
 <img align="right" src="https://raw.githubusercontent.com/MAKOMO/artisan/master/wiki/screenshots/artisan.png">
 
-[Artisan](https://github.com/MAKOMO/artisan/blob/master/README.md) 
+[Artisan](https://artisan-scope.org/) 
 ==========
 Visual scope for coffee roasters
 
@@ -29,115 +29,6 @@ If you think Artisan is useful to you, contribute financially to its further dev
 ![](https://github.com/MAKOMO/artisan/blob/master/wiki/screenshots/FZ94-PID-small.png?raw=true)
 
 [Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)
-
-
-
-Features
---------
-- free for personal and commercial use
-- multi-platform (Mac, Windows, and Linux)
-- multi-language (English, German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norwegian, Finish, Hungarian, Hebrew, Polish, Greek, Turkish, Chinese, Russian, Thai, Indonesian, Korean,..)
-- multi-device (manual and automatic logging of roast temperatures via supported devices; see [Device Selection](http://artisan-roasterscope.blogspot.de/2013/06/device-selection.html))
-  * [Fuji PXR/PXG 4 & 5 PID](https://www.fujielectric.com/products/instruments/products/controller/top.html)
-  * [Delta DTA/DTB PID](http://www.deltaww.com/Products/CategoryListT1.aspx?CID=060405&PID=ALL&hl=en-US)
-  * [Modbus](http://artisan-roasterscope.blogspot.de/2013/05/more-modbus.html) Serial ASCII/RTU/Binary, TCP and UDP (known to work with PIDs of Fuji, ENDA, Watlow, meters like myPCLab, as well as several variable frequency drives)
-  * Omega HH309, HH506RA, HH802U, HH806AU, HHM28
-  * [General Tools DT309DL](https://www.generaltools.com/4-channel-data-logging-k-thermocouple-thermometer)
-  * CENTER 300, 301, 302, 303, 304, 305, 306, 309
-  * VOLTCRAFT K201, K202, K204, 300K, 302KJ, PL-125-T2, PL-125-T4
-  * [EXTECH 755](http://www.extech.com/display/?id=14489) (differential pressure), [EXTECH 421509](http://www.extech.com/display/?id=14239)
-  * [Apollo DT301](http://www.ueitest.com/products/temperature-humidity/dt301)
-  * [Arduino TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) with PID support
-     - [aArtisan firmware v3.10](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan/tags/REL-310) from 1.7.2015 by Jim ([serial commands](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan/trunk/src/aArtisan/commands.txt), baudrate: 115200)
-     - [aArtisanQ PID 6 firmware](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/branches/aArtisanQ_PID_6) by Brad ([configuration notes](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan_PID/tags/REL-aArtisanQ_PID_6_2_3/aArtisanQ_PID/Configuration%20Options.pdf), [serial commands](https://github.com/greencardigan/TC4-shield/blob/master/applications/Artisan/aArtisan_PID/branches/aArtisanQ_PID_6/aArtisanQ_PID/commands.txt), baudrate: 115200)
-  * TE VA18B
-  * HHM28 multimeter
-  * Amprobe TMD-56 (non-wireless)
-  * [Phidget IR 1045](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=34)
-  * Phidget TC
-     - 4x: [1048](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=38), VINT [TMP1101](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=726)
-     - 1x: [1051](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=43)
-     - 1x isolated: VINT [TMP1100](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=725)
-  * Phidget RTD
-     - 4x: [1046](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=35) (bridge needed)
-     - 1x: VINT [TMP1200](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=968)
-  * Phidget IO
-      - 8x analog/digital in, 8x digital out: [1010](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=3), [1013](https://www.phidgets.com/?tier=3&prodid=8), [1018](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=18), [1019](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=20), [1073](https://www.phidgets.com/?tier=3&catid=1&pcid=0&prodid=69)
-      - 6x analog/digital in, 6x digital out: VINT [HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643)
-      - 1x 12bit voltage out: VINT [OUT1000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=711)
-      - 1x 12bit isolated voltage out: VINT [OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712)
-      - 1x 16bit isolated voltage out: VINT [OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713)
-      - 4x 12bit analog out: USB [1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2)
-      - 8x digital out: USB [1017](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=15)
-      - 4x digital out: USB [1014](https://www.phidgets.com/?tier=3&prodid=9)
-      - 4x digital PWM out: VINT [OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714)
-      - 2x analog/digital in, 2x digital out: [1011](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=4)
-  * Mastech MS6514
-  * Yocto [Thermocouple](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-thermocouple) and [PT100](http://www.yoctopuce.com/EN/products/usb-environmental-sensors/yocto-pt100)
-  * external program
-- and machines
-  * [Probat Probatone 2](https://artisan-roasterscope.blogspot.de/2017/06/probat-probatone.html)
-  * [Hottop KN-8828B-2K+](http://artisan-roasterscope.blogspot.de/2015/05/hottop-kn-8828b-2k.html)
-  * Aillio Bullet R1
-- multi-format (import and export of various file formats: HTML, PDF, SVG, CSV, JSON, Omega HH506RA, K202, K204, [RoastLogger](http://roastlogger.co.uk/coffee/roastlogger/roastlogger.htm), [Probat Pilot](http://www.probat-shoproaster.com/en/plants-equipment/control-software/general-features/), [Aillio Bullet R1](https://aillio.com))
-- unlimited number of temperature and [virtual curves](https://artisan-roasterscope.blogspot.de/2014/04/virtual-devices-and-symbolic-assignments.html) incl. rate-of-rise curves for ET and BT
-- [spike filter](http://artisan-roasterscope.blogspot.de/2013/05/fighting-spikes.html) and [curve smoothing](https://artisan-roasterscope.blogspot.de/2014/01/sampling-interval-smoothing-and-rate-of.html)
-- [symbolic expressions](https://artisan-roasterscope.blogspot.de/2016/03/roast-calculus.html)
-- Fahrenheit and Celsius support
-- logging of roast events like FCs, FCe,.. via tablet-friendly buttons
-- [custom event programmable buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html) supporting the [Hottop Roaster Interface](http://artisan-roasterscope.blogspot.de/2013/02/controlling-hottop.html)
-- [time and temperature-based alarms](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html) with user defined actions
-- head-up-display and projections predicting ET/BT development
-- [phases LCDs predicting and counting developments per phase](https://artisan-roasterscope.blogspot.de/2017/02/roast-phases-statistics-and-phases-lcds.html)
-- automatic CHARGE/DROP event detection
-- [event quantifiers](https://artisan-roasterscope.blogspot.de/2014/04/event-quantifiers.html)
-- [template/background profile with playback aid and replay functions for reproduction of roasts](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html)
-- configurable profile evaluations and statistics
-- weight input from digital scales ([Kern](http://www.kern-sohn.com/) and [Acaia](http://acaia.co/))
-- color input from color meters (supports for now [Tonino](http://my-tonino.com/))
-- cupping editor and graphs
-- profile designer and wheel graph editor
-- [LargeLCDs and WebLCDs](https://artisan-roasterscope.blogspot.de/2016/03/lcds.html)
-- [volume calculator](https://artisan-roasterscope.blogspot.de/2014/11/batch-volume-and-bean-density.html)
-- [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html)
-- [roast, production (for tax reporting) and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html)
-- [PID-based roast reproduction (follow background mode)](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html)
-- [software PID](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html)
-- [Area under the Curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html)
-
-
-Documentation and Support
-------------------------
-- [Installation](wiki/Installation.md)
-- [Artisan Blog](http://artisan-roasterscope.blogspot.de/) ([Overview](https://artisan-roasterscope.blogspot.de/p/contents.html))
-- [User Mailing List](https://mailman.ghostdub.de/mailman/listinfo/artisan-user) (you need to subscribe to send and receive messages)
-  * NOTES:
-     - Only subscribers can send messages to the list. Messages from others are deleted by the system
-     - Messages with large attachments (images) will be deleted by the system
-- Documentation (written by users)
-  * [Documentation on v0.5.x](http://coffeetroupe.com/artisandocs/)
-  * [aArtisan/TC4 Driver Installation (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SlRQa1ozNnZ4Uk0/edit?usp=sharing) by John Hannon
-  * [Controlling a Hottop Roaster with Artisan: The Basics v6 (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit?usp=sharing) by Barrie Fairley
-  * [Artisan - Basic Setup and Tuning Guide (GoogleDocs)](https://docs.google.com/document/d/1eGtztr56t3GFYafTaMvQUDU3YQXK5nOFNcECM-q_WQ8/edit)
-  * [Artisan Configurations for Huky and Phidgets 1048](https://drive.google.com/folderview?id=0B4HTX5wS3NB2TFVid0h2TGxBWG8&usp=sharing)  by Susan
-    - [What We Know about PHIDGETS (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2OWd4bmtMNVpQSWc/view?usp=sharing)
-    - [ARTISAN #1 Configure Your Device (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2MnRyQ1Z2NmdBWTg/view?usp=sharing)
-    - [ARTISAN #2 Configure the Events (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2cnNaMDVFbmZqVVk/view?usp=sharing)
-    - [ARTISAN #3 Configure the Axes (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2X3h4MjE4X3Z3RFE/view?usp=sharing)
-    - [ARTISAN #4 Configure Tools Extras (PDF)](https://drive.google.com/file/d/0B4HTX5wS3NB2SmZua2VSd2FjZFE/view?usp=sharing)
-  * Hottop USA: [Speaking Alarms for Windows](https://www.hottopusa.com/SayStatic.html)
-  * INSTRUCTABLE: [Roast Coffee With Artisan and Phidgets](http://www.instructables.com/id/Roast-Coffee-With-Artisan-and-Phidgets)
-- Tutorial Videos (provided by users)
-  * [Rick Groszkiewicz](https://www.youtube.com/channel/UCrLDJbbG8c6fO1KXjbDTllw)
-    - [YouTube video on Alarms](https://www.youtube.com/watch?v=KLnb8lZwHjE)
-    - [YouTube video on Events](https://www.youtube.com/watch?v=614R8i-EoHI)
-    - [YouTube video showing a full Hottop/TC4 roast](https://www.youtube.com/watch?v=mE2qdb4qGrc)
-  * [A full software PID controlled on a Probatone 5 on Vimeo](https://vimeo.com/193018671)
-  * [Hottop KN-8828B-2K+ YouTube tutorial](https://www.youtube.com/watch?v=glyE_6vv-Lo&t=110s) by [roastmasterscoffee](https://www.youtube.com/channel/UCsba_bXJQbqFX06X5xP_7ug)
-  * [Hottop KN-8828B-2K+ YouTube tutorial](https://www.youtube.com/watch?v=T0If1ZbxjOI&t=310s) by [NapoHBarista TV](https://www.youtube.com/channel/UC-k4iHzxb8xrLZ2NSlUo8hg)
-  * [Setup for TC4](https://www.youtube.com/watch?v=0-Co-pXF2NM) by [Brad](https://www.youtube.com/channel/UCxcEts9cSvi29QrXyt3qvsQ)
-  * [TC4 PID Control](https://www.youtube.com/watch?v=ykuUCXhGAC4) by [Brad](https://www.youtube.com/channel/UCxcEts9cSvi29QrXyt3qvsQ)
-
 
 
 
