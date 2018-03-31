@@ -12120,6 +12120,7 @@ class ApplicationWindow(QMainWindow):
         phasesLCDlayout.setSpacing(0)
         self.phasesLCDs.setLayout(phasesLCDlayout)
         self.phasesLCDs.hide()
+        self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through the display options <time>, <percentage>, <temperature>", None))
 
         #level 1
 #        self.level1layout.addWidget(self.ntb)
@@ -13628,7 +13629,10 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # before DRY
                     dryexpectedtime = None
-                    self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
+                    if aw.qmc.phasesLCDmode == 0:
+                        self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
+                    else:
+                        self.DRYlabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
                     if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         # display expected time to reach DRY as defined in the background profile or the phases dialog
                         if self.qmc.background and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
@@ -13689,7 +13693,10 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # before FCs
                     fcsexpectedtime = None
-                    self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
+                    if aw.qmc.phasesLCDmode == 0:
+                        self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
+                    else:
+                        self.FCslabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")                    
                     if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                         self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
