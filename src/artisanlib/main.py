@@ -2026,7 +2026,7 @@ class tgraphcanvas(FigureCanvas):
         self.base_messagevisible = False  
         
         #threshold for deltaE color difference comparisons
-        self.colorDifferenceThreshold = 30              
+        self.colorDifferenceThreshold = 20              
         
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -12644,8 +12644,8 @@ class ApplicationWindow(QMainWindow):
             colorPairsToCheck = [
                 ('BT',               aw.qmc.palette['bt'],               'Background',              aw.qmc.palette['background']),       
                 ('ET',               aw.qmc.palette['et'],               'Background',              aw.qmc.palette['background']),       
-                ('DeltaBT',          aw.qmc.palette['deltabt'],          'Background',              aw.qmc.palette['background']),       
-                ('DeltaET',          aw.qmc.palette['deltaet'],          'Background',              aw.qmc.palette['background']),       
+                (deltaLabelPrefix+'BT',aw.qmc.palette['deltabt'],        'Background',              aw.qmc.palette['background']),       
+                (deltaLabelPrefix+'ET',aw.qmc.palette['deltaet'],        'Background',              aw.qmc.palette['background']),       
                 ('Markers',          aw.qmc.palette['markers'],          'Background',              aw.qmc.palette['background']),       
                 ('Text',             aw.qmc.palette['text'],             'Background',              aw.qmc.palette['background']),       
                 ('Time Guide',       aw.qmc.palette['timeguide'],        'Background',              aw.qmc.palette['background']),       
@@ -12700,7 +12700,12 @@ class ApplicationWindow(QMainWindow):
                 colorPairsToCheck.append(
                     (aw.qmc.etypes[i] + " Text", aw.qmc.EvalueTextColor[i], aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i]),
                 )                           
-            
+
+            for i in range(len(aw.extraeventstypes)):
+                colorPairsToCheck.append(
+                    ("Event button " + u(aw.extraeventslabels[i]), aw.extraeventbuttoncolor[i], 'its text', aw.extraeventbuttontextcolor[i]),
+                )                           
+
         except Exception as e:        
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -31446,13 +31451,17 @@ class EventsDlg(ArtisanDialog):
             visibilityComboBox.setCurrentIndex(aw.extraeventsvisibility[i])
             visibilityComboBox.currentIndexChanged.connect(lambda i=i:self.setvisibilitytyeventbutton(1,i))
             #Color
-            colorButton = QPushButton("Select")
-            colorButton.setFocusPolicy(Qt.NoFocus)
-            colorButton.clicked.connect(lambda _,x=i : self.setbuttoncolor(x))
+            self.colorButton = QPushButton("Select")
+            self.colorButton.setFocusPolicy(Qt.NoFocus)
+            self.colorButton.clicked.connect(lambda _,x=i : self.setbuttoncolor(x))
+            self.colorButton.setText(u(aw.extraeventslabels[i]))
+            self.colorButton.setStyleSheet("background-color: %s; color: %s;"%(aw.extraeventbuttoncolor[i],aw.extraeventbuttontextcolor[i]))
             #Text Color
-            colorTextButton = QPushButton("Select")
-            colorTextButton.setFocusPolicy(Qt.NoFocus)
-            colorTextButton.clicked.connect(lambda _,x=i : self.setbuttontextcolor(x))
+            self.colorTextButton = QPushButton("Select")
+            self.colorTextButton.setFocusPolicy(Qt.NoFocus)
+            self.colorTextButton.clicked.connect(lambda _,x=i : self.setbuttontextcolor(x))
+            self.colorTextButton.setText(u(aw.extraeventslabels[i]))
+            self.colorTextButton.setStyleSheet("background-color: %s; color: %s;"%(aw.extraeventbuttoncolor[i],aw.extraeventbuttontextcolor[i]))
             #Empty Cell
             emptyCell = QLabel("")
             #add widgets to the table
@@ -31463,8 +31472,8 @@ class EventsDlg(ArtisanDialog):
             self.eventbuttontable.setCellWidget(i,4,actionComboBox)
             self.eventbuttontable.setCellWidget(i,5,actiondescriptionedit)
             self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
-            self.eventbuttontable.setCellWidget(i,7,colorButton)
-            self.eventbuttontable.setCellWidget(i,8,colorTextButton)
+            self.eventbuttontable.setCellWidget(i,7,self.colorButton)
+            self.eventbuttontable.setCellWidget(i,8,self.colorTextButton)
             self.eventbuttontable.setCellWidget(i,9,emptyCell)
         self.eventbuttontable.horizontalHeader().setStretchLastSection(False)
         self.eventbuttontable.resizeColumnsToContents()
@@ -31480,7 +31489,9 @@ class EventsDlg(ArtisanDialog):
             aw.extraeventbuttoncolor[x] = colorname
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
             aw.buttonlist[x].setStyleSheet(style)
-
+            self.createEventbuttonTable()
+            aw.checkColors([("Event button " + u(aw.extraeventslabels[x]), u(aw.extraeventbuttoncolor[x]), 'its text', u(aw.extraeventbuttontextcolor[x]))])
+            
     def setbuttontextcolor(self,x):
         colorf = aw.colordialog(QColor(aw.extraeventbuttontextcolor[x]))
         if colorf.isValid():
@@ -31488,6 +31499,8 @@ class EventsDlg(ArtisanDialog):
             aw.extraeventbuttontextcolor[x] = colorname
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
             aw.buttonlist[x].setStyleSheet(style)
+            self.createEventbuttonTable()
+            aw.checkColors([("Event button " + u(aw.extraeventslabels[x]), u(aw.extraeventbuttoncolor[x]), 'its text', u(aw.extraeventbuttontextcolor[x]))])
 
     def savetableextraeventbutton(self):
         for i in range(len(aw.extraeventstypes)):
@@ -31532,6 +31545,7 @@ class EventsDlg(ArtisanDialog):
             label = chr(10).join(parts)
         aw.extraeventslabels[i] = label
         aw.settooltip()
+        self.createEventbuttonTable()
 
     def setdescriptioneventbutton(self,_,i):
         descriptionedit = self.eventbuttontable.cellWidget(i,1)
