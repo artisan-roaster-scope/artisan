@@ -1,12 +1,14 @@
 #!/bin/sh
 
+set -ex
+
 export QT_SELECT="default"
 export QTTOOLDIR="/usr/lib/arm-linux-gnueabihf/qt4/bin"
 export QTLIBDIR="/usr/lib/arm-linux-gnueabihf"
 export QT_PATH=/usr/share/qt4
 
 export QT=/usr/lib/arm-linux-gnueabihf/qt4
-
+export PATH=$PATH:`python3 -m site --user-base`/bin
 
 # translations
 pylupdate4 artisan.pro
