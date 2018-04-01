@@ -12623,6 +12623,7 @@ class ApplicationWindow(QMainWindow):
         self.loadThemeAction = QAction(QApplication.translate("Menu", "Load Theme...", None),self)
         self.loadThemeAction.triggered.connect(self.loadSettings_theme)
         self.loadThemeAction.setMenuRole(QAction.NoRole) # avoid specific handling of settings menu
+        submenu.addSeparator()
         submenu.addAction(self.loadThemeAction)
 
     def openThemeSettings(self):
