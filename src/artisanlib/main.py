@@ -22921,7 +22921,7 @@ class ApplicationWindow(QMainWindow):
         if action:
             fname = toString(action.data())
             if os.path.isfile(fname):
-                self.loadSettings(fn=fname)
+                self.loadSettings_theme(fn=fname)
             else:
                 settings = QSettings()
                 files = toStringList(settings.value('recentThemeList'))
@@ -22967,8 +22967,13 @@ class ApplicationWindow(QMainWindow):
             if fn:
                 filename = fn
             else:
-                filename = self.ArtisanOpenFileDialog()
+                filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Theme",None),ext="*.athm")
             if filename:
+                string = QApplication.translate("Message", "Load theme {0}?",None).format(os.path.basename(filename))
+                reply = QMessageBox.question(aw,QApplication.translate("Message", "Adjust Theme Related Settings",None),string,
+                    QMessageBox.Yes|QMessageBox.Cancel)
+                if reply == QMessageBox.Cancel:
+                    return 
                 try:
 #                    aw.stopActivities()
                     res = aw.settingsLoad(filename)
