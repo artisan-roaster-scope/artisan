@@ -31573,7 +31573,7 @@ class EventsDlg(ArtisanDialog):
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
             aw.buttonlist[x].setStyleSheet(style)
             self.createEventbuttonTable()
-            aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[i]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
+            aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[x]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
 
     def savetableextraeventbutton(self):
         for i in range(len(aw.extraeventstypes)):
