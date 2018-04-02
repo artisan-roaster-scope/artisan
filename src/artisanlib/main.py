@@ -12642,68 +12642,129 @@ class ApplicationWindow(QMainWindow):
     def getcolorPairsToCheck(self):
         try:
             colorPairsToCheck = [
-                ('BT',               aw.qmc.palette['bt'],               'Background',              aw.qmc.palette['background']),       
-                ('ET',               aw.qmc.palette['et'],               'Background',              aw.qmc.palette['background']),       
-                (deltaLabelPrefix+'BT',aw.qmc.palette['deltabt'],        'Background',              aw.qmc.palette['background']),       
-                (deltaLabelPrefix+'ET',aw.qmc.palette['deltaet'],        'Background',              aw.qmc.palette['background']),       
-                ('Markers',          aw.qmc.palette['markers'],          'Background',              aw.qmc.palette['background']),       
-                ('Text',             aw.qmc.palette['text'],             'Background',              aw.qmc.palette['background']),       
-                ('Time Guide',       aw.qmc.palette['timeguide'],        'Background',              aw.qmc.palette['background']),       
-                ('Background ET',    aw.qmc.backgroundmetcolor,          'Background',              aw.qmc.palette['background']),       
-                ('Background BT',    aw.qmc.backgroundbtcolor,           'Background',              aw.qmc.palette['background']),       
-                ('Background '+deltaLabelPrefix+'ET',aw.qmc.backgrounddeltaetcolor,'Background',    aw.qmc.palette['background']),       
-                ('Background '+deltaLabelPrefix+'BT',aw.qmc.backgrounddeltabtcolor,'Background',    aw.qmc.palette['background']),       
-                ('Background Extra', aw.qmc.palette['xt'],               'Background',              aw.qmc.palette['background']),       
-                ('X Label',          aw.qmc.palette['xlabel'],           'Canvas',                  aw.qmc.palette['canvas']),         
-                ('Y Label',          aw.qmc.palette['ylabel'],           'Canvas',                  aw.qmc.palette['canvas']),         
-                ('Title',            aw.qmc.palette['title'],            'Canvas',                  aw.qmc.palette['canvas']),           
-                ('SpecialEventText', aw.qmc.palette['specialeventtext'], 'SpecialEventBox',         aw.qmc.palette['specialeventbox']), 
-                ('Timer LCD LED',    aw.lcdpaletteF['timer'],            'Timer LCD Background',    aw.lcdpaletteB['timer']), 
-                ('ET LCD LED',       aw.lcdpaletteF['et'],               'ET LCD Background',       aw.lcdpaletteB['et']), 
-                ('BT LCD LED',       aw.lcdpaletteF['bt'],               'BT LCD Background',       aw.lcdpaletteB['bt']), 
-                ('DeltaET LCD LED',  aw.lcdpaletteF['deltaet'],          'DeltaET LCD Background',  aw.lcdpaletteB['deltaet']), 
-                ('DeltaBT LCD LED',  aw.lcdpaletteF['deltabt'],          'DeltaBT LCD Background',  aw.lcdpaletteB['deltabt']), 
-                ('Extra/PID LCD LED',aw.lcdpaletteF['sv'],               'Extra/PID LCD Background',aw.lcdpaletteB['sv']), 
-                ('BT',               aw.qmc.palette['bt'],               'Legend bkgnd',            aw.qmc.palette['legendbg']),         
-                ('ET',               aw.qmc.palette['et'],               'Legend bkgnd',            aw.qmc.palette['legendbg']),         
-                ('MET Text',         aw.qmc.palette['mettext'],          'MET Box',                 aw.qmc.palette['metbox']),         
-                ('MET Box',          aw.qmc.palette['metbox'],           'Background',              aw.qmc.palette['background']),       
-                (deltaLabelPrefix+'BT',aw.qmc.palette['deltabt'],        'Legend bkgnd',            aw.qmc.palette['legendbg']),         
-                (deltaLabelPrefix+'ET',aw.qmc.palette['deltaet'],        'Legend bkgnd',            aw.qmc.palette['legendbg']),         
-               ]
+                # aw.qmc.palette
+                (QApplication.translate("Label","BT",None), aw.qmc.palette["bt"],
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","ET",None), aw.qmc.palette["et"],
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (deltaLabelPrefix+QApplication.translate("Label","BT",None), aw.qmc.palette["deltabt"],
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (deltaLabelPrefix+QApplication.translate("Label","ET",None), aw.qmc.palette["deltaet"],
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","Markers",None), aw.qmc.palette["markers"],
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","Text",None), aw.qmc.palette["text"],
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","Time Guide",None), aw.qmc.palette["timeguide"],
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","Background ET",None), aw.qmc.backgroundmetcolor,
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","Background BT",None), aw.qmc.backgroundbtcolor,
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","Background",None)+" "+deltaLabelPrefix+QApplication.translate("Label","ET",None), aw.qmc.backgrounddeltaetcolor,
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","Background",None)+" "+deltaLabelPrefix+QApplication.translate("Label","BT",None), aw.qmc.backgrounddeltabtcolor,
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","Background Extra",None), aw.qmc.palette["xt"],
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                (QApplication.translate("Label","X Label",None), aw.qmc.palette["xlabel"],
+                 QApplication.translate("Label","Canvas",None), aw.qmc.palette["canvas"]),
+
+                (QApplication.translate("Label","Y Label",None), aw.qmc.palette["ylabel"],
+                 QApplication.translate("Label","Canvas",None), aw.qmc.palette["canvas"]),
+
+                (QApplication.translate("Label","Title",None), aw.qmc.palette["title"],
+                 QApplication.translate("Label","Canvas",None), aw.qmc.palette["canvas"]),
+
+                (QApplication.translate("Label","SpecialEventText",None), aw.qmc.palette["specialeventtext"],
+                 QApplication.translate("Label","SpecialEventBox",None), aw.qmc.palette["specialeventbox"]),
+
+                (QApplication.translate("Label","ET",None), aw.qmc.palette["et"],
+                 QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette["legendbg"]),
+
+                (QApplication.translate("Label","BT",None), aw.qmc.palette["bt"],
+                 QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette["legendbg"]),
+
+                (deltaLabelPrefix+QApplication.translate("Label","ET",None), aw.qmc.palette["deltaet"],
+                 QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette["legendbg"]),
+
+                (deltaLabelPrefix+QApplication.translate("Label","BT",None), aw.qmc.palette["deltabt"],
+                 QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette["legendbg"]),
+
+                (QApplication.translate("Label","MET Text",None), aw.qmc.palette["mettext"],
+                 QApplication.translate("Label","MET Box",None), aw.qmc.palette["metbox"]),
+
+                (QApplication.translate("Label","MET Box",None), aw.qmc.palette["metbox"],
+                 QApplication.translate("Label","Background",None), aw.qmc.palette["background"]),
+
+                # aw.lcdpalette
+                (QApplication.translate("Label","Timer LCD Digits",None), aw.lcdpaletteF["timer"],
+                 QApplication.translate("Label","Timer LCD Background",None), aw.lcdpaletteB["timer"]),
+
+                (QApplication.translate("Label","ET LCD Digits",None), aw.lcdpaletteF["et"],
+                 QApplication.translate("Label","ET LCD Background",None), aw.lcdpaletteB["et"]),
+
+                (QApplication.translate("Label","BT LCD Digits",None), aw.lcdpaletteF["bt"],
+                 QApplication.translate("Label","BT LCD Background",None), aw.lcdpaletteB["bt"]),
+
+                (deltaLabelPrefix+QApplication.translate("Label","ET LCD Digits",None), aw.lcdpaletteF["deltaet"],
+                 deltaLabelPrefix+QApplication.translate("Label","ET LCD Background",None), aw.lcdpaletteB["deltaet"]),
+
+                (deltaLabelPrefix+QApplication.translate("Label","BT LCD Digits",None), aw.lcdpaletteF["deltabt"],
+                 deltaLabelPrefix+QApplication.translate("Label","BT LCD Background",None), aw.lcdpaletteB["deltabt"]),
+
+                (QApplication.translate("Label","Extra/PID LCD Digits",None), aw.lcdpaletteF["sv"],
+                 QApplication.translate("Label","Extra/PID LCD Background",None), aw.lcdpaletteB["sv"]),
+            ]
+
+            # extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if  aw.extraCurveVisibility1[i]:
                     colorPairsToCheck.append(
-                        (aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], 'Background',   aw.qmc.palette['background']),
+                        (aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background']),
                     )                           
                     colorPairsToCheck.append(
-                        (aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], 'Legend bkgnd', aw.qmc.palette['background']),
+                        (aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette['background']),
                     )                           
                 if  aw.extraCurveVisibility2[i]:
                     colorPairsToCheck.append(   
-                        (aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], 'Background',   aw.qmc.palette['background']),
+                        (aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background']),
                     )
                     colorPairsToCheck.append(   
-                        (aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], 'Legend bkgnd', aw.qmc.palette['background']),
+                        (aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Legend bkgnd",None),aw.qmc.palette['background']),
                     )
 
+            # special events
             for i in range(len(aw.qmc.EvalueColor)):
                 colorPairsToCheck.append(
-                    (aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i], 'Background',   aw.qmc.palette['background']),
+                    (aw.qmc.etypes[i] +" "+QApplication.translate("Label","Event",None), aw.qmc.EvalueColor[i], QApplication.translate("Label","Background",None),   aw.qmc.palette['background']),
                 )                           
                 colorPairsToCheck.append(
-                    (aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i], 'Legend bkgnd', aw.qmc.palette['background']),
+                    (aw.qmc.etypes[i] +" "+QApplication.translate("Label","Event",None), aw.qmc.EvalueColor[i], QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette['background']),
                 )                           
                 colorPairsToCheck.append(
-                    (aw.qmc.etypes[i] + " Slider",aw.qmc.EvalueColor[i], 'Canvas',       aw.qmc.palette['canvas']),
+                    (aw.qmc.etypes[i] +" "+QApplication.translate("Label","Slider",None),aw.qmc.EvalueColor[i], QApplication.translate("Label","Background",None),       aw.qmc.palette['canvas']),
                 )                           
                 colorPairsToCheck.append(
-                    (aw.qmc.etypes[i] + " Text", aw.qmc.EvalueTextColor[i], aw.qmc.etypes[i] + " Event", aw.qmc.EvalueColor[i]),
+                    (aw.qmc.etypes[i] +" "+QApplication.translate("Label","Text",None), aw.qmc.EvalueTextColor[i], aw.qmc.etypes[i] +" "+QApplication.translate("Label","Event",None), aw.qmc.EvalueColor[i]),
                 )                           
 
+            #events buttons
             for i in range(len(aw.extraeventstypes)):
                 colorPairsToCheck.append(
-                    ("Event button " + u(aw.extraeventslabels[i]), aw.extraeventbuttoncolor[i], 'its text', aw.extraeventbuttontextcolor[i]),
+                    (QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[i]), aw.extraeventbuttoncolor[i], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[i]),
                 )                           
 
         except Exception as e:        
@@ -12747,14 +12808,15 @@ class ApplicationWindow(QMainWindow):
         return cDiff
 
         
-    def checkColors(self,colorPairsToCheck=[]):
+    def checkColors(self,colorPairsToCheck=[],showMsg=True):
         val = -1
         try:
             for c in colorPairsToCheck:
                 val = self.colorDifference(c[1],c[3]) 
                 if val < aw.qmc.colorDifferenceThreshold :
                     val = aw.float2float(val,1)
-                    aw.sendmessage(u(QApplication.translate("Message","{0!s} color ({1!s}) is very similar to {2!s} color ({3!s}) and may be hard to see. (deltaE={4:.1f})",None).format(c[0], c[1], c[2], c[3],val)))
+                    if showMsg:
+                        aw.sendmessage(u(QApplication.translate("Message","Detected a color pair that may be hard to see: ",None) + "{0!s} ({1!s}) <-> {2!s} ({3!s}) [deltaE={4:.1f}]".format(c[0], c[1], c[2], c[3],val)))
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Too similar", str(c[1]), str(c[3]), str(val)) #debugprint
 #                else: #debugprint
 #                    print("checkColors", str(c[0]), "/", str(c[2]), "  Okay", str(c[1]), str(c[3]), str(val))  #debugprint
@@ -12787,9 +12849,15 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " convertToGreyscale() {0}").format(str(e)),exc_tb.tb_lineno)
-
         return nc
 
+    def labelBorW(self,backgroundcolor):
+        base = self.convertToGreyscale(backgroundcolor)
+        if self.checkColors([("base",base,"white","#ffffff")], False) > self.checkColors([("base",base,"black","#000000")],False):
+            return "white"
+        else:
+            return "black"
+        
     def setLCDsBW(self):
         aw.lcdpaletteB["timer"] = "black"
         aw.lcdpaletteF["timer"] = "white"
@@ -31490,7 +31558,7 @@ class EventsDlg(ArtisanDialog):
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
             aw.buttonlist[x].setStyleSheet(style)
             self.createEventbuttonTable()
-            aw.checkColors([("Event button " + u(aw.extraeventslabels[x]), u(aw.extraeventbuttoncolor[x]), 'its text', u(aw.extraeventbuttontextcolor[x]))])
+            aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[i]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
             
     def setbuttontextcolor(self,x):
         colorf = aw.colordialog(QColor(aw.extraeventbuttontextcolor[x]))
@@ -31500,7 +31568,7 @@ class EventsDlg(ArtisanDialog):
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
             aw.buttonlist[x].setStyleSheet(style)
             self.createEventbuttonTable()
-            aw.checkColors([("Event button " + u(aw.extraeventslabels[x]), u(aw.extraeventbuttoncolor[x]), 'its text', u(aw.extraeventbuttontextcolor[x]))])
+            aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[i]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
 
     def savetableextraeventbutton(self):
         for i in range(len(aw.extraeventstypes)):
@@ -41290,12 +41358,16 @@ class DeviceAssignmentDlg(ArtisanDialog):
                             typeComboBox.setCurrentIndex(devices.index(dev_name))
                         except Exception:
                             pass
-                        color1Button = QPushButton(QApplication.translate("Button","Select",None))
-                        color1Button.setFocusPolicy(Qt.NoFocus)
-                        color1Button.clicked.connect(lambda _, c = i: self.setextracolor(1,c))
-                        color2Button = QPushButton(QApplication.translate("Button","Select",None))
-                        color2Button.setFocusPolicy(Qt.NoFocus)
-                        color2Button.clicked.connect(lambda _, c = i: self.setextracolor(2,c))
+                        self.color1Button = QPushButton(QApplication.translate("Button","Select",None))
+                        self.color1Button.setFocusPolicy(Qt.NoFocus)
+                        self.color1Button.clicked.connect(lambda _, c = i: self.setextracolor(1,c))
+                        textcolor = aw.labelBorW(aw.qmc.extradevicecolor1[i])
+                        self.color1Button.setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor1[i], textcolor))
+                        self.color2Button = QPushButton(QApplication.translate("Button","Select",None))
+                        self.color2Button.setFocusPolicy(Qt.NoFocus)
+                        self.color2Button.clicked.connect(lambda _, c = i: self.setextracolor(2,c))
+                        textcolor = aw.labelBorW(aw.qmc.extradevicecolor2[i])
+                        self.color2Button.setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor2[i], textcolor))
                         name1edit = QLineEdit(u(aw.qmc.extraname1[i]))
                         name2edit = QLineEdit(u(aw.qmc.extraname2[i]))
                         mexpr1edit = QLineEdit(u(aw.qmc.extramathexpression1[i]))
@@ -41328,8 +41400,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                         Curve2visibilityComboBox.stateChanged.connect(lambda x=0,ind=i: self.updateCurveVisibility(bool(x),2,ind))
                         #add widgets to the table
                         self.devicetable.setCellWidget(i,0,typeComboBox)
-                        self.devicetable.setCellWidget(i,1,color1Button)
-                        self.devicetable.setCellWidget(i,2,color2Button)
+                        self.devicetable.setCellWidget(i,1,self.color1Button)
+                        self.devicetable.setCellWidget(i,2,self.color2Button)
                         self.devicetable.setCellWidget(i,3,name1edit)
                         self.devicetable.setCellWidget(i,4,name2edit)
                         self.devicetable.setCellWidget(i,5,mexpr1edit)
@@ -41566,6 +41638,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.extradevicecolor1[i] = colorname
                     # set LCD label color
                     aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))
+                    self.color1Button.setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor1[i], aw.labelBorW(aw.qmc.extradevicecolor1[i])))
+                    self.createDeviceTable()
+                    aw.checkColors([(aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background'])])
+                    aw.checkColors([(aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette['background'])])
             #line 2
             elif l == 2:
                 # use native no buttons dialog on Mac OS X, blocks otherwise
@@ -41575,6 +41651,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.extradevicecolor2[i] = colorname
                     # set LCD label color
                     aw.setLabelColor(aw.extraLCDlabel2[i],QColor(colorname))
+                    self.color2Button.setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor2[i], aw.labelBorW(aw.qmc.extradevicecolor2[i])))
+                    self.createDeviceTable()
+                    aw.checkColors([(aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background'])])
+                    aw.checkColors([(aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Legend bkgnd",None),aw.qmc.palette['background'])])
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " setextracolor(): {0}").format(str(e)),exc_tb.tb_lineno)
