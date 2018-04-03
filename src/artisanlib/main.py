@@ -31468,7 +31468,7 @@ class EventsDlg(ArtisanDialog):
             else:
                 idx = aw.extraeventstypes[i]+1
             typeComboBox.setCurrentIndex(idx)
-            typeComboBox.currentIndexChanged.connect(lambda z=1,i=i:self.settypeeventbutton(z,i))
+            typeComboBox.currentIndexChanged.connect(lambda _=0,i=i:self.settypeeventbutton(i))
             #value
             valueEdit = QLineEdit()
             valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\-?\d?\d?$"),self)) # QRegExp(r"^100|\d?\d?$"),self))
@@ -31500,7 +31500,7 @@ class EventsDlg(ArtisanDialog):
             if act > 7:
                 act = act - 1
             actionComboBox.setCurrentIndex(act)
-            actionComboBox.currentIndexChanged.connect(lambda z=1,i=i:self.setactioneventbutton(z,i))
+            actionComboBox.currentIndexChanged.connect(lambda _=0,i=i:self.setactioneventbutton(i))
             #action description
             actiondescriptionedit = QLineEdit(u(aw.extraeventsactionstrings[i]))
             actiondescriptionedit.editingFinished.connect(lambda i=i:self.setactiondescriptioneventbutton(1,i))
@@ -31508,7 +31508,7 @@ class EventsDlg(ArtisanDialog):
             visibilityComboBox =  QComboBox()
             visibilityComboBox.addItems(visibility)
             visibilityComboBox.setCurrentIndex(aw.extraeventsvisibility[i])
-            visibilityComboBox.currentIndexChanged.connect(lambda i=i:self.setvisibilitytyeventbutton(1,i))
+            visibilityComboBox.currentIndexChanged.connect(lambda _=0,x=i:self.setvisibilitytyeventbutton(x))
             #Color
             self.colorButton = QPushButton("Select")
             self.colorButton.setFocusPolicy(Qt.NoFocus)
@@ -31549,6 +31549,8 @@ class EventsDlg(ArtisanDialog):
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
             aw.buttonlist[x].setStyleSheet(style)
             self.createEventbuttonTable()
+            colorButton = self.eventbuttontable.cellWidget(x,7)
+            colorButton.setStyleSheet("background-color: %s; color: %s;"%(aw.extraeventbuttoncolor[x],aw.extraeventbuttontextcolor[x]))            
             aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[x]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
             
     def setbuttontextcolor(self,x):
@@ -31557,8 +31559,9 @@ class EventsDlg(ArtisanDialog):
             colorname = str(colorf.name())
             aw.extraeventbuttontextcolor[x] = colorname
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
-            aw.buttonlist[x].setStyleSheet(style)
-            self.createEventbuttonTable()
+            aw.buttonlist[x].setStyleSheet(style)            
+            colorTextButton = self.eventbuttontable.cellWidget(x,8)
+            colorTextButton.setStyleSheet("background-color: %s; color: %s;"%(aw.extraeventbuttoncolor[x],aw.extraeventbuttontextcolor[x]))
             aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[x]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
 
     def savetableextraeventbutton(self):
@@ -31591,7 +31594,7 @@ class EventsDlg(ArtisanDialog):
             aw.extraeventsactionstrings[i] = ades
             aw.update_extraeventbuttons_visibility()
 
-    def setvisibilitytyeventbutton(self,_,i):
+    def setvisibilitytyeventbutton(self,i):
         actioncombobox = self.eventbuttontable.cellWidget(i,6)
         aw.extraeventsvisibility[i] = actioncombobox.currentIndex()
         aw.update_extraeventbuttons_visibility()
@@ -31604,7 +31607,6 @@ class EventsDlg(ArtisanDialog):
             label = chr(10).join(parts)
         aw.extraeventslabels[i] = label
         aw.settooltip()
-        self.createEventbuttonTable()
 
     def setdescriptioneventbutton(self,_,i):
         descriptionedit = self.eventbuttontable.cellWidget(i,1)
@@ -31616,7 +31618,7 @@ class EventsDlg(ArtisanDialog):
         aw.extraeventsactionstrings[i] = u(actiondescriptionedit.text())
         aw.settooltip()
 
-    def setactioneventbutton(self,_,i):
+    def setactioneventbutton(self,i):
         actioncombobox = self.eventbuttontable.cellWidget(i,4)
         aw.extraeventsactions[i] = actioncombobox.currentIndex()
         if aw.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
@@ -31632,7 +31634,7 @@ class EventsDlg(ArtisanDialog):
         aw.buttonlist[i].setText(u(aw.qmc.etypesf(aw.extraeventstypes[i])[0])+part2)
         aw.settooltip()
 
-    def settypeeventbutton(self,_,i):
+    def settypeeventbutton(self,i):
         typecombobox = self.eventbuttontable.cellWidget(i,2)
         aw.extraeventstypes[i] = typecombobox.currentIndex() - 1 # we remove again the offset of 1 here to jump over the new EVENT entry
         if aw.extraeventstypes[i] == -1:
