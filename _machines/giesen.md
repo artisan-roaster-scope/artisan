@@ -9,7 +9,7 @@ header:
   teaser: assets/images/giesen.jpg
 ---
 * __Producer:__ [GIESEN coffee-roasters](http://www.giesencoffeeroasters.eu), The Netherlands
-* __Machines:__ W1A/W6A/W15A with networked PLC
+* __Machines:__ W1A/W6A/W15A with networked PLC (6/2014 and later)
 * __Connection:__ Siemens S7 network
 * __Features:__
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves

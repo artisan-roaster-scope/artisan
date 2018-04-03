@@ -10,7 +10,6 @@ header:
 toc: true
 toc_label: "On this page"
 toc_icon: "cog"
-modified: 2016-04-18T16:39:37-04:00
 ---
 Artisan implements the communication protocols of a number of handheld meters that can operate autonomous, run on their own power source (battery or power-plug), come with a display and feature a serial interface to communicate with an external software.
 

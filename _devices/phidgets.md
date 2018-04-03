@@ -10,7 +10,6 @@ header:
 toc: true
 toc_label: "On this page"
 toc_icon: "cog"
-modified: 2016-04-18T16:39:37-04:00
 ---
 Artisan supports a large number of Phidgets that gather temperature and other data. It also supports Phidgets that can generate external output triggered by Artisan actions.
 

@@ -7,7 +7,6 @@ header:
   overlay_image: /assets/images/arduino-TC4-logo.jpg
   image: /assets/images/arduino-TC4-logo.jpg
   teaser: assets/images/arduino-TC4-logo.jpg
-modified: 2016-04-18T16:39:37-04:00
 ---
 
 The [Arduino/TC4](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) is an interesting option for those that do not worry much about handling electronics without a case. The TC4 is a 4-channel temperature probe shield that can be attached to the standard [Arduino UNO](http://arduino.cc/) open-hardware device. There is also an integrated product that combines a variant of the UNO with the TC4 in one package, named TC4C. Furthermore, the [HT Roaster Interface](http://www.mlgp-llc.com/htri/index.html) was developed as add on to the [TC4/TC4C](http://www.mlgp-llc.com/arduino/public/arduino-pcb.html) stack to allow the control of the [Hottop home roaster](http://www.hottopusa.com/) via serial commands that can be assigned to sliders or buttons in Artisan (see [this post](http://artisan-roasterscope.blogspot.de/2013/02/controlling-hottop.html) for details).

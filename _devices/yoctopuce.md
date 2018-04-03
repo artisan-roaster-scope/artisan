@@ -7,7 +7,6 @@ header:
   overlay_image: /assets/images/yoctopuce-logo.png
   image: /assets/images/yoctopuce-logo.png
   teaser: assets/images/yoctopuce-logo.png
-modified: 2016-04-18T16:39:37-04:00
 ---
 
 Artisan supports both, the Yocto Thermocouple and the Yocto PT100. Both connect directly via USB and do not need the installation of any additional driver.

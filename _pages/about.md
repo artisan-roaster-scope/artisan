@@ -45,7 +45,6 @@ gallery:
     image_path: /assets/images/cte-logo.jpg
     alt: "COFFEE-TECH ENGINEERING"
     title: "COFFEE-TECH ENGINEERING"
-modified: 2016-04-18T16:39:37-04:00
 ---
 
 Artisan is a software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
@@ -90,6 +89,7 @@ __Rui Paulo__ –– Aillio master & CI
 
 __Michael Herbert__ –– documentation
 
+We are always looking for people that support us here and there. Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
 
 Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.it/p/contact-me.html) on the [Artisan blog](https://artisan-roasterscope.blogspot.it).
 

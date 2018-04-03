@@ -5,7 +5,6 @@ header:
   overlay_image: /assets/images/teaser-small.jpg
   image: /assets/images/teaser-small.jpg
 title: "Documentation"
-modified: 2016-04-18T16:39:37-04:00
 toc: true
 toc_label: "On this page"
 toc_icon: "cog"
