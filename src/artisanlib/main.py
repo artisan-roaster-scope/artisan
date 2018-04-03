@@ -19001,13 +19001,6 @@ class ApplicationWindow(QMainWindow):
         try:
             if "canvas" in aw.qmc.palette:
                 aw.updateCanvasColors()
-                
-            #update visibility of main event button, extra event buttons and 
-            self.applyStandardButtonVisibility()
-            #update individual visibility of each buttons
-            self.realignbuttons()
-            aw.updateExtraButtonsVisibility()
-            aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             
             aw.setFonts()
             
@@ -19034,6 +19027,16 @@ class ApplicationWindow(QMainWindow):
                 self.restoreGeometry(settings.value("Geometry"))
             if filename: # only if an external settings file is loaded
                 FigureCanvas.updateGeometry(aw.stack)
+                
+            #update visibility of main event button, extra event buttons and 
+            self.applyStandardButtonVisibility()
+            
+            aw.updateExtraButtonsVisibility()
+            
+            #update individual visibility of each buttons
+            self.realignbuttons()
+            
+            aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
                             
         except Exception:
             res = False
