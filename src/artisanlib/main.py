@@ -4361,7 +4361,7 @@ class tgraphcanvas(FigureCanvas):
                         tx = t0idx
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
                     ystep_down = ystep_down
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","{0}", None),str(self.stringfromseconds(timex[tidx]-t0,False)))                    
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP {0}", None),str(self.stringfromseconds(timex[tidx]-t0,False)))                    
                     if aw.qmc.graphfont == 1:
                         st1 = toASCII(st1)
                     if timeindex2:
