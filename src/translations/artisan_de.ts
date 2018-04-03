@@ -3626,7 +3626,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="40682"/>
         <source>AT Channel</source>
-        <translation>AT Kannal</translation>
+        <translation>AT Kanal</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="40707"/>
