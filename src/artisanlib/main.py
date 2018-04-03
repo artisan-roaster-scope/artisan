@@ -4050,9 +4050,9 @@ class tgraphcanvas(FigureCanvas):
                 self.l_background_annotations = [] # initiate the event annotations
 
                 aw.hideDefaultButtons()
-                aw.hideExtraButtons(changeDefault=False)
+                aw.updateExtraButtonsVisibility()
                 aw.hideLCDs()
-#                aw.hideSliders(changeDefault=False)
+#                aw.updateSlidersVisibility()
                 aw.enableEditMenus()
                 
                 aw.pidcontrol.pidActive = False
@@ -10760,7 +10760,7 @@ class ApplicationWindow(QMainWindow):
             }
 
         #user defined event buttons
-        self.extraeventsbuttonsflags = [0,1,1] # slider visibility per state OFF, ON, START
+        self.extraeventsbuttonsflags = [0,1,1] # extra button visibility per state OFF, ON, START
         self.extraeventslabels,self.extraeventsdescriptions, self.extraeventstypes,self.extraeventsvalues = [],[],[],[]  #hold string,string,index,index
         # extraeventtypes: 
         #  0-3: custom event types (absolute value assignments)
@@ -14690,7 +14690,7 @@ class ApplicationWindow(QMainWindow):
     def showDefaultButtons(self):
         self.lowerbuttondialog.setVisible(True)
 
-    # update the visibility of the sliders based on the users preference for the current state
+    # update the visibility of the extra event buttons based on the users preference for the current state
     def updateExtraButtonsVisibility(self):
         # update visibility (based on the app state)
         if aw.qmc.flagstart:
@@ -16821,21 +16821,6 @@ class ApplicationWindow(QMainWindow):
             #extra devices load and check
             if "extratimex" in profile and len(profile["extratimex"]) > 0:
                 if "extradevices" in profile:
-#                    if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
-#                        string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None))
-#                        if quiet:
-#                            reply = QMessageBox.Yes
-#                        else:
-#                            reply = QMessageBox.question(aw,QApplication.translate("Message", "Found a different number of curves",None),string,QMessageBox.Yes|QMessageBox.Cancel)
-#                        if reply == QMessageBox.Yes:
-#                            if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
-#                                aw.qmc.resetlinecountcaches()
-#                                self.qmc.extradevices = profile["extradevices"]
-#                            else:
-#                                return False
-#                        else:
-#                            return False
-
                     if (len(self.qmc.extradevices) < len(profile["extradevices"])) or self.qmc.extradevices[:len(profile["extradevices"])] != profile["extradevices"]:
                         string = u(QApplication.translate("Message","To fully load this profile the extra device configuration needs to modified?\nModify your setup?",None))
                         if quiet:
@@ -17290,7 +17275,6 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.deleteBackground() # delete a loaded background if any                 
             aw.autoAdjustAxis()
-                    
             return True
         except Exception as ex:
 #            import traceback
@@ -17931,6 +17915,8 @@ class ApplicationWindow(QMainWindow):
                 self.resetqsettings = toInt(settings.value("resetqsettings",self.resetqsettings))
                 if self.resetqsettings:
                     self.resetqsettings = 0
+                    if "canvas" in aw.qmc.palette:
+                        aw.updateCanvasColors()
                     aw.setFonts()
                     self.qmc.redraw()
                     return  #don't load any more settings. They could be bad (corrupted). Stop here.
@@ -18966,8 +18952,6 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventsdescriptions[i] = u(self.extraeventsdescriptions[i])
                     self.extraeventbuttoncolor[i] = str(self.extraeventbuttoncolor[i])
                     self.extraeventbuttontextcolor[i] = str(self.extraeventbuttontextcolor[i])
-                #update individual visibility of each buttons
-                self.realignbuttons()
                 if settings.contains("buttonpalette_shortcuts"):
                     self.buttonpalette_shortcuts = bool(toBool(settings.value("buttonpalette_shortcuts",self.buttonpalette_shortcuts)))
             settings.endGroup()
@@ -19015,15 +18999,17 @@ class ApplicationWindow(QMainWindow):
 
 #--------------------------------
         try:
+            if "canvas" in aw.qmc.palette:
+                aw.updateCanvasColors()
+                
             #update visibility of main event button, extra event buttons and 
             self.applyStandardButtonVisibility()
-            aw.update_extraeventbuttons_visibility()
+            #update individual visibility of each buttons
+            self.realignbuttons()
             aw.updateExtraButtonsVisibility()
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             
             aw.setFonts()
-            if "canvas" in aw.qmc.palette and filename is not None:
-                aw.updateCanvasColors()
             
             # set window appearances (style)
             if settings.contains("appearance"):
@@ -22831,7 +22817,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings() {0}").format(str(ex)),exc_tb.tb_lineno)
         
     def updateRecentSettingActions(self):
         settings = QSettings()
@@ -23031,7 +23017,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " fileLoad() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " loadSettings_theme() {0}").format(str(ex)),exc_tb.tb_lineno)
         
     def largeLCDs(self):
         if not self.largeLCDs_dialog:
@@ -31563,7 +31549,7 @@ class EventsDlg(ArtisanDialog):
             style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
             aw.buttonlist[x].setStyleSheet(style)
             self.createEventbuttonTable()
-            aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[i]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
+            aw.checkColors([(QApplication.translate("Label","Event button",None)+" "+ u(aw.extraeventslabels[x]), aw.extraeventbuttoncolor[x], " "+QApplication.translate("Label","its text",None), aw.extraeventbuttontextcolor[x])])
             
     def setbuttontextcolor(self,x):
         colorf = aw.colordialog(QColor(aw.extraeventbuttontextcolor[x]))
@@ -49686,7 +49672,6 @@ def main():
             pass
 
     aw.show()
-    aw.updateCanvasColors()
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
