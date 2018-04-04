@@ -2736,24 +2736,28 @@ class tgraphcanvas(FigureCanvas):
     def updateLCDtime(self):
         if self.flagon and self.flagstart:
             tx = self.timeclock.elapsed()/1000.
-            if self.timeindex[0] != -1:
-                ts = tx - self.timex[self.timeindex[0]]
-            else:
-                ts = tx
-            nextreading = 1000. - 1000.*(tx%1.)
-
-            # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
-            if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and (tx - aw.qmc.timex[aw.qmc.timeindex[6]]) > aw.qmc.statisticsconditions[7]:
-                aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%("red",aw.lcdpaletteB["timer"]))
-
-            timestr = self.stringfromseconds(int(round(ts)))
-            aw.lcd1.display(u(timestr))
             
-            # update connected WebLCDs
-            if aw.WebLCDs:
-                self.updateWebLCDs(time=timestr)
-            if aw.largeLCDs_dialog:
-                self.updateLargeLCDs(time=timestr)
+            if type(self.timeindex) is list and len(self.timeindex) == 8: # ensure we have a valid self.timeindex array
+            
+                if self.timeindex[0] != -1 and type(self.timex) is list and len(self.timex) > self.timeindex[0]:
+                    ts = tx - self.timex[self.timeindex[0]]
+                else:
+                    ts = tx
+                nextreading = 1000. - 1000.*(tx%1.)
+    
+                # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
+                if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and len(self.timex) > self.timeindex[6] and \
+                    type(aw.qmc.statisticsconditions) is list and len(aw.qmc.statisticsconditions) > 7 and (tx - aw.qmc.timex[aw.qmc.timeindex[6]]) > aw.qmc.statisticsconditions[7]:
+                    aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%("red",aw.lcdpaletteB["timer"]))
+    
+                timestr = self.stringfromseconds(int(round(ts)))
+                aw.lcd1.display(u(timestr))
+                
+                # update connected WebLCDs
+                if aw.WebLCDs:
+                    self.updateWebLCDs(time=timestr)
+                if aw.largeLCDs_dialog:
+                    self.updateLargeLCDs(time=timestr)
             
             QTimer.singleShot(nextreading,self.updateLCDtime)
 
