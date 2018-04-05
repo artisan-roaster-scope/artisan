@@ -42,7 +42,7 @@ v1.3.0 (xx.4.2018)
    - redesigned slider style
    - cleaned up time axis setup and introduced the possibility to set the min time axis limit on RESET/CHARGE
    - changes some defaults (DeltaET lcd hidden, render delta curves thinner than temperature curves)
-   - siders and buttons remember their visibility per state (OFF/ON/START)
+   - sliders and buttons remember their visibility per state (OFF/ON/START)
  * Bug Fixes
    - fixes a bug that made the background RoR curves disappear on START
    - fixes a crasher on clicking the SV slider
