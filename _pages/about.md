@@ -121,7 +121,7 @@ Artisan builds on a large number of excellent open-source software.
 
 ..and many other packages. Thanks for releasing your work as open-source!
 
-## Licence
+## License
 
 Artisan is developed and distributed under the [GPLv3.0 License](http://www.gnu.org/copyleft/gpl.html)
 
