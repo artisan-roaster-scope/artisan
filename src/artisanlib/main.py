@@ -4908,13 +4908,9 @@ class tgraphcanvas(FigureCanvas):
                             cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                             if (not aw.qmc.optimalSmoothing) or sampling or aw.qmc.flagon:
                                 temp_decay_weights = numpy.arange(1,cf+1)
-#                                st1 = self.decay_smooth_list(self.fill_gaps(self.temp1B),decay_weights=temp_decay_weights)
-#                                st2 = self.decay_smooth_list(self.fill_gaps(self.temp2B),decay_weights=temp_decay_weights)
                                 st1 = self.decay_smooth_list(self.fill_gaps(temp_etb),decay_weights=temp_decay_weights)
                                 st2 = self.decay_smooth_list(self.fill_gaps(temp_btb),decay_weights=temp_decay_weights)
                             else: # we use optimal smoothing in the offline case
-#                                st1 = self.smooth_list(self.timeB,self.fill_gaps(self.temp1B),window_len=cf)
-#                                st2 = self.smooth_list(self.timeB,self.fill_gaps(self.temp2B),window_len=cf)
                                 st1 = self.smooth_list(self.timeB,self.fill_gaps(temp_etb),window_len=cf)
                                 st2 = self.smooth_list(self.timeB,self.fill_gaps(temp_btb),window_len=cf)
                             self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB[0],aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=(aw.qmc.optimalSmoothing and (not (sampling or aw.qmc.flagon))))
@@ -5049,12 +5045,12 @@ class tgraphcanvas(FigureCanvas):
                 labels = []
                 
                 if smooth or len(self.stemp1) != len(self.timex):
-                    if (not aw.qmc.optimalSmoothing) or aw.qmc.flagon: # we don't smooth, but remove the dropouts
+                    if aw.qmc.flagon: # we don't smooth, but remove the dropouts
                         self.stemp1 = self.fill_gaps(self.temp1)
                     else:
                         self.stemp1 = self.smooth_list(self.timex,self.fill_gaps(self.temp1),window_len=self.curvefilter)
                 if smooth or len(self.stemp2) != len(self.timex):
-                    if (not aw.qmc.optimalSmoothing) or aw.qmc.flagon:  # we don't smooth, but remove the dropouts
+                    if aw.qmc.flagon:  # we don't smooth, but remove the dropouts
                         self.stemp2 = self.fill_gaps(self.temp2)
                     else:                    
                         self.stemp2 = self.smooth_list(self.timex,self.fill_gaps(self.temp2),window_len=self.curvefilter)
@@ -5404,32 +5400,22 @@ class tgraphcanvas(FigureCanvas):
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= extraname1_subst[i])[0])
                         else:
-                            if aw.qmc.optimalSmoothing:
-                                if (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
-                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
-                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
-                            else:
-                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],                        
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
+                            if (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
+                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
+                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
                     if aw.extraCurveVisibility2[i]:
                         if False and aw.qmc.flagon:
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                         else:
-                            if aw.qmc.optimalSmoothing:
-                                if (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
-                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter)
-                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
-                            else:
-                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extratemp2[i],color=self.extradevicecolor2[i],
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])                                            
+                            if (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
+                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter)
+                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
+                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                 ##### ET,BT curves
                 if aw.qmc.ETcurve:
                     if False and aw.qmc.flagon:
@@ -15799,23 +15785,15 @@ class ApplicationWindow(QMainWindow):
                 timex = profile["extratimex"]
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.extratimexB = timex
-                if aw.qmc.optimalSmoothing:
-                    b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter)
-                    b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter)
-                else: # temperature curves are unsmoothed if optimalSmoothing is not ticked as in the online case
-                    b1 = self.qmc.fill_gaps(t1)
-                    b2 = self.qmc.fill_gaps(t2)
+                b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter)
+                b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter)
                 
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
                 b1x = []
                 b2x = []
                 for i in range(min(len(t1x),len(t2x))):
-                    if aw.qmc.optimalSmoothing:
-                        b1x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter))
-                        b2x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter))
-                    else:
-                        b1x.append(self.qmc.fill_gaps(t1x[i]))
-                        b2x.append(self.qmc.fill_gaps(t2x[i]))
+                    b1x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter))
+                    b2x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter))
                 # NOTE: parallel assignment after time intensive smoothing is necessary to avoid redraw failure!
                 self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = b1,b2,b1x,b2x
                 self.qmc.backgroundEvents = profile["specialevents"]
@@ -20979,12 +20957,7 @@ class ApplicationWindow(QMainWindow):
                         
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]
-                        if aw.qmc.optimalSmoothing:
-                            stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter)
-                        else:
-                            # we use the non-optimal smoothing filter with double the smoothing factor as in other places
-                            temp_decay_weights = numpy.arange(1,(self.qmc.curvefilter*2)+1)
-                            stemp = self.qmc.decay_smooth_list(self.qmc.fill_gaps(temp),decay_weights=temp_decay_weights)
+                        stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter)
                         charge = max(0,rd["charge_idx"]) # start of visible data
                         drop = rd["drop_idx"] # end of visible data
                         stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
@@ -24520,7 +24493,7 @@ class HUDDlg(ArtisanDialog):
         self.DeltaFilter.setValue(aw.qmc.deltafilter/2)
         self.DeltaFilter.editingFinished.connect(lambda :self.changeDeltaFilter())
 
-        self.OptimalSmoothingFlag = QCheckBox(QApplication.translate("CheckBox", "Optimal Smoothing",None))
+        self.OptimalSmoothingFlag = QCheckBox(QApplication.translate("CheckBox", "Optimal Smoothing Post Roast",None))
         self.OptimalSmoothingFlag.setToolTip(QApplication.translate("Tooltip", "Use an optimal smoothing algorithm (only applicable offline, after recording)", None))        
         self.OptimalSmoothingFlag.setChecked(aw.qmc.optimalSmoothing)
         self.OptimalSmoothingFlag.stateChanged.connect(lambda _:self.changeOptimalSmoothingFlag())
@@ -24533,27 +24506,11 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setAlignment(Qt.AlignRight)
         self.Filter.setValue(aw.qmc.curvefilter/2)
         self.Filter.editingFinished.connect(lambda :self.changeFilter())
-        self.Filter.setEnabled(aw.qmc.optimalSmoothing)
-             
-#        windowlabel = QLabel(QApplication.translate("Label", "Window",None))
-#        #Window holds the number of pads in filter
-#        self.Window = QSpinBox()
-#        self.Window.setSingleStep(1)
-#        self.Window.setRange(0,40)
-#        self.Window.setAlignment(Qt.AlignRight)
-#        self.Window.setValue(aw.qmc.smoothingwindowsize)
-#        self.Window.editingFinished.connect(lambda :self.changeWindow())
         #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None))
         self.FilterSpikes.setChecked(aw.qmc.filterDropOuts)
         self.FilterSpikes.stateChanged.connect(lambda _:self.changeDropFilter())
         self.FilterSpikes.setFocusPolicy(Qt.NoFocus)
-        self.FilterSpikes.setEnabled(aw.qmc.optimalSmoothing)
-#        #altsmoothing
-#        self.AltSmoothing = QCheckBox(QApplication.translate("CheckBox", "Smooth2",None))
-#        self.AltSmoothing.setChecked(aw.qmc.altsmoothing)
-#        self.AltSmoothing.stateChanged.connect(lambda _:self.changeAltSmoothing())
-#        self.AltSmoothing.setFocusPolicy(Qt.NoFocus)
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None))
         self.DropSpikes.setChecked(aw.qmc.dropSpikes)
@@ -24731,10 +24688,13 @@ class HUDDlg(ArtisanDialog):
         inputFilterVBox = QVBoxLayout()
         inputFilterVBox.addLayout(inputFilter1)
         inputFilterVBox.addLayout(inputFilter2) 
-        inputFilterVBox.addLayout(rorRoRAlgo)       
-        inputFilterVBox.addLayout(spikesLayout)
         inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filters",None))
         inputFilterGroupLayout.setLayout(inputFilterVBox)        
+        # Post Roast Group
+        postRoastVBox = QVBoxLayout()     
+        postRoastVBox.addLayout(spikesLayout)
+        postRoastGroupLayout = QGroupBox(QApplication.translate("GroupBox","Post Roast",None))
+        postRoastGroupLayout.setLayout(postRoastVBox)    
         #swapETBT flag
         self.rorFilter = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
         self.rorFilter.setChecked(aw.qmc.RoRlimitFlag)
@@ -24768,6 +24728,7 @@ class HUDDlg(ArtisanDialog):
         rorFilterVBox = QVBoxLayout()
         rorFilterVBox.addLayout(rorFilterHBox)
         rorFilterVBox.addLayout(sensitivityLayout)
+        rorFilterVBox.addLayout(rorRoRAlgo)  
         rorFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Rate of Rise Filter",None))
         rorFilterGroupLayout.setLayout(rorFilterVBox)
         # path effects
@@ -24819,6 +24780,7 @@ class HUDDlg(ArtisanDialog):
         #tab1
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(inputFilterGroupLayout)
+        tab1Layout.addWidget(postRoastGroupLayout)
         tab1Layout.addWidget(rorFilterGroupLayout)
         tab1Layout.addStretch()
         #tab11
@@ -26046,8 +26008,6 @@ class HUDDlg(ArtisanDialog):
 
     def changeOptimalSmoothingFlag(self):
         aw.qmc.optimalSmoothing = not aw.qmc.optimalSmoothing
-        self.FilterSpikes.setEnabled(aw.qmc.optimalSmoothing)
-        self.Filter.setEnabled(aw.qmc.optimalSmoothing)
         aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
         
     def changeDropFilter(self):
