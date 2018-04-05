@@ -32,6 +32,7 @@ If you think Artisan is useful to you, contribute financially to its further dev
 
 [Download](https://github.com/MAKOMO/artisan/releases/latest) (Mac/Windows/Linux)
 
+[Installation Instructions](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md)
 
 
 Version History
