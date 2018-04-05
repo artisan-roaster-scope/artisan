@@ -36515,8 +36515,14 @@ class serialport(object):
             else:
                 timeout = 1000 # NOTE: 500ms timeout is tight, for remote access choose a larger timeout
             while True:
-                constructor = globals()[phidget_class_name]
-                p = constructor()
+                with suppress_stdout_stderr():
+                    try:
+                        constructor = globals()[phidget_class_name]
+                        p = constructor()            
+                    except OSError as ex:
+                        aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " Phidget v22 driver not installed")
+                        return None,None 
+                    
                 hub = 0 # we don't search for a hub port
                 
                 if device_id in [DeviceID.PHIDID_HUB0000]:
@@ -36559,13 +36565,13 @@ class serialport(object):
                             serial = p.getDeviceSerialNumber()
                             port = None
                 p.close()
-            return serial,port
+            return serial,port        
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)            
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " getFirstMatchingPhidget() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return None,None,False
+            return None,None
         
 #---
 
