@@ -40,7 +40,7 @@ v1.3.0 (xx.4.2018)
    - deactivates mouse-over scroll wheel events on combo-boxes inside scrolling areas
    - allows one decimal in alarm value limits
    - redesigned slider style
-   - cleaned up time axis setup and introduced
+   - cleaned up time axis setup and introduced the possibility to set the min time axis limit on RESET/CHARGE
    - changes some defaults (DeltaET lcd hidden, render delta curves thinner than temperature curves)
    - siders and buttons remember their visibility per state (OFF/ON/START)
  * Bug Fixes
