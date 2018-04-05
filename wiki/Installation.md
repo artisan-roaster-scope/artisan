@@ -67,6 +67,10 @@ After this command you might need to logout and login again. Try
 that your account was successful added to the dialout group.
 
 
+Note that for apps running by non-root users access to Phidgets or Yoctopuce devices require the installation of corresponding udev rules. Check the [Phidgets](https://www.phidgets.com/docs/OS_-_Linux#Advanced_Information) and [Yoctopuce](https://www.yoctopuce.com/EN/article/how-to-begin-with-yoctopuce-devices-on-linux) platform installation notes.
+
+
+
 ## Step 4: Configure Artisan for your setup
 
 You need to tell Artisan which machine or devices you attached. Startup Artisan and select your roasting machine (menu `Config >> Machines`) or open the Device Assignment dialog (menu `Config >> Device`) and configure your device here.
