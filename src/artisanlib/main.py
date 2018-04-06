@@ -11151,14 +11151,14 @@ class ApplicationWindow(QMainWindow):
 
         self.ConfMenu.addSeparator()
         
+        self.colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
+        self.colorsAction.triggered.connect(lambda _:self.qmc.changeGColor(3))
+        self.ConfMenu.addAction(self.colorsAction)
+        
         self.themeMenu = QMenu(UIconst.CONF_MENU_THEMES)
         self.populateThemeMenu()
         self.ConfMenu.addMenu(self.themeMenu)
         self.updateRecentThemeActions()
-
-        self.colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
-        self.colorsAction.triggered.connect(lambda _:self.qmc.changeGColor(3))
-        self.ConfMenu.addAction(self.colorsAction)
         
         self.ConfMenu.addSeparator()
 
@@ -11482,11 +11482,6 @@ class ApplicationWindow(QMainWindow):
         self.saveAsSettingsAction.triggered.connect(self.saveSettings)
         self.saveAsSettingsAction.setMenuRole(QAction.NoRole)  # avoid specific handling of settings menu
         self.helpMenu.addAction(self.saveAsSettingsAction)
-        
-        self.saveAsThemeAction = QAction(UIconst.SETTINGS_MENU_SAVETHEME,self)
-        self.saveAsThemeAction.triggered.connect(self.saveSettings_theme)
-        self.saveAsThemeAction.setMenuRole(QAction.NoRole)  # avoid specific handling of settings menu
-        self.helpMenu.addAction(self.saveAsThemeAction)
 
         self.helpMenu.addSeparator()
 
@@ -12615,8 +12610,14 @@ class ApplicationWindow(QMainWindow):
         self.loadThemeAction = QAction(QApplication.translate("Menu", "Load Theme...", None),self)
         self.loadThemeAction.triggered.connect(self.loadSettings_theme)
         self.loadThemeAction.setMenuRole(QAction.NoRole) # avoid specific handling of settings menu
+        
+        self.saveAsThemeAction = QAction(UIconst.SETTINGS_MENU_SAVETHEME,self)
+        self.saveAsThemeAction.triggered.connect(self.saveSettings_theme)
+        self.saveAsThemeAction.setMenuRole(QAction.NoRole)  # avoid specific handling of settings menu
+        
         submenu.addSeparator()
-        submenu.addAction(self.loadThemeAction)
+        submenu.addAction(self.loadThemeAction)        
+        submenu.addAction(self.saveAsThemeAction)
 
     def openThemeSettings(self):
         action = self.sender()
