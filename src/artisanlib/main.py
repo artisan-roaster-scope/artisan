@@ -41607,7 +41607,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     # set LCD label color
                     aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))
                     self.color1Button.setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor1[i], aw.labelBorW(aw.qmc.extradevicecolor1[i])))
-                    self.createDeviceTable()
+                    textcolor = aw.labelBorW(colorname)
+                    self.devicetable.cellWidget(i,1).setStyleSheet("background-color: %s; color: %s"%(colorname, textcolor))
                     aw.checkColors([(aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background'])])
                     aw.checkColors([(aw.qmc.extraname1[i], aw.qmc.extradevicecolor1[i], QApplication.translate("Label","Legend bkgnd",None), aw.qmc.palette['background'])])
             #line 2
@@ -41620,7 +41621,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     # set LCD label color
                     aw.setLabelColor(aw.extraLCDlabel2[i],QColor(colorname))
                     self.color2Button.setStyleSheet("background-color: %s; color: %s"%(aw.qmc.extradevicecolor2[i], aw.labelBorW(aw.qmc.extradevicecolor2[i])))
-                    self.createDeviceTable()
+                    textcolor = aw.labelBorW(colorname)
+                    self.devicetable.cellWidget(i,2).setStyleSheet("background-color: %s; color: %s"%(colorname, textcolor))
                     aw.checkColors([(aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Background",None), aw.qmc.palette['background'])])
                     aw.checkColors([(aw.qmc.extraname2[i], aw.qmc.extradevicecolor2[i], QApplication.translate("Label","Legend bkgnd",None),aw.qmc.palette['background'])])
         except Exception as e:
