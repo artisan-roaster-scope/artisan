@@ -861,7 +861,7 @@ class tgraphcanvas(FigureCanvas):
         self.palette1 = self.palette.copy()
         self.EvalueColor_default = ['#4895CE','#49B160','#800080','#910113'] #["brown","blue","purple","grey"]
         self.EvalueTextColor_default = ['white','white','white','white']
-        self.legendbgalpha = 0.2
+#        self.legendbgalpha = 0.2
         
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None),
                                             QApplication.translate("Textbox", "Aftertaste",None),
@@ -5538,7 +5538,7 @@ class tgraphcanvas(FigureCanvas):
                     leg.draggable(state=True)
                     frame = leg.get_frame()
                     frame.set_facecolor(self.palette["legendbg"])
-                    frame.set_alpha(self.legendbgalpha) #dave
+#                    frame.set_alpha(self.legendbgalpha)
                     #frame.set_linewidth(0)
                     frame.set_edgecolor(self.palette["legendborder"])
                     frame.set_linewidth(0.5)
@@ -6130,7 +6130,7 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["aucarea"] = str(dialog.aucareaLabel.text())
                 self.palette["canvas"] = str(dialog.canvasLabel.text())
                 self.palette["legendbg"] = str(dialog.legendbgLabel.text())
-                self.palette["legendbgalpha"] = str(dialog.legendbgalphaLabel.text())
+#                self.palette["legendbgalpha"] = str(dialog.legendbgalphaLabel.text())
                 self.palette["legendborder"] = str(dialog.legendborderLabel.text())
                 self.palette["specialeventbox"] = str(dialog.specialeventboxLabel.text())
                 self.palette["specialeventtext"] = str(dialog.specialeventtextLabel.text())
