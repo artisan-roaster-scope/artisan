@@ -43,6 +43,7 @@ v1.3.0 (xx.4.2018)
    - cleaned up time axis setup and introduced the possibility to set the min time axis limit on RESET/CHARGE
    - changes some defaults (DeltaET lcd hidden, render delta curves thinner than temperature curves)
    - sliders and buttons remember their visibility per state (OFF/ON/START)
+   - convert temperatures on profile load instead of switching the temperature mode
  * Bug Fixes
    - fixes a bug that made the background RoR curves disappear on START
    - fixes a crasher on clicking the SV slider
@@ -54,6 +55,7 @@ v1.3.0 (xx.4.2018)
    - ensures that the persisted graph dpi is applied on startup and loading settings
    - fixed Issue #154 where replay-by-temp events would trigger out of order
    - fixes Phidgets 1046 device support broken in v1.2
+   - restrict temperature conversion to temperature curves
 
 
 ----

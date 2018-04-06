@@ -1196,6 +1196,34 @@ class tgraphcanvas(FigureCanvas):
                        "+Aillio Bullet R1 Voltage/Exhaust",  #86
                        "+Aillio Bullet R1 State",            #87
                        ]
+                       
+    
+        # ids of devices temperature conversions should not be applied
+        self.nonTempDevices = [
+            22, # +PID SV/DUTY %
+            25, # +Virtual
+            40, # Phidget IO 01
+            41, # +Phidget IO 23
+            42, # +Phidget IO 45
+            43, # +Phidget IO 67
+            50, # DUMMY
+            54, # +Hottop Heater/Fan
+            57, # EXTECH 755
+            62, # Phidget 1011 IO 01
+            63, # Phidget HUB0000 IO 01
+            64, # +Phidget HUB0000 IO 23
+            65, # +Phidget HUB0000 IO 45
+            69, # Phidget IO Digital 01
+            70, # +Phidget IO Digital 23
+            71, # +Phidget IO Digital 45
+            72, # +Phidget IO Digital 67
+            73, # Phidget 1011 IO Digital 01
+            74, # Phidget HUB0000 IO Digital 0
+            75, # +Phidget HUB0000 IO Digital 23
+            76, # +Phidget HUB0000 IO Digital 45
+            84, # +Aillio Bullet R1 Heater/Fan
+            87, # +Aillio Bullet R1 State
+        ]
 
         #extra devices
         self.extradevices = []                                      # list with indexes for extra devices
@@ -1213,6 +1241,12 @@ class tgraphcanvas(FigureCanvas):
         self.extralinewidths1,self.extralinewidths2 = [],[]         # list of extra curve linewidth
         self.extramarkers1,self.extramarkers2 = [],[]               # list of extra curve marker styles
         self.extramarkersizes1,self.extramarkersizes2 = [],[]       # list of extra curve marker size
+        
+        # the following two list are generated on ON from the extradevices types and might be longer or smaller than len(self.extradevices)
+        # if no entry is available, a temperature curve that needs C<->F translation is assumed
+        # note that ET/BT main curves are assumed to always hold temperatures
+        self.extraNoneTempHint1 = []                                # list of flags indicating which extra 1 curves are not holding temperature values
+        self.extraNoneTempHint2 = []                                # list of flags indicating which extra 1 curves are not holding temperature values
 
         #holds math expressions to plot
         self.plotcurves=[""]*9
@@ -5885,6 +5919,7 @@ class tgraphcanvas(FigureCanvas):
             self.AUCbase = int(round(self.fromCtoF(self.AUCbase)))
             self.RoRlimit = int(round(self.fromCtoF(self.RoRlimit)))
             self.RoRlimitm = int(round(self.fromCtoF(self.RoRlimitm)))
+            self.alarmtemperature = [(self.fromCtoF(t) if t != 500 else t) for t in self.alarmtemperature]
             # conv Arduino mode
             if aw:
                 aw.pidcontrol.conv2fahrenheit()
@@ -5922,6 +5957,7 @@ class tgraphcanvas(FigureCanvas):
             self.AUCbase = int(round(self.fromFtoC(self.AUCbase)))
             self.RoRlimit = int(round(self.fromFtoC(self.RoRlimit)))
             self.RoRlimitm = int(round(self.fromFtoC(self.RoRlimitm)))
+            self.alarmtemperature = [(self.fromFtoC(t) if t != 500 else t) for t in self.alarmtemperature]
             # conv Arduino mode
             if aw:
                 aw.pidcontrol.conv2celsius()
@@ -5950,7 +5986,7 @@ class tgraphcanvas(FigureCanvas):
     def convertTemperature(self,t,silent=False):
         #verify there is a loaded profile
         profilelength = len(self.timex)
-        if profilelength > 0:
+        if profilelength > 0 or self.background:
             if t == "F":
                 if silent:
                     reply = QMessageBox.Yes
@@ -5978,8 +6014,10 @@ class tgraphcanvas(FigureCanvas):
                             if nextra:
                                 for e in range(nextra):
                                     try:
-                                        aw.qmc.extratemp1[e][i] = self.fromCtoF(aw.qmc.extratemp1[e][i])
-                                        aw.qmc.extratemp2[e][i] = self.fromCtoF(aw.qmc.extratemp2[e][i])
+                                        if not (len(aw.qmc.extraNoneTempHint1) > e and aw.qmc.extraNoneTempHint1[e]):
+                                            aw.qmc.extratemp1[e][i] = self.fromCtoF(aw.qmc.extratemp1[e][i])
+                                        if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
+                                            aw.qmc.extratemp2[e][i] = self.fromCtoF(aw.qmc.extratemp2[e][i])
                                     except Exception:
                                         pass
 
@@ -6275,9 +6313,44 @@ class tgraphcanvas(FigureCanvas):
             
     def StopAsyncSamplingAction(self):
         aw.AsyncSamplingAction = False
+    
+    # fill the self.extraNoneTempHint1 and self.extraNoneTempHint2 lists
+    # indicating which curves should not be temperature converted
+    def generateNoneTempHints(self):
+        self.extraNoneTempHint1 = []
+        self.extraNoneTempHint2 = []
+        for d in self.extradevices:
+            if d in self.nonTempDevices:
+                self.extraNoneTempHint1.append(True)
+                self.extraNoneTempHint2.append(True)
+            elif d == 29: # MODBUS
+                self.extraNoneTempHint1.append(aw.modbus.input1mode == "")
+                self.extraNoneTempHint2.append(aw.modbus.input2mode == "")                    
+            elif d == 33: # +MODBUS 34
+                self.extraNoneTempHint1.append(aw.modbus.input3mode == "")
+                self.extraNoneTempHint2.append(aw.modbus.input4mode == "")  
+            elif d == 55: # +MODBUS 56
+                self.extraNoneTempHint1.append(aw.modbus.input5mode == "")
+                self.extraNoneTempHint2.append(aw.modbus.input6mode == "") 
+            elif d == 79: # S7
+                self.extraNoneTempHint1.append(not bool(aw.s7.mode[0]))
+                self.extraNoneTempHint2.append(not bool(aw.s7.mode[1]))
+            elif d == 80: # +S7 34
+                self.extraNoneTempHint1.append(not bool(aw.s7.mode[2]))
+                self.extraNoneTempHint2.append(not bool(aw.s7.mode[3]))
+            elif d == 81: # +S7 56
+                self.extraNoneTempHint1.append(not bool(aw.s7.mode[4]))
+                self.extraNoneTempHint2.append(not bool(aw.s7.mode[5]))
+            elif d == 82: # +S7 78
+                self.extraNoneTempHint1.append(not bool(aw.s7.mode[6]))
+                self.extraNoneTempHint2.append(not bool(aw.s7.mode[7]))
+            else:
+                self.extraNoneTempHint1.append(False)
+                self.extraNoneTempHint2.append(False)          
         
     def OnMonitor(self):
-        try:                    
+        try:
+            self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
             aw.qmc.reset(True,False,sampling=True,keepProperties=True)                     
 
@@ -15797,6 +15870,26 @@ class ApplicationWindow(QMainWindow):
                 t2 = profile["temp2"]
                 t1x = profile["extratemp1"]
                 t2x = profile["extratemp2"]
+                
+                if "mode" in profile:
+                    m = str(profile["mode"])
+                    #convert modes only if needed comparing the new uploaded mode to the old one.
+                    #otherwise it would incorrectly convert the uploaded phases
+                    if m == "F" and self.qmc.mode == "C":
+                        # we have to convert all temperatures from F to C
+                        t1 = [self.qmc.fromFtoC(t) for t in t1]
+                        t2 = [self.qmc.fromFtoC(t) for t in t2]
+                        for e in range(len(t1x)):
+                            t1x[e] = [self.qmc.fromFtoC(t) for t in t1x[e]]
+                            t2x[e] = [self.qmc.fromFtoC(t) for t in t2x[e]]
+                    if m == "C" and self.qmc.mode == "F":
+                        # we have to convert all temperatures from C to F
+                        t1 = [self.qmc.fromCtoF(t) for t in t1]
+                        t2 = [self.qmc.fromCtoF(t) for t in t2]
+                        for e in range(len(t1x)):
+                            t1x[e] = [self.qmc.fromCtoF(t) for t in t1x[e]]
+                            t2x[e] = [self.qmc.fromCtoF(t) for t in t2x[e]]
+                
                 names1x = [d(x) for x in profile["extraname1"]]
                 names2x = [d(x) for x in profile["extraname2"]]
                 timex = profile["extratimex"]
@@ -16901,11 +16994,9 @@ class ApplicationWindow(QMainWindow):
                 if "extradevicecolor2" in profile:
                     self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]] + self.qmc.extradevicecolor2[len(profile["extradevicecolor2"]):]
                     
-
                 # ensure that extra list length are of the size of the extradevices:
                 self.ensureCorrectExtraDeviceListLenght()                 
-                    
-                    
+                                        
                 if "extramarkersizes1" in profile:
                     self.qmc.extramarkersizes1 = profile["extramarkersizes1"] + self.qmc.extramarkersizes1[len(profile["extramarkersizes1"]):]
                 else:
@@ -16948,15 +17039,16 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp2)
             self.updateExtraLCDvisibility()
 
-            old_mode = self.qmc.mode
-            if "mode" in profile:
-                m = str(profile["mode"])
-                #convert modes only if needed comparing the new uploaded mode to the old one.
-                #otherwise it would incorrectly convert the uploaded phases
-                if m == "F" and self.qmc.mode == "C":
-                    self.qmc.fahrenheitMode()
-                if m == "C" and self.qmc.mode == "F":
-                    self.qmc.celsiusMode()
+# we don't change temp mode anymore on loading a profile
+#            old_mode = self.qmc.mode
+#            if "mode" in profile:
+#                m = str(profile["mode"])
+#                #convert modes only if needed comparing the new uploaded mode to the old one.
+#                #otherwise it would incorrectly convert the uploaded phases
+#                if m == "F" and self.qmc.mode == "C":
+#                    self.qmc.fahrenheitMode()
+#                if m == "C" and self.qmc.mode == "F":
+#                    self.qmc.celsiusMode()
 
 # if auto-adjusted is ticked phases will automatically adjust to the set values in the profile
 # we better not load the phases from the profile not to change the user defined phases settings
@@ -17114,54 +17206,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.cuppingnotes = ""
             if "timex" in profile:
                 self.qmc.timex = profile["timex"]
-            if "temp1" in profile:
-                self.qmc.temp1 = profile["temp1"]
-            if "temp2" in profile:
-                self.qmc.temp2 = profile["temp2"]
-            if self.qmc.mode != old_mode:
-                if "zmax" in profile:
-                    self.qmc.zlimit = min(int(profile["zmax"]),self.qmc.zlimit_max)
-                if "zmin" in profile:
-                    self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),self.qmc.zlimit_min_max)
-                if "ymax" in profile:
-                    self.qmc.ylimit = min(int(profile["ymax"]),self.qmc.ylimit_max)
-                if "ymin" in profile:
-                    self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),self.qmc.ylimit_min_max)
-            if  not self.qmc.locktimex:
-                # otherwise don't let the users y/z min/max axis limits be overwritten by loading a profile
-                if "xmin" in profile:
-                    self.qmc.startofx = float(profile["xmin"])
-                if "xmax" in profile:
-                    self.qmc.endofx = float(profile["xmax"])
-                else:
-                    #Set the xlimits
-                    if self.qmc.timex:
-                        self.qmc.endofx = self.qmc.timex[-1] + 40
-            if "ambientTemp" in profile:
-                self.qmc.ambientTemp = profile["ambientTemp"]    
-            if "ambient_humidity" in profile:
-                self.qmc.ambient_humidity = profile["ambient_humidity"]
-            if "moisture_greens" in profile:
-                self.qmc.moisture_greens = profile["moisture_greens"]
-            else:
-                self.qmc.moisture_greens = 0.
-            if "greens_temp" in profile:
-                self.qmc.greens_temp = profile["greens_temp"]
-            else:
-                self.qmc.greens_temp = 0.
-            if "moisture_roasted" in profile:
-                self.qmc.moisture_roasted = profile["moisture_roasted"]
-            else:
-                self.qmc.moisture_roasted = 0.
-# we load external programs only from app settings
-#            if "externalprogram" in profile:
-#                self.ser.externalprogram = d(profile["externalprogram"])
-#            if "externaloutprogram" in profile:
-#                self.ser.externaloutprogram = d(profile["externaloutprogram"])
-            if "samplinginterval" in profile:
-                # derive aw.qmc.deltasamples from aw.qmc.deltaspan and the sampling interval of the profile
-                self.qmc.profile_sampling_interval = profile["samplinginterval"]
-                self.qmc.updateDeltaSamples()
             # alarms
             if self.qmc.loadalarmsfromprofile:
                 self.qmc.alarmsfile = filename
@@ -17210,6 +17254,100 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
                 self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered
+                
+            if "extraNoneTempHint1" in profile:
+                self.qmc.extraNoneTempHint1 = profile["extraNoneTempHint1"]
+            else:
+                self.qmc.extraNoneTempHint1 = []
+            if "extraNoneTempHint2" in profile:
+                self.qmc.extraNoneTempHint2 = profile["extraNoneTempHint2"]
+            else:
+                self.qmc.extraNoneTempHint2 = []
+                
+            if "mode" in profile:
+                m = str(profile["mode"]) 
+            else:
+                m = self.qmc.mode
+            if "temp1" in profile:
+                self.qmc.temp1 = profile["temp1"]
+            if "temp2" in profile:
+                self.qmc.temp2 = profile["temp2"] 
+            if "ambientTemp" in profile:
+                self.qmc.ambientTemp = profile["ambientTemp"]
+            if "greens_temp" in profile:
+                self.qmc.greens_temp = profile["greens_temp"]
+            else:
+                self.qmc.greens_temp = 0.
+                
+            if self.qmc.mode == "C" and m == "F":
+                self.qmc.temp1 = [self.qmc.fromFtoC(t) for t in self.qmc.temp1]
+                self.qmc.temp2 = [self.qmc.fromFtoC(t) for t in self.qmc.temp2]
+                for e in range(len(self.qmc.extratimex)):
+                    if not (len(aw.qmc.extraNoneTempHint1) > e and aw.qmc.extraNoneTempHint1[e]):
+                        self.qmc.extratemp1[e] = [self.qmc.fromFtoC(t) for t in self.qmc.extratemp1[e]]
+                    if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
+                        self.qmc.extratemp2[e] = [self.qmc.fromFtoC(t) for t in self.qmc.extratemp2[e]]
+                if self.qmc.ambientTemp != 0:
+                    self.qmc.ambientTemp = self.qmc.fromFtoC(self.qmc.ambientTemp)
+                if self.qmc.loadalarmsfromprofile and "alarmtemperature" in profile:
+                    self.qmc.alarmtemperature = [(self.qmc.fromFtoC(t) if t != 500 else t) for t in self.qmc.alarmtemperature]
+                if self.qmc.greens_temp != 0.:
+                    self.qmc.greens_temp = self.qmc.fromFtoC(self.qmc.greens_temp)
+                self.qmc.safesaveflag = True
+            elif self.qmc.mode == "F" and m == "C":
+                self.qmc.temp1 = [self.qmc.fromCtoF(t) for t in self.qmc.temp1]
+                self.qmc.temp2 = [self.qmc.fromCtoF(t) for t in self.qmc.temp2]
+                for e in range(len(self.qmc.extratimex)):
+                    if not (len(aw.qmc.extraNoneTempHint1) > e and aw.qmc.extraNoneTempHint1[e]):
+                        self.qmc.extratemp1[e] = [self.qmc.fromCtoF(t) for t in self.qmc.extratemp1[e]]
+                    if not (len(aw.qmc.extraNoneTempHint2) > e and aw.qmc.extraNoneTempHint2[e]):
+                        self.qmc.extratemp2[e] = [self.qmc.fromCtoF(t) for t in self.qmc.extratemp2[e]]
+                if self.qmc.ambientTemp != 0:
+                    self.qmc.ambientTemp = self.qmc.fromCtoF(self.qmc.ambientTemp)
+                if self.qmc.loadalarmsfromprofile and "alarmtemperature" in profile:
+                    self.qmc.alarmtemperature = [self.qmc.fromCtoF(t) for t in self.qmc.alarmtemperature]
+                if self.qmc.greens_temp != 0.:
+                    self.qmc.greens_temp = self.qmc.fromCtoF(self.qmc.greens_temp)
+                self.qmc.safesaveflag = True
+            else:
+                # only if the temperature mode of the profile equals to our current mode, we respect the temp/RoR axis limits
+                if "zmax" in profile:
+                    self.qmc.zlimit = min(int(profile["zmax"]),self.qmc.zlimit_max)
+                if "zmin" in profile:
+                    self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),self.qmc.zlimit_min_max)
+                if "ymax" in profile:
+                    self.qmc.ylimit = min(int(profile["ymax"]),self.qmc.ylimit_max)
+                if "ymin" in profile:
+                    self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),self.qmc.ylimit_min_max)                
+            if  not self.qmc.locktimex:
+                # otherwise don't let the users y/z min/max axis limits be overwritten by loading a profile
+                if "xmin" in profile:
+                    self.qmc.startofx = float(profile["xmin"])
+                if "xmax" in profile:
+                    self.qmc.endofx = float(profile["xmax"])
+                else:
+                    #Set the xlimits
+                    if self.qmc.timex:
+                        self.qmc.endofx = self.qmc.timex[-1] + 40  
+            if "ambient_humidity" in profile:
+                self.qmc.ambient_humidity = profile["ambient_humidity"]
+            if "moisture_greens" in profile:
+                self.qmc.moisture_greens = profile["moisture_greens"]
+            else:
+                self.qmc.moisture_greens = 0.
+            if "moisture_roasted" in profile:
+                self.qmc.moisture_roasted = profile["moisture_roasted"]
+            else:
+                self.qmc.moisture_roasted = 0.
+# we load external programs only from app settings
+#            if "externalprogram" in profile:
+#                self.ser.externalprogram = d(profile["externalprogram"])
+#            if "externaloutprogram" in profile:
+#                self.ser.externaloutprogram = d(profile["externaloutprogram"])
+            if "samplinginterval" in profile:
+                # derive aw.qmc.deltasamples from aw.qmc.deltaspan and the sampling interval of the profile
+                self.qmc.profile_sampling_interval = profile["samplinginterval"]
+                self.qmc.updateDeltaSamples()
             # Ramp/Soak Profiles
             if aw.pidcontrol.loadRampSoakFromProfile:
                 if "svValues" in profile:
@@ -17627,6 +17765,8 @@ class ApplicationWindow(QMainWindow):
             profile["extradrawstyles2"] = [encodeLocal(x) for x in self.qmc.extradrawstyles2]            
             profile["externalprogram"] = encodeLocal(self.ser.externalprogram)
             profile["externaloutprogram"] = encodeLocal(self.ser.externaloutprogram)
+            profile["extraNoneTempHint1"] = self.qmc.extraNoneTempHint1
+            profile["extraNoneTempHint2"] = self.qmc.extraNoneTempHint2
             #alarms
             profile["alarmflag"] = self.qmc.alarmflag
             profile["alarmguard"] = self.qmc.alarmguard
@@ -33846,7 +33986,7 @@ class modbusport(object):
     """ this class handles the communications with all the modbus devices"""
     def __init__(self):
         # retries
-        self.readRetries = 2
+        self.readRetries = 1
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = "COM5"      #NOTE: this string should not be translated.
         self.baudrate = 115200
@@ -33924,17 +34064,17 @@ class modbusport(object):
         
     # this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
     def sleepBetween(self,write=False):
-        pass # handled in MODBUS lib
-#        if write:
+        if write:
 #            if self.type in [3,4]: # TCP or UDP
 #                libtime.sleep(0.040)
 #            else:
 #                libtime.sleep(0.085)
-#        else:
-#            if self.type in [3,4]: # delay between writes only on serial connections
-#                pass
-#            else:
-#                libtime.sleep(0.035)
+            pass # handled in MODBUS lib
+        else:
+            if self.type in [3,4]: # delay between writes only on serial connections
+                pass
+            else:
+                libtime.sleep(0.025)
     
     def address2register(self,addr,code=3):
         if code == 3 or code == 6:
