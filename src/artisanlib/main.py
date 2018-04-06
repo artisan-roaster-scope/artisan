@@ -5651,7 +5651,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.weight[1]:
                         statstr += '\n' + QApplication.translate("AddlInfo", "Weight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
 
-                if aw.qmc.density[0]:
+                if aw.qmc.density[0] and aw.qmc.density[2] != 0:
                     statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3])
                     if cp["roasted_density"]:
