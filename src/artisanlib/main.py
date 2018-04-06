@@ -5538,6 +5538,7 @@ class tgraphcanvas(FigureCanvas):
                     leg.draggable(state=True)
                     frame = leg.get_frame()
                     frame.set_facecolor(self.palette["legendbg"])
+                    frame.set_alpha(self.legendbgalpha) #dave
                     #frame.set_linewidth(0)
                     frame.set_edgecolor(self.palette["legendborder"])
                     frame.set_linewidth(0.5)
@@ -6129,6 +6130,7 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["aucarea"] = str(dialog.aucareaLabel.text())
                 self.palette["canvas"] = str(dialog.canvasLabel.text())
                 self.palette["legendbg"] = str(dialog.legendbgLabel.text())
+                self.palette["legendbgalpha"] = str(dialog.legendbgalphaLabel.text())
                 self.palette["legendborder"] = str(dialog.legendborderLabel.text())
                 self.palette["specialeventbox"] = str(dialog.specialeventboxLabel.text())
                 self.palette["specialeventtext"] = str(dialog.specialeventtextLabel.text())
@@ -12051,6 +12053,7 @@ class ApplicationWindow(QMainWindow):
         TP2DRYlayout.setContentsMargins(3,0,3,0)
         TP2DRYframe = QFrame()
         TP2DRYframe.setLayout(TP2DRYlayout)
+        TP2DRYframe.setToolTip(QApplication.translate("Tooltip","Projected time from TP to DRY", None))  #dave
 
         # DRY
         self.DRYlabel = QLabel()
@@ -12060,6 +12063,7 @@ class ApplicationWindow(QMainWindow):
         self.DRYlcd.customContextMenuRequested.connect(self.PhaseslcdClicked)
         self.DRYlcd.display("--:--")
         self.DRYlcdFrame = self.makePhasesLCDbox(self.DRYlabel,self.DRYlcd)
+        self.DRYlcdFrame.setToolTip("DRYlcdFrame tooltip")  #dave
 
         # DRY2FCs
         self.DRY2FCslabel = QLabel("")
@@ -13632,6 +13636,8 @@ class ApplicationWindow(QMainWindow):
 
                 # TP phase LCD
                 if aw.qmc.phasesLCDmode == 0: # time mode
+                    if 'TP2DRYframe' in locals():  #dave
+                        TP2DRYframe.setToolTip("TIME MODE")  #dave
                     if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
                         # after TP
                         self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")                    
@@ -13645,6 +13651,8 @@ class ApplicationWindow(QMainWindow):
                         # before TP
                         self.TPlcd.display(u("--:--"))
                 elif aw.qmc.phasesLCDmode == 1: # percentage mode
+                    if 'TP2DRYframe' in locals():  #dave
+                        TP2DRYframe.setToolTip("PERCENTAGE MODE")  #dave
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
                     if self.qmc.timeindex[1]: # after DRY
                         ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
@@ -13658,6 +13666,8 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.TPlcd.display(u(" --- "))
                 elif aw.qmc.phasesLCDmode == 2: # temp mode
+                    if 'TP2DRYframe' in locals():  #dave
+                        TP2DRYframe.setToolTip("TEMP MODE")  #dave
                     if self.qmc.TPalarmtimeindex:
                         if self.qmc.timeindex[6]: # after drop
                             dBT = self.qmc.temp2[self.qmc.timeindex[6]]
@@ -19926,7 +19936,6 @@ class ApplicationWindow(QMainWindow):
                 settings = QSettings()
             #save Events settings
             settings.beginGroup("events")
-            settings.setValue("showEtypes",self.qmc.showEtypes)            
             settings.setValue("EvalueColor",self.qmc.EvalueColor)
             settings.setValue("EvalueTextColor",self.qmc.EvalueTextColor)
             settings.setValue("EvalueMarker",self.qmc.EvalueMarker)
@@ -19945,20 +19954,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)
             settings.setValue("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)
             settings.setValue("BackgroundAlpha",self.qmc.backgroundalpha)
-#            settings.beginGroup("Style")
-#            settings.setValue("patheffects",self.qmc.patheffects)
-#            settings.setValue("graphstyle",self.qmc.graphstyle)
-#            settings.setValue("graphfont",self.qmc.graphfont)
-#            settings.endGroup()
             settings.beginGroup("XT")
             settings.setValue("color",self.qmc.backgroundxtcolor)
             settings.setValue("index",self.qmc.xtcurveidx)
             settings.endGroup()
-#            #save extra devices
-#            settings.beginGroup("ExtraDev")
-#            settings.setValue("extradevicecolor1",self.qmc.extradevicecolor1)
-#            settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
-#            settings.endGroup()
             settings.beginGroup("grid")
             settings.setValue("gridalpha",self.qmc.gridalpha)
             settings.endGroup()
