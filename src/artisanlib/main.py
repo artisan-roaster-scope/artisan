@@ -12048,7 +12048,7 @@ class ApplicationWindow(QMainWindow):
         TP2DRYlayout.setContentsMargins(3,0,3,0)
         self.TP2DRYframe = QFrame()
         self.TP2DRYframe.setLayout(TP2DRYlayout)
-        self.TP2DRYframe.setToolTip(QApplication.translate("Tooltip","Projected time from TP to DRY", None))  #dave
+#        self.TP2DRYframe.setToolTip(QApplication.translate("Tooltip","Projected time from TP to DRY", None))  #dave
 
         # DRY
         self.DRYlabel = QLabel()
@@ -12058,7 +12058,6 @@ class ApplicationWindow(QMainWindow):
         self.DRYlcd.customContextMenuRequested.connect(self.PhaseslcdClicked)
         self.DRYlcd.display("--:--")
         self.DRYlcdFrame = self.makePhasesLCDbox(self.DRYlabel,self.DRYlcd)
-        self.DRYlcdFrame.setToolTip("DRYlcdFrame tooltip")  #dave
 
         # DRY2FCs
         self.DRY2FCslabel = QLabel("")
@@ -12113,7 +12112,7 @@ class ApplicationWindow(QMainWindow):
         phasesLCDlayout.setSpacing(0)
         self.phasesLCDs.setLayout(phasesLCDlayout)
         self.phasesLCDs.hide()
-        self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through the display options <time>, <percentage>, <temperature>", None))
+        self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE", None))
 
         #level 1
 #        self.level1layout.addWidget(self.ntb)

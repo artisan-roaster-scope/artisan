@@ -52,6 +52,8 @@ v1.3.0 (xx.4.2018)
    - recomputes AUC in ranking reports based on actual AUC settings
    - fixes an issue where closing a confirmation dialog via its close box could lead to losing the recorded profile instead of canceling the activity
    - ensures that the persisted graph dpi is applied on startup and loading settings
+   - fixed Issue #154 where replay-by-temp events would trigger out of order
+   - fixes Phidgets 1046 device support broken in v1.2
 
 
 ----
