@@ -12046,9 +12046,9 @@ class ApplicationWindow(QMainWindow):
         TP2DRYlayout = QHBoxLayout()
         TP2DRYlayout.addWidget(self.TP2DRYlabel)
         TP2DRYlayout.setContentsMargins(3,0,3,0)
-        TP2DRYframe = QFrame()
-        TP2DRYframe.setLayout(TP2DRYlayout)
-        TP2DRYframe.setToolTip(QApplication.translate("Tooltip","Projected time from TP to DRY", None))  #dave
+        self.TP2DRYframe = QFrame()
+        self.TP2DRYframe.setLayout(TP2DRYlayout)
+        self.TP2DRYframe.setToolTip(QApplication.translate("Tooltip","Projected time from TP to DRY", None))  #dave
 
         # DRY
         self.DRYlabel = QLabel()
@@ -12065,8 +12065,8 @@ class ApplicationWindow(QMainWindow):
         DRY2FCslayout = QHBoxLayout()
         DRY2FCslayout.addWidget(self.DRY2FCslabel)
         DRY2FCslayout.setContentsMargins(3,0,3,0)
-        DRY2FCsframe = QFrame()
-        DRY2FCsframe.setLayout(DRY2FCslayout)
+        self.DRY2FCsframe = QFrame()
+        self.DRY2FCsframe.setLayout(DRY2FCslayout)
 
         # FCs
         self.FCslabel = QLabel()
@@ -12105,9 +12105,9 @@ class ApplicationWindow(QMainWindow):
         self.phasesLCDs.setContentsMargins(0, 0, 0, 0)
         phasesLCDlayout = QHBoxLayout()
         phasesLCDlayout.addWidget(self.TPlcdFrame)
-        phasesLCDlayout.addWidget(TP2DRYframe)
+        phasesLCDlayout.addWidget(self.TP2DRYframe)
         phasesLCDlayout.addWidget(self.DRYlcdFrame)
-        phasesLCDlayout.addWidget(DRY2FCsframe)
+        phasesLCDlayout.addWidget(self.DRY2FCsframe)
         phasesLCDlayout.addWidget(self.FCslcdFrame)
         phasesLCDlayout.setContentsMargins(0, 0, 0, 0)
         phasesLCDlayout.setSpacing(0)
@@ -13637,8 +13637,7 @@ class ApplicationWindow(QMainWindow):
 
                 # TP phase LCD
                 if aw.qmc.phasesLCDmode == 0: # time mode
-                    if 'TP2DRYframe' in locals():  #dave
-                        TP2DRYframe.setToolTip("TIME MODE")  #dave
+                    self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #dave
                     if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
                         # after TP
                         self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")                    
@@ -13652,8 +13651,7 @@ class ApplicationWindow(QMainWindow):
                         # before TP
                         self.TPlcd.display(u("--:--"))
                 elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                    if 'TP2DRYframe' in locals():  #dave
-                        TP2DRYframe.setToolTip("PERCENTAGE MODE")  #dave
+                    self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #dave
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
                     if self.qmc.timeindex[1]: # after DRY
                         ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
@@ -13667,8 +13665,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.TPlcd.display(u(" --- "))
                 elif aw.qmc.phasesLCDmode == 2: # temp mode
-                    if 'TP2DRYframe' in locals():  #dave
-                        TP2DRYframe.setToolTip("TEMP MODE")  #dave
+                    self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #dave
                     if self.qmc.TPalarmtimeindex:
                         if self.qmc.timeindex[6]: # after drop
                             dBT = self.qmc.temp2[self.qmc.timeindex[6]]
@@ -13754,9 +13751,11 @@ class ApplicationWindow(QMainWindow):
                     else: # before drop
                         ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
                     if aw.qmc.phasesLCDmode == 0: # time mode
+                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #marko
                         self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
                         self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
                     elif aw.qmc.phasesLCDmode == 1: # percentage mode
+                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #marko
                         if totaltime:
                             finishphaseP = fmtstr%(ts*100./totaltime)
                         else:
@@ -13766,6 +13765,7 @@ class ApplicationWindow(QMainWindow):
                         self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "DEV%",None)) + "</b></small>")
                         self.FCslcd.display(u(finishphaseP))
                     elif aw.qmc.phasesLCDmode == 2: # temp mode
+                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #marko
                         if self.qmc.timeindex[6]: # after drop
                             dBT = self.qmc.temp2[self.qmc.timeindex[6]]
                         else:
@@ -13783,9 +13783,14 @@ class ApplicationWindow(QMainWindow):
                     # before FCs
                     fcsexpectedtime = None
                     if aw.qmc.phasesLCDmode == 0:
+                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #marko
                         self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
                     else:
                         self.FCslabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")                    
+                        if aw.qmc.phasesLCDmode == 1:
+                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #marko
+                        elif aw.qmc.phasesLCDmode == 2:
+                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #marko
                     if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                         self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
@@ -13820,7 +13825,7 @@ class ApplicationWindow(QMainWindow):
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
                 elif aw.qmc.phasesLCDmode == 2: # temp mode
                     self.TPlcd.display(u(" --- "))
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")                
+                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
                 self.TP2DRYlabel.setText("")
                 self.DRYlcd.display("--:--")
                 self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
