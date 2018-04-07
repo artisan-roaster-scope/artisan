@@ -67,16 +67,16 @@ cat /dev/zero | ssh-keygen -q -N ""
 sudo cp $HOME/.ssh/id_rsa.pub $mountpoint/home/pi/.ssh/authorized_keys
 if [ -d src ]; then
     sudo cp -R ../artisan $mountpoint/home/pi
-elif [ -d artisan ]; then
-    sudo cp -R artisan $mountpoint/home/pi
+elif [ -f artisan.py ]; then
+    sudo cp -R ../../artisan $mountpoint/home/pi
 fi
 cd $mountpoint/home/pi
-curl -L -O https://astuteinternet.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-7z x snap7-full-1.4.2.7z
-curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget22.tar.gz
-tar -xzf libphidget22.tar.gz
-curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
-unzip Phidget22Python.zip
+sudo curl -L -O https://astuteinternet.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
+sudo 7z x snap7-full-1.4.2.7z
+sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget22.tar.gz
+sudo tar -xzf libphidget22.tar.gz
+sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
+sudo unzip Phidget22Python.zip
 cd -
 sudo umount $mountpoint
 rmdir $mountpoint
