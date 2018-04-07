@@ -61,8 +61,8 @@ unit: sectors
 2018-03-13-raspbian-stretch-lite.img1 : start=        8192, size=       85611, type=c
 2018-03-13-raspbian-stretch-lite.img2 : start=       98304, size=     7725056, type=83
 EOF
-if [ -f util-linux*/sfdisk ]; then
-    util-linux*/sfdisk  ${RASPIAN_IMAGE} < $partitions
+if [ -f ../util-linux*/sfdisk ]; then
+    ../util-linux*/sfdisk  ${RASPIAN_IMAGE} < $partitions
 else
     sfdisk  ${RASPIAN_IMAGE} < $partitions
 fi
