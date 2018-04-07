@@ -24,8 +24,6 @@ ssh_control()
 	sleep 1
     done
     set -ex
-    # Avoid copying the .git directory
-    ${SSH} pi@localhost mkdir artisan
     cat <<EOF > script
     set -ex
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
