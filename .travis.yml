@@ -5,37 +5,17 @@ matrix:
   - os: linux
     python: 3.6
     sudo: required
+    env:
+      - ARTISAN_OS=linux
   - os: osx
     language: generic
+    env:
+      - ARTISAN_OS=osx
 
 install:
   - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
   - sed -i'' -e "s/__revision__ = '0'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew upgrade python; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install p7zip qt; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install ruby-dev build-essential p7zip-full rpm gdb libudev-dev qt5-default; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get remove libusb-1.0-0; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl -L -O https://kent.dl.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.21/libusb-1.0.21.tar.bz2; fi 
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar xjf libusb-1.0.21.tar.bz2; fi 
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd libusb-1.0.21 && ./configure --prefix=/usr && make && sudo make install); fi 
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget22.tar.gz; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar -xzf libphidget22.tar.gz; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd libphidget22-* && ./configure --prefix=/usr && make && sudo make install && cp plat/linux/udev/* ../src/debian/etc/udev/rules.d) fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then gem install fpm; fi
-  - pip3 install -r src/requirements.txt
-  - pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
-  - curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
-  - unzip Phidget22Python.zip
-  - (cd Phidget22Python && python3 setup.py install)
-  - curl -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-  - 7za x snap7-full-1.4.2.7z
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then (cd snap7-full-1.4.2/build/unix && make -f x86_64_linux.mk all && sudo make -f x86_64_linux.mk install); fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then (cd snap7-full-1.4.2/build/osx && make -f x86_64_osx.mk all && sudo make -f x86_64_osx.mk LibInstall=/usr/local/lib install);  fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/macos/Phidget22.dmg; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then hdiutil attach Phidget22.dmg; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -pkg /Volumes/Phidgets22/Phidgets.pkg -target / ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo rm -rf /usr/local/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data; fi
+  - .travis/install-${ARTISAN_OS}.sh
   
 before_script:
   - ulimit -c unlimited -S
@@ -46,12 +26,7 @@ after_failure:
   - gdb -c src/core `which python3` -ex "thread apply all bt" -ex "set pagination 0" -batch
 
 script:
-  - cd src
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-centos-pi.sh && ./build-linux.sh; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-mac35.sh; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then xvfb-run --server-args="-screen 0 1024x768x24" python artisan.py; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then python3 artisan.py; fi
-  - cd ..
+  - .travis/script-${ARTISAN_OS}.sh
 
 deploy:
   skip_cleanup: true
