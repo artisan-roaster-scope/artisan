@@ -9,7 +9,7 @@ curl -L -O https://download.qemu.org/qemu-2.11.1.tar.xz
 tar xJf qemu-2.11.1.tar.xz
 cd qemu-2.11.1
 ./configure --target-list=arm-softmmu
-make
+make -j4
 sudo make install
 cd ..
 
@@ -18,5 +18,5 @@ curl -L -O https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.32/util
 tar xzf util-linux-2.32.tar.gz
 cd util-linux-2.32
 ./configure --disable-plymouth_support --disable-libmount --without-python
-make
+make -j4
 sudo make install
