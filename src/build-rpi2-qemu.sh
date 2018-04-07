@@ -65,10 +65,11 @@ sudo chown 1000  $mountpoint/home/pi/.ssh
 sudo chmod go-rwx $mountpoint/home/pi/.ssh
 cat /dev/zero | ssh-keygen -q -N ""
 sudo cp $HOME/.ssh/id_rsa.pub $mountpoint/home/pi/.ssh/authorized_keys
+sudo mkdir $mountpoint/home/pi/artisan
 if [ -d src ]; then
-    sudo cp -R ../artisan $mountpoint/home/pi
+    sudo cp -R ../artisan/src $mountpoint/home/pi/artisan
 elif [ -f artisan.py ]; then
-    sudo cp -R ../../artisan $mountpoint/home/pi
+    sudo cp -R ../../artisan/src $mountpoint/home/pi/artisan
 fi
 cd $mountpoint/home/pi
 sudo curl -L -O https://astuteinternet.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
