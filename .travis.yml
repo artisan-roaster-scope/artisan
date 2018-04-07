@@ -1,12 +1,21 @@
 language: python
 
+env:
+  
 matrix:
+  allow_failures:
+    - env: ARTISAN_OS=rpi
   include:
   - os: linux
     python: 3.6
     sudo: required
     env:
       - ARTISAN_OS=linux
+  - os: linux
+    language: generic
+    sudo: required
+    env:
+      ARTISAN_OS=rpi
   - os: osx
     language: generic
     env:
