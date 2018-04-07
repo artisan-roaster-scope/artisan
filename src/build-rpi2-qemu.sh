@@ -50,7 +50,8 @@ EOF
 ssh-keygen -R "[localhost]:2222"
 curl -L -O ${RASPIAN_URL}/${RASPIAN_ZIP}
 unzip ${RASPIAN_ZIP}
-
+curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/${KERNEL_IMAGE}
+curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/versatile-pb.dtb
 qemu-img resize ${RASPIAN_IMAGE} +2G
 parted -s ${RASPIAN_IMAGE} "resizepart 2 4006MB"
 sudo losetup -o $((98304*512)) /dev/loop0 ${RASPIAN_IMAGE}
@@ -64,7 +65,11 @@ sudo chown 1000  $mountpoint/home/pi/.ssh
 sudo chmod go-rwx $mountpoint/home/pi/.ssh
 cat /dev/zero | ssh-keygen -q -N ""
 sudo cp $HOME/.ssh/id_rsa.pub $mountpoint/home/pi/.ssh/authorized_keys
-sudo cp -R artisan $mountpoint/home/pi/.ssh
+if [ -d src ]; then
+    sudo cp -R ../artisan $mountpoint/home/pi
+elif [ -d artisan ]; then
+    sudo cp -R artisan $mountpoint/home/pi
+fi
 cd $mountpoint/home/pi
 curl -L -O https://astuteinternet.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
 7z x snap7-full-1.4.2.7z
@@ -75,9 +80,6 @@ unzip Phidget22Python.zip
 cd -
 sudo umount $mountpoint
 rmdir $mountpoint
-
-curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/${KERNEL_IMAGE}
-curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/versatile-pb.dtb
 
 ssh_control &
 qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -hda ${RASPIAN_IMAGE} -redir tcp:2222::22
