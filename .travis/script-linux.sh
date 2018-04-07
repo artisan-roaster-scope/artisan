@@ -4,3 +4,4 @@ set -ex
 cd src
 ./build-centos-pi.sh && ./build-linux.sh
 xvfb-run --server-args="-screen 0 1024x768x24" python artisan.py
+cd ..
