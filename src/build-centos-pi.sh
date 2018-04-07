@@ -101,9 +101,16 @@ cp $PYTHON_PATH/yoctopuce/cdll/* dist
 
 cp /usr/lib/libsnap7.so dist
 
-
 cp README.txt dist
 cp ../LICENSE dist/LICENSE.txt
+
+# remove automatically collected libs that might break things on some installations (eg. Ubuntu 16.04)
+# so it is better to rely on the system installed once
+# see https://github.com/gridsync/gridsync/issues/47 and https://github.com/gridsync/gridsync/issues/43
+#   and https://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error
+rm -f dist/libdrm.so.2
+rm -f dist/libX11.so.6
+rm -f dist/libstdc++.so.6
 
 rm -f libusb-1.0.so.0
 
