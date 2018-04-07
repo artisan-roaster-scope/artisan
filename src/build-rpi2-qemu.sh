@@ -96,7 +96,6 @@ sudo unzip Phidget22Python.zip
 cd -
 sudo umount $mountpoint
 sudo losetup -d /dev/loop0
-losetup -l
 rmdir $mountpoint
 
 ssh_control &
