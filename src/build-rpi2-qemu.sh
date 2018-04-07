@@ -79,6 +79,7 @@ sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidg
 sudo unzip Phidget22Python.zip
 cd -
 sudo umount $mountpoint
+sudo losetup -d /dev/loop0
 rmdir $mountpoint
 
 ssh_control &
