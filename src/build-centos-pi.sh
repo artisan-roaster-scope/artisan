@@ -6,11 +6,18 @@ export LD_LIBRARY_PATH=$LD_LIBTRARY_PATH:/usr/local/lib
 export PATH=$PATH:$HOME/.local/bin
 
 if [ ! -z $TRAVIS ]; then
+    # Travis environment
     export PYTHON_PATH=/home/travis/virtualenv/python3.6/lib/python3.6/site-packages
-else
+    export QT_PATH=$PYTHON_PATH/PyQt5/Qt
+elif [ -d /usr/lib/python3/dist-packages/PyQt5 ]; then
+    # ARM builds
     export PYTHON_PATH=`python3 -m site --user-site`
+    export QT_PATH=/usr/share/qt5
+else
+    # Other builds
+    export PYTHON_PATH=`python3 -m site --user-site`
+    export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 fi
-export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 
 rm -rf build
 rm -rf dist
