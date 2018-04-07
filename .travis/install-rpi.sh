@@ -17,6 +17,6 @@ cd ..
 curl -L -O https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.32/util-linux-2.32.tar.gz
 tar xzf util-linux-2.32.tar.gz
 cd util-linux-2.32
-./configure --disable-plymouth_support 
+./configure --disable-plymouth_support --disable-libmount --without-python
 make
 sudo make install
