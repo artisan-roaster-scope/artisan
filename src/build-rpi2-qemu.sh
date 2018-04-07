@@ -63,13 +63,15 @@ sudo sed -i'' -e 's/exit 0/\/etc\/init.d\/ssh start/' $mountpoint/etc/rc.local
 sudo mkdir $mountpoint/home/pi/.ssh
 sudo chown 1000  $mountpoint/home/pi/.ssh
 sudo chmod go-rwx $mountpoint/home/pi/.ssh
-cat /dev/zero | ssh-keygen -q -N ""
+cat /dev/zero | ssh-keygen -q -N "" || true
 sudo cp $HOME/.ssh/id_rsa.pub $mountpoint/home/pi/.ssh/authorized_keys
 sudo mkdir $mountpoint/home/pi/artisan
 if [ -d src ]; then
     sudo cp -R ../artisan/src $mountpoint/home/pi/artisan
+    sudo cp -R ../artisan/LICENSE $mountpoint/home/pi/artisan
 elif [ -f artisan.py ]; then
     sudo cp -R ../../artisan/src $mountpoint/home/pi/artisan
+    sudo cp -R ../../artisan/LICENSE $mountpoint/home/pi/artisan
 fi
 cd $mountpoint/home/pi
 sudo curl -L -O https://astuteinternet.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
