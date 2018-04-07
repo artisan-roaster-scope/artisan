@@ -37,9 +37,7 @@ ssh_control()
     (cd snap7-full-1.4.2/build/unix && make -f arm_v6_linux.mk all && sudo make -f arm_v6_linux.mk install);
     (cd libphidget22-* && ./configure --prefix=/usr && make && sudo make install && cp plat/linux/udev/* ../artisan/src/debian/etc/udev/rules.d)
     (cd Phidget22Python && sudo python3 setup.py install)
-    if [ -d src ]; then
-       cd src
-    fi
+    cd artisan/src
     ./build-centos-pi.sh
     ./build-rpi2-deb.sh
 EOF
@@ -90,13 +88,14 @@ elif [ -f artisan.py ]; then
     sudo cp -R ../../artisan/src $mountpoint/home/pi/artisan
     sudo cp -R ../../artisan/LICENSE $mountpoint/home/pi/artisan
 fi
-cd $mountpoint/home/pi/artisan
+cd $mountpoint/home/pi
 sudo curl -L -O https://astuteinternet.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
 sudo 7z x -bd snap7-full-1.4.2.7z
 sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget22.tar.gz
 sudo tar -xzf libphidget22.tar.gz
 sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
 sudo unzip -q Phidget22Python.zip
+sudo chown -R 1000 .
 cd -
 sudo umount $mountpoint
 sudo losetup -d /dev/loop0
