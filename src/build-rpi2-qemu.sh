@@ -27,7 +27,7 @@ ssh_control()
     cat <<EOF > script
     set -x
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
-	    libblas-dev liblapack-dev libatlas-base-dev gfortran p7zip-full
+	    libblas-dev liblapack-dev libatlas-base-dev gfortran
     # Sometimes pip3 fails
     pip3 install -r artisan/src/requirements.txt
     while [ $? -ne 0 ]; do
