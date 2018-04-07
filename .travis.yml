@@ -18,6 +18,8 @@ matrix:
       ARTISAN_OS=rpi
   - os: osx
     language: generic
+    cache:
+      - pip
     env:
       - ARTISAN_OS=osx
 
