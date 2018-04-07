@@ -12953,6 +12953,7 @@ class ApplicationWindow(QMainWindow):
                                    + "border: 0px solid black;"
                                    + "}" )
         
+        
         # update navigationbar
         aw.level1layout.removeWidget(aw.ntb) # remove current bar
         if aw.ntb._active == 'PAN':
@@ -12965,6 +12966,7 @@ class ApplicationWindow(QMainWindow):
         aw.ntb.destroy()
         whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
         aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
+        
         if whitep:
             aw.qmc.palette["messages"] = 'white'
         else:
@@ -44472,7 +44474,7 @@ class AlarmDlg(ArtisanDialog):
                                QApplication.translate("ComboBox","above",None)])
         condComboBox.setCurrentIndex(aw.qmc.alarmcond[i])
         #temperature
-        tempedit = QLineEdit(str(aw.qmc.alarmtemperature[i]))
+        tempedit = QLineEdit(str(aw.float2float(aw.qmc.alarmtemperature[i])))
         tempedit.setAlignment(Qt.AlignRight)
         tempedit.setMaximumWidth(100)
 #        tempedit.setValidator(QIntValidator(0, 999,tempedit))
