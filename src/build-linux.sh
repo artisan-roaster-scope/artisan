@@ -53,7 +53,7 @@ flavor." \
 
 # Allow FPM to write some temporary files
 sudo chmod o+w .
-fpm -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" -p .. \
+fpm --deb-no-default-config-files -s dir -t deb -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>" -p .. \
 --vendor "Artisan GitHub" \
 --no-auto-depends \
 --url "https://github.com/artisan-roaster-scope/artisan" \

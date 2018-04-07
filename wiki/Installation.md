@@ -67,7 +67,7 @@ After this command you might need to logout and login again. Try
 that your account was successful added to the dialout group.
 
 
-Note that for apps running by non-root users access to Phidgets or Yoctopuce devices require the installation of corresponding udev rules. Check the [Phidgets](https://www.phidgets.com/docs/OS_-_Linux#Advanced_Information) and [Yoctopuce](https://www.yoctopuce.com/EN/article/how-to-begin-with-yoctopuce-devices-on-linux) platform installation notes.
+Note that for apps running by non-root users access to Phidgets or Yoctopuce devices require the installation of corresponding udev rules. Check the [Phidgets](https://www.phidgets.com/docs/OS_-_Linux#Advanced_Information) and [Yoctopuce](https://www.yoctopuce.com/EN/article/how-to-begin-with-yoctopuce-devices-on-linux) platform installation notes. Those rules are installed automatically by Artisan, but require the users to be in the `sudo` group for security considerations.
 
 
 
@@ -128,17 +128,4 @@ Artisan uses one decimal point. You have to manually configure your pid so that 
 
 ## Aillio Bullet R1
 
-On Linux, Artisan needs read/write access to the USB device.
-The easiest way to make sure permissions are always setup is to create
-a udev rule.
-
-Create a file in `/etc/udev/rules.d` named `60-aillio-r1.rules` containing
-the following line:
-
-```
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5741", MODE="0660", GROUP="you-group-name"
-```
-
-Make sure GROUP is set correctly based on your group.  Most of the
-time your group name matches your user name, but you can confirm that
-by running `id` on a terminal.
+On Linux, Artisan needs read/write access to the USB device. Corresponding udev rules are automatically installed along Artisan in `/etc/udev/rules.d`. However, those require the users to be in the `sudo` group for security considerations.
