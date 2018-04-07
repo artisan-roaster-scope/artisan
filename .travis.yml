@@ -1,7 +1,5 @@
 language: python
 
-env:
-  
 matrix:
   allow_failures:
     - env: ARTISAN_OS=rpi
