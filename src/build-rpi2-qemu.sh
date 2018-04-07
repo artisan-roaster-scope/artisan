@@ -62,6 +62,7 @@ sudo sed -i'' -e 's/exit 0/\/etc\/init.d\/ssh start/' $mountpoint/etc/rc.local
 sudo mkdir $mountpoint/home/pi/.ssh
 sudo chown 1000  $mountpoint/home/pi/.ssh
 sudo chmod go-rwx $mountpoint/home/pi/.ssh
+cat /dev/zero | ssh-keygen -q -N ""
 sudo cp $HOME/.ssh/id_rsa.pub $mountpoint/home/pi/.ssh/authorized_keys
 sudo cp -R artisan $mountpoint/home/pi/.ssh
 cd $mountpoint/home/pi
