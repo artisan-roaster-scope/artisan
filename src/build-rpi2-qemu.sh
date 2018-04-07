@@ -52,18 +52,7 @@ curl -L -O ${RASPIAN_URL}/${RASPIAN_ZIP}
 unzip ${RASPIAN_ZIP}
 
 qemu-img resize ${RASPIAN_IMAGE} +2G
-partitions=`mktemp`
-cat <<EOF > $partitions
-label: dos
-label-id: 0xa8fe70f4
-device: 2018-03-13-raspbian-stretch-lite.img
-unit: sectors
-
-2018-03-13-raspbian-stretch-lite.img1 : start=        8192, size=       85611, type=c
-2018-03-13-raspbian-stretch-lite.img2 : start=       98304, size=     7725056, type=83
-EOF
-sfdisk ${RASPIAN_IMAGE} < $partitions
-rm $partitions
+parted -s ${RASPIAN_IMAGE} "resizepart 2 4006MB"
 sudo losetup -D
 sudo losetup -o $((98304*512)) /dev/loop0 ${RASPIAN_IMAGE}
 sudo e2fsck -fy /dev/loop0 || true
