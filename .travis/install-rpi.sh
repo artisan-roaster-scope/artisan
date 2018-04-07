@@ -18,5 +18,6 @@ curl -L -O https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.32/util
 tar xzf util-linux-2.32.tar.gz
 cd util-linux-2.32
 ./configure --disable-plymouth_support --disable-libmount --without-python
-make -j4
-sudo make install
+make -j4 sfdisk
+./sfdisk || true
+
