@@ -53,7 +53,18 @@ unzip ${RASPIAN_ZIP}
 curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/${KERNEL_IMAGE}
 curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/versatile-pb.dtb
 qemu-img resize ${RASPIAN_IMAGE} +2G
-parted -s ${RASPIAN_IMAGE} "resizepart 2 4006MB"
+partitions=`mktemp`
+cat <<EOF > $partitions
+label: dos
+label-id: 0xa8fe70f4
+device: 2018-03-13-raspbian-stretch-lite.img
+unit: sectors
+
+2018-03-13-raspbian-stretch-lite.img1 : start=        8192, size=       85611, type=c
+2018-03-13-raspbian-stretch-lite.img2 : start=       98304, size=     7725056, type=83
+EOF
+sfdisk ${RASPIAN_IMAGE} < $partitions
+rm $partitions
 sudo losetup -o $((98304*512)) /dev/loop0 ${RASPIAN_IMAGE}
 sudo e2fsck -fy /dev/loop0 || true
 sudo resize2fs /dev/loop0
