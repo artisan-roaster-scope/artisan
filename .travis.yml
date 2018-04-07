@@ -7,6 +7,8 @@ matrix:
   - os: linux
     python: 3.6
     sudo: required
+    cache:
+      - pip
     env:
       - ARTISAN_OS=linux
   - os: linux

@@ -90,7 +90,7 @@ elif [ -f artisan.py ]; then
     sudo cp -R ../../artisan/src $mountpoint/home/pi/artisan
     sudo cp -R ../../artisan/LICENSE $mountpoint/home/pi/artisan
 fi
-cd $mountpoint/home/pi
+cd $mountpoint/home/pi/artisan
 sudo curl -L -O https://astuteinternet.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
 sudo 7z x -bd snap7-full-1.4.2.7z
 sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget22.tar.gz
