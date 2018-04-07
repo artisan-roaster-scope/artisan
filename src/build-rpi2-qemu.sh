@@ -25,17 +25,21 @@ ssh_control()
     done
     set -ex
     cat <<EOF > script
-    set -ex
+    set -x
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran p7zip-full
     # Sometimes pip3 fails
-    pip3 install -r artisan/src/requirements.txt || pip3 install -r artisan/src/requirements.txt
+    pip3 install -r artisan/src/requirements.txt
+    while [ $? -ne 0 ]; do
+    	  pip3 install -r artisan/src/requirements.txt
+    done
+    set -e
     (cd snap7-full-1.4.2/build/unix && make -f arm_v6_linux.mk all && sudo make -f arm_v6_linux.mk install);
     (cd libphidget22-* && ./configure --prefix=/usr && make && sudo make install && cp plat/linux/udev/* ../artisan/src/debian/etc/udev/rules.d)
-    curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
-    unzip Phidget22Python.zip
     (cd Phidget22Python && sudo python3 setup.py install)
-    cd artisan/src
+    if [ -d src ]; then
+       cd src
+    fi
     ./build-centos-pi.sh
     ./build-rpi2-deb.sh
 EOF
