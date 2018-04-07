@@ -53,7 +53,6 @@ unzip ${RASPIAN_ZIP}
 
 qemu-img resize ${RASPIAN_IMAGE} +2G
 parted -s ${RASPIAN_IMAGE} "resizepart 2 4006MB"
-sudo losetup -D
 sudo losetup -o $((98304*512)) /dev/loop0 ${RASPIAN_IMAGE}
 sudo e2fsck -fy /dev/loop0 || true
 sudo resize2fs /dev/loop0
@@ -75,7 +74,6 @@ unzip Phidget22Python.zip
 cd -
 sudo umount $mountpoint
 rmdir $mountpoint
-sudo losetup -D
 
 curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/${KERNEL_IMAGE}
 curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/versatile-pb.dtb
