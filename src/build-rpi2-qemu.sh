@@ -93,7 +93,11 @@ sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidg
 sudo unzip -q Phidget22Python.zip
 sudo curl -L -O https://dl.bintray.com/artisan/artisan-cache/pip-cache.tar.gz   
 sudo tar -xzpf pip-cache.tar.gz
+sudo rm pip-cache.tar.gz
 sudo chown -R 1000 .
+sudo curl -L -O https://dl.bintray.com/artisan/artisan-cache/apt-cache.tar.gz
+sudo tar -C $mountpoint -xzpf apt-cache.tar.gz
+sudo rm apt-cache.tar.gz
 cd -
 sudo umount $mountpoint
 sudo losetup -d /dev/loop0
