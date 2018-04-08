@@ -6,7 +6,8 @@ sudo apt-get install p7zip-full libglib2.0-dev zlib1g-dev
 # Use updated qemu
 curl -L -O https://dl.bintray.com/artisan/artisan-cache/qemu.tar.gz
 tar xzf qemu.tar.gz
-export PATH=$PATH:$PWD
+sudo mv qemu-img /usr/bin
+sudo mv qemu-system-arm /usr/bin
 #curl -L -O https://download.qemu.org/qemu-2.11.1.tar.xz
 #tar xJf qemu-2.11.1.tar.xz
 #cd qemu-2.11.1
