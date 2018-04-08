@@ -28,11 +28,7 @@ ssh_control()
     set -x
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
-    # Sometimes pip3 fails
     pip3 install -r artisan/src/requirements.txt
-    while [ $? -ne 0 ]; do
-    	  pip3 install -r artisan/src/requirements.txt
-    done
     set -e
     (cd snap7-full-1.4.2/build/unix && make -f arm_v6_linux.mk all && sudo make -f arm_v6_linux.mk install);
     (cd libphidget22-* && ./configure --prefix=/usr && make && sudo make install && cp plat/linux/udev/* ../artisan/src/debian/etc/udev/rules.d)
@@ -95,6 +91,8 @@ sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/lib
 sudo tar -xzf libphidget22.tar.gz
 sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
 sudo unzip -q Phidget22Python.zip
+sudo curl -L -O https://dl.bintray.com/artisan/artisan-cache/pip-cache.tar.gz   
+sudo tar -xzpf pip-cache.tar.gz
 sudo chown -R 1000 .
 cd -
 sudo umount $mountpoint
