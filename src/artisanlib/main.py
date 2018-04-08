@@ -23932,7 +23932,7 @@ class ApplicationWindow(QMainWindow):
             if filename:
                 if extension not in filename:
                     filename += extension
-                aw.qmc.fig.savefig(filename,transparent=True,facecolor='none', edgecolor='none',frameon=True) # transparent=True is need to get the delta curves and legend drawn
+                aw.qmc.fig.savefig(filename,transparent=(aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"]=='None'),facecolor=str(aw.qmc.palette["canvas"]),edgecolor=None,frameon=True) # transparent=True is need to get the delta curves and legend drawn
                 aw.qmc.updateBackground() # that redraw is needed to avoid the "transparent flicker"
                                 
                 self.sendmessage(QApplication.translate("Message","{0} saved", None).format(str(filename)))
