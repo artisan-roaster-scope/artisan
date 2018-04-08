@@ -6,7 +6,7 @@ sudo apt-get install p7zip-full libglib2.0-dev zlib1g-dev
 # Use updated qemu
 curl -L -O http://ftp.us.debian.org/debian/pool/main/q/qemu/qemu-system-arm_2.11+dfsg-1_amd64.deb
 curl -L -O http://ftp.us.debian.org/debian/pool/main/q/qemu/qemu-system-common_2.11+dfsg-1_amd64.deb
-dpkg -i qemu*
+sudo dpkg -i qemu*
 #curl -L -O https://download.qemu.org/qemu-2.11.1.tar.xz
 #tar xJf qemu-2.11.1.tar.xz
 #cd qemu-2.11.1
