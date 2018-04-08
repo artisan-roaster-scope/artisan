@@ -9,6 +9,7 @@ matrix:
     sudo: required
     cache:
       - pip
+      - bundler
     env:
       - ARTISAN_OS=linux
   - os: linux
