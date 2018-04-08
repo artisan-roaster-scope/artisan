@@ -15,3 +15,8 @@ header:
 * __Features:__ 
   - logging of drum temperature (DT), bean temperature (BT), exhaust temperature, BT rate-of-rise curves, and voltage
   - control of fan, heater and drum speed
+
+**Watch out!** For best performance, please start monitoring the
+roaster before pre-heating.  Artisan doesn't monitor unsafe
+temperatures, so you should never leave the roaster alone.
+{: .notice--primary}
