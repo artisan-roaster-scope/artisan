@@ -1462,7 +1462,7 @@ class tgraphcanvas(FigureCanvas):
         self.ETlcd = True
         self.BTlcd = True
         self.swaplcds = False
-        self.LCDdecimalplaces = 0
+        self.LCDdecimalplaces = 1
         self.DeltaETflag = False
         self.DeltaBTflag = True
         self.DeltaETlcdflag = False
