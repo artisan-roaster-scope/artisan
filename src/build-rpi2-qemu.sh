@@ -86,7 +86,7 @@ elif [ -f artisan.py ]; then
 fi
 cd $mountpoint/home/pi
 sudo curl -L -O https://astuteinternet.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-sudo 7z x -bd snap7-full-1.4.2.7z
+sudo 7z x -bd snap7-full-1.4.2.7z >/dev/null
 sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget22.tar.gz
 sudo tar -xzf libphidget22.tar.gz
 sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
