@@ -25,13 +25,9 @@ ssh_control()
     done
     set -ex
     cat <<EOF > script
-    set -x
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
     pip3 install -r artisan/src/requirements.txt
-    set -e
-    (cd snap7-full-1.4.2/build/unix && make -f arm_v6_linux.mk all && sudo make -f arm_v6_linux.mk install);
-    (cd libphidget22-* && ./configure --prefix=/usr && make && sudo make install && cp plat/linux/udev/* ../artisan/src/debian/etc/udev/rules.d)
     (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan/src
     ./build-centos-pi.sh

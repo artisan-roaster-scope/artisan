@@ -18,5 +18,4 @@ tar xzf util-linux-2.32.tar.gz
 cd util-linux-2.32
 ./configure --disable-plymouth_support --disable-libmount --without-python
 make -j4 sfdisk
-./sfdisk || true
 
