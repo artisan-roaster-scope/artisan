@@ -4,13 +4,14 @@ set -exm
 
 # User configurable variables
 KERNEL_IMAGE="kernel-qemu-4.9.59-stretch"
-RASPIAN_DATE="2018-03-13"
-RASPIAN_URL="http://director.downloads.raspberrypi.org/raspbian/images/raspbian-2018-03-14"
+RASPBIAN_DATE="2018-03-13"
+#RASPBIAN_URL="http://director.downloads.raspberrypi.org/raspbian/images/raspbian-2018-03-14"
+RASPBIAN_URL="http://ftp.jaist.ac.jp/pub/raspberrypi/raspbian/images/raspbian-2018-03-14"
 
 SSH="ssh -p 2222 -o StrictHostKeyChecking=no"
 SCP="scp -P 2222 -o StrictHostKeyChecking=no"
-RASPIAN_ZIP=${RASPIAN_DATE}-raspbian-stretch.zip
-RASPIAN_IMAGE=${RASPIAN_DATE}-raspbian-stretch.img
+RASPBIAN_ZIP=${RASPBIAN_DATE}-raspbian-stretch.zip
+RASPBIAN_IMAGE=${RASPBIAN_DATE}-raspbian-stretch.img
 
 ssh_control()
 {
@@ -49,11 +50,11 @@ EOF
 }
 
 ssh-keygen -R "[localhost]:2222"
-curl -L -O ${RASPIAN_URL}/${RASPIAN_ZIP}
-unzip ${RASPIAN_ZIP}
+curl -L -O ${RASPBIAN_URL}/${RASPBIAN_ZIP}
+unzip ${RASPBIAN_ZIP}
 curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/${KERNEL_IMAGE}
 curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/versatile-pb.dtb
-qemu-img resize ${RASPIAN_IMAGE} +2G
+qemu-img resize ${RASPBIAN_IMAGE} +2G
 partitions=`mktemp`
 cat <<EOF > $partitions
 label: dos
@@ -64,9 +65,9 @@ unit: sectors
 2018-03-14-raspbian-stretch.img1 : start=        8192, size=       85611, type=c
 2018-03-14-raspbian-stretch.img2 : start=       98304, size=    13860863, type=83
 EOF
-sfdisk  ${RASPIAN_IMAGE} < $partitions
+sfdisk  ${RASPBIAN_IMAGE} < $partitions
 rm $partitions
-sudo losetup -o $((98304*512)) /dev/loop0 ${RASPIAN_IMAGE}
+sudo losetup -o $((98304*512)) /dev/loop0 ${RASPBIAN_IMAGE}
 sudo e2fsck -fy /dev/loop0 || true
 sudo resize2fs /dev/loop0
 mountpoint=`mktemp -d`
@@ -105,4 +106,4 @@ sudo losetup -d /dev/loop0
 rmdir $mountpoint
 
 ssh_control &
-qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -hda ${RASPIAN_IMAGE} -redir tcp:2222::22
+qemu-system-arm -kernel ${KERNEL_IMAGE} -dtb versatile-pb.dtb -cpu arm1176 -m 256 -M versatilepb -no-reboot -nographic -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw" -hda ${RASPBIAN_IMAGE} -redir tcp:2222::22
