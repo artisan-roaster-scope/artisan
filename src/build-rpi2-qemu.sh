@@ -5,13 +5,12 @@ set -exm
 # User configurable variables
 KERNEL_IMAGE="kernel-qemu-4.9.59-stretch"
 RASPIAN_DATE="2018-03-13"
-RASPIAN_URL="http://director.downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-03-14"
+RASPIAN_URL="http://director.downloads.raspberrypi.org/raspbian/images/raspbian-2018-03-14"
 
 SSH="ssh -p 2222 -o StrictHostKeyChecking=no"
 SCP="scp -P 2222 -o StrictHostKeyChecking=no"
-RASPIAN_ZIP=${RASPIAN_DATE}-raspbian-stretch-lite.zip
-RASPIAN_IMAGE=${RASPIAN_DATE}-raspbian-stretch-lite.img
-
+RASPIAN_ZIP=${RASPIAN_DATE}-raspbian-stretch.zip
+RASPIAN_IMAGE=${RASPIAN_DATE}-raspbian-stretch.img
 
 ssh_control()
 {
@@ -58,18 +57,14 @@ qemu-img resize ${RASPIAN_IMAGE} +2G
 partitions=`mktemp`
 cat <<EOF > $partitions
 label: dos
-label-id: 0xa8fe70f4
-device: 2018-03-13-raspbian-stretch-lite.img
+label-id: 0x15ca46a5
+device: 2018-03-14-raspbian-stretch.img
 unit: sectors
 
-2018-03-13-raspbian-stretch-lite.img1 : start=        8192, size=       85611, type=c
-2018-03-13-raspbian-stretch-lite.img2 : start=       98304, size=     7725056, type=83
+2018-03-14-raspbian-stretch.img1 : start=        8192, size=       85611, type=c
+2018-03-14-raspbian-stretch.img2 : start=       98304, size=    13860863, type=83
 EOF
-if [ -f util-linux*/sfdisk ]; then
-    util-linux*/sfdisk  ${RASPIAN_IMAGE} < $partitions
-else
-    sfdisk  ${RASPIAN_IMAGE} < $partitions
-fi
+sfdisk  ${RASPIAN_IMAGE} < $partitions
 rm $partitions
 sudo losetup -o $((98304*512)) /dev/loop0 ${RASPIAN_IMAGE}
 sudo e2fsck -fy /dev/loop0 || true
