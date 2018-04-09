@@ -33,6 +33,7 @@ ssh_control()
     fi
     while :; do
         pip3 install -r artisan/src/requirements.txt
+	which pyinstaller
 	if [ $? -eq 0 ]; then
 	   break
 	fi
