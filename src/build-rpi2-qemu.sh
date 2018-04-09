@@ -25,14 +25,19 @@ ssh_control()
     done
     set -ex
     cat <<EOF > script
+    set -x
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
+    if [ $? -ne 0 ]; then
+       exit 1
+    fi
     while :; do
         pip3 install -r artisan/src/requirements.txt
 	if [ $? -eq 0 ]; then
 	   break
 	fi
-    done       	
+    done
+    set -e
     (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan/src
     ./build-centos-pi.sh
