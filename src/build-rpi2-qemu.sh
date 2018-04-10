@@ -36,7 +36,8 @@ ssh_control()
 EOF
     ${SCP} script pi@localhost:
     ${SSH} pi@localhost sh script
-    ${SCP} pi@localhost:artisan/src/\*.deb .
+    pwd
+    ${SCP} pi@localhost:artisan/src/\*.deb src
     pkill qemu-system-arm
 }
 
