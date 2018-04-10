@@ -5,8 +5,8 @@ set -exm
 # User configurable variables
 KERNEL_IMAGE="kernel-qemu-4.9.59-stretch"
 RASPBIAN_DATE="2018-03-13"
-#RASPBIAN_URL="http://director.downloads.raspberrypi.org/raspbian/images/raspbian-2018-03-14"
-RASPBIAN_URL="http://ftp.jaist.ac.jp/pub/raspberrypi/raspbian/images/raspbian-2018-03-14"
+RASPBIAN_URL="http://director.downloads.raspberrypi.org/raspbian/images/raspbian-2018-03-14"
+#RASPBIAN_URL="http://ftp.jaist.ac.jp/pub/raspberrypi/raspbian/images/raspbian-2018-03-14"
 
 SSH="ssh -p 2222 -o StrictHostKeyChecking=no"
 SCP="scp -P 2222 -o StrictHostKeyChecking=no"
@@ -25,27 +25,17 @@ ssh_control()
     done
     set -ex
     cat <<EOF > script
-    set -x
+    set -xe
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
-    if [ $? -ne 0 ]; then
-       exit 1
-    fi
-    while :; do
-        pip3 install -r artisan/src/requirements.txt
-	which pyinstaller
-	if [ $? -eq 0 ]; then
-	   break
-	fi
-    done
-    set -e
+    pip3 install -r artisan/src/requirements.txt || pip3 install -r artisan/src/requirements.txt
     (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan/src
     ./build-centos-pi.sh
     ./build-rpi2-deb.sh
 EOF
     ${SCP} script pi@localhost:
-    ${SSH} pi@localhost sh script
+    travis_wait ${SSH} pi@localhost sh script
     ${SCP} pi@localhost:artisan/src/\*.deb .
     pkill qemu-system-arm
 }
@@ -74,6 +64,7 @@ sudo resize2fs /dev/loop0
 mountpoint=`mktemp -d`
 sudo mount /dev/loop0 $mountpoint
 sudo sed -i'' -e 's/exit 0/\/etc\/init.d\/ssh start/' $mountpoint/etc/rc.local
+sudo sh -c "echo '' >> $mountpoint/etc/rc.local"
 sudo mkdir $mountpoint/home/pi/.ssh
 sudo chown 1000  $mountpoint/home/pi/.ssh
 sudo chmod go-rwx $mountpoint/home/pi/.ssh
