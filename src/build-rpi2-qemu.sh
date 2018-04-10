@@ -15,7 +15,6 @@ RASPBIAN_IMAGE=${RASPBIAN_DATE}-raspbian-stretch.img
 
 ssh_control()
 {
-    set +ex
     while :; do
 	${SSH} pi@localhost ls 2>&1 >/dev/null
 	if [ $? -eq 0 ]; then
@@ -23,9 +22,8 @@ ssh_control()
 	fi
 	sleep 1
     done
-    set -ex
     cat <<EOF > script
-    set -xe
+    set -x
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
     pip3 install -r artisan/src/requirements.txt || pip3 install -r artisan/src/requirements.txt
@@ -34,6 +32,7 @@ ssh_control()
     ./build-centos-pi.sh
     ./build-rpi2-deb.sh
 EOF
+    set -x
     ${SCP} script pi@localhost:
     ${SSH} pi@localhost sh script
     ${SCP} pi@localhost:artisan/src/\*.deb .
