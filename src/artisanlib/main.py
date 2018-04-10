@@ -22511,7 +22511,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
         contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeye Coffee), Moshe Spinell")
         contributors += u(", Morris Beume (Morris.Coffee), Michael Herbert, Bill (San Franciscan Roaster), Chistopher Feran")
-        contributors += u(", Coffed<br>")
+        contributors += u(", Coffed, Bono Gargolov<br>")
         box = QMessageBox(self)
         
         #create a html QString
@@ -28257,8 +28257,13 @@ class editGraphDlg(ArtisanDialog):
                     j = j + 1
 
     def createEventTable(self):
-        self.eventtable.clear()
         nevents = len(aw.qmc.specialevents)
+        
+        #self.eventtable.clear() # this crashes Ubuntu 16.04
+#        if nevents != 0:
+#            self.eventtable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
+        self.eventtable.clearSelection() # this seems to work also for Ubuntu 16.04
+        
         self.eventtable.setRowCount(nevents)
         self.eventtable.setColumnCount(6)
         self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table", "Time", None),
@@ -28272,6 +28277,7 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventtable.setSelectionMode(QTableWidget.ExtendedSelection)
         self.eventtable.setShowGrid(True)
+        
         if pyqtversion < 5:
             self.eventtable.verticalHeader().setResizeMode(2)
         else:
@@ -28477,7 +28483,6 @@ class editGraphDlg(ArtisanDialog):
             # check for selection
             selected = self.eventtable.selectedRanges()
             if selected and len(selected) > 0:
-                #rows = [s.topRow() for s in selected]
                 rows = []
                 for s in selected:
                     top = s.topRow()
@@ -31535,8 +31540,13 @@ class EventsDlg(ArtisanDialog):
 
     def createEventbuttonTable(self):
         self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
-        self.eventbuttontable.clear()
         nbuttons = len(aw.extraeventstypes) 
+        
+        # self.eventbuttontable.clear() # this crashes Ubuntu 16.04
+#        if ndata != 0:
+#            self.eventbuttontable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
+        self.eventbuttontable.clearSelection() # this seems to work also for Ubuntu 16.04
+        
         self.eventbuttontable.setRowCount(nbuttons)
         self.eventbuttontable.setColumnCount(10)
         self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None),
@@ -32629,8 +32639,13 @@ class flavorDlg(ArtisanDialog):
         aw.qmc.flavorchart()
 
     def createFlavorTable(self):
-        self.flavortable.clear()
         nflavors = len(aw.qmc.flavorlabels)
+        
+        # self.flavortable.clear() # this crashes Ubuntu 16.04
+#        if ndata != 0:
+#            self.flavortable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
+        self.flavortable.clearSelection() # this seems to work also for Ubuntu 16.04
+        
         if nflavors:
             self.flavortable.setRowCount(nflavors)
             self.flavortable.setColumnCount(2)
@@ -33096,7 +33111,8 @@ class backgroundDlg(ArtisanDialog):
         self.xtcurveComboBox.clear()
         aw.deleteBackground()
         self.eventtable.clear()
-        self.datatable.clear()
+        self.createEventTable()
+        self.createDataTable()
         aw.qmc.resetlinecountcaches()
         self.xtcurveComboBox.blockSignals(False)
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -33174,212 +33190,220 @@ class backgroundDlg(ArtisanDialog):
         #aw.qmc.safesaveflag = True
 
     def createEventTable(self):
-        self.eventtable.clear()
         ndata = len(aw.qmc.backgroundEvents)
-        if ndata:
-            self.eventtable.setRowCount(ndata)
-            self.eventtable.setColumnCount(6)
-            self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None),
-                                                       QApplication.translate("Table", "BT", None),
-                                                       QApplication.translate("Table", "ET", None),
-                                                       QApplication.translate("Table","Description",None),
-                                                       QApplication.translate("Table","Type",None),
-                                                       QApplication.translate("Table","Value",None)])
-            self.eventtable.setAlternatingRowColors(True)
-            self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
-            self.eventtable.setShowGrid(True)
-            if pyqtversion < 5:
-                self.eventtable.verticalHeader().setResizeMode(2)
-            else:
-                self.eventtable.verticalHeader().setSectionResizeMode(2)
-            if aw.qmc.timeindex[0] != -1:
-                start = aw.qmc.timex[aw.qmc.timeindex[0]]
-            else:
-                start = 0
-            for i in range(ndata):
-                timez = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start)))
-                timez.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+        
+        # self.eventtable.clear() # this crashes Ubuntu 16.04
+#        if ndata != 0:
+#            self.eventtable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
+        self.eventtable.clearSelection() # this seems to work also for Ubuntu 16.04
+        
+        self.eventtable.setRowCount(ndata)
+        self.eventtable.setColumnCount(6)
+        self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None),
+                                                   QApplication.translate("Table", "BT", None),
+                                                   QApplication.translate("Table", "ET", None),
+                                                   QApplication.translate("Table","Description",None),
+                                                   QApplication.translate("Table","Type",None),
+                                                   QApplication.translate("Table","Value",None)])
+        self.eventtable.setAlternatingRowColors(True)
+        self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
+        self.eventtable.setShowGrid(True)
+        if pyqtversion < 5:
+            self.eventtable.verticalHeader().setResizeMode(2)
+        else:
+            self.eventtable.verticalHeader().setSectionResizeMode(2)
+        if aw.qmc.timeindex[0] != -1:
+            start = aw.qmc.timex[aw.qmc.timeindex[0]]
+        else:
+            start = 0
+        for i in range(ndata):
+            timez = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start)))
+            timez.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
     
-                if aw.qmc.LCDdecimalplaces:
-                    fmtstr = "%.1f"
-                else:
-                    fmtstr = "%.0f"
-                
-                btline = QTableWidgetItem(fmtstr%(aw.qmc.temp2B[aw.qmc.backgroundEvents[i]]) + aw.qmc.mode)
-                btline.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
-                
-                etline = QTableWidgetItem(fmtstr%(aw.qmc.temp1B[aw.qmc.backgroundEvents[i]]) + aw.qmc.mode)
-                etline.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
-                            
-                
-                description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
-                etype = QTableWidgetItem(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[i]))
-                evalue = QTableWidgetItem(aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[i]))
-                evalue.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
-                #add widgets to the table
-                self.eventtable.setItem(i,0,timez)
-                self.eventtable.setItem(i,1,btline)
-                self.eventtable.setItem(i,2,etline)
-                self.eventtable.setItem(i,3,description)
-                self.eventtable.setItem(i,4,etype)
-                self.eventtable.setItem(i,5,evalue)
-            # improve width of Time column
-            self.eventtable.setColumnWidth(1,175)
-            header = self.eventtable.horizontalHeader()
-            if pyqtversion < 5:
-                header.setResizeMode(0, QHeaderView.Fixed)
-                header.setResizeMode(1, QHeaderView.Fixed)
-                header.setResizeMode(2, QHeaderView.Fixed)
-                header.setResizeMode(3, QHeaderView.Stretch)
-                header.setResizeMode(4, QHeaderView.Fixed)
-                header.setResizeMode(5, QHeaderView.Fixed)
+            if aw.qmc.LCDdecimalplaces:
+                fmtstr = "%.1f"
             else:
-                header.setSectionResizeMode(0, QHeaderView.Fixed)
-                header.setSectionResizeMode(1, QHeaderView.Fixed)
-                header.setSectionResizeMode(2, QHeaderView.Fixed)
-                header.setSectionResizeMode(3, QHeaderView.Stretch)
-                header.setSectionResizeMode(4, QHeaderView.Fixed)
-                header.setSectionResizeMode(5, QHeaderView.Fixed)
-            self.eventtable.resizeColumnsToContents()
-            self.eventtable.setColumnWidth(1,65)
-            self.eventtable.setColumnWidth(2,65)
+                fmtstr = "%.0f"
+            
+            btline = QTableWidgetItem(fmtstr%(aw.qmc.temp2B[aw.qmc.backgroundEvents[i]]) + aw.qmc.mode)
+            btline.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+            
+            etline = QTableWidgetItem(fmtstr%(aw.qmc.temp1B[aw.qmc.backgroundEvents[i]]) + aw.qmc.mode)
+            etline.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+                        
+            
+            description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
+            etype = QTableWidgetItem(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[i]))
+            evalue = QTableWidgetItem(aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[i]))
+            evalue.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+            #add widgets to the table
+            self.eventtable.setItem(i,0,timez)
+            self.eventtable.setItem(i,1,btline)
+            self.eventtable.setItem(i,2,etline)
+            self.eventtable.setItem(i,3,description)
+            self.eventtable.setItem(i,4,etype)
+            self.eventtable.setItem(i,5,evalue)
+        # improve width of Time column
+        self.eventtable.setColumnWidth(1,175)
+        header = self.eventtable.horizontalHeader()
+        if pyqtversion < 5:
+            header.setResizeMode(0, QHeaderView.Fixed)
+            header.setResizeMode(1, QHeaderView.Fixed)
+            header.setResizeMode(2, QHeaderView.Fixed)
+            header.setResizeMode(3, QHeaderView.Stretch)
+            header.setResizeMode(4, QHeaderView.Fixed)
+            header.setResizeMode(5, QHeaderView.Fixed)
+        else:
+            header.setSectionResizeMode(0, QHeaderView.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.Fixed)
+            header.setSectionResizeMode(2, QHeaderView.Fixed)
+            header.setSectionResizeMode(3, QHeaderView.Stretch)
+            header.setSectionResizeMode(4, QHeaderView.Fixed)
+            header.setSectionResizeMode(5, QHeaderView.Fixed)
+        self.eventtable.resizeColumnsToContents()
+        self.eventtable.setColumnWidth(1,65)
+        self.eventtable.setColumnWidth(2,65)
 
     def createDataTable(self):
-        self.datatable.clear()
         ndata = len(aw.qmc.timeB)
+        
+        # self.datatable.clear() # this crashes Ubuntu 16.04
+#        if ndata != 0:
+#            self.datatable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
+        self.datatable.clearSelection() # this seems to work also for Ubuntu 16.04
+
         if aw.qmc.timeindexB[0] != -1 and len(aw.qmc.timeB) > aw.qmc.timeindexB[0]:
             start = aw.qmc.timeB[aw.qmc.timeindexB[0]]
         else:
             start = 0
-        if ndata:
-            self.datatable.setRowCount(ndata)
-            headers = [QApplication.translate("Table","Time",None),
-                                                      QApplication.translate("Table","ET",None),
-                                                      QApplication.translate("Table","BT",None),
-                                                      deltaLabelUTF8 + QApplication.translate("Table","ET",None),
-                                                      deltaLabelUTF8 + QApplication.translate("Table","BT",None)]
-            xtcurve = False # no XT curve
-            if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
-                idx3 = aw.qmc.xtcurveidx - 1
-                n3 = idx3 // 2
-                if len(aw.qmc.temp1BX) > n3 and len(aw.qmc.extratimexB) > n3:
-                    xtcurve = True
-                    if aw.qmc.xtcurveidx % 2:
-                        headers.append(aw.qmc.extraname1B[n3])
-                    else:
-                        headers.append(aw.qmc.extraname2B[n3])            
-            headers.append("") # dummy column that stretches
-            self.datatable.setColumnCount(len(headers))
-            self.datatable.setHorizontalHeaderLabels(headers)
-            self.datatable.setAlternatingRowColors(True)
-            self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.datatable.setSelectionMode(QTableWidget.SingleSelection)
-            self.datatable.setShowGrid(True)
-            if pyqtversion < 5:
-                self.datatable.verticalHeader().setResizeMode(2)
+        self.datatable.setRowCount(ndata)
+        headers = [QApplication.translate("Table","Time",None),
+                                                  QApplication.translate("Table","ET",None),
+                                                  QApplication.translate("Table","BT",None),
+                                                  deltaLabelUTF8 + QApplication.translate("Table","ET",None),
+                                                  deltaLabelUTF8 + QApplication.translate("Table","BT",None)]
+        xtcurve = False # no XT curve
+        if aw.qmc.xtcurveidx > 0: # 3rd background curve set?
+            idx3 = aw.qmc.xtcurveidx - 1
+            n3 = idx3 // 2
+            if len(aw.qmc.temp1BX) > n3 and len(aw.qmc.extratimexB) > n3:
+                xtcurve = True
+                if aw.qmc.xtcurveidx % 2:
+                    headers.append(aw.qmc.extraname1B[n3])
+                else:
+                    headers.append(aw.qmc.extraname2B[n3])            
+        headers.append("") # dummy column that stretches
+        self.datatable.setColumnCount(len(headers))
+        self.datatable.setHorizontalHeaderLabels(headers)
+        self.datatable.setAlternatingRowColors(True)
+        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+        self.datatable.setShowGrid(True)
+        if pyqtversion < 5:
+            self.datatable.verticalHeader().setResizeMode(2)
+        else:
+            self.datatable.verticalHeader().setSectionResizeMode(2)
+        for i in range(ndata):
+            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
+            Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            if aw.qmc.LCDdecimalplaces:
+                fmtstr = "%.1f"
             else:
-                self.datatable.verticalHeader().setSectionResizeMode(2)
-            for i in range(ndata):
-                Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
-                Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                if aw.qmc.LCDdecimalplaces:
-                    fmtstr = "%.1f"
+                fmtstr = "%.0f"
+            ET = QTableWidgetItem(fmtstr%aw.qmc.temp1B[i])
+            BT = QTableWidgetItem(fmtstr%aw.qmc.temp2B[i])
+            ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            if i:
+                d = (aw.qmc.timeB[i]-aw.qmc.timeB[i-1])
+                if d == 0:
+                    dET = 0.
+                    dBT = 0.
                 else:
-                    fmtstr = "%.0f"
-                ET = QTableWidgetItem(fmtstr%aw.qmc.temp1B[i])
-                BT = QTableWidgetItem(fmtstr%aw.qmc.temp2B[i])
-                ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                if i:
-                    d = (aw.qmc.timeB[i]-aw.qmc.timeB[i-1])
-                    if d == 0:
-                        dET = 0.
-                        dBT = 0.
-                    else:
-                        dET = (60*(aw.qmc.temp1B[i]-aw.qmc.temp1B[i-1])/d)
-                        dBT = (60*(aw.qmc.temp2B[i]-aw.qmc.temp2B[i-1])/d)
-                    deltaET = QTableWidgetItem("%.1f"%dET)
-                    deltaBT = QTableWidgetItem("%.1f"%dBT)
-                else:
-                    deltaET = QTableWidgetItem("--")
-                    deltaBT = QTableWidgetItem("--")
-                deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                self.datatable.setItem(i,0,Rtime)
-                        
-                if i:
-                    #identify by color and add notation
-                    if i == aw.qmc.timeindexB[0] != -1:
-                        self.datatable.item(i,0).setBackground(QColor('#f07800'))
-                        text = QApplication.translate("Table", "CHARGE",None)
-                    elif i == aw.qmc.timeindexB[1]:
-                        self.datatable.item(i,0).setBackground(QColor('orange'))
-                        text = QApplication.translate("Table", "DRY END",None)
-                    elif i == aw.qmc.timeindexB[2]:
-                        self.datatable.item(i,0).setBackground(QColor('orange'))
-                        text = QApplication.translate("Table", "FC START",None)
-                    elif i == aw.qmc.timeindexB[3]:
-                        self.datatable.item(i,0).setBackground(QColor('orange'))
-                        text = QApplication.translate("Table", "FC END",None)
-                    elif i == aw.qmc.timeindexB[4]:
-                        self.datatable.item(i,0).setBackground(QColor('orange'))
-                        text = QApplication.translate("Table", "SC START",None)
-                    elif i == aw.qmc.timeindexB[5]:
-                        self.datatable.item(i,0).setBackground(QColor('orange'))
-                        text = QApplication.translate("Table", "SC END",None)
-                    elif i == aw.qmc.timeindexB[6]:
-                        self.datatable.item(i,0).setBackground(QColor('#f07800'))
-                        text = QApplication.translate("Table", "DROP",None)
-                    elif i == aw.qmc.timeindexB[7]:
-                        self.datatable.item(i,0).setBackground(QColor('orange'))
-                        text = QApplication.translate("Table", "COOL",None)
-                    elif i in aw.qmc.backgroundEvents:
-                        self.datatable.item(i,0).setBackground(QColor('yellow'))
-                        index = aw.qmc.backgroundEvents.index(i)
-                        text = QApplication.translate("Table", "#{0} {1}{2}",None).format(str(index+1),aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0],aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[index]))
-                    else:
-                        text = u("")
-                    Rtime.setText(text + u(" " + Rtime.text()))                
-                self.datatable.setItem(i,1,ET)
-                self.datatable.setItem(i,2,BT)
-                self.datatable.setItem(i,3,deltaET)
-                self.datatable.setItem(i,4,deltaBT)
-                
-                if xtcurve: # an XT column is availble, fill it with data
-                    if aw.qmc.xtcurveidx % 2:
-                        XT = QTableWidgetItem("%.0f"%aw.qmc.temp1BX[n3][i])
-                    else:
-                        XT = QTableWidgetItem("%.0f"%aw.qmc.temp2BX[n3][i])
-                    XT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
-                    self.datatable.setItem(i,5,XT)
+                    dET = (60*(aw.qmc.temp1B[i]-aw.qmc.temp1B[i-1])/d)
+                    dBT = (60*(aw.qmc.temp2B[i]-aw.qmc.temp2B[i-1])/d)
+                deltaET = QTableWidgetItem("%.1f"%dET)
+                deltaBT = QTableWidgetItem("%.1f"%dBT)
+            else:
+                deltaET = QTableWidgetItem("--")
+                deltaBT = QTableWidgetItem("--")
+            deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            self.datatable.setItem(i,0,Rtime)
                     
-            header = self.datatable.horizontalHeader()
-            if pyqtversion < 5:
-                header.setResizeMode(0, QHeaderView.Fixed)
-                header.setResizeMode(1, QHeaderView.Fixed)
-                header.setResizeMode(2, QHeaderView.Fixed)
-                header.setResizeMode(3, QHeaderView.Fixed)
-                header.setResizeMode(4, QHeaderView.Fixed)
-                if xtcurve:
-                    header.setResizeMode(5, QHeaderView.Fixed)
-                    header.setResizeMode(6, QHeaderView.Stretch)
+            if i:
+                #identify by color and add notation
+                if i == aw.qmc.timeindexB[0] != -1:
+                    self.datatable.item(i,0).setBackground(QColor('#f07800'))
+                    text = QApplication.translate("Table", "CHARGE",None)
+                elif i == aw.qmc.timeindexB[1]:
+                    self.datatable.item(i,0).setBackground(QColor('orange'))
+                    text = QApplication.translate("Table", "DRY END",None)
+                elif i == aw.qmc.timeindexB[2]:
+                    self.datatable.item(i,0).setBackground(QColor('orange'))
+                    text = QApplication.translate("Table", "FC START",None)
+                elif i == aw.qmc.timeindexB[3]:
+                    self.datatable.item(i,0).setBackground(QColor('orange'))
+                    text = QApplication.translate("Table", "FC END",None)
+                elif i == aw.qmc.timeindexB[4]:
+                    self.datatable.item(i,0).setBackground(QColor('orange'))
+                    text = QApplication.translate("Table", "SC START",None)
+                elif i == aw.qmc.timeindexB[5]:
+                    self.datatable.item(i,0).setBackground(QColor('orange'))
+                    text = QApplication.translate("Table", "SC END",None)
+                elif i == aw.qmc.timeindexB[6]:
+                    self.datatable.item(i,0).setBackground(QColor('#f07800'))
+                    text = QApplication.translate("Table", "DROP",None)
+                elif i == aw.qmc.timeindexB[7]:
+                    self.datatable.item(i,0).setBackground(QColor('orange'))
+                    text = QApplication.translate("Table", "COOL",None)
+                elif i in aw.qmc.backgroundEvents:
+                    self.datatable.item(i,0).setBackground(QColor('yellow'))
+                    index = aw.qmc.backgroundEvents.index(i)
+                    text = QApplication.translate("Table", "#{0} {1}{2}",None).format(str(index+1),aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0],aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[index]))
                 else:
-                    header.setResizeMode(5, QHeaderView.Stretch)
+                    text = u("")
+                Rtime.setText(text + u(" " + Rtime.text()))                
+            self.datatable.setItem(i,1,ET)
+            self.datatable.setItem(i,2,BT)
+            self.datatable.setItem(i,3,deltaET)
+            self.datatable.setItem(i,4,deltaBT)
+            
+            if xtcurve: # an XT column is availble, fill it with data
+                if aw.qmc.xtcurveidx % 2:
+                    XT = QTableWidgetItem("%.0f"%aw.qmc.temp1BX[n3][i])
+                else:
+                    XT = QTableWidgetItem("%.0f"%aw.qmc.temp2BX[n3][i])
+                XT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                self.datatable.setItem(i,5,XT)
+                
+        header = self.datatable.horizontalHeader()
+        if pyqtversion < 5:
+            header.setResizeMode(0, QHeaderView.Fixed)
+            header.setResizeMode(1, QHeaderView.Fixed)
+            header.setResizeMode(2, QHeaderView.Fixed)
+            header.setResizeMode(3, QHeaderView.Fixed)
+            header.setResizeMode(4, QHeaderView.Fixed)
+            if xtcurve:
+                header.setResizeMode(5, QHeaderView.Fixed)
+                header.setResizeMode(6, QHeaderView.Stretch)
             else:
-                header.setSectionResizeMode(0, QHeaderView.Fixed)
-                header.setSectionResizeMode(1, QHeaderView.Fixed)
-                header.setSectionResizeMode(2, QHeaderView.Fixed)
-                header.setSectionResizeMode(3, QHeaderView.Fixed)
-                header.setSectionResizeMode(4, QHeaderView.Fixed)
-                if xtcurve:
-                    header.setSectionResizeMode(5, QHeaderView.Fixed)
-                    header.setSectionResizeMode(6, QHeaderView.Stretch)
-                else:
-                    header.setSectionResizeMode(5, QHeaderView.Stretch)
-            self.datatable.resizeColumnsToContents()
+                header.setResizeMode(5, QHeaderView.Stretch)
+        else:
+            header.setSectionResizeMode(0, QHeaderView.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.Fixed)
+            header.setSectionResizeMode(2, QHeaderView.Fixed)
+            header.setSectionResizeMode(3, QHeaderView.Fixed)
+            header.setSectionResizeMode(4, QHeaderView.Fixed)
+            if xtcurve:
+                header.setSectionResizeMode(5, QHeaderView.Fixed)
+                header.setSectionResizeMode(6, QHeaderView.Stretch)
+            else:
+                header.setSectionResizeMode(5, QHeaderView.Stretch)
+        self.datatable.resizeColumnsToContents()
 
 #############################################################################
 ################  Statistics DIALOG ########################
@@ -33852,7 +33876,7 @@ class s7port(object):
             else:
                 aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeFloat() connecting to PLC failed"))               
         except Exception as ex:
-            self.disconnect()
+#            self.disconnect()
             aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeFloat() {0}").format(str(ex)))
         finally:
             if self.COMsemaphore.available() < 1:
@@ -33871,7 +33895,7 @@ class s7port(object):
             else:
                 aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeInt() connecting to PLC failed"))               
         except Exception as ex:
-            self.disconnect()
+#            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeINT() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -34077,7 +34101,7 @@ class modbusport(object):
                 pass
             else:
                 libtime.sleep(0.025)
-    
+
     def address2register(self,addr,code=3):
         if code == 3 or code == 6:
             return addr - 40001
@@ -34142,7 +34166,7 @@ class modbusport(object):
                             host=self.host, 
                             port=self.port,
                             retry_on_empty=True,
-                            retries=2,
+                            retries=3,
                             timeout=0.7, #self.timeout
                             )
                     except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
@@ -34158,11 +34182,13 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retry_on_empty=True,
-                        timeout=self.timeout)          
+                        retry_on_empty=False,
+                        retries=0,
+                        timeout=self.timeout)  
+                    self.readRetries = 0
                 self.master.connect()
                 aw.qmc.adderror(QApplication.translate("Error Message","Connected via MODBUS",None))
-                libtime.sleep(.03) # avoid possible hickups on startup
+                libtime.sleep(.5) # avoid possible hickups on startup
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -34176,7 +34202,7 @@ class modbusport(object):
             self.master.write_coils(int(register),list(values),unit=int(slave))
             libtime.sleep(.3) # avoid possible hickups on startup
         except Exception as ex:
-            self.disconnect()
+#            self.disconnect()
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
@@ -34194,7 +34220,7 @@ class modbusport(object):
             self.master.write_coil(int(register),value,unit=int(slave))
             libtime.sleep(.3) # avoid possible hickups on startup
         except Exception as ex:
-            self.disconnect()
+#            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoil() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -34225,7 +34251,7 @@ class modbusport(object):
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            self.disconnect()
+#            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -34243,7 +34269,7 @@ class modbusport(object):
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            self.disconnect()
+#            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeMask() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -34260,7 +34286,7 @@ class modbusport(object):
             self.master.write_registers(int(register),values,unit=int(slave))
             libtime.sleep(.03)
         except Exception as ex:
-            self.disconnect()
+#            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeRegisters() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -34282,7 +34308,7 @@ class modbusport(object):
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
             libtime.sleep(.03)
         except Exception as ex:
-            self.disconnect()
+#            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -34302,7 +34328,7 @@ class modbusport(object):
             self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
             libtime.sleep(.03)
         except Exception as ex:
-            self.disconnect()
+#            self.disconnect()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -41424,8 +41450,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
             
     def createDeviceTable(self):
         try:
-            self.devicetable.clear()
             nddevices = len(aw.qmc.extradevices)
+            #self.devicetable.clear() # this crashes Ubuntu 16.04
+#            if nddevices != 0:
+#                self.devicetable.clearContents() # this crashes Ubuntu 16.04 if device table is empty
+            self.devicetable.clearSelection()
             self.devicetable.setRowCount(nddevices)
             self.devicetable.setColumnCount(11)
             self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None),
@@ -41589,7 +41618,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             selected = self.devicetable.selectedRanges()
             if len(selected) > 0:
                 bindex = selected[0].topRow()
-            if bindex >= 0:
+            if bindex >= 0 and bindex < len(aw.qmc.extradevices):
                 self.delextradevice(bindex)
             aw.updateExtraLCDvisibility()
             aw.qmc.resetlinecountcaches()
@@ -41635,6 +41664,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.extramarkers2.pop(x)
             aw.qmc.extramarkersizes1.pop(x)
             aw.qmc.extramarkersizes2.pop(x)
+            
             # visible courves before this one
             before1 = before2 = 0
             for j in range(x):
@@ -43551,8 +43581,13 @@ class WheelDlg(ArtisanDialog):
         self.labeltable.setVisible(True)
         self.labelCloseButton.setVisible(True)
         self.labelResetButton.setVisible(True)
-        self.labeltable.clear()
+        
         nlabels = len(aw.qmc.wheelnames[x])
+        # self.labeltable.clear() # this crashes Ubuntu 16.04
+#        if ndata != 0:
+#            self.labeltable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
+        self.labeltable.clearSelection() # this seems to work also for Ubuntu 16.04
+        
         if nlabels:
             self.labeltable.setRowCount(nlabels)
             self.labeltable.setColumnCount(5)
@@ -43728,77 +43763,81 @@ class WheelDlg(ArtisanDialog):
 
     #creates graph table
     def createdatatable(self):
-        self.datatable.clear()
         ndata = len(aw.qmc.wheelnames)
-        if ndata:
-            self.datatable.setRowCount(ndata)
-            self.datatable.setColumnCount(10)
-            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Delete Wheel",None),
-                                                      QApplication.translate("Table","Edit Labels",None),
-                                                      QApplication.translate("Table","Update Labels",None),
-                                                      QApplication.translate("Table","Properties",None),
-                                                      QApplication.translate("Table","Radius",None),
-                                                      QApplication.translate("Table","Starting angle",None),
-                                                      QApplication.translate("Table","Projection",None),
-                                                      QApplication.translate("Table","Text Size",None),
-                                                      QApplication.translate("Table","Color",None),
-                                                      QApplication.translate("Table","Color Pattern",None)])
-            self.datatable.setAlternatingRowColors(True)
-            self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.datatable.setSelectionMode(QTableWidget.SingleSelection)
-            self.datatable.setShowGrid(True)
-            if pyqtversion < 5:
-                self.datatable.verticalHeader().setResizeMode(2)
-            else:
-                self.datatable.verticalHeader().setSectionResizeMode(2)
-            #populate table
-            for i in range(ndata):
-                delButton = QPushButton(QApplication.translate("Button","Delete",None))
-                delButton.clicked.connect(lambda _,x = i: self.popwheel(x))
-                labelsedit = QLineEdit(str(",".join(aw.qmc.wheelnames[i])))
-                updateButton = QPushButton(QApplication.translate("Button","Update",None))
-                updateButton.clicked.connect(lambda _,x = i: self.updatelabels(x))
-                setButton = QPushButton(QApplication.translate("Button","Select",None))
-                setButton.clicked.connect(lambda _,x = i: self.createlabeltable(x))
-                widthSpinBox = QDoubleSpinBox()
-                widthSpinBox.setRange(1.,100.)
-                widthSpinBox.setValue(aw.qmc.wradii[i])
-                widthSpinBox.setSuffix("%")
-                widthSpinBox.valueChanged.connect(lambda _,x=i: self.setwidth(x))
-                angleSpinBox = QSpinBox()
-                angleSpinBox.setSuffix(QApplication.translate("Label"," dg",None))
-                angleSpinBox.setRange(0,359)
-                angleSpinBox.setWrapping(True)
-                angleSpinBox.setValue(aw.qmc.startangle[i])
-                angleSpinBox.valueChanged.connect(lambda _,x=i: self.setangle(x))
-                projectionComboBox =  QComboBox()
-                projectionComboBox.addItems([QApplication.translate("ComboBox","Flat",None),
-                                             QApplication.translate("ComboBox","Perpendicular",None),
-                                             QApplication.translate("ComboBox","Radial",None)])
-                projectionComboBox.setCurrentIndex(aw.qmc.projection[i])
-                projectionComboBox.currentIndexChanged.connect(lambda _,x=i:self.setprojection(x))
-                txtSpinBox = QSpinBox()
-                txtSpinBox.setRange(1,30)
-                txtSpinBox.setValue(aw.qmc.wheeltextsize[i])
-                txtSpinBox.valueChanged.connect(lambda _,x=i: self.setTextsizeX(x))
-                colorButton = QPushButton(QApplication.translate("Button","Set Color",None))
-                colorButton.clicked.connect(lambda _,x=i: self.setwheelcolor(x))
-                colorSpinBox = QSpinBox()
-                colorSpinBox.setRange(0,255)
-                colorSpinBox.setWrapping(True)
-                colorSpinBox.valueChanged.connect(lambda _,x=i,: self.setwheelcolorpattern(x))
-                #add widgets to the table
-                self.datatable.setCellWidget(i,0,delButton)
-                self.datatable.setCellWidget(i,1,labelsedit)
-                self.datatable.setCellWidget(i,2,updateButton)
-                self.datatable.setCellWidget(i,3,setButton)
-                self.datatable.setCellWidget(i,4,widthSpinBox)
-                self.datatable.setCellWidget(i,5,angleSpinBox)
-                self.datatable.setCellWidget(i,6,projectionComboBox)
-                self.datatable.setCellWidget(i,7,txtSpinBox)
-                self.datatable.setCellWidget(i,8,colorButton)
-                self.datatable.setCellWidget(i,9,colorSpinBox)
+        
+        # self.datatable.clear() # this crashes Ubuntu 16.04
+#        if ndata != 0:
+#            self.datatable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
+        self.datatable.clearSelection() # this seems to work also for Ubuntu 16.04
+        
+        self.datatable.setRowCount(ndata)
+        self.datatable.setColumnCount(10)
+        self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Delete Wheel",None),
+                                                  QApplication.translate("Table","Edit Labels",None),
+                                                  QApplication.translate("Table","Update Labels",None),
+                                                  QApplication.translate("Table","Properties",None),
+                                                  QApplication.translate("Table","Radius",None),
+                                                  QApplication.translate("Table","Starting angle",None),
+                                                  QApplication.translate("Table","Projection",None),
+                                                  QApplication.translate("Table","Text Size",None),
+                                                  QApplication.translate("Table","Color",None),
+                                                  QApplication.translate("Table","Color Pattern",None)])
+        self.datatable.setAlternatingRowColors(True)
+        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+        self.datatable.setShowGrid(True)
+        if pyqtversion < 5:
+            self.datatable.verticalHeader().setResizeMode(2)
+        else:
+            self.datatable.verticalHeader().setSectionResizeMode(2)
+        #populate table
+        for i in range(ndata):
+            delButton = QPushButton(QApplication.translate("Button","Delete",None))
+            delButton.clicked.connect(lambda _,x = i: self.popwheel(x))
+            labelsedit = QLineEdit(str(",".join(aw.qmc.wheelnames[i])))
+            updateButton = QPushButton(QApplication.translate("Button","Update",None))
+            updateButton.clicked.connect(lambda _,x = i: self.updatelabels(x))
+            setButton = QPushButton(QApplication.translate("Button","Select",None))
+            setButton.clicked.connect(lambda _,x = i: self.createlabeltable(x))
+            widthSpinBox = QDoubleSpinBox()
+            widthSpinBox.setRange(1.,100.)
+            widthSpinBox.setValue(aw.qmc.wradii[i])
+            widthSpinBox.setSuffix("%")
+            widthSpinBox.valueChanged.connect(lambda _,x=i: self.setwidth(x))
+            angleSpinBox = QSpinBox()
+            angleSpinBox.setSuffix(QApplication.translate("Label"," dg",None))
+            angleSpinBox.setRange(0,359)
+            angleSpinBox.setWrapping(True)
+            angleSpinBox.setValue(aw.qmc.startangle[i])
+            angleSpinBox.valueChanged.connect(lambda _,x=i: self.setangle(x))
+            projectionComboBox =  QComboBox()
+            projectionComboBox.addItems([QApplication.translate("ComboBox","Flat",None),
+                                         QApplication.translate("ComboBox","Perpendicular",None),
+                                         QApplication.translate("ComboBox","Radial",None)])
+            projectionComboBox.setCurrentIndex(aw.qmc.projection[i])
+            projectionComboBox.currentIndexChanged.connect(lambda _,x=i:self.setprojection(x))
+            txtSpinBox = QSpinBox()
+            txtSpinBox.setRange(1,30)
+            txtSpinBox.setValue(aw.qmc.wheeltextsize[i])
+            txtSpinBox.valueChanged.connect(lambda _,x=i: self.setTextsizeX(x))
+            colorButton = QPushButton(QApplication.translate("Button","Set Color",None))
+            colorButton.clicked.connect(lambda _,x=i: self.setwheelcolor(x))
+            colorSpinBox = QSpinBox()
+            colorSpinBox.setRange(0,255)
+            colorSpinBox.setWrapping(True)
+            colorSpinBox.valueChanged.connect(lambda _,x=i,: self.setwheelcolorpattern(x))
+            #add widgets to the table
+            self.datatable.setCellWidget(i,0,delButton)
+            self.datatable.setCellWidget(i,1,labelsedit)
+            self.datatable.setCellWidget(i,2,updateButton)
+            self.datatable.setCellWidget(i,3,setButton)
+            self.datatable.setCellWidget(i,4,widthSpinBox)
+            self.datatable.setCellWidget(i,5,angleSpinBox)
+            self.datatable.setCellWidget(i,6,projectionComboBox)
+            self.datatable.setCellWidget(i,7,txtSpinBox)
+            self.datatable.setCellWidget(i,8,colorButton)
+            self.datatable.setCellWidget(i,9,colorSpinBox)
 
     #reads label edit box for wheel with index x, and updates labels
     def updatelabels(self,x):
