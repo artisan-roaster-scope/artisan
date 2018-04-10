@@ -34093,18 +34093,19 @@ class modbusport(object):
         self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
         
     # this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
+    # this sleep delays between requests seems to be beneficial on slow RTU serial connections like those of the FZ-94
     def sleepBetween(self,write=False):
         if write:
 #            if self.type in [3,4]: # TCP or UDP
 #                libtime.sleep(0.040)
+                pass # handled in MODBUS lib
 #            else:
-#                libtime.sleep(0.085)
-            pass # handled in MODBUS lib
+                libtime.sleep(0.035)
         else:
             if self.type in [3,4]: # delay between writes only on serial connections
                 pass
             else:
-                libtime.sleep(0.025)
+                libtime.sleep(0.035)
 
     def address2register(self,addr,code=3):
         if code == 3 or code == 6:
@@ -34186,10 +34187,10 @@ class modbusport(object):
                         bytesize=self.bytesize,
                         parity=self.parity,
                         stopbits=self.stopbits,
-                        retry_on_empty=False,
-#                        retries=0, # optino not available on old pymodbus versions
+                        retry_on_empty=False, # with retry_on_empty=True and the old pymodbus v1.3 the FZ-94 generates more errors
+#                        retries=0, # option not available on old pymodbus versions (before v1.4)
                         timeout=self.timeout)  
-                    self.readRetries = 0
+                    self.readRetries = 1
                 self.master.connect()
                 aw.qmc.adderror(QApplication.translate("Error Message","Connected via MODBUS",None))
                 libtime.sleep(.5) # avoid possible hickups on startup
@@ -34452,7 +34453,7 @@ class modbusport(object):
                 if res is None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
                     if retry > 0:
                         retry = retry - 1
-                        #libtime.sleep(0.020)
+                        libtime.sleep(0.020)
                     else:
                         raise Exception("Exception response")
                 else:
