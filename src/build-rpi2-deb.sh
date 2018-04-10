@@ -38,4 +38,4 @@ rm -f ${NAME}_raspbian-stretch.deb
 sudo chmod 755 debian/DEBIAN
 sudo chmod 755 debian/DEBIAN/postinst
 sudo chmod 755 debian/DEBIAN/prerm
-dpkg-deb -v --build debian ${NAME}_raspbian-stretch.deb
+dpkg-deb -vD --build debian ${NAME}_raspbian-stretch.deb
