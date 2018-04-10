@@ -35,7 +35,7 @@ ssh_control()
     ./build-rpi2-deb.sh
 EOF
     ${SCP} script pi@localhost:
-    travis_wait ${SSH} pi@localhost sh script
+    ${SSH} pi@localhost sh script
     ${SCP} pi@localhost:artisan/src/\*.deb .
     pkill qemu-system-arm
 }
