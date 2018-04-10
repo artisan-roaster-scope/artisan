@@ -209,6 +209,7 @@ import pymodbus.version as pymodbus_version
 import socket
 
 if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 and pymodbus_version.version.minor > 3):
+    # pymodbus v1.4 and newer
     def getBinaryPayloadBuilder(byteorderLittle=True,wordorderLittle=False):
         if byteorderLittle: 
             byteorder = Endian.Little
@@ -230,13 +231,16 @@ if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 an
             wordorder = Endian.Big
         return BinaryPayloadDecoder.fromRegisters(registers, byteorder=byteorder, wordorder=wordorder)
 else:
+    # pymodbus v1.3 and older
     def getBinaryPayloadBuilder(byteorderLittle=True,_=False):
-        if byteorderLittle:
+        if not byteorderLittle: # NOTE: v1.3 and older had the semantic of the byteorder interpreted inversely
+            # see https://github.com/riptideio/pymodbus/issues/255
             return BinaryPayloadBuilder(endian=Endian.Little)
         else:
             return BinaryPayloadBuilder(endian=Endian.Big)
     def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,_=False):
-        if byteorderLittle:
+        if not byteorderLittle: # NOTE: v1.3 and older had the semantic of the byteorder interpreted inversely
+            # see https://github.com/riptideio/pymodbus/issues/255
             return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Little)
         else:
             return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Big)

@@ -56,6 +56,7 @@ v1.3.0 (xx.4.2018)
    - fixed Issue #154 where replay-by-temp events would trigger out of order
    - fixes Phidgets 1046 device support broken in v1.2
    - restrict temperature conversion to temperature curves
+   - fixes crasher on some Linux platforms w.r.t. selection of items in tables like events, alarms,..
 
 
 ----
