@@ -15,7 +15,7 @@ RASPBIAN_IMAGE=${RASPBIAN_DATE}-raspbian-stretch.img
 
 ssh_control()
 {
-    ssh +e
+    set +e
     while :; do
 	${SSH} pi@localhost ls 2>&1 >/dev/null
 	if [ $? -eq 0 ]; then
