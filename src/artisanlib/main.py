@@ -34187,7 +34187,7 @@ class modbusport(object):
                         parity=self.parity,
                         stopbits=self.stopbits,
                         retry_on_empty=False,
-                        retries=0,
+#                        retries=0, # optino not available on old pymodbus versions
                         timeout=self.timeout)  
                     self.readRetries = 0
                 self.master.connect()
