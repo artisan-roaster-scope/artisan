@@ -24839,12 +24839,12 @@ class HUDDlg(ArtisanDialog):
         inputFilterVBox = QVBoxLayout()
         inputFilterVBox.addLayout(inputFilter1)
         inputFilterVBox.addLayout(inputFilter2) 
-        inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filters",None))
+        inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filter",None))
         inputFilterGroupLayout.setLayout(inputFilterVBox)        
         # Post Roast Group
         postRoastVBox = QVBoxLayout()     
         postRoastVBox.addLayout(spikesLayout)
-        postRoastGroupLayout = QGroupBox(QApplication.translate("GroupBox","Post Roast",None))
+        postRoastGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curve Filter",None))
         postRoastGroupLayout.setLayout(postRoastVBox)    
         #swapETBT flag
         self.rorFilter = QCheckBox(QApplication.translate("CheckBox", "Limits",None))
@@ -31596,7 +31596,8 @@ class EventsDlg(ArtisanDialog):
             typeComboBox.currentIndexChanged.connect(lambda _=0,i=i:self.settypeeventbutton(i))
             #value
             valueEdit = QLineEdit()
-            valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\-?\d?\d?$"),self)) # QRegExp(r"^100|\d?\d?$"),self))
+#            valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\-?\d?\d?$"),self)) # QRegExp(r"^100|\d?\d?$"),self))
+            valueEdit.setValidator(QIntValidator(0, 999, valueEdit))
             valueEdit.setText(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
             valueEdit.setAlignment(Qt.AlignRight)
             valueEdit.editingFinished.connect(lambda i=i:self.setvalueeventbutton(1,i))
@@ -34180,16 +34181,28 @@ class modbusport(object):
                             port=self.port,
                             )
                 else: # Serial RTU
-                    self.master = ModbusSerialClient(
-                        method='rtu',
-                        port=self.comport,
-                        baudrate=self.baudrate,
-                        bytesize=self.bytesize,
-                        parity=self.parity,
-                        stopbits=self.stopbits,
-                        retry_on_empty=False, # with retry_on_empty=True and the old pymodbus v1.3 the FZ-94 generates more errors
-#                        retries=0, # option not available on old pymodbus versions (before v1.4)
-                        timeout=self.timeout)  
+                    if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 and pymodbus_version.version.minor > 3):
+                        # pymodbus v1.4 or newer
+                        self.master = ModbusSerialClient(
+                            method='rtu',
+                            port=self.comport,
+                            baudrate=self.baudrate,
+                            bytesize=self.bytesize,
+                            parity=self.parity,
+                            stopbits=self.stopbits,
+                            retry_on_empty=False, # with retry_on_empty=True and the old pymodbus v1.3 the FZ-94 generates more errors
+                            retries=0, # option not available on old pymodbus versions (before v1.4)
+                            timeout=self.timeout)  
+                    else: # pymodbus v1.3 or older
+                        self.master = ModbusSerialClient(
+                            method='rtu',
+                            port=self.comport,
+                            baudrate=self.baudrate,
+                            bytesize=self.bytesize,
+                            parity=self.parity,
+                            stopbits=self.stopbits,
+                            retry_on_empty=False, # with retry_on_empty=True and the old pymodbus v1.3 the FZ-94 generates more errors
+                            timeout=self.timeout)  
                     self.readRetries = 1
                 self.master.connect()
                 aw.qmc.adderror(QApplication.translate("Error Message","Connected via MODBUS",None))
