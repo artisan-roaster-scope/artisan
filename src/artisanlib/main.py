@@ -22620,7 +22620,7 @@ class ApplicationWindow(QMainWindow):
            
         if ok:
             self.qmc.delay = int(secondsdelay*1000.)
-            if self.qmc.delay <= self.qmc.min_delay + 1000:
+            if self.qmc.delay < self.qmc.default_delay:
                 QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))
 
     def setcommport(self):
