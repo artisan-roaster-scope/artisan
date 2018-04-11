@@ -36,7 +36,6 @@ ssh_control()
 EOF
     ${SCP} script pi@localhost:
     ${SSH} pi@localhost sh script
-    pwd
     ${SCP} pi@localhost:artisan/src/\*.deb src
     pkill qemu-system-arm
 }
@@ -65,7 +64,10 @@ sudo resize2fs /dev/loop0
 mountpoint=`mktemp -d`
 sudo mount /dev/loop0 $mountpoint
 sudo sed -i'' -e 's/exit 0/\/etc\/init.d\/ssh start/' $mountpoint/etc/rc.local
-sudo sh -c "echo '' >> $mountpoint/etc/rc.local"
+sudo sh -c "echo 'systemctl set-default multi-user.target --force' >> $mountpoint/etc/rc.local"
+sudo sh -c "echo 'systemctl stop lightdm.service --force' >> $mountpoint/etc/rc.local"
+sudo sh -c "echo 'systemctl stop graphical.target --force' >> $mountpoint/etc/rc.local"
+sudo sh -c "echo 'systemctl stop plymouth.service --force' >> $mountpoint/etc/rc.local"
 sudo mkdir $mountpoint/home/pi/.ssh
 sudo chown 1000  $mountpoint/home/pi/.ssh
 sudo chmod go-rwx $mountpoint/home/pi/.ssh
