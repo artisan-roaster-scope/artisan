@@ -10689,6 +10689,8 @@ class ApplicationWindow(QMainWindow):
         self.redrawTimer = QTimer()
         self.redrawTimer.setSingleShot(True)
         self.redrawTimer.timeout.connect(lambda : aw.qmc.redraw(False,False))
+        
+        self.eventaction_running_threads = []
 
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
@@ -14197,13 +14199,19 @@ class ApplicationWindow(QMainWindow):
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
     #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command
     def eventaction(self,action,cmd):
-        self.eventaction_internal(action,cmd)
-#        if action:
+#        self.eventaction_internal(action,cmd)
+        if action:
 #            if action in [0,1,2,3,7]:
 #                self.eventaction_internal(action,cmd)
 #            else:
-#                self.eventActionThread = EventActionThread(action,cmd)
-#                self.eventActionThread.start()
+            eventActionThread = EventActionThread(action,cmd)                
+            eventActionThread.finished.connect(lambda x=eventActionThread : self.eventactionThreadDone(x))
+            self.eventaction_running_threads.append(eventActionThread)
+            eventActionThread.start()
+                
+    def eventactionThreadDone(self,actionthread):
+        if actionthread in self.eventaction_running_threads:
+            self.eventaction_running_threads.remove(actionthread)
     
     def eventaction_internal(self,action,cmd):
         if action:
