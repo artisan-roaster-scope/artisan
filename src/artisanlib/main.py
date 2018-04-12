@@ -21619,8 +21619,8 @@ class ApplicationWindow(QMainWindow):
                         except Exception as e:
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
-                            _, _, exc_tb = sys.exc_info()
-                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
+#                            _, _, exc_tb = sys.exc_info()
+#                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
                             pass
                     # write trailer
                     if c > 1:

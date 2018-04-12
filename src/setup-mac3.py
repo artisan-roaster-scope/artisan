@@ -152,7 +152,7 @@ OPTIONS = {
                     'QtHelp','QtMultimedia','QtNetwork',
                     'QtOpenGL','QtScript','QtScriptTools',
                     'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
-    'packages': ['yoctopuce','gevent'],
+    'packages': ['yoctopuce','gevent','openpyxl'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
@@ -201,7 +201,7 @@ os.chdir('./dist')
 try:
     PYTHONPATH = os.environ["PYTHONPATH"] + r'/'
 except:
-    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6'
+    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/'
 
 try:
     PYTHON_V = os.environ["PYTHON_V"]
@@ -210,13 +210,13 @@ except:
     
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 os.system(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs')
-
-os.system(r'cp -R ' + PYTHONPATH + r'/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs')
-os.system(r'cp ' + PYTHONPATH + r'/site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
+os.system(r'cp -R ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs')
+os.system(r'cp ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
 
 # copy snap7 dylib
-os.system(r'cp /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
-os.system(r'cp /usr/local/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
+os.system(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
+os.system(r'cp -f /usr/local/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
+
 
 # copy brew installed libusb (note the slight name change of the dylib!)
 os.system(r'cp /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib')

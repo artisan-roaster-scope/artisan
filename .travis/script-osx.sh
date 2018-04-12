@@ -2,6 +2,6 @@
 
 set -ex
 cd src
-./build-mac35.sh
+./build-mac3.sh
 python3 artisan.py
 cd ..
