@@ -10648,9 +10648,25 @@ class Athreadserver(QWidget):
         sthread.wait(300)    #needed in some Win OS
 
 
+#########################################################################################################
+###     Event Action Thread
+#########################################################################################################
+
+class EventActionThread(QThread):
+
+    def __init__(self, action, command):
+        QThread.__init__(self)
+        self.action = action
+        self.command = command
+
+    def run(self):    
+        aw.eventaction_internal(self.action,self.command)
+
+
 ########################################################################################
 #################### MAIN APPLICATION WINDOW ###########################################
 ########################################################################################
+
 
 class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
@@ -14175,11 +14191,16 @@ class ApplicationWindow(QMainWindow):
             self.eventaction((a if (a < 3) else ((a + 2) if (a > 5) else (a + 1))), cmd)
         except Exception:
             pass
+                    
 
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command; 6=IO Command (Phidgets IO); 
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
     #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command
     def eventaction(self,action,cmd):
+        self.eventActionThread = EventActionThread(action,cmd)
+        self.eventActionThread.start()
+    
+    def eventaction_internal(self,action,cmd):
         if action:
             try:
                 cmd_str = u(cmd)
