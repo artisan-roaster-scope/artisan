@@ -5693,13 +5693,13 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.density[0] and aw.qmc.density[2] != 0:
                     statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Density", None) + ': '+ str(aw.float2float(aw.qmc.density[0]/aw.qmc.density[2],2)) + ' ' + encodeLocal(aw.qmc.density[1]) + "/" + encodeLocal(aw.qmc.density[3])
-                    if cp["roasted_density"]:
+                    if "roasted_density" in cp:
                         statstr += '\n' + QApplication.translate("AddlInfo", "Density Loss", None) + ': '+ str(-aw.float2float(100*cp["roasted_density"]/aw.qmc.density[0],2)) + "%"
 
                 if aw.qmc.volume[0]:
                     statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2])
-                    if cp["volume_gain"]:
+                    if "volume_gain" in cp: 
                         statstr += '\n' + QApplication.translate("AddlInfo", "Volume Gain", None) + ': ' + str(aw.float2float(cp["volume_gain"],2)) + "%"
                         
                 if aw.qmc.beansize:
