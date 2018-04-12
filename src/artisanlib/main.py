@@ -14227,7 +14227,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.modbus.sleepBetween(write=True)
                                 else:
                                     aw.modbus.sleepBetween(write=False)
-                                #libtime.sleep(followupCmd) #this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec)
+                                #libtime.sleep(followupCmd) #this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec)                                
                             if cs.startswith('writem'):
                                 try:
                                     cmds = eval(cs[len('writem'):])
@@ -14237,6 +14237,15 @@ class ApplicationWindow(QMainWindow):
                                         followupCmd = 0.08
                                 except Exception:
                                     pass
+                            elif cs.startswith('sleep'):
+                                try:
+                                    cmds = eval(cs[len('sleep'):])
+                                    if isinstance(cmds,float) or isinstance(cmds,int):
+                                        # cmd has format "sleep(xx.yy)"
+                                        libtime.sleep(cmds)
+                                        followupCmd = 0.08
+                                except Exception:
+                                    pass                                    
                             elif cs.startswith("writeBCD"):
                                 try:
                                     cmds = eval(cs[len('writeBCD'):])
@@ -21610,6 +21619,8 @@ class ApplicationWindow(QMainWindow):
                         except Exception as e:
 #                            import traceback
 #                            traceback.print_exc(file=sys.stdout)
+                            _, _, exc_tb = sys.exc_info()
+                            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
                             pass
                     # write trailer
                     if c > 1:
@@ -21657,6 +21668,10 @@ class ApplicationWindow(QMainWindow):
                     # close file
                     wb.save(filename)
                 except Exception as e:
+#                    import traceback
+#                    traceback.print_exc(file=sys.stdout)
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
                     pass
 
     def htmlReport(self):
