@@ -1,0 +1,1562 @@
+diff --git ez_setup.py ez_setup.py
+index a12de6b..0f92ac8 100644
+--- ez_setup.py
++++ ez_setup.py
+@@ -1,4 +1,5 @@
+ #!python
++from __future__ import print_function
+ """Bootstrap setuptools installation
+ 
+ If you want to use setuptools in your package's setup.py, just include this
+@@ -14,8 +15,10 @@ the appropriate options to ``use_setuptools()``.
+ This file can also be run as a script to install or upgrade setuptools.
+ """
+ import sys
++
+ DEFAULT_VERSION = "0.6c11"
+ DEFAULT_URL     = "http://pypi.python.org/packages/%s/s/setuptools/" % sys.version[:3]
++IS_PYTHON3 = sys.version_info[0] == 3
+ 
+ md5_data = {
+     'setuptools-0.6b1-py2.3.egg': '8822caf901250d848b996b7f25c6e6ca',
+@@ -66,14 +69,16 @@ import sys, os
+ try: from hashlib import md5
+ except ImportError: from md5 import md5
+ 
++
++def print_error(msg, **kwargs):
++    print(msg, file=sys.stderr, **kwargs)
++
++
+ def _validate_md5(egg_name, data):
+     if egg_name in md5_data:
+         digest = md5(data).hexdigest()
+         if digest != md5_data[egg_name]:
+-            print((
+-                "md5 validation of %s failed!  (Possible download problem?)"
+-                % egg_name
+-            ), file=sys.stderr)
++            print_error("md5 validation of %s failed!  (Possible download problem?)" % egg_name)
+             sys.exit(2)
+     return data
+ 
+@@ -105,12 +110,12 @@ def use_setuptools(
+         pkg_resources.require("setuptools>="+version); return
+     except pkg_resources.VersionConflict as e:
+         if was_imported:
+-            print((
++            print_error((
+             "The required version of setuptools (>=%s) is not available, and\n"
+             "can't be installed while this script is running. Please install\n"
+             " a more recent version first, using 'easy_install -U setuptools'."
+             "\n\n(Currently using %r)"
+-            ) % (version, e.args[0]), file=sys.stderr)
++            ) % (version, e.args[0]))
+             sys.exit(2)
+     except pkg_resources.DistributionNotFound:
+         pass
+diff --git pymodbus/__init__.py pymodbus/__init__.py
+old mode 100644
+new mode 100755
+index 2b89b4d..1eb935a
+--- pymodbus/__init__.py
++++ pymodbus/__init__.py
+@@ -27,3 +27,8 @@ except ImportError:
+             pass
+ 
+ __logging.getLogger(__name__).addHandler(__null())
++
++#---------------------------------------------------------------------------#
++# Define True and False if we don't have them (2.3.2)
++#---------------------------------------------------------------------------#
++
+diff --git pymodbus/bit_read_message.py pymodbus/bit_read_message.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/bit_write_message.py pymodbus/bit_write_message.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/client/__init__.py pymodbus/client/__init__.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/client/async.py pymodbus/client/async.py
+old mode 100644
+new mode 100755
+index 724127e..6dc332f
+--- pymodbus/client/async.py
++++ pymodbus/client/async.py
+@@ -33,27 +33,108 @@ Another example::
+        reactor.run()
+ """
+ from twisted.internet import defer, protocol
+-from pymodbus.client import async_twisted
+ from pymodbus.factory import ClientDecoder
++from pymodbus.exceptions import ConnectionException
+ from pymodbus.transaction import ModbusSocketFramer
+ from pymodbus.transaction import FifoTransactionManager
+ from pymodbus.transaction import DictTransactionManager
+ from pymodbus.client.common import ModbusClientMixin
++from twisted.python.failure import Failure
+ 
+ #---------------------------------------------------------------------------#
+ # Logging
+ #---------------------------------------------------------------------------#
+ import logging
+-
+ _logger = logging.getLogger(__name__)
+ 
+ 
+ #---------------------------------------------------------------------------#
+ # Connected Client Protocols
+ #---------------------------------------------------------------------------#
++class ModbusClientProtocol(protocol.Protocol, ModbusClientMixin):
++    '''
++    This represents the base modbus client protocol.  All the application
++    layer code is deferred to a higher level wrapper.
++    '''
++
++    def __init__(self, framer=None, **kwargs):
++        ''' Initializes the framer module
++
++        :param framer: The framer to use for the protocol
++        '''
++        self._connected = False
++        self.framer = framer or ModbusSocketFramer(ClientDecoder())
++        if isinstance(self.framer, ModbusSocketFramer):
++            self.transaction = DictTransactionManager(self, **kwargs)
++        else: self.transaction = FifoTransactionManager(self, **kwargs)
++
++    def connectionMade(self):
++        ''' Called upon a successful client connection.
++        '''
++        _logger.debug("Client connected to modbus server")
++        self._connected = True
++
++    def connectionLost(self, reason):
++        ''' Called upon a client disconnect
++
++        :param reason: The reason for the disconnect
++        '''
++        _logger.debug("Client disconnected from modbus server: %s" % reason)
++        self._connected = False
++        for tid in list(self.transaction):
++            self.transaction.getTransaction(tid).errback(Failure(
++                ConnectionException('Connection lost during request')))
++
++    def dataReceived(self, data):
++        ''' Get response, check for valid message, decode result
++
++        :param data: The data returned from the server
++        '''
++        self.framer.processIncomingPacket(data, self._handleResponse)
++
++    def execute(self, request):
++        ''' Starts the producer to send the next request to
++        consumer.write(Frame(request))
++        '''
++        request.transaction_id = self.transaction.getNextTID()
++        packet = self.framer.buildPacket(request)
++        self.transport.write(packet)
++        return self._buildResponse(request.transaction_id)
++
++    def _handleResponse(self, reply):
++        ''' Handle the processed response and link to correct deferred
++
++        :param reply: The reply to process
++        '''
++        if reply is not None:
++            tid = reply.transaction_id
++            handler = self.transaction.getTransaction(tid)
++            if handler:
++                handler.callback(reply)
++            else: _logger.debug("Unrequested message: " + str(reply))
++
++    def _buildResponse(self, tid):
++        ''' Helper method to return a deferred response
++        for the current request.
++
++        :param tid: The transaction identifier for this response
++        :returns: A defer linked to the latest request
++        '''
++        if not self._connected:
++            return defer.fail(Failure(
++                ConnectionException('Client is not connected')))
++
++        d = defer.Deferred()
++        self.transaction.addTransaction(d, tid)
++        return d
+ 
+-# Backwards compatibility.
+-ModbusClientProtocol = async_twisted.ModbusClientProtocol
++    #----------------------------------------------------------------------#
++    # Extra Functions
++    #----------------------------------------------------------------------#
++    #if send_failed:
++    #       if self.retry > 0:
++    #               deferLater(clock, self.delay, send, message)
++    #               self.retry -= 1
+ 
+ 
+ #---------------------------------------------------------------------------#
+@@ -65,16 +146,15 @@ class ModbusUdpClientProtocol(protocol.DatagramProtocol, ModbusClientMixin):
+     layer code is deferred to a higher level wrapper.
+     '''
+ 
+-    def __init__(self, framer=None):
++    def __init__(self, framer=None, **kwargs):
+         ''' Initializes the framer module
+ 
+         :param framer: The framer to use for the protocol
+         '''
+         self.framer = framer or ModbusSocketFramer(ClientDecoder())
+         if isinstance(self.framer, ModbusSocketFramer):
+-            self.transaction = DictTransactionManager(self)
+-        else:
+-            self.transaction = FifoTransactionManager(self)
++            self.transaction = DictTransactionManager(self, **kwargs)
++        else: self.transaction = FifoTransactionManager(self, **kwargs)
+ 
+     def datagramReceived(self, data, params):
+         ''' Get response, check for valid message, decode result
+@@ -104,8 +184,7 @@ class ModbusUdpClientProtocol(protocol.DatagramProtocol, ModbusClientMixin):
+             handler = self.transaction.getTransaction(tid)
+             if handler:
+                 handler.callback(reply)
+-            else:
+-                _logger.debug("Unrequested message: " + str(reply))
++            else: _logger.debug("Unrequested message: " + str(reply))
+ 
+     def _buildResponse(self, tid):
+         ''' Helper method to return a deferred response
+diff --git pymodbus/client/common.py pymodbus/client/common.py
+old mode 100644
+new mode 100755
+index 4b0caa1..4e2f4bd
+--- pymodbus/client/common.py
++++ pymodbus/client/common.py
+@@ -132,6 +132,18 @@ class ModbusClientMixin(object):
+         request = ReadWriteMultipleRegistersRequest(*args, **kwargs)
+         return self.execute(request)
+ 
++    def mask_write_register(self, *args, **kwargs):
++        '''
++
++        :param address: The address of the register to write
++        :param and_mask: The and bitmask to apply to the register address
++        :param or_mask: The or bitmask to apply to the register address
++        :param unit: The slave unit this request is targeting
++        :returns: A deferred response handle
++        '''
++        request = MaskWriteRegisterRequest(*args, **kwargs)
++        return self.execute(request)
++
+ #---------------------------------------------------------------------------#
+ # Exported symbols
+ #---------------------------------------------------------------------------#
+diff --git pymodbus/client/sync.py pymodbus/client/sync.py
+old mode 100644
+new mode 100755
+index d01fbb2..901bc1c
+--- pymodbus/client/sync.py
++++ pymodbus/client/sync.py
+@@ -1,5 +1,6 @@
+ import socket
+ import serial
++import time
+ 
+ from pymodbus.constants import Defaults
+ from pymodbus.factory import ClientDecoder
+@@ -29,15 +30,15 @@ class BaseModbusClient(ModbusClientMixin):
+     framer.
+     '''
+ 
+-    def __init__(self, framer):
++    def __init__(self, framer, **kwargs):
+         ''' Initialize a client instance
+ 
+         :param framer: The modbus framer implementation to use
+         '''
+         self.framer = framer
+         if isinstance(self.framer, ModbusSocketFramer):
+-            self.transaction = DictTransactionManager(self)
+-        else: self.transaction = FifoTransactionManager(self)
++            self.transaction = DictTransactionManager(self, **kwargs)
++        else: self.transaction = FifoTransactionManager(self, **kwargs)
+ 
+     #-----------------------------------------------------------------------#
+     # Client interface
+@@ -113,19 +114,24 @@ class ModbusTcpClient(BaseModbusClient):
+     ''' Implementation of a modbus tcp client
+     '''
+ 
+-    def __init__(self, host='127.0.0.1', port=Defaults.Port, framer=ModbusSocketFramer):
++    def __init__(self, host='127.0.0.1', port=Defaults.Port,
++        framer=ModbusSocketFramer, **kwargs):
+         ''' Initialize a client instance
+ 
+         :param host: The host to connect to (default 127.0.0.1)
+         :param port: The modbus port to connect to (default 502)
++        :param source_address: The source address tuple to bind to (default ('', 0))
++        :param timeout: The timeout to use for this socket (default Defaults.Timeout)
+         :param framer: The modbus framer to use (default ModbusSocketFramer)
+ 
+         .. note:: The host argument will accept ipv4 and ipv6 hosts
+         '''
+         self.host = host
+         self.port = port
++        self.source_address = kwargs.get('source_address', ('', 0))
+         self.socket = None
+-        BaseModbusClient.__init__(self, framer(ClientDecoder()))
++        self.timeout  = kwargs.get('timeout',  Defaults.Timeout)
++        BaseModbusClient.__init__(self, framer(ClientDecoder()), **kwargs)
+ 
+     def connect(self):
+         ''' Connect to the modbus tcp server
+@@ -134,7 +140,8 @@ class ModbusTcpClient(BaseModbusClient):
+         '''
+         if self.socket: return True
+         try:
+-            self.socket = socket.create_connection((self.host, self.port), Defaults.Timeout)
++            self.socket = socket.create_connection((self.host, self.port),
++                timeout=self.timeout, source_address=self.source_address)
+         except socket.error as msg:
+             _logger.error('Connection to (%s, %s) failed: %s' % \
+                 (self.host, self.port, msg))
+@@ -185,17 +192,20 @@ class ModbusUdpClient(BaseModbusClient):
+     ''' Implementation of a modbus udp client
+     '''
+ 
+-    def __init__(self, host='127.0.0.1', port=Defaults.Port, framer=ModbusSocketFramer):
++    def __init__(self, host='127.0.0.1', port=Defaults.Port,
++        framer=ModbusSocketFramer, **kwargs):
+         ''' Initialize a client instance
+ 
+         :param host: The host to connect to (default 127.0.0.1)
+         :param port: The modbus port to connect to (default 502)
+         :param framer: The modbus framer to use (default ModbusSocketFramer)
++        :param timeout: The timeout to use for this socket (default None)
+         '''
+-        self.host = host
+-        self.port = port
+-        self.socket = None
+-        BaseModbusClient.__init__(self, framer(ClientDecoder()))
++        self.host    = host
++        self.port    = port
++        self.socket  = None
++        self.timeout = kwargs.get('timeout', None)
++        BaseModbusClient.__init__(self, framer(ClientDecoder()), **kwargs)
+ 
+     @classmethod
+     def _get_address_family(cls, address):
+@@ -220,6 +230,7 @@ class ModbusUdpClient(BaseModbusClient):
+         try:
+             family = ModbusUdpClient._get_address_family(self.host)
+             self.socket = socket.socket(family, socket.SOCK_DGRAM)
++            self.socket.settimeout(self.timeout)
+         except socket.error as ex:
+             _logger.error('Unable to create udp socket %s' % ex)
+             self.close()
+@@ -286,7 +297,7 @@ class ModbusSerialClient(BaseModbusClient):
+         '''
+         self.method   = method
+         self.socket   = None
+-        BaseModbusClient.__init__(self, self.__implementation(method))
++        BaseModbusClient.__init__(self, self.__implementation(method), **kwargs)
+ 
+         self.port     = kwargs.get('port', 0)
+         self.stopbits = kwargs.get('stopbits', Defaults.Stopbits)
+@@ -294,6 +305,9 @@ class ModbusSerialClient(BaseModbusClient):
+         self.parity   = kwargs.get('parity',   Defaults.Parity)
+         self.baudrate = kwargs.get('baudrate', Defaults.Baudrate)
+         self.timeout  = kwargs.get('timeout',  Defaults.Timeout)
++        if self.method == "rtu":
++            self._last_frame_end = 0.0
++            self._silent_interval = 3.5 * (1 + 8 + 2) / self.baudrate
+ 
+     @staticmethod
+     def __implementation(method):
+@@ -310,7 +324,7 @@ class ModbusSerialClient(BaseModbusClient):
+         raise ParameterException("Invalid framer method requested")
+ 
+     def connect(self):
+-        ''' Connect to the modbus tcp server
++        ''' Connect to the modbus serial server
+ 
+         :returns: True if connection succeeded, False otherwise
+         '''
+@@ -322,6 +336,8 @@ class ModbusSerialClient(BaseModbusClient):
+         except serial.SerialException as msg:
+             _logger.error(msg)
+             self.close()
++        if self.method == "rtu":
++            self._last_frame_end = time.time()          
+         return self.socket != None
+ 
+     def close(self):
+@@ -334,13 +350,36 @@ class ModbusSerialClient(BaseModbusClient):
+     def _send(self, request):
+         ''' Sends data on the underlying socket
+ 
++         If receive buffer still holds some data then flush it.
++ 
++         Sleep if last send finished less than 3.5 character
++         times ago.
++  
+         :param request: The encoded request to send
+         :return: The number of bytes written
+         '''
+         if not self.socket:
+             raise ConnectionException(self.__str__())
+         if request:
+-            return self.socket.write(request)
++            ts = time.time()
++            if self.method == "rtu":
++                if ts < self._last_frame_end + self._silent_interval:
++                    _logger.debug("will sleep to wait for 3.5 char")
++                    time.sleep(self._last_frame_end + self._silent_interval - ts)
++
++            try:
++                waitingbytes = self.socket.inWaiting()
++                if waitingbytes:
++                    result = self.socket.read(waitingbytes)
++                    if _logger.isEnabledFor(logging.WARNING):
++                        _logger.warning("cleanup recv buffer before send: " + " ".join([hex(x) for x in result]))
++            except NotImplementedError:
++                pass
++
++            size = self.socket.write(request)
++            if self.method == "rtu":
++                self._last_frame_end = time.time()
++            return size   
+         return 0
+ 
+     def _recv(self, size):
+@@ -351,7 +390,10 @@ class ModbusSerialClient(BaseModbusClient):
+         '''
+         if not self.socket:
+             raise ConnectionException(self.__str__())
+-        return self.socket.read(size)
++        result = self.socket.read(size)
++        if self.method == "rtu":
++            self._last_frame_end = time.time()
++        return result        
+ 
+     def __str__(self):
+         ''' Builds a string representation of the connection
+diff --git pymodbus/compat.py pymodbus/compat.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/constants.py pymodbus/constants.py
+old mode 100644
+new mode 100755
+index e1d9869..45b722e
+--- pymodbus/constants.py
++++ pymodbus/constants.py
+@@ -20,6 +20,12 @@ class Defaults(Singleton):
+        The default number of times a client should retry the given
+        request before failing (3)
+ 
++    .. attribute:: RetryOnEmpty
++
++       A flag indicating if a transaction should be retried in the
++       case that an empty response is received. This is useful for
++       slow clients that may need more time to process a requst.
++
+     .. attribute:: Timeout
+ 
+        The default amount of time a client should wait for a request
+@@ -70,18 +76,33 @@ class Defaults(Singleton):
+ 
+        The number of bits sent after each character in a message to
+        indicate the end of the byte.  This defaults to 1.
++
++    .. attribute:: ZeroMode
++
++       Indicates if the slave datastore should use indexing at 0 or 1.
++       More about this can be read in section 4.4 of the modbus specification.
++
++    .. attribute:: IgnoreMissingSlaves
++
++       In case a request is made to a missing slave, this defines if an error
++       should be returned or simply ignored. This is useful for the case of a
++       serial server emulater where a request to a non-existant slave on a bus
++       will never respond. The client in this case will simply timeout.
+     '''
+-    Port          = 502
+-    Retries       = 3
+-    Timeout       = 3
+-    Reconnects    = 0
+-    TransactionId = 0
+-    ProtocolId    = 0
+-    UnitId        = 0x00
+-    Baudrate      = 19200
+-    Parity        = 'N'
+-    Bytesize      = 8
+-    Stopbits      = 1
++    Port                = 502
++    Retries             = 3
++    RetryOnEmpty        = False
++    Timeout             = 3
++    Reconnects          = 0
++    TransactionId       = 0
++    ProtocolId          = 0
++    UnitId              = 0x00
++    Baudrate            = 19200
++    Parity              = 'N'
++    Bytesize            = 8
++    Stopbits            = 1
++    ZeroMode            = False
++    IgnoreMissingSlaves = False
+ 
+ 
+ class ModbusStatus(Singleton):
+diff --git pymodbus/datastore/__init__.py pymodbus/datastore/__init__.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/datastore/context.py pymodbus/datastore/context.py
+old mode 100644
+new mode 100755
+index 17297ea..45d1657
+--- pymodbus/datastore/context.py
++++ pymodbus/datastore/context.py
+@@ -1,4 +1,4 @@
+-from pymodbus.exceptions import ParameterException
++from pymodbus.exceptions import NoSuchSlaveException
+ from pymodbus.interfaces import IModbusSlaveContext
+ from pymodbus.datastore.store import ModbusSequentialDataBlock
+ from pymodbus.constants import Defaults
+@@ -36,6 +36,7 @@ class ModbusSlaveContext(IModbusSlaveContext):
+         self.store['c'] = kwargs.get('co', ModbusSequentialDataBlock.create())
+         self.store['i'] = kwargs.get('ir', ModbusSequentialDataBlock.create())
+         self.store['h'] = kwargs.get('hr', ModbusSequentialDataBlock.create())
++        self.zero_mode  = kwargs.get('zero_mode', Defaults.ZeroMode)
+ 
+     def __str__(self):
+         ''' Returns a string representation of the context
+@@ -57,7 +58,7 @@ class ModbusSlaveContext(IModbusSlaveContext):
+         :param count: The number of values to test
+         :returns: True if the request in within range, False otherwise
+         '''
+-        address = address + 1  # section 4.4 of specification
++        if not self.zero_mode: address = address + 1
+         _logger.debug("validate[%d] %d:%d" % (fx, address, count))
+         return self.store[self.decode(fx)].validate(address, count)
+ 
+@@ -69,7 +70,7 @@ class ModbusSlaveContext(IModbusSlaveContext):
+         :param count: The number of values to retrieve
+         :returns: The requested values from a:a+c
+         '''
+-        address = address + 1  # section 4.4 of specification
++        if not self.zero_mode: address = address + 1
+         _logger.debug("getValues[%d] %d:%d" % (fx, address, count))
+         return self.store[self.decode(fx)].getValues(address, count)
+ 
+@@ -80,7 +81,7 @@ class ModbusSlaveContext(IModbusSlaveContext):
+         :param address: The starting address
+         :param values: The new values to be set
+         '''
+-        address = address + 1  # section 4.4 of specification
++        if not self.zero_mode: address = address + 1
+         _logger.debug("setValues[%d] %d:%d" % (fx, address, len(values)))
+         self.store[self.decode(fx)].setValues(address, values)
+ 
+@@ -129,7 +130,7 @@ class ModbusServerContext(object):
+         if self.single: slave = Defaults.UnitId
+         if 0xf7 >= slave >= 0x00:
+             self.__slaves[slave] = context
+-        else: raise ParameterException('slave index out of range')
++        else: raise NoSuchSlaveException('slave index[%d] out of range' % slave)
+ 
+     def __delitem__(self, slave):
+         ''' Wrapper used to access the slave context
+@@ -138,7 +139,7 @@ class ModbusServerContext(object):
+         '''
+         if not self.single and (0xf7 >= slave >= 0x00):
+             del self.__slaves[slave]
+-        else: raise ParameterException('slave index out of range')
++        else: raise NoSuchSlaveException('slave index[%d] out of range' % slave)
+ 
+     def __getitem__(self, slave):
+         ''' Used to get access to a slave context
+@@ -149,4 +150,4 @@ class ModbusServerContext(object):
+         if self.single: slave = Defaults.UnitId
+         if slave in self.__slaves:
+             return self.__slaves.get(slave)
+-        else: raise ParameterException("slave does not exist, or is out of range")
++        else: raise NoSuchSlaveException('slave index[%d] out of range' % slave)
+diff --git pymodbus/datastore/remote.py pymodbus/datastore/remote.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/datastore/store.py pymodbus/datastore/store.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/device.py pymodbus/device.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/diag_message.py pymodbus/diag_message.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/events.py pymodbus/events.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/exceptions.py pymodbus/exceptions.py
+old mode 100644
+new mode 100755
+index eea0b4c..e35db8d
+--- pymodbus/exceptions.py
++++ pymodbus/exceptions.py
+@@ -11,6 +11,7 @@ class ModbusException(Exception):
+ 
+     def __init__(self, string):
+         ''' Initialize the exception
++
+         :param string: The message to append to the error
+         '''
+         self.string = string
+@@ -24,6 +25,7 @@ class ModbusIOException(ModbusException):
+ 
+     def __init__(self, string=""):
+         ''' Initialize the exception
++
+         :param string: The message to append to the error
+         '''
+         message = "[Input/Output] %s" % string
+@@ -31,13 +33,27 @@ class ModbusIOException(ModbusException):
+ 
+ 
+ class ParameterException(ModbusException):
+-    ''' Error resulting from invalid paramater '''
++    ''' Error resulting from invalid parameter '''
++
++    def __init__(self, string=""):
++        ''' Initialize the exception
++
++        :param string: The message to append to the error
++        '''
++        message = "[Invalid Parameter] %s" % string
++        ModbusException.__init__(self, message)
++
++
++class NoSuchSlaveException(ModbusException):
++    ''' Error resulting from making a request to a slave
++    that does not exist '''
+ 
+     def __init__(self, string=""):
+         ''' Initialize the exception
++
+         :param string: The message to append to the error
+         '''
+-        message = "[Invalid Paramter] %s" % string
++        message = "[No Such Slave] %s" % string
+         ModbusException.__init__(self, message)
+ 
+ 
+@@ -46,6 +62,7 @@ class NotImplementedException(ModbusException):
+ 
+     def __init__(self, string=""):
+         ''' Initialize the exception
++
+         :param string: The message to append to the error
+         '''
+         message = "[Not Implemented] %s" % string
+@@ -57,6 +74,7 @@ class ConnectionException(ModbusException):
+ 
+     def __init__(self, string=""):
+         ''' Initialize the exception
++
+         :param string: The message to append to the error
+         '''
+         message = "[Connection] %s" % string
+@@ -68,5 +86,5 @@ class ConnectionException(ModbusException):
+ __all__ = [
+     "ModbusException", "ModbusIOException",
+     "ParameterException", "NotImplementedException",
+-    "ConnectionException",
++    "ConnectionException", "NoSuchSlaveException",
+ ]
+diff --git pymodbus/factory.py pymodbus/factory.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/file_message.py pymodbus/file_message.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/interfaces.py pymodbus/interfaces.py
+old mode 100644
+new mode 100755
+index 8587e94..606798d
+--- pymodbus/interfaces.py
++++ pymodbus/interfaces.py
+@@ -151,6 +151,14 @@ class IModbusFramer(object):
+         raise NotImplementedException(
+             "Method not implemented by derived class")
+ 
++    def getResponseSize(self, message):
++        ''' Returns expected packet size of response for this request
++
++        :returns: The expected packet size
++        '''
++        raise NotImplementedException(
++            "Method not implemented by derived class")
++
+ 
+ class IModbusSlaveContext(object):
+     '''
+diff --git pymodbus/internal/__init__.py pymodbus/internal/__init__.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/internal/ptwisted.py pymodbus/internal/ptwisted.py
+old mode 100644
+new mode 100755
+index e81f2a6..54a68ec
+--- pymodbus/internal/ptwisted.py
++++ pymodbus/internal/ptwisted.py
+@@ -1,9 +1,9 @@
+ '''
+ A collection of twisted utility code
+ '''
+-#from twisted.cred import portal, checkers
+-#from twisted.conch import manhole, manhole_ssh
+-#from twisted.conch.insults import insults
++from twisted.cred import portal, checkers
++from twisted.conch import manhole, manhole_ssh
++from twisted.conch.insults import insults
+ 
+ #---------------------------------------------------------------------------#
+ # Logging
+@@ -23,7 +23,6 @@ def InstallManagementConsole(namespace, users={'admin': 'admin'}, port=503):
+     :param users: The users to login with
+     :param port: The port to host the server on
+     '''
+-    raise NotImplemented("This code currently doesn't work on python3")
+     from twisted.internet import reactor
+ 
+     def build_protocol():
+diff --git pymodbus/mei_message.py pymodbus/mei_message.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/other_message.py pymodbus/other_message.py
+old mode 100644
+new mode 100755
+index fccae76..d63290f
+--- pymodbus/other_message.py
++++ pymodbus/other_message.py
+@@ -43,7 +43,7 @@ class ReadExceptionStatusRequest(ModbusRequest):
+         '''
+         pass
+ 
+-    def execute(self):
++    def execute(self, context):
+         ''' Run a read exeception status request against the store
+ 
+         :returns: The populated response
+@@ -144,7 +144,7 @@ class GetCommEventCounterRequest(ModbusRequest):
+         '''
+         pass
+ 
+-    def execute(self):
++    def execute(self, context):
+         ''' Run a read exeception status request against the store
+ 
+         :returns: The populated response
+@@ -249,7 +249,7 @@ class GetCommEventLogRequest(ModbusRequest):
+         '''
+         pass
+ 
+-    def execute(self):
++    def execute(self, context):
+         ''' Run a read exeception status request against the store
+ 
+         :returns: The populated response
+@@ -359,7 +359,7 @@ class ReportSlaveIdRequest(ModbusRequest):
+         '''
+         pass
+ 
+-    def execute(self):
++    def execute(self, context):
+         ''' Run a read exeception status request against the store
+ 
+         :returns: The populated response
+diff --git pymodbus/payload.py pymodbus/payload.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/pdu.py pymodbus/pdu.py
+old mode 100644
+new mode 100755
+index 70fb791..88efeee
+--- pymodbus/pdu.py
++++ pymodbus/pdu.py
+@@ -11,6 +11,7 @@ from pymodbus.compat import iteritems, int2byte, byte2int
+ # Logging
+ #---------------------------------------------------------------------------#
+ import logging
++import collections
+ _logger = logging.getLogger(__name__)
+ 
+ 
+@@ -107,7 +108,13 @@ class ModbusRequest(ModbusPDU):
+                 (self.function_code, exception))
+         return ExceptionResponse(self.function_code, exception)
+ 
++    def getResponseSize(self):
++        ''' Returns expected packet size of response for this request
+ 
++        :raises: A not implemented exception
++        '''
++        raise NotImplementedException()
++ 
+ class ModbusResponse(ModbusPDU):
+     ''' Base class for a modbus response PDU
+ 
+@@ -154,7 +161,7 @@ class ModbusExceptions(Singleton):
+         :param code: The code number to translate
+         '''
+         values = dict((v, k) for k, v in iteritems(cls.__dict__)
+-            if not k.startswith('__') and not callable(v))
++            if not k.startswith('__') and not isinstance(v, collections.Callable))
+         return values.get(code, None)
+ 
+ 
+diff --git pymodbus/register_read_message.py pymodbus/register_read_message.py
+old mode 100644
+new mode 100755
+index ca72708..abc744d
+--- pymodbus/register_read_message.py
++++ pymodbus/register_read_message.py
+@@ -39,6 +39,13 @@ class ReadRegistersRequestBase(ModbusRequest):
+         '''
+         self.address, self.count = struct.unpack('>HH', data)
+ 
++    def getResponseSize(self):
++        ''' Returns expected packet size of response for this request
++
++        :returns: The expected packet size
++        '''
++        return 1 + 2 * self.count
++
+     def __str__(self):
+         ''' Returns a string representation of the instance
+ 
+diff --git pymodbus/register_write_message.py pymodbus/register_write_message.py
+old mode 100644
+new mode 100755
+index edd29f8..74dc5c4
+--- pymodbus/register_write_message.py
++++ pymodbus/register_write_message.py
+@@ -61,6 +61,13 @@ class WriteSingleRegisterRequest(ModbusRequest):
+         values = context.getValues(self.function_code, self.address, 1)
+         return WriteSingleRegisterResponse(self.address, values[0])
+ 
++    def getResponseSize(self):
++        ''' Returns expected packet size of response for this request
++
++        :returns: The expected packet size
++        '''
++        return 2 + 2
++
+     def __str__(self):
+         ''' Returns a string representation of the instance
+ 
+@@ -132,9 +139,11 @@ class WriteMultipleRegistersRequest(ModbusRequest):
+         '''
+         ModbusRequest.__init__(self, **kwargs)
+         self.address = address
+-        self.values = values or []
+-        if not hasattr(values, '__iter__'):
++        if values is None:
++            values = []
++        elif not hasattr(values, '__iter__'):
+             values = [values]
++        self.values = values
+         self.count = len(self.values)
+         self.byte_count = self.count * 2
+ 
+@@ -179,6 +188,13 @@ class WriteMultipleRegistersRequest(ModbusRequest):
+         context.setValues(self.function_code, self.address, self.values)
+         return WriteMultipleRegistersResponse(self.address, self.count)
+ 
++    def getResponseSize(self):
++        ''' Returns expected packet size of response for this request
++
++        :returns: The expected packet size
++        '''
++        return 2 + 2
++
+     def __str__(self):
+         ''' Returns a string representation of the instance
+ 
+diff --git pymodbus/server/__init__.py pymodbus/server/__init__.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/server/async.py pymodbus/server/async.py
+old mode 100644
+new mode 100755
+index a69080a..5816ba3
+--- pymodbus/server/async.py
++++ pymodbus/server/async.py
+@@ -3,6 +3,7 @@ Implementation of a Twisted Modbus Server
+ ------------------------------------------
+ 
+ '''
++import traceback
+ from binascii import b2a_hex
+ from twisted.internet import protocol
+ from twisted.internet.protocol import ServerFactory
+@@ -13,9 +14,9 @@ from pymodbus.datastore import ModbusServerContext
+ from pymodbus.device import ModbusControlBlock
+ from pymodbus.device import ModbusAccessControl
+ from pymodbus.device import ModbusDeviceIdentification
++from pymodbus.exceptions import NoSuchSlaveException
+ from pymodbus.transaction import ModbusSocketFramer, ModbusAsciiFramer
+ from pymodbus.pdu import ModbusExceptions as merror
+-from pymodbus.internal.ptwisted import InstallManagementConsole
+ from pymodbus.compat import byte2int
+ 
+ #---------------------------------------------------------------------------#
+@@ -54,7 +55,7 @@ class ModbusTcpProtocol(protocol.Protocol):
+         :param data: The data sent by the client
+         '''
+         if _logger.isEnabledFor(logging.DEBUG):
+-            _logger.debug(' '.join([hex(byte2int(x)) for x in data]))
++             _logger.debug(' '.join([hex(byte2int(x)) for x in data]))
+         if not self.factory.control.ListenOnly:
+             self.framer.processIncomingPacket(data, self._execute)
+ 
+@@ -66,6 +67,11 @@ class ModbusTcpProtocol(protocol.Protocol):
+         try:
+             context = self.factory.store[request.unit_id]
+             response = request.execute(context)
++        except NoSuchSlaveException as ex:
++            _logger.debug("requested slave does not exist: %s; %s", ex, traceback.format_exc() )
++            if self.factory.ignore_missing_slaves:
++                return # the client will simply timeout waiting for a response
++            response = request.doException(merror.GatewayNoResponse)
+         except Exception as ex:
+             _logger.debug("Datastore unable to fulfill request: %s" % ex)
+             response = request.doException(merror.SlaveFailure)
+@@ -97,7 +103,7 @@ class ModbusServerFactory(ServerFactory):
+ 
+     protocol = ModbusTcpProtocol
+ 
+-    def __init__(self, store, framer=None, identity=None):
++    def __init__(self, store, framer=None, identity=None, **kwargs):
+         ''' Overloaded initializer for the modbus factory
+ 
+         If the identify structure is not passed in, the ModbusControlBlock
+@@ -106,13 +112,14 @@ class ModbusServerFactory(ServerFactory):
+         :param store: The ModbusServerContext datastore
+         :param framer: The framer strategy to use
+         :param identity: An optional identify structure
+-
++        :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+         '''
+         self.decoder = ServerDecoder()
+         self.framer = framer or ModbusSocketFramer
+         self.store = store or ModbusServerContext()
+         self.control = ModbusControlBlock()
+         self.access = ModbusAccessControl()
++        self.ignore_missing_slaves = kwargs.get('ignore_missing_slaves', Defaults.IgnoreMissingSlaves)
+ 
+         if isinstance(identity, ModbusDeviceIdentification):
+             self.control.Identity.update(identity)
+@@ -124,7 +131,7 @@ class ModbusServerFactory(ServerFactory):
+ class ModbusUdpProtocol(protocol.DatagramProtocol):
+     ''' Implements a modbus udp server in twisted '''
+ 
+-    def __init__(self, store, framer=None, identity=None):
++    def __init__(self, store, framer=None, identity=None, **kwargs):
+         ''' Overloaded initializer for the modbus factory
+ 
+         If the identify structure is not passed in, the ModbusControlBlock
+@@ -133,13 +140,14 @@ class ModbusUdpProtocol(protocol.DatagramProtocol):
+         :param store: The ModbusServerContext datastore
+         :param framer: The framer strategy to use
+         :param identity: An optional identify structure
+-
++        :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+         '''
+         framer = framer or ModbusSocketFramer
+         self.framer = framer(decoder=ServerDecoder())
+         self.store = store or ModbusServerContext()
+         self.control = ModbusControlBlock()
+         self.access = ModbusAccessControl()
++        self.ignore_missing_slaves = kwargs.get('ignore_missing_slaves', Defaults.IgnoreMissingSlaves)
+ 
+         if isinstance(identity, ModbusDeviceIdentification):
+             self.control.Identity.update(identity)
+@@ -164,6 +172,11 @@ class ModbusUdpProtocol(protocol.DatagramProtocol):
+         try:
+             context = self.store[request.unit_id]
+             response = request.execute(context)
++        except NoSuchSlaveException as ex:
++            _logger.debug("requested slave does not exist: %s; %s", ex, traceback.format_exc() )
++            if self.ignore_missing_slaves:
++                return # the client will simply timeout waiting for a response
++            response = request.doException(merror.GatewayNoResponse)
+         except Exception as ex:
+             _logger.debug("Datastore unable to fulfill request: %s" % ex)
+             response = request.doException(merror.SlaveFailure)
+@@ -188,38 +201,42 @@ class ModbusUdpProtocol(protocol.DatagramProtocol):
+ #---------------------------------------------------------------------------#
+ # Starting Factories
+ #---------------------------------------------------------------------------#
+-def StartTcpServer(context, identity=None, address=None, console=False):
++def StartTcpServer(context, identity=None, address=None, console=False, **kwargs):
+     ''' Helper method to start the Modbus Async TCP server
+ 
+     :param context: The server data context
+     :param identify: The server identity to use (default empty)
+     :param address: An optional (interface, port) to bind to.
+     :param console: A flag indicating if you want the debug console
++    :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+     '''
+     from twisted.internet import reactor
+ 
+     address = address or ("", Defaults.Port)
+     framer  = ModbusSocketFramer
+-    factory = ModbusServerFactory(context, framer, identity)
+-    if console: InstallManagementConsole({'factory': factory})
++    factory = ModbusServerFactory(context, framer, identity, **kwargs)
++    if console:
++        from pymodbus.internal.ptwisted import InstallManagementConsole
++        InstallManagementConsole({'factory': factory})
+ 
+     _logger.info("Starting Modbus TCP Server on %s:%s" % address)
+     reactor.listenTCP(address[1], factory, interface=address[0])
+     reactor.run()
+ 
+ 
+-def StartUdpServer(context, identity=None, address=None):
++def StartUdpServer(context, identity=None, address=None, **kwargs):
+     ''' Helper method to start the Modbus Async Udp server
+ 
+     :param context: The server data context
+     :param identify: The server identity to use (default empty)
+     :param address: An optional (interface, port) to bind to.
++    :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+     '''
+     from twisted.internet import reactor
+ 
+     address = address or ("", Defaults.Port)
+     framer  = ModbusSocketFramer
+-    server  = ModbusUdpProtocol(context, framer, identity)
++    server  = ModbusUdpProtocol(context, framer, identity, **kwargs)
+ 
+     _logger.info("Starting Modbus UDP Server on %s:%s" % address)
+     reactor.listenUDP(address[1], server, interface=address[0])
+@@ -236,6 +253,7 @@ def StartSerialServer(context, identity=None,
+     :param port: The serial port to attach to
+     :param baudrate: The baud rate to use for the serial device
+     :param console: A flag indicating if you want the debug console
++    :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+     '''
+     from twisted.internet import reactor
+     from twisted.internet.serialport import SerialPort
+@@ -245,8 +263,10 @@ def StartSerialServer(context, identity=None,
+     console = kwargs.get('console', False)
+ 
+     _logger.info("Starting Modbus Serial Server on %s" % port)
+-    factory = ModbusServerFactory(context, framer, identity)
+-    if console: InstallManagementConsole({'factory': factory})
++    factory = ModbusServerFactory(context, framer, identity, **kwargs)
++    if console:
++        from pymodbus.internal.ptwisted import InstallManagementConsole
++        InstallManagementConsole({'factory': factory})
+ 
+     protocol = factory.buildProtocol(None)
+     SerialPort.getHost = lambda self: port # hack for logging
+diff --git pymodbus/server/sync.py pymodbus/server/sync.py
+old mode 100644
+new mode 100755
+index 582e04c..628056f
+--- pymodbus/server/sync.py
++++ pymodbus/server/sync.py
+@@ -6,6 +6,7 @@ Implementation of a Threaded Modbus Server
+ from binascii import b2a_hex
+ import serial
+ import socket
++import traceback
+ 
+ from pymodbus.constants import Defaults
+ from pymodbus.factory import ServerDecoder
+@@ -13,7 +14,7 @@ from pymodbus.datastore import ModbusServerContext
+ from pymodbus.device import ModbusControlBlock
+ from pymodbus.device import ModbusDeviceIdentification
+ from pymodbus.transaction import *
+-from pymodbus.exceptions import NotImplementedException
++from pymodbus.exceptions import NotImplementedException, NoSuchSlaveException
+ from pymodbus.pdu import ModbusExceptions as merror
+ from pymodbus.compat import socketserver, byte2int
+ 
+@@ -56,8 +57,13 @@ class ModbusBaseRequestHandler(socketserver.BaseRequestHandler):
+         try:
+             context = self.server.context[request.unit_id]
+             response = request.execute(context)
++        except NoSuchSlaveException as ex:
++            _logger.debug("requested slave does not exist: %s; %s", ex, traceback.format_exc() )
++            if self.server.ignore_missing_slaves:
++                return # the client will simply timeout waiting for a response
++            response = request.doException(merror.GatewayNoResponse)
+         except Exception as ex:
+-            _logger.debug("Datastore unable to fulfill request: %s" % ex)
++            _logger.debug("Datastore unable to fulfill request: %s; %s", ex, traceback.format_exc() )
+             response = request.doException(merror.SlaveFailure)
+         response.transaction_id = request.transaction_id
+         response.unit_id = request.unit_id
+@@ -121,7 +127,17 @@ class ModbusConnectedRequestHandler(ModbusBaseRequestHandler):
+     '''
+ 
+     def handle(self):
+-        ''' Callback when we receive any data
++        '''Callback when we receive any data, until self.running becomes not True.  Blocks indefinitely
++        awaiting data.  If shutdown is required, then the global socket.settimeout(<seconds>) may be
++        used, to allow timely checking of self.running.  However, since this also affects socket
++        connects, if there are outgoing socket connections used in the same program, then these will
++        be prevented, if the specfied timeout is too short.  Hence, this is unreliable.
++
++        To respond to Modbus...Server.server_close() (which clears each handler's self.running),
++        derive from this class to provide an alternative handler that awakens from time to time when
++        no input is available and checks self.running.  Use Modbus...Server( handler=... ) keyword
++        to supply the alternative request handler class.
++
+         '''
+         while self.running:
+             try:
+@@ -131,11 +147,16 @@ class ModbusConnectedRequestHandler(ModbusBaseRequestHandler):
+                     _logger.debug(' '.join([hex(byte2int(x)) for x in data]))
+                 # if not self.server.control.ListenOnly:
+                 self.framer.processIncomingPacket(data, self.execute)
+-            except socket.timeout: pass
++            except socket.timeout as msg:
++                if _logger.isEnabledFor(logging.DEBUG):
++                    _logger.debug("Socket timeout occurred %s", msg)
++                pass
+             except socket.error as msg:
+-                _logger.error("Socket error occurred %s" % msg)
++                _logger.error("Socket error occurred %s", msg)
++                self.running = False
++            except:
++                _logger.error("Socket exception occurred %s", traceback.format_exc() )
+                 self.running = False
+-            except: self.running = False
+ 
+     def send(self, message):
+         ''' Send a request (string) to the network
+@@ -201,7 +222,7 @@ class ModbusTcpServer(socketserver.ThreadingTCPServer):
+     server context instance.
+     '''
+ 
+-    def __init__(self, context, framer=None, identity=None, address=None):
++    def __init__(self, context, framer=None, identity=None, address=None, handler=None, **kwargs):
+         ''' Overloaded initializer for the socket server
+ 
+         If the identify structure is not passed in, the ModbusControlBlock
+@@ -211,6 +232,8 @@ class ModbusTcpServer(socketserver.ThreadingTCPServer):
+         :param framer: The framer strategy to use
+         :param identity: An optional identify structure
+         :param address: An optional (interface, port) to bind to.
++        :param handler: A handler for each client session; default is ModbusConnectedRequestHandler
++        :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+         '''
+         self.threads = []
+         self.decoder = ServerDecoder()
+@@ -218,12 +241,13 @@ class ModbusTcpServer(socketserver.ThreadingTCPServer):
+         self.context = context or ModbusServerContext()
+         self.control = ModbusControlBlock()
+         self.address = address or ("", Defaults.Port)
++        self.ignore_missing_slaves = kwargs.get('ignore_missing_slaves', Defaults.IgnoreMissingSlaves)
+ 
+         if isinstance(identity, ModbusDeviceIdentification):
+             self.control.Identity.update(identity)
+ 
+         socketserver.ThreadingTCPServer.__init__(self,
+-            self.address, ModbusConnectedRequestHandler)
++            self.address, handler or ModbusConnectedRequestHandler)
+ 
+     def process_request(self, request, client):
+         ''' Callback for connecting a new client thread
+@@ -234,6 +258,15 @@ class ModbusTcpServer(socketserver.ThreadingTCPServer):
+         _logger.debug("Started thread to serve client at " + str(client))
+         socketserver.ThreadingTCPServer.process_request(self, request, client)
+ 
++    def shutdown(self):
++        ''' Stops the serve_forever loop.
++
++        Overridden to signal handlers to stop.
++        '''
++        for thread in self.threads:
++            thread.running = False
++        socketserver.ThreadingTCPServer.shutdown(self)
++
+     def server_close(self):
+         ''' Callback for stopping the running server
+         '''
+@@ -252,7 +285,7 @@ class ModbusUdpServer(socketserver.ThreadingUDPServer):
+     server context instance.
+     '''
+ 
+-    def __init__(self, context, framer=None, identity=None, address=None):
++    def __init__(self, context, framer=None, identity=None, address=None, handler=None, **kwargs):
+         ''' Overloaded initializer for the socket server
+ 
+         If the identify structure is not passed in, the ModbusControlBlock
+@@ -262,6 +295,8 @@ class ModbusUdpServer(socketserver.ThreadingUDPServer):
+         :param framer: The framer strategy to use
+         :param identity: An optional identify structure
+         :param address: An optional (interface, port) to bind to.
++        :param handler: A handler for each client session; default is ModbusDisonnectedRequestHandler
++        :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+         '''
+         self.threads = []
+         self.decoder = ServerDecoder()
+@@ -269,12 +304,13 @@ class ModbusUdpServer(socketserver.ThreadingUDPServer):
+         self.context = context or ModbusServerContext()
+         self.control = ModbusControlBlock()
+         self.address = address or ("", Defaults.Port)
++        self.ignore_missing_slaves = kwargs.get('ignore_missing_slaves', Defaults.IgnoreMissingSlaves)
+ 
+         if isinstance(identity, ModbusDeviceIdentification):
+             self.control.Identity.update(identity)
+ 
+         socketserver.ThreadingUDPServer.__init__(self,
+-            self.address, ModbusDisconnectedRequestHandler)
++            self.address, handler or ModbusDisconnectedRequestHandler)
+ 
+     def process_request(self, request, client):
+         ''' Callback for connecting a new client thread
+@@ -319,7 +355,7 @@ class ModbusSerialServer(object):
+         :param parity: Which kind of parity to use
+         :param baudrate: The baud rate to use for the serial device
+         :param timeout: The timeout to use for the serial device
+-
++        :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+         '''
+         self.threads = []
+         self.decoder = ServerDecoder()
+@@ -336,6 +372,7 @@ class ModbusSerialServer(object):
+         self.parity   = kwargs.get('parity',   Defaults.Parity)
+         self.baudrate = kwargs.get('baudrate', Defaults.Baudrate)
+         self.timeout  = kwargs.get('timeout',  Defaults.Timeout)
++        self.ignore_missing_slaves = kwargs.get('ignore_missing_slaves', Defaults.IgnoreMissingSlaves)
+         self.socket   = None
+         self._connect()
+         self.is_running = True
+@@ -389,27 +426,30 @@ class ModbusSerialServer(object):
+ #---------------------------------------------------------------------------#
+ # Creation Factories
+ #---------------------------------------------------------------------------#
+-def StartTcpServer(context=None, identity=None, address=None):
++def StartTcpServer(context=None, identity=None, address=None, **kwargs):
+     ''' A factory to start and run a tcp modbus server
+ 
+     :param context: The ModbusServerContext datastore
+     :param identity: An optional identify structure
+     :param address: An optional (interface, port) to bind to.
++    :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+     '''
+     framer = ModbusSocketFramer
+-    server = ModbusTcpServer(context, framer, identity, address)
++    server = ModbusTcpServer(context, framer, identity, address, **kwargs)
+     server.serve_forever()
+ 
+ 
+-def StartUdpServer(context=None, identity=None, address=None):
++def StartUdpServer(context=None, identity=None, address=None, **kwargs):
+     ''' A factory to start and run a udp modbus server
+ 
+     :param context: The ModbusServerContext datastore
+     :param identity: An optional identify structure
+     :param address: An optional (interface, port) to bind to.
++    :param framer: The framer to operate with (default ModbusSocketFramer)
++    :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+     '''
+-    framer = ModbusSocketFramer
+-    server = ModbusUdpServer(context, framer, identity, address)
++    framer = kwargs.pop('framer', ModbusSocketFramer)
++    server = ModbusUdpServer(context, framer, identity, address, **kwargs)
+     server.serve_forever()
+ 
+ 
+@@ -418,14 +458,16 @@ def StartSerialServer(context=None, identity=None, **kwargs):
+ 
+     :param context: The ModbusServerContext datastore
+     :param identity: An optional identify structure
++    :param framer: The framer to operate with (default ModbusAsciiFramer)
+     :param port: The serial port to attach to
+     :param stopbits: The number of stop bits to use
+     :param bytesize: The bytesize of the serial messages
+     :param parity: Which kind of parity to use
+     :param baudrate: The baud rate to use for the serial device
+     :param timeout: The timeout to use for the serial device
++    :param ignore_missing_slaves: True to not send errors on a request to a missing slave
+     '''
+-    framer = ModbusAsciiFramer
++    framer = kwargs.pop('framer', ModbusAsciiFramer)
+     server = ModbusSerialServer(context, framer, identity, **kwargs)
+     server.serve_forever()
+ 
+diff --git pymodbus/transaction.py pymodbus/transaction.py
+old mode 100644
+new mode 100755
+index f9d03f2..3a96aa8
+--- pymodbus/transaction.py
++++ pymodbus/transaction.py
+@@ -6,7 +6,7 @@ import struct
+ import socket
+ from binascii import b2a_hex, a2b_hex
+ 
+-from pymodbus.exceptions import ModbusIOException
++from pymodbus.exceptions import ModbusIOException, NotImplementedException
+ from pymodbus.constants  import Defaults
+ from pymodbus.interfaces import IModbusFramer
+ from pymodbus.utilities  import checkCRC, computeCRC
+@@ -39,19 +39,24 @@ class ModbusTransactionManager(object):
+     This module helps to abstract this away from the framer and protocol.
+     '''
+ 
+-    def __init__(self, client):
++    def __init__(self, client, **kwargs):
+         ''' Initializes an instance of the ModbusTransactionManager
+ 
+         :param client: The client socket wrapper
++        :param retry_on_empty: Should the client retry on empty
++        :param retries: The number of retries to allow
+         '''
+         self.tid = Defaults.TransactionId
+         self.client = client
++        self.retry_on_empty = kwargs.get('retry_on_empty', Defaults.RetryOnEmpty)
++        self.retries = kwargs.get('retries', Defaults.Retries)
++        
+ 
+     def execute(self, request):
+         ''' Starts the producer to send the next request to
+         consumer.write(Frame(request))
+         '''
+-        retries = Defaults.Retries
++        retries = self.retries
+         request.transaction_id = self.getNextTID()
+         _logger.debug("Running transaction %d" % request.transaction_id)
+ 
+@@ -59,10 +64,26 @@ class ModbusTransactionManager(object):
+             try:
+                 self.client.connect()
+                 self.client._send(self.client.framer.buildPacket(request))
+-                # I need to fix this to read the header and the result size,
+-                # as this may not read the full result set, but right now
+-                # it should be fine...
+-                result = self.client._recv(1024)
++                
++                try:
++                    recvsize = self.client.framer.getResponseSize(request)
++                except NotImplementedException:
++                    recvsize = 0;
++                    
++                # TODO: read first only as much as needed to check Modbus
++                # exception and then all remaining bytes. Otherwise
++                # exception always takes _timeout_ seconds.
++                if recvsize:
++                    result = self.client._recv(recvsize)
++                else:
++                    result = self.client._recv(1024)                
++                
++                if not result and self.retry_on_empty:
++                    retries -= 1
++                    continue
++# fails on py3:
++#                if _logger.isEnabledFor(logging.DEBUG):
++#                    _logger.debug("recv: " + " ".join([hex(ord(x)) for x in result]))
+                 self.client.framer.processIncomingPacket(result, self.addTransaction)
+                 break;
+             except socket.error as msg:
+@@ -120,20 +141,20 @@ class DictTransactionManager(ModbusTransactionManager):
+     results are keyed based on the supplied transaction id.
+     '''
+ 
+-    def __init__(self, client):
++    def __init__(self, client, **kwargs):
+         ''' Initializes an instance of the ModbusTransactionManager
+ 
+         :param client: The client socket wrapper
+         '''
+         self.transactions = {}
+-        super(DictTransactionManager, self).__init__(client)
++        super(DictTransactionManager, self).__init__(client, **kwargs)
+ 
+     def __iter__(self):
+         ''' Iterater over the current managed transactions
+ 
+         :returns: An iterator of the managed transactions
+         '''
+-        return iterkeys(self.transactions)
++        return iter(list(self.transactions.keys()))
+ 
+     def addTransaction(self, request, tid=None):
+         ''' Adds a transaction to the handler
+@@ -172,12 +193,12 @@ class FifoTransactionManager(ModbusTransactionManager):
+     results are returned in a FIFO manner.
+     '''
+ 
+-    def __init__(self, client):
++    def __init__(self, client, **kwargs):
+         ''' Initializes an instance of the ModbusTransactionManager
+ 
+         :param client: The client socket wrapper
+         '''
+-        super(FifoTransactionManager, self).__init__(client)
++        super(FifoTransactionManager, self).__init__(client, **kwargs)
+         self.transactions = []
+ 
+     def __iter__(self):
+@@ -435,8 +456,12 @@ class ModbusRtuFramer(IModbusFramer):
+         it or determined that it contains an error. It also has to reset the
+         current frame header handle
+         '''
+-        self.__buffer = self.__buffer[self.__header['len']:]
+-        self.__header = {}
++        try:
++            self.__buffer = self.__buffer[self.__header['len']:]
++        except KeyError:
++            #   Error response, no header len found
++            self.resetFrame()    
++        self.__header = {}    
+ 
+     def resetFrame(self):
+         ''' Reset the entire message frame.
+@@ -546,6 +571,13 @@ class ModbusRtuFramer(IModbusFramer):
+         packet += struct.pack(">H", computeCRC(packet))
+         return packet
+ 
++    def getResponseSize(self, message):
++        ''' Returns expected packet size of response for request
++
++        :param message: Request message
++        :returns: The expected packet size
++        '''
++        return 1 + 1 + message.getResponseSize() + 2
+ 
+ #---------------------------------------------------------------------------#
+ # Modbus ASCII Message
+diff --git pymodbus/utilities.py pymodbus/utilities.py
+old mode 100644
+new mode 100755
+diff --git pymodbus/version.py pymodbus/version.py
+old mode 100644
+new mode 100755
+index 5d9fbba..c002097
+--- pymodbus/version.py
++++ pymodbus/version.py
+@@ -35,7 +35,7 @@ class Version(object):
+         '''
+         return '[%s, version %s]' % (self.package, self.short())
+ 
+-version = Version('pymodbus', 1, 2, 0)
++version = Version('pymodbus', 1, 3, 0)
+ version.__name__ = 'pymodbus'  # fix epydoc error
+ 
+ #---------------------------------------------------------------------------#
+diff --git setup.py setup.py
+old mode 100644
+new mode 100755
+index 5c75b8c..fcb566f
+--- setup.py
++++ setup.py
+@@ -63,13 +63,13 @@ setup(name  = 'pymodbus',
+     include_package_data = True,
+     zip_safe = True,
+     install_requires = [
+-        #'twisted >= 13.1.0',
++#        'twisted >= 12.2.0',
+         'pyserial >= 2.6'
+     ],
+     extras_require = {
+         'quality'   : [ 'coverage >= 3.5.3', 'nose >= 1.2.1', 'mock >= 1.0.0', 'pep8 >= 1.3.3' ],
+         'documents' : [ 'sphinx >= 1.1.3' ],
+-        'twisted'   : [ 'pyasn1 >= 0.1.4', 'pycrypto >= 2.6' ],
++#        'twisted'   : [ 'pyasn1 >= 0.1.4', 'pycrypto >= 2.6' ],
+     },
+     test_suite = 'nose.collector',
+     cmdclass = command_classes,
+diff --git setup_commands.py setup_commands.py
+index 91c6184..ff68bc8 100755
+--- setup_commands.py
++++ setup_commands.py
+@@ -40,7 +40,7 @@ class DeepCleanCommand(Command):
+ 
+     def initialize_options(self):
+         ''' options setup '''
+-        self.trash = ['build', 'dist', 'pymodbus.egg-info', '.tox',
++        self.trash = ['build', 'dist', 'pymodbus.egg-info',
+             os.path.join(os.path.join('doc','sphinx'),'build'),
+         ]
+ 
+@@ -49,25 +49,22 @@ class DeepCleanCommand(Command):
+ 
+     def run(self):
+         ''' command runner '''
+-        self.__delete_cache_files()
++        self.__delete_pyc_files()
+         self.__delete_trash_dirs()
+ 
+     def __delete_trash_dirs(self):
+         ''' remove all directories created in building '''
++        self.__delete_pyc_files()
+         for directory in self.trash:
+             if os.path.exists(directory):
+                 shutil.rmtree(directory)
+ 
+-    def __delete_cache_files(self):
++    def __delete_pyc_files(self):
+         ''' remove all python cache files '''
+-        for root, directories, files in os.walk('.'):
++        for root,dirs,files in os.walk('.'):
+             for file in files:
+                 if file.endswith('.pyc'):
+-                    os.remove(os.path.join(root, file))
+-
+-            for directory in directories:
+-                if directory == "__pycache__":
+-                    shutil.rmtree(os.path.join(root, directory))
++                    os.remove(os.path.join(root,file))
+ 
+ class LintCommand(Command):
+     ''' Helper command to perform a lint scan of the
+@@ -173,32 +170,6 @@ class Pep8Command(Command):
+             return True
+         except: return False
+ 
+-class ToxCommand(Command):
+-    ''' Helper command to run the tox test runner
+-    '''
+-    description  = "perform tox unit tests"
+-    user_options = []
+-
+-    def initialize_options(self):
+-        ''' options setup '''
+-        if not os.path.exists('./tox.ini'):
+-            raise Exception("Please run tox-quickstart")
+-
+-    def finalize_options(self):
+-        pass
+-
+-    def run(self):
+-        ''' command runner '''
+-        self.__run_tox()
+-
+-    def __run_tox(self):
+-        try:
+-            from tox import cmdline as main
+-            sys.argv = '''tox -c tox.ini'''.split()
+-            main()
+-            return True
+-        except Exception as ex: print(ex);return False
+-
+ #---------------------------------------------------------------------------# 
+ # Command Configuration
+ #---------------------------------------------------------------------------# 
+@@ -208,7 +179,6 @@ command_classes = {
+     'lint'          : LintCommand,
+     'scan_2to3'     : Python3Command,
+     'pep8'          : Pep8Command,
+-    'tox'           : ToxCommand,
+ }
+ 
+ #---------------------------------------------------------------------------# 
