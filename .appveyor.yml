@@ -49,4 +49,6 @@ deploy:
   publish: true
   override: true
   explode: false
+  on:
+    branch: master
   
