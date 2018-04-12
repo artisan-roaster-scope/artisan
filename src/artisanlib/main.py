@@ -14197,8 +14197,12 @@ class ApplicationWindow(QMainWindow):
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
     #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command
     def eventaction(self,action,cmd):
-        self.eventActionThread = EventActionThread(action,cmd)
-        self.eventActionThread.start()
+        if action
+            if action in [0,1,2,3,7]:
+                self.eventaction_internal(action,cmd)
+            else:
+                self.eventActionThread = EventActionThread(action,cmd)
+                self.eventActionThread.start()
     
     def eventaction_internal(self,action,cmd):
         if action:
