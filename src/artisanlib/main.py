@@ -20758,9 +20758,12 @@ class ApplicationWindow(QMainWindow):
                         ws['G{0}'.format(c+1)].font = bf 
                         ws['G{0}'.format(c+1)].number_format = '0.0%'
                     wb.save(filename)
+                    aw.sendmessage(QApplication.translate("Message","Excel Production Report exported to {0}", None).format(filename))
                 except Exception as e:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " productionExcelReport() {0}").format(str(e)),exc_tb.tb_lineno)
                     pass
                     
 
@@ -21667,6 +21670,7 @@ class ApplicationWindow(QMainWindow):
                         ws['P{0}'.format(c+1)].number_format = "0.00"                                      
                     # close file
                     wb.save(filename)
+                    aw.sendmessage(QApplication.translate("Message","Excel Ranking Report exported to {0}", None).format(filename))
                 except Exception as e:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
