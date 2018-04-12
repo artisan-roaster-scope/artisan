@@ -27,4 +27,5 @@ $QT_PATH/bin/lrelease -verbose artisan.pro
 
 # distribution
 rm -rf build dist
+sleep .3 # sometimes it takes a little for dist to get really empty
 $PYTHON/bin/python$PYTHON_V setup-mac3.py py2app
