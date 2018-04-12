@@ -17,4 +17,4 @@ sudo installer -pkg /Volumes/Phidgets22/Phidgets.pkg -target /
 sudo rm -rf /usr/local/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data
 
 git clone -b python3 https://github.com/riptideio/pymodbus.git
-(cd pymodbus && patch -p0 < src/patches/pymodbus.patch && python3 setup.py install)
+(cd pymodbus && patch -p0 < ../src/patches/pymodbus.patch && python3 setup.py install)
