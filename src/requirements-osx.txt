@@ -1,4 +1,5 @@
 appnope==0.1.0
 #pyobjc==4.1
+pyobjc-core==4.2.1
 py2app==0.14
 PyQt5==5.10.0

@@ -699,7 +699,7 @@ if sys.platform.startswith("darwin"):
     # control app napping on OS X >= 10.9
     import appnope
     # to establish a thread pool on OS X
-#    import objc  # @UnusedImport # pyobjc seems not to be needed anylonger
+    import objc  # @UnusedImport # pyobjc seems not to be needed anylonger
     import Foundation
 #   list_ports module patched for P3k from new pyserial GitHub repository
     if serial.VERSION.split(".")[0].strip() == "2":
