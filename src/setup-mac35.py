@@ -6,7 +6,7 @@ Usage:
 """
 
 # manually remove sample-data mpl subdirectory from Python installation:
-# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/site-packages/matplotlib/mpl-data/sample_data
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data
 
 from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
@@ -201,12 +201,12 @@ os.chdir('./dist')
 try:
     PYTHONPATH = os.environ["PYTHONPATH"] + r'/'
 except:
-    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5'
+    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6'
 
 try:
     PYTHON_V = os.environ["PYTHON_V"]
 except:
-    PYTHON_V = '3.5'
+    PYTHON_V = '3.6'
     
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 os.system(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs')
@@ -221,6 +221,42 @@ os.system(r'cp /usr/local/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/lib
 # copy brew installed libusb (note the slight name change of the dylib!)
 os.system(r'cp /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib')
 
+# for Qt5
+print('*** Removing unused Qt frameworks ***')
+for fw in [
+            'QtDeclarative.framework',
+            'QtHelp.framework',
+            'QtMultimedia.framework',
+            'QtNetwork.framework',
+            'QtOpenGL.framework',
+            'QtScript.framework',
+            'QtScriptTools.framework',
+            'QtSql.framework',
+            'QtDesigner.framework',
+            'QtTest.framework',
+            'QtWebKit.framework',
+            'QtWebKitWidgets.framework',
+            'QtXMLPatterns.framework',
+            'QtCLucene.framework',
+            'QtPositioning.framework',
+            'QtQml.framework',
+            'QtSensors.framework',
+            'QtWebChannel.framework',
+            'QtQuick.framework',
+            'QtMultimediaWidgets.framework',
+            
+            'Qt3DRender.framework',
+            'QtLocation.framework',
+            'QtQuickTemplates2.framework',
+            'Qt3DExtras.framework',
+            'QtBluetooth.framework',
+            
+            ]:
+    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw):
+        for file in files:
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+            
 # for Qt5
 print('*** Removing unused Qt frameworks ***')
 Qt_frameworks = [
@@ -241,6 +277,7 @@ for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
 # remove doublicate Qt installation
 
 os.system("rm -rf ./Artisan.app/Contents/Resources/lib/python3.6/PyQt5/Qt")
+                        
 
 print('*** Removing unused files ***')
 for root, dirs, files in os.walk('.'):
