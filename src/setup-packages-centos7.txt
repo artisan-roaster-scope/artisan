@@ -36,8 +36,8 @@ o colorspacious 1.1.0
 # pip-review --local --interactive
 
 # cd src
-# ./build-centos-pi.sh
-# sudo ./build-linux.sh
+# ./build-linux.sh
+# sudo ./build-linux-pkg.sh
 # cp *.deb *.rpm /media/sf_host/
 # 
 

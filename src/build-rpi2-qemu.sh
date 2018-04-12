@@ -31,7 +31,7 @@ ssh_control()
     pip3 install -r artisan/src/requirements.txt || pip3 install -r artisan/src/requirements.txt
     (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan/src
-    ./build-centos-pi.sh
+    ./build-linux.sh
     ./build-rpi2-deb.sh
 EOF
     ${SCP} script pi@localhost:
