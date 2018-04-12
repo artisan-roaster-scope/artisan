@@ -221,41 +221,6 @@ os.system(r'cp -f /usr/local/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/
 # copy brew installed libusb (note the slight name change of the dylib!)
 os.system(r'cp /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib')
 
-# for Qt5
-print('*** Removing unused Qt frameworks ***')
-for fw in [
-            'QtDeclarative.framework',
-            'QtHelp.framework',
-            'QtMultimedia.framework',
-            'QtNetwork.framework',
-            'QtOpenGL.framework',
-            'QtScript.framework',
-            'QtScriptTools.framework',
-            'QtSql.framework',
-            'QtDesigner.framework',
-            'QtTest.framework',
-            'QtWebKit.framework',
-            'QtWebKitWidgets.framework',
-            'QtXMLPatterns.framework',
-            'QtCLucene.framework',
-            'QtPositioning.framework',
-            'QtQml.framework',
-            'QtSensors.framework',
-            'QtWebChannel.framework',
-            'QtQuick.framework',
-            'QtMultimediaWidgets.framework',
-            
-            'Qt3DRender.framework',
-            'QtLocation.framework',
-            'QtQuickTemplates2.framework',
-            'Qt3DExtras.framework',
-            'QtBluetooth.framework',
-            
-            ]:
-    for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw):
-        for file in files:
-#            print('Deleting', file)
-            os.remove(os.path.join(root,file))
             
 # for Qt5
 print('*** Removing unused Qt frameworks ***')

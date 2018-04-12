@@ -10,10 +10,10 @@ if [ ! -z $TRAVIS ]; then
     export QT_PATH=`echo /usr/local/Cellar/qt/*`
     export MACOSX_DEPLOYMENT_TARGET=10.13
 else
-    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.5
-    export PYTHONPATH=$PYTHON/lib/python3.5
+    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.6
+    export PYTHONPATH=$PYTHON/lib/python3.6
+    export PYTHON_V=3.6
     export QT_PATH=~/Qt5.10.0/5.10.0/clang_64
-    export PYTHON_V=3.5
     export MACOSX_DEPLOYMENT_TARGET=10.13
 fi
 
