@@ -14201,9 +14201,6 @@ class ApplicationWindow(QMainWindow):
     def eventaction(self,action,cmd):
 #        self.eventaction_internal(action,cmd)
         if action:
-#            if action in [0,1,2,3,7]:
-#                self.eventaction_internal(action,cmd)
-#            else:
             eventActionThread = EventActionThread(action,cmd)                
             eventActionThread.finished.connect(lambda x=eventActionThread : self.eventactionThreadDone(x))
             self.eventaction_running_threads.append(eventActionThread)
@@ -34245,8 +34242,8 @@ class modbusport(object):
                             bytesize=self.bytesize,
                             parity=self.parity,
                             stopbits=self.stopbits,
-                            retry_on_empty=False, # with retry_on_empty=True and the old pymodbus v1.3 the FZ-94 generates more errors
-                            retries=0, # option not available on old pymodbus versions (before v1.4)
+                            retry_on_empty=True, # with retry_on_empty=True and the old pymodbus v1.3 the FZ-94 generates more errors
+#                            retries=0, # option not available on old pymodbus versions (before v1.4)
                             timeout=self.timeout)  
                     else: # pymodbus v1.3 or older
                         self.master = ModbusSerialClient(
