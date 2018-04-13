@@ -3,6 +3,11 @@
 set -ex
 
 version=22
+if [ "$ARTISAN_OS" = "rpi" ]; then
+    SUDO="sudo"
+else
+    SUDO=""
+fi
 if [ "$ARTISAN_OS" = "linux" ] || [ "$ARTISAN_OS" = "rpi" ]; then
     curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget${version}.tar.gz
     tar -xzf libphidget${version}.tar.gz
@@ -14,4 +19,4 @@ elif [ "$ARTISAN_OS" = "osx" ]; then
 fi
 curl -L -O https://www.phidgets.com/downloads/phidget${version}/libraries/any/Phidget${version}Python.zip
 unzip -q Phidget${version}Python.zip
-(cd Phidget${version}Python && python3 setup.py install)
+(cd Phidget${version}Python && $SUDO python3 setup.py install)
