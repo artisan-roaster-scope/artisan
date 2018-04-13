@@ -13,11 +13,7 @@ tar -xzf libphidget22.tar.gz
 gem install fpm
 pip3 install -r src/requirements.txt
 pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
-curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
-unzip -q Phidget22Python.zip
-(cd Phidget22Python && python3 setup.py install)
-curl -L -O https://kent.dl.sourceforge.net/project/snap7/1.4.2/snap7-full-1.4.2.7z
-7z x -bd snap7-full-1.4.2.7z
-(cd snap7-full-1.4.2/build/unix && make -f x86_64_linux.mk all && sudo make -f x86_64_linux.mk install)
 
+.travis/install-phidgets.sh
+.travis/install-snap7.sh
 .travis/install-pymodbus.sh
