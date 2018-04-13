@@ -167,7 +167,6 @@ try:
 except ImportError:
     import matplotlib.backends.qt4_editor.figureoptions as figureoptions # for matplotlib <v1.4
 
-#from Phidget22.PhidgetException import * 
 from Phidget22.Net import Net as PhidgetNetwork
 from Phidget22.DeviceClass import DeviceClass
 from Phidget22.DeviceID import DeviceID
@@ -175,7 +174,6 @@ from Phidget22.ThermocoupleType import ThermocoupleType
 from Phidget22.RTDType import RTDType
 from Phidget22.RTDWireSetup import RTDWireSetup
 from Phidget22.BridgeGain import BridgeGain  # @UnusedImport
-#from Phidget22.Phidget import * 
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
 from Phidget22.Devices.VoltageRatioInput import *  # @UnusedWildImport
 from Phidget22.Devices.VoltageInput import * # @UnusedWildImport
