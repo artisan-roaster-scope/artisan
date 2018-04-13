@@ -31,10 +31,9 @@ ssh_control()
     done
     set -ex
     cat <<EOF > script
-    set -ex
+    set -x
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
-    set +e
     while :; do
         pip3 install -r artisan/src/requirements.txt
 	if [ $? -eq 0 ]; then
@@ -90,9 +89,11 @@ cat /dev/zero | ssh-keygen -q -N "" || true
 sudo cp $HOME/.ssh/id_rsa.pub $mountpoint/home/pi/.ssh/authorized_keys
 sudo mkdir $mountpoint/home/pi/artisan
 if [ -d src ]; then
+    sudo cp -R ../artisan/.travis $mountpoint/home/pi/artisan
     sudo cp -R ../artisan/src $mountpoint/home/pi/artisan
     sudo cp -R ../artisan/LICENSE $mountpoint/home/pi/artisan
 elif [ -f artisan.py ]; then
+    sudo cp -R ../../artisan/.travis $mountpoint/home/pi/artisan
     sudo cp -R ../../artisan/src $mountpoint/home/pi/artisan
     sudo cp -R ../../artisan/LICENSE $mountpoint/home/pi/artisan
 fi
