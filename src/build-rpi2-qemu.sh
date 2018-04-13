@@ -6,7 +6,7 @@ set -exm
 KERNEL_IMAGE="kernel-qemu-4.9.59-stretch"
 RASPBIAN_DATE="2018-03-13"
 RASPBIAN_URL="http://director.downloads.raspberrypi.org/raspbian/images/raspbian-2018-03-14"
-#RASPBIAN_URL="http://ftp.jaist.ac.jp/pub/raspberrypi/raspbian/images/raspbian-2018-03-14"
+RASPBIAN_MIRROR_URL="http://ftp.jaist.ac.jp/pub/raspberrypi/raspbian/images/raspbian-2018-03-14"
 
 SSH="ssh -p 2222 -o StrictHostKeyChecking=no"
 SCP="scp -P 2222 -o StrictHostKeyChecking=no"
@@ -56,7 +56,8 @@ EOF
 }
 
 ssh-keygen -R "[localhost]:2222"
-curl -L -O ${RASPBIAN_URL}/${RASPBIAN_ZIP}
+(sleep 300; pgrep curl && pkill curl)&
+curl -L -O ${RASPBIAN_URL}/${RASPBIAN_ZIP} || curl -L -O ${RASPBIAN_MIRROR_URL}/${RASPBIAN_ZIP}
 unzip ${RASPBIAN_ZIP}
 curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/${KERNEL_IMAGE}
 curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/versatile-pb.dtb
