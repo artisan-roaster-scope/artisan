@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -exm
 
@@ -43,7 +43,7 @@ ssh_control()
 EOF
     ${SCP} script pi@localhost:
     trap die ERR
-    ${SSH} pi@localhost bash script
+    ${SSH} pi@localhost sh script
     ${SCP} pi@localhost:artisan/src/\*.deb src
     pkill qemu-system-arm
 }
