@@ -13,9 +13,15 @@ SCP="scp -P 2222 -o StrictHostKeyChecking=no"
 RASPBIAN_ZIP=${RASPBIAN_DATE}-raspbian-stretch.zip
 RASPBIAN_IMAGE=${RASPBIAN_DATE}-raspbian-stretch.img
 
+die()
+{
+    pkill -9 qemu-system-arm
+    exit 1
+}
+
 ssh_control()
 {
-    set +e
+    set +ex
     while :; do
 	${SSH} pi@localhost ls 2>&1 >/dev/null
 	if [ $? -eq 0 ]; then
@@ -23,7 +29,7 @@ ssh_control()
 	fi
 	sleep 1
     done
-    set -e
+    set -ex
     cat <<EOF > script
     set -ex
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
@@ -36,6 +42,7 @@ ssh_control()
     ./build-rpi2-deb.sh
 EOF
     ${SCP} script pi@localhost:
+    trap die ERR
     ${SSH} pi@localhost sh script
     ${SCP} pi@localhost:artisan/src/\*.deb src
     pkill qemu-system-arm
