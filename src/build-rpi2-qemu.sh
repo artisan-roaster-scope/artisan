@@ -43,8 +43,8 @@ ssh_control()
 	fi
     done
     set -e
+    (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan
-    .travis/install-phidgets.sh
     .travis/install-pymodbus.sh
     cd src
     ./build-linux.sh
@@ -104,6 +104,10 @@ fi
 cd $mountpoint/home/pi
 sudo curl -L -O https://dl.bintray.com/artisan/artisan-cache/libsnap.tar.gz
 sudo tar -C $mountpoint/usr/lib -xzf libsnap.tar.gz
+sudo curl -L -O https://dl.bintray.com/artisan/artisan-cache/libphidget22.tar.gz
+sudo tar -C $mountpoint/usr/lib -xzf libphidget22.tar.gz
+sudo curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/any/Phidget22Python.zip
+sudo unzip -q Phidget22Python.zip
 sudo curl -L -O https://dl.bintray.com/artisan/artisan-cache/pip-cache.tar.gz   
 sudo tar -xzpf pip-cache.tar.gz
 sudo rm pip-cache.tar.gz
