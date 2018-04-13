@@ -34,7 +34,14 @@ ssh_control()
     set -ex
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
-    pip3 install -r artisan/src/requirements.txt || pip3 install -r artisan/src/requirements.txt
+    set +e
+    while :; do
+        pip3 install -r artisan/src/requirements.txt
+	if [ $? -eq 0 ]; then
+	   break
+	fi
+    done
+    set -e
     artisan/.travis/install-phidgets.sh
     artisan/.travis/install-pymodbus.sh
     cd artisan/src
