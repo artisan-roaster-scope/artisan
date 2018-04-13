@@ -3,7 +3,7 @@
 set -ex
 
 version=22
-if [ "$ARTISAN_OS" = "linux" ]; then
+if [ "$ARTISAN_OS" = "linux" ] || [ "$ARTISAN_OS" = "rpi" ]; then
     curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget${version}.tar.gz
     tar -xzf libphidget${version}.tar.gz
     (cd libphidget${version}-* && ./configure --prefix=/usr && make && sudo make install && cp plat/linux/udev/* ../src/debian/etc/udev/rules.d)

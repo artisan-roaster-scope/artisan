@@ -41,9 +41,10 @@ ssh_control()
 	fi
     done
     set -e
-    artisan/.travis/install-phidgets.sh
-    artisan/.travis/install-pymodbus.sh
-    cd artisan/src
+    cd artisan
+    .travis/install-phidgets.sh
+    .travis/install-pymodbus.sh
+    cd src
     ./build-linux.sh
     ./build-rpi2-deb.sh
 EOF
