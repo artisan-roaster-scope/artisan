@@ -6,7 +6,7 @@ version=22
 if [ "$ARTISAN_OS" = "linux" ] || [ "$ARTISAN_OS" = "rpi" ]; then
     curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/linux/libphidget${version}.tar.gz
     tar -xzf libphidget${version}.tar.gz
-    (cd libphidget${version}-* && ./configure --prefix=/usr && make && sudo make install && cp plat/linux/udev/* ../src/debian/etc/udev/rules.d)
+    (cd libphidget${version}-* && ./configure --prefix=/usr && make -j4 && sudo make install && cp plat/linux/udev/* ../src/debian/etc/udev/rules.d)
 elif [ "$ARTISAN_OS" = "osx" ]; then
     curl -L -O https://www.phidgets.com/downloads/phidget22/libraries/macos/Phidget${version}.dmg
     hdiutil attach Phidget${version}.dmg
