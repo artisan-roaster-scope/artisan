@@ -1,6 +1,6 @@
 pyserial==3.4
 numpy==1.14.2
-scipy==1.0.1
+scipy==1.0.0
 matplotlib==2.2.2
 #pymodbus==1.4.0
 unidecode==1.0.22
