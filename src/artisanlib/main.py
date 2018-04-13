@@ -233,14 +233,16 @@ if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 an
 else:
     # pymodbus v1.3 and older
     def getBinaryPayloadBuilder(byteorderLittle=True,_=False):
-        if not byteorderLittle: # NOTE: v1.3 and older had the semantic of the byteorder interpreted inversely
+#        if not byteorderLittle: # NOTE: v1.3 and older had the semantic of the byteorder interpreted inversely
             # see https://github.com/riptideio/pymodbus/issues/255
+        if byteorderLittle: # REVERTED TO 1:1 byteorder
             return BinaryPayloadBuilder(endian=Endian.Little)
         else:
             return BinaryPayloadBuilder(endian=Endian.Big)
     def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,_=False):
-        if not byteorderLittle: # NOTE: v1.3 and older had the semantic of the byteorder interpreted inversely
+#        if not byteorderLittle: # NOTE: v1.3 and older had the semantic of the byteorder interpreted inversely
             # see https://github.com/riptideio/pymodbus/issues/255
+        if byteorderLittle: # REVERTED TO 1:1 byteorder
             return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Little)
         else:
             return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Big)
@@ -34243,7 +34245,7 @@ class modbusport(object):
                             parity=self.parity,
                             stopbits=self.stopbits,
                             retry_on_empty=True, # with retry_on_empty=True and the old pymodbus v1.3 the FZ-94 generates more errors
-#                            retries=0, # option not available on old pymodbus versions (before v1.4)
+#                            retries=0, # option not available on old pymodbus versions (before v1.4); retries=0 seems to fail for SF machines
                             timeout=self.timeout)  
                     else: # pymodbus v1.3 or older
                         self.master = ModbusSerialClient(
