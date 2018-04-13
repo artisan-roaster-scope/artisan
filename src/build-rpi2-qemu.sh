@@ -37,6 +37,7 @@ ssh_control()
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
     while :; do
         pip3 install -r artisan/src/requirements.txt
+	which pyinstaller
 	if [ $? -eq 0 ]; then
 	   break
 	fi
@@ -57,7 +58,7 @@ EOF
 }
 
 ssh-keygen -R "[localhost]:2222"
-(sleep 300; pgrep curl && pkill curl)&
+(sleep 600; pgrep curl && pkill curl)&
 curl -L -O ${RASPBIAN_URL}/${RASPBIAN_ZIP} || curl -L -O ${RASPBIAN_MIRROR_URL}/${RASPBIAN_ZIP}
 unzip ${RASPBIAN_ZIP}
 curl -L -O https://github.com/juokelis/qemu-rpi-kernel/raw/master/${KERNEL_IMAGE}
