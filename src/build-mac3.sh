@@ -22,8 +22,8 @@ export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 
 # translations
-$PYTHON/bin/pylupdate5 artisan.pro || true
-$QT_PATH/bin/lrelease -verbose artisan.pro
+$PYTHON/bin/pylupdate5 artisan.pro
+$QT_PATH/bin/lrelease -verbose artisan.pro || true
 
 # distribution
 rm -rf build dist
