@@ -1,6 +1,10 @@
 [General]
 Delay=3000
 Oversampling=true
+BTlcd=true
+ETlcd=false
+BTcurve=true
+ETcurve=false
 
 [Device]
 id=29

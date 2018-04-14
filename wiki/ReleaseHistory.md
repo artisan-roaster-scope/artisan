@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v1.3.0 (xx.4.2018)
+v1.3.0 (15.4.2018)
 ------------------
 
  * New Features 
@@ -44,6 +44,8 @@ v1.3.0 (xx.4.2018)
    - changes some defaults (DeltaET lcd hidden, render delta curves thinner than temperature curves)
    - sliders and buttons remember their visibility per state (OFF/ON/START)
    - convert temperatures on profile load instead of switching the temperature mode
+   - event actions are processed in parallel threads
+   - Mac OS X app now code signed for easier installation
  * Bug Fixes
    - fixes a bug that made the background RoR curves disappear on START
    - fixes a crasher on clicking the SV slider

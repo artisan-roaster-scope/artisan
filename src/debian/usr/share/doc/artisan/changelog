@@ -1,3 +1,13 @@
+artisan (1.3.0-0) precise; urgency=low
+  * new upstream release
+  * changes since 1.2.0:
+   - adds Siemens S7 support
+   - adds MODBUS BCD decode
+   - adds color themes
+   - adds extraction yield calculator
+   - adds support for Aillio, BC Roasters, Bühler, Coffed, Coffee-Tech, Coffeetool, Giesen, IMF, K+M, Loring, Proaster, San Franciscan, Toper, US Roaster Corp
+ --  <marko.luther@gmx.net>  Sun, 14 Dec 2018 19:32:14 +0200
+
 artisan (1.2.0-3) precise; urgency=low
   * new upstream release
   * changes since 1.1.0:
