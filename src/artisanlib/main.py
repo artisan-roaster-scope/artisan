@@ -60,7 +60,6 @@ else:
 
 import artisanlib.arabic_reshaper
 
-
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith("Windows"):
         os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
