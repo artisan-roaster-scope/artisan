@@ -27,10 +27,7 @@ import artisanlib
 VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
-try:
-    QTDIR = os.environ["QT_PATH"] + r'/'
-except:
-    QTDIR = r'/Users/luther/Qt5.10.0/5.10.0/clang_64/' # qt5
+QTDIR = os.environ["QT_PATH"] + r'/'
 
 APP = ['artisan.py']
 
