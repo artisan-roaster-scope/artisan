@@ -2,7 +2,7 @@
 
 set -ex
 brew upgrade python
-brew install p7zip qt
+brew install p7zip
 pip3 install -r src/requirements.txt
 pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
 sudo rm -rf /usr/local/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data
