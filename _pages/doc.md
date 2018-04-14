@@ -17,9 +17,16 @@ toc_icon: "cog"
 
 The setup of Artisan is quite simple on all platforms. The necessary steps and some hints on specific setups are detailed in the [Installation Instructions](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/Installation.md).
 
+
 ### Getting Started
 
-The Artisan team is maintaining a [Getting Started](http://bit.ly/ArtisanGetStarted) guide to ease the on-boarding.
+The Artisan team is maintaining a [Getting Started Guide](/assets/docs/Getting Started Guide Artisan 1.3.pdf) (PDF) to ease the on-boarding.
+
+
+### Release Notes
+
+* [Artisan v1.3 Release Notes](/assets/docs/Artisan 1-3 Release Notes.pdf) (PDF)
+
 
 ### Blog
 
@@ -70,5 +77,3 @@ The Artisan users are supporting the project by writeups on specific topics.
   * [TC4 PID Control](https://www.youtube.com/watch?v=ykuUCXhGAC4) by [Brad](https://www.youtube.com/channel/UCxcEts9cSvi29QrXyt3qvsQ)
   * [Azis Muslim](https://www.youtube.com/channel/UC8PQskLA6lHik9_W_Js_OCg) (in Indonesian)
     - [YouTube Tutorial instalasi Artisan Roaster Scope dan konfigurasi device pada mesin roasting](https://www.youtube.com/watch?v=DRUXTT6NLm4)
-
-
