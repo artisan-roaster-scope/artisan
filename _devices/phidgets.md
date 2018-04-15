@@ -70,15 +70,15 @@ Single channel IR with integrated sensor
 
 Artisan can attach to all Phidgets IO ports. The input ports are configured as (extra) devices and are handled as temperature curves. Phidgets output can be activated via `IO Command`, `PWM Command` or `VOUT Command` button or slider actions configured in the Events tab (menu `Config >> Events`). Note that buttons and sliders themself can be triggered autoamtically via alarm actions.
 
-* [Phidget 1010](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=3) (USB), [Phidget 1013](https://www.phidgets.com/?tier=3&prodid=8) (USB), [Phidget 1018](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=18) (USB), [Phidget 1019](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=20) (USB), [Phidget 1073](https://www.phidgets.com/?tier=3&catid=1&pcid=0&prodid=69) (USB): 8x analog/digital in, 8x digital out
 * [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643) (VINT HUB): 6x analog/digital in, 6x digital out
 * [Phidget OUT1000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=711) (VINT): 1x 12bit voltage out
 * [Phidget OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712) (VINT): 1x 12bit isolated voltage out
 * [Phidget OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713) (VINT): 1x 16bit isolated voltage out
-* [Phidget 1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2) (USB): 4x 12bit analog out
-* [Phidget 1017](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=15) (USB): 8x digital out
-* [Phidget 1014](https://www.phidgets.com/?tier=3&prodid=9) (USB): 4x digital out
 * [Phidget OUT1100](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=714) (VINT): 4x digital PWM out
+* [Phidget 1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=2) (USB): 4x 12bit analog out
 * [Phidget 1011](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=4) (USB): 2x analog/digital in, 2x digital out
+* [Phidget 1014](https://www.phidgets.com/?tier=3&prodid=9) (USB): 4x digital out
+* [Phidget 1017](https://www.phidgets.com/?tier=3&catid=46&pcid=39&prodid=15) (USB): 8x digital out
+* [Phidget 1010](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=3) (USB), [Phidget 1013](https://www.phidgets.com/?tier=3&prodid=8) (USB), [Phidget 1018](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=18) (USB), [Phidget 1019](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=20) (USB), [Phidget 1073](https://www.phidgets.com/?tier=3&catid=1&pcid=0&prodid=69) (USB): 8x analog/digital in, 8x digital out
 
 Each output action supports a number of different commands specified in the `Documentation` field. See the post [More Phidgets!](https://artisan-roasterscope.blogspot.it/2017/12/more-phidgets.html) for details.
