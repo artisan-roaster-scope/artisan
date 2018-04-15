@@ -87,7 +87,7 @@ __Dave Baxter__ –– design wizard
 
 __Rui Paulo__ –– Aillio master & CI
 
-__Michael Herbert__ –– documentation and testing
+__Michael Herbert__ –– documentation & testing
 
 __Dario Ernst__ –– mailing list hosting
 
