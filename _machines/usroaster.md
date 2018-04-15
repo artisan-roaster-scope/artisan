@@ -11,4 +11,4 @@ header:
 * __Producer:__ [US Roaster Corp](http://www.usroastercorp.com), USA
 * __Machines:__ all with USB connection
 * __Connection:__ MODBUS RTU; requires the installation of a serial driver
-* __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
+* __Features:__ logging of bean temperature (BT) and related rate-of-rise curve
