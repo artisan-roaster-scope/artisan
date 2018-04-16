@@ -70,7 +70,7 @@ Single channel IR with integrated sensor
 
 Artisan can attach to all Phidgets IO ports. The input ports are configured as (extra) devices and are handled as temperature curves. Phidgets output can be activated via `IO Command`, `PWM Command` or `VOUT Command` button or slider actions configured in the Events tab (menu `Config >> Events`). Note that buttons and sliders themself can be triggered autoamtically via alarm actions.
 
-* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643) (VINT HUB): 6x analog/digital in, 6x digital out
+* [Phidget  HUB0000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=643) (VINT HUB): 6x analog/digital in, 6x digital PWM out
 * [Phidget OUT1000](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=711) (VINT): 1x 12bit voltage out
 * [Phidget OUT1001](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=712) (VINT): 1x 12bit isolated voltage out
 * [Phidget OUT1002](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=713) (VINT): 1x 16bit isolated voltage out
