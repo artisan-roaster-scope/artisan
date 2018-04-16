@@ -10668,6 +10668,9 @@ class EventActionThread(QThread):
 
 
 class ApplicationWindow(QMainWindow):
+
+    singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
+
     def __init__(self, parent = None):
     
         self.superusermode = False
@@ -12423,6 +12426,17 @@ class ApplicationWindow(QMainWindow):
         self.qmc.toolbar.hide() # we need to hide the default navigation toolbar that we don't use
         self.qmc.toolbar.destroy()
         
+        # we connect the
+        self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
+        
+    # turns channel off after millis
+    def processSingleShotPhidgetsPulse(self,channel,millis,fct):
+        if fct == "OUTsetPWM":
+            QTimer.singleShot(millis,lambda : self.ser.phidgetOUTsetPWM(channel,0))
+        elif fct == "OUTsetPWMhub":
+            QTimer.singleShot(millis,lambda : self.ser.phidgetOUTsetPWMhub(channel,0))
+        elif fct == "BinaryOUTset":
+            QTimer.singleShot(millis,lambda : self.ser.phidgetBinaryOUTset(channel,0))
         
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
@@ -37440,8 +37454,11 @@ class serialport(object):
         self.phidgetBinaryOUTset(channel,1)
 #        QTimer.singleShot(millis,lambda : self.phidgetBinaryOUTset(channel,0))            
         # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
-        libtime.sleep(millis/1000.)
-        self.phidgetBinaryOUTset(channel,0)
+        # the following solution has the drawback to block the eventaction thread
+#        libtime.sleep(millis/1000.)
+#        self.phidgetBinaryOUTset(channel,0)
+        # so we use a QTimer.singleShot running in the main thread
+        aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"BinaryOUTset")
                
     # channel: 0-8
     # value: True or False
@@ -37529,11 +37546,12 @@ class serialport(object):
             
     def phidgetOUTpulsePWM(self,channel,millis):
         self.phidgetOUTsetPWM(channel,100)
-#        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWM(channel,0))
-        # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
-        libtime.sleep(millis/1000.)
-        self.phidgetOUTsetPWM(channel,0)
-    
+#        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWM(channel,0))        
+#        # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
+        # the following solution has the drawback to block the eventaction thread
+#        libtime.sleep(millis/1000.)
+#        self.phidgetOUTsetPWM(channel,0)    
+        aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"OUTsetPWM")
 
     # channel: 0-3
     # value: 0-100
@@ -37602,8 +37620,10 @@ class serialport(object):
         self.phidgetOUTsetPWMhub(channel,100)
 #        QTimer.singleShot(millis,lambda : self.phidgetOUTsetPWMhub(channel,0))
         # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
-        libtime.sleep(millis/1000.)
-        self.phidgetOUTsetPWMhub(channel,0)
+        # the following solution has the drawback to block the eventaction thread
+#        libtime.sleep(millis/1000.)
+#        self.phidgetOUTsetPWMhub(channel,0)
+        aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"OUTsetPWMhub")
         
     # channel: 0-5
     # value: 0-100
