@@ -31630,10 +31630,11 @@ class EventsDlg(ArtisanDialog):
         for i in range(nbuttons):
             #label
             labeledit = QLineEdit(u(aw.extraeventslabels[i]).replace(chr(10),"\\n"))
-            labeledit.editingFinished.connect(lambda i=i:self.setlabeleventbutton(1,i))
+            labeledit.editingFinished.connect(lambda x=i:self.setlabeleventbutton(x))
+        
             #description
             descriptionedit = QLineEdit(u(aw.extraeventsdescriptions[i]))
-            descriptionedit.editingFinished.connect(lambda i=i:self.setdescriptioneventbutton(1,i))
+            descriptionedit.editingFinished.connect(lambda x=i:self.setdescriptioneventbutton(x))
             #type
             typeComboBox = QComboBox()
             typeComboBox.addItems(std_extra_events)
@@ -31776,31 +31777,35 @@ class EventsDlg(ArtisanDialog):
         aw.extraeventsvisibility[i] = actioncombobox.currentIndex()
         aw.update_extraeventbuttons_visibility()
 
-    def setlabeleventbutton(self,_,i):
+    def setlabeleventbutton(self,i):
         labeledit = self.eventbuttontable.cellWidget(i,0)
         label = u(labeledit.text())
         if "\\n" in label:              #make multiple line text if "\n" found in label string
             parts = label.split("\\n")
             label = chr(10).join(parts)
-        aw.extraeventslabels[i] = label
+        if i < len(aw.extraeventslabels):
+            aw.extraeventslabels[i] = label
         aw.settooltip()
 
-    def setdescriptioneventbutton(self,_,i):
+    def setdescriptioneventbutton(self,i):
         descriptionedit = self.eventbuttontable.cellWidget(i,1)
-        aw.extraeventsdescriptions[i] = u(descriptionedit.text())
+        if i < len(aw.extraeventsdescriptions):
+            aw.extraeventsdescriptions[i] = u(descriptionedit.text())
         aw.settooltip()
 
     def setactiondescriptioneventbutton(self,_,i):
         actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
-        aw.extraeventsactionstrings[i] = u(actiondescriptionedit.text())
+        if i < len(aw.extraeventsactionstrings):
+            aw.extraeventsactionstrings[i] = u(actiondescriptionedit.text())
         aw.settooltip()
 
     def setactioneventbutton(self,i):
         actioncombobox = self.eventbuttontable.cellWidget(i,4)
-        aw.extraeventsactions[i] = actioncombobox.currentIndex()
-        if aw.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
-            aw.extraeventsactions[i] = aw.extraeventsactions[i] + 1
-        aw.settooltip()
+        if i < len(aw.extraeventsactions):
+            aw.extraeventsactions[i] = actioncombobox.currentIndex()
+            if aw.extraeventsactions[i] > 6: # increase action type as 7=CallProgramWithArg is not available for buttons
+                aw.extraeventsactions[i] = aw.extraeventsactions[i] + 1
+            aw.settooltip()
 
     def setvalueeventbutton(self,_,i):
         valueedit = self.eventbuttontable.cellWidget(i,3)
@@ -31826,7 +31831,23 @@ class EventsDlg(ArtisanDialog):
         aw.buttonlist[i].setText(etype_char+str(aw.qmc.eventsvalues(aw.extraeventsvalues[i])))
         aw.settooltip()
 
+    def disconnectTableItemActions(self):
+        for x in range(self.eventbuttontable.rowCount()):
+            try:
+                self.eventbuttontable.cellWidget(x,0).editingFinished.disconnect() # label edit
+                self.eventbuttontable.cellWidget(x,1).editingFinished.disconnect() # description edit
+                self.eventbuttontable.cellWidget(x,2).currentIndexChanged.disconnect() # type combo
+                self.eventbuttontable.cellWidget(x,3).editingFinished.disconnect() # value edit
+                self.eventbuttontable.cellWidget(x,4).currentIndexChanged.disconnect() # action combo
+                self.eventbuttontable.cellWidget(x,5).editingFinished.disconnect() # action description
+                self.eventbuttontable.cellWidget(x,6).currentIndexChanged.disconnect() # visibility combo
+                self.eventbuttontable.cellWidget(x,7).clicked.disconnect() # color button
+                self.eventbuttontable.cellWidget(x,8).clicked.disconnect() # color text button
+            except:
+                pass
+        
     def delextraeventbutton(self):
+        self.disconnectTableItemActions() # we ensure that signals from to be deleted items are not fired anymore
         bindex = len(aw.extraeventstypes)-1
         selected = self.eventbuttontable.selectedRanges()
         if len(selected) > 0:
@@ -31841,7 +31862,6 @@ class EventsDlg(ArtisanDialog):
             aw.extraeventsvisibility.pop(bindex)
             aw.extraeventbuttoncolor.pop(bindex)
             aw.extraeventbuttontextcolor.pop(bindex)
-            self.createEventbuttonTable()  #update table
             if len(aw.e4buttondialog.buttons()):
                 aw.e4buttondialog.removeButton(aw.buttonlist[bindex])
                 if not len(aw.e4buttondialog.buttons()):
@@ -31861,6 +31881,7 @@ class EventsDlg(ArtisanDialog):
             elif len(aw.lowerbuttondialog.buttons()):
                 aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
             aw.buttonlist.pop(bindex)
+            self.createEventbuttonTable()  #update table
         aw.update_extraeventbuttons_visibility()
 
     def insertextraeventbutton(self):
