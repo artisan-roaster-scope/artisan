@@ -18254,7 +18254,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("clampEvents"):
                 self.qmc.clampEvents = toInt(settings.value("clampEvents",int(self.qmc.clampEvents)))
             if settings.contains("renderEventsDescr"):
-                self.qmc.renderEventsDescr = toInt(settings.value("renderEventsDescr",int(self.qmc.renderEventsDescr)))
+                self.qmc.renderEventsDescr = bool(toBool(settings.value("renderEventsDescr",self.qmc.renderEventsDescr)))
             if settings.contains("eventslabelschars"):
                 self.qmc.eventslabelschars = toInt(settings.value("eventslabelschars",int(self.qmc.eventslabelschars)))
             if settings.contains("annotationsflag"):
