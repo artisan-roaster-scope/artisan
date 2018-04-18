@@ -31,20 +31,13 @@ ssh_control()
     done
     set -ex
     cat <<EOF > script
-    set -x
+    set -xe
     export ARTISAN_OS=rpi
     curl -L -O https://bootstrap.pypa.io/get-pip.py
     sudo python3 get-pip.py
     sudo apt install -y python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
-    while :; do
-        pip3 install -r artisan/src/requirements.txt
-	which pyinstaller
-	if [ $? -eq 0 ]; then
-	   break
-	fi
-    done
-    set -e
+    pip3 install -Ir artisan/src/requirements.txt
     (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan
     .travis/install-pymodbus.sh
