@@ -33,7 +33,7 @@ ssh_control()
     cat <<EOF > script
     set -xe
     export ARTISAN_OS=rpi
-    sudo apt remove python3-serial
+    sudo apt remove -y python3-serial
     curl -L -O https://bootstrap.pypa.io/get-pip.py
     sudo python3 get-pip.py
     sudo apt install -y python3-pyqt5 libusb-1.0 \
