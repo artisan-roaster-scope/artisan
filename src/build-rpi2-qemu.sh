@@ -37,7 +37,6 @@ ssh_control()
     sudo python3 get-pip.py
     sudo apt install -y python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
-    sudo apt 
     while :; do
         pip3 install -r artisan/src/requirements.txt
 	which pyinstaller
