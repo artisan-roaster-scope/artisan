@@ -33,11 +33,12 @@ ssh_control()
     cat <<EOF > script
     set -xe
     export ARTISAN_OS=rpi
+    pip3 uninstall pyserial || sudo apt remove python3-serial
     curl -L -O https://bootstrap.pypa.io/get-pip.py
     sudo python3 get-pip.py
     sudo apt install -y python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
-    pip3 install -Ir artisan/src/requirements.txt
+    pip3 install -r artisan/src/requirements.txt
     (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan
     .travis/install-pymodbus.sh
