@@ -803,47 +803,7 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 
 from const import UIconst
 from artisanlib import pid
-
-
-# results in a three digits resolution (eg. 1.234)
-#class ArtisanTime():
-#    def __init__(self):
-#        self.clock = QTime()
-#
-#    def setHMS(self,a,b,c,d):
-#        self.clock.setHMS(a,b,c,d)
-#        
-#    def start(self):
-#        self.clock.start()
-#        
-#    def elapsed(self):
-#        return self.clock.elapsed()
-  
-
-# higher resultion time signal (at least on Mac OS X)
-class ArtisanTime():
-    def __init__(self):
-        if sys.version < '3':
-            self.clock = libtime.time()
-        else:
-            self.clock = libtime.perf_counter()
-
-    def setHMS(self,*_):
-        self.start()
-        
-    def start(self):
-        if sys.version < '3':
-            self.clock = libtime.time()
-        else:
-            self.clock = libtime.perf_counter()
-        
-    def elapsed(self):
-        if sys.version < '3':
-            return (libtime.time() - self.clock)*1000.
-        else:
-            return (libtime.perf_counter() - self.clock)*1000.
-
-    
+from artisanlib.time import ArtisanTime
 
 
 #######################################################################################
@@ -49866,25 +49826,6 @@ def main():
     global app
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
-    
-    # font fix for OS X 10.9
-    try:
-        v, _, _ = platform.mac_ver()
-        #v = float('.'.join(v.split('.')[:2]))
-        v = v.split('.')[:2]
-        major = int(v[0])
-        minor = int(v[1])
-        if major >= 10 and minor >= 10: #v >= 10.10:
-            # fix Mac OS X 10.10 (Yosemite) font issue [seems not to have any effect!?]
-            # https://bugreports.qt-project.org/browse/QTBUG-40833
-            QFont.insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue")  
-        if major >= 10 and minor >= 9: #v >= 10.9:
-            # fix Mac OS X 10.9 (Mavericks) font issue
-            # https://bugreports.qt-project.org/browse/QTBUG-32789
-            QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")            
-    except:
-        pass
-
     aw = ApplicationWindow()
     
 #    aw.setStyleSheet("QMainWindow {background: 'white';}")
@@ -49897,7 +49838,6 @@ def main():
         QApplication.setLayoutDirection(Qt.RightToLeft)
     else:
         QApplication.setLayoutDirection(Qt.LeftToRight)
-    
     aw.settingsLoad()
     
 
@@ -49907,7 +49847,6 @@ def main():
         tmp.setLayout(aw.LCD2frame.layout())
         aw.LCD2frame.setLayout(aw.LCD3frame.layout())
         aw.LCD3frame.setLayout(tmp.layout())
-
     try:
         if sys.argv and len(sys.argv) > 1:
             argv_file = sys.argv[1]
@@ -49944,13 +49883,11 @@ def main():
                     aw.qmc.background = False
     except Exception:
         pass
-        
     if platf == 'Windows' and aw.appFrozen():
         try:
             sys.stderr = sys.stdout
         except:
             pass
-
     aw.show()
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
