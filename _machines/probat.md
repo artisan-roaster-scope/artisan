@@ -29,3 +29,7 @@ header:
   * CMD-3: adds a third slider for fan speed control
 - the air pressure LCD & Curve are hidden by default, but can be made visible by ticking the Curve2/LCD2 flags of the first extra device entry (menu `Config` >> `Device`, tab `Extra Devices`)
 - you might need to update your Probatones firmware to the lastest version via Probat to enjoy all features
+
+
+**Watch out!** For best performance, please start monitoring the roaster before pre-heating.  Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
+{: .notice--primary}
