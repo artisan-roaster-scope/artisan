@@ -22552,6 +22552,7 @@ class ApplicationWindow(QMainWindow):
                 </p>
                 <p><b>{9}</b><small>{10}</small></p>
                 <p><b>{11}</b><small>{12}</small></p>
+                <p><b>{14}</b><br><small>{15}</small></p>
                 """).format(
                 "Artisan",
                 str(__version__),
@@ -22566,7 +22567,9 @@ class ApplicationWindow(QMainWindow):
                 coredevelopers,
                 QApplication.translate("About", "Contributors",None),
                 contributors,
-                PYMODBUS_VERSION_STR))
+                PYMODBUS_VERSION_STR,
+                QApplication.translate("About", "License",None),
+                '<a href="http://www.gnu.org/copyleft/gpl.html">GNU Public Licence (GPLv3.0)</a>'))
 
     def showAboutQt(self):
         QApplication.instance().aboutQt()
