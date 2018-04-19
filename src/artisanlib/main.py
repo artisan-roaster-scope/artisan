@@ -2719,7 +2719,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.moveslider(el[0],el[1])
                     if aw.qmc.flagstart:
                         value = aw.float2float((el[1] + 10.0) / 10.0)
-                        aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription=u("Q"))
+                        aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription=u("Q")+aw.qmc.eventsvalues(value))
                 self.quantifiedEvent = []
 
                     
@@ -31288,7 +31288,7 @@ class EventsDlg(ArtisanDialog):
                                     # add to event table
                                     aw.qmc.specialevents.append(aw.qmc.time2index(timex[ii]))
                                     aw.qmc.specialeventstype.append(i)
-                                    aw.qmc.specialeventsStrings.append("Q")
+                                    aw.qmc.specialeventsStrings.append("Q"+ aw.qmc.eventsvalues(float(d+1)))
                                     aw.qmc.specialeventsvalue.append(float(d+1))
                                     aw.qmc.safesaveflag = True
                     redraw = True
