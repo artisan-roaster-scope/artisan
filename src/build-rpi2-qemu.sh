@@ -34,8 +34,6 @@ ssh_control()
     set -ex
     export ARTISAN_OS=rpi
     sudo apt remove -y python3-serial
-    curl -L -O https://bootstrap.pypa.io/get-pip.py
-    sudo python3 get-pip.py
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
     sudo -H pip3 install --upgrade pip
