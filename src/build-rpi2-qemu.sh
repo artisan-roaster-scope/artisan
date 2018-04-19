@@ -37,7 +37,12 @@ ssh_control()
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
     sudo -H pip3 install --upgrade pip
-    pip3 install -r artisan/src/requirements.txt || true
+    while :; do
+        pip3 install -r artisan/src/requirements.txt || true
+	if [ `which pyinstaller` ]; then
+	   break
+	fi
+    done
     (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan
     .travis/install-pymodbus.sh

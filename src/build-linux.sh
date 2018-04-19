@@ -31,7 +31,11 @@ else
     ln -s /usr/lib/libusb-1.0.so.0
 fi
 
-pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream --log-level=INFO artisan-linux.spec
+# Render pyi_rth_mplconfig.py useless because it makes our startup slow
+echo > $PYTHON_PATH/PyInstaller/loader/rthooks/pyi_rth_mplconfig.py
+
+pyinstaller -D -n artisan -y -c --hidden-import scipy._lib.messagestream \
+	    --log-level=INFO artisan-linux.spec
 
 mv dist/artisan dist/artisan.d
 mv dist/artisan.d/* dist
