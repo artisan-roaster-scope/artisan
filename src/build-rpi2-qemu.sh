@@ -39,7 +39,7 @@ ssh_control()
     sudo -H pip3 install --upgrade pip
     while :; do
         pip3 install -r artisan/src/requirements.txt || true
-	if [ `which pyinstaller` ]; then
+	if [ $(which pyinstaller) ]; then
 	   break
 	fi
     done
