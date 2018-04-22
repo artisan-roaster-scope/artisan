@@ -33,7 +33,6 @@ from artisanlib import __revision__
 
 
 import os
-import imp
 import sys
 import ast
 import platform
@@ -81,40 +80,20 @@ sip.setapi('QVariant', 2)
 #    import traceback
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
-try:
-    from PyQt5.QtCore import QLibraryInfo  # @UnusedImport
-    pyqtversion = 5
-except Exception as e:
-    pyqtversion = 4
-
-if pyqtversion < 5:
-    from PyQt4.QtGui import (QImageReader,QProgressDialog, # @UnresolvedImport @UnusedImport
-                             QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, # @UnresolvedImport @UnusedImport
-                             QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @UnresolvedImport @UnusedImport
-                             QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @UnresolvedImport @UnusedImport
-                             QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView, QStandardItem, # @UnresolvedImport @UnusedImport
-                             QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton, # @UnresolvedImport @UnusedImport
-                             QPixmap, QImage, QColor, QColorDialog, QPalette, QFrame, QCheckBox, QDesktopServices, QIcon, # @UnresolvedImport @UnusedImport
-                             QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QBrush, QRadialGradient, # @UnresolvedImport @UnusedImport
-                             QStyleFactory, QWindow, QTableWidget, QTableWidgetItem, QMenu, QCursor, QDoubleSpinBox, QTextDocument) # @UnresolvedImport @UnusedImport
-    from PyQt4.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, # @UnresolvedImport @UnusedImport @Reimport
-                              QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @UnresolvedImport @UnusedImport
-                              QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore) # @UnresolvedImport @UnusedImport
-else:
-    from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,  # @Reimport
-                             QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @Reimport
-                             QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @Reimport
-                             QLCDNumber, QSpinBox, QComboBox, QHeaderView, # @Reimport 
-                             QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton, # @Reimport
-                             QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
-                             QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox) # @Reimport
-    from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
-                                QKeySequence,QStandardItem,QImage,QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
-                                QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor,QTextDocument)  # @Reimport
-    from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
-    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,  # @Reimport
-                              QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
-                              QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
+from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,  # @Reimport
+                         QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @Reimport
+                         QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @Reimport
+                         QLCDNumber, QSpinBox, QComboBox, QHeaderView, # @Reimport 
+                         QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton, # @Reimport
+                         QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
+                         QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox) # @Reimport
+from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
+                            QKeySequence,QStandardItem,QImage,QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
+                            QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor,QTextDocument)  # @Reimport
+from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
+from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,  # @Reimport
+                          QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
+                          QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
 
 import matplotlib as mpl
 
@@ -140,10 +119,7 @@ except:
 svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
 
 from functools import reduce as freduce
-if pyqtversion < 5:
-    mpl.use('Qt4Agg')
-else:
-    mpl.use('Qt5Agg')
+mpl.use('Qt5Agg')
 
 from matplotlib.figure import Figure
 from matplotlib import rcParams
@@ -154,12 +130,8 @@ import matplotlib.patheffects as PathEffects
 
 import qrcode
 
-if pyqtversion < 5:
-    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas # @UnresolvedImport @UnusedImport
-    from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar # @UnresolvedImport @UnusedImport
-else:
-    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
-    from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
 
 try:
     import matplotlib.backends.qt_editor.figureoptions as figureoptions # for matplotlib >= v1.4
@@ -191,10 +163,8 @@ try:
         import win_inet_pton # @UnresolvedImport @UnusedImport
 except:
     pass
-    
-import snap7.client
-from snap7.util import set_real, get_real, set_int, get_int
-from snap7.common import load_library as load_snap7_library
+
+#from snap7.util import set_real, get_real, set_int, get_int
 
 from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient
 from pymodbus.constants import Endian
@@ -262,8 +232,8 @@ from unidecode import unidecode
 from artisanlib.weblcds import startWeb, stopWeb
 from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopControl, releaseHottopControl, setHottop
 from artisanlib.aillio import AillioR1
-
-
+from artisanlib.util import appFrozen
+from artisanlib.suppress_errors import suppress_stdout_stderr
 
 
 artisan_slider_style = """
@@ -614,16 +584,7 @@ else:
 platf = str(platform.system())
 
 
-# patch S7 client
 
-class S7Client(snap7.client.Client):
-    def __init__(self):
-        super(S7Client, self).__init__()
-            
-    # avoiding an exception on __del__ as self.library might not yet be set if loading of shared lib failed!
-    def destroy(self):
-        if hasattr(self, 'library'):
-            return super(S7Client, self).destroy()
     
 #######################################################################################
 #################### Main Application  ################################################
@@ -724,16 +685,10 @@ def __dependencies_for_freezing():
     import packaging.markers # @UnresolvedImport @UnusedImport
     import packaging.requirements # @UnresolvedImport @UnusedImport
     
-    if pyqtversion < 5:
-        import PyQt4.QtSvg # @UnresolvedImport @UnusedImport
-        import PyQt4.QtXml # @UnresolvedImport @UnusedImport
-        import PyQt4.QtDBus # @UnresolvedImport @UnusedImport
-        import PyQt4.QtPrintSupport # needed for by platform plugin libqcocoa # @UnresolvedImport  @UnusedImport
-    else:
-        import PyQt5.QtSvg  # @UnusedImport
-        import PyQt5.QtXml  # @UnusedImport
-        import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
-        import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
+    import PyQt5.QtSvg  # @UnusedImport
+    import PyQt5.QtXml  # @UnusedImport
+    import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
+    import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
     # for gevent bundling
     from gevent import core, resolver_thread, resolver_ares, socket, threadpool, thread, threading, select, subprocess, pywsgi, server, hub # @UnusedImport @Reimport 
 
@@ -2773,10 +2728,7 @@ class tgraphcanvas(FigureCanvas):
         #ON
         else:
             #load
-            if pyqtversion < 5:
-                img = QPixmap().grabWidget(self)
-            else:
-                img = self.grab()
+            img = self.grab()
             aw.HUD.setPixmap(img)
             
             self.HUDflag = True
@@ -9812,8 +9764,7 @@ class VMToolbar(NavigationToolbar):
         else:
             name = name.replace('.png','.svg')
         # large png icons introduced in MPL 2.1
-        if pyqtversion == 5:
-            name = name.replace('.png', '_large.png')                        
+        name = name.replace('.png', '_large.png')                        
         p = os.path.join(basedir, name)
         pm = QPixmap(p)
         if hasattr(pm, 'setDevicePixelRatio'):
@@ -10766,7 +10717,9 @@ class ApplicationWindow(QMainWindow):
         #create a modbus port object (main modbus device)
         self.modbus = modbusport()
         #create an s7 port object (main s7 device)
-        self.s7 = s7port()
+        
+        from artisanlib.s7port import s7port
+        self.s7 = s7port(self.sendmessage,self.qmc.adderror,self.addserial)
         #create scale port object
         self.scale = scaleport()
         #create color port object
@@ -13473,36 +13426,15 @@ class ApplicationWindow(QMainWindow):
             self.slider4.setFocusPolicy(Qt.NoFocus)
         self.slider4.clearFocus()
 
-    def appFrozen(self):
-        ib = False
-        try:
-            if platf == "Darwin":
-                # the sys.frozen is set by py2app and pyinstaller and is unset otherwise
-                if getattr( sys, 'frozen', False ):      
-                    ib = True
-#                if str(sys.frozen) == "macosx_app":
-#                    ib = True                    
-            elif platf == "Windows":
-                ib = (hasattr(sys, "frozen") or # new py2exe
-                    hasattr(sys, "importers") # old py2exe
-                    or imp.is_frozen("__main__")) # tools/freeze
-            elif platf == "Linux":
-                if getattr(sys, 'frozen', False):
-                    # The application is frozen
-                    ib = True
-        except Exception:
-            pass
-        return ib
-
     def getAppPath(self):
         res = ""
         if platf in ['Darwin','Linux']:
-            if self.appFrozen():
+            if appFrozen():
                 res = QApplication.applicationDirPath() + "/../../../"
             else:
                 res = os.path.dirname(os.path.realpath(__file__)) + "/../"
         elif platf == "Windows":
-            if self.appFrozen():
+            if appFrozen():
                 res = os.path.dirname(sys.executable) + "\\"
             else:
                 res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\"
@@ -13513,17 +13445,17 @@ class ApplicationWindow(QMainWindow):
     def getResourcePath(self):
         res = ""
         if platf == 'Darwin':
-            if self.appFrozen():
+            if appFrozen():
                 res = QApplication.applicationDirPath() + "/../Resources/"
             else:
                 res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
         elif platf == 'Linux':
-            if self.appFrozen():
+            if appFrozen():
                 res = QApplication.applicationDirPath() + "/"
             else:
                 res = os.path.dirname(os.path.realpath(__file__)) + "/../includes/"
         elif platf == "Windows":
-            if self.appFrozen():
+            if appFrozen():
                 res = os.path.dirname(sys.executable) + "\\"
             else:
                 res = os.path.dirname(os.path.realpath(__file__)) + "\\..\\includes\\"
@@ -14098,26 +14030,24 @@ class ApplicationWindow(QMainWindow):
         self.slider4.blockSignals(False)        
 
     def setLabelColor(self,label,color):
-#        palette = QPalette(label.palette()) # make a copy of the palette
-#        palette.setColor(QPalette.Foreground, color)
-#        label.setPalette(palette) # assign new palette
         label.setStyleSheet("QLabel { color: %s; }" % color.name())
 
-    #adds errors
+    #adds to serial log
     def addserial(self,serialstring):
-        try:
-            #### lock shared resources #####
-            aw.qmc.serialsemaphore.acquire(1)
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 1000 comm strings
-            if len(self.seriallog) > 999:
-                self.seriallog = self.seriallog[1:]
-            self.seriallog.append(timez + " " + serialstring)
-        except Exception:
-            pass
-        finally:
-            if aw.qmc.serialsemaphore.available() < 1:
-                aw.qmc.serialsemaphore.release(1)
+        if aw.seriallogflag:
+            try:
+                #### lock shared resources #####
+                aw.qmc.serialsemaphore.acquire(1)
+                timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
+                #keep a max of 1000 comm strings
+                if len(self.seriallog) > 999:
+                    self.seriallog = self.seriallog[1:]
+                self.seriallog.append(timez + " " + serialstring)
+            except Exception:
+                pass
+            finally:
+                if aw.qmc.serialsemaphore.available() < 1:
+                    aw.qmc.serialsemaphore.release(1)
 
     def resizeEvent(self, event):
         if aw.qmc.statssummary and len(aw.qmc.timex) > 3:
@@ -14133,7 +14063,7 @@ class ApplicationWindow(QMainWindow):
     def setdpi(self,dpi,moveWindow=True):
         if aw:
             aw.dpi = dpi
-            if mpl_major_version >= 2 and pyqtversion >= 5:
+            if mpl_major_version >= 2:
                 # on mpl >= v2 we assume hidpi support and consider the pixel ratio
                 self.qmc.fig.set_dpi(dpi*aw.devicePixelRatio())
             else:
@@ -15710,10 +15640,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFilesDialog(self,msg="Select",ext="*",path=None):
         if path is None:   
             path = self.getDefaultPath()
-        if pyqtversion < 5:
-            res = QFileDialog.getOpenFileNames(self,msg,path,ext)
-        else:
-            res = QFileDialog.getOpenFileNames(self,msg,path,ext)[0]
+        res = QFileDialog.getOpenFileNames(self,msg,path,ext)[0]
         for f in res:
             self.setDefaultPath(u(f))
         return res
@@ -15724,10 +15651,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
         if path is None:   
             path = self.getDefaultPath()        
-        if pyqtversion < 5:
-            res = u(QFileDialog.getOpenFileName(self,msg,path,ext))
-        else:
-            res = u(QFileDialog.getOpenFileName(self,msg,path,ext)[0])
+        res = u(QFileDialog.getOpenFileName(self,msg,path,ext)[0])
         f = u(res)
         self.setDefaultPath(f)
         return f
@@ -15737,10 +15661,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
         if path is None:
             path = self.getDefaultPath()
-        if pyqtversion < 5:
-            f = u(QFileDialog.getSaveFileName(self,msg,path,ext))
-        else:
-            f = u(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
+        f = u(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
         self.setDefaultPath(f)
         return f
  
@@ -17944,10 +17865,7 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.reset(redraw=False,soundOn=False)
                         self.setProfile(f,self.deserialize(f),quiet=True)
                         self.qmc.redraw()
-                        if pyqtversion < 5:
-                            self.image = QPixmap.grabWidget(aw.qmc)
-                        else:
-                            self.image = aw.qmc.grab()
+                        self.image = aw.qmc.grab()
                         self.image.save(fconv,"PNG")
                     else:
                         aw.sendmessage(QApplication.translate("Message","Target file {0} exists. {1} not converted.", None).format(fconv,fname + u(".png")))                        
@@ -20388,10 +20306,7 @@ class ApplicationWindow(QMainWindow):
         self.closeApp()
 
     def filePrint(self):
-        if pyqtversion < 5:
-            image = QPixmap().grabWidget(aw.qmc).toImage()
-        else:
-            image = aw.qmc.grab().toImage()
+        image = aw.qmc.grab().toImage()
 
         if image.isNull():
             return
@@ -22578,20 +22493,12 @@ class ApplicationWindow(QMainWindow):
         QDesktopServices.openUrl(QUrl("https://artisan-scope.org/doc/", QUrl.TolerantMode))
 
     def applicationscreenshot(self):
-        if pyqtversion < 5:
-            imag = QPixmap().grabWidget(self)
-        else:
-            imag = self.grab()
+        imag = self.grab()
         fmt = 'png'
         initialPath = QDir.currentPath() + "/ArtisanScreenshot." + fmt
-        if pyqtversion < 5:
-            fileName = u(QFileDialog.getSaveFileName(self, "Artisan ScreenShot",
-                    initialPath,
-                    "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt)))
-        else:
-            fileName = u(QFileDialog.getSaveFileName(self, "Artisan ScreenShot",
-                    initialPath,
-                    "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0])
+        fileName = u(QFileDialog.getSaveFileName(self, "Artisan ScreenShot",
+                initialPath,
+                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0])
         if fileName:
             imag.save(fileName, fmt) 
 
@@ -22612,21 +22519,13 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.weight[1] = v
 
     def desktopscreenshot(self):
-        if pyqtversion < 5:
-            imag = QPixmap.grabWindow(QApplication.desktop().winId())
-        else:
-            screen = QApplication.primaryScreen()
-            imag = screen.grabWindow(QApplication.desktop().winId())
+        screen = QApplication.primaryScreen()
+        imag = screen.grabWindow(QApplication.desktop().winId())
         fmt = 'png'
         initialPath = QDir.currentPath() + "/DesktopScreenshot." + fmt       
-        if pyqtversion < 5:
-            fileName = u(QFileDialog.getSaveFileName(self, "Desktop ScreenShot",
-                    initialPath,
-                    "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt)))
-        else:
-            fileName = u(QFileDialog.getSaveFileName(self, "Desktop ScreenShot",
-                    initialPath,
-                    "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0])
+        fileName = u(QFileDialog.getSaveFileName(self, "Desktop ScreenShot",
+                initialPath,
+                "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))[0])
         if fileName:
             imag.save(fileName, fmt)
             
@@ -23925,19 +23824,10 @@ class ApplicationWindow(QMainWindow):
 
     #resizes and saves graph to a new width w 
     def resizeImg(self,w,transformationmode):
-        try: 
-                
+        try:                
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None),ext="*.png")
-            if filename:
-                
-                ##aw.qmc.fig.canvas.setStyleSheet("background-color:transparent;") # original in setup
-                #aw.qmc.fig.canvas.setAttribute(Qt.WA_TranslucentBackground) # additional?
-                #aw.qmc.fig.canvas.setStyleSheet("background-color:white;") # makes background white for windows
-                if pyqtversion < 5:
-                    self.image = QPixmap.grabWidget(aw.qmc)
-                else:
-                    self.image = aw.qmc.grab()
-                
+            if filename:                
+                self.image = aw.qmc.grab()                
                 if w != 0:
                     self.image = self.image.scaledToWidth(w,transformationmode)
                 
@@ -24081,10 +23971,7 @@ class ApplicationWindow(QMainWindow):
             #turn back ON to adquire new size
             self.qmc.toggleHUD()
             self.qmc.hudresizeflag = False
-        if pyqtversion < 5:
-            img = QPixmap().grabWidget(self.qmc)
-        else:
-            img = self.qmc.grab()
+        img = self.qmc.grab()
         p = QPainter(img)
         Wwidth= self.qmc.size().width()
         Wheight = self.qmc.size().height()
@@ -26861,10 +26748,7 @@ class equDataDlg(ArtisanDialog):
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
             self.datatable.setSelectionMode(QTableWidget.SingleSelection)
             self.datatable.setShowGrid(True)
-            if pyqtversion < 5:
-                self.datatable.verticalHeader().setResizeMode(2)
-            else:
-                self.datatable.verticalHeader().setSectionResizeMode(2)
+            self.datatable.verticalHeader().setSectionResizeMode(2)
             
             for i in range(ndata): 
     
@@ -26943,20 +26827,12 @@ class equDataDlg(ArtisanDialog):
                 self.datatable.setItem(i,10,P9)
     
             header = self.datatable.horizontalHeader()
-            if pyqtversion < 5:
-                header.setResizeMode(0, QHeaderView.Fixed)
-                header.setResizeMode(1, QHeaderView.Fixed)
-                header.setResizeMode(2, QHeaderView.Fixed)
-                header.setResizeMode(3, QHeaderView.Fixed)
-                header.setResizeMode(4, QHeaderView.Fixed)
-                header.setResizeMode(len(columns) - 1, QHeaderView.Stretch)
-            else:
-                header.setSectionResizeMode(0, QHeaderView.Fixed)
-                header.setSectionResizeMode(1, QHeaderView.Fixed)
-                header.setSectionResizeMode(2, QHeaderView.Fixed)
-                header.setSectionResizeMode(3, QHeaderView.Fixed)
-                header.setSectionResizeMode(4, QHeaderView.Fixed)
-                header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
+            header.setSectionResizeMode(0, QHeaderView.Fixed)
+            header.setSectionResizeMode(1, QHeaderView.Fixed)
+            header.setSectionResizeMode(2, QHeaderView.Fixed)
+            header.setSectionResizeMode(3, QHeaderView.Fixed)
+            header.setSectionResizeMode(4, QHeaderView.Fixed)
+            header.setSectionResizeMode(len(columns) - 1, QHeaderView.Stretch)
             self.datatable.resizeColumnsToContents()
         except Exception as e:
 #            import traceback
@@ -28207,10 +28083,7 @@ class editGraphDlg(ArtisanDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SingleSelection)
         self.datatable.setShowGrid(True)
-        if pyqtversion < 5:
-            self.datatable.verticalHeader().setResizeMode(2)
-        else:
-            self.datatable.verticalHeader().setSectionResizeMode(2)
+        self.datatable.verticalHeader().setSectionResizeMode(2)
         offset = 0
         if aw.qmc.timeindex[0] > -1:
             offset = aw.qmc.timex[aw.qmc.timeindex[0]]
@@ -28310,10 +28183,7 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.setSelectionMode(QTableWidget.ExtendedSelection)
         self.eventtable.setShowGrid(True)
         
-        if pyqtversion < 5:
-            self.eventtable.verticalHeader().setResizeMode(2)
-        else:
-            self.eventtable.verticalHeader().setSectionResizeMode(2)
+        self.eventtable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
 #        regexvalue = QRegExp(r"^100|\d?\d?$")
         self.eventtable.setShowGrid(True) 
@@ -28367,20 +28237,12 @@ class editGraphDlg(ArtisanDialog):
             valueEdit.setValidator(QIntValidator(0,aw.eventsMaxValue,self.eventtable.cellWidget(i,5)))
         header = self.eventtable.horizontalHeader()
         #header.setStretchLastSection(True)
-        if pyqtversion < 5:
-            header.setResizeMode(0, QHeaderView.Fixed)
-            header.setResizeMode(1, QHeaderView.Fixed)
-            header.setResizeMode(2, QHeaderView.Fixed)
-            header.setResizeMode(3, QHeaderView.Stretch)
-            header.setResizeMode(4, QHeaderView.ResizeToContents)
-            header.setResizeMode(5, QHeaderView.Fixed)
-        else:
-            header.setSectionResizeMode(0, QHeaderView.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.Fixed)
-            header.setSectionResizeMode(2, QHeaderView.Fixed)
-            header.setSectionResizeMode(3, QHeaderView.Stretch)
-            header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(5, QHeaderView.Fixed)
+        header.setSectionResizeMode(0, QHeaderView.Fixed)
+        header.setSectionResizeMode(1, QHeaderView.Fixed)
+        header.setSectionResizeMode(2, QHeaderView.Fixed)
+        header.setSectionResizeMode(3, QHeaderView.Stretch)
+        header.setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(5, QHeaderView.Fixed)
         # improve width of Time column
         self.eventtable.setColumnWidth(0,60)
         self.eventtable.setColumnWidth(1,65)
@@ -28968,10 +28830,7 @@ class tareDlg(ArtisanDialog):
         self.taretable.setSelectionBehavior(QTableWidget.SelectRows)
         self.taretable.setSelectionMode(QTableWidget.SingleSelection)
         self.taretable.setShowGrid(True)
-        if pyqtversion < 5:
-            self.taretable.verticalHeader().setResizeMode(2)
-        else:
-            self.taretable.verticalHeader().setSectionResizeMode(2)
+        self.taretable.verticalHeader().setSectionResizeMode(2)
         for i in range(len(aw.qmc.container_names)):
             #add widgets to the table
             name = QLineEdit()
@@ -28985,12 +28844,8 @@ class tareDlg(ArtisanDialog):
             self.taretable.setCellWidget(i,0,name)
             self.taretable.setCellWidget(i,1,weight)
         header = self.taretable.horizontalHeader()
-        if pyqtversion < 5:
-            header.setResizeMode(0, QHeaderView.Stretch)
-            header.setResizeMode(1, QHeaderView.Fixed)
-        else:
-            header.setSectionResizeMode(0, QHeaderView.Stretch)
-            header.setSectionResizeMode(1, QHeaderView.Fixed)
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.Fixed)
         self.taretable.setColumnWidth(1,65)
 
 
@@ -31595,10 +31450,7 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
         self.eventbuttontable.setShowGrid(True)
-        if pyqtversion < 5:
-            self.eventbuttontable.verticalHeader().setResizeMode(2)
-        else:
-            self.eventbuttontable.verticalHeader().setSectionResizeMode(2)
+        self.eventbuttontable.verticalHeader().setSectionResizeMode(2)
         visibility = [QApplication.translate("ComboBox","OFF",None),
                       QApplication.translate("ComboBox","ON",None)]
         std_extra_events = [self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),"--"]
@@ -32710,10 +32562,7 @@ class flavorDlg(ArtisanDialog):
             self.flavortable.setSelectionBehavior(QTableWidget.SelectRows)
             self.flavortable.setSelectionMode(QTableWidget.SingleSelection)
             self.flavortable.setShowGrid(True)
-            if pyqtversion < 5:
-                self.flavortable.verticalHeader().setResizeMode(2)
-            else:
-                self.flavortable.verticalHeader().setSectionResizeMode(2)
+            self.flavortable.verticalHeader().setSectionResizeMode(2)
             #populate table
             for i in range(nflavors):
                 labeledit = QLineEdit(u(aw.qmc.flavorlabels[i]))
@@ -32732,10 +32581,7 @@ class flavorDlg(ArtisanDialog):
                 self.flavortable.setCellWidget(i,1,valueSpinBox)
             self.flavortable.resizeColumnsToContents()
             header = self.flavortable.horizontalHeader()
-            if pyqtversion < 5:
-                header.setResizeMode(0, QHeaderView.Stretch)
-            else:
-                header.setSectionResizeMode(0, QHeaderView.Stretch)
+            header.setSectionResizeMode(0, QHeaderView.Stretch)
 
     def showbackground(self):
         if self.backgroundCheck.isChecked():
@@ -33264,10 +33110,7 @@ class backgroundDlg(ArtisanDialog):
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
         self.eventtable.setShowGrid(True)
-        if pyqtversion < 5:
-            self.eventtable.verticalHeader().setResizeMode(2)
-        else:
-            self.eventtable.verticalHeader().setSectionResizeMode(2)
+        self.eventtable.verticalHeader().setSectionResizeMode(2)
         if aw.qmc.timeindex[0] != -1:
             start = aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
@@ -33302,20 +33145,12 @@ class backgroundDlg(ArtisanDialog):
         # improve width of Time column
         self.eventtable.setColumnWidth(1,175)
         header = self.eventtable.horizontalHeader()
-        if pyqtversion < 5:
-            header.setResizeMode(0, QHeaderView.Fixed)
-            header.setResizeMode(1, QHeaderView.Fixed)
-            header.setResizeMode(2, QHeaderView.Fixed)
-            header.setResizeMode(3, QHeaderView.Stretch)
-            header.setResizeMode(4, QHeaderView.Fixed)
-            header.setResizeMode(5, QHeaderView.Fixed)
-        else:
-            header.setSectionResizeMode(0, QHeaderView.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.Fixed)
-            header.setSectionResizeMode(2, QHeaderView.Fixed)
-            header.setSectionResizeMode(3, QHeaderView.Stretch)
-            header.setSectionResizeMode(4, QHeaderView.Fixed)
-            header.setSectionResizeMode(5, QHeaderView.Fixed)
+        header.setSectionResizeMode(0, QHeaderView.Fixed)
+        header.setSectionResizeMode(1, QHeaderView.Fixed)
+        header.setSectionResizeMode(2, QHeaderView.Fixed)
+        header.setSectionResizeMode(3, QHeaderView.Stretch)
+        header.setSectionResizeMode(4, QHeaderView.Fixed)
+        header.setSectionResizeMode(5, QHeaderView.Fixed)
         self.eventtable.resizeColumnsToContents()
         self.eventtable.setColumnWidth(1,65)
         self.eventtable.setColumnWidth(2,65)
@@ -33356,10 +33191,7 @@ class backgroundDlg(ArtisanDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SingleSelection)
         self.datatable.setShowGrid(True)
-        if pyqtversion < 5:
-            self.datatable.verticalHeader().setResizeMode(2)
-        else:
-            self.datatable.verticalHeader().setSectionResizeMode(2)
+        self.datatable.verticalHeader().setSectionResizeMode(2)
         for i in range(ndata):
             Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
@@ -33435,28 +33267,16 @@ class backgroundDlg(ArtisanDialog):
                 self.datatable.setItem(i,5,XT)
                 
         header = self.datatable.horizontalHeader()
-        if pyqtversion < 5:
-            header.setResizeMode(0, QHeaderView.Fixed)
-            header.setResizeMode(1, QHeaderView.Fixed)
-            header.setResizeMode(2, QHeaderView.Fixed)
-            header.setResizeMode(3, QHeaderView.Fixed)
-            header.setResizeMode(4, QHeaderView.Fixed)
-            if xtcurve:
-                header.setResizeMode(5, QHeaderView.Fixed)
-                header.setResizeMode(6, QHeaderView.Stretch)
-            else:
-                header.setResizeMode(5, QHeaderView.Stretch)
+        header.setSectionResizeMode(0, QHeaderView.Fixed)
+        header.setSectionResizeMode(1, QHeaderView.Fixed)
+        header.setSectionResizeMode(2, QHeaderView.Fixed)
+        header.setSectionResizeMode(3, QHeaderView.Fixed)
+        header.setSectionResizeMode(4, QHeaderView.Fixed)
+        if xtcurve:
+            header.setSectionResizeMode(5, QHeaderView.Fixed)
+            header.setSectionResizeMode(6, QHeaderView.Stretch)
         else:
-            header.setSectionResizeMode(0, QHeaderView.Fixed)
-            header.setSectionResizeMode(1, QHeaderView.Fixed)
-            header.setSectionResizeMode(2, QHeaderView.Fixed)
-            header.setSectionResizeMode(3, QHeaderView.Fixed)
-            header.setSectionResizeMode(4, QHeaderView.Fixed)
-            if xtcurve:
-                header.setSectionResizeMode(5, QHeaderView.Fixed)
-                header.setSectionResizeMode(6, QHeaderView.Stretch)
-            else:
-                header.setSectionResizeMode(5, QHeaderView.Stretch)
+            header.setSectionResizeMode(5, QHeaderView.Stretch)
         self.datatable.resizeColumnsToContents()
 
 #############################################################################
@@ -33768,292 +33588,6 @@ class StatisticsDlg(ArtisanDialog):
                 aw.qmc.statisticsflags[5] = 0
             aw.qmc.redraw(recomputeAllDeltas=False)
             self.close()
-
-###########################################################################################
-##################### S7 PORT #########################################################
-###########################################################################################
-
-# Define a context manager to suppress stdout and stderr.
-class suppress_stdout_stderr(object):
-    '''
-    A context manager for doing a "deep suppression" of stdout and stderr in 
-    Python, i.e. will suppress all print, even if the print originates in a 
-    compiled C/Fortran sub-function.
-       This will not suppress raised exceptions, since exceptions are printed
-    to stderr just before a script exits, and after the context manager has
-    exited (at least, I think that is why it lets exceptions through).      
-
-    '''
-    def __init__(self):
-        # Open a pair of null files
-        self.null_fds =  [os.open(os.devnull,os.O_RDWR) for _ in range(2)]
-        # Save the actual stdout (1) and stderr (2) file descriptors.
-        self.save_fds = [os.dup(1), os.dup(2)]
-
-    def __enter__(self):
-        # Assign the null pointers to stdout and stderr.
-        os.dup2(self.null_fds[0],1)
-        os.dup2(self.null_fds[1],2)
-
-    def __exit__(self, *_):
-        # Re-assign the real stdout/stderr back to (1) and (2)
-        os.dup2(self.save_fds[0],1)
-        os.dup2(self.save_fds[1],2)
-        # Close all file descriptors
-        for fd in self.null_fds + self.save_fds:
-            os.close(fd)
-
-class s7port(object):
-    def __init__(self):
-        self.readRetries = 1
-        self.channels = 8 # maximal number of S7 channels
-        self.host = '127.0.0.1' # the TCP host
-        self.port = 102 # the TCP port
-        self.rack = 0 # 0,..,7
-        self.slot = 0 # 0,..,31
-                
-        self.lastReadResult = 0 # this is set by eventaction following some custom button/slider S/ actions with "read" command
-        
-        self.area = [0]*self.channels
-        self.db_nr = [1]*self.channels
-        self.start = [0]*self.channels
-        self.type = [0]*self.channels
-        self.mode = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F (this is different than other places)
-        self.div = [0]*self.channels
-        
-        self.PID_area = 0
-        self.PID_db_nr = 0
-        self.PID_SV_register = 0
-        self.PID_p_register = 0
-        self.PID_i_register = 0
-        self.PID_d_register = 0
-        self.PID_ON_action = ""
-        self.PID_OFF_action = ""
-        self.SVmultiplier = 0
-        self.PIDmultiplier = 0
-        
-        self.COMsemaphore = QSemaphore(1)
-        
-        self.areas = [
-            0x81, # PE
-            0x82, # PA
-            0x83, # MK
-            0x1C, # CT
-            0x1D, # TM
-            0x84, # DB
-        ]
-        
-        self.plc = None
-        self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
-        
-    def setPID(self,p,i,d):
-        if self.PID_area and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
-            multiplier = 1.
-            if aw.s7.PIDmultiplier == 1:
-                multiplier = 10.
-            elif aw.s7.PIDmultiplier == 2:
-                multiplier = 100.
-            self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_p_register,p*multiplier)
-            self.writeInt(self.PID_area-1,self.PID_area,self.PID_db_nr,self.PID_i_register,i*multiplier)
-            self.writeInt(self.PID_area-1,self.PID_area,self.PID_db_nr,self.PID_d_register,d*multiplier)
-        
-    def setTarget(self,sv):
-        if self.PID_area:
-            multiplier = 1.
-            if aw.s7.SVmultiplier == 1:
-                multiplier = 10.
-            elif aw.s7.SVmultiplier == 2:
-                multiplier = 100.
-            self.writeInt(self.PID_area-1,self.PID_db_nr,self.PID_SV_register,int(round(sv*multiplier)))
-                    
-    def isConnected(self):
-        return not (self.plc is None) and self.plc.get_connected()
-        
-    def disconnect(self):
-        if self.isConnected():
-            try:
-                self.plc.disconnect()
-                self.plc.destroy()
-                self.plc = None
-            except Exception:
-                pass
-        
-    def connect(self):
-        # first load shared lib if needed
-        if platf in ['Windows','Linux'] and aw.appFrozen():
-            libpath = os.path.dirname(sys.executable)
-            if platf == 'Linux':
-                snap7dll = os.path.join(libpath,"libsnap7.so")
-            else: # Windows:
-                snap7dll = os.path.join(libpath,"snap7.dll")                
-            load_snap7_library(snap7dll) # will ensure to load it only once
-        # next reset client instance if not yet connected to ensure a fresh start
-        if self.plc and not self.plc.get_connected():
-            self.plc = None
-        # connect if not yet connected
-        if self.plc is None:
-            try:
-                self.commError = False
-                self.plc = S7Client()
-                with suppress_stdout_stderr():
-                    libtime.sleep(0.3)
-                    self.plc.connect(self.host,self.rack,self.slot,self.port)
-                if self.plc.get_connected():
-                    aw.sendmessage(QApplication.translate("Message","S7 Connected", None))
-                    libtime.sleep(0.7)
-                else:
-                    libtime.sleep(0.5)
-                    self.plc = S7Client()
-                    # we try a second time
-                    with suppress_stdout_stderr():
-                        libtime.sleep(0.3)
-                        self.plc.connect(self.host,self.rack,self.slot,self.port)
-                    if self.plc.get_connected():
-                        aw.sendmessage(QApplication.translate("Message","S7 Connected", None))
-                        libtime.sleep(0.7)
-            except Exception as ex:
-                self.commError = True
-                _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
-                
-                
-    def writeFloat(self,area,dbnumber,start,value):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            if self.plc is not None and self.plc.get_connected():
-                with suppress_stdout_stderr():
-                    ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                    set_real(ba, 0, float(value))
-                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
-            else:
-                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeFloat() connecting to PLC failed"))               
-        except Exception as ex:
-#            self.disconnect()
-            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeFloat() {0}").format(str(ex)))
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-
-    def writeInt(self,area,dbnumber,start,value):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            if self.plc is not None and self.plc.get_connected():
-                with suppress_stdout_stderr():
-                    ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    set_int(ba, 0, int(value))
-                    self.plc.write_area(self.areas[area],dbnumber,start,ba)
-            else:
-                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeInt() connecting to PLC failed"))               
-        except Exception as ex:
-#            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " writeINT() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-                    
-    def readFloat(self,area,dbnumber,start):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            if self.plc is not None and self.plc.get_connected():
-                retry = self.readRetries   
-                res = None             
-                while True:
-                    try:
-                        with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                    except:
-                        res = None
-                    if res is None:
-                        if retry > 0:
-                            retry = retry - 1
-                        else:
-                            raise Exception("Communication error")
-                    else:
-                        break
-                if res is None:
-                    return -1
-                else:
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                    return get_real(res,0)
-            else:
-                self.commError = True
-#                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() connecting to PLC failed"))   
-                aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))                                   
-                return -1
-        except Exception: # as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-#            self.disconnect()
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
-            aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
-            self.commError = True
-            return -1
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-            #note: logged chars should be unicode not binary
-            if aw.seriallogflag:
-                aw.addserial("S7 readFloat")
-                
-    def readInt(self,area,dbnumber,start):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            if self.plc is not None and self.plc.get_connected():
-                retry = self.readRetries   
-                res = None             
-                while True:
-                    try:
-                        with suppress_stdout_stderr():
-                            res = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    except:
-                        res = None
-                    if res is None:
-                        if retry > 0:
-                            retry = retry - 1
-                        else:
-                            raise Exception("Communication error")
-                    else:
-                        break
-                if res is None:
-                    return -1
-                else:
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                    return get_int(res,0)
-            else:
-                self.commError = True
-#                aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() connecting to PLC failed"))  
-                aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))   
-                return -1
-        except Exception: # as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-#            self.disconnect()
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","S7 Error:",None) + " readInt() {0}").format(str(ex)),exc_tb.tb_lineno)
-            aw.qmc.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
-            self.commError = True
-            return -1
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-            #note: logged chars should be unicode not binary
-            if aw.seriallogflag:
-                aw.addserial("S7 readInt")                
-
 
 
 ###########################################################################################
@@ -36146,7 +35680,10 @@ class serialport(object):
                 if aw.s7.type[i]:
                     v = aw.s7.readFloat(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
                 else:
-                    v = aw.s7.readInt(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
+                    try:
+                        v = aw.s7.readInt(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
+                    except Exception as e:
+                        print(e)
                 v = self.processChannelData(v,aw.s7.div[i],("C" if aw.s7.mode[i]==1 else ("F" if aw.s7.mode[i]==2 else "")))         
                 res.append(v)
             else:
@@ -37879,13 +37416,13 @@ class serialport(object):
                 arch = platform.architecture()[0]
                 machine = platform.machine()
                 libpath = os.path.dirname(sys.executable)
-                if platf == 'Windows' and aw.appFrozen():
+                if platf == 'Windows' and appFrozen():
                     if arch == '32bit':
                         YAPI._yApiCLibFile = libpath + "\\lib\\yapi.dll"
                     else:
                         YAPI._yApiCLibFile = libpath + "\\lib\\yapi64.dll"
                     YAPI._yApiCLibFileFallback = libpath + "\\lib\\yapi.dll"
-                elif platf == "Linux" and aw.appFrozen():
+                elif platf == "Linux" and appFrozen():
                     if machine.find("arm") >= 0: # Raspberry
                         YAPI._yApiCLibFile = libpath + "/libyapi-armhf.so"
                         YAPI._yApiCLibFileFallback = libpath + "/libyapi-armel.so"
@@ -40342,10 +39879,7 @@ class comportDlg(ArtisanDialog):
                 self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
                 self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
                 self.serialtable.setShowGrid(True)
-                if pyqtversion < 5:
-                    self.serialtable.verticalHeader().setResizeMode(2)
-                else:
-                    self.serialtable.verticalHeader().setSectionResizeMode(2)
+                self.serialtable.verticalHeader().setSectionResizeMode(2)
                 for i in range(nssdevices):
                     if len(aw.qmc.extradevices) > i:
                         devid = aw.qmc.extradevices[i]
@@ -41556,10 +41090,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
             self.devicetable.setSelectionMode(QTableWidget.SingleSelection)
             self.devicetable.setShowGrid(True)
-            if pyqtversion < 5:
-                self.devicetable.verticalHeader().setResizeMode(2)
-            else:
-                self.devicetable.verticalHeader().setSectionResizeMode(2)
+            self.devicetable.verticalHeader().setSectionResizeMode(2)
             if nddevices:
                 dev = aw.qmc.devices[:]             #deep copy
                 limit = len(dev)
@@ -43684,10 +43215,7 @@ class WheelDlg(ArtisanDialog):
             self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
             self.labeltable.setSelectionMode(QTableWidget.SingleSelection)
             self.labeltable.setShowGrid(True)
-            if pyqtversion < 5:
-                self.labeltable.verticalHeader().setResizeMode(2)
-            else:
-                self.labeltable.verticalHeader().setSectionResizeMode(2)
+            self.labeltable.verticalHeader().setSectionResizeMode(2)
             #populate table
             for i in range(nlabels):
                 label = QTableWidgetItem(aw.qmc.wheelnames[x][i])
@@ -43870,10 +43398,7 @@ class WheelDlg(ArtisanDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SingleSelection)
         self.datatable.setShowGrid(True)
-        if pyqtversion < 5:
-            self.datatable.verticalHeader().setResizeMode(2)
-        else:
-            self.datatable.verticalHeader().setSectionResizeMode(2)
+        self.datatable.verticalHeader().setSectionResizeMode(2)
         #populate table
         for i in range(ndata):
             delButton = QPushButton(QApplication.translate("Button","Delete",None))
@@ -44701,10 +44226,7 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.setSelectionMode(QTableWidget.SingleSelection)
             self.alarmtable.setShowGrid(True)
             nalarms = len(aw.qmc.alarmtemperature)
-            if pyqtversion < 5:
-                self.alarmtable.verticalHeader().setResizeMode(2)
-            else:
-                self.alarmtable.verticalHeader().setSectionResizeMode(2)
+            self.alarmtable.verticalHeader().setSectionResizeMode(2)
             self.alarmtable.verticalHeader().setVisible(False)
             self.alarmtable.setSortingEnabled(False)
             if nalarms:
@@ -45724,10 +45246,7 @@ class PXRpidDlgControl(ArtisanDialog):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        if pyqtversion < 5:
-            self.segmenttable.verticalHeader().setResizeMode(2)
-        else:
-            self.segmenttable.verticalHeader().setSectionResizeMode(2)
+        self.segmenttable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(8):
@@ -47811,10 +47330,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        if pyqtversion < 5:
-            self.segmenttable.verticalHeader().setResizeMode(2)
-        else:
-            self.segmenttable.verticalHeader().setSectionResizeMode(2)
+        self.segmenttable.verticalHeader().setSectionResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(16):
@@ -49549,7 +49065,7 @@ class PIDcontrol(object):
             self.sv = max(0,sv)
             if move:
                 aw.moveSVslider(sv,setValue=True)
-            aw.s7.setTarget(sv)
+            aw.s7.setTarget(sv,aw.s7.SVmultiplier)
             self.sv = sv # remember last sv
         elif aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
             if aw.ser.ArduinoIsInitialized:
@@ -49635,7 +49151,7 @@ class PIDcontrol(object):
             self.pidKd = kd
             aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
         elif (aw.pidcontrol.externalPIDControl() == 2): # S7 (external) Control active
-            aw.s7.setPID(kp,ki,kd)
+            aw.s7.setPID(kp,ki,kd,aw.s7.PIDmultiplier)
             self.pidKp = kp
             self.pidKi = ki
             self.pidKd = kd
@@ -49886,7 +49402,7 @@ def main():
                     aw.qmc.background = False
     except Exception:
         pass
-    if platf == 'Windows' and aw.appFrozen():
+    if platf == 'Windows' and appFrozen():
         try:
             sys.stderr = sys.stdout
         except:
