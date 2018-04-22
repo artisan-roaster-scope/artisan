@@ -32757,8 +32757,10 @@ class backgroundDlg(ArtisanDialog):
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
         self.speedSpinBox.setValue(aw.qmc.backgroundmovespeed)
+        self.xtcurvelabel = QLabel(QApplication.translate("Label", "Extra",None))
         self.xtcurveComboBox = QComboBox()
         self.xtcurveComboBox.setToolTip(QApplication.translate("Tooltip","For loaded backgrounds with extra devices only",None))
+        self.xtcurveComboBox.setMinimumWidth(120)
         curvenames = [""] # first entry is the empty one, no extra curve displayed
         for i in range(min(len(aw.qmc.extraname1B),len(aw.qmc.extraname2B),len(aw.qmc.extratimexB))):
             curvenames.append("B" + str(2*i+3) + ": " + aw.qmc.extraname1B[i])
@@ -32862,6 +32864,7 @@ class backgroundDlg(ArtisanDialog):
         layoutBoxed.addLayout(layoutBoxedH)
         layoutBoxed.addStretch()
         alignButtonBoxed = QHBoxLayout()
+        alignButtonBoxed.addWidget(self.xtcurvelabel)
         alignButtonBoxed.addWidget(self.xtcurveComboBox)
         alignButtonBoxed.addStretch()
         alignButtonBoxed.addWidget(alignButton)
