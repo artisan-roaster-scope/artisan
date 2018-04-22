@@ -25,6 +25,14 @@ a = Analysis(['artisan.py'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
+
+# Remove pyi_rth_mplconfig.py useless because it makes our startup slow.
+# This hook only applies to one-file distributions.
+for s in a.scripts:
+    if s[0] == 'pyi_rth_mplconfig':
+        a.scripts.remove(s)
+        break
+
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
