@@ -56,7 +56,10 @@ class AillioR1:
 
     def __dbg(self, msg):
         if self.AILLIO_DEBUG:
-            print('AillioR1: ' + msg)
+            try:
+                print('AillioR1: ' + msg)
+            except IOError:
+                pass
 
     def __open(self):
         if self.usbhandle is not None:
