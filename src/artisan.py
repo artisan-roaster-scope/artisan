@@ -2,7 +2,6 @@
 """
 Start the application.
 """
-
 import sys
 import imp
 import os

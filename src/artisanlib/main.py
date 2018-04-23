@@ -36,8 +36,6 @@ import os
 import sys
 import ast
 import platform
-import serial  # @UnusedImport
-import serial.tools.list_ports
 import math
 import binascii
 import time as libtime
@@ -94,19 +92,7 @@ from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VE
                           QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
 
 import matplotlib as mpl
-
 from matplotlib import cm
-
-mpl_major_version = 2
-try:
-    mpl_major_version = int(mpl.__version__.split('.')[0])
-except:
-    pass
-mpl_minor_version = 1
-try:
-    mpl_minor_version = int(mpl.__version__.split('.')[1])
-except:
-    pass
 
 # on OS X / PyQt5 one needs to
 #   export DYLD_FRAMEWORK_PATH=~/Qt5.5.0/5.5/clang_64/lib/
@@ -129,26 +115,17 @@ import matplotlib.patheffects as PathEffects
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
 
-try:
-    import matplotlib.backends.qt_editor.figureoptions as figureoptions # for matplotlib >= v1.4
-except ImportError:
-    import matplotlib.backends.qt4_editor.figureoptions as figureoptions # for matplotlib <v1.4
+import matplotlib.backends.qt_editor.figureoptions as figureoptions
 
-from Phidget22.Net import Net as PhidgetNetwork
+
 from Phidget22.DeviceClass import DeviceClass
 from Phidget22.DeviceID import DeviceID
-from Phidget22.ThermocoupleType import ThermocoupleType
-from Phidget22.RTDType import RTDType
-from Phidget22.RTDWireSetup import RTDWireSetup
-from Phidget22.BridgeGain import BridgeGain  # @UnusedImport
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
 from Phidget22.Devices.VoltageRatioInput import *  # @UnusedWildImport
 from Phidget22.Devices.VoltageInput import * # @UnusedWildImport
 from Phidget22.Devices.DigitalInput import * # @UnusedWildImport
 from Phidget22.Devices.DigitalOutput import * # @UnusedWildImport 
 from Phidget22.Devices.VoltageOutput import * # @UnusedWildImport
-
-
 
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
@@ -244,6 +221,7 @@ artisan_slider_style = """
 # 3 => e-type
 # 4 => t-type
 def PHIDGET_THERMOCOUPLE_TYPE(tp):
+    from Phidget22.ThermocoupleType import ThermocoupleType
     if tp == 2:
         return ThermocoupleType.THERMOCOUPLE_TYPE_J
     elif tp == 3:
@@ -258,6 +236,7 @@ def PHIDGET_THERMOCOUPLE_TYPE(tp):
 # 2 => 3-wire
 # 3 => 4-wire
 def PHIDGET_RTD_WIRE(tp):
+    from Phidget22.RTDWireSetup import RTDWireSetup
     if tp == 1:
         return RTDWireSetup.RTD_WIRE_SETUP_3WIRE
     elif tp == 2:
@@ -271,6 +250,7 @@ def PHIDGET_RTD_WIRE(tp):
 # 3 => PT1000 3850
 # 4 => PT1000 3920        
 def PHIDGET_RTD_TYPE(tp):
+    from Phidget22.RTDType import RTDType
     if tp == 1:
         return RTDType.RTD_TYPE_PT100_3920
     elif tp == 2:
@@ -286,6 +266,7 @@ def PHIDGET_RTD_TYPE(tp):
 #   2x Amplification => BRIDGE_GAIN_2
 #   4x Amplification => BRIDGE_GAIN_4
 def PHIDGET_GAIN_VALUE(gv):
+    from Phidget22.BridgeGain import BridgeGain  # @UnusedImport
     if gv == 2:
         return BridgeGain.BRIDGE_GAIN_8 # 8x Amplification
     elif gv == 3:	
@@ -612,10 +593,6 @@ if sys.platform.startswith("darwin"):
     import objc  # @UnusedImport # pyobjc seems not to be needed anylonger
     import Foundation
 #   list_ports module patched for P3k from new pyserial GitHub repository
-    if serial.VERSION.split(".")[0].strip() == "2":
-        from artisanlib.list_ports_osx import comports
-        serial.tools.list_ports.comports = comports
-
 
 # to make py2exe happy with scipy >0.11
 def __dependencies_for_freezing():
@@ -1123,21 +1100,10 @@ class tgraphcanvas(FigureCanvas):
 
         self.fig = Figure(tight_layout={"pad":.2},frameon=True,dpi=dpi) # ,"h_pad":0.0,"w_pad":0.0
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
-        
-#        #figure back color
-#        if platf == 'Darwin':
-#            self.backcolor ="#EEEEEE"
-#        else:
-#            self.backcolor = "white"
-#        self.fig.patch.set_facecolor(self.backcolor)
-#        self.fig.patch.set_edgecolor(self.backcolor)
 
         self.fig.patch.set_facecolor(str(self.palette["canvas"]))
 
-        if mpl_major_version >= 2:
-            self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
-        else:
-            self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
+        self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
         self.delta_ax = self.ax.twinx()
 
         #legend location
@@ -2569,12 +2535,7 @@ class tgraphcanvas(FigureCanvas):
                                     if aw.qmc.AUCguideFlag and aw.qmc.AUCguideTime and aw.qmc.AUCguideTime > 0:
                                         aw.qmc.ax.draw_artist(self.l_AUCguide)
                                         
-                                    
-                                    if False: #aw.qmc.ax.clipbox:
-                                        self.fig.canvas.blit(aw.qmc.ax.clipbox) # .clipbox is None in matplotlib <1.5
-                                    else:
-                                        self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
-                                        
+                                    self.fig.canvas.blit(aw.qmc.ax.get_figure().bbox)
                                         
                                 else:
                                     # we do not have a background to bitblit, so do a full redraw
@@ -4495,11 +4456,7 @@ class tgraphcanvas(FigureCanvas):
     
                 self.fig.clf()   #wipe out figure. keep_observers=False
     
-                if mpl_major_version >= 2:
-                    self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
-                else:
-                    self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
-    
+                self.ax = self.fig.add_subplot(111,facecolor=self.palette["background"])
 
                 self.ax.set_ylim(self.ylimit_min, self.ylimit)
                 self.ax.set_autoscale_on(False)
@@ -4879,10 +4836,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
                                     E4b_last = i
-                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
-                                every = None
-                            else:
-                                every = 2                            
+                            every = 2                            
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if cool exists and last event was earlier
                                     self.E1backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -5084,10 +5038,7 @@ class tgraphcanvas(FigureCanvas):
                                 E4_nonempty = True
                                 E4_last = i
                                 
-                        if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
-                            every = None
-                        else:
-                            every = 2
+                        every = 2
     
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
@@ -5100,12 +5051,8 @@ class tgraphcanvas(FigureCanvas):
                             E1y = self.E1values
                             ds = "steps-post"
                         else:
-                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
-                                E1x = []
-                                E1y = []
-                            else:
-                                E1x = [None]
-                                E1y = [None]
+                            E1x = [None]
+                            E1y = [None]
                             ds = "steps-post"
                         self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                               picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
@@ -5120,12 +5067,8 @@ class tgraphcanvas(FigureCanvas):
                             E2y = self.E2values
                             ds = "steps-post"
                         else:
-                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
-                                E2x = []
-                                E2y = []
-                            else:
-                                E2x = [None]
-                                E2y = [None]
+                            E2x = [None]
+                            E2y = [None]
                             ds = "steps-post"
                         self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                               picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
@@ -5140,12 +5083,8 @@ class tgraphcanvas(FigureCanvas):
                             E3y = self.E3values
                             ds = "steps-post"
                         else:
-                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
-                                E3x = []
-                                E3y = []
-                            else:
-                                E3x = [None]
-                                E3y = [None]
+                            E3x = [None]
+                            E3y = [None]
                             ds = "steps-post"
                         self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                               picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
@@ -5160,13 +5099,9 @@ class tgraphcanvas(FigureCanvas):
                             E4y = self.E4values
                             ds = "steps-post"
                         else:
-                            if mpl_major_version < 2 or (mpl_major_version == 2 and mpl_minor_version == 0):
-                                E4x = []
-                                E4y = []
-                            else:
-                                E4x = [None]
-                                E4y = [None]
-                                every = 2
+                            E4x = [None]
+                            E4y = [None]
+                            every = 2
                             ds = "steps-post"
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                               picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
@@ -5450,11 +5385,7 @@ class tgraphcanvas(FigureCanvas):
                         rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette["background"])]                    
     
                 # we create here the project line plots to have the accurate time axis after CHARGE               
-                if mpl_major_version >= 2:
-                    dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0
-                else:
-                    dashes_setup = [3,4,1,4] # matplot 1.5 default
-                    #dashes_setup = [0.5,1,0.1,1] # very fine
+                dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0
                     
                 ############  ready to plot ############
                 #self.fig.canvas.draw() # done by updateBackground()
@@ -6060,12 +5991,7 @@ class tgraphcanvas(FigureCanvas):
             self.fig.clf()
             #create a new name ax1 instead of ax (ax is used when plotting profiles)
             
-            if mpl_major_version >= 2:
-    #            self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor=self.backcolor) #) radar green facecolor='#d5de9c'
-                self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor='None') #) radar green facecolor='#d5de9c'
-            else:
-    #            self.ax1 = self.fig.add_subplot(111,projection='polar',axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
-                self.ax1 = self.fig.add_subplot(111,projection='polar',axisbg='None') #) radar green axisbg='#d5de9c'
+            self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor='None') #) radar green facecolor='#d5de9c'
             self.ax1.set_aspect(self.flavoraspect)
             
             aw.setFonts(redraw=False)
@@ -9368,10 +9294,7 @@ class tgraphcanvas(FigureCanvas):
             # same as redraw but using different axes
             self.fig.clf()
             #create a new name ax1 instead of ax
-            if mpl_major_version >= 2:
-                self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor='None')
-            else:
-                self.ax2 = self.fig.add_subplot(111, projection='polar',axisbg='None')
+            self.ax2 = self.fig.add_subplot(111, projection='polar',facecolor='None')
             self.ax2.set_rmax(1.)
             self.ax2.set_aspect(self.wheelaspect)
             self.ax2.grid(False)
@@ -9660,16 +9583,15 @@ class VMToolbar(NavigationToolbar):
         
 
 # add green flag menu on matplotlib v2.0 and later
-        if mpl_major_version >= 2:
-            if len(self.actions()) > 0:
-                # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
-                if svgsupport:
-                    a = QAction(self._icon("qt4_editor_options.svg"),'Customize',self)
-                else:
-                    a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
-                a.triggered.connect(self.edit_parameters)     
-                a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
-                self.insertAction(self.actions()[-1],a)        
+        if len(self.actions()) > 0:
+            # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
+            if svgsupport:
+                a = QAction(self._icon("qt4_editor_options.svg"),'Customize',self)
+            else:
+                a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
+            a.triggered.connect(self.edit_parameters)     
+            a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
+            self.insertAction(self.actions()[-1],a)        
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
@@ -12535,6 +12457,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
                 elif aw.qmc.device == 0  or aw.qmc.device == 53 or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Hottop or MODBUS serial
+                    import serial.tools.list_ports
                     comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                     if platf == 'Darwin':
                         ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
@@ -14016,11 +13939,8 @@ class ApplicationWindow(QMainWindow):
     def setdpi(self,dpi,moveWindow=True):
         if aw:
             aw.dpi = dpi
-            if mpl_major_version >= 2:
-                # on mpl >= v2 we assume hidpi support and consider the pixel ratio
-                self.qmc.fig.set_dpi(dpi*aw.devicePixelRatio())
-            else:
-                self.qmc.fig.set_dpi(dpi)
+            # on mpl >= v2 we assume hidpi support and consider the pixel ratio
+            self.qmc.fig.set_dpi(dpi*aw.devicePixelRatio())
             #move widget to update display
             if moveWindow: 
                 aw.qmc.fig.canvas.draw()
@@ -33539,20 +33459,12 @@ class extraserialport(object):
         self.SP = None
 
     def confport(self):
-        if serial.VERSION.split(".")[0].strip() == "2":
-            self.SP.setPort(self.comport)
-            self.SP.setBaudrate(self.baudrate)
-            self.SP.setByteSize(self.bytesize)
-            self.SP.setParity(self.parity)
-            self.SP.setStopbits(self.stopbits)
-            self.SP.setTimeout(self.timeout)
-        else:
-            self.SP.port = self.comport
-            self.SP.baudrate = self.baudrate
-            self.SP.bytesize = self.bytesize
-            self.SP.parity = self.parity
-            self.SP.stopbits = self.stopbits
-            self.SP.timeout = self.timeout
+        self.SP.port = self.comport
+        self.SP.baudrate = self.baudrate
+        self.SP.bytesize = self.bytesize
+        self.SP.parity = self.parity
+        self.SP.stopbits = self.stopbits
+        self.SP.timeout = self.timeout
 
     def openport(self):
         try:
@@ -33560,11 +33472,10 @@ class extraserialport(object):
             #open port
             if not self.SP.isOpen():
                 self.SP.open()
-        except Exception: #serial.SerialException:
+        except Exception:
             self.SP.close()            
             libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
             error = QApplication.translate("Error Message","Serial Exception:",None)
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error + " Unable to open serial port",exc_tb.tb_lineno)
 
@@ -33576,6 +33487,7 @@ class extraserialport(object):
     def connect(self):
         if self.SP is None:
             try:
+                import serial  # @UnusedImport
                 self.SP = serial.Serial()
                 self.openport()
             except Exception as e:
@@ -33752,6 +33664,7 @@ class serialport(object):
         self.stopbits = 1
         self.timeout=1.0
         #serial port for ET/BT
+        import serial  # @UnusedImport
         self.SP = serial.Serial()
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1) 
@@ -33963,7 +33876,7 @@ class serialport(object):
                     return "0"
             else:
                 return "0"
-        except serial.SerialException:
+        except Exception:
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendFUJIcommand()"
             _, _, exc_tb = sys.exc_info()
@@ -34113,7 +34026,7 @@ class serialport(object):
                         return aw.qmc.temp1[-1]
                     else:
                         return -1.
-        except serial.SerialException:
+        except Exception:
             error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendDTAcommand()"
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds            
             _, _, exc_tb = sys.exc_info()
@@ -34654,12 +34567,6 @@ class serialport(object):
                             return -1,-1
             else:
                 return -1, -1
-        except serial.SerialException:
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))  # zzz = miliseconds
-            error = QApplication.translate("Error Message", "Serial Exception:", None) + " ser.EXTECH755pressure()"
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error, exc_tb.tb_lineno)
-            return -1, -1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",
@@ -34709,7 +34616,7 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.SP.open()
                 libtime.sleep(.2) # avoid possible hickups on startup
-        except Exception: #serial.SerialException:
+        except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             self.SP.close()
@@ -34719,20 +34626,12 @@ class serialport(object):
 
     #loads configuration to ports
     def confport(self):
-        if serial.VERSION.split(".")[0].strip() == "2":
-            self.SP.setPort(self.comport)
-            self.SP.setBaudrate(self.baudrate)
-            self.SP.setByteSize(self.bytesize)
-            self.SP.setParity(self.parity)
-            self.SP.setStopbits(self.stopbits)
-            self.SP.setTimeout(self.timeout)
-        else:
-            self.SP.port = self.comport
-            self.SP.baudrate = self.baudrate
-            self.SP.bytesize = self.bytesize
-            self.SP.parity = self.parity
-            self.SP.stopbits = self.stopbits
-            self.SP.timeout = self.timeout
+        self.SP.port = self.comport
+        self.SP.baudrate = self.baudrate
+        self.SP.bytesize = self.bytesize
+        self.SP.parity = self.parity
+        self.SP.stopbits = self.stopbits
+        self.SP.timeout = self.timeout
 
     def closeport(self):
         try:
@@ -34745,7 +34644,7 @@ class serialport(object):
     def closeEvent(self,_):
         try:
             self.closeport() 
-        except serial.SerialException:
+        except Exception:
             pass
 
     def binary(self, n, digits=8):
@@ -34852,12 +34751,6 @@ class serialport(object):
                     return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
-        except serial.SerialException:
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.MS6514temperature()"
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.MS6514temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -34906,12 +34799,6 @@ class serialport(object):
                     return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
-        except serial.SerialException:
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.DT301temperature()"
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.DT301temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -34982,12 +34869,6 @@ class serialport(object):
                         return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
-        except serial.SerialException:
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH806AUtemperature()"
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806AUtemperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -35013,11 +34894,6 @@ class serialport(object):
                 self.SP.write(str2cmd("\x21\x05\x00\x58\x7E"))
                 libtime.sleep(2.)
                 self.HH806Winitflag = 1
-        except serial.SerialException:
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH806Winit()"
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806Winit() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -35054,12 +34930,6 @@ class serialport(object):
                             return r1,r2
                 #BAD
                 return -1.,-1.
-        except serial.SerialException:
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH806Wtemperature()"
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH806Wtemperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -35238,12 +35108,6 @@ class serialport(object):
                 else:
                     nbytes = len(ID)
                     aw.qmc.adderror(QApplication.translate("Error Message","HH506RAGetID: {0} bytes received but 5 needed",None).format(nbytes))
-        except serial.SerialException:
-            self.closeport()
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH506RAGetID()"
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
@@ -35288,12 +35152,6 @@ class serialport(object):
                         return -1,-1
             else:
                 return -1,-1
-        except serial.SerialException:
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HH506RAtemperature()"
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " ser.HH506RAtemperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -35346,12 +35204,6 @@ class serialport(object):
                         return -1,-1 
             else:
                 return -1,-1 
-        except serial.SerialException:
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER302temperature()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER302temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -35415,13 +35267,6 @@ class serialport(object):
                         return -1,-1
             else:
                 return -1,-1 
-        except serial.SerialException:
-            _, _, exc_tb = sys.exc_info()
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER303temperature()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER303temperature() {0}").format(str(ex)),exc_tb.tb_lineno)            
@@ -35466,12 +35311,6 @@ class serialport(object):
                         return -1,-1
             else:
                 return -1,-1
-        except serial.SerialException:
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " VOLTCRAFTPL125T2temperature()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " VOLTCRAFTPL125T2temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -35517,12 +35356,6 @@ class serialport(object):
                         return -1,-1
             else:
                 return -1,-1
-        except serial.SerialException:
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " VOLTCRAFTPL125T4temperature()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " VOLTCRAFTPL125T4temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -35587,12 +35420,6 @@ class serialport(object):
                         return -1,-1
             else:
                 return -1,-1
-        except serial.SerialException:
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER306temperature()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER306temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -35671,12 +35498,6 @@ class serialport(object):
                         return -1,-1 
             else:
                 return -1,-1
-        except serial.SerialException:
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " CENTER309temperature()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " CENTER309temperature() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -35690,11 +35511,13 @@ class serialport(object):
 
     def addPhidgetServer(self):
         if not aw.qmc.phidgetServerAdded:
+            from Phidget22.Net import Net as PhidgetNetwork
             PhidgetNetwork.addServer("PhidgetServer",aw.qmc.phidgetServerID,aw.qmc.phidgetPort,aw.qmc.phidgetPassword,0)
             aw.qmc.phidgetServerAdded = True
 
     def removePhidgetServer(self):
         if aw.qmc.phidgetServerAdded:
+            from Phidget22.Net import Net as PhidgetNetwork
             PhidgetNetwork.removeServer("PhidgetServer")
             aw.qmc.phidgetServerAdded = False
             
@@ -37140,13 +36963,6 @@ class serialport(object):
                     elif (28 in aw.qmc.extradevices and 32 in aw.qmc.extradevices) and aw.ser.arduinoATChannel == "T6":
                         aw.qmc.extraArduinoT4 = float(res[0])
                 return t1, t2
-        except serial.SerialException as e:
-            #self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.ARDUINOTC4temperature()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error + " " + str(e),exc_tb.tb_lineno)
-            return -1.,-1.
         except Exception as e:
             # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
             _, _, exc_tb = sys.exc_info()
@@ -37326,13 +37142,6 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1 
-        except serial.SerialException:
-            #self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception:",None) + " ser.TEVA18Btemperature()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1 
         except Exception as ex:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
@@ -37445,13 +37254,6 @@ class serialport(object):
                     return str(aw.qmc.extratemp1[index][-1]),str(aw.qmc.temp2[index][-1])
                 else:
                     return "0","0"
-        except serial.SerialException:
-            #self.closeport()
-            error  = QApplication.translate("Error Message","Serial Exception:",None) + " ser.HHM28multimeter()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return "0",""
         except Exception as ex:
             #self.closeport()
             _, _, exc_tb = sys.exc_info()
@@ -37481,12 +37283,6 @@ class serialport(object):
                     command += "\n"
                 self.SP.write(str2cmd(command))
                 #self.SP.flush()
-        except serial.SerialException as e:
-            #self.closeport() # do not close the serial port as reopening might take too long
-            error  = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendTXcommand()"
-            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error + " " + str(e),exc_tb.tb_lineno)
         except Exception as ex:
             #self.closeport() # do not close the serial port as reopening might take too long
             _, _, exc_tb = sys.exc_info()
@@ -37510,12 +37306,6 @@ class serialport(object):
 #                return r
 #            else:
 #                return "ERR"
-#        except serial.SerialException:
-#            self.closeport()
-#            error  = QApplication.translate("Error Message","Serial Exception:",None) + " ser.sendTXRXcommand()"
-#            timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
 #        except Exception as ex:
 #            self.closeport()
 #            _, _, exc_tb = sys.exc_info()
@@ -38210,6 +38000,7 @@ class PortComboBox(QComboBox):
     def updateMenu(self):
         self.blockSignals(True)
         try:
+            import serial.tools.list_ports
             comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
             if platf == 'Darwin':
                 self.ports = list([p for p in comports if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync',
