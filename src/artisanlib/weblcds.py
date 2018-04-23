@@ -101,6 +101,7 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         return False
     
 def stopWeb():
+    print("stopWeb")
     global wsocks, process
     for ws in wsocks:
         ws.close()

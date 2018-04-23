@@ -47,7 +47,6 @@ import string as libstring
 import cgi
 import codecs
 import numpy
-import requests
 import subprocess
 import shlex
 
@@ -57,7 +56,6 @@ else:
     import urllib.parse as urlparse  # @Reimport
     import urllib.request as urllib  # @Reimport
 
-import artisanlib.arabic_reshaper
 
 try: # activate support for hiDPI screens on Windows
     if str(platform.system()).startswith("Windows"):
@@ -128,8 +126,6 @@ import matplotlib.transforms as transforms
 import matplotlib.ticker as ticker
 import matplotlib.patheffects as PathEffects
 
-import qrcode
-
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
 
@@ -153,9 +149,7 @@ from Phidget22.Devices.DigitalOutput import * # @UnusedWildImport
 from Phidget22.Devices.VoltageOutput import * # @UnusedWildImport
 
 
-# import Yoctopuce Python library (installed form PyPI)
-from yoctopuce.yocto_api import YAPI, YRefParam
-from yoctopuce.yocto_temperature import YTemperature
+
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
@@ -164,76 +158,32 @@ try:
 except:
     pass
 
-#from snap7.util import set_real, get_real, set_int, get_int
-
-from pymodbus.client.sync import ModbusSerialClient, ModbusUdpClient, ModbusTcpClient
-from pymodbus.constants import Endian
-from pymodbus.payload import BinaryPayloadDecoder, BinaryPayloadBuilder
-from pymodbus.pdu import ExceptionResponse
-from pymodbus.exceptions import ModbusException
-import pymodbus.version as pymodbus_version
-
-import socket
-
-if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 and pymodbus_version.version.minor > 3):
-    # pymodbus v1.4 and newer
-    def getBinaryPayloadBuilder(byteorderLittle=True,wordorderLittle=False):
-        if byteorderLittle: 
-            byteorder = Endian.Little
-        else:
-            byteorder = Endian.Big
-        if wordorderLittle:
-            wordorder = Endian.Little
-        else:
-            wordorder = Endian.Big
-        return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
-    def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorderLittle=False):
-        if byteorderLittle:
-            byteorder = Endian.Little
-        else:
-            byteorder = Endian.Big
-        if wordorderLittle:
-            wordorder = Endian.Little
-        else:
-            wordorder = Endian.Big
-        return BinaryPayloadDecoder.fromRegisters(registers, byteorder=byteorder, wordorder=wordorder)
-else:
-    # pymodbus v1.3 and older
-    def getBinaryPayloadBuilder(byteorderLittle=True,_=False):
-#        if not byteorderLittle: # NOTE: v1.3 and older had the semantic of the byteorder interpreted inversely
-            # see https://github.com/riptideio/pymodbus/issues/255
-        if byteorderLittle: # REVERTED TO 1:1 byteorder
-            return BinaryPayloadBuilder(endian=Endian.Little)
-        else:
-            return BinaryPayloadBuilder(endian=Endian.Big)
-    def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,_=False):
-#        if not byteorderLittle: # NOTE: v1.3 and older had the semantic of the byteorder interpreted inversely
-            # see https://github.com/riptideio/pymodbus/issues/255
-        if byteorderLittle: # REVERTED TO 1:1 byteorder
-            return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Little)
-        else:
-            return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Big)
-
 
 #---------------------------------------------------------------------------# 
-# configure the service logging
+# configure the service logging and use _logger.debug("..") statements
 #---------------------------------------------------------------------------# 
 #import logging
+#import logging.handlers as Handlers
 #logging.basicConfig()
+#myFormatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 #log = logging.getLogger()
 #log.setLevel(logging.DEBUG)
+#filehandler = Handlers.RotatingFileHandler(os.getenv("HOME") + "/Desktop/artisan-logfile", maxBytes=1024*1024)
+#filehandler.setFormatter(myFormatter)
+#log.addHandler(filehandler)
+#_logger = logging.getLogger(__name__)
 #---------------------------------------------------------------------------# 
 
 
-import json
+
 import unicodedata # @UnresolvedImport
 from unidecode import unidecode
 
-from artisanlib.weblcds import startWeb, stopWeb
-from artisanlib.hottop import startHottop, stopHottop, getHottop, takeHottopControl, releaseHottopControl, setHottop
-from artisanlib.aillio import AillioR1
+import artisanlib.arabic_reshaper
 from artisanlib.util import appFrozen
 from artisanlib.suppress_errors import suppress_stdout_stderr
+from artisanlib.s7port import s7port
+from artisanlib.modbusport import modbusport
 
 
 artisan_slider_style = """
@@ -689,6 +639,7 @@ def __dependencies_for_freezing():
     import PyQt5.QtXml  # @UnusedImport
     import PyQt5.QtDBus # needed for QT5 builds  # @UnusedImport
     import PyQt5.QtPrintSupport # needed for by platform plugin libqcocoa  # @UnusedImport
+    
     # for gevent bundling
     from gevent import core, resolver_thread, resolver_ares, socket, threadpool, thread, threading, select, subprocess, pywsgi, server, hub # @UnusedImport @Reimport 
 
@@ -2373,7 +2324,9 @@ class tgraphcanvas(FigureCanvas):
                     payload['alert']['title'] = alertTitle
                 if alertTimeout:
                     payload['alert']['timeout'] = alertTimeout
-            requests.post(url, data=json.dumps(payload),headers=headers,timeout=0.3)
+            from requests import post as request_post
+            from json import dumps as json_dumps
+            request_post(url, data=json_dumps(payload),headers=headers,timeout=0.3)
         except Exception:
             pass
             
@@ -6270,6 +6223,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.reset(True,False,sampling=True,keepProperties=True)                     
 
             if aw.qmc.device == 53:
+                from artisanlib.hottop import startHottop
                 startHottop(0.6,aw.ser.comport,aw.ser.baudrate,aw.ser.bytesize,aw.ser.parity,aw.ser.stopbits,aw.ser.timeout)
             try:
                 aw.eventactionx(aw.qmc.extrabuttonactions[0],aw.qmc.extrabuttonactionstrings[0])
@@ -6420,6 +6374,7 @@ class tgraphcanvas(FigureCanvas):
         ser.removePhidgetServer()
         if ser.YOCTOsensor:
             try:
+                from yoctopuce.yocto_api import YAPI
                 YAPI.FreeAPI()
                 ser.YOCTOsensor = None
                 ser.YOCTOchan1 = None
@@ -10715,10 +10670,8 @@ class ApplicationWindow(QMainWindow):
         #create a serial port object (main ET BT device)
         self.ser = serialport()
         #create a modbus port object (main modbus device)
-        self.modbus = modbusport()
-        #create an s7 port object (main s7 device)
-        
-        from artisanlib.s7port import s7port
+        self.modbus = modbusport(self.sendmessage,self.qmc.adderror,self.addserial)
+        #create an s7 port object (main s7 device)        
         self.s7 = s7port(self.sendmessage,self.qmc.adderror,self.addserial)
         #create scale port object
         self.scale = scaleport()
@@ -14302,11 +14255,14 @@ class ApplicationWindow(QMainWindow):
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " callProgram(): {0}").format(str(e)),exc_tb.tb_lineno)
                 elif action == 8: # HOTTOP Heater
+                    from artisanlib.hottop import setHottop
                     setHottop(heater=int(cmd))
                 elif action == 9: # HOTTOP Main Fan
+                    from artisanlib.hottop import setHottop
                     setHottop(main_fan=int(cmd))
                 elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer")
                     if cmd_str:
+                        from artisanlib.hottop import setHottop
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
@@ -16159,7 +16115,8 @@ class ApplicationWindow(QMainWindow):
     def exportJSON(self,filename):
         try:
             outfile = open(filename, 'w')
-            json.dump(self.getProfile(), outfile, ensure_ascii=True)
+            from json import dump as json_dump
+            json_dump(self.getProfile(), outfile, ensure_ascii=True)
             outfile.write('\n')
             outfile.close()
             return True
@@ -16377,7 +16334,8 @@ class ApplicationWindow(QMainWindow):
         try:
             import io
             infile = io.open(filename, 'r', encoding='utf-8')
-            obj = json.load(infile)
+            from json import load as json_load
+            obj = json_load(infile)
             res = self.setProfile(filename,obj)
             infile.close()
             if res:
@@ -19120,6 +19078,7 @@ class ApplicationWindow(QMainWindow):
     def startWebLCDs(self,force=False):
         try:
             if not self.WebLCDs or force:
+                from artisanlib.weblcds import startWeb
                 res = startWeb(
                     self.WebLCDsPort,
                     u(self.getResourcePath()),
@@ -19152,9 +19111,10 @@ class ApplicationWindow(QMainWindow):
             
     def stopWebLCDs(self):
         try:
+            from artisanlib.weblcds import stopWeb
             stopWeb()
             self.WebLCDs = False
-        except Exception:
+        except Exception as ex:
             pass
 
     def applyStandardButtonVisibility(self):
@@ -20237,7 +20197,9 @@ class ApplicationWindow(QMainWindow):
         if self.full_screen_mode_active:
             aw.fullscreenAction.setChecked(False)
             self.showNormal()
-        stopHottop()
+        if aw.qmc.device == 53:
+            from artisanlib.hottop import stopHottop
+            stopHottop()
         if aw.qmc.flagon:
             aw.qmc.ToggleMonitor()
         if aw.WebLCDs:
@@ -22716,6 +22678,7 @@ class ApplicationWindow(QMainWindow):
             self.HottopControlOn()
             
     def HottopControlOff(self):
+        from artisanlib.hottop import releaseHottopControl
         res = releaseHottopControl()
         if res:
             if self.HottopControlActive:
@@ -22725,6 +22688,7 @@ class ApplicationWindow(QMainWindow):
     
     def HottopControlOn(self):
         if aw.superusermode: # Hottop control mode can for now activated only in super user mode
+            from artisanlib.hottop import takeHottopControl, setHottop
             res = takeHottopControl()
             if res:
                 setHottop(drum_motor=True)
@@ -23593,7 +23557,8 @@ class ApplicationWindow(QMainWindow):
                 return
             import io
             infile = io.open(filename, 'r', encoding='utf-8')
-            obj = json.load(infile)
+            from json import load as json_load
+            obj = json_load(infile)
             infile.close()
             if not self.qmc.reset():
                 return
@@ -24405,7 +24370,8 @@ class ApplicationWindow(QMainWindow):
         try:
             import io
             infile = io.open(filename, 'r', encoding='utf-8')
-            alarms = json.load(infile)
+            from json import load as json_load
+            alarms = json_load(infile)
             infile.close()
             aw.qmc.alarmflag = alarms["alarmflags"]
             aw.qmc.alarmguard = alarms["alarmguards"]
@@ -24479,33 +24445,6 @@ class ArtisanMessageBox(QMessageBox):
         if (self.currentTime >= self.timeout):
             self.done(0)
 
-##########################################################################
-#####################     QR Image   #####################################
-##########################################################################
-
-class QRImage(qrcode.image.base.BaseImage):
-    def __init__(self, border, width, box_size):
-        self.border = border
-        self.width = width
-        self.box_size = box_size
-        size = (width + border * 2) * box_size
-        self._image = QImage(
-            size, size, QImage.Format_RGB16)
-        self._image.fill(Qt.white)
-
-    def pixmap(self):
-        return QPixmap.fromImage(self._image)
-
-    def drawrect(self, row, col):
-        painter = QPainter(self._image)
-        painter.fillRect(
-            (col + self.border) * self.box_size,
-            (row + self.border) * self.box_size,
-            self.box_size, self.box_size,
-            Qt.black)
-
-    def save(self, stream, kind=None):
-        pass
         
 ##########################################################################
 #####################     EXTRAS/HUD  EDIT DLG     #######################
@@ -25319,19 +25258,13 @@ class HUDDlg(ArtisanDialog):
         url_str = self.getWebLCDsURL()
         # set URL label
         self.WebLCDsURL.setText('<a href="' + url_str + '">' + url_str + '</a>')
-        # set QR label  
-        qr = qrcode.QRCode(
-            version=None, # 1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=4,
-            border=1,
-            image_factory=QRImage)
-        qr.add_data(url_str)
-        qr.make(fit=True)
-        self.QRpic.setPixmap(qr.make_image().pixmap())
-        
+        # set QR label 
+        from artisanlib.qrcode import QRlabel
+        qr = QRlabel(url_str)
+        self.QRpic.setPixmap(qr.make_image().pixmap())        
         
     def getWebLCDsURL(self):
+        import socket
         localIP = [(s.connect(('8.8.8.8', 80)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
         return 'http://' + str(localIP) + ':' + str(aw.WebLCDsPort) + '/artisan'
         
@@ -33592,522 +33525,6 @@ class StatisticsDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
             self.close()
 
-
-###########################################################################################
-##################### MODBUS PORT #########################################################
-###########################################################################################
-
-
-# pymodbus version
-class modbusport(object):
-    """ this class handles the communications with all the modbus devices"""
-    def __init__(self):
-        # retries
-        self.readRetries = 1
-        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
-        self.comport = "COM5"      #NOTE: this string should not be translated.
-        self.baudrate = 115200
-        self.bytesize = 8
-        self.parity= 'N'
-        self.stopbits = 1
-        self.timeout = 1.0
-        self.PID_slave_ID = 0
-        self.PID_SV_register = 0
-        self.PID_p_register = 0
-        self.PID_i_register = 0
-        self.PID_d_register = 0
-        self.PID_ON_action = ""
-        self.PID_OFF_action = ""
-        self.input1slave = 0
-        self.input1register = 0
-        self.input1float = False
-        self.input1bcd = False
-        self.input1code = 3
-        self.input1div = 0 # 0: none, 1: 1/10, 2:1/100
-        self.input1mode = "C"
-        self.input2slave = 0
-        self.input2register = 0
-        self.input2float = False
-        self.input2bcd = False
-        self.input2code = 3
-        self.input2div = 0
-        self.input2mode = "C"
-        self.input3slave = 0
-        self.input3register = 0
-        self.input3float = False
-        self.input3bcd = False
-        self.input3code = 3
-        self.input3div = 0
-        self.input3mode = "C"
-        self.input4slave = 0
-        self.input4register = 0
-        self.input4float = False
-        self.input4bcd = False
-        self.input4code = 3
-        self.input4div = 0
-        self.input4mode = "C"
-        self.input5slave = 0
-        self.input5register = 0
-        self.input5float = False
-        self.input5bcd = False
-        self.input5code = 3
-        self.input5div = 0
-        self.input5mode = "C"
-        self.input6slave = 0
-        self.input6register = 0
-        self.input6float = False
-        self.input6bcd = False
-        self.input6code = 3
-        self.input6div = 0
-        self.input6mode = "C"
-        self.SVmultiplier = 0
-        self.PIDmultiplier = 0
-        self.byteorderLittle = False
-        self.wordorderLittle = True
-        self.master = None
-        self.COMsemaphore = QSemaphore(1)
-        self.host = '127.0.0.1' # the TCP/UDP host
-        self.port = 502 # the TCP/UDP port
-        self.type = 0
-        # type =
-        #    0: Serial RTU
-        #    1: Serial ASCII
-        #    2: Serial Binary
-        #    3: TCP
-        #    4: UDP
-        self.lastReadResult = 0 # this is set by eventaction following some custom button/slider Modbus actions with "read" command
-        
-        self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
-        
-    # this garantees a minimum of 30 miliseconds between readings and 80ms between writes (according to the Modbus spec) on serial connections
-    # this sleep delays between requests seems to be beneficial on slow RTU serial connections like those of the FZ-94
-    def sleepBetween(self,write=False):
-        if write:
-#            if self.type in [3,4]: # TCP or UDP
-#                libtime.sleep(0.040)
-                pass # handled in MODBUS lib
-#            else:
-                libtime.sleep(0.035)
-        else:
-            if self.type in [3,4]: # delay between writes only on serial connections
-                pass
-            else:
-                libtime.sleep(0.035)
-
-    def address2register(self,addr,code=3):
-        if code == 3 or code == 6:
-            return addr - 40001
-        else:
-            return addr - 30001      
-
-    def isConnected(self):
-        return not (self.master is None) and self.master.socket
-        
-    def disconnect(self):
-        try:
-            self.master.close()
-        except Exception:
-            pass
-        self.master = None
-
-    def connect(self):
-#        if self.master and not self.master.socket:
-#            self.master = None
-        if self.master is None:
-            self.commError = False
-            try:
-                # as in the following the port is None, no port is opened on creation of the (py)serial object
-                if self.type == 1: # Serial ASCII
-                    self.master = ModbusSerialClient(
-                        method='ascii',
-                        port=self.comport,
-                        baudrate=self.baudrate,
-                        bytesize=self.bytesize,
-                        parity=self.parity,
-                        stopbits=self.stopbits,
-                        retry_on_empty=True,
-                        timeout=self.timeout)
-                elif self.type == 2: # Serial Binary
-                    self.master = ModbusSerialClient(
-                        method='binary',
-                        port=self.comport,
-                        baudrate=self.baudrate,
-                        bytesize=self.bytesize,
-                        parity=self.parity,
-                        stopbits=self.stopbits,
-                        retry_on_empty=True,
-                        timeout=self.timeout)  
-                elif self.type == 3: # TCP
-                    try:
-                        self.master = ModbusTcpClient(
-                                host=self.host, 
-                                port=self.port,
-                                retry_on_empty=True,
-                                retries=1,
-                                timeout=0.9, #self.timeout
-                                )
-                        self.readRetries = 0
-                    except:
-                        self.master = ModbusTcpClient(
-                                host=self.host, 
-                                port=self.port,
-                                )
-                elif self.type == 4: # UDP
-                    try:
-                        self.master = ModbusUdpClient(
-                            host=self.host, 
-                            port=self.port,
-                            retry_on_empty=True,
-                            retries=3,
-                            timeout=0.7, #self.timeout
-                            )
-                    except: # older versions of pymodbus don't support the retries, timeout nor the retry_on_empty arguments
-                        self.master = ModbusUdpClient(
-                            host=self.host, 
-                            port=self.port,
-                            )
-                else: # Serial RTU
-                    if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 and pymodbus_version.version.minor > 3):
-                        # pymodbus v1.4 or newer
-                        self.master = ModbusSerialClient(
-                            method='rtu',
-                            port=self.comport,
-                            baudrate=self.baudrate,
-                            bytesize=self.bytesize,
-                            parity=self.parity,
-                            stopbits=self.stopbits,
-                            retry_on_empty=True, # with retry_on_empty=True and the old pymodbus v1.3 the FZ-94 generates more errors
-#                            retries=0, # option not available on old pymodbus versions (before v1.4); retries=0 seems to fail for SF machines
-                            timeout=self.timeout)  
-                    else: # pymodbus v1.3 or older
-                        self.master = ModbusSerialClient(
-                            method='rtu',
-                            port=self.comport,
-                            baudrate=self.baudrate,
-                            bytesize=self.bytesize,
-                            parity=self.parity,
-                            stopbits=self.stopbits,
-                            retry_on_empty=False, # with retry_on_empty=True and the old pymodbus v1.3 the FZ-94 generates more errors
-                            timeout=self.timeout)  
-                    self.readRetries = 1
-                self.master.connect()
-                aw.qmc.adderror(QApplication.translate("Error Message","Connected via MODBUS",None))
-                libtime.sleep(.5) # avoid possible hickups on startup
-            except Exception as ex:
-                _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " connect() {0}").format(str(ex)),exc_tb.tb_lineno)
-
-    # function 15 (Write Multiple Coils)
-    def writeCoils(self,slave,register,values):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            self.master.write_coils(int(register),list(values),unit=int(slave))
-            libtime.sleep(.3) # avoid possible hickups on startup
-        except Exception as ex:
-#            self.disconnect()
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoils() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)    
-                
-    # function 5 (Write Single Coil)
-    def writeCoil(self,slave,register,value):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            self.master.write_coil(int(register),value,unit=int(slave))
-            libtime.sleep(.3) # avoid possible hickups on startup
-        except Exception as ex:
-#            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeCoil() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-        
-    # write value to register on slave (function 6 for int or function 16 for float)
-    # value can be one of string (containing an int or float), an int or a float
-    def writeRegister(self,slave,register,value):
-        if stringp(value):
-            if "." in value:
-                self.writeWord(slave,register,value)
-            else:
-                self.writeSingleRegister(slave,register,value)
-        elif isinstance(value, int):
-            self.writeSingleRegister(slave,register,value)
-        elif isinstance(value, float):
-            self.writeWord(slave,register,value)
-
-    # function 6 (Write Single Holding Register)
-    def writeSingleRegister(self,slave,register,value):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            self.master.write_register(int(register),int(value),unit=int(slave))
-            libtime.sleep(.03) # avoid possible hickups on startup
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-#            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-
-    # function 22 (Mask Write Register)
-    def maskWriteRegister(self,slave,register,and_mask,or_mask):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            self.master.mask_write_register(int(register),int(and_mask),int(or_mask),unit=int(slave))
-            libtime.sleep(.03)
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-#            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeMask() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-                
-    # function 16 (Write Multiple Holding Registers)
-    # values is a list of integers or one integer
-    def writeRegisters(self,slave,register,values):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            self.master.write_registers(int(register),values,unit=int(slave))
-            libtime.sleep(.03)
-        except Exception as ex:
-#            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeRegisters() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-
-
-    # function 16 (Write Multiple Holding Registers)
-    # value=int or float
-    # writes a single precision 32bit float (2-registers)
-    def writeWord(self,slave,register,value):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
-            builder.add_32bit_float(float(value))
-            payload = builder.build() # .tolist()
-            self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
-            libtime.sleep(.03)
-        except Exception as ex:
-#            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-
-    # translates given int value int a 16bit BCD and writes it into one register
-    def writeBCD(self,slave,register,value):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            builder = getBinaryPayloadBuilder(self.byteorderLittle,self.wordorderLittle)
-            r = convert_to_bcd(int(value))
-            builder.add_16bit_uint(r)
-            payload = builder.build() # .tolist()
-            self.master.write_registers(int(register),payload,unit=int(slave),skip_encode=True)
-            libtime.sleep(.03)
-        except Exception as ex:
-#            self.disconnect()
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " writeWord() {0}").format(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-                
-    # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
-    def readFloat(self,slave,register,code=3):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            retry = self.readRetries                
-            while True:
-                if code==3:
-                    res = self.master.read_holding_registers(int(register),2,unit=int(slave))
-                else:
-                    res = self.master.read_input_registers(int(register),2,unit=int(slave))
-                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
-                    if retry > 0:
-                        retry = retry - 1
-                        #libtime.sleep(0.020)
-                    else:
-                        raise Exception("Exception response")
-                else:
-                    break
-            decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-            r = decoder.decode_32bit_float()
-            if self.commError: # we clear the previous error and send a message
-                self.commError = False
-                aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
-            return r
-        except Exception: # as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-#            self.disconnect()
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readFloat() {0}").format(str(ex)),exc_tb.tb_lineno)
-            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-            #note: logged chars should be unicode not binary
-            if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("MODBUS readFloat :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
-
-    # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
-    def readBCD(self,slave,register,code=3):
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            retry = self.readRetries                
-            while True:
-                if code==3:
-                    res = self.master.read_holding_registers(int(register),1,unit=int(slave))
-                else:
-                    res = self.master.read_input_registers(int(register),1,unit=int(slave))
-                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
-                    if retry > 0:
-                        retry = retry - 1
-                        #libtime.sleep(0.020)
-                    else:
-                        raise Exception("Exception response")
-                else:
-                    break
-            decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)            
-            r = decoder.decode_16bit_uint()
-            if self.commError: # we clear the previous error and send a message
-                self.commError = False
-                aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
-            libtime.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
-            return convert_from_bcd(r)
-        except Exception: # as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-#            self.disconnect()
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readBCD() {0}").format(str(ex)),exc_tb.tb_lineno)
-            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-            #note: logged chars should be unicode not binary
-            if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("MODBUS readBCD :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
-
-
-    # function 1 (Read Coil)
-    # function 2 (Read Discrete Input)
-    # function 3 (Read Multiple Holding Registers) and 
-    # function 4 (Read Input Registers)
-    def readSingleRegister(self,slave,register,code=3):
-#        import logging
-#        logging.basicConfig()
-#        log = logging.getLogger()
-#        log.setLevel(logging.DEBUG)
-        try:
-            #### lock shared resources #####
-            self.COMsemaphore.acquire(1)
-            self.connect()
-            retry = self.readRetries
-            while True:
-                try:
-                    if code==1:
-                        res = self.master.read_coils(int(register),1,unit=int(slave))
-                    elif code==2:
-                        res = self.master.read_discrete_inputs(int(register),1,unit=int(slave))                    
-                    elif code==4:
-                        res = self.master.read_input_registers(int(register),1,unit=int(slave))
-                    else: # code==3
-                        res = self.master.read_holding_registers(int(register),1,unit=int(slave))
-                except Exception:
-                    res = None
-                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,ModbusException):
-                    if retry > 0:
-                        retry = retry - 1
-                        libtime.sleep(0.020)
-                    else:
-                        raise Exception("Exception response")
-                else:
-                    break
-            if code in [1,2]:
-                if res is not None and res.bits[0]:
-                    return 1
-                else:
-                    return 0                
-            else:
-                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                r = decoder.decode_16bit_uint()
-                if self.commError: # we clear the previous error and send a message
-                    self.commError = False
-                    aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Resumed",None))
-                return r
-        except Exception: # as ex:
-#            self.disconnect()
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None) + " readSingleRegister() {0}").format(str(ex)),exc_tb.tb_lineno)
-            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Communication Error",None))
-            self.commError = True
-        finally:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
-            #note: logged chars should be unicode not binary
-            if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
-
-
-    def setTarget(self,sv):
-        if self.PID_slave_ID:
-            multiplier = 1.
-            if aw.modbus.SVmultiplier == 1:
-                multiplier = 10.
-            elif aw.modbus.SVmultiplier == 2:
-                multiplier = 100.
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_SV_register,int(round(sv*multiplier)))
-        
-    def setPID(self,p,i,d):
-        if self.PID_slave_ID and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
-            multiplier = 1.
-            if aw.modbus.PIDmultiplier == 1:
-                multiplier = 10.
-            elif aw.modbus.PIDmultiplier == 2:
-                multiplier = 100.
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_p_register,p*multiplier)
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_i_register,i*multiplier)
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_d_register,d*multiplier)
-        
-
-
 class extraserialport(object):
     def __init__(self):
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
@@ -34975,6 +34392,7 @@ class serialport(object):
 
     def R1_DTBT(self):
         if self.R1 is None:
+            from artisanlib.aillio import AillioR1
             self.R1 = AillioR1()
         tx = aw.qmc.timeclock.elapsed()/1000.
         try:
@@ -35508,6 +34926,7 @@ class serialport(object):
 
     def HOTTOPtemperatures(self):
         try:
+            from artisanlib.hottop import getHottop
             BT, ET, heater, main_fan = getHottop()
             aw.qmc.hottop_HEATER = heater
             aw.qmc.hottop_MAIN_FAN = main_fan
@@ -37399,6 +36818,7 @@ class serialport(object):
     # given the YOCTOsensor, return the first of the given mode (mode=0 => Yocto-Thermocouple; mode=1 => Yocto-Thermocouple)
     # that is not in the list of already connected ones
     def getNextYOCTOsensorOfType(self,mode,connected_yoctos,YOCTOsensor):
+        from yoctopuce.yocto_temperature import YTemperature
         if YOCTOsensor:
             productName = YOCTOsensor.get_module().get_productName()
             if not (YOCTOsensor.get_module().get_serialNumber() in connected_yoctos) and ((mode == 0 and productName == "Yocto-Thermocouple") or (mode == 1 and productName == "Yocto-PT100")):
@@ -37412,7 +36832,9 @@ class serialport(object):
     def YOCTOtemperatures(self,mode=0):
         try: 
             if not self.YOCTOsensor:
-#                aw.sendmessage(str(YAPI._yApiCLibFile))
+                # import Yoctopuce Python library (installed form PyPI)
+                from yoctopuce.yocto_api import YAPI, YRefParam
+                from yoctopuce.yocto_temperature import YTemperature
                 errmsg=YRefParam()
 #                aw.sendmessage(str(errmsg))
                 ## WINDOWS/Linux DLL HACK BEGIN
@@ -43896,7 +43318,8 @@ class AlarmDlg(ArtisanDialog):
         try:
             import io
             infile = io.open(filename, 'r', encoding='utf-8')
-            alarms = json.load(infile)
+            from json import load as json_load
+            alarms = json_load(infile)
             infile.close()
             aw.qmc.alarmsfile = filename            
             self.alarmsfile.setText(aw.qmc.alarmsfile)
@@ -43948,7 +43371,8 @@ class AlarmDlg(ArtisanDialog):
             alarms["alarmbeep"] = aw.qmc.alarmbeep
             alarms["alarmstrings"] = list(map(lambda s:u(s),aw.qmc.alarmstrings))
             outfile = open(filename, 'w')
-            json.dump(alarms, outfile, ensure_ascii=True)
+            from json import dump as json_dump
+            json_dump(alarms, outfile, ensure_ascii=True)
             outfile.write('\n')
             outfile.close()
             return True
@@ -46029,7 +45453,8 @@ class PXG4pidDlgControl(ArtisanDialog):
         try:
             import io
             infile = io.open(filename, 'r', encoding='utf-8')
-            pids = json.load(infile)
+            from json import load as json_load
+            pids = json_load(infile)
             infile.close()
             # load set values
             setvalues = pids["setvalues"]
@@ -46139,7 +45564,8 @@ class PXG4pidDlgControl(ArtisanDialog):
                 segments[soakkey] = aw.qmc.stringfromseconds(aw.fujipid.PXG4[soakkey][0])
             pids["segments"] = segments
             outfile = open(filename, 'w')
-            json.dump(pids, outfile, ensure_ascii=True)
+            from json import dump as json_dump
+            json_dump(pids, outfile, ensure_ascii=True)
             outfile.write('\n')
             outfile.close()
             return True
@@ -47883,7 +47309,6 @@ class FujiPID(object):
                     #record command as an Event 
                     strcommand = "SETSV::" + str("%.1f"%float(value))
                     aw.qmc.DeviceEventRecord(strcommand)
-                #aw.lcd6.display("%.1f"%float(value))
                 self.sv = value
             else:
                 aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setPXGsv()")
@@ -47906,7 +47331,6 @@ class FujiPID(object):
                     #record command as an Event 
                     strcommand = "SETSV::" + str("%.1f"%float(value))
                     aw.qmc.DeviceEventRecord(strcommand)
-                #aw.lcd6.display("%.1f"%float(value))
                 self.sv = value
             else:
                 aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " setPXRsv()")
@@ -48563,7 +47987,8 @@ class PID_DlgControl(ArtisanDialog):
         try:
             import io
             infile = io.open(filename, 'r', encoding='utf-8')
-            rampsoaks = json.load(infile)
+            from json import load as json_load
+            rampsoaks = json_load(infile)
             infile.close()
             aw.pidcontrol.svValues = rampsoaks["svValues"]
             aw.pidcontrol.svRamps = rampsoaks["svRamps"]
@@ -48587,7 +48012,8 @@ class PID_DlgControl(ArtisanDialog):
             rampsoaks["svSoaks"] = aw.pidcontrol.svSoaks
             rampsoaks["mode"] = aw.qmc.mode
             outfile = open(filename, 'w')
-            json.dump(rampsoaks, outfile, ensure_ascii=True)
+            from json import dump as json_dump
+            json_dump(rampsoaks, outfile, ensure_ascii=True)
             outfile.write('\n')
             outfile.close()
             return True
