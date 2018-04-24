@@ -1,7 +1,7 @@
 main:
-  - title: "Suported Machines"
+  - title: "Supported Machines"
     url: /machines/index
-  - title: "Suported Devices"
+  - title: "Supported Devices"
     url: /devices/index
   - title: "About"
     url: /about/
