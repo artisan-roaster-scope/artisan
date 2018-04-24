@@ -12,6 +12,7 @@ import usb.util
 class AillioR1:
     AILLIO_VID = 0x0483
     AILLIO_PID = 0x5741
+    AILLIO_PID_REV3 = 0xa27e
     AILLIO_ENDPOINT_WR = 0x3
     AILLIO_ENDPOINT_RD = 0x81
     AILLIO_INTERFACE = 0x1
@@ -66,6 +67,9 @@ class AillioR1:
             return
         self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
                                        idProduct=self.AILLIO_PID)
+        if self.usbhandle is None:
+            self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
+                                           idProduct=self.AILLIO_PID_REV3)
         if self.usbhandle is None:
             raise IOError("not found or no permission")
         self.__dbg('device found!')
