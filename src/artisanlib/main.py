@@ -4537,10 +4537,10 @@ class tgraphcanvas(FigureCanvas):
                             titleB = toASCII(titleB)
                         if self.title is None or u(self.title).strip() == "":
                             self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
-                                horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1)
+                                horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
                         else:
                             self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
-                                horizontalalignment="right",fontsize="xx-small",fontproperties=fontprop_small,x=suptitleX,y=1)
+                                horizontalalignment="right",fontsize="xx-small",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
                 
     #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
     #            self.ax.spines['top'].set_color('none')
