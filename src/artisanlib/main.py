@@ -9553,7 +9553,6 @@ class tgraphcanvas(FigureCanvas):
 #####   temporary hack for windows till better solution found about toolbar icon problem with py2exe and svg
 #######################################################################################
 
-# changed "NavigationToolbar" for "VMToolbar" in ApplicationWindow
 
 def my_get_icon(name):
     basedir = os.path.join(mpl.rcParams['datapath'], 'images')
@@ -13989,6 +13988,8 @@ class ApplicationWindow(QMainWindow):
     def eventaction_internal(self,action,cmd):
         if action:
             try:
+                if action in [8,9,10]:
+                    from artisanlib.hottop import setHottop
                 cmd_str = u(cmd)
                 if action == 1:
                     cmd_str_bin = ""
@@ -14175,14 +14176,11 @@ class ApplicationWindow(QMainWindow):
                         _, _, exc_tb = sys.exc_info()
                         aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " callProgram(): {0}").format(str(e)),exc_tb.tb_lineno)
                 elif action == 8: # HOTTOP Heater
-                    from artisanlib.hottop import setHottop
                     setHottop(heater=int(cmd))
                 elif action == 9: # HOTTOP Main Fan
-                    from artisanlib.hottop import setHottop
                     setHottop(main_fan=int(cmd))
                 elif action == 10: # HOTTOP Command (one of "heater", "fan", "motor", "solenoid", "stirrer")
                     if cmd_str:
-                        from artisanlib.hottop import setHottop
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
                             cs = c.strip()
@@ -18614,75 +18612,75 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.BTdrawstyle = s2a(toString(settings.value("BTdrawstyle",self.qmc.BTdrawstyle)))
                 if self.qmc.BTdrawstyle == '-':
                     self.qmc.BTdrawstyle = self.qmc.drawstyle_default
-                self.qmc.BTlinewidth = toInt(settings.value("BTlinewidth",self.qmc.BTlinewidth))
+                self.qmc.BTlinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTlinewidth",self.qmc.BTlinewidth))))
                 self.qmc.BTmarker = s2a(toString(settings.value("BTmarker",self.qmc.BTmarker)))
-                self.qmc.BTmarkersize = toInt(settings.value("BTmarkersize",self.qmc.BTmarkersize))
+                self.qmc.BTmarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTmarkersize",self.qmc.BTmarkersize))))
                 self.qmc.ETlinestyle = s2a(toString(settings.value("ETlinestyle",self.qmc.ETlinestyle)))
                 self.qmc.ETdrawstyle = s2a(toString(settings.value("ETdrawstyle",self.qmc.ETdrawstyle)))
                 if self.qmc.ETdrawstyle == '-':
                     self.qmc.ETdrawstyle = self.qmc.drawstyle_default
-                self.qmc.ETlinewidth = toInt(settings.value("ETlinewidth",self.qmc.ETlinewidth))
+                self.qmc.ETlinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETlinewidth",self.qmc.ETlinewidth))))
                 self.qmc.ETmarker = s2a(toString(settings.value("ETmarker",self.qmc.ETmarker)))
-                self.qmc.ETmarkersize = toInt(settings.value("ETmarkersize",self.qmc.ETmarkersize))
+                self.qmc.ETmarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETmarkersize",self.qmc.ETmarkersize))))
                 self.qmc.BTdeltalinestyle = s2a(toString(settings.value("BTdeltalinestyle",self.qmc.BTdeltalinestyle)))
                 self.qmc.BTdeltadrawstyle = s2a(toString(settings.value("BTdeltadrawstyle",self.qmc.BTdeltadrawstyle)))
                 if self.qmc.BTdeltadrawstyle == '-':
                     self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
-                self.qmc.BTdeltalinewidth = toInt(settings.value("BTdeltalinewidth",self.qmc.BTdeltalinewidth))
+                self.qmc.BTdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTdeltalinewidth",self.qmc.BTdeltalinewidth))))
                 self.qmc.BTdeltamarker = s2a(toString(settings.value("BTdeltamarker",self.qmc.BTdeltamarker)))
-                self.qmc.BTdeltamarkersize = toInt(settings.value("BTdeltamarkersize",self.qmc.BTdeltamarkersize))
+                self.qmc.BTdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTdeltamarkersize",self.qmc.BTdeltamarkersize))))
                 self.qmc.ETdeltalinestyle = s2a(toString(settings.value("ETdeltalinestyle",self.qmc.ETdeltalinestyle)))
                 self.qmc.ETdeltadrawstyle = s2a(toString(settings.value("ETdeltadrawstyle",self.qmc.ETdeltadrawstyle)))
                 if self.qmc.ETdeltadrawstyle == '-':
                     self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
-                self.qmc.ETdeltalinewidth = toInt(settings.value("ETdeltalinewidth",self.qmc.ETdeltalinewidth))
+                self.qmc.ETdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETdeltalinewidth",self.qmc.ETdeltalinewidth))))
                 self.qmc.ETdeltamarker = s2a(toString(settings.value("ETdeltamarker",self.qmc.ETdeltamarker)))
-                self.qmc.ETdeltamarkersize = toInt(settings.value("ETdeltamarkersize",self.qmc.ETdeltamarkersize))
+                self.qmc.ETdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETdeltamarkersize",self.qmc.ETdeltamarkersize))))
                 self.qmc.BTbacklinestyle = s2a(toString(settings.value("BTbacklinestyle",self.qmc.BTbacklinestyle)))
                 self.qmc.BTbackdrawstyle = s2a(toString(settings.value("BTbackdrawstyle",self.qmc.BTbackdrawstyle)))
                 if self.qmc.BTbackdrawstyle == '-':
                     self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.BTbacklinewidth = toInt(settings.value("BTbacklinewidth",self.qmc.BTbacklinewidth))
+                self.qmc.BTbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTbacklinewidth",self.qmc.BTbacklinewidth))))
                 self.qmc.BTbackmarker = s2a(toString(settings.value("BTbackmarker",self.qmc.BTbackmarker)))
-                self.qmc.BTbackmarkersize = toInt(settings.value("BTbackmarkersize",self.qmc.BTbackmarkersize))
+                self.qmc.BTbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTbackmarkersize",self.qmc.BTbackmarkersize))))
                 self.qmc.ETbacklinestyle = s2a(toString(settings.value("ETbacklinestyle",self.qmc.ETbacklinestyle)))
                 self.qmc.ETbackdrawstyle = s2a(toString(settings.value("ETbackdrawstyle",self.qmc.ETbackdrawstyle)))
                 if self.qmc.ETbackdrawstyle == '-':
                     self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.ETbacklinewidth = toInt(settings.value("ETbacklinewidth",self.qmc.ETbacklinewidth))
+                self.qmc.ETbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETbacklinewidth",self.qmc.ETbacklinewidth))))
                 self.qmc.ETbackmarker = s2a(toString(settings.value("ETbackmarker",self.qmc.ETbackmarker)))
-                self.qmc.ETbackmarkersize = toInt(settings.value("ETbackmarkersize",self.qmc.ETbackmarkersize))
+                self.qmc.ETbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETbackmarkersize",self.qmc.ETbackmarkersize))))
                 self.qmc.XTbacklinestyle = s2a(toString(settings.value("XTbacklinestyle",self.qmc.XTbacklinestyle)))
                 self.qmc.XTbackdrawstyle = s2a(toString(settings.value("XTbackdrawstyle",self.qmc.XTbackdrawstyle)))
                 if self.qmc.XTbackdrawstyle == '-':
                     self.qmc.XTbackdrawstyle = self.qmc.drawstyle_default
-                self.qmc.XTbacklinewidth = toInt(settings.value("XTbacklinewidth",self.qmc.XTbacklinewidth))
+                self.qmc.XTbacklinewidth = max(0.1,aw.float2float(toFloat(settings.value("XTbacklinewidth",self.qmc.XTbacklinewidth))))
                 self.qmc.XTbackmarker = s2a(toString(settings.value("XTbackmarker",self.qmc.XTbackmarker)))
-                self.qmc.XTbackmarkersize = toInt(settings.value("XTbackmarkersize",self.qmc.ETbackmarkersize))
+                self.qmc.XTbackmarkersize = max(0.1,aw.float2float(toFloat(settings.value("XTbackmarkersize",self.qmc.ETbackmarkersize))))
                 self.qmc.extralinestyles1 = list(map(str,list(toStringList(settings.value("extralinestyles1",self.qmc.extralinestyles1)))))
                 self.qmc.extralinestyles2 = list(map(str,list(toStringList(settings.value("extralinestyles2",self.qmc.extralinestyles2)))))
                 self.qmc.extradrawstyles1 = list(map(str,list(toStringList(settings.value("extradrawstyles1",self.qmc.extradrawstyles1)))))
                 self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles1]                                
                 self.qmc.extradrawstyles2 = list(map(str,list(toStringList(settings.value("extradrawstyles2",self.qmc.extradrawstyles2)))))
                 self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default if s=='-' else s for s in self.qmc.extradrawstyles2]                                                
-                self.qmc.extralinewidths1 = [toInt(x) for x in toList(settings.value("extralinewidths1"))]
-                self.qmc.extralinewidths2 = [toInt(x) for x in toList(settings.value("extralinewidths2"))]
+                self.qmc.extralinewidths1 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extralinewidths1"))]
+                self.qmc.extralinewidths2 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extralinewidths2"))]
                 self.qmc.extramarkers1 = list(map(str,list(toStringList(settings.value("extramarkers1",self.qmc.extramarkers1)))))
                 self.qmc.extramarkers2 = list(map(str,list(toStringList(settings.value("extramarkers2",self.qmc.extramarkers2)))))
-                self.qmc.extramarkersizes1 = [toInt(x) for x in toList(settings.value("extramarkersizes1"))]
-                self.qmc.extramarkersizes2 = [toInt(x) for x in toList(settings.value("extramarkersizes2"))]
+                self.qmc.extramarkersizes1 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extramarkersizes1"))]
+                self.qmc.extramarkersizes2 = [max(0.1,aw.float2float(toFloat(x))) for x in toList(settings.value("extramarkersizes2"))]
                 self.qmc.BTBdeltalinestyle = s2a(toString(settings.value("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle)))
                 self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle)))
                 
-                self.qmc.BTBdeltalinewidth = toInt(settings.value("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth))
+                self.qmc.BTBdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth))))
                 self.qmc.BTBdeltamarker = s2a(toString(settings.value("BTBdeltamarker",self.qmc.BTBdeltamarker)))
-                self.qmc.BTBdeltamarkersize = toInt(settings.value("BTBdeltamarkersize",self.qmc.BTBdeltamarkersize))
+                self.qmc.BTBdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("BTBdeltamarkersize",self.qmc.BTBdeltamarkersize))))
                 self.qmc.ETBdeltalinestyle = s2a(toString(settings.value("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle)))
                 self.qmc.ETBdeltadrawstyle = s2a(toString(settings.value("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle)))
                 
-                self.qmc.ETBdeltalinewidth = toInt(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))
+                self.qmc.ETBdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))))
                 self.qmc.ETBdeltamarker = s2a(toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker)))
-                self.qmc.ETBdeltamarkersize = toInt(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))
+                self.qmc.ETBdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))))
                 
             settings.endGroup()
             
@@ -19034,7 +19032,7 @@ class ApplicationWindow(QMainWindow):
             from artisanlib.weblcds import stopWeb
             stopWeb()
             self.WebLCDs = False
-        except Exception as ex:
+        except Exception:
             pass
 
     def applyStandardButtonVisibility(self):
@@ -33477,7 +33475,7 @@ class extraserialport(object):
             libtime.sleep(0.7) # on OS X opening a serial port too fast after closing the port get's disabled
             error = QApplication.translate("Error Message","Serial Exception:",None)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error + " Unable to open serial port",exc_tb.tb_lineno)
+            aw.qmc.adderror(error + " Unable to open serial port",exc_tb.tb_lineno)
 
     def closeport(self):
         if self.SP is None:
@@ -34972,10 +34970,7 @@ class serialport(object):
                 if aw.s7.type[i]:
                     v = aw.s7.readFloat(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
                 else:
-                    try:
-                        v = aw.s7.readInt(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
-                    except Exception as e:
-                        print(e)
+                    v = aw.s7.readInt(aw.s7.area[i]-1,aw.s7.db_nr[i],aw.s7.start[i])
                 v = self.processChannelData(v,aw.s7.div[i],("C" if aw.s7.mode[i]==1 else ("F" if aw.s7.mode[i]==2 else "")))         
                 res.append(v)
             else:
@@ -39349,27 +39344,17 @@ class scanModbusDlg(ArtisanDialog):
                 aw.modbus.sleepBetween()
                 aw.modbus.sleepBetween()
                 aw.modbus.connect()
-                try:
-                    res = aw.modbus.master.read_input_registers(int(register),1,unit=self.slave)
-                except:
-                    res = None
-                if res is not None and  not isinstance(res,ExceptionResponse):
-                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                    r = decoder.decode_16bit_uint()
-                    result += str(register) + "(4)," + str(r) + "<br>"
+                res = aw.modbus.peekSingleRegister(self.slave,int(register),code=4)
+                if res is not None:
+                    result += str(register) + "(4)," + str(res) + "<br>"
                     self.modbusEdit.setHtml(result)
             if self.code3:
                 aw.modbus.sleepBetween()
                 aw.modbus.sleepBetween()
                 aw.modbus.connect()
-                try:
-                    res = aw.modbus.master.read_holding_registers(int(register),1,unit=self.slave)
-                except:
-                    res = None    
-                if res is not None and  not isinstance(res,ExceptionResponse):
-                    decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
-                    r = decoder.decode_16bit_uint()
-                    result += str(register) + "(3)," + str(r) + "<br>"
+                res = aw.modbus.peekSingleRegister(self.slave,int(register),code=3)   
+                if res is not None:
+                    result += str(register) + "(3)," + str(res) + "<br>"
                     self.modbusEdit.setHtml(result)
         # reconstruct MODBUS setup
         aw.modbus.comport = self.port_aw

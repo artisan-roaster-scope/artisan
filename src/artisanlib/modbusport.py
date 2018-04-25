@@ -41,45 +41,6 @@ def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorde
         # pymodbus v1.3 and older
         return BinaryPayloadDecoder.fromRegisters(registers, endian=byteorder)
 
-#import pymodbus.version as pymodbus_version
-#from pymodbus.constants import Endian
-#from pymodbus.payload import BinaryPayloadDecoder, BinaryPayloadBuilder
-#
-#if pymodbus_version.version.major > 1 or (pymodbus_version.version.major == 1 and pymodbus_version.version.minor > 3):
-#    # pymodbus v1.4 and newer
-#    def getBinaryPayloadBuilder(byteorderLittle=True,wordorderLittle=False):
-#        if byteorderLittle: 
-#            byteorder = Endian.Little
-#        else:
-#            byteorder = Endian.Big
-#        if wordorderLittle:
-#            wordorder = Endian.Little
-#        else:
-#            wordorder = Endian.Big
-#        return BinaryPayloadBuilder(byteorder=byteorder, wordorder=wordorder)
-#    def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,wordorderLittle=False):
-#        if byteorderLittle:
-#            byteorder = Endian.Little
-#        else:
-#            byteorder = Endian.Big
-#        if wordorderLittle:
-#            wordorder = Endian.Little
-#        else:
-#            wordorder = Endian.Big
-#        return BinaryPayloadDecoder.fromRegisters(registers, byteorder=byteorder, wordorder=wordorder)
-#else:
-#    # pymodbus v1.3 and older
-#    def getBinaryPayloadBuilder(byteorderLittle=True,_=False):
-#        if byteorderLittle:
-#            return BinaryPayloadBuilder(endian=Endian.Little)
-#        else:
-#            return BinaryPayloadBuilder(endian=Endian.Big)
-#    def getBinaryPayloadDecoderFromRegisters(registers,byteorderLittle=True,_=False):
-#        if byteorderLittle:
-#            return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Little)
-#        else:
-#            return BinaryPayloadDecoder.fromRegisters(registers, endian=Endian.Big)
-
 
 ###########################################################################################
 ##################### MODBUS PORT #########################################################
@@ -508,6 +469,34 @@ class modbusport(object):
             settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
             self.addserial("MODBUS readBCD :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
 
+
+    # as readSingleRegister, but does not retry nor raise and error and returns a None instead
+    # also does not reserve the port via a semaphore!
+    def peekSingleRegister(self,slave,register,code=3):
+        from pymodbus.pdu import ExceptionResponse
+        try:
+            if code==1:
+                res = self.master.read_coils(int(register),1,unit=int(slave))
+            elif code==2:
+                res = self.master.read_discrete_inputs(int(register),1,unit=int(slave))                    
+            elif code==4:
+                res = self.master.read_input_registers(int(register),1,unit=int(slave))
+            else: # code==3
+                res = self.master.read_holding_registers(int(register),1,unit=int(slave))
+        except Exception:
+            res = None
+        if res is not None and not isinstance(res,ExceptionResponse) and not isinstance(res,Exception):
+            if code in [1,2]:
+                if res is not None and res.bits[0]:
+                    return 1
+                else:
+                    return 0                
+            else:
+                decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
+                r = decoder.decode_16bit_uint()
+                return r
+        else:
+            return None
 
     # function 1 (Read Coil)
     # function 2 (Read Discrete Input)
