@@ -22,11 +22,6 @@ install:
   - cd Phidget22Python
   - python setup.py install
   - cd ..
-  - git clone -b python3 https://github.com/riptideio/pymodbus.git
-  - cd pymodbus
-  - patch -p0 < ../src/patches/pymodbus.patch
-  - python setup.py install
-  - cd ..
 
 build_script:
   - cmd: cd src

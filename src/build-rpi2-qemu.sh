@@ -39,7 +39,6 @@ ssh_control()
     pip3 install -r artisan/src/requirements.txt
     (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan
-    .travis/install-pymodbus.sh
     cd src
     ./build-linux.sh
     ./build-rpi2-deb.sh

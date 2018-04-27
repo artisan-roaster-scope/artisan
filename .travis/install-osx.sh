@@ -17,4 +17,3 @@ sudo rm -rf /usr/local/lib/python3.6/site-packages/matplotlib/mpl-data/sample_da
 
 .travis/install-phidgets.sh
 .travis/install-snap7.sh
-.travis/install-pymodbus.sh

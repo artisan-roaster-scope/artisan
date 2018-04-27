@@ -10,4 +10,3 @@ pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
 .travis/install-libusb.sh
 .travis/install-phidgets.sh
 .travis/install-snap7.sh
-.travis/install-pymodbus.sh
