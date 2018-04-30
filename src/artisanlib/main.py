@@ -31329,7 +31329,7 @@ class EventsDlg(ArtisanDialog):
             #value
             valueEdit = QLineEdit()
 #            valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\-?\d?\d?$"),self)) # QRegExp(r"^100|\d?\d?$"),self))
-            valueEdit.setValidator(QIntValidator(0, 999, valueEdit))
+            valueEdit.setValidator(QIntValidator(-999, 999, valueEdit))
             valueEdit.setText(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
             valueEdit.setAlignment(Qt.AlignRight)
             valueEdit.editingFinished.connect(lambda i=i:self.setvalueeventbutton(1,i))
