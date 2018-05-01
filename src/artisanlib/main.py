@@ -43,7 +43,6 @@ import datetime
 import warnings
 import string as libstring
 import cgi
-import codecs
 import numpy
 import subprocess
 import shlex
@@ -160,6 +159,7 @@ import artisanlib.arabic_reshaper
 from artisanlib.util import appFrozen
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
+from artisanlib.compat import *
 from artisanlib.modbusport import modbusport
 
 
@@ -280,110 +280,6 @@ def PHIDGET_GAIN_VALUE(gv):
     else:
         return BridgeGain.BRIDGE_GAIN_1 # no gain
 
-
-if sys.version < '3':
-    def decs2string(x):
-        return "".join(chr(b) for b in x)
-    def arange(x):
-        return xrange(x)  # @UndefinedVariable
-    def stringp(x):
-        return isinstance(x, basestring)  # @UndefinedVariable
-    def uchr(x):
-        return unichr(x)  # @UndefinedVariable
-    def o(x): # converts char to byte
-        return ord(x)
-    def u(x): # convert to unicode string
-        return unicode(x)  # @UndefinedVariable
-    def d(x):
-        if x is not None:
-            try:
-                return codecs.unicode_escape_decode(x)[0]
-            except Exception:
-                return x
-        else:
-            return None
-    def encodeLocal(x):
-        if x is not None:
-            return codecs.unicode_escape_encode(unicode(x))[0]  # @UndefinedVariable
-        else:
-            return None
-    def hex2int(h1,h2=""):
-        return int(binascii.hexlify(h1+h2),16)
-    def s2a(s):
-        return u(s).encode('ascii','ignore')
-    def cmd2str(c):
-        return c
-    def str2cmd(s):
-        return s2a(s)
-else:
-    def decs2string(x):
-        if len(x) > 0:
-            return bytes(x)
-        else:
-            return b""
-    def arange(x):
-        return range(x)
-    def stringp(x):
-        return isinstance(x, str)
-    def uchr(x):
-        return chr(x)
-    def o(x): # converts char to byte
-        return x
-    def u(x): # convert to unicode string
-        return str(x)
-    def d(x):
-        if x is not None:
-            return codecs.unicode_escape_decode(x)[0]
-        else:
-            return None
-    def encodeLocal(x):
-        if x is not None:
-            return codecs.unicode_escape_encode(str(x))[0].decode("utf8")
-        else:
-            return None
-    def hex2int(h1,h2=None):
-        if h2 is not None:
-            return int(h1*256 + h2)
-        else:
-            return int(h1)
-    def str2cmd(s):
-        return bytes(s,"ascii")
-    def cmd2str(c):
-        return str(c,"latin1")
-    def s2a(s):
-        return s.encode('ascii','ignore').decode("ascii")   
-
-def convert_to_bcd(decimal):
-    ''' Converts a decimal value to a bcd value
-
-    :param value: The decimal value to to pack into bcd
-    :returns: The number in bcd form
-    '''
-    place, bcd = 0, 0
-    while decimal > 0:
-        nibble = decimal % 10
-        bcd += nibble << place
-        if sys.version < '3':
-            decimal = decimal / 10
-        else:
-            decimal = decimal // 10
-        place += 4
-    return bcd
-
-
-def convert_from_bcd(bcd):
-    ''' Converts a bcd value to a decimal value
-
-    :param value: The value to unpack from bcd
-    :returns: The number in decimal form
-    '''
-    place, decimal = 1, 0
-    while bcd > 0:
-        nibble = bcd & 0xf
-        decimal += nibble * place
-        bcd >>= 4
-        place *= 10
-    return decimal
 
 umlaute_dict = {
    uchr(228): 'ae',  # U+00E4   \xc3\xa4

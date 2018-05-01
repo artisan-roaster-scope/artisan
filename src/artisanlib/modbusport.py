@@ -3,6 +3,40 @@ import time
 from PyQt5.QtCore import QSemaphore
 from PyQt5.QtWidgets import QApplication
 
+from artisanlib.compat import *
+
+def convert_to_bcd(decimal):
+    ''' Converts a decimal value to a bcd value
+
+    :param value: The decimal value to to pack into bcd
+    :returns: The number in bcd form
+    '''
+    place, bcd = 0, 0
+    while decimal > 0:
+        nibble = decimal % 10
+        bcd += nibble << place
+        if sys.version < '3':
+            decimal = decimal / 10
+        else:
+            decimal = decimal // 10
+        place += 4
+    return bcd
+
+
+def convert_from_bcd(bcd):
+    ''' Converts a bcd value to a decimal value
+
+    :param value: The value to unpack from bcd
+    :returns: The number in decimal form
+    '''
+    place, decimal = 1, 0
+    while bcd > 0:
+        nibble = bcd & 0xf
+        decimal += nibble * place
+        bcd >>= 4
+        place *= 10
+    return decimal
+
 def getBinaryPayloadBuilder(byteorderLittle=True,wordorderLittle=False):
     import pymodbus.version as pymodbus_version
     from pymodbus.constants import Endian
