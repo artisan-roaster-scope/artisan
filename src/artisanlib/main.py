@@ -10672,6 +10672,7 @@ class ApplicationWindow(QMainWindow):
         self.fileMenu.addAction(self.fileSaveAction)
 
         self.fileSaveAsAction = QAction(UIconst.FILE_MENU_SAVEAS,self)
+        self.fileSaveAsAction.setShortcut(QKeySequence.SaveAs)
         self.fileSaveAsAction.triggered.connect(lambda _:self.fileSave(None))
         self.fileMenu.addAction(self.fileSaveAsAction)
 
@@ -43298,9 +43299,12 @@ class AlarmDlg(ArtisanDialog):
     def markNotEnabledAlarmRows(self):
         for i in range(self.alarmtable.rowCount()):
             for j in range(11):
-                if aw.qmc.alarmstate[i]:
-                    #self.alarmtable.setItem(i,j,QTableWidgetItem())
-                    self.alarmtable.item(i,j).setBackground(QColor(191, 191, 191))
+                try:
+                    if aw.qmc.alarmstate[i]:
+                        #self.alarmtable.setItem(i,j,QTableWidgetItem())
+                        self.alarmtable.item(i,j).setBackground(QColor(191, 191, 191))
+                except:
+                    pass
 
     def createalarmtable(self):
         try:
