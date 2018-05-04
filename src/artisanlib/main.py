@@ -37,7 +37,6 @@ import sys
 import ast
 import platform
 import math
-import binascii
 import time as libtime
 import datetime
 import warnings
@@ -46,6 +45,8 @@ import cgi
 import numpy
 import subprocess
 import shlex
+import binascii
+import codecs
 
 if sys.version < '3':
     import urlparse, urllib # @UnresolvedImport @UnusedImport
@@ -159,7 +160,7 @@ import artisanlib.arabic_reshaper
 from artisanlib.util import appFrozen
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
-from artisanlib.compat import *
+from artisanlib.compat import decs2string, arange, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
 from artisanlib.modbusport import modbusport
 
 
@@ -21726,24 +21727,24 @@ class ApplicationWindow(QMainWindow):
             else:
                 start = 0
             # sort events by time/index
-            sevents = sorted(self.qmc.specialevents)
+            sevents = sorted(zip(self.qmc.specialevents,range(len(self.qmc.specialevents))))
             seventsString = []
             seventsType = [] 
-            seventsValue = [] 
+            seventsValue = []
             for i in range(len(sevents)):
-                sorted_pos = self.qmc.specialevents.index(sevents[i])
+                sorted_pos = sevents[i][1]
                 seventsString.append(self.qmc.specialeventsStrings[sorted_pos])
                 seventsType.append(self.qmc.specialeventstype[sorted_pos])
                 seventsValue.append(self.qmc.specialeventsvalue[sorted_pos])
             for i in range(len(self.qmc.specialevents)):
                 temps = ""
                 if self.qmc.mode == "F":
-                    temps += "%.1fF"%self.qmc.temp2[sevents[i]] + " / " + "%.1fF"%self.qmc.temp1[sevents[i]]
+                    temps += "%.1fF"%self.qmc.temp2[sevents[i][0]] + " / " + "%.1fF"%self.qmc.temp1[sevents[i][0]]
                 else:
-                    temps += "%.1f&deg;C"%self.qmc.temp2[sevents[i]] + " / " "%.1f&deg;C"%self.qmc.temp1[sevents[i]]
+                    temps += "%.1f&deg;C"%self.qmc.temp2[sevents[i][0]] + " / " "%.1f&deg;C"%self.qmc.temp1[sevents[i][0]]
                 html += ("<tr>"+
                      "\n<td>" + str(i+1) + "</td><td>" +
-                     self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i]] - start)) +
+                     self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i][0]] - start)) +
                      "</td><td>at " + temps + "</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
             html += '</table>\n</center>'
         return u(html)
