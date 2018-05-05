@@ -31,5 +31,5 @@ header:
 - you might need to update your Probatones firmware to the lastest version via Probat to enjoy all features
 
 
-**Watch out!** For best performance, please start monitoring the roaster before pre-heating.  Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
+**Watch out!** Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
 {: .notice--primary}

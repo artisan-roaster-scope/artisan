@@ -8,6 +8,10 @@ title: "About"
 toc: true
 toc_label: "On this page"
 toc_icon: "cog"
+intro:
+  - excerpt: '[Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large} &emsp; [Documentation](/doc/){: .btn .btn--success .btn--large}'
+featurerequest:
+  - excerpt: '[Request a Feature](https://github.com/artisan-roaster-scope/artisan/issues){: .btn .btn--success .btn--large}'
 gallery:
   - url: http://www.sanfranroaster.com/
     image_path: /assets/images/sf-logo.png
@@ -47,10 +51,10 @@ gallery:
     title: "COFFEE-TECH ENGINEERING"
 ---
 
+
 Artisan is a software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
 
-
-[Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large} &emsp; [Documentation](/doc/){: .btn .btn--success .btn--large}
+{% include feature_row id="intro" type="center" %}
 
 ## Platforms
 
@@ -76,7 +80,7 @@ There are also experimental builds for the Raspberry Pi platform.
 - [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html) with programable actions
 - many import and export formats
 
-[Request a Feature](https://github.com/artisan-roaster-scope/artisan/issues){: .btn .btn--success .btn--large}
+{% include feature_row id="featurerequest" type="center" %}
 
 ## Cast
 

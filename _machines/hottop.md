@@ -17,5 +17,5 @@ header:
   - slider control of fan and heater
   - button control of motor, door solenoid, and stirrer 
 
-**Watch out!** For best performance, please start monitoring the roaster before pre-heating.  Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
+**Watch out!** Artisan doesn't monitor unsafe temperatures, so you should never leave the roaster alone.
 {: .notice--primary}
