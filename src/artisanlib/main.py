@@ -17777,6 +17777,9 @@ class ApplicationWindow(QMainWindow):
                 if settings.contains("batchcounter"):
                     self.settingspath = filename
                 settings.endGroup()
+            
+            if settings.contains("fullscreen"):
+                self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -18883,6 +18886,11 @@ class ApplicationWindow(QMainWindow):
             self.realignbuttons()
             
             aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
+            
+            if self.full_screen_mode_active:
+                self.showFullScreen()
+                if platf != 'Darwin':
+                    aw.fullscreenAction.setChecked(True)
                             
         except Exception:
             res = False
@@ -19171,6 +19179,7 @@ class ApplicationWindow(QMainWindow):
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
         #many applications (including the KDE applications) use INI text files
+        
         try:
             if filename:
                 settings = QSettings(filename,QSettings.IniFormat)
@@ -19181,6 +19190,8 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("Geometry",QVariant(self.saveGeometry()))
             else:
                 settings.setValue("Geometry",self.saveGeometry())
+                
+            settings.setValue("fullscreen", (self.full_screen_mode_active or self.isFullScreen()))
                 
             #on OS X we prevent the reopening of windows
             # as done by defaults write com.google.code.p.Artisan NSQuitAlwaysKeepsWindows -bool false
@@ -20012,7 +20023,8 @@ class ApplicationWindow(QMainWindow):
 
     def stopActivities(self):
         if self.full_screen_mode_active:
-            aw.fullscreenAction.setChecked(False)
+            if platf != 'Darwin':
+                aw.fullscreenAction.setChecked(False)
             self.showNormal()
         if aw.qmc.device == 53:
             from artisanlib.hottop import stopHottop
