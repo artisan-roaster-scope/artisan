@@ -11218,6 +11218,7 @@ class ApplicationWindow(QMainWindow):
 
         helpDocumentationAction = QAction(UIconst.HELP_MENU_DOCUMENTATION,self)
         helpDocumentationAction.triggered.connect(self.helpHelp)
+        helpDocumentationAction.setShortcut(QKeySequence.HelpContents)
         self.helpMenu.addAction(helpDocumentationAction)
 
         KshortCAction = QAction(UIconst.HELP_MENU_KEYBOARDSHORTCUTS,self)
@@ -31181,7 +31182,7 @@ class EventsDlg(ArtisanDialog):
         # self.eventbuttontable.clear() # this crashes Ubuntu 16.04
 #        if ndata != 0:
 #            self.eventbuttontable.clearContents() # this crashes Ubuntu 16.04 if device table is empty and also sometimes else
-        self.eventbuttontable.clearSelection() # this seems to work also for Ubuntu 16.04
+#        self.eventbuttontable.clearSelection() # this seems to work also for Ubuntu 16.04
         
         self.eventbuttontable.setRowCount(nbuttons)
         self.eventbuttontable.setColumnCount(10)
@@ -31327,9 +31328,9 @@ class EventsDlg(ArtisanDialog):
             if "\\n" in label:              #make multiple line text if "\n" found in label string
                 parts = label.split("\\n")
                 label = chr(10).join(parts)
-            aw.extraeventslabels[i] = label            
+            aw.extraeventslabels[i] = label  
             # event type et
-            et = self.extraeventstypes[i]
+            et = aw.extraeventstypes[i]
             if et > 4 and et < 9:
                 et = et - 5
             if et < 4:
@@ -31461,46 +31462,39 @@ class EventsDlg(ArtisanDialog):
             aw.buttonlist.pop(bindex)
             self.createEventbuttonTable()  #update table
         aw.update_extraeventbuttons_visibility()
-
+        
     def insertextraeventbutton(self):
         self.savetableextraeventbutton() #save previous changes
         if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
             return
-        aw.extraeventsdescriptions.append("")
-        aw.extraeventstypes.append(4)
-        aw.extraeventsvalues.append(0)
-        aw.extraeventsactions.append(0)
-        aw.extraeventsactionstrings.append("")
-        aw.extraeventsvisibility.append(1)
-        aw.extraeventbuttoncolor.append("yellow")
-        aw.extraeventbuttontextcolor.append("black")
-        initialtext = u("E")
-        aw.extraeventslabels.append(initialtext)
-        self.createEventbuttonTable() 
-        aw.buttonlist.append(QPushButton())
-        bindex = len(aw.buttonlist)-1
-        aw.buttonlist[bindex].setFocusPolicy(Qt.NoFocus)
-        aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ")
-        aw.buttonlist[bindex].setMinimumWidth(90)
-        aw.buttonlist[bindex].setMinimumHeight(aw.standard_button_height)
-        aw.buttonlist[bindex].setText(initialtext)
-        aw.buttonlist[bindex].clicked.connect(lambda _:aw.recordextraevent(bindex))
-        if False: # lowerbuttonvisiblebuttons < aw.buttonlistmaxlen:
-            aw.lowerbuttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-        elif len(aw.e1buttondialog.buttons()) < aw.buttonlistmaxlen:
-            aw.e1buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-            aw.e1buttondialog.setVisible(True)
-        elif len(aw.e2buttondialog.buttons()) < aw.buttonlistmaxlen:
-            aw.e2buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-            aw.e2buttondialog.setVisible(True)
-        elif len(aw.e3buttondialog.buttons()) < aw.buttonlistmaxlen:
-            aw.e3buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-            aw.e3buttondialog.setVisible(True)
-        else:
-            aw.e4buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
-            aw.e4buttondialog.setVisible(True)
-        aw.update_extraeventbuttons_visibility()
-        aw.settooltip()
+        bindex = len(aw.extraeventstypes)
+        selected = self.eventbuttontable.selectedRanges()
+        if len(selected) > 0:
+            bindex = selected[0].topRow()
+        if bindex >= 0:
+            aw.extraeventsdescriptions = aw.extraeventsdescriptions[:bindex] + [""] + aw.extraeventsdescriptions[bindex:]
+            aw.extraeventstypes = aw.extraeventstypes[:bindex] + [4] + aw.extraeventstypes[bindex:]
+            aw.extraeventsvalues = aw.extraeventsvalues[:bindex] + [0] + aw.extraeventsvalues[bindex:]
+            aw.extraeventsactions = aw.extraeventsactions[:bindex] + [0] + aw.extraeventsactions[bindex:]
+            aw.extraeventsactionstrings = aw.extraeventsactionstrings[:bindex] + [""] +  aw.extraeventsactionstrings[bindex:]
+            aw.extraeventsvisibility = aw.extraeventsvisibility[:bindex] + [1] + aw.extraeventsvisibility[bindex:]
+            aw.extraeventbuttoncolor = aw.extraeventbuttoncolor[:bindex] + ["yellow"] + aw.extraeventbuttoncolor[bindex:]
+            aw.extraeventbuttontextcolor = aw.extraeventbuttontextcolor[:bindex] + ["black"] + aw.extraeventbuttontextcolor[bindex:]
+            initialtext = u("E")
+            aw.extraeventslabels = aw.extraeventslabels[:bindex] + [initialtext] + aw.extraeventslabels[bindex:]
+            
+            self.createEventbuttonTable() 
+            aw.buttonlist.append(QPushButton())
+
+#            aw.buttonlist[bindex].setFocusPolicy(Qt.NoFocus)
+            aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ")
+            aw.buttonlist[bindex].setMinimumWidth(90)
+            aw.buttonlist[bindex].setMinimumHeight(aw.standard_button_height)
+            aw.buttonlist[bindex].setText(initialtext)
+            aw.buttonlist[bindex].clicked.connect(lambda _:aw.recordextraevent(bindex))            
+            aw.realignbuttons()
+            aw.update_extraeventbuttons_visibility()
+            aw.settooltip()
 
     def eventsbuttonflagChanged(self):
         if self.eventsbuttonflag.isChecked():
