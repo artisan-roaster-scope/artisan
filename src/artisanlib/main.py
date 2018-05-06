@@ -5878,6 +5878,8 @@ class tgraphcanvas(FigureCanvas):
 
         #update screen with new colors
         aw.updateCanvasColors()
+        aw.applyStandardButtonVisibility()
+        aw.update_extraeventbuttons_visibility()
         self.fig.canvas.redraw()
 
     #draws a polar star graph to score cupping. It does not delete any profile data.
@@ -42006,6 +42008,8 @@ class graphColorDlg(ArtisanDialog):
         if colorf.isValid():
             aw.qmc.palette[color] = str(colorf.name())
             aw.updateCanvasColors()
+            aw.applyStandardButtonVisibility()
+            aw.update_extraeventbuttons_visibility()
             var.setText(colorf.name())
             var.setStyleSheet("QLabel { background-color: " + aw.qmc.palette[color] + " }");
 #            var.setPalette(QPalette(colorf))
