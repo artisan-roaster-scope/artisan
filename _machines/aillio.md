@@ -20,3 +20,6 @@ header:
 roaster before pre-heating.  Artisan doesn't monitor unsafe
 temperatures, so you should never leave the roaster alone.
 {: .notice--primary}
+
+**Watch out!** Running Artisan in parallel with another roast logging software, like RoastTime, connected to the same machine might lead to unstabilities and crashes.
+{: .notice--primary}
