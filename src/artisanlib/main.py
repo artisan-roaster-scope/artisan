@@ -15426,7 +15426,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
         if path is None:   
             path = self.getDefaultPath()
-        if platf == 'Linux' # avoid complications with file icons on RPi
+        if platf == 'Linux': # avoid complications with file icons on RPi
             res = u(QFileDialog.getOpenFileName(self,msg,path,ext, options=QFileDialog.DontUseCustomDirectoryIcons)[0])
         else:
             res = u(QFileDialog.getOpenFileName(self,msg,path,ext)[0])
