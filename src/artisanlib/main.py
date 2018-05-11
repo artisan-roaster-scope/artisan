@@ -13412,12 +13412,12 @@ class ApplicationWindow(QMainWindow):
                 else: # before drop
                     totaltime = tx - chrg
 
-                # TP phase LCD
+                # 1st PhaseLCD: TP
                 if aw.qmc.phasesLCDmode == 0: # time mode
                     self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #dave
+                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>") 
                     if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
-                        # after TP
-                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")                    
+                        # after TP                   
                         if self.qmc.timeindex[6]:
                             ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
                         else:
@@ -13443,18 +13443,20 @@ class ApplicationWindow(QMainWindow):
                         self.TPlcd.display(u(" --- "))
                 elif aw.qmc.phasesLCDmode == 2: # temp mode
                     self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #dave
+                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
                     if self.qmc.TPalarmtimeindex:
                         if self.qmc.timeindex[6]: # after drop
                             dBT = self.qmc.temp2[self.qmc.timeindex[6]]
                         else:
                             dBT = self.qmc.temp2[-1]
                         dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.TPalarmtimeindex])
-                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
                         self.TPlcd.display(u(dBT + self.qmc.mode))                       
                     else:
                         # before TP
                         self.TPlcd.display(u(" --- "))
-                # DRY phase LCD
+                        
+                        
+                # 2nd PhaseLCD: DRY
                 if self.qmc.timeindex[1]:
                     # after DRY
                     if self.qmc.timeindex[6]:
@@ -13492,10 +13494,10 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # before DRY
                     dryexpectedtime = None
-                    if aw.qmc.phasesLCDmode == 0:
-                        self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
-                    else:
+                    if aw.qmc.phasesLCDmode == 2:
                         self.DRYlabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
+                    else:
+                        self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
                     if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         # display expected time to reach DRY as defined in the background profile or the phases dialog
                         if self.qmc.background and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
@@ -13504,10 +13506,10 @@ class ApplicationWindow(QMainWindow):
                             drytarget = self.qmc.phases[1] # Drying max phases definition
                         if drytarget > self.qmc.temp2[-1]:
                             dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
-                            if aw.qmc.phasesLCDmode == 0:
-                                tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime)))
-                            else:
+                            if aw.qmc.phasesLCDmode == 2:
                                 tstring = u(self.qmc.stringfromseconds(int(dryexpectedtime)))
+                            else:
+                                tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime)))
                             self.DRYlcd.display(tstring)
                         else:
                             self.DRYlcd.display(u("--:--"))
@@ -13520,7 +13522,9 @@ class ApplicationWindow(QMainWindow):
                         self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
                     else:
                         self.TP2DRYlabel.setText("")
-                # FCs phase LCD  
+                        
+                        
+                # 3rd PhasesLCD: FCs
                 if self.qmc.timeindex[2]:
                     # after FCs
                     if self.qmc.timeindex[6]: # after drop
@@ -13562,13 +13566,15 @@ class ApplicationWindow(QMainWindow):
                     if aw.qmc.phasesLCDmode == 0:
                         self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #marko
                         self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
-                    else:
+                    elif aw.qmc.phasesLCDmode == 1:
+                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #marko
+                        self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
+                    elif aw.qmc.phasesLCDmode == 2:
+                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #marko
                         self.FCslabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")                    
-                        if aw.qmc.phasesLCDmode == 1:
-                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #marko
-                        elif aw.qmc.phasesLCDmode == 2:
-                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #marko
+                            
                     if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
+                        # after DRY:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                         self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
                         # display expected time to reach FCs as defined in the background profile or the phases dialog
@@ -13578,21 +13584,24 @@ class ApplicationWindow(QMainWindow):
                             fcstarget = self.qmc.phases[2] # FCs min phases definition
                         if fcstarget > self.qmc.temp2[-1]:
                             fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
-                            if aw.qmc.phasesLCDmode == 0:
-                                tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime)))
-                            else:
+                            if aw.qmc.phasesLCDmode == 2:
                                 tstring = u(self.qmc.stringfromseconds(int(fcsexpectedtime)))
+                            else:
+                                tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime)))
                             self.FCslcd.display(tstring)
                         else:
                             self.FCslcd.display(u("--:--"))
                     else:
                         self.FCslcd.display(u("--:--"))
+                        
                     # DRY2FCs (display estimated time between DRY and FCs)
                     if fcsexpectedtime and window_width > 950 and self.qmc.timeindex[1]:
                         t = tx - self.qmc.timex[self.qmc.timeindex[1]] + fcsexpectedtime # time after DRY plus expected-time-to-FCs = total time expected for 2nd phase
                         self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
                     else:
                         self.DRY2FCslabel.setText("")
+                        
+                        
             else:
                 if aw.qmc.phasesLCDmode == 0: # time mode
                     self.TPlcd.display("--:--")                
@@ -15426,10 +15435,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
         if path is None:   
             path = self.getDefaultPath()
-        if platf == 'Linux': # avoid complications with file icons on RPi
-            res = u(QFileDialog.getOpenFileName(self,msg,path,ext, options=QFileDialog.DontUseCustomDirectoryIcons)[0])
-        else:
-            res = u(QFileDialog.getOpenFileName(self,msg,path,ext)[0])
+        res = u(QFileDialog.getOpenFileName(self,msg,path,ext)[0])
         f = u(res)
         self.setDefaultPath(f)
         return f
@@ -36371,16 +36377,19 @@ class serialport(object):
                     self.PhidgetIOvalues[channel] = v
 
     def phidget1018getSensorReading(self,i,idx,digital=False):
-        if not digital and aw.qmc.phidget1018_async[i]:            
-            if self.PhidgetIOvalues[i] == -1:
-                self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
-            return self.PhidgetIOvalues[i]
-        else:
-            if digital:
-                v = self.PhidgetIOvalues[i] = int(self.PhidgetIO[idx].getState())
+        if self.PhidgetIO and len(self.PhidgetIO) > idx: 
+            if not digital and aw.qmc.phidget1018_async[i]:            
+                if self.PhidgetIOvalues[i] == -1:
+                    self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
+                return self.PhidgetIOvalues[i]
             else:
-                v = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
-            return v
+                if digital:
+                    v = self.PhidgetIOvalues[i] = int(self.PhidgetIO[idx].getState())
+                else:
+                    v = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
+                return v
+        else:
+            return -1
 
     def configure1018(self,deviceType,idx,digital=False):
         # set data rates of all active inputs to 4ms
@@ -36502,7 +36511,7 @@ class serialport(object):
                         try:
                             if self.PhidgetIO and self.PhidgetIO[0].getAttached():
                                 self.PhidgetIO[0].close()
-                            if mode != 2 and self.PhidgetIO and len(self.PhidgetIO)> 1 and self.PhidgetIO[1].getAttached():
+                            if self.PhidgetIO and len(self.PhidgetIO)> 1 and self.PhidgetIO[1].getAttached():
                                 self.PhidgetIO[1].close()                            
                         except Exception:
                             pass
@@ -36530,7 +36539,7 @@ class serialport(object):
             try:
                 if self.PhidgetIO and self.PhidgetIO[0].getAttached():
                     self.PhidgetIO[0].close()
-                if mode != 2 and self.PhidgetIO and len(self.PhidgetIO)> 1 and self.PhidgetIO[1].getAttached():
+                if self.PhidgetIO and len(self.PhidgetIO)> 1 and self.PhidgetIO[1].getAttached():
                     self.PhidgetIO[1].close()                            
             except Exception:
                 pass
