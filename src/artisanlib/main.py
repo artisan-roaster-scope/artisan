@@ -985,6 +985,8 @@ class tgraphcanvas(FigureCanvas):
         self.extramarkers1,self.extramarkers2 = [],[]               # list of extra curve marker styles
         self.extramarkersizes1,self.extramarkersizes2 = [],[]       # list of extra curve marker size
         
+        self.devicetablecolumnwidths = []
+        
         # the following two list are generated on ON from the extradevices types and might be longer or smaller than len(self.extradevices)
         # if no entry is available, a temperature curve that needs C<->F translation is assumed
         # note that ET/BT main curves are assumed to always hold temperatures
@@ -1420,6 +1422,7 @@ class tgraphcanvas(FigureCanvas):
                                     # 17 (RampSoak_ON), 18 (RampSoak_OFF), 19 (PID_ON), 20 (PID_OFF)
         self.alarmbeep = []    # 0 = OFF; 1 = ON flags
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
+        self.alarmtablecolumnwidths = []
 
         self.loadalarmsfromprofile = False # if set, alarms are loaded from profile (even background profiles)
         self.alarmsfile = "" # filename alarms were loaded from
@@ -11692,6 +11695,8 @@ class ApplicationWindow(QMainWindow):
         self.buttonpalettemaxlen = [14]*10  #keeps max number of buttons per row per palette
         self.buttonpalette_shortcuts = True # if True palettes can be changed via the number keys
 
+        self.eventbuttontablecolumnwidths = [] # custom event button table column widths
+
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
         self.lowerbuttondialog.setContentsMargins(0,0,0,10)
@@ -18287,6 +18292,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmsfile = toString(settings.value("alarmsfile",self.qmc.loadalarmsfromprofile))
                 if settings.contains("alarm_popup_timout"):
                     self.qmc.alarm_popup_timout = toInt(settings.value("alarm_popup_timout",aw.qmc.alarm_popup_timout))
+                if settings.contains("alarmtablecolumnwidths"):
+                    self.qmc.alarmtablecolumnwidths = [toInt(x) for x in toList(settings.value("alarmtablecolumnwidths",self.qmc.alarmtablecolumnwidths))]
             settings.endGroup()
             #restore TC4/Arduino PID settings
             settings.beginGroup("ArduinoPID")
@@ -18594,7 +18601,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ETBdeltalinewidth = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth))))
                 self.qmc.ETBdeltamarker = s2a(toString(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker)))
                 self.qmc.ETBdeltamarkersize = max(0.1,aw.float2float(toFloat(settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize))))
-                
+                                
+                if settings.contains("devicetablecolumnwidths"):
+                    self.qmc.devicetablecolumnwidths = [toInt(x) for x in toList(settings.value("devicetablecolumnwidths",self.qmc.devicetablecolumnwidths))]
+
             settings.endGroup()
             
             ndevices = len(self.qmc.extradevices)
@@ -18814,6 +18824,8 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventbuttontextcolor[i] = str(self.extraeventbuttontextcolor[i])
                 if settings.contains("buttonpalette_shortcuts"):
                     self.buttonpalette_shortcuts = bool(toBool(settings.value("buttonpalette_shortcuts",self.buttonpalette_shortcuts)))
+                if settings.contains("eventbuttontablecolumnwidths"):
+                    self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value("eventbuttontablecolumnwidths",self.eventbuttontablecolumnwidths))]                
             settings.endGroup()
             # Extras more info            
             settings.beginGroup("ExtrasMoreInfo")
@@ -19605,6 +19617,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)
             settings.setValue("alarmsfile",self.qmc.alarmsfile)
             settings.setValue("alarm_popup_timout",self.qmc.alarm_popup_timout)
+            settings.setValue("alarmtablecolumnwidths",self.qmc.alarmtablecolumnwidths)
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
             settings.setValue("settingspath",self.settingspath)
@@ -19698,6 +19711,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extramarkers2",self.qmc.extramarkers2)
             settings.setValue("extramarkersizes1",self.qmc.extramarkersizes1)
             settings.setValue("extramarkersizes2",self.qmc.extramarkersizes2)
+            settings.setValue("devicetablecolumnwidths",self.qmc.devicetablecolumnwidths)
             settings.endGroup()
             #background settings
             settings.beginGroup("background")
@@ -19735,6 +19749,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("buttonpalette",self.buttonpalette)
             settings.setValue("buttonpalettemaxlen",self.buttonpalettemaxlen)
             settings.setValue("buttonpalette_shortcuts",self.buttonpalette_shortcuts)
+            settings.setValue("eventbuttontablecolumnwidths",self.eventbuttontablecolumnwidths)
             settings.endGroup()
             settings.beginGroup("RoRlimits")
             settings.setValue("RoRlimitFlag",self.qmc.RoRlimitFlag)
@@ -31317,9 +31332,15 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.horizontalHeader().setStretchLastSection(False)
         self.eventbuttontable.resizeColumnsToContents()
         self.eventbuttontable.horizontalHeader().setStretchLastSection(True)
+        # remember the columnwidth
         self.eventbuttontable.setColumnWidth(0,70)
         self.eventbuttontable.setColumnWidth(1,80)
         self.eventbuttontable.setColumnWidth(3,50)
+        for i in range(len(aw.eventbuttontablecolumnwidths)):
+            try:
+                self.eventbuttontable.setColumnWidth(i,aw.eventbuttontablecolumnwidths[i])      
+            except:
+                pass
 
     def setbuttoncolor(self,x):
         colorf = aw.colordialog(QColor(aw.extraeventbuttoncolor[x]))
@@ -31754,6 +31775,8 @@ class EventsDlg(ArtisanDialog):
     def updatetypes(self):
         try:
             self.savetableextraeventbutton()
+            # save column widths
+            aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]        
             #save default buttons
             aw.qmc.buttonvisibility[0] = self.CHARGEbutton.isChecked()
             aw.button_8.setVisible(bool(aw.qmc.buttonvisibility[0]))
@@ -40287,8 +40310,15 @@ class DeviceAssignmentDlg(ArtisanDialog):
 #                        traceback.print_exc(file=sys.stdout)
                         pass
                 self.devicetable.resizeColumnsToContents()
+                # remember the columnwidth
+                for i in range(len(aw.qmc.devicetablecolumnwidths)):
+                    try:
+                        self.devicetable.setColumnWidth(i,aw.qmc.devicetablecolumnwidths[i])
+                    except:
+                        pass
                 header = self.devicetable.horizontalHeader()
                 header.setStretchLastSection(True)
+                
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " createDeviceTable(): {0}").format(str(e)),exc_tb.tb_lineno)
@@ -40539,6 +40569,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         try:
             #save any extra devices here
             self.savedevicetable(redraw=False)
+            aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
+            
             message = QApplication.translate("Message","Device not set", None)
             # by default switch PID buttons/LCDs off
             aw.button_10.setVisible(False)
@@ -42756,7 +42788,6 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem):
       
 class MyTableWidgetItemInt(QTableWidgetItem):
     def __init__(self, text, sortKey):
-        #QTableWidgetItem.__init__(self, text, QTableWidgetItem.UserType)
         super(QTableWidgetItem,self).__init__(text, QTableWidgetItem.UserType)
         self.sortKey = sortKey
 
@@ -42802,6 +42833,7 @@ class AlarmDlg(ArtisanDialog):
         
         #table for alarms
         self.alarmtable = QTableWidget()
+        self.alarmtable.itemSelectionChanged.connect(self.selectionChanged)
         self.createalarmtable()
         allonButton = QPushButton(QApplication.translate("Button","All On",None))
         allonButton.clicked.connect(lambda _: self.alarmson(1))
@@ -42812,7 +42844,14 @@ class AlarmDlg(ArtisanDialog):
         addButton = QPushButton(QApplication.translate("Button","Add",None))
         addButton.clicked.connect(lambda _:self.addalarm())
         addButton.setMinimumWidth(80)
-        addButton.setFocusPolicy(Qt.NoFocus)
+        addButton.setFocusPolicy(Qt.NoFocus)   
+        
+        self.insertButton = QPushButton(QApplication.translate("Button","Insert",None))
+        self.insertButton.clicked.connect(lambda _:self.insertalarm())
+        self.insertButton.setMinimumWidth(80)
+        self.insertButton.setFocusPolicy(Qt.NoFocus)
+        self.insertButton.setEnabled(False)
+                     
         deleteButton = QPushButton(QApplication.translate("Button","Delete",None))
         deleteButton.clicked.connect(lambda _:self.deletealarm())
         deleteButton.setMinimumWidth(80)
@@ -42851,13 +42890,13 @@ class AlarmDlg(ArtisanDialog):
         self.alarmsfile = QLabel(aw.qmc.alarmsfile)
         self.alarmsfile.setAlignment(Qt.AlignRight)
         self.alarmsfile.setMinimumWidth(300)
-        self.alarmsfile.setMaximumWidth(300)
         tablelayout = QVBoxLayout()
         buttonlayout = QHBoxLayout()
         okbuttonlayout = QHBoxLayout()
         mainlayout = QVBoxLayout()
         tablelayout.addWidget(self.alarmtable)
         buttonlayout.addWidget(addButton)
+        buttonlayout.addWidget(self.insertButton)
         buttonlayout.addWidget(deleteButton)
         buttonlayout.addStretch()
         buttonlayout.addSpacing(10)
@@ -42877,7 +42916,7 @@ class AlarmDlg(ArtisanDialog):
         okbuttonlayout.addSpacing(15)
         okbuttonlayout.addWidget(popupTimeoutLabel)
         okbuttonlayout.addWidget(self.popupTimoutSpinBox)
-        okbuttonlayout.addStretch()
+#        okbuttonlayout.addStretch()
         okbuttonlayout.addWidget(self.alarmsfile)
         okbuttonlayout.addSpacing(15)
         okbuttonlayout.addWidget(okButton)
@@ -42885,6 +42924,13 @@ class AlarmDlg(ArtisanDialog):
         mainlayout.addLayout(buttonlayout)
         mainlayout.addLayout(okbuttonlayout)
         self.setLayout(mainlayout)
+        
+    def selectionChanged(self):
+        selected = self.alarmtable.selectedRanges()
+        if selected and len(selected) > 0:
+            self.insertButton.setEnabled(True)	
+        else:	
+            self.insertButton.setEnabled(False)
 
     def deselectAll(self):
         selected = self.alarmtable.selectedRanges()
@@ -42935,14 +42981,17 @@ class AlarmDlg(ArtisanDialog):
         nalarms = self.alarmtable.rowCount()
         self.alarmtable.setRowCount(nalarms + 1)
         self.setalarmtablerow(nalarms)
-        self.alarmtable.resizeColumnsToContents()
-        self.alarmtable.resizeRowsToContents()
-        # improve width of Qlineedit columns
-        self.alarmtable.setColumnWidth(2,50)
-        self.alarmtable.setColumnWidth(3,50)
-        self.alarmtable.setColumnWidth(5,50)
-        self.alarmtable.setColumnWidth(6,80)
-        self.alarmtable.setColumnWidth(8,40)
+        
+        if len(aw.qmc.alarmflag) == 1: # only for the first entry we apply some default column width
+            self.alarmtable.resizeColumnsToContents()
+            self.alarmtable.resizeRowsToContents()
+            # improve width of Qlineedit columns
+            self.alarmtable.setColumnWidth(2,50)
+            self.alarmtable.setColumnWidth(3,50)
+            self.alarmtable.setColumnWidth(5,50)
+            self.alarmtable.setColumnWidth(6,80)
+            self.alarmtable.setColumnWidth(8,40)
+        
         header = self.alarmtable.horizontalHeader()
         header.setStretchLastSection(False)
         self.deselectAll()
@@ -42952,6 +43001,67 @@ class AlarmDlg(ArtisanDialog):
         self.markNotEnabledAlarmRows()
         self.alarmtable.setSortingEnabled(True)
 
+    def insertalarm(self):
+        self.alarmtable.setSortingEnabled(False)
+        nalarms = self.alarmtable.rowCount()
+        if nalarms:
+            # check for selection
+            selected = self.alarmtable.selectedRanges()
+            if selected and len(selected) > 0:
+                selected_row = selected[0].topRow()
+                selected_row = int(self.alarmtable.item(selected_row,0).text()) -1 # we derref the rows number that might be different per sorting order
+                aw.qmc.alarmflag.insert(selected_row,1)
+                aw.qmc.alarmguard.insert(selected_row,-1)
+                aw.qmc.alarmnegguard.insert(selected_row,-1)
+                aw.qmc.alarmtime.insert(selected_row,-1)
+                aw.qmc.alarmoffset.insert(selected_row,0)
+                aw.qmc.alarmcond.insert(selected_row,1)
+                aw.qmc.alarmstate.insert(selected_row,0)
+                aw.qmc.alarmsource.insert(selected_row,1)
+                aw.qmc.alarmtemperature.insert(selected_row,500)
+                aw.qmc.alarmaction.insert(selected_row,0)
+                aw.qmc.alarmbeep.insert(selected_row,0)
+                aw.qmc.alarmstrings.insert(selected_row,QApplication.translate("Label","Enter description",None))
+                self.alarmtable.insertRow(selected_row)
+                self.setalarmtablerow(selected_row)
+#                self.alarmtable.resizeColumnsToContents()
+#                #  improve width of Qlineedit columns
+#                self.alarmtable.setColumnWidth(2,50)
+#                self.alarmtable.setColumnWidth(3,50)
+#                self.alarmtable.setColumnWidth(5,50)
+#                self.alarmtable.setColumnWidth(6,80)
+#                self.alarmtable.setColumnWidth(8,40)
+                header = self.alarmtable.horizontalHeader()
+                header.setStretchLastSection(False)
+                self.deselectAll()
+                # select newly inserted item
+                self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(selected_row,0,selected_row,self.alarmtable.columnCount()-1),True)
+                header.setStretchLastSection(True)
+                self.markNotEnabledAlarmRows()
+                self.alarmtable.sortItems(0, Qt.AscendingOrder) # we first have to sort the table according to the row numbers
+                # we no re-number rows
+                self.renumberRows()
+                # we correct the IfAlarm and ButNot references to items after the inserted one
+                for i in range(self.alarmtable.rowCount()):
+                    guard = self.alarmtable.cellWidget(i,2)
+                    try:
+                        guard_value = int(str(guard.text())) - 1
+                    except Exception:
+                        guard_value = -1
+                    if guard_value >= selected_row:
+                        guard.setText(str(guard_value+2))
+                    nguard = self.alarmtable.cellWidget(i,3)
+                    try:
+                        nguard_value = int(str(nguard.text())) - 1
+                    except Exception:
+                        nguard_value = -1
+                    if nguard_value >= selected_row:
+                        nguard.setText(str(nguard_value+2))
+        self.alarmtable.setSortingEnabled(True)
+        
+    def renumberRows(self):
+        for i in range(self.alarmtable.rowCount()):
+            self.alarmtable.setItem(i, 0, MyTableWidgetItemInt(str(i+1),i))
 
     def deletealarm(self):
         self.alarmtable.setSortingEnabled(False)
@@ -42961,6 +43071,7 @@ class AlarmDlg(ArtisanDialog):
             selected = self.alarmtable.selectedRanges()
             if selected and len(selected) > 0:
                 selected_row = selected[0].topRow()
+                selected_row = int(self.alarmtable.item(selected_row,0).text()) # we derref the rows number that might be different per sorting order
                 self.alarmtable.removeRow(selected_row)
                 aw.qmc.alarmflag = aw.qmc.alarmflag[0:selected_row] + aw.qmc.alarmflag[selected_row + 1:]
                 aw.qmc.alarmguard = aw.qmc.alarmguard[0:selected_row] + aw.qmc.alarmguard[selected_row + 1:]
@@ -42979,9 +43090,25 @@ class AlarmDlg(ArtisanDialog):
                 # select row number that was just deleted
                 self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(selected_row,0,selected_row,self.alarmtable.columnCount()-1),True)
                 self.alarmtable.sortItems(0)
+                self.alarmtable.sortItems(0, Qt.AscendingOrder) # we first have to sort the table according to the row numbers
                 # renumber elements
-                for i in range(nalarms - 1):
-                    self.alarmtable.setItem(i, 0, MyTableWidgetItemInt(str(i+1),i))
+                self.renumberRows()
+                # we correct the IfAlarm and ButNot references to items after the deleted one
+                for i in range(self.alarmtable.rowCount()):
+                    guard = self.alarmtable.cellWidget(i,2)
+                    try:
+                        guard_value = int(str(guard.text())) - 1
+                    except Exception:
+                        guard_value = -1
+                    if guard_value >= selected_row:
+                        guard.setText(str(guard_value))
+                    nguard = self.alarmtable.cellWidget(i,3)
+                    try:
+                        nguard_value = int(str(nguard.text())) - 1
+                    except Exception:
+                        nguard_value = -1
+                    if nguard_value >= selected_row:
+                        nguard.setText(str(nguard_value))                    
             else:
                 self.alarmtable.removeRow(self.alarmtable.rowCount() - 1)
                 # nothing selected, we pop the last element
@@ -43075,6 +43202,9 @@ class AlarmDlg(ArtisanDialog):
 
     def closealarms(self):
         self.savealarms()
+        # save column widths
+        aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
+        
         aw.qmc.alarm_popup_timout = int(self.popupTimoutSpinBox.value())
         settings = QSettings()
         #save window geometry
@@ -43331,7 +43461,7 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.setTabKeyNavigation(True)
             self.alarmtable.setColumnCount(12)
             self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Nr",None),
-                                                            QApplication.translate("Table","Status",None),
+                                                           QApplication.translate("Table","Status",None),
                                                            QApplication.translate("Table","If Alarm",None),
                                                            QApplication.translate("Table","But Not",None),
                                                            QApplication.translate("Table","From",None),
@@ -43357,12 +43487,12 @@ class AlarmDlg(ArtisanDialog):
                 for i in range(nalarms):
                     self.setalarmtablerow(i)
                 self.alarmtable.resizeColumnsToContents()
-                # improve width of Qlineedit columns
-#                self.alarmtable.setColumnWidth(2,60)
-#                self.alarmtable.setColumnWidth(3,60)
-#                self.alarmtable.setColumnWidth(5,60)
-#                self.alarmtable.setColumnWidth(6,80)
-#                self.alarmtable.setColumnWidth(8,60)
+                # remember the columnwidth
+                for i in range(len(aw.qmc.alarmtablecolumnwidths)):
+                    try:
+                        self.alarmtable.setColumnWidth(i,aw.qmc.alarmtablecolumnwidths[i])
+                    except:
+                        pass
                 header = self.alarmtable.horizontalHeader()
                 header.setStretchLastSection(True)
                 self.markNotEnabledAlarmRows()
