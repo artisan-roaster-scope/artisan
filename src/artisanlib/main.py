@@ -11833,6 +11833,7 @@ class ApplicationWindow(QMainWindow):
 
         # TP2DRY
         self.TP2DRYlabel = QLabel("")
+        self.TP2DRYlabel.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         TP2DRYlayout = QHBoxLayout()
         TP2DRYlayout.addWidget(self.TP2DRYlabel)
         TP2DRYlayout.setContentsMargins(3,0,3,0)
@@ -11851,6 +11852,7 @@ class ApplicationWindow(QMainWindow):
 
         # DRY2FCs
         self.DRY2FCslabel = QLabel("")
+        self.DRY2FCslabel.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         DRY2FCslayout = QHBoxLayout()
         DRY2FCslayout.addWidget(self.DRY2FCslabel)
         DRY2FCslayout.setContentsMargins(3,0,3,0)
@@ -13524,9 +13526,16 @@ class ApplicationWindow(QMainWindow):
                     # TP2DRY (display estimated time between TP and DRY)
                     if dryexpectedtime and window_width > 950 and self.qmc.TPalarmtimeindex:
                         t = tx - self.qmc.timex[self.qmc.TPalarmtimeindex] + dryexpectedtime # time after TP plus expected-time-to-DRY = total time expected for 1nd phase
-                        self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                        if t > 3600:
+                            self.TP2DRYlabel.setText("")
+                            self.TP2DRYlabel.setMinimumWidth(0)
+                        else:
+                            self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                            width = self.TP2DRYlabel.fontMetrics().boundingRect("88:::88").width()
+                            self.TP2DRYlabel.setMinimumWidth(width)
                     else:
                         self.TP2DRYlabel.setText("")
+                        self.TP2DRYlabel.setMinimumWidth(0)
                         
                         
                 # 3rd PhasesLCD: FCs
@@ -13603,6 +13612,8 @@ class ApplicationWindow(QMainWindow):
                     if fcsexpectedtime and window_width > 950 and self.qmc.timeindex[1]:
                         t = tx - self.qmc.timex[self.qmc.timeindex[1]] + fcsexpectedtime # time after DRY plus expected-time-to-FCs = total time expected for 2nd phase
                         self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                        width = self.DRY2FCslabel.fontMetrics().boundingRect("88:::88").width()
+                        self.DRY2FCslabel.setMinimumWidth(width)
                     else:
                         self.DRY2FCslabel.setText("")
                         
@@ -43071,7 +43082,7 @@ class AlarmDlg(ArtisanDialog):
             selected = self.alarmtable.selectedRanges()
             if selected and len(selected) > 0:
                 selected_row = selected[0].topRow()
-                selected_row = int(self.alarmtable.item(selected_row,0).text()) # we derref the rows number that might be different per sorting order
+                selected_row = int(self.alarmtable.item(selected_row,0).text()) -1 # we derref the rows number that might be different per sorting order
                 self.alarmtable.removeRow(selected_row)
                 aw.qmc.alarmflag = aw.qmc.alarmflag[0:selected_row] + aw.qmc.alarmflag[selected_row + 1:]
                 aw.qmc.alarmguard = aw.qmc.alarmguard[0:selected_row] + aw.qmc.alarmguard[selected_row + 1:]
