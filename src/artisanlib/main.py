@@ -11878,6 +11878,7 @@ class ApplicationWindow(QMainWindow):
         self.AUClcdFrame = self.makePhasesLCDbox(self.AUClabel,self.AUClcd)
         self.AUClcdFrame.setFrameStyle(QFrame.Plain)
         self.AUClcd.setNumDigits(3)
+        self.AUClcd.setMinimumWidth(65)
         self.AUClcdFrame.setStyleSheet("background-color: rgb(210,210,210);")
         
         AUCLayout = QHBoxLayout()
@@ -13342,16 +13343,16 @@ class ApplicationWindow(QMainWindow):
         lcd.setLineWidth(0)
         lcd.setContentsMargins(0, 0, 0, 0)
         frame = QFrame()
-        LCDHbox = QVBoxLayout()
-        LCDHbox.addWidget(label)
-        LCDHbox.addWidget(lcd)
-        LCDHbox.setSpacing(0)
-        LCDHbox.setContentsMargins(0, 0, 0, 0)
+        LCDVbox = QVBoxLayout()
+        LCDVbox.addWidget(label)
+        LCDVbox.addWidget(lcd)
+        LCDVbox.setSpacing(0)
+        LCDVbox.setContentsMargins(0, 0, 0, 0)
         frame.setStyleSheet("background-color: rgb(230,230,230);")
         frame.setFrameShadow(QFrame.Sunken)
         frame.setLineWidth(1)
         frame.setFrameShape(QFrame.Panel)
-        frame.setLayout(LCDHbox)
+        frame.setLayout(LCDVbox)
         return frame
 
     def updateAUCLCD(self):
