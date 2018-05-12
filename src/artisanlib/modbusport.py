@@ -433,7 +433,8 @@ class modbusport(object):
                     res = self.master.read_holding_registers(int(register),2,unit=int(slave))
                 else:
                     res = self.master.read_input_registers(int(register),2,unit=int(slave))
-                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,Exception):
+#                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,Exception):
+                if res is None or res.isError(): # requires pymodbus v1.5.1
                     if retry > 0:
                         retry = retry - 1
                         #time.sleep(0.020)
@@ -474,7 +475,8 @@ class modbusport(object):
                     res = self.master.read_holding_registers(int(register),1,unit=int(slave))
                 else:
                     res = self.master.read_input_registers(int(register),1,unit=int(slave))
-                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,Exception):
+#                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,Exception):
+                if res is None or res.isError(): # requires pymodbus v1.5.1
                     if retry > 0:
                         retry = retry - 1
                         #time.sleep(0.020)
@@ -519,7 +521,8 @@ class modbusport(object):
                 res = self.master.read_holding_registers(int(register),1,unit=int(slave))
         except Exception:
             res = None
-        if res is not None and not isinstance(res,ExceptionResponse) and not isinstance(res,Exception):
+#        if res is not None and not isinstance(res,ExceptionResponse) and not isinstance(res,Exception):
+        if res is not None and not res.isError(): # requires pymodbus v1.5.1
             if code in [1,2]:
                 if res is not None and res.bits[0]:
                     return 1
@@ -559,7 +562,8 @@ class modbusport(object):
                         res = self.master.read_holding_registers(int(register),1,unit=int(slave))
                 except Exception:
                     res = None
-                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,Exception):
+#                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,Exception):
+                if res is None or res.isError(): # requires pymodbus v1.5.1
                     if retry > 0:
                         retry = retry - 1
                         time.sleep(0.020)
