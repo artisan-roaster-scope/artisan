@@ -5356,7 +5356,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 roastoftheday = ''
 
-            cp = aw.computedProfileInformation()  # get all the computed proflie information
+            cp = aw.computedProfileInformation()  # get all the computed profile information
 
             skipline = '\n'
             statstr = ''
@@ -13328,10 +13328,10 @@ class ApplicationWindow(QMainWindow):
     def makePhasesLCDbox(self,label,lcd):
         label.setAlignment(Qt.Alignment(Qt.AlignRight | Qt.AlignVCenter))
         lcd.setMinimumHeight(30)
-        lcd.setMinimumWidth(70)
+        lcd.setMinimumWidth(84)
         lcd.setSegmentStyle(2)
         lcd.setFrameStyle(QFrame.Plain)
-        lcd.setNumDigits(5)
+        lcd.setNumDigits(6)
         lcd.setLineWidth(0)
         lcd.setContentsMargins(0, 0, 0, 0)
         frame = QFrame()
@@ -13414,7 +13414,7 @@ class ApplicationWindow(QMainWindow):
 
                 # 1st PhaseLCD: TP
                 if aw.qmc.phasesLCDmode == 0: # time mode
-                    self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #dave
+                    self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TIME MODE", None))
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>") 
                     if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
                         # after TP                   
@@ -13428,7 +13428,7 @@ class ApplicationWindow(QMainWindow):
                         # before TP
                         self.TPlcd.display(u("--:--"))
                 elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                    self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #dave
+                    self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in PERCENTAGE MODE", None))
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
                     if self.qmc.timeindex[1]: # after DRY
                         ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
@@ -13442,7 +13442,7 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.TPlcd.display(u(" --- "))
                 elif aw.qmc.phasesLCDmode == 2: # temp mode
-                    self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #dave
+                    self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TEMP MODE", None))
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
                     if self.qmc.TPalarmtimeindex:
                         if self.qmc.timeindex[6]: # after drop
