@@ -3844,6 +3844,7 @@ class tgraphcanvas(FigureCanvas):
             ### REDRAW  ##
             if redraw:
                 self.redraw(True,sampling=sampling)
+            QApplication.processEvents() # this one seems to be needed for a proper redraw in fullscreen mode on OS X if a profile was loaded and NEW is pressed
             return True
 
     def medfilt(self, x, k):
@@ -5324,8 +5325,9 @@ class tgraphcanvas(FigureCanvas):
                 # HACK
                 # a bug in Qt/PyQt/mpl cause the canvas not to be repainted on load/switch/reset in fullscreen mode without this
                 try:
-                    if platf == 'Darwin' and app.allWindows()[0].visibility() == QWindow.FullScreen:
+                    if platf == 'Darwin' and app.allWindows()[0].visibility() == QWindow.FullScreen or aw.full_screen_mode_active or aw.isFullScreen():
                         aw.qmc.repaint()
+                        QApplication.processEvents()
                 except:
                     pass
                         
@@ -6085,7 +6087,9 @@ class tgraphcanvas(FigureCanvas):
             self.block_update = False # unblock the updating of the bitblit canvas            
             aw.showLCDs() # this one triggers the resize and the recreation of the bitblit canvas
             self.threadserver.createSampleThread()
+            QApplication.processEvents()
             self.StartAsyncSamplingAction()
+            QApplication.processEvents()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -6101,7 +6105,8 @@ class tgraphcanvas(FigureCanvas):
             self.flagon = False
             # now wait until the current sampling round is done
             while self.flagsampling:
-                libtime.sleep(0.01)
+                libtime.sleep(0.02)
+                QApplication.processEvents()
             # clear data from monitoring-only mode
             if len(self.timex) == 1:
                 aw.qmc.clearMeasurements()
@@ -6117,6 +6122,7 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     aw.fujipid.sv = 0
             self.disconnectProbes()
+            QApplication.processEvents()
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.button_7.setEnabled(True)
@@ -6142,9 +6148,11 @@ class tgraphcanvas(FigureCanvas):
             aw.pidcontrol.activateONOFFeasySV(False)
             self.StopAsyncSamplingAction()
             aw.enableEditMenus()
+            QApplication.processEvents()
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
             #appnope.nap()
             aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
+            QApplication.processEvents()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
