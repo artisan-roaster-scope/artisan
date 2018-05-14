@@ -16,11 +16,14 @@ Artisan Getting Started Guide is maintained by *Michael Herbert of Evergreen Buz
 
 Roasters Covered
 
-You will find many roaster manufacturers are now supporting Artisan.  In 1.3, you will find simplified setup for the ones offering support.    See:
+You will find many roaster manufacturers are now supporting Artisan.  In 1.3, you will find simplified setup for the ones offering support.    
 
-https://artisan-scope.org/machines/
+See:https://artisan-scope.org/machines/
+
+
 
 Under Config>Machine, 1.3 has direct support for:
+
 	•	Aillio Bullet R1 including profile imports
 	•	BC Roasters
 	•	Bühler Roastmaster
@@ -38,7 +41,7 @@ Under Config>Machine, 1.3 has direct support for:
 	•	Toper TKM-SX
 	•	US Roaster Corp
 
-Installing Software and Getting Connected to a Roaster
+**Installing Software and Getting Connected to a Roaster**
 
 Determine what connection devices you have.  Mine had a 1048 Phidget
 https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=38
