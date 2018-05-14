@@ -1,5 +1,4 @@
 #!/bin/sh
 
-cd /usr/share/artisan
 exec /usr/bin/env QT_PLUGIN_PATH=/usr/share/artisan/PyQt5/Qt/plugins LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/gtk-3.0/modules:/usr/share/artisan:$LD_LIBRARY_PATH LIBOVERLAY_SCROLLBAR=0 GTK2_RC_FILES="$HOME/.gtkrc-2.0" /usr/share/artisan/artisan "$@" 2>/dev/null
 
