@@ -1,4 +1,11 @@
 #!/bin/sh
 
+if [ -f /etc/os-release ]; then
+    grep Raspbian /etc/os-release >/dev/null
+    # Workaround for issue #187
+    if [ $? -eq 0 ]; then
+	unset XDG_CURRENT_DESKTOP
+    fi
+fi
 exec /usr/bin/env QT_PLUGIN_PATH=/usr/share/artisan/PyQt5/Qt/plugins LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/gtk-3.0/modules:/usr/share/artisan:$LD_LIBRARY_PATH LIBOVERLAY_SCROLLBAR=0 GTK2_RC_FILES="$HOME/.gtkrc-2.0" /usr/share/artisan/artisan "$@" 2>/dev/null
 
