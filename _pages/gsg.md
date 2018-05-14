@@ -1,3 +1,4 @@
+---
 layout: single
 permalink: /gsg/
 header:
