@@ -7,6 +7,7 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 ### Roast Properties Dialog
 
 Under the Roast Properties, you can input many parameters for your current batch and you can choose a Profile to run in the background.
+
 ![roasting menus](/assets/images/gsg/roast menu.png)
 
 When you enter the coffee bean name here, it shows up on the graph.  To save them hit the + sign to the right of the name.  You can add notes about the beans, and the roaster.  With weight and volume entered, density can be calculated.  You can note moisture as well if you know it.  On the second tab Notes, you can add roasting and cupping notes.  Events and Data are entered by Artisan when the roast is done.  

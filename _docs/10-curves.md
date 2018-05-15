@@ -13,6 +13,7 @@ These are critical settings within Artisan and for most the first two tabs will 
 
 First you decide which ROR curves and LCD’s you want to display, and the projection of them will be linear or Newton.  You will just have to play with those options and decide which you prefer.
 ![curves ror](/assets/images/gsg/curves ror.png)
+
 Secondly you decide on the filters tab how you want the curves to display.  If you want the curves to be the same during and after the roast your settings will be different than if you want additional post roast filtering/smoothing.  
 ![curves filters](/assets/images/gsg/curves-filters.png)
 
