@@ -18,7 +18,7 @@ Roasters Covered
 
 You will find many roaster manufacturers are now supporting Artisan.  In 1.3, you will find simplified setup for the ones offering support.    
 
-See:(https://artisan-scope.org/machines/ "Artisan Machines")
+See:[Aritsan Machines](https://artisan-scope.org/machines/)
 
 
 
@@ -47,10 +47,10 @@ Determine what connection devices you have.  Mine had a 1048 Phidget
 (https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=38)
 
 First install the Phidgets Software Drivers
-(https://www.phidgets.com/docs/Software_Overview "Phidget Drivers")
+[Phidget Drivers](https://www.phidgets.com/docs/Software_Overview)
 
 Then you need to install Artisan
-(https://github.com/artisan-roaster-scope/artisan "Install Artisan")
+[Install Artisan](https://github.com/artisan-roaster-scope/artisan)
 
 On a PC, the installer will first remove your prior version but this won’t remove your prior settings if you have them.  On a MAC, your settings will be saved as well.  You can also downgrade to a previous version by just uninstalling the current version and re-installing the old version without losing any settings.  On a MAC, you will get a warning that Artisan is from an unidentified developer.  That is being worked on but go to Settings>Security and Privacy, and you will be able to allow Artisan to install.  NOTE, we still advise you to save stable settings before changing any settings or installing a new version (Help>Save Settings).
 Further information here:
