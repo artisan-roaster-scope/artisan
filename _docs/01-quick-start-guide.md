@@ -66,4 +66,19 @@ Click for [detailed Phidget information in Artisan](https://artisan-roasterscope
 
 ### Your first roast
 
-With Artisan open, do to your first roast, go to Menu>View and make sure Controls and Readings are checked.  Then make sure if your roaster is on that the LCDs for temperatures are getting a reading.  When you are ready to charge the roaster, push the On Button. Then push the Start button, and give it about 15 seconds before you push the Charge button at the bottom of the Artisan.  Using the trier, when you determine you are at Dry End, hit the Dry Button, and do the same for First Crack Start, and Drop.  After the roast completes, hit the off button.  Congratulations on your first roast.  
+With Artisan open, do to your first roast, go to Menu>View and make sure Controls and Readings are checked.  Then make sure if your roaster is on that the LCDs for temperatures are getting a reading.  
+
+*Buttons and Sliders*
+
+Artisan’s standard buttons are as follows:
+![Artisan buttons](/assets/images/gsg/standard buttons.png)
+
+
+
+The buttons above contain key time points in your roast and after using the trier in the roaster, you would hit the button when the event occurs.  Pushing these buttons during a roast will add data to your roast log.  You can find the data under Roast>Properties>Data tab. Sliders can be used to create Events as well.   
+
+
+When you are ready to charge the roaster, push the On Button. Then push the Start button, and give it about 15 seconds before you push the Charge button at the bottom of the Artisan.  Using the trier, when you determine you are at Dry End, hit the Dry Button, and do the same for First Crack Start, and Drop.  After the roast completes, hit the off button.  Congratulations on your first roast.  
+
+NOTE *Unplug Your Laptop Before You Roast*
+Note that for most people unless you have a USB isolator you need to unplug your computer when using Artisan or will get feedback loops that will create all sorts of crazy spikes in the graph.  If you are using a desktop I guess you need to get an isolator.  
