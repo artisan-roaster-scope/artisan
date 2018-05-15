@@ -65,3 +65,79 @@ devices:
         url: /devices/s7/
       - title: "Yoctopuce"
         url: /devices/yoctopuce/
+
+docs:
+  - title: Getting Started
+    children:
+      - title: "Quick-Start Guide"
+        url: /docs/quick-start-guide/
+      - title: "Installation"
+        url: /docs/installation/
+      - title: "Setup"
+        url: /docs/setup/
+      - title: "Upgrading"
+        url: /docs/upgrading/
+      - title: "Community"
+        url: /docs/community/
+  - title: Roasting
+    children:
+      - title: "Properties"
+        url: /docs/properties/
+      - title: "Background"
+        url: /docs/background/
+      - title: "Cup Profile"
+        url: /docs/cup-profile/
+  - title: Configuration
+    children:
+      - title: "Sampling"
+        url: /docs/sampling/
+      - title: "Curves"
+        url: /docs/curves/
+      - title: "Events"
+        url: /docs/events/
+      - title: "Alarms"
+        url: /docs/alarms/
+      - title: "Phases"
+        url: /docs/phases/
+      - title: "Statistics"
+        url: /docs/statistics/
+      - title: "Axes"
+        url: /docs/axes/
+      - title: "Colors"
+        url: /docs/colors/
+      - title: "Themes"
+        url: /docs/themes/
+      - title: "Autosave"
+        url: /docs/autosave/
+      - title: "Batches"
+        url: /docs/batches/
+  - title: Views
+    children:
+      - title: "Controls"
+        url: /docs/controls/
+      - title: "LCDs"
+        url: /docs/lcds/
+  - title: Tools
+    children:
+      - title: "Designer"
+        url: /docs/designer/
+      - title: "Calculator"
+        url: /docs/calculator/
+      - title: "Wheel Graph"
+        url: /docs/wheel-graph/
+      - title: "Shortcuts"
+        url: /docs/shortcuts/
+  - title: Reports
+    children:
+      - title: "Roast Reports"
+        url: /docs/roast-reports/
+      - title: "Production Reports"
+        url: /docs/production-reports/
+      - title: "Ranking Reports"
+        url: /docs/ranking-reports/
+  - title: Tutorials
+    children:
+      - title: "Videos"
+        url: /docs/videos/
+      - title: "Documents"
+        url: /docs/documents/
