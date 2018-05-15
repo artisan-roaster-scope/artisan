@@ -14,7 +14,7 @@ toc_icon: "cog"
 
 Artisan Getting Started Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*
 
-![Artisan 1.3](/assets/images/gsg/artisan 1.3.png)
+![Artisan 1.3](/assets/images/gsg/artisan 1-3.png)
 
 **Roasters Covered**
 
