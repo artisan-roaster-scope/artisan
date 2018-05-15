@@ -70,13 +70,13 @@ With Artisan open, do to your first roast, go to Menu>View and make sure Control
 
 *Buttons and Sliders*
 
-Artisan’s standard buttons are as follows:
+The main controls look like this:
+![View Controls](/assets/images/gsg/view menu controls.png)
+
+Artisan’s standard event buttons are as follows:
 ![Artisan buttons](/assets/images/gsg/standard buttons.png)
 
-
-
 The buttons above contain key time points in your roast and after using the trier in the roaster, you would hit the button when the event occurs.  Pushing these buttons during a roast will add data to your roast log.  You can find the data under Roast>Properties>Data tab. Sliders can be used to create Events as well.   
-
 
 When you are ready to charge the roaster, push the On Button. Then push the Start button, and give it about 15 seconds before you push the Charge button at the bottom of the Artisan.  Using the trier, when you determine you are at Dry End, hit the Dry Button, and do the same for First Crack Start, and Drop.  After the roast completes, hit the off button.  Congratulations on your first roast.  
 
