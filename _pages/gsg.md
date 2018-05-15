@@ -14,13 +14,13 @@ toc_icon: "cog"
 
 Artisan Getting Started Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*
 
-assets/images/gsg/Artisan 1.3.png
+![Artisan 1.3](/Users/evergreen/Documents/GitHub/artisan/assets/images/gsg/Artisan 1.3.png)
 
 **Roasters Covered**
 
 You will find many roaster manufacturers are now supporting Artisan.  In 1.3, you will find simplified setup for the ones offering support.    
 
-See[Artisan Machines](https://artisan-scope.org/machines/)
+See [Artisan Machines](https://artisan-scope.org/machines/).
 
 
 
