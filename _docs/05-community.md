@@ -9,9 +9,9 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 You can get support from the community and the developers by sending your questions and issues by email to the [User Mailing List](https://mailman.ghostdub.de/mailman/listinfo/artisan-user).
 
-**Watch out!** 
+**Watch out!**
 You need to be subscribed to this list to send and receive messages. Messages by non-subscribers are discarded automatically as are messages with large attachments (e.g. images).
-{: .notice--primary}
+
 
 ## Blog
 
@@ -19,3 +19,5 @@ There are posts detailing many topics on the [Artisan Blog](http://artisan-roast
 
 
 ## Coffee Roasting Forums
+
+[Home Barista](www.home-barista.com)
