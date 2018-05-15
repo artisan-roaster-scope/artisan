@@ -14,7 +14,7 @@ toc_icon: "cog"
 
 Artisan Getting Started Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*
 
-![Artisan 1.3](assets/images/gsg/artisan 1.3.png)
+![Artisan 1.3](/assets/images/gsg/artisan 1.3.png)
 
 **Roasters Covered**
 
@@ -56,4 +56,4 @@ More complete
 
 Connecting the Phidget was easy.  
 From my Phidget 1048 the connections were made as follows:
-![Phidget Connections](assets/images/gsg/phidget wiring.jpg)
+![Phidget Connections](/assets/images/gsg/phidget wiring.jpg)
