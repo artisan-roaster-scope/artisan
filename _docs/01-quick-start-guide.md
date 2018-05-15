@@ -7,7 +7,7 @@ last_modified_at: 2018-05-15T15:58:49-04:00
 
 ## Quick-Start Guide
 
-Artisan Quick-Start Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*
+Artisan Quick-Start Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*  If you have suggestions for imporving the content of the Quick-Start Guide, please use the commmunity mailing list on the [Community](/_docs/05-community.md) page. 
 
 ![Artisan 1.3](/assets/images/gsg/artisan 1-3.png)
 
