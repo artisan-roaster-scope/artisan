@@ -7,9 +7,9 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 ### Alarms
 
-Alarms can warn you of certain events and they can also trigger certain things to happen.  For some roasters with advanced controls they can even control the roaster.  
+Alarms can warn you of certain events and they can also trigger certain things to happen.  For some advanced users, you can even control the roaster with Alarms.  
 
-Two Artisan blog posts explain how to work them:
+Artisan blog posts explain how to work with Alarms:
 
 [Basics](https://artisan-roasterscope.blogspot.com/2013/03/alarms.html)
 
@@ -17,12 +17,12 @@ Two Artisan blog posts explain how to work them:
 
 [Talking alarms](https://artisan-roasterscope.blogspot.com/2017/12/talking-alarms.html)
 
-Here is a simple alarm that ROR is at 30 after the charge so that I focus on heat and not let it stray up too much past the 32-39 range in the first few minutes.  This should trigger a pop up to be alert.  New in 1.3, is you can have the pop-up disappear after a X seconds.
+Here is a simple alarm that ROR is at 30 after the charge so that the roasters focuses on the next adjustment to make.  The alarm triggers a pop-up.  New in 1.3, is you can have the pop-up disappear after a X seconds.
 
 ![alarm sample](/assets/images/gsg/alarm config example.png)
 
 
-Alarms are unordered by definition. All alarm conditions of not-yet activated alarms are evaluated once per sampling interval and where all pre-conditions are fulfilled the alarm is fired. Note that each alarm is only fired once.  An alarm is triggered only once even if it has both an alarm time and temperature set.  
+Alarms are unordered by definition. All alarm conditions of not-yet activated alarms are evaluated once per sampling interval and where all pre-conditions are fulfilled the alarm is fired. Note that each alarm is only fired once.  An alarm is triggered only once even if it has both an alarm time and temperature trigger set.  
 
 You can program alarms to push an Event button, such as mark - Air Min at Charge.  In this case my Event Button 11 is Air Min.
 ![alarm event](/assets/images/gsg/alarm event example.png)

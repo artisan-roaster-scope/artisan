@@ -6,8 +6,13 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 ---
 ### Reports
 
-You can save one graph under File>Save Graph.  Multiple Artisan profiles can be converted into various other formats like CSV, PNG and PDF using File >> Convert To. Select the intended output format from the corresponding submenu, then select the Artisan profiles to be converted, along with the destination directory.   There are Reports for Roasts, Batches and Ranking under Files>Reports.  
 
+*Saving Profiles in various formats*
+You can save one graph under File>Save Graph.  Multiple Artisan profiles can be converted into various other formats like CSV, PNG and PDF using File >> Convert To. Select the intended output format from the corresponding submenu, then select the Artisan profiles to be converted, along with the destination directory.   
+
+*Multiple Roast Reports*
+
+There are Reports for Roasts, Batches and Ranking under Files>Reports.  
 
 You can run reports on your Batches – date, profile, beans, in, out, and loss.
 

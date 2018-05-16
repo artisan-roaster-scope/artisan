@@ -7,7 +7,9 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 ### Ranking Reports
 
-For comparing your roasts, a great feature is Report>Ranking>Web
+For comparing your roasts, a great feature is Report>Ranking>.
+You can save these reports in a web page format, a CSV or an Excel format.
+
 This is the web version and it’s hard to screen shot, but you get Load, Charge Temp, FC start time, FC temp, Drop time, Drop Temp, Dry %, Mai%, Dev%, AUC, and Loss.
 
 *Roast Ranking Report*

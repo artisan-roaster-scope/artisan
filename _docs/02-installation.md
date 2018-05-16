@@ -33,7 +33,6 @@ Extract the downloaded zip archive and start the included installer.
 
 Mount the installation `.dmg` archive with a double-click and drag the contained `Artisan.app` to your `Applications` folder
 
-You need to (temporarily during installation) tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app. On first app start Mac OS X can warn about unidentified developer. See https://support.apple.com/kb/PH21769 on how to open an app from an unidentified developer. After first application start, tick again "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel.
 
 ### Linux
 
