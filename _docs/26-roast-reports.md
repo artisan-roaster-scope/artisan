@@ -19,4 +19,4 @@ Menu>File>Report>Roast
 
 You can also run individual roast reports.  These are useful for analyzing an individual roast.  As they are static HTML page.  Hard to screen shot all at once.  
 
-![roast report 1](/assets/images/gsg/roast report 1.jpg)![roast report 2](/assets/images/gsg/roast report 2.jpg)![roast report 3](/assets/images/gsg/roast report3.jpg)![roast report 4](/assets/images/gsg/roast report 4.jpg)
+![roast report 1](/assets/images/gsg/Roast Report 1.png)![roast report 2](/assets/images/gsg/Roast Report 2.png)
