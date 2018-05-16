@@ -14,4 +14,4 @@ The installer, on a MAC or PC, will first remove your prior version but this won
 
 To ensure no issues, save your stable settings before changing any settings or installing a new version (Help>Save Settings).
 
-More complete instructions on the [installations page](https://artisan-scope.org/docs/installation).
+More complete instructions on the [installations page](https://artisan-scope.org/docs/installation/).

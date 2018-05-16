@@ -90,6 +90,6 @@ Menu>Help> is where you go to load and save settings.  Load Recent is a shortcut
 
 Menu>Help is a place you can find information on Errors, Messages from the program, a Serial log, search your settings, and information on the platform you are using.  
 
-#Factory Reset
+# Factory Reset
 
 If you ever need to reset Artisan to factory settings, it's under Menu>Help>Factory Reset.  
