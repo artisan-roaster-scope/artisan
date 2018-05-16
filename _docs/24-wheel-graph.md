@@ -10,6 +10,6 @@ toc: false
 
 Menu>Tools>Wheel Graph
 
-This shows a coffee flavor wheel.  
+Simply a coffee flavor wheel for you to use in describing your coffee cupping.  
 
 ![flavor wheel](/assets/images/gsg/Flavor Wheel.png)

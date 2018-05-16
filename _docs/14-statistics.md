@@ -11,7 +11,15 @@ Menu>Config>Statistics
 
 ![statistic dialog](/assets/images/gsg/statistics dialog.png)
 
-These selections allow you to see the three phases in the classic Artisan colors (green, yellow, brown) at the end of the roast, with the items you check: time, bar, average ROR, AUC, evaluation (descriptive words).  These Phases depend on your settings in Configuration>Phases.  The Characteristics, at the bottom of your graph post roast, show basic information on the roast, like date, time, beans, batch-size, roast-loss, on the x-axis label if you have entered some of this information in Roast>Properties.  You have to enter Charge and Drop in order to get statistics which can be either manually via an event button or automatically.  Summary shows roast information on the right, post roast such as what roast of the day it is, weight loss, and other data.  New is 1.3, is the time after First Crack as a Characteristic.
+These selections allow you to see the three roast phases in the classic Artisan colors (green, yellow, brown) at the end of the roast, with the items you check: time, bar, average ROR, AUC, evaluation (descriptive words).  Phases exampe with the time,bar and F/min:
+
+![phases example](/assets/images/gsg/Three Phases.png)
+
+These Phases depend on your settings in Configuration>Phases.  The Characteristics, at the bottom of your graph post roast, show basic information on the roast, like date, time, beans, batch-size, roast-loss, on the x-axis label if you have entered some of this information in Roast>Properties.  You have to enter Charge and Drop in order to get statistics which can be either manually via an event button or automatically.  Summary shows roast information on the right, post roast such as what roast of the day it is, weight loss, and other data.  New is 1.3, is the time after First Crack as a Characteristic at the bottom.
+
+Sample post roast showing Characteristics at the bottom of the graph:
+![post roast Characteristics](/assets/images/gsg/post roast charateristics.png)
+
 
 *Statistics – Area Under Curve*
 
@@ -23,6 +31,3 @@ Initial users have suggested that using Dry End as a reference point is good bec
 
 You can now see your Area Under Curve.  AUC will also be recomputed for ranking reports based on actual AUC settings under Config>Statistics.  This will make AUC very useful in ranking reports.  Generally AUC is useful tool to compare roasts of the same bean.  More details can be found [here](https://artisan-roasterscope.blogspot.com/2016/11/area-under-curve-auc.html), and on [Frans Goddijn’s excellent blog](http://kostverlorenvaart.blogspot.com/2016/11/the-area-under-curve.html
 https://www.home-barista.com/home-roasting/charting-auc-in-artisan-t46404.html).
-
-Sample post roast showing Characteristics at the bottom of the graph:
-![post roast Characteristics](/assets/images/gsg/post roast charateristics.png)

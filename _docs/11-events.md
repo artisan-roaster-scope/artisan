@@ -30,13 +30,14 @@ And here is what a slider looks like. NOTE if you have sliders checked on the co
 In order to set up custom events, you need to create Event types, under Config>Events:
 ![config events](/assets/images/gsg/events config dialog.png)
 
-You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these at the bottom of your roasting graph.  You need to set your temperature axis to a low of 0° in order to see these the best.  Config>Axes.  
+You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these events on your roasting graph.  You may need to set your temperature axis to a low of 0° in order to see these the best.  Config>Axes.  
 
 In 1.3, you have the option to render event descriptions instead of values.  In addition, 1.3 adds a new custom event button type "--" that adds an event (compared to the pure action button of type " ") and can be used to add labels to the graph rendering its button description.  For those using sliders the rendering will continue to be the first letter of the Event name and two digits of the value IF you check Decimal Places under Config>Curves>UI.  If you don’t it will render only one digit.  
 
 ### Rendering Events on Your Curves
 
 Under Config>Events on the right side of the dialog box you will see to the right of Events you now have a drop down with options:
+
 ![combo setting](/assets/images/gsg/combo example.png)
 
 Flag will render an event either on your ET line or your BT line (check the box “show on BT”) and your event description if you check the box for Descr.  (number represents how many letters) or it will show the first letter of your event name and the event value if you do not.  
