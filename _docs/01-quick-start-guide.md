@@ -7,7 +7,7 @@ last_modified_at: 2018-05-15T15:58:49-04:00
 
 ## Quick-Start Guide
 
-**If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.**  Artisan Quick-Start Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*  If you have suggestions for improving the content of the Quick-Start Guide or technical questions, please use the commmunity mailing list on the [Community](https://artisan-scope.org/docs/community) page.
+**If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.**  Artisan Quick-Start Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*  If you have suggestions for improving the content of the Quick-Start Guide or technical questions, please use the community mailing list on the [Community](https://artisan-scope.org/docs/community)page.
 
 ![Artisan 1.3](/assets/images/gsg/artisan 1-3.png)
 
@@ -43,7 +43,7 @@ The installer, on a MAC or PC, will first remove your prior version but this won
 If installing on a MAC, you will get a warning that Artisan is from an unidentified developer.  That is being worked on, and for now go to Settings>Security and Privacy, and you will be able to allow Artisan to install.  
 
 To ensure no issues, save your stable settings before changing any settings or installing a new version (Help>Save Settings).
-More complete instructions on the [installations page](/_docs/02-installation.md).  You can install Artisan before your roaster arrives.  
+More complete instructions on the [installations page](https://artisan-scope.org/installation).  You can install Artisan before your roaster arrives.  
 
 ### Setup for your hardware
 If you don't have a Roaster that supports the Artisan effort and isn't automatically configured by choosing that Roaster under Cofig>Machines, you will need to connect your devices to the roaster and to your computer.  Then you will need to use Config>Devices to tell Artisan how to read your hardware.
