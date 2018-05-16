@@ -6,6 +6,8 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 ---
 ### Roast Properties Dialog
 
+Menu: Roast>Properties
+
 Under the Roast Properties, you can input many parameters for your current batch and you can choose a prior roast profile to run in the background.
 
 ![roasting menus](/assets/images/gsg/roast menu.png)

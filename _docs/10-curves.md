@@ -7,6 +7,8 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 ### Curves
 
+Menu>Config>Curves
+
 ![cofig curves](/assets/images/gsg/config curves menu.png)
 
 These are critical settings within Artisan and for most the first two tabs will be where your focus lies.  

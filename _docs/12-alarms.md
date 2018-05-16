@@ -7,6 +7,8 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 ### Alarms
 
+Menu>Config>Alarms
+
 Alarms can warn you of certain events and they can also trigger certain things to happen.  For some advanced users, you can even control the roaster with Alarms.  
 
 Artisan blog posts explain how to work with Alarms:

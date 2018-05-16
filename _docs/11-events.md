@@ -7,6 +7,8 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 ### Events
 
+Menu>Config>Events
+
 Creating Events allows you to record data to be shown on your roast graph with either Buttons or Sliders.  
 
 Artisan’s standard buttons are as follows:
@@ -79,4 +81,4 @@ Quantifiers turn readings received from a connected device into custom events on
 
 [A good video on the topic of Buttons and Alarms from an earlier version of Artisan by Michael Wright](https://www.youtube.com/watch?time_continue=321&v=IrvC9dPqgjE)
 
-You can create [multiple palettes of buttons](https://artisan-roasterscope.blogspot.com/2013/02/events-buttons-and-palettes.html) as well to use in different roasting situations. 
+You can create [multiple palettes of buttons](https://artisan-roasterscope.blogspot.com/2013/02/events-buttons-and-palettes.html) as well to use in different roasting situations.

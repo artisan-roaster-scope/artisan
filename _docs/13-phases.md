@@ -7,6 +7,8 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 ### Phases
 
+Menu>Config>Phases
+
 In the Phases Dialog you can set the temperature limits of each phase.
 
 ![phases dialog](/assets/images/gsg/phases dialog.png)

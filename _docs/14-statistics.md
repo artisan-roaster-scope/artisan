@@ -6,6 +6,8 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 ---
 ### Statistics
 
+Menu>Config>Statistics
+
 ![statistic dialog](/assets/images/gsg/statistics dialog.png)
 
 These selections allow you to see the three phases in the classic Artisan colors (green, yellow, brown) at the end of the roast, with the items you check: time, bar, average ROR, AUC, evaluation (descriptive words).  These Phases depend on your settings in Configuration>Phases.  The Characteristics, at the bottom of your graph post roast, show basic information on the roast, like date, time, beans, batch-size, roast-loss, on the x-axis label if you have entered some of this information in Roast>Properties.  You have to enter Charge and Drop in order to get statistics which can be either manually via an event button or automatically.  Summary shows roast information on the right, post roast such as what roast of the day it is, weight loss, and other data.  New is 1.3, is the time after First Crack as a Characteristic.
