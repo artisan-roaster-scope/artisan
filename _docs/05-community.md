@@ -15,7 +15,7 @@ You need to be subscribed to this list to send and receive messages. Messages by
 
 ## Blog
 
-There are posts detailing many topics on the [Artisan Blog](http://artisan-roasterscope.blogspot.de/). If you are looking for something specific it is best to start with the [Overview](https://artisan-roasterscope.blogspot.de/p/contents.html) page.
+There are posts detailing many topics on the [Artisan Blog](http://artisan-roasterscope.blogspot.de/). If you are looking for something specific it is best to start with the [Overview](https://artisan-roasterscope.blogspot.de/p/contents.html) page.  Note some blog posts of these relate to prior versions so the menus may not be the same.  
 
 
 ## Coffee Roasting Forums

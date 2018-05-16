@@ -15,7 +15,7 @@ Verify that your roasting machine and the devices you plan to operate with Artis
 
 ## Step 1: Download Artisan for your platform
 
-Find and download the package of the latest release for your platform. The filenames are as follows, with `x.x.x` the version number.
+Find and [download](https://github.com/artisan-roaster-scope/artisan/releases/latest) the package of the latest release for your platform. The filenames are as follows, with `x.x.x` the version number.
 
 * OS X: `artisan-mac-x.x.x.dmg`
 * Windows: `artisan-win-x.x.x.zip`

@@ -33,11 +33,10 @@ Under Config>Machine, Artisan 1.3 has direct support for:
 ### Configure for supported devices
 
 Here is a quick discussion of connecting a Phidget.  Each divice will differ. Connecting a Phidget is easy.  
-From my Phidget 1048, the connections were made as follows:
-![Phidget Connections](/assets/images/gsg/phidget wiring.jpg)
-As thermocouples differ your wiring colors may vary.  And different devices will connect differently.
+For a Phidget 1048, the connections were made as follows:
+![Phidget Connections](/assets/images/gsg/phidget wiring.jpg) As thermocouples differ your wiring colors may vary.  And different devices will connect differently.
 
-My correct wiring colors were as follows:
+The correct wiring colors for the thermocouples used were as follows:
 
 1. BT G – white
 2. BT 0 – Red
@@ -76,19 +75,9 @@ NOTE *Unplug Your Laptop Before You Roast*
 Note that for most people unless you have a USB isolator you need to unplug your computer when using Artisan or will get feedback loops that will create all sorts of crazy spikes in the graph.  If you are using a desktop I guess you need to get an isolator.  
 
 # Roaster Setup Specific Information
-*Huky*
-See:
-https://drive.google.com/drive/u/0/folders/0B4HTX5wS3NB2TFVid0h2TGxBWG8  
-which references on the Artisan Github page
+[*Huky*](https://drive.google.com/drive/u/0/folders/0B4HTX5wS3NB2TFVid0h2TGxBWG8) 
 
-https://github.com/artisan-roaster-scope/artisan/blob/master/README.md
 
-*Hottop*
-Also referenced at the Github page
+[*Hottop*](https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit)
 
-https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit
-
-*US Roaster Corp*
-Feb 2018 Thread on HB for set up-
-
-https://www.home-barista.com/home-roasting/us-roaster-artisan-start-up-t51065.html
+[*US Roaster Corp*](https://www.home-barista.com/home-roasting/us-roaster-artisan-start-up-t51065.html)
