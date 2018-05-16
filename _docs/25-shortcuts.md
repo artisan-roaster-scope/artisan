@@ -11,4 +11,6 @@ toc: false
 Menu>Help>Keyboard Shortcuts
 
 With Artisan you can press the Spacebar to enter and exit into shortcut mode.  Here are the shortcuts:
+
+
 ![keyboard shortcuts](/assets/images/gsg/keyboard shortcuts.png)
