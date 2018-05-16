@@ -14,3 +14,5 @@ Found under the menu Tools>Calculator, there are a few useful calculators.
 #3 Extraction Yield - contains fields for Grams of ground coffee, grams of extracted coffee, TDS, and Yield.  
 #4 Weight Conversion
 #5 Volume Conversion
+
+![calculator](/assets/images/gsg/Calculator.png)
