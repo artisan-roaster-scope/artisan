@@ -3,11 +3,12 @@ title: "Background"
 permalink: /docs/background/
 excerpt: ""
 last_modified_at: 2018-05-15T15:59:00-04:00
+toc: false
 ---
 
 ### Roast Background Dialog
 
-Menu>Roast>background
+Menu>Roast>Background
 
 The Profile Background dialog box is where you would load a background profile, determine the opaqueness, and align it to an event such as charge.  You also can choose if events such as Charge should be shown.  The opaqueness and the color can be the same as the current profile, or alternatively, individual colors can be set for each of the background curves.
 

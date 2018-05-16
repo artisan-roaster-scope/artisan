@@ -82,22 +82,14 @@ Artisan](https://artisan-roasterscope.blogspot.com/2014/01/sampling-interval-smo
 NOTE *Unplug Your Laptop Before You Roast*
 Note that for most people unless you have a USB isolator you need to unplug your computer when using Artisan or will get feedback loops that will create all sorts of crazy spikes in the graph.  If you are using a desktop I guess you need to get an isolator.  
 
-# Settings- Load, Load Recent, Save
+### Settings- Load, Load Recent, Save
 
 Menu>Help> is where you go to load and save settings.  Load Recent is a shortcut to settings you have recently used.  
 
-# Information for Troubleshooting
+### Information for Troubleshooting
 
 Menu>Help is a place you can find information on Errors, Messages from the program, a Serial log, search your settings, and information on the platform you are using.  
 
 #Factory Reset
 
 If you ever need to reset Artisan to factory settings, it's under Menu>Help>Factory Reset.  
-
-# Roaster Setup Specific Information
-[*Huky*](https://drive.google.com/drive/u/0/folders/0B4HTX5wS3NB2TFVid0h2TGxBWG8) 
-
-
-[*Hottop*](https://drive.google.com/file/d/0B4HTX5wS3NB2ZGxsTU4tbmtVUmM/edit)
-
-[*US Roaster Corp*](https://www.home-barista.com/home-roasting/us-roaster-artisan-start-up-t51065.html)

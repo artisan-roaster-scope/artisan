@@ -33,7 +33,7 @@ You can label up to 4 event types. You can edit how they work with the tabs Butt
 
 In 1.3, you have the option to render event descriptions instead of values.  In addition, 1.3 adds a new custom event button type "--" that adds an event (compared to the pure action button of type " ") and can be used to add labels to the graph rendering its button description.  For those using sliders the rendering will continue to be the first letter of the Event name and two digits of the value IF you check Decimal Places under Config>Curves>UI.  If you don’t it will render only one digit.  
 
-*Rendering Events on Your Curves*
+### Rendering Events on Your Curves
 
 Under Config>Events on the right side of the dialog box you will see to the right of Events you now have a drop down with options:
 ![combo setting](/assets/images/gsg/combo example.png)
