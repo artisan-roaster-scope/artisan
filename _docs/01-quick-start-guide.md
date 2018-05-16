@@ -83,7 +83,7 @@ When you are ready to charge the roaster, push the On Button. Then push the Star
 
 For most people unless you have a USB isolator you need to unplug your computer when using Artisan or will get feedback loops that will create all sorts of crazy spikes in the graph.  If you are using a desktop I guess you need to get an isolator.
 
-Before or after your first roast, look at the [setup page](https://artisan-scope.org/setup)to see how to adjust your bean temp readings and your sampling rates.
+Before or after your first roast, look at the [setup page](https://artisan-scope.org/docs/setup/)to see how to adjust your bean temp readings and your sampling rates.
 
 You can save your graphs under File>Save Graph to various size formats or PDF.  You can aslo convert your data to other formats and export it under the File>Convert and File>Export commands.  You can import another roaster's file under File>Import.  
 
