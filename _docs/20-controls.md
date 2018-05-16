@@ -16,6 +16,7 @@ This toggles on the top line of controls on the right:
 These are needed to be visible to operate Artisan.  
 
 Menu>View>Buttons
+
 Menu>View>Sliders
 
 This is where you toggle on and off your Buttons and Sliders configured under [Events](https://artisan-scope.org/docs/events/)
