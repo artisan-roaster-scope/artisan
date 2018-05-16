@@ -32,7 +32,10 @@ Under Config>Machine, Artisan 1.3 has direct support for:
 
 ### Configure for supported devices
 
-Here is a quick discussion of connecting a Phidget.  Each divice will differ. Connecting a Phidget is easy.  
+Port settings are found under Config>Port IF they are needed.  
+
+Here is a quick discussion of connecting a Phidget.  Each device will differ. Connecting a Phidget is easy and you don't have to use the Port menu.  
+
 For a Phidget 1048, the connections were made as follows:
 ![Phidget Connections](/assets/images/gsg/phidget wiring.jpg) As thermocouples differ your wiring colors may vary.  And different devices will connect differently.
 
@@ -47,7 +50,12 @@ The correct wiring colors for the thermocouples used were as follows:
 Click for [detailed Phidget information in Artisan](https://artisan-roasterscope.blogspot.de/2017/12/more-phidgets.html)
 
 
-### Configure Temps and Sampling
+### Configure Language, Temps and Sampling
+
+*Language and Temp C or F*
+
+Menu>Config>Temperature and Menu>Config>Language are where you go to choose your language and Celsius or Fahrenheit and switch between the two if you like.  
+
 *Symbolic BT/ET*
 
 What BT and ET temperatures do you want as reference points?
@@ -81,6 +89,10 @@ Menu>Help> is where you go to load and save settings.  Load Recent is a shortcut
 # Information for Troubleshooting
 
 Menu>Help is a place you can find information on Errors, Messages from the program, a Serial log, search your settings, and information on the platform you are using.  
+
+#Factory Reset
+
+If you ever need to reset Artisan to factory settings, it's under Menu>Help>Factory Reset.  
 
 # Roaster Setup Specific Information
 [*Huky*](https://drive.google.com/drive/u/0/folders/0B4HTX5wS3NB2TFVid0h2TGxBWG8) 
