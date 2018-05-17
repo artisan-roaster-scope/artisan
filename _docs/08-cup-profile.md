@@ -10,7 +10,7 @@ toc: false
 
 Menu>Roast>Cup Profile
 
-After you have cupped your coffee you can create cupping notes and produce a flavor wheel:
+After you have cupped your coffee you can create cupping notes and produce a cup profile graph:
 
 ![cupping wheel](/assets/images/gsg/cup profile.png)
 
