@@ -43,10 +43,10 @@ The installer, on a MAC or PC, will first remove your prior version but this won
 If installing on a MAC, you will get a warning that Artisan is from an unidentified developer.  That is being worked on, and for now go to Settings>Security and Privacy, and you will be able to allow Artisan to install.  
 
 To ensure no issues, save your stable settings before changing any settings or installing a new version (Help>Save Settings).
-More complete instructions on the [installations page](https://artisan-scope.org/docs/installation/).  You can install Artisan before your roaster arrives.  
+More complete instructions on the [Installation page](https://artisan-scope.org/docs/installation/).  You can install Artisan before your roaster arrives.  
 
 ### Setup for your hardware
-If you don't have a Roaster that supports the Artisan effort and isn't automatically configured by choosing that Roaster under Cofig>Machines, you will need to connect your devices to the roaster and to your computer.  Then you will need to use Config>Devices to tell Artisan how to read your hardware.
+If you don't have a Roaster that supports the Artisan effort and isn't automatically configured by choosing that Roaster under Cofig>Machines, you will need to connect your devices to the roaster and to your computer.  Then you will need to use Config>Devices to tell Artisan how to read your hardware. More complete instructions on the [Setup page](https://artisan-scope.org/docs/setup/).
 
 Determine what connection devices you have.  For example, a
 [Phidget 1048](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=38) can measure four temperatures.  First install the
