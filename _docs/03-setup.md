@@ -48,7 +48,7 @@ The correct wiring colors for the thermocouples used were as follows:
 2. BT 0 – Red
 3. ET G – white with blue stripe
 4. ET 0 – white with red stripe
-![Phidget Wirring](/assets/images/gsg/ET0 white with red stripe.jpg)
+![Phidget Wiring](/assets/images/gsg/ET0 white with red stripe.jpg)
 
 
 Want to know more?
@@ -77,7 +77,7 @@ Do you have to do this? NO.    You will know your roaster best and these data po
 
 *Sampling and Oversampling*
 
-The default for sampling is set to 3s.  For a Phidget device one second is possible, and Artisan 1.3 goes down to .5s now.  Oversampling will take two readings per interval and average them.  See the [sampling](https://artisan-scope.org/docs/sampling/) page for more details.  
+The default for sampling is set to 3s.  For a Phidget device one second is possible, and Artisan 1.3 goes down to .5s now.  Oversampling will take two readings per interval and average them.  See the [Sampling](https://artisan-scope.org/docs/sampling/) page for more details.  
 
 If you go below a 3s interval you will get a popup warning ![interval warning](/assets/images/gsg/sampling interval warning.png)
 
