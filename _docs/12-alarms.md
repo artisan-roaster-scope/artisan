@@ -58,7 +58,8 @@ If you want your alarms to talk to you, an Artisan blog posts explains [talking 
 
 ### Help Dialog
 
-There is a Help dialog box for Alarms:
+Help dialog box for Alarms:
+
 ![alarm help dialog](/assets/images/gsg/alarm help dialog.png)
 
 Some things to remember
