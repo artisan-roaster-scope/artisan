@@ -400,12 +400,8 @@ else:
     def toMap(x):
         return x
     def removeAll(l,s):
-        if sys.version < '3':
-            for _ in xrange(l.count(s)):  # @UndefinedVariable
-                l.remove(s)
-        else:
-            for _ in range(l.count(s)):
-                l.remove(s)
+        for _ in arange(l.count(s)):  # @UndefinedVariable
+            l.remove(s)
     def toByteArray(x):
         return x        
 
@@ -9703,10 +9699,7 @@ class SampleThread(QThread):
         ys = temps[-n:]
 
         # Remove NaNs from input
-        if sys.version < '3':
-            r = xrange(n - 1, -1, -1)  # @UndefinedVariable
-        else:
-            r = range(n - 1, -1, -1)
+        r = arange(n - 1, -1, -1)  # @UndefinedVariable
         for i in r:
             if math.isnan(ys[i]):
                 ys[i:i+1] = []
@@ -10629,7 +10622,7 @@ class ApplicationWindow(QMainWindow):
         self.ToolkitMenu = self.menuBar().addMenu(UIconst.TOOLKIT_MENU)
         self.viewMenu = self.menuBar().addMenu(UIconst.VIEW_MENU)
         self.helpMenu = self.menuBar().addMenu(UIconst.HELP_MENU)
-
+        
         #FILE menu
         self.newRoastMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_NEW)
 
@@ -12151,6 +12144,40 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  #####################################    
 
+    def copy_cells_to_clipboard(self,table_widget):
+        if len(table_widget.selectionModel().selectedIndexes()) > 0:
+            # sort select indexes into rows and columns
+            previous = table_widget.selectionModel().selectedIndexes()[0]
+            columns = []
+            rows = []
+            for index in table_widget.selectionModel().selectedIndexes():
+                if previous.row() != index.row():
+                    columns.append(rows)
+                    rows = []
+                rows.append(index.data())
+                previous = index
+            columns.append(rows)
+
+            # add rows and columns to clipboard            
+            clipboard = ""
+            nrows = len(columns)
+            ncols = len(columns[0])
+            for r in arange(nrows):
+                for c in arange(ncols):
+                    if columns[r][c] is not None:
+                        entry = columns[r][c]
+                        idx = entry.rfind(" ")
+                        if idx > -1:
+                            entry = entry[:idx] + "\t" + entry[idx+1:]
+                        clipboard += entry
+                        if c != (ncols-1):
+                            clipboard += '\t'
+                clipboard = clipboard[:-1] + '\n'
+
+            # copy to the system clipboard
+            sys_clip = QApplication.clipboard()
+            sys_clip.setText(clipboard)
+            
     def createRecentRoast(self,title,beans,weightIn,weightOut,weightUnit,volumeIn,volumeOut,volumeUnit,
             densityWeight,densityWeightUnit,densityVolume,densityVolumeUnit, beanSize,
             moistureGreen,moistureRoasted,wholeColor,groundColor,colorSystem,background):
@@ -12869,10 +12896,7 @@ class ApplicationWindow(QMainWindow):
     def lastEventValue(self,tp):
         res_last = None
         try:
-            if sys.version < '3':
-                r = xrange(len(aw.qmc.specialeventstype) - 1, -1, -1)  # @UndefinedVariable
-            else:
-                r = range(len(aw.qmc.specialeventstype) - 1, -1, -1)
+            r = arange(len(aw.qmc.specialeventstype) - 1, -1, -1)  # @UndefinedVariable
             for i in r:
                 if aw.qmc.specialeventstype[i] == tp:
                     res_last = aw.qmc.specialeventsvalue[i]
@@ -26716,9 +26740,8 @@ class RoastsComboBox(QComboBox):
         except:
             pass
         self.blockSignals(False)
-        
 
-
+            
 ########################################################################################
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
 ########################################################################################
@@ -26921,7 +26944,6 @@ class editGraphDlg(ArtisanDialog):
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
         #self.titleedit = QLineEdit(aw.qmc.title)
-
         self.titleedit = RoastsComboBox(selection = aw.qmc.title)
         self.titleedit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
         self.titleedit.activated.connect(self.recentRoastActivated)
@@ -27667,6 +27689,9 @@ class editGraphDlg(ArtisanDialog):
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):
         key = int(event.key())
+        if event.matches(QKeySequence.Copy):
+            if self.TabWidget.currentIndex() == 3: # datatable
+                aw.copy_cells_to_clipboard(self.datatable)
         if key == 16777220 and aw.scale.device is not None and aw.scale.device != "" and aw.scale.device != "None": # ENTER key pressed and scale connected
             if self.weightinedit.hasFocus():
                 self.inWeight()
@@ -27910,7 +27935,7 @@ class editGraphDlg(ArtisanDialog):
         self.datatable.setAlternatingRowColors(True)
         self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+        self.datatable.setSelectionMode(QTableWidget.ExtendedSelection) # QTableWidget.SingleSelection, ContiguousSelection, MultiSelection
         self.datatable.setShowGrid(True)
         self.datatable.verticalHeader().setSectionResizeMode(2)
         offset = 0
@@ -30919,12 +30944,16 @@ class EventsDlg(ArtisanDialog):
         self.showEtype4.setChecked(self.showEtypes[3])       
         self.etype0.setText(aw.qmc.etypesdefault[0])
         self.etype0.setCursorPosition(0)
+        self.etype0.repaint()
         self.etype1.setText(aw.qmc.etypesdefault[1])
         self.etype1.setCursorPosition(0)
+        self.etype1.repaint()
         self.etype2.setText(aw.qmc.etypesdefault[2])
         self.etype2.setCursorPosition(0)
+        self.etype2.repaint()
         self.etype3.setText(aw.qmc.etypesdefault[3])
         self.etype3.setCursorPosition(0)
+        self.etype3.repaint()
         # update extra LCD label substitutions
         for i in range(len(aw.qmc.extradevices)):
             if i < len(aw.qmc.extraname1):
@@ -32759,28 +32788,34 @@ class backgroundDlg(ArtisanDialog):
         tab3layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         #tab layout
         tab1layout.setSpacing(5)
-        TabWidget = QTabWidget()
+        self.TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Events",None))
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Events",None))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Data",None))
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Data",None))
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(loadButton)
         buttonLayout.addWidget(delButton)
         buttonLayout.addStretch()
         buttonLayout.addWidget(okButton)
         mainLayout = QVBoxLayout()
-        mainLayout.addWidget(TabWidget) 
+        mainLayout.addWidget(self.TabWidget) 
         mainLayout.addWidget(self.pathedit)
         mainLayout.addLayout(buttonLayout)
         mainLayout.setContentsMargins(5, 10, 5, 5) # left, top, right, bottom 
         self.setLayout(mainLayout)
         
+    #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
+    def keyPressEvent(self,event):
+        if event.matches(QKeySequence.Copy):
+            if self.TabWidget.currentIndex() == 2: # datatable
+                aw.copy_cells_to_clipboard(self.datatable)
+                        
     def accept(self):
         aw.qmc.backgroundmovespeed = self.speedSpinBox.value()
         self.close()
@@ -33057,7 +33092,7 @@ class backgroundDlg(ArtisanDialog):
         self.datatable.setAlternatingRowColors(True)
         self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+        self.datatable.setSelectionMode(QTableWidget.ExtendedSelection) # QTableWidget.SingleSelection, ContiguousSelection, MultiSelection
         self.datatable.setShowGrid(True)
         self.datatable.verticalHeader().setSectionResizeMode(2)
         for i in range(ndata):
