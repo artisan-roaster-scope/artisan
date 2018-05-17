@@ -30,7 +30,9 @@ And here is what a slider looks like. NOTE if you have sliders checked on the co
 In order to set up custom events, you need to create Event types, under Config>Events:
 ![config events](/assets/images/gsg/events config dialog.png)
 
-You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these events on your roasting graph.  You may need to set your temperature axis to a low of 0° in order to see these the best.  Config>Axes.  
+You can label up to 4 event types. You can edit how they work with the tabs Buttons and Sliders.  When you click a button or move a slider Artisan records an event on a scale of 0-999.  You can display these events on your roasting graph.  You may need to set your temperature axis to a low of 0° in order to see these the best.  Config>Axes.  If you check Mini Editor you will be able to add or edit existing events during the roast.  It will appeal below your Buttons.  
+
+![events editor](/assets/images/gsg/events editor.png)
 
 In 1.3, you have the option to render event descriptions instead of values.  In addition, 1.3 adds a new custom event button type "--" that adds an event (compared to the pure action button of type " ") and can be used to add labels to the graph rendering its button description.  For those using sliders the rendering will continue to be the first letter of the Event name and two digits of the value IF you check Decimal Places under Config>Curves>UI.  If you don’t it will render only one digit.  
 
@@ -79,8 +81,8 @@ The above screenshot shows the Button Label and Description, Type, Value, Action
 
 Quantifiers turn readings received from a connected device into custom events on their 0-100% scale. For example, if you have a channel configured to read burner output on a scale from 0-2000 you can decide to hide the corresponding curve (as it won't fit into the range of the standard temperature axis) or turn just the changes of its readings into events by defining a corresponding quantifier. You end up with a more readable and useful profile.
 
-[Read more about quantifiers for advanced users](https://artisan-roasterscope.blogspot.com/2014/04/event-quantifiers.html)
+[Read ](https://artisan-roasterscope.blogspot.com/2014/04/event-quantifiers.html)more about quantifiers for advanced users.
 
-[A good video on the topic of Buttons and Alarms from an earlier version of Artisan by Michael Wright](https://www.youtube.com/watch?time_continue=321&v=IrvC9dPqgjE)
+A [video](https://www.youtube.com/watch?time_continue=321&v=IrvC9dPqgjE) on the topic of Buttons and Alarms from an earlier version of Artisan by Michael Wright.
 
 You can create [multiple palettes of buttons](https://artisan-roasterscope.blogspot.com/2013/02/events-buttons-and-palettes.html) as well to use in different roasting situations.
