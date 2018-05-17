@@ -36,6 +36,8 @@ Alarms on some roasters can turn down the heat automatically not just tell the h
 
 ![alarm trigger slider](/assets/images/gsg/Alarm trigger slider.png)
 
+Read the [blog](https://artisan-roasterscope.blogspot.com/2018/05/automating-huky.html) post on automating a Huky to find out how the right hardware and alarms can control the roaster from Artisan.  Remember to never leave your roaster unattended though.  
+
 ### Time Triggered Alarms
 
 Let's turn the fan speed to 72% 2min after FC automatically. For this we need a second alarm that moves our Fan slider to 72 based on a temporal criteria. As a From value we select FC START. Further, we set the Time of this on to 02:00 and it's temperature Source to the empty entry, just to be sure that this alarm is not triggered by any temperature change.

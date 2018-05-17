@@ -50,7 +50,12 @@ The correct wiring colors for the thermocouples used were as follows:
 4. ET 0 – white with red stripe
 ![Phidget Wirring](/assets/images/gsg/ET0 white with red stripe.jpg)
 
-Click for [detailed Phidget information in Artisan](https://artisan-roasterscope.blogspot.de/2017/12/more-phidgets.html)
+
+Want to know more?
+
+[Roasting with Phidgets in Artisan](https://artisan-roasterscope.blogspot.com/2017/12/roasting-with-phidgets.html) and [More on Phidgets in Artisan](https://artisan-roasterscope.blogspot.de/2017/12/more-phidgets.html) go into greater depth on using Phidgets.  
+
+If you need support for your device, go to the ![Community](https://artisan-scope.org/docs/community/)to see where to get help.  
 
 
 ### Configure Language, Temps and Sampling
