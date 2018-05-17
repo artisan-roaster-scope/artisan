@@ -7,7 +7,7 @@ last_modified_at: 2018-05-15T15:58:49-04:00
 
 ## Quick-Start Guide
 
-**If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.**  Artisan Quick-Start Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*  If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the community mailing list on the [Community](https://artisan-scope.org/docs/community/)page.  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  
+**If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.**  Artisan Quick-Start Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*  If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the community mailing list on the [Community](https://artisan-scope.org/docs/community/) page.  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  
 
 ![Artisan 1.3](/assets/images/gsg/artisan 1-3.png)
 
@@ -60,8 +60,7 @@ The correct wiring colors for the thermocouples used were as follows:
 4. ET 0 – white with red stripe
 ![Phidget Wirring](/assets/images/gsg/ET0 white with red stripe.jpg)
 
-Click for [detailed Phidget information in Artisan](https://artisan-roasterscope.blogspot.de/2017/12/more-phidgets.html)
-
+More information on Phidgets is on the [Installation](https://artisan-scope.org/docs/installaion/) page.
 ### Your first roast
 
 With Artisan open, to do your first roast, go to Menu>View and make sure Controls and Readings are checked.  Then make sure your roaster is on and heating, and that the LCDs for temperatures are getting a reading.  
@@ -81,9 +80,9 @@ When you are ready to charge the roaster, push the On Button. Then push the Star
 **NOTE:
 *Unplug Your Laptop Before You Roast***
 
-For most people unless you have a USB isolator you need to unplug your computer when using Artisan or will get feedback loops that will create all sorts of crazy spikes in the graph.  If you are using a desktop I guess you need to get an isolator.
+For most people, unless you have a USB isolator you need to unplug your computer when using Artisan or will get feedback loops that will create all sorts of crazy spikes in the graph.  If you are using a desktop I guess you need to get an isolator.
 
-Before or after your first roast, look at the [setup page](https://artisan-scope.org/docs/setup/)to see how to adjust your bean temp readings and your sampling rates.
+Before or after your first roast, look at the [setup ](https://artisan-scope.org/docs/setup/) page to see how to adjust your bean temp readings and your sampling rates.
 
 You can save your graphs under File>Save Graph to various size formats or PDF.  You can aslo convert your data to other formats and export it under the File>Convert and File>Export commands.  You can import another roaster's file under File>Import.  
 
