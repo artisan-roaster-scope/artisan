@@ -40,8 +40,7 @@ Port settings are found under Config>Port IF they are needed.
 *Example* - Here is a quick discussion of connecting a Phidget.  Each device will differ. Connecting a Phidget is easy and you don't have to use the Port menu.  
 
 For a Phidget 1048, the connections were made as follows:
-![Phidget Connections](/assets/images/gsg/phidget wiring.jpg) As thermocouples differ your wiring colors may vary.  And different devices will connect differently.
-
+![Phidget Connections](/assets/images/gsg/phidget wiring1.jpg) As thermocouples differ your wiring colors may vary.  And different devices will connect differently.
 The correct wiring colors for the thermocouples used were as follows:
 
 1. BT G – white
