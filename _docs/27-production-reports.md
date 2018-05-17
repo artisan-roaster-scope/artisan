@@ -13,3 +13,6 @@ Menu>File>Report>Batches
 These can be saved in web,csv or excel format.
 
 You can run reports on your Batches – date, profile, beans, in, out, and loss.
+
+Sample excel output:
+![batch report](/assets/images/gsg/Batch report.png)
