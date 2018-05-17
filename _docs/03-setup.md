@@ -55,7 +55,7 @@ Want to know more?
 
 [Roasting with Phidgets in Artisan](https://artisan-roasterscope.blogspot.com/2017/12/roasting-with-phidgets.html) and [More on Phidgets in Artisan](https://artisan-roasterscope.blogspot.de/2017/12/more-phidgets.html) go into greater depth on using Phidgets.  
 
-If you need support for your device, go to the ![Community](https://artisan-scope.org/docs/community/)to see where to get help.  
+If you need support for your device, go to the [Community](https://artisan-scope.org/docs/community/) page to see where to get help.  
 
 
 ### Configure Language, Temps and Sampling
