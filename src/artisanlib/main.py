@@ -10575,6 +10575,8 @@ class ApplicationWindow(QMainWindow):
         self.eventslidersflags = [0,1,1] # slider visibility per state OFF, ON, START
         self.eventslidercoarse = [0,0,0,0] # if 1, sliders step in multiples of 10, otherwise 1
         self.eventslidertemp = [0,0,0,0] # if 1, slider values are interpreted as temperatures and min/max limit are converted with the temp mode
+        self.eventsliderunits = ["","","",""]
+        self.eventslidermoved = [0,0,0,0] # just set on move and reset on release to avoid unprecise slider moves
         
         #event quantifiers        
         self.eventquantifieractive = [0,0,0,0]
@@ -11988,6 +11990,7 @@ class ApplicationWindow(QMainWindow):
         self.slider1.sliderMoved.connect(lambda v=0:self.updateSliderLCD(0,v))
         self.slider1.valueChanged.connect(lambda _:self.sliderReleased(0,updateLCD=True))
         self.slider1.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
+        self.slider1.sliderMoved.connect(lambda : self.sliderMoved(0))
         
 
         self.slider2 = self.slider()
@@ -12011,6 +12014,7 @@ class ApplicationWindow(QMainWindow):
         self.slider2.sliderMoved.connect(lambda v=0:self.updateSliderLCD(1,v))
         self.slider2.valueChanged.connect(lambda _:self.sliderReleased(1,updateLCD=True))
         self.slider2.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
+        self.slider2.sliderMoved.connect(lambda : self.sliderMoved(1))
 
         self.slider3 = self.slider()
         self.sliderLCD3 = self.sliderLCD()
@@ -12033,6 +12037,7 @@ class ApplicationWindow(QMainWindow):
         self.slider3.sliderMoved.connect(lambda v=0:self.updateSliderLCD(2,v))
         self.slider3.valueChanged.connect(lambda _:self.sliderReleased(2,updateLCD=True))
         self.slider3.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
+        self.slider3.sliderMoved.connect(lambda : self.sliderMoved(2))
 
         self.slider4 = self.slider()
         self.sliderLCD4 = self.sliderLCD()
@@ -12055,6 +12060,7 @@ class ApplicationWindow(QMainWindow):
         self.slider4.sliderMoved.connect(lambda v=0:self.updateSliderLCD(3,v))
         self.slider4.valueChanged.connect(lambda _:self.sliderReleased(3,updateLCD=True))
         self.slider4.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
+        self.slider4.sliderMoved.connect(lambda : self.sliderMoved(3))
 
         self.sliderSV = self.slider()
         self.sliderLCDSV = self.sliderLCD()
@@ -13705,22 +13711,25 @@ class ApplicationWindow(QMainWindow):
                 self.sliderSV.setValue(v)
             else:
                 self.sliderSV.setSliderPosition(v)
-
+                
+    def sliderMoved(self,n):
+        self.eventslidermoved[n]=1
+        
     # if updateLCD=True, call moveslider() which in turn updates the LCD
     def sliderReleased(self,n,force=False, updateLCD=False):
         if n == 0:
-            sv = self.slider1.value()
-            if force or sv != self.eventslidervalues[0]:
+            if force or (self.eventslidermoved[0] and self.slider1.value() != self.eventslidervalues[0]) or abs(self.slider1.value() - self.eventslidervalues[0]) > 3:
+                self.eventslidermoved[0] = 0
                 if aw.eventslidercoarse[0]:
-                    v = int(round(sv / 10.))*10
+                    v = int(round(self.slider1.value() / 10.))*10
                 else:
-                    v = sv
+                    v = self.slider1.value()
                 self.eventslidervalues[0] = v
                 if updateLCD:
                     self.moveslider(0,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 1:
-            if force or self.slider2.value() != self.eventslidervalues[1]:
+            if force or (self.eventslidermoved[1] and self.slider2.value() != self.eventslidervalues[1]) or abs(self.slider2.value() - self.eventslidervalues[1]) > 3:
                 if aw.eventslidercoarse[1]:
                     v = int(round(self.slider2.value() / 10.))*10
                 else:
@@ -13730,7 +13739,7 @@ class ApplicationWindow(QMainWindow):
                     self.moveslider(1,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 2:
-            if force or self.slider3.value() != self.eventslidervalues[2]:
+            if force or (self.eventslidermoved[2] and self.slider3.value() != self.eventslidervalues[2]) or abs(self.slider3.value() - self.eventslidervalues[2]) > 3:
                 if aw.eventslidercoarse[2]:
                     v = int(round(self.slider3.value() / 10.))*10
                 else:
@@ -13740,7 +13749,7 @@ class ApplicationWindow(QMainWindow):
                     self.moveslider(2,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 3:
-            if force or self.slider4.value() != self.eventslidervalues[3]:
+            if force or (self.eventslidermoved[3] and self.slider4.value() != self.eventslidervalues[3]) or abs(self.slider4.value() - self.eventslidervalues[3]) > 3:
                 if aw.eventslidercoarse[3]:
                     v = int(round(self.slider4.value() / 10.))*10
                 else:
@@ -13786,7 +13795,8 @@ class ApplicationWindow(QMainWindow):
         self.extraeventsactionslastvalue[n] = self.eventslidervalues[n]
         if self.qmc.flagstart:
             value = aw.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
-            self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value)
+            description = str(aw.float2float(self.eventslidervalues[n] * self.eventsliderfactors[n] + self.eventslideroffsets[n])).rstrip('0').rstrip('.') + self.eventsliderunits[n]
+            self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value,eventdescription=description)
         self.fireslideraction(n)
 
     def sliderLCD(self):
@@ -18745,6 +18755,8 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidercoarse = [toInt(x) for x in toList(settings.value("eventslidercoarse",self.eventslidercoarse))]                
             if settings.contains("eventslidertemp"):
                 self.eventslidertemp = [toInt(x) for x in toList(settings.value("eventslidertemp",self.eventslidertemp))]
+            if settings.contains("eventsliderunits"):
+                self.eventsliderunits = list(map(u,list(toStringList(settings.value("eventsliderunits",self.eventsliderunits)))))
             if settings.contains("ModeTempSliders"):
                 self.qmc.mode_tempsliders = str(settings.value("ModeTempSliders",self.qmc.mode_tempsliders))              
             settings.endGroup()
@@ -19796,6 +19808,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("eventslidersflags",self.eventslidersflags)
             settings.setValue("eventslidercoarse",self.eventslidercoarse)
             settings.setValue("eventslidertemp",self.eventslidertemp)
+            settings.setValue("eventsliderunits",self.eventsliderunits)
             settings.setValue("ModeTempSliders",self.qmc.mode_tempsliders)
             settings.endGroup()
             settings.beginGroup("Quantifiers")
@@ -24055,6 +24068,8 @@ class ApplicationWindow(QMainWindow):
         copy.append(self.eventslidercoarse[:])
         # added slider temp
         copy.append(self.eventslidertemp[:])
+        # added slider unit
+        copy.append(self.eventsliderunits[:])
               
         self.buttonpalette[pindex] = copy[:]
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
@@ -24131,6 +24146,10 @@ class ApplicationWindow(QMainWindow):
                 self.eventslidertemp = copy[22][:]
             else:
                 self.eventslidertemp = [0,0,0,0]
+            if len(copy)>23 and len(copy[23]) == 4:
+                self.eventsliderunits = copy[23][:]
+            else:
+                self.eventsliderunits = [0,0,0,0]
                 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
@@ -30137,6 +30156,8 @@ class EventsDlg(ArtisanDialog):
         slidercoarsetitlelabel.setFont(titlefont)
         slidertemptitlelabel = QLabel(QApplication.translate("Label","Temp", None))
         slidertemptitlelabel.setFont(titlefont)
+        sliderunittitlelabel = QLabel(QApplication.translate("Label","Unit", None))
+        sliderunittitlelabel.setFont(titlefont)
         self.E1visibility = QCheckBox(aw.qmc.etypesf(0))
         self.E1visibility.setFocusPolicy(Qt.NoFocus)
         self.E1visibility.setChecked(bool(aw.eventslidervisibilities[0]))
@@ -30296,7 +30317,20 @@ class EventsDlg(ArtisanDialog):
         self.E4slider_temp = QCheckBox()
         self.E4slider_temp.setFocusPolicy(Qt.NoFocus)
         self.E4slider_temp.setChecked(bool(aw.eventslidertemp[3]))
-        self.E4slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None))                 
+        self.E4slider_temp.setToolTip(QApplication.translate("Tooltip", "Slider values interpreted as temperatures", None))
+        maxwidth = 40
+        self.E1unit = QLineEdit(aw.eventsliderunits[0])
+        self.E1unit.setMaximumWidth(maxwidth)
+        self.E1unit.setToolTip(QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None))
+        self.E2unit = QLineEdit(aw.eventsliderunits[1])
+        self.E2unit.setMaximumWidth(maxwidth)        
+        self.E2unit.setToolTip(QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None))
+        self.E3unit = QLineEdit(aw.eventsliderunits[2])
+        self.E3unit.setMaximumWidth(maxwidth)        
+        self.E3unit.setToolTip(QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None))
+        self.E4unit = QLineEdit(aw.eventsliderunits[3])
+        self.E4unit.setMaximumWidth(maxwidth)        
+        self.E4unit.setToolTip(QApplication.translate("Tooltip", "Unit to be added to generated event descriptions", None))
         helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None))
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         helpsliderbutton.clicked.connect(lambda _:self.showSliderHelp())
@@ -30752,6 +30786,7 @@ class EventsDlg(ArtisanDialog):
         tab5Layout.addWidget(max_titlelabel,0,6)
         tab5Layout.addWidget(slidercoarsetitlelabel,0,7)
         tab5Layout.addWidget(slidertemptitlelabel,0,8)
+        tab5Layout.addWidget(sliderunittitlelabel,0,9)
         tab5Layout.addWidget(self.E1visibility,1,0)
         tab5Layout.addWidget(self.E2visibility,2,0)
         tab5Layout.addWidget(self.E3visibility,3,0)
@@ -30788,6 +30823,10 @@ class EventsDlg(ArtisanDialog):
         tab5Layout.addWidget(self.E2slider_temp,2,8,Qt.AlignCenter)
         tab5Layout.addWidget(self.E3slider_temp,3,8,Qt.AlignCenter)
         tab5Layout.addWidget(self.E4slider_temp,4,8,Qt.AlignCenter)
+        tab5Layout.addWidget(self.E1unit,1,9)
+        tab5Layout.addWidget(self.E2unit,2,9)
+        tab5Layout.addWidget(self.E3unit,3,9)
+        tab5Layout.addWidget(self.E4unit,4,9)
         SliderHelpHBox = QHBoxLayout()
         SliderHelpHBox.addStretch()
         SliderHelpHBox.addWidget(helpsliderbutton)
@@ -31103,6 +31142,11 @@ class EventsDlg(ArtisanDialog):
         self.E2slider_temp.setChecked(bool(aw.eventslidertemp[1]))
         self.E3slider_temp.setChecked(bool(aw.eventslidertemp[2]))
         self.E4slider_temp.setChecked(bool(aw.eventslidertemp[3]))
+        # set slider units
+        self.E1unit.setText(aw.eventsliderunits[0])
+        self.E2unit.setText(aw.eventsliderunits[1])
+        self.E3unit.setText(aw.eventsliderunits[2])
+        self.E4unit.setText(aw.eventsliderunits[3])
 
     def setElinethickness(self,_,val):
         self.E1thicknessSpinBox.setDisabled(True)
@@ -31679,6 +31723,10 @@ class EventsDlg(ArtisanDialog):
         aw.eventslidertemp[1] = int(self.E2slider_temp.isChecked())
         aw.eventslidertemp[2] = int(self.E3slider_temp.isChecked())
         aw.eventslidertemp[3] = int(self.E4slider_temp.isChecked())
+        aw.eventsliderunits[0] = u(self.E1unit.text())
+        aw.eventsliderunits[1] = u(self.E2unit.text())
+        aw.eventsliderunits[2] = u(self.E3unit.text())
+        aw.eventsliderunits[3] = u(self.E4unit.text())
         aw.updateSliderMinMax()
         aw.slidersAction.setEnabled(any(aw.eventslidervisibilities) or aw.pidcontrol.svSlider)
 
@@ -31742,6 +31790,7 @@ class EventsDlg(ArtisanDialog):
         self.eventslidermax = aw.eventslidermax
         self.eventslidercoarse = aw.eventslidercoarse
         self.eventslidertemp = aw.eventslidertemp
+        self.eventsliderunits = aw.eventsliderunits
         # palettes
         self.buttonpalette = aw.buttonpalette
         # styles
@@ -31787,6 +31836,7 @@ class EventsDlg(ArtisanDialog):
         aw.eventslidermax = self.eventslidermax
         aw.eventslidercoarse = self.eventslidercoarse
         aw.eventslidertemp = self.eventslidertemp
+        aw.eventsliderunits = self.eventsliderunits
         # palettes
         aw.buttonpalette = self.buttonpalette
         # styles
