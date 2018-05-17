@@ -6,16 +6,15 @@ last_modified_at: 2018-05-15T15:59:00-04:00
 
 ---
 
-### Alarms
+### Alarms - Purpose
 
 Menu>Config>Alarms
 
-Alarms can warn you of certain events and they can also trigger certain things to happen.  Alarms are for intermediate and advanced users.  Beginners should be aware they exist and as you gain experience with Artisan come back here and learn more about how powerful they can be as, you can even control the roaster with Alarms.
+Alarms are for intermediate and advanced users.  Beginners should be aware they exist and as you gain experience with Artisan come back here and learn more about how powerful they can be as, you can even control the roaster with Alarms.
 
-Artisan alarms can help you in keeping the focus while roasting. There are triggers and actions. So assuming we would like Artisan to show a popup once the BT (bean temperature) raises beyond 180C, reminding us to turn down the heat on approaching FCs (First Crack Start). Here BT raises beyond 180C is the trigger and showing a popup is the action.
+Alarms trigger certain actions to happen. Artisan alarms can help you in keeping the focus while roasting. The actions can be PopUPs, spoken words, or even controlling the roaster.  For example, if we would like Artisan to show a popup once the BT (bean temperature) raises beyond 180C, reminding us to turn down the heat on approaching FCs (First Crack Start). Here BT beyond 180C is the trigger and showing a popup is the action.
 
 Alarms are unordered by definition. All alarm conditions of not-yet activated alarms are evaluated once per sampling interval and where all pre-conditions are fulfilled the alarm is fired. Note that each alarm is only fired once.  An alarm is triggered only once even if it has both an alarm time and temperature trigger set.   
-
 
 
 ### Alarms To Trigger PopUPs
