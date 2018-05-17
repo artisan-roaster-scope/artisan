@@ -15,9 +15,12 @@ toc: false
   * By [roastmasterscoffee](https://www.youtube.com/channel/UCsba_bXJQbqFX06X5xP_7ug)
     - [Hottop KN-8828B-2K+ YouTube tutorial](https://www.youtube.com/watch?v=glyE_6vv-Lo&t=110s)
   * By [NapoHBarista TV](https://www.youtube.com/channel/UC-k4iHzxb8xrLZ2NSlUo8hg)
-    - [Hottop KN-8828B-2K+ YouTube tutorial](https://www.youtube.com/watch?v=T0If1ZbxjOI&t=310s) 
+    - [Hottop KN-8828B-2K+ YouTube tutorial](https://www.youtube.com/watch?v=T0If1ZbxjOI&t=310s)
   * By [Brad](https://www.youtube.com/channel/UCxcEts9cSvi29QrXyt3qvsQ)
     - [Setup for TC4](https://www.youtube.com/watch?v=0-Co-pXF2NM)
     - [TC4 PID Control](https://www.youtube.com/watch?v=ykuUCXhGAC4)
   * By [Azis Muslim](https://www.youtube.com/channel/UC8PQskLA6lHik9_W_Js_OCg) (in Indonesian)
     - [YouTube Tutorial instalasi Artisan Roaster Scope dan konfigurasi device pada mesin roasting](https://www.youtube.com/watch?v=DRUXTT6NLm4)
+
+  * By Michael Wright
+      - [Alarms Video](https://www.youtube.com/watch?time_continue=321&v=IrvC9dPqgjE) that uses Alarms for a much more sophisticated purpose in controlling his machine.  
