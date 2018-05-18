@@ -6,38 +6,38 @@ v1.3.1 (20.5.2018)
 ------------------
 
  * New Features 
-   - adds Cmd-S as shortcut for "Save As" ([#194](../../issues/194))
-   - remembers fullscreen mode over restarts ([#199](../../issues/194))
+   - adds Cmd-S as shortcut for "Save As" ([#194](../issues/194))
+   - remembers fullscreen mode over restarts ([#199](../issues/199))
    - allows to insert a custom event button line before the selected one by clicking Add
    - adds insert action to the alarm table to add an alarm line before the selected one
    - adds support for the new Fuji PID PXF
    - adds PXF variant of Sedona Elite and Phoenix machine configurations
    - adds copy as tab delimited text action for data tables
  * Changes
-   - #198: Roast properties: weight & volume to allow hundredths not tenths
-   - #196: Phases LCD defaults should be configurable or same as 1.2
+   - restricts the "time-to" display introduced in v1.3 to the temperature mode rendering the percentage mode again as in v1.2 ([#196](../issues/196))
+   - all hundredths not only thenth in roast properties weight adn volume ([#198](../issues/198))
    - events created by sliders now put the values translated using the sliders offset and factor to the event descriptions together with a unit prefix
    - started internal code modularisation resulting in lower memory demand in most cases
    - removed support for Qt4
-   - updates to pymodbus 1.5.2 with better error handling
+   - updates to pymodbus 1.5.2 for better error handling on noisy lines
    - increase width of phases LCDs to hold one more digit and update tooltip
    - improves slider release action
  * Bug Fixes
-   - #178: matplotlib not using persistent font cache (Linux)
-   - #179: Event button line just added errs when deleted
-   - #180: Config>Event Event description checkbox setting not retained
-   - #182/187/188: RPi crashes on open file selector
-   - #184: No communication between Artisan(MAC) and Aillio Bullet
-   - #186: Curve width not working with decimal point
-   - #191: Negative value do not work anymore in Event/Button/Value
-   - #192: Unhandled Exception (Config/Alarms)
-   - #195: Roasting Report: First event duplicated
-   - fixes Phidgets pulse
+   - ensures that the matplotlib font cache is used on Linux ([#178](../issues/178))
+   - fixes an error that could occur on deleting an event button definition ([#179](../issues/179))
+   - ensures proper persistance of the "Descr." checkbox state of the events dialog over restarts ([#180](../issues/180))
+   - fixes a communication issue with Aillio Bullet R1 roasters running a newer firmware ([#188](../issues/184))
+   - fixes a build error in v1.3 that caused Artisan to crash on opening a file selector ([#182](../issues/182),[#187](../issues/187),[#188](../issues/188))
+   - ensures that decimals in curve width are properly handled ([#186](../issues/186))
+   - fixes a regression that disallowed for negative event button values ([#191](../issues/191))
+   - fixes an unhandled exception in the alarm processing ([#192](../issues/192))
+   - fixes a rare case were the first event listed in roasting reports got duplicated ([#195](../issues/195))
+   - fixes Phidgets pulses that never latched back
    - fixes background title colors
    - fixes a problem setting extra device colors
    - fixes reveal of hidden buttons when changing Config>Colors
    - fixes some redraw hickups in fullscreen mode on OS X
-   - fixes character encoding of dates in statistic summaries
+   - fixes wrong character encoding of dates in statistic summaries
 
    
 ----
