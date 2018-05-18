@@ -2,6 +2,45 @@ Detailed Release History
 ========================
 
 ----
+v1.3.1 (20.5.2018)
+------------------
+
+ * New Features 
+   - #194: Cmd-S should be Save As
+   - #198: Roast properties: weight & volume to allow hundredths not tenths
+   - #199: Start up Artisan with fullscreen as default
+   - adds insert of a custom button before the selected one
+   - adds insert to the alarm table
+   - adds support for the new Fuji PID PXF
+   - adds PXF variant of Sedona Elite and Phoenix machine configurations
+   - adds slider event descriptions with unit prefix
+   - adds copy as tab delimited text action for data tables
+ * Changes
+   - #196: Phases LCD defaults should be configurable or same as 1.2
+   - started internal code modularisation resulting in lower memory demand in most cases
+   - removed support for Qt4
+   - updates to pymodbus 1.5.2 with better error handling
+   - increase width of phases LCDs to hold one more digit and update tooltip
+   - improves slider release action
+ * Bug Fixes
+   - #178: matplotlib not using persistent font cache (Linux)
+   - #179: Event button line just added errs when deleted
+   - #180: Config>Event Event description checkbox setting not retained
+   - #182/187/188: RPi crashes on open file selector
+   - #184: No communication between Artisan(MAC) and Aillio Bullet
+   - #186: Curve width not working with decimal point
+   - #191: Negative value do not work anymore in Event/Button/Value
+   - #192: Unhandled Exception (Config/Alarms)
+   - #195: Roasting Report: First event duplicated
+   - fixes Phidgets pulse
+   - fixes background title colors
+   - fixes a problem setting extra device colors
+   - fixes reveal of hidden buttons when changing Config>Colors
+   - fixes some redraw hickups in fullscreen mode on OS X
+   - fixes character encoding of dates in statistic summaries
+
+   
+----
 v1.3.0 (15.4.2018)
 ------------------
 
