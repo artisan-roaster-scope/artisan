@@ -5362,8 +5362,8 @@ class tgraphcanvas(FigureCanvas):
             skipline = '\n'
             statstr = ''
             if self.statssummary:   
-                statstr += encodeLocal(aw.qmc.roastdate.date().toString()) + ' '
-                statstr += encodeLocal(aw.qmc.roastdate.time().toString())
+                statstr += aw.qmc.roastdate.date().toString() + ' '
+                statstr += aw.qmc.roastdate.time().toString()
                 statstr += roastoftheday
                 if aw.qmc.roastertype:
                     statstr += '\n' + str(aw.qmc.roastertype)
