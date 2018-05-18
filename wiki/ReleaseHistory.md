@@ -15,7 +15,7 @@ v1.3.1 (20.5.2018)
    - adds copy as tab delimited text action for data tables
  * Changes
    - restricts the "time-to" display introduced in v1.3 to the temperature mode rendering the percentage mode again as in v1.2 ([#196](../../../issues/196))
-   - all hundredths not only thenth in roast properties weight adn volume ([#198](../../../issues/198))
+   - all hundredths not only thenth in roast properties weight and volume ([#198](../../../issues/198))
    - events created by sliders now put the values translated using the sliders offset and factor to the event descriptions together with a unit prefix
    - started internal code modularisation resulting in lower memory demand in most cases
    - removed support for Qt4
