@@ -6,17 +6,17 @@ v1.3.1 (20.5.2018)
 ------------------
 
  * New Features 
-   - #194: Cmd-S should be Save As
-   - #198: Roast properties: weight & volume to allow hundredths not tenths
-   - #199: Start up Artisan with fullscreen as default
-   - adds insert of a custom button before the selected one
-   - adds insert to the alarm table
+   - adds Cmd-S as shortcut for "Save As" ([#194](../../issues/194))
+   - remembers fullscreen mode over restarts ([#199](../../issues/194))
+   - allows to insert a custom event button line before the selected one by clicking Add
+   - adds insert action to the alarm table to add an alarm line before the selected one
    - adds support for the new Fuji PID PXF
    - adds PXF variant of Sedona Elite and Phoenix machine configurations
-   - adds slider event descriptions with unit prefix
    - adds copy as tab delimited text action for data tables
  * Changes
+   - #198: Roast properties: weight & volume to allow hundredths not tenths
    - #196: Phases LCD defaults should be configurable or same as 1.2
+   - events created by sliders now put the values translated using the sliders offset and factor to the event descriptions together with a unit prefix
    - started internal code modularisation resulting in lower memory demand in most cases
    - removed support for Qt4
    - updates to pymodbus 1.5.2 with better error handling
