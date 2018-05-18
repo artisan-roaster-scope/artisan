@@ -83,6 +83,6 @@ Quantifiers turn readings received from a connected device into custom events on
 
 [Read ](https://artisan-roasterscope.blogspot.com/2014/04/event-quantifiers.html)more about quantifiers for advanced users.
 
-A [video](https://www.youtube.com/watch?time_continue=321&v=IrvC9dPqgjE) on the topic of Buttons and Alarms from an earlier version of Artisan by Michael Wright.
+Check out a [video](https://www.youtube.com/watch?time_continue=321&v=IrvC9dPqgjE) on the topic of Buttons and Alarms from an earlier version of Artisan by Michael Wright.
 
 You can create [multiple palettes of buttons](https://artisan-roasterscope.blogspot.com/2013/02/events-buttons-and-palettes.html) as well to use in different roasting situations.

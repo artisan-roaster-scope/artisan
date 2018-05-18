@@ -18,5 +18,5 @@ If you go below a 3s interval you will get a popup warning ![interval warning](/
 
 but you can experiment and see what is best for you. You can try it lower and see if your equipment can handle it. If you go down to 1s or less sampling, and you check oversampling, make sure it doesn't cause graph lines that are to jumpy.  
 
-[More information ](https://artisan-roasterscope.blogspot.com/2014/01/sampling-interval-smoothing-and-rate-of.html)on sampling in
+[More information](https://artisan-roasterscope.blogspot.com/2014/01/sampling-interval-smoothing-and-rate-of.html)on sampling in
 Artisan.
