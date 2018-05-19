@@ -18,3 +18,5 @@ Examples of the Focus and Midnight themes:
 
 ![focus](/assets/images/gsg/Focus Theme.png)
 ![midnight](/assets/images/gsg/Midnight Theme.png)
+
+Note that in the Focus theme the FCs-to-FCe watermark is colored to blend into the background.  In the Midnight theme the option Config>Phases>Watermarks is turned off so both the horizontal bands highlighting the phases and the vertical bands highlighting the duration of first crack and second crack are hidden.  
