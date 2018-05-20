@@ -9,61 +9,9 @@ last_modified_at: 2018-05-15T15:58:49-04:00
 
 **If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.**  Artisan Quick-Start Guide is maintained by *Michael Herbert of Evergreen Buzz Buzz.*  If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the community mailing list on the [Community](https://artisan-scope.org/docs/community/) page.  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  
 
-![Artisan 1.3](/assets/images/gsg/artisan 1-3.png)
-
-**Roasters Covered**
-
-You will find many roaster manufacturers are now supporting Artisan.  In 1.3, you will find simplified setup for the ones offering support.  See [Artisan Machines](https://artisan-scope.org/machines/).
-
-Under Config>Machine, Artisan 1.3 has direct support for:
-
-	•	Aillio Bullet R1 including profile imports
-	•	BC Roasters
-	•	Bühler Roastmaster
-	•	Coffed SR5/SR25
-	•	Coffee-Tech FZ-94
-	•	Coffeetool R500/3/5/15
-	•	Giesen W1A/W6A/W15A
-	•	IMF RM5/RM15
-	•	K+M UG15/UG22
-	•	Loring S7/15/35/70
-	•	Phoenix ORO
-	•	Proaster
-	•	San Franciscan SF1-75
-	•	Sedona Elite
-	•	Toper TKM-SX
-	•	US Roaster Corp
-
-### Installing Artisan
-
-[Download and install Artisan](https://github.com/artisan-roaster-scope/artisan) first.
-
-The installer, on a MAC or PC, will first remove your prior version but this won’t remove your prior settings if you have them. You can also downgrade to a previous version by just uninstalling the current version and re-installing the old version without losing any settings.  
-
-If installing on a MAC, you will get a warning that Artisan is from an unidentified developer.  That is being worked on, and for now go to Settings>Security and Privacy, and you will be able to allow Artisan to install.  
-
-To ensure no issues, save your stable settings before changing any settings or installing a new version (Help>Save Settings).
-More complete instructions on the [Installation page](https://artisan-scope.org/docs/installation/).  You can install Artisan before your roaster arrives.  
-
-### Setup for your hardware
-If you don't have a Roaster that supports the Artisan effort and isn't automatically configured by choosing that Roaster under Cofig>Machines, you will need to connect your devices to the roaster and to your computer.  Then you will need to use Config>Devices to tell Artisan how to read your hardware. More complete instructions on the [Setup page](https://artisan-scope.org/docs/setup/).
-
-Determine what connection devices you have.  For example, a
-[Phidget 1048](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=38) can measure four temperatures.  First install the
-[Phidget software drivers](https://www.phidgets.com/docs/Software_Overview), or other drivers as needed.  Then connect the hardware which was easy for a Phidget 1048:
-![Phidget Connections](/assets/images/gsg/phidget wiring.jpg) As thermocouples differ your wiring colors may vary.
-The correct wiring colors for the thermocouples used were as follows:
-
-1. BT G – white
-2. BT 0 – Red
-3. ET G – white with blue stripe
-4. ET 0 – white with red stripe
-![Phidget Wirring](/assets/images/gsg/ET0 white with red stripe.jpg)
-
-More information on Phidgets is on the [Installation](https://artisan-scope.org/docs/installaion/) page.
 ### Your first roast
 
-With Artisan open, to do your first roast, go to Menu>View and make sure Controls and Readings are checked.  Then make sure your roaster is on and heating, and that the LCDs for temperatures are getting a reading.  
+**After you review the pages on the left and have done your setup,** with Artisan open, to do your first roast, go to Menu>View and make sure Controls and Readings are checked.  Then make sure your roaster is on and heating, and that the LCDs for temperatures are getting a reading.  
 
 *Buttons and Sliders*
 
