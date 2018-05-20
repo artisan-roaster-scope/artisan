@@ -2798,33 +2798,32 @@ class tgraphcanvas(FigureCanvas):
             elif self.alarmaction[alarmnumber] == 16:
                 # CHARGE
                 aw.qmc.autoChargeIdx = len(aw.qmc.timex)
-            elif self.alarmaction[alarmnumber] == 17:
+            elif self.alarmaction[alarmnumber] == 17 and aw.qmc.Controlbuttonflag:
                 # RampSoak ON
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setrampsoak(1)
-                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # internal or external MODBUS PID control
+                elif aw.pidcontrol: # internal or external MODBUS PID control
                     aw.pidcontrol.svMode = 1
                     aw.pidcontrol.pidOn()
-            elif self.alarmaction[alarmnumber] == 18:
+            elif self.alarmaction[alarmnumber] == 18 and aw.qmc.Controlbuttonflag:
                 # RampSoak OFF
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setrampsoak(0)
-                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag):  # internal or external MODBUS PID control
+                elif aw.pidcontrol:  # internal or external MODBUS PID control
                     aw.pidcontrol.svMode = 0
                     aw.pidcontrol.pidOff()
-            elif self.alarmaction[alarmnumber] == 19:
+            elif self.alarmaction[alarmnumber] == 19 and aw.qmc.Controlbuttonflag:
                 # PID ON
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setONOFFstandby(0)
-                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # internal or external MODBUS PID control
+                elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
                     aw.pidcontrol.pidOn()
-            elif self.alarmaction[alarmnumber] == 20:
+            elif self.alarmaction[alarmnumber] == 20 and aw.qmc.Controlbuttonflag:
                 # PID OFF
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setONOFFstandby(1)
-                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # internal or external MODBUS PID control
+                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # internal or external MODBUS PID control or Arduino TC4 PID
                     aw.pidcontrol.pidOff()
-                    
             elif self.alarmaction[alarmnumber] == 21:
                 # SV slider alarm
                 try:
@@ -6070,7 +6069,9 @@ class tgraphcanvas(FigureCanvas):
             #disable RESET button:
             aw.button_7.setEnabled(False)
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            QApplication.processEvents()
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])
+            QApplication.processEvents()
             aw.button_1.setText(QApplication.translate("Button", "OFF",None)) # text means click to turn OFF (it is ON)
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None))
             aw.button_2.setEnabled(True) # ensure that the START button is enabled
@@ -12990,8 +12991,8 @@ class ApplicationWindow(QMainWindow):
             res = True
             if aw.ser.showFujiLCDs:
                 lcds = True
-        elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ARDUINOTC4
-            res = True
+#        elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ARDUINOTC4
+#            res = True
         elif aw.qmc.Controlbuttonflag:
             res = True
         if res:
@@ -14901,7 +14902,7 @@ class ApplicationWindow(QMainWindow):
                         pass
                 elif key == 80:                       #P
                     # switch PID mode
-                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                    if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
                         # toggle mode: manual => RS => background
                         if not aw.fujipid.rampsoak and not aw.fujipid.followBackground: # => RS
                             aw.fujipid.setrampsoak(1)
@@ -14927,14 +14928,14 @@ class ApplicationWindow(QMainWindow):
                         elif  aw.pidcontrol.svMode == 2:
                             aw.sendmessage(QApplication.translate("Message","PID Mode: Background", None))
                 elif key == 45:                       #-
-                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                    if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
                         aw.fujipid.lookahead = max(0,aw.fujipid.lookahead-1)
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
                     elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
                         aw.pidcontrol.svLookahead = max(0,aw.pidcontrol.svLookahead-1)
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.pidcontrol.svLookahead))
                 elif key == 43:                       #+
-                    if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
+                    if aw.qmc.device == 0 and aw.fujipid and aw.qmc.Controlbuttonflag: # FUJI PID
                         aw.fujipid.lookahead = aw.fujipid.lookahead+1
                         aw.sendmessage(QApplication.translate("Message","PID Lookahead: {0}", None).format(aw.fujipid.lookahead))
                     elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # MODBUS hardware PID
