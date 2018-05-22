@@ -67,7 +67,7 @@ port=502
 stopbits=1
 timeout=1
 type=0
-wordorderLittle=true
+wordorderLittle=false
 
 [RoastProperties]
 roastertype=BC Roaster
