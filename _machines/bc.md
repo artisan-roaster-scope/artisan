@@ -14,8 +14,15 @@ header:
 * __Connection:__ MODBUS RTU; requires the installation of a serial driver
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
 
-**Watch out!** Artsan v1.3.1 and later need a slightly different MODBUS setup (check menu `Config >> Port, 3rd tab MODBUS` for the BC roasters than previous versions.
+{% capture notice-text %}
+Artsan v1.3.1 and later need a slightly different MODBUS setup (check menu `Config >> Port`, 3rd tab `MODBUS`) than earlier versions where the state of the little-endian flag `words` was insignificant. Now both little-endian flags, `bytes` and `words`, should not be ticked as in the screenshot below.
 
-* for v1.3.0 and earlier the `bytes` little endian flag needs to be unticked. The state of the `words` is not significant.
-* for v1.3.1 and later both little-endian flags, `bytes` and `words`, need to be unticked.
-{: .notice--primary}
+![alt text](../../assets/images/BC_modbus.png)
+{% endcapture %}
+
+<div class="notice--primary">
+  <h4>Watch out!</h4>
+  <BR>
+  {{ notice-text | markdownify }}
+</div>
+
