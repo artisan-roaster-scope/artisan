@@ -2820,7 +2820,7 @@ class tgraphcanvas(FigureCanvas):
                 # PID OFF
                 if aw.qmc.device == 0 and aw.fujipid: # FUJI PID
                     aw.fujipid.setONOFFstandby(1)
-                elif (aw.pidcontrol and aw.qmc.Controlbuttonflag): # internal or external MODBUS PID control or Arduino TC4 PID
+                elif aw.pidcontrol: # internal or external MODBUS PID control or Arduino TC4 PID
                     aw.pidcontrol.pidOff()
             elif self.alarmaction[alarmnumber] == 21:
                 # SV slider alarm
