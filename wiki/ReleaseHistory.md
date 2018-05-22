@@ -23,6 +23,7 @@ v1.3.1 (20.5.2018)
    - updates to pymodbus 1.5.2 for better error handling on noisy lines
    - increase width of phases LCDs to hold one more digit and update tooltip
    - improves slider release action
+   - the semantic of the MODBUS little_endian `word` flag, relevant for Float values only, of the underlying pymodbus lib changed with the effect that some setups need to be updated (eg. the one for BC Roasters, and Coffeetool) by inversing the flag.
  * Bug Fixes
    - ensures that the matplotlib font cache is used on Linux ([#178](../../../issues/178))
    - fixes an error that could occur on deleting an event button definition ([#179](../../../issues/179))
