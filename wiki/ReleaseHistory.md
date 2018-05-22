@@ -39,7 +39,10 @@ v1.3.1 (20.5.2018)
    - fixes reveal of hidden buttons when changing Config>Colors
    - fixes some redraw hickups in fullscreen mode on OS X
    - fixes wrong character encoding of dates in statistic summaries
-
+ * Builds
+   - v1.3.1(0): build 0 (initial release)
+   - v1.3.1(1): build 1 uploaded on 22.05.2018
+     - fixes BC Roaster machine setup
    
 ----
 v1.3.0 (15.4.2018)
