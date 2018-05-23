@@ -3,6 +3,7 @@
 
 from artisanlib import __version__
 from artisanlib import __revision__
+from artisanlib import __build__
 
 # ABOUT
 # This program shows how to plot the temperature and its rate of change from a
@@ -19251,6 +19252,21 @@ class ApplicationWindow(QMainWindow):
             event.accept()
         else:
             event.ignore()
+            
+    # returns OS name and version strings
+    def get_os(self):
+        try:
+            if platform.system().startswith('Darwin'):
+                return "Mac OS X", platform.mac_ver()[0]
+            elif platform.system().startswith("Windows"):
+                return "Windows", platform.release()
+            elif sys.platform.startswith("Linux"):
+                distr = platform.linux_distribution()
+                return distr[0],distr[1]
+            else:
+                return "",""
+        except:
+            return "",""
     
     def closeEventSettings(self, filename=None):
         #save window geometry and position. See QSettings documentation.
@@ -19279,6 +19295,15 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("NSQuitAlwaysKeepsWindows",False)
             #save mode
             settings.setValue("Mode",self.qmc.mode)
+            #save system
+            settings.beginGroup("System")
+            settings.setValue("artisan_version",__version__)
+            settings.setValue("artisan_revision",__revision__)
+            settings.setValue("artisan_build",__build__)
+            os,os_version = self.get_os()
+            settings.setValue("artisan_os",os)
+            settings.setValue("artisan_os_version",os_version)
+            settings.endGroup()
             #save device
             settings.beginGroup("Device")
             settings.setValue("id",self.qmc.device)
@@ -22332,9 +22357,12 @@ class ApplicationWindow(QMainWindow):
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
         from pymodbus import __version__ as PYMODBUS_VERSION_STR
+        build = ""
+        if __build__ != "0":
+            build = " build " + __build__
         box.about(self,
                 QApplication.translate("About", "About",None),
-                u("""<h2>{0} {1} ({2})</h2>
+                u("""<h2>{0} {1}{16} ({2})</h2>
                 <p>
                 <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}, pymodbus {13}</small>
                 </p>
@@ -22357,7 +22385,8 @@ class ApplicationWindow(QMainWindow):
                 contributors,
                 PYMODBUS_VERSION_STR,
                 QApplication.translate("About", "License",None),
-                '<a href="http://www.gnu.org/copyleft/gpl.html">GNU Public Licence (GPLv3.0)</a>'))
+                '<a href="http://www.gnu.org/copyleft/gpl.html">GNU Public Licence (GPLv3.0)</a>',
+                build))
 
     def showAboutQt(self):
         QApplication.instance().aboutQt()
