@@ -564,6 +564,9 @@ qtTranslator = QTranslator()
 #load Qt default translations from QLibrary
 if qtTranslator.load("qt_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)):
     app.installTranslator(qtTranslator)
+#find Qt default translations in Unix binaries
+elif qtTranslator.load("qt_" + locale, QApplication.applicationDirPath() + "/translations"):
+    app.installTranslator(qtTranslator)
 #find Qt default translations in Mac binary
 elif qtTranslator.load("qt_" + locale, QApplication.applicationDirPath() + "/../translations"):
     app.installTranslator(qtTranslator)
@@ -571,6 +574,9 @@ elif qtTranslator.load("qt_" + locale, QApplication.applicationDirPath() + "/../
 appTranslator = QTranslator()
 #find application translations in source folder
 if appTranslator.load("artisan_" + locale, "translations"):
+    app.installTranslator(appTranslator)
+#find application translations in Unix binaries
+elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/translations"):
     app.installTranslator(appTranslator)
 #find application translations in Mac binary
 elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
