@@ -26971,6 +26971,7 @@ class editGraphDlg(ArtisanDialog):
         self.deleventTableButton.setMaximumSize(self.deleventTableButton.sizeHint())
         self.deleventTableButton.setMinimumSize(self.deleventTableButton.minimumSizeHint())
         self.deleventTableButton.clicked.connect(lambda _:self.deleteEventTable())
+        
         #DATA Table
         self.datatable = QTableWidget()
         self.datatable.setTabKeyNavigation(True)
@@ -30141,6 +30142,7 @@ class EventsDlg(ArtisanDialog):
         #table for showing events
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
+        self.eventbuttontable.itemSelectionChanged.connect(self.selectionChanged)
         self.createEventbuttonTable()
         addButton = QPushButton(QApplication.translate("Button","Add",None))
         addButton.setToolTip(QApplication.translate("Tooltip","Add new extra Event button",None))
@@ -30152,6 +30154,13 @@ class EventsDlg(ArtisanDialog):
         #delButton.setMaximumWidth(100)
         delButton.setFocusPolicy(Qt.NoFocus)
         delButton.clicked.connect(lambda _:self.delextraeventbutton())
+        
+        self.insertButton = QPushButton(QApplication.translate("Button","Insert",None))
+        self.insertButton.clicked.connect(lambda _:self.insertextraeventbutton(True))
+        self.insertButton.setMinimumWidth(80)
+        self.insertButton.setFocusPolicy(Qt.NoFocus)
+        self.insertButton.setEnabled(False)
+        
         helpButton = QPushButton(QApplication.translate("Button","Help",None))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         helpButton.setFocusPolicy(Qt.NoFocus)
@@ -30761,6 +30770,7 @@ class EventsDlg(ArtisanDialog):
         nbuttonslayout.addStretch()
         tab2buttonlayout = QHBoxLayout()
         tab2buttonlayout.addWidget(addButton)
+        tab2buttonlayout.addWidget(self.insertButton)
         tab2buttonlayout.addWidget(delButton)
         tab2buttonlayout.addStretch()
         tab2buttonlayout.addWidget(helpButton)
@@ -30965,6 +30975,13 @@ class EventsDlg(ArtisanDialog):
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
         
+    def selectionChanged(self):
+        selected = self.eventbuttontable.selectedRanges()
+        if selected and len(selected) > 0:
+            self.insertButton.setEnabled(True)	
+        else:	
+            self.insertButton.setEnabled(False)
+                    
     def changeShowMet(self):
         aw.qmc.showmet = not aw.qmc.showmet
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -31640,13 +31657,13 @@ class EventsDlg(ArtisanDialog):
             self.createEventbuttonTable()  #update table
         aw.update_extraeventbuttons_visibility()
         
-    def insertextraeventbutton(self):
+    def insertextraeventbutton(self,insert=False):
         self.savetableextraeventbutton() #save previous changes
         if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
             return
         bindex = len(aw.extraeventstypes)
         selected = self.eventbuttontable.selectedRanges()
-        if len(selected) > 0:
+        if len(selected) > 0 and insert:
             bindex = selected[0].topRow()
         if bindex >= 0:
             aw.extraeventsdescriptions = aw.extraeventsdescriptions[:bindex] + [""] + aw.extraeventsdescriptions[bindex:]
@@ -43086,7 +43103,7 @@ class AlarmDlg(ArtisanDialog):
             self.insertButton.setEnabled(True)	
         else:	
             self.insertButton.setEnabled(False)
-
+            
     def deselectAll(self):
         selected = self.alarmtable.selectedRanges()
         if selected and len(selected) > 0:
