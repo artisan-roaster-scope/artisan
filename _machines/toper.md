@@ -19,6 +19,6 @@ The computer running Artisan must be on the same IP network as the Toper roaster
 {: .notice--primary}
 
 **Watch out!**
-Tutorial by Stuart Lee Archer of [Pumphrey's Coffee](http://www.pumphreys-coffee.co.uk) on [Connecting a Toper TKM SX to Artisan Roaster Scope](https://youtu.be/e4nrlxgq04o)
+A video tutorial by Stuart Lee Archer of [Pumphrey's Coffee](http://www.pumphreys-coffee.co.uk) on [Connecting a Toper TKM SX to Artisan Roaster Scope](https://youtu.be/e4nrlxgq04o). Enjoy!
 [![Connecting a Toper TKM SX](http://img.youtube.com/vi/e4nrlxgq04o/0.jpg)](https://youtu.be/e4nrlxgq04o)
 {: .notice--primary}
