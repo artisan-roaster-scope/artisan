@@ -21,4 +21,5 @@ toc: false
   - [Building a Phidget Network server on Raspberry Pi](https://wbcoffee.blogspot.tw/2018/03/building-phidgets-network-server-on.html)
   - [Using Phidget Network Server](https://wbcoffee.blogspot.tw/2018/03/using-phidgets-network-server.html)
   - [Installing Phidget 1136 Differential Air Pressure Sensor in Artisan](https://wbcoffee.blogspot.com/2018/04/installing-phidget-1136-differential.html)
-*  [Using a Raspberry Pi to control my Hottop Roaster with Artisan Software](https://dew-itwebservices.com.au/using-a-raspberry-pi-to-control-my-hottop-roaster-with-artisan-software/) by David Williams
+*  [Using a Raspberry Pi to control my Hottop Roaster with Artisan Software](https://dew-itwebservices.com.au/using-a-raspberry-pi-to-control-my-hottop-roaster-with-artisan-software/) by [David Williams](https://dew-itwebservices.com.au/author/davidfw1960/)
+*  [How to Make an Arduino Controlled Coffee Roaster](https://medium.com/@lukasgrasse/how-to-make-an-arduino-controlled-coffee-roaster-f6a3334fd7d5) by [Lukas Grasse](https://medium.com/@lukasgrasse?source=user_popover)
