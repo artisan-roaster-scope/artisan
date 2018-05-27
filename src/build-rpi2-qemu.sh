@@ -67,7 +67,7 @@ ssh_control()
 EOF
     ${SCP} script pi@localhost:
     trap die ERR
-    ${SSH} -t pi@localhost bash script
+    ${SSH} pi@localhost bash script
     ${SCP} pi@localhost:artisan/src/\*.deb src
     pkill qemu-system-arm
 }
