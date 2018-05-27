@@ -36,15 +36,11 @@ xSET_SOLENOID = None # False: closed; True: open
 xSET_DRUM_MOTOR = None
 xSET_COOLING_MOTOR = None
 
-if sys.version < '3':
-    def hex2int(h1,h2=""):
-        return int(binascii.hexlify(h1+h2),16)
-else:
-    def hex2int(h1,h2=None):
-        if h2:
-            return int(h1*256 + h2)
-        else:
-            return int(h1)
+def hex2int(h1,h2=None):
+    if h2:
+        return int(h1*256 + h2)
+    else:
+        return int(h1)
         
 def openport(p):
     try:

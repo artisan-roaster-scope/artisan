@@ -49,11 +49,8 @@ import shlex
 import binascii
 import codecs
 
-if sys.version < '3':
-    import urlparse, urllib # @UnresolvedImport @UnusedImport
-else:
-    import urllib.parse as urlparse  # @Reimport
-    import urllib.request as urllib  # @Reimport
+import urllib.parse as urlparse  # @Reimport
+import urllib.request as urllib  # @Reimport
 
 
 try: # activate support for hiDPI screens on Windows
@@ -158,10 +155,9 @@ import unicodedata # @UnresolvedImport
 from unidecode import unidecode
 
 import artisanlib.arabic_reshaper
-from artisanlib.util import appFrozen
+from artisanlib.util import appFrozen, decs2string, arange, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
-from artisanlib.compat import decs2string, arange, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
 from artisanlib.modbusport import modbusport
 
 
@@ -377,22 +373,13 @@ else:
         if x is None:
             return False
         else:
-            if sys.version < '3':
-                if isinstance(x,unicode):  # @UndefinedVariable
-                    if str(x) in ["false","False"]:
-                        return False
-                    else:
-                        return True
+            if isinstance(x,str):
+                if x in ["false","False"]:
+                    return False
                 else:
-                    return bool(x)
+                    return True
             else:
-                if isinstance(x,str):
-                    if x in ["false","False"]:
-                        return False
-                    else:
-                        return True
-                else:
-                    return bool(x)
+                return bool(x)
     def toStringList(x):
         if x:
             return [u(s) for s in x]
@@ -9742,16 +9729,10 @@ class SampleThread(QThread):
                 if aw.qmc.device != 18: # not NONE device
                 
                     #### first retrieve readings from the main device
-                    if sys.version < '3':
-                        timeBeforeETBT = libtime.time() # the time before sending the request to the main device
-                    else:
-                        timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
+                    timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
                     #read time, ET (t1) and BT (t2) TEMPERATURE                    
                     tx,t1,t2 = self.sample_main_device()
-                    if sys.version < '3':
-                        timeAfterETBT = libtime.time() # the time the data of the main device was received
-                    else:
-                        timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
+                    timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
                     aw.qmc.RTtemp1 = t1 # store readings for real-time symbolic evaluation
                     aw.qmc.RTtemp2 = t2
                     ##############  if using Extra devices
@@ -9834,10 +9815,7 @@ class SampleThread(QThread):
                                 errormessage = "ERROR: extra devices lengths don't match: %s"%string
                                 errormessage += "\nPlease Reset: Extra devices"
                             raise Exception(errormessage)
-                    if sys.version < '3':
-                        timeAfterExtra = libtime.time() # the time the data of all extra devices was received
-                    else:
-                        timeAfterExtra = libtime.perf_counter() # the time the data of all extra devices was received
+                    timeAfterExtra = libtime.perf_counter() # the time the data of all extra devices was received
                     if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
                         # let's do the oversampling thing and take a second reading from the main device
                         sampling_interval = aw.qmc.delay/1000.
@@ -10281,10 +10259,7 @@ class SampleThread(QThread):
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
             while True:
                 if aw.qmc.flagon:
-                    if sys.version < '3':
-                        start = libtime.time()
-                    else:
-                        start = libtime.perf_counter()
+                    start = libtime.perf_counter()
                     #tx = aw.qmc.timeclock.elapsed()
                     
                     #collect information
@@ -10295,10 +10270,7 @@ class SampleThread(QThread):
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
                     
                     min_delay = aw.qmc.delay # was aw.qmc.min_delay, but for now rela
-                    if sys.version < '3':
-                        now = libtime.time()
-                    else:
-                        now = libtime.perf_counter()
+                    now = libtime.perf_counter()
                     dt = max(0.05,min(min_delay,aw.qmc.delay)/1000. - now + start) # min of 1sec to allow for refresh the display
                     
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
@@ -14392,11 +14364,7 @@ class ApplicationWindow(QMainWindow):
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                     except AttributeError:
                         startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW  # @UndefinedVariable
-                    if sys.version < '3':
-                        import locale as locl
-                        prg_file = u(qd.absolutePath()).encode(locl.getpreferredencoding())
-                    else:
-                        prg_file = u(qd.absolutePath())
+                    prg_file = u(qd.absolutePath())
 #                    CREATE_NEW_PROCESS_GROUP = 0x00000200
 #                    DETACHED_PROCESS = 0x00000008
                     #subprocess.Popen([prg_file] + [x.strip() for x in cmd_str_parts[1:]], shell=False,env=my_env)
@@ -15211,10 +15179,7 @@ class ApplicationWindow(QMainWindow):
         #if moves on
         if self.keyboardmoveflag:
             if kcommand == "space":
-                if sys.version < '3':
-                    now = libtime.time()
-                else:
-                    now = libtime.perf_counter()
+                now = libtime.perf_counter()
                 if self.lastkeyboardcmd == 0 or (now > self.lastkeyboardcmd + 2): # accept SPACE keyboard cmds only every 2sec.
                     self.keyboardmove[self.keyboardmoveindex]()   #apply button command
                     #behaviour rules after pressing a button
@@ -15801,10 +15766,7 @@ class ApplicationWindow(QMainWindow):
         try:
             import io
             import csv
-            if sys.version < '3':
-                csvFile = io.open(filename, 'rb') # , encoding='utf-8'
-            else:
-                csvFile = io.open(filename, 'r', newline="",encoding='utf-8')
+            csvFile = io.open(filename, 'r', newline="",encoding='utf-8')
             data = csv.reader(csvFile,delimiter='\t')
             #read file header
             header = next(data)
@@ -15835,16 +15797,10 @@ class ApplicationWindow(QMainWindow):
             for i in range(len(extra_fields)):
                 if i % 2 == 1:
                     # odd
-                    if sys.version < '3':
-                        self.qmc.extraname2[int(i/2)] = d(extra_fields[i])
-                    else:
-                        self.qmc.extraname2[int(i/2)] = extra_fields[i]
+                    self.qmc.extraname2[int(i/2)] = extra_fields[i]
                 else:
                     # even
-                    if sys.version < '3':
-                        self.qmc.extraname1[int(i/2)] = d(extra_fields[i])
-                    else:
-                        self.qmc.extraname1[int(i/2)] = extra_fields[i]
+                    self.qmc.extraname1[int(i/2)] = extra_fields[i]
             #read data
             last_time = None
             
@@ -16595,12 +16551,8 @@ class ApplicationWindow(QMainWindow):
                     [COOL, "COOL",False],
                     ]
                 import csv
-                
-                if sys.version < '3':
-                    outfile = open(filename, 'wb')
-                else:
-                    import io
-                    outfile = io.open(filename, 'w',newline="",encoding='utf8')
+                import io
+                outfile = io.open(filename, 'w',newline="",encoding='utf8')
                     
                 writer= csv.writer(outfile,delimiter='\t')
                 writer.writerow([
@@ -16617,8 +16569,6 @@ class ApplicationWindow(QMainWindow):
                     u("COOL:" + self.eventtime2string(COOL)),
                     u("Time:" + self.qmc.roastdate.time().toString()[:-3])])
                 row = ([u('Time1'),u('Time2'),u('BT'),u('ET'),u('Event')] + freduce(lambda x,y: x + [u(y[0]),u(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))                
-                if sys.version < '3':
-                    row = [encodeLocal(e) for e in row]
                 writer.writerow(row)
                 last_time = None
                 for i in range(len(self.qmc.timex)):
@@ -20468,10 +20418,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # write header
                     import csv
-                    if sys.version < '3':
-                        outfile = open(filename, 'wb')
-                    else:
-                        outfile = open(filename, 'w',newline="")
+                    outfile = open(filename, 'w',newline="")
                     writer= csv.writer(outfile,delimiter='\t')
                     writer.writerow(["batch","time","profile","beans","in (g)","out (g)"])
                     # write data
@@ -21275,10 +21222,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # write header
                     import csv
-                    if sys.version < '3':
-                        outfile = open(filename, 'wb')
-                    else:
-                        outfile = open(filename, 'w',newline="")
+                    outfile = open(filename, 'w',newline="")
                     writer= csv.writer(outfile,delimiter='\t')
                     writer.writerow(["batch","time","profile","load (g)","charge (" + aw.qmc.mode + ")","FCs","FCs (" + aw.qmc.mode + ")","DROP","DROP (" + aw.qmc.mode + ")","DRY (%)","MAI (%)","DEV (%)","AUC","loss (%)","color","cup"])
                     # write data
@@ -34153,9 +34097,6 @@ class serialport(object):
             
             if platf == 'Windows':
                 cmd_str = os.path.expanduser(aw.ser.externalprogram)
-                if sys.version < '3':
-                    import locale as locl
-                    cmd_str = cmd_str.encode(locl.getpreferredencoding())
                 p = subprocess.Popen(cmd_str,env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo,shell=True)
             else:
                 p = subprocess.Popen([os.path.expanduser(c) for c in shlex.split(aw.ser.externalprogram)],env=my_env,stdout=subprocess.PIPE,startupinfo=startupinfo)
@@ -48557,12 +48498,8 @@ def excepthook(excType, excValue, tracebackobj):
     versionInfo= "Version: " + str(__version__) + ", revision: " + str(__revision__) + "\n"
     timeString = libtime.strftime("%Y-%m-%d, %H:%M:%S")
     
-    if sys.version < '3':
-        import cStringIO
-        tbinfofile = cStringIO.StringIO()  # @UndefinedVariable @UnresolvedImport @UnusedImport
-    else:
-        import io
-        tbinfofile = io.StringIO()
+    import io
+    tbinfofile = io.StringIO()
     
     import traceback
     traceback.print_tb(tracebackobj, None, tbinfofile)

@@ -20,24 +20,15 @@ import time
 # higher resultion time signal (at least on Mac OS X)
 class ArtisanTime():
     def __init__(self):
-        if sys.version < '3':
-            self.clock = time.time()
-        else:
-            self.clock = time.perf_counter()
+        self.clock = time.perf_counter()
 
     def setHMS(self,*_):
         self.start()
         
     def start(self):
-        if sys.version < '3':
-            self.clock = time.time()
-        else:
-            self.clock = time.perf_counter()
+        self.clock = time.perf_counter()
         
     def elapsed(self):
-        if sys.version < '3':
-            return (time.time() - self.clock)*1000.
-        else:
-            return (time.perf_counter() - self.clock)*1000.
+        return (time.perf_counter() - self.clock)*1000.
 
     

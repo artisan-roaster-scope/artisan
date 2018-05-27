@@ -3,7 +3,7 @@ import time
 from PyQt5.QtCore import QSemaphore
 from PyQt5.QtWidgets import QApplication
 
-from artisanlib.compat import *
+from artisanlib.util import *
 
 def convert_to_bcd(decimal):
     ''' Converts a decimal value to a bcd value
@@ -15,10 +15,7 @@ def convert_to_bcd(decimal):
     while decimal > 0:
         nibble = decimal % 10
         bcd += nibble << place
-        if sys.version < '3':
-            decimal = decimal / 10
-        else:
-            decimal = decimal // 10
+        decimal = decimal // 10
         place += 4
     return bcd
 

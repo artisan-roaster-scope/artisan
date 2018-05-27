@@ -38,10 +38,7 @@ elif system().startswith("Windows"):
         else:
             import site
             #gives error in python 3.4: could not find or load the Qt platform plugin "windows"
-            if sys.version < '3':
-                QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "\\PyQt5\\plugins")
-            else:
-                QApplication.addLibraryPath(site.getsitepackages()[1] + "\\PyQt5\\plugins")
+            QApplication.addLibraryPath(site.getsitepackages()[1] + "\\PyQt5\\plugins")
 
     except Exception:
         try:
