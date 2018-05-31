@@ -43053,6 +43053,7 @@ class AlarmDlg(ArtisanDialog):
         self.alarmsfile = QLabel(aw.qmc.alarmsfile)
         self.alarmsfile.setAlignment(Qt.AlignRight)
         self.alarmsfile.setMinimumWidth(300)
+        self.alarmsfile.setSizePolicy(QSizePolicy.MinimumExpanding,QSizePolicy.Preferred)
         tablelayout = QVBoxLayout()
         buttonlayout = QHBoxLayout()
         okbuttonlayout = QHBoxLayout()
