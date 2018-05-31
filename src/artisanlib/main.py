@@ -2724,9 +2724,6 @@ class tgraphcanvas(FigureCanvas):
                 slidernr = None
                 try:
                     text = self.alarmstrings[alarmnumber].split('#')[0].strip()
-                    slidervalue = max(0,min(100,int(str(text))))
-                    if slidervalue < 0 or slidervalue > 100:
-                        raise Exception()
                     if self.alarmaction[alarmnumber] == 3:
                         slidernr = 0
                     elif self.alarmaction[alarmnumber] == 4:
@@ -2736,6 +2733,7 @@ class tgraphcanvas(FigureCanvas):
                     elif self.alarmaction[alarmnumber] == 6:
                         slidernr = 3
                     if slidernr is not None:
+                        slidervalue = max(aw.eventslidermin[slidernr],min(aw.eventslidermax[slidernr],int(str(text))))
                         aw.moveslider(slidernr,slidervalue)
                         # we set the last value to be used for relative +- button action as base
                         aw.extraeventsactionslastvalue[slidernr] = int(round(slidervalue))
@@ -9465,12 +9463,12 @@ def my_get_icon(name):
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
         self.toolitems = (
+#            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
             ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
             ('Forward', QApplication.translate("Tooltip", 'Forward to next view', None), 'forward', 'forward'),
             (None, None, None, None),
             ('Pan', QApplication.translate("Tooltip", 'Pan axes with left mouse, zoom with right', None), 'move', 'pan'),
-#            ('Subplots', QApplication.translate("Tooltip", 'Configure subplots', None), 'subplots', 'configure_subplots'),
             ('Zoom', QApplication.translate("Tooltip", 'Zoom to rectangle', None), 'zoom_to_rect', 'zoom'),
         )
         
@@ -9489,7 +9487,10 @@ class VMToolbar(NavigationToolbar):
                 a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
             a.triggered.connect(self.edit_parameters)     
             a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
-            self.insertAction(self.actions()[-1],a)        
+            self.insertAction(self.actions()[-1],a) 
+            
+#            if aw is not None:
+#                aw.updatePlusStatus(self)    
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
@@ -9529,23 +9530,30 @@ class VMToolbar(NavigationToolbar):
 
     def _icon(self, name):
         if self.white_icons:
-            name = 'white_' + name
+            if not name.startswith("plus"):
+                name = 'white_' + name
             basedir = os.path.join(aw.getResourcePath(),"Icons")
         else:
-            basedir = self.basedir     
+            if aw is not None and name.startswith("plus"):
+                basedir = os.path.join(aw.getResourcePath(),"Icons")
+            else:
+                basedir = self.basedir     
         #dirty hack to prefer .svg over .png Toolbar icons
         if not svgsupport:
             name = name.replace('.svg','.png')
         else:
             name = name.replace('.png','.svg')
         # large png icons introduced in MPL 2.1
-        name = name.replace('.png', '_large.png')                        
+        name = name.replace('.png', '_large.png')
         p = os.path.join(basedir, name)
         pm = QPixmap(p)
         if hasattr(pm, 'setDevicePixelRatio'):
             pm.setDevicePixelRatio(self.canvas._dpi_ratio)
         return QIcon(pm)
 
+    def plus(self):
+        import plus.controller
+        plus.controller.toggle(aw)
         
     def edit_parameters(self):
         try:
@@ -10342,6 +10350,8 @@ class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
     
         self.superusermode = False
+        
+        self.plus_account = None # if set to a login string, Artisan plus features are enabled
         
         self.appearance = ""
         
@@ -11504,8 +11514,7 @@ class ApplicationWindow(QMainWindow):
         self.button_16.clicked.connect(lambda _: self.adjustPIDsv(-10))
         self.button_17.clicked.connect(lambda _: self.adjustPIDsv(-5))
 
-        # NavigationToolbar VMToolbar
-        #self.ntb = NavigationToolbar(self.qmc, self.main_widget)        
+        # NavigationToolbar VMToolbar       
         self.ntb = VMToolbar(self.qmc, self.main_widget)
         #self.ntb.setMinimumHeight(50)
 
@@ -12109,7 +12118,32 @@ class ApplicationWindow(QMainWindow):
         
         # we connect the
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
-        
+    
+    def updatePlusStatus(self,ntb=None):
+        if ntb is None:
+            ntb = self.ntb
+        try:
+            if aw.plus_account:
+                import plus.controller
+                if plus.controller.is_connected():
+                    plus_icon = "plus-connected"
+                else:
+                    plus_icon = "plus-on"
+                tooltip = QApplication.translate("Tooltip", 'Disconnect Artisan Plus', None)
+            else:
+                plus_icon = "plus-off"
+                tooltip = QApplication.translate("Tooltip", 'Connect Artisan Plus', None)
+            if svgsupport:
+                plus_icon += ".svg"
+            else:
+                plus_icon += ".png"
+            a = ntb.actions()[0] # the plus action is the first one
+            a.setIcon(ntb._icon(plus_icon))
+            a.setToolTip(tooltip)
+        except:
+            pass
+
+    
     # turns channel off after millis
     def processSingleShotPhidgetsPulse(self,channel,millis,fct):
         if fct == "OUTsetPWM":
@@ -17412,6 +17446,10 @@ class ApplicationWindow(QMainWindow):
             profile = {}
             profile["version"] = str(__version__)
             profile["revision"] = str(__revision__)
+            profile["build"] = str(__build__)
+            os,os_version = self.get_os()
+            profile["artisan_os"] = os
+            profile["artisan_os_version"] = os_version            
             profile["mode"] = self.qmc.mode
             profile["timeindex"] = self.qmc.timeindex
             profile["flavors"] = self.qmc.flavors
@@ -17806,6 +17844,14 @@ class ApplicationWindow(QMainWindow):
             
             if settings.contains("fullscreen"):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
+            if settings.contains("plus_account"):
+                self.plus_account = settings.value("plus_account",self.plus_account)
+                if self.plus_account is not None:
+                    import plus.controller
+                    try:
+                        plus.controller.start(aw)
+                    except:
+                        pass
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -19242,6 +19288,7 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("Geometry",self.saveGeometry())
                 
             settings.setValue("fullscreen", (self.full_screen_mode_active or self.isFullScreen()))
+            settings.setValue("plus_account",self.plus_account)
                 
             #on OS X we prevent the reopening of windows
             # as done by defaults write com.google.code.p.Artisan NSQuitAlwaysKeepsWindows -bool false
@@ -24034,10 +24081,13 @@ class ApplicationWindow(QMainWindow):
 
     def update_extraeventbuttons_visibility(self):
         for i in range(len(self.buttonlist)):
-            if self.extraeventsvisibility[i]:
-                self.buttonlist[i].setVisible(True)
-            else:
-                self.buttonlist[i].setVisible(False)
+            try:
+                if self.extraeventsvisibility[i]:
+                    self.buttonlist[i].setVisible(True)
+                else:
+                    self.buttonlist[i].setVisible(False)
+            except:
+                pass
 
     #transfers current buttons to a palette number
     def transferbuttonsto(self,pindex):
@@ -39674,7 +39724,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             
             self.probeTypeCombos.append(probeTypeCombo)
             phidgetBox1048.addWidget(probeTypeCombo,1,i)            
-            rowLabel = QLabel(str(i))
+            rowLabel = QLabel(str(i-1))
             phidgetBox1048.addWidget(rowLabel,0,i)
      
         self.dataRateCombo1048 = QComboBox()             
@@ -39807,7 +39857,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             asyncFlag.setChecked(aw.qmc.phidget1046_async[i-1])
             self.asyncCheckBoxes1046.append(asyncFlag)
             phidgetBox1046.addWidget(asyncFlag,3,i)        
-            rowLabel = QLabel(str(i))
+            rowLabel = QLabel(str(i-1))
             phidgetBox1046.addWidget(rowLabel,0,i)
             
         self.dataRateCombo1046 = QComboBox()
@@ -40012,7 +40062,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             asyncFlag.setChecked(aw.qmc.phidget1018_async[i-1])
             self.asyncCheckBoxes.append(asyncFlag)
             phidgetBox1018.addWidget(asyncFlag,2,i)
-            rowLabel = QLabel(str(i))
+            rowLabel = QLabel(str(i-1))
             phidgetBox1018.addWidget(rowLabel,0,i)
            
         asyncLabel = QLabel(QApplication.translate("Label","Async", None))
