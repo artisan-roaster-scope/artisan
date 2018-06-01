@@ -34,7 +34,6 @@ from artisanlib import __build__
 
 
 import os
-import sys
 import ast
 import platform
 import math
@@ -48,6 +47,7 @@ import subprocess
 import shlex
 import binascii
 import codecs
+import uuid
 
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
@@ -1175,6 +1175,9 @@ class tgraphcanvas(FigureCanvas):
         self.roastbatchprefix = self.batchprefix # batch prefix of the roast
         self.roastbatchpos = 1 # position of the roast in the roast session (first batch, second batch,..)
         self.roasttzoffset = libtime.timezone # timezone offset to be added to roastepoch to get time in local timezone
+        # profile UUID
+        self.roastUUID = None
+        
         self.beans = ""
 
         #flags to show projections, draw Delta ET, and draw Delta BT
@@ -3617,6 +3620,7 @@ class tgraphcanvas(FigureCanvas):
                 #reset time
                 aw.qmc.timeclock.start()
                 
+                self.roastUUID = None # reset UUID
                 aw.qmc.roastbatchnr = 0 # initialized to 0, set to increased batchcounter on DROP
                 aw.qmc.roastbatchpos = 1 # initialized to 0, set to increased batchsequence on DROP
                 aw.qmc.roastbatchprefix = aw.qmc.batchprefix
@@ -6922,6 +6926,8 @@ class tgraphcanvas(FigureCanvas):
                             removed = True
                     else:
                         self.incBatchCounter()
+                        # generate UUID
+                        self.roastUUID = uuid.uuid4().hex
                         if self.device != 18:
                             if self.autoDropIdx:
                                 self.timeindex[6] = self.autoDropIdx
@@ -9463,6 +9469,7 @@ def my_get_icon(name):
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
         self.toolitems = (
+#PLUS        
 #            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
             ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -9488,7 +9495,8 @@ class VMToolbar(NavigationToolbar):
             a.triggered.connect(self.edit_parameters)     
             a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
             self.insertAction(self.actions()[-1],a) 
-            
+
+#PLUS            
 #            if aw is not None:
 #                aw.updatePlusStatus(self)    
 
@@ -16942,6 +16950,10 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.roastdate = QDateTime(date)
                 except Exception:
                     pass
+            if "roastUUID" in profile:
+                self.qmc.roastUUID = d(profile["roastUUID"])
+            else:
+                self.qmc.roastUUID = None
             if "roastbatchnr" in profile:
                 try:
                     self.qmc.roastbatchnr = int(profile["roastbatchnr"])
@@ -17499,6 +17511,9 @@ class ApplicationWindow(QMainWindow):
             profile["roastbatchnr"] = self.qmc.roastbatchnr
             profile["roastbatchprefix"] = encodeLocal(u(self.qmc.roastbatchprefix))
             profile["roastbatchpos"] = self.qmc.roastbatchpos
+            if self.qmc.roastUUID is None:
+                self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
+            profile["roastUUID"] = self.qmc.roastUUID
             profile["beansize"] = str(self.qmc.beansize)
             profile["specialevents"] = self.qmc.specialevents
             profile["specialeventstype"] = self.qmc.specialeventstype
@@ -17844,14 +17859,15 @@ class ApplicationWindow(QMainWindow):
             
             if settings.contains("fullscreen"):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
-            if settings.contains("plus_account"):
-                self.plus_account = settings.value("plus_account",self.plus_account)
-                if self.plus_account is not None:
-                    import plus.controller
-                    try:
-                        plus.controller.start(aw)
-                    except:
-                        pass
+#PLUS                
+#            if settings.contains("plus_account"):
+#                self.plus_account = settings.value("plus_account",self.plus_account)
+#                if self.plus_account is not None:
+#                    import plus.controller
+#                    try:
+#                        plus.controller.start(aw)
+#                    except:
+#                        pass
                       
             #restore mode
             old_mode = self.qmc.mode
