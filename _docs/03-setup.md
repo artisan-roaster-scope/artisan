@@ -90,7 +90,7 @@ Note that for most people unless you have a USB isolator you need to unplug your
 
 ### Settings- Load, Load Recent, Save
 
-Menu>Help> is where you go to load and save settings.  Load Recent is a shortcut to settings you have recently used.  
+Menu>Help> is where you go to load and save settings.  Load Recent is a shortcut to settings you have recently used. You can use Artisan with more than roaster by saving two sets of settings and then using Load Recent to change between roasters.   
 
 ### Information for Troubleshooting
 
