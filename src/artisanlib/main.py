@@ -264,19 +264,19 @@ def PHIDGET_RTD_TYPE(tp):
 #   2x Amplification => BRIDGE_GAIN_2
 #   4x Amplification => BRIDGE_GAIN_4
 def PHIDGET_GAIN_VALUE(gv):
-    from Phidget22.BridgeGain import BridgeGain  # @UnusedImport
+    from Phidget22.BridgeGain import BridgeGain as BG  # @UnusedImport
     if gv == 2:
-        return BridgeGain.BRIDGE_GAIN_8 # 8x Amplification
+        return BG.BRIDGE_GAIN_8 # 8x Amplification
     elif gv == 3:	
-        return BridgeGain.BRIDGE_GAIN_16 # 16x Amplification
+        return BG.BRIDGE_GAIN_16 # 16x Amplification
     elif gv == 4:	
-        return BridgeGain.BRIDGE_GAIN_32 # 32x Amplification
+        return BG.BRIDGE_GAIN_32 # 32x Amplification
     elif gv == 5:
-        return BridgeGain.BRIDGE_GAIN_64 # 64x Amplification
+        return BG.BRIDGE_GAIN_64 # 64x Amplification
     elif gv == 6:	
-        return BridgeGain.BRIDGE_GAIN_128 # 128x Amplification
+        return BG.BRIDGE_GAIN_128 # 128x Amplification
     else:
-        return BridgeGain.BRIDGE_GAIN_1 # no gain
+        return BG.BRIDGE_GAIN_1 # no gain
 
 
 umlaute_dict = {
@@ -8228,6 +8228,7 @@ class tgraphcanvas(FigureCanvas):
     #adds errors (can be called also outside the GUI thread, eg. from the sampling thread as actuall message is written by updategraphics in the GUI thread)
     def adderror(self,error,line=None):
         try:
+            QApplication.processEvents()
             #### lock shared resources #####
             aw.qmc.errorsemaphore.acquire(1)
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -9471,6 +9472,7 @@ class VMToolbar(NavigationToolbar):
         self.toolitems = (
 #PLUS        
 #            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
+            
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
             ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
             ('Forward', QApplication.translate("Tooltip", 'Forward to next view', None), 'forward', 'forward'),
@@ -14549,6 +14551,7 @@ class ApplicationWindow(QMainWindow):
     # this should only be called from within the main GUI thread (and never from the sampling thread!)
     def sendmessage(self,message,append=True,style=None):
         try:
+            QApplication.processEvents()
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
             if style:
@@ -16651,18 +16654,36 @@ class ApplicationWindow(QMainWindow):
 
     #Write object to file
     def serialize(self,filename,obj):
-        f = codecs.open(u(filename), 'w+', encoding='utf-8')
+        fn = u(filename)
+        f = codecs.open(fn, 'w+', encoding='utf-8')
         f.write(repr(obj))
         f.close()
+        # fill plus UUID register
+        if self.plus_account is not None and obj is not None:
+            import plus.config
+            if plus.config.uuid_tag in obj:
+                import plus.register
+                plus.register.add_path(obj[plus.config.uuid_tag],fn)
+
 
     #Read object from file 
     def deserialize(self,filename):
         try:
             obj = None
-            if os.path.exists(u(filename)):
-                f = codecs.open(u(filename), 'rb', encoding='utf-8')
+            fn = u(filename)
+            if os.path.exists(fn):
+                f = codecs.open(fn, 'rb', encoding='utf-8')
                 obj=ast.literal_eval(f.read())
                 f.close()
+            # fill plus UUID register
+            try:
+                if self.plus_account is not None and obj is not None:
+                    import plus.config
+                    if plus.config.uuid_tag in obj:
+                        import plus.register
+                        plus.register.add_path(obj[plus.config.uuid_tag],fn)
+            except Exception as e:
+                print(e)
             return obj
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
