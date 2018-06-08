@@ -159,7 +159,7 @@ from artisanlib.util import appFrozen, decs2string, arange, stringp, uchr, o, u,
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
-
+from artisanlib.qtsingleapplication import QtSingleApplication
 
 artisan_slider_style = """
             QSlider::groove:vertical {{
@@ -400,10 +400,13 @@ platf = str(platform.system())
 #################### Main Application  ################################################
 #######################################################################################
 
-class Artisan(QApplication):
+
+appGuid = '9068bd2fa8e54945a6be1f1a0a589e92'
+
+class Artisan(QtSingleApplication):
     def __init__(self, args):
-        super(Artisan, self).__init__(args)
-        
+        super(Artisan, self).__init__(appGuid,args)
+
     def event(self, event):
         if event.type() == QEvent.FileOpen:
             try:
@@ -442,6 +445,7 @@ if platf == 'Windows':
     except Exception as e:
         pass
 app = Artisan(args)
+if app.isRunning(): sys.exit(0)
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
@@ -9470,6 +9474,7 @@ def my_get_icon(name):
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
         self.toolitems = (
+
 #PLUS        
 #            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
             
@@ -16658,12 +16663,17 @@ class ApplicationWindow(QMainWindow):
         f = codecs.open(fn, 'w+', encoding='utf-8')
         f.write(repr(obj))
         f.close()
-        # fill plus UUID register
-        if self.plus_account is not None and obj is not None:
-            import plus.config
-            if plus.config.uuid_tag in obj:
-                import plus.register
-                plus.register.add_path(obj[plus.config.uuid_tag],fn)
+        
+#PLUS        
+#        # fill plus UUID register
+#        try:
+#            if self.plus_account is not None and obj is not None:
+#                import plus.config
+#                if plus.config.uuid_tag in obj:
+#                    import plus.register
+#                    plus.register.add_path(obj[plus.config.uuid_tag],fn)
+#        except:
+#            pass
 
 
     #Read object from file 
@@ -16675,15 +16685,18 @@ class ApplicationWindow(QMainWindow):
                 f = codecs.open(fn, 'rb', encoding='utf-8')
                 obj=ast.literal_eval(f.read())
                 f.close()
-            # fill plus UUID register
-            try:
-                if self.plus_account is not None and obj is not None:
-                    import plus.config
-                    if plus.config.uuid_tag in obj:
-                        import plus.register
-                        plus.register.add_path(obj[plus.config.uuid_tag],fn)
-            except Exception as e:
-                print(e)
+                
+#PLUS                 
+#            # fill plus UUID register
+#            try:
+#                if self.plus_account is not None and obj is not None:
+#                    import plus.config
+#                    if plus.config.uuid_tag in obj:
+#                        import plus.register
+#                        plus.register.add_path(obj[plus.config.uuid_tag],fn)
+#            except:
+#                pass
+                
             return obj
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -48652,6 +48665,8 @@ def main():
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
     aw = ApplicationWindow()
+    
+    app.setActivationWindow(aw) # set the activation window for the QtSingleApplication
     
 #    aw.setStyleSheet("QMainWindow {background: 'white';}")
     
