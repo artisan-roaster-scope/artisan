@@ -6250,6 +6250,7 @@ class tgraphcanvas(FigureCanvas):
             self.OffMonitor()
 
     def OnRecorder(self):
+        print("OnRecorder")
         try:
             # if on turn mouse crosslines off
             if aw.qmc.crossmarker:
@@ -8232,7 +8233,6 @@ class tgraphcanvas(FigureCanvas):
     #adds errors (can be called also outside the GUI thread, eg. from the sampling thread as actuall message is written by updategraphics in the GUI thread)
     def adderror(self,error,line=None):
         try:
-            QApplication.processEvents()
             #### lock shared resources #####
             aw.qmc.errorsemaphore.acquire(1)
             timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -12746,26 +12746,95 @@ class ApplicationWindow(QMainWindow):
         aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         aw.updateExtraLCDvisibility()
 
+
+#    def updateCanvasColors(self):
+#        aw.qmc.fig.patch.set_facecolor(str(aw.qmc.palette["canvas"]))
+#        aw.setStyleSheet("QMainWindow{background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+#                                   + "border: 0px solid black;"
+#                                   + "}" )
+#        
+#        
+#        # update navigationbar
+#        aw.level1layout.removeWidget(aw.ntb) # remove current bar
+#        if aw.ntb._active == 'PAN':
+#            aw.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
+#        if aw.ntb._active == 'ZOOM':
+#            aw.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
+#        
+#        aw.removeToolBar(aw.ntb)
+##        aw.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
+#        aw.ntb.destroy()
+#        whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
+#        aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
+#        
+#        if whitep:
+#            aw.qmc.palette["messages"] = 'white'
+#        else:
+#            aw.qmc.palette["messages"] = 'black'
+#        aw.ntb.setMinimumHeight(50)
+#        aw.sliderFrame.setStyleSheet("QGroupBox {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+#                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+#                                    + "border: 0px solid gray;"
+#                                    + "border-width: 0px;"
+#                                    + "padding-top: 12px;"
+#                                    + "padding-bottom: 5px;"
+#                                    + "padding-left: 0px;"
+#                                    + "padding-right: 0px;"
+#                                    + "}"
+#                                    + "QGroupBox::title {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+#                                    + "subcontrol-origin: margin;" # or border or margin
+#                                    + "subcontrol-position: top center;" #/* position at the top center */
+#                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+#                                    + "}" ) 
+#        # ensure x/y coordinates are readable
+#        aw.ntb.locLabel.setStyleSheet("QWidget {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+#                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+#                                    + "}" )
+#        # make QToolBar background transparent
+#        aw.ntb.setStyleSheet("QToolBar {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
+#                                    + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
+#                                    + "color: " + str(aw.qmc.palette["title"]) + ";"
+#                                    + "}" )
+#            
+#        aw.level1layout.insertWidget(0,aw.ntb)
+#        
+#        if str(aw.qmc.palette["canvas"]) == 'None':
+#            aw.qmc.fig.canvas.setStyleSheet("background-color:transparent;") 
+#            aw.ntb.setStyleSheet("QToolBar {background-color:transparent;}")
+#
+#        aw.updateSliderColors()
+#                         
+#        colorPairsToCheck = self.getcolorPairsToCheck()
+#        self.checkColors(colorPairsToCheck)
+
+
         
     def updateCanvasColors(self):
+        current_background_color = None
+        try:
+            s = aw.styleSheet()[12+len("background-color:"):]
+            current_background_color = s[:s.index(";")]
+        except:
+            pass
+
+        whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
+
         aw.qmc.fig.patch.set_facecolor(str(aw.qmc.palette["canvas"]))
         aw.setStyleSheet("QMainWindow{background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                    + "border: 0px solid black;"
                                    + "}" )
         
-        
-        # update navigationbar
-        aw.level1layout.removeWidget(aw.ntb) # remove current bar
-        if aw.ntb._active == 'PAN':
-            aw.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
-        if aw.ntb._active == 'ZOOM':
-            aw.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar
-        
-        aw.removeToolBar(aw.ntb)
-#        aw.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
-        aw.ntb.destroy()
-        whitep = aw.colorDifference("white",aw.qmc.palette["canvas"]) > aw.colorDifference("black",aw.qmc.palette["canvas"])
-        aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
+        if current_background_color is None or current_background_color != str(aw.qmc.palette["canvas"]) or (whitep and aw.qmc.palette["messages"] != 'white'): # canvas color did not change, we do not need to redo the navigation bar        
+            # update navigationbar
+            aw.level1layout.removeWidget(aw.ntb) # remove current bar
+            if aw.ntb._active == 'PAN':
+                aw.ntb.pan() # PAN is active, we deactivate it before changing the ToolBar
+            if aw.ntb._active == 'ZOOM':
+                aw.ntb.zoom() # ZOOM is active, we deactivate it before changing the ToolBar        
+            aw.removeToolBar(aw.ntb)
+#            aw.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
+            aw.ntb.destroy()
+            aw.ntb = VMToolbar(aw.qmc, aw.main_widget, whitep)
         
         if whitep:
             aw.qmc.palette["messages"] = 'white'
@@ -14555,6 +14624,9 @@ class ApplicationWindow(QMainWindow):
 
     # this should only be called from within the main GUI thread (and never from the sampling thread!)
     def sendmessage(self,message,append=True,style=None):
+        QTimer.singleShot(2,lambda : self.sendmessage_internal(message,append,style))
+        
+    def sendmessage_internal(self,message,append=True,style=None):
         try:
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
@@ -14571,8 +14643,6 @@ class ApplicationWindow(QMainWindow):
                 self.messagehist.append(timez + message)
             self.messagelabel.setText(message)
             self.messagelabel.repaint()
-        except Exception:
-            pass
         finally:
             if aw.qmc.messagesemaphore.available() < 1:
                 aw.qmc.messagesemaphore.release(1)
@@ -41546,12 +41616,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
             aw.sendmessage(message)
             #open serial conf Dialog
+            self.accept()
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
             if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]):
                 aw.setcommport()
             #self.close()
-            self.accept()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " device accept(): {0}").format(str(e)),exc_tb.tb_lineno)
