@@ -6250,7 +6250,6 @@ class tgraphcanvas(FigureCanvas):
             self.OffMonitor()
 
     def OnRecorder(self):
-        print("OnRecorder")
         try:
             # if on turn mouse crosslines off
             if aw.qmc.crossmarker:
