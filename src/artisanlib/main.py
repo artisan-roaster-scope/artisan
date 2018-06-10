@@ -12283,7 +12283,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.redraw()
                 except:
                     pass                        
-                self.newRoast()
+            self.newRoast()
             self.setRecentRoast(rr)
                 
         
@@ -14556,7 +14556,6 @@ class ApplicationWindow(QMainWindow):
     # this should only be called from within the main GUI thread (and never from the sampling thread!)
     def sendmessage(self,message,append=True,style=None):
         try:
-            QApplication.processEvents()
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
             if style:
@@ -14571,6 +14570,7 @@ class ApplicationWindow(QMainWindow):
                 timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz ")))    #zzz = miliseconds
                 self.messagehist.append(timez + message)
             self.messagelabel.setText(message)
+            self.messagelabel.repaint()
         except Exception:
             pass
         finally:
