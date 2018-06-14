@@ -30,7 +30,7 @@ And the result is certainly different.
 
 ![designer 3](/assets/images/gsg/designer 3.png)
 
-The only way to get the curve close to the original, reflecting the performance of your roaster, is to right click on the curve to add a point, giving this menu.
+The only way to get the curve close to the original, reflecting the performance of your roaster, is first be sure that the event associated points that are given are where you want them, and then in-between those points, is to right click on the curve to add a point, giving this menu.  
 
 ![designer4](/assets/images/gsg/designer 4.png)
 
