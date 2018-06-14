@@ -1,5 +1,6 @@
 import time
 import platform
+import struct
 
 import artisanlib.util
 from artisanlib.suppress_errors import suppress_stdout_stderr
@@ -54,6 +55,53 @@ class s7port(object):
         
         self.plc = None
         self.commError = False # True after a communication error was detected and not yet cleared by receiving proper data
+
+################
+# conversion methods copied from s7:util.py
+
+    def set_int(self,_bytearray, byte_index, _int):
+        """
+        Set value in bytearray to int
+        """
+        # make sure were dealing with an int
+        _int = int(_int)
+        _bytes = struct.unpack('2B', struct.pack('>h', _int))
+        _bytearray[byte_index:byte_index + 2] = _bytes
+        
+    def get_int(self,_bytearray, byte_index):
+        """
+        Get int value from bytearray.
+    
+        int are represented in two bytes
+        """
+        data = _bytearray[byte_index:byte_index + 2]
+        data[1] = data[1] & 0xFF # added to fix a conversion problem: see https://github.com/gijzelaerr/python-snap7/issues/101
+        value = struct.unpack('>h', struct.pack('2B', *data))[0]
+        return value
+        
+    def set_real(self,_bytearray, byte_index, real):
+        """
+        Set Real value
+    
+        make 4 byte data from real
+    
+        """
+        real = float(real)
+        real = struct.pack('>f', real)
+        _bytes = struct.unpack('4B', real)
+        for i, b in enumerate(_bytes):
+            _bytearray[byte_index + i] = b
+        
+    def get_real(self,_bytearray, byte_index):
+        """
+        Get real value. create float from 4 bytes
+        """
+        x = _bytearray[byte_index:byte_index + 4]
+        real = struct.unpack('>f', struct.pack('4B', *x))[0]
+        return real
+        
+################
+
         
     def setPID(self,p,i,d,PIDmultiplier):
         if self.PID_area and not (self.PID_p_register == self.PID_i_register == self.PID_d_register == 0):
@@ -106,20 +154,22 @@ class s7port(object):
         if self.plc is None:
             self.plc = S7Client()
             with suppress_stdout_stderr():
-                time.sleep(0.3)
+                time.sleep(0.4)
                 self.plc.connect(self.host,self.rack,self.slot,self.port)
+                time.sleep(0.4)
             if self.plc.get_connected():
                 self.sendmessage(QApplication.translate("Message","S7 Connected", None))
                 time.sleep(0.7)
             else:
-                time.sleep(0.5)
+                time.sleep(0.6)
                 self.plc = S7Client()
                 # we try a second time
                 with suppress_stdout_stderr():
-                    time.sleep(0.3)
+                    time.sleep(0.4)
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
+                    time.sleep(0.4)
                 if self.plc.get_connected():
-                    self.sendmessage(QApplication.translate("Message","S7 Connected", None))
+                    self.sendmessage(QApplication.translate("Message","S7 Connected", None) + " (2)")
                     time.sleep(0.7)
 
     def writeFloat(self,area,dbnumber,start,value):
@@ -130,16 +180,16 @@ class s7port(object):
             if self.plc is not None and self.plc.get_connected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
-                    from snap7.util import set_real
-                    set_real(ba, 0, float(value))
+                    self.set_real(ba, 0, float(value))
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
-        except Exception as ex:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
+        except Exception as e:
+            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeFloat: " + str(e))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
+            self.addserial("S7 writeFloat(" + str(area) + "," + str(dbnumber) + "," + str(start) + "," + str(value) + ")")
 
     def writeInt(self,area,dbnumber,start,value): 
         try:
@@ -149,16 +199,16 @@ class s7port(object):
             if self.plc is not None and self.plc.get_connected():
                 with suppress_stdout_stderr():
                     ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    from snap7.util import set_int 
-                    set_int(ba, 0, int(value))
+                    self.set_int(ba, 0, int(value))
                     self.plc.write_area(self.areas[area],dbnumber,start,ba)
             else:
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))               
-        except Exception:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
+        except Exception as e:
+            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " writeInt: " + str(e))
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
+            self.addserial("S7 writeInt(" + str(area) + "," + str(dbnumber) + "," + str(start) + "," + str(value) + ")")
                     
     def readFloat(self,area,dbnumber,start):
         try:
@@ -187,20 +237,19 @@ class s7port(object):
                     if self.commError: # we clear the previous error and send a message
                         self.commError = False
                         self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                    from snap7.util import get_real
-                    return get_real(res,0)
+                    return self.get_real(res,0)
             else:
                 self.commError = True  
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))                                 
                 return -1
-        except Exception:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
+        except Exception as e:
+            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readFloat: " + str(e))
             self.commError = True
             return -1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
-            self.addserial("S7 readFloat")
+            self.addserial("S7 readFloat(" + str(area) + "," + str(dbnumber) + "," + str(start) + ")")
                 
     def readInt(self,area,dbnumber,start):
         try:
@@ -214,7 +263,7 @@ class s7port(object):
                     try:
                         with suppress_stdout_stderr():
                             res = self.plc.read_area(self.areas[area],dbnumber,start,2)
-                    except Exception as e:
+                    except Exception:
                         res = None
                     if res is None:
                         if retry > 0:
@@ -229,17 +278,16 @@ class s7port(object):
                     if self.commError: # we clear the previous error and send a message
                         self.commError = False
                         self.adderror(QApplication.translate("Error Message","S7 Communication Resumed",None))
-                    from snap7.util import get_int  
-                    return get_int(res,0)
+                    return self.get_int(res,0)
             else:
                 self.commError = True  
                 self.adderror((QApplication.translate("Error Message","S7 Error:",None) + " connecting to PLC failed"))
                 return -1
-        except Exception:
-            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None))
+        except Exception as e:
+            self.adderror(QApplication.translate("Error Message","S7 Communication Error",None) + " readInt: " + str(e))
             self.commError = True
             return -1
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
-            self.addserial("S7 readInt")  
+            self.addserial("S7 readInt(" + str(area) + "," + str(dbnumber) + "," + str(start) + ")")  
