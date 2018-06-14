@@ -140,7 +140,7 @@ class s7port(object):
         from snap7.common import load_library as load_snap7_library
         # first load shared lib if needed
         platf = str(platform.system())
-        if platf in ['Windows','Linux'] and util.appFrozen():
+        if platf in ['Windows','Linux'] and artisanlib.util.appFrozen():
             libpath = os.path.dirname(sys.executable)
             if platf == 'Linux':
                 snap7dll = os.path.join(libpath,"libsnap7.so")
