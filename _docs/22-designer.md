@@ -16,7 +16,7 @@ Designer allows you to create a model roast profile.
 
 To save a profile created in designer mode, go to Tools>Designer and untick the Designer menu item, and you are left with a regular profile that you can save as any other one.
 
-In order to create a smooth curve, you have to add data points and drag the profile line into place by grabbing one point at a time to adjust it.   You can also import a profile into Designer that I you actually roasted; however, Designer extrapolates the curve from recorded Events in the profile and it won’t look like your exact profile.  
+In order to create a smooth curve, you have to add data points and drag the profile line into place by grabbing one point at a time to adjust it.   You can also import a profile into Designer that you actually roasted; however, Designer extrapolates the curve from recorded Events in the profile and it won’t look like your exact profile.  
 
 So, if the original curve is this:
 
