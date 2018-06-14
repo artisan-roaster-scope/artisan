@@ -2,6 +2,7 @@ import time
 import platform
 import struct
 import os
+import sys
 
 import artisanlib.util
 from artisanlib.suppress_errors import suppress_stdout_stderr
