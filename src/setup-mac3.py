@@ -163,6 +163,7 @@ OPTIONS = {
                  'PyQt5.QtSvg',
                  'PyQt5.QtXml',
                  'PyQt5.QtDBus',
+                 'PyQt5.QtNetwork',
                  'PyQt5.QtPrintSupport'
                  ],
     'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
@@ -227,6 +228,7 @@ Qt_frameworks = [
     'QtGui.framework',
     'QtSvg.framework',
     'QtPrintSupport.framework',
+    'QtNetwork.framework',
 #    'QtXml.framework',
 #    'QtMacExtras.framework',
 ]
