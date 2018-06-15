@@ -39,6 +39,6 @@ To design a useful curve to use as a background when you roast next, you'll need
 
 Designing a curve is a sequential process: 1) right click choose - Config - to insert your main points; 2) insert new event points between the events you imported into Designer; 2) grab and drag those in-between points to adjust the curve that connects your imported events; 3) move your key events (vertical lines with dashes) like DE or FCs too where you want them by sliding them left or right; 4)fine tune the roast profile by dragging points to where you want them.  To get a declining the ROR curve make changes in the BT curve. Use a declining ROR curve as your guide to have Designer help you know where to locate targeted events.  
 
-You can also see the impact on the phases by hovering over the colored phases bar.
+You can also see the Phases information at the top.  If you hover over an event the Phases bar will show you the time for that event.  
 
 ![designer5](/assets/images/gsg/designer 5.png)
