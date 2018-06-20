@@ -12,4 +12,4 @@ Menu>Config>Batch
 
 Count batches so you can use that to determine maintenance needs, or other purposes.  Some use batch counts to identify samples or lots.
 
-![batch dialog](/assets/images/gsg/batch dialog.png)
+![batch dialog](/assets/images/gsg/batch dialog1.png)
