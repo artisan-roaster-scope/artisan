@@ -1586,7 +1586,7 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventstypecopy = []
         self.currentx = 0               #used to add point when right click
         self.currenty = 0               #used to add point when right click
-#        self.designertimeinit = [50,300,540,560,660,700,800,900]
+        self.designertimeinit = [50,300,540,560,660,700,800,900]
 #        if self.mode == "C":
 ##                                     #CH, DE, Fcs,Fce,Scs,Sce,Drop
 #            self.designertemp1init = [290,290,290,290,290,290,290,290]
