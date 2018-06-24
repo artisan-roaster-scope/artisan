@@ -29977,6 +29977,9 @@ class EventsDlg(ArtisanDialog):
         titlefont.setWeight(75)
         self.setWindowTitle(QApplication.translate("Form Caption","Events",None))
         self.setModal(True)
+        settings = QSettings()
+        if settings.contains("EventsGeometry"):
+            toByteArray(self.restoreGeometry(settings.value("EventsGeometry")))
         self.storeState()
         ## TAB 1
         self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button",None))
@@ -32152,6 +32155,14 @@ class EventsDlg(ArtisanDialog):
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatetypes(): {0}").format(str(e)),exc_tb.tb_lineno)
+
+    def closeEvent(self,_):
+        settings = QSettings()
+        #save window geometry
+        if sip.getapi('QVariant') == 1:
+            settings.setValue("EventsGeometry",QVariant(self.saveGeometry()))
+        else:
+            settings.setValue("EventsGeometry",self.saveGeometry())    
 
     def showEventbuttonhelp(self):
         string = u(QApplication.translate("Message", "<small><b>Button Label</b> Enter \\n to create labels with multiple lines.",None))
