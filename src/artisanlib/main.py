@@ -745,7 +745,8 @@ class tgraphcanvas(FigureCanvas):
         #show phases LCDs during roasts
         self.phasesLCDflag = True
         self.phasesLCDmode = 1 # one of 0: time, 1: percentage, 2: temp mode
-        
+        self.phasesLCDmode_l = [1,1,1]
+
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
         self.statisticsflags = [1,1,0,1,1,0]
@@ -6302,6 +6303,8 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.AUClcdFlag:
                 aw.AUCLCD.show()
                 
+            aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[0]
+
             aw.update_minieventline_visibility()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -6539,6 +6542,7 @@ class tgraphcanvas(FigureCanvas):
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
+                        aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[1]
     
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
@@ -6623,6 +6627,7 @@ class tgraphcanvas(FigureCanvas):
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
+                        aw.qmc.phasesLCDmode = aw.qmc.phasesLCDmode_l[2]
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -18079,6 +18084,12 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phasesLCDflag = bool(toBool(settings.value("phasesLCDs",self.qmc.phasesLCDflag)))
             if settings.contains("phasesLCDmode"):
                 self.qmc.phasesLCDmode = toInt(settings.value("phasesLCDmode",self.qmc.phasesLCDmode))
+            # Important - this must come after the code that restores phasesLCDmode 
+            # Done this way with two variables to maintain forward and backward compatibility with settings since adding LCD mode by phase.
+            if settings.contains("phasesLCDmode_l"):  #dave45
+                self.qmc.phasesLCDmode_l = [toInt(x) for x in toList(settings.value("phasesLCDmode_l",self.qmc.phasesLCDmode_l))]
+            else:
+                self.qmc.phasesLCDmode_l = [toInt(self.qmc.phasesLCDmode)]*3
             if settings.contains("autoDry"):
                 self.qmc.autoDRYflag = bool(toBool(settings.value("autoDry",self.qmc.autoDRYflag)))
             if settings.contains("autoFCs"):
@@ -32298,6 +32309,7 @@ class phasesGraphDlg(ArtisanDialog):
         finishEspressoLabel = QLabel(QApplication.translate("Label", "Finishing",None))
         minfEspresso = QLabel(QApplication.translate("Label", "min",None))
         maxfEspresso = QLabel(QApplication.translate("Label", "max",None))
+        lcdmodeEspresso = QLabel(QApplication.translate("Label", "LCDs Mode",None))  #dave45
 
         self.startdryEspresso = QSpinBox()
         self.startdryEspresso.setAlignment(Qt.AlignRight)
@@ -32371,10 +32383,43 @@ class phasesGraphDlg(ArtisanDialog):
         self.phasesTabs.addTab(EspressoWidget,QApplication.translate("Tab","Espresso",None))
         
         self.phasesTabs.setCurrentIndex(aw.qmc.phases_mode)
+
+        lcdmodes = [QApplication.translate("ComboBox","Time",None),
+                    QApplication.translate("ComboBox","Percentage",None),
+                    QApplication.translate("ComboBox","Temp",None)]
+        lcdModeLayout = QVBoxLayout()
+        lcdmode = QLabel(QApplication.translate("Label", "Phases\nLCDs Mode",None))
+        lcdmode.setAlignment(Qt.AlignCenter)
+        self.lcdmodeComboBox_dry = QComboBox()
+        self.lcdmodeComboBox_dry.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeComboBox_dry.setMaximumWidth(80)
+        self.lcdmodeComboBox_dry.addItems(lcdmodes)
+        self.lcdmodeComboBox_dry.currentIndexChanged.connect(self.lcdmodeComboBox_dryChanged)
+        self.lcdmodeComboBox_mid = QComboBox()
+        self.lcdmodeComboBox_mid.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeComboBox_mid.setMaximumWidth(80)
+        self.lcdmodeComboBox_mid.addItems(lcdmodes)
+        self.lcdmodeComboBox_mid.currentIndexChanged.connect(self.lcdmodeComboBox_midChanged)
+        self.lcdmodeComboBox_fin = QComboBox()
+        self.lcdmodeComboBox_fin.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeComboBox_fin.setMaximumWidth(80)
+        self.lcdmodeComboBox_fin.addItems(lcdmodes)
+        self.lcdmodeComboBox_fin.currentIndexChanged.connect(self.lcdmodeComboBox_finChanged)
+        lcdModeLayout.addStretch()
+        lcdModeLayout.addStretch()
+        lcdModeLayout.addWidget(lcdmode)
+        lcdModeLayout.addWidget(self.lcdmodeComboBox_dry)
+        lcdModeLayout.addWidget(self.lcdmodeComboBox_mid)
+        lcdModeLayout.addWidget(self.lcdmodeComboBox_fin)
+        lcdModeLayout.addStretch()
+        self.lcdmodeComboBox_dry.setCurrentIndex(aw.qmc.phasesLCDmode_l[0])
+        self.lcdmodeComboBox_mid.setCurrentIndex(aw.qmc.phasesLCDmode_l[1])
+        self.lcdmodeComboBox_fin.setCurrentIndex(aw.qmc.phasesLCDmode_l[2])
         
         boxedPhaseLayout = QHBoxLayout()
         boxedPhaseLayout.addStretch()
         boxedPhaseLayout.addWidget(self.phasesTabs)
+        boxedPhaseLayout.addLayout(lcdModeLayout)
         boxedPhaseLayout.addStretch()
         boxedPhaseFlagGrid = QGridLayout()
         boxedPhaseFlagGrid.addWidget(self.pushbuttonflag,0,0)
@@ -32399,6 +32444,16 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
         aw.qmc.redraw(recomputeAllDeltas=False)
+
+    def lcdmodeComboBox_dryChanged(self):
+        aw.qmc.phasesLCDmode_l[0] = self.lcdmodeComboBox_dry.currentIndex()
+        aw.qmc.phasesLCD = aw.qmc.phasesLCDmode_l[0]
+
+    def lcdmodeComboBox_midChanged(self):
+        aw.qmc.phasesLCDmode_l[1] = self.lcdmodeComboBox_mid.currentIndex()
+
+    def lcdmodeComboBox_finChanged(self):
+        aw.qmc.phasesLCDmode_l[2] = self.lcdmodeComboBox_fin.currentIndex()
 
     def savePhasesSettings(self):
         if not aw.qmc.phasesbuttonflag:
