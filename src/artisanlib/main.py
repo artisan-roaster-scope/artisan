@@ -15700,7 +15700,7 @@ class ApplicationWindow(QMainWindow):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " {0}").format(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " {0}: {1}").format(str(ex),str(filename)))
             # remove file from the recent file list
             settings = QSettings()
             files = toStringList(settings.value('recentFileList'))
