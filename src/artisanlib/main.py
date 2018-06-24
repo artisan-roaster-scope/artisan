@@ -22862,7 +22862,7 @@ class ApplicationWindow(QMainWindow):
                         for widget in QApplication.topLevelWidgets():
                             if isinstance(widget, ApplicationWindow):
                                 widget.updateRecentSettingActions()
-                        self.sendmessage(QApplication.translate("Message","Settings loaded", None))
+                        self.sendmessage(QApplication.translate("Message","Settings loaded {0}".format(aw.strippedName(filename)), None))
                     else:
                         # remove file from the recent file list
                         settings = QSettings()
