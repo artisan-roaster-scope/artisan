@@ -22179,7 +22179,7 @@ class ApplicationWindow(QMainWindow):
 
     # this can be used to find the CHARGE index as well as the DROP index by using
     # 0 or the DRY index as start index, respectively
-    def findBTbreak(self,start_index=0,end_index=0):
+    def findBTbreak(self,start_index=0,end_index=0,offset=-1):
         result = 0        
         # determine average deltaBT wrt. the two previous measurements
         # the deltaBT values wrt. the next two measurements must by twice as high and negative
@@ -22188,9 +22188,14 @@ class ApplicationWindow(QMainWindow):
             if end_index and i > end_index:
                 break
             if i>3:
-                if self.BTbreak(i):
-                    result = i - 2
-                    break
+                if offset < 0:  
+                    if self.BTbreak(i):
+                        result = i - 2
+                        break
+                else:
+                    if self.BTbreak(i,offset=offset):
+                        result = i - 2
+                        break
         return result
         
     # updates AUC guide (expected time to hit target AUC; aw.qmc.AUCguideTime) based on current AUC, target, base, and RoR
@@ -26933,7 +26938,7 @@ class editGraphDlg(ArtisanDialog):
                 #find when dry phase ends 
                 dryEndIndex = aw.findDryEnd(TP_index)
             self.charge_idx = aw.findBTbreak(0,dryEndIndex)
-            self.drop_idx = aw.findBTbreak(dryEndIndex)
+            self.drop_idx = aw.findBTbreak(dryEndIndex,offset=0.1)
             if self.charge_idx != 0 and self.charge_idx != aw.qmc.timeindex[0]:
                 if aw.qmc.timeindex[0] == -1:
                     time_diff = int(round(aw.qmc.timex[self.charge_idx]))
@@ -27455,9 +27460,12 @@ class editGraphDlg(ArtisanDialog):
         timeLayout.addWidget(self.CCendedit,1,5,Qt.AlignHCenter)
         timeLayout.addWidget(self.dropedit,1,6,Qt.AlignHCenter)
         timeLayout.addWidget(self.cooledit,1,7,Qt.AlignHCenter)
-        if charge_str != "" or drop_str != "":
-            timeLayout.addWidget(self.chargeestimate,2,0,Qt.AlignHCenter)
-            timeLayout.addWidget(self.dropestimate,2,6,Qt.AlignHCenter)
+        if charge_str != "":
+            calc_chargestr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[0]]))
+            aw.sendmessage(QApplication.translate("Message","The recorded CHARGE time ({0}) does not match the post roast calculated CHARGE time. ({1})", None).format(charge_str, calc_chargestr))
+        if drop_str != "":
+            calc_dropstr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+            aw.sendmessage(QApplication.translate("Message","THe recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})", None).format(drop_str, calc_dropstr))
         textLayout = QGridLayout()
         textLayout.addWidget(datelabel1,0,0)
         datebatch = QHBoxLayout()
