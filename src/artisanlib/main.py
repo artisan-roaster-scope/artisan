@@ -27326,7 +27326,7 @@ class editGraphDlg(ArtisanDialog):
         self.ambientedit = QLineEdit()
         self.ambientedit.setText(str(aw.qmc.ambientTemp))
         self.ambientedit.setMaximumWidth(50)
-        self.ambientedit.setValidator(QDoubleValidator(0., 200., 2, self.ambientedit))  
+        self.ambientedit.setValidator(QDoubleValidator(-40., 200., 2, self.ambientedit))  
         self.ambientedit.setAlignment(Qt.AlignRight)       
         self.ambientedit_tempUnitsComboBox = QComboBox()
         self.ambientedit_tempUnitsComboBox.setMaximumWidth(60)
