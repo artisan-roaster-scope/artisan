@@ -8689,8 +8689,12 @@ class tgraphcanvas(FigureCanvas):
                         etbt2 = "%i"%(ts2)
                         etbt3 = "%i"%(ts3)
 
-                        if dryphasetime:
-                            dryroc = (" %.1f " + aw.qmc.mode + "/min")%((dryramp/dryphasetime)*60.)
+                        min_bt,time_min_bt = self.findTPdes()
+                        dryrampTP = self.temp2[self.timeindex[1]] - min_bt
+                        dryphasetimeTP = self.timex[self.timeindex[1]] - time_min_bt
+
+                        if dryphasetimeTP:
+                            dryroc = (" %.1f " + aw.qmc.mode + "/min")%((dryrampTP/dryphasetimeTP)*60.)
                         else:
                             dryroc = " 0 " + aw.qmc.mode + "/min"
 
@@ -8720,6 +8724,22 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " on_motion() {0}").format(str(e)),exc_tb.tb_lineno)
             self.unrarefy_designer()
             return
+
+    def findTPdes(self):
+        try:
+            from scipy.interpolate import UnivariateSpline
+            funcBT = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
+            timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
+            btvals = funcBT(timez).tolist()
+            min_bt = min(btvals)
+            idx_min_bt = btvals.index(min_bt)
+            time_min_bt = timez[idx_min_bt]
+            return min_bt, time_min_bt
+
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " findTPdes() {0}").format(str(e)),exc_tb.tb_lineno)
+            return 
 
     #this is used in on_motion() to try to prevent points crossing over points
     def unrarefy_designer(self):
