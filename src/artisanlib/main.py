@@ -28145,6 +28145,8 @@ class editGraphDlg(ArtisanDialog):
                 else:
                     text = u("")
                 Rtime.setText(text + u(" " + Rtime.text()))
+            else:
+                Rtime.setText(u(" " + Rtime.text()))
                             
             self.datatable.setItem(i,1,ET)
             self.datatable.setItem(i,2,BT)
