@@ -75,7 +75,7 @@ EOF
 ssh-keygen -R "[localhost]:2222"
 if [ ! -f ${RASPBIAN_ZIP} ]; then
     (sleep 600; pgrep curl && pkill curl)&
-    curl -L -O ${RASPBIAN_URL}/${RASPBIAN_ZIP} || curl -L -O ${RASPBIAN_MIRROR_URL}/${RASPBIAN_ZIP}
+    curl -L -O ${RASPBIAN_URL}/${RASPBIAN_ZIP} || curl -C - -L -O ${RASPBIAN_MIRROR_URL}/${RASPBIAN_ZIP}
 
 fi
 if [ ! -f ${RASPBIAN_IMAGE} ]; then
