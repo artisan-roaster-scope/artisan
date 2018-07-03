@@ -13,8 +13,7 @@
 #        
 #    def elapsed(self):
 #        return self.clock.elapsed()
-  
-import sys
+
 import time
 
 # higher resultion time signal (at least on Mac OS X)

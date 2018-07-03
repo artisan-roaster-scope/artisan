@@ -79,17 +79,17 @@ class PID(object):
         return res
             
     
-    def smooth_input(self,input):
+    def smooth_input(self,inp):
         # create or update smoothing decay weights
         if self.input_smoothing_factor != 0 and (self.input_decay_weights == None or len(self.input_decay_weights) != self.input_smoothing_factor): # recompute only on changes
             self.input_decay_weights = numpy.arange(1,self.input_smoothing_factor+1)
         # add new value
-        self.previous_inputs.append(input)
+        self.previous_inputs.append(inp)
         # throw away superflous values
         self.previous_inputs = self.previous_inputs[-self.input_smoothing_factor:]
         # compute smoothed output
         if len(self.previous_inputs) < self.input_smoothing_factor or self.input_smoothing_factor == 0:
-            res = input # no smoothing yet
+            res = inp # no smoothing yet
         else:
             res = numpy.average(self.previous_inputs,weights=self.input_decay_weights)
         return res

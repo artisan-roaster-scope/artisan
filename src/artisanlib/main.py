@@ -502,6 +502,16 @@ def __dependencies_for_freezing():
     
     # for gevent bundling
     from gevent import core, resolver_thread, resolver_ares, socket, threadpool, thread, threading, select, subprocess, pywsgi, server, hub # @UnusedImport @Reimport 
+    
+    # keyring
+    import keyring.backends.fail
+    import keyring.backends.kwallet
+    import keyring.backends.OS_X
+    import keyring.backends.SecretService
+    import keyring.backends.Windows
+    import keyring
+    # ssl
+    import ssl # @UnusedImport
 
 del __dependencies_for_freezing
 
@@ -1057,6 +1067,8 @@ class tgraphcanvas(FigureCanvas):
         self.greens_temp = 0.
         
         self.beansize = 0.0
+        self.beansize_min = 0
+        self.beansize_max = 0
 
         self.whole_color = 0
         self.ground_color = 0
@@ -1106,6 +1118,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundDetails = True
         self.backgroundeventsflag = True
         self.backgroundpath = ""
+        self.backgroundUUID = None
         self.backgroundmovespeed = 30
         self.titleB = ""
         self.roastbatchnrB = 0
@@ -1183,6 +1196,15 @@ class tgraphcanvas(FigureCanvas):
         # profile UUID
         self.roastUUID = None
         
+#PLUS   
+        # the default store selected by the user (save in the  app settings)
+        self.plus_default_store = None
+        
+        # the current profiles coffee or blend and associated store ids (saved in the *.alog profile)
+        self.plus_store = None
+        self.plus_coffee = None
+        self.plus_blend = None
+                
         self.beans = ""
 
         #flags to show projections, draw Delta ET, and draw Delta BT
@@ -3668,12 +3690,16 @@ class tgraphcanvas(FigureCanvas):
                     self.roastingnotes = ""
                     self.cuppingnotes = ""
                     self.beans = ""
+                    self.plus_coffee = None
+                    self.plus_blend = None
                     self.weight = [0,0,self.weight[2]]
                     self.volume = [0,0,self.volume[2]]
                     self.density = [0,self.density[1],0,self.density[3]]
                     self.ambientTemp = 0.
                     self.ambient_humidity = 0.
                     self.beansize = 0.
+                    self.beansize_min = 0
+                    self.beansize_max = 0
                     self.moisture_greens = 0.
                     self.greens_temp = 0.
                     self.volumeCalcWeightInStr = ""
@@ -5391,11 +5417,21 @@ class tgraphcanvas(FigureCanvas):
                     statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2])
                     if "volume_gain" in cp: 
-                        statstr += '\n' + QApplication.translate("AddlInfo", "Volume Gain", None) + ': ' + str(aw.float2float(cp["volume_gain"],2)) + "%"
-                        
-                if aw.qmc.beansize:
+                        statstr += '\n' + QApplication.translate("AddlInfo", "Volume Gain", None) + ': ' + str(aw.float2float(cp["volume_gain"],2)) + "%"                        
+#                if aw.qmc.beansize:
+#                    statstr += skipline
+#                    statstr += '\n' + QApplication.translate("AddlInfo", "Bean Size", None) + ': '+ str(aw.qmc.beansize) + 'mm'
+
+                if aw.qmc.beansize_min or aw.qmc.beansize_max:
                     statstr += skipline
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Bean Size", None) + ': '+ str(aw.qmc.beansize) + 'mm'
+                    screen = ""
+                    if aw.qmc.beansize_min:
+                        screen = str(aw.qmc.beansize_min)
+                    if aw.qmc.beansize_max:
+                        if screen:
+                            screen = screen + "/"
+                        screen = screen + str(aw.qmc.beansize_max)
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Screen", None) + ': '+ screen + '18/64\u2033'
 
                 if aw.qmc.moisture_greens or aw.qmc.moisture_roasted:
                     statstr += skipline
@@ -6970,6 +7006,15 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.updateAmbientTemp()
                         except Exception:
                             pass
+#PLUS
+#                        # add to out-queue
+#                        try:
+#                            if aw.plus_account is not None:
+#                                import plus.queue
+#                                plus.queue.addRoast()
+#                        except:
+#                            pass
+
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
                 aw.sendmessage(message)
@@ -9529,7 +9574,7 @@ class VMToolbar(NavigationToolbar):
 
 #PLUS            
 #            if aw is not None:
-#                aw.updatePlusStatus(self)    
+#                aw.updatePlusStatus(self)
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
@@ -9590,9 +9635,10 @@ class VMToolbar(NavigationToolbar):
             pm.setDevicePixelRatio(self.canvas._dpi_ratio)
         return QIcon(pm)
 
-    def plus(self):
-        import plus.controller
-        plus.controller.toggle(aw)
+#PLUS
+#    def plus(self):
+#        import plus.controller
+#        plus.controller.toggle(aw)
         
     def edit_parameters(self):
         try:
@@ -12230,8 +12276,9 @@ class ApplicationWindow(QMainWindow):
             sys_clip.setText(clipboard)
             
     def createRecentRoast(self,title,beans,weightIn,weightOut,weightUnit,volumeIn,volumeOut,volumeUnit,
-            densityWeight,densityWeightUnit,densityVolume,densityVolumeUnit, beanSize,
-            moistureGreen,moistureRoasted,wholeColor,groundColor,colorSystem,background):
+            densityWeight,densityWeightUnit,densityVolume,densityVolumeUnit, beanSize_min, beanSize_max,
+            moistureGreen,moistureRoasted,wholeColor,groundColor,colorSystem,background,backgroundUUID,
+            plus_account,plus_store,plus_coffee,plus_blend):
         d = {
             "title": title,
             "weightIn": weightIn,
@@ -12246,13 +12293,20 @@ class ApplicationWindow(QMainWindow):
         d["densityWeightUnit"] = densityWeightUnit
         d["densityVolume"] = densityVolume
         d["densityVolumeUnit"] = densityVolumeUnit
-        d["beanSize"] = beanSize
+        d["beanSize_min"] = beanSize_min
+        d["beanSize_max"] = beanSize_max
         d["moistureGreen"] = moistureGreen
         d["moistureRoasted"] = moistureRoasted
         d["wholeColor"] = wholeColor
         d["groundColor"] = groundColor
         d["colorSystem"] = colorSystem
         d["background"] = background
+        # added in v1.4
+        d["backgroundUUID"] = backgroundUUID
+        d["plus_account"] = plus_account
+        d["plus_store"] = plus_store
+        d["plus_coffee"] = plus_coffee
+        d["plus_blend"] = plus_blend
         return d
     
     def setRecentRoast(self,rr):
@@ -12260,12 +12314,23 @@ class ApplicationWindow(QMainWindow):
         self.qmc.weight = [rr["weightIn"],rr["weightOut"],rr["weightUnit"]]
         self.qmc.volume = [rr["volumeIn"],rr["volumeOut"],rr["volumeUnit"]]
         self.qmc.density = [rr["densityWeight"],rr["densityWeightUnit"],rr["densityVolume"],rr["densityVolumeUnit"]]
-        self.qmc.beansize = rr["beanSize"]
+        self.qmc.beansize_min = rr["beanSize_min"]
+        self.qmc.beansize_max = rr["beanSize_max"]
         self.qmc.moisture_green = rr["moistureGreen"]
         self.qmc.moisture_roasted = rr["moistureRoasted"]
         self.qmc.whole_color = rr["wholeColor"]
         self.qmc.ground_color = rr["groundColor"]
         self.qmc.color_system_idx = rr["colorSystem"]
+#PLUS
+#        if self.plus_account is not None and "plus_account" in rr and self.plus_account == rr["plus_account"]:
+#            if "plus_store" in rr:
+#                self.qmc.plus_store = rr["plus_store"]
+#            if "plus_coffee" in rr:
+#                self.qmc.plus_coffee = rr["plus_coffee"]
+#            if "plus_store" in rr:
+#                self.qmc.plus_blend = rr["plus_blend"]
+#            if self.qmc.plus_default_store is not None and self.qmc.plus_default_store != self.qmc.plus_store:
+#                self.qmc.plus_default_store = None # we reset the defaultstore
         
     # d is a recentRoast dict
     def addRecentRoast(self,d):
@@ -12348,30 +12413,6 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel2[i].setText(l2)
         aw.settooltip()
 
-#    def populateListMenu(self,resourceName,ext,triggered,menu,addMenu = True):
-#        one_added = False
-#        for root,dirs,files in os.walk(os.path.join(self.getResourcePath(),resourceName)):
-#            dirs.sort()
-#            files.sort()
-#            for fl in files:
-#                if fl.endswith(ext): 
-#                    d = os.path.split(root)
-#                    p = os.path.join(root,fl)
-#                    f = fl.replace(ext,"").replace("_"," ")
-#                    if len(d) > 0:
-#                        a = QAction(self, visible=True,
-#                            triggered=triggered)
-#                        a.setData(p)
-#                        if d[-1] == resourceName:
-#                            a.setText(u(f)) # + u("...")
-#                        else:
-#                            a.setText(u(d[-1] + u(" ") + u(f))) # + u("...")
-#                        menu.addAction(a)
-#                        one_added = True
-#        if one_added and addMenu:
-#            self.ConfMenu.addMenu(menu)
-
-
     def populateListMenu(self,resourceName,ext,triggered,menu,addMenu = True,forceSubmenu=False):
         one_added = False
         res = {}
@@ -12421,8 +12462,7 @@ class ApplicationWindow(QMainWindow):
                 one_added = True
         if one_added and addMenu:
             self.ConfMenu.addMenu(menu)
-            
-                        
+   
     def populateMachineMenu(self):
         self.populateListMenu("Machines",".aset",self.openMachineSettings,self.machineMenu)
 
@@ -13494,7 +13534,7 @@ class ApplicationWindow(QMainWindow):
     def makePhasesLCDbox(self,label,lcd):
         label.setAlignment(Qt.Alignment(Qt.AlignRight | Qt.AlignVCenter))
         lcd.setMinimumHeight(30)
-        lcd.setMinimumWidth(84)
+        lcd.setMinimumWidth(80)  # NOTE: with minimumWidth 84 the lcds not always fit in on Mac, 80 works! Better to keep at default.
         lcd.setSegmentStyle(2)
         lcd.setFrameStyle(QFrame.Plain)
         lcd.setNumDigits(6)
@@ -15879,6 +15919,10 @@ class ApplicationWindow(QMainWindow):
                     message =  u(QApplication.translate("Message", "Background {0} loaded successfully {1}",None).format(u(filename),u("")))                    
                 self.sendmessage(message)
                 self.qmc.backgroundpath = u(filename)
+                if "UUID" in profile:
+                    self.qmc.backgroundUUID = profile["roastUUID"]
+                else:
+                    self.qmc.backgroundUUID = None
             else:
                 self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None))
         except IOError as e:
@@ -16987,6 +17031,22 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.title = d(profile["title"])
             else:            
                 self.qmc.title = QApplication.translate("Scope Title", "Roaster Scope",None)
+                
+##PLUS (for now stored but not loaded)
+##            if "plus_store" in profile:
+##                self.qmc.plus_store = d(profile["plus_store"])
+##            else:
+##                self.qmc.plus_store = None  
+##            if "plus_coffee" in profile:
+##                self.qmc.plus_coffee = d(profile["plus_coffee"])
+##            else:
+##                self.qmc.plus_coffee = None
+##            if "plus_blend" in profile:
+##                self.qmc.plus_blend = d(profile["plus_blend"])
+##            else:
+##                self.qmc.plus_blend = None
+                
+                
             if "beans" in profile:
                 self.qmc.beans = d(profile["beans"])
             else:
@@ -17016,9 +17076,19 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.qmc.drumspeed = ""
             if "beansize" in profile:
-                self.qmc.beansize = float(profile["beansize"])
+                # we map beansize in mm to beansize_max in 1/64"
+                try:            
+                    self.qmc.beansize_max = int(round(float(profile["beansize"]) * 0.0393701 * 61))
+                except:
+                    pass
+            if "beansize_min" in profile:
+                self.qmc.beansize_min = float(profile["beansize_min"])
             else:
-                self.qmc.beansize = 0.0
+                self.qmc.beansize_min = 0
+            if "beansize_max" in profile:
+                self.qmc.beansize_max = float(profile["beansize_max"])
+            else:
+                self.qmc.beansize_max = 0
             if "heavyFC" in profile:
                 self.qmc.heavyFC_flag = profile["heavyFC"]
             if "lowFC" in profile:
@@ -17597,6 +17667,15 @@ class ApplicationWindow(QMainWindow):
             profile["flavorstartangle"] = self.qmc.flavorstartangle
             profile["flavoraspect"] = self.qmc.flavoraspect
             profile["title"] = encodeLocal(self.qmc.title)
+            
+#PLUS
+#            if self.qmc.plus_store is not None:
+#                profile["plus_store"] = self.qmc.plus_store
+#            if self.qmc.plus_coffee is not None:
+#                profile["plus_coffee"] = self.qmc.plus_coffee
+#            if self.qmc.plus_blend is not None:
+#                profile["plus_blend"] = self.qmc.plus_blend
+                        
             profile["beans"] = encodeLocal(self.qmc.beans)
             profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocal(self.qmc.weight[2])]
             profile["volume"] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocal(self.qmc.volume[2])]
@@ -17643,6 +17722,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
             profile["roastUUID"] = self.qmc.roastUUID
             profile["beansize"] = str(self.qmc.beansize)
+            profile["beansize_min"] = str(self.qmc.beansize_min)
+            profile["beansize_max"] = str(self.qmc.beansize_max)
             profile["specialevents"] = self.qmc.specialevents
             profile["specialeventstype"] = self.qmc.specialeventstype
             profile["specialeventsvalue"] = self.qmc.specialeventsvalue
@@ -17701,8 +17782,10 @@ class ApplicationWindow(QMainWindow):
             profile["alarmaction"] = self.qmc.alarmaction
             profile["alarmbeep"] = self.qmc.alarmbeep
             profile["alarmstrings"] = [encodeLocal(x) for x in self.qmc.alarmstrings]
-            # remember background profile path
+            # remember background profile path and UUID
             profile["backgroundpath"] = encodeLocal(self.qmc.backgroundpath)
+            if self.qmc.backgroundUUID is not None:
+                profile["backgroundUUID"] = self.qmc.backgroundUUID
             #write only:
             profile["samplinginterval"] = self.qmc.profile_sampling_interval
             profile["oversampling"] = self.qmc.oversampling
@@ -17991,8 +18074,8 @@ class ApplicationWindow(QMainWindow):
 #            if settings.contains("plus_account"):
 #                self.plus_account = settings.value("plus_account",self.plus_account)
 #                if self.plus_account is not None:
-#                    import plus.controller
 #                    try:
+#                        import plus.controller
 #                        plus.controller.start(aw)
 #                    except:
 #                        pass
@@ -18687,6 +18770,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.chargemintime = toInt(settings.value("chargemintime",self.qmc.chargemintime))
             self.qmc.legendloc = toInt(settings.value("legendloc",self.qmc.legendloc))
             settings.endGroup()
+            
             settings.beginGroup("RoastProperties")
             self.qmc.operator = toString(settings.value("operator",self.qmc.operator))
             self.qmc.roastertype = toString(settings.value("roastertype",self.qmc.roastertype))
@@ -18694,7 +18778,14 @@ class ApplicationWindow(QMainWindow):
             self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2]))
             if settings.contains("beansize"):
                 self.qmc.beansize = toDouble(settings.value("beansize",self.qmc.beansize))
+            if settings.contains("beansize_min"):
+                self.qmc.beansize_min = toInt(settings.value("beansize_min",self.qmc.beansize_min))
+            if settings.contains("beansize_max"):
+                self.qmc.beansize_max = toInt(settings.value("beansize_max",self.qmc.beansize_max))
+            if settings.contains("plus_default_store"):
+                self.qmc.plus_default_store = toString(settings.value("plus_default_store",self.qmc.plus_default_store))
             settings.endGroup()
+
             self.userprofilepath = toString(settings.value("profilepath",self.userprofilepath))
             if settings.contains("settingspath"):            
                 self.settingspath = toString(settings.value("settingspath",self.settingspath))
@@ -19822,6 +19913,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("roastertype",self.qmc.roastertype)
             settings.setValue("densitySampleVolume",self.qmc.density[2])
             settings.setValue("beansize",self.qmc.beansize)
+            settings.setValue("beansize_min",self.qmc.beansize_min)
+            settings.setValue("beansize_max",self.qmc.beansize_max)
+            settings.setValue("plus_default_store",self.qmc.plus_default_store)
             settings.endGroup()
             settings.beginGroup("XT")
             settings.setValue("color",self.qmc.backgroundxtcolor)
@@ -23174,6 +23268,7 @@ class ApplicationWindow(QMainWindow):
     def deleteBackground(self):
         self.qmc.background = False
         self.qmc.backgroundpath = ""
+        self.qmc.backgroundUUID = None
         self.qmc.titleB = ""
         self.qmc.roastbatchnrB = 0
         self.qmc.roastbatchprefixB = u("")
@@ -26884,8 +26979,6 @@ class RoastsComboBox(QComboBox):
         super(RoastsComboBox, self).__init__(parent)
         self.installEventFilter(self)
         self.selection = u(selection) # just the roast title
-        # a list of triples as returned by serial.tools.list_ports
-        self.ports = []
         self.edited = selection
         self.updateMenu()
         self.editTextChanged.connect(lambda txt="":self.textEdited(txt))
@@ -26900,7 +26993,6 @@ class RoastsComboBox(QComboBox):
     def setSelection(self,i):
         if i >= 0:
             try:
-#                self.selection = u(self.ports[i][0])
                 self.edited = None # reset the user text editing
             except Exception:
                 pass
@@ -27131,14 +27223,10 @@ class editGraphDlg(ArtisanDialog):
         self.titleedit = RoastsComboBox(selection = aw.qmc.title)
         self.titleedit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
         self.titleedit.activated.connect(self.recentRoastActivated)
+        self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
 
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
         self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
-        
-        # add to recent
-        self.addRecentButton = QPushButton("+")
-        self.addRecentButton.clicked.connect(lambda _:self.addRecentRoast())
-        self.addRecentButton.setFocusPolicy(Qt.NoFocus)
         
         #Date
         datelabel1 = QLabel("<b>" + u(QApplication.translate("Label", "Date",None)) + "</b>")
@@ -27178,12 +27266,14 @@ class editGraphDlg(ArtisanDialog):
             batchedit = QLineEdit(batch)
             batchedit.setReadOnly(True)
             batchedit.setStyleSheet("background-color:'lightgrey'")
+            
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
         self.beansedit = QTextEdit()
-        self.beansedit.setMaximumHeight(40)
+        self.beansedit.setMaximumHeight(60)
         if aw.qmc.beans is not None:
             self.beansedit.setPlainText(u(aw.qmc.beans))
+                    
         #roaster
         self.roaster = QLineEdit(aw.qmc.roastertype)
         #operator
@@ -27288,28 +27378,41 @@ class editGraphDlg(ArtisanDialog):
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         volumeCalcButton.setFocusPolicy(Qt.NoFocus)
         
+        # add to recent
+        self.addRecentButton = QPushButton("+")
+        self.addRecentButton.clicked.connect(lambda _:self.addRecentRoast())
+        self.addRecentButton.setFocusPolicy(Qt.NoFocus)
+        self.recentRoastEnabled()
+        
         #bean size
-        bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Size",None)) + "</b>")
-        self.bean_size_edit = QLineEdit(str(aw.qmc.beansize))
-        self.bean_size_edit.setValidator(QDoubleValidator(0., 10., 1,self.bean_density_weight_edit))
-        self.bean_size_edit.setMinimumWidth(45)
-        self.bean_size_edit.setMaximumWidth(45)
-        self.bean_size_edit.setAlignment(Qt.AlignRight)
-        bean_size_unit_label = QLabel(QApplication.translate("Label", "mm",None))
+        bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Screen",None)) + "</b>")
+        self.bean_size_min_edit = QLineEdit(str(aw.qmc.beansize_min))
+        self.bean_size_min_edit.setValidator(QIntValidator(0,25,self.bean_size_min_edit))
+        self.bean_size_min_edit.setMinimumWidth(25)
+        self.bean_size_min_edit.setMaximumWidth(25)
+        self.bean_size_min_edit.setAlignment(Qt.AlignRight)
+        bean_size_sep_label = QLabel("/")
+        self.bean_size_max_edit = QLineEdit(str(aw.qmc.beansize_max))
+        self.bean_size_max_edit.setValidator(QIntValidator(0,25,self.bean_size_max_edit))
+        self.bean_size_max_edit.setMinimumWidth(25)
+        self.bean_size_max_edit.setMaximumWidth(25)
+        self.bean_size_max_edit.setAlignment(Qt.AlignRight)
+        bean_size_unit_label = QLabel(QApplication.translate("Label", "18/64\u2033",None))
         #bean color
         whole_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Whole Color",None)) + "</b>")
         self.whole_color_edit = QLineEdit(str(aw.qmc.whole_color))
-        self.whole_color_edit.setValidator(QIntValidator(0, 1000, self.bean_density_weight_edit))
+        self.whole_color_edit.setValidator(QIntValidator(0, 1000, self.whole_color_edit))
         self.whole_color_edit.setMinimumWidth(45)
         self.whole_color_edit.setMaximumWidth(45)
         self.whole_color_edit.setAlignment(Qt.AlignRight)
         ground_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Ground Color",None)) + "</b>")
         self.ground_color_edit = QLineEdit(str(aw.qmc.ground_color))
-        self.ground_color_edit.setValidator(QIntValidator(0, 1000, self.bean_density_weight_edit))
+        self.ground_color_edit.setValidator(QIntValidator(0, 1000, self.ground_color_edit))
         self.ground_color_edit.setMinimumWidth(45)
         self.ground_color_edit.setMaximumWidth(45)
         self.ground_color_edit.setAlignment(Qt.AlignRight)
-        self.bean_size_edit.setAlignment(Qt.AlignRight)
+        self.bean_size_min_edit.setAlignment(Qt.AlignRight)
+        self.bean_size_max_edit.setAlignment(Qt.AlignRight)
         self.colorSystemComboBox = QComboBox()
         self.colorSystemComboBox.addItems(aw.qmc.color_systems)
         self.colorSystemComboBox.setCurrentIndex(aw.qmc.color_system_idx)
@@ -27375,7 +27478,7 @@ class editGraphDlg(ArtisanDialog):
         self.calculateorganiclosslabel = QLabel("")
         # NOTES
         roastertypelabel = QLabel()
-        roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Roaster",None)) + "</b>")
+        roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Machine",None)) + "</b>")
         operatorlabel = QLabel()
         operatorlabel.setText("<b> " + u(QApplication.translate("Label", "Operator",None)) + "</b>")
         drumspeedlabel = QLabel()
@@ -27514,13 +27617,63 @@ class editGraphDlg(ArtisanDialog):
         titleLine.addWidget(self.titleedit)
         titleLine.addWidget(self.addRecentButton)
         titleLine.addSpacing(5)
-        titleLine.addWidget(self.titleShowAlwaysFlag)
+        titleLine.addWidget(self.titleShowAlwaysFlag) 
 
+#PLUS (keep)               
+        if aw.plus_account is not None:
+            # variables populated by stock data as rendered in the corresponding popups
+            self.plus_stores = None
+            self.plus_coffees = None
+            self.plus_blends = None
+            self.plus_default_store = aw.qmc.plus_default_store            
+            # current selected stock/coffee/blend id
+            self.plus_store_selected = aw.qmc.plus_store # holds the store corresponding to the plus_coffee_selected/plus_blend_selected
+            self.plus_coffee_selected = aw.qmc.plus_coffee
+            self.plus_blend_selected = aw.qmc.plus_blend
+            self.plus_amount_selected = None # holds the amount of the selected coffee/blend if known            
+            textLayoutPlusOffset = 1 # to insert the plus widget row, we move the remaining ones one step lower
+            plusCoffeeslabel = QLabel("<b>" + u(QApplication.translate("Label", "Coffee",None)) + "</b>")
+            plusStoreslabel = QLabel("<b>" + u(QApplication.translate("Label", "Store",None)) + "</b>")
+            plusBlendslabel = QLabel("<b>" + u(QApplication.translate("Label", "Blend",None)) + "</b>")            
+            self.plus_stores_combo = QComboBox()            
+            self.plus_coffees_combo = QComboBox()
+            self.plus_blends_combo = QComboBox()            
+            self.populatePlusCoffeeBlendCombos()            
+            self.plus_stores_combo.currentIndexChanged.connect(self.storeSelectionChanged)
+            self.plus_coffees_combo.currentIndexChanged.connect(self.coffeeSelectionChanged)            
+            self.plus_blends_combo.currentIndexChanged.connect(self.blendSelectionChanged)           
+            # layouting
+            self.plus_coffees_combo.setMinimumContentsLength(15)
+            self.plus_blends_combo.setMinimumContentsLength(10)
+            self.plus_stores_combo.setMinimumContentsLength(10)
+            self.plus_stores_combo.setMaximumWidth(120)            
+            self.plus_coffees_combo.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
+            self.plus_coffees_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            self.plus_blends_combo.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
+            self.plus_blends_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            self.plus_stores_combo.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
+            self.plus_stores_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            # plus widget row
+            plusLine = QHBoxLayout()
+            plusLine.addWidget(self.plus_coffees_combo)
+            plusLine.addSpacing(15)
+            plusLine.addWidget(plusBlendslabel)
+            plusLine.addSpacing(5)
+            plusLine.addWidget(self.plus_blends_combo)
+            plusLine.addSpacing(15)
+            plusLine.addWidget(plusStoreslabel)
+            plusLine.addSpacing(5)
+            plusLine.addWidget(self.plus_stores_combo)
+            textLayout.addWidget(plusCoffeeslabel,3,0)
+            textLayout.addLayout(plusLine,3,1)            
+        else:
+            textLayoutPlusOffset = 0        
         textLayout.addWidget(titlelabel,2,0)
         textLayout.addLayout(titleLine,2,1)
-        textLayout.addWidget(beanslabel,3,0)
-        textLayout.addWidget(self.beansedit,3,1)        
-        textLayout.addWidget(operatorlabel,4,0)
+        textLayout.addWidget(beanslabel,3+textLayoutPlusOffset,0)
+        textLayout.addWidget(self.beansedit,3+textLayoutPlusOffset,1)        
+        textLayout.addWidget(operatorlabel,4+textLayoutPlusOffset,0)
+            
         roasteroperator = QHBoxLayout()
         roasteroperator.addWidget(self.operator, stretch=3)
         roasteroperator.addSpacing(15)
@@ -27530,7 +27683,7 @@ class editGraphDlg(ArtisanDialog):
         roasteroperator.addWidget(drumspeedlabel)
         roasteroperator.addSpacing(7)
         roasteroperator.addWidget(self.drumspeed,stretch=1)
-        textLayout.addLayout(roasteroperator,4,1)        
+        textLayout.addLayout(roasteroperator,4+textLayoutPlusOffset,1)        
         weightLayout = QHBoxLayout()
         weightLayout.setSpacing(0)
         weightLayout.addWidget(weightlabel)
@@ -27592,7 +27745,9 @@ class editGraphDlg(ArtisanDialog):
         densityLayout.addSpacing(15)
         densityLayout.addWidget(bean_size_label)
         densityLayout.addSpacing(10)
-        densityLayout.addWidget(self.bean_size_edit)
+        densityLayout.addWidget(self.bean_size_min_edit)
+        densityLayout.addWidget(bean_size_sep_label)
+        densityLayout.addWidget(self.bean_size_max_edit)
         densityLayout.addSpacing(5)
         densityLayout.addWidget(bean_size_unit_label)
         
@@ -27743,10 +27898,195 @@ class editGraphDlg(ArtisanDialog):
         self.setLayout(totallayout)
         self.titleedit.setFocus()
         
+#PLUS
+#        try:
+#            if aw.plus_account is not None:
+#                import plus.stock
+#                plus.stock.update()                
+#                QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
+#        except:
+#            pass
+        
+    def populatePlusCoffeeBlendCombos(self,storeIndex=None):
+        import plus.stock
+        
+        #---- Stores
+        
+        if storeIndex is None:
+            self.plus_stores = plus.stock.getStores() 
+            self.plus_stores_combo.blockSignals(True)       
+            self.plus_stores_combo.clear()
+            self.plus_stores_combo.addItems([""] + plus.stock.getStoreLabels(self.plus_stores))
+            p = plus.stock.getStorePosition(self.plus_default_store,self.plus_stores)
+            if p is None:
+                self.plus_stores_combo.setCurrentIndex(0)
+            else:
+                self.plus_stores_combo.setCurrentIndex(p+1)
+            self.plus_stores_combo.blockSignals(False)
+        
+        storeIdx = self.plus_stores_combo.currentIndex()
+        if storeIdx:
+            self.plus_default_store = plus.stock.getStoreId(self.plus_stores[storeIdx-1])
+        else:
+            self.plus_default_store = None
+                 
+        #---- Coffees
+        
+        self.plus_coffees = plus.stock.getCoffees(self.unitsComboBox.currentIndex(),self.plus_default_store)
+        self.plus_coffees_combo.blockSignals(True)  
+        self.plus_coffees_combo.clear()
+        self.plus_coffees_combo.addItems([""] + plus.stock.getCoffeesLabels(self.plus_coffees))        
+        
+        p = None
+        if self.plus_coffee_selected:
+            p = plus.stock.getCoffeeStockPosition(self.plus_coffee_selected,self.plus_store_selected,self.plus_coffees)            
+        if p is None:
+            self.plus_coffees_combo.setCurrentIndex(0)
+            if self.plus_blend_selected is None:
+                self.beansedit.setReadOnly(False)
+            self.plus_coffee_selected = None
+            self.plus_coffees_combo.blockSignals(False)
+        else:
+            # if roast is complete (charge and drop are set) 
+            if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6] > 0:
+                # we first change the index and then unblock signals to avoid properties being overwritten from the selected coffee
+                self.plus_coffees_combo.setCurrentIndex(p+1)
+                self.plus_coffees_combo.blockSignals(False)
+            else:
+                # if roast is not yet complete we unblock the signals before changing the index to get the coffee data be filled in
+                self.plus_coffees_combo.blockSignals(False)
+                self.plus_coffees_combo.setCurrentIndex(p+1)
+        
+        
+        #---- Blends  
+
+        self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store)
+        self.plus_blends_combo.blockSignals(True)  
+        self.plus_blends_combo.clear()
+        self.plus_blends_combo.addItems([""] + plus.stock.getBlendLabels(self.plus_blends))  
+ 
+        p = None
+        if self.plus_blend_selected:
+            p = plus.stock.getBlendStockPosition(self.plus_blend_selected,self.plus_store_selected,self.plus_blends)            
+        if p is None:
+            self.plus_blends_combo.setCurrentIndex(0)
+            if self.plus_coffee_selected is None:
+                self.beansedit.setReadOnly(False)
+            self.plus_blend_selected = None
+            self.plus_blends_combo.blockSignals(False)
+        else:
+            # if roast is complete (charge and drop are set) 
+            if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6] > 0:
+                # we first change the index and then unblock signals to avoid properties being overwritten from the selected blend
+                self.plus_blends_combo.setCurrentIndex(p+1)
+                self.plus_blends_combo.blockSignals(False)
+            else:
+                # if roast is not yet complete we unblock the signals before changing the index to get the blend data be filled in
+                self.plus_blends_combo.blockSignals(False)
+                self.plus_blends_combo.setCurrentIndex(p+1)                
+
+    def fillBlendData(self,blend):
+        import plus.stock
+        try:
+            if self.weightinedit.text() != "":
+                weightIn = float(str(self.weightinedit.text()))
+            else:
+                weightIn = 0.0
+            blend_lines = plus.stock.blend2beans(blend,self.unitsComboBox.currentIndex(),weightIn)
+            self.beansedit.clear()
+            for l in blend_lines:
+                self.beansedit.append(l)
+        except:
+            pass
+        
+    def fillCoffeeData(self,coffee):
+        import plus.stock
+        cd = plus.stock.getCoffeeCoffeeDict(coffee)
+        self.beansedit.setPlainText(plus.stock.coffee2beans(coffee))
+        if "moisture" in cd:
+            self.moisture_greens_edit.setText(str(cd["moisture"]))
+        else:
+            self.moisture_greens_edit.setText(str(0))
+        if "density" in cd:
+            self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index("g"))
+            self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index("ml"))
+            self.bean_density_weight_edit.setText(str(cd["density"]))
+            self.bean_density_volume_edit.setText(str(1.0)) 
+        else:
+            self.bean_density_weight_edit.setText(str(0)) 
+        if "screen_size" in cd:
+            screen = cd["screen_size"]
+            if "min" in screen:
+                self.bean_size_min_edit.setText(str(screen["min"]))
+            else:
+                self.bean_size_min_edit.setText("0")
+            if "max" in screen:
+                self.bean_size_max_edit.setText(str(screen["max"]))
+            else:
+                self.bean_size_max_edit.setText("0")
+        else:
+            self.bean_size_min_edit.setText("0")
+            self.bean_size_max_edit.setText("0")
+        self.standard_density()  
+        self.beansedit.setReadOnly(True)
+        
+    def defaultCoffeeData(self):
+        self.beansedit.setPlainText("")
+        self.beansedit.setReadOnly(False)
+        self.moisture_greens_edit.setText(str(0))
+        self.bean_density_weight_edit.setText(str(0))
+        self.standard_density()
+        self.bean_size_min_edit.setText("0")
+        self.bean_size_max_edit.setText("0")
+                    
+    def storeSelectionChanged(self,n):
+        if n != -1:
+            self.populatePlusCoffeeBlendCombos(n)
+
+    def coffeeSelectionChanged(self,n):
+        import plus.stock
+        if n < 1:
+            self.defaultCoffeeData()
+            self.plus_store_selected = None
+            self.plus_coffee_selected = None
+            self.plus_amount_selected = None
+        else:
+            self.plus_blends_combo.setCurrentIndex(0)
+            selected_coffee = self.plus_coffees[n-1]
+            self.plus_store_selected = plus.stock.getCoffeeStockDict(selected_coffee)["location_hr_id"]
+            self.plus_coffee_selected = plus.stock.getCoffeeCoffeeDict(selected_coffee)["hr_id"]
+            self.plus_blend_selected = None
+            if "amount" in plus.stock.getCoffeeStockDict(selected_coffee):
+                self.plus_amount_selected = plus.stock.getCoffeeStockDict(selected_coffee)["amount"]
+            else:
+                self.pus_amount_selected = None
+            self.fillCoffeeData(selected_coffee)
+        self.checkWeightIn()
+
+    def blendSelectionChanged(self,n):
+        import plus.stock
+        if n < 1:
+            self.defaultCoffeeData()
+            self.plus_store_selected = None
+            self.plus_blend_selected = None
+            self.pus_amount_selected = None
+        else:
+            self.plus_coffees_combo.setCurrentIndex(0)
+            selected_blend = self.plus_blends[n-1]
+            self.plus_store_selected = plus.stock.getBlendStockDict(selected_blend)["location_hr_id"]
+            self.plus_coffee_selected = None
+            self.plus_blend_selected = plus.stock.getBlendBlendDict(selected_blend)["hr_id"]
+            if "amount" in plus.stock.getBlendStockDict(selected_blend):
+                self.plus_amount_selected = plus.stock.getBlendMaxAmount(selected_blend)
+            else:
+                self.pus_amount_selected = None
+            self.fillBlendData(selected_blend)
+        self.checkWeightIn()
+        
     def recentRoastActivated(self,n):
         # note, the first item is the edited text!
         if n > 0 and n <= len(aw.recentRoasts):
-            rr = aw.recentRoasts[n-1]
+            rr = aw.recentRoasts[n-1]            
             self.titleedit.textEdited(rr["title"])
             self.titleedit.setEditText(rr["title"])
             self.unitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["weightUnit"]))
@@ -27761,24 +28101,54 @@ class editGraphDlg(ArtisanDialog):
             self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(rr["densityWeightUnit"]))
             self.bean_density_volume_edit.setText(str(rr["densityVolume"]))
             self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index(rr["densityVolumeUnit"]))
-            self.bean_size_edit.setText(str(rr["beanSize"]))
             self.moisture_greens_edit.setText(str(rr["moistureGreen"]))
             self.moisture_roasted_edit.setText(str(rr["moistureRoasted"]))
             self.whole_color_edit.setText(str(rr["wholeColor"]))
             self.ground_color_edit.setText(str(rr["groundColor"]))
             self.colorSystemComboBox.setCurrentIndex(rr["colorSystem"])
+            # items added in v1.4 might not be in the data set of previous stored recent roasts
+            if "beanSize_min" in rr:
+                self.bean_size_min_edit.setText(str(rr["beanSize_min"]))
+            if "beanSize_max" in rr:
+                self.bean_size_max_edit.setText(str(rr["beanSize_max"]))
             # Note: the background profile will not be changed if recent roast is activated from Roast Properties
+            
+#PLUS            
+#            if aw.plus_account is not None and "plus_account" in rr and aw.plus_account == rr["plus_account"]:
+#                if "plus_store" in rr:
+#                    self.plus_store_selected = rr["plus_store"]
+#                if "plus_coffee" in rr:
+#                    self.plus_coffee_selected = rr["plus_coffee"]
+#                if "plus_store" in rr:
+#                    self.plus_blend_selected = rr["plus_blend"]
+#                if self.plus_store_selected is not None and self.plus_default_store is not None and self.plus_default_store != self.plus_store_selected:
+#                    self.plus_default_store = None # we reset the defaultstore                                    
+#                # we now set the actual values from the stock
+#                self.populatePlusCoffeeBlendCombos()
+
+        self.recentRoastEnabled()
         
+    def recentRoastEnabled(self):
+        try:
+            title = u(self.titleedit.currentText())
+            weightIn = float(str(self.weightinedit.text()))
+            # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
+            if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
+                # enable "+" addRecentRoast button
+                self.addRecentButton.setEnabled(True)
+            else:
+                self.addRecentButton.setEnabled(False)
+        except:
+            self.addRecentButton.setEnabled(False)
+        
+    
     def addRecentRoast(self):
         try:
             title = u(self.titleedit.currentText())
-            if self.weightinedit.text() != "":
-                weightIn = float(str(self.weightinedit.text()))
-            else:
-                weightIn = 0.0
-            beans = u(self.beansedit.toPlainText())
+            weightIn = float(str(self.weightinedit.text()))
             # add new recent roast entry only if title is not default, beans is not empty and weight-in is not 0
             if title != QApplication.translate("Scope Title", "Roaster Scope",None) and weightIn != 0:
+                beans = u(self.beansedit.toPlainText())
                 if self.weightoutedit.text() != "":
                     weightOut = float(str(self.weightoutedit.text()))
                 else:
@@ -27803,10 +28173,14 @@ class editGraphDlg(ArtisanDialog):
                 else:
                     densityVolume = 0.0
                 densityVolumeUnit = u(self.bean_density_volumeUnitsComboBox.currentText())
-                if self.bean_size_edit.text() != "":
-                    beanSize = float(str(self.bean_size_edit.text()))
+                if self.bean_size_min_edit.text() != "":
+                    beanSize_min = float(str(self.bean_size_min_edit.text()))
                 else:
-                    beanSize = 0.0
+                    beanSize_min = 0.0
+                if self.bean_size_max_edit.text() != "":
+                    beanSize_max = float(str(self.bean_size_max_edit.text()))
+                else:
+                    beanSize_max = 0.0  
                 if self.moisture_greens_edit.text() != "":
                     moistureGreen = float(self.moisture_greens_edit.text())
                 else:
@@ -27823,8 +28197,7 @@ class editGraphDlg(ArtisanDialog):
                     groundColor = int(str(self.ground_color_edit.text()))
                 else:
                     groundColor = 0
-                colorSystem = self.colorSystemComboBox.currentIndex()
-                background = aw.qmc.backgroundpath
+                colorSystem = self.colorSystemComboBox.currentIndex()                      
                 rr = aw.createRecentRoast(
                     title,
                     beans,
@@ -27838,13 +28211,19 @@ class editGraphDlg(ArtisanDialog):
                     densityWeightUnit,
                     densityVolume,
                     densityVolumeUnit, 
-                    beanSize,
+                    beanSize_min,
+                    beanSize_max,
                     moistureGreen,
                     moistureRoasted,
                     wholeColor,
                     groundColor,
                     colorSystem,
-                    background
+                    aw.qmc.backgroundpath,
+                    aw.qmc.backgroundUUID,
+                    aw.plus_account,
+                    self.plus_store_selected,
+                    self.plus_coffee_selected, 
+                    self.plus_blend_selected
                     )
                 aw.addRecentRoast(rr)
         except Exception as e:
@@ -27894,12 +28273,12 @@ class editGraphDlg(ArtisanDialog):
                     dv = dv / 1000.0
                 d = dw / dv
                 w = self.weightinedit.text()
-                if self.unitsComboBox.currentIndex() == 1:
-                    w = w * 1000.0
                 if d and d != "" and w and w != "":
                     # calculate in-volume from density and weight
                     d = float(d)
                     w = float(w)
+                    if self.unitsComboBox.currentIndex() == 1:
+                        w = w * 1000.0
                     res = self.calc_volume(d,w)
                     if self.volumeUnitsComboBox.currentIndex() == 1:
                         res = res / 1000.0
@@ -28445,9 +28824,29 @@ class editGraphDlg(ArtisanDialog):
         self.percent()
         self.calculated_density()
 
+    def checkWeightIn(self):
+        enough = True        
+        if self.plus_amount_selected is not None:
+            weightIn = 0.0
+            try:
+                weightIn = float(str(self.weightinedit.text()))
+                # convert weight to kg
+                wc = aw.convertWeight(weightIn,aw.qmc.weight_units.index(self.unitsComboBox.currentText()),aw.qmc.weight_units.index("Kg"))
+                if wc > self.plus_amount_selected:
+                    enough = False 
+            except:
+                pass       
+        if enough:
+            self.weightinedit.setStyleSheet("""QLineEdit { color: black }""")
+        else:
+            self.weightinedit.setStyleSheet("""QLineEdit { color: red }""")
+        
     def weightineditChanged(self):
         self.percent()
         self.calculated_density()
+        self.recentRoastEnabled()
+        if aw.plus_account is not None:
+            self.checkWeightIn()
         
     def percent(self):
         percent = 0.
@@ -28513,6 +28912,13 @@ class editGraphDlg(ArtisanDialog):
             self.calculateddensitylabel.setText("")
             self.tab1aLayout.removeWidget(self.calculateddensitylabel)
         self.calculated_organic_loss()
+#PLUS
+#        try:
+#            # weight unit changed, we update the coffee/blend lists in plus mode
+#            if aw.plus_account is not None:
+#                self.populatePlusCoffeeBlendCombos(self.plus_stores_combo.currentIndex())
+#        except:
+#            pass
             
     def calc_organic_loss(self):
         wloss = 0. # weight (moisture + organic)
@@ -28559,7 +28965,7 @@ class editGraphDlg(ArtisanDialog):
             self.standarddensitylabel.setText(QApplication.translate("Label","({0}g/l)", None).format(aw.float2float(weight / volume,0)))
         else:
             self.standarddensitylabel.setText("")
-
+                
     def accept(self):
         #check for graph
         if len(aw.qmc.timex):
@@ -28654,6 +29060,15 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.title = u(self.titleedit.currentText())
         aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
         aw.qmc.container_idx = self.tareComboBox.currentIndex() - 3
+
+#PLUS        
+#        # Update Plus
+#        if aw.plus_account is not None:
+#            aw.qmc.plus_default_store = self.plus_default_store
+#            aw.qmc.plus_store = self.plus_store_selected
+#            aw.qmc.plus_coffee = self.plus_coffee_selected
+#            aw.qmc.plus_blend = self.plus_blend_selected
+        
         # Update beans
         aw.qmc.beans = u(self.beansedit.toPlainText())
         #update ambient temperature source
@@ -28690,10 +29105,18 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.density[2] = 0
         aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
         #update bean size
+#        try:
+#            aw.qmc.beansize = float(str(self.bean_size_edit.text()))
+#        except Exception:
+#            aw.qmc.beansize = 0.0
         try:
-            aw.qmc.beansize = float(str(self.bean_size_edit.text()))
+            aw.qmc.beansize_min = int(str(self.bean_size_min_edit.text()))
         except Exception:
-            aw.qmc.beansize = 0.0
+            aw.qmc.beansize_min = 0
+        try:
+            aw.qmc.beansize_max = int(str(self.bean_size_max_edit.text()))
+        except Exception:
+            aw.qmc.beansize_max = 0
         #update roastflags
         aw.qmc.heavyFC_flag = self.heavyFC.isChecked()
         aw.qmc.lowFC_flag = self.lowFC.isChecked()
@@ -41839,7 +42262,7 @@ class graphColorDlg(ArtisanDialog):
         self.titleLabel =QLabel(aw.qmc.palette["title"])
         self.titleLabel.setPalette(QPalette(QColor(aw.qmc.palette["title"])))
         self.titleLabel.setAutoFillBackground(True)
-        self.titleButton = QPushButton(QApplication.translate("Button","Title", None))
+        self.titleButton = QPushButton(QApplication.translate("Label","Title", None))
         self.titleButton.setFocusPolicy(Qt.NoFocus)
         self.titleLabel.setFrameStyle(frameStyle)
         self.titleButton.clicked.connect(lambda _: self.setColor("Title",self.titleLabel,"title"))

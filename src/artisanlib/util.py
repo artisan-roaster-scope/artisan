@@ -1,9 +1,7 @@
 import imp
-import sys
 import platform
 import sys
 import codecs
-import binascii
 
 def appFrozen():
     ib = False

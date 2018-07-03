@@ -185,10 +185,10 @@ class AillioR1:
         if d > 9:
             d = 9
         if h > value:
-            for i in range(d):
+            for _ in range(d):
                 self.parent_pipe.send(self.AILLIO_CMD_HEATER_DECR)
         else:
-            for i in range(d):
+            for _ in range(d):
                 self.parent_pipe.send(self.AILLIO_CMD_HEATER_INCR)
         self.heater = value
         
@@ -206,10 +206,10 @@ class AillioR1:
         if d > 11:
             d = 11
         if f > value:
-            for i in range(0, d):
+            for _ in range(0, d):
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_DECR)
         else:
-            for i in range(0, d):
+            for _ in range(0, d):
                 self.parent_pipe.send(self.AILLIO_CMD_FAN_INCR)
         self.fan = value
         

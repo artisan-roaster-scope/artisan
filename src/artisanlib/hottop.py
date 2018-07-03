@@ -5,8 +5,6 @@ from ctypes import c_bool, c_double
 import serial
 
 import time
-import sys
-import binascii
 
 process = None
 control = False # Hottop under control?

@@ -419,7 +419,7 @@ class modbusport(object):
                 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     def readFloat(self,slave,register,code=3):
-        from pymodbus.pdu import ExceptionResponse
+        r = None
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -430,7 +430,6 @@ class modbusport(object):
                     res = self.master.read_holding_registers(int(register),2,unit=int(slave))
                 else:
                     res = self.master.read_input_registers(int(register),2,unit=int(slave))
-#                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,Exception):
                 if res is None or res.isError(): # requires pymodbus v1.5.1
                     if retry > 0:
                         retry = retry - 1
@@ -457,11 +456,15 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-            self.addserial("MODBUS readFloat :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
-
+            ser_str = "MODBUS readFloat :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code)
+            if r is not None:
+                ser_str = ser_str + " || Rx = " + str(r)
+            self.addserial(ser_str)
+            
+            
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     def readBCD(self,slave,register,code=3):
-        from pymodbus.pdu import ExceptionResponse
+        r = None
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -472,7 +475,6 @@ class modbusport(object):
                     res = self.master.read_holding_registers(int(register),1,unit=int(slave))
                 else:
                     res = self.master.read_input_registers(int(register),1,unit=int(slave))
-#                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,Exception):
                 if res is None or res.isError(): # requires pymodbus v1.5.1
                     if retry > 0:
                         retry = retry - 1
@@ -500,13 +502,14 @@ class modbusport(object):
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
             settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-            self.addserial("MODBUS readBCD :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
-
+            ser_str = "MODBUS readBCD :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code)
+            if r is not None:
+                ser_str = ser_str + " || Rx = " + str(r)
+            self.addserial(ser_str)
 
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore!
     def peekSingleRegister(self,slave,register,code=3):
-        from pymodbus.pdu import ExceptionResponse
         try:
             if code==1:
                 res = self.master.read_coils(int(register),1,unit=int(slave))
@@ -518,7 +521,6 @@ class modbusport(object):
                 res = self.master.read_holding_registers(int(register),1,unit=int(slave))
         except Exception:
             res = None
-#        if res is not None and not isinstance(res,ExceptionResponse) and not isinstance(res,Exception):
         if res is not None and not res.isError(): # requires pymodbus v1.5.1
             if code in [1,2]:
                 if res is not None and res.bits[0]:
@@ -537,11 +539,11 @@ class modbusport(object):
     # function 3 (Read Multiple Holding Registers) and 
     # function 4 (Read Input Registers)
     def readSingleRegister(self,slave,register,code=3):
-        from pymodbus.pdu import ExceptionResponse
 #        import logging
 #        logging.basicConfig()
 #        log = logging.getLogger()
 #        log.setLevel(logging.DEBUG)
+        r = None
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -559,7 +561,6 @@ class modbusport(object):
                         res = self.master.read_holding_registers(int(register),1,unit=int(slave))
                 except Exception:
                     res = None
-#                if res is None or isinstance(res,ExceptionResponse) or isinstance(res,Exception):
                 if res is None or res.isError(): # requires pymodbus v1.5.1
                     if retry > 0:
                         retry = retry - 1
@@ -570,9 +571,10 @@ class modbusport(object):
                     break
             if code in [1,2]:
                 if res is not None and res.bits[0]:
-                    return 1
+                    r = 1
                 else:
-                    return 0                
+                    r = 0
+                return r
             else:
                 decoder = getBinaryPayloadDecoderFromRegisters(res.registers, self.byteorderLittle, self.wordorderLittle)
                 r = decoder.decode_16bit_uint()
@@ -592,8 +594,11 @@ class modbusport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             #note: logged chars should be unicode not binary
-            settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-            self.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
+            settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)            
+            ser_str = "MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code)
+            if r is not None:
+                ser_str = ser_str + " || Rx = " + str(r)
+            self.addserial(ser_str)
 
 
     def setTarget(self,sv):
