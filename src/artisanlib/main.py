@@ -1039,10 +1039,11 @@ class tgraphcanvas(FigureCanvas):
         #read and plot on/off flag
         self.flagon = False  # Artisan turned on
         self.flagstart = False # Artisan logging
+        self.flagKeepON = False # turn Artisan ON again after pressing OFF during recording
         self.flagsampling = False # if True, Artisan is still in the sampling phase and one has to wait for its end to turn OFF
         self.flagsamplingthreadrunning = False
         #log flag that tells to log ET when using device 18 (manual mode)
-        self.manuallogETflag = 0
+        self.manuallogETflag = 0        
         
         self.zoom_follow = False # if True, Artisan "follows" BT in the center by panning during recording. Activated via a click on the ZOOM icon while ZOOM is active
         
@@ -6132,7 +6133,8 @@ class tgraphcanvas(FigureCanvas):
             if self.HUDflag:
                 self.toggleHUD()
             # stop Recorder if still running
-            if self.flagstart:
+            recording = self.flagstart
+            if recording:
                 self.OffRecorder()
             self.flagon = False
             # now wait until the current sampling round is done
@@ -6185,6 +6187,8 @@ class tgraphcanvas(FigureCanvas):
             #appnope.nap()
             aw.eventactionx(aw.qmc.extrabuttonactions[1],aw.qmc.extrabuttonactionstrings[1])
             QApplication.processEvents()
+            if recording and self.flagKeepON:
+                self.OnMonitor()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -8723,7 +8727,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             return
 
-                        dryramp = self.temp2[self.timeindex[1]] - self.temp2[self.timeindex[0]]
+#                        dryramp = self.temp2[self.timeindex[1]] - self.temp2[self.timeindex[0]] # ML: unused
                         midramp = self.temp2[self.timeindex[2]] - self.temp2[self.timeindex[1]]
                         finishramp = self.temp2[self.timeindex[6]] - self.temp2[self.timeindex[2]]
 
@@ -18281,6 +18285,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Oversampling"):
                 self.qmc.oversampling = bool(toBool(settings.value("Oversampling",self.qmc.oversampling)))
                 aw.oversamplingAction.setChecked(aw.qmc.oversampling)
+            # restore keepON flag
+            if settings.contains("KeepON"):
+                self.qmc.flagKeepON = bool(toBool(settings.value("KeepON",self.qmc.flagKeepON)))
             # restore extra event sampling interval
             if settings.contains("ExtraEventSamplingDelay"):
                 self.qmc.extra_event_sampling_delay = toInt(settings.value("ExtraEventSamplingDelay",int(self.qmc.extra_event_sampling_delay)))
@@ -19656,6 +19663,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Delay",self.qmc.delay)
             # save oversampling
             settings.setValue("Oversampling",self.qmc.oversampling)
+            # save keepON flag
+            settings.setValue("KeepON",self.qmc.flagKeepON)
             # save extra event sampling interval
             settings.setValue("ExtraEventSamplingDelay",self.qmc.extra_event_sampling_delay)
             #save colors
@@ -22685,18 +22694,23 @@ class ApplicationWindow(QMainWindow):
             "Oversampling is only active with a sampling interval equal or larger than 3s.",None))
 
 
+#    def calibratedelay(self):
+#        secondsdelay, ok = QInputDialog.getDouble(self,
+#                QApplication.translate("Message", "Sampling Interval",None),
+#                QApplication.translate("Message", "Seconds",None),
+#                #calSpinBox.value(),
+#                self.qmc.delay/1000.,
+#                aw.qmc.min_delay/1000.,30.)
+#           
+#        if ok:
+#            self.qmc.delay = int(secondsdelay*1000.)
+#            if self.qmc.delay < self.qmc.default_delay:
+#                QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))
+               
     def calibratedelay(self):
-        secondsdelay, ok = QInputDialog.getDouble(self,
-                QApplication.translate("Message", "Sampling Interval",None),
-                QApplication.translate("Message", "Seconds",None),
-                #calSpinBox.value(),
-                self.qmc.delay/1000.,
-                aw.qmc.min_delay/1000.,30.)
-           
-        if ok:
-            self.qmc.delay = int(secondsdelay*1000.)
-            if self.qmc.delay < self.qmc.default_delay:
-                QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))
+        samplingDl = SamplingDlg(self)
+        samplingDl.show()
+        samplingDl.setFixedSize(samplingDl.size())                        
 
     def setcommport(self):
         dialog = comportDlg(self)
@@ -24643,7 +24657,72 @@ class ArtisanMessageBox(QMessageBox):
         if (self.currentTime >= self.timeout):
             self.done(0)
 
+            
+##########################################################################
+#####################     SAMPLING DLG     ###############################
+##########################################################################
+
+class SamplingDlg(ArtisanDialog):
+    def __init__(self, parent = None):
+        super(SamplingDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Message","Sampling Interval", None))
+        self.setModal(True)
         
+        self.keepOnFlag = QCheckBox(QApplication.translate("Label","Keep ON", None))
+        self.keepOnFlag.setFocusPolicy(Qt.NoFocus)
+        self.keepOnFlag.setChecked(bool(aw.qmc.flagKeepON))
+        
+        self.interval = QDoubleSpinBox()
+        self.interval.setSingleStep(1)
+        self.interval.setValue(aw.qmc.delay/1000.)
+        self.interval.setRange(aw.qmc.min_delay/1000.,40.)
+        self.interval.setDecimals(1)
+        self.interval.setAlignment(Qt.AlignRight)
+        self.interval.setSuffix("s")
+        
+        okButton = QPushButton(QApplication.translate("Button","OK",None))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
+        cancelButton.setFocusPolicy(Qt.NoFocus)
+        cancelButton.clicked.connect(lambda _:self.close())
+        okButton.clicked.connect(lambda _:self.ok()) 
+        
+        flagLayout = QHBoxLayout()
+        flagLayout.addStretch()
+        flagLayout.addWidget(self.keepOnFlag)  
+        flagLayout.addStretch()      
+        buttonsLayout = QHBoxLayout()        
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(cancelButton)
+        buttonsLayout.addWidget(okButton)
+        
+        #incorporate layouts
+        layout = QVBoxLayout()
+        layout.addWidget(self.interval)
+        layout.addLayout(flagLayout)
+        layout.addStretch()
+        layout.addLayout(buttonsLayout)
+        layout.setSizeConstraint(QLayout.SetFixedSize)
+        self.setLayout(layout)         
+        
+    def closeEvent(self,_):
+        self.close()
+        
+    #cancel button
+    def close(self):
+        self.reject()
+    
+    #ok button
+    def ok(self):
+        if self.keepOnFlag.isChecked():
+            aw.qmc.flagKeepON = True
+        else:
+            aw.qmc.flagKeepON = False
+        aw.qmc.delay = int(self.interval.value()*1000.)
+        if aw.qmc.delay < aw.qmc.default_delay:
+            QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None))        
+        self.accept()
+        
+    
 ##########################################################################
 #####################     EXTRAS/HUD  EDIT DLG     #######################
 ##########################################################################
@@ -32752,7 +32831,7 @@ class phasesGraphDlg(ArtisanDialog):
         finishEspressoLabel = QLabel(QApplication.translate("Label", "Finishing",None))
         minfEspresso = QLabel(QApplication.translate("Label", "min",None))
         maxfEspresso = QLabel(QApplication.translate("Label", "max",None))
-        lcdmodeEspresso = QLabel(QApplication.translate("Label", "LCDs Mode",None))  #dave45
+#        lcdmodeEspresso = QLabel(QApplication.translate("Label", "LCDs Mode",None))  #dave45 #ML: unused
 
         self.startdryEspresso = QSpinBox()
         self.startdryEspresso.setAlignment(Qt.AlignRight)
