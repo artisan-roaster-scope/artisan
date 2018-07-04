@@ -7,6 +7,9 @@ set -ex
 brew update
 brew upgrade pyenv
 pyenv install 3.6.5
+pyenv local 3.6.5
+export PATH="/shims:$PATH"
+eval "$(pyenv init -)"
 #
 brew install p7zip
 #curl -L -O https://download.qt.io/archive/qt/5.10/5.10.0/single/qt-everywhere-src-5.10.0.tar.xz
