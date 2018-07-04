@@ -4,7 +4,8 @@ set -ex
 
 
 if [ ! -z $TRAVIS ]; then
-    export PYTHON=/usr/local
+#    export PYTHON=/usr/local
+    export PYTHON=~/.pyenv/versions/3.6.5
     export PYTHONPATH=$PYTHON/lib/python3.6
     export PYTHON_V=3.6
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
