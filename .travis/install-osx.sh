@@ -5,7 +5,7 @@ set -ex
 #brew upgrade python
 #ML: force the installation of Python 3.5.6 instead
 brew update
-brew install pyenv
+brew upgrade pyenv
 pyenv install 3.6.5
 #
 brew install p7zip
