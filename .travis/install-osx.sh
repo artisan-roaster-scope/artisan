@@ -1,7 +1,13 @@
 #!/bin/sh
 
 set -ex
-brew upgrade python
+#ML: brew upgrade python installs now python3.7 which fails in numpy/scipy => commented
+#brew upgrade python
+#ML: force the installation of Python 3.5.6 instead
+brew update
+brew install pyenv
+pyenv install 3.6.5
+#
 brew install p7zip
 #curl -L -O https://download.qt.io/archive/qt/5.10/5.10.0/single/qt-everywhere-src-5.10.0.tar.xz
 #tar xzf qt-everywhere-src-5.10.0.tar.xz
