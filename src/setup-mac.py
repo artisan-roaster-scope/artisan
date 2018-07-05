@@ -19,7 +19,7 @@ import sys, os
 from setuptools import setup
 
 import string
-from plistlib import Plist
+import plistlib
 
 import artisanlib
 
@@ -101,20 +101,23 @@ DATA_FILES = [
     ("../Resources", [r"includes/Themes"]),
   ]
   
-plist = Plist.fromFile('Info.plist')
-plist.update({ 'CFBundleDisplayName': 'Artisan',
-                    'CFBundleGetInfoString': 'Artisan, Roast Logger',
-                    'CFBundleIdentifier': 'com.google.code.p.Artisan',
-                    'CFBundleShortVersionString': VERSION,
-                    'CFBundleVersion': 'Artisan ' + VERSION,
-                    'LSMinimumSystemVersion': '10.10',
-                    'LSMultipleInstancesProhibited': 'false',
-                    'LSPrefersPPC': False,
-                    'LSArchitecturePriority': 'x86_64',
-                    'NSHumanReadableCopyright': LICENSE,
-                    'NSHighResolutionCapable': True,
-                })
-                
+with open('Info.plist', 'r+b') as fp:
+    plist = plistlib.load(fp)
+    plist['CFBundleDisplayName'] = 'Artisan'
+    plist['CFBundleGetInfoString'] = 'Artisan, Roast Logger'
+    plist['CFBundleIdentifier'] = 'com.google.code.p.Artisan'
+    plist['CFBundleShortVersionString'] = VERSION
+    plist['CFBundleVersion'] = 'Artisan ' + VERSION
+    plist['LSMinimumSystemVersion'] = '10.13'
+    plist['LSMultipleInstancesProhibited'] = 'false'
+    plist['LSPrefersPPC'] = False,
+    plist['LSArchitecturePriority'] = 'x86_64',
+    plist['NSHumanReadableCopyright'] = LICENSE
+    plist['NSHighResolutionCapable'] = True
+    fp.seek(0, os.SEEK_SET)
+    fp.truncate()
+    plistlib.dump(plist, fp)
+
 OPTIONS = {
     'strip':True,
     'argv_emulation': False, # this would confuses GUI processing
