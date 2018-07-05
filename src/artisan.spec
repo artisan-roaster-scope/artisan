@@ -41,22 +41,22 @@ exe = EXE(pyz,
 # prepare Info.plist
 import artisanlib
 import string
-from plistlib import Plist
+import plistlib
 VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
-plist = Plist.fromFile('Info.plist')
-plist.update({ 'CFBundleDisplayName': 'Artisan',
-                    'CFBundleGetInfoString': 'Artisan, Roast Logger',
-                    'CFBundleIdentifier': 'com.google.code.p.Artisan',
-                    'CFBundleShortVersionString': VERSION,
-                    'CFBundleVersion': 'Artisan ' + VERSION,
-                    'LSMinimumSystemVersion': '10.13',
-                    'LSMultipleInstancesProhibited': 'false',
-                    'LSPrefersPPC': False,
-                    'LSArchitecturePriority': 'x86_64',
-                    'NSHumanReadableCopyright': LICENSE,
-                })
-
+with open('Info.plist', 'r+b') as fp:
+    plist = plistlib.load(fp)
+    plist['CFBundleDisplayName'] = 'Artisan'
+    plist['CFBundleGetInfoString'] = 'Artisan, Roast Logger'
+    plist['CFBundleIdentifier'] = 'com.google.code.p.Artisan'
+    plist['CFBundleShortVersionString'] = VERSION
+    plist['CFBundleVersion'] = 'Artisan ' + VERSION
+    plist['LSMinimumSystemVersion'] = '10.13'
+    plist['LSMultipleInstancesProhibited'] = 'false'
+    plist['LSPrefersPPC'] = False,
+    plist['LSArchitecturePriority'] = 'x86_64',
+    plist['NSHumanReadableCopyright'] = LICENSE
+    plistlib.dump(plist, fp)
 
 app = BUNDLE(exe,
           name='Artisan.app',
