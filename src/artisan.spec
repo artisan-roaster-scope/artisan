@@ -56,6 +56,8 @@ with open('Info.plist', 'r+b') as fp:
     plist['LSPrefersPPC'] = False,
     plist['LSArchitecturePriority'] = 'x86_64',
     plist['NSHumanReadableCopyright'] = LICENSE
+    fp.seek(0, os.SEEK_SET)
+    fp.truncate()
     plistlib.dump(plist, fp)
 
 app = BUNDLE(exe,
