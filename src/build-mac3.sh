@@ -5,14 +5,14 @@ set -ex
 
 if [ ! -z $TRAVIS ]; then
     export PYTHON=/usr/local
-    export PYTHONPATH=$PYTHON/lib/python3.7
-    export PYTHON_V=3.7
+    export PYTHONPATH=$PYTHON/lib/python3.6
+    export PYTHON_V=3.6
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export MACOSX_DEPLOYMENT_TARGET=10.13
 else
-    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.7
-    export PYTHONPATH=$PYTHON/lib/python3.7
-    export PYTHON_V=3.7
+    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.6
+    export PYTHONPATH=$PYTHON/lib/python3.6
+    export PYTHON_V=3.6
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export MACOSX_DEPLOYMENT_TARGET=10.13
 fi
