@@ -18,6 +18,7 @@ matrix:
     env:
       ARTISAN_OS=rpi
   - os: osx
+    python: 3.6
     language: generic
     cache:
       - pip
