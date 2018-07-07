@@ -15691,12 +15691,13 @@ class ApplicationWindow(QMainWindow):
 
     def newRoast(self):
         #####################################
-        #IF there is an ongoing roast (if ON):
+        #IF there is an ongoing roast (if START):
         #   (this block allows batch processing using the autosave feature)
         #   if no CHARGE found:
         #       return
         #   if no DROP found:
-        #       use last data point as DROP (mark DROP)
+        #       #use last data point as DROP (mark DROP)
+        #       return
         #   stop recording
         #   if there is an autosave path (from autosafe config) AND the autosave flag is ON:
         #       create filename using the autosavepath and date+time
@@ -15718,7 +15719,9 @@ class ApplicationWindow(QMainWindow):
                 return
             #mark drop if not yet done
             if self.qmc.timeindex[6] == 0:
-                self.qmc.markDrop()
+#                self.qmc.markDrop()
+                self.sendmessage(QApplication.translate("Message","No profile found", None))
+                return
             #invoke "OFF"
             self.qmc.OffMonitor()
 
