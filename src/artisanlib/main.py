@@ -14851,16 +14851,31 @@ class ApplicationWindow(QMainWindow):
             self.showLCDs()
 
     def updateSlidersProperties(self):
-        # update slider properties
-        aw.sliderGrpBox1.setVisible(bool(aw.eventslidervisibilities[0]))
-        aw.sliderGrpBox2.setVisible(bool(aw.eventslidervisibilities[1]))
-        aw.sliderGrpBox3.setVisible(bool(aw.eventslidervisibilities[2]))
-        aw.sliderGrpBox4.setVisible(bool(aw.eventslidervisibilities[3]))
-        # update event type names
-        aw.sliderGrpBox1.setTitle(aw.qmc.etypesf(0))
-        aw.sliderGrpBox2.setTitle(aw.qmc.etypesf(1))
-        aw.sliderGrpBox3.setTitle(aw.qmc.etypesf(2))
-        aw.sliderGrpBox4.setTitle(aw.qmc.etypesf(3))
+        # update slider properties and event type names
+        if bool(aw.eventslidervisibilities[0]):
+            aw.sliderGrpBox1.setVisible(True)
+            aw.sliderGrpBox1.setTitle(aw.qmc.etypesf(0))
+        else:
+            aw.sliderGrpBox1.setVisible(False)
+            aw.sliderGrpBox1.setTitle(None)
+        if bool(aw.eventslidervisibilities[1]):
+            aw.sliderGrpBox2.setVisible(True)
+            aw.sliderGrpBox2.setTitle(aw.qmc.etypesf(1))
+        else:
+            aw.sliderGrpBox2.setVisible(False)
+            aw.sliderGrpBox2.setTitle(None)
+        if bool(aw.eventslidervisibilities[2]):
+            aw.sliderGrpBox3.setVisible(True)
+            aw.sliderGrpBox3.setTitle(aw.qmc.etypesf(2))
+        else:
+            aw.sliderGrpBox3.setVisible(False)
+            aw.sliderGrpBox3.setTitle(None)
+        if bool(aw.eventslidervisibilities[3]):
+            aw.sliderGrpBox4.setVisible(True)
+            aw.sliderGrpBox4.setTitle(aw.qmc.etypesf(3))
+        else:
+            aw.sliderGrpBox4.setVisible(False)
+            aw.sliderGrpBox4.setTitle(None)
 
     def hideLCDs(self):
         self.lcdFrame.setVisible(False)
