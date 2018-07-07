@@ -17,7 +17,7 @@ else
     export MACOSX_DEPLOYMENT_TARGET=10.13
 fi
 
-export PATH=$PYTHON/bin:$PYTHON:$PYTHON/lib:/lib:$PATH
+export PATH=$PYTHON/bin:$PYTHON:/lib:$PATH
 export PATH=$QT_PATH/bin:$QT_PATH/lib:$PATH
 export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 export DYLD_LIBRARY_PATH=$PYTHON/lib/:$PYTHON/lib/python$PYTHON_V/site-packages/PIL/.dylibs/:$DYLD_LIBRARY_PATH
