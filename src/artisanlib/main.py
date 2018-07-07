@@ -502,16 +502,6 @@ def __dependencies_for_freezing():
     
     # for gevent bundling
     from gevent import core, resolver_thread, resolver_ares, socket, threadpool, thread, threading, select, subprocess, pywsgi, server, hub # @UnusedImport @Reimport 
-    
-    # keyring
-    import keyring.backends.fail
-    import keyring.backends.kwallet
-    import keyring.backends.OS_X
-    import keyring.backends.SecretService
-    import keyring.backends.Windows
-    import keyring
-    # ssl
-    import ssl # @UnusedImport
 
 del __dependencies_for_freezing
 
@@ -7011,13 +7001,13 @@ class tgraphcanvas(FigureCanvas):
                         except Exception:
                             pass
 #PLUS
-#                        # add to out-queue
-#                        try:
-#                            if aw.plus_account is not None:
-#                                import plus.queue
-#                                plus.queue.addRoast()
-#                        except:
-#                            pass
+                        # add to out-queue
+                        try:
+                            if aw.plus_account is not None:
+                                import plus.queue
+                                plus.queue.addRoast()
+                        except:
+                            pass
 
             else:
                 message = QApplication.translate("Message","Scope is OFF", None)
@@ -8014,7 +8004,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " univariateinfo() {0}").format(str(e)),exc_tb.tb_lineno)
             return
 
-    def polyfit(self,xarray,yarray,deg,startindex,endindex):
+    def polyfit(self,xarray,yarray,deg,startindex,endindex,_=False):
         xa = xarray[startindex:endindex]
         ya = yarray[startindex:endindex]
         if len(xa) > 0 and len(xa) == len(ya) and not all(x == 0 for x in xa) and not all(x == 0 for x in ya):
@@ -9640,9 +9630,9 @@ class VMToolbar(NavigationToolbar):
         return QIcon(pm)
 
 #PLUS
-#    def plus(self):
-#        import plus.controller
-#        plus.controller.toggle(aw)
+    def plus(self):
+        import plus.controller
+        plus.controller.toggle(aw)
         
     def edit_parameters(self):
         try:
@@ -12326,15 +12316,15 @@ class ApplicationWindow(QMainWindow):
         self.qmc.ground_color = rr["groundColor"]
         self.qmc.color_system_idx = rr["colorSystem"]
 #PLUS
-#        if self.plus_account is not None and "plus_account" in rr and self.plus_account == rr["plus_account"]:
-#            if "plus_store" in rr:
-#                self.qmc.plus_store = rr["plus_store"]
-#            if "plus_coffee" in rr:
-#                self.qmc.plus_coffee = rr["plus_coffee"]
-#            if "plus_store" in rr:
-#                self.qmc.plus_blend = rr["plus_blend"]
-#            if self.qmc.plus_default_store is not None and self.qmc.plus_default_store != self.qmc.plus_store:
-#                self.qmc.plus_default_store = None # we reset the defaultstore
+        if self.plus_account is not None and "plus_account" in rr and self.plus_account == rr["plus_account"]:
+            if "plus_store" in rr:
+                self.qmc.plus_store = rr["plus_store"]
+            if "plus_coffee" in rr:
+                self.qmc.plus_coffee = rr["plus_coffee"]
+            if "plus_store" in rr:
+                self.qmc.plus_blend = rr["plus_blend"]
+            if self.qmc.plus_default_store is not None and self.qmc.plus_default_store != self.qmc.plus_store:
+                self.qmc.plus_default_store = None # we reset the defaultstore
         
     # d is a recentRoast dict
     def addRecentRoast(self,d):
@@ -16807,15 +16797,15 @@ class ApplicationWindow(QMainWindow):
         f.close()
         
 #PLUS        
-#        # fill plus UUID register
-#        try:
-#            if self.plus_account is not None and obj is not None:
-#                import plus.config
-#                if plus.config.uuid_tag in obj:
-#                    import plus.register
-#                    plus.register.add_path(obj[plus.config.uuid_tag],fn)
-#        except:
-#            pass
+        # fill plus UUID register
+        try:
+            if self.plus_account is not None and obj is not None:
+                import plus.config
+                if plus.config.uuid_tag in obj:
+                    import plus.register
+                    plus.register.add_path(obj[plus.config.uuid_tag],fn)
+        except:
+            pass
 
 
     #Read object from file 
@@ -16829,15 +16819,15 @@ class ApplicationWindow(QMainWindow):
                 f.close()
                 
 #PLUS                 
-#            # fill plus UUID register
-#            try:
-#                if self.plus_account is not None and obj is not None:
-#                    import plus.config
-#                    if plus.config.uuid_tag in obj:
-#                        import plus.register
-#                        plus.register.add_path(obj[plus.config.uuid_tag],fn)
-#            except:
-#                pass
+            # fill plus UUID register
+            try:
+                if self.plus_account is not None and obj is not None:
+                    import plus.config
+                    if plus.config.uuid_tag in obj:
+                        import plus.register
+                        plus.register.add_path(obj[plus.config.uuid_tag],fn)
+            except:
+                pass
                 
             return obj
         except Exception as ex:
@@ -17673,12 +17663,12 @@ class ApplicationWindow(QMainWindow):
             profile["title"] = encodeLocal(self.qmc.title)
             
 #PLUS
-#            if self.qmc.plus_store is not None:
-#                profile["plus_store"] = self.qmc.plus_store
-#            if self.qmc.plus_coffee is not None:
-#                profile["plus_coffee"] = self.qmc.plus_coffee
-#            if self.qmc.plus_blend is not None:
-#                profile["plus_blend"] = self.qmc.plus_blend
+            if self.qmc.plus_store is not None:
+                profile["plus_store"] = self.qmc.plus_store
+            if self.qmc.plus_coffee is not None:
+                profile["plus_coffee"] = self.qmc.plus_coffee
+            if self.qmc.plus_blend is not None:
+                profile["plus_blend"] = self.qmc.plus_blend
                         
             profile["beans"] = encodeLocal(self.qmc.beans)
             profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocal(self.qmc.weight[2])]
@@ -18075,14 +18065,14 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("fullscreen"):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 #PLUS                
-#            if settings.contains("plus_account"):
-#                self.plus_account = settings.value("plus_account",self.plus_account)
-#                if self.plus_account is not None:
-#                    try:
-#                        import plus.controller
-#                        plus.controller.start(aw)
-#                    except:
-#                        pass
+            if settings.contains("plus_account"):
+                self.plus_account = settings.value("plus_account",self.plus_account)
+                if self.plus_account is not None:
+                    try:
+                        import plus.controller
+                        plus.controller.start(aw)
+                    except:
+                        pass
                       
             #restore mode
             old_mode = self.qmc.mode
@@ -26032,9 +26022,11 @@ class HUDDlg(ArtisanDialog):
         endtime = aw.qmc.stringtoseconds(str(self.endEdit.text()))
         if starttime == -1 or endtime == -1:
             self.result.setText("")
+            self.result.repaint()
             return
         if  endtime > aw.qmc.timex[-1] or endtime < starttime:
             self.result.setText("")
+            self.result.repaint()
             return
         if aw.qmc.timeindex[0] != -1:
             start = aw.qmc.timex[aw.qmc.timeindex[0]]
@@ -26074,9 +26066,11 @@ class HUDDlg(ArtisanDialog):
             if sign == "-":
                 s = sign + s
             self.result.setText(s)
+            self.result.repaint()
             return True
         else:
             self.result.setText("")
+            self.result.repaint()
             return False
 
     def polyfitcurveschanged(self,_):
@@ -26093,11 +26087,13 @@ class HUDDlg(ArtisanDialog):
                 if not res:
                     self.polyfitCheck.setChecked(False)
                     self.result.setText("")
+                    self.result.repaint()
                     aw.qmc.resetlines()
                 QApplication.processEvents()
             else:
                 self.polyfitCheck.setChecked(False)
                 self.result.setText("")
+                self.result.repaint()
                 aw.qmc.resetlines()
         except Exception:
             pass
@@ -26110,7 +26106,7 @@ class HUDDlg(ArtisanDialog):
         self.polyfitdeg.setFocus()
 
     def tabSwitched(self,i):
-        if i != 3:
+        if i != 4:
             if self.polyfitCheck.isChecked():
                 self.polyfitCheck.setChecked(False)
             if self.xxvarCheck.isChecked():
@@ -26179,9 +26175,10 @@ class HUDDlg(ArtisanDialog):
                     self.polyfitCheck.setChecked(False)
             else:
                 self.result.setText("")
+                self.result.repaint()
                 aw.qmc.resetlines()
                 self.redraw_enabled_math_curves()
-        except:
+        except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             pass
@@ -27978,13 +27975,13 @@ class editGraphDlg(ArtisanDialog):
         self.titleedit.setFocus()
         
 #PLUS
-#        try:
-#            if aw.plus_account is not None:
-#                import plus.stock
-#                plus.stock.update()                
-#                QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
-#        except:
-#            pass
+        try:
+            if aw.plus_account is not None:
+                import plus.stock
+                plus.stock.update()                
+                QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
+        except:
+            pass
         
     def populatePlusCoffeeBlendCombos(self,storeIndex=None):
         import plus.stock
@@ -28193,17 +28190,17 @@ class editGraphDlg(ArtisanDialog):
             # Note: the background profile will not be changed if recent roast is activated from Roast Properties
             
 #PLUS            
-#            if aw.plus_account is not None and "plus_account" in rr and aw.plus_account == rr["plus_account"]:
-#                if "plus_store" in rr:
-#                    self.plus_store_selected = rr["plus_store"]
-#                if "plus_coffee" in rr:
-#                    self.plus_coffee_selected = rr["plus_coffee"]
-#                if "plus_store" in rr:
-#                    self.plus_blend_selected = rr["plus_blend"]
-#                if self.plus_store_selected is not None and self.plus_default_store is not None and self.plus_default_store != self.plus_store_selected:
-#                    self.plus_default_store = None # we reset the defaultstore                                    
-#                # we now set the actual values from the stock
-#                self.populatePlusCoffeeBlendCombos()
+            if aw.plus_account is not None and "plus_account" in rr and aw.plus_account == rr["plus_account"]:
+                if "plus_store" in rr:
+                    self.plus_store_selected = rr["plus_store"]
+                if "plus_coffee" in rr:
+                    self.plus_coffee_selected = rr["plus_coffee"]
+                if "plus_store" in rr:
+                    self.plus_blend_selected = rr["plus_blend"]
+                if self.plus_store_selected is not None and self.plus_default_store is not None and self.plus_default_store != self.plus_store_selected:
+                    self.plus_default_store = None # we reset the defaultstore                                    
+                # we now set the actual values from the stock
+                self.populatePlusCoffeeBlendCombos()
 
         self.recentRoastEnabled()
         
@@ -28992,12 +28989,12 @@ class editGraphDlg(ArtisanDialog):
             self.tab1aLayout.removeWidget(self.calculateddensitylabel)
         self.calculated_organic_loss()
 #PLUS
-#        try:
-#            # weight unit changed, we update the coffee/blend lists in plus mode
-#            if aw.plus_account is not None:
-#                self.populatePlusCoffeeBlendCombos(self.plus_stores_combo.currentIndex())
-#        except:
-#            pass
+        try:
+            # weight unit changed, we update the coffee/blend lists in plus mode
+            if aw.plus_account is not None:
+                self.populatePlusCoffeeBlendCombos(self.plus_stores_combo.currentIndex())
+        except:
+            pass
             
     def calc_organic_loss(self):
         wloss = 0. # weight (moisture + organic)
@@ -29141,12 +29138,12 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.container_idx = self.tareComboBox.currentIndex() - 3
 
 #PLUS        
-#        # Update Plus
-#        if aw.plus_account is not None:
-#            aw.qmc.plus_default_store = self.plus_default_store
-#            aw.qmc.plus_store = self.plus_store_selected
-#            aw.qmc.plus_coffee = self.plus_coffee_selected
-#            aw.qmc.plus_blend = self.plus_blend_selected
+        # Update Plus
+        if aw.plus_account is not None:
+            aw.qmc.plus_default_store = self.plus_default_store
+            aw.qmc.plus_store = self.plus_store_selected
+            aw.qmc.plus_coffee = self.plus_coffee_selected
+            aw.qmc.plus_blend = self.plus_blend_selected
         
         # Update beans
         aw.qmc.beans = u(self.beansedit.toPlainText())
