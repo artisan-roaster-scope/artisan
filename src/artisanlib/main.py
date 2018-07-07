@@ -22665,7 +22665,7 @@ class ApplicationWindow(QMainWindow):
         QApplication.instance().aboutQt()
         
     def helpHelp(self):
-        QDesktopServices.openUrl(QUrl("https://artisan-scope.org/doc/", QUrl.TolerantMode))
+        QDesktopServices.openUrl(QUrl("https://artisan-scope.org/docs/quick-start-guide/", QUrl.TolerantMode))
 
     def applicationscreenshot(self):
         imag = self.grab()
