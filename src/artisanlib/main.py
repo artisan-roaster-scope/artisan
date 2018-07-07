@@ -1188,7 +1188,7 @@ class tgraphcanvas(FigureCanvas):
         # profile UUID
         self.roastUUID = None
         
-#PLUS   
+#PLUS
         # the default store selected by the user (save in the  app settings)
         self.plus_default_store = None
         
@@ -9539,7 +9539,7 @@ class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
         self.toolitems = (
 
-#PLUS        
+#PLUS-COMMENT
 #            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
             
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
@@ -9567,7 +9567,7 @@ class VMToolbar(NavigationToolbar):
             a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
             self.insertAction(self.actions()[-1],a) 
 
-#PLUS            
+#PLUS-COMMENT            
 #            if aw is not None:
 #                aw.updatePlusStatus(self)
 
@@ -22894,6 +22894,10 @@ class ApplicationWindow(QMainWindow):
                 if not self.HottopControlActive:
                     aw.sendmessage(QApplication.translate("Message","Hottop control turned on", None))            
                 self.HottopControlActive = True
+        else:
+            QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", 
+                "To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!",None))        
+            
 
     def PIDcontrol(self):
         #FUJI/DELTA pid
