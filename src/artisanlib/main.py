@@ -48,6 +48,7 @@ import shlex
 import binascii
 import codecs
 import uuid
+import threading
 
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
@@ -14682,9 +14683,15 @@ class ApplicationWindow(QMainWindow):
 
     # this should only be called from within the main GUI thread (and never from the sampling thread!)
     def sendmessage(self,message,append=True,style=None):
-        QTimer.singleShot(2,lambda : self.sendmessage_internal(message,append,style))
+        if isinstance(threading.current_thread(), threading._MainThread):
+            # we are running in the main thread thus we can call sendmessage_internal via a QTimer to avoid redraw issues
+            QTimer.singleShot(2,lambda : self.sendmessage_internal(message,append,style))
+        else:
+            # we are not running in the main thread thus we CANNOT call sendmessage_internal via a QTimer
+            self.sendmessage_internal(message,append,style,repaint=False)
+            # if this is executed via a QTimer we receive "QObject::startTimer: Timers can only be used with threads started with QThread"
         
-    def sendmessage_internal(self,message,append=True,style=None):
+    def sendmessage_internal(self,message,append=True,style=None,repaint=True):
         try:
             #### lock shared resources #####
             aw.qmc.messagesemaphore.acquire(1)
@@ -14700,7 +14707,8 @@ class ApplicationWindow(QMainWindow):
                 timez = str(QDateTime.currentDateTime().toString(u("hh:mm:ss.zzz ")))    #zzz = miliseconds
                 self.messagehist.append(timez + message)
             self.messagelabel.setText(message)
-            self.messagelabel.repaint()
+            if repaint: # if repaint is executed in the main thread we receive "QWidget::repaint: Recursive repaint detected"
+                self.messagelabel.repaint()
         finally:
             if aw.qmc.messagesemaphore.available() < 1:
                 aw.qmc.messagesemaphore.release(1)
