@@ -11352,7 +11352,7 @@ class ApplicationWindow(QMainWindow):
 
         #create a Label object to display program status information
         self.messagelabel = QLabel()
-        self.messagelabel.setIndent(2)
+        self.messagelabel.setIndent(6)
 
         if locale == "es":
             self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
@@ -12151,12 +12151,14 @@ class ApplicationWindow(QMainWindow):
         sliderGrp12.setSpacing(0)
         sliderGrp12.setContentsMargins(0,0,0,0)
         sliderGrp12.addWidget(self.sliderGrpBox1)
-        sliderGrp12.addWidget(self.sliderGrpBox2)
+#        sliderGrp12.addSpacing(10)
+        sliderGrp12.addWidget(self.sliderGrpBox2) # DRUM
         sliderGrp34 = QVBoxLayout()
         sliderGrp34.setSpacing(0)
         sliderGrp34.setContentsMargins(0,0,0,0)
         sliderGrp34.addWidget(self.sliderGrpBox3)
-        sliderGrp34.addWidget(self.sliderGrpBox4)
+#        sliderGrp34.addSpacing(10)
+        sliderGrp34.addWidget(self.sliderGrpBox4) # BURNER
         sliderGrpSV = QVBoxLayout()
         sliderGrpSV.setSpacing(0)
         sliderGrpSV.setContentsMargins(0,0,0,0)
@@ -48808,18 +48810,23 @@ class PIDcontrol(object):
         if self.lastEnergy is None or self.lastEnergy != v:
             try: 
                 if aw.pidcontrol.pidPositiveTarget:
-                    heat = min(100,max(0,int(v)))
-                    if aw.pidcontrol.invertControl:
-                        heat = abs(100 - heat)
                     slidernr = aw.pidcontrol.pidPositiveTarget - 1
+                    if aw.pidcontrol.invertControl:
+                        vp = abs(100 - v)
+                    vp = min(100,max(0,int(vp)))
+                    # we need to map the duty [0%,100%] to the [slidermin,slidermax] range
+                    heat = int(round(numpy.interp(vp,[0,100],[aw.eventslidermin[slidernr],aw.eventslidermax[slidernr]])))
                     aw.qmc.temporarymovepositiveslider = (slidernr,heat)
                 if aw.pidcontrol.pidNegativeTarget:
-                    cool = min(100,abs(min(0,int(v))))
-                    if aw.pidcontrol.invertControl:
-                        cool = abs(100 - cool)
                     slidernr = aw.pidcontrol.pidNegativeTarget - 1
+                    if aw.pidcontrol.invertControl:
+                        vn = 0 - v
+                    vn = min(0,max(-100,int(vn)))
+                    # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range
+                    cool = int(round(numpy.interp(vn,[-100,0],[aw.eventslidermax[slidernr],aw.eventslidermin[slidernr]])))
                     aw.qmc.temporarymovenegativeslider = (slidernr,cool)
-            except Exception as e:
+            except:
+    #            print(e)
     #            import traceback
     #            traceback.print_exc(file=sys.stdout)
                 pass
