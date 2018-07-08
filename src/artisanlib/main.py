@@ -736,9 +736,6 @@ class tgraphcanvas(FigureCanvas):
         self.phases_fahrenheit_defaults = [200,300,390,450]
         self.phases_celsius_defaults = [110,150,200,230]
         self.phases = list(self.phases_fahrenheit_defaults) # contains either the phases_filter or phases_espresso, depending on the mode
-        self.phases_mode = 0 # indicates the active phases mode: 0: filter; 1: espresso
-        self.phases_filter = self.phases[:]
-        self.phases_espresso = self.phases[:]
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
         self.phasesbuttonflag = False #False no change; True make the DRY and FC buttons change the phases during roast automatically
         self.watermarksflag = True
@@ -5633,8 +5630,6 @@ class tgraphcanvas(FigureCanvas):
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
                 self.phases[i] = int(round(self.fromCtoF(self.phases[i])))
-                self.phases_espresso[i] = int(round(self.fromCtoF(self.phases_espresso[i])))
-                self.phases_filter[i] = int(round(self.fromCtoF(self.phases_filter[i])))
             self.ETtarget = int(round(self.fromCtoF(self.ETtarget)))
             self.ET2target = int(round(self.fromCtoF(self.ET2target)))
             self.BTtarget = int(round(self.fromCtoF(self.BTtarget)))
@@ -5671,8 +5666,6 @@ class tgraphcanvas(FigureCanvas):
             #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
             for i in range(4):
                 self.phases[i] = int(round(self.fromFtoC(self.phases[i])))
-                self.phases_espresso[i] = int(round(self.fromFtoC(self.phases_espresso[i])))
-                self.phases_filter[i] = int(round(self.fromFtoC(self.phases_filter[i])))
             self.ETtarget = int(round(self.fromFtoC(self.ETtarget)))
             self.ET2target = int(round(self.fromFtoC(self.ET2target)))
             self.BTtarget = int(round(self.fromFtoC(self.BTtarget)))
@@ -18195,12 +18188,6 @@ class ApplicationWindow(QMainWindow):
             #restore phases
             if settings.contains("Phases"):
                 self.qmc.phases = [toInt(x) for x in toList(settings.value("Phases",self.qmc.phases))]
-            if settings.contains("PhasesFilter"):
-                self.qmc.phases_filter = [toInt(x) for x in toList(settings.value("PhasesFilter",self.qmc.phases_filter))]
-            if settings.contains("PhasesMode"):
-                self.qmc.phases_mode = toInt(settings.value("PhasesMode",int(self.qmc.phases_mode)))
-            if settings.contains("PhasesEspresso"):
-                self.qmc.phases_espresso = [toInt(x) for x in toList(settings.value("PhasesEspresso",self.qmc.phases_espresso))]
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = bool(toBool(settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag)))
             if settings.contains("watermarks"):
@@ -18211,7 +18198,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phasesLCDmode = toInt(settings.value("phasesLCDmode",self.qmc.phasesLCDmode))
             # Important - this must come after the code that restores phasesLCDmode 
             # Done this way with two variables to maintain forward and backward compatibility with settings since adding LCD mode by phase.
-            if settings.contains("phasesLCDmode_l"):  #dave45
+            if settings.contains("phasesLCDmode_l"):
                 self.qmc.phasesLCDmode_l = [toInt(x) for x in toList(settings.value("phasesLCDmode_l",self.qmc.phasesLCDmode_l))]
             else:
                 self.qmc.phasesLCDmode_l = [toInt(self.qmc.phasesLCDmode)]*3
@@ -19618,9 +19605,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("backgroundReproduce",self.qmc.backgroundReproduce)
             settings.setValue("backgroundPlaybackEvents",self.qmc.backgroundPlaybackEvents)
             settings.setValue("replayType",self.qmc.replayType)
-            settings.setValue("PhasesMode",self.qmc.phases_mode)
-            settings.setValue("PhasesEspresso",self.qmc.phases_espresso)
-            settings.setValue("PhasesFilter",self.qmc.phases_filter)
             settings.setValue("Phases",self.qmc.phases)
             #save phasesbuttonflag
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
@@ -19629,6 +19613,7 @@ class ApplicationWindow(QMainWindow):
             #save phases LCDs on recording flag
             settings.setValue("phasesLCDs",self.qmc.phasesLCDflag)
             settings.setValue("phasesLCDmode",self.qmc.phasesLCDmode)
+            settings.setValue("phasesLCDmode_l", self.qmc.phasesLCDmode_l)
             #phase triggered DRY and FCs
             settings.setValue("autoDry",self.qmc.autoDRYflag)
             settings.setValue("autoFCs",self.qmc.autoFCsFlag)
@@ -32835,7 +32820,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.autoFCsFlag.stateChanged.connect(self.autoFCsFlagChanged)
         okButton = QPushButton(QApplication.translate("Button","OK",None))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None))
-        setDefaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
+        setDefaultButton = QPushButton(QApplication.translate("Button","Default Temperatures",None))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         setDefaultButton.setFocusPolicy(Qt.NoFocus)
         cancelButton.clicked.connect(lambda _:self.cancel())
@@ -32843,8 +32828,8 @@ class phasesGraphDlg(ArtisanDialog):
         setDefaultButton.clicked.connect(lambda _:self.setdefault())
         
         phaseLayout = QGridLayout()
-        phaseLayout.addWidget(minf,0,1,Qt.AlignCenter)
-        phaseLayout.addWidget(maxf,0,2,Qt.AlignCenter)
+        phaseLayout.addWidget(minf,0,1,Qt.AlignHCenter|Qt.AlignBottom)
+        phaseLayout.addWidget(maxf,0,2,Qt.AlignHCenter|Qt.AlignBottom)
         phaseLayout.addWidget(dryLabel,1,0,Qt.AlignRight)
         phaseLayout.addWidget(self.startdry,1,1)
         phaseLayout.addWidget(self.enddry,1,2)
@@ -32855,122 +32840,39 @@ class phasesGraphDlg(ArtisanDialog):
         phaseLayout.addWidget(self.startfinish,3,1)
         phaseLayout.addWidget(self.endfinish,3,2)
 
-        dryEspressoLabel = QLabel(QApplication.translate("Label", "Drying",None))
-        midEspressoLabel = QLabel(QApplication.translate("Label", "Maillard",None))
-        finishEspressoLabel = QLabel(QApplication.translate("Label", "Finishing",None))
-        minfEspresso = QLabel(QApplication.translate("Label", "min",None))
-        maxfEspresso = QLabel(QApplication.translate("Label", "max",None))
-#        lcdmodeEspresso = QLabel(QApplication.translate("Label", "LCDs Mode",None))  #dave45 #ML: unused
-
-        self.startdryEspresso = QSpinBox()
-        self.startdryEspresso.setAlignment(Qt.AlignRight)
-        self.startdryEspresso.setMinimumWidth(80)
-        self.enddryEspresso = QSpinBox()
-        self.enddryEspresso.setAlignment(Qt.AlignRight)
-        self.enddryEspresso.setMinimumWidth(80)
-        self.startmidEspresso = QSpinBox()
-        self.startmidEspresso.setAlignment(Qt.AlignRight)
-        self.startmidEspresso.setMinimumWidth(80)
-        self.endmidEspresso = QSpinBox()
-        self.endmidEspresso.setAlignment(Qt.AlignRight)
-        self.endmidEspresso.setMinimumWidth(80)
-        self.startfinishEspresso = QSpinBox()
-        self.startfinishEspresso.setAlignment(Qt.AlignRight)
-        self.startfinishEspresso.setMinimumWidth(80)
-        self.endfinishEspresso = QSpinBox()
-        self.endfinishEspresso.setAlignment(Qt.AlignRight)
-        self.endfinishEspresso.setMinimumWidth(80)
-        self.startdryEspresso.setRange(0,1000)    #(min,max)
-        self.enddryEspresso.setRange(0,1000)
-        self.startmidEspresso.setRange(0,1000)
-        self.endmidEspresso.setRange(0,1000)
-        self.startfinishEspresso.setRange(0,1000)
-        self.endfinishEspresso.setRange(0,1000)
-        self.enddryEspresso.valueChanged.connect(self.startmidEspresso.setValue)
-        self.startmidEspresso.valueChanged.connect(self.enddryEspresso.setValue)
-        self.endmidEspresso.valueChanged.connect(self.startfinishEspresso.setValue)
-        self.startfinishEspresso.valueChanged.connect(self.endmidEspresso.setValue)
-               
-        self.events2phases()
-        
-        if aw.qmc.mode == "F":
-            self.startdryEspresso.setSuffix(" F")
-            self.enddryEspresso.setSuffix(" F")
-            self.startmidEspresso.setSuffix(" F")
-            self.endmidEspresso.setSuffix(" F")
-            self.startfinishEspresso.setSuffix(" F")
-            self.endfinishEspresso.setSuffix(" F")
-        elif aw.qmc.mode == "C":
-            self.startdryEspresso.setSuffix(" C")
-            self.enddryEspresso.setSuffix(" C")
-            self.startmidEspresso.setSuffix(" C")
-            self.endmidEspresso.setSuffix(" C")
-            self.startfinishEspresso.setSuffix(" C")
-            self.endfinishEspresso.setSuffix(" C")
-            
-        self.getphases()
-
-        phaseEspressoLayout = QGridLayout()
-        phaseEspressoLayout.addWidget(minfEspresso,0,1,Qt.AlignCenter)
-        phaseEspressoLayout.addWidget(maxfEspresso,0,2,Qt.AlignCenter)
-        phaseEspressoLayout.addWidget(dryEspressoLabel,1,0,Qt.AlignRight)
-        phaseEspressoLayout.addWidget(self.startdryEspresso,1,1)
-        phaseEspressoLayout.addWidget(self.enddryEspresso,1,2)
-        phaseEspressoLayout.addWidget(midEspressoLabel,2,0,Qt.AlignRight)
-        phaseEspressoLayout.addWidget(self.startmidEspresso,2,1)
-        phaseEspressoLayout.addWidget(self.endmidEspresso,2,2)
-        phaseEspressoLayout.addWidget(finishEspressoLabel,3,0,Qt.AlignRight)
-        phaseEspressoLayout.addWidget(self.startfinishEspresso,3,1)
-        phaseEspressoLayout.addWidget(self.endfinishEspresso,3,2)        
-        
-        self.phasesTabs = QTabWidget()
-        # filter phases tab
-        FilterWidget = QWidget()
-        FilterWidget.setLayout(phaseLayout)
-        self.phasesTabs.addTab(FilterWidget,QApplication.translate("Tab","Filter",None))
-        # filter phases tab
-        EspressoWidget = QWidget()
-        EspressoWidget.setLayout(phaseEspressoLayout)
-        self.phasesTabs.addTab(EspressoWidget,QApplication.translate("Tab","Espresso",None))
-        
-        self.phasesTabs.setCurrentIndex(aw.qmc.phases_mode)
-
         lcdmodes = [QApplication.translate("ComboBox","Time",None),
                     QApplication.translate("ComboBox","Percentage",None),
                     QApplication.translate("ComboBox","Temp",None)]
-        lcdModeLayout = QVBoxLayout()
+
         lcdmode = QLabel(QApplication.translate("Label", "Phases\nLCDs Mode",None))
-        lcdmode.setAlignment(Qt.AlignCenter)
+        phaseLayout.addWidget(lcdmode,0,3,Qt.AlignCenter)
+
         self.lcdmodeComboBox_dry = QComboBox()
         self.lcdmodeComboBox_dry.setFocusPolicy(Qt.NoFocus)
-#        self.lcdmodeComboBox_dry.setMaximumWidth(80)
         self.lcdmodeComboBox_dry.addItems(lcdmodes)
         self.lcdmodeComboBox_dry.currentIndexChanged.connect(self.lcdmodeComboBox_dryChanged)
         self.lcdmodeComboBox_mid = QComboBox()
         self.lcdmodeComboBox_mid.setFocusPolicy(Qt.NoFocus)
-#        self.lcdmodeComboBox_mid.setMaximumWidth(80)
         self.lcdmodeComboBox_mid.addItems(lcdmodes)
         self.lcdmodeComboBox_mid.currentIndexChanged.connect(self.lcdmodeComboBox_midChanged)
         self.lcdmodeComboBox_fin = QComboBox()
         self.lcdmodeComboBox_fin.setFocusPolicy(Qt.NoFocus)
-#        self.lcdmodeComboBox_fin.setMaximumWidth(80)
         self.lcdmodeComboBox_fin.addItems(lcdmodes)
         self.lcdmodeComboBox_fin.currentIndexChanged.connect(self.lcdmodeComboBox_finChanged)
-        lcdModeLayout.addStretch()
-        lcdModeLayout.addStretch()
-        lcdModeLayout.addWidget(lcdmode)
-        lcdModeLayout.addWidget(self.lcdmodeComboBox_dry)
-        lcdModeLayout.addWidget(self.lcdmodeComboBox_mid)
-        lcdModeLayout.addWidget(self.lcdmodeComboBox_fin)
-        lcdModeLayout.addStretch()
+        phaseLayout.addWidget(self.lcdmodeComboBox_dry,1,3)
+        phaseLayout.addWidget(self.lcdmodeComboBox_mid,2,3)
+        phaseLayout.addWidget(self.lcdmodeComboBox_fin,3,3)
+
         self.lcdmodeComboBox_dry.setCurrentIndex(aw.qmc.phasesLCDmode_l[0])
         self.lcdmodeComboBox_mid.setCurrentIndex(aw.qmc.phasesLCDmode_l[1])
         self.lcdmodeComboBox_fin.setCurrentIndex(aw.qmc.phasesLCDmode_l[2])
+               
+        self.events2phases()
+        self.getphases()
         
         boxedPhaseLayout = QHBoxLayout()
         boxedPhaseLayout.addStretch()
-        boxedPhaseLayout.addWidget(self.phasesTabs)
-        boxedPhaseLayout.addLayout(lcdModeLayout)
+        boxedPhaseLayout.addLayout(phaseLayout)
         boxedPhaseLayout.addStretch()
         boxedPhaseFlagGrid = QGridLayout()
         boxedPhaseFlagGrid.addWidget(self.pushbuttonflag,0,0)
@@ -33019,14 +32921,10 @@ class phasesGraphDlg(ArtisanDialog):
                 aw.qmc.phases[1] = int(round(aw.qmc.temp2[aw.qmc.timeindex[1]]))
             self.enddry.setDisabled(True)
             self.startmid.setDisabled(True)
-            self.enddryEspresso.setDisabled(True)
-            self.startmidEspresso.setDisabled(True)
             if aw.qmc.timeindex[2]:
                 aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
             self.endmid.setDisabled(True)
             self.startfinish.setDisabled(True)
-            self.endmidEspresso.setDisabled(True)
-            self.startfinishEspresso.setDisabled(True)
 
     def watermarksflagChanged(self,_):
         aw.qmc.watermarksflag = not aw.qmc.watermarksflag
@@ -33062,33 +32960,15 @@ class phasesGraphDlg(ArtisanDialog):
             self.startmid.setEnabled(True)
             self.endmid.setEnabled(True)
             self.startfinish.setEnabled(True)
-            self.enddryEspresso.setEnabled(True)
-            self.startmidEspresso.setEnabled(True)
-            self.endmidEspresso.setEnabled(True)
-            self.startfinishEspresso.setEnabled(True)
         if aw.qmc.phasesbuttonflag:
             self.autoDRYflag.setChecked(False)
             self.autoFCsFlag.setChecked(False)
 
     def updatephases(self):
-        aw.qmc.phases_filter[0] = self.startdry.value()
-        aw.qmc.phases_filter[1] = self.enddry.value()
-        aw.qmc.phases_filter[2] = self.endmid.value()
-        aw.qmc.phases_filter[3] = self.endfinish.value()
-        
-        aw.qmc.phases_espresso[0] = self.startdryEspresso.value()
-        aw.qmc.phases_espresso[1] = self.enddryEspresso.value()
-        aw.qmc.phases_espresso[2] = self.endmidEspresso.value()
-        aw.qmc.phases_espresso[3] = self.endfinishEspresso.value()
-        
-        aw.qmc.phases_mode = self.phasesTabs.currentIndex()
-        
-        if aw.qmc.phases_mode:
-            # espresso mode
-            aw.qmc.phases = aw.qmc.phases_espresso[:]
-        else:
-            # filter mode
-            aw.qmc.phases = aw.qmc.phases_filter[:]
+        aw.qmc.phases[0] = self.startdry.value()
+        aw.qmc.phases[1] = self.enddry.value()
+        aw.qmc.phases[2] = self.endmid.value()
+        aw.qmc.phases[3] = self.endfinish.value()
 
         if self.pushbuttonflag.isChecked():
             aw.qmc.phasesbuttonflag = True
@@ -33105,25 +32985,12 @@ class phasesGraphDlg(ArtisanDialog):
         self.close()
 
     def getphases(self):
-        if aw.qmc.phases_mode:
-            # espresso mode
-            aw.qmc.phases_espresso = aw.qmc.phases[:]
-        else:
-            # filter mode
-            aw.qmc.phases_filter = aw.qmc.phases[:]
-
-        self.startdry.setValue(aw.qmc.phases_filter[0])
-        self.enddry.setValue(aw.qmc.phases_filter[1])
-        self.endmid.setValue(aw.qmc.phases_filter[2])
-        self.endfinish.setValue(aw.qmc.phases_filter[3])
-        
-        self.startdryEspresso.setValue(aw.qmc.phases_espresso[0])
-        self.enddryEspresso.setValue(aw.qmc.phases_espresso[1])
-        self.endmidEspresso.setValue(aw.qmc.phases_espresso[2])
-        self.endfinishEspresso.setValue(aw.qmc.phases_espresso[3])
+        self.startdry.setValue(aw.qmc.phases[0])
+        self.enddry.setValue(aw.qmc.phases[1])
+        self.endmid.setValue(aw.qmc.phases[2])
+        self.endfinish.setValue(aw.qmc.phases[3])
         
     def setdefault(self):
-        aw.qmc.phases_mode = self.phasesTabs.currentIndex()
         if aw.qmc.mode == "F":
             aw.qmc.phases = list(aw.qmc.phases_fahrenheit_defaults)
         elif aw.qmc.mode == "C":
