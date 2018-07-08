@@ -1796,6 +1796,7 @@ class tgraphcanvas(FigureCanvas):
         self.met_annotate = []
         self.extendevents = True
         self.statssummary = False        
+        self.showtimeguide = False
         
         #mouse cross lines measurement 
         self.baseX,self.baseY = None, None
@@ -2426,7 +2427,7 @@ class tgraphcanvas(FigureCanvas):
                                     if aw.qmc.BTcurve:
                                         aw.qmc.ax.draw_artist(self.l_temp2)
                                      
-                                    if aw.qmc.device == 18 and aw.qmc.l_timeline is not None: # not NONE device
+                                    if (aw.qmc.device == 18 or aw.qmc.showtimeguide) and aw.qmc.l_timeline is not None: # not NONE device
                                         aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
                                         
                                     if aw.qmc.BTcurve:
@@ -6140,6 +6141,7 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     aw.fujipid.sv = 0
             self.disconnectProbes()
+            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)  #DEBUG this statement here for timeguide bar.  May have unintended consequenses.
             QApplication.processEvents()
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
@@ -10299,14 +10301,15 @@ class SampleThread(QThread):
                         aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
                         aw.qmc.xaxistosm(redraw=False) # don't redraw within the sampling process!!
                     #aw.qmc.resetlines()
-                    #add to plot a vertical time line
-                    aw.qmc.l_timeline, = aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["timeguide"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
                     # also in the manual case we check for TP
                     if local_flagstart:
                         # check for TP event if already CHARGEed and not yet recognized
                         if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
+                #add to plot a vertical time line
+                if aw.qmc.showtimeguide or aw.qmc.device == 18:
+                    aw.qmc.l_timeline, = aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["timeguide"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -19144,6 +19147,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.showmet = bool(toBool(settings.value("showmet",self.qmc.showmet)))
             if settings.contains("statssummary"):
                 self.qmc.statssummary = bool(toBool(settings.value("statssummary")))                
+            if settings.contains("showtimeguide"):
+                self.qmc.showtimeguide = bool(toBool(settings.value("showtimeguide",self.qmc.showtimeguide)))
             settings.endGroup()
             
             # recent roasts
@@ -20139,6 +20144,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ExtrasMoreInfo")
             settings.setValue("showmet",self.qmc.showmet)
             settings.setValue("statssummary",self.qmc.statssummary)            
+            settings.setValue("showtimeguide",self.qmc.showtimeguide)
             settings.endGroup()
             try:
                 settings.setValue("appearance",aw.appearance)
@@ -20283,6 +20289,7 @@ class ApplicationWindow(QMainWindow):
         extras["Beep"]= str(self.soundflag)
         extras["showmet"]= str(self.qmc.showmet)
         extras["statssummary"]= str(self.qmc.statssummary)
+        extras["showtimeguide"]= str(self.qmc.showtimeguide)
         axes["xmin"]= str(self.qmc.startofx)
         axes["xmax"]= str(self.qmc.endofx)
         axes["ymax"]= str(self.qmc.ylimit)
@@ -30795,6 +30802,10 @@ class EventsDlg(ArtisanDialog):
         self.ShowMet.setChecked(aw.qmc.showmet)
         self.ShowMet.setFocusPolicy(Qt.NoFocus)
         self.ShowMet.stateChanged.connect(lambda _:self.changeShowMet())         #toggle          
+        self.ShowTimeguide = QCheckBox(QApplication.translate("CheckBox", "Show Time Guide",None))
+        self.ShowTimeguide.setChecked(aw.qmc.showtimeguide)
+        self.ShowTimeguide.setFocusPolicy(Qt.NoFocus)
+        self.ShowTimeguide.stateChanged.connect(lambda _:self.changeShowTimeguide())
         self.okButton = QPushButton(QApplication.translate("Button","OK",None))
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None))
@@ -31204,6 +31215,8 @@ class EventsDlg(ArtisanDialog):
         FlagsLayout2.addWidget(self.markTP)
         FlagsLayout2.addSpacing(15)
         FlagsLayout2.addWidget(self.ShowMet)
+        FlagsLayout2.addSpacing(15)
+        FlagsLayout2.addWidget(self.ShowTimeguide)
 
         typeLayout = QGridLayout()
         typeLayout.addWidget(typelabel1,0,0)
@@ -31659,6 +31672,9 @@ class EventsDlg(ArtisanDialog):
         aw.qmc.showmet = not aw.qmc.showmet
         aw.qmc.redraw(recomputeAllDeltas=False)
         
+    def changeShowTimeguide(self):
+        aw.qmc.showtimeguide = not aw.qmc.showtimeguide
+
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
         self.showEtypes = [True]*5
