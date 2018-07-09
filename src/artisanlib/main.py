@@ -9536,7 +9536,7 @@ class VMToolbar(NavigationToolbar):
         self.toolitems = (
 
 #PLUS-COMMENT
-            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
+#            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
             
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
             ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -9564,8 +9564,8 @@ class VMToolbar(NavigationToolbar):
             self.insertAction(self.actions()[-1],a) 
 
 #PLUS-COMMENT            
-            if aw is not None:
-                aw.updatePlusStatus(self)
+#            if aw is not None:
+#                aw.updatePlusStatus(self)
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
