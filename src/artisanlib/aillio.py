@@ -147,6 +147,11 @@ class AillioR1:
         self.__getstate()
         return self.fan
 
+    def get_fan_rpm(self):
+        self.__dbg('get_fan_rpm')
+        self.__getstate()
+        return self.fan_rpm
+
     def get_drum(self):
         self.__getstate()
         return self.drum

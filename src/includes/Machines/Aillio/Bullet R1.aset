@@ -18,14 +18,14 @@ extratimeout=1, 1, 1, 0.5
 extraCurveVisibility1=false, false, false, false, true, true, true, true, true, true
 extraCurveVisibility2=false, false, false, false, true, true, true, true, true, true
 extraLCDvisibility1=false, true, true, false, false, false, false, false, false, false
-extraLCDvisibility2=false, false, true, false, false, false, false, false, false, false
+extraLCDvisibility2=false, false, true, true, false, false, false, false, false, false
 extradevicecolor1=black, black, black, black
 extradevicecolor2=black, black, black, black
 extradevices=84, 85, 86, 87
 extramathexpression1=, , , 
 extramathexpression2=, , , 
 extraname1={3}, BT RoR, Voltage, State
-extraname2={0}, {1}, Exhaust,
+extraname2={0}, {1}, Exhaust, Fan RPM
 
 [RoastProperties]
 roastertype=Aillio Bullet R1

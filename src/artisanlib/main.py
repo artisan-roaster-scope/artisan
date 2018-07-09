@@ -928,7 +928,7 @@ class tgraphcanvas(FigureCanvas):
                        "+Aillio Bullet R1 Heater/Fan",       #84
                        "+Aillio Bullet R1 BT RoR/Drum",      #85
                        "+Aillio Bullet R1 Voltage/Exhaust",  #86
-                       "+Aillio Bullet R1 State",            #87
+                       "+Aillio Bullet R1 State/Fan RPM",    #87
                        ]
                        
     
@@ -1729,6 +1729,7 @@ class tgraphcanvas(FigureCanvas):
         self.R1_VOLTAGE = 0 # 0-300
         self.R1_TX = 0.
         self.R1_STATE = 0
+        self.R1_FAN_RPM = 0
         self.R1_STATE_STR = ""
         
         #temporary storage to pass values. Holds extra T3, T4, T5 and T6 values for MODBUS connected devices
@@ -34543,7 +34544,7 @@ class serialport(object):
                                    self.R1_HF,                #84
                                    self.R1_DRUM_BTROR,        #85
                                    self.R1_EXIT_TEMP_VOLT,    #86
-                                   self.R1_STATE,             #87
+                                   self.R1_RPM_STATE,         #87
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -35038,6 +35039,7 @@ class serialport(object):
             aw.qmc.R1_BT_ROR = self.R1.get_bt_ror()
             aw.qmc.R1_EXIT_TEMP = self.R1.get_exit_temperature()
             aw.qmc.R1_STATE = self.R1.get_state()
+            aw.qmc.R1_FAN_RPM = self.R1.get_fan_rpm()
             aw.qmc.R1_TX = tx
             newstate = self.R1.get_state_string()
             if newstate != aw.qmc.R1_STATE_STR:
@@ -35065,9 +35067,9 @@ class serialport(object):
         tx = aw.qmc.R1_TX
         return tx, aw.qmc.R1_EXIT_TEMP, aw.qmc.R1_VOLTAGE
 
-    def R1_STATE(self):
+    def R1_RPM_STATE(self):
         tx = aw.qmc.R1_TX
-        return tx, 0, aw.qmc.R1_STATE
+        return tx, aw.qmc.R1_FAN_RPM, aw.qmc.R1_STATE
     
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
