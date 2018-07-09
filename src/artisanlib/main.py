@@ -9536,7 +9536,7 @@ class VMToolbar(NavigationToolbar):
         self.toolitems = (
 
 #PLUS-COMMENT
-#            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
+            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
             
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
             ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -9564,8 +9564,8 @@ class VMToolbar(NavigationToolbar):
             self.insertAction(self.actions()[-1],a) 
 
 #PLUS-COMMENT            
-#            if aw is not None:
-#                aw.updatePlusStatus(self)
+            if aw is not None:
+                aw.updatePlusStatus(self)
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
@@ -12208,10 +12208,10 @@ class ApplicationWindow(QMainWindow):
                     plus_icon = "plus-connected"
                 else:
                     plus_icon = "plus-on"
-                tooltip = QApplication.translate("Tooltip", 'Disconnect Artisan Plus', None)
+                tooltip = QApplication.translate("Tooltip", 'Disconnect artisan.plus', None)
             else:
                 plus_icon = "plus-off"
-                tooltip = QApplication.translate("Tooltip", 'Connect Artisan Plus', None)
+                tooltip = QApplication.translate("Tooltip", 'Connect artisan.plus', None)
             if svgsupport:
                 plus_icon += ".svg"
             else:
@@ -27700,7 +27700,7 @@ class editGraphDlg(ArtisanDialog):
             aw.sendmessage(QApplication.translate("Message","The recorded CHARGE time ({0}) does not match the post roast calculated CHARGE time. ({1})", None).format(charge_str, calc_chargestr))
         if drop_str != "":
             calc_dropstr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
-            aw.sendmessage(QApplication.translate("Message","THe recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})", None).format(drop_str, calc_dropstr))
+            aw.sendmessage(QApplication.translate("Message","The recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})", None).format(drop_str, calc_dropstr))
         textLayout = QGridLayout()
         textLayout.addWidget(datelabel1,0,0)
         datebatch = QHBoxLayout()

@@ -3,15 +3,20 @@
 block_cipher = None
 
 import os
-if os.environ.get('TRAVIS'):
-    path=['/Users/travis/build/artisan-roaster-scope/artisan/src']
-else:
-    path=['/Users/luther/Documents/Projects/Artisan/RepositoryGIT/src']
+
+path=os.environ['HOME'] + '/artisan-master/src'
+if not os.path.isdir(path):
+    path=os.environ['HOME'] + '/artisan/src'
+if not os.path.isdir(path):
+    path=os.environ['HOME'] + '/Documents/Projects/Artisan/RepositoryGIT/src'
+# For Travis
+if not os.path.isdir(path):
+    path=os.getcwd()
     
 phidget="/Library/Frameworks/Phidget22.framework/Versions/Current/Phidget22"
 
 a = Analysis(['artisan.py'],
-             pathex=path,
+             pathex=[path],
              binaries=[],
              datas=[],
              hiddenimports=['scipy._lib.messagestream'],
@@ -21,6 +26,13 @@ a = Analysis(['artisan.py'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
+
+# Remove pyi_rth_mplconfig.py useless because it makes our startup slow.
+# This hook only applies to one-file distributions.
+for s in a.scripts:
+    if s[0] == 'pyi_rth_mplconfig':
+        a.scripts.remove(s)
+        break
 
 a.binaries = [x for x in a.binaries if not x[0].startswith(phidget)]
 
@@ -69,4 +81,4 @@ app = BUNDLE(exe,
 import os
 os.system(r'rm dist/Artisan.app/Contents/Info.plist')
 
-plist.write(r'dist/Artisan.app/Contents/Info.plist')
+plistlib.writePlist(plist,r'dist/Artisan.app/Contents/Info.plist')

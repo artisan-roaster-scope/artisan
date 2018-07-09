@@ -3,7 +3,7 @@
 Start the application.
 """
 import sys
-import imp
+#import imp # deprecated favour of importlib
 import os
 from platform import system
 
@@ -31,7 +31,8 @@ elif system().startswith("Windows"):
     try:
         ib = (hasattr(sys, "frozen") or # new py2exe
             hasattr(sys, "importers") # old py2exe
-            or imp.is_frozen("__main__")) # tools/freeze
+#            or imp.is_frozen("__main__")) # tools/freeze
+             or getattr(sys, 'frozen', False)) # tools/freeze           
         from PyQt5.QtWidgets import QApplication
         if ib:
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
@@ -76,7 +77,8 @@ from multiprocessing import freeze_support
 
 if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe
                             or hasattr(sys, "importers") # old py2exe
-                            or imp.is_frozen("__main__")): # tools/freeze
+#                            or imp.is_frozen("__main__")): # tools/freeze
+                            or getattr(sys, 'frozen', False)): # tools/freeze
     from multiprocessing import set_executable
     executable = os.path.join(os.path.dirname(sys.executable), 'artisan.exe')
     set_executable(executable)    
