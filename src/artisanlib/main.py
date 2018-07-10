@@ -10754,6 +10754,10 @@ class ApplicationWindow(QMainWindow):
 
         self.exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_EXPORT)
 
+        fileExportExcelAction = QAction(QApplication.translate("Menu", "Artisan Excel...",None),self)
+        fileExportExcelAction.triggered.connect(self.fileExportExcel)
+        self.exportMenu.addAction(fileExportExcelAction)
+
         fileExportCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
         fileExportCSVAction.triggered.connect(self.fileExportCSV)
         self.exportMenu.addAction(fileExportCSVAction)
@@ -10784,6 +10788,10 @@ class ApplicationWindow(QMainWindow):
         self.convMenu.addAction(fileConvertCelsiusAction)
         
         self.convMenu.addSeparator()
+
+        fileConvertExcelAction = QAction(QApplication.translate("Menu", "Artisan Excel...",None),self)
+        fileConvertExcelAction.triggered.connect(self.fileConvertExcel)
+        self.convMenu.addAction(fileConvertExcelAction)
 
         fileConvertCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
         fileConvertCSVAction.triggered.connect(self.fileConvertCSV)
@@ -16814,6 +16822,165 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportCSV() {0}").format(str(ex)),exc_tb.tb_lineno)
             return False
 
+    #Write readings to Artisan Excel file
+    def exportExcel(self,filename):
+        try:
+            if len(self.qmc.timex) > 0:
+                CHARGE = self.qmc.timex[self.qmc.timeindex[0]] 
+                TP_index = self.findTP()
+                TP = 0.
+                if TP_index and TP_index < len(self.qmc.timex):
+                    TP = self.qmc.timex[TP_index]
+                dryEndIndex = self.findDryEnd(TP_index)
+                if self.qmc.timeindex[1]:
+                    #manual dryend available
+                    DRYe = self.qmc.timex[self.qmc.timeindex[1]]
+                else:
+                    #we use the dryEndIndex respecting the dry phase
+                    if dryEndIndex < len(self.qmc.timex):
+                        DRYe = self.qmc.timex[dryEndIndex]
+                    else:
+                        DRYe = 0.
+                if self.qmc.timeindex[2]:
+                    FCs = self.qmc.timex[self.qmc.timeindex[2]]
+                else:
+                    FCs = 0
+                if self.qmc.timeindex[3]:
+                    FCe = self.qmc.timex[self.qmc.timeindex[3]]
+                else:
+                    FCe = 0
+                if self.qmc.timeindex[4]:
+                    SCs = self.qmc.timex[self.qmc.timeindex[4]]
+                else:
+                    SCs = 0
+                if self.qmc.timeindex[5]:
+                    SCe = self.qmc.timex[self.qmc.timeindex[5]]
+                else:
+                    SCe = 0
+                if self.qmc.timeindex[6]:
+                    DROP = self.qmc.timex[self.qmc.timeindex[6]]
+                else:
+                    DROP = 0
+                if self.qmc.timeindex[7]:
+                    COOL = self.qmc.timex[self.qmc.timeindex[7]]
+                else:
+                    COOL = 0
+                events = [     
+                    [CHARGE,"Charge",False],
+                    [TP,"TP",False],      
+                    [DRYe,"Dry End",False], 
+                    [FCs,"FCs",False],
+                    [FCe,"FCe",False],
+                    [SCs,"SCs",False],
+                    [SCe,"SCe",False],
+                    [DROP, "Drop",False],
+                    [COOL, "COOL",False],
+                    ]
+
+                from openpyxl import Workbook
+                from openpyxl.styles import Font, Fill,Alignment
+
+                wb = Workbook()
+                ws = wb.active
+                ws.title = u(QApplication.translate("HTML Report Template", "Profile",None)) 
+                
+                bf = Font(bold=True)                    
+
+                #summary section
+                fieldlist = [
+                    ["Date",   self.qmc.roastdate.date().toString("dd'.'MM'.'yyyy")   ],
+                    ["Unit",   self.qmc.mode                                          ],
+                    ["CHARGE", self.eventtime2string(CHARGE)                          ],
+                    ["TP",     self.eventtime2string(TP)                              ],
+                    ["DRYe",   self.eventtime2string(DRYe)                            ],
+                    ["FCs",    self.eventtime2string(FCs)                             ],
+                    ["FCe",    self.eventtime2string(FCe)                             ],
+                    ["SCs",    self.eventtime2string(SCs)                             ],
+                    ["SCe",    self.eventtime2string(SCe)                             ],
+                    ["DROP",   self.eventtime2string(DROP)                            ],
+                    ["COOL",   self.eventtime2string(COOL)                            ],
+                    ["Time",   self.qmc.roastdate.time().toString()[:-3]              ],
+                    ]
+                for f in range(len(fieldlist)):
+                    ws.cell(row=1,column=f+1).value = fieldlist[f][0]
+                    ws.cell(row=1,column=f+1).font = bf
+                    ws.cell(row=2,column=f+1).value = fieldlist[f][1]
+                    ws.cell(row=1,column=f+1).alignment = Alignment(horizontal='center')
+                    ws.cell(row=2,column=f+1).alignment = Alignment(horizontal='center')
+                    
+                #profile data
+                fieldlist = [
+                    ["Time1",  "time1"             ],
+                    ["Time2",  "time2"             ],
+                    ["BT",     "self.qmc.temp2[i]" ],
+                    ["ET",     "self.qmc.temp2[i]" ],
+                    ["Event",  "event"             ],
+                    ]
+                extraslist = list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)]))
+
+                r = 4  #starting row number
+                c = 0  #starting col number
+                for f in range(len(fieldlist)):
+                    c += 1
+                    ws.cell(row=r,column=c,value=fieldlist[f][0])
+                for f in range(len(extraslist)):
+                    c += 1
+                    ws.cell(row=r,column=c).value = extraslist[f][0]
+                    c += 1
+                    ws.cell(row=r,column=c).value = extraslist[f][1]
+
+                for i in range(ws.max_column):
+                    ws.cell(row=r,column=i+1).font = bf
+                    ws.cell(row=r,column=i+1).alignment = Alignment(horizontal='center')                    
+                r += 1
+                
+                last_time = None
+                for i in range(len(self.qmc.timex)):
+                    if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
+                        time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
+                    else:
+                        time2 = "" 
+                    event = ""               
+                    for e in range(len(events)):
+                        if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
+                            event = events[e][1]
+                            events[e][2] = True
+                            break
+                    time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
+                    if not last_time or last_time != time1:
+                        extratemps = []
+                        for j in range(len(self.qmc.extradevices)):
+                            if j < len(self.qmc.extratemp1) and i < len(self.qmc.extratemp1[j]):
+                                extratemps.append(self.qmc.extratemp1[j][i])
+                            else:
+                                extratemps.append(-1)
+                            if j < len(self.qmc.extratemp2) and i < len(self.qmc.extratemp2[j]):
+                                extratemps.append(self.qmc.extratemp2[j][i])
+                            else:
+                                extratemps.append(-1)
+                                
+                        ws.cell(row=r+i, column=1).value = eval(fieldlist[0][1])
+                        ws.cell(row=r+i, column=2).value = eval(fieldlist[1][1])
+                        ws.cell(row=r+i, column=3).value = eval(fieldlist[2][1])
+                        ws.cell(row=r+i, column=4).value = eval(fieldlist[3][1])
+                        ws.cell(row=r+i, column=5).value = eval(fieldlist[4][1])
+
+                        for j in range(len(extratemps)):
+                            ws.cell(row=r+i, column=6+j).value = extratemps[j]
+
+                    last_time = time1
+
+                wb.save(filename)
+                return True
+            else:
+                return False
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " exportExcel() {0}").format(str(ex)),exc_tb.tb_lineno)
+            return False
+
     #Write object to file
     def serialize(self,filename,obj):
         fn = u(filename)
@@ -17872,6 +18039,9 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " fileExport(): {0}").format(str(ex)))
             return
 
+    def fileExportExcel(self):
+        self.fileExport(QApplication.translate("Message", "Export Excel",None),"*.xlsx",self.exportExcel)
+
     def fileExportCSV(self):
         self.fileExport(QApplication.translate("Message", "Export CSV",None),"*.csv",self.exportCSV)
 
@@ -17916,6 +18086,9 @@ class ApplicationWindow(QMainWindow):
             progress.cancel()
             progress = None
         
+    def fileConvertExcel(self):
+        self.fileConvert(".xlsx",self.exportExcel)
+
     def fileConvertCSV(self):
         self.fileConvert(".csv",self.exportCSV)
 
