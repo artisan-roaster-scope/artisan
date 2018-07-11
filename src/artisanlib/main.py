@@ -5283,6 +5283,11 @@ class tgraphcanvas(FigureCanvas):
                     self.l_AUCguide, = self.ax.plot([], [],color = self.palette["aucguide"],
                                                 label=aw.arabicReshape(QApplication.translate("Label", "AUCguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
+
+                if aw.qmc.showtimeguide:
+                    self.l_timeline, = self.ax.plot([], [],color = self.palette["timeguide"],
+                                                label=aw.arabicReshape(QApplication.translate("Label", "TIMEguide", None)),
+                                                linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
     
                 # if designer ON
                 if self.designerflag:
@@ -6104,7 +6109,6 @@ class tgraphcanvas(FigureCanvas):
                         pass
                     aw.fujipid.sv = 0
             self.disconnectProbes()
-            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)  #DEBUG this statement here for timeguide bar.  May have unintended consequenses.
             QApplication.processEvents()
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
@@ -10272,7 +10276,7 @@ class SampleThread(QThread):
                             aw.qmc.TPalarmtimeindex = aw.findTP()
                 #add to plot a vertical time line
                 if aw.qmc.showtimeguide or aw.qmc.device == 18:
-                    aw.qmc.l_timeline, = aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["timeguide"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
+                    aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
