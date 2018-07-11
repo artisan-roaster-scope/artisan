@@ -60,11 +60,6 @@ try: # activate support for hiDPI screens on Windows
 except:
     pass
 
-# needs to be done before any other PyQt import
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
-
 # write logtrace to Console on OS X:
 #try:
 #..
@@ -305,94 +300,61 @@ def path2url(path):
     return urlparse.urljoin(
       'file:', urllib.pathname2url(path))        
         
-if sip.getapi('QVariant') == 1:
-    def toInt(x):
-        if x is None:
+# remaining artifacts from Qt4/5 compatibility layer:
+def toInt(x):
+    if x is None:
+        return 0
+    else:
+        try:
+            return int(x)
+        except:
             return 0
-        else:
-            return x.toInt()[0]
-    def toString(x):
-        return u(x.toString())
-    def toList(x):
-        return x.toList()
-    def toFloat(x):
-        if x is None:
+def toString(x):
+    return u(x)
+def toList(x):
+    if x is None:
+        return []
+    else:
+        return list(x)
+def toFloat(x):
+    if x is None:
+        return 0.
+    else:
+        try:
+            return float(x)
+        except:
             return 0.
-        else:
-            return x.toFloat()
-    def toDouble(x):
-        if x is None:
+def toDouble(x):
+    if x is None:
+        return 0.
+    else:
+        try:
+            return float(x)
+        except:
             return 0.
-        else:
-            return x.toDouble()
-    def toBool(x):
-        if x is None:
-            return False
-        else:
-            return x.toBool()
-    def toStringList(x):
-        return x.toStringList()
-    def toMap(x):
-        return x.toMap()
-    def removeAll(l,s):
-        l.removeAll(s)
-    def toByteArray(x):
-        return x.toByteArray()
-else:
-    def toInt(x):
-        if x is None:
-            return 0
-        else:
-            try:
-                return int(x)
-            except:
-                return 0
-    def toString(x):
-        return u(x)
-    def toList(x):
-        if x is None:
-            return []
-        else:
-            return list(x)
-    def toFloat(x):
-        if x is None:
-            return 0.
-        else:
-            try:
-                return float(x)
-            except:
-                return 0.
-    def toDouble(x):
-        if x is None:
-            return 0.
-        else:
-            try:
-                return float(x)
-            except:
-                return 0.
-    def toBool(x):
-        if x is None:
-            return False
-        else:
-            if isinstance(x,str):
-                if x in ["false","False"]:
-                    return False
-                else:
-                    return True
+def toBool(x):
+    if x is None:
+        return False
+    else:
+        if isinstance(x,str):
+            if x in ["false","False"]:
+                return False
             else:
-                return bool(x)
-    def toStringList(x):
-        if x:
-            return [u(s) for s in x]
+                return True
         else:
-            return []
-    def toMap(x):
-        return x
-    def removeAll(l,s):
-        for _ in arange(l.count(s)):  # @UndefinedVariable
-            l.remove(s)
-    def toByteArray(x):
-        return x        
+            return bool(x)
+def toStringList(x):
+    if x:
+        return [u(s) for s in x]
+    else:
+        return []
+def toMap(x):
+    return x
+def removeAll(l,s):
+    for _ in arange(l.count(s)):  # @UndefinedVariable
+        l.remove(s)
+def toByteArray(x):
+    return x        
 
 platf = str(platform.system())
 
@@ -19714,10 +19676,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 settings = QSettings()
             #save window geometry
-            if sip.getapi('QVariant') == 1:
-                settings.setValue("Geometry",QVariant(self.saveGeometry()))
-            else:
-                settings.setValue("Geometry",self.saveGeometry())
+            settings.setValue("Geometry",self.saveGeometry())
                 
             settings.setValue("fullscreen", (self.full_screen_mode_active or self.isFullScreen()))
             settings.setValue("plus_account",self.plus_account)
@@ -28510,10 +28469,7 @@ class editGraphDlg(ArtisanDialog):
     def closeEvent(self, _):
         settings = QSettings()
         #save window geometry
-        if sip.getapi('QVariant') == 1:
-            settings.setValue("RoastGeometry",QVariant(self.saveGeometry()))
-        else:
-            settings.setValue("RoastGeometry",self.saveGeometry())
+        settings.setValue("RoastGeometry",self.saveGeometry())
 
     def cancel_dialog(self):
         aw.qmc.specialevents = self.org_specialevents
@@ -30687,10 +30643,7 @@ class calculatorDlg(ArtisanDialog):
     def closeEvent(self, _):
         settings = QSettings()
         #save window geometry
-        if sip.getapi('QVariant') == 1:
-            settings.setValue("CalculatorGeometry",QVariant(self.saveGeometry()))
-        else:
-            settings.setValue("CalculatorGeometry",self.saveGeometry())              
+        settings.setValue("CalculatorGeometry",self.saveGeometry())              
 
 ##########################################################################
 #####################  EVENTS CONFIGURATION DLG     ######################
@@ -32896,10 +32849,7 @@ class EventsDlg(ArtisanDialog):
     def closeEvent(self,_):
         settings = QSettings()
         #save window geometry
-        if sip.getapi('QVariant') == 1:
-            settings.setValue("EventsGeometry",QVariant(self.saveGeometry()))
-        else:
-            settings.setValue("EventsGeometry",self.saveGeometry())    
+        settings.setValue("EventsGeometry",self.saveGeometry())    
 
     def showEventbuttonhelp(self):
         string = u(QApplication.translate("Message", "<small><b>Button Label</b> Enter \\n to create labels with multiple lines.",None))
@@ -33671,10 +33621,7 @@ class backgroundDlg(ArtisanDialog):
     def closeEvent(self,_):
         settings = QSettings()
         #save window geometry
-        if sip.getapi('QVariant') == 1:
-            settings.setValue("BackgroundGeometry",QVariant(self.saveGeometry()))
-        else:
-            settings.setValue("BackgroundGeometry",self.saveGeometry())    
+        settings.setValue("BackgroundGeometry",self.saveGeometry())    
         
     def getColorIdx(self,c):
         try:
@@ -43162,10 +43109,7 @@ class LargeLCDs(ArtisanDialog):
     def closeEvent(self, _):
         settings = QSettings()
         #save window geometry
-        if sip.getapi('QVariant') == 1:
-            settings.setValue("LCDGeometry",QVariant(self.saveGeometry()))
-        else:
-            settings.setValue("LCDGeometry",self.saveGeometry())
+        settings.setValue("LCDGeometry",self.saveGeometry())
                 
         aw.largeLCDs_dialog = None
         aw.LargeLCDs = False
@@ -44176,10 +44120,7 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarm_popup_timout = int(self.popupTimoutSpinBox.value())
         settings = QSettings()
         #save window geometry
-        if sip.getapi('QVariant') == 1:
-            settings.setValue("AlarmsGeometry",QVariant(self.saveGeometry()))
-        else:
-            settings.setValue("AlarmsGeometry",self.saveGeometry())  
+        settings.setValue("AlarmsGeometry",self.saveGeometry())  
         self.accept()
     
     def closeEvent(self, _):
@@ -48733,10 +48674,7 @@ class PID_DlgControl(ArtisanDialog):
     def closeEvent(self,_):
         settings = QSettings()
         #save window geometry
-        if sip.getapi('QVariant') == 1:
-            settings.setValue("PIDGeometry",QVariant(self.saveGeometry()))
-        else:
-            settings.setValue("PIDGeometry",self.saveGeometry())   
+        settings.setValue("PIDGeometry",self.saveGeometry())   
         self.accept()
 
 

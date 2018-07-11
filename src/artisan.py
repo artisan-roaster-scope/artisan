@@ -7,11 +7,6 @@ import sys
 import os
 from platform import system
 
-# needs to be done before any other PyQt import
-import sip
-sip.setapi('QString', 2)
-sip.setapi('QVariant', 2)
-
         
 # on Qt5, the platform plugin cocoa/windows is not found in the plugin directory (dispite the qt.conf file) if we do not
 # extend the libraryPath accordingly
