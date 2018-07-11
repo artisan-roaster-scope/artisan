@@ -70,7 +70,10 @@ except:
 #    import traceback
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
-from PyQt5 import sip # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 private sip module
+try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 private sip module
+    from PyQt5 import sip # @UnusedImport 
+except:
+    pass
 from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,  # @Reimport
                          QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @Reimport
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @Reimport
@@ -84,7 +87,7 @@ from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,  # @Reimport
                           QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
-                          QRegExp, QDate, QUrl, QDir, QVariant, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
+                          QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
 
 import matplotlib as mpl
 from matplotlib import cm
@@ -10276,7 +10279,7 @@ class SampleThread(QThread):
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
                 #add to plot a vertical time line
-                if aw.qmc.showtimeguide or aw.qmc.device == 18:
+                if aw.qmc.showtimeguide or aw.qmc.device == 18 and aw.qmc.l_timeline is not None:
                     aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
         except Exception as e:
             #import traceback
@@ -23105,7 +23108,7 @@ class ApplicationWindow(QMainWindow):
                 dialog = PID_DlgControl(self)
                 #modeless style dialog 
                 dialog.show()
-                dialog.setFixedSize(dialog.size())
+#                dialog.setFixedSize(dialog.size())
 
     def deviceassigment(self):
         dialog = DeviceAssignmentDlg(self)
