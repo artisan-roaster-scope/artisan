@@ -70,6 +70,7 @@ except:
 #    import traceback
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
+from PyQt5 import sip # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 private sip module
 from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,  # @Reimport
                          QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @Reimport
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @Reimport
@@ -12017,6 +12018,8 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox1.setMaximumWidth(55)
         self.sliderGrpBox1.setVisible(False)
         self.sliderGrpBox1.setFlat(True)
+        self.sliderGrpBox1x = QVBoxLayout() # we had to add this extra layer of QVBoxLayout for alignment issues
+        self.sliderGrpBox1x.addWidget(self.sliderGrpBox1)
         self.slider1.setTracking(False)
         self.slider1.sliderMoved.connect(lambda v=0:self.updateSliderLCD(0,v))
         self.slider1.valueChanged.connect(lambda _:self.sliderReleased(0,updateLCD=True))
@@ -12041,6 +12044,8 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox2.setMaximumWidth(55) 
         self.sliderGrpBox2.setVisible(False)
         self.sliderGrpBox2.setFlat(True)
+        self.sliderGrpBox2x = QVBoxLayout() # we had to add this extra layer of QVBoxLayout for alignment issues
+        self.sliderGrpBox2x.addWidget(self.sliderGrpBox2)
         self.slider2.setTracking(False)
         self.slider2.sliderMoved.connect(lambda v=0:self.updateSliderLCD(1,v))
         self.slider2.valueChanged.connect(lambda _:self.sliderReleased(1,updateLCD=True))
@@ -12064,6 +12069,8 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox3.setMaximumWidth(55) 
         self.sliderGrpBox3.setVisible(False)
         self.sliderGrpBox3.setFlat(True)
+        self.sliderGrpBox3x = QVBoxLayout() # we had to add this extra layer of QVBoxLayout for alignment issues
+        self.sliderGrpBox3x.addWidget(self.sliderGrpBox3)
         self.slider3.setTracking(False)
         self.slider3.sliderMoved.connect(lambda v=0:self.updateSliderLCD(2,v))
         self.slider3.valueChanged.connect(lambda _:self.sliderReleased(2,updateLCD=True))
@@ -12087,6 +12094,8 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox4.setMaximumWidth(55) 
         self.sliderGrpBox4.setVisible(False)
         self.sliderGrpBox4.setFlat(True)
+        self.sliderGrpBox4x = QVBoxLayout() # we had to add this extra layer of QVBoxLayout for alignment issues
+        self.sliderGrpBox4x.addWidget(self.sliderGrpBox4)
         self.slider4.setTracking(False)
         self.slider4.sliderMoved.connect(lambda v=0:self.updateSliderLCD(3,v))
         self.slider4.valueChanged.connect(lambda _:self.sliderReleased(3,updateLCD=True))
@@ -12121,15 +12130,13 @@ class ApplicationWindow(QMainWindow):
         sliderGrp12 = QVBoxLayout()
         sliderGrp12.setSpacing(0)
         sliderGrp12.setContentsMargins(0,0,0,0)
-        sliderGrp12.addWidget(self.sliderGrpBox1)
-#        sliderGrp12.addSpacing(10)
-        sliderGrp12.addWidget(self.sliderGrpBox2) # DRUM
+        sliderGrp12.addLayout(self.sliderGrpBox1x)
+        sliderGrp12.addLayout(self.sliderGrpBox2x)
         sliderGrp34 = QVBoxLayout()
         sliderGrp34.setSpacing(0)
         sliderGrp34.setContentsMargins(0,0,0,0)
-        sliderGrp34.addWidget(self.sliderGrpBox3)
-#        sliderGrp34.addSpacing(10)
-        sliderGrp34.addWidget(self.sliderGrpBox4) # BURNER
+        sliderGrp34.addLayout(self.sliderGrpBox3x)
+        sliderGrp34.addLayout(self.sliderGrpBox4x)
         sliderGrpSV = QVBoxLayout()
         sliderGrpSV.setSpacing(0)
         sliderGrpSV.setContentsMargins(0,0,0,0)
