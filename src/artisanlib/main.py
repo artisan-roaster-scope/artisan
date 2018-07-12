@@ -5243,7 +5243,9 @@ class tgraphcanvas(FigureCanvas):
                     rcParams['path.effects'] = []
                     prop = aw.mpl_fontproperties.copy()
                     prop.set_size("x-small")
-                    if len(handles) > 3:
+                    if len(handles) > 7:
+                        ncol = int(math.ceil(len(handles)/4.))
+                    elif len(handles) > 3:
                         ncol = int(math.ceil(len(handles)/2.))
                     else:
                         ncol = int(math.ceil(len(handles)))
