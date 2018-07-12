@@ -16213,33 +16213,42 @@ class ApplicationWindow(QMainWindow):
             roasttype = ET.SubElement(tree, "roasttype")
             roasttype.text = "0" # 0: global, 1: time, 2: temp
             
-            recipedata = ET.SubElement(tree, "recipedata", temp_unit=aw.qmc.mode)
-            diagrampoints = ET.SubElement(recipedata, "diagrampoints")
+            recipedata = ET.SubElement(tree, "recipedata_temp_unit")
+            recipedata.text = aw.qmc.mode
+            
+            diagrampoints = ET.SubElement(tree, "diagrampoints")
+            
+            time_tag = "sTime"
+            temp_tag = "nTemperature"
+            burner_tag = "nBurnercapacity"
+            rising_tag = "bRising"
             
             # if CHARGE is defined, only export from CHARGE
             # if DROP is defined only export until DROP
             end_temp = None
             end_time = None
+            idx = 1
             for i in arange(len(aw.qmc.timex)):
                 if (self.qmc.timeindex[0] < 0 or i >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or i <= self.qmc.timeindex[6]):
-                    data = ET.SubElement(diagrampoints, "data")
+                    data = ET.SubElement(diagrampoints, "data", index=str(idx))
                     t = self.qmc.timex[i]
                     if self.qmc.timeindex[0] > -1:
                         t = t - self.qmc.timex[self.qmc.timeindex[0]]
-                    time = ET.SubElement(data,"time")
+                    time = ET.SubElement(data,time_tag)
                     time.text = "%02d:%02d"% divmod(t,60)
                     end_time = time.text
-                    temp = ET.SubElement(data,"temperature")
+                    temp = ET.SubElement(data,temp_tag)
                     temp.text = str(int(round(self.qmc.temp2[i])))
                     end_temp = temp.text
-                    burner = ET.SubElement(data,"burnercapacity")
+                    burner = ET.SubElement(data,burner_tag)
                     if len(self.qmc.extradevices) > 0:
                         burner.text = str(int(round(self.qmc.extratemp1[0][i])))
-                    rising = ET.SubElement(data,"rising")
+                    rising = ET.SubElement(data,rising_tag)
                     if self.qmc.delta2[i] and self.qmc.delta2[i] > 0:
                         rising.text = "true"                        
                     else:
                         rising.text = "false"
+                    idx = idx + 1
 
             endtemperature = ET.SubElement(tree, "endtemperature")
             if end_temp:
@@ -16256,11 +16265,12 @@ class ApplicationWindow(QMainWindow):
             else:
                 cooling.text = "00:00"
             
-            switchpoints = ET.SubElement(recipedata, "switchpoints")
+            switchpoints = ET.SubElement(tree, "switchpoints")
             # take data from 2nd extra event type
+            idx = 1
             for i in arange(len(self.qmc.specialevents)):
                 if self.qmc.specialeventstype[i] == 1 and (self.qmc.timeindex[0] < 0 or self.qmc.specialevents[i] >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or self.qmc.specialevents[i] <= self.qmc.timeindex[6]):
-                    data = ET.SubElement(switchpoints, "data")
+                    data = ET.SubElement(switchpoints, "data", index=str(idx))
                     if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
                         timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
                     else:
@@ -16268,18 +16278,19 @@ class ApplicationWindow(QMainWindow):
                     t = self.qmc.specialevents[i]
                     if self.qmc.timeindex[0] > -1:
                         t = t - self.qmc.timeindex[0]
-                    time = ET.SubElement(data,"time")
+                    time = ET.SubElement(data,time_tag)
                     time.text = timez
-                    temp = ET.SubElement(data,"temperature")
+                    temp = ET.SubElement(data,temp_tag)
                     temp.text = str(int(round(self.qmc.temp2[self.qmc.specialevents[i]])))
-                    burner = ET.SubElement(data,"burnercapacity")
+                    burner = ET.SubElement(data,burner_tag)
                     b = self.qmc.eventsInternal2ExternalValue(self.qmc.specialeventsvalue[i])
                     burner.text = str(int(round(b)))
-                    rising = ET.SubElement(data,"rising")
+                    rising = ET.SubElement(data,rising_tag)
                     if self.qmc.delta2[i] and self.qmc.delta2[i] > 0:
                         rising.text = "true"                        
                     else:
                         rising.text = "false"
+                    idx = idx + 1
             self.indent(tree)
             ET.ElementTree(tree).write(filename,encoding='utf-8', xml_declaration=True)
             return True
@@ -23792,24 +23803,29 @@ class ApplicationWindow(QMainWindow):
                 return
             if self.qmc.reset():
                 tree = ET.ElementTree(file=filename)
-                root = tree.getroot()
+                root = tree.getroot()                
                 
-                date = root.find("historydate")
-                time = root.find("historytime")
-                if date is not None and time is not None:
-                    aw.qmc.roastdate = QDateTime(QDate.fromString(date.text,"M/d/yyyy"),QTime.fromString(time.text,"h:mm AP"))
+                if root.tag == "history":
+                    date = root.find("historydate")
+                    time = root.find("historytime")
+                    if date is not None and time is not None:
+                        aw.qmc.roastdate = QDateTime(QDate.fromString(date.text,"M/d/yyyy"),QTime.fromString(time.text,"h:mm AP"))                    
   
                 title = root.find("roasttype")
                 if title is None:
                     aw.qmc.title = u(os.path.basename(filename))
                 else:
                     aw.qmc.title = u(title.text)
+                    
                 beans = root.find("coffeetype")
                 if beans is not None:
-                    aw.qmc.beans = u(beans.text)
+                    if beans.text is not None:
+                    	aw.qmc.beans = u(beans.text)
+                                        
                 roaster = root.find("roaster")
                 if roaster is not None:
-                    aw.qmc.roastertype = u(roaster.text)
+                    if roaster.text is not None:
+                        aw.qmc.roastertype = u(roaster.text)
                     
                 chargestr = root.find("charge")
                 if chargestr is None:
@@ -23820,6 +23836,7 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.weight[2] = "Kg"
                     except:
                         pass
+                        
                 dischargestr = root.find("dischargingcapacity")
                 if dischargestr is not None: # contains floating point number; default unit Kg
                     try:
@@ -23827,28 +23844,32 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.weight[3] = "Kg"
                     except:
                         pass
-
+                        
                 colorstr = root.find("coffeecolor")
                 if colorstr is not None:
                     c = None
-                    for e in colorstr.text.strip().split():
-                        try:
-                            c = int(e)
-                            break
-                        except:
-                            pass
+                    if colorstr.text is not None:
+                        for e in colorstr.text.strip().split():
+                            try:
+                                c = int(e)
+                                break
+                            except:
+                                pass
                     if c:
                         aw.qmc.ground_color = c
-
+                        
                 notes = root.find("notes")
                 if notes is not None:
-                    self.qmc.roastingnotes = u(notes.text)
+                    if notes.text is not None:
+                        self.qmc.roastingnotes = u(notes.text)
 
                 recipedata = tree.find('recipedata')
                 if recipedata is not None:
                     m = recipedata.get("temp_unit")
-                else:
-                    m = None
+                else:    
+                    m = tree.find('recipedata_temp_unit')
+                    if m is not None:
+                        m = m.text
                 if m is None:
                     historydata = tree.find('historydata')
                     if historydata is not None:
@@ -23869,19 +23890,28 @@ class ApplicationWindow(QMainWindow):
                 if recipedata is not None:
                     diagrampoints = tree.find('recipedata/diagrampoints')
                 else:
-                    diagrampoints = None
+                    diagrampoints = tree.find('diagrampoints')
                 if diagrampoints is None:
                     diagrampoints = tree.find('historydata')
                 if diagrampoints is not None:
                     for elem in diagrampoints.findall("data"):
-                        timez = float(self.qmc.stringtoseconds(elem.find("time").text))
+                        time_entry = elem.find("time")
+                        if time_entry is None:
+                            time_entry = elem.find("sTime")
+                        timez = float(self.qmc.stringtoseconds(time_entry.text))
                         self.qmc.timex.append(timez)
                         self.qmc.temp1.append(-1)
-                        bt = elem.find("temperature").text
+                        temp_entry = elem.find("temperature")
+                        if temp_entry is None:
+                            temp_entry = elem.find("nTemperature")
+                        bt = temp_entry.text
                         bt = bt.replace(",",".")
                         self.qmc.temp2.append(float(bt))
                         self.qmc.extratimex[0].append(timez)
-                        burner = elem.find("burnercapacity").text
+                        burner_entry = elem.find("burnercapacity")
+                        if burner_entry is None:
+                            burner_entry = elem.find("nBurnercapacity")                                
+                        burner = burner_entry.text
                         burner = burner.replace(",",".")
                         self.qmc.extratemp1[0].append(float(burner))
                         self.qmc.extratemp2[0].append(-1)
@@ -23892,11 +23922,20 @@ class ApplicationWindow(QMainWindow):
                     
                 if recipedata is not None:
                     switchpoints = tree.find('recipedata/switchpoints')
+                else:
+                    switchpoints = tree.find('switchpoints')
+                if switchpoints is not None:
                     for elem in switchpoints.findall("data"):
-                        time = float(self.qmc.stringtoseconds(elem.find("time").text))                    
+                        time_entry = elem.find("time")
+                        if time_entry is None:
+                            time_entry = elem.find("sTime")                                
+                        time = float(self.qmc.stringtoseconds(time_entry.text))
                         self.qmc.specialevents.append(self.qmc.time2index(time))
                         self.qmc.specialeventstype.append(1)
-                        self.qmc.specialeventsvalue.append(self.qmc.str2eventsvalue(elem.find("burnercapacity").text))
+                        burner_entry = elem.find("burnercapacity")
+                        if burner_entry is None:
+                            burner_entry = elem.find("nBurnercapacity")
+                        self.qmc.specialeventsvalue.append(self.qmc.str2eventsvalue(burner_entry.text))
                         self.qmc.specialeventsStrings.append("")
                         
                 aw.autoAdjustAxis()
@@ -23909,9 +23948,10 @@ class ApplicationWindow(QMainWindow):
         except ValueError as ex:
             aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None) + " importPilot(): {0}").format(str(ex)))
         except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
+            aw.sendmessage(QApplication.translate("Message","Import Probat Pilot failed", None))
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importPilot() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     def importBullet(self):
@@ -24776,6 +24816,7 @@ class ApplicationWindow(QMainWindow):
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None):
         super(ArtisanDialog,self).__init__(parent)
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
 
 #        if platf == 'Windows':
 # setting those Windows flags could be the reason for some instabilities on Windows
@@ -48836,7 +48877,6 @@ class PIDcontrol(object):
                     cool = int(round(numpy.interp(vn,[-100,0],[aw.eventslidermax[slidernr],aw.eventslidermin[slidernr]])))
                     aw.qmc.temporarymovenegativeslider = (slidernr,cool)
             except:
-    #            print(e)
     #            import traceback
     #            traceback.print_exc(file=sys.stdout)
                 pass
