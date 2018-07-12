@@ -10724,10 +10724,6 @@ class ApplicationWindow(QMainWindow):
 
         self.exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_EXPORT)
 
-        fileExportExcelAction = QAction(QApplication.translate("Menu", "Artisan Excel...",None),self)
-        fileExportExcelAction.triggered.connect(self.fileExportExcel)
-        self.exportMenu.addAction(fileExportExcelAction)
-
         fileExportCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
         fileExportCSVAction.triggered.connect(self.fileExportCSV)
         self.exportMenu.addAction(fileExportCSVAction)
@@ -10735,6 +10731,12 @@ class ApplicationWindow(QMainWindow):
         fileExportJSONAction = QAction(QApplication.translate("Menu", "Artisan JSON...",None),self)
         fileExportJSONAction.triggered.connect(self.fileExportJSON)
         self.exportMenu.addAction(fileExportJSONAction)
+        
+        self.exportMenu.addSeparator()
+
+        fileExportExcelAction = QAction(QApplication.translate("Menu", "Excel...",None),self)
+        fileExportExcelAction.triggered.connect(self.fileExportExcel)
+        self.exportMenu.addAction(fileExportExcelAction)
         
         self.exportMenu.addSeparator()
 
