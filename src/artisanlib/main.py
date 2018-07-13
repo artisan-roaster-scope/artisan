@@ -23841,7 +23841,7 @@ class ApplicationWindow(QMainWindow):
                 beans = root.find("coffeetype")
                 if beans is not None:
                     if beans.text is not None:
-                    	aw.qmc.beans = u(beans.text)
+                        aw.qmc.beans = u(beans.text)
                                         
                 roaster = root.find("roaster")
                 if roaster is not None:
