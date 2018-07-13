@@ -23796,6 +23796,21 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importK204() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    # normalize xml tags and attributs to lower case
+    def normalize_tags(self,root):
+        root.tag = root.tag.lower()
+        for child in root:
+            self.normalize_tags(child)
+    def normalize_attr(self,root):
+        for attr,value in root.attrib.items():
+            norm_attr = attr.lower()
+            if norm_attr != attr:
+                root.set(norm_attr,value)
+                root.attrib.pop(attr)
+        for child in root:
+            self.normalize_attr(child)
+
+
     def importPilot(self):
         try:
             try:
@@ -23806,8 +23821,10 @@ class ApplicationWindow(QMainWindow):
             if len(filename) == 0:
                 return
             if self.qmc.reset():
-                tree = ET.ElementTree(file=filename)
-                root = tree.getroot()                
+                tree = ET.ElementTree(file=filename)                
+                root = tree.getroot()
+                self.normalize_tags(root) # normalize tags to lower case
+                self.normalize_attr(root) # normalize attributes to lower case
                 
                 if root.tag == "history":
                     date = root.find("historydate")
@@ -23845,7 +23862,7 @@ class ApplicationWindow(QMainWindow):
                 if dischargestr is not None: # contains floating point number; default unit Kg
                     try:
                         aw.qmc.weight[1] = float(dischargestr.text)
-                        aw.qmc.weight[3] = "Kg"
+                        aw.qmc.weight[2] = "Kg"
                     except:
                         pass
                         
@@ -23867,6 +23884,8 @@ class ApplicationWindow(QMainWindow):
                     if notes.text is not None:
                         self.qmc.roastingnotes = u(notes.text)
 
+                recipedata = None
+                historydata = None
                 recipedata = tree.find('recipedata')
                 if recipedata is not None:
                     m = recipedata.get("temp_unit")
@@ -23878,6 +23897,10 @@ class ApplicationWindow(QMainWindow):
                     historydata = tree.find('historydata')
                     if historydata is not None:
                         m = historydata.get("temp_unit")
+                    else:
+                        m = tree.find('historydata_temp_unit')
+                        if m is not None:
+                            m = m.text
                 if m is not None:
                     m = m.lower()
                     if m == "c" and self.qmc.mode == "F":
@@ -23891,30 +23914,37 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.extraname1[0] == "Extra 1":
                     self.qmc.extraname1[0] = "Burner" 
                 
+                diagrampoints = None
                 if recipedata is not None:
                     diagrampoints = tree.find('recipedata/diagrampoints')
-                else:
+                if diagrampoints is None:
                     diagrampoints = tree.find('diagrampoints')
                 if diagrampoints is None:
                     diagrampoints = tree.find('historydata')
+                last_timez = 0
                 if diagrampoints is not None:
                     for elem in diagrampoints.findall("data"):
                         time_entry = elem.find("time")
                         if time_entry is None:
-                            time_entry = elem.find("sTime")
-                        timez = float(self.qmc.stringtoseconds(time_entry.text))
+                            time_entry = elem.find("stime")
+                        if time_entry is None or time_entry.text is None:
+                            last_timez = last_timez + 1
+                            timez = last_timez
+                        else:
+                            timez = float(self.qmc.stringtoseconds(time_entry.text))
+                            last_timez = timez
                         self.qmc.timex.append(timez)
                         self.qmc.temp1.append(-1)
                         temp_entry = elem.find("temperature")
                         if temp_entry is None:
-                            temp_entry = elem.find("nTemperature")
+                            temp_entry = elem.find("ntemperature")
                         bt = temp_entry.text
                         bt = bt.replace(",",".")
                         self.qmc.temp2.append(float(bt))
                         self.qmc.extratimex[0].append(timez)
                         burner_entry = elem.find("burnercapacity")
                         if burner_entry is None:
-                            burner_entry = elem.find("nBurnercapacity")                                
+                            burner_entry = elem.find("nburnercapacity")                                
                         burner = burner_entry.text
                         burner = burner.replace(",",".")
                         self.qmc.extratemp1[0].append(float(burner))
@@ -23932,13 +23962,13 @@ class ApplicationWindow(QMainWindow):
                     for elem in switchpoints.findall("data"):
                         time_entry = elem.find("time")
                         if time_entry is None:
-                            time_entry = elem.find("sTime")                                
+                            time_entry = elem.find("stime")                                
                         time = float(self.qmc.stringtoseconds(time_entry.text))
                         self.qmc.specialevents.append(self.qmc.time2index(time))
                         self.qmc.specialeventstype.append(3)
                         burner_entry = elem.find("burnercapacity")
                         if burner_entry is None:
-                            burner_entry = elem.find("nBurnercapacity")
+                            burner_entry = elem.find("nburnercapacity")
                         self.qmc.specialeventsvalue.append(self.qmc.str2eventsvalue(burner_entry.text))
                         self.qmc.specialeventsStrings.append("")
                         
