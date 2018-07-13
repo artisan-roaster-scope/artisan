@@ -44,20 +44,20 @@ Designing a curve is a sequential process: 1) Right click to choose Config to in
 
 Right click example:  hover the cursor over the curve and right click to add a point in between previously imported event points.
 
-![designer7](/assets/images/gsg/designer 7.png)
+![designer7](/assets/images/gsg/Designer 7.png)
 
 That pops up a window showing where you are adding the point.
 
-![designer8](/assets/images/gsg/designer 8.png)
+![designer8](/assets/images/gsg/Designer 8.png)
 
 The next screen shows the point added.
 
-![designer9](/assets/images/gsg/designer 9.png)
+![designer9](/assets/images/gsg/Designer 9.png)
 
 Left clicking over the point allows you to drag it upward, adjusting the BT curve and the ROR curve along with it. Grab icon is not shown.
 
 The process of creating a realistic curve for your roaster will likely involve inserting "in-between" points after where turning point is marked and dragging those points upward until the curve actually rises after TP. 
 
-![designer 10](/assets/images/gsg/designer 10.png)
+![designer 10](/assets/images/gsg/Designer 10.png)
 
 With further adjustment of the BT line the ROR line will come into shape.  
