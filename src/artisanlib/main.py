@@ -16273,7 +16273,7 @@ class ApplicationWindow(QMainWindow):
             # take data from 2nd extra event type
             idx = 1
             for i in arange(len(self.qmc.specialevents)):
-                if self.qmc.specialeventstype[i] == 1 and (self.qmc.timeindex[0] < 0 or self.qmc.specialevents[i] >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or self.qmc.specialevents[i] <= self.qmc.timeindex[6]):
+                if self.qmc.specialeventstype[i] == 3 and (self.qmc.timeindex[0] < 0 or self.qmc.specialevents[i] >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or self.qmc.specialevents[i] <= self.qmc.timeindex[6]):
                     data = ET.SubElement(switchpoints, "data", index=str(idx))
                     if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
                         timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
@@ -23935,7 +23935,7 @@ class ApplicationWindow(QMainWindow):
                             time_entry = elem.find("sTime")                                
                         time = float(self.qmc.stringtoseconds(time_entry.text))
                         self.qmc.specialevents.append(self.qmc.time2index(time))
-                        self.qmc.specialeventstype.append(1)
+                        self.qmc.specialeventstype.append(3)
                         burner_entry = elem.find("burnercapacity")
                         if burner_entry is None:
                             burner_entry = elem.find("nBurnercapacity")
@@ -30765,7 +30765,7 @@ class EventsDlg(ArtisanDialog):
                     
         self.bartypeComboBox =  QComboBox()
         self.bartypeComboBox.setFocusPolicy(Qt.NoFocus)
-        self.bartypeComboBox.setMaximumWidth(80)
+#        self.bartypeComboBox.setMaximumWidth(80)
         self.bartypeComboBox.addItems(barstyles)
         if not aw.qmc.eventsshowflag:
             self.bartypeComboBox.setCurrentIndex(0)
