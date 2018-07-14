@@ -5793,7 +5793,6 @@ class tgraphcanvas(FigureCanvas):
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
     def changeGColor(self,color):
-        print("changeGColor",color)
         #load selected dictionary
         if color == 1:
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
@@ -16190,6 +16189,12 @@ class ApplicationWindow(QMainWindow):
             
     def exportPilot(self,filename):
         try:
+            # warning popup if filename contains more than one _
+            # only contain one _ followed by an index number like Name_0.xml
+            s = filename.split("_")
+            if (len(s) < 2 or len(s) > 2):
+                QMessageBox.warning(aw,QApplication.translate("Message", "Warning",None),QApplication.translate("Message", "The Probat Shop Pilot Software expects files named <Name>_<Index>.xml like in Test_0.xml on import",None))
+        
             try:
                 import xml.etree.cElementTree as ET
             except ImportError:
@@ -16197,8 +16202,7 @@ class ApplicationWindow(QMainWindow):
             tree = ET.Element("recipe")
             
             charge = ET.SubElement(tree, "charge")
-            if aw.qmc.weight[0]:
-                charge.text = u(aw.float2float(aw.convertWeight(aw.qmc.weight[0],aw.qmc.weight_units.index(aw.qmc.weight[2]),1)))
+            charge.text = u(aw.float2float(aw.convertWeight(aw.qmc.weight[0],aw.qmc.weight_units.index(aw.qmc.weight[2]),1)))
             
             beans = ET.SubElement(tree, "coffeetype")
             if aw.qmc.beans and aw.qmc.beans != "":
@@ -16252,7 +16256,9 @@ class ApplicationWindow(QMainWindow):
                     end_temp = temp.text
                     burner = ET.SubElement(data,burner_tag)
                     if len(self.qmc.extradevices) > 0:
-                        burner.text = str(int(round(self.qmc.extratemp1[0][i])))
+                        burner.text = str(max(0,int(round(self.qmc.extratemp1[0][i]))))
+                    else:
+                        burner.text = "0"
                     rising = ET.SubElement(data,rising_tag)
                     if self.qmc.delta2[i] and self.qmc.delta2[i] > 0:
                         rising.text = "true"                        
