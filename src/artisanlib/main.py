@@ -5793,6 +5793,7 @@ class tgraphcanvas(FigureCanvas):
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
     def changeGColor(self,color):
+        print("changeGColor",color)
         #load selected dictionary
         if color == 1:
             aw.sendmessage(QApplication.translate("Message","Colors set to defaults", None))
@@ -5870,6 +5871,7 @@ class tgraphcanvas(FigureCanvas):
                 self.backgrounddeltaetcolor = str(dialog.bgdeltametLabel.text())
                 self.backgrounddeltabtcolor = str(dialog.bgdeltabtLabel.text())
                 self.backgroundxtcolor = str(dialog.bgextraLabel.text())
+                dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
 
         #update screen with new colors
         aw.updateCanvasColors()
@@ -16205,6 +16207,10 @@ class ApplicationWindow(QMainWindow):
             color = ET.SubElement(tree, "coffeecolor")
             if aw.qmc.ground_color:
                 color.text = str(aw.qmc.ground_color)
+                
+            endtemperature = ET.SubElement(tree, "endtemperature")
+            endtime = ET.SubElement(tree, "endtime")
+            cooling = ET.SubElement(tree, "coolingtime")                
             
             roaster = ET.SubElement(tree, "roaster")
             if aw.qmc.roastertype and aw.qmc.roastertype != "":
@@ -16254,15 +16260,12 @@ class ApplicationWindow(QMainWindow):
                         rising.text = "false"
                     idx = idx + 1
 
-            endtemperature = ET.SubElement(tree, "endtemperature")
             if end_temp:
                 endtemperature.text = end_temp
                 
-            endtime = ET.SubElement(tree, "endtime")
             if end_temp:
                 endtime.text = end_time
                 
-            cooling = ET.SubElement(tree, "coolingtime")
             if self.qmc.timeindex[7]:
                 t = self.qmc.timex[self.qmc.timeindex[7]] - self.qmc.timex[self.qmc.timeindex[6]]
                 cooling.text = "%02d:%02d"% divmod(t,60)
@@ -22881,8 +22884,8 @@ class ApplicationWindow(QMainWindow):
                
     def calibratedelay(self):
         samplingDl = SamplingDlg(self)
-        samplingDl.show()
-        samplingDl.setFixedSize(samplingDl.size())                        
+        samplingDl.show()         
+        samplingDl.setFixedSize(samplingDl.size())             
 
     def setcommport(self):
         dialog = comportDlg(self)
@@ -23042,6 +23045,7 @@ class ApplicationWindow(QMainWindow):
             self.color.stopbits = int(str(dialog.color_stopbitsComboBox.currentText()))
             self.color.parity = str(dialog.color_parityComboBox.currentText())
             self.color.timeout = aw.float2float(toFloat(str(dialog.color_timeoutEdit.text())))
+            dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
 
     def toggleHottopControl(self):
         if self.HottopControlActive:
@@ -24850,6 +24854,9 @@ class ApplicationWindow(QMainWindow):
 class ArtisanDialog(QDialog):
     def __init__(self, parent=None):
         super(ArtisanDialog,self).__init__(parent)
+        # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this attribute 
+        # has to be set to False explicitly in its initializer (like in comportDlg) to avoid the early GC and one might
+        # want to use a dialog.deleteLater() call to explicitly have the dialog and its widgets GCed
         self.setAttribute(Qt.WA_DeleteOnClose, True)
 
 #        if platf == 'Windows':
@@ -38953,6 +38960,7 @@ class PortComboBox(QComboBox):
 class comportDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(comportDlg,self).__init__(parent)
+        self.setAttribute(Qt.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
         self.setWindowTitle(QApplication.translate("Form Caption","Ports Configuration",None))
         self.setModal(True)
         ##########################    TAB 1 WIDGETS
@@ -42353,6 +42361,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
 class graphColorDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(graphColorDlg,self).__init__(parent)
+        self.setAttribute(Qt.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Colors", None))
         frameStyle = QFrame.Sunken | QFrame.Panel
@@ -43210,6 +43219,7 @@ class LargeLCDs(ArtisanDialog):
 class WheelDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(WheelDlg,self).__init__(parent)
+        self.setAttribute(Qt.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
         
         rcParams['path.effects'] = []
             
