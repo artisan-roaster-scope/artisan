@@ -7234,7 +7234,7 @@ class tgraphcanvas(FigureCanvas):
                     #i = index number of the event (current length of the time list)
                     i = len(self.timex)-1
                     # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
-                    if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
+                    if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(eventtype != 4 and self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
                         self.specialevents.append(i)
                         self.specialeventstype.append(4)
                         self.specialeventsStrings.append(str(Nevents+1))
@@ -10402,6 +10402,7 @@ class ApplicationWindow(QMainWindow):
         self.superusermode = False
         
         self.plus_account = None # if set to a login string, Artisan plus features are enabled
+        self.plus_remember_credentials = True # store plus account credentials in systems keychain
         
         self.appearance = ""
         
@@ -14601,7 +14602,7 @@ class ApplicationWindow(QMainWindow):
         except Exception:
             pass
         cmdvalue = self.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee])
-        if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type "--" that does not add an event; if eventtype == 9 we have an untyped event
+        if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type " " that does not add an event; if eventtype == 9 ("-") we have an untyped event
             if eventtype == 9: # an untyped event
                 # we just fire the action
                 self.eventaction(self.extraeventsactions[ee],u(self.extraeventsactionstrings[ee]).format(cmdvalue))
@@ -18265,6 +18266,7 @@ class ApplicationWindow(QMainWindow):
 #PLUS                
             if settings.contains("plus_account"):
                 self.plus_account = settings.value("plus_account",self.plus_account)
+                self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
                 if self.plus_account is not None:
                     try:
                         import plus.controller
@@ -19718,6 +19720,7 @@ class ApplicationWindow(QMainWindow):
                 
             settings.setValue("fullscreen", (self.full_screen_mode_active or self.isFullScreen()))
             settings.setValue("plus_account",self.plus_account)
+            settings.setValue("plus_remember_credentials",self.plus_remember_credentials)
                 
             #on OS X we prevent the reopening of windows
             # as done by defaults write com.google.code.p.Artisan NSQuitAlwaysKeepsWindows -bool false
