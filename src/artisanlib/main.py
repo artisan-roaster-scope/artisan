@@ -10515,7 +10515,7 @@ class ApplicationWindow(QMainWindow):
         #mpl.rcParams['toolbar'] == None # this does not work to remove the default toolbar
                 
         settings = QSettings()
-        if settings.contains("dpi"):
+        if settings.contains("dpi") and (not settings.contains("resetqsettings") or toInt(settings.value("resetqsettings",self.resetqsettings)) == 0):
             try:
                 self.dpi = toInt(settings.value("dpi",self.dpi))
             except:
@@ -18273,6 +18273,11 @@ class ApplicationWindow(QMainWindow):
                     self.resetqsettings = 0
                     if "canvas" in aw.qmc.palette:
                         aw.updateCanvasColors()
+                    # remove window geometry settings
+                    for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry",
+                        "BackgroundGeometry","LCDGeometry","AlarmsGeometry","PIDGeometry"]:
+                        settings.remove(s)
+                    #
                     aw.setFonts()
                     self.qmc.redraw()
                     return  #don't load any more settings. They could be bad (corrupted). Stop here.
@@ -23554,7 +23559,7 @@ class ApplicationWindow(QMainWindow):
         self.hideExtraButtons()
         dialog = flavorDlg(self)
         dialog.show()
-        dialog.setFixedSize(dialog.size())
+#        dialog.setFixedSize(dialog.size())
 
     def designerTriggered(self):
         if self.qmc.designerflag:
@@ -27390,9 +27395,6 @@ class editGraphDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))        
 
-        settings = QSettings()
-        if settings.contains("RoastGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("RoastGeometry")))
         
         self.org_specialevents = aw.qmc.specialevents
         self.org_specialeventstype = aw.qmc.specialeventstype
@@ -28255,11 +28257,15 @@ class editGraphDlg(ArtisanDialog):
         totallayout.addLayout(okLayout)
         totallayout.setContentsMargins(10,10,10,0)
         totallayout.setSpacing(0)
-        #totallayout.addStretch()
-        #totallayout.addLayout(buttonsLayout)
         self.volume_percent()
         self.setLayout(totallayout)
         self.titleedit.setFocus()
+        
+        settings = QSettings()
+        if settings.contains("RoastGeometry"):
+            toByteArray(self.restoreGeometry(settings.value("RoastGeometry")))
+        else:
+            self.resize(self.minimumSizeHint())
         
 #PLUS
         try:
@@ -30790,7 +30796,7 @@ class EventsDlg(ArtisanDialog):
         self.setModal(True)
         settings = QSettings()
         if settings.contains("EventsGeometry"):
-            toByteArray(self.restoreGeometry(settings.value("EventsGeometry")))
+                toByteArray(self.restoreGeometry(settings.value("EventsGeometry")))
         self.storeState()
         ## TAB 1
         self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button",None))
@@ -33285,6 +33291,11 @@ class flavorDlg(ArtisanDialog):
         flags = flags & (~helpFlag)
         self.setWindowFlags(flags)
         self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None))
+        
+        settings = QSettings()
+        if settings.contains("FlavorProperties"):
+            toByteArray(self.restoreGeometry(settings.value("FlavorProperties")))
+            
         defaultlabel = QLabel(QApplication.translate("Label","Default",None))
         self.defaultcombobox = QComboBox()
         self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","WCRC","*CUSTOM*"])
@@ -33357,7 +33368,7 @@ class flavorDlg(ArtisanDialog):
         mainLayout.addLayout(blayout1)
         mainLayout.addWidget(extraGroupLayout)
         mainLayout.addLayout(blayout)
-        mainLayout.addStretch()
+#        mainLayout.addStretch()
         mainLayout.addLayout(mainButtonsLayout)
         self.setLayout(mainLayout)
         aw.qmc.flavorchart()
@@ -33389,7 +33400,7 @@ class flavorDlg(ArtisanDialog):
             for i in range(nflavors):
                 labeledit = QLineEdit(u(aw.qmc.flavorlabels[i]))
                 labeledit.textChanged.connect(lambda _,x=i: self.setlabel(x))
-                valueSpinBox = QDoubleSpinBox()
+                valueSpinBox = MyQDoubleSpinBox()
                 valueSpinBox.setRange(0.,10.)
                 valueSpinBox.setSingleStep(.25)
                 valueSpinBox.setAlignment(Qt.AlignRight)
@@ -33507,7 +33518,10 @@ class flavorDlg(ArtisanDialog):
     def closeEvent(self,_):
         self.close()
 
-    def close(self):   
+    def close(self):  
+        settings = QSettings()
+        #save window geometry
+        settings.setValue("FlavorProperties",self.saveGeometry())  
         self.savetable()
         aw.qmc.safesaveflag = True
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -43808,6 +43822,15 @@ class MyQComboBox(QComboBox):
         if self.hasFocus():
             return QComboBox.wheelEvent(self, *args, **kwargs)
 
+class MyQDoubleSpinBox(QDoubleSpinBox):
+    def __init__(self, *args, **kwargs):
+        super(MyQDoubleSpinBox, self).__init__(*args, **kwargs)
+        self.setFocusPolicy(Qt.StrongFocus)
+
+    def wheelEvent(self, *args, **kwargs):
+        if self.hasFocus():
+            return MyQDoubleSpinBox.wheelEvent(self, *args, **kwargs)
+            
 class MyTableWidgetItemQLineEdit(QTableWidgetItem):
     def __init__(self, sortKey):
         #call custom constructor with UserType item type
