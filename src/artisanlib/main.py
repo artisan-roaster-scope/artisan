@@ -32544,16 +32544,25 @@ class EventsDlg(ArtisanDialog):
     def settypeeventbutton(self,i):
         typecombobox = self.eventbuttontable.cellWidget(i,2)
         aw.extraeventstypes[i] = typecombobox.currentIndex() - 1 # we remove again the offset of 1 here to jump over the new EVENT entry
-        if aw.extraeventstypes[i] == -1:
-            aw.extraeventstypes[i] = 4 # and map the first entry to 4
-        elif aw.extraeventstypes[i] == 4:
-            aw.extraeventstypes[i] = 9 # and map the entry 4 to 9
-        etype_char = ""
-        if aw.extraeventstypes[i] < 4 or (aw.extraeventstypes[i] > 4 and aw.extraeventstypes[i] < 9):
-            etype_char = str(aw.qmc.etypesf(aw.extraeventstypes[i])[0])
-        elif aw.extraeventstypes[i] == 9:
-            etype_char = "E"
-        aw.buttonlist[i].setText(etype_char+str(aw.qmc.eventsvalues(aw.extraeventsvalues[i])))
+#        if aw.extraeventstypes[i] == -1:
+#            aw.extraeventstypes[i] = 4 # and map the first entry to 4
+#        elif aw.extraeventstypes[i] == 4:
+#            aw.extraeventstypes[i] = 9 # and map the entry 4 to 9
+#        etype_char = ""
+#        if aw.extraeventstypes[i] < 4 or (aw.extraeventstypes[i] > 4 and aw.extraeventstypes[i] < 9):
+#            etype_char = str(aw.qmc.etypesf(aw.extraeventstypes[i])[0])
+#        elif aw.extraeventstypes[i] == 9:
+#            etype_char = "E"
+        labeledit = self.eventbuttontable.cellWidget(i,0)
+        label = u(labeledit.text())
+        if "\\n" in label:              #make multiple line text if "\n" found in label string
+            parts = label.split("\\n")
+            label = chr(10).join(parts)
+        et = aw.extraeventstypes[i]
+        if et < 4:
+            label = label.replace("\\t",aw.qmc.etypes[et])
+        aw.buttonlist[i].setText(label)                            
+#        aw.buttonlist[i].setText(etype_char+str(aw.qmc.eventsvalues(aw.extraeventsvalues[i])))
         aw.settooltip()
 
     def disconnectTableItemActions(self):
