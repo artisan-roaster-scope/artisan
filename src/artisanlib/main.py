@@ -9532,13 +9532,36 @@ class VMToolbar(NavigationToolbar):
                 a = QAction(self._icon("qt4_editor_options.svg"),'Customize',self)
             else:
                 a = QAction(self._icon("qt4_editor_options.png"),'Customize',self)
-            a.triggered.connect(self.edit_parameters)     
+            a.triggered.connect(self.edit_parameters)   
             a.setToolTip(QApplication.translate("Tooltip", 'Edit axis and curve parameters', None))
             self.insertAction(self.actions()[-1],a) 
+
+        for a in self.actions():
+            if aw is not None: 
+                if aw.qmc.palette["canvas"] is None or aw.qmc.palette["canvas"] == "None":
+                    canvas_color = QColor("#ECECEC")
+                else:           
+                    canvas_color = QColor(aw.qmc.palette["canvas"])
+                if canvas_color.name() == "#000000": # on black we start with (1,1,1) for lighter
+                    canvas_color = QColor("#222222")
+                
+                if self.white_icons:
+                    selected_canvas_color = canvas_color.lighter(250)
+                    border_color = "white"
+                else:
+                    selected_canvas_color = canvas_color.darker(120)
+                    border_color = "black"                    
+                self.widgetForAction(a).setStyleSheet(" \
+                        QToolButton:checked {border:1px solid transparent; margin: 1px; padding: 2px; background-color:" + selected_canvas_color.name() + ";border-radius: 3px;} \
+                        QToolButton:hover {border:1px solid " + border_color + "; margin: 2px; padding: 2px; background-color:transparent;border-radius: 3px;} \
+                        QToolButton:checked:hover {border:1px solid " + border_color + "; margin: 2px; padding: 2px; background-color:" + selected_canvas_color.name() + ";border-radius: 3px;} \
+                        QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
 #            if aw is not None:
 #                aw.updatePlusStatus(self)
+
+
 
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
@@ -11577,6 +11600,7 @@ class ApplicationWindow(QMainWindow):
 
         # NavigationToolbar VMToolbar       
         self.ntb = VMToolbar(self.qmc, self.main_widget)
+        
         #self.ntb.setMinimumHeight(50)
 
         #create LCD displays
@@ -12911,7 +12935,7 @@ class ApplicationWindow(QMainWindow):
         aw.ntb.setStyleSheet("QToolBar {background-color:" + str(aw.qmc.palette["canvas"]) + ";"
                                     + "border: 5px solid " + str(aw.qmc.palette["canvas"]) + ";"
                                     + "color: " + str(aw.qmc.palette["title"]) + ";"
-                                    + "}" )
+                                    + "}" )                                  
             
         aw.level1layout.insertWidget(0,aw.ntb)
         
@@ -16879,7 +16903,7 @@ class ApplicationWindow(QMainWindow):
                     ]
 
                 from openpyxl import Workbook
-                from openpyxl.styles import Font, Fill,Alignment
+                from openpyxl.styles import Font,Alignment # , Fill # ML: not used
 
                 wb = Workbook()
                 ws = wb.active
@@ -16937,14 +16961,15 @@ class ApplicationWindow(QMainWindow):
                 
                 last_time = None
                 for i in range(len(self.qmc.timex)):
-                    if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
-                        time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
-                    else:
-                        time2 = "" 
-                    event = ""               
+# ML to DB: vars time2 and event are unused!?
+#                    if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
+#                        time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
+#                    else:
+#                        time2 = "" 
+#                    event = ""               
                     for e in range(len(events)):
                         if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
-                            event = events[e][1]
+#                            event = events[e][1]
                             events[e][2] = True
                             break
                     time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
@@ -24713,7 +24738,7 @@ class ApplicationWindow(QMainWindow):
             if len(copy)>23 and len(copy[23]) == 4:
                 self.eventsliderunits = copy[23][:]
             else:
-                self.eventsliderunits = [0,0,0,0]
+                self.eventsliderunits = ["","","",""]
                 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
