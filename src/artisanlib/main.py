@@ -20430,8 +20430,6 @@ class ApplicationWindow(QMainWindow):
         device["arduinoBTChannel"] = str(self.ser.arduinoBTChannel)
         device["arduinoATChannel"] = str(self.ser.arduinoATChannel)
         phases["Phases"] = str(self.qmc.phases)
-        phases["PhasesEspresso"] = str(self.qmc.phases_espresso)
-        phases["PhasesFilter"] = str(self.qmc.phases_filter)
         phases["phasesbuttonflag"] = str(self.qmc.phasesbuttonflag)
         phases["watermarks"] = str(self.qmc.watermarksflag)
         phases["phasesLCDs"] = str(self.qmc.phasesLCDflag)
