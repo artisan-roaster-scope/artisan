@@ -9629,38 +9629,39 @@ class VMToolbar(NavigationToolbar):
         
     def edit_parameters(self):
         try:
-            allaxes = self.canvas.figure.get_axes()
-            if len(allaxes) == 1:
-                pass
-            else:
-                if aw.qmc.flagstart:
-                    # temporary set the axis to get proper menu items (same code as in redraw)
-                    aw.qmc.ax.set_ylabel(aw.qmc.mode)
-                    aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None)))
-                    two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
-                    if two_ax_mode and aw.qmc.delta_ax:
-                        aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
- 
-            axes = allaxes[0]
-            
-            try:
-                # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
-                steps_post_lines = []
-                for line in aw.qmc.ax.lines:
-                    if line.get_drawstyle() == "steps-post":
-                        steps_post_lines.append(line)
-                        line.set_drawstyle("steps")
-                figureoptions.figure_edit(axes)
-                for line in steps_post_lines:
-                    line.set_drawstyle("steps-post")
-            except Exception as e:
-#                import traceback
-#                traceback.print_exc(file=sys.stdout)
-                pass
-            aw.fetchCurveStyles()
-            aw.fetchAxisLimits()
-            # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
-            aw.qmc.redraw(recomputeAllDeltas=False)
+            if not aw.qmc.designerflag: # deactivate figure_options in designer mode due to all kind of side effects
+                allaxes = self.canvas.figure.get_axes()
+                if len(allaxes) == 1:
+                    pass
+                else:
+                    if aw.qmc.flagstart:
+                        # temporary set the axis to get proper menu items (same code as in redraw)
+                        aw.qmc.ax.set_ylabel(aw.qmc.mode)
+                        aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None)))
+                        two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
+                        if two_ax_mode and aw.qmc.delta_ax:
+                            aw.qmc.delta_ax.set_ylabel(aw.qmc.mode + aw.arabicReshape(QApplication.translate("Label", "/min", None)))
+     
+                axes = allaxes[0]
+                
+                try:
+                    # hack to work around an inconsistency in mpl (1.5.1, 2.0b3) that throws an index error on "steps-post" in figureoptions
+                    steps_post_lines = []
+                    for line in aw.qmc.ax.lines:
+                        if line.get_drawstyle() == "steps-post":
+                            steps_post_lines.append(line)
+                            line.set_drawstyle("steps")
+                    figureoptions.figure_edit(axes)
+                    for line in steps_post_lines:
+                        line.set_drawstyle("steps-post")
+                except Exception as e:
+    #                import traceback
+    #                traceback.print_exc(file=sys.stdout)
+                    pass
+                aw.fetchCurveStyles()
+                aw.fetchAxisLimits()
+                # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
+                aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " edit_parameters() {0}").format(str(e)),exc_tb.tb_lineno)
