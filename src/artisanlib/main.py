@@ -19438,7 +19438,7 @@ class ApplicationWindow(QMainWindow):
                 if platf != 'Darwin':
                     aw.fullscreenAction.setChecked(True)
                             
-        except Exception:
+        except Exception as e:
             res = False
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -25042,11 +25042,11 @@ class HUDDlg(ArtisanDialog):
         #delta ET
         self.DeltaET = QCheckBox()
         self.DeltaET.setChecked(aw.qmc.DeltaETflag)
-        DeltaETlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "ET",None))
+        DeltaETlabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "ET",None))
         #delta BT
         self.DeltaBT = QCheckBox()
         self.DeltaBT.setChecked(aw.qmc.DeltaBTflag)
-        DeltaBTlabel = QLabel(deltaLabelPrefix + QApplication.translate("Label", "BT",None))
+        DeltaBTlabel = QLabel(deltaLabelUTF8 + QApplication.translate("Label", "BT",None))
         filterlabel = QLabel(QApplication.translate("Label", "Smooth Deltas",None))
         #DeltaFilter holds the number of pads in filter
         self.DeltaFilter = QSpinBox()
@@ -49547,6 +49547,9 @@ def main():
         tmp.setLayout(aw.LCD2frame.layout())
         aw.LCD2frame.setLayout(aw.LCD3frame.layout())
         aw.LCD3frame.setLayout(tmp.layout())
+        
+    aw.show()
+    
     try:
         if sys.argv and len(sys.argv) > 1:
             argv_file = sys.argv[1]
@@ -49588,7 +49591,6 @@ def main():
             sys.stderr = sys.stdout
         except:
             pass
-    aw.show()
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
