@@ -104,6 +104,8 @@ Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.it/p/con
 
 The development of Artisan is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors.
 
+Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther)"
+
 {% include gallery %}
 
 <sub><sup>
