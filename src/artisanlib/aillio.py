@@ -51,6 +51,7 @@ class AillioR1:
         self.worker_thread = None
         self.worker_thread_run = True
         self.roast_number = -1
+        self.fan_rpm = 0
 
     def __del__(self):
         self.__close()
