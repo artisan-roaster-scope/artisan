@@ -25275,11 +25275,11 @@ class HUDDlg(ArtisanDialog):
         self.rormaxLimit.setMinimumWidth(80)
         self.rormaxLimit.setValue(aw.qmc.RoRlimit)
         if aw.qmc.mode == "F":
-            self.rorminLimit.setSuffix(" F")
-            self.rormaxLimit.setSuffix(" F")
+            self.rorminLimit.setSuffix(" F/min")
+            self.rormaxLimit.setSuffix(" F/min")
         elif aw.qmc.mode == "C":
-            self.rorminLimit.setSuffix(" C")
-            self.rormaxLimit.setSuffix(" C")
+            self.rorminLimit.setSuffix(" C/min")
+            self.rormaxLimit.setSuffix(" C/min")
         rorFilterHBox = QHBoxLayout()
         rorFilterHBox.addWidget(self.rorFilter)
         rorFilterHBox.addStretch()

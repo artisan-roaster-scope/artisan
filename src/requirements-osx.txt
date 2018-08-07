@@ -1,7 +1,7 @@
 appnope==0.1.0
 pyobjc-core==4.2.2
 pyobjc-framework-Cocoa==4.2.2
-py2app==0.14
+py2app==0.15
 sip==4.19.8
 PyQt5==5.11.2
 
