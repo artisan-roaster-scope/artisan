@@ -2599,10 +2599,11 @@ class tgraphcanvas(FigureCanvas):
                     c += 1
             if aw.qmc.backgroundeventsflag and aw.qmc.eventsGraphflag in [2,3,4]:
                 unique_etypes = set(aw.qmc.backgroundEtypes)
-                unique_etypes.discard(4) # we remove the "untyped" event as this is only drawn as annotation
-                c += len(unique_etypes)
+                # only those background event lines exists that are active and hold events
+                active_background_events = list(map(lambda e : e < 4 and aw.qmc.showEtypes[e],unique_etypes)) # we remove the "untyped" event as this is only drawn as annotation
+                c += sum(active_background_events)
         if aw.qmc.eventsshowflag and aw.qmc.eventsGraphflag in [2,3,4]:
-            c += 4 # always 4 ax lines are added as new events might have to be drawn of each of the 4 types
+            c += 4 # the foreground event lines (in contrast to the background ones) are always all present in those modes
         return c
 
     # we count
@@ -4714,7 +4715,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
                                     E4b_last = i
-                            every = 2                            
+                            every = None
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if cool exists and last event was earlier
                                     self.E1backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4916,7 +4917,7 @@ class tgraphcanvas(FigureCanvas):
                                 E4_nonempty = True
                                 E4_last = i
                                 
-                        every = 2
+                        every = None
     
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
@@ -9844,7 +9845,7 @@ class SampleThread(QThread):
                                
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
                                     extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
-                                    extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)                                    
+                                    extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)                                                                                                   
                                 if local_flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
                                     aw.qmc.extratemp2[i].append(float(extrat2))                                       
@@ -9906,21 +9907,28 @@ class SampleThread(QThread):
                         # and only half of the sampling interval is gone
                         if (sampling_interval - gone) > etbt_time and gone < (sampling_interval / 2.0):
                             # place the second ET/BT sampling in the middle of the sampling interval
-                            libtime.sleep((sampling_interval / 2.0) - gone)
-                            tx_2,t1_2,t2_2 = self.sample_main_device()
-                            tx = tx + (tx_2 - tx) / 2.0
-                            if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
-                                t2 = (t2 + t2_2) / 2.0
-                                t1 = (t1 + t1_2) / 2.0
-                            else: # use new values only to fix reading errors of the initial set of values
-                                if t1 == -1:
-                                    t1 = t1_2
-                                elif t1_2 != -1:
-                                    t1 = (t1 + t1_2) / 2.0
-                                if t2 == -1:
-                                    t2 = t2_2
-                                elif t2_2 != -1:
+                            stime = (sampling_interval / 2.0) - gone
+# releasing the semaphore here seems dangerous to me (despite the long blocking)                            
+#                            # but first release the samplingsemaphore
+#                            if aw.qmc.samplingsemaphore.available() < 1:
+#                                aw.qmc.samplingsemaphore.release(1)
+                            libtime.sleep(stime)
+#                            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,150) # we try to catch a lock for 150ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+                            if True: # gotlock:
+                                tx_2,t1_2,t2_2 = self.sample_main_device()
+                                tx = tx + (tx_2 - tx) / 2.0
+                                if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
                                     t2 = (t2 + t2_2) / 2.0
+                                    t1 = (t1 + t1_2) / 2.0
+                                else: # use new values only to fix reading errors of the initial set of values
+                                    if t1 == -1:
+                                        t1 = t1_2
+                                    elif t1_2 != -1:
+                                        t1 = (t1 + t1_2) / 2.0
+                                    if t2 == -1:
+                                        t2 = t2_2
+                                    elif t2_2 != -1:
+                                        t2 = (t2 + t2_2) / 2.0
                     ####### all values retrieved                
 
                     if aw.qmc.ETfunction is not None and len(aw.qmc.ETfunction):
@@ -10099,8 +10107,8 @@ class SampleThread(QThread):
                             
                     # append new data to the rateofchange arrays
                     if local_flagstart:
-                        # only if we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
-                        if length_of_qmc_timex > int(round(aw.qmc.deltafilter/2.)) + max(2,(aw.qmc.deltasamples + 1)):
+                        # only after CHARGE and we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
+                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex > int(round(aw.qmc.deltafilter/2.)) + max(2,(aw.qmc.deltasamples + 1)):
                             aw.qmc.delta1.append(rateofchange1plot)
                             aw.qmc.delta2.append(rateofchange2plot)
                         else:
@@ -10133,9 +10141,10 @@ class SampleThread(QThread):
                         # only if BT > 77C/170F
                         if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
                             ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 77) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 170)):
-                            if aw.BTbreak(length_of_qmc_timex - 1):
+                            b = aw.BTbreak(length_of_qmc_timex - 1)
+                            if b > 0:
                                 # we found a BT break at the current index minus 2
-                                aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
+                                aw.qmc.autoChargeIdx = length_of_qmc_timex - b
                         # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
                         elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                             tp = aw.findTP()
@@ -17944,7 +17953,7 @@ class ApplicationWindow(QMainWindow):
             profile["etypes"] = [encodeLocal(et) for et in self.qmc.etypes]
             profile["roastingnotes"] = encodeLocal(self.qmc.roastingnotes)
             profile["cuppingnotes"] = encodeLocal(self.qmc.cuppingnotes)
-            profile["timex"] = [self.float2float(x,5) for x in self.qmc.timex]
+            profile["timex"] = [self.float2float(x,6) for x in self.qmc.timex]
             profile["temp1"] = [self.float2float(x,5) for x in self.qmc.temp1]
             profile["temp2"] = [self.float2float(x,5) for x in self.qmc.temp2]
             profile["phases"] = self.qmc.phases
@@ -17962,9 +17971,9 @@ class ApplicationWindow(QMainWindow):
             profile["extradevices"] = self.qmc.extradevices
             profile["extraname1"] = [encodeLocal(n) for n in self.qmc.extraname1]
             profile["extraname2"] = [encodeLocal(n) for n in self.qmc.extraname2]
-            profile["extratimex"] = [[self.float2float(t,5) for t in x] for x in self.qmc.extratimex]
-            profile["extratemp1"] = [[self.float2float(t,2) for t in x] for x in self.qmc.extratemp1]
-            profile["extratemp2"] = [[self.float2float(t,2) for t in x] for x in self.qmc.extratemp2]
+            profile["extratimex"] = [[self.float2float(t,6) for t in x] for x in self.qmc.extratimex]
+            profile["extratemp1"] = [[self.float2float(t,5) for t in x] for x in self.qmc.extratemp1]
+            profile["extratemp2"] = [[self.float2float(t,5) for t in x] for x in self.qmc.extratemp2]
             profile["extramathexpression1"] = [encodeLocal(x) for x in self.qmc.extramathexpression1]
             profile["extramathexpression2"] = [encodeLocal(x) for x in self.qmc.extramathexpression2]
             profile["extradevicecolor1"] = [encodeLocal(x) for x in self.qmc.extradevicecolor1]
@@ -19511,14 +19520,16 @@ class ApplicationWindow(QMainWindow):
         
     def fetchAxisLimits(self):
         try:
-            # x-axis min/max (in standard units)
-            xmin, xmax = map(float, aw.qmc.ax.get_xlim())
-            aw.qmc.startofx = xmin
-            aw.qmc.endofx = xmax
-            # y-axis min/max
-            ymin, ymax = map(float, aw.qmc.ax.get_ylim())
-            aw.qmc.ylimit_min = ymin
-            aw.qmc.ylimit = ymax
+# don't fetch the axis as one might be zoomed in and then those values overwrite the standard Artisan axis setting on leaving the
+# figure options dialog without editing the axis limits. Not very intuitive!
+#            # x-axis min/max (in standard units)
+#            xmin, xmax = map(float, aw.qmc.ax.get_xlim())
+#            aw.qmc.startofx = xmin
+#            aw.qmc.endofx = xmax
+#            # y-axis min/max
+#            ymin, ymax = map(float, aw.qmc.ax.get_ylim())
+#            aw.qmc.ylimit_min = ymin
+#            aw.qmc.ylimit = ymax
             # title            
             aw.qmc.title = aw.qmc.ax.get_title()
         except:
@@ -22504,25 +22515,34 @@ class ApplicationWindow(QMainWindow):
                 index = i
         return index
 
+    def checkTop(self,offset,p0,p1,p2,p3,p4,p5):
+        d1 = p0 - p1
+        d2 = p1 - p2
+        #--
+        d3 = p4 - p3
+        d4 = p5 - p4
+        dpre = (d1 + d2) / 2.0
+        dpost = (d3 + d4) / 2.0
+#        print("checkTop",d3 < .0,d4 < .0,abs(dpost),(offset + (2.5 * abs(dpre))))
+        if d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (2.5 * abs(dpre)))):
+            return True
+        else:
+            return False
+        
+    
     # returns True if a BT break at i-2 is detected
     # idea:
     # . average delta before i-2 is not negative
     # . average delta after i-2 is negative and twice as high (absolute) as the one before
     def BTbreak(self,i,offset=0.5):
+#        print("BTbreak",i,offset,self.qmc.temp2[i])
+        res = 0
         if len(self.qmc.timex)>5 and i < len(self.qmc.timex):
-            d1 = self.qmc.temp2[i-5] - self.qmc.temp2[i-4]
-            d2 = self.qmc.temp2[i-4] - self.qmc.temp2[i-3]
-            d3 = self.qmc.temp2[i-1] - self.qmc.temp2[i-2]
-            d4 = self.qmc.temp2[i] - self.qmc.temp2[i-1]
-            dpre = (d1 + d2) / 2.0
-            dpost = (d3 + d4) / 2.0
-            #print("BTbreak",i,self.qmc.temp2[i],d3 < .0,d4 < .0,abs(dpost),(offset + (2.5 * abs(dpre))))
-            if d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (2.5 * abs(dpre)))):
-                return True
-            else:
-                return False
-        else:
-            return False
+            if self.checkTop(offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
+                res = 5
+            elif len(self.qmc.timex)>10 and self.checkTop(offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i]):
+                res = 7
+        return res
 
     # this can be used to find the CHARGE index as well as the DROP index by using
     # 0 or the DRY index as start index, respectively
@@ -35131,7 +35151,7 @@ class serialport(object):
         return tx,a,t
 
     def PHIDGET1048(self):
-        tx = aw.qmc.timeclock.elapsed()/1000.
+        tx = aw.qmc.timeclock.elapsed()
         t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,0)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
 
