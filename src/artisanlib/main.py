@@ -3890,57 +3890,75 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " smooth() {0}").format(str(ex)),exc_tb.tb_lineno)
             return x
 
-    def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1,toIndex=0):  # default 'hanning'
-        #pylint: disable=E1103        
-        win_len = max(0,window_len)
-        # filter spikes
-        if aw.qmc.filterDropOuts and len(a) == len(b) and len(a) > 1:
-            try:
-                b = self.medfilt(numpy.array(b),7).tolist()  # k=3 seems not to catch all spikes in all cases
-            except:
-                pass
-        if win_len != 1: # at the lowest level we turn smoothing completely off
+
+    # a: list of timestamps
+    # b: list of readings
+    # re_sample: if true re-sample readings to a linear spaced time before smoothing
+    # back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
+    # a_lin: pre-computed linear spaced timestamps of equal length than a
+    def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):  # default 'hanning'
+        if len(a) > 1 and len(a) == len(b):
+            #pylint: disable=E1103
+            # 1. truncate
             if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
                 if toIndex==0: # no limit
                     toIndex=len(a)
-                return numpy.concatenate(([None]*(fromIndex),
-                        self.smooth(numpy.array(a)[fromIndex:toIndex],numpy.array(b)[fromIndex:toIndex],window_len,window).tolist(),
-                        [None]*(len(a)-toIndex)
-                         )).tolist()
+            else: # smooth list on full length
+                fromIndex = 0
+                toIndex = len(a)
+            a = numpy.array(a)[fromIndex:toIndex]
+            b = numpy.array(b)[fromIndex:toIndex] 
+            # 2. re-sample           
+            if re_sample:
+                if a_lin is None or len(a_lin) != len(a):
+                    time_delta = a[-1]/(len(a)-1) # regular time interval                        
+                    a_mod= numpy.arange(0,time_delta*len(a),time_delta) # linear spaced self.timex timestamps for resampling 
+                else:
+                    a_mod = a_lin                   
+                b = numpy.interp(a_mod, a, b) # resample data in a to linear spaced time                               
             else:
-                return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
-        else:
-            return b
-                
-    # ignore -1 readings in averaging and ensure a good ramp up
-    def decay_smooth_list(self, l, window_len=7, decay_weights=None):
-        try:
-            if l is not None and ((isinstance(l,(numpy.ndarray,numpy.generic)) and l.size) or l) and aw.qmc.deltafilter: # and not aw.qmc.altsmoothing:
+                a_mod = a
+            # 3. filter spikes
+            if aw.qmc.filterDropOuts:
+                try:
+                    b = self.medfilt(numpy.array(b),7)  # k=3 seems not to catch all spikes in all cases
+                except:
+                    pass
+            # 4. smooth data
+            if decay_smoothing:
+                # decay smoothing
                 if decay_weights is None:
                     decay_weights = numpy.arange(1,window_len+1)
                 else:
                     window_len = len(decay_weights)
                 if decay_weights.sum() == 0:
-                    return l.tolist()
+                    res = b
                 else:
                     res = []
-                    for i in range(len(l)):
-                        seq = l[max(0,i-window_len + 1):i+1] 
+                    # ignore -1 readings in averaging and ensure a good ramp
+                    for i in range(len(b)):
+                        seq = b[max(0,i-window_len + 1):i+1] 
                         # we need to surpress -1 drop out values from this
                         seq = list(filter(lambda item: item != -1,seq))
                         w = decay_weights[max(0,window_len-len(seq)):]
                         w = w[len(w)-len(seq):]
                         if len(w) == 0:
-                            res.append(l[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
+                            res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
                         else:
-                            res.append(numpy.average(seq,weights=w))
-                    return res
+                            res.append(numpy.average(seq,weights=w))            
             else:
-                return l.tolist()
-        except Exception:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            pass
+                # optimal smoothing (the default)
+                win_len = max(0,window_len)
+                if win_len != 1: # at the lowest level we turn smoothing completely off
+                    res = self.smooth(a_mod,b,win_len,window)
+                else:
+                    res = b
+            # 4. sample back
+            if re_sample and back_sample:
+                res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps
+            return numpy.concatenate(([None]*(fromIndex),res.tolist(),[None]*(len(a)-toIndex))).tolist()
+        else:
+            return b
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):                
         if aw.qmc.patheffects:
@@ -4144,7 +4162,8 @@ class tgraphcanvas(FigureCanvas):
         
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
-    def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True):
+    # timex_lin: a linear spaced version of timex
+    def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True,timex_lin=None):
         try:
             tx = numpy.array(timex)
             if CHARGEidx > -1:
@@ -4157,6 +4176,11 @@ class tgraphcanvas(FigureCanvas):
                 roast_end_idx = len(tx)
             tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
             lt = len(tx_roast)
+            if timex_lin is not None:
+                if len(timex_lin) == len(timex):
+                    timex_lin = numpy.array(timex_lin[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
+                else:
+                    timex_lin = None
             if t1 is not None:
                 with numpy.errstate(divide='ignore'):
                     nt1 = numpy.array([0 if x is None else x for x in t1[roast_start_idx:roast_end_idx]]) # ERROR None Type object not scriptable! t==None on ON
@@ -4167,10 +4191,10 @@ class tgraphcanvas(FigureCanvas):
                 if lt > ld1:
                     z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
                 if optimalSmoothing:
-                    delta1 = self.smooth_list(tx_roast,z1,window_len=self.deltafilter)
+                    user_filter = self.deltafilter
                 else:
                     user_filter = int(round(self.deltafilter/2.))
-                    delta1 = self.decay_smooth_list(z1,window_len=user_filter)
+                delta1 = self.smooth_list(tx_roast,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
                 # add None for parts before and after CHARGE/DROP
                 delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx))) # ERROR: all input arrays must have the same number of dimensions
                 # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
@@ -4191,10 +4215,10 @@ class tgraphcanvas(FigureCanvas):
                 if lt > ld2:
                     z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
                 if optimalSmoothing:
-                    delta2 = self.smooth_list(tx_roast,z2,window_len=self.deltafilter)
+                    user_filter = self.deltafilter
                 else:
                     user_filter = int(round(self.deltafilter/2.))
-                    delta2 = self.decay_smooth_list(z2,window_len=user_filter)                          
+                delta2 = self.smooth_list(tx_roast,z2,window_len=user_filter,decay_smoothing=(not user_filter),a_lin=timex_lin)                          
                 # add None for parts before and after CHARGE/DROP
                 delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))                
                 # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
@@ -4640,19 +4664,23 @@ class tgraphcanvas(FigureCanvas):
                                                 sketch_params=None,path_effects=[],
                                                 alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None)))
     
+    
+                    # we resample the temperatures to regular interval timestamps
+                    if self.timeB is not None and self.timeB:
+                        timeB_delta = self.timeB[-1]/(len(self.timeB)-1) # regular time interval
+                        timeB_lin = numpy.arange(0,timeB_delta*len(self.timeB),timeB_delta) # linare spaced self.timeB timestamps to be (re-)used for resampling
+                    else:
+                        timeB_lin = None
+                    
                     #populate background delta ET (self.delta1B) and delta BT (self.delta2B)                    
                     if self.DeltaETBflag or self.DeltaBTBflag:
                         if recomputeAllDeltas:
                             # we populate temporary smoothed ET/BT data arrays
                             cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                            if (not aw.qmc.optimalSmoothing) or sampling or aw.qmc.flagon:
-                                temp_decay_weights = numpy.arange(1,cf+1)
-                                st1 = self.decay_smooth_list(self.fill_gaps(temp_etb),decay_weights=temp_decay_weights)
-                                st2 = self.decay_smooth_list(self.fill_gaps(temp_btb),decay_weights=temp_decay_weights)
-                            else: # we use optimal smoothing in the offline case
-                                st1 = self.smooth_list(self.timeB,self.fill_gaps(temp_etb),window_len=cf)
-                                st2 = self.smooth_list(self.timeB,self.fill_gaps(temp_btb),window_len=cf)
-                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB[0],aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=(aw.qmc.optimalSmoothing and (not (sampling or aw.qmc.flagon))))
+                            decay_smoothing_p = (not aw.qmc.optimalSmoothing) or sampling or aw.qmc.flagon
+                            st1 = self.smooth_list(self.timeB,self.fill_gaps(temp_etb),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+                            st2 = self.smooth_list(self.timeB,self.fill_gaps(temp_btb),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB[0],aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=decay_smoothing_p,timex_lin=timeB_lin)
                         
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
@@ -4779,17 +4807,27 @@ class tgraphcanvas(FigureCanvas):
                     
                 handles = []
                 labels = []
-                
+                    
+
+                # we resample the temperatures to regular interval timestamps
+                if self.timex is not None and self.timex:
+                    time_delta = self.timex[-1]/(len(self.timex)-1) # regular time interval
+                    timex_lin = numpy.arange(0,time_delta*len(self.timex),time_delta) # linare spaced self.timex timestamps to be (re-)used for resampling
+                else:
+                    timex_lin = None
+                temp1_nogaps = self.fill_gaps(self.temp1)
+                temp2_nogaps = self.fill_gaps(self.temp2)
+                        
                 if smooth or len(self.stemp1) != len(self.timex):
                     if aw.qmc.flagon: # we don't smooth, but remove the dropouts
-                        self.stemp1 = self.fill_gaps(self.temp1)
+                        self.stemp1 = temp1_nogaps
                     else:
-                        self.stemp1 = self.smooth_list(self.timex,self.fill_gaps(self.temp1),window_len=self.curvefilter)
+                        self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,a_lin=timex_lin)
                 if smooth or len(self.stemp2) != len(self.timex):
                     if aw.qmc.flagon:  # we don't smooth, but remove the dropouts
                         self.stemp2 = self.fill_gaps(self.temp2)
-                    else:                    
-                        self.stemp2 = self.smooth_list(self.timex,self.fill_gaps(self.temp2),window_len=self.curvefilter)
+                    else:
+                        self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,a_lin=timex_lin)
     
                 if self.eventsshowflag:
                     Nevents = len(self.specialevents)
@@ -5077,23 +5115,16 @@ class tgraphcanvas(FigureCanvas):
                 if self.DeltaETflag or self.DeltaBTflag:
                     if recomputeAllDeltas and not self.flagstart: # during recording we don't recompute the deltas
                         cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                        if not aw.qmc.optimalSmoothing or aw.qmc.flagon:
-                            if len(self.temp1):
-                                temp_decay_weights = numpy.arange(1,cf+1)
-                                t1 = self.decay_smooth_list(self.fill_gaps(self.temp1),decay_weights=temp_decay_weights)
-                            else:
-                                t1 = self.temp1
+                        decay_smoothing_p = not aw.qmc.optimalSmoothing or aw.qmc.flagon
+                        t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+                        t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)                        
+                        if True: # self.flagon: # NOTE: DeltaET might make sense before TP
+                            RoR_start = aw.qmc.timeindex[0]
                         else:
-                            t1 = self.smooth_list(self.timex,self.fill_gaps(self.temp1),window_len=cf)
-                        if not aw.qmc.optimalSmoothing or aw.qmc.flagon:
-                            if len(self.temp2):
-                                temp_decay_weights = numpy.arange(1,cf+1)
-                                t2 = self.decay_smooth_list(self.fill_gaps(self.temp2),decay_weights=temp_decay_weights)
-                            else:
-                                t2 = self.temp2
-                        else:
-                            t2 = self.smooth_list(self.timex,self.fill_gaps(self.temp2),window_len=cf)
-                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,aw.qmc.timeindex[0],aw.qmc.timeindex[6],t1,t2,optimalSmoothing=(aw.qmc.optimalSmoothing and (not aw.qmc.flagon)))
+                            RoR_start = aw.findTP() # cut RoR in offline mode before TP if possible
+                            if not RoR_start or RoR_start == -1:
+                                RoR_start = aw.qmc.timeindex[0]                            
+                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=(aw.qmc.optimalSmoothing and (not aw.qmc.flagon)),timex_lin=timex_lin)
                                                     
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
@@ -5111,6 +5142,11 @@ class tgraphcanvas(FigureCanvas):
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
                 for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                    if self.extratimex[i] is not None and self.extratimex[i]:
+                        time_delta = self.extratimex[i][-1]/(len(self.extratimex[i])-1) # regular time interval
+                        timexi_lin = numpy.arange(0,time_delta*len(self.extratimex[i]),time_delta) # linare spaced self.timex timestamps to be (re-)used for resampling
+                    else:
+                        timexi_lin = None                
                     if aw.extraCurveVisibility1[i]:
                         if False and aw.qmc.flagon:
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
@@ -5118,7 +5154,7 @@ class tgraphcanvas(FigureCanvas):
                             markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= extraname1_subst[i])[0])
                         else:
                             if (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
-                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter)
+                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,a_lin=timexi_lin)
                             self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
@@ -5129,7 +5165,7 @@ class tgraphcanvas(FigureCanvas):
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                         else:
                             if (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
-                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter)
+                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,a_lin=timexi_lin)
                             self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
                             sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                             markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
@@ -9790,7 +9826,7 @@ class SampleThread(QThread):
     def sample(self):
         try:
             ##### lock resources  #########
-            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,300) # we try to catch a lock for 300ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
             if gotlock:
                 
                 # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
@@ -9813,8 +9849,10 @@ class SampleThread(QThread):
                     #### first retrieve readings from the main device
                     timeBeforeETBT = libtime.perf_counter() # the time before sending the request to the main device
                     #read time, ET (t1) and BT (t2) TEMPERATURE                    
-                    tx,t1,t2 = self.sample_main_device()
+                    tx_org,t1,t2 = self.sample_main_device()
                     timeAfterETBT = libtime.perf_counter() # the time the data of the main device was received
+                    etbt_time = timeAfterETBT - timeBeforeETBT
+                    tx = tx_org + (etbt_time / 2.0) # we take the average between before and after
                     aw.qmc.RTtemp1 = t1 # store readings for real-time symbolic evaluation
                     aw.qmc.RTtemp2 = t2
                     ##############  if using Extra devices
@@ -9901,34 +9939,37 @@ class SampleThread(QThread):
                     if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
                         # let's do the oversampling thing and take a second reading from the main device
                         sampling_interval = aw.qmc.delay/1000.
-                        etbt_time = timeAfterETBT - timeBeforeETBT
                         gone = timeAfterExtra - timeBeforeETBT
                         # only do it if there is enough time to do the ET/BT sampling (which takes etbt_time) 
                         # and only half of the sampling interval is gone
                         if (sampling_interval - gone) > etbt_time and gone < (sampling_interval / 2.0):
                             # place the second ET/BT sampling in the middle of the sampling interval
-                            stime = (sampling_interval / 2.0) - gone
-# releasing the semaphore here seems dangerous to me (despite the long blocking)                            
-#                            # but first release the samplingsemaphore
-#                            if aw.qmc.samplingsemaphore.available() < 1:
-#                                aw.qmc.samplingsemaphore.release(1)
+                            #stime = (sampling_interval / 2.0) - gone # placing the second sample in the middle blocks too long!
+                            stime = max(0,0.1 - gone) # we want the second main sample minimally 100ms after the first
                             libtime.sleep(stime)
-#                            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,150) # we try to catch a lock for 150ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
-                            if True: # gotlock:
-                                tx_2,t1_2,t2_2 = self.sample_main_device()
-                                tx = tx + (tx_2 - tx) / 2.0
-                                if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
-                                    t2 = (t2 + t2_2) / 2.0
+                            timeBeforeETBT2 = libtime.perf_counter() # the time before sending the 2nd request to the main device
+                            tx_2,t1_2,t2_2 = self.sample_main_device()
+                            timeAfterETBT2 = libtime.perf_counter() # the time after sending the 2nd request to the main device
+                            if t1 != -1 and t2 != -1 and t1_2 != -1 and t2_2 != -1:
+                                t2 = (t2 + t2_2) / 2.0
+                                t1 = (t1 + t1_2) / 2.0
+                                etbt_time_total = timeAfterETBT2 - timeBeforeETBT
+                                tx = tx_org + (etbt_time_total / 2.0) # we take the average between before and after
+                            elif t1 == -1 and t2 == -1 and t1_2 != -1 and t2_2 != -1: # only the second pair is valid, take that one
+                                t2 = t2_2
+                                t1 = t1_2
+                                etbt_time_2nd = timeAfterETBT2 - timeBeforeETBT2
+                                tx = tx_2 + (etbt_time_2nd / 2.0) # we take the average between before and after
+                            else: # use new values only to fix reading errors of the initial set of values
+                                if t1 == -1:
+                                    t1 = t1_2
+                                elif t1_2 != -1:
                                     t1 = (t1 + t1_2) / 2.0
-                                else: # use new values only to fix reading errors of the initial set of values
-                                    if t1 == -1:
-                                        t1 = t1_2
-                                    elif t1_2 != -1:
-                                        t1 = (t1 + t1_2) / 2.0
-                                    if t2 == -1:
-                                        t2 = t2_2
-                                    elif t2_2 != -1:
-                                        t2 = (t2 + t2_2) / 2.0
+                                if t2 == -1:
+                                    t2 = t2_2
+                                elif t2_2 != -1:
+                                    t2 = (t2 + t2_2) / 2.0
+
                     ####### all values retrieved                
 
                     if aw.qmc.ETfunction is not None and len(aw.qmc.ETfunction):
@@ -9988,7 +10029,6 @@ class SampleThread(QThread):
                         else:
                             aw.qmc.ctimex1.append(tx)
                             
-                            
                     # update lines data using the lists with new data (use stempX instead of tempX to supress dropouts
                     if local_flagstart:
                         if aw.qmc.ETcurve:
@@ -10013,6 +10053,7 @@ class SampleThread(QThread):
                     else:
                         cf2 = cf
                         dw2 = self.temp_decay_weights
+                    # average smoothing
                     if len(aw.qmc.ctemp1) > 0:
                         st1 = numpy.average(aw.qmc.ctemp1[-min(len(aw.qmc.ctemp1),cf1):],weights=dw1[max(0,cf1-len(aw.qmc.ctemp1)):])
                     else:
@@ -10021,6 +10062,7 @@ class SampleThread(QThread):
                         st2 = numpy.average(aw.qmc.ctemp2[-min(len(aw.qmc.ctemp2),cf2):],weights=dw2[max(0,cf2-len(aw.qmc.ctemp2)):])
                     else:
                         st2 = -1
+                    # register smoothed values
                     aw.qmc.tstemp1.append(st1)
                     aw.qmc.tstemp2.append(st2)
                     if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
@@ -10039,10 +10081,6 @@ class SampleThread(QThread):
                             else:
                                 aw.qmc.rateofchange1 = 0.
                         else: # normal data received
-#                            if aw.qmc.altsmoothing:
-#                                # Use numpy to compute a linear approximation for deltas:
-#                                aw.qmc.rateofchange1 = self.compute_delta(aw.qmc.timex, aw.qmc.temp1, aw.qmc.smoothingwindowsize)
-#                            else:
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             left_index = min(len(aw.qmc.ctimex1),max(2,(aw.qmc.deltasamples + 1)))
                             timed = aw.qmc.ctimex1[-1] - aw.qmc.ctimex1[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
@@ -10054,10 +10092,6 @@ class SampleThread(QThread):
                             else:
                                 aw.qmc.rateofchange2 = 0.
                         else: # normal data received
-#                            if aw.qmc.altsmoothing:
-#                                # Use numpy to compute a linear approximation for deltas:
-#                                aw.qmc.rateofchange2 = self.compute_delta(aw.qmc.timex, aw.qmc.temp2, aw.qmc.smoothingwindowsize)
-#                            else:
                             #   Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                             left_index = min(len(aw.qmc.ctimex2),max(2,(aw.qmc.deltasamples + 1)))
                             timed = aw.qmc.ctimex2[-1] - aw.qmc.ctimex2[-left_index]   #time difference between last aw.qmc.deltasamples readings                                
@@ -15876,15 +15910,27 @@ class ApplicationWindow(QMainWindow):
                 timex = profile["extratimex"]
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.extratimexB = timex
-                b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter)
-                b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter)
+                # we resample the temperatures to regular interval timestamps
+                if tb is not None and tb:
+                    tb_delta = tb[-1]/(len(tb)-1) # regular time interval
+                    tb_lin = numpy.arange(0,tb_delta*len(tb),tb_delta) # linare spaced tb timestamps to be (re-)used for resampling
+                else:
+                    tb_lin = None                
+                b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter,a_lin=tb_lin)
+                b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter,a_lin=tb_lin)
                 
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
                 b1x = []
                 b2x = []
                 for i in range(min(len(t1x),len(t2x))):
-                    b1x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter))
-                    b2x.append(self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter))
+                    tx=timex[i]
+                    if tx is not None and tx:
+                        tx_delta = tx[-1]/(len(tx)-1) # regular time interval
+                        tx_lin = numpy.arange(0,tx_delta*len(tx),tx_delta) # linare spaced tx timestamps to be (re-)used for resampling
+                    else:
+                        tx_lin = None 
+                    b1x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter,a_lin=tx_lin))
+                    b2x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter,a_lin=tx_lin))
                 # NOTE: parallel assignment after time intensive smoothing is necessary to avoid redraw failure!
                 self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = b1,b2,b1x,b2x
                 self.qmc.backgroundEvents = profile["specialevents"]
@@ -21412,7 +21458,7 @@ class ApplicationWindow(QMainWindow):
                         entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
                         
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
-                        timex = rd["timex"]
+                        timex = rd["timex"]       
                         stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter)
                         charge = max(0,rd["charge_idx"]) # start of visible data
                         drop = rd["drop_idx"] # end of visible data
@@ -21678,13 +21724,11 @@ class ApplicationWindow(QMainWindow):
                     graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
                     
                     # redraw original graph
-                    if not foreground_profile_path and not aw.qmc.backgroundpath:
-                        self.qmc.redraw(recomputeAllDeltas=False)
-                    else:
-                        if foreground_profile_path:
-                            aw.loadFile(foreground_profile_path)
-                        if aw.qmc.backgroundpath:
-                            aw.loadbackground(aw.qmc.backgroundpath)
+                    if foreground_profile_path:
+                        aw.loadFile(foreground_profile_path)
+                    if aw.qmc.backgroundpath:
+                        aw.loadbackground(aw.qmc.backgroundpath)
+                    self.qmc.redraw(recomputeAllDeltas=False)
                 except Exception as e:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
@@ -26596,7 +26640,7 @@ class HUDDlg(ArtisanDialog):
         
     def changeDropFilter(self):
         aw.qmc.filterDropOuts = not aw.qmc.filterDropOuts
-        aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
+        aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
         
 #    def changeAltSmoothing(self):
 #        aw.qmc.altsmoothing = not aw.qmc.altsmoothing
@@ -30375,7 +30419,10 @@ class WindowsDlg(ArtisanDialog):
             self.enableXAxisControls()
 
     def autoAxis(self):
-        t_min,t_max = aw.calcAutoAxis()
+        if aw.qmc.backgroundpath and not aw.curFile:
+            t_min,t_max = aw.calcAutoAxisBackground()
+        else:
+            t_min,t_max = aw.calcAutoAxis()
         if aw.qmc.timeindex[0] != -1:
             self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(t_min - aw.qmc.timex[aw.qmc.timeindex[0]]))
             self.xlimitEdit.setText(aw.qmc.stringfromseconds(t_max - aw.qmc.timex[aw.qmc.timeindex[0]]))
@@ -34670,6 +34717,7 @@ class serialport(object):
     """ this class handles the communications with all the devices"""
 
     def __init__(self):
+        
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = "COM4"      #NOTE: this string should not be translated. It is an argument for lib Pyserial
         self.baudrate = 9600
@@ -35151,7 +35199,7 @@ class serialport(object):
         return tx,a,t
 
     def PHIDGET1048(self):
-        tx = aw.qmc.timeclock.elapsed()
+        tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,0)
         return tx,t1,t2 # time, ET (chan2), BT (chan1)
 
@@ -36795,6 +36843,8 @@ class serialport(object):
 
 #----
 
+    
+    
     def phidget1048TemperatureChanged(self,t,idx):
         if self.PhidgetTemperatureSensor and len(self.PhidgetTemperatureSensor) > idx:
             channel = self.PhidgetTemperatureSensor[idx].getChannel()
@@ -40616,9 +40666,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
             
-            changeTriggersCombo.setMinimumContentsLength(1)
+            changeTriggersCombo.setMinimumContentsLength(3)
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
+            if platf == 'Darwin':
+                changeTriggersCombo.setMaximumWidth(width)
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)
             phidgetBox1048.addWidget(changeTriggersCombo,3,i)
@@ -40661,7 +40713,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombo1048.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1048_dataRate))
         except Exception:
             pass
-        self.dataRateCombo1048.setMinimumContentsLength(3)
+        self.dataRateCombo1048.setMinimumContentsLength(5)
         width = self.dataRateCombo1048.minimumSizeHint().width()
         self.dataRateCombo1048.setMinimumWidth(width)
         if platf == 'Darwin':
@@ -40767,10 +40819,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
                                    
-            formulaCombo.setMinimumContentsLength(1)
+            formulaCombo.setMinimumContentsLength(3)
             width = formulaCombo.minimumSizeHint().width()
             formulaCombo.setMinimumWidth(width)
-#            formulaCombo.setMaximumWidth(width)
+            if platf == 'Darwin':
+                formulaCombo.setMaximumWidth(width)
+            
                         
             self.formulaCombos1046.append(formulaCombo)
             phidgetBox1046.addWidget(formulaCombo,2,i)
@@ -40794,7 +40848,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombo1046.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1046_dataRate))
         except Exception:
             pass                
-        self.dataRateCombo1046.setMinimumContentsLength(3)
+        self.dataRateCombo1046.setMinimumContentsLength(5)
         width = self.dataRateCombo1046.minimumSizeHint().width()
         self.dataRateCombo1046.setMinimumWidth(width)
         if platf == 'Darwin':
@@ -40949,10 +41003,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
 
-            dataRatesCombo.setMinimumContentsLength(3)
+            dataRatesCombo.setMinimumContentsLength(5)
             width = dataRatesCombo.minimumSizeHint().width()
             dataRatesCombo.setMinimumWidth(width)
-#            dataRatesCombo.setMaximumWidth(width)
+            if platf == 'Darwin':
+                dataRatesCombo.setMaximumWidth(width)
             
             self.dataRateCombos.append(dataRatesCombo)
             phidgetBox1018.addWidget(dataRatesCombo,4,i)
