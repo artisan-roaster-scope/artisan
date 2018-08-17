@@ -710,6 +710,7 @@ class tgraphcanvas(FigureCanvas):
         self.phasesLCDflag = True
         self.phasesLCDmode = 1 # one of 0: time, 1: percentage, 2: temp mode
         self.phasesLCDmode_l = [1,1,1]
+        self.phasesLCDmode_all = [False,False,False]
 
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
@@ -3911,8 +3912,7 @@ class tgraphcanvas(FigureCanvas):
             # 2. re-sample           
             if re_sample:
                 if a_lin is None or len(a_lin) != len(a):
-                    time_delta = a[-1]/(len(a)-1) # regular time interval                        
-                    a_mod= numpy.arange(0,time_delta*len(a),time_delta) # linear spaced self.timex timestamps for resampling 
+                    a_mod = numpy.linspace(a[0],a[-1],len(a))
                 else:
                     a_mod = a_lin                   
                 b = numpy.interp(a_mod, a, b) # resample data in a to linear spaced time                               
@@ -3921,7 +3921,7 @@ class tgraphcanvas(FigureCanvas):
             # 3. filter spikes
             if aw.qmc.filterDropOuts:
                 try:
-                    b = self.medfilt(numpy.array(b),7)  # k=3 seems not to catch all spikes in all cases
+                    b = self.medfilt(numpy.array(b),7)  # k=3 seems not to catch all spikes in all cases; k must be odd!
                 except:
                     pass
             # 4. smooth data
@@ -4667,8 +4667,7 @@ class tgraphcanvas(FigureCanvas):
     
                     # we resample the temperatures to regular interval timestamps
                     if self.timeB is not None and self.timeB:
-                        timeB_delta = self.timeB[-1]/(len(self.timeB)-1) # regular time interval
-                        timeB_lin = numpy.arange(0,timeB_delta*len(self.timeB),timeB_delta) # linare spaced self.timeB timestamps to be (re-)used for resampling
+                        timeB_lin = numpy.linspace(self.timeB[0],self.timeB[-1],len(self.timeB))
                     else:
                         timeB_lin = None
                     
@@ -4678,9 +4677,14 @@ class tgraphcanvas(FigureCanvas):
                             # we populate temporary smoothed ET/BT data arrays
                             cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                             decay_smoothing_p = (not aw.qmc.optimalSmoothing) or sampling or aw.qmc.flagon
-                            st1 = self.smooth_list(self.timeB,self.fill_gaps(temp_etb),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-                            st2 = self.smooth_list(self.timeB,self.fill_gaps(temp_btb),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,aw.qmc.timeindexB[0],aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=decay_smoothing_p,timex_lin=timeB_lin)
+                            st1 = self.smooth_list(self.timeB,self.fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+                            st2 = self.smooth_list(self.timeB,self.fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
+                            # we start RoR computation 7 readings after CHARGE to avoid this initial peak
+                            if aw.qmc.timeindexB[0]>-1:
+                                RoRstart = min(aw.qmc.timeindexB[0]+7, len(self.timeB)-1)
+                            else:
+                                RoRstart = -1
+                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=decay_smoothing_p,timex_lin=timeB_lin)
                         
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
@@ -4810,9 +4814,8 @@ class tgraphcanvas(FigureCanvas):
                     
 
                 # we resample the temperatures to regular interval timestamps
-                if self.timex is not None and self.timex:
-                    time_delta = self.timex[-1]/(len(self.timex)-1) # regular time interval
-                    timex_lin = numpy.arange(0,time_delta*len(self.timex),time_delta) # linare spaced self.timex timestamps to be (re-)used for resampling
+                if self.timex is not None and self.timex and len(self.timex)>1:
+                    timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
                 else:
                     timex_lin = None
                 temp1_nogaps = self.fill_gaps(self.temp1)
@@ -5118,12 +5121,11 @@ class tgraphcanvas(FigureCanvas):
                         decay_smoothing_p = not aw.qmc.optimalSmoothing or aw.qmc.flagon
                         t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                         t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)                        
-                        if True: # self.flagon: # NOTE: DeltaET might make sense before TP
-                            RoR_start = aw.qmc.timeindex[0]
+                        # we start RoR computation 7 readings after CHARGE to avoid this initial peak
+                        if aw.qmc.timeindex[0]>-1:
+                            RoR_start = min(aw.qmc.timeindex[0]+7, len(self.timeB)-1)
                         else:
-                            RoR_start = aw.findTP() # cut RoR in offline mode before TP if possible
-                            if not RoR_start or RoR_start == -1:
-                                RoR_start = aw.qmc.timeindex[0]                            
+                            RoR_start = -1                                                                                          
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=(aw.qmc.optimalSmoothing and (not aw.qmc.flagon)),timex_lin=timex_lin)
                                                     
                     ##### DeltaET,DeltaBT curves
@@ -5142,9 +5144,8 @@ class tgraphcanvas(FigureCanvas):
                 ##### Extra devices-curves
                 self.extratemp1lines,self.extratemp2lines = [],[]
                 for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                    if self.extratimex[i] is not None and self.extratimex[i]:
-                        time_delta = self.extratimex[i][-1]/(len(self.extratimex[i])-1) # regular time interval
-                        timexi_lin = numpy.arange(0,time_delta*len(self.extratimex[i]),time_delta) # linare spaced self.timex timestamps to be (re-)used for resampling
+                    if self.extratimex[i] is not None and self.extratimex[i] and len(self.extratimex[i])>1:
+                        timexi_lin = numpy.linspace(self.extratimex[i][0],self.extratimex[i][-1],len(self.extratimex[i]))
                     else:
                         timexi_lin = None                
                     if aw.extraCurveVisibility1[i]:
@@ -9826,7 +9827,7 @@ class SampleThread(QThread):
     def sample(self):
         try:
             ##### lock resources  #########
-            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,300) # we try to catch a lock for 300ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,350) # we try to catch a lock for 350ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
             if gotlock:
                 
                 # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
@@ -9945,8 +9946,8 @@ class SampleThread(QThread):
                         if (sampling_interval - gone) > etbt_time and gone < (sampling_interval / 2.0):
                             # place the second ET/BT sampling in the middle of the sampling interval
                             #stime = (sampling_interval / 2.0) - gone # placing the second sample in the middle blocks too long!
-                            stime = max(0,0.1 - gone) # we want the second main sample minimally 100ms after the first
-                            libtime.sleep(stime)
+#                            stime = max(0,0.1 - gone) # we want the second main sample minimally 100ms after the first
+#                            libtime.sleep(stime)
                             timeBeforeETBT2 = libtime.perf_counter() # the time before sending the 2nd request to the main device
                             tx_2,t1_2,t2_2 = self.sample_main_device()
                             timeAfterETBT2 = libtime.perf_counter() # the time after sending the 2nd request to the main device
@@ -10041,7 +10042,7 @@ class SampleThread(QThread):
                     if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
                         self.temp_decay_weights = numpy.arange(1,cf+1)
                     # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
-                    if -1 in aw.qmc.temp1[-(cf+1):]:                        
+                    if -1 in aw.qmc.temp1[-(cf+1):]: 
                         cf1 = 1
                         dw1 = [1]
                     else:
@@ -10054,12 +10055,27 @@ class SampleThread(QThread):
                         cf2 = cf
                         dw2 = self.temp_decay_weights
                     # average smoothing
+                    d = aw.qmc.delay / 1000.
                     if len(aw.qmc.ctemp1) > 0:
-                        st1 = numpy.average(aw.qmc.ctemp1[-min(len(aw.qmc.ctemp1),cf1):],weights=dw1[max(0,cf1-len(aw.qmc.ctemp1)):])
+                        len1 = min(len(aw.qmc.ctemp1),cf1)
+                        tx1_org = aw.qmc.ctimex1[-len1:]                      
+                        # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
+                        tx1_lin = numpy.flip(numpy.arange(tx1_org[-1],tx1_org[-1]-len(tx1_org)*d,-d))
+                        v1 = aw.qmc.ctemp1[-len1:]
+                        v1_re = numpy.interp(tx1_lin, tx1_org, v1) # resample data in a to linear spaced time 
+                        st1 = numpy.average(v1_re,weights=dw1[max(0,cf1-len(aw.qmc.ctemp1)):])
+#                        st1 = numpy.average(aw.qmc.ctemp1[-min(len(aw.qmc.ctemp1),cf1):],weights=dw1[max(0,cf1-len(aw.qmc.ctemp1)):])
                     else:
                         st1 = -1
-                    if len(aw.qmc.ctemp2) > 0:                    
-                        st2 = numpy.average(aw.qmc.ctemp2[-min(len(aw.qmc.ctemp2),cf2):],weights=dw2[max(0,cf2-len(aw.qmc.ctemp2)):])
+                    if len(aw.qmc.ctemp2) > 0:
+                        len2 = min(len(aw.qmc.ctemp2),cf2)
+                        tx2_org = aw.qmc.ctimex2[-len2:]                                         
+                        # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
+                        tx2_lin = numpy.flip(numpy.arange(tx2_org[-1],tx2_org[-1]-len(tx2_org)*d,-d))
+                        v2 = aw.qmc.ctemp2[-len2:]
+                        v2_re = numpy.interp(tx2_lin, tx2_org, v2) # resample data in a to linear spaced time 
+                        st2 = numpy.average(v2_re,weights=dw2[max(0,cf2-len(aw.qmc.ctemp2)):])
+#                        st2 = numpy.average(aw.qmc.ctemp2[-min(len(aw.qmc.ctemp2),cf2):],weights=dw2[max(0,cf2-len(aw.qmc.ctemp2)):])
                     else:
                         st2 = -1
                     # register smoothed values
@@ -10102,7 +10118,7 @@ class SampleThread(QThread):
                         
                         #######   filter deltaBT deltaET
                         # decay smoothing
-                        if aw.qmc.deltafilter: # and not aw.qmc.altsmoothing:
+                        if aw.qmc.deltafilter:
                             user_filter = int(round(aw.qmc.deltafilter/2.))
                             if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
@@ -10142,7 +10158,8 @@ class SampleThread(QThread):
                     # append new data to the rateofchange arrays
                     if local_flagstart:
                         # only after CHARGE and we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
-                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex > int(round(aw.qmc.deltafilter/2.)) + max(2,(aw.qmc.deltasamples + 1)):
+                        # and only 7 readings after CHARGE
+                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>6+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltafilter/2.)) + max(2,(aw.qmc.deltasamples + 1)):
                             aw.qmc.delta1.append(rateofchange1plot)
                             aw.qmc.delta2.append(rateofchange2plot)
                         else:
@@ -13669,204 +13686,233 @@ class ApplicationWindow(QMainWindow):
                     totaltime = self.qmc.timex[self.qmc.timeindex[6]] - chrg
                 else: # before drop
                     totaltime = tx - chrg
-
-                # 1st PhaseLCD: TP
-                if aw.qmc.phasesLCDmode == 0: # time mode
-                    self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TIME MODE", None))
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>") 
-                    if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
-                        # after TP                   
-                        if self.qmc.timeindex[6]:
-                            ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                        else:
-                            ts = tx - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                        tss = u(self.qmc.stringfromseconds(int(ts)))
-                        self.TPlcd.display(tss)
-                    else:
-                        # before TP
-                        self.TPlcd.display(u("--:--"))
-                elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                    self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in PERCENTAGE MODE", None))
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
-                    if self.qmc.timeindex[1]: # after DRY
-                        ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
-                        if totaltime:
-                            dryphaseP = fmtstr%(ts*100./totaltime)
-                        else:
-                            dryphaseP = " --- "
-                        if not aw.qmc.LCDdecimalplaces and totaltime:
-                            dryphaseP += " "
-                        self.TPlcd.display(u(dryphaseP))
-                    else:
-                        self.TPlcd.display(u(" --- "))
-                elif aw.qmc.phasesLCDmode == 2: # temp mode
-                    self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TEMP MODE", None))
-                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
-                    if self.qmc.TPalarmtimeindex:
-                        if self.qmc.timeindex[6]: # after drop
-                            dBT = self.qmc.temp2[self.qmc.timeindex[6]]
-                        else:
-                            dBT = self.qmc.temp2[-1]
-                        dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.TPalarmtimeindex])
-                        self.TPlcd.display(u(dBT + self.qmc.mode))                       
-                    else:
-                        # before TP
-                        self.TPlcd.display(u(" --- "))
-                        
-                        
-                # 2nd PhaseLCD: DRY
-                if self.qmc.timeindex[1]:
-                    # after DRY
-                    if self.qmc.timeindex[6]:
-                        ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[1]]
-                    else:
-                        ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
-                    if aw.qmc.phasesLCDmode == 0: # time mode
-                        self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None)) + "&raquo;</b></small>")
-                        self.DRYlcd.display(u(self.qmc.stringfromseconds(int(ts))))
-                    elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                        if self.qmc.timeindex[2]:
-                            ts = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
-                        if totaltime:
-                            midphaseP = fmtstr%(ts*100./totaltime)
-                        else:
-                            midphaseP = " --- "
-                        if not aw.qmc.LCDdecimalplaces and totaltime:
-                            midphaseP += " "
-                        self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "RAMP%",None)) + "</b></small>")
-                        self.DRYlcd.display(u(midphaseP))
-                    elif aw.qmc.phasesLCDmode == 2: # temp mode
-                        if self.qmc.timeindex[6]: # after drop
-                            dBT = self.qmc.temp2[self.qmc.timeindex[6]]
-                        else:
-                            dBT = self.qmc.temp2[-1]
-                        dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[1]])
-                        self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None)) + "&raquo;</b></small>")
-                        self.DRYlcd.display(u(dBT + self.qmc.mode))                       
-                    # TP2DRY
-                    if window_width > 950 and self.qmc.TPalarmtimeindex:
-                        t = self.qmc.timex[self.qmc.timeindex[1]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                        self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
-                    else:
-                        self.TP2DRYlabel.setText("")
-                else:
-                    # before DRY
-                    dryexpectedtime = None
-                    if aw.qmc.phasesLCDmode == 2:
-                        self.DRYlabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
-                    else:
-                        self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
-                    if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
-                        # display expected time to reach DRY as defined in the background profile or the phases dialog
-                        if self.qmc.background and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
-                            drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
-                        else:
-                            drytarget = self.qmc.phases[1] # Drying max phases definition
-                        if drytarget > self.qmc.temp2[-1]:
-                            dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
-                            if aw.qmc.phasesLCDmode == 2:
-                                tstring = u(self.qmc.stringfromseconds(int(dryexpectedtime)))
-                            else:
-                                tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime)))
-                            self.DRYlcd.display(tstring)
-                        else:
-                            self.DRYlcd.display(u("--:--"))
-                    else:
-                        self.DRYlcd.display(u("--:--"))
                     
-                    # TP2DRY (display estimated time between TP and DRY)
-                    if dryexpectedtime and window_width > 950 and self.qmc.TPalarmtimeindex:
-                        t = tx - self.qmc.timex[self.qmc.TPalarmtimeindex] + dryexpectedtime # time after TP plus expected-time-to-DRY = total time expected for 1nd phase
-                        if t > 3600:
+                if False: #aw.qmc.phasesLCDmode_all[0] and not self.qmc.timeindex[1] and not self.qmc.timeindex[2]: # not DRY and not FCs
+                    # show all dry phase values: time/percent/temp
+                    # DRY phase temp on LCD1
+                    # DRY phase percentage on LCD2
+                    # DRY phase time on LCD3
+                    print("dry")
+                    pass
+                elif False: #aw.qmc.phasesLCDmode_all[1] and self.qmc.timeindex[1] and not self.qmc.timeindex[2]: # DRY and not FCs
+                    # show all mid phase values: time/percent/temp
+                    # show all dry phase values: time/percent/temp
+                    # MID phase temp on LCD1
+                    # MID phase percentage on LCD2
+                    # MID phase time on LCD3
+                    print("mid")
+                    pass
+                elif False: #aw.qmc.phasesLCDmode_all[2] and self.qmc.timeindex[1] and self.qmc.timeindex[2]: # DRY and FCs
+                    # show all finish phase values: time/percent/temp
+                    # show all dry phase values: time/percent/temp
+                    # FIN phase temp on LCD1
+                    # FIN phase percentage on LCD2
+                    # FIN phase time on LCD3
+                    print("fin")
+                    pass
+                else:
+                    # show the regular phases LCD values split by phase
+
+                    # 1st PhaseLCD: TP
+                    if aw.qmc.phasesLCDmode == 0: # time mode
+                        self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TIME MODE", None))
+                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>") 
+                        if self.qmc.TPalarmtimeindex and self.qmc.TPalarmtimeindex < len(self.qmc.timex):
+                            # after TP                   
+                            if self.qmc.timeindex[6]:
+                                ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
+                            else:
+                                ts = tx - self.qmc.timex[self.qmc.TPalarmtimeindex]
+                            tss = u(self.qmc.stringfromseconds(int(ts)))
+                            self.TPlcd.display(tss)
+                        else:
+                            # before TP
+                            self.TPlcd.display(u("--:--"))
+                    elif aw.qmc.phasesLCDmode == 1: # percentage mode
+                        self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in PERCENTAGE MODE", None))
+                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY%",None)) + "</b></small>")
+                        if self.qmc.timeindex[1]: # after DRY
+                            ts = self.qmc.timex[self.qmc.timeindex[1]] - chrg
+                            if totaltime:
+                                dryphaseP = fmtstr%(ts*100./totaltime)
+                            else:
+                                dryphaseP = " --- "
+                            if not aw.qmc.LCDdecimalplaces and totaltime:
+                                dryphaseP += " "
+                            self.TPlcd.display(u(dryphaseP))
+                        else:
+                            self.TPlcd.display(u(" --- "))
+                    elif aw.qmc.phasesLCDmode == 2: # temp mode
+                        self.phasesLCDs.setToolTip(QApplication.translate("Tooltip","Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE\nCurrently in TEMP MODE", None))
+                        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
+                        if self.qmc.TPalarmtimeindex:
+                            if self.qmc.timeindex[6]: # after drop
+                                dBT = self.qmc.temp2[self.qmc.timeindex[6]]
+                            else:
+                                dBT = self.qmc.temp2[-1]
+                            dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.TPalarmtimeindex])
+                            self.TPlcd.display(u(dBT + self.qmc.mode))                       
+                        else:
+                            # before TP
+                            self.TPlcd.display(u(" --- "))
+                            
+                            
+                    # 2nd PhaseLCD: DRY
+                    if self.qmc.timeindex[1]:
+                        # after DRY
+                        if self.qmc.timeindex[6]:
+                            ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[1]]
+                        else:
+                            ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
+                        if aw.qmc.phasesLCDmode == 0: # time mode
+                            self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None)) + "&raquo;</b></small>")
+                            self.DRYlcd.display(u(self.qmc.stringfromseconds(int(ts))))
+                        elif aw.qmc.phasesLCDmode == 1: # percentage mode
+                            if self.qmc.timeindex[2]:
+                                ts = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
+                            if totaltime:
+                                midphaseP = fmtstr%(ts*100./totaltime)
+                            else:
+                                midphaseP = " --- "
+                            if not aw.qmc.LCDdecimalplaces and totaltime:
+                                midphaseP += " "
+                            self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "RAMP%",None)) + "</b></small>")
+                            self.DRYlcd.display(u(midphaseP))
+                        elif aw.qmc.phasesLCDmode == 2: # temp mode
+                            if self.qmc.timeindex[6]: # after drop
+                                dBT = self.qmc.temp2[self.qmc.timeindex[6]]
+                            else:
+                                dBT = self.qmc.temp2[-1]
+                            dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[1]])
+                            self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None)) + "&raquo;</b></small>")
+                            self.DRYlcd.display(u(dBT + self.qmc.mode))                       
+                        # TP2DRY
+                        if window_width > 950 and self.qmc.TPalarmtimeindex:
+                            t = self.qmc.timex[self.qmc.timeindex[1]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
+                            self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                        else:
                             self.TP2DRYlabel.setText("")
                             self.TP2DRYlabel.setMinimumWidth(0)
-                        else:
-                            self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
-                            width = self.TP2DRYlabel.fontMetrics().boundingRect("88:::88").width()
-                            self.TP2DRYlabel.setMinimumWidth(width)
                     else:
-                        self.TP2DRYlabel.setText("")
-                        self.TP2DRYlabel.setMinimumWidth(0)
-                        
-                        
-                # 3rd PhasesLCD: FCs
-                if self.qmc.timeindex[2]:
-                    # after FCs
-                    if self.qmc.timeindex[6]: # after drop
-                        ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[2]]
-                    else: # before drop
-                        ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
-                    if aw.qmc.phasesLCDmode == 0: # time mode
-                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #marko
-                        self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
-                        self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
-                    elif aw.qmc.phasesLCDmode == 1: # percentage mode
-                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #marko
-                        if totaltime:
-                            finishphaseP = fmtstr%(ts*100./totaltime)
+                        # before DRY
+                        dryexpectedtime = None
+                        if aw.qmc.phasesLCDmode == 2:
+                            self.DRYlabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
                         else:
-                            finishphaseP = " --- "
-                        if not aw.qmc.LCDdecimalplaces and totaltime:
-                            finishphaseP += " "
-                        self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "DEV%",None)) + "</b></small>")
-                        self.FCslcd.display(u(finishphaseP))
-                    elif aw.qmc.phasesLCDmode == 2: # temp mode
-                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #marko
-                        if self.qmc.timeindex[6]: # after drop
-                            dBT = self.qmc.temp2[self.qmc.timeindex[6]]
-                        else:
-                            dBT = self.qmc.temp2[-1]
-                        dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[2]])
-                        self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
-                        self.FCslcd.display(u(dBT + self.qmc.mode))                        
-                    # DRY2FCs
-                    if  window_width > 950 and self.qmc.timeindex[1]:
-                        t = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
-                        self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
-                    else:
-                        self.DRY2FCslabel.setText("")
-                else:
-                    # before FCs
-                    fcsexpectedtime = None
-                    if aw.qmc.phasesLCDmode == 0:
-                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #marko
-                        self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
-                    elif aw.qmc.phasesLCDmode == 1:
-                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #marko
-                        self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
-                    elif aw.qmc.phasesLCDmode == 2:
-                        self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #marko
-                        self.FCslabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")                    
-                            
-                    if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
-                        # after DRY:
-                        ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
-                        self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
-                        # display expected time to reach FCs as defined in the background profile or the phases dialog
-                        if self.qmc.background and self.qmc.timeindexB[2]:
-                            fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
-                        else:
-                            fcstarget = self.qmc.phases[2] # FCs min phases definition
-                        if fcstarget > self.qmc.temp2[-1]:
-                            fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
-                            if aw.qmc.phasesLCDmode == 2:
-                                tstring = u(self.qmc.stringfromseconds(int(fcsexpectedtime)))
+                            self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
+                        if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
+                            # display expected time to reach DRY as defined in the background profile or the phases dialog
+                            if self.qmc.background and self.qmc.timeindexB[1] and not aw.qmc.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
+                                drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
                             else:
-                                tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime)))
-                            self.FCslcd.display(tstring)
+                                drytarget = self.qmc.phases[1] # Drying max phases definition
+                            if drytarget > self.qmc.temp2[-1]:
+                                dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
+                                if aw.qmc.phasesLCDmode == 2:
+                                    tstring = u(self.qmc.stringfromseconds(int(dryexpectedtime)))
+                                else:
+                                    tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime)))
+                                self.DRYlcd.display(tstring)
+                            else:
+                                self.DRYlcd.display(u("--:--"))
+                        else:
+                            self.DRYlcd.display(u("--:--"))
+                        
+                        # TP2DRY (display estimated time between TP and DRY)
+                        if dryexpectedtime and window_width > 950 and self.qmc.TPalarmtimeindex:
+                            t = tx - self.qmc.timex[self.qmc.TPalarmtimeindex] + dryexpectedtime # time after TP plus expected-time-to-DRY = total time expected for 1nd phase
+                            if t > 3600:
+                                self.TP2DRYlabel.setText("")
+                                self.TP2DRYlabel.setMinimumWidth(0)
+                            else:
+                                self.TP2DRYlabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                                width = self.TP2DRYlabel.fontMetrics().boundingRect("88:::88").width()
+                                self.TP2DRYlabel.setMinimumWidth(width)
+                        else:
+                            self.TP2DRYlabel.setText("")
+                            self.TP2DRYlabel.setMinimumWidth(0)
+                            
+                            
+                    # 3rd PhasesLCD: FCs
+                    if self.qmc.timeindex[2]:
+                        # after FCs
+                        if self.qmc.timeindex[6]: # after drop
+                            ts = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[2]]
+                        else: # before drop
+                            ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
+                        if aw.qmc.phasesLCDmode == 0: # time mode
+                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #marko
+                            self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
+                            self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
+                        elif aw.qmc.phasesLCDmode == 1: # percentage mode
+                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #marko
+                            if totaltime:
+                                finishphaseP = fmtstr%(ts*100./totaltime)
+                            else:
+                                finishphaseP = " --- "
+                            if not aw.qmc.LCDdecimalplaces and totaltime:
+                                finishphaseP += " "
+                            self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "DEV%",None)) + "</b></small>")
+                            self.FCslcd.display(u(finishphaseP))
+                        elif aw.qmc.phasesLCDmode == 2: # temp mode
+                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #marko
+                            if self.qmc.timeindex[6]: # after drop
+                                dBT = self.qmc.temp2[self.qmc.timeindex[6]]
+                            else:
+                                dBT = self.qmc.temp2[-1]
+                            dBT = fmtstr%(dBT-self.qmc.temp2[self.qmc.timeindex[2]])
+                            self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None)) + "&raquo;</b></small>")
+                            self.FCslcd.display(u(dBT + self.qmc.mode))                        
+                        # DRY2FCs
+                        if  window_width > 950 and self.qmc.timeindex[1]:
+                            t = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
+                            self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                        else:
+                            self.DRY2FCslabel.setText("")
+                            self.DRY2FCslabel.setMinimumWidth(0)
+                    else:
+                        # before FCs
+                        fcsexpectedtime = None
+                        if aw.qmc.phasesLCDmode == 0:
+                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TIME MODE",None)))  #marko
+                            self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
+                        elif aw.qmc.phasesLCDmode == 1:
+                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #marko
+                            self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
+                        elif aw.qmc.phasesLCDmode == 2:
+                            self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","TEMP MODE",None)))  #marko
+                            self.FCslabel.setText("<small><b>&darr;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")                    
+                                
+                        if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
+                            # after DRY:
+                            ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
+                            self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
+                            # display expected time to reach FCs as defined in the background profile or the phases dialog
+                            if self.qmc.background and self.qmc.timeindexB[2]:
+                                fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
+                            else:
+                                fcstarget = self.qmc.phases[2] # FCs min phases definition
+                            if fcstarget > self.qmc.temp2[-1]:
+                                fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
+                                if aw.qmc.phasesLCDmode == 2:
+                                    tstring = u(self.qmc.stringfromseconds(int(fcsexpectedtime)))
+                                else:
+                                    tstring = u(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime)))
+                                self.FCslcd.display(tstring)
+                            else:
+                                self.FCslcd.display(u("--:--"))
                         else:
                             self.FCslcd.display(u("--:--"))
-                    else:
-                        self.FCslcd.display(u("--:--"))
-                        
-                    # DRY2FCs (display estimated time between DRY and FCs)
-                    if fcsexpectedtime and window_width > 950 and self.qmc.timeindex[1]:
-                        t = tx - self.qmc.timex[self.qmc.timeindex[1]] + fcsexpectedtime # time after DRY plus expected-time-to-FCs = total time expected for 2nd phase
-                        self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
-                        width = self.DRY2FCslabel.fontMetrics().boundingRect("88:::88").width()
-                        self.DRY2FCslabel.setMinimumWidth(width)
-                    else:
-                        self.DRY2FCslabel.setText("")
+                            
+                        # DRY2FCs (display estimated time between DRY and FCs)
+                        if fcsexpectedtime and window_width > 950 and self.qmc.timeindex[1]:
+                            t = tx - self.qmc.timex[self.qmc.timeindex[1]] + fcsexpectedtime # time after DRY plus expected-time-to-FCs = total time expected for 2nd phase
+                            self.DRY2FCslabel.setText(u(self.qmc.stringfromseconds(int(t))))
+                            width = self.DRY2FCslabel.fontMetrics().boundingRect("88:::88").width()
+                            self.DRY2FCslabel.setMinimumWidth(width)
+                        else:
+                            self.DRY2FCslabel.setText("")
+                            self.DRY2FCslabel.setMinimumWidth(0)
                         
                         
             else:
@@ -13880,12 +13926,14 @@ class ApplicationWindow(QMainWindow):
                     self.TPlcd.display(u(" --- "))
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None)) + "&raquo;</b></small>")
                 self.TP2DRYlabel.setText("")
+                self.TP2DRYlabel.setMinimumWidth(0)
                 self.DRYlcd.display("--:--")
                 self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None)) + "</b></small>")
                 self.DRY2FCslabel.setText("")
+                self.DRY2FCslabel.setMinimumWidth(0)
                 self.FCslcd.display("--:--")
                 self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None)) + "</b></small>")
-        except Exception as e:        
+        except Exception as e:    
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
@@ -15912,12 +15960,12 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extratimexB = timex
                 # we resample the temperatures to regular interval timestamps
                 if tb is not None and tb:
-                    tb_delta = tb[-1]/(len(tb)-1) # regular time interval
-                    tb_lin = numpy.arange(0,tb_delta*len(tb),tb_delta) # linare spaced tb timestamps to be (re-)used for resampling
+                    tb_lin = numpy.linspace(tb[0],tb[-1],len(tb))
                 else:
-                    tb_lin = None                
-                b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter,a_lin=tb_lin)
-                b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter,a_lin=tb_lin)
+                    tb_lin = None 
+                decay_smoothing_p = not aw.qmc.optimalSmoothing               
+                b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
+                b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
                 
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
                 b1x = []
@@ -15925,8 +15973,7 @@ class ApplicationWindow(QMainWindow):
                 for i in range(min(len(t1x),len(t2x))):
                     tx=timex[i]
                     if tx is not None and tx:
-                        tx_delta = tx[-1]/(len(tx)-1) # regular time interval
-                        tx_lin = numpy.arange(0,tx_delta*len(tx),tx_delta) # linare spaced tx timestamps to be (re-)used for resampling
+                        tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
                     else:
                         tx_lin = None 
                     b1x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter,a_lin=tx_lin))
@@ -18467,6 +18514,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phasesLCDmode_l = [toInt(x) for x in toList(settings.value("phasesLCDmode_l",self.qmc.phasesLCDmode_l))]
             else:
                 self.qmc.phasesLCDmode_l = [toInt(self.qmc.phasesLCDmode)]*3
+            if settings.contains("phasesLCDmode_all"):
+                self.qmc.phasesLCDmode_all = [bool(toBool(x)) for x in toList(settings.value("phasesLCDmode_all",self.qmc.phasesLCDmode_all))]               
             if settings.contains("autoDry"):
                 self.qmc.autoDRYflag = bool(toBool(settings.value("autoDry",self.qmc.autoDRYflag)))
             if settings.contains("autoFCs"):
@@ -19881,6 +19930,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phasesLCDs",self.qmc.phasesLCDflag)
             settings.setValue("phasesLCDmode",self.qmc.phasesLCDmode)
             settings.setValue("phasesLCDmode_l", self.qmc.phasesLCDmode_l)
+            settings.setValue("phasesLCDmode_all", self.qmc.phasesLCDmode_all)
             #phase triggered DRY and FCs
             settings.setValue("autoDry",self.qmc.autoDRYflag)
             settings.setValue("autoFCs",self.qmc.autoFCsFlag)
@@ -33106,7 +33156,16 @@ class phasesGraphDlg(ArtisanDialog):
         super(phasesGraphDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Phases",None))
         self.setModal(True)
+        # remember initial values for Canel action
         self.phases = list(aw.qmc.phases)
+        self.phasesbuttonflag = bool(aw.qmc.phasesbuttonflag)
+        self.watermarksflag = bool(aw.qmc.watermarksflag)
+        self.phasesLCDflag = bool(aw.qmc.phasesLCDflag)
+        self.autoDRYflag = bool(aw.qmc.autoDRYflag)
+        self.autoFCsFlag = bool(aw.qmc.autoFCsFlag)
+        self.phasesLCDmode_l = list(aw.qmc.phasesLCDmode_l)
+        self.phasesLCDmode_all = list(aw.qmc.phasesLCDmode_all)
+        #
         dryLabel = QLabel(QApplication.translate("Label", "Drying",None))
         midLabel = QLabel(QApplication.translate("Label", "Maillard",None))
         finishLabel = QLabel(QApplication.translate("Label", "Finishing",None))
@@ -33197,6 +33256,8 @@ class phasesGraphDlg(ArtisanDialog):
 
         lcdmode = QLabel(QApplication.translate("Label", "Phases\nLCDs Mode",None))
         phaseLayout.addWidget(lcdmode,0,3,Qt.AlignCenter)
+        lcdmode = QLabel(QApplication.translate("Label", "Phases\nLCDs All",None))
+        phaseLayout.addWidget(lcdmode,0,4,Qt.AlignCenter)
 
         self.lcdmodeComboBox_dry = QComboBox()
         self.lcdmodeComboBox_dry.setFocusPolicy(Qt.NoFocus)
@@ -33215,11 +33276,29 @@ class phasesGraphDlg(ArtisanDialog):
         phaseLayout.addWidget(self.lcdmodeComboBox_fin,3,3)
 
         self.lcdmodeComboBox_dry.setCurrentIndex(aw.qmc.phasesLCDmode_l[0])
+        self.lcdmodeComboBox_dry.setEnabled(not bool(aw.qmc.phasesLCDmode_all[0]))
         self.lcdmodeComboBox_mid.setCurrentIndex(aw.qmc.phasesLCDmode_l[1])
+        self.lcdmodeComboBox_mid.setEnabled(not bool(aw.qmc.phasesLCDmode_all[1]))
         self.lcdmodeComboBox_fin.setCurrentIndex(aw.qmc.phasesLCDmode_l[2])
+        self.lcdmodeComboBox_fin.setEnabled(not bool(aw.qmc.phasesLCDmode_all[2]))
+        
+        self.lcdmodeFlag_all_dry = QCheckBox()
+        self.lcdmodeFlag_all_dry.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeFlag_all_dry.setChecked(aw.qmc.phasesLCDmode_all[0])
+        self.lcdmodeFlag_all_dry.stateChanged.connect(lambda x :self.lcdmodeFlagDryChanged(x))
+        self.lcdmodeFlag_all_mid = QCheckBox()
+        self.lcdmodeFlag_all_mid.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeFlag_all_mid.setChecked(aw.qmc.phasesLCDmode_all[1])
+        self.lcdmodeFlag_all_mid.stateChanged.connect(lambda x :self.lcdmodeFlagMidChanged(x))
+        self.lcdmodeFlag_all_fin = QCheckBox()
+        self.lcdmodeFlag_all_fin.setFocusPolicy(Qt.NoFocus)
+        self.lcdmodeFlag_all_fin.setChecked(aw.qmc.phasesLCDmode_all[2])
+        self.lcdmodeFlag_all_fin.stateChanged.connect(lambda x :self.lcdmodeFlagFinChanged(x))
+        phaseLayout.addWidget(self.lcdmodeFlag_all_dry,1,4,Qt.AlignCenter)
+        phaseLayout.addWidget(self.lcdmodeFlag_all_mid,2,4,Qt.AlignCenter)
+        phaseLayout.addWidget(self.lcdmodeFlag_all_fin,3,4,Qt.AlignCenter)
                
         self.events2phases()
-        self.getphases()
         
         boxedPhaseLayout = QHBoxLayout()
         boxedPhaseLayout.addStretch()
@@ -33247,8 +33326,20 @@ class phasesGraphDlg(ArtisanDialog):
         mainLayout.addLayout(buttonsLayout)
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(mainLayout)
-        aw.qmc.redraw(recomputeAllDeltas=False)
+        self.getphases()
 
+    def lcdmodeFlagDryChanged(self,value):
+        aw.qmc.phasesLCDmode_all[0] = bool(value)
+        self.lcdmodeComboBox_dry.setEnabled(not bool(aw.qmc.phasesLCDmode_all[0]))
+        
+    def lcdmodeFlagMidChanged(self,value):
+        aw.qmc.phasesLCDmode_all[1] = bool(value)
+        self.lcdmodeComboBox_mid.setEnabled(not bool(aw.qmc.phasesLCDmode_all[1]))
+        
+    def lcdmodeFlagFinChanged(self,value):
+        aw.qmc.phasesLCDmode_all[2] = bool(value)
+        self.lcdmodeComboBox_fin.setEnabled(not bool(aw.qmc.phasesLCDmode_all[2]))
+        
     def lcdmodeComboBox_dryChanged(self):
         aw.qmc.phasesLCDmode_l[0] = self.lcdmodeComboBox_dry.currentIndex()
         aw.qmc.phasesLCD = aw.qmc.phasesLCDmode_l[0]
@@ -33331,15 +33422,26 @@ class phasesGraphDlg(ArtisanDialog):
 
     def cancel(self):
         aw.qmc.phases = list(self.phases)
+        aw.qmc.phasesbuttonflag = bool(self.phasesbuttonflag)
+        aw.qmc.watermarksflag = bool(self.watermarksflag)
+        aw.qmc.phasesLCDflag = bool(self.phasesLCDflag)
+        aw.qmc.autoDRYflag = bool(self.autoDRYflag)
+        aw.qmc.autoFCsFlag = bool(self.autoFCsFlag)
+        aw.qmc.phasesLCDmode_l = list(self.phasesLCDmode_l)
+        aw.qmc.phasesLCDmode_all = list(self.phasesLCDmode_all)                
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.savePhasesSettings()
         self.close()
 
     def getphases(self):
         self.startdry.setValue(aw.qmc.phases[0])
+        self.startdry.repaint()
         self.enddry.setValue(aw.qmc.phases[1])
+        self.enddry.repaint()
         self.endmid.setValue(aw.qmc.phases[2])
+        self.endmid.repaint()
         self.endfinish.setValue(aw.qmc.phases[3])
+        self.endfinish.repaint()
         
     def setdefault(self):
         if aw.qmc.mode == "F":
