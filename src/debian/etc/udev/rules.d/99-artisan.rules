@@ -1,4 +1,5 @@
 # udev rule to allow write access to all users for Aillio USB devices
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5741", MODE="0660", GROUP="sudo"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="a27e", MODE="0660", GROUP="sudo"
 # udev rule to allow write access to all users for Yoctopuce USB devices
 SUBSYSTEM=="usb", ATTR{idVendor}=="24e0", MODE="0666", GROUP="sudo"
