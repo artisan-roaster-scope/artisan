@@ -5123,7 +5123,7 @@ class tgraphcanvas(FigureCanvas):
                         t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)                        
                         # we start RoR computation 7 readings after CHARGE to avoid this initial peak
                         if aw.qmc.timeindex[0]>-1:
-                            RoR_start = min(aw.qmc.timeindex[0]+7, len(self.timeB)-1)
+                            RoR_start = min(aw.qmc.timeindex[0]+7, len(self.timex)-1)
                         else:
                             RoR_start = -1                                                                                          
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=(aw.qmc.optimalSmoothing and (not aw.qmc.flagon)),timex_lin=timex_lin)
