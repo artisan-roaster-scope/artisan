@@ -2,8 +2,8 @@ version: '1.4.0.{build}'
 
 environment:
   matrix:
-    - PYTHON: "C:\\Python36-x64"
-      PYTHON_VERSION: 3.6
+    - PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: 3.7
       ARTISAN_VERSION: 1.4.0
 
 install:
