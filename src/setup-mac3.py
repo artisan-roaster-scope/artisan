@@ -6,7 +6,7 @@ Usage:
 """
 
 # manually remove sample-data mpl subdirectory from Python installation:
-# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/matplotlib/mpl-data/sample_data
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/site-packages/matplotlib/mpl-data/sample_data
 
 from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
@@ -203,12 +203,12 @@ os.chdir('./dist')
 try:
     PYTHONPATH = os.environ["PYTHONPATH"] + r'/'
 except:
-    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/'
+    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7/'
 
 try:
     PYTHON_V = os.environ["PYTHON_V"]
 except:
-    PYTHON_V = '3.6'
+    PYTHON_V = '3.7'
     
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
 os.system(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs')
@@ -244,7 +244,7 @@ for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
 
 # remove doublicate Qt installation
 
-os.system("rm -rf ./Artisan.app/Contents/Resources/lib/python3.6/PyQt5/Qt")
+os.system("rm -rf ./Artisan.app/Contents/Resources/lib/python3.7/PyQt5/Qt")
                         
 
 print('*** Removing unused files ***')
