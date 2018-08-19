@@ -143,7 +143,7 @@ Function .onInit
     IDOK uninst
     Abort
   ${Else}
-    MessageBox MB_OK "x64 test only"
+    MessageBox MB_OK "You are not using a 64bit system.\nSorry, we can not install Artisan on your system."
     Abort
   ${EndIf}
  
