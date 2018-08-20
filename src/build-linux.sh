@@ -7,7 +7,7 @@ export PATH=$PATH:$HOME/.local/bin
 
 if [ ! -z $TRAVIS ]; then
     # Travis environment
-    export PYTHON_PATH=/home/travis/virtualenv/python3.7/lib/python3.7/site-packages
+    export PYTHON_PATH=/home/travis/virtualenv/python3.6/lib/python3.6/site-packages
     export QT_PATH=$PYTHON_PATH/PyQt5/Qt
 elif [ -d /usr/lib/python3/dist-packages/PyQt5 ]; then
     # ARM builds
