@@ -46,11 +46,11 @@ exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
           name=NAME,
-          debug=True,
+          debug=False,
           strip=False, # =True fails
           upx=True, # not installed
           icon='artisan.ico',
-          console=True) # was True
+          console=False) # was True
 
 coll = COLLECT(exe,
                a.binaries,
