@@ -2227,10 +2227,14 @@ class tgraphcanvas(FigureCanvas):
                         lcdformat = "%.0f"
                     if len(self.temp1) and -100 < self.temp1[-1] < 1000:
                         aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
+                    elif len(self.temp1) and -1000 < self.temp1[-1] < 10000:
+                        aw.lcd2.display("%.0f"%float(self.temp1[-1]))
                     else:
                         aw.lcd2.display("--")
                     if len(self.temp2) and -100 < self.temp2[-1] < 1000:
                         aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
+                    elif len(self.temp2) and -1000 < self.temp2[-1] < 10000:
+                        aw.lcd3.display("%.0f"%float(self.temp2[-1]))
                     else:
                         aw.lcd3.display("--")
                     if -100 < self.rateofchange1 < 1000:
@@ -2252,8 +2256,8 @@ class tgraphcanvas(FigureCanvas):
                             if self.extratemp1[i]:
                                 fmt = lcdformat
                                 v = float(self.extratemp1[i][-1])
-                                if -100 < v < 1000:
-                                    if v.is_integer() and self.intChannel(i,0):
+                                if -1000 < v < 10000:
+                                    if (v.is_integer() and self.intChannel(i,0)) or not (-100 < v < 1000):
                                         fmt = "%.0f" # we display this value without decimals
                                     aw.extraLCD1[i].display(fmt%v)
                                 else:
@@ -2261,8 +2265,8 @@ class tgraphcanvas(FigureCanvas):
                             if self.extratemp2[i]:
                                 fmt = lcdformat
                                 v = float(self.extratemp2[i][-1])
-                                if -100 < v < 1000:
-                                    if v.is_integer() and self.intChannel(i,1):
+                                if -1000 < v < 10000:
+                                    if (v.is_integer() and self.intChannel(i,1)) or not (-100 < v < 1000):
                                         fmt = "%.0f" # we display this value without decimals
                                     aw.extraLCD2[i].display(fmt%v)
                                 else:
@@ -21615,11 +21619,15 @@ class ApplicationWindow(QMainWindow):
             graph_image = ""
             graph_image_pct = ''
 
+            prop = aw.mpl_fontproperties.copy()
+            prop.set_size("x-small")
+                    
             if len(profiles) > 10:
                 QMessageBox.information(aw,QApplication.translate("Message", "Ranking Report",None),
                                           QApplication.translate("Message", "Ranking graphs are only generated up to 10 profiles",None))
             else:
                 try:
+                    
                     # remove annotations, lines and artists from background profile
                     try:
                         for l in aw.qmc.l_annotations + aw.qmc.l_background_annotations:
@@ -21657,14 +21665,12 @@ class ApplicationWindow(QMainWindow):
                                     pass
                     except Exception:
                         pass
-                        
+
                     aw.qmc.ax.set_xlim(min_start_time-15,max_end_time+15) # we adjust the min, max time scale to ensure all data is visible
                     graph_image = "roastlog-graph"
                     self.qmc.ax.set_title("")
                     self.qmc.fig.suptitle("")           
                     rcParams['path.effects'] = []
-                    prop = aw.mpl_fontproperties.copy()
-                    prop.set_size("x-small")
                     if len(handles) > 3:
                         ncol = int(math.ceil(len(handles)/2.))
                     else:
@@ -21687,138 +21693,146 @@ class ApplicationWindow(QMainWindow):
                     graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
                     graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
 
-                    # Create a roast phase visualization graph      
-                    import matplotlib.pyplot as plt
-
-                    fig_height = 3.2       # in inches when there are 10 profiles, will be scaled for number of profiles 
-                    fig_width = 10         # in inches
-
-                    # values that define the bars and spacing 
-                    barspacer =  2     # vertical space between bars
-                    barheight =  18    # height of each bar
-                    textoffset = 6     # shifts text annotations upward to toward middle of the bar 
-                    m = 10             # width of batch number field and drop time field 
-                    g = 2              # gap
-                    n = m + g          # start of horiz stacked bar
-                    ind = 7            # width of color legend indicator
-
-                    # setup the font 
-                    fontcolor = 'black'
-                    lightfontcolor = 'grey'
-                    prop.set_family(mpl.rcParams['font.family'])
-
-                    # generate graph  ( not written to support MPL < v2.0 )
-                    fig = plt.figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
-                    ax = fig.add_subplot(111, frameon=False)
-                    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
-                    
-                    # no grid or tick marks
-                    ax.grid(False)
-                    ax.axes.get_xaxis().set_ticks([])
-                    ax.axes.get_yaxis().set_ticks([])
-                    
-                    # set graph xy limits
-                    ylim = (barheight + barspacer) * (1 + len(profiles))
-                    xlim = m+g+100+g+m +1
-                    ax.set_ylim(0, ylim)   
-                    ax.set_xlim(0, xlim)     
-
-                    graph_image_pct = "roastlog-graph-pct"
-
-                    i = len(profiles)   # bar counter 
-
-                    # generate the legend at the top
-                    facecolors = ('#00b950', '#ffb347', '#9f7960')
-                    prop.set_size("medium")  
-                    ax.broken_barh( [ (n, g),                         #Dry indicator
-                                      (n+g+ind, g),                   #MAI indicator
-                                      (n+g+ind+g+ind, g)              #DEV indicator
-                                    ], 
-                                    (i*(barheight + barspacer), barheight*0.75), facecolors=facecolors
-                                  )                      
-                    ax.text(    m/2,             i*(barheight + barspacer) + textoffset/3, 'Nr', ha='center', color=fontcolor, fontproperties=prop)
-                    ax.text( 1+ n+g,             i*(barheight + barspacer) + textoffset/3, 'Dry', ha='left', color=fontcolor, fontproperties=prop)
-                    ax.text( 1+ n+g+ind+g,       i*(barheight + barspacer) + textoffset/3, 'Mai', ha='left', color=fontcolor, fontproperties=prop)
-                    ax.text( 1+ n+g+ind+g+ind+g, i*(barheight + barspacer) + textoffset/3, 'Dev', ha='left', color=fontcolor, fontproperties=prop)
-                    ax.text(    n+100 + 10/2,    i*(barheight + barspacer) + textoffset/3, 'Drop', ha='center', color=fontcolor, fontproperties=prop)
-                        
-                    # generate the bar graph 
-                    prop.set_size("small")  
-                    color=iter(cm.tab10(numpy.linspace(0,1,10)))    # @UndefinedVariable   
-                    for p in profiles:
-                        i -= 1
-                        cl = next(color),'#00b950', '#ffb347', '#9f7960'
-                        try:
-                            rd = self.profileRankingData(p)
-                        except Exception as e:
-        #                        import traceback
-        #                        traceback.print_exc(file=sys.stdout)
-                            _, _, exc_tb = sys.exc_info()
-                            aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
-                            i += 1   #avoid a blank line
-                            continue
-                        pd = self.profileProductionData(p)
-                        label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))[:8]
-                        if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
-                            ax.broken_barh( [ (0, m), 
-                                              (n, rd["DRY_percent"]), 
-                                              (n+rd["DRY_percent"], rd["MAI_percent"]), 
-                                              (n+rd["DRY_percent"] + rd["MAI_percent"], rd["DEV_percent"]),
-                                              (n+rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g, m*rd["DROP_time"]/max_drop_time)
-                                            ], 
-                                            (i*(barheight + barspacer), barheight), facecolors=cl
-                                          )                      
-                            ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + rd["DRY_percent"]/2,                                               i*(barheight + barspacer) + textoffset, str(round(rd["DRY_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DRY_time"]), ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + rd["DRY_percent"] + rd["MAI_percent"]/2,                           i*(barheight + barspacer) + textoffset, str(round(rd["MAI_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["MAI_time"]), ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"]/2,       i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
-                        elif "DEV_percent" in rd:   # has FCs but no Dry event
-                            cl = cl[0],'white',cl[3]     
-                            missingDryevent = u(QApplication.translate("Message", "Profile missing Dry event",None))
-                            ax.broken_barh( [ (0, m), 
-                                              (n, 100 - rd["DEV_percent"]),
-                                              (n+ 100 - rd["DEV_percent"], rd["DEV_percent"]),
-                                              (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
-                                            ], 
-                                            (i*(barheight + barspacer), barheight), facecolors=cl
-                                          )                      
-                            ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + (100 - rd["DEV_percent"])/2,                                       i*(barheight + barspacer) + textoffset, missingDryevent, ha='center', color=lightfontcolor, fontproperties=prop)
-                            ax.text( n + 100 - rd["DEV_percent"] + rd["DEV_percent"]/2,                     i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
-                        else:    # no useful events
-                            cl = cl[0],'white'
-                            missingPhaseevents = u(QApplication.translate("Message", "Profile missing phase events",None))
-                            ax.broken_barh( [ (0, m),
-                                              (n, 100),
-                                              (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
-                                            ], 
-                                            (i*(barheight + barspacer), barheight), facecolors=cl
-                                          )                      
-                            ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
-                            ax.text( n + 100/2,                                                             i*(barheight + barspacer) + textoffset, missingPhaseevents, ha='center', color=lightfontcolor, fontproperties=prop)
-                            ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
-                                                          
-                    # save graph
-                    graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
-                    try:
-                        os.remove(graph_image_pct)
-                    except OSError:
-                        pass
-                    fig.savefig(graph_image_pct)                   
-                    #add some random number to force HTML reloading
-                    graph_image_pct = path2url(graph_image_pct)
-                    graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
-                    graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
-                   
 
                 except Exception as e:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
-            
+
+            try:
+                # Create a roast phase visualization graph      
+                import matplotlib.pyplot as plt
+
+                fig_height = 3.2       # in inches when there are 10 profiles, will be scaled for number of profiles 
+                fig_width = 10         # in inches
+
+                # values that define the bars and spacing 
+                barspacer =  2     # vertical space between bars
+                barheight =  18    # height of each bar
+                textoffset = 6     # shifts text annotations upward to toward middle of the bar 
+                m = 10             # width of batch number field and drop time field 
+                g = 2              # gap
+                n = m + g          # start of horiz stacked bar
+                ind = 7            # width of color legend indicator
+
+                # setup the font 
+                fontcolor = 'black'
+                lightfontcolor = 'grey'
+                prop.set_family(mpl.rcParams['font.family'])
+
+                # generate graph  ( not written to support MPL < v2.0 )
+                fig = plt.figure(figsize=(fig_width, (fig_height * len(profiles)/10 + 0.2)))
+                ax = fig.add_subplot(111, frameon=False)
+                plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+                
+                # no grid or tick marks
+                ax.grid(False)
+                ax.axes.get_xaxis().set_ticks([])
+                ax.axes.get_yaxis().set_ticks([])
+                
+                # set graph xy limits
+                ylim = (barheight + barspacer) * (1 + len(profiles))
+                xlim = m+g+100+g+m +1
+                ax.set_ylim(0, ylim)   
+                ax.set_xlim(0, xlim)     
+
+                graph_image_pct = "roastlog-graph-pct"
+
+                i = len(profiles)   # bar counter 
+
+                # generate the legend at the top
+                facecolors = ('#00b950', '#ffb347', '#9f7960')
+                prop.set_size("medium")  
+                ax.broken_barh( [ (n, g),                         #Dry indicator
+                                  (n+g+ind, g),                   #MAI indicator
+                                  (n+g+ind+g+ind, g)              #DEV indicator
+                                ], 
+                                (i*(barheight + barspacer), barheight*0.75), facecolors=facecolors
+                              )                      
+                ax.text(    m/2,             i*(barheight + barspacer) + textoffset/3, 'Nr', ha='center', color=fontcolor, fontproperties=prop)
+                ax.text( 1+ n+g,             i*(barheight + barspacer) + textoffset/3, 'Dry', ha='left', color=fontcolor, fontproperties=prop)
+                ax.text( 1+ n+g+ind+g,       i*(barheight + barspacer) + textoffset/3, 'Mai', ha='left', color=fontcolor, fontproperties=prop)
+                ax.text( 1+ n+g+ind+g+ind+g, i*(barheight + barspacer) + textoffset/3, 'Dev', ha='left', color=fontcolor, fontproperties=prop)
+                ax.text(    n+100 + 10/2,    i*(barheight + barspacer) + textoffset/3, 'Drop', ha='center', color=fontcolor, fontproperties=prop)
+                    
+                # generate the bar graph 
+                prop.set_size("small")  
+                color=iter(cm.tab10(numpy.linspace(0,1,len(profiles))))    # @UndefinedVariable   
+                for p in profiles:
+                    i -= 1
+                    cl = next(color),'#00b950', '#ffb347', '#9f7960'
+                    try:
+                        rd = self.profileRankingData(p)
+                    except Exception as e:
+        #                    import traceback
+        #                    traceback.print_exc(file=sys.stdout)
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception (probably due to an empty profile):",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+                        i += 1   #avoid a blank line
+                        continue
+                    pd = self.profileProductionData(p)
+                    label = ((u(pd["batchprefix"]) + u(pd["batchnr"])) if pd["batchnr"] > 0 else u(""))[:8]
+                    if "DRY_percent" in rd and "MAI_percent" in rd and "DEV_percent" in rd:
+                        ax.broken_barh( [ (0, m), 
+                                          (n, rd["DRY_percent"]), 
+                                          (n+rd["DRY_percent"], rd["MAI_percent"]), 
+                                          (n+rd["DRY_percent"] + rd["MAI_percent"], rd["DEV_percent"]),
+                                          (n+rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g, m*rd["DROP_time"]/max_drop_time)
+                                        ], 
+                                        (i*(barheight + barspacer), barheight), facecolors=cl
+                                      )                      
+                        ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
+                        ax.text( n + rd["DRY_percent"]/2,                                               i*(barheight + barspacer) + textoffset, str(round(rd["DRY_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DRY_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                        ax.text( n + rd["DRY_percent"] + rd["MAI_percent"]/2,                           i*(barheight + barspacer) + textoffset, str(round(rd["MAI_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["MAI_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                        ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"]/2,       i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                        ax.text( n + rd["DRY_percent"] + rd["MAI_percent"] + rd["DEV_percent"] + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
+                    elif "DEV_percent" in rd:   # has FCs but no Dry event
+                        cl = cl[0],'white',cl[3]     
+                        missingDryevent = u(QApplication.translate("Message", "Profile missing Dry event",None))
+                        ax.broken_barh( [ (0, m), 
+                                          (n, 100 - rd["DEV_percent"]),
+                                          (n+ 100 - rd["DEV_percent"], rd["DEV_percent"]),
+                                          (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
+                                        ], 
+                                        (i*(barheight + barspacer), barheight), facecolors=cl
+                                      )                      
+                        ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
+                        ax.text( n + (100 - rd["DEV_percent"])/2,                                       i*(barheight + barspacer) + textoffset, missingDryevent, ha='center', color=lightfontcolor, fontproperties=prop)
+                        ax.text( n + 100 - rd["DEV_percent"] + rd["DEV_percent"]/2,                     i*(barheight + barspacer) + textoffset, str(round(rd["DEV_percent"],1)) + '%  ' + self.qmc.stringfromseconds(rd["DEV_time"]), ha='center', color=fontcolor, fontproperties=prop)
+                        ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
+                    else:    # no useful events
+                        cl = cl[0],'white'
+                        missingPhaseevents = u(QApplication.translate("Message", "Profile missing phase events",None))
+                        ax.broken_barh( [ (0, m),
+                                          (n, 100),
+                                          (n+ 100 + g, m*rd["DROP_time"]/max_drop_time)
+                                        ], 
+                                        (i*(barheight + barspacer), barheight), facecolors=cl
+                                      )                      
+                        ax.text( m/2,                                                                   i*(barheight + barspacer) + textoffset, label, ha='center', color=fontcolor, fontproperties=prop)
+                        ax.text( n + 100/2,                                                             i*(barheight + barspacer) + textoffset, missingPhaseevents, ha='center', color=lightfontcolor, fontproperties=prop)
+                        ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, self.qmc.stringfromseconds(rd["DROP_time"]), ha='left', color=fontcolor, fontproperties=prop)
+                                                      
+                # save graph
+                graph_image_pct = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + ".svg")))
+                try:
+                    os.remove(graph_image_pct)
+                except OSError:
+                    pass
+                fig.savefig(graph_image_pct)                   
+                #add some random number to force HTML reloading
+                graph_image_pct = path2url(graph_image_pct)
+                graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
+                graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
+                
+
+            except Exception as e:
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
+
             try:
                 # redraw original graph
                 if foreground_profile_path:
@@ -36196,7 +36210,7 @@ class serialport(object):
             elif aw.modbus.input1bcd:
                 res1 = aw.modbus.readBCD(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
             else:
-                res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
+                res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)            
             res1 = self.processChannelData(res1,aw.modbus.input1div,aw.modbus.input1mode)
             just_send = True
         else:
