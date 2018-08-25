@@ -2217,6 +2217,8 @@ class tgraphcanvas(FigureCanvas):
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
     def updategraphics(self):
         try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagon:
                 if len(self.timex):
                     if self.LCDdecimalplaces:
@@ -2474,7 +2476,10 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)            
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
     def updateLCDtime(self):
         if self.flagon and self.flagstart:
@@ -13063,12 +13068,16 @@ class ApplicationWindow(QMainWindow):
                 t_min,t_max = aw.calcAutoAxisBackground()
             else:
                 t_min,t_max = aw.calcAutoAxis()
+                
+            if aw.qmc.background:
+                _,t_max_b = aw.calcAutoAxisBackground()
+                t_max = max(t_max,t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]])
             
             if background and aw.qmc.timeindexB[0] != -1:
                 aw.qmc.startofx = t_min - aw.qmc.timeB[aw.qmc.timeindexB[0]]
             else:
                 aw.qmc.startofx = t_min
-                            
+            
             if not background and aw.qmc.timeindex[0] != -1:
                 aw.qmc.endofx = t_max - aw.qmc.timex[aw.qmc.timeindex[0]]
             elif background and aw.qmc.timeindexB[0] != -1:
@@ -21533,7 +21542,7 @@ class ApplicationWindow(QMainWindow):
                         
                         temp = [aw.qmc.convertTemp(t,rd["temp_unit"],self.qmc.mode) for t in rd["temp"]]
                         timex = rd["timex"]       
-                        stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter)
+                        stemp = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=self.qmc.curvefilter,decay_smoothing=not aw.qmc.optimalSmoothing)
                         charge = max(0,rd["charge_idx"]) # start of visible data
                         drop = rd["drop_idx"] # end of visible data
                         stemp = numpy.concatenate(([None]*charge,stemp[charge:drop],[None]*(len(timex)-drop)))
@@ -21566,7 +21575,10 @@ class ApplicationWindow(QMainWindow):
                         
                         if self.qmc.DeltaBTflag and self.qmc.delta_ax:
                             tx = numpy.array(timex)
-                            delta,_ = self.qmc.recomputeDeltas(tx,rd["charge_idx"],drop,stemp,None,optimalSmoothing=aw.qmc.optimalSmoothing)
+                            cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                            t1 = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=cf,decay_smoothing=not aw.qmc.optimalSmoothing)
+                            t1 = numpy.concatenate(([None]*charge,t1[charge:drop],[None]*(len(timex)-drop)))                            
+                            delta,_ = self.qmc.recomputeDeltas(tx,rd["charge_idx"],drop,t1,None,optimalSmoothing=aw.qmc.optimalSmoothing)
                             if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
                                 dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
                                 dlinestyle = self.qmc.BTdeltalinestyle
@@ -21603,7 +21615,10 @@ class ApplicationWindow(QMainWindow):
             graph_image = ""
             graph_image_pct = ''
 
-            if len(profiles) < 11:
+            if len(profiles) > 10:
+                QMessageBox.information(aw,QApplication.translate("Message", "Ranking Report",None),
+                                          QApplication.translate("Message", "Ranking graphs are only generated up to 10 profiles",None))
+            else:
                 try:
                     # remove annotations, lines and artists from background profile
                     try:
@@ -21796,19 +21811,24 @@ class ApplicationWindow(QMainWindow):
                     graph_image_pct = path2url(graph_image_pct)
                     graph_image_pct = graph_image_pct + "?dummy=" + str(int(libtime.time()))
                     graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
-                    
-                    # redraw original graph
-                    if foreground_profile_path:
-                        aw.loadFile(foreground_profile_path)
-                    if aw.qmc.backgroundpath:
-                        aw.loadbackground(aw.qmc.backgroundpath)
-                    self.qmc.redraw(recomputeAllDeltas=False)
+                   
+
                 except Exception as e:
 #                    import traceback
 #                    traceback.print_exc(file=sys.stdout)
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " rankingReport() {0}").format(str(e)),exc_tb.tb_lineno)
             
+            try:
+                # redraw original graph
+                if foreground_profile_path:
+                    aw.loadFile(foreground_profile_path)
+                if aw.qmc.backgroundpath:
+                    aw.loadbackground(aw.qmc.backgroundpath)
+                self.qmc.redraw(recomputeAllDeltas=False)
+            except:
+                pass
+                                
             weight_fmt = ('{0:.2f}' if aw.qmc.weight[2] in ["Kg", "lb"] else '{0:.0f}')
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                 resources = u(self.getResourcePath()),
