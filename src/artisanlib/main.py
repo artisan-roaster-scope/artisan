@@ -21454,7 +21454,8 @@ class ApplicationWindow(QMainWindow):
                 try:
                     cl = next(color) # here to keep colors in sync with the pct graph colors
                 except Exception as e:
-                    pass
+                    color=iter(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable
+                    cl = next(color)
                 try:
                     rd = self.profileRankingData(p)
                 except Exception as e:
@@ -21526,7 +21527,7 @@ class ApplicationWindow(QMainWindow):
                     cuppings += rd["cupping"]
                     cuppings_count += 1
                 if len(profiles) >= 11:
-                    entries += self.rankingData2htmlentry(pd,rd) + "\n"
+                    entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
                 else:
                     # add BT curve to graph
                     try:
@@ -21758,10 +21759,14 @@ class ApplicationWindow(QMainWindow):
                     
                 # generate the bar graph 
                 prop.set_size("small")  
-                color=iter(cm.tab10(numpy.linspace(0,1,len(profiles))))    # @UndefinedVariable   
+                color=iter(cm.tab10(numpy.linspace(0,1,10)))    # @UndefinedVariable   
                 for p in profiles:
                     i -= 1
-                    cl = next(color),'#00b950', '#ffb347', '#9f7960'
+                    try:
+                        cl = next(color), '#00b950', '#ffb347', '#9f7960'
+                    except Exception as e:
+                        color=iter(cm.tab10(numpy.linspace(0,1,10)))    # @UndefinedVariable  
+                        cl = next(color), '#00b950', '#ffb347', '#9f7960'
                     try:
                         rd = self.profileRankingData(p)
                     except Exception as e:
@@ -49208,6 +49213,8 @@ class PIDcontrol(object):
                     slidernr = aw.pidcontrol.pidPositiveTarget - 1
                     if aw.pidcontrol.invertControl:
                         vp = abs(100 - v)
+                    else:
+                        vp = v
                     vp = min(100,max(0,int(vp)))
                     # we need to map the duty [0%,100%] to the [slidermin,slidermax] range
                     heat = int(round(numpy.interp(vp,[0,100],[aw.eventslidermin[slidernr],aw.eventslidermax[slidernr]])))
@@ -49216,13 +49223,15 @@ class PIDcontrol(object):
                     slidernr = aw.pidcontrol.pidNegativeTarget - 1
                     if aw.pidcontrol.invertControl:
                         vn = 0 - v
+                    else:
+                        vp = v
                     vn = min(0,max(-100,int(vn)))
                     # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range
                     cool = int(round(numpy.interp(vn,[-100,0],[aw.eventslidermax[slidernr],aw.eventslidermin[slidernr]])))
                     aw.qmc.temporarymovenegativeslider = (slidernr,cool)
             except:
-    #            import traceback
-    #            traceback.print_exc(file=sys.stdout)
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
                 pass
         self.lastEnergy = v
 
