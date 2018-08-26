@@ -114,9 +114,10 @@ class PID(object):
                         else:
                             dinput = 0
                         
-                        # apply some simple moving average filter to avoid major spikes (used only for D)
-                        if self.lastDerr:
-                            derr = (derr + self.lastDerr) / 2.0
+#                        # apply some simple moving average filter to avoid major spikes (used only for D)
+#                        if self.lastDerr:
+#                            derr = (derr + self.lastDerr) / 2.0
+# This smoothing is dangerous if time between readings is not considered!
                         self.lastDerr = derr
                         
                         self.lastTime = now
@@ -164,7 +165,7 @@ class PID(object):
     def init(self):
         self.errSum = 0.0
         self.lastError = 0.0
-        self.lastTime = 0.0
+        self.lastTime = None
         self.lastDerr = 0.0
         if self.lastOutput != None:
             self.Iterm = self.lastOutput
