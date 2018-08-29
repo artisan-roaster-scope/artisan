@@ -80,7 +80,7 @@ from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox
                          QLCDNumber, QSpinBox, QComboBox, QHeaderView, # @Reimport 
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton, # @Reimport
                          QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
-                         QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox) # @Reimport
+                         QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox,QButtonGroup) # @Reimport
 from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
                             QKeySequence,QStandardItem,QImage,QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
                             QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor,QTextDocument)  # @Reimport
@@ -6112,6 +6112,7 @@ class tgraphcanvas(FigureCanvas):
             #disable RESET button:
             aw.button_7.setEnabled(False)
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            aw.button_7.setVisible(False)
             QApplication.processEvents()
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])
             QApplication.processEvents()
@@ -6167,6 +6168,7 @@ class tgraphcanvas(FigureCanvas):
             #enable RESET button:
             aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
             aw.button_7.setEnabled(True)
+            aw.button_7.setVisible(True)
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
             aw.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None))
             aw.sendmessage(QApplication.translate("Message","Scope stopped", None))
@@ -12065,13 +12067,13 @@ class ApplicationWindow(QMainWindow):
         self.level1layout.addWidget(self.button_2)
         self.level1layout.addSpacing(15)
         self.level1layout.addWidget(self.button_10)
-        self.level1layout.addSpacing(15)
+        self.level1layout.addSpacing(10)
         self.level1layout.addWidget(self.button_18)
-        self.level1layout.addSpacing(15)
+        self.level1layout.addSpacing(10)
         self.level1layout.addWidget(self.lcd1)
         self.level1layout.setContentsMargins(0,0,0,0)
         self.level1layout.setSpacing(0)
-        self.level1layout.setContentsMargins(5,5,5,0)
+        self.level1layout.setContentsMargins(3,3,3,0)
 
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
@@ -12556,6 +12558,7 @@ class ApplicationWindow(QMainWindow):
             elif reply == QMessageBox.Yes:
                 aw.qmc.etypes = aw.qmc.etypesdefault
                 aw.loadSettings(fn=action.data(),remember=False)
+                print(action.text())
                 aw.establish_etypes()
                 aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(action.text()))
                 if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
@@ -18981,6 +18984,8 @@ class ApplicationWindow(QMainWindow):
                     aw.pidcontrol.pidPositiveTarget = toInt(settings.value("pidPositiveTarget",aw.pidcontrol.pidPositiveTarget))
                     aw.pidcontrol.pidNegativeTarget = toInt(settings.value("pidNegativeTarget",aw.pidcontrol.pidNegativeTarget))
                     aw.pidcontrol.invertControl = bool(toBool(settings.value("invertControl",aw.pidcontrol.invertControl)))         
+                if settings.contains("pOnE"):
+                    aw.pidcontrol.pOnE = bool(toBool(settings.value("pOnE",aw.pidcontrol.pOnE)))                      
             settings.endGroup()
             
             #restore pid settings
@@ -20187,6 +20192,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("pidPositiveTarget",aw.pidcontrol.pidPositiveTarget)
             settings.setValue("pidNegativeTarget",aw.pidcontrol.pidNegativeTarget)
             settings.setValue("invertControl",aw.pidcontrol.invertControl)
+            settings.setValue("pOnE",aw.pidcontrol.pOnE)
             settings.endGroup()
             settings.beginGroup("PXR")
             for key in list(self.fujipid.PXR.keys()):
@@ -45095,15 +45101,15 @@ class PXRpidDlgControl(ArtisanDialog):
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
         #self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
-        self.ETthermocombobox.addItems(aw.fuji.PXRthermotypes)
+        self.ETthermocombobox.addItems(aw.fujipid.PXRthermotypes)
         if aw.ser.readBTpid[0] == 0:        #fuji PXG
-            self.BTthermocombobox.addItems(aw.fuji.PXGthermotypes)
+            self.BTthermocombobox.addItems(aw.fujipid.PXGthermotypes)
         elif aw.ser.readBTpid[0] == 1:      #fuji PXR
-            self.BTthermocombobox.addItems(aw.fuji.PXRthermotypes)
+            self.BTthermocombobox.addItems(aw.fujipid.PXRthermotypes)
         else: # fuji PXF
-            self.BTthermocombobox.addItems(aw.fuji.PXFthermotypes)
-        if aw.fujipid.PXR["pvinputtype"][0] in aw.fuji.PXRconversiontoindex:
-            self.ETthermocombobox.setCurrentIndex(aw.fuji.PXRconversiontoindex.index(aw.fujipid.PXR["pvinputtype"][0]))
+            self.BTthermocombobox.addItems(aw.fujipid.PXFthermotypes)
+        if aw.fujipid.PXR["pvinputtype"][0] in aw.fujipid.PXRconversiontoindex:
+            self.ETthermocombobox.setCurrentIndex(aw.fujipid.PXRconversiontoindex.index(aw.fujipid.PXR["pvinputtype"][0]))
         setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
         setETthermocouplebutton.setFocusPolicy(Qt.NoFocus)
         setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None))
@@ -48676,11 +48682,30 @@ class PID_DlgControl(ArtisanDialog):
         pidSetBox.addStretch()
         pidSetBox.addWidget(pidSetPID)
         
+        self.pOnGroup = QButtonGroup()
+        self.pOnGroup.setExclusive(True)
+        self.pOnE = QRadioButton("P on Error")
+        self.pOnGroup.addButton(self.pOnE)
+        self.pOnM = QRadioButton("P on Input")
+        self.pOnGroup.addButton(self.pOnM)
+        self.pOnE.setChecked(aw.pidcontrol.pOnE)
+        self.pOnM.setChecked(not aw.pidcontrol.pOnE)
+        if aw.pidcontrol.externalPIDControl() in [1,2] or aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl():
+            self.pOnE.setEnabled(False)
+            self.pOnM.setEnabled(False)
+        
+        pOnLayout = QVBoxLayout() 
+        pOnLayout.addWidget(self.pOnE)
+        pOnLayout.addWidget(self.pOnM)
+        
         pidVBox = QVBoxLayout()
         pidVBox.addLayout(pidSourceBox)
         if aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4
             pidVBox.addLayout(pidCycleBox)
+        pidVBox.addLayout(pOnLayout)
+        pidVBox.setAlignment(pOnLayout,Qt.AlignRight)
         pidVBox.addLayout(pidSetBox)
+        pidVBox.setAlignment(pidSetBox,Qt.AlignRight)
         
         #PID target (only shown if interal PID for hottop/modbus/TC4 is active
         controlItems = ["None",aw.qmc.etypesf(0),aw.qmc.etypesf(1),aw.qmc.etypesf(2),aw.qmc.etypesf(3)]
@@ -48838,8 +48863,7 @@ class PID_DlgControl(ArtisanDialog):
         self.dutyMax.setSingleStep(10)
         self.dutyMax.setValue(aw.pidcontrol.dutyMax) 
         self.dutyMax.setSuffix(" %")
-        dutyMaxLabel = QLabel(QApplication.translate("Label","Max",None))
-        
+        dutyMaxLabel = QLabel(QApplication.translate("Label","Max",None))      
         
         svGrpBox = QVBoxLayout()
         svGrpBox.addStretch()
@@ -49033,7 +49057,8 @@ class PID_DlgControl(ArtisanDialog):
         kd = self.pidKd.value() # 0.00
         source = self.pidSource.currentIndex() + 1 # 1-4, def 1
         cycle = self.pidCycle.value() # def 1000 in ms
-        aw.pidcontrol.confPID(kp,ki,kd,source,cycle)
+        pOnE = bool(self.pOnE.isChecked())
+        aw.pidcontrol.confPID(kp,ki,kd,source,cycle,pOnE)
         if not (aw.qmc.device == 19 and aw.qmc.PIDbuttonflag): # don't show Targets if TC4 firmware PID is in use
             aw.pidcontrol.pidPositiveTarget = self.positiveControlCombo.currentIndex()
             aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
@@ -49054,7 +49079,8 @@ class PID_DlgControl(ArtisanDialog):
             aw.pidcontrol.pidNegativeTarget = self.negativeControlCombo.currentIndex()
             aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
         cycle = self.pidCycle.value() # def 1000 in ms
-        aw.pidcontrol.setPID(kp,ki,kd,source,cycle)
+        pOnE = bool(self.pOnE.isChecked())
+        aw.pidcontrol.setPID(kp,ki,kd,source,cycle,pOnE)
         #
         aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
         aw.pidcontrol.loadRampSoakFromProfile = self.loadRampSoakFromProfile.isChecked()
@@ -49170,6 +49196,8 @@ class PIDcontrol(object):
         self.pidKi = 0.01
         self.pidKd = 3.0
         self.lastEnergy = None
+        # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
+        self.pOnE = True # True for Proposional on Error mode, False for Proposional on Measurement Mode
         # pidSource
         #   either the TC4 input channel from [1,..,4] if self.qmc.device == 19 (Arduino/TC4)
         #   in all other cases (HOTTOP, MODBUS,..), 1 is interpreted as BT and 2 as ET
@@ -49311,7 +49339,7 @@ class PIDcontrol(object):
                             aw.ser.COMsemaphore.release(1)     
             # software PID
             elif aw.qmc.Controlbuttonflag:
-                aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
+                aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd,self.pOnE)
                 aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
                 aw.qmc.pid.setDutySteps(aw.pidcontrol.dutySteps)
                 aw.qmc.pid.setDutyMin(aw.pidcontrol.dutyMin)
@@ -49560,17 +49588,18 @@ class PIDcontrol(object):
             aw.button_17.setVisible(False)
 
     # just store the p-i-d configuration
-    def setPID(self,kp,ki,kd,source=None,cycle=None):
+    def setPID(self,kp,ki,kd,source=None,cycle=None,pOnE=True):
         self.pidKp = kp
         self.pidKi = ki
         self.pidKd = kd
+        self.pOnE = pOnE
         if source is not None:
             self.pidSource = source
         if cycle is not None:
             self.pidCycle = cycle
     
     # send conf to connected PID
-    def confPID(self,kp,ki,kd,source=None,cycle=None):
+    def confPID(self,kp,ki,kd,source=None,cycle=None,pOnE=True):
         if (aw.pidcontrol.externalPIDControl() == 1): # MODBUS (external) Control active
             aw.modbus.setPID(kp,ki,kd)
             self.pidKp = kp
@@ -49584,6 +49613,7 @@ class PIDcontrol(object):
             self.pidKd = kd
             aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
         elif aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
+            # TODO: treat pOnE for TC4
             if aw.ser.ArduinoIsInitialized:
                 try:
                     #### lock shared resources #####
@@ -49606,10 +49636,11 @@ class PIDcontrol(object):
                     if aw.ser.COMsemaphore.available() < 1:
                         aw.ser.COMsemaphore.release(1)
         elif aw.qmc.Controlbuttonflag: # in all other cases if the "Control" flag is ticked
-            aw.qmc.pid.setPID(kp,ki,kd)
+            aw.qmc.pid.setPID(kp,ki,kd,pOnE)
             self.pidKp = kp
             self.pidKi = ki
             self.pidKd = kd
+            self.pOnE = pOnE
             aw.qmc.pid.setLimits((-100 if aw.pidcontrol.pidNegativeTarget else 0),(100 if aw.pidcontrol.pidPositiveTarget else 0))
             aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
 

@@ -34,6 +34,9 @@ class PID(object):
         self.Kp = p
         self.Ki = i
         self.Kd = d
+        # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
+        self.pOnE = True # True for Proposional on Error mode, False for Proposional on Measurement Mode
+        self.Pterm = 0.0
         self.errSum = 0.0
         self.Iterm = 0.0
         self.lastError = None # used for derivative_on_error mode
@@ -110,9 +113,11 @@ class PID(object):
                     if dt>0:
                         derr = (err - self.lastError) / dt
                         if self.lastInput:
-                            dinput = (i - self.lastInput) / dt
+                            dinput = i - self.lastInput
+                            dtinput = dinput / dt
                         else:
                             dinput = 0
+                            dtinput = 0
                         
 #                        # apply some simple moving average filter to avoid major spikes (used only for D)
 #                        if self.lastDerr:
@@ -129,14 +134,20 @@ class PID(object):
                         
                         # clamp Iterm to [outMin,outMax] and avoid integral windup
                         self.Iterm = max(self.outMin,min(self.outMax,self.Iterm))
-                            
-                        P = self.Kp * err
+                        
+                        # compute P-Term
+                        if self.pOnE:
+                            self.Pterm = self.Kp * err
+                        else:
+                            self.Pterm = self.Pterm -self.Kp * dinput
+                        
+                        # compute D-Term
                         if self.derivative_on_error:
                             D = self.Kd * derr
                         else:
-                            D = - self.Kd * dinput
-                            
-                        output = P + self.Iterm + D
+                            D = - self.Kd * dtinput
+                                                                                   
+                        output = self.Pterm + self.Iterm + D
                         
                         output = self.smooth_output(output)
                         
@@ -167,6 +178,7 @@ class PID(object):
         self.lastError = 0.0
         self.lastTime = None
         self.lastDerr = 0.0
+        self.Pterm = 0.0
         if self.lastOutput != None:
             self.Iterm = self.lastOutput
         else:
@@ -184,10 +196,11 @@ class PID(object):
     def getTarget(self):
         return self.target
 
-    def setPID(self,p,i,d):
+    def setPID(self,p,i,d,pOnE=True):
         self.Kp = max(p,0)
         self.Ki = max(i,0)
         self.Kd = max(d,0)
+        self.pOnE = pOnE
         
     def setLimits(self,outMin,outMax):
         self.outMin = outMin
