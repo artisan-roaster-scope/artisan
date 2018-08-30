@@ -12558,7 +12558,6 @@ class ApplicationWindow(QMainWindow):
             elif reply == QMessageBox.Yes:
                 aw.qmc.etypes = aw.qmc.etypesdefault
                 aw.loadSettings(fn=action.data(),remember=False)
-                print(action.text())
                 aw.establish_etypes()
                 aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(action.text()))
                 if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
@@ -14516,7 +14515,7 @@ class ApplicationWindow(QMainWindow):
                                     libtime.sleep(0.035)
                                     aw.fujipid.setpidPXR("d",kd)
                             else:
-                                aw.pidcontrol.confPID(kp,ki,kd)                    
+                                aw.pidcontrol.confPID(kp,ki,kd,aw.pidcontrol.pOnE)                    
                                 #aw.pidcontrol.setPID(kp,ki,kd) # we don't set the new values in the dialog
                 elif action == 12: # Fuji Command (currently only "write(<unitId>,<register>,<value>)" is supproted
                     if cmd_str:
@@ -48693,7 +48692,7 @@ class PID_DlgControl(ArtisanDialog):
         self.pOnGroup.addButton(self.pOnM)
         self.pOnE.setChecked(aw.pidcontrol.pOnE)
         self.pOnM.setChecked(not aw.pidcontrol.pOnE)
-        if aw.pidcontrol.externalPIDControl() in [1,2] or aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl():
+        if aw.pidcontrol.externalPIDControl() in [1,2]:
             self.pOnE.setEnabled(False)
             self.pOnM.setEnabled(False)
         
@@ -49328,11 +49327,14 @@ class PIDcontrol(object):
                 aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"]) 
             elif aw.qmc.device == 19 and aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
                 if aw.ser.ArduinoIsInitialized:
-                    self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle) # first configure PID according to the actual settings
+                    self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle,aw.pidcontrol.pOnE) # first configure PID according to the actual settings
                     try:
                         #### lock shared resources #####
                         aw.ser.COMsemaphore.acquire(1)
                         if aw.ser.SP.isOpen():
+                            duty_min = min(100,max(0,aw.pidcontrol.dutyMin))
+                            duty_max = min(100,max(0,aw.pidcontrol.dutyMax))
+                            aw.ser.SP.write(str2cmd("PID;LIMIT;" + str(duty_min) + ";" + str(duty_max) + "\n"))
                             aw.ser.SP.write(str2cmd("PID;ON\n"))
                             self.pidActive = True
                             aw.button_10.setStyleSheet(aw.pushbuttonstyles["PIDactive"])                    
@@ -49616,7 +49618,6 @@ class PIDcontrol(object):
             self.pidKd = kd
             aw.sendmessage(QApplication.translate("Message","p-i-d values updated", None))
         elif aw.qmc.device == 19 and aw.pidcontrol.externalPIDControl(): # ArduinoTC4 firmware PID
-            # TODO: treat pOnE for TC4
             if aw.ser.ArduinoIsInitialized:
                 try:
                     #### lock shared resources #####
@@ -49624,7 +49625,10 @@ class PIDcontrol(object):
                     if aw.ser.SP.isOpen():
                         aw.ser.SP.flushInput()
                         aw.ser.SP.flushOutput()
-                        aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
+                        if pOnE:
+                            aw.ser.SP.write(str2cmd("PID;T;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
+                        else:
+                            aw.ser.SP.write(str2cmd("PID;T_POM;" + str(kp) + ";" + str(ki) + ";" + str(kd) + "\n"))
                         self.pidKp = kp
                         self.pidKi = ki
                         self.pidKd = kd
