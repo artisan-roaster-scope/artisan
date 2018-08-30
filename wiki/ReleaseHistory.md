@@ -2,21 +2,91 @@ Detailed Release History
 ========================
 
 ----
+v1.4.0 (xx.xx.2018)
+------------------
+
+ * New Features 
+   - allow alarms to move sliders beyond the default range of 0-100 ([Issue #213](../../../issues/213))
+   - save and restore "geometry" of Events configuration dialog
+   - adds phasesLCD mode-by-phase selection
+   - adds PhasesLCD mode that shows all of time/temp/percentage in finish phase accros the 3 Phases LCDs ([Issue #235](../../../issues/235))
+   - adds time guide option (most useful when following a background profile)
+   - adds export and convert to Excel
+   - adds fan RPM to R1 Aillio setup
+   - adds machine setup for Coffee-Tech Engineering Ghibli
+   - adds machine setup for Besca roasting machines
+   - adds machine setup for Atilla GOLD plus 7" roaster
+   - adds re-sampling and back-sampling to improve all smoothing algorithms
+   - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) (complementing the standard P-on-Error mode)
+   - adds KeepON flag
+ * Changes 
+   - adds "Insert" button to trigger the extra event table insert action instead of abusing the "Add" button
+   - use zero-based port numbering in Phidgets tab
+   - renumbers config event types 1-4 to be consistent with plotter notation
+   - adds roastUUID to alog profiles
+   - ensures that only a single instance runs per machine
+   - adds a pop-up reminder message when you forget to right-click on the timer LCD in Hottop 2K+ mode ([Issue #220](../../../issues/220))
+   - maps internal PID duty 0-100% to the full min/max range of the selected positive/negative target sliders
+   - updates link to documentation
+   - simplifies to one set of roast phases
+   - removes Py2.7 support and updates build environment
+   - reset window geometries and dpi settings on factory-reset
+   - more accurate timestamping
+   - increases number of time/temp decimals in alog profiles
+   - LCDs extended to show readings beyond 4 digits without decimals ([Issue #238](../../../issues/238))
+   - roast phase visualisation graph of the ranking report now also shown if more than 10 profiles have been selected
+   - adds warning if more than 10 profiles are selected that graph will not be rendered ([Issue #226](../../../issues/226))
+   - autoAdjusts now ensures also that the background profile is fully visible
+ * Bug Fixes 
+   - fixes missing translations on Linux/RPi ([Issue #211](../../../issues/211))
+   - fixes hanging message line in FullScreen mode
+   - close the device assignment dialog before opening the serial dialog to ensure that it cannot hide the serial dialog if app is put in background and back in foreground again
+   - avoids flicker of the navbar on loading setups if canvas color did not change
+   - fixes S7 for Windows and Linux that got broken by the code restructuring in v1.3.1
+   - fixes a modbus hickup due to modularization in relation to serial logging
+   - allows a negative ambient temperature in roast properties ([Issue #221](../../../issues/221))
+   - prevent an exception when editing times in an imported profile
+   - format the first entry in RoastProperties>Data table for correct paste after copy
+   - fixes the post roast calculation for CHARGE and DROP to match the auto calculations during a roast
+   - change the way RoR is calculated for the first phase in the Designer to be consistent with the recorded profiles (from TP to DE)
+   - disables CMD-N NEW action during recording until CHARGE and DROP ([Issue #225](../../../issues/225))
+   - fixes slider layout issue and removes remaining PyQt4 support
+   - fixed PID dialog geometry
+   - render long legends more compact
+   - makes Probat Pilot import/export compatible with latest Pilot version ([Issue #228](../../../issues/228))
+   - allow duplicate button events of empty event type "-"
+   - fixes slider event unit defaults
+   - ensures visible selection and hover actions in navigation bar on OS X under any theme
+   - fixes Events buttons labels which were not set correctly on changing their event type
+   - deactivate figure_options in designer mode preventing all kind of side effects
+   - fixes an issue of not fully restoring the main window geometry if a previous loaded profile is re-loaded on startup
+   - fixes RoR Filter unit labels
+   - fixes a redraw issue caused by deactivated event types leading to wrong background line count
+   - improves autoCharge detection on fast sampling rates
+   - ensures that drop-filter is applied on (non-optimal) decay smoothing
+   - reduces long (blocking) delay between the two samplings occurring with oversampling turned on
+   - better align foreground- and background smoothing if optimal-smoothing is deactivated
+   - fix an issue leading to a 100% duty after turning PID off and then on again
+   - better error message when trying to install on 32bit windows
+   - fixes Fuji PXR PID dialog ([Issue #243](../../../issues/243))
+
+
+----
 v1.3.1 (20.5.2018)
 ------------------
 
  * New Features 
-   - adds Cmd-S as shortcut for "Save As" ([#194](../../../issues/194))
-   - remembers fullscreen mode over restarts ([#199](../../../issues/199))
+   - adds Cmd-S as shortcut for "Save As" ([Issue #194](../../../issues/194))
+   - remembers fullscreen mode over restarts ([Issue #199](../../../issues/199))
    - allows to insert a custom event button line before the selected one by clicking Add
    - adds insert action to the alarm table to add an alarm line before the selected one
    - adds support for the new Fuji PID PXF
    - adds PXF variant of Sedona Elite and Phoenix machine configurations
    - adds copy as tab delimited text action for data tables
  * Changes
-   - restricts the "time-to" display introduced in v1.3 to the temperature mode rendering the percentage mode again as in v1.2 ([#196](../../../issues/196))
-   - all hundredths not only thenth in roast properties weight and volume ([#198](../../../issues/198))
-   - requires to tick the `Control` flag to activate the ´Control` button and the PID features also for the case of the TC4 with PID Firmware as for the Fuji PIDs ([#205](../../../issues/205))
+   - restricts the "time-to" display introduced in v1.3 to the temperature mode rendering the percentage mode again as in v1.2 ([Issue #196](../../../issues/196))
+   - all hundredths not only thenth in roast properties weight and volume ([Issue #198](../../../issues/198))
+   - requires to tick the `Control` flag to activate the ´Control` button and the PID features also for the case of the TC4 with PID Firmware as for the Fuji PIDs ([Issue #205](../../../issues/205))
    - events created by sliders now put the values translated using the sliders offset and factor to the event descriptions together with a unit postfix
    - started internal code modularisation resulting in lower memory demand in most cases
    - removed support for Qt4
@@ -25,15 +95,15 @@ v1.3.1 (20.5.2018)
    - improves slider release action
    - the semantic of the MODBUS little_endian `word` flag, relevant for Float values only, of the underlying pymodbus lib changed with the effect that some setups need to be updated (eg. the one for BC Roasters, and Coffeetool) by inversing the flag.
  * Bug Fixes
-   - ensures that the matplotlib font cache is used on Linux ([#178](../../../issues/178))
-   - fixes an error that could occur on deleting an event button definition ([#179](../../../issues/179))
-   - ensures proper persistance of the "Descr." checkbox state of the events dialog over restarts ([#180](../../../issues/180))
-   - fixes a communication issue with Aillio Bullet R1 roasters running a newer firmware ([#188](../../../issues/184))
-   - fixes a build error in v1.3 that caused Artisan to crash on opening a file selector ([#182](../../../issues/182),[#187](../../../issues/187),[#188](../../../issues/188))
-   - ensures that decimals in curve width are properly handled ([#186](../../../issues/186))
-   - fixes a regression that disallowed for negative event button values ([#191](../../../issues/191))
-   - fixes an unhandled exception in the alarm processing ([#192](../../../issues/192))
-   - fixes a rare case were the first event listed in roasting reports got duplicated ([#195](../../../issues/195))
+   - ensures that the matplotlib font cache is used on Linux ([Issue #178](../../../issues/178))
+   - fixes an error that could occur on deleting an event button definition ([Issue #179](../../../issues/179))
+   - ensures proper persistance of the "Descr." checkbox state of the events dialog over restarts ([Issue #180](../../../issues/180))
+   - fixes a communication issue with Aillio Bullet R1 roasters running a newer firmware ([Issue #188](../../../issues/184))
+   - fixes a build error in v1.3 that caused Artisan to crash on opening a file selector ([Issue #182](../../../issues/182),[Issue #187](../../../issues/187),[#188](../../../issues/188))
+   - ensures that decimals in curve width are properly handled ([Issue #186](../../../issues/186))
+   - fixes a regression that disallowed for negative event button values ([Issue #191](../../../issues/191))
+   - fixes an unhandled exception in the alarm processing ([Issue #192](../../../issues/192))
+   - fixes a rare case were the first event listed in roasting reports got duplicated ([Issue #195](../../../issues/195))
    - fixes Phidgets pulses that never latched back
    - fixes background title colors
    - fixes a problem setting extra device colors
