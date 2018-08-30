@@ -28165,8 +28165,11 @@ class editGraphDlg(ArtisanDialog):
         titleLine.addWidget(self.addRecentButton)
         titleLine.addSpacing(5)
         titleLine.addWidget(self.titleShowAlwaysFlag) 
-
-#PLUS (keep)               
+        
+#PLUS (keep)
+        self.plus_store_selected = None
+        self.plus_coffee_selected = None
+        self.plus_blend_selected = None        
         if aw.plus_account is not None:
             # variables populated by stock data as rendered in the corresponding popups
             self.plus_stores = None
