@@ -1117,10 +1117,11 @@ class tgraphcanvas(FigureCanvas):
         self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="darkgrey")
         self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="slategrey")
         self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="slateblue")
+
         # background Deltas
         self.DeltaETBflag = False
-        self.DeltaBTBflag = True
-
+        self.DeltaBTBflag = True  
+    
         # projection variables of change of rate
         self.HUDflag = False
         self.hudresizeflag = False
@@ -1133,6 +1134,7 @@ class tgraphcanvas(FigureCanvas):
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
         self.roastertype = ""
+        self.machinesetup = ""
         self.operator = ""
         self.drumspeed = ""
         self.roastingnotes = ""
@@ -2297,7 +2299,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.temporarymovepositiveslider:
                     slidernr,value = self.temporarymovepositiveslider
                     if aw.sliderpos(slidernr) != value or self.temporayslider_force_move:
-                        aw.moveslider(slidernr,value) # move slider  
+                        aw.moveslider(slidernr,value) # move slider
                         aw.fireslideraction(slidernr) # fire action
                         self.temporayslider_force_move = False
                 self.temporarymovepositiveslider = None
@@ -3313,6 +3315,17 @@ class tgraphcanvas(FigureCanvas):
                                 val = self.plotterstack[-1*nint]
                                 if "F"+mathexpression[i+1] not in mathdictionary:
                                     mathdictionary["F"+mathexpression[i+1]] = val
+                                    
+                    # add channel tare values (T1 => ET, T2 => BT, T3 => E1c1, T4 => E1c2, T5 => E2c1,...
+                    # set by clicking on the corresponding LCD
+                    elif mathexpression[i] == "T":
+                        if i+1 < mlen:                          #check for out of range
+                            if mathexpression[i+1].isdigit():
+                                nint = int(mathexpression[i+1])-1              #Enumber int
+                                if len(aw.channel_tare_values) > nint:
+                                    mathdictionary["T"+mathexpression[i+1]] = aw.channel_tare_values[nint]
+                                else:
+                                    mathdictionary["T"+mathexpression[i+1]] = 0.0
 
                     #############   end of mathexpression loop ##########################
                     
@@ -11105,31 +11118,16 @@ class ApplicationWindow(QMainWindow):
         self.ConfMenu.addAction(batchAction)
 
         self.ConfMenu.addSeparator()
-
-        self.temperatureMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_TEMPERATURE)
         
-        self.ConvertToFahrenheitAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_FAHRENHEIT,self)
-        self.ConvertToFahrenheitAction.triggered.connect(lambda _:self.qmc.convertTemperature("F"))
-        self.temperatureMenu.addAction(self.ConvertToFahrenheitAction)
-
-        self.ConvertToCelsiusAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_CELSIUS,self)
-        self.ConvertToCelsiusAction.triggered.connect(lambda _:self.qmc.convertTemperature("C"))
-        self.temperatureMenu.addAction(self.ConvertToCelsiusAction)
-
+        self.temperatureConfMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_TEMPERATURE)
+        
         self.FahrenheitAction = QAction(UIconst.ROAST_MENU_FAHRENHEIT_MODE,self)
         self.FahrenheitAction.triggered.connect(self.qmc.fahrenheitModeRedraw)
-        self.temperatureMenu.addAction(self.FahrenheitAction)
+        self.temperatureConfMenu.addAction(self.FahrenheitAction)
 
         self.CelsiusAction = QAction(UIconst.ROAST_MENU_CELSIUS_MODE,self)
         self.CelsiusAction.triggered.connect(self.qmc.celsiusModeRedraw)
-        self.temperatureMenu.addAction(self.CelsiusAction)
-
-        if self.qmc.mode == "F":
-            self.FahrenheitAction.setDisabled(True)
-            self.ConvertToFahrenheitAction.setDisabled(True)
-        else:
-            self.CelsiusAction.setDisabled(True)
-            self.ConvertToCelsiusAction.setDisabled(True)
+        self.temperatureConfMenu.addAction(self.CelsiusAction)        
             
         self.languageMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_LANGUAGE)
 
@@ -11314,7 +11312,27 @@ class ApplicationWindow(QMainWindow):
         self.wheeleditorAction.setCheckable(True)
         self.wheeleditorAction.setChecked(self.qmc.wheelflag)
         self.ToolkitMenu.addAction(self.wheeleditorAction)
+
+        self.ToolkitMenu.addSeparator()
+
+        self.temperatureMenu = self.ToolkitMenu.addMenu(UIconst.CONF_MENU_TEMPERATURE)
         
+        self.ConvertToFahrenheitAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_FAHRENHEIT,self)
+        self.ConvertToFahrenheitAction.triggered.connect(lambda _:self.qmc.convertTemperature("F"))
+        self.temperatureMenu.addAction(self.ConvertToFahrenheitAction)
+
+        self.ConvertToCelsiusAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_CELSIUS,self)
+        self.ConvertToCelsiusAction.triggered.connect(lambda _:self.qmc.convertTemperature("C"))
+        self.temperatureMenu.addAction(self.ConvertToCelsiusAction)
+
+        if self.qmc.mode == "F":
+            self.FahrenheitAction.setDisabled(True)
+            self.ConvertToFahrenheitAction.setDisabled(True)
+        else:
+            self.CelsiusAction.setDisabled(True)
+            self.ConvertToCelsiusAction.setDisabled(True)
+            
+                    
         # VIEW menu
         
         self.controlsAction = QAction(UIconst.CONF_MENU_CONTROLS,self)
@@ -11688,7 +11706,11 @@ class ApplicationWindow(QMainWindow):
 
 
         self.lcd2 = self.ArtisanLCD() # Temperature MET
+        self.lcd2.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.lcd2.customContextMenuRequested.connect(lambda _: self.setTare(0))
         self.lcd3 = self.ArtisanLCD() # Temperature BT
+        self.lcd3.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.lcd3.customContextMenuRequested.connect(lambda _: self.setTare(1))
         self.lcd4 = self.ArtisanLCD() # rate of change MET
         self.lcd5 = self.ArtisanLCD() # rate of change BT
         self.lcd6 = self.ArtisanLCD() # pid sv
@@ -11773,6 +11795,11 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.extraLCD1[i].display("0")
                 self.extraLCD2[i].display("0")
+            self.extraLCD1[i].setContextMenuPolicy(Qt.CustomContextMenu)
+            self.extraLCD1[i].setContextMenuPolicy(Qt.CustomContextMenu)
+            self.extraLCD1[i].customContextMenuRequested.connect(lambda _,r=2+i*2: self.setTare(r))
+            self.extraLCD2[i].setContextMenuPolicy(Qt.CustomContextMenu)
+            self.extraLCD2[i].customContextMenuRequested.connect(lambda _,r=2+i*2: self.setTare(r+1))
             self.extraLCDframe2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -11781,7 +11808,10 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel1[i].setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
             self.extraLCDlabel2[i].setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-
+            
+        # channel tare values (set by clicking on the corresponding LCDs)
+        # for ET/BT and each extra channel (2x self.nLCDS)
+        self.channel_tare_values = [0.0]*(2+self.nLCDS*2)
 
         # Stores messages up to 500
         self.messagehist = []
@@ -12284,6 +12314,22 @@ class ApplicationWindow(QMainWindow):
         # we connect the
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
     
+    # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
+    def setTare(self,n):
+        if self.qmc.flagon: # we set the tare value
+            if n == 0 and len(self.qmc.temp1)>0: # ET
+                self.channel_tare_values[n] = self.qmc.temp1[-1]
+            elif n == 1 and len(self.qmc.temp2)>0: # BT
+                self.channel_tare_values[n] = self.qmc.temp2[-1]
+            else:
+                i = (n - 2) // 2
+                if n % 2 == 0 and len(self.qmc.extratemp1)>i and len(self.qmc.extratemp1[i])>0: # even
+                    self.channel_tare_values[n] = self.qmc.extratemp1[i][-1]
+                elif len(self.qmc.extratemp2)>i and len(self.qmc.extratemp2[i])>0:
+                    self.channel_tare_values[n] = self.qmc.extratemp2[i][-1]
+        else: # we reset the tare value
+            self.channel_tare_values[n] = 0
+    
     def updatePlusStatus(self,ntb=None):
         if ntb is None:
             ntb = self.ntb
@@ -12559,6 +12605,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.etypes = aw.qmc.etypesdefault
                 aw.loadSettings(fn=action.data(),remember=False)
                 aw.establish_etypes()
+                aw.qmc.machinesetup = action.text()
                 aw.sendmessage(QApplication.translate("Message","Artisan configured for {0}",None).format(action.text()))
                 if aw.qmc.device == 29 and aw.modbus.type in [3,4]: # MODBUS TCP or UDP
                     host,res = QInputDialog.getText(self,
@@ -17420,7 +17467,7 @@ class ApplicationWindow(QMainWindow):
             if "roastertype" in profile:
                 self.qmc.roastertype = d(profile["roastertype"])
             else:
-                self.qmc.roastertype = ""
+                self.qmc.roastertype = ""                
             if "operator" in profile:
                 self.qmc.operator = d(profile["operator"])
             else:
@@ -19141,6 +19188,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoastProperties")
             self.qmc.operator = toString(settings.value("operator",self.qmc.operator))
             self.qmc.roastertype = toString(settings.value("roastertype",self.qmc.roastertype))
+            if settings.contains("machinesetup"):
+                self.qmc.machinesetup = toString(settings.value("machinesetup",self.qmc.machinesetup))
             self.qmc.drumspeed = toString(settings.value("drumspeed",self.qmc.drumspeed))
             self.qmc.density[2] = toDouble(settings.value("densitySampleVolume",self.qmc.density[2]))
             if settings.contains("beansize"):
@@ -19334,6 +19383,8 @@ class ApplicationWindow(QMainWindow):
                     self.extraser[i].stopbits = self.extrastopbits[i]
                     self.extraser[i].timeout = self.extratimeout[i]
             settings.endGroup()
+            if settings.contains("ChannelTares"):
+                self.channel_tare_values = [toDouble(x) for x in toList(settings.value("ChannelTares",self.channel_tare_values))]
             if settings.contains("BTfunction"):
                 self.qmc.BTfunction = s2a(toString(settings.value("BTfunction",self.qmc.BTfunction)))
                 self.qmc.ETfunction = s2a(toString(settings.value("ETfunction",self.qmc.ETfunction)))
@@ -20282,6 +20333,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("drumspeed",self.qmc.drumspeed)
             settings.setValue("operator",self.qmc.operator)
             settings.setValue("roastertype",self.qmc.roastertype)
+            settings.setValue("machinesetup",self.qmc.machinesetup)
             settings.setValue("densitySampleVolume",self.qmc.density[2])
             settings.setValue("beansize",self.qmc.beansize)
             settings.setValue("beansize_min",self.qmc.beansize_min)
@@ -20347,6 +20399,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extrastopbits",self.extrastopbits)
             settings.setValue("extratimeout",self.extratimeout)
             settings.endGroup()
+            settings.setValue("ChannelTares",self.channel_tare_values)
             settings.setValue("BTfunction",self.qmc.BTfunction)
             settings.setValue("ETfunction",self.qmc.ETfunction)
             settings.setValue("resetqsettings",self.resetqsettings)

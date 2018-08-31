@@ -19,6 +19,7 @@ v1.4.0 (xx.xx.2018)
    - adds re-sampling and back-sampling to improve all smoothing algorithms
    - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) (complementing the standard P-on-Error mode)
    - adds KeepON flag
+   - adds zero-ing of channels via extra symbolic variables Tn set to current value on right-click of corresponding LCD 
  * Changes 
    - adds "Insert" button to trigger the extra event table insert action instead of abusing the "Add" button
    - use zero-based port numbering in Phidgets tab
@@ -37,6 +38,7 @@ v1.4.0 (xx.xx.2018)
    - roast phase visualisation graph of the ranking report now also shown if more than 10 profiles have been selected
    - adds warning if more than 10 profiles are selected that graph will not be rendered ([Issue #226](../../../issues/226))
    - autoAdjusts now ensures also that the background profile is fully visible
+   - split temperature menu actions and move conversions to Tools menu
  * Bug Fixes 
    - fixes missing translations on Linux/RPi ([Issue #211](../../../issues/211))
    - fixes hanging message line in FullScreen mode
