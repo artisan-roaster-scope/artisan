@@ -5276,7 +5276,7 @@ class tgraphcanvas(FigureCanvas):
                             self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
                         if self.timeindex[6]:
                             self.writestatistics(TP_index)
-
+                
                 if not sampling and not aw.qmc.flagstart and self.timeindex[6] and aw.qmc.statssummary:
                     self.statsSummary()
 
@@ -5540,7 +5540,13 @@ class tgraphcanvas(FigureCanvas):
                         bbox = Bbox(bbox_data)   
                         t.remove()
 
-                self.ax.text(self.ax.get_xlim()[1]-bbox.width-20, statsheight, statstr, verticalalignment='top',fontproperties=prop,color=fc)
+                border = 3
+                pos_x = self.ax.get_xlim()[1]-bbox.width-20
+                pos_y = statsheight
+                rect = patches.Rectangle((pos_x-border,pos_y+border),bbox.width+2*border,-bbox.height-2*border,linewidth=1,edgecolor='grey',facecolor='lightgrey',fill=True,alpha=0.2,zorder=10)
+                self.ax.add_patch(rect)
+                
+                txt = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',fontproperties=prop,color=fc,zorder=11,path_effects=[PathEffects.Normal()])
                 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
