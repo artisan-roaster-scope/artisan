@@ -3854,16 +3854,19 @@ class tgraphcanvas(FigureCanvas):
         """
         assert k % 2 == 1, "Median filter length must be odd."
         assert x.ndim == 1, "Input must be one-dimensional."
-        k2 = (k - 1) // 2
-        y = numpy.zeros ((len (x), k), dtype=x.dtype)
-        y[:,k2] = x
-        for i in range (k2):
-            j = k2 - i
-            y[j:,i] = x[:-j]
-            y[:j,i] = x[0]
-            y[:-j,-(i+1)] = x[j:]
-            y[-j:,-(i+1)] = x[-1]
-        return numpy.median(y, axis=1)
+        if len(x) == 0:
+            return x
+        else:
+            k2 = (k - 1) // 2
+            y = numpy.zeros ((len (x), k), dtype=x.dtype)
+            y[:,k2] = x
+            for i in range (k2):
+                j = k2 - i
+                y[j:,i] = x[:-j]
+                y[:j,i] = x[0]
+                y[:-j,-(i+1)] = x[j:]
+                y[-j:,-(i+1)] = x[-1]
+            return numpy.median(y, axis=1)
 
     # smoothes a list of values 'y' at taken at times indicated by the numbers in list 'x'
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
@@ -3873,13 +3876,7 @@ class tgraphcanvas(FigureCanvas):
     def smooth(self, x, y, window_len=15, window='hanning'):
         try:
             if len(x) == len(y) and len(x) > 1:
-                # filter spikes
-                if aw.qmc.filterDropOuts:
-                    try:
-                        y = self.medfilt(y,5) # k=3 seems not to catch all spikes in all cases
-                    except:
-                        pass
-                if window_len > 2 and len(x) == len(y) and len(x) > 1:
+                if window_len > 2:
                     # smooth curves
                     #s = numpy.r_[2*x[0]-y[window_len:1:-1],y,2*y[-1]-y[-1:-window_len:-1]]
                     s=numpy.r_[y[window_len-1:0:-1],y,y[-1:-window_len:-1]]
@@ -3953,6 +3950,7 @@ class tgraphcanvas(FigureCanvas):
                     decay_weights = numpy.arange(1,window_len+1)
                 else:
                     window_len = len(decay_weights)
+                # invariant: window_len = len(decay_weights)
                 if decay_weights.sum() == 0:
                     res = b
                 else:
@@ -3962,12 +3960,12 @@ class tgraphcanvas(FigureCanvas):
                         seq = b[max(0,i-window_len + 1):i+1] 
                         # we need to surpress -1 drop out values from this
                         seq = list(filter(lambda item: item != -1,seq))
-                        w = decay_weights[max(0,window_len-len(seq)):]
-                        w = w[len(w)-len(seq):]
+                        w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
                         if len(w) == 0:
                             res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
                         else:
-                            res.append(numpy.average(seq,weights=w))            
+                            res.append(numpy.average(seq,weights=w)) # works only if len(seq) = len(w) 
+                    # postCond: len(res) = len(b)        
             else:
                 # optimal smoothing (the default)
                 win_len = max(0,window_len)
@@ -4263,7 +4261,9 @@ class tgraphcanvas(FigureCanvas):
             
     # fills in intermediate interpolated values replacing -1 values based on surrounding values
     # [1, 2, 3, -1, -1, -1, 10, 11] => [1, 2, 3, 4.75, 6.5, 8.25, 11]
-    # [1,2,3,-1,-1,-1,-1] => [1,2,3,-1,-1,-1,-1]
+    # [1,2,3,-1,-1,-1,-1] => [1,2,3,-1,-1,-1,-1] # no final value to interpolate too, so trailing -1 are kept!
+    # [-1,-1,2] => [2, 2.0, 2] # a prefix of -1 will be replaced by the first value in l that is not -1
+    # INVARIANT: the resulting list has always the same lenght as l
     def fill_gaps(self,l):
         res = []
         last_val = -1
@@ -5169,29 +5169,37 @@ class tgraphcanvas(FigureCanvas):
                     if self.extratimex[i] is not None and self.extratimex[i] and len(self.extratimex[i])>1:
                         timexi_lin = numpy.linspace(self.extratimex[i][0],self.extratimex[i][-1],len(self.extratimex[i]))
                     else:
-                        timexi_lin = None                
-                    if aw.extraCurveVisibility1[i]:
-                        if False and aw.qmc.flagon:
-                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= extraname1_subst[i])[0])
-                        else:
-                            if (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
-                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,a_lin=timexi_lin)
-                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
-                    if aw.extraCurveVisibility2[i]:
-                        if False and aw.qmc.flagon:
-                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
-                        else:
-                            if (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
-                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,a_lin=timexi_lin)
-                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
-                            sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                            markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
+                        timexi_lin = None
+                    try:
+                        if aw.extraCurveVisibility1[i]:
+                            if False and aw.qmc.flagon:
+                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= extraname1_subst[i])[0])
+                            else:
+                                if (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
+                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,a_lin=timexi_lin)
+                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
+                    except Exception as ex:
+                        _, _, exc_tb = sys.exc_info() 
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)                        
+                    try:
+                        if aw.extraCurveVisibility2[i]:
+                            if False and aw.qmc.flagon:
+                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
+                            else:
+                                if (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
+                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,a_lin=timexi_lin)
+                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
+                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
+                                markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
+                    except Exception as ex:
+                        _, _, exc_tb = sys.exc_info() 
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)                        
                 ##### ET,BT curves
                 if aw.qmc.ETcurve:
                     if False and aw.qmc.flagon:
@@ -9846,6 +9854,22 @@ class SampleThread(QThread):
         fit = numpy.polyfit(xs, ys, 1)
         return fit[0] * 60
 
+    # the temp get's averaged using the given decay weights after resampling
+    # to linear time based on tx and the current sampling interval
+    def decay_average(self,tx,temp,decay_weights):
+        if len(tx) != len(temp):
+            return temp
+        else:
+            # we take one more reading, if availble, for the re-sampling to make it more likely to have all readings re-sampled
+            l = min(len(decay_weights)+1,len(temp))
+            d = aw.qmc.delay / 1000.
+            tx_org = tx[-l:] # as len(tx)=len(temp) here, it is guranteed that len(tx_org)=l
+            # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
+            tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d)) # by contruction, len(tx_lin)=len(tx_org)=l
+            temp_trail = temp[-l:] # by construction, len(temp_trail)=len(tx_lin)=len(tx_org)=l
+            temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
+            return numpy.average(temp_trail_re[-len(decay_weights):],weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
+        
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
@@ -10067,39 +10091,21 @@ class SampleThread(QThread):
                         self.temp_decay_weights = numpy.arange(1,cf+1)
                     # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
                     if -1 in aw.qmc.temp1[-(cf+1):]: 
-                        cf1 = 1
                         dw1 = [1]
                     else:
-                        cf1 = cf
                         dw1 = self.temp_decay_weights
                     if -1 in aw.qmc.temp2[-(cf+1):]:
-                        cf2 = 1
                         dw2 = [1]
                     else:
-                        cf2 = cf
                         dw2 = self.temp_decay_weights
                     # average smoothing
                     d = aw.qmc.delay / 1000.
                     if len(aw.qmc.ctemp1) > 0:
-                        len1 = min(len(aw.qmc.ctemp1),cf1)
-                        tx1_org = aw.qmc.ctimex1[-len1:]                      
-                        # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
-                        tx1_lin = numpy.flip(numpy.arange(tx1_org[-1],tx1_org[-1]-len(tx1_org)*d,-d))
-                        v1 = aw.qmc.ctemp1[-len1:]
-                        v1_re = numpy.interp(tx1_lin, tx1_org, v1) # resample data in a to linear spaced time 
-                        st1 = numpy.average(v1_re,weights=dw1[max(0,cf1-len(aw.qmc.ctemp1)):])
-#                        st1 = numpy.average(aw.qmc.ctemp1[-min(len(aw.qmc.ctemp1),cf1):],weights=dw1[max(0,cf1-len(aw.qmc.ctemp1)):])
+                        st1 = self.decay_average(aw.qmc.ctimex1,aw.qmc.ctemp1,dw1)
                     else:
                         st1 = -1
                     if len(aw.qmc.ctemp2) > 0:
-                        len2 = min(len(aw.qmc.ctemp2),cf2)
-                        tx2_org = aw.qmc.ctimex2[-len2:]                                         
-                        # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
-                        tx2_lin = numpy.flip(numpy.arange(tx2_org[-1],tx2_org[-1]-len(tx2_org)*d,-d))
-                        v2 = aw.qmc.ctemp2[-len2:]
-                        v2_re = numpy.interp(tx2_lin, tx2_org, v2) # resample data in a to linear spaced time 
-                        st2 = numpy.average(v2_re,weights=dw2[max(0,cf2-len(aw.qmc.ctemp2)):])
-#                        st2 = numpy.average(aw.qmc.ctemp2[-min(len(aw.qmc.ctemp2),cf2):],weights=dw2[max(0,cf2-len(aw.qmc.ctemp2)):])
+                        st2 = self.decay_average(aw.qmc.ctimex2,aw.qmc.ctemp2,dw2)
                     else:
                         st2 = -1
                     # register smoothed values
@@ -10146,9 +10152,9 @@ class SampleThread(QThread):
                             user_filter = int(round(aw.qmc.deltafilter/2.))
                             if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
-                                    self.decay_weights = numpy.arange(1,user_filter+1)
-                                aw.qmc.rateofchange1 = numpy.average(aw.qmc.unfiltereddelta1[-user_filter:],weights=self.decay_weights)
-                                aw.qmc.rateofchange2 = numpy.average(aw.qmc.unfiltereddelta2[-user_filter:],weights=self.decay_weights)
+                                    self.decay_weights = numpy.arange(1,user_filter+1)                                
+                                aw.qmc.rateofchange1 = self.decay_average(aw.qmc.timex,aw.qmc.unfiltereddelta1,self.decay_weights)
+                                aw.qmc.rateofchange2 = self.decay_average(aw.qmc.timex,aw.qmc.unfiltereddelta2,self.decay_weights)
                                 
                         if aw.qmc.timeindex[6]:
                             rateofchange1plot = None
@@ -12623,7 +12629,7 @@ class ApplicationWindow(QMainWindow):
                         aw.s7.host = host
                     else:
                         aw.sendmessage(QApplication.translate("Message","Action canceled",None))
-                elif aw.qmc.device == 0  or aw.qmc.device == 53 or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Hottop or MODBUS serial
+                elif aw.qmc.device in [0,19,53] or (aw.qmc.device == 29 and aw.modbus.type in [0,1,2]): # Hottop or MODBUS serial
                     import serial.tools.list_ports
                     comports = [(cp if isinstance(cp, (list, tuple)) else [cp.device, cp.product, None]) for cp in serial.tools.list_ports.comports()]
                     if platf == 'Darwin':
@@ -17150,15 +17156,14 @@ class ApplicationWindow(QMainWindow):
                 
                 last_time = None
                 for i in range(len(self.qmc.timex)):
-# ML to DB: vars time2 and event are unused!?
-#                    if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
-#                        time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
-#                    else:
-#                        time2 = "" 
-#                    event = ""               
+                    if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
+                        time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60) #@UnusedVariable
+                    else:
+                        time2 = "" #@UnusedVariable
+                    event = ""     #@UnusedVariable       
                     for e in range(len(events)):
                         if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
-#                            event = events[e][1]
+                            event = events[e][1] #@UnusedVariable
                             events[e][2] = True
                             break
                     time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
@@ -23387,7 +23392,7 @@ class ApplicationWindow(QMainWindow):
                 dialog = PID_DlgControl(self)
                 #modeless style dialog 
                 dialog.show()
-                dialog.setFixedSize(dialog.size())
+                #dialog.setFixedSize(dialog.size()) # this badly interacts with keeping the window gemetry in qsettings
             else:
                 #self.pidcontrol.togglePID()
                 self.toggleHottopControl()
@@ -23400,7 +23405,7 @@ class ApplicationWindow(QMainWindow):
                 dialog = PID_DlgControl(self)
                 #modeless style dialog 
                 dialog.show()
-#                dialog.setFixedSize(dialog.size())
+#                dialog.setFixedSize(dialog.size())  # this badly interacts with keeping the window gemetry in qsettings
 
     def deviceassigment(self):
         dialog = DeviceAssignmentDlg(self)
@@ -23430,7 +23435,7 @@ class ApplicationWindow(QMainWindow):
         dialog = calculatorDlg(self)
         dialog.setModal(False)
         dialog.show()
-#        dialog.setFixedSize(dialog.size())
+#        dialog.setFixedSize(dialog.size()) # setting this fixed size badly interacts with remembering the screen geometry in app settings
         QApplication.processEvents()
         
     def loadSettings(self,fn=None,remember=True,reset=True):
@@ -49159,7 +49164,7 @@ class PID_DlgControl(ArtisanDialog):
     def closeEvent(self,_):
         settings = QSettings()
         #save window geometry
-        settings.setValue("PIDGeometry",self.saveGeometry())   
+        settings.setValue("PIDGeometry",self.saveGeometry()) 
         self.accept()
 
 
@@ -49437,7 +49442,6 @@ class PIDcontrol(object):
                         aw.ser.COMsemaphore.release(1)
                 aw.button_10.setStyleSheet(aw.pushbuttonstyles["PID"])
                 self.pidActive = False
-
         # software PID
         elif aw.qmc.Controlbuttonflag:
             aw.qmc.pid.setControl(lambda _: _)

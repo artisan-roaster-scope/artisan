@@ -1,0 +1,111 @@
+[General]
+Delay=2000
+Oversampling=true
+
+[ArduinoPID]
+dutyMax=100
+dutyMin=-100
+dutySteps=1
+invertControl=false
+loadRampSoakFromProfile=false
+pOnE=true
+pidCycle=1000
+pidKd=3
+pidKi=0.01
+pidKp=20
+pidNegativeTarget=0
+pidOnCHARGE=false
+pidPositiveTarget=0
+pidSource=1
+svButtons=false
+svLookahead=0
+svMode=0
+svRamps=0, 0, 0, 0, 0, 0, 0, 0
+svSlider=true
+svSliderMax=200
+svSliderMin=0
+svSoaks=0, 0, 0, 0, 0, 0, 0, 0
+svValue=120
+svValues=0, 0, 0, 0, 0, 0, 0, 0
+
+[CurveStyles]
+BTlinestyle=-
+extradrawstyles1=default, default, default
+extradrawstyles2=default, default, default
+extralinestyles1=-, -, -
+extralinestyles2=-, -, -
+extralinewidths1=1, 1, 1
+extralinewidths2=1, 1, 1
+extramarkers1=None, None, None
+extramarkers2=None, None, None
+extramarkersizes1=6, 6, 6
+extramarkersizes2=6, 6, 6
+
+[Device]
+Controlbuttonflag=true
+id=19
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200
+extrabytesize=8, 8, 8
+extracomport=COM1, COM1, COM1
+extraparity=N, N, N
+extrastopbits=1, 1, 1
+extratimeout=1, 1, 1
+
+[ExtraDev]
+extraCurveVisibility1=false, true, true, true, true, true, true, true, true, true
+extraCurveVisibility2=false, true, false, true, true, true, true, true, true, true
+extraLCDvisibility1=true, true, true, false, false, false, false, false, false, false
+extraLCDvisibility2=true, true, true, false, false, false, false, false, false, false
+extradevicecolor1=#1b9e1a, #910113, black
+extradevicecolor2=#fd8f12, #4895ce, black
+extradevices=28, 32, 44
+extramathexpression1=, , 
+extramathexpression2=, , 
+extraname1=Extra 1, Heater, SV
+extraname2=Extra 2, Fan, AT
+
+[ExtraEventButtons]
+buttonlistmaxlen=11
+buttonpalette="@Variant(\0\0\0\t\0\0\0\x18\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\b\0\0\0\x2\0\0\0\b\0\0\0\x2\0\0\0\x5\0\0\0\x2\0\0\0\x5\0\0\0\t\0\0\0\x4\0\0\0\x6@\0\0\0\0\0\0\0\0\0\0\x6\xc0\0\0\0\0\0\0\0\0\0\0\x6@\0\0\0\0\0\0\0\0\0\0\x6\xc0\0\0\0\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\f\0O\0T\0\x31\0,\0{\0}\0\0\0\n\0\0\0\f\0O\0T\0\x31\0,\0{\0}\0\0\0\n\0\0\0\x10\0\x44\0\x43\0\x46\0\x41\0N\0,\0{\0}\0\0\0\n\0\0\0\x10\0\x44\0\x43\0\x46\0\x41\0N\0,\0{\0}\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\x14\0H\0\x65\0\x61\0t\0\x65\0r\0\n\0+\0\x31\0\x30\0\0\0\n\0\0\0\x14\0H\0\x65\0\x61\0t\0\x65\0r\0\n\0-\0\x31\0\x30\0\0\0\n\0\0\0\xe\0\x46\0\x61\0n\0\n\0+\0\x31\0\x30\0\0\0\n\0\0\0\xe\0\x46\0\x61\0n\0\n\0-\0\x31\0\x30\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\xe\0#\0\x39\0\x31\0\x30\0\x31\0\x31\0\x33\0\0\0\n\0\0\0\xe\0#\0\x39\0\x31\0\x30\0\x31\0\x31\0\x33\0\0\0\n\0\0\0\xe\0#\0\x34\0\x38\0\x39\0\x35\0\x63\0\x65\0\0\0\n\0\0\0\xe\0#\0\x34\0\x38\0\x39\0\x35\0\x63\0\x65\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0\n\0\0\0\xe\0#\0\x66\0\x66\0\x66\0\x66\0\x66\0\x66\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x1\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\x1\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\x10\0\x44\0\x43\0\x46\0\x41\0N\0,\0{\0}\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\f\0O\0T\0\x31\0,\0{\0}\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\x6?\xf0\0\0\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\x2\0\0\0\x64\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\x2\0\0\0\0\0\0\0\t\0\0\0\x4\0\0\0\n\0\0\0\x2\0%\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\0\0\0\0\n\0\0\0\x2\0%)", @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0)
+buttonpalette_shortcuts=true
+buttonpalettemaxlen=11, 14, 14, 14, 14, 14, 14, 14, 14, 14
+eventbuttontablecolumnwidths=70, 80, 128, 64, 165, 98, 92, 100, 227, 105
+extraeventbuttoncolor=#910113, #910113, #4895ce, #4895ce
+extraeventbuttontextcolor=#ffffff, #ffffff, #ffffff, #ffffff
+extraeventsactions=1, 1, 1, 1
+extraeventsactionstrings="OT1,{}", "OT1,{}", "DCFAN,{}", "DCFAN,{}"
+extraeventsbuttonsflag=1
+extraeventsbuttonsflags=0, 1, 1
+extraeventsdescriptions=, , , 
+extraeventslabels=Heater\n+10, Heater\n-10, Fan\n+10, Fan\n-10
+extraeventstypes=8, 8, 5, 5
+extraeventsvalues=2, -2, 2, -2
+extraeventsvisibility=1, 1, 1, 1
+
+[RoastProperties]
+roastertype=Hottop TC4
+
+[SerialPort]
+baudrate=115200
+bytesize=8
+comport=/dev/cu.usbserial-AH01B8JA
+parity=N
+stopbits=1
+timeout=1
+
+[Sliders]
+ModeTempSliders=C
+eventslidercoarse=0, 0, 0, 0
+eventslidersflag=1
+eventslidersflags=0, 1, 1
+eventslidertemp=0, 0, 0, 0
+eventsliderunits=%, , , %
+slideractions=1, 0, 0, 1
+slidercommands="DCFAN,{}", , , "OT1,{}"
+sliderfactors=1, 1, 1, 1
+slidermax=100, 100, 100, 100
+slidermin=0, 0, 0, 0
+slideroffsets=0, 0, 0, 0
+slidervisibilities=1, 0, 0, 1
