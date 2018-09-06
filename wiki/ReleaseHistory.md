@@ -42,7 +42,8 @@ v1.4.0 (xx.xx.2018)
    - adds warning if more than 10 profiles are selected that graph will not be rendered ([Issue #226](../../../issues/226))
    - autoAdjusts now ensures also that the background profile is fully visible
    - split temperature menu actions and move conversions to Tools menu
-   - improved rendering of statistics summary
+   - improved rendering of statistic summary
+   - adds beans and roasting notes to statistic summary
  * Bug Fixes 
    - fixes missing translations on Linux/RPi ([Issue #211](../../../issues/211))
    - fixes hanging message line in FullScreen mode

@@ -27733,6 +27733,10 @@ class editGraphDlg(ArtisanDialog):
         self.org_specialeventsStrings = aw.qmc.specialeventsStrings
         self.org_specialeventsvalue = aw.qmc.specialeventsvalue
         
+        self.org_ambientTemp = aw.qmc.ambientTemp
+        self.org_ambient_humidity = aw.qmc.ambient_humidity
+        self.org_ambient_pressure = aw.qmc.ambient_pressure
+        
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #MARKERS
         chargelabel = QLabel("<b>" + u(QApplication.translate("Label", "CHARGE",None)) + "</b>")
@@ -28955,6 +28959,11 @@ class editGraphDlg(ArtisanDialog):
         aw.qmc.specialeventstype = self.org_specialeventstype
         aw.qmc.specialeventsStrings = self.org_specialeventsStrings
         aw.qmc.specialeventsvalue = self.org_specialeventsvalue
+        
+        aw.qmc.ambientTemp = self.org_ambientTemp
+        aw.qmc.ambient_humidity = self.org_ambient_humidity
+        aw.qmc.ambient_pressure = self.org_ambient_pressure
+        
         self.reject()   
 
     # calcs volume (in ml) from density (in g/l) and weight (in g)
