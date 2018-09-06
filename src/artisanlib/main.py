@@ -6181,11 +6181,7 @@ class tgraphcanvas(FigureCanvas):
             QApplication.processEvents()
             self.StartAsyncSamplingAction()
             QApplication.processEvents()
-            
-#            aw.ser.PhidgetHUM1000temperature()
-#            aw.ser.PhidgetHUM1000humidity()
-#            aw.ser.PhidgetPRE1000pressure()
-            
+            QTimer.singleShot(10,lambda : self.getAmbientData())           
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -6256,6 +6252,39 @@ class tgraphcanvas(FigureCanvas):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
+
+    def getAmbientData(self):
+        if self.ambient_temperature_device == 1: # Phidget HUM1000
+            temp = aw.ser.PhidgetHUM1000temperature()
+            if temp is not None:
+                if self.mode == "F":
+                    temp = self.fromCtoF(temp)
+                self.ambientTemp = aw.float2float(temp,1)
+                aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
+        if self.ambient_humidity_device == 1: # Phidget HUM1000
+            humidity = aw.ser.PhidgetHUM1000humidity()
+            if humidity is not None:
+                self.ambient_humidity = aw.float2float(humidity,1)
+                aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
+        if self.ambient_pressure_device == 1: # Phidget PRE1000
+            pressure = aw.ser.PhidgetPRE1000pressure()
+            if pressure is not None:
+                if self.ambientTemp == 0:
+                    t = 23 # we just assume 23C room temperature if no ambient temperature is given
+                else:
+                    t = self.ambientTemp
+                if self.mode == "F":
+                    t = self.fromFtoC(t)
+                self.ambient_pressure = aw.float2float(self.barometricPressure(pressure*10,t,self.elevation),1)
+                aw.sendmessage(QApplication.translate("Message","Pressure: {}hPa", None).format(self.ambient_pressure))
+      
+    # computes the barometric pressure from 
+    #   aap:  atmospheric pressure in hPa
+    #   atc:  temperature in Celsius
+    #   hasl: height above sea level in m
+    # see https://www.wmo.int/pages/prog/www/IMOP/meetings/SI/ET-Stand-1/Doc-10_Pressure-red.pdf
+    def barometricPressure(self, aap, atc, hasl):
+        return aap * pow((1 - ((0.0065*hasl) / (atc + (0.0065*hasl) + 273.15))),-5.257)
 
     # close serial port, Phidgets and Yocto ports
     def disconnectProbesFromSerialDevice(self,ser):
@@ -13967,7 +13996,7 @@ class ApplicationWindow(QMainWindow):
                             self.FCslcd.display(u(self.qmc.stringfromseconds(int(ts))[1:]))
                         elif aw.qmc.phasesLCDmode == 1: # percentage mode
                             self.DRY2FCsframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None))) #marko
-                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","TEMP PERCENTAGE",None)))  #marko
+                            self.TP2DRYframe.setToolTip(u(QApplication.translate("Label","PERCENTAGE MODE",None)))  #marko
                             if totaltime:
                                 finishphaseP = fmtstr%(ts*100./totaltime)
                             else:
@@ -18243,6 +18272,7 @@ class ApplicationWindow(QMainWindow):
                 profile["devices"] = [self.qmc.devices[d-1] for d in ds]
             except Exception as ex:
                 pass
+            profile["elevation"] = self.qmc.elevation
             profile["computed"] = self.computedProfileInformation()
             return profile
         except Exception as ex:
@@ -18596,6 +18626,11 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("yoctoRemoteFlag"):
                 self.qmc.yoctoRemoteFlag = bool(toBool(settings.value("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)))
                 self.qmc.yoctoServerID = toString(settings.value("yoctoServerID",self.qmc.yoctoServerID))
+            if settings.contains("ambient_temperature_device"):
+                self.qmc.ambient_temperature_device = toInt(settings.value("ambient_temperature_device",self.qmc.ambient_temperature_device))
+                self.qmc.ambient_humidity_device = toInt(settings.value("ambient_humidity_device",self.qmc.ambient_humidity_device))
+                self.qmc.ambient_pressure_device = toInt(settings.value("ambient_pressure_device",self.qmc.ambient_pressure_device))
+                self.qmc.elevation = toInt(settings.value("elevation",self.qmc.elevation))                
             # activate CONTROL BUTTON
             aw.showControlButton()
             if settings.contains("controlETpid"):
@@ -20051,6 +20086,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Controlbuttonflag",self.qmc.Controlbuttonflag)
             settings.setValue("yoctoRemoteFlag",self.qmc.yoctoRemoteFlag)
             settings.setValue("yoctoServerID",self.qmc.yoctoServerID)
+            settings.setValue("ambient_temperature_device",self.qmc.ambient_temperature_device)
+            settings.setValue("ambient_humidity_device",self.qmc.ambient_humidity_device)
+            settings.setValue("ambient_pressure_device",self.qmc.ambient_pressure_device)
+            settings.setValue("elevation",self.qmc.elevation)
             settings.endGroup()
             settings.setValue("fmt_data_RoR",self.qmc.fmt_data_RoR)
             settings.setValue("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime)
@@ -28115,9 +28154,9 @@ class editGraphDlg(ArtisanDialog):
         pressureunitslabel = QLabel("hPa")
         self.pressureedit = QLineEdit()
         self.pressureedit.setText(str(aw.qmc.ambient_pressure))
-        self.pressureedit.setMinimumWidth(50)
-        self.pressureedit.setMaximumWidth(50)
-        self.pressureedit.setValidator(QDoubleValidator(0, 1.2, 3, self.pressureedit))  
+        self.pressureedit.setMinimumWidth(55)
+        self.pressureedit.setMaximumWidth(55)
+        self.pressureedit.setValidator(QDoubleValidator(0, 1200, 1, self.pressureedit))  
         self.pressureedit.setAlignment(Qt.AlignRight)
                 
         ambient = QHBoxLayout()
@@ -35952,62 +35991,62 @@ class serialport(object):
         else:
             return tx, 0., float(val)   #send a 0. as second reading because the meter only returns one reading
             
-#    # connects to a Phidgets HUM1000, returns current temperature value and disconnects
-#    def PhidgetHUM1000temperature(self):
-#        try:
-#            # Temperature
-#            tempSensor = PhidgetTemperatureSensor()
-#            if aw.qmc.phidgetRemoteFlag:
-#                self.addPhidgetServer() 
-#            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
-#                tempSensor.setIsRemote(True)
-#                tempSensor.setIsLocal(False)                   
-#            print("attaching")
-#            tempSensor.openWaitForAttachment(2000)
-#            if tempSensor.getAttached():
-#                print("attached")
-#                libtime.sleep(0.4)
-#                print("temp",tempSensor.getTemperature())                
-#            print("done")
-#            tempSensor.close()
-#        except Exception as e:
-#            print("exception",e)
-#    # connects to a Phidgets HUM1000, returns current humidity value and disconnects
-#    
-#    def PhidgetHUM1000humidity(self):
-#        try:
-#            # Humidity
-#            humSensor = PhidgetHumiditySensor()
-#            if aw.qmc.phidgetRemoteFlag:
-#                self.addPhidgetServer() 
-#            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
-#                humSensor.setIsRemote(True)
-#                humSensor.setIsLocal(False)                   
-#            print("attaching")
-#            humSensor.openWaitForAttachment(2000)
-#            if humSensor.getAttached():
-#                print("attached")
-#                libtime.sleep(0.4)
-#                print("hum",humSensor.getHumidity())             
-#            print("done")
-#            humSensor.close()
-#        except Exception as e:
-#            print("exception",e)            
-#
-#    # connects to a Phidgets PRE1000, returns current pressure value and disconnects
-#    def PhidgetPRE1000pressure(self):
-#        try:
-#            pressSensor = PhidgetPressureSensor()
-#            pressSensor.openWaitForAttachment(2000)
-#            if pressSensor.getAttached():
-#                print("attached")
-#                libtime.sleep(0.4)
-#                print("press",pressSensor.getPressure())             
-#            print("done")
-#            pressSensor.close()
-#        except Exception as e:
-#            print("exception",e)                
-        
+    # connects to a Phidgets HUM1000, returns current temperature value and disconnects
+    def PhidgetHUM1000temperature(self):
+        try:
+            # Temperature
+            tempSensor = PhidgetTemperatureSensor()
+            if aw.qmc.phidgetRemoteFlag:
+                self.addPhidgetServer() 
+            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
+                tempSensor.setIsRemote(True)
+                tempSensor.setIsLocal(False)                   
+            tempSensor.openWaitForAttachment(1000)
+            if tempSensor.getAttached():
+                libtime.sleep(0.4)
+                res = tempSensor.getTemperature()
+                tempSensor.close()
+                return res
+            else:
+                return None
+        except Exception:
+            return None
+            
+    # connects to a Phidgets HUM1000, returns current humidity value and disconnects    
+    def PhidgetHUM1000humidity(self):
+        try:
+            # Humidity
+            humSensor = PhidgetHumiditySensor()
+            if aw.qmc.phidgetRemoteFlag:
+                self.addPhidgetServer() 
+            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
+                humSensor.setIsRemote(True)
+                humSensor.setIsLocal(False)                   
+            humSensor.openWaitForAttachment(1000)
+            if humSensor.getAttached():
+                libtime.sleep(0.4)
+                res = humSensor.getHumidity()
+                humSensor.close()
+                return res
+            else:
+                return None
+        except Exception:
+            return None
+
+    # connects to a Phidgets PRE1000, returns current pressure value and disconnects
+    def PhidgetPRE1000pressure(self):
+        try:
+            pressSensor = PhidgetPressureSensor()
+            pressSensor.openWaitForAttachment(2000)
+            if pressSensor.getAttached():
+                libtime.sleep(0.4)
+                res = pressSensor.getPressure()
+                pressSensor.close()
+                return res
+            else:
+                return None
+        except Exception:
+            return None
 
 ############################################################################
     def openport(self):
@@ -41476,25 +41515,47 @@ class DeviceAssignmentDlg(ArtisanDialog):
         yoctoVBox.setSpacing(5)
         yoctoVBox.setContentsMargins(0,0,0,0)  
         # Ambient Widgets and Layouts
-        temperatureDeviceCombo = QComboBox()
-        temperatureDeviceCombo.setFocusPolicy(Qt.NoFocus)
-        temperatureDeviceCombo.addItems(aw.qmc.temperaturedevicefunctionlist)
-        humidityDeviceCombo = QComboBox()
-        humidityDeviceCombo.setFocusPolicy(Qt.NoFocus)
-        humidityDeviceCombo.addItems(aw.qmc.humiditydevicefunctionlist)
-        pressureDeviceCombo = QComboBox()
-        pressureDeviceCombo.setFocusPolicy(Qt.NoFocus)
-        pressureDeviceCombo.addItems(aw.qmc.pressuredevicefunctionlist)
+        self.temperatureDeviceCombo = QComboBox()
+        self.temperatureDeviceCombo.setFocusPolicy(Qt.NoFocus)
+        self.temperatureDeviceCombo.addItems(aw.qmc.temperaturedevicefunctionlist)
+        try:
+            self.temperatureDeviceCombo.setCurrentIndex(aw.qmc.ambient_temperature_device)
+        except:
+            pass
+        self.humidityDeviceCombo = QComboBox()
+        self.humidityDeviceCombo.setFocusPolicy(Qt.NoFocus)
+        self.humidityDeviceCombo.addItems(aw.qmc.humiditydevicefunctionlist)
+        try:
+            self.humidityDeviceCombo.setCurrentIndex(aw.qmc.ambient_humidity_device)
+        except:
+            pass
+        self.elevationSpinBox = QSpinBox()
+        self.pressureDeviceCombo = QComboBox()
+        self.pressureDeviceCombo.setFocusPolicy(Qt.NoFocus)
+        self.pressureDeviceCombo.addItems(aw.qmc.pressuredevicefunctionlist)
+        try:
+            self.pressureDeviceCombo.setCurrentIndex(aw.qmc.ambient_pressure_device)
+        except:
+            pass
+        self.elevationSpinBox = QSpinBox()
+        self.elevationSpinBox.setAlignment(Qt.AlignRight)
+        self.elevationSpinBox.setRange(0,3000)
+        self.elevationSpinBox.setSingleStep(1)
+        self.elevationSpinBox.setValue(aw.qmc.elevation)
+        self.elevationSpinBox.setSuffix("m")
         temperatureDeviceLabel = QLabel(QApplication.translate("Label","Temperature",None))
         humidityDeviceLabel = QLabel(QApplication.translate("Label","Humidity",None))
         pressureDeviceLabel = QLabel(QApplication.translate("Label","Pressure",None))
+        elevationLabel = QLabel(QApplication.translate("Label","Elevation",None))
         ambientGrid = QGridLayout()
         ambientGrid.addWidget(temperatureDeviceLabel,0,0)
-        ambientGrid.addWidget(temperatureDeviceCombo,0,1)
+        ambientGrid.addWidget(self.temperatureDeviceCombo,0,1)
         ambientGrid.addWidget(humidityDeviceLabel,1,0)
-        ambientGrid.addWidget(humidityDeviceCombo,1,1)
+        ambientGrid.addWidget(self.humidityDeviceCombo,1,1)
         ambientGrid.addWidget(pressureDeviceLabel,2,0)
-        ambientGrid.addWidget(pressureDeviceCombo,2,1)
+        ambientGrid.addWidget(self.pressureDeviceCombo,2,1)
+        ambientGrid.addWidget(elevationLabel,3,0)
+        ambientGrid.addWidget(self.elevationSpinBox,3,1)
         ambientHBox = QHBoxLayout()
         ambientHBox.addStretch()
         ambientHBox.addLayout(ambientGrid)
@@ -42804,9 +42865,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
             # close all ports to force a reopen
             aw.qmc.disconnectProbes()
             
-            # Yotopuce conigurations
+            # Yotopuce configurations
             aw.qmc.yoctoRemoteFlag = self.yoctoBoxRemoteFlag.isChecked()
             aw.qmc.yoctoServerID = u(self.yoctoServerId.text())
+            
+            # Ambient confifgurations
+            aw.qmc.ambient_temperature_device = self.temperatureDeviceCombo.currentIndex()
+            aw.qmc.ambient_humidity_device = self.humidityDeviceCombo.currentIndex()
+            aw.qmc.ambient_pressure_device = self.pressureDeviceCombo.currentIndex()
+            try:
+                aw.qmc.elevation = int(self.elevationSpinBox.value())
+            except:
+                pass
             
             # Phidget configurations
             for i in range(4):

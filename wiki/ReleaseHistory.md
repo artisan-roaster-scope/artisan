@@ -16,10 +16,13 @@ v1.4.0 (xx.xx.2018)
    - adds machine setup for Coffee-Tech Engineering Ghibli
    - adds machine setup for Besca roasting machines
    - adds machine setup for Atilla GOLD plus 7" roaster
+   - adds machine setup for Hottop TC4 configurations
    - adds re-sampling and back-sampling to improve all smoothing algorithms
    - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) (complementing the standard P-on-Error mode)
    - adds KeepON flag
-   - adds zero-ing of channels via extra symbolic variables Tn set to current value on right-click of corresponding LCD 
+   - adds zero-ing of channels via extra symbolic variables Tn set to current value on right-click of corresponding LCD
+   - adds barometric pressure to roast properties and statistic summary
+   - adds support for ambient sensors Phidget [HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644) and [PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719) 
  * Changes 
    - adds "Insert" button to trigger the extra event table insert action instead of abusing the "Add" button
    - use zero-based port numbering in Phidgets tab
@@ -39,6 +42,7 @@ v1.4.0 (xx.xx.2018)
    - adds warning if more than 10 profiles are selected that graph will not be rendered ([Issue #226](../../../issues/226))
    - autoAdjusts now ensures also that the background profile is fully visible
    - split temperature menu actions and move conversions to Tools menu
+   - improved rendering of statistics summary
  * Bug Fixes 
    - fixes missing translations on Linux/RPi ([Issue #211](../../../issues/211))
    - fixes hanging message line in FullScreen mode
