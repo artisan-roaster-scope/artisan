@@ -1926,6 +1926,7 @@ class tgraphcanvas(FigureCanvas):
             res = aw.qmc.ambientTempSourceAvg()
             if res is not None and (isinstance(res, float) or isinstance(res, int)) and not math.isnan(res):
                 aw.qmc.ambientTemp = aw.float2float(float(res))
+        aw.qmc.getAmbientData()
 
     # eventsvalues maps the given internal event value v to an external event int value as displayed to the user as special event value
     # v is expected to be float value of range [-11.0,11.0]
@@ -5455,6 +5456,14 @@ class tgraphcanvas(FigureCanvas):
                     statstr +=  str(aw.float2float(aw.qmc.ambient_pressure,2)) + 'hPa'
                 if aw.qmc.greens_temp:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Bean Temp", None) + ': ' + str(int(aw.qmc.greens_temp)) + u'\u00b0' + aw.qmc.mode
+                    
+                if aw.qmc.beans is not None and len(aw.qmc.beans)>0:
+                    statstr += skipline
+                    for l in aw.qmc.beans.split("\n"):
+                        statstr += '\n' + l[:28]
+                        if len(l)>28:
+                            statstr += ".."
+                    
                 if aw.qmc.weight[0]:
                     statstr += skipline
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ str(aw.float2float(aw.qmc.weight[0],2)) + aw.qmc.weight[2]
@@ -5500,6 +5509,12 @@ class tgraphcanvas(FigureCanvas):
                     statstr += '\n' + QApplication.translate("AddlInfo", "Whole Color", None) + ': '+ str(aw.qmc.whole_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
                 if aw.qmc.ground_color > 0:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Ground Color", None) + ': '+ str(aw.qmc.ground_color) + " " + str(aw.qmc.color_systems[aw.qmc.color_system_idx])
+                    
+                if aw.qmc.roastingnotes is not None and len(aw.qmc.roastingnotes)>0:
+                    statstr += skipline
+                    statstr += '\n' + aw.qmc.roastingnotes[:28]
+                    if len(aw.qmc.roastingnotes)>28:
+                        statstr += ".."
 
                 prop = aw.mpl_fontproperties.copy()
                 if aw.qmc.graphfont == 1:
@@ -28149,16 +28164,14 @@ class editGraphDlg(ArtisanDialog):
         self.ambientedit.setMinimumWidth(40)
         self.ambientedit.setMaximumWidth(40)
         self.ambientedit.setValidator(QDoubleValidator(-40., 200., 2, self.ambientedit))  
-        self.ambientedit.setAlignment(Qt.AlignRight)
-        
+        self.ambientedit.setAlignment(Qt.AlignRight)        
         pressureunitslabel = QLabel("hPa")
         self.pressureedit = QLineEdit()
         self.pressureedit.setText(str(aw.qmc.ambient_pressure))
         self.pressureedit.setMinimumWidth(55)
         self.pressureedit.setMaximumWidth(55)
         self.pressureedit.setValidator(QDoubleValidator(0, 1200, 1, self.pressureedit))  
-        self.pressureedit.setAlignment(Qt.AlignRight)
-                
+        self.pressureedit.setAlignment(Qt.AlignRight)                
         ambient = QHBoxLayout()
         ambient.addWidget(self.ambientedit)
         ambient.addWidget(ambientunitslabel)
@@ -29062,6 +29075,8 @@ class editGraphDlg(ArtisanDialog):
     def updateAmbientTemp(self):
         aw.qmc.updateAmbientTemp()
         self.ambientedit.setText(str(aw.qmc.ambientTemp))
+        self.ambient_humidity_edit.setText(str(aw.qmc.ambient_humidity))
+        self.pressureedit.setText(str(aw.qmc.ambient_pressure))
 
     def scanWholeColor(self):
         v = aw.color.readColor()
