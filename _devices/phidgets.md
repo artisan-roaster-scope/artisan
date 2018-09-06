@@ -82,3 +82,11 @@ Artisan can attach to all Phidgets IO ports. The input ports are configured as (
 * [Phidget 1010](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=3) (USB), [Phidget 1013](https://www.phidgets.com/?tier=3&prodid=8) (USB), [Phidget 1018](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=18) (USB), [Phidget 1019](https://www.phidgets.com/?tier=3&catid=2&pcid=1&prodid=20) (USB), [Phidget 1073](https://www.phidgets.com/?tier=3&catid=1&pcid=0&prodid=69) (USB): 8x analog/digital in, 8x digital out
 
 Each output action supports a number of different commands specified in the `Documentation` field. See the post [More Phidgets!](https://artisan-roasterscope.blogspot.it/2017/12/more-phidgets.html) for details.
+
+
+## Ambient Sensors
+
+Artisan v1.4 adds support for the following ambient sensors that allow to automatically fill the room temperature, relative humidity and barometric pressure data of roast profiles.
+
+* [Phidget HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644) (VINT): Measure relative humidity from 0 to 100% and temperature from -40°C to +85°C
+* [Phidget PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719) (VINT): Measure the absolute air pressures between 50 and 110 kPa
