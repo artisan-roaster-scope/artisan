@@ -5459,10 +5459,11 @@ class tgraphcanvas(FigureCanvas):
                     
                 if aw.qmc.beans is not None and len(aw.qmc.beans)>0:
                     statstr += skipline
-                    for l in aw.qmc.beans.split("\n"):
+                    lines = aw.qmc.beans.split("\n")
+                    for l in lines[:3]:
                         statstr += '\n' + l[:28]
                         if len(l)>28:
-                            statstr += ".."
+                            statstr += ".."                     
                     
                 if aw.qmc.weight[0]:
                     statstr += skipline
@@ -5512,9 +5513,11 @@ class tgraphcanvas(FigureCanvas):
                     
                 if aw.qmc.roastingnotes is not None and len(aw.qmc.roastingnotes)>0:
                     statstr += skipline
-                    statstr += '\n' + aw.qmc.roastingnotes[:28]
-                    if len(aw.qmc.roastingnotes)>28:
-                        statstr += ".."
+                    lines = aw.qmc.roastingnotes.split("\n")
+                    for l in lines[:3]:                    
+                        statstr += '\n' + l[:28]
+                        if len(l)>28:
+                            statstr += ".."
 
                 prop = aw.mpl_fontproperties.copy()
                 if aw.qmc.graphfont == 1:
