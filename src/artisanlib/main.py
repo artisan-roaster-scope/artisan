@@ -119,6 +119,8 @@ import matplotlib.backends.qt_editor.figureoptions as figureoptions
 from Phidget22.DeviceClass import DeviceClass
 from Phidget22.DeviceID import DeviceID
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
+from Phidget22.Devices.HumiditySensor import HumiditySensor as PhidgetHumiditySensor
+from Phidget22.Devices.PressureSensor import PressureSensor as PhidgetPressureSensor
 from Phidget22.Devices.VoltageRatioInput import *  # @UnusedWildImport
 from Phidget22.Devices.VoltageInput import * # @UnusedWildImport
 from Phidget22.Devices.DigitalInput import * # @UnusedWildImport
@@ -1015,8 +1017,25 @@ class tgraphcanvas(FigureCanvas):
         self.ambientTemp = 0.
         self.ambientTempSource = 0 # indicates the temperature curve that is used to automatically fill the ambient temperature on DROP
 #                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
+        self.ambient_temperature_device = 0
+        self.ambient_pressure = 0.
+        self.ambient_pressure_device = 0
         self.ambient_humidity = 0.
-        #relative humidity percentage [0], corresponding temperature [1]
+        self.ambient_humidity_device = 0
+        self.elevation = 0
+        
+        self.temperaturedevicefunctionlist = [
+            "",                #0
+            "Phidget HUM1000", #1
+        ]
+        self.humiditydevicefunctionlist = [
+            "",                #0
+            "Phidget HUM1000", #1
+        ]
+        self.pressuredevicefunctionlist = [
+            "",                #0
+            "Phidget PRE1000", #1
+        ]
         
         self.moisture_greens = 0.
         self.moisture_roasted = 0.
@@ -3678,6 +3697,7 @@ class tgraphcanvas(FigureCanvas):
                     self.density = [0,self.density[1],0,self.density[3]]
                     self.ambientTemp = 0.
                     self.ambient_humidity = 0.
+                    self.ambient_pressure = 0.
                     self.beansize = 0.
                     self.beansize_min = 0
                     self.beansize_max = 0
@@ -3940,7 +3960,7 @@ class tgraphcanvas(FigureCanvas):
             # 3. filter spikes
             if aw.qmc.filterDropOuts:
                 try:
-                    b = self.medfilt(numpy.array(b),7)  # k=3 seems not to catch all spikes in all cases; k must be odd!
+                    b = self.medfilt(numpy.array(b),5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
                 except:
                     pass
             # 4. smooth data
@@ -4706,7 +4726,7 @@ class tgraphcanvas(FigureCanvas):
                                 RoRstart = min(aw.qmc.timeindexB[0]+7, len(self.timeB)-1)
                             else:
                                 RoRstart = -1
-                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=decay_smoothing_p,timex_lin=timeB_lin)
+                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin)
                         
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
@@ -5140,7 +5160,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.DeltaETflag or self.DeltaBTflag:
                     if recomputeAllDeltas and not self.flagstart: # during recording we don't recompute the deltas
                         cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                        decay_smoothing_p = not aw.qmc.optimalSmoothing or aw.qmc.flagon
+                        decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
                         t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                         t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)                        
                         # we start RoR computation 7 readings after CHARGE to avoid this initial peak
@@ -5148,7 +5168,7 @@ class tgraphcanvas(FigureCanvas):
                             RoR_start = min(aw.qmc.timeindex[0]+7, len(self.timex)-1)
                         else:
                             RoR_start = -1                                                                                          
-                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=(aw.qmc.optimalSmoothing and (not aw.qmc.flagon)),timex_lin=timex_lin)
+                        self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
                                                     
                     ##### DeltaET,DeltaBT curves
                     if self.delta_ax:
@@ -5425,12 +5445,14 @@ class tgraphcanvas(FigureCanvas):
                     statstr += '\n' + str(aw.qmc.roastertype)
                 if aw.qmc.drumspeed:
                     statstr += '\n' + (QApplication.translate("Label", "Drum Speed",None)) + ': ' + str(aw.qmc.drumspeed)
-                if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [None,0]:
+                if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [None,0] or aw.qmc.ambient_pressure not in [None,0]:
                     statstr += '\n' + (QApplication.translate("HTML Report Template", "Ambient:",None)) + ' '
                 if aw.qmc.ambientTemp not in [None,0]:
                     statstr += str(int(aw.qmc.ambientTemp)) + u'\u00b0' + aw.qmc.mode + '  '
                 if aw.qmc.ambient_humidity not in [None,0]:
-                    statstr +=  str(int(aw.qmc.ambient_humidity)) + '% ' + QApplication.translate("AddlInfo", "RH",None)
+                    statstr +=  str(int(aw.qmc.ambient_humidity)) + '% '
+                if aw.qmc.ambient_pressure not in [None,0]:
+                    statstr +=  str(aw.float2float(aw.qmc.ambient_pressure,2)) + 'hPa'
                 if aw.qmc.greens_temp:
                     statstr += '\n' + QApplication.translate("AddlInfo", "Bean Temp", None) + ': ' + str(int(aw.qmc.greens_temp)) + u'\u00b0' + aw.qmc.mode
                 if aw.qmc.weight[0]:
@@ -5481,9 +5503,10 @@ class tgraphcanvas(FigureCanvas):
 
                 prop = aw.mpl_fontproperties.copy()
                 if aw.qmc.graphfont == 1:
-                    prop.set_size("small")
+                    prop.set_size("x-small")
                 else:
-                    prop.set_size("medium")
+                    prop.set_size("small")
+                ls = 1.7 # linespacing
                 fc = aw.qmc.palette["text"]
 
                 if aw.qmc.legendloc != 1:
@@ -5499,7 +5522,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     start = 0
                 from matplotlib.transforms import Bbox
-                t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop,color=fc)
+                t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=1.2,fontproperties=prop,color=fc,path_effects=[])
                 f = self.ax.get_figure()
                 r = f.canvas.get_renderer()
                 bb = t.get_window_extent(renderer=r) # bounding box in display space
@@ -5515,7 +5538,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.endofx = orig_endofx
  
                     # rinse and repeat, so the bbox values get affected by the auto axis scaling 
-                    t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop,color=fc)
+                    t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
                     f = self.ax.get_figure()
                     r = f.canvas.get_renderer()
                     bb = t.get_window_extent(renderer=r) # bounding box in display space
@@ -5532,7 +5555,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.endofx = orig_endofx
      
                         # rinse and repeat, so the bbox values get affected by the auto axis scaling 
-                        t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',fontproperties=prop,color=fc)
+                        t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
                         f = self.ax.get_figure()
                         r = f.canvas.get_renderer()
                         bb = t.get_window_extent(renderer=r) # bounding box in display space
@@ -5540,13 +5563,13 @@ class tgraphcanvas(FigureCanvas):
                         bbox = Bbox(bbox_data)   
                         t.remove()
 
-                border = 3
+                border = 4
                 pos_x = self.ax.get_xlim()[1]-bbox.width-20
                 pos_y = statsheight
-                rect = patches.Rectangle((pos_x-border,pos_y+border),bbox.width+2*border,-bbox.height-2*border,linewidth=1,edgecolor='grey',facecolor='lightgrey',fill=True,alpha=0.2,zorder=10)
+                rect = patches.Rectangle((pos_x-border,pos_y+border),bbox.width+2*border,-bbox.height-2*border,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=QColor(aw.qmc.palette["background"]).lighter(150).name(),fill=True,alpha=0.8,zorder=10)
                 self.ax.add_patch(rect)
                 
-                txt = self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',fontproperties=prop,color=fc,zorder=11,path_effects=[PathEffects.Normal()])
+                self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,zorder=11,path_effects=[])
                 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -6158,6 +6181,11 @@ class tgraphcanvas(FigureCanvas):
             QApplication.processEvents()
             self.StartAsyncSamplingAction()
             QApplication.processEvents()
+            
+#            aw.ser.PhidgetHUM1000temperature()
+#            aw.ser.PhidgetHUM1000humidity()
+#            aw.ser.PhidgetPRE1000pressure()
+            
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -15260,7 +15288,7 @@ class ApplicationWindow(QMainWindow):
                     if not aw.qmc.designerflag:
                         self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
                         if len(u(self.filename)) == 0:
-                            return
+                            aw.deleteBackground()
                         try:
                             aw.qmc.resetlinecountcaches()
                             aw.loadbackground(u(self.filename))           
@@ -17728,6 +17756,8 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.endofx = self.qmc.timex[-1] + 40  
             if "ambient_humidity" in profile:
                 self.qmc.ambient_humidity = profile["ambient_humidity"]
+            if "ambient_pressure" in profile:
+                self.qmc.ambient_pressure = profile["ambient_pressure"]
             if "moisture_greens" in profile:
                 self.qmc.moisture_greens = profile["moisture_greens"]
             else:
@@ -18036,7 +18066,7 @@ class ApplicationWindow(QMainWindow):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " computedProfileInformation() {0}").format(str(ex)),exc_tb.tb_lineno)                
-        ######### Humidity #########
+        ######### Humidity / Pressure #########
         try:
             if aw.qmc.moisture_greens != 0.0 and not math.isnan(aw.qmc.moisture_greens):
                 computedProfile["moisture_greens"] = self.float2float(aw.qmc.moisture_greens)
@@ -18044,6 +18074,8 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["moisture_roasted"] = self.float2float(aw.qmc.moisture_roasted)
             if aw.qmc.ambient_humidity != 0.0 and not math.isnan(aw.qmc.ambient_humidity):
                 computedProfile["ambient_humidity"] = self.float2float(aw.qmc.ambient_humidity)
+            if aw.qmc.ambient_pressure != 0.0 and not math.isnan(aw.qmc.ambient_pressure):
+                computedProfile["ambient_pressure"] = self.float2float(aw.qmc.ambient_pressure)
             if aw.qmc.ambientTemp != 0.0 and not math.isnan(aw.qmc.ambientTemp):
                 computedProfile["ambient_temperature"] = self.float2float(aw.qmc.ambientTemp)
         except Exception as ex:
@@ -18155,6 +18187,7 @@ class ApplicationWindow(QMainWindow):
             profile["xmax"] = float(self.qmc.endofx)
             profile["ambientTemp"] = self.qmc.ambientTemp
             profile["ambient_humidity"] = self.qmc.ambient_humidity
+            profile["ambient_pressure"] = self.qmc.ambient_pressure
             profile["moisture_greens"] = self.qmc.moisture_greens
             profile["greens_temp"] = self.qmc.greens_temp
             profile["moisture_roasted"] = self.qmc.moisture_roasted
@@ -27996,13 +28029,13 @@ class editGraphDlg(ArtisanDialog):
         
         #bean size
         bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Screen",None)) + "</b>")
-        self.bean_size_min_edit = QLineEdit(str(aw.qmc.beansize_min))
+        self.bean_size_min_edit = QLineEdit(str(int(round(aw.qmc.beansize_min))))
         self.bean_size_min_edit.setValidator(QIntValidator(0,25,self.bean_size_min_edit))
         self.bean_size_min_edit.setMinimumWidth(25)
         self.bean_size_min_edit.setMaximumWidth(25)
         self.bean_size_min_edit.setAlignment(Qt.AlignRight)
         bean_size_sep_label = QLabel("/")
-        self.bean_size_max_edit = QLineEdit(str(aw.qmc.beansize_max))
+        self.bean_size_max_edit = QLineEdit(str(int(round(aw.qmc.beansize_max))))
         self.bean_size_max_edit.setValidator(QIntValidator(0,25,self.bean_size_max_edit))
         self.bean_size_max_edit.setMinimumWidth(25)
         self.bean_size_max_edit.setMaximumWidth(25)
@@ -28068,22 +28101,31 @@ class editGraphDlg(ArtisanDialog):
         ambient_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.ambient_humidity_edit = QLineEdit()
         self.ambient_humidity_edit.setText(str(aw.qmc.ambient_humidity))
+        self.ambient_humidity_edit.setMinimumWidth(50)
         self.ambient_humidity_edit.setMaximumWidth(50)
         self.ambient_humidity_edit.setValidator(QDoubleValidator(0., 100., 2, self.ambient_humidity_edit))  
         self.ambient_humidity_edit.setAlignment(Qt.AlignRight) 
-        ambient_humidity_at_label = QLabel(QApplication.translate("Label", "at",None))
         self.ambientedit = QLineEdit()
         self.ambientedit.setText(str(aw.qmc.ambientTemp))
-        self.ambientedit.setMaximumWidth(50)
+        self.ambientedit.setMinimumWidth(40)
+        self.ambientedit.setMaximumWidth(40)
         self.ambientedit.setValidator(QDoubleValidator(-40., 200., 2, self.ambientedit))  
-        self.ambientedit.setAlignment(Qt.AlignRight)       
-        self.ambientedit_tempUnitsComboBox = QComboBox()
-        self.ambientedit_tempUnitsComboBox.setMaximumWidth(60)
-        self.ambientedit_tempUnitsComboBox.setMinimumWidth(60)
+        self.ambientedit.setAlignment(Qt.AlignRight)
+        
+        pressureunitslabel = QLabel("hPa")
+        self.pressureedit = QLineEdit()
+        self.pressureedit.setText(str(aw.qmc.ambient_pressure))
+        self.pressureedit.setMinimumWidth(50)
+        self.pressureedit.setMaximumWidth(50)
+        self.pressureedit.setValidator(QDoubleValidator(0, 1.2, 3, self.pressureedit))  
+        self.pressureedit.setAlignment(Qt.AlignRight)
+                
         ambient = QHBoxLayout()
-        ambient.addWidget(ambient_humidity_at_label)
         ambient.addWidget(self.ambientedit)
         ambient.addWidget(ambientunitslabel)
+        ambient.addSpacing(10)
+        ambient.addWidget(self.pressureedit)
+        ambient.addWidget(pressureunitslabel)
         ambient.addStretch()
         self.calculateorganiclosslabel = QLabel("")
         # NOTES
@@ -28289,12 +28331,13 @@ class editGraphDlg(ArtisanDialog):
             
         roasteroperator = QHBoxLayout()
         roasteroperator.addWidget(self.operator, stretch=3)
-        roasteroperator.addSpacing(15)
+        roasteroperator.addSpacing(10)
         roasteroperator.addWidget(roastertypelabel)        
-        roasteroperator.addSpacing(7)
+        roasteroperator.addSpacing(5)
         roasteroperator.addWidget(self.roaster,stretch=3)
+        roasteroperator.addSpacing(10)
         roasteroperator.addWidget(drumspeedlabel)
-        roasteroperator.addSpacing(7)
+        roasteroperator.addSpacing(5)
         roasteroperator.addWidget(self.drumspeed,stretch=1)
         textLayout.addLayout(roasteroperator,4+textLayoutPlusOffset,1)        
         weightLayout = QHBoxLayout()
@@ -29779,6 +29822,11 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.ambient_humidity = float(str(self.ambient_humidity_edit.text()))
         except Exception:
             aw.qmc.ambient_humidity = 0
+        #update ambient pressure
+        try:
+            aw.qmc.ambient_pressure = float(str(self.pressureedit.text()))
+        except Exception:
+            aw.qmc.ambient_pressure = 0
         #update notes
         aw.qmc.roastertype = u(self.roaster.text())
         aw.qmc.operator = u(self.operator.text())
@@ -35903,6 +35951,63 @@ class serialport(object):
             ### not finished
         else:
             return tx, 0., float(val)   #send a 0. as second reading because the meter only returns one reading
+            
+#    # connects to a Phidgets HUM1000, returns current temperature value and disconnects
+#    def PhidgetHUM1000temperature(self):
+#        try:
+#            # Temperature
+#            tempSensor = PhidgetTemperatureSensor()
+#            if aw.qmc.phidgetRemoteFlag:
+#                self.addPhidgetServer() 
+#            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
+#                tempSensor.setIsRemote(True)
+#                tempSensor.setIsLocal(False)                   
+#            print("attaching")
+#            tempSensor.openWaitForAttachment(2000)
+#            if tempSensor.getAttached():
+#                print("attached")
+#                libtime.sleep(0.4)
+#                print("temp",tempSensor.getTemperature())                
+#            print("done")
+#            tempSensor.close()
+#        except Exception as e:
+#            print("exception",e)
+#    # connects to a Phidgets HUM1000, returns current humidity value and disconnects
+#    
+#    def PhidgetHUM1000humidity(self):
+#        try:
+#            # Humidity
+#            humSensor = PhidgetHumiditySensor()
+#            if aw.qmc.phidgetRemoteFlag:
+#                self.addPhidgetServer() 
+#            if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
+#                humSensor.setIsRemote(True)
+#                humSensor.setIsLocal(False)                   
+#            print("attaching")
+#            humSensor.openWaitForAttachment(2000)
+#            if humSensor.getAttached():
+#                print("attached")
+#                libtime.sleep(0.4)
+#                print("hum",humSensor.getHumidity())             
+#            print("done")
+#            humSensor.close()
+#        except Exception as e:
+#            print("exception",e)            
+#
+#    # connects to a Phidgets PRE1000, returns current pressure value and disconnects
+#    def PhidgetPRE1000pressure(self):
+#        try:
+#            pressSensor = PhidgetPressureSensor()
+#            pressSensor.openWaitForAttachment(2000)
+#            if pressSensor.getAttached():
+#                print("attached")
+#                libtime.sleep(0.4)
+#                print("press",pressSensor.getPressure())             
+#            print("done")
+#            pressSensor.close()
+#        except Exception as e:
+#            print("exception",e)                
+        
 
 ############################################################################
     def openport(self):
@@ -41028,6 +41133,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         for i in range(1,5):
             gainCombo = QComboBox()
             gainCombo.setFocusPolicy(Qt.NoFocus)
+            
             model = gainCombo.model()
             gainItems = self.createItems(aw.qmc.phidget1046_gainValues)
             for item in gainItems:
@@ -41368,7 +41474,36 @@ class DeviceAssignmentDlg(ArtisanDialog):
         yoctoVBox.addWidget(yoctoNetworkGroupBox)
         yoctoVBox.addStretch()
         yoctoVBox.setSpacing(5)
-        yoctoVBox.setContentsMargins(0,0,0,0)      
+        yoctoVBox.setContentsMargins(0,0,0,0)  
+        # Ambient Widgets and Layouts
+        temperatureDeviceCombo = QComboBox()
+        temperatureDeviceCombo.setFocusPolicy(Qt.NoFocus)
+        temperatureDeviceCombo.addItems(aw.qmc.temperaturedevicefunctionlist)
+        humidityDeviceCombo = QComboBox()
+        humidityDeviceCombo.setFocusPolicy(Qt.NoFocus)
+        humidityDeviceCombo.addItems(aw.qmc.humiditydevicefunctionlist)
+        pressureDeviceCombo = QComboBox()
+        pressureDeviceCombo.setFocusPolicy(Qt.NoFocus)
+        pressureDeviceCombo.addItems(aw.qmc.pressuredevicefunctionlist)
+        temperatureDeviceLabel = QLabel(QApplication.translate("Label","Temperature",None))
+        humidityDeviceLabel = QLabel(QApplication.translate("Label","Humidity",None))
+        pressureDeviceLabel = QLabel(QApplication.translate("Label","Pressure",None))
+        ambientGrid = QGridLayout()
+        ambientGrid.addWidget(temperatureDeviceLabel,0,0)
+        ambientGrid.addWidget(temperatureDeviceCombo,0,1)
+        ambientGrid.addWidget(humidityDeviceLabel,1,0)
+        ambientGrid.addWidget(humidityDeviceCombo,1,1)
+        ambientGrid.addWidget(pressureDeviceLabel,2,0)
+        ambientGrid.addWidget(pressureDeviceCombo,2,1)
+        ambientHBox = QHBoxLayout()
+        ambientHBox.addStretch()
+        ambientHBox.addLayout(ambientGrid)
+        ambientHBox.addStretch()
+        ambientVBox = QVBoxLayout()
+        ambientVBox.addStretch()
+        ambientVBox.addLayout(ambientHBox)
+        ambientVBox.addStretch()
+        ambientVBox.setContentsMargins(0,0,0,0)     
         # create pid box
         PIDgrid = QGridLayout()
         PIDgrid.addWidget(label1,0,1)
@@ -41494,6 +41629,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
         tab5Layout = QVBoxLayout()
         tab5Layout.addLayout(yoctoVBox)        
         tab5Layout.setContentsMargins(0,0,0,0)
+        #LAYOUT TAB 6 (Ambient)
+        tab6Layout = QVBoxLayout()
+        tab6Layout.addLayout(ambientVBox)
+        tab6Layout.setContentsMargins(0,0,0,0)
         #main tab widget
         TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -41511,6 +41650,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
         TabWidget.addTab(C5Widget,QApplication.translate("Tab","Yoctopuce",None))
+        C6Widget = QWidget()
+        C6Widget.setLayout(tab6Layout)
+        TabWidget.addTab(C6Widget,QApplication.translate("Tab","Ambient",None))
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
