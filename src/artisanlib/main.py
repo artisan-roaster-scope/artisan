@@ -5550,7 +5550,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     start = 0
                 from matplotlib.transforms import Bbox
-                t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=1.2,fontproperties=prop,color=fc,path_effects=[])
+                t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
                 f = self.ax.get_figure()
                 r = f.canvas.get_renderer()
                 bb = t.get_window_extent(renderer=r) # bounding box in display space
