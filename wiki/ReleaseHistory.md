@@ -23,6 +23,7 @@ v1.4.0 (xx.xx.2018)
    - adds zero-ing of channels via extra symbolic variables Tn set to current value on right-click of corresponding LCD
    - adds barometric pressure to roast properties and statistic summary
    - adds support for ambient sensors Phidget [HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644) and [PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719) 
+   - adds flag to allow phases to be adjusted based on DRY and FCs of the background profile
  * Changes 
    - adds "Insert" button to trigger the extra event table insert action instead of abusing the "Add" button
    - use zero-based port numbering in Phidgets tab

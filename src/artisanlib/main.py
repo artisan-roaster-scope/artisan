@@ -717,6 +717,7 @@ class tgraphcanvas(FigureCanvas):
         self.phases = list(self.phases_fahrenheit_defaults) # contains either the phases_filter or phases_espresso, depending on the mode
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
         self.phasesbuttonflag = False #False no change; True make the DRY and FC buttons change the phases during roast automatically
+        self.phasesfromBackgroundflag = False # False: no change; True: set phases from background profile on load
         self.watermarksflag = True
 
         #show phases LCDs during roasts
@@ -16199,6 +16200,12 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.Betypes = profile["etypes"]
                 if "timeindex" in profile:
                     self.qmc.timeindexB = profile["timeindex"]          #if new profile found with variable timeindex
+                    if self.qmc.phasesfromBackgroundflag:
+                        # adjust phases by DryEnd and FCs events from background profile
+                        if self.qmc.timeindexB[1]:
+                            self.qmc.phases[1] = int(round(self.qmc.temp2B[self.qmc.timeindexB[1]]))
+                        if self.qmc.timeindexB[2]:
+                            self.qmc.phases[2] = int(round(self.qmc.temp2B[self.qmc.timeindexB[2]]))
                 else:            
                     if "startend" in profile:
                         startendB = profile["startend"]
@@ -18699,6 +18706,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phases = [toInt(x) for x in toList(settings.value("Phases",self.qmc.phases))]
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = bool(toBool(settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag)))
+            if settings.contains("phasesfromBackgroundflag"):
+                self.qmc.phasesfromBackgroundflag = bool(toBool(settings.value("phasesfromBackgroundflag",self.qmc.phasesfromBackgroundflag)))
             if settings.contains("watermarks"):
                 self.qmc.watermarksflag = bool(toBool(settings.value("watermarks",self.qmc.watermarksflag)))
             if settings.contains("phasesLCDs"):
@@ -20131,6 +20140,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Phases",self.qmc.phases)
             #save phasesbuttonflag
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
+            settings.setValue("phasesfromBackgroundflag",self.qmc.phasesfromBackgroundflag)
             #save phases watermarks flag
             settings.setValue("watermarks",self.qmc.watermarksflag)
             #save phases LCDs on recording flag
@@ -33422,15 +33432,16 @@ class phasesGraphDlg(ArtisanDialog):
         super(phasesGraphDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Phases",None))
         self.setModal(True)
-        # remember initial values for Canel action
+        # remember initial values for Cancel action
         self.phases = list(aw.qmc.phases)
-        self.phasesbuttonflag = bool(aw.qmc.phasesbuttonflag)
-        self.watermarksflag = bool(aw.qmc.watermarksflag)
-        self.phasesLCDflag = bool(aw.qmc.phasesLCDflag)
-        self.autoDRYflag = bool(aw.qmc.autoDRYflag)
-        self.autoFCsFlag = bool(aw.qmc.autoFCsFlag)
-        self.phasesLCDmode_l = list(aw.qmc.phasesLCDmode_l)
-        self.phasesLCDmode_all = list(aw.qmc.phasesLCDmode_all)
+        self.org_phasesbuttonflag = bool(aw.qmc.phasesbuttonflag)
+        self.org_fromBackgroundflag = bool(aw.qmc.phasesfromBackgroundflag)
+        self.org_watermarksflag = bool(aw.qmc.watermarksflag)
+        self.org_phasesLCDflag = bool(aw.qmc.phasesLCDflag)
+        self.org_autoDRYflag = bool(aw.qmc.autoDRYflag)
+        self.org_autoFCsFlag = bool(aw.qmc.autoFCsFlag)
+        self.org_phasesLCDmode_l = list(aw.qmc.phasesLCDmode_l)
+        self.org_phasesLCDmode_all = list(aw.qmc.phasesLCDmode_all)
         #
         dryLabel = QLabel(QApplication.translate("Label", "Drying",None))
         midLabel = QLabel(QApplication.translate("Label", "Maillard",None))
@@ -33482,6 +33493,9 @@ class phasesGraphDlg(ArtisanDialog):
         self.pushbuttonflag = QCheckBox(QApplication.translate("CheckBox","Auto Adjusted",None))
         self.pushbuttonflag.setChecked(bool(aw.qmc.phasesbuttonflag))
         self.pushbuttonflag.stateChanged.connect(self.pushbuttonflagChanged)
+        self.fromBackgroundflag = QCheckBox(QApplication.translate("CheckBox","From Background",None))
+        self.fromBackgroundflag.setChecked(bool(aw.qmc.phasesfromBackgroundflag))
+        self.fromBackgroundflag.stateChanged.connect(self.fromBackgroundflagChanged)
         self.watermarksflag = QCheckBox(QApplication.translate("CheckBox","Watermarks",None))
         self.watermarksflag.setChecked(bool(aw.qmc.watermarksflag))
         self.phasesLCDflag = QCheckBox(QApplication.translate("CheckBox","Phases LCDs",None))
@@ -33572,6 +33586,7 @@ class phasesGraphDlg(ArtisanDialog):
         boxedPhaseLayout.addStretch()
         boxedPhaseFlagGrid = QGridLayout()
         boxedPhaseFlagGrid.addWidget(self.pushbuttonflag,0,0)
+        boxedPhaseFlagGrid.addWidget(self.fromBackgroundflag,0,1)
         boxedPhaseFlagGrid.addWidget(self.autoDRYflag,1,0)
         boxedPhaseFlagGrid.addWidget(self.autoFCsFlag,1,1)
         boxedPhaseFlagGrid.addWidget(self.watermarksflag,2,0)
@@ -33622,6 +33637,14 @@ class phasesGraphDlg(ArtisanDialog):
             #save phases
             settings.setValue("Phases",aw.qmc.phases)
 
+    def bevents2phases(self):
+        if aw.qmc.phasesfromBackgroundflag and aw.qmc.background:
+            # adjust phases by DryEnd and FCs events from background profile
+            if aw.qmc.timeindexB[1]:
+                aw.qmc.phases[1] = int(round(aw.qmc.temp2B[aw.qmc.timeindexB[1]]))
+            if aw.qmc.timeindexB[2]:
+                aw.qmc.phases[2] = int(round(aw.qmc.temp2B[aw.qmc.timeindexB[2]]))
+            
     def events2phases(self):
         if aw.qmc.phasesbuttonflag:
             # adjust phases by DryEnd and FCs events
@@ -33656,6 +33679,15 @@ class phasesGraphDlg(ArtisanDialog):
         if aw.qmc.autoFCsFlag:
             self.pushbuttonflag.setChecked(False)
 
+    def fromBackgroundflagChanged(self,i):
+        if i:
+            aw.qmc.phasesfromBackgroundflag = True
+            self.bevents2phases()
+            self.getphases()
+            aw.qmc.redraw(recomputeAllDeltas=False)
+        else:
+            aw.qmc.phasesfromBackgroundflag = False
+        
     def pushbuttonflagChanged(self,i):
         if i:
             aw.qmc.phasesbuttonflag = True
@@ -33688,13 +33720,14 @@ class phasesGraphDlg(ArtisanDialog):
 
     def cancel(self):
         aw.qmc.phases = list(self.phases)
-        aw.qmc.phasesbuttonflag = bool(self.phasesbuttonflag)
-        aw.qmc.watermarksflag = bool(self.watermarksflag)
-        aw.qmc.phasesLCDflag = bool(self.phasesLCDflag)
-        aw.qmc.autoDRYflag = bool(self.autoDRYflag)
-        aw.qmc.autoFCsFlag = bool(self.autoFCsFlag)
-        aw.qmc.phasesLCDmode_l = list(self.phasesLCDmode_l)
-        aw.qmc.phasesLCDmode_all = list(self.phasesLCDmode_all)                
+        aw.qmc.phasesbuttonflag = bool(self.org_phasesbuttonflag)
+        aw.qmc.phasesfromBackgroundflag = bool(self.org_fromBackgroundflag)
+        aw.qmc.watermarksflag = bool(self.org_watermarksflag)
+        aw.qmc.phasesLCDflag = bool(self.org_phasesLCDflag)
+        aw.qmc.autoDRYflag = bool(self.org_autoDRYflag)
+        aw.qmc.autoFCsFlag = bool(self.org_autoFCsFlag)
+        aw.qmc.phasesLCDmode_l = list(self.org_phasesLCDmode_l)
+        aw.qmc.phasesLCDmode_all = list(self.org_phasesLCDmode_all)                
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.savePhasesSettings()
         self.close()
