@@ -2250,8 +2250,9 @@ class tgraphcanvas(FigureCanvas):
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
     def updategraphics(self):
         try:
-            #### lock shared resources #####
-            aw.qmc.samplingsemaphore.acquire(1)
+            ## NOTE: locking the resource here seems to block the UI on replying events and not locking (as in v1.3.1 and before) seems not to harm
+#            #### lock shared resources #####
+#            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagon:
                 if len(self.timex):
                     if self.LCDdecimalplaces:
@@ -2506,17 +2507,15 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.EventRecordAction(extraevent = 1,eventtype=el[0],eventvalue=value,eventdescription=u("Q")+aw.qmc.eventsvalues(value))
                 self.quantifiedEvent = []
 
-                    
-
         except Exception as e:
             self.flagon = False
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)            
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
+#        finally:
+#            if aw.qmc.samplingsemaphore.available() < 1:
+#                aw.qmc.samplingsemaphore.release(1)
 
     def updateLCDtime(self):
         if self.flagon and self.flagstart:
@@ -7459,7 +7458,6 @@ class tgraphcanvas(FigureCanvas):
                                         self.temp1[index]),xytext=(self.timex[index],row[firstletter]),
                                         alpha=1.,
                                         bbox=dict(boxstyle='square,pad=0.1', fc=self.EvalueColor[etype], ec='none'),
-#                                        path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                         color=self.EvalueTextColor[etype],
                                         arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),
@@ -7471,7 +7469,6 @@ class tgraphcanvas(FigureCanvas):
                                             self.temp2[index]),xytext=(self.timex[index],row[firstletter]),
                                             alpha=1.,
                                             bbox=dict(boxstyle='square,pad=0.1', fc=self.EvalueColor[etype], ec='none'),
-#                                            path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
                                             path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                             color=self.EvalueTextColor[etype],
                                             arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
