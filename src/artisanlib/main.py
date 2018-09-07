@@ -546,7 +546,18 @@ from const import UIconst
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 
+#######################################################################################
+#################### Ambient Data Collection  #########################################
+#######################################################################################
 
+class AmbientThread(QThread):
+    def __init__(self):
+        super(AmbientThread,self).__init__()
+
+    def run(self):
+        aw.qmc.getAmbientData()
+        
+        
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
 #######################################################################################
@@ -6153,7 +6164,12 @@ class tgraphcanvas(FigureCanvas):
                 self.extraNoneTempHint2.append(False)          
         
     def OnMonitor(self):
-        try:
+        try: 
+            # collect ambient data if any
+            if self.ambient_pressure_device or self.ambient_humidity_device or self.ambient_temperature_device:
+                self.ambiThread = AmbientThread()
+                self.ambiThread.start()
+            
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
             aw.qmc.reset(True,False,sampling=True,keepProperties=True)                     
@@ -6198,8 +6214,7 @@ class tgraphcanvas(FigureCanvas):
             self.threadserver.createSampleThread()
             QApplication.processEvents()
             self.StartAsyncSamplingAction()
-            QApplication.processEvents()
-            QTimer.singleShot(10,lambda : self.getAmbientData())           
+            QApplication.processEvents()        
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -12398,8 +12413,9 @@ class ApplicationWindow(QMainWindow):
         self.qmc.toolbar.hide() # we need to hide the default navigation toolbar that we don't use
         self.qmc.toolbar.destroy()
         
-        # we connect the
+        # we connect the signals
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
+
     
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
     def setTare(self,n):
@@ -36030,7 +36046,7 @@ class serialport(object):
                 tempSensor.setIsLocal(False)                   
             tempSensor.openWaitForAttachment(1000)
             if tempSensor.getAttached():
-                libtime.sleep(0.4)
+                libtime.sleep(0.3)
                 res = tempSensor.getTemperature()
                 tempSensor.close()
                 return res
@@ -36051,7 +36067,7 @@ class serialport(object):
                 humSensor.setIsLocal(False)                   
             humSensor.openWaitForAttachment(1000)
             if humSensor.getAttached():
-                libtime.sleep(0.4)
+                libtime.sleep(0.3)
                 res = humSensor.getHumidity()
                 humSensor.close()
                 return res
@@ -36066,7 +36082,7 @@ class serialport(object):
             pressSensor = PhidgetPressureSensor()
             pressSensor.openWaitForAttachment(2000)
             if pressSensor.getAttached():
-                libtime.sleep(0.4)
+                libtime.sleep(0.3)
                 res = pressSensor.getPressure()
                 pressSensor.close()
                 return res
