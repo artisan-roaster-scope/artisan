@@ -5549,6 +5549,7 @@ class tgraphcanvas(FigureCanvas):
                     start = aw.qmc.timex[aw.qmc.timeindex[0]]
                 else:
                     start = 0
+                    
                 from matplotlib.transforms import Bbox
                 t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
                 f = self.ax.get_figure()
@@ -30735,6 +30736,9 @@ class WindowsDlg(ArtisanDialog):
             t_min,t_max = aw.calcAutoAxisBackground()
         else:
             t_min,t_max = aw.calcAutoAxis()
+            if aw.qmc.backgroundpath:
+                _,t_max_b = aw.calcAutoAxisBackground()
+                t_max = max(t_max,t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]])                
         if aw.qmc.timeindex[0] != -1:
             self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(t_min - aw.qmc.timex[aw.qmc.timeindex[0]]))
             self.xlimitEdit.setText(aw.qmc.stringfromseconds(t_max - aw.qmc.timex[aw.qmc.timeindex[0]]))
@@ -32819,7 +32823,7 @@ class EventsDlg(ArtisanDialog):
         for i in range(len(aw.eventbuttontablecolumnwidths)):
             try:
                 self.eventbuttontable.setColumnWidth(i,aw.eventbuttontablecolumnwidths[i])      
-            except:
+            except Exception:
                 pass
 
     def setbuttoncolor(self,x):
