@@ -3055,7 +3055,7 @@ class tgraphcanvas(FigureCanvas):
     # mathexpression = formula; t = a number to evaluate(usually time);
     # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTsval = RealTime var val
     def eval_math_expression(self,mathexpression,t,equeditnumber=None, RTsname=None,RTsval=None,t_offset=0):
-        if len(mathexpression):              
+        if len(mathexpression):
             mathdictionary = {"min":min,"max":max,"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
                               "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
                               "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
@@ -3082,7 +3082,7 @@ class tgraphcanvas(FigureCanvas):
             #if background
             if self.background and "B" in mathexpression:
                 bindex = self.backgroundtime2index(t)         #use background time
-
+    
             #under work: index for: self.extratimex, self.extratimexB, and mixP#
                         
             #timeshift working vars 
@@ -3107,7 +3107,7 @@ class tgraphcanvas(FigureCanvas):
                                     nint = int(mathexpression[i+1])              #Ynumber int
                                     Yshiftval = int(mathexpression[i+4])
                                     sign = mathexpression[i+3]
-
+    
                                     #timeshift with two digits
                                     if mathexpression[i+5].isdigit():
                                         seconddigit = int(mathexpression[i+5])
@@ -3138,7 +3138,7 @@ class tgraphcanvas(FigureCanvas):
                                             val = self.extratemp1[edindex][shiftedindex]
                                         else:
                                             val = self.extratemp2[edindex][shiftedindex]
- 
+     
                                     #add expression and values found
                                     evaltimeexpression = "Y" + mathexpression[i+1] + evalsign*2 + mathexpression[i+4] + seconddigitstr + evalsign
                                     timeshiftexpressions.append(evaltimeexpression)
@@ -3155,11 +3155,11 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     Yval.append(mathexpression[i+1])
                                     
-
+    
                     #the actual value
                     elif mathexpression[i] == "x":
                         if "x" not in mathdictionary:
-                            if RTsval is not None:                       # zero could be a valid value
+                            if RTsval is not None:                   # zero could be a valid value
                                 mathdictionary['x'] = RTsval         # add x to the math dictionary
                             else:
                                 mathdictionary['x'] = -1
@@ -3179,7 +3179,7 @@ class tgraphcanvas(FigureCanvas):
                                 mathdictionary['o'] = aw.qmc.ylimit_min - (aw.qmc.zlimit_min * (aw.qmc.ylimit - aw.qmc.ylimit_min) / float(aw.qmc.zlimit - aw.qmc.zlimit_min))
                             except Exception:
                                 mathdictionary['o'] = 0
-
+    
                     #Add to dict Event1-4 external value
                     elif mathexpression[i] == "E":
                         if i+1 < mlen:                          #check for out of range
@@ -3204,7 +3204,7 @@ class tgraphcanvas(FigureCanvas):
                         if i+4 < len(mathexpression) and mathexpression[i+1] == "[":
                             Yshiftval = int(mathexpression[i+3])
                             sign = mathexpression[i+2]
-
+    
                             if mathexpression[i+4].isdigit():
                                 seconddigit = int(mathexpression[i+4])
                                 seconddigitstr = mathexpression[i+4]
@@ -3266,7 +3266,7 @@ class tgraphcanvas(FigureCanvas):
                                         val = -1000                                        
                                     if "P" + mathexpression[i+1] not in mathdictionary:    
                                         mathdictionary["P"+mathexpression[i+1]] = val                                
-
+    
                     #Background B1 = ETbackground; B2 = BTbackground
                     elif mathexpression[i] == "B":
                         if i+1 < mlen:
@@ -3277,7 +3277,7 @@ class tgraphcanvas(FigureCanvas):
                                 if i+5 < len(mathexpression) and mathexpression[i+2] == "[":
                                     Yshiftval = int(mathexpression[i+4])
                                     sign = mathexpression[i+3]
-
+    
                                     # TWO digits shifting
                                     if mathexpression[i+5].isdigit():
                                         seconddigit = int(mathexpression[i+5])
@@ -3335,7 +3335,7 @@ class tgraphcanvas(FigureCanvas):
                                                 val = self.temp2BX[n3][bindex]                                      
                                            
                                         mathdictionary["B"+mathexpression[i+1]] = val
-
+    
                     # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
                     # holds the ten previous formula results (same window) in order.
                     # F1 is the last result. F5 is the past 5th result 
@@ -3357,7 +3357,7 @@ class tgraphcanvas(FigureCanvas):
                                     mathdictionary["T"+mathexpression[i+1]] = aw.channel_tare_values[nint]
                                 else:
                                     mathdictionary["T"+mathexpression[i+1]] = 0.0
-
+    
                     #############   end of mathexpression loop ##########################
                     
                 #created Ys values 
@@ -3389,15 +3389,19 @@ class tgraphcanvas(FigureCanvas):
                 except:
                     pass
                        
-
+    
                 #background symbols just in case there was no profile loaded but a background loaded.
                 if len(self.timeB) > 0:
                     for i in range(len(timeshiftexpressions)):
                         if timeshiftexpressions[i] not in mathdictionary:   
                             mathdictionary[timeshiftexpressions[i]] = timeshiftexpressionsvalues[i]                    
                                     
-                try:                            
-                    res = eval(mathexpression,{"__builtins__":None},mathdictionary)
+                try:
+                    if any([k in mathexpression for k,v in mathdictionary.items() if v == -1]):
+                        # if any variable is bound to the error value -1 we return -1 for the full formula
+                        return -1
+                    else:  
+                        res = eval(mathexpression,{"__builtins__":None},mathdictionary)
                 except ValueError as e:
                     res = -1
                 except ZeroDivisionError as e:
@@ -3415,7 +3419,7 @@ class tgraphcanvas(FigureCanvas):
                     if equeditnumber:
                         self.plotterequationresults[equeditnumber-1].append(res)
                     return res
-
+    
             except Exception as e:
                 #if plotter
                 if equeditnumber:
@@ -3430,8 +3434,7 @@ class tgraphcanvas(FigureCanvas):
                         e = str(e)
                         _, _, exc_tb = sys.exc_info()
                         self.adderror((QApplication.translate("Error Message", "Exception:",None) + " eval_curve_expression(): %s {0} "%mathexpression).format(e),exc_tb.tb_lineno)
-                    return -1
-
+                    return -1    
         return -1
 
 
@@ -3876,7 +3879,7 @@ class tgraphcanvas(FigureCanvas):
             self.clearMeasurements()
             ### REDRAW  ##
             if redraw:
-                self.redraw(True,sampling=sampling)
+                self.redraw(True,sampling=sampling,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
             QApplication.processEvents() # this one seems to be needed for a proper redraw in fullscreen mode on OS X if a profile was loaded and NEW is pressed
             return True
 
@@ -4383,7 +4386,7 @@ class tgraphcanvas(FigureCanvas):
         self.ax.add_patch(poly)
 
     #Redraws data
-    # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
+    # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
         if aw.qmc.designerflag:
             aw.qmc.redrawdesigner()
@@ -4391,6 +4394,8 @@ class tgraphcanvas(FigureCanvas):
             try:
                 #### lock shared resources   ####
                 aw.qmc.samplingsemaphore.acquire(1)
+                
+                decay_smoothing_p = (not aw.qmc.optimalSmoothing) or sampling or aw.qmc.flagon
     
                 rcParams['path.effects'] = []
                 if aw.qmc.graphstyle == 1:
@@ -4681,6 +4686,18 @@ class tgraphcanvas(FigureCanvas):
                 
                 #check BACKGROUND flag
                 if self.background: 
+                    if smooth:
+                        # re-smooth background curves
+                        tb = self.timeB
+                        t1 = self.temp1B
+                        t2 = self.temp2B
+                        if tb is not None and tb:
+                            tb_lin = numpy.linspace(tb[0],tb[-1],len(tb))
+                        else:
+                            tb_lin = None 
+                        self.stemp1B = self.smooth_list(tb,self.fill_gaps(t1),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
+                        self.stemp2B = self.smooth_list(tb,self.fill_gaps(t2),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
+                                        
                     self.l_background_annotations = []
                     #check to see if there is both a profile loaded and a background loaded
                     if self.backmoveflag:
@@ -4691,10 +4708,23 @@ class tgraphcanvas(FigureCanvas):
                         idx3 = aw.qmc.xtcurveidx - 1
                         n3 = idx3 // 2
                         if len(self.stemp1BX) > n3 and len(self.stemp2BX) > n3 and len(self.extratimexB) > n3:
+                            if smooth:
+                                # re-smooth the extra background curve
+                                tx = self.extratimexB[n3]
+                                if tx is not None and tx:
+                                    tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
+                                else:
+                                    tx_lin = None                         
                             if aw.qmc.xtcurveidx % 2:
-                                stemp3B = self.stemp1BX[n3]
+                                if smooth:
+                                    stemp3B = self.smooth_list(tx,self.fill_gaps(self.temp1BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                else:
+                                    stemp3B = self.stemp1BX[n3]
                             else:
-                                stemp3B = self.stemp2BX[n3]
+                                if smooth:
+                                    stemp3B = self.smooth_list(tx,self.fill_gaps(self.temp2BX[n3]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin)
+                                else:
+                                    stemp3B = self.stemp2BX[n3]
                             self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                         sketch_params=None,path_effects=[],
                                                         linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
@@ -4723,14 +4753,13 @@ class tgraphcanvas(FigureCanvas):
                     if self.timeB is not None and self.timeB:
                         timeB_lin = numpy.linspace(self.timeB[0],self.timeB[-1],len(self.timeB))
                     else:
-                        timeB_lin = None
+                        timeB_lin = None                        
                     
                     #populate background delta ET (self.delta1B) and delta BT (self.delta2B)                    
                     if self.DeltaETBflag or self.DeltaBTBflag:
                         if recomputeAllDeltas:
                             # we populate temporary smoothed ET/BT data arrays
-                            cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
-                            decay_smoothing_p = (not aw.qmc.optimalSmoothing) or sampling or aw.qmc.flagon
+                            cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing                            
                             st1 = self.smooth_list(self.timeB,self.fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
                             st2 = self.smooth_list(self.timeB,self.fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
                             # we start RoR computation 7 readings after CHARGE to avoid this initial peak
@@ -4879,12 +4908,12 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.flagon: # we don't smooth, but remove the dropouts
                         self.stemp1 = temp1_nogaps
                     else:
-                        self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,a_lin=timex_lin)
+                        self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                 if smooth or len(self.stemp2) != len(self.timex):
                     if aw.qmc.flagon:  # we don't smooth, but remove the dropouts
                         self.stemp2 = self.fill_gaps(self.temp2)
                     else:
-                        self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,a_lin=timex_lin)
+                        self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
     
                 if self.eventsshowflag:
                     Nevents = len(self.specialevents)
@@ -5210,7 +5239,7 @@ class tgraphcanvas(FigureCanvas):
                                 markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= extraname1_subst[i])[0])
                             else:
                                 if (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
-                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,a_lin=timexi_lin)
+                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                                 self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
@@ -5225,7 +5254,7 @@ class tgraphcanvas(FigureCanvas):
                                 markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                             else:
                                 if (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
-                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,a_lin=timexi_lin)
+                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                                 self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
@@ -6173,7 +6202,7 @@ class tgraphcanvas(FigureCanvas):
             
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            aw.qmc.reset(True,False,sampling=True,keepProperties=True)                     
+            aw.qmc.reset(False,False,sampling=True,keepProperties=True)                     
 
             if aw.qmc.device == 53:
                 from artisanlib.hottop import startHottop
@@ -6192,6 +6221,8 @@ class tgraphcanvas(FigureCanvas):
             
             self.timeclock.start()   #set time to the current computer time
             self.flagon = True
+            aw.qmc.redraw(True,sampling=True,smooth=aw.qmc.optimalSmoothing) # we need to re-smooth with standard smoothing if ON and optimal-smoothing is ticked
+            
             if self.designerflag: return
             aw.sendmessage(QApplication.translate("Message","Scope monitoring...", None))
             #disable RESET button:
@@ -10010,7 +10041,7 @@ class SampleThread(QThread):
                             aw.qmc.RTextratemp1,aw.qmc.RTextratemp2,aw.qmc.RTextratx = [],[],[]
                             #2 load RT buffers
                             for i in range(nxdevices):
-                                extratx,extrat2,extrat1 = self.sample_extra_device(i) 
+                                extratx,extrat2,extrat1 = self.sample_extra_device(i)
                                 aw.qmc.RTextratemp1.append(extrat1)
                                 aw.qmc.RTextratemp2.append(extrat2)
                                 aw.qmc.RTextratx.append(extratx)                                
@@ -16151,21 +16182,31 @@ class ApplicationWindow(QMainWindow):
                     tb_lin = numpy.linspace(tb[0],tb[-1],len(tb))
                 else:
                     tb_lin = None 
-                decay_smoothing_p = not aw.qmc.optimalSmoothing               
+                decay_smoothing_p = not aw.qmc.optimalSmoothing 
                 b1 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t1),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
                 b2 = self.qmc.smooth_list(tb,self.qmc.fill_gaps(t2),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
                 
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
                 b1x = []
                 b2x = []
+                idx3 = aw.qmc.xtcurveidx - 1
+                n3 = idx3 // 2
                 for i in range(min(len(t1x),len(t2x))):
-                    tx=timex[i]
-                    if tx is not None and tx:
-                        tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
+                    if aw.qmc.xtcurveidx > 0 and n3 == 1: # this is the 3rd background curve to be drawn, we smooth it
+                        tx=timex[i]
+                        if tx is not None and tx:
+                            tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
+                        else:
+                            tx_lin = None
+                        if aw.qmc.xtcurveidx % 2:
+                            b1x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
+                            b2x.append(self.qmc.fill_gaps(t2x[i]))
+                        else:
+                            b1x.append(self.qmc.fill_gaps(t1x[i]))
+                            b2x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
                     else:
-                        tx_lin = None 
-                    b1x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t1x[i]),window_len=self.qmc.curvefilter,a_lin=tx_lin))
-                    b2x.append(self.qmc.smooth_list(tx,self.qmc.fill_gaps(t2x[i]),window_len=self.qmc.curvefilter,a_lin=tx_lin))
+                        b1x.append(self.qmc.fill_gaps(t1x[i]))
+                        b2x.append(self.qmc.fill_gaps(t2x[i]))
                 # NOTE: parallel assignment after time intensive smoothing is necessary to avoid redraw failure!
                 self.qmc.stemp1B,self.qmc.stemp2B,self.qmc.stemp1BX,self.qmc.stemp2BX = b1,b2,b1x,b2x
                 self.qmc.backgroundEvents = profile["specialevents"]
@@ -34381,7 +34422,7 @@ class backgroundDlg(ArtisanDialog):
     def changeXTcurveidx(self,i):
         aw.qmc.xtcurveidx = i
         self.createDataTable()
-        aw.qmc.redraw(recomputeAllDeltas=False)
+        aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
 
     def load(self):
         self.filename = aw.ArtisanOpenFileDialog()
