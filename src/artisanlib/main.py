@@ -30791,6 +30791,7 @@ class WindowsDlg(ArtisanDialog):
         if n:
             self.locktimexFlag.setChecked(False) 
             self.enableXAxisControls()
+            self.autoAxis()
 
     def autoAxis(self):
         if aw.qmc.backgroundpath and not aw.curFile:
