@@ -19662,7 +19662,7 @@ class ApplicationWindow(QMainWindow):
                 if settings.contains("buttonpalette_shortcuts"):
                     self.buttonpalette_shortcuts = bool(toBool(settings.value("buttonpalette_shortcuts",self.buttonpalette_shortcuts)))
                 if settings.contains("eventbuttontablecolumnwidths"):
-                    self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value("eventbuttontablecolumnwidths",self.eventbuttontablecolumnwidths))]                
+                    self.eventbuttontablecolumnwidths = [toInt(x) for x in toList(settings.value("eventbuttontablecolumnwidths",self.eventbuttontablecolumnwidths))] 
             settings.endGroup()
             # Extras more info            
             settings.beginGroup("ExtrasMoreInfo")
@@ -32434,6 +32434,8 @@ class EventsDlg(ArtisanDialog):
             self.saveSliderSettings()
             self.saveQuantifierSettings()
         elif i == 1: # switched to Button tab
+            # save column widths
+            aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())] 
             self.createEventbuttonTable()
             self.saveSliderSettings()
             self.saveQuantifierSettings()
@@ -32826,10 +32828,10 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.horizontalHeader().setStretchLastSection(False)
         self.eventbuttontable.resizeColumnsToContents()
         self.eventbuttontable.horizontalHeader().setStretchLastSection(True)
-        # remember the columnwidth
         self.eventbuttontable.setColumnWidth(0,70)
         self.eventbuttontable.setColumnWidth(1,80)
         self.eventbuttontable.setColumnWidth(3,50)
+        # remember the columnwidth
         for i in range(len(aw.eventbuttontablecolumnwidths)):
             try:
                 self.eventbuttontable.setColumnWidth(i,aw.eventbuttontablecolumnwidths[i])      
