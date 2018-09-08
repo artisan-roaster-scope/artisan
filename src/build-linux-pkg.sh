@@ -39,7 +39,7 @@ rm -rf usr/share/man/man1/._*
 rm -rf usr/share/pixmaps/._*
 rm -rf usr/share/applications/._*
 
-fpm --debug --verbose -s dir -t rpm -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>"  -p .. \
+fpm -s dir -t rpm -n artisan --license GPL3 -m "Marko Luther <marko.luther@gmx.net>"  -p .. \
 --vendor "Artisan GitHub" \
 --url "https://github.com/artisan-roaster-scope/artisan" \
 --description "This program or software helps coffee roasters record, analyze, and control
