@@ -7,6 +7,7 @@ matrix:
   - os: linux
     python: 3.6
     sudo: required
+    dist: xenial
     cache:
       - pip
       - bundler
