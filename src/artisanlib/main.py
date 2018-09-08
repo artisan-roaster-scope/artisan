@@ -3400,8 +3400,10 @@ class tgraphcanvas(FigureCanvas):
                     if any([k in mathexpression for k,v in mathdictionary.items() if v == -1]):
                         # if any variable is bound to the error value -1 we return -1 for the full formula
                         return -1
-                    else:  
+                    else:
                         res = eval(mathexpression,{"__builtins__":None},mathdictionary)
+                except TypeError as e:
+                    res = -1
                 except ValueError as e:
                     res = -1
                 except ZeroDivisionError as e:
@@ -27448,7 +27450,6 @@ class realtimeHelpDlg(ArtisanDialog):
         string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None))
         string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None))
         string1 += "</UL>"
-
         string2 = "<UL><LI><b>t</b> Absolute time (seconds)"
         string2 += "<LI><b>x</b> " + u(QApplication.translate("Message", "Actual value",None))
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "ET value",None))
@@ -27457,15 +27458,24 @@ class realtimeHelpDlg(ArtisanDialog):
         string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "Extra Device #1 T2 value",None))
         string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra Device #2 T1 value",None))
         string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra Device #2 T2 value",None))
+        string2 += "<LI><b>..</b>"
+        string2 += "<LI><b>Y9</b> " + u(QApplication.translate("Message", "Extra Device #4 T1 value",None))
         string2 += "<LI><b>B1</b> " + u(QApplication.translate("Message", "ET background ",None))
         string2 += "<LI><b>B2</b> " + u(QApplication.translate("Message", "BT background",None))
-        string2 += "<LI><b>B3</b> " + u(QApplication.translate("Message", "Extra background #1-A from a loaded background that has extra devices",None))        
-        string2 += "<LI><b>B4</b> " + u(QApplication.translate("Message", "Extra background #1-B from a loaded background that has extra devices",None))        
-        string2 += "<LI><b>B5</b> " + u(QApplication.translate("Message", "Extra background #2-A from a loaded background that has extra devices",None)) 
+        string2 += "<LI><b>B3</b> " + u(QApplication.translate("Message", "Extra background #1-A",None))        
+        string2 += "<LI><b>B4</b> " + u(QApplication.translate("Message", "Extra background #1-B",None))        
+        string2 += "<LI><b>B5</b> " + u(QApplication.translate("Message", "Extra background #2-A",None)) 
+        string2 += "<LI><b>..</b>"
+        string2 += "<LI><b>B9</b> " + u(QApplication.translate("Message", "Extra background #4-A",None)) 
+        string2 += "<LI><b>T1</b> " + u(QApplication.translate("Message", "ET tare value",None))
+        string2 += "<LI><b>T2</b> " + u(QApplication.translate("Message", "BT tare value",None))
+        string2 += "<LI><b>T3</b> " + u(QApplication.translate("Message", "Extra Device #1 channel 1 tare value",None))
+        string2 += "<LI><b>T4</b> " + u(QApplication.translate("Message", "Extra Device #1 channel 2 tare value",None))
+        string2 += "<LI><b>..</b>"
+        string2 += "<LI><b>T9</b> " + u(QApplication.translate("Message", "Extra Device #4 channel 1 tare value",None))
         string2 += "<BR><BR> " +  u(QApplication.translate("Message", "Math formulas are evaluated in order",None))   
         string2 += "<BR> " +  u(QApplication.translate("Message", "(extra devices before the main device)",None))
         string2 += "</UL>"
-
         #format help
         string4 = "<TABLE><TR><TH bgcolor=lightgrey>"
         string4 += QApplication.translate("Message",  "MATHEMATICAL FUNCTIONS",None)
