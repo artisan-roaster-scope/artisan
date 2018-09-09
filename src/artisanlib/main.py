@@ -3954,7 +3954,7 @@ class tgraphcanvas(FigureCanvas):
     # back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
     # a_lin: pre-computed linear spaced timestamps of equal length than a
     def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):  # default 'hanning'
-        if len(a) > 1 and len(a) == len(b):
+        if len(a) > 1 and len(a) == len(b) and window_len>2:
             #pylint: disable=E1103
             # 1. truncate
             if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None

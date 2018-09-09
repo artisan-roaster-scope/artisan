@@ -45,6 +45,7 @@ v1.4.0 (xx.xx.2018)
    - split temperature menu actions and move conversions to Tools menu
    - improved rendering of statistic summary
    - adds beans and roasting notes to statistic summary
+   - ensures that background curves are always render using the same smoothing algorithm as the foreground
  * Bug Fixes 
    - fixes missing translations on Linux/RPi ([Issue #211](../../../issues/211))
    - fixes hanging message line in FullScreen mode
