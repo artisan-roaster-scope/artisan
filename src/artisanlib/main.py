@@ -5421,7 +5421,7 @@ class tgraphcanvas(FigureCanvas):
                                                 label=aw.arabicReshape(QApplication.translate("Label", "AUCguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
-                if aw.qmc.showtimeguide and aw.qmc.flagstart:
+                if aw.qmc.showtimeguide:
                     self.l_timeline, = self.ax.plot([], [],color = self.palette["timeguide"],
                                                 label=aw.arabicReshape(QApplication.translate("Label", "TIMEguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
@@ -9707,7 +9707,7 @@ class VMToolbar(NavigationToolbar):
         self.toolitems = (
 
 #PLUS-COMMENT
-            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
+#            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
             
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
             ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -9756,8 +9756,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-            if aw is not None:
-                aw.updatePlusStatus(self)
+#            if aw is not None:
+#                aw.updatePlusStatus(self)
 
 
 
@@ -10524,7 +10524,7 @@ class SampleThread(QThread):
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
                 #add to plot a vertical time line
-                if aw.qmc.flagstart and aw.qmc.showtimeguide or aw.qmc.device == 18 and aw.qmc.l_timeline is not None:
+                if aw.qmc.showtimeguide or aw.qmc.device == 18 and aw.qmc.l_timeline is not None:
                     aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
         except Exception as e:
             #import traceback
