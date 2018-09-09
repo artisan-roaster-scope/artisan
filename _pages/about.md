@@ -54,6 +54,7 @@ Artisan is an open-source software that helps coffee roasters record, analyze, a
 
 [Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large}
 &emsp; [Documentation](/docs/quick-start-guide/){: .btn .btn--success .btn--large}
+&emsp; [Blog](https://artisan-roasterscope.blogspot.com/){: .btn .btn--success .btn--large}
 
 [All Releases](https://github.com/artisan-roaster-scope/artisan/releases)
 
