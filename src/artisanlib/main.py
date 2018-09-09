@@ -5596,7 +5596,6 @@ class tgraphcanvas(FigureCanvas):
                     orig_endofx = aw.qmc.endofx
                     aw.qmc.endofx += bbox.width+10  #provide room for the stats
                     self.xaxistosm()
-                    aw.qmc.endofx = orig_endofx
  
                     # rinse and repeat, so the bbox values get affected by the auto axis scaling 
                     t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
@@ -5606,6 +5605,7 @@ class tgraphcanvas(FigureCanvas):
                     bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
                     bbox = Bbox(bbox_data)   
                     t.remove()
+                    aw.qmc.endofx = orig_endofx
                 
                     if aw.qmc.graphfont == 1:
                         # do it all again to get better positioning when the font is Humor 
@@ -5613,7 +5613,6 @@ class tgraphcanvas(FigureCanvas):
                         orig_endofx = aw.qmc.endofx
                         aw.qmc.endofx += bbox.width+10  #provide room for the stats
                         self.xaxistosm()
-                        aw.qmc.endofx = orig_endofx
      
                         # rinse and repeat, so the bbox values get affected by the auto axis scaling 
                         t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
@@ -5623,6 +5622,7 @@ class tgraphcanvas(FigureCanvas):
                         bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
                         bbox = Bbox(bbox_data)   
                         t.remove()
+                        aw.qmc.endofx = orig_endofx
 
                 border = 4
                 pos_x = self.ax.get_xlim()[1]-bbox.width-20
