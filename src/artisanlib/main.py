@@ -5241,14 +5241,11 @@ class tgraphcanvas(FigureCanvas):
                         timexi_lin = None
                     try:
                         if aw.extraCurveVisibility1[i]:
-                            if False and aw.qmc.flagon:
-                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= extraname1_subst[i])[0])
-                            else:
-                                if (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
-                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
-                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
+                            if not aw.qmc.flagon and (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
+                                self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
+                            else: # we don't smooth, but remove the dropouts
+                                self.extrastemp1[i] = self.fill_gaps(self.extratemp1[i])
+                            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],                        
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label=extraname1_subst[i])[0])
                     except Exception as ex:
@@ -5256,14 +5253,11 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)                        
                     try:
                         if aw.extraCurveVisibility2[i]:
-                            if False and aw.qmc.flagon:
-                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],
-                                sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
-                                markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
+                            if not aw.qmc.flagon and (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
+                                self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                             else:
-                                if (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
-                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
-                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
+                                self.extrastemp2[i] = self.fill_gaps(self.extratemp2[i])
+                            self.extratemp2lines.append(self.ax.plot(self.extratimex[i],self.extrastemp2[i],color=self.extradevicecolor2[i],
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths2[i]+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= extraname2_subst[i])[0])
                     except Exception as ex:
