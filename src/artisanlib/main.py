@@ -31240,7 +31240,7 @@ class EventsDlg(ArtisanDialog):
         self.setModal(True)
         settings = QSettings()
         if settings.contains("EventsGeometry"):
-                toByteArray(self.restoreGeometry(settings.value("EventsGeometry")))
+            toByteArray(self.restoreGeometry(settings.value("EventsGeometry")))
         self.storeState()
         ## TAB 1
         self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button",None))
@@ -40976,6 +40976,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         super(DeviceAssignmentDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment", None))
         self.setModal(True)
+        settings = QSettings()
+        if settings.contains("DeviceAssignmentGeometry"):
+            toByteArray(self.restoreGeometry(settings.value("DeviceAssignmentGeometry")))
         ################ TAB 1   WIDGETS
         #ETcurve
         self.ETcurve = QCheckBox(QApplication.translate("CheckBox", "ET",None))
@@ -42274,6 +42277,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
 
     def okEvent(self):
         try:
+            settings = QSettings()
+            #save window geometry
+            settings.setValue("DeviceAssignmentGeometry",self.saveGeometry()) 
+        
             #save any extra devices here
             self.savedevicetable(redraw=False)
             aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
