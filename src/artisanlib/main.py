@@ -3351,12 +3351,18 @@ class tgraphcanvas(FigureCanvas):
                     # set by clicking on the corresponding LCD
                     elif mathexpression[i] == "T":
                         if i+1 < mlen:                          #check for out of range
-                            if mathexpression[i+1].isdigit():
-                                nint = int(mathexpression[i+1])-1              #Enumber int
+                            nint = -1 #Enumber int 
+                            if i+2 < mlen and mathexpression[i+2].isdigit():
+                                nint = int(mathexpression[i+1]+mathexpression[i+2])-1
+                                mexpr = "T"+mathexpression[i+1]+mathexpression[i+2]
+                            elif mathexpression[i+1].isdigit():
+                                nint = int(mathexpression[i+1])-1                                              
+                                mexpr = "T"+mathexpression[i+1]
+                            if nint != -1:  
                                 if len(aw.channel_tare_values) > nint:
-                                    mathdictionary["T"+mathexpression[i+1]] = aw.channel_tare_values[nint]
+                                    mathdictionary[mexpr] = aw.channel_tare_values[nint]
                                 else:
-                                    mathdictionary["T"+mathexpression[i+1]] = 0.0
+                                    mathdictionary[mexpr] = 0.0          
     
                     #############   end of mathexpression loop ##########################
                     
@@ -9760,7 +9766,6 @@ class VMToolbar(NavigationToolbar):
 #                aw.updatePlusStatus(self)
 
 
-
         self.update_view_org = self._update_view
         self._update_view = self.update_view_new
         self.draw_org = self.draw
@@ -12453,15 +12458,15 @@ class ApplicationWindow(QMainWindow):
     def setTare(self,n):
         if self.qmc.flagon: # we set the tare value
             if n == 0 and len(self.qmc.temp1)>0: # ET
-                self.channel_tare_values[n] = self.qmc.temp1[-1]
+                self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp1[-1]
             elif n == 1 and len(self.qmc.temp2)>0: # BT
-                self.channel_tare_values[n] = self.qmc.temp2[-1]
+                self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.temp2[-1]
             else:
                 i = (n - 2) // 2
                 if n % 2 == 0 and len(self.qmc.extratemp1)>i and len(self.qmc.extratemp1[i])>0: # even
-                    self.channel_tare_values[n] = self.qmc.extratemp1[i][-1]
+                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp1[i][-1]
                 elif len(self.qmc.extratemp2)>i and len(self.qmc.extratemp2[i])>0:
-                    self.channel_tare_values[n] = self.qmc.extratemp2[i][-1]
+                    self.channel_tare_values[n] = self.channel_tare_values[n] + self.qmc.extratemp2[i][-1]
         else: # we reset the tare value
             self.channel_tare_values[n] = 0
     
@@ -27459,20 +27464,17 @@ class realtimeHelpDlg(ArtisanDialog):
         string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "Extra Device #2 T1 value",None))
         string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "Extra Device #2 T2 value",None))
         string2 += "<LI><b>..</b>"
-        string2 += "<LI><b>Y9</b> " + u(QApplication.translate("Message", "Extra Device #4 T1 value",None))
         string2 += "<LI><b>B1</b> " + u(QApplication.translate("Message", "ET background ",None))
         string2 += "<LI><b>B2</b> " + u(QApplication.translate("Message", "BT background",None))
         string2 += "<LI><b>B3</b> " + u(QApplication.translate("Message", "Extra background #1-A",None))        
         string2 += "<LI><b>B4</b> " + u(QApplication.translate("Message", "Extra background #1-B",None))        
         string2 += "<LI><b>B5</b> " + u(QApplication.translate("Message", "Extra background #2-A",None)) 
         string2 += "<LI><b>..</b>"
-        string2 += "<LI><b>B9</b> " + u(QApplication.translate("Message", "Extra background #4-A",None)) 
         string2 += "<LI><b>T1</b> " + u(QApplication.translate("Message", "ET tare value",None))
         string2 += "<LI><b>T2</b> " + u(QApplication.translate("Message", "BT tare value",None))
         string2 += "<LI><b>T3</b> " + u(QApplication.translate("Message", "Extra Device #1 channel 1 tare value",None))
         string2 += "<LI><b>T4</b> " + u(QApplication.translate("Message", "Extra Device #1 channel 2 tare value",None))
         string2 += "<LI><b>..</b>"
-        string2 += "<LI><b>T9</b> " + u(QApplication.translate("Message", "Extra Device #4 channel 1 tare value",None))
         string2 += "<BR><BR> " +  u(QApplication.translate("Message", "Math formulas are evaluated in order",None))   
         string2 += "<BR> " +  u(QApplication.translate("Message", "(extra devices before the main device)",None))
         string2 += "</UL>"
