@@ -1,0 +1,85 @@
+[General]
+Delay=1000
+Oversampling=false
+
+[CurveStyles]
+BTlinestyle=-
+extradrawstyles1=default, default, default, default, default, default
+extradrawstyles2=default, default, default, default, default, default
+extralinestyles1=-, -, -, -, -, -
+extralinestyles2=-, -, -, -, -, -
+extralinewidths1=2, 2, 2, 2, 2, 2
+extralinewidths2=2, 2, 2, 2, 2, 2
+extramarkers1=None, None, None, None, None, None
+extramarkers2=None, None, None, None, None, None
+extramarkersizes1=6, 6, 6, 6, 6, 6
+extramarkersizes2=6, 6, 6, 6, 6, 6
+
+[Device]
+ArduinoFILT=10, 10, 10, 10
+Controlbuttonflag=false
+PIDbuttonflag=true
+ambient_humidity_device=0
+ambient_pressure_device=0
+ambient_temperature_device=0
+arduinoATChannel=None
+arduinoBTChannel=2
+arduinoETChannel=1
+controlETpid=0, 1
+elevation=0
+id=34
+phidget1018Ratiometric=true
+phidget1018_async=false, false, false, false, false, false, false, false
+phidget1018_changeTriggers=10, 10, 10, 10, 10, 10, 10, 10
+phidget1018_dataRates=1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000
+phidget1018_raws=false, false, false, false, false, false, false, false
+phidget1045_async=false
+phidget1045_changeTrigger=1
+phidget1045_emissivity=1
+phidget1046_async=false, false, false, false
+phidget1046_dataRate=1000
+phidget1046_formula=1, 1, 1, 1
+phidget1046_gain=1, 1, 1, 1
+phidget1048_async=false, false, false, false
+phidget1048_changeTriggers=1, 1, 1, 1
+phidget1048_dataRate=256
+phidget1048_types=1, 1, 1, 1
+phidget1200_async=false
+phidget1200_changeTrigger=0.2
+phidget1200_dataRate=250
+phidget1200_formula=0
+phidget1200_wire=0
+phidgetPassword=
+phidgetPort=5661
+phidgetRemoteFlag=false
+phidgetRemoteOnlyFlag=false
+phidgetServerID=
+readBTpid=1, 2
+showFujiLCDs=true
+useModbusPort=false
+yoctoRemoteFlag=false
+yoctoServerID=127.0.0.1
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200, 19200, 9600, 19200
+extrabytesize=8, 8, 8, 8, 8, 8
+extracomport=COM1, COM1, COM1, COM1, COM1, COM1
+extraparity=E, E, E, E, N, E
+extrastopbits=1, 1, 1, 1, 1, 1
+extratimeout=1, 1, 1, 1, 1, 1
+
+[ExtraDev]
+extraCurveVisibility1=false, true, true, false, true, true, true, true, true, true
+extraCurveVisibility2=true, true, false, false, false, false, true, true, true, true
+extraLCDvisibility1=false, true, true, false, true, true, false, false, false, false
+extraLCDvisibility2=true, true, false, false, false, false, false, false, false, false
+extradevicecolor1=#000000, #ff0000, #ff5500, #ff0000, #55aa00, #ffcf0e
+extradevicecolor2=#0000ff, #aa5500, #ff0000, #ff0000, #55007f, black
+extradevices=34, 35, 40, 41, 25, 36
+extramathexpression1=, , (Y7-196)/1.9, (x+(1/(Y8+.1)*1/(Y10+.1)))/2, Y8+Y9+Y10, 
+extramathexpression2=, , x/10, x-Y10, , 
+extraname1=Bean Temp, Total Exhaust, Gas Usage (0-100%), Roast Air 50/50, Roast Air, Board Temp
+extraname2=Drum Exhaust, Inlet Temp, Roast Air 100%, Roast Air 0%, , 
+
+[RoastProperties]
+roastertype=Diedrich 6-Sensor NG
