@@ -4770,9 +4770,9 @@ class tgraphcanvas(FigureCanvas):
                             cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing                            
                             st1 = self.smooth_list(self.timeB,self.fill_gaps(self.temp1B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
                             st2 = self.smooth_list(self.timeB,self.fill_gaps(self.temp2B),window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timeB_lin)
-                            # we start RoR computation 7 readings after CHARGE to avoid this initial peak
+                            # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                             if aw.qmc.timeindexB[0]>-1:
-                                RoRstart = min(aw.qmc.timeindexB[0]+7, len(self.timeB)-1)
+                                RoRstart = min(aw.qmc.timeindexB[0]+10, len(self.timeB)-1)
                             else:
                                 RoRstart = -1
                             self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin)
@@ -5212,9 +5212,9 @@ class tgraphcanvas(FigureCanvas):
                         decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
                         t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                         t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)                        
-                        # we start RoR computation 7 readings after CHARGE to avoid this initial peak
+                        # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                         if aw.qmc.timeindex[0]>-1:
-                            RoR_start = min(aw.qmc.timeindex[0]+7, len(self.timex)-1)
+                            RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
                         else:
                             RoR_start = -1                                                                                          
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
@@ -10316,7 +10316,7 @@ class SampleThread(QThread):
                     if local_flagstart:
                         # only after CHARGE and we have enough readings to fully apply the delta_span and delta_smoothing, we draw the resulting lines
                         # and only 7 readings after CHARGE
-                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>6+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltafilter/2.)) + max(2,(aw.qmc.deltasamples + 1)):
+                        if aw.qmc.timeindex[0] > -1 and length_of_qmc_timex>9+aw.qmc.timeindex[0] and length_of_qmc_timex > int(round(aw.qmc.deltafilter/2.)) + max(2,(aw.qmc.deltasamples + 1)):
                             aw.qmc.delta1.append(rateofchange1plot)
                             aw.qmc.delta2.append(rateofchange2plot)
                         else:
@@ -11006,9 +11006,11 @@ class ApplicationWindow(QMainWindow):
         
         self.convMenu.addSeparator()
 
-        fileConvertExcelAction = QAction(QApplication.translate("Menu", "Artisan Excel...",None),self)
+        fileConvertExcelAction = QAction(QApplication.translate("Menu", "Excel...",None),self)
         fileConvertExcelAction.triggered.connect(self.fileConvertExcel)
         self.convMenu.addAction(fileConvertExcelAction)
+        
+        self.convMenu.addSeparator()
 
         fileConvertCSVAction = QAction(QApplication.translate("Menu", "Artisan CSV...",None),self)
         fileConvertCSVAction.triggered.connect(self.fileConvertCSV)
@@ -13258,7 +13260,10 @@ class ApplicationWindow(QMainWindow):
                 
             if aw.qmc.background:
                 _,t_max_b = aw.calcAutoAxisBackground()
-                t_max = max(t_max,t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]])
+                if aw.qmc.timeindexB[0] != -1:
+                    t_max = max(t_max,t_max_b - aw.qmc.timeB[aw.qmc.timeindexB[0]])
+                else:
+                    t_max = max(t_max,t_max_b)
             
             if background and aw.qmc.timeindexB[0] != -1:
                 aw.qmc.startofx = t_min - aw.qmc.timeB[aw.qmc.timeindexB[0]]
@@ -15383,12 +15388,13 @@ class ApplicationWindow(QMainWindow):
                         self.filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Load Background",None),ext="*.alog")
                         if len(u(self.filename)) == 0:
                             aw.deleteBackground()
-                        try:
-                            aw.qmc.resetlinecountcaches()
-                            aw.loadbackground(u(self.filename))           
-                        except:
-                            pass
-                        aw.qmc.background = True
+                        else:
+                            try:
+                                aw.qmc.resetlinecountcaches()
+                                aw.loadbackground(u(self.filename))           
+                            except:
+                                pass
+                            aw.qmc.background = True
                         aw.qmc.timealign(redraw=False)
                         aw.qmc.redraw()  
                 elif key == 76:                       #L
@@ -18619,7 +18625,7 @@ class ApplicationWindow(QMainWindow):
                         aw.updateCanvasColors()
                     # remove window geometry settings
                     for s in ["RoastGeometry","FlavorProperties","CalculatorGeometry","EventsGeometry",
-                        "BackgroundGeometry","LCDGeometry","AlarmsGeometry","PIDGeometry"]:
+                        "BackgroundGeometry","LCDGeometry","AlarmsGeometry","PIDGeometry","DeviceAssignmentGeometry"]:
                         settings.remove(s)
                     #
                     aw.setFonts()
