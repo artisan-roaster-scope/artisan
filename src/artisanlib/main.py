@@ -5487,7 +5487,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.roastertype:
                     statstr += '\n' + str(aw.qmc.roastertype)
                 if aw.qmc.drumspeed:
-                    statstr += '\n' + (QApplication.translate("Label", "Drum Speed",None)) + ': ' + str(aw.qmc.drumspeed)
+                    statstr += '\n' + (QApplication.translate("Label", "Drum Speed",None)) + ': ' + str(aw.qmc.drumspeed) + "RPM"
                 if aw.qmc.ambientTemp not in [None,0] or aw.qmc.ambient_humidity not in [None,0] or aw.qmc.ambient_pressure not in [None,0]:
                     statstr += '\n' + (QApplication.translate("HTML Report Template", "Ambient:",None)) + ' '
                 if aw.qmc.ambientTemp not in [None,0]:
@@ -5509,7 +5509,11 @@ class tgraphcanvas(FigureCanvas):
                     
                 if aw.qmc.weight[0]:
                     statstr += skipline
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ str(aw.float2float(aw.qmc.weight[0],2)) + aw.qmc.weight[2]
+                    if aw.qmc.weight[2] == "g":
+                        w =str(aw.float2float(aw.qmc.weight[0],0))
+                    else:
+                        w = str(aw.float2float(aw.qmc.weight[0],2))
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Charge Weight", None) + ': '+ w + aw.qmc.weight[2]
                     if aw.qmc.weight[1]:
                         statstr += '\n' + QApplication.translate("AddlInfo", "Weight Loss", None) + ': '+ str(-aw.float2float(aw.weight_loss(aw.qmc.weight[0],aw.qmc.weight[1]),1)) + "%"
 
@@ -5524,20 +5528,20 @@ class tgraphcanvas(FigureCanvas):
                     statstr += '\n' + QApplication.translate("AddlInfo", "Charge Volume", None) + ': '+ str(aw.float2float(aw.qmc.volume[0],2)) + ' ' + encodeLocal(aw.qmc.volume[2])
                     if "volume_gain" in cp: 
                         statstr += '\n' + QApplication.translate("AddlInfo", "Volume Gain", None) + ': ' + str(aw.float2float(cp["volume_gain"],2)) + "%"                        
-#                if aw.qmc.beansize:
-#                    statstr += skipline
+#               if aw.qmc.beansize:
+#                    #statstr += skipline
 #                    statstr += '\n' + QApplication.translate("AddlInfo", "Bean Size", None) + ': '+ str(aw.qmc.beansize) + 'mm'
 
                 if aw.qmc.beansize_min or aw.qmc.beansize_max:
-                    statstr += skipline
+                    #statstr += skipline
                     screen = ""
                     if aw.qmc.beansize_min:
-                        screen = str(aw.qmc.beansize_min)
+                        screen = str(int(round(aw.qmc.beansize_min)))
                     if aw.qmc.beansize_max:
                         if screen:
                             screen = screen + "/"
-                        screen = screen + str(aw.qmc.beansize_max)
-                    statstr += '\n' + QApplication.translate("AddlInfo", "Screen", None) + ': '+ screen + '18/64\u2033'
+                        screen = screen + str(int(round(aw.qmc.beansize_max)))
+                    statstr += '\n' + QApplication.translate("AddlInfo", "Screen", None) + ': '+ screen # + '18/64\u2033' # the unit makes it hard to read
 
                 if aw.qmc.moisture_greens or aw.qmc.moisture_roasted:
                     statstr += skipline
