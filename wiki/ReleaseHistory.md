@@ -5,37 +5,32 @@ Detailed Release History
 v1.4.0 (xx.xx.2018)
 ------------------
 
- * New Features 
-   - allow alarms to move sliders beyond the default range of 0-100 ([Issue #213](../../../issues/213))
-   - save and restore "geometry" of Events configuration dialog
-   - adds phasesLCD mode-by-phase selection
-   - adds PhasesLCD mode that shows all of time/temp/percentage in finish phase accros the 3 Phases LCDs ([Issue #235](../../../issues/235))
-   - adds time guide option (most useful when following a background profile)
+ * New Features
+   - adds time guide option (most useful when following a background profile)  
    - adds export and convert to Excel
-   - adds fan RPM to R1 Aillio setup
-   - adds machine setup for Coffee-Tech Engineering Ghibli
-   - adds machine setup for Besca roasting machines
-   - adds machine setup for Atilla GOLD plus 7" roaster
-   - adds machine setup for Hottop TC4 configurations
-   - adds re-sampling and back-sampling to improve all smoothing algorithms
-   - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) (complementing the standard P-on-Error mode)
+   - adds PhasesLCD mode-by-phase selection
+   - adds PhasesLCD mode that shows all of time/temp/percentage in finish phase accros the 3 Phases LCDs ([Issue #235](../../../issues/235))   
+   - adds flag to allow phases to be adjusted based on DRY and FCs of the background profile
+   - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) for internal Software PID and [TC4 aArtisanQ v6.6 PID](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/tags/REL_aArtisanQ_PID_6_6) (complementing the standard P-on-Error mode)
    - adds KeepON flag
    - adds zero-ing of channels via extra symbolic variables Tn set to current value on right-click of corresponding LCD
    - adds barometric pressure to roast properties and statistic summary
-   - adds support for ambient sensors Phidget [HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644) and [PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719) 
-   - adds flag to allow phases to be adjusted based on DRY and FCs of the background profile
+   - adds support for ambient sensors Phidget [HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644) and [PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719)
+   - add machine setup for Hottop TC4 configurations, [Coffee-Tech Engineering Ghibli](https://www.coffee-tech.com/products/commercial-roasters/ghibli-r15/), [Atilla GOLD plus 7"](http://www.atilla.com.br/p/atilla-5kg-gold-plus/) and [Besca roasting machines](https://www.bescaroasters.com/)
+   - adds fan RPM to R1 Aillio setup
  * Changes 
+   - ensures that background curves are always render using the same smoothing algorithm as the foreground
+   - adds re-sampling and back-sampling to improve all smoothing algorithms
    - adds "Insert" button to trigger the extra event table insert action instead of abusing the "Add" button
    - use zero-based port numbering in Phidgets tab
    - renumbers config event types 1-4 to be consistent with plotter notation
    - adds roastUUID to alog profiles
    - ensures that only a single instance runs per machine
    - adds a pop-up reminder message when you forget to right-click on the timer LCD in Hottop 2K+ mode ([Issue #220](../../../issues/220))
+   - allow alarms to move sliders beyond the default range of 0-100 ([Issue #213](../../../issues/213))
    - maps internal PID duty 0-100% to the full min/max range of the selected positive/negative target sliders
-   - updates link to documentation
+   - updates in-app link to documentation
    - simplifies to one set of roast phases
-   - removes Py2.7 support and updates build environment
-   - reset window geometries and dpi settings on factory-reset
    - more accurate timestamping
    - increases number of time/temp decimals in alog profiles
    - LCDs extended to show readings beyond 4 digits without decimals ([Issue #238](../../../issues/238))
@@ -45,7 +40,9 @@ v1.4.0 (xx.xx.2018)
    - split temperature menu actions and move conversions to Tools menu
    - improved rendering of statistic summary
    - adds beans and roasting notes to statistic summary
-   - ensures that background curves are always render using the same smoothing algorithm as the foreground
+   - save and restore "geometry" of Events configuration dialog
+   - reset window geometries and dpi settings on factory-reset
+   - removes Py2.7 support and updates build environment
  * Bug Fixes 
    - fixes missing translations on Linux/RPi ([Issue #211](../../../issues/211))
    - fixes hanging message line in FullScreen mode
@@ -58,7 +55,7 @@ v1.4.0 (xx.xx.2018)
    - format the first entry in RoastProperties>Data table for correct paste after copy
    - fixes the post roast calculation for CHARGE and DROP to match the auto calculations during a roast
    - change the way RoR is calculated for the first phase in the Designer to be consistent with the recorded profiles (from TP to DE)
-   - disables CMD-N NEW action during recording until CHARGE and DROP ([Issue #225](../../../issues/225))
+   - disables CMD-N NEW action during recording until CHARGE and DROP are set ([Issue #225](../../../issues/225))
    - fixes slider layout issue and removes remaining PyQt4 support
    - fixed PID dialog geometry
    - render long legends more compact
@@ -74,7 +71,6 @@ v1.4.0 (xx.xx.2018)
    - improves autoCharge detection on fast sampling rates
    - ensures that drop-filter is applied on (non-optimal) decay smoothing
    - reduces long (blocking) delay between the two samplings occurring with oversampling turned on
-   - better align foreground- and background smoothing if optimal-smoothing is deactivated
    - fix an issue leading to a 100% duty after turning PID off and then on again
    - better error message when trying to install on 32bit windows
    - fixes Fuji PXR PID dialog ([Issue #243](../../../issues/243))
