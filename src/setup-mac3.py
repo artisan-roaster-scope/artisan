@@ -50,8 +50,9 @@ DATA_FILES = [
     ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqcocoa.dylib']), # qt5
 #    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqoffscreen.dylib']), # qt5
 #    ("../Resources/qt_plugins/platforms", [QTDIR + r'/plugins/platforms/libqminimal.dylib']), # qt5
-    ("../Resources/qt_plugins/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # qt5/# standard     
-    ("../Resources/qt_plugins/styles", [QTDIR + r'/plugins/styles/libqmacstyle.dylib']), # QT 5.10 requires this
+    ("../Resources/qt_plugins/printsupport", [QTDIR + r'/plugins/printsupport/libcocoaprintersupport.dylib']), # qt5/# standard
+    ("../Resources/qt_plugins/styles", [QTDIR + r'/plugins/styles/libqmacstyle.dylib']), # QT 5.10 requires this (not available on 5.8)
+    ("../Resources/qt_plugins/platformthemes", [QTDIR + r'/plugins/platformthemes/libqflatpak.dylib']), # unclear what this is for (not available on 5.8)
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
     ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
@@ -115,6 +116,10 @@ DATA_FILES = [
     ("../Resources", [r"includes/Themes"]),
     ("../Resources", [r"includes/Icons"]),
   ]
+  
+if os.environ['ARTISAN_LEGACY_BUILD'] == "true":
+    # we remove Qt components that are not available on legacy Qt installations
+    DATA_FILES = [e for e in DATA_FILES if not "qt_plugins/styles" in e[0] and not "qt_plugins/platformthemes" in e[0]]
 
 with open('Info.plist', 'r+b') as fp:
     plist = plistlib.load(fp)
@@ -123,7 +128,7 @@ with open('Info.plist', 'r+b') as fp:
     plist['CFBundleIdentifier'] = 'com.google.code.p.Artisan'
     plist['CFBundleShortVersionString'] = VERSION
     plist['CFBundleVersion'] = 'Artisan ' + VERSION
-    plist['LSMinimumSystemVersion'] = '10.13'
+    plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
     plist['LSMultipleInstancesProhibited'] = 'false'
     plist['LSPrefersPPC'] = False,
     plist['LSArchitecturePriority'] = 'x86_64',
@@ -288,7 +293,11 @@ for root, dirs, files in os.walk('.'):
                     os.remove(os.path.join(r,fl))                
             
 os.chdir('..')
-os.system(r"rm artisan-mac-" + VERSION + r".dmg")
-os.system(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"')
+if os.environ['ARTISAN_LEGACY_BUILD'] == "true":
+    os.system(r"rm artisan-mac-" + VERSION + r"-legacy.dmg")
+    os.system(r'hdiutil create artisan-mac-' + VERSION + r'-legacy.dmg -volname "Artisan legacy" -fs HFS+ -srcfolder "dist"')
+else:
+    os.system(r"rm artisan-mac-" + VERSION + r".dmg")
+    os.system(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"')
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
 

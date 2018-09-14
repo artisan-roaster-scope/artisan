@@ -2,15 +2,29 @@
 
 set -ex
 
+# add argument "legacy" to make a build that supports older OS X systems using an outdated Qt
 
 if [ ! -z $TRAVIS ]; then
+    # Travis CI builds
     export PYTHON=/usr/local
     export PYTHONPATH=$PYTHON/lib/python3.6
     export PYTHON_V=3.6
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=${QT_PATH}
     export MACOSX_DEPLOYMENT_TARGET=10.13
+    export ARTISAN_LEGACY_BUILD=false
+elif [ $1 = "legacy" ]; then
+    # local legacy build featuring an outdated Qt to minimize the DEPLOYMENT_TARGET supporting older system
+    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.6
+    export PYTHONPATH=$PYTHON/lib/python3.6
+    export PYTHON_V=3.6
+    export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
+    export QT_SRC_PATH=~/Qt5.8.0/5.8/clang_64
+    export MACOSX_DEPLOYMENT_TARGET=10.9
+    export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
+    export ARTISAN_LEGACY_BUILD=true
 else
+    # standard local builds
     export PYTHON=/Library/Frameworks/Python.framework/Versions/3.6
     export PYTHONPATH=$PYTHON/lib/python3.6
     export PYTHON_V=3.6
@@ -18,6 +32,7 @@ else
     export QT_SRC_PATH=~/Qt5.11.1/5.11.1/clang_64
     export MACOSX_DEPLOYMENT_TARGET=10.13
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
+    export ARTISAN_LEGACY_BUILD=false
 fi
 
 export PATH=$PYTHON/bin:$PYTHON/lib:$PATH

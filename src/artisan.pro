@@ -14,7 +14,8 @@
 
 SOURCES = \
     artisanlib/main.py \
-    const/UIconst.py
+    const/UIconst.py \
+#    plus/login.py
     
 TRANSLATIONS = \
 	translations/artisan_de.ts \

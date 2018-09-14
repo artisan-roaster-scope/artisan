@@ -70,10 +70,7 @@ except:
 #    import traceback
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
-try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 private sip module
-    from PyQt5 import sip # @UnusedImport 
-except:
-    pass
+
 from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,  # @Reimport
                          QInputDialog, QGroupBox, QDialog, QLineEdit, QTimeEdit, QTableWidgetSelectionRange, # @Reimport
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox, # @Reimport
@@ -88,7 +85,13 @@ from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,  # @Reimport
                           QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
                           QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
+from PyQt5.QtNetwork import QLocalSocket, QLocalServer
 
+try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 private sip module
+    from PyQt5 import sip # @UnusedImport 
+except:
+    pass
+    
 import matplotlib as mpl
 from matplotlib import cm
 
