@@ -19,8 +19,8 @@ elif [ $1 = "legacy" ]; then
     export PYTHONPATH=$PYTHON/lib/python3.6
     export PYTHON_V=3.6
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
-    export QT_SRC_PATH=~/Qt5.8.0/5.8/clang_64
-    export MACOSX_DEPLOYMENT_TARGET=10.9
+    export QT_SRC_PATH=~/Qt5.9.3/5.9.3/clang_64
+    export MACOSX_DEPLOYMENT_TARGET=10.10
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
     export ARTISAN_LEGACY_BUILD=true
 else
