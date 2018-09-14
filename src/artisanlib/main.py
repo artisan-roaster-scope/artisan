@@ -5568,13 +5568,22 @@ class tgraphcanvas(FigureCanvas):
                         if len(l)>28:
                             statstr += ".."
 
+                #defaults appropriate for default font
                 prop = aw.mpl_fontproperties.copy()
-                if aw.qmc.graphfont == 1:
+                prop.set_size("small")
+                fc = aw.qmc.palette["text"]  #text color
+                ls = 1.7                     #linespacing
+                droptext_width = 80          #approximate width of the DROP time annotation (in seconds)
+                border = 10                  #space around outside of text box (in seconds)
+                margin = 4                   #text to edge of text box
+                
+                #adjust for other fonts
+                if aw.qmc.graphfont == 1:   #Humor
                     prop.set_size("x-small")
-                else:
-                    prop.set_size("small")
-                ls = 1.7 # linespacing
-                fc = aw.qmc.palette["text"]
+                    droptext_width = 120
+                if aw.qmc.graphfont == 2:   #Comic
+                    ls = 1.2
+                    droptext_width = 70
 
                 if aw.qmc.legendloc != 1:
                     # legend not in upper right
@@ -5585,56 +5594,35 @@ class tgraphcanvas(FigureCanvas):
 
                 # startofx is the first recorded value, to find the 0s we have to shift this by CHARGE
                 if aw.qmc.timeindex[0] != -1:
+#                    t_min,t_max = aw.calcAutoAxis()
                     start = aw.qmc.timex[aw.qmc.timeindex[0]]
                 else:
                     start = 0
                     
-                from matplotlib.transforms import Bbox
-                t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
-                f = self.ax.get_figure()
-                r = f.canvas.get_renderer()
-                bb = t.get_window_extent(renderer=r) # bounding box in display space
-                bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
-                bbox = Bbox(bbox_data)   
-                t.remove()
-                
-                if (aw.qmc.autotimex):
-                    aw.autoAdjustAxis()
-                    orig_endofx = aw.qmc.endofx
-                    aw.qmc.endofx += bbox.width+10  #provide room for the stats
-                    self.xaxistosm()
- 
-                    # rinse and repeat, so the bbox values get affected by the auto axis scaling 
-                    t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
-                    f = self.ax.get_figure()
-                    r = f.canvas.get_renderer()
-                    bb = t.get_window_extent(renderer=r) # bounding box in display space
-                    bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
-                    bbox = Bbox(bbox_data)   
-                    t.remove()
-                    aw.qmc.endofx = orig_endofx
-                
-                    if aw.qmc.graphfont == 1:
-                        # do it all again to get better positioning when the font is Humor 
-                        aw.autoAdjustAxis()
-                        orig_endofx = aw.qmc.endofx
-                        aw.qmc.endofx += bbox.width+10  #provide room for the stats
-                        self.xaxistosm()
-     
-                        # rinse and repeat, so the bbox values get affected by the auto axis scaling 
-                        t = self.ax.text(aw.qmc.endofx+start, statsheight, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
-                        f = self.ax.get_figure()
-                        r = f.canvas.get_renderer()
-                        bb = t.get_window_extent(renderer=r) # bounding box in display space
-                        bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
-                        bbox = Bbox(bbox_data)   
-                        t.remove()
-                        aw.qmc.endofx = orig_endofx
+                #get the width of the DROP time annotation text (the brute force way, in the future it would be good to get it from the aw.qmc.ax directly)
+                droptextstr = 'DROP 22:22'  # just used as an example to calculate an approximate width
+                droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,droptextstr,ls,prop,fc)
+                stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
+                stats_textbox_width = stats_textbox_bounds[2]
+                stats_textbox_height = stats_textbox_bounds[3]
+                pos_x = self.ax.get_xlim()[1]-stats_textbox_width-border
 
-                border = 4
-                pos_x = self.ax.get_xlim()[1]-bbox.width-20
+                if (aw.qmc.autotimex):
+                    aw.qmc.endofx = droptext_end + stats_textbox_width # provide room for the stats
+                    self.xaxistosm()  # recalculate the x axis
+
+                    #get the width of the DROP time annotation text (the brute force way, in the future it would be good to get it from the aw.qmc.ax directly)
+                    droptextstr = 'DROP 22:22'  # just an example to be used to calculate an approximate width
+                    droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,droptextstr,ls,prop,fc)
+                    stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
+                    stats_textbox_width = stats_textbox_bounds[2]
+                    stats_textbox_height = stats_textbox_bounds[3]
+                    aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border #provide room for the stats
+                    self.xaxistosm()
+                    pos_x = droptext_end + border + start
+                
                 pos_y = statsheight
-                rect = patches.Rectangle((pos_x-border,pos_y+border),bbox.width+2*border,-bbox.height-2*border,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=QColor(aw.qmc.palette["background"]).lighter(150).name(),fill=True,alpha=0.8,zorder=10)
+                rect = patches.Rectangle((pos_x-margin,pos_y+margin),stats_textbox_width+2*margin,-stats_textbox_height-2*margin,linewidth=0.5,edgecolor=aw.qmc.palette["grid"],facecolor=QColor(aw.qmc.palette["background"]).lighter(150).name(),fill=True,alpha=0.8,zorder=10)
                 self.ax.add_patch(rect)
                 
                 self.ax.text(pos_x, pos_y, statstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,zorder=11,path_effects=[])
@@ -5643,6 +5631,30 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " statsSummary() {0}").format(str(e)),exc_tb.tb_lineno)
     
+    def statstextboxBounds(self,x_pos,y_pos,textstr,ls,prop,fc):
+        from matplotlib.transforms import Bbox
+        t = self.ax.text(x_pos, y_pos, textstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
+        f = self.ax.get_figure()
+        r = f.canvas.get_renderer()
+        bb = t.get_window_extent(renderer=r) # bounding box in display space
+        bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
+        bbox = Bbox(bbox_data)   
+        t.remove()
+        return bbox.bounds
+
+    def droptextBounds(self,x_pos,y_pos,textstr,ls,prop,fc):
+        #get the width of the DROP time annotation text (the brute force way, in the future it would be good to get it from the aw.qmc.ax directly)
+        droptext_width = self.statstextboxBounds(x_pos,y_pos,textstr,ls,prop,fc)[2]
+
+        import re        
+        for child in self.ax.get_children():
+            if isinstance(child, mpl.text.Annotation):
+                droptext = re.search(r'.*\((.*?),.*DROP',str(child))
+                if droptext:
+                    droptextstart = int(float(droptext.group(1))) - x_pos
+                    droptext_end = droptextstart + droptext_width
+        return droptext_width,droptextstart,droptext_end
+
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
     def findtextgap(self,ystep_down,ystep_up,height1,height2,dd=0):
