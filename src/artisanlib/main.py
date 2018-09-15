@@ -5592,16 +5592,13 @@ class tgraphcanvas(FigureCanvas):
                     # legend in upper right
                     statsheight = aw.qmc.ylimit - (0.13 * (aw.qmc.ylimit - aw.qmc.ylimit_min))
 
-                # startofx is the first recorded value, to find the 0s we have to shift this by CHARGE
                 if aw.qmc.timeindex[0] != -1:
-#                    t_min,t_max = aw.calcAutoAxis()
                     start = aw.qmc.timex[aw.qmc.timeindex[0]]
                 else:
                     start = 0
                     
-                #get the width of the DROP time annotation text (the brute force way, in the future it would be good to get it from the aw.qmc.ax directly)
-                droptextstr = 'DROP 22:22'  # just used as an example to calculate an approximate width
-                droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,droptextstr,ls,prop,fc)
+                # position the stats summary relative to the right hand edge of the graph
+                droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
                 stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                 stats_textbox_width = stats_textbox_bounds[2]
                 stats_textbox_height = stats_textbox_bounds[3]
@@ -5611,12 +5608,12 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.endofx = droptext_end + stats_textbox_width # provide room for the stats
                     self.xaxistosm()  # recalculate the x axis
 
-                    #get the width of the DROP time annotation text (the brute force way, in the future it would be good to get it from the aw.qmc.ax directly)
-                    droptextstr = 'DROP 22:22'  # just an example to be used to calculate an approximate width
-                    droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,droptextstr,ls,prop,fc)
+                    droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
                     stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                     stats_textbox_width = stats_textbox_bounds[2]
                     stats_textbox_height = stats_textbox_bounds[3]
+
+                    # position the stats summary relative to the right edge of the drop text
                     aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border #provide room for the stats
                     self.xaxistosm()
                     pos_x = droptext_end + border + start
@@ -5642,16 +5639,14 @@ class tgraphcanvas(FigureCanvas):
         t.remove()
         return bbox.bounds
 
-    def droptextBounds(self,x_pos,y_pos,textstr,ls,prop,fc):
-        #get the width of the DROP time annotation text (the brute force way, in the future it would be good to get it from the aw.qmc.ax directly)
-        droptext_width = self.statstextboxBounds(x_pos,y_pos,textstr,ls,prop,fc)[2]
-
+    def droptextBounds(self,x_pos,y_pos,ls,prop,fc):
         import re        
         for child in self.ax.get_children():
             if isinstance(child, mpl.text.Annotation):
-                droptext = re.search(r'.*\((.*?),.*DROP',str(child))
+                droptext = re.search(r'.*\((.*?),.*(DROP [0-9:]*)',str(child))
                 if droptext:
                     droptextstart = int(float(droptext.group(1))) - x_pos
+                    droptext_width = self.statstextboxBounds(x_pos,y_pos,droptext.group(2),ls,prop,fc)[2]
                     droptext_end = droptextstart + droptext_width
         return droptext_width,droptextstart,droptext_end
 
