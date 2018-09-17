@@ -85,7 +85,7 @@ from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,  # @Reimport
                           QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
                           QRegExp, QDate, QUrl, QDir, Qt, QPoint, QEvent, QDateTime, QThread, QSemaphore)  # @Reimport
-from PyQt5.QtNetwork import QLocalSocket, QLocalServer
+from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
 try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 private sip module
     from PyQt5 import sip # @UnusedImport 
@@ -1000,9 +1000,9 @@ class tgraphcanvas(FigureCanvas):
         # set the parent widget
         self.setParent(parent)
         # we define the widget as
-        FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)
+        FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)  #@UndefinedVariable
         # notify the system of updated policy
-        FigureCanvas.updateGeometry(self)
+        FigureCanvas.updateGeometry(self)  #@UndefinedVariable
 
         # the rate of chage of temperature
         self.rateofchange1 = 0.0
@@ -2263,15 +2263,15 @@ class tgraphcanvas(FigureCanvas):
                         lcdformat = "%.1f"
                     else:
                         lcdformat = "%.0f"
-                    if len(self.temp1) and -100 < self.temp1[-1] < 1000:
-                        aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
-                    elif len(self.temp1) and -1000 < self.temp1[-1] < 10000:
-                        aw.lcd2.display("%.0f"%float(self.temp1[-1]))
+                    if not self.temp1 is None and len(self.temp1) and -100 < self.temp1[-1] < 1000:
+                            aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
+                    elif not self.temp1 is None and len(self.temp1) and -1000 < self.temp1[-1] < 10000:
+                            aw.lcd2.display("%.0f"%float(self.temp1[-1]))
                     else:
                         aw.lcd2.display("--")
-                    if len(self.temp2) and -100 < self.temp2[-1] < 1000:
+                    if not self.temp2 is None and len(self.temp2) and -100 < self.temp2[-1] < 1000:
                         aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
-                    elif len(self.temp2) and -1000 < self.temp2[-1] < 10000:
+                    elif not self.temp2 is None and len(self.temp2) and -1000 < self.temp2[-1] < 10000:
                         aw.lcd3.display("%.0f"%float(self.temp2[-1]))
                     else:
                         aw.lcd3.display("--")
@@ -2512,7 +2512,6 @@ class tgraphcanvas(FigureCanvas):
                 self.quantifiedEvent = []
 
         except Exception as e:
-            self.flagon = False
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
@@ -5447,7 +5446,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.repaint()
                         QApplication.processEvents()
                 except:
-                    pass
+                    pass                 
                         
             except Exception as ex:
 #                import traceback
@@ -5573,17 +5572,17 @@ class tgraphcanvas(FigureCanvas):
                 prop.set_size("small")
                 fc = aw.qmc.palette["text"]  #text color
                 ls = 1.7                     #linespacing
-                droptext_width = 80          #approximate width of the DROP time annotation (in seconds)
+#                droptext_width = 80          #approximate width of the DROP time annotation (in seconds)
                 border = 10                  #space around outside of text box (in seconds)
                 margin = 4                   #text to edge of text box
                 
                 #adjust for other fonts
                 if aw.qmc.graphfont == 1:   #Humor
                     prop.set_size("x-small")
-                    droptext_width = 120
+#                    droptext_width = 120
                 if aw.qmc.graphfont == 2:   #Comic
                     ls = 1.2
-                    droptext_width = 70
+#                    droptext_width = 70
 
                 if aw.qmc.legendloc != 1:
                     # legend not in upper right
@@ -5598,7 +5597,8 @@ class tgraphcanvas(FigureCanvas):
                     start = 0
                     
                 # position the stats summary relative to the right hand edge of the graph
-                droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
+#                droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
+                _,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
                 stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                 stats_textbox_width = stats_textbox_bounds[2]
                 stats_textbox_height = stats_textbox_bounds[3]
@@ -5608,7 +5608,8 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.endofx = droptext_end + stats_textbox_width # provide room for the stats
                     self.xaxistosm()  # recalculate the x axis
 
-                    droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
+#                    droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
+                    _,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
                     stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                     stats_textbox_width = stats_textbox_bounds[2]
                     stats_textbox_height = stats_textbox_bounds[3]
@@ -5616,6 +5617,7 @@ class tgraphcanvas(FigureCanvas):
                     # position the stats summary relative to the right edge of the drop text
                     aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border #provide room for the stats
                     self.xaxistosm()
+                                        
                     pos_x = droptext_end + border + start
                 
                 pos_y = statsheight
@@ -6218,7 +6220,7 @@ class tgraphcanvas(FigureCanvas):
             
             self.generateNoneTempHints()
             self.block_update = True # block the updating of the bitblit canvas (unblocked at the end of this function to avoid multiple redraws)
-            aw.qmc.reset(False,False,sampling=True,keepProperties=True)                     
+            aw.qmc.reset(False,False,sampling=True,keepProperties=True)
 
             if aw.qmc.device == 53:
                 from artisanlib.hottop import startHottop
@@ -6262,7 +6264,7 @@ class tgraphcanvas(FigureCanvas):
             self.threadserver.createSampleThread()
             QApplication.processEvents()
             self.StartAsyncSamplingAction()
-            QApplication.processEvents()        
+            QApplication.processEvents()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OnMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -6559,7 +6561,7 @@ class tgraphcanvas(FigureCanvas):
             aw.hideEventsMinieditor()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffRecorder() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     #Turns START/STOP flag self.flagon to read and plot. Called from push button_2.
     def ToggleRecorder(self):
@@ -14413,7 +14415,7 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.fig.canvas.draw()
                 aw.qmc.fig.canvas.update()
                 aw.stack.adjustSize()
-                FigureCanvas.updateGeometry(aw.stack)
+                FigureCanvas.updateGeometry(aw.stack)  #@UndefinedVariable
                 QApplication.processEvents()
 
     def enableSaveActions(self):
@@ -19799,7 +19801,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Geometry"):
                 self.restoreGeometry(settings.value("Geometry"))
             if filename: # only if an external settings file is loaded
-                FigureCanvas.updateGeometry(aw.stack)
+                FigureCanvas.updateGeometry(aw.stack)  #@UndefinedVariable
                 
             #update visibility of main event button, extra event buttons and 
             self.applyStandardButtonVisibility()
@@ -35507,6 +35509,10 @@ class serialport(object):
         else:
             t2 = aw.qmc.currentpidsv  #return 
         ################################################################
+        if t1 is None:
+            t1 = -1
+        if t2 is None:
+            t2 = -1
         return tx,t1,t2
 
     def sendDTAcommand(self,command):
@@ -50091,10 +50097,11 @@ class DtaPID(object):
         #dictionary "KEY": [VALUE,ASCII_MEMORY_ADDRESS]  note: address contains hex alpha characters
         self.dtamem={
                   "pv": [0,"4700"],             # process value (temperature reading)
-                  "sv": [100.0,"4701"],           # set point
+                  "sv": [100.0,"4701"],         # set point
                   "p": [5,"4708"],              # p value 0-9999
                   "i": [240,"4709"],            # i value 0-9999
                   "d": [60,"470A"],             # d value 0-9999
+                  "duty" : [0,"471D"],          # duty
                   "sensortype": [0,"4710"],     # 0 = K type1; 1 = K type2; 2 = J type1; 3 = J type2
                                                 # 4 = T type1; 5 = T type2; 6 = E ; 7 = N; 8 = R; 9 = S; 10 = B
                                                 # 11 = JPT100 type1; 12 = JPT100 type2; 13 = PT100 type1; 14 = PT100 type2
