@@ -2263,52 +2263,69 @@ class tgraphcanvas(FigureCanvas):
                         lcdformat = "%.1f"
                     else:
                         lcdformat = "%.0f"
-                    if not self.temp1 is None and len(self.temp1) and -100 < self.temp1[-1] < 1000:
+                    try: # if self.temp1 is None, which should never be the case, this fails
+                        if len(self.temp1) and -100 < self.temp1[-1] < 1000:
                             aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
-                    elif not self.temp1 is None and len(self.temp1) and -1000 < self.temp1[-1] < 10000:
+                        elif len(self.temp1) and -1000 < self.temp1[-1] < 10000:
                             aw.lcd2.display("%.0f"%float(self.temp1[-1]))
-                    else:
-                        aw.lcd2.display("--")
-                    if not self.temp2 is None and len(self.temp2) and -100 < self.temp2[-1] < 1000:
-                        aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
-                    elif not self.temp2 is None and len(self.temp2) and -1000 < self.temp2[-1] < 10000:
-                        aw.lcd3.display("%.0f"%float(self.temp2[-1]))
-                    else:
-                        aw.lcd3.display("--")
-                    if -100 < self.rateofchange1 < 1000:
-                        aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
-                    else:
-                        aw.lcd4.display("--")
-                    if -100 < self.rateofchange2 < 1000:
-                        aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
-                    else:
-                        aw.lcd5.display("--")
-                    
-                    if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
-                        aw.lcd6.display(lcdformat%self.currentpidsv)
-                        aw.lcd7.display(lcdformat%self.dutycycle)
+                        else:
+                            aw.lcd2.display("--")
+                    except:
+                        pass
+                    try:
+                        if len(self.temp2) and -100 < self.temp2[-1] < 1000:
+                            aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
+                        elif len(self.temp2) and -1000 < self.temp2[-1] < 10000:
+                            aw.lcd3.display("%.0f"%float(self.temp2[-1]))
+                        else:
+                            aw.lcd3.display("--")
+                    except:
+                        pass
+                    try:
+                        if -100 < self.rateofchange1 < 1000:                    
+                            aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
+                        else:
+                            aw.lcd4.display("--")
+                        if -100 < self.rateofchange2 < 1000:
+                            aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
+                        else:
+                            aw.lcd5.display("--")
+                    except:
+                        pass
+                    try:                    
+                        if aw.ser.showFujiLCDs and self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid
+                            aw.lcd6.display(lcdformat%self.currentpidsv)
+                            aw.lcd7.display(lcdformat%self.dutycycle)
+                    except:
+                        pass
 
                     ndev = len(self.extradevices)
                     for i in range(ndev):
                         if i < aw.nLCDS:
-                            if self.extratemp1[i]:
-                                fmt = lcdformat
-                                v = float(self.extratemp1[i][-1])
-                                if -1000 < v < 10000:
-                                    if (v.is_integer() and self.intChannel(i,0)) or not (-100 < v < 1000):
-                                        fmt = "%.0f" # we display this value without decimals
-                                    aw.extraLCD1[i].display(fmt%v)
-                                else:
-                                    aw.extraLCD1[i].display("--")
-                            if self.extratemp2[i]:
-                                fmt = lcdformat
-                                v = float(self.extratemp2[i][-1])
-                                if -1000 < v < 10000:
-                                    if (v.is_integer() and self.intChannel(i,1)) or not (-100 < v < 1000):
-                                        fmt = "%.0f" # we display this value without decimals
-                                    aw.extraLCD2[i].display(fmt%v)
-                                else:
-                                    aw.extraLCD2[i].display("--")
+                            try:
+                                if self.extratemp1[i]:
+                                    fmt = lcdformat
+                                    v = float(self.extratemp1[i][-1])
+                                    if -1000 < v < 10000:
+                                        if (v.is_integer() and self.intChannel(i,0)) or not (-100 < v < 1000):
+                                            fmt = "%.0f" # we display this value without decimals
+                                        aw.extraLCD1[i].display(fmt%v)
+                                    else:
+                                        aw.extraLCD1[i].display("--")
+                            except:
+                                pass
+                            try:
+                                if self.extratemp2[i]:
+                                    fmt = lcdformat
+                                    v = float(self.extratemp2[i][-1])
+                                    if -1000 < v < 10000:
+                                        if (v.is_integer() and self.intChannel(i,1)) or not (-100 < v < 1000):
+                                            fmt = "%.0f" # we display this value without decimals
+                                        aw.extraLCD2[i].display(fmt%v)
+                                    else:
+                                        aw.extraLCD2[i].display("--")
+                            except:
+                                pass
                                     
                     # update large LCDs (incl. Web LCDs)
                     timestr = None
@@ -5457,6 +5474,7 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
 
+
     #add stats summmary to graph 
     def statsSummary(self):
         try:
@@ -5603,21 +5621,31 @@ class tgraphcanvas(FigureCanvas):
                 stats_textbox_width = stats_textbox_bounds[2]
                 stats_textbox_height = stats_textbox_bounds[3]
                 pos_x = self.ax.get_xlim()[1]-stats_textbox_width-border
+#                print("\n1 stats_textbox_width",stats_textbox_width)
 
                 if (aw.qmc.autotimex):
-                    aw.qmc.endofx = droptext_end + stats_textbox_width # provide room for the stats
-                    self.xaxistosm()  # recalculate the x axis
+                    aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border # provide room for the stats
+                    self.xaxistosm(redraw=False)  # recalculate the x axis
 
-#                    droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
-                    _,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
-                    stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
-                    stats_textbox_width = stats_textbox_bounds[2]
-                    stats_textbox_height = stats_textbox_bounds[3]
+                    prev_stats_textbox_width = 0
+                    #set the maximum number of iterations
+                    for _ in range(2, 20):
+#                        droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
+                        _,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
+                        stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
+                        stats_textbox_width = stats_textbox_bounds[2]
+                        stats_textbox_height = stats_textbox_bounds[3]
+#                        print(x,"stats_textbox_width",stats_textbox_width, )
 
-                    # position the stats summary relative to the right edge of the drop text
-                    aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border #provide room for the stats
-                    self.xaxistosm()
-                                        
+                        # position the stats summary relative to the right edge of the drop text
+                        aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border #provide room for the stats
+                        self.xaxistosm(redraw=False)
+                        #break the loop if it looks like stats_textbox_width has converged
+                        if abs(prev_stats_textbox_width - stats_textbox_width) < .2:
+                            break
+                        else:
+                            prev_stats_textbox_width = stats_textbox_width
+
                     pos_x = droptext_end + border + start
                 
                 pos_y = statsheight
@@ -5629,17 +5657,19 @@ class tgraphcanvas(FigureCanvas):
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " statsSummary() {0}").format(str(e)),exc_tb.tb_lineno)
-    
+            
     def statstextboxBounds(self,x_pos,y_pos,textstr,ls,prop,fc):
         from matplotlib.transforms import Bbox
         t = self.ax.text(x_pos, y_pos, textstr, verticalalignment='top',linespacing=ls,fontproperties=prop,color=fc,path_effects=[])
         f = self.ax.get_figure()
         r = f.canvas.get_renderer()
+        t.update_bbox_position_size(renderer=r)
         bb = t.get_window_extent(renderer=r) # bounding box in display space
         bbox_data = aw.qmc.ax.transData.inverted().transform(bb)
         bbox = Bbox(bbox_data)   
         t.remove()
         return bbox.bounds
+
 
     def droptextBounds(self,x_pos,y_pos,ls,prop,fc):
         import re        
