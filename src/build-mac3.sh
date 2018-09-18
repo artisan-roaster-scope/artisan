@@ -13,7 +13,7 @@ if [ ! -z $TRAVIS ]; then
     export QT_SRC_PATH=${QT_PATH}
     export MACOSX_DEPLOYMENT_TARGET=10.13
     export ARTISAN_LEGACY_BUILD=false
-elif [ $1 = "legacy" ]; then
+elif [ "$1" = "legacy" ]; then
     # local legacy build featuring an outdated Qt to minimize the DEPLOYMENT_TARGET supporting older system
     export PYTHON=/Library/Frameworks/Python.framework/Versions/3.6
     export PYTHONPATH=$PYTHON/lib/python3.6
