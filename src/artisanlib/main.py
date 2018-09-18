@@ -1137,6 +1137,7 @@ class tgraphcanvas(FigureCanvas):
         self.detectBackgroundEventTime = 20 #seconds
         self.backgroundReproduce = False
         self.backgroundPlaybackEvents = False
+        self.backgroundPlaybackDROP = False
         self.Betypes = [QApplication.translate("ComboBox", "Air",None),
                         QApplication.translate("ComboBox", "Drum",None),
                         QApplication.translate("ComboBox", "Damper",None),
@@ -2479,8 +2480,11 @@ class tgraphcanvas(FigureCanvas):
                                     self.updateBackground() # does the canvas draw, but also fills the ax_background cache 
                             #-- end update display
                         
-                        if aw.qmc.background and (aw.qmc.backgroundReproduce or aw.qmc.backgroundPlaybackEvents) and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
-                            aw.qmc.playbackevent()
+                        if aw.qmc.background and (aw.qmc.timeindex[0] > -1 or aw.qmc.timeindexB[0] < 0):
+                            if aw.qmc.backgroundReproduce or aw.qmc.backgroundPlaybackEvents:
+                                aw.qmc.playbackevent()
+                            if aw.qmc.backgroundPlaybackDROP:
+                                aw.qmc.playbackdrop()
                     except Exception:
                         pass
                         
@@ -2888,6 +2892,19 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " setalarm() {0}").format(str(ex)),exc_tb.tb_lineno)
 
+    # called only after CHARGE
+    def playbackdrop(self):
+        try:
+            #needed when using device NONE
+            if len(self.timex) and self.timeindexB[6] and not self.timeindex[6]:
+                if ((aw.qmc.replayType == 0 and self.timeB[self.timeindexB[6]] - self.timeclock.elapsed()/1000. <= 0) or # by time
+                    (aw.qmc.replayType == 1 and aw.qmc.TPalarmtimeindex and self.stemp2B[self.timeindexB[6]] - self.ctemp2[-1] <= 0) or # by BT
+                    (aw.qmc.replayType == 2 and aw.qmc.TPalarmtimeindex and self.stemp21[self.timeindexB[6]] - self.ctemp1[-1] <= 0)): # by ET
+                    aw.qmc.autoDropIdx = len(aw.qmc.timex) - 2
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " playbackdrop() {0}").format(str(ex)),exc_tb.tb_lineno)
+        
     # called only after CHARGE
     def playbackevent(self):
         try:
@@ -18793,6 +18810,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundReproduce = bool(toBool(settings.value("backgroundReproduce",self.qmc.backgroundReproduce)))
             if settings.contains("backgroundPlaybackEvents"):
                 self.qmc.backgroundPlaybackEvents = bool(toBool(settings.value("backgroundPlaybackEvents",self.qmc.backgroundPlaybackEvents)))
+            if settings.contains("backgroundPlaybackDROP"):
+                self.qmc.backgroundPlaybackDROP = bool(toBool(settings.value("backgroundPlaybackDROP",self.qmc.backgroundPlaybackDROP)))
             if settings.contains("replayType"):
                 aw.qmc.replayType = toInt(settings.value("replayType",aw.qmc.replayType))
             #restore phases
@@ -20230,6 +20249,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("detectBackgroundEventTime",self.qmc.detectBackgroundEventTime)
             settings.setValue("backgroundReproduce",self.qmc.backgroundReproduce)
             settings.setValue("backgroundPlaybackEvents",self.qmc.backgroundPlaybackEvents)
+            settings.setValue("backgroundPlaybackDROP",self.qmc.backgroundPlaybackDROP)
             settings.setValue("replayType",self.qmc.replayType)
             settings.setValue("Phases",self.qmc.phases)
             #save phasesbuttonflag
@@ -34231,7 +34251,11 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundPlaybackEvents = QCheckBox(QApplication.translate("CheckBox","Playback Events",None))
         self.backgroundPlaybackEvents.setChecked(aw.qmc.backgroundPlaybackEvents)
         self.backgroundPlaybackEvents.setFocusPolicy(Qt.NoFocus)
-        self.backgroundPlaybackEvents.stateChanged.connect(lambda _:self.setplaybackevent())
+        self.backgroundPlaybackEvents.stateChanged.connect(lambda _:self.setplaybackevent())        
+        self.backgroundPlaybackDROP = QCheckBox(QApplication.translate("CheckBox","Playback DROP",None))
+        self.backgroundPlaybackDROP.setChecked(aw.qmc.backgroundPlaybackDROP)
+        self.backgroundPlaybackDROP.setFocusPolicy(Qt.NoFocus)
+        self.backgroundPlaybackDROP.stateChanged.connect(lambda _:self.setplaybackdrop())        
         etimelabel =QLabel(QApplication.translate("Label", "Text Warning",None))
         etimeunit =QLabel(QApplication.translate("Label", "sec",None))
         self.etimeSpinBox = QSpinBox()
@@ -34289,10 +34313,12 @@ class backgroundDlg(ArtisanDialog):
         tab4content.addWidget(etimelabel)
         tab4content.addWidget(self.etimeSpinBox)
         tab4content.addWidget(etimeunit)
-        tab4content.addSpacing(15)
+        tab4content.addSpacing(20)
         tab4content.addStretch()
         tab4content.addWidget(self.backgroundPlaybackEvents)
-        tab4content.addSpacing(15)
+        tab4content.addSpacing(10)
+        tab4content.addWidget(self.backgroundPlaybackDROP)
+        tab4content.addSpacing(10)
         tab4content.addWidget(self.replayComboBox)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(layoutBoxed)
@@ -34364,7 +34390,18 @@ class backgroundDlg(ArtisanDialog):
             msg = QApplication.translate("StatusBar","Playback Events set OFF",None)
             s = "background-color:'transparent';"
         aw.sendmessage(msg, style=s)
-        
+
+    def setplaybackdrop(self):
+        s = None
+        if self.backgroundPlaybackDROP.isChecked():
+            aw.qmc.backgroundPlaybackDROP = True
+            msg = QApplication.translate("Message","Playback DROP set ON",None)
+        else:
+            aw.qmc.backgroundPlaybackDROP = False
+            msg = QApplication.translate("StatusBar","Playback DROP set OFF",None)
+            s = "background-color:'transparent';"
+        aw.sendmessage(msg, style=s)
+                
     def setreproduce(self):
         aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
         s = None

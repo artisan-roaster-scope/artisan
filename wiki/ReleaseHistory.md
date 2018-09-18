@@ -13,6 +13,7 @@ v1.4.0 (xx.xx.2018)
    - adds flag to allow phases to be adjusted based on DRY and FCs of the background profile
    - adds [PID P-on-Measurement/Input mode](http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/) for internal Software PID and [TC4 aArtisanQ v6.6 PID](https://github.com/greencardigan/TC4-shield/tree/master/applications/Artisan/aArtisan_PID/tags/REL_aArtisanQ_PID_6_6) (complementing the standard P-on-Error mode)
    - adds KeepON flag
+   - adds Replay DROP from background profile by time or temperature
    - adds zero-ing of channels via extra symbolic variables Tn set to current value on right-click of corresponding LCD
    - adds barometric pressure to roast properties and statistic summary
    - adds support for ambient sensors Phidget [HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644) and [PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719)
