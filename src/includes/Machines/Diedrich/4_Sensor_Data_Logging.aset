@@ -1,5 +1,9 @@
 [General]
+BTcurve=true
+BTlcd=true
 Delay=1000
+ETcurve=false
+ETlcd=false
 Oversampling=false
 
 [CurveStyles]
@@ -61,10 +65,10 @@ yoctoRemoteFlag=false
 yoctoServerID=127.0.0.1
 
 [ExtraComm]
-extrabaudrate=19200, 19200, 19200
+extrabaudrate=9600, 19200, 19200
 extrabytesize=8, 8, 8
 extracomport=COM1, COM1, COM1
-extraparity=E, E, E
+extraparity=N, E, E
 extrastopbits=1, 1, 1
 extratimeout=1, 1, 1
 
@@ -75,11 +79,15 @@ extraLCDvisibility1=false, true, true, false, true, true, false, false, false, f
 extraLCDvisibility2=true, true, false, false, false, false, false, false, false, false
 extradevicecolor1=#000000, #ff0000, #ffcf0e
 extradevicecolor2=#0000ff, #aa5500, black
-extradevices=34, 35, 36
+extradevices=50, 35, 36
 extramathexpression1=, , 
-extramathexpression2=, , 
+extramathexpression2=Y1, , 
 extraname1=Bean Temp, Total Exhaust, Board Temp
 extraname2=Drum Exhaust, Inlet Temp, 
+
+[RoC]
+DeltaET=false
+DeltaETlcd=false
 
 [RoastProperties]
 roastertype=Diedrich 4-Sensor

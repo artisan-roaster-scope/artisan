@@ -41068,6 +41068,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         settings = QSettings()
         if settings.contains("DeviceAssignmentGeometry"):
             toByteArray(self.restoreGeometry(settings.value("DeviceAssignmentGeometry")))
+            
         ################ TAB 1   WIDGETS
         #ETcurve
         self.ETcurve = QCheckBox(QApplication.translate("CheckBox", "ET",None))
@@ -41752,7 +41753,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.humidityDeviceCombo.setCurrentIndex(aw.qmc.ambient_humidity_device)
         except:
             pass
-        self.elevationSpinBox = QSpinBox()
         self.pressureDeviceCombo = QComboBox()
         self.pressureDeviceCombo.setFocusPolicy(Qt.NoFocus)
         self.pressureDeviceCombo.addItems(aw.qmc.pressuredevicefunctionlist)
@@ -41765,7 +41765,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.elevationSpinBox.setRange(0,3000)
         self.elevationSpinBox.setSingleStep(1)
         self.elevationSpinBox.setValue(aw.qmc.elevation)
-        self.elevationSpinBox.setSuffix("m")
+        self.elevationSpinBox.setSuffix(" m.a.s.l")
         temperatureDeviceLabel = QLabel(QApplication.translate("Label","Temperature",None))
         humidityDeviceLabel = QLabel(QApplication.translate("Label","Humidity",None))
         pressureDeviceLabel = QLabel(QApplication.translate("Label","Pressure",None))

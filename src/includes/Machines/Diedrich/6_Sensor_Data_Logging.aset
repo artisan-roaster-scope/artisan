@@ -1,5 +1,9 @@
 [General]
+BTcurve=true
+BTlcd=true
 Delay=1000
+ETcurve=false
+ETlcd=false
 Oversampling=false
 
 [CurveStyles]
@@ -31,13 +35,13 @@ id=34
 phidget1018Ratiometric=true
 phidget1018_async=false, false, false, false, false, false, false, false
 phidget1018_changeTriggers=10, 10, 10, 10, 10, 10, 10, 10
-phidget1018_dataRates=1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000
+phidget1018_dataRates=64, 64, 64, 64, 64, 64, 64, 64
 phidget1018_raws=false, false, false, false, false, false, false, false
 phidget1045_async=false
 phidget1045_changeTrigger=1
 phidget1045_emissivity=1
 phidget1046_async=false, false, false, false
-phidget1046_dataRate=1000
+phidget1046_dataRate=64
 phidget1046_formula=1, 1, 1, 1
 phidget1046_gain=1, 1, 1, 1
 phidget1048_async=false, false, false, false
@@ -61,10 +65,10 @@ yoctoRemoteFlag=false
 yoctoServerID=127.0.0.1
 
 [ExtraComm]
-extrabaudrate=19200, 19200, 19200, 19200, 9600, 19200
+extrabaudrate=9600, 19200, 19200, 19200, 9600, 19200
 extrabytesize=8, 8, 8, 8, 8, 8
 extracomport=COM1, COM1, COM1, COM1, COM1, COM1
-extraparity=E, E, E, E, N, E
+extraparity=N, E, E, E, N, E
 extrastopbits=1, 1, 1, 1, 1, 1
 extratimeout=1, 1, 1, 1, 1, 1
 
@@ -75,11 +79,15 @@ extraLCDvisibility1=false, true, true, false, true, true, false, false, false, f
 extraLCDvisibility2=true, true, false, false, false, false, false, false, false, false
 extradevicecolor1=#000000, #ff0000, #ff5500, #ff0000, #55aa00, #ffcf0e
 extradevicecolor2=#0000ff, #aa5500, #ff0000, #ff0000, #55007f, black
-extradevices=34, 35, 40, 41, 25, 36
-extramathexpression1=, , x/10, (x+(1/(Y8+.1)*1/(Y10+.1)))/2, Y8+Y9+Y10, 
-extramathexpression2=, , x/10, x-Y10, , 
+extradevices=50, 35, 40, 41, 25, 36
+extramathexpression1=, , x*0.02, ((x*.2)+(1/(Y8+.1)*1/(Y10+.1)))/2., Y8+Y9+Y10, 
+extramathexpression2=Y1, , x*0.02, x-Y10, , 
 extraname1=Bean Temp, Total Exhaust, Power (0-100%), Roast Air 50/50, Roast Air, Board Temp
 extraname2=Drum Exhaust, Inlet Temp, Roast Air 100%, Roast Air 0%, , 
 
+[RoC]
+DeltaET=false
+DeltaETlcd=false
+
 [RoastProperties]
-roastertype=Diedrich 6-Sensor PWR
+roastertype=Diedrich 6-Sensor
