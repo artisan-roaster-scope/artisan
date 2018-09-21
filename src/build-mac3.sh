@@ -1,6 +1,7 @@
 #!/bin/sh
 
-set -ex
+#set -ex
+set -e
 
 # add argument "legacy" to make a build that supports older OS X systems using an outdated Qt
 

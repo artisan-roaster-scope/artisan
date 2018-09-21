@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #set -ex
-set -a
+set -e
 
 cd src
 ./build-mac3.sh
