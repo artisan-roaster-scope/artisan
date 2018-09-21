@@ -1,6 +1,7 @@
 #!/bin/sh
 
-set -ex
+#set -ex
+set -e
 
 #brew upgrade python
 
