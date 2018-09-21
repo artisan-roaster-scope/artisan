@@ -75,6 +75,7 @@ v1.4.0 (xx.xx.2018)
    - fix an issue leading to a 100% duty after turning PID off and then on again
    - better error message when trying to install on 32bit windows
    - fixes Fuji PXR PID dialog ([Issue #243](../../../issues/243))
+   - fixes an issue in the event quantifier that could lead to doublicate events
 
 
 ----

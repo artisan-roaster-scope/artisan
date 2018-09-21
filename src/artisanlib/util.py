@@ -28,8 +28,6 @@ def decs2string(x):
         return bytes(x)
     else:
         return b""
-def arange(x):
-    return range(x)
 def stringp(x):
     return isinstance(x, str)
 def uchr(x):

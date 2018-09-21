@@ -160,7 +160,7 @@ import unicodedata # @UnresolvedImport
 from unidecode import unidecode
 
 import artisanlib.arabic_reshaper
-from artisanlib.util import appFrozen, decs2string, arange, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
+from artisanlib.util import appFrozen, decs2string, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
@@ -360,7 +360,7 @@ def toStringList(x):
 def toMap(x):
     return x
 def removeAll(l,s):
-    for _ in arange(l.count(s)):  # @UndefinedVariable
+    for _ in range(l.count(s)):  # @UndefinedVariable
         l.remove(s)
 def toByteArray(x):
     return x        
@@ -3049,7 +3049,7 @@ class tgraphcanvas(FigureCanvas):
                         #get y points
                         ypoints = [self.ctemp2[-1]]                                  # start initializing with last BT
                         K =  self.projectionconstant*aw.qmc.delta2[-1]/den/60.                 # multiplier
-                        for _ in arange(len(xpoints)-1):                                     # create new points from previous points
+                        for _ in range(len(xpoints)-1):                                     # create new points from previous points
                             DeltaT = K*(self.ctemp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
                             ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
 
@@ -5914,7 +5914,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.FahrenheitAction.setEnabled(True)
                         aw.ConvertToCelsiusAction.setDisabled(True)
                         aw.ConvertToFahrenheitAction.setEnabled(True)
-                        for i in arange(profilelength):
+                        for i in range(profilelength):
                             self.temp1[i] = self.fromCtoF(self.temp1[i])    #ET
                             self.temp2[i] = self.fromCtoF(self.temp2[i])    #BT
                             if len(self.delta1):
@@ -5939,7 +5939,7 @@ class tgraphcanvas(FigureCanvas):
                         self.safesaveflag = True
 
                         #background
-                        for i in arange(len(self.timeB)):
+                        for i in range(len(self.timeB)):
                             self.temp1B[i] = self.fromCtoF(self.temp1B[i])
                             self.temp2B[i] = self.fromCtoF(self.temp2B[i])
                             self.stemp1B[i] = self.fromCtoF(self.stemp1B[i])
@@ -5970,7 +5970,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.ConvertToCelsiusAction.setEnabled(True) 
                         aw.FahrenheitAction.setDisabled(True)
                         aw.CelsiusAction.setEnabled(True)   
-                        for i in arange(profilelength):
+                        for i in range(profilelength):
                             self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
                             self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
                             if self.device != 18:
@@ -5990,7 +5990,7 @@ class tgraphcanvas(FigureCanvas):
 
                         self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
 
-                        for i in arange(len(self.timeB)):
+                        for i in range(len(self.timeB)):
                             self.temp1B[i] = self.fromFtoC(self.temp1B[i]) #ET B
                             self.temp2B[i] = self.fromFtoC(self.temp2B[i]) #BT B
                             self.stemp1B[i] = self.fromFtoC(self.stemp1B[i])
@@ -8487,7 +8487,7 @@ class tgraphcanvas(FigureCanvas):
     def timeindexupdate(self,times):
 ##        #          START            DRYEND          FCs             FCe         SCs         SCe         DROP
 ##        times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
-        for i in arange(len(times)):               
+        for i in range(len(times)):               
             if times[i]:
                 self.timeindex[i] = self.time2index(times[i])
             else:
@@ -8497,7 +8497,7 @@ class tgraphcanvas(FigureCanvas):
     def timebackgroundindexupdate(self,times):
 ##        #          STARTB            DRYENDB          FCsB       FCeB         SCsB         SCeB               DROPB
 ##        times = [self.startendB[0],self.dryendB[0],self.varCB[0],self.varCB[2],self.varCB[4],self.varCB[6],self.startendB[2]]
-        for i in arange(len(times)):               
+        for i in range(len(times)):               
             if times[i]:
                 self.timeindexB[i] = self.backgroundtime2index(times[i])
             else:
@@ -8614,7 +8614,7 @@ class tgraphcanvas(FigureCanvas):
         #    self.redraw()
     
         self.timex,self.temp1,self.temp2 = [],[],[]
-        for i in arange(len(self.timeindex)):
+        for i in range(len(self.timeindex)):
             self.timex.append(self.designertimeinit[i])
             self.temp1.append(self.designertemp1init[i])
             self.temp2.append(self.designertemp2init[i])
@@ -8889,7 +8889,7 @@ class tgraphcanvas(FigureCanvas):
                 return
 
             if type(event.xdata):                       #outside graph type is None
-                for i in arange(len(self.timex)):
+                for i in range(len(self.timex)):
                     if abs(event.xdata - self.timex[i]) < 7.:
                         if i in self.timeindex:
                             if abs(self.temp2[i] - ydata) < 10:
@@ -10019,30 +10019,6 @@ class SampleThread(QThread):
         except Exception:
             tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1.0,-1.0
-
-    def compute_delta(self, times, temps, n):
-        """Compute a temperature delta using numpy's polyfit with degree 1.
-
-        The latest n values from times and temps are used.  This returns a
-        least-squares linear fit of the series. The result's units are degrees
-        per minute.
-        """
-        n = min(n, len(times), len(temps))
-        if n <= 0: return 0
-        xs = times[-n:]
-        ys = temps[-n:]
-
-        # Remove NaNs from input
-        r = arange(n - 1, -1, -1)  # @UndefinedVariable
-        for i in r:
-            if math.isnan(ys[i]):
-                ys[i:i+1] = []
-                xs[i:i+1] = []
-        if not ys:  # All NaNs
-            return 0
-
-        fit = numpy.polyfit(xs, ys, 1)
-        return fit[0] * 60
 
     # the temp get's averaged using the given decay weights after resampling
     # to linear time based on tx and the current sampling interval
@@ -12584,8 +12560,8 @@ class ApplicationWindow(QMainWindow):
             clipboard = ""
             nrows = len(columns)
             ncols = len(columns[0])
-            for r in arange(nrows):
-                for c in arange(ncols):
+            for r in range(nrows):
+                for c in range(ncols):
                     if columns[r][c] is not None:
                         entry = columns[r][c]
                         idx = entry.rfind(" ")
@@ -13296,7 +13272,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.lastdigitizedtemp[i] = t
                                     lv = aw.lastEventValue(i)
                                     # now move corresponding slider and add event if its value is not equal to the previous one                                                    
-                                    if ((aw.float2float((v + 10.0) / 10.0)) != lv):
+                                    if (aw.float2float((v + 10.0) / 10.0)) != aw.float2float(lv):
                                         # we set the last value to be used for relative +- button action as base
                                         aw.extraeventsactionslastvalue[i] = int(round(v))
                                         aw.qmc.quantifiedEvent.append([i,v])
@@ -13389,7 +13365,7 @@ class ApplicationWindow(QMainWindow):
     def lastEventValue(self,tp):
         res_last = None
         try:
-            r = arange(len(aw.qmc.specialeventstype) - 1, -1, -1)  # @UndefinedVariable
+            r = range(len(aw.qmc.specialeventstype) - 1, -1, -1)  # @UndefinedVariable
             for i in r:
                 if aw.qmc.specialeventstype[i] == tp:
                     res_last = aw.qmc.specialeventsvalue[i]
@@ -13448,13 +13424,17 @@ class ApplicationWindow(QMainWindow):
                 # group those with minimally 2x min_span time delta by keeping the first with the value of the last
                 for i in range(len(aw.qmc.specialevents)):
                     if aw.qmc.specialeventstype[i] == tp and last_event_idx is not None:
-                        time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
-                        if time_diff < 2*min_span:
+                        if aw.qmc.specialeventsvalue[last_event_idx] == aw.qmc.specialeventsvalue[i]:
+                            # if the value of the event is the same as the previous, we remove it
                             indexes_to_be_removed.append(i)
-                            if last_index_not_removed is not None:
-                                aw.qmc.specialeventsvalue[last_index_not_removed] = aw.qmc.specialeventsvalue[i]
                         else:
-                            last_index_not_removed = i
+                            time_diff = aw.qmc.specialevents[i] - aw.qmc.specialevents[last_event_idx]
+                            if time_diff < 2*min_span:
+                                indexes_to_be_removed.append(i)
+                                if last_index_not_removed is not None:
+                                    aw.qmc.specialeventsvalue[last_index_not_removed] = aw.qmc.specialeventsvalue[i]
+                            else:
+                                last_index_not_removed = i
                     if aw.qmc.specialeventstype[i] == tp:
                         last_event_idx = i
                 # remove marked events
@@ -16675,7 +16655,7 @@ class ApplicationWindow(QMainWindow):
             end_temp = None
             end_time = None
             idx = 1
-            for i in arange(len(aw.qmc.timex)):
+            for i in range(len(aw.qmc.timex)):
                 if (self.qmc.timeindex[0] < 0 or i >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or i <= self.qmc.timeindex[6]):
                     data = ET.SubElement(diagrampoints, "data", index=str(idx))
                     t = self.qmc.timex[i]
@@ -16714,7 +16694,7 @@ class ApplicationWindow(QMainWindow):
             switchpoints = ET.SubElement(tree, "switchpoints")
             # take data from 2nd extra event type
             idx = 1
-            for i in arange(len(self.qmc.specialevents)):
+            for i in range(len(self.qmc.specialevents)):
                 if self.qmc.specialeventstype[i] == 3 and (self.qmc.timeindex[0] < 0 or self.qmc.specialevents[i] >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or self.qmc.specialevents[i] <= self.qmc.timeindex[6]):
                     data = ET.SubElement(switchpoints, "data", index=str(idx))
                     if aw.qmc.timeindex[0] > -1 and len(aw.qmc.timex) > aw.qmc.timeindex[0]:
@@ -16771,7 +16751,7 @@ class ApplicationWindow(QMainWindow):
             import csv
             writer= csv.writer(outfile,delimiter=',')
             writer.writerow(["Elapsed time "," T1 "," T2 "," Event type"])
-            for i in arange(len(aw.qmc.timex)):
+            for i in range(len(aw.qmc.timex)):
                 if i == aw.qmc.timeindex[0]:
                     kind = "Beans loaded"
                 elif i!=0 and i == aw.qmc.timeindex[2]:
@@ -22812,7 +22792,7 @@ class ApplicationWindow(QMainWindow):
     def BTfromseconds(self,seconds):
         if len(self.qmc.timex):
             #find when input time crosses timex
-            for i in arange(len(self.qmc.timex)):
+            for i in range(len(self.qmc.timex)):
                 if self.qmc.timex[i] > seconds:
                     break
             return float(self.qmc.temp2[i-1])           #return the BT temperature
@@ -22823,7 +22803,7 @@ class ApplicationWindow(QMainWindow):
     def ETfromseconds(self,seconds):
         if len(self.qmc.timex):
             #find when input time crosses timex
-            for i in arange(len(self.qmc.timex)):
+            for i in range(len(self.qmc.timex)):
                 if self.qmc.timex[i] > seconds:
                     break
             return float(self.qmc.temp1[i-1])           #return the ET temperature
@@ -22832,7 +22812,7 @@ class ApplicationWindow(QMainWindow):
 
     # converts times (values of timex) to indices
     def time2index(self,time):
-        for i in arange(len(self.qmc.timex)):
+        for i in range(len(self.qmc.timex)):
             if self.qmc.timex[i] >= time:
                 if i > 0 and abs(time - self.qmc.timex[i]) > abs(time - self.qmc.timex[i-1]):
                     return i-1
@@ -26395,7 +26375,7 @@ class HUDDlg(ArtisanDialog):
                         toff = aw.qmc.timex[aw.qmc.timeindex[0]]
                     else:
                         toff = 0
-                    for i in arange(len(aw.qmc.timex)):
+                    for i in range(len(aw.qmc.timex)):
                         y_range.append(aw.qmc.eval_math_expression(EQU[e],aw.qmc.timex[i],t_offset=toff))
                     if e:
                         extratemp2 = y_range
@@ -29437,7 +29417,7 @@ class editGraphDlg(ArtisanDialog):
             self.datatable.setItem(i,3,deltaET)
             self.datatable.setItem(i,4,deltaBT)
             j = 5
-            for k in arange(len(aw.qmc.extratimex)):
+            for k in range(len(aw.qmc.extratimex)):
                 if len(aw.qmc.extratemp1) > k and len(aw.qmc.extratemp1[k]) > i:
                     extra_qtw1 = QTableWidgetItem(fmtstr%aw.qmc.extratemp1[k][i])
                     extra_qtw1.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
@@ -32526,7 +32506,7 @@ class EventsDlg(ArtisanDialog):
                     # loop over that data and classify each value
                     ld = None # last digitized value
                     lt = None # last digitized temp value
-                    for ii in arange(len(temp)):
+                    for ii in range(len(temp)):
                         t = temp[ii]
                         if t != -1: # -1 is an error value
                             d = aw.digitize(t,linespace,aw.eventquantifiercoarse[i],aw.eventslidermin[i])
