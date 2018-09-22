@@ -18334,9 +18334,9 @@ class ApplicationWindow(QMainWindow):
             profile["etypes"] = [encodeLocal(et) for et in self.qmc.etypes]
             profile["roastingnotes"] = encodeLocal(self.qmc.roastingnotes)
             profile["cuppingnotes"] = encodeLocal(self.qmc.cuppingnotes)
-            profile["timex"] = [self.float2float(x,6) for x in self.qmc.timex]
-            profile["temp1"] = [self.float2float(x,5) for x in self.qmc.temp1]
-            profile["temp2"] = [self.float2float(x,5) for x in self.qmc.temp2]
+            profile["timex"] = [self.float2float(x,8) for x in self.qmc.timex]
+            profile["temp1"] = [self.float2float(x,6) for x in self.qmc.temp1]
+            profile["temp2"] = [self.float2float(x,6) for x in self.qmc.temp2]
             profile["phases"] = self.qmc.phases
             profile["zmax"] = int(self.qmc.zlimit)
             profile["zmin"] = int(self.qmc.zlimit_min)
@@ -18353,9 +18353,9 @@ class ApplicationWindow(QMainWindow):
             profile["extradevices"] = self.qmc.extradevices
             profile["extraname1"] = [encodeLocal(n) for n in self.qmc.extraname1]
             profile["extraname2"] = [encodeLocal(n) for n in self.qmc.extraname2]
-            profile["extratimex"] = [[self.float2float(t,6) for t in x] for x in self.qmc.extratimex]
-            profile["extratemp1"] = [[self.float2float(t,5) for t in x] for x in self.qmc.extratemp1]
-            profile["extratemp2"] = [[self.float2float(t,5) for t in x] for x in self.qmc.extratemp2]
+            profile["extratimex"] = [[self.float2float(t,8) for t in x] for x in self.qmc.extratimex]
+            profile["extratemp1"] = [[self.float2float(t,6) for t in x] for x in self.qmc.extratemp1]
+            profile["extratemp2"] = [[self.float2float(t,6) for t in x] for x in self.qmc.extratemp2]
             profile["extramathexpression1"] = [encodeLocal(x) for x in self.qmc.extramathexpression1]
             profile["extramathexpression2"] = [encodeLocal(x) for x in self.qmc.extramathexpression2]
             profile["extradevicecolor1"] = [encodeLocal(x) for x in self.qmc.extradevicecolor1]
