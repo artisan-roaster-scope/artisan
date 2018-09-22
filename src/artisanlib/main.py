@@ -13272,7 +13272,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.lastdigitizedtemp[i] = t
                                     lv = aw.lastEventValue(i)
                                     # now move corresponding slider and add event if its value is not equal to the previous one                                                    
-                                    if (aw.float2float((v + 10.0) / 10.0)) != aw.float2float(lv):
+                                    if (aw.float2float((v + 10.0) / 10.0)) != lv:
                                         # we set the last value to be used for relative +- button action as base
                                         aw.extraeventsactionslastvalue[i] = int(round(v))
                                         aw.qmc.quantifiedEvent.append([i,v])
@@ -18005,17 +18005,20 @@ class ApplicationWindow(QMainWindow):
 
     # the int n specifies the number of digits
     def float2float(self,f,n=1):
-        if n==0:
-            if math.isnan(f):
-                return 0
-            else:
-                return int(round(f))
+        if f is None:
+            return None
         else:
-            res = float(("%." + str(n) + "f")%f)
-            if math.isnan(res):
-                return 0.0
+            if n==0:
+                if math.isnan(f):
+                    return 0
+                else:
+                    return int(round(f))
             else:
-                return res
+                res = float(("%." + str(n) + "f")%f)
+                if math.isnan(res):
+                    return 0.0
+                else:
+                    return res
 
     # returns data that is computed by Artisan out of raw profile data using some formulas 
     # and displayed to users e.g. as part of the Report to users and stored along profiles to be used by external programs
