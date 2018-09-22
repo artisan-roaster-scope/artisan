@@ -24,3 +24,6 @@ toc: false
 
   * By Michael Wright
       - [Alarms Video](https://www.youtube.com/watch?time_continue=321&v=IrvC9dPqgjE) that uses Alarms for a much more sophisticated purpose in controlling his machine.  
+
+  * By Elvio Junior from [Mestre Cafeeiro](https://www.mestrecafeeiro.com.br/) (in Portuguese)
+      - [Torrando cafés com software](https://www.mestrecafeeiro.com.br/video)
