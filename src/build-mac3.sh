@@ -47,4 +47,4 @@ $QT_SRC_PATH/bin/lrelease -verbose artisan.pro || true
 # distribution
 rm -rf build dist
 sleep .3 # sometimes it takes a little for dist to get really empty
-$PYTHON/bin/python$PYTHON_V setup-mac3.py py2app
+$PYTHON/bin/python$PYTHON_V setup-mac3.py py2app | egrep -v '^(creating|copying file|byte-compiling|locate)'
