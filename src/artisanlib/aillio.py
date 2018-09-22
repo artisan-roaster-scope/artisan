@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import time
+import time, random
 from struct import unpack
 from multiprocessing import Pipe
 import threading
@@ -35,6 +35,7 @@ class AillioR1:
     AILLIO_STATE_SHUTDOWN = 0x09
 
     def __init__(self, debug=True):
+        self.simulated = False
         self.AILLIO_DEBUG = debug
         self.__dbg('init')
         self.usbhandle = None
@@ -54,16 +55,19 @@ class AillioR1:
         self.fan_rpm = 0
 
     def __del__(self):
-        self.__close()
+        if not self.simulated:
+            self.__close()
 
     def __dbg(self, msg):
-        if self.AILLIO_DEBUG:
+        if self.AILLIO_DEBUG and self.simulated != True:
             try:
                 print('AillioR1: ' + msg)
             except IOError:
                 pass
 
     def __open(self):
+        if self.simulated:
+            return
         if self.usbhandle is not None:
             return
         self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
@@ -110,6 +114,8 @@ class AillioR1:
         self.worker_thread.start()
 
     def __close(self):
+        if self.simulated:
+            return
         if self.usbhandle is not None:
             try:
                 usb.util.release_interface(self.usbhandle,
@@ -253,6 +259,26 @@ class AillioR1:
 
     def __getstate(self):
         self.__dbg('getstate')
+        if self.simulated:
+            if random.random() > 0.01:
+                return
+            self.bt += random.random()
+            self.bt_ror += random.random()
+            self.dt += random.random()
+            self.exitt += random.random()
+            self.fan = random.random() * 10
+            self.heater = random.random() * 8
+            self.drum = random.random() * 8
+            self.irt = random.random()
+            self.pcbt = random.random()
+            self.fan_rpm += random.random()
+            self.voltage = 240
+            self.coil_fan = 0
+            self.coil_fan2 = 0
+            self.pht = 0
+            self.r1state = self.AILLIO_STATE_ROASTING
+            self.state_str = "roasting"
+            return
         self.__open()
         if not self.parent_pipe.poll():
             return
