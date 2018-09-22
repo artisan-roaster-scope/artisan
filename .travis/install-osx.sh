@@ -7,8 +7,8 @@ set -e
 
 # following https://stackoverflow.com/questions/51125013/how-can-i-install-a-previous-version-of-python-3-in-macos-using-homebrew/51125014#51125014
 # to install Python 3.6.5
-brew remove --ignore-dependencies python
-brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb
+brew remove --ignore-dependencies python 1>/dev/null 2>&1
+brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb 1>/dev/null 2>&1
 
 brew install p7zip
 
