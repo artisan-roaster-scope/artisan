@@ -260,7 +260,7 @@ class AillioR1:
     def __getstate(self):
         self.__dbg('getstate')
         if self.simulated:
-            if random.random() > 0.01:
+            if random.random() > 0.05:
                 return
             self.bt += random.random()
             self.bt_ror += random.random()
