@@ -5457,7 +5457,7 @@ class tgraphcanvas(FigureCanvas):
                                                 label=aw.arabicReshape(QApplication.translate("Label", "AUCguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
-                if aw.qmc.showtimeguide:
+                if aw.qmc.showtimeguide or aw.qmc.device == 18:
                     self.l_timeline, = self.ax.plot([], [],color = self.palette["timeguide"],
                                                 label=aw.arabicReshape(QApplication.translate("Label", "TIMEguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
@@ -6655,11 +6655,8 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]                            
                             self.timeindex[0] = -1
                             self.xaxistosm(redraw=False)
-                            removed = True
+                        removed = True
                     else:
-                        if not aw.qmc.locktimex:
-                            aw.qmc.startofx = aw.qmc.chargemintime + self.timex[self.timeindex[0]] # we set the min x-axis limit to the CHARGE Min time
-
                         if self.device == 18: #manual mode
                             tx,et,bt = aw.ser.NONE()
                             if bt != 1 and et != -1:  #cancel
@@ -6677,6 +6674,11 @@ class tgraphcanvas(FigureCanvas):
                                     message = QApplication.translate("Message","Not enough data collected yet. Try again in a few seconds", None)
                             if aw.pidcontrol.pidOnCHARGE and not aw.pidcontrol.pidActive: # Arduino/TC4, Hottop, MODBUS
                                 aw.pidcontrol.pidOn()
+                        try:
+                            if not aw.qmc.locktimex:
+                                aw.qmc.startofx = aw.qmc.chargemintime + self.timex[self.timeindex[0]] # we set the min x-axis limit to the CHARGE Min time
+                        except Exception:
+                            pass
                                 
                         self.xaxistosm(redraw=False) # need to fix uneven x-axis labels like -0:13
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
@@ -6764,12 +6766,12 @@ class tgraphcanvas(FigureCanvas):
         try:
             self.samplingsemaphore.acquire(1)
             if self.flagstart:
+                removed = False
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.safesaveflag = True
                     
-                    removed = False
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -6848,12 +6850,12 @@ class tgraphcanvas(FigureCanvas):
         try:
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
+                removed = False
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.safesaveflag = True
                     
-                    removed = False
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -6933,12 +6935,12 @@ class tgraphcanvas(FigureCanvas):
         try:
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
+                removed = False
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.safesaveflag = True
                     
-                    removed = False
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -7010,12 +7012,12 @@ class tgraphcanvas(FigureCanvas):
         try:
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
+                removed = False
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile. 
                     self.safesaveflag = True
                     
-                    removed = False
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -7092,12 +7094,12 @@ class tgraphcanvas(FigureCanvas):
         try:
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
+                removed = False
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.safesaveflag = True
                     
-                    removed = False
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -7175,12 +7177,12 @@ class tgraphcanvas(FigureCanvas):
             if takeLock:
                 aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
+                removed = False
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.safesaveflag = True
                     
-                    removed = False
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
@@ -7362,12 +7364,12 @@ class tgraphcanvas(FigureCanvas):
         try:
             aw.qmc.samplingsemaphore.acquire(1)
             if self.flagstart:
+                removed = False
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.safesaveflag = True
                     
-                    removed = False
                     if self.timeindex[0] > -1:
                         start = self.timex[self.timeindex[0]]
                     else:
