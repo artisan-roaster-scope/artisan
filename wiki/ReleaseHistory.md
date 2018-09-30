@@ -17,8 +17,9 @@ v1.4.0 (xx.xx.2018)
    - adds zero-ing of channels via extra symbolic variables Tn set to current value on right-click of corresponding LCD
    - adds barometric pressure to roast properties and statistic summary
    - adds support for ambient sensors Phidget [HUM1000](https://www.phidgets.com/?tier=3&catid=14&pcid=12&prodid=644) and [PRE1000](https://www.phidgets.com/?tier=3&catid=64&pcid=57&prodid=719)
-   - add machine setup for Hottop TC4 configurations, [Coffee-Tech Engineering Ghibli](https://www.coffee-tech.com/products/commercial-roasters/ghibli-r15/), [Atilla GOLD plus 7"](http://www.atilla.com.br/p/atilla-5kg-gold-plus/) and [Besca roasting machines](https://www.bescaroasters.com/)
+   - add machine setup for Hottop TC4 configurations, [Atilla GOLD plus 7"](http://www.atilla.com.br/p/atilla-5kg-gold-plus/), [Besca roasting machines](https://www.bescaroasters.com/), [Coffee-Tech Engineering Ghibli](https://www.coffee-tech.com/products/commercial-roasters/ghibli-r15/) and [Diedrich Roasters](https://www.diedrichroasters.com/)
    - adds fan RPM to R1 Aillio setup
+   - adds option to load alarms from background profiles
  * Changes 
    - ensures that background curves are always render using the same smoothing algorithm as the foreground
    - adds re-sampling and back-sampling to improve all smoothing algorithms
@@ -35,7 +36,7 @@ v1.4.0 (xx.xx.2018)
    - more accurate timestamping
    - increases number of time/temp decimals in alog profiles
    - LCDs extended to show readings beyond 4 digits without decimals ([Issue #238](../../../issues/238))
-   - roast phase visualisation graph of the ranking report now also shown if more than 10 profiles have been selected
+   - roast phase visualisation graph of the ranking report now also shown if more than maximally rendered profiles have been selected and this maximum was increased from 10 to 20
    - adds warning if more than 10 profiles are selected that graph will not be rendered ([Issue #226](../../../issues/226))
    - autoAdjusts now ensures also that the background profile is fully visible
    - split temperature menu actions and move conversions to Tools menu
@@ -44,6 +45,7 @@ v1.4.0 (xx.xx.2018)
    - save and restore "geometry" of Events configuration dialog
    - reset window geometries and dpi settings on factory-reset
    - removes Py2.7 support and updates build environment
+   - improved autoCHARGE/autoDROP in Fahrenheit mode
  * Bug Fixes 
    - fixes missing translations on Linux/RPi ([Issue #211](../../../issues/211))
    - fixes hanging message line in FullScreen mode
@@ -83,7 +85,7 @@ v1.3.1 (20.5.2018)
 ------------------
 
  * New Features 
-   - adds Cmd-S as shortcut for "Save As" ([Issue #194](../../../issues/194))
+   - adds Cmd-Shift-S as shortcut for "Save As" ([Issue #194](../../../issues/194))
    - remembers fullscreen mode over restarts ([Issue #199](../../../issues/199))
    - allows to insert a custom event button line before the selected one by clicking Add
    - adds insert action to the alarm table to add an alarm line before the selected one

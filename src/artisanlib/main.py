@@ -1080,6 +1080,8 @@ class tgraphcanvas(FigureCanvas):
         #list to store the time of each reading. Most IMPORTANT variable.
         self.timex = []
 
+        self.smooth_curves_on_recording = False # by default we do not smooth curves during recording
+        
         #lists to store temps and rates of change. Second most IMPORTANT variables. All need same dimension.
         #self.temp1 = ET ; self.temp2 = BT; self.delta1 = deltaMET; self.delta2 = deltaBT
         self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]
@@ -1432,10 +1434,11 @@ class tgraphcanvas(FigureCanvas):
                                     # 16 (CHARGE),
                                     # 17 (RampSoak_ON), 18 (RampSoak_OFF), 19 (PID_ON), 20 (PID_OFF)
         self.alarmbeep = []    # 0 = OFF; 1 = ON flags
-        self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
+        self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program (comments after # are ignored)
         self.alarmtablecolumnwidths = []
 
-        self.loadalarmsfromprofile = False # if set, alarms are loaded from profile (even background profiles)
+        self.loadalarmsfromprofile = False # if set, alarms are loaded from profile
+        self.loadalarmsfrombackground = False # if set, alarms are loaded from background profiles
         self.alarmsfile = "" # filename alarms were loaded from
         self.temporaryalarmflag = -3 #holds temporary index value of triggered alarm in updategraphics()
         self.TPalarmtimeindex = None # is set to the current  aw.qmc.timeindex by sample(), if alarms are defined and once the TP is detected
@@ -4005,8 +4008,8 @@ class tgraphcanvas(FigureCanvas):
             else: # smooth list on full length
                 fromIndex = 0
                 toIndex = len(a)
-            a = numpy.array(a)[fromIndex:toIndex]
-            b = numpy.array(b)[fromIndex:toIndex] 
+            a = numpy.array(a,dtype='float64')[fromIndex:toIndex]
+            b = numpy.array(b,dtype='float64')[fromIndex:toIndex] 
             # 2. re-sample           
             if re_sample:
                 if a_lin is None or len(a_lin) != len(a):
@@ -4259,10 +4262,94 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),exc_tb.tb_lineno)
 
         
+#    # computes the RoR deltas and returns the smoothed versions for both temperature channels
+#    # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
+#    # timex_lin: a linear spaced version of timex
+#    def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True,timex_lin=None,deltasamples=None):
+#        try:
+#            tx = numpy.array(timex)
+#            if CHARGEidx > -1:
+#                roast_start_idx = CHARGEidx
+#            else:
+#                roast_start_idx = 0
+#            if DROPidx > 0:
+#                roast_end_idx = DROPidx
+#            else:
+#                roast_end_idx = len(tx)
+#            tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
+#            lt = len(tx_roast)
+#            if deltasamples is None:
+#                ds = aw.qmc.deltasamples
+#            else:
+#                ds = deltasamples
+#            if timex_lin is not None:
+#                if len(timex_lin) == len(timex):
+#                    timex_lin = numpy.array(timex_lin[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
+#                else:
+#                    timex_lin = None
+#            if t1 is not None:
+#                with numpy.errstate(divide='ignore'):
+#                    nt1 = numpy.array([0 if x is None else x for x in t1[roast_start_idx:roast_end_idx]]) # ERROR None Type object not scriptable! t==None on ON
+#                    z1 = (nt1[ds:] - nt1[:-ds]) / ((tx_roast[ds:] - tx_roast[:-ds])/60.)
+#                    ld1 = len(z1)
+#                    
+#                # make lists equal in length
+#                if lt > ld1:
+#                    z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
+##                    z1 = numpy.append([None]*(lt - ld1),z1)
+#                if optimalSmoothing:
+#                    user_filter = self.deltafilter
+#                else:
+#                    user_filter = int(round(self.deltafilter/2.))
+#                delta1 = self.smooth_list(tx_roast,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
+#                # add None for parts before and after CHARGE/DROP
+#                delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx))) # ERROR: all input arrays must have the same number of dimensions
+#                # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
+#                if aw.qmc.RoRlimitFlag:
+#                    # remove values beyond the RoRlimit
+#                    delta1 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
+#                if isinstance(delta1, (numpy.ndarray, numpy.generic)):
+#                    delta1 = delta1.tolist()
+#            else:
+#                delta1 = None
+#
+#            if t2 is not None:
+#                with numpy.errstate(divide='ignore'):
+#                    nt2 = numpy.array([0 if x is None else x for x in t2[roast_start_idx:roast_end_idx]])
+#                    z2 = (nt2[ds:] - nt2[:-ds]) / ((tx_roast[ds:] - tx_roast[:-ds])/60.)
+#                    ld2 = len(z2)
+#                # make lists equal in length
+#                if lt > ld2:
+#                    z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
+##                    z2 = numpy.append([None]*(lt - ld2),z2)
+#                if optimalSmoothing:
+#                    user_filter = self.deltafilter
+#                else:
+#                    user_filter = int(round(self.deltafilter/2.))
+#                delta2 = self.smooth_list(tx_roast,z2,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
+#                # add None for parts before and after CHARGE/DROP
+#                delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))                
+#                # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
+#                if aw.qmc.RoRlimitFlag:
+#                    # remove values beyond the RoRlimit
+#                    delta2 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
+#                if isinstance(delta2, (numpy.ndarray, numpy.generic)):
+#                    delta2 = delta2.tolist()
+#            else:
+#                delta2 = None
+#                    
+#            return delta1, delta2
+#        except Exception as e:
+##            import traceback
+##            traceback.print_exc(file=sys.stdout)
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),exc_tb.tb_lineno)
+#            return [0]*len(timex),[0]*len(timex)
+            
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
     # timex_lin: a linear spaced version of timex
-    def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True,timex_lin=None):
+    def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True,timex_lin=None,deltasamples=None):
         try:
             tx = numpy.array(timex)
             if CHARGEidx > -1:
@@ -4273,27 +4360,33 @@ class tgraphcanvas(FigureCanvas):
                 roast_end_idx = DROPidx
             else:
                 roast_end_idx = len(tx)
-            tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
+            tx_roast = numpy.array(timex) # just the part from CHARGE TO DROP
             lt = len(tx_roast)
+            if deltasamples is None:
+                ds = aw.qmc.deltasamples
+            else:
+                ds = deltasamples
             if timex_lin is not None:
                 if len(timex_lin) == len(timex):
-                    timex_lin = numpy.array(timex_lin[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
+                    timex_lin = numpy.array(timex_lin) # just the part from CHARGE TO DROP
                 else:
                     timex_lin = None
             if t1 is not None:
                 with numpy.errstate(divide='ignore'):
-                    nt1 = numpy.array([0 if x is None else x for x in t1[roast_start_idx:roast_end_idx]]) # ERROR None Type object not scriptable! t==None on ON
-                    z1 = (nt1[aw.qmc.deltasamples:] - nt1[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+                    nt1 = numpy.array([0 if x is None else x for x in t1]) # ERROR None Type object not scriptable! t==None on ON
+                    z1 = (nt1[ds:] - nt1[:-ds]) / ((tx_roast[ds:] - tx_roast[:-ds])/60.)
                     ld1 = len(z1)
                     
                 # make lists equal in length
                 if lt > ld1:
                     z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
+#                    z1 = numpy.append([None]*(lt - ld1),z1)
                 if optimalSmoothing:
                     user_filter = self.deltafilter
                 else:
                     user_filter = int(round(self.deltafilter/2.))
                 delta1 = self.smooth_list(tx_roast,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
+                delta1 = delta1[roast_start_idx:roast_end_idx]
                 # add None for parts before and after CHARGE/DROP
                 delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx))) # ERROR: all input arrays must have the same number of dimensions
                 # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
@@ -4307,17 +4400,19 @@ class tgraphcanvas(FigureCanvas):
 
             if t2 is not None:
                 with numpy.errstate(divide='ignore'):
-                    nt2 = numpy.array([0 if x is None else x for x in t2[roast_start_idx:roast_end_idx]])
-                    z2 = (nt2[aw.qmc.deltasamples:] - nt2[:-aw.qmc.deltasamples]) / ((tx_roast[aw.qmc.deltasamples:] - tx_roast[:-aw.qmc.deltasamples])/60.)
+                    nt2 = numpy.array([0 if x is None else x for x in t2])
+                    z2 = (nt2[ds:] - nt2[:-ds]) / ((tx_roast[ds:] - tx_roast[:-ds])/60.)
                     ld2 = len(z2)
                 # make lists equal in length
                 if lt > ld2:
                     z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
+#                    z2 = numpy.append([None]*(lt - ld2),z2)
                 if optimalSmoothing:
                     user_filter = self.deltafilter
                 else:
                     user_filter = int(round(self.deltafilter/2.))
-                delta2 = self.smooth_list(tx_roast,z2,window_len=user_filter,decay_smoothing=(not user_filter),a_lin=timex_lin)                          
+                delta2 = self.smooth_list(tx_roast,z2,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
+                delta2 = delta2[roast_start_idx:roast_end_idx]
                 # add None for parts before and after CHARGE/DROP
                 delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))                
                 # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
@@ -4335,8 +4430,7 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),exc_tb.tb_lineno)
-            return [0]*len(timex),[0]*len(timex)
-            
+            return [0]*len(timex),[0]*len(timex)            
             
     # fills in intermediate interpolated values replacing -1 values based on surrounding values
     # [1, 2, 3, -1, -1, -1, 10, 11] => [1, 2, 3, 4.75, 6.5, 8.25, 11]
@@ -4811,7 +4905,8 @@ class tgraphcanvas(FigureCanvas):
                                 RoRstart = min(aw.qmc.timeindexB[0]+10, len(self.timeB)-1)
                             else:
                                 RoRstart = -1
-                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin)
+                            ds = int(max(1,aw.qmc.deltaspan / aw.qmc.background_profile_sampling_interval))
+                            self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltasamples=ds)
                         
                         ##### DeltaETB,DeltaBTB curves
                         if self.delta_ax:
@@ -4874,7 +4969,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[i]-1)*10))))])
                                     E4b_last = i
-                            every = None
+#                            every = None
                             if len(self.E1backgroundtimex)>0 and len(self.E1backgroundtimex)==len(self.E1backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E1b_last]]):   #if cool exists and last event was earlier
                                     self.E1backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4883,7 +4978,9 @@ class tgraphcanvas(FigureCanvas):
                                     self.E1backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E1backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E1b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
+                                                                            picker=2,
+                                                                            #markevery=every,
+                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(0,True))                            
                             if len(self.E2backgroundtimex)>0 and len(self.E2backgroundtimex)==len(self.E2backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E2b_last]]):   #if cool exists and last event was earlier
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4892,7 +4989,9 @@ class tgraphcanvas(FigureCanvas):
                                     self.E2backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E2backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E2b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
+                                                                            picker=2,
+                                                                            #markevery=every,
+                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(1,True))
                             if len(self.E3backgroundtimex)>0 and len(self.E3backgroundtimex)==len(self.E3backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E3b_last]]):   #if cool exists and last event was earlier
                                     self.E3backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4901,7 +5000,9 @@ class tgraphcanvas(FigureCanvas):
                                     self.E3backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E3backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E3b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
+                                                                            picker=2,
+                                                                            #markevery=every,
+                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(2,True))
                             if len(self.E4backgroundtimex)>0 and len(self.E4backgroundtimex)==len(self.E4backgroundvalues):
                                 if (self.timeindexB[7] > 0 and aw.qmc.extendevents and self.timeB[self.timeindexB[7]] > self.timeB[self.backgroundEvents[E4b_last]]):   #if cool exists and last event was earlier
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[7]]) #time of drop
@@ -4910,7 +5011,9 @@ class tgraphcanvas(FigureCanvas):
                                     self.E4backgroundtimex.append(self.timeB[self.timeindexB[6]]) #time of drop
                                     self.E4backgroundvalues.append(self.eventpositionbars[min(110,max(0,int(round((self.backgroundEvalues[E4b_last]-1)*10))))]) #repeat last event value
                                 self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                                            picker=2,markevery=every,linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
+                                                                            picker=2,
+                                                                            #markevery=every,
+                                                                            linestyle="-",drawstyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha, label=self.Betypesf(3,True))
                                                                               
                     #check backgroundDetails flag
                     if self.backgroundDetails:
@@ -4949,12 +5052,12 @@ class tgraphcanvas(FigureCanvas):
                 temp2_nogaps = self.fill_gaps(self.temp2)
                         
                 if smooth or len(self.stemp1) != len(self.timex):
-                    if aw.qmc.flagon: # we don't smooth, but remove the dropouts
+                    if not aw.qmc.smooth_curves_on_recording or aw.qmc.flagon: # we don't smooth, but remove the dropouts
                         self.stemp1 = temp1_nogaps
                     else:
                         self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                 if smooth or len(self.stemp2) != len(self.timex):
-                    if aw.qmc.flagon:  # we don't smooth, but remove the dropouts
+                    if not aw.qmc.smooth_curves_on_recording or aw.qmc.flagon:  # we don't smooth, but remove the dropouts
                         self.stemp2 = self.fill_gaps(self.temp2)
                     else:
                         self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
@@ -5085,7 +5188,7 @@ class tgraphcanvas(FigureCanvas):
                                 E4_nonempty = True
                                 E4_last = i
                                 
-                        every = None
+#                        every = None
     
                         if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E1_last]]):   #if cool exists and last event was earlier
@@ -5102,7 +5205,9 @@ class tgraphcanvas(FigureCanvas):
                             E1y = [None]
                             ds = "steps-post"
                         self.l_eventtype1dots, = self.ax.plot(E1x, E1y, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                              picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
+                                                              picker=2,
+                                                              #markevery=every,
+                                                              linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                         if len(self.E2timex) > 0 and len(self.E2values) == len(self.E2timex): 
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E2_last]]):   #if cool exists and last event was earlier
                                 self.E2timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -5118,7 +5223,9 @@ class tgraphcanvas(FigureCanvas):
                             E2y = [None]
                             ds = "steps-post"
                         self.l_eventtype2dots, = self.ax.plot(E2x, E2y, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                              picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
+                                                              picker=2,
+                                                              #markevery=every,
+                                                              linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                         if len(self.E3timex) > 0 and len(self.E3values) == len(self.E3timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E3_last]]):   #if cool exists and last event was earlier
                                 self.E3timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -5134,7 +5241,9 @@ class tgraphcanvas(FigureCanvas):
                             E3y = [None]
                             ds = "steps-post"
                         self.l_eventtype3dots, = self.ax.plot(E3x, E3y, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                              picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
+                                                              picker=2,
+                                                              #markevery=every,
+                                                              linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                         if len(self.E4timex) > 0 and len(self.E4values) == len(self.E4timex):
                             if (self.timeindex[7] > 0 and aw.qmc.extendevents and self.timex[self.timeindex[7]] > self.timex[self.specialevents[E4_last]]):   #if cool exists and last event was earlier
                                 self.E4timex.append(self.timex[self.timeindex[7]]) #time of cool
@@ -5148,10 +5257,10 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             E4x = [None]
                             E4y = [None]
-                            every = 2
                             ds = "steps-post"
                         self.l_eventtype4dots, = self.ax.plot(E4x, E4y, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                              picker=2,markevery=every,linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
+                                                              picker=2,#markevery=every,
+                                                              linestyle="-",drawstyle=ds,linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
                             
                     if Nevents:
                         if self.eventsGraphflag == 4:
@@ -5252,7 +5361,7 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.timeindex[0]>-1:
                             RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
                         else:
-                            RoR_start = -1                                                                                          
+                            RoR_start = -1
                         self.delta1, self.delta2 = self.recomputeDeltas(self.timex,RoR_start,aw.qmc.timeindex[6],t1,t2,optimalSmoothing=not decay_smoothing_p,timex_lin=timex_lin)
                                                     
                     ##### DeltaET,DeltaBT curves
@@ -7231,8 +7340,7 @@ class tgraphcanvas(FigureCanvas):
                         self.updateBackground() # but we need
                         try:
                             # update ambient temperature if a ambient temperature source is configured and no value yet established
-                            if aw.qmc.ambientTemp == 0.0:
-                                aw.qmc.updateAmbientTemp()
+                            aw.qmc.updateAmbientTemp()
                         except Exception:
                             pass
 #PLUS
@@ -10247,14 +10355,14 @@ class SampleThread(QThread):
                             aw.qmc.ctimex1.append(tx)
                             
                     # update lines data using the lists with new data (use stempX instead of tempX to supress dropouts
-                    if local_flagstart:
-                        if aw.qmc.ETcurve:
-                            aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.ctemp1)
-                        if aw.qmc.BTcurve:
-                            aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.ctemp2)
+#                    if local_flagstart:
+#                        if aw.qmc.ETcurve:
+#                            aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.ctemp1)
+#                        if aw.qmc.BTcurve:
+#                            aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.ctemp2)
                             
                     #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
-                    cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
+                    cf = aw.qmc.curvefilter*2 - 1 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                     if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
                         self.temp_decay_weights = numpy.arange(1,cf+1)
                     # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
@@ -10279,6 +10387,48 @@ class SampleThread(QThread):
                     # register smoothed values
                     aw.qmc.tstemp1.append(st1)
                     aw.qmc.tstemp2.append(st2)
+
+                    if aw.qmc.smooth_curves_on_recording:
+                        cf = aw.qmc.curvefilter 
+                        if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
+                            self.temp_decay_weights = numpy.arange(1,cf+1)
+                        # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
+                        if -1 in aw.qmc.temp1[-(cf+1):]: 
+                            dw1 = [1]
+                        else:
+                            dw1 = self.temp_decay_weights
+                        if -1 in aw.qmc.temp2[-(cf+1):]:
+                            dw2 = [1]
+                        else:
+                            dw2 = self.temp_decay_weights
+                        # average smoothing
+                        d = aw.qmc.delay / 1000.
+                        if len(aw.qmc.ctemp1) > 0:
+                            sst1 = self.decay_average(aw.qmc.ctimex1,aw.qmc.ctemp1,dw1)
+                        else:
+                            sst1 = -1
+                        if len(aw.qmc.ctemp2) > 0:
+                            sst2 = self.decay_average(aw.qmc.ctimex2,aw.qmc.ctemp2,dw2)
+                        else:
+                            sst2 = -1
+                        # register smoothed values
+                        aw.qmc.stemp1.append(sst1)
+                        aw.qmc.stemp2.append(sst2)
+                    
+                    if local_flagstart:
+                        if aw.qmc.ETcurve:
+                            if aw.qmc.smooth_curves_on_recording:
+                                aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.stemp1)
+                            else:
+                                aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.temp1)
+                        if aw.qmc.BTcurve:
+                            if aw.qmc.smooth_curves_on_recording:
+                                aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.stemp2)
+                            else:             
+                                aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.temp2)
+
+                            
+                    
                     if (aw.qmc.Controlbuttonflag and aw.pidcontrol.pidActive and \
                             not aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
                         if aw.pidcontrol.pidSource == 1:
@@ -10320,7 +10470,7 @@ class SampleThread(QThread):
                             user_filter = int(round(aw.qmc.deltafilter/2.))
                             if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
-                                    self.decay_weights = numpy.arange(1,user_filter+1)                                
+                                    self.decay_weights = numpy.arange(1,user_filter+1)
                                 aw.qmc.rateofchange1 = self.decay_average(aw.qmc.timex,aw.qmc.unfiltereddelta1,self.decay_weights)
                                 aw.qmc.rateofchange2 = self.decay_average(aw.qmc.timex,aw.qmc.unfiltereddelta2,self.decay_weights)
                                 
@@ -10346,8 +10496,12 @@ class SampleThread(QThread):
                         aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
                         
                         
-                    # limit displayed RoR (only before TP is recognized)
-                    if not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
+                    # show RoR only 10 readings after CHARGE
+                    if aw.qmc.timeindex[0] == -1 or (aw.qmc.timeindex[0]>-1 and len(aw.qmc.timex) < aw.qmc.timeindex[0] + 10):
+                        rateofchange1plot = None
+                        rateofchange2plot = None
+                    # limit displayed RoR (only before TP is recognized) # WHY?
+                    elif aw.qmc.RoRlimitFlag: # not aw.qmc.TPalarmtimeindex and aw.qmc.RoRlimitFlag:
                         if rateofchange1plot is not None and not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange1plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
                             rateofchange1plot = None
                         if rateofchange2plot is not None and not (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < rateofchange2plot < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)):
@@ -10390,9 +10544,13 @@ class SampleThread(QThread):
                         # only if BT > 77C/170F
                         if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
                             ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 77) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 170)):
-                            b = aw.BTbreak(length_of_qmc_timex - 1)
+                            if aw.qmc.mode == "C":
+                                o = 0.5
+                            else:
+                                o = 0.5 * 1.8
+                            b = aw.BTbreak(length_of_qmc_timex - 1,o)
                             if b > 0:
-                                # we found a BT break at the current index minus 2
+                                # we found a BT break at the current index minus b
                                 aw.qmc.autoChargeIdx = length_of_qmc_timex - b
                         # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
                         elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():
@@ -10408,9 +10566,14 @@ class SampleThread(QThread):
                         if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
                             length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 160) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 320)) and\
                             ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 480):
-                            if aw.BTbreak(length_of_qmc_timex - 1,offset=0.1):
-                                # we found a BT break at the current index minus 2
-                                aw.qmc.autoDropIdx = length_of_qmc_timex - 3
+                            if aw.qmc.mode == "C":
+                                o = 0.2
+                            else:
+                                o = 0.2 * 1.8                            
+                            b = aw.BTbreak(length_of_qmc_timex - 1,o)
+                            if b > 0:
+                                # we found a BT break at the current index minus b
+                                aw.qmc.autoDropIdx = length_of_qmc_timex - b
                         #check for autoDRY: # only after CHARGE and TP and before FCs if not yet set
                         if aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
                             # if DRY event not yet set check for BT exceeding Dry-max as specified in the phases dialog
@@ -10872,7 +11035,7 @@ class ApplicationWindow(QMainWindow):
         self.block_quantification_sampling_ticks = [0,0,0,0]
         # by default we block quantification for sampling_ticks_to_block_quantifiction sampling intervals after
         # a button/slider event
-        self.sampling_ticks_to_block_quantifiction = 5
+        self.sampling_ticks_to_block_quantifiction = 10
                         
         self.extraeventsactionslastvalue = [None,None,None,None]
 
@@ -16186,6 +16349,54 @@ class ApplicationWindow(QMainWindow):
         finally:
             if f:
                 f.close()
+                
+    def loadAlarmsFromProfile(self,filename,profile):
+        self.qmc.alarmsfile = filename
+        if "alarmflag" in profile:
+            self.qmc.alarmflag = profile["alarmflag"]
+        else:
+            self.qmc.alarmflag = []
+        if "alarmguard" in profile:
+            self.qmc.alarmguard = profile["alarmguard"]
+        else:
+            self.qmc.alarmguard = [0]*len(self.qmc.alarmflag)
+        if "alarmnegguard" in profile:
+            self.qmc.alarmnegguard = profile["alarmnegguard"]
+        else:
+            self.qmc.alarmnegguard = [0]*len(self.qmc.alarmflag)
+        if "alarmtime" in profile:
+            self.qmc.alarmtime = profile["alarmtime"]
+        else:
+            self.qmc.alarmtime = [-1]*len(self.qmc.alarmflag)
+        if "alarmoffset" in profile:
+            self.qmc.alarmoffset = profile["alarmoffset"]
+        else:
+            self.qmc.alarmoffset = [0]*len(self.qmc.alarmflag)
+        if "alarmcond" in profile:
+            self.qmc.alarmcond = profile["alarmcond"]
+        else:
+            self.qmc.alarmcond = [1]*len(self.qmc.alarmflag)
+        if "alarmsource" in profile:
+            self.qmc.alarmsource = profile["alarmsource"]
+        else:
+            self.qmc.alarmsource = [1]*len(self.qmc.alarmflag)
+        if "alarmtemperature" in profile:
+            self.qmc.alarmtemperature = profile["alarmtemperature"]
+        else:
+            self.qmc.alarmtemperature = [500.]*len(self.qmc.alarmflag)
+        if "alarmaction" in profile:
+            self.qmc.alarmaction = profile["alarmaction"]
+        else:
+            self.qmc.alarmaction = [0]*len(self.qmc.alarmflag)
+        if "alarmbeep" in profile:
+            self.qmc.alarmbeep = profile["alarmbeep"]
+        else:
+            self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
+        if "alarmstrings" in profile:
+            self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
+        else:
+            self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
+        self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered    
 
     # Loads background profile
     def loadbackground(self,filename):
@@ -16229,6 +16440,7 @@ class ApplicationWindow(QMainWindow):
                 timex = profile["extratimex"]
                 self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
                 self.qmc.extratimexB = timex
+
                 # we resample the temperatures to regular interval timestamps
                 if tb is not None and tb:
                     tb_lin = numpy.linspace(tb[0],tb[-1],len(tb))
@@ -16244,6 +16456,7 @@ class ApplicationWindow(QMainWindow):
                 idx3 = aw.qmc.xtcurveidx - 1
                 n3 = idx3 // 2
                 for i in range(min(len(t1x),len(t2x))):
+# we smooth also that 3rd background courve only on redraw with the actual smoothing parameters                
                     if aw.qmc.xtcurveidx > 0 and n3 == 1: # this is the 3rd background curve to be drawn, we smooth it
                         tx=timex[i]
                         if tx is not None and tx:
@@ -16282,7 +16495,11 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.roastbatchprefixB = u("")
                     self.qmc.roastbatchposB = 1
                 
-# we don't load alarms from backgrounds as this would overload the one of the foreground profile that automatically loads this background
+# on request we load alarms from backgrounds, but keep in mind as this would overload the one of the foreground profile that automatically loads this background
+                if self.qmc.loadalarmsfrombackground:
+                    self.loadAlarmsFromProfile(filename,profile)
+
+
                 #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
                 if self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
                     l = len(self.qmc.backgroundFlavors)
@@ -17792,54 +18009,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.cuppingnotes = ""
             if "timex" in profile:
                 self.qmc.timex = profile["timex"]
+                
             # alarms
             if self.qmc.loadalarmsfromprofile:
-                self.qmc.alarmsfile = filename
-                if "alarmflag" in profile:
-                    self.qmc.alarmflag = profile["alarmflag"]
-                else:
-                    self.qmc.alarmflag = []
-                if "alarmguard" in profile:
-                    self.qmc.alarmguard = profile["alarmguard"]
-                else:
-                    self.qmc.alarmguard = [0]*len(self.qmc.alarmflag)
-                if "alarmnegguard" in profile:
-                    self.qmc.alarmnegguard = profile["alarmnegguard"]
-                else:
-                    self.qmc.alarmnegguard = [0]*len(self.qmc.alarmflag)
-                if "alarmtime" in profile:
-                    self.qmc.alarmtime = profile["alarmtime"]
-                else:
-                    self.qmc.alarmtime = [-1]*len(self.qmc.alarmflag)
-                if "alarmoffset" in profile:
-                    self.qmc.alarmoffset = profile["alarmoffset"]
-                else:
-                    self.qmc.alarmoffset = [0]*len(self.qmc.alarmflag)
-                if "alarmcond" in profile:
-                    self.qmc.alarmcond = profile["alarmcond"]
-                else:
-                    self.qmc.alarmcond = [1]*len(self.qmc.alarmflag)
-                if "alarmsource" in profile:
-                    self.qmc.alarmsource = profile["alarmsource"]
-                else:
-                    self.qmc.alarmsource = [1]*len(self.qmc.alarmflag)
-                if "alarmtemperature" in profile:
-                    self.qmc.alarmtemperature = profile["alarmtemperature"]
-                else:
-                    self.qmc.alarmtemperature = [500.]*len(self.qmc.alarmflag)
-                if "alarmaction" in profile:
-                    self.qmc.alarmaction = profile["alarmaction"]
-                else:
-                    self.qmc.alarmaction = [0]*len(self.qmc.alarmflag)
-                if "alarmbeep" in profile:
-                    self.qmc.alarmbeep = profile["alarmbeep"]
-                else:
-                    self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
-                if "alarmstrings" in profile:
-                    self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
-                else:
-                    self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
-                self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered
+                self.loadAlarmsFromProfile(filename,profile)
                 
             if "extraNoneTempHint1" in profile:
                 self.qmc.extraNoneTempHint1 = profile["extraNoneTempHint1"]
@@ -19207,8 +19380,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)
                 if settings.contains("loadAlarmsFromProfile"):
                     self.qmc.loadalarmsfromprofile = bool(toBool(settings.value("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)))
+                if settings.contains("loadAlarmsFromBackground"):
+                    self.qmc.loadalarmsfrombackground = bool(toBool(settings.value("loadAlarmsFromBackground",self.qmc.loadalarmsfrombackground)))
                 if settings.contains("alarmsfile"):
-                    self.qmc.alarmsfile = toString(settings.value("alarmsfile",self.qmc.loadalarmsfromprofile))
+                    self.qmc.alarmsfile = toString(settings.value("alarmsfile",self.qmc.alarmsfile))
                 if settings.contains("alarm_popup_timout"):
                     self.qmc.alarm_popup_timout = toInt(settings.value("alarm_popup_timout",aw.qmc.alarm_popup_timout))
                 if settings.contains("alarmtablecolumnwidths"):
@@ -20589,6 +20764,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("alarmbeep",self.qmc.alarmbeep)
             settings.setValue("alarmstrings",self.qmc.alarmstrings)
             settings.setValue("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)
+            settings.setValue("loadAlarmsFromBackground",self.qmc.loadalarmsfrombackground)
             settings.setValue("alarmsfile",self.qmc.alarmsfile)
             settings.setValue("alarm_popup_timout",self.qmc.alarm_popup_timout)
             settings.setValue("alarmtablecolumnwidths",self.qmc.alarmtablecolumnwidths)
@@ -21719,7 +21895,8 @@ class ApplicationWindow(QMainWindow):
             timex_list = []
             stemp_list = []
             cl_list = []
-            color=iter(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable
+            max_profiles = 20
+            color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable
             # collect data
             c = 1
             foreground_profile_path = aw.curFile  # @UndefinedVariable
@@ -21729,14 +21906,14 @@ class ApplicationWindow(QMainWindow):
             first_profile = True
             first_profile_event_time = 0
             max_drop_time = 0
-            label_chr_nr = 0
+            label_chr_nr = 0            
             for p in profiles:
                 pd = self.profileProductionData(p)
                 c += 1
                 try:
                     cl = next(color) # here to keep colors in sync with the pct graph colors
                 except Exception as e:
-                    color=iter(cm.tab10(numpy.linspace(0,1,10)))  # @UndefinedVariable
+                    color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable
                     cl = next(color)
                 try:
                     rd = self.profileRankingData(p)
@@ -21808,7 +21985,7 @@ class ApplicationWindow(QMainWindow):
                 if rd["cupping"] > 0:
                     cuppings += rd["cupping"]
                     cuppings_count += 1
-                if len(profiles) >= 11:
+                if len(profiles) > max_profiles:
                     entries += self.rankingData2htmlentry(pd,rd, cl) + "\n"
                 else:
                     # add BT curve to graph
@@ -21905,9 +22082,9 @@ class ApplicationWindow(QMainWindow):
             prop = aw.mpl_fontproperties.copy()
             prop.set_size("x-small")
                     
-            if len(profiles) > 10:
+            if len(profiles) > max_profiles:
                 QMessageBox.information(aw,QApplication.translate("Message", "Ranking Report",None),
-                                          QApplication.translate("Message", "Ranking graphs are only generated up to 10 profiles",None))
+                                          QApplication.translate("Message", "Ranking graphs are only generated up to {0} profiles",None).format(str(max_profiles)))
             else:
                 try:
                     
@@ -21954,7 +22131,9 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ax.set_title("")
                     self.qmc.fig.suptitle("")           
                     rcParams['path.effects'] = []
-                    if len(handles) > 3:
+                    if len(handles) > 7:
+                        ncol = int(math.ceil(len(handles)/4.))
+                    elif len(handles) > 3:
                         ncol = int(math.ceil(len(handles)/2.))
                     else:
                         ncol = int(math.ceil(len(handles)))
@@ -22041,13 +22220,13 @@ class ApplicationWindow(QMainWindow):
                     
                 # generate the bar graph 
                 prop.set_size("small")  
-                color=iter(cm.tab10(numpy.linspace(0,1,10)))    # @UndefinedVariable   
+                color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable   
                 for p in profiles:
                     i -= 1
                     try:
                         cl = next(color), '#00b950', '#ffb347', '#9f7960'
                     except Exception as e:
-                        color=iter(cm.tab10(numpy.linspace(0,1,10)))    # @UndefinedVariable  
+                        color=iter(cm.tab20(numpy.linspace(0,1,max_profiles)))    # @UndefinedVariable  
                         cl = next(color), '#00b950', '#ffb347', '#9f7960'
                     try:
                         rd = self.profileRankingData(p)
@@ -22955,6 +23134,7 @@ class ApplicationWindow(QMainWindow):
         return index
 
     def checkTop(self,offset,p0,p1,p2,p3,p4,p5):
+#        print("->",p0,p1,p2,p3,p4,p5)
         d1 = p0 - p1
         d2 = p1 - p2
         #--
@@ -22962,10 +23142,16 @@ class ApplicationWindow(QMainWindow):
         d4 = p5 - p4
         dpre = (d1 + d2) / 2.0
         dpost = (d3 + d4) / 2.0
-#        print("checkTop",d3 < .0,d4 < .0,abs(dpost),(offset + (2.5 * abs(dpre))))
-        if d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (2.5 * abs(dpre)))):
+        if aw.qmc.mode == "C":
+            f = 2.5
+        else:
+            f = 2.8 * 1.8
+#        print("checkTop",d3 < .0,d4 < .0,abs(dpost),(offset + (f * abs(dpre))))
+        if d3 < .0 and d4 < .0 and (abs(dpost) > (offset + (f * abs(dpre)))):
+#            print(" => True")
             return True
         else:
+#            print(" => False")
             return False
         
     
@@ -22973,19 +23159,19 @@ class ApplicationWindow(QMainWindow):
     # idea:
     # . average delta before i-2 is not negative
     # . average delta after i-2 is negative and twice as high (absolute) as the one before
-    def BTbreak(self,i,offset=0.5):
+    def BTbreak(self,i,offset):
 #        print("BTbreak",i,offset,self.qmc.temp2[i])
         res = 0
         if len(self.qmc.timex)>5 and i < len(self.qmc.timex):
             if self.checkTop(offset,self.qmc.temp2[i-5],self.qmc.temp2[i-4],self.qmc.temp2[i-3],self.qmc.temp2[i-2],self.qmc.temp2[i-1],self.qmc.temp2[i]):
-                res = 4
+                res = 3
             elif len(self.qmc.timex)>10 and self.checkTop(offset,self.qmc.temp2[i-10],self.qmc.temp2[i-8],self.qmc.temp2[i-6],self.qmc.temp2[i-4],self.qmc.temp2[i-2],self.qmc.temp2[i]):
                 res = 6
         return res
 
     # this can be used to find the CHARGE index as well as the DROP index by using
     # 0 or the DRY index as start index, respectively
-    def findBTbreak(self,start_index=0,end_index=0,offset=-1):
+    def findBTbreak(self,start_index=0,end_index=0,offset=0.5):
         result = 0        
         # determine average deltaBT wrt. the two previous measurements
         # the deltaBT values wrt. the next two measurements must by twice as high and negative
@@ -22994,14 +23180,14 @@ class ApplicationWindow(QMainWindow):
             if end_index and i > end_index:
                 break
             if i>3:
-                if offset < 0:  
-                    if self.BTbreak(i):
-                        result = i - 2
-                        break
+                if aw.qmc.mode == "C":
+                    o = offset
                 else:
-                    if self.BTbreak(i,offset=offset):
-                        result = i - 2
-                        break
+                    o = offset * 1.8
+                b = self.BTbreak(i,offset)
+                if b > 0:
+                    result = i + 1 - b
+                    break
         return result
         
     # updates AUC guide (expected time to hit target AUC; aw.qmc.AUCguideTime) based on current AUC, target, base, and RoR
@@ -25069,15 +25255,18 @@ class ApplicationWindow(QMainWindow):
     #assigns tooltips to extra event buttons
     def settooltip(self):
         for i in range(len(self.buttonlist)):
-            tip = u(QApplication.translate("Tooltip","<b>Label</b>= ", None)) + u(self.extraeventslabels[i]) + "<br>"
-            tip += u(QApplication.translate("Tooltip","<b>Description </b>= ", None)) + u(self.extraeventsdescriptions[i]) + "<br>"
-            tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None)) + u(self.qmc.etypesf(self.extraeventstypes[i])) + "<br>"            
-            if self.extraeventstypes[i] != 4: # no tips for 4: no event type set
-                tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None)) + u(aw.qmc.eventsvalues(self.extraeventsvalues[i])) + "<br>"
-                #+ u(int(round((self.extraeventsvalues[i]-1)*10.)))  + "<br>"
-            tip += u(QApplication.translate("Tooltip","<b>Documentation </b>= ", None)) + u(self.extraeventsactionstrings[i]) + "<br>"
-            tip += u(QApplication.translate("Tooltip","<b>Button# </b>= ", None)) + str(i+1)
-            self.buttonlist[i].setToolTip(tip)
+            try:
+                tip = u(QApplication.translate("Tooltip","<b>Label</b>= ", None)) + u(self.extraeventslabels[i]) + "<br>"
+                tip += u(QApplication.translate("Tooltip","<b>Description </b>= ", None)) + u(self.extraeventsdescriptions[i]) + "<br>"
+                tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None)) + u(self.qmc.etypesf(self.extraeventstypes[i])) + "<br>"            
+                if self.extraeventstypes[i] != 4: # no tips for 4: no event type set
+                    tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None)) + u(aw.qmc.eventsvalues(self.extraeventsvalues[i])) + "<br>"
+                    #+ u(int(round((self.extraeventsvalues[i]-1)*10.)))  + "<br>"
+                tip += u(QApplication.translate("Tooltip","<b>Documentation </b>= ", None)) + u(self.extraeventsactionstrings[i]) + "<br>"
+                tip += u(QApplication.translate("Tooltip","<b>Button# </b>= ", None)) + str(i+1)
+                self.buttonlist[i].setToolTip(tip)
+            except:
+                pass
 
     def update_extraeventbuttons_visibility(self):
         for i in range(len(self.buttonlist)):
@@ -26299,7 +26488,11 @@ class HUDDlg(ArtisanDialog):
                     self.WebLCDsFlag.setChecked(False)
                 else:
                     self.WebLCDsFlag.setChecked(True)
-            except Exception:
+            except Exception as e:
+                aw.sendmessage(str(e))
+                self.WebLCDsAlerts.setDisabled(True)
+                self.WebLCDsFlag.setChecked(False)
+                self.WebLCDsPort.setDisabled(False)
                 self.WebLCDsURL.setText("")
                 self.QRpic.setPixmap(QPixmap())
                 aw.WebLCDs = False
@@ -27892,8 +28085,8 @@ class editGraphDlg(ArtisanDialog):
             else:
                 #find when dry phase ends 
                 dryEndIndex = aw.findDryEnd(TP_index)
-            self.charge_idx = aw.findBTbreak(0,dryEndIndex)
-            self.drop_idx = aw.findBTbreak(dryEndIndex,offset=0.1)
+            self.charge_idx = aw.findBTbreak(0,dryEndIndex,offset=0.5)
+            self.drop_idx = aw.findBTbreak(dryEndIndex,offset=0.2)
             if self.charge_idx != 0 and self.charge_idx != aw.qmc.timeindex[0]:
                 if aw.qmc.timeindex[0] == -1:
                     time_diff = int(round(aw.qmc.timex[self.charge_idx]))
@@ -29465,6 +29658,7 @@ class editGraphDlg(ArtisanDialog):
         for i in range(nevents):
             #create widgets
             typeComboBox = MyQComboBox()
+            typeComboBox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
             typeComboBox.addItems(etypes)
             typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
 
@@ -31597,14 +31791,12 @@ class EventsDlg(ArtisanDialog):
         delButton.setToolTip(QApplication.translate("Tooltip","Delete the last extra Event button",None))
         #delButton.setMaximumWidth(100)
         delButton.setFocusPolicy(Qt.NoFocus)
-        delButton.clicked.connect(lambda _:self.delextraeventbutton())
-        
+        delButton.clicked.connect(lambda _:self.delextraeventbutton())        
         self.insertButton = QPushButton(QApplication.translate("Button","Insert",None))
         self.insertButton.clicked.connect(lambda _:self.insertextraeventbutton(True))
         self.insertButton.setMinimumWidth(80)
         self.insertButton.setFocusPolicy(Qt.NoFocus)
-        self.insertButton.setEnabled(False)
-        
+        self.insertButton.setEnabled(False)        
         helpButton = QPushButton(QApplication.translate("Button","Help",None))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None))
         helpButton.setFocusPolicy(Qt.NoFocus)
@@ -32854,7 +33046,7 @@ class EventsDlg(ArtisanDialog):
             descriptionedit = QLineEdit(u(aw.extraeventsdescriptions[i]))
             descriptionedit.editingFinished.connect(lambda x=i:self.setdescriptioneventbutton(x))
             #type
-            typeComboBox = QComboBox()
+            typeComboBox = MyQComboBox()
             typeComboBox.addItems(std_extra_events)
             if aw.extraeventstypes[i] == 9:  # we add an offset of +1 here to jump over the new EVENT entry
                 idx = 5
@@ -32872,7 +33064,7 @@ class EventsDlg(ArtisanDialog):
             valueEdit.setAlignment(Qt.AlignRight)
             valueEdit.editingFinished.connect(lambda i=i:self.setvalueeventbutton(1,i))
             #action
-            actionComboBox = QComboBox()
+            actionComboBox = MyQComboBox()
             actionComboBox.addItems(["",
                                      QApplication.translate("ComboBox","Serial Command",None),
                                      QApplication.translate("ComboBox","Call Program",None),
@@ -32901,7 +33093,7 @@ class EventsDlg(ArtisanDialog):
             actiondescriptionedit = QLineEdit(u(aw.extraeventsactionstrings[i]))
             actiondescriptionedit.editingFinished.connect(lambda i=i:self.setactiondescriptioneventbutton(1,i))
             #visibility
-            visibilityComboBox =  QComboBox()
+            visibilityComboBox =  MyQComboBox()
             visibilityComboBox.addItems(visibility)
             visibilityComboBox.setCurrentIndex(aw.extraeventsvisibility[i])
             visibilityComboBox.currentIndexChanged.connect(lambda _=0,x=i:self.setvisibilitytyeventbutton(x))
@@ -32929,13 +33121,20 @@ class EventsDlg(ArtisanDialog):
             self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
             self.eventbuttontable.setCellWidget(i,7,self.colorButton)
             self.eventbuttontable.setCellWidget(i,8,self.colorTextButton)
-            self.eventbuttontable.setCellWidget(i,9,emptyCell)
+            self.eventbuttontable.setCellWidget(i,9,emptyCell)        
         self.eventbuttontable.horizontalHeader().setStretchLastSection(False)
         self.eventbuttontable.resizeColumnsToContents()
         self.eventbuttontable.horizontalHeader().setStretchLastSection(True)
         self.eventbuttontable.setColumnWidth(0,70)
         self.eventbuttontable.setColumnWidth(1,80)
+        self.eventbuttontable.setColumnWidth(2,100)
         self.eventbuttontable.setColumnWidth(3,50)
+        self.eventbuttontable.setColumnWidth(4,150)
+        self.eventbuttontable.setColumnWidth(5,100)
+        self.eventbuttontable.setColumnWidth(6,80)
+        self.eventbuttontable.setColumnWidth(7,80)
+        self.eventbuttontable.setColumnWidth(8,80)
+        
         # remember the columnwidth
         for i in range(len(aw.eventbuttontablecolumnwidths)):
             try:
@@ -33118,6 +33317,7 @@ class EventsDlg(ArtisanDialog):
         aw.update_extraeventbuttons_visibility()
         
     def insertextraeventbutton(self,insert=False):
+        aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
         self.savetableextraeventbutton() #save previous changes
         if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
             return
@@ -42094,6 +42294,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
 #                        traceback.print_exc(file=sys.stdout)
                         pass
                 self.devicetable.resizeColumnsToContents()
+                self.devicetable.setColumnWidth(0,150)
                 # remember the columnwidth
                 for i in range(len(aw.qmc.devicetablecolumnwidths)):
                     try:
@@ -44017,7 +44218,7 @@ class WheelDlg(ArtisanDialog):
             
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None))
-        #table for alarms
+        #table
         self.datatable = QTableWidget()
         self.createdatatable()
         #table for labels
@@ -44561,6 +44762,7 @@ class MyQComboBox(QComboBox):
     def __init__(self, *args, **kwargs):
         super(MyQComboBox, self).__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.StrongFocus)
+        self.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
 
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
@@ -44644,8 +44846,8 @@ class AlarmDlg(ArtisanDialog):
         
         #table for alarms
         self.alarmtable = QTableWidget()
-        self.alarmtable.itemSelectionChanged.connect(self.selectionChanged)
         self.createalarmtable()
+        self.alarmtable.itemSelectionChanged.connect(self.selectionChanged)
         allonButton = QPushButton(QApplication.translate("Button","All On",None))
         allonButton.clicked.connect(lambda _: self.alarmson(1))
         allonButton.setFocusPolicy(Qt.NoFocus)
@@ -44686,9 +44888,11 @@ class AlarmDlg(ArtisanDialog):
         clearButton.setToolTip(QApplication.translate("Tooltip","Clear alarms table",None))
         clearButton.setFocusPolicy(Qt.NoFocus)
         clearButton.setMinimumWidth(80)
+        clearButton.clicked.connect(lambda _:self.clearalarms())
         self.loadAlarmsFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load from profile",None))
         self.loadAlarmsFromProfile.setChecked(aw.qmc.loadalarmsfromprofile)
-        clearButton.clicked.connect(lambda _:self.clearalarms())
+        self.loadAlarmsFromBackground = QCheckBox(QApplication.translate("CheckBox", "Load from background",None))
+        self.loadAlarmsFromBackground.setChecked(aw.qmc.loadalarmsfrombackground)
         
         self.popupTimoutSpinBox = QSpinBox()
         self.popupTimoutSpinBox.setSuffix("s")
@@ -44725,6 +44929,8 @@ class AlarmDlg(ArtisanDialog):
         buttonlayout.addSpacing(15)
         buttonlayout.addWidget(helpButton)
         okbuttonlayout.addWidget(self.loadAlarmsFromProfile)
+        okbuttonlayout.addSpacing(10)
+        okbuttonlayout.addWidget(self.loadAlarmsFromBackground)
         okbuttonlayout.addSpacing(15)
         okbuttonlayout.addWidget(popupTimeoutLabel)
         okbuttonlayout.addWidget(self.popupTimoutSpinBox)
@@ -44750,6 +44956,7 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.setRangeSelected(selected[0],False)
 
     def clearalarms(self):
+        aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
         aw.qmc.alarmsfile = ""
         self.alarmsfile.setText(aw.qmc.alarmsfile)
         aw.qmc.alarmflag = []
@@ -44776,7 +44983,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmflag[i] = 0
         self.createalarmtable()
 
-    def addalarm(self):
+    def addalarm(self):        
         aw.qmc.alarmflag.append(1)
         aw.qmc.alarmguard.append(-1)
         aw.qmc.alarmnegguard.append(-1)
@@ -44794,24 +45001,35 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setRowCount(nalarms + 1)
         self.setalarmtablerow(nalarms)
         
-        if len(aw.qmc.alarmflag) == 1: # only for the first entry we apply some default column width
-            self.alarmtable.resizeColumnsToContents()
-            self.alarmtable.resizeRowsToContents()
-            # improve width of Qlineedit columns
-            self.alarmtable.setColumnWidth(2,50)
-            self.alarmtable.setColumnWidth(3,50)
-            self.alarmtable.setColumnWidth(5,50)
-            self.alarmtable.setColumnWidth(6,80)
-            self.alarmtable.setColumnWidth(8,40)
-        
         header = self.alarmtable.horizontalHeader()
         header.setStretchLastSection(False)
-        self.deselectAll()
-        # select newly added row i.e. the last one
-        self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(nalarms,0,nalarms,self.alarmtable.columnCount()-1),True)
-        header.setStretchLastSection(True)
-        self.markNotEnabledAlarmRows()
-        self.alarmtable.setSortingEnabled(True)
+        
+        if len(aw.qmc.alarmflag) == 1: # only for the first entry we apply some default column width
+            self.alarmtable.resizeColumnsToContents()
+            self.alarmtable.resizeRowsToContents()          
+            # improve width of Qlineedit columns
+            self.alarmtable.setColumnWidth(1,50)
+            self.alarmtable.setColumnWidth(2,50)
+            self.alarmtable.setColumnWidth(3,50)
+            self.alarmtable.setColumnWidth(4,90)
+            self.alarmtable.setColumnWidth(5,50)
+            self.alarmtable.setColumnWidth(6,70)
+            self.alarmtable.setColumnWidth(7,90)
+            self.alarmtable.setColumnWidth(8,50)
+            self.alarmtable.setColumnWidth(9,90)
+            # remember the columnwidth
+            for i in range(len(aw.qmc.alarmtablecolumnwidths)):
+                try:
+                    self.alarmtable.setColumnWidth(i,aw.qmc.alarmtablecolumnwidths[i])
+                except:
+                    pass
+        else:
+            self.deselectAll()
+            # select newly added row i.e. the last one
+            self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(nalarms,0,nalarms,self.alarmtable.columnCount()-1),True)
+            header.setStretchLastSection(True)
+            self.markNotEnabledAlarmRows()
+            self.alarmtable.setSortingEnabled(True)
 
     def insertalarm(self):
         self.alarmtable.setSortingEnabled(False)
@@ -44876,6 +45094,7 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.setItem(i, 0, MyTableWidgetItemInt(str(i+1),i))
 
     def deletealarm(self):
+        aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
         self.alarmtable.setSortingEnabled(False)
         nalarms = self.alarmtable.rowCount()
         if nalarms:
@@ -45050,6 +45269,7 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.sortItems(0)
             nalarms = self.alarmtable.rowCount()
             aw.qmc.loadalarmsfromprofile = self.loadAlarmsFromProfile.isChecked()
+            aw.qmc.loadalarmsfrombackground = self.loadAlarmsFromBackground.isChecked()
             aw.qmc.alarmflag = [1]*nalarms
             aw.qmc.alarmguard = [-1]*nalarms
             aw.qmc.alarmnegguard = [-1]*nalarms
@@ -45181,7 +45401,7 @@ class AlarmDlg(ArtisanDialog):
         #temperature
         tempedit = QLineEdit(str(aw.float2float(aw.qmc.alarmtemperature[i])))
         tempedit.setAlignment(Qt.AlignRight)
-        tempedit.setMaximumWidth(100)
+        tempedit.setMaximumWidth(130)
 #        tempedit.setValidator(QIntValidator(0, 999,tempedit))
         tempedit.setValidator(QDoubleValidator(0., 999.9,1,tempedit))
         #action
@@ -45295,6 +45515,8 @@ class AlarmDlg(ArtisanDialog):
                 #populate table
                 for i in range(nalarms):
                     self.setalarmtablerow(i)
+                header = self.alarmtable.horizontalHeader()
+                header.setStretchLastSection(True)
                 self.alarmtable.resizeColumnsToContents()
                 # remember the columnwidth
                 for i in range(len(aw.qmc.alarmtablecolumnwidths)):
@@ -45302,8 +45524,6 @@ class AlarmDlg(ArtisanDialog):
                         self.alarmtable.setColumnWidth(i,aw.qmc.alarmtablecolumnwidths[i])
                     except:
                         pass
-                header = self.alarmtable.horizontalHeader()
-                header.setStretchLastSection(True)
                 self.markNotEnabledAlarmRows()
                 self.alarmtable.setSortingEnabled(True)
             self.alarmtable.sortItems(0)
