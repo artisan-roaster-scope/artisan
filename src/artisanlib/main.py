@@ -88,7 +88,8 @@ from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VE
 from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
 try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 private sip module
-    from PyQt5 import sip # @UnusedImport 
+    from PyQt5 import sip # @UnusedImport
+    import PyQt5.QtDBus
 except:
     pass
     

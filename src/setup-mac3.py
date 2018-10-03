@@ -238,6 +238,7 @@ Qt_frameworks = [
     'QtSvg.framework',
     'QtPrintSupport.framework',
     'QtNetwork.framework',
+    'QtDBus.framework',
 #    'QtXml.framework',
 #    'QtMacExtras.framework',
 ]

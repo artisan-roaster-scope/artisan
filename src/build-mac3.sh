@@ -26,9 +26,9 @@ elif [[ "$1" = "legacy" ]]; then
     export ARTISAN_LEGACY_BUILD=true
 else
     # standard local builds
-    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.7
-    export PYTHONPATH=$PYTHON/lib/python3.7
-    export PYTHON_V=3.7
+    export PYTHON=/Library/Frameworks/Python.framework/Versions/3.6
+    export PYTHONPATH=$PYTHON/lib/python3.6
+    export PYTHON_V=3.6
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
     export QT_SRC_PATH=~/Qt5.11.2/5.11.2/clang_64
     export MACOSX_DEPLOYMENT_TARGET=10.13
