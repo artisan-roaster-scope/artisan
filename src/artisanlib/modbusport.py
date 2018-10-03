@@ -310,6 +310,7 @@ class modbusport(object):
     # write value to register on slave (function 6 for int or function 16 for float)
     # value can be one of string (containing an int or float), an int or a float
     def writeRegister(self,slave,register,value):
+#        print("writeRegister",slave,register,value)
         if stringp(value):
             if "." in value:
                 self.writeWord(slave,register,value)

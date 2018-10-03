@@ -1,3 +1,19 @@
+artisan (1.4.0-0) precise; urgency=low
+  * new upstream release
+  * changes since 1.3.1:
+   - adds time guide
+   - adds additional PhasesLCD configurations
+   - adds export/convert to Excel and import/export to Probat Pilot v1.4
+   - adds channel tare
+   - adds playback DROP event
+   - adds always ON mode
+   - adds support for ambient data and Phidget ambient sensors HUM1000 and PRE1000
+   - adds PID P-on-Measurement/Input mode
+   - adds improved curve smoothing
+   - adds additional machine support for Atilla GOLD plus 7", Besca roasting machines, Coffee-Tech Engineering Ghibli and Diedrich Roasters
+   - bug fixes
+ --  <marko.luther@gmx.net>  Wed, 3 Oct 2018 19:32:14 +0200
+
 artisan (1.3.1-0) precise; urgency=low
   * new upstream release
   * changes since 1.3.0:

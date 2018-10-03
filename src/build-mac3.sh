@@ -30,7 +30,7 @@ else
     export PYTHONPATH=$PYTHON/lib/python3.7
     export PYTHON_V=3.7
     export QT_PATH=${PYTHONPATH}/site-packages/PyQt5/Qt
-    export QT_SRC_PATH=~/Qt5.11.1/5.11.1/clang_64
+    export QT_SRC_PATH=~/Qt5.11.2/5.11.2/clang_64
     export MACOSX_DEPLOYMENT_TARGET=10.13
     export DYLD_LIBRARY_PATH=$PYTHON/lib:$DYLD_LIBRARY_PATH
     export ARTISAN_LEGACY_BUILD=false
