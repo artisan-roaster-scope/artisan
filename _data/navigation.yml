@@ -12,8 +12,12 @@ machines:
     children:
       - title: "Aillio"
         url: /machines/aillio/
+      - title: "Atilla"
+        url: /machines/atilla/
       - title: "BC Roasters"
         url: /machines/bc/
+      - title: "Besca"
+        url: /machines/besca/
       - title: "Bühler"
         url: /machines/buhler/
       - title: "Coffeed"
@@ -22,6 +26,8 @@ machines:
         url: /machines/coffeetech/
       - title: "Coffeetool"
         url: /machines/coffeetool/
+      - title: "Diedrich"
+        url: /machines/diedrich/
       - title: "Giesen"
         url: /machines/giesen/
       - title: "Hottop"

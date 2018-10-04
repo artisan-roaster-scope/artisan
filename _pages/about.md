@@ -47,6 +47,10 @@ gallery:
     image_path: /assets/images/cte-logo.jpg
     alt: "COFFEE-TECH ENGINEERING"
     title: "COFFEE-TECH ENGINEERING"
+  - url: https://www.diedrichroasters.com/
+    image_path: /assets/images/diedrich-logo.png
+    alt: "Diedrich Roasters"
+    title: "Diedrich Roasters"
 ---
 
 
@@ -67,7 +71,7 @@ Artisan supports the following 64bit operating systems:
 * Windows 8 and newer
 * Linux glibc 2.18
 
-There are also experimental builds for the Raspberry Pi platform.
+There are also experimental builds for the Raspberry Pi platform and legacy Mac OS X versions 10.10 and newer.
 
 ## Notable Features
 
