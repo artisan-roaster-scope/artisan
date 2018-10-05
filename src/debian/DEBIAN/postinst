@@ -60,10 +60,10 @@ case "$1" in
    ;;
 
    1)
-   if rpm -q xdg-utils; then
+   if rpm -q xdg-utils 2>&1 >/dev/null; then
        set_mime;
    fi
-   if dpkg-query -W udev 2>&1 >/dev/null; then
+   if rpm -q udev 2>&1 >/dev/null; then
       udevadm control -R
    fi
    ;;
