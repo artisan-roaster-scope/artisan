@@ -20,7 +20,3 @@ You can switch a current profile to the background under Menu>Roast>Switch Profi
 Playback Aid lets you get pop ups of events from the background roast and Playback Events actually execute the events. You can choose what you want to see from the prior roast, and you can move the graph up and down or to the side if you are just viewing two roasts later on.
 
 Playback aids and events are explained in this blog [post](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html).
-
-During a roast it is now possible to have Artisan draw a line at the current point in time, which helps to compare the current roast state with that of the template (RoR, background event markers,..). You can activate this feature in the Events dialog (menu Config >> Events) by ticking the flag Show Time Guide.
-
-![time guide](/assets/images/gsg/time guide.gif)

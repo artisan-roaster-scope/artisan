@@ -36,6 +36,11 @@ You can label up to 4 event types. You can edit how they work with the tabs Butt
 
 In 1.3, you have the option to render event descriptions instead of values.  In addition, 1.3 adds a new custom event button type "--" that adds an event (compared to the pure action button of type " ") and can be used to add labels to the graph rendering its button description.  For those using sliders the rendering will continue to be the first letter of the Event name and two digits of the value IF you check Decimal Places under Config>Curves>UI.  If you don’t it will render only one digit.  
 
+During a roast it is now possible to have Artisan draw a line at the current point in time, which helps to compare the current roast state with that of the template (RoR, background event markers,..). You can activate this feature in the Events dialog (menu Config >> Events) by ticking the flag Show Time Guide.  This helps you see Events you have in your Background roast profile.
+
+![time guide](/assets/images/gsg/time guide.gif)
+
+
 ### Rendering Events on Your Curves
 
 Under Config>Events on the right side of the dialog box you will see to the right of Events you now have a drop down with options:
