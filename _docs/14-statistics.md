@@ -22,7 +22,7 @@ Sample post roast showing Characteristics at the bottom of the graph:
 
 Post roast, the placement and formatting of the statistic summary has been improved to make things more readable. Lines to render the green beans names and some of the roasting notes have been added to allow you to add some free text to the summary. Finally, barometric pressure has been add to the roast properties as well as to the ambient data line in this summary.
 
-![post roast Characteristics](/assets/images/gsg/stats in 14.png)
+![post roast statistics](/assets/images/gsg/stats in 14.png)
 
 
 *Statistics – Area Under Curve*
