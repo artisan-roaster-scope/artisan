@@ -18,9 +18,9 @@ Often roasters identify distinct roast phases.
 
 Artisan marks the drying phase in green, the Maillard phase in yellow and the finishing phase in brown. You can define two sets of phases limits (called Filter and Espresso) to switch between them.  You can choose to have Artisan automatically mark phases with a watermark on the graph with time and temp.  Checking the Watermarks and Phases LCD is essential.  The Phases are shown at the end of the roast on your graph depending on your choices under [Statistics](https://aritisan-scope.org/docs/statistics/).
 
-In the Phases Dialog you can set the temperature limits of each phase.
+In the Phases Dialog (menu Config >> Phases) you can set the temperature limits of each phase.  At the same time it is now possible in the Roast Phases dialog to define the display mode (Time, Percentage or Temperature - explained below) to be used on entering any of the three phases.
 
-![phases dialog](/assets/images/gsg/phases dialog.png)
+![phases dialog](/assets/images/gsg/phases new dialog 14.png)
 
 Roast phases can either be used in manual mode, where their temperature limits are defined in the corresponding dialog, or in Auto Adjusted mode, where those limits are taken from the corresponding DRY and FCs events as keyed during a roast. In manual mode some people activate AutoDRY and AutoFCs to let Artisan generate the corresponding events once the BT reaches the limits of the corresponding phases defined in the dialog are reached.  So it’s really semi-automatic that way.   
 
@@ -30,30 +30,24 @@ In percentage mode you can see the % time in each phase.  This is good to see th
 
 In temperature mode, you see the bean temperature change relative to the previous phase, so if you want to drop 10 degrees after first crack you can see that.  
 
-1.3 adds expected time to DRY and FCs to phases LCDs in percentage and temperature mode.
+##### For the last phase, one can decide to display all information (time, temp and percentage) across the 3 available PhasesLCDs.  Do this by ticking the flag at the end of the Finishing phase row. This specific mode avoids having to right-click the PhasesLCDs regular to check all this relevant information during that last busy phase.  This is one of the best features of the 1.4 release.  
 
 Here are examples of how the three Phases LCDs work if you check the box to make them visible.  Each of the three small LCDs relate to one of the three roasting phases.
 
 Each of the LCDs displays information relative to the current progress of the roast and operates in one of three modes: time / percentage / temperature.
 
-For example, in the following situation, the roast just passed the turning point (TP) and is approaching DRY. The phasesLCDs are in time mode. The TP lcd indicates that 2:45 minutes have passed since TP and that, based on the current RoR, DRY is expected to happen 7:41 minutes into the roast. The last LCD does not have any meaningful information to be displayed yet.
+For example, in the following situation, the roast just passed the turning point (TP) and is approaching DRY. The phasesLCDs are in time mode. The TP LCD indicates that 2:15 minutes have passed since TP and that, based on the current RoR, DRY is expected to happen 6:24 minutes into the roast. The last LCD does not have any meaningful information to be displayed yet.
 
-![time past tp](/assets/images/gsg/Time past TP.png)
-
-
-A little bit further into that roast, after DRY (39 seconds ago as reported by the second LCD and 6:15 minutes after TP) and approaching FCs, the last LCD reports that the FCs is estimated to happen at 11:08 minutes into the roast. Additionally, a small number between the TP and the DRY LCD tells us that DRY happened exactly 5:36 minutes after TP.
-
-![time between tip and dry](/assets/images/gsg/time between tp and dry.png)
+![time past tp](/assets/images/gsg/phases1 in 14.png)
 
 
-Finally, 21 seconds ago we reached FCs at 11:51, 4:21 minutes after DRY.
+A little bit further into that roast the LCDs are in temp mode per the choice made above, and you can see the temperature change since TP and since Dry started.  You can see the time remaining until FCs.
 
-![time past FC](/assets/images/gsg/time past fc.png)
+![time between tip and dry](/assets/images/gsg/phases2 in 14.png)
 
-Many people are focused on a 20%-25% development ratio. Just clicking the phases LCDs with the right mouse button switches from time to percentage mode, and we see that we still have some time as we are only at 3% right now.
 
-![dtr time](/assets/images/gsg/dtr time.png)
+Finally, 1:21 ago we reached FCs, and the temp has changed 7.9C since then.  Development time ratio is 11%.  Many people are focused on a 20%-25% development ratio.
 
-Another right-click on the phases LCDs toggles from percentage into temperature mode, indicating the temperature difference relative to the previous roasting event. This might be useful if we want to stop our roast e.g. 10C above FCs.
+![time past FC](/assets/images/gsg/phases3 in 14.png)
 
-![bt increase since fcs](/assets/images/gsg/bt increase since fc.png)
+By ticking the From Background flag one can instruct Artisan to read phases information on loading a background profile.
