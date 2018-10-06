@@ -52,52 +52,45 @@ def work(p,rp,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
         
 def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,showbtflag):
     global port, process, static_path, nonesymbol, timecolor, timebackground, btcolor, btbackground, etcolor, etbackground, showet, showbt
-    try:
-        port = p
-        static_path = resourcePath
-        nonesymbol = nonesym
-        timecolor = timec
-        timebackground = timebg
-        btcolor = btc
-        btbackground = btbg
-        etcolor = etc
-        etbackground = etbg
-        showet = showetflag
-        showbt = showbtflag
-        if psystem() != 'Windows':
-            gsignal(SIGQUIT, kill)
-        
-        # start the server in a separate process
-# using multiprocessing
-        process = mProcess(target=work,args=(
-            port,
-            resourcePath,
-            nonesym,
-            timec,
-            timebg,
-            btc,
-            btbg,
-            etc,
-            etbg,
-            showetflag,
-            showbtflag,))
-        process.start()
-       
-        libtime.sleep(4)
-        
-        # check successful start
-        url = "http://127.0.0.1:" + str(port) + "/status"
-        r = rget(url,timeout=2)
-        
-        if r.status_code == 200:
-            return True
-        else:
-            return False
-
-    except Exception:
-#        import traceback
-#        import sys
-#        traceback.print_exc(file=sys.stdout)
+    port = p
+    static_path = resourcePath
+    nonesymbol = nonesym
+    timecolor = timec
+    timebackground = timebg
+    btcolor = btc
+    btbackground = btbg
+    etcolor = etc
+    etbackground = etbg
+    showet = showetflag
+    showbt = showbtflag
+    if psystem() != 'Windows':
+        gsignal(SIGQUIT, kill)
+    
+    # start the server in a separate process
+# usmultiprocessing
+    process = mProcess(target=work,args=(
+        port,
+        resourcePath,
+        nonesym,
+        timec,
+        timebg,
+        btc,
+        btbg,
+        etc,
+        etbg,
+        showetflag,
+        showbtflag,))
+    process.start()
+    
+    libtime.sleep(4)
+    
+    # check successful start
+    url = "http://127.0.0.1:" + str(port) + "/status"
+    r = rget(url,timeout=2)
+    
+    if r.status_code == 200:
+        return True
+    else:
         return False
     
 def stopWeb():

@@ -26488,16 +26488,17 @@ class HUDDlg(ArtisanDialog):
     def toggleWebLCDs(self,i):
         if i:
             try:
-                self.setWebLCDsURL() # this might fail if socket cannot be established
-                self.WebLCDsAlerts.setDisabled(False)
-                self.WebLCDsPort.setDisabled(True)
                 res = aw.startWebLCDs()
                 if not res:
                     self.WebLCDsPort.setDisabled(False)
                     self.WebLCDsURL.setText("")
                     self.QRpic.setPixmap(QPixmap())
                     self.WebLCDsFlag.setChecked(False)
+                    self.WebLCDsAlerts.setDisabled(True)
                 else:
+                    self.setWebLCDsURL() # this might fail if socket cannot be established
+                    self.WebLCDsAlerts.setDisabled(False)
+                    self.WebLCDsPort.setDisabled(True)
                     self.WebLCDsFlag.setChecked(True)
             except Exception as e:
                 aw.sendmessage(str(e))
