@@ -16,6 +16,11 @@ Alarms trigger certain actions to happen. Artisan alarms can help you in keeping
 
 Alarms are unordered by definition. All alarm conditions of not-yet activated alarms are evaluated once per sampling interval and where all pre-conditions are fulfilled the alarm is fired. Note that each alarm is only fired once.  An alarm is triggered only once even if it has both an alarm time and temperature trigger set.   
 
+### Alarms from Background Roasts
+
+If you have alarms from a background roast that you want to use you can check the box for Load from Background.
+
+![alarm trigger](/assets/images/gsg/alarms in 14.png)
 
 ### Alarms To Trigger PopUPs
 

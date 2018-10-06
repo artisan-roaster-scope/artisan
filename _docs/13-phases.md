@@ -22,7 +22,7 @@ In the Phases Dialog (menu Config >> Phases) you can set the temperature limits 
 
 ![phases dialog](/assets/images/gsg/phases new dialog 14.png)
 
-Roast phases can either be used in manual mode, where their temperature limits are defined in the corresponding dialog, or in Auto Adjusted mode, where those limits are taken from the corresponding DRY and FCs events as keyed during a roast. In manual mode some people activate AutoDRY and AutoFCs to let Artisan generate the corresponding events once the BT reaches the limits of the corresponding phases defined in the dialog are reached.  So it’s really semi-automatic that way.   
+Roast phases can either be used in manual mode, where their temperature limits are defined in the corresponding dialog, or in Auto Adjusted mode, where those limits are taken from the corresponding DRY and FCs events as keyed during a roast. In manual mode some people activate AutoDRY and AutoFCs to let Artisan generate the corresponding events once the BT reaches the limits of the corresponding phases defined in the dialog box are reached. You can also choose to have DRY and FCs marked to a background profile by checking the From Background choice.  So it’s really semi-automatic that way.   
 
 The Phases LCD's are essential for your roasting. The Phases LCD are three small LCD panels at the top that displays information relative to the current progress of the roast and operates in one of three modes: time / percentage / temperature. A right click changes the mode between these three. In time mode for example after Tipping Point, you will see an estimate of when Dry End will happen and the first LCD will show the time since TP, and based on the current ROR, when Dry will happen.  These change as the roast progresses.  After TP and Dry are complete small numbers between the LCDs show the time between the two.  The most important is that you will have some idea of when FC is coming based on prior events and ROR and you can anticipate the need for air or gas changes.  
 
@@ -30,7 +30,7 @@ In percentage mode you can see the % time in each phase.  This is good to see th
 
 In temperature mode, you see the bean temperature change relative to the previous phase, so if you want to drop 10 degrees after first crack you can see that.  
 
-For the last phase, one can decide to display all information (time, temp and percentage) across the 3 available PhasesLCDs.  Do this by ticking the flag at the end of the Finishing phase row. This specific mode avoids having to right-click the PhasesLCDs regular to check all this relevant information during that last busy phase. **This is one of the best features of the 1.4 release.** 
+For the last phase, one can decide to display all information (time, temp and percentage) across the 3 available PhasesLCDs.  Do this by ticking the flag at the end of the Finishing phase row. This specific mode avoids having to right-click the PhasesLCDs regular to check all this relevant information during that last busy phase. **This is one of the best features of the 1.4 release.**
 
 Here are examples of how the three Phases LCDs work if you check the box to make them visible.  Each of the three small LCDs relate to one of the three roasting phases.
 
