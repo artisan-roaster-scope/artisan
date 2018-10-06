@@ -70,6 +70,10 @@ Some things to remember
 - not all events that you can select to restrict the active period of a roast via the From attribute, like DryEnd, are set automatically by Artisan during a roast. Therefore, the corresponding alarms depending on those events are triggered only after those events are entered manually by pressing the corresponding event button
 - an alarm is triggered only once even if it has both, an alarm time and temperature set
 
+### Always On
+
+For those automating their roasting, Artisan can turn back on automatically after terminating a recording. This is especially useful if one uses Alarms to control sessions with a sequence of roasts. So you might have configured an alarm that triggers the OFF action automatically at the end of the first roast, but there is no way to have Artisan turned ON again via Alarms as alarms are not processed while not sampling.  In Artisan v1.4 you can tick the Keep ON flag in the "Sampling Interval" dialog (menu Config >> Sampling Interval) to have Artisan turn itself on automatically after it received an OFF signal while recording. If there is unsaved data Artisan will still ask you to save that before doing a reset and running the ON action.
+
 ### Other Videos and Resources
 
 Michael Wright has a [video](https://www.youtube.com/watch?time_continue=321&v=IrvC9dPqgjE) that uses Alarms for a much more sophisticated purpose in controlling his machine.  His alarm dialog is below for reference.
