@@ -21,6 +21,6 @@ You can also run individual roast reports.  These are useful for analyzing an in
 
 ![roast report 1](/assets/images/gsg/Roast Report 1.png)![roast report 2](/assets/images/gsg/Roast Report 2.png)
 
-*Exporting Roast Report*
+*Exporting Roast Reports*
 
 Under File>Export, you can now export directly into Excel as well as Probat Pilot 1.4, Artisan CSV or JSON, or RoastLogger format.  
