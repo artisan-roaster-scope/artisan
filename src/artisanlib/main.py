@@ -89,7 +89,6 @@ from PyQt5.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport
 
 try: # hidden import to allow pyinstaller build on OS X to include the PyQt5.11 private sip module
     from PyQt5 import sip # @UnusedImport
-    import PyQt5.QtDBus
 except:
     pass
     
@@ -813,6 +812,7 @@ class tgraphcanvas(FigureCanvas):
         
         self.phidget1018valueFactor = 1000 # we map the 0-5V voltage returned by the Phidgets22 API to mV
         self.phidget1018_async = [False]*8
+        self.phidget1018_ratio = [False]*8 # if True VoltageRatio instead of VoltageInput is returned
         self.phidget1018_dataRates = [256]*8 # in ms; (Phidgets default 256ms, min is 8ms, 16ms if wireless is active), max 1000ms
                 # with the new PhidgetsAPI the 1011/1018 dataRate is from 1ms to 1.000ms
         self.phidget1018_changeTriggers = [10]*8
@@ -18935,6 +18935,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phidget1018_async = [bool(toBool(x)) for x in toList(settings.value("phidget1018_async",self.qmc.phidget1018_async))]
                 self.qmc.phidget1018_dataRates = [toInt(x) for x in toList(settings.value("phidget1018_dataRates",self.qmc.phidget1018_dataRates))]
                 self.qmc.phidget1018_changeTriggers = [toInt(x) for x in toList(settings.value("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers))]
+            if settings.contains("phidget1018_ratio"):
+                self.qmc.phidget1018_ratio = [bool(toBool(x)) for x in toList(settings.value("phidget1018_ratio",self.qmc.phidget1018_ratio))]
             if settings.contains("PIDbuttonflag"):
                 self.qmc.PIDbuttonflag = bool(toBool(settings.value("PIDbuttonflag",self.qmc.PIDbuttonflag)))
             if settings.contains("Controlbuttonflag"):
@@ -19021,7 +19023,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("eventsshowflag"):
                 self.qmc.eventsshowflag = toInt(settings.value("eventsshowflag",int(self.qmc.eventsshowflag)))
             if settings.contains("clampEvents"):
-                self.qmc.clampEvents = toInt(settings.value("clampEvents",int(self.qmc.clampEvents)))
+                self.qmc.clampEvents = bool(toBool(settings.value("clampEvents",self.qmc.clampEvents)))
             if settings.contains("renderEventsDescr"):
                 self.qmc.renderEventsDescr = bool(toBool(settings.value("renderEventsDescr",self.qmc.renderEventsDescr)))
             if settings.contains("eventslabelschars"):
@@ -20394,6 +20396,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phidgetPort",self.qmc.phidgetPort)
             settings.setValue("phidgetRemoteOnlyFlag",self.qmc.phidgetRemoteOnlyFlag)
             settings.setValue("phidget1018_async",self.qmc.phidget1018_async)
+            settings.setValue("phidget1018_ratio",self.qmc.phidget1018_ratio)
             settings.setValue("phidget1018_dataRates",self.qmc.phidget1018_dataRates)
             settings.setValue("phidget1018_changeTriggers",self.qmc.phidget1018_changeTriggers)
             settings.setValue("controlETpid",self.ser.controlETpid)
@@ -38348,7 +38351,8 @@ class serialport(object):
 
     def phidget1018SensorChanged(self,v,channel,idx):
         if self.PhidgetIO and len(self.PhidgetIO) > idx:
-            v = v * aw.qmc.phidget1018valueFactor
+            if not aw.qmc.phidget1018_ratio[channel]:
+                v = v * aw.qmc.phidget1018valueFactor
             if aw.qmc.phidget1018_async[channel]:
                 if self.PhidgetIOvalues[channel] != -1:
                     self.PhidgetIOvalues[channel] = (self.PhidgetIOvalues[channel] + v)/2.0
@@ -38359,13 +38363,19 @@ class serialport(object):
         if self.PhidgetIO and len(self.PhidgetIO) > idx: 
             if not digital and aw.qmc.phidget1018_async[i]:            
                 if self.PhidgetIOvalues[i] == -1:
-                    self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
+                    if aw.qmc.phidget1018_ratio[i]:
+                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltageRatio()
+                    else:
+                        self.PhidgetIOvalues[i] = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
                 return self.PhidgetIOvalues[i]
             else:
                 if digital:
                     v = self.PhidgetIOvalues[i] = int(self.PhidgetIO[idx].getState())
                 else:
-                    v = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
+                    if aw.qmc.phidget1018_ratio[i]:
+                        v = self.PhidgetIO[idx].getVoltageRatio()
+                    else:
+                        v = self.PhidgetIO[idx].getVoltage() * aw.qmc.phidget1018valueFactor
                 return v
         else:
             return -1
@@ -38392,10 +38402,16 @@ class serialport(object):
                     except PhidgetException:
                         #print("Phidget Exception %i: %s" % (e.code, e.details))
                         pass
-                    self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx))
+                    if aw.qmc.phidget1018_ratio[channel]:                    
+                        self.PhidgetIO[idx].setOnVoltageRatioChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx))
+                    else:
+                        self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx))
                 else:
                     self.PhidgetIO[idx].setVoltageChangeTrigger(0.0)
-                    self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda *_:None) 
+                    if aw.qmc.phidget1018_ratio[channel]:
+                        self.PhidgetIO[idx].setOnVoltageRatioChangeHandler(lambda *_:None) 
+                    else:
+                        self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda *_:None) 
             self.PhidgetIOvalues[channel] = -1
 
     def phidget1018attached(self,deviceType,idx,digital=False):
@@ -38448,8 +38464,16 @@ class serialport(object):
                 if ser:
                     if digital:
                         self.PhidgetIO = [DigitalInput(),DigitalInput()]
-                    else:      
-                        self.PhidgetIO = [VoltageInput(),VoltageInput()]
+                    else:
+                        if aw.qmc.phidget1018_ratio[mode*2]:
+                            ch1 = VoltageRatioInput()
+                        else:
+                            ch1 = VoltageInput()
+                        if aw.qmc.phidget1018_ratio[mode*2+1]:
+                            ch2 = VoltageRatioInput()
+                        else:
+                            ch2 = VoltageInput()
+                        self.PhidgetIO = [ch1,ch2]
                     try: 
                         self.PhidgetIO[0].setOnAttachHandler(lambda _:self.phidget1018attached(deviceType,0,digital))
                         self.PhidgetIO[0].setOnDetachHandler(lambda _:self.phidget1018detached(deviceType,0))
@@ -41486,6 +41510,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetProbeTypeItems = ["K", "J", "E", "T"]
         phidgetBox1048 = QGridLayout()
         self.asyncCheckBoxes1048 = []
+        self.ratioCheckBoxes1048 = []
         self.changeTriggerCombos1048 = []
         self.probeTypeCombos = []
         for i in range(1,5):
@@ -41824,6 +41849,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetBox1018 = QGridLayout()
         phidgetBox1018.setSpacing(5)
         self.asyncCheckBoxes = []
+        self.ratioCheckBoxes = []
         self.dataRateCombos = []
         self.changeTriggerCombos = []
         for i in range(1,9):
@@ -41867,8 +41893,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             
             self.changeTriggerCombos.append(changeTriggersCombo)
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
-            
-            
+                        
             asyncFlag = QCheckBox()
             asyncFlag.setFocusPolicy(Qt.NoFocus)
             asyncFlag.setChecked(True)
@@ -41876,15 +41901,25 @@ class DeviceAssignmentDlg(ArtisanDialog):
             asyncFlag.setChecked(aw.qmc.phidget1018_async[i-1])
             self.asyncCheckBoxes.append(asyncFlag)
             phidgetBox1018.addWidget(asyncFlag,2,i)
+
+            ratioFlag = QCheckBox()
+            ratioFlag.setFocusPolicy(Qt.NoFocus)
+            ratioFlag.setChecked(False)
+            ratioFlag.setChecked(aw.qmc.phidget1018_ratio[i-1])
+            self.ratioCheckBoxes.append(ratioFlag)
+            phidgetBox1018.addWidget(ratioFlag,5,i)
+
             rowLabel = QLabel(str(i-1))
             phidgetBox1018.addWidget(rowLabel,0,i)
            
         asyncLabel = QLabel(QApplication.translate("Label","Async", None))
         dataRateLabel = QLabel(QApplication.translate("Label","Rate", None))
-        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))
+        changeTriggerLabel = QLabel(QApplication.translate("Label","Change", None))        
+        ratioLabel = QLabel(QApplication.translate("Label","Ratio", None))
         phidgetBox1018.addWidget(asyncLabel,2,0,Qt.AlignRight)
         phidgetBox1018.addWidget(changeTriggerLabel,3,0,Qt.AlignRight)
         phidgetBox1018.addWidget(dataRateLabel,4,0,Qt.AlignRight)
+        phidgetBox1018.addWidget(ratioLabel,5,0,Qt.AlignRight)
         phidget1018HBox = QVBoxLayout()
         phidget1018HBox.addLayout(phidgetBox1018)
         phidget1018GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1010/1011/1013/1018/1019/HUB0000/SBC IO",None))
@@ -43366,6 +43401,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 pass
             for i in range(8):
                 aw.qmc.phidget1018_async[i] = self.asyncCheckBoxes[i].isChecked()
+                aw.qmc.phidget1018_ratio[i] = self.ratioCheckBoxes[i].isChecked()
                 aw.qmc.phidget1018_dataRates[i] = aw.qmc.phidget_dataRatesValues[self.dataRateCombos[i].currentIndex()]
                 aw.qmc.phidget1018_changeTriggers[i] = aw.qmc.phidget1018_changeTriggersValues[self.changeTriggerCombos[i].currentIndex()]
 
