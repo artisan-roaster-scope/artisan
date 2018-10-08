@@ -34,7 +34,7 @@ from artisanlib import __build__
 
 
 import os
-import sys
+import sys  # @UnusedImport
 import ast
 import platform
 import math
@@ -2260,7 +2260,7 @@ class tgraphcanvas(FigureCanvas):
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
     def updategraphics(self):
         try:
-            ## NOTE: locking the resource here seems to block the UI on replying events and not locking (as in v1.3.1 and before) seems not to harm
+            ## NOTE: locking the resource here seems to block the UI on replaying events and not locking seems not to harm
 #            #### lock shared resources #####
 #            aw.qmc.samplingsemaphore.acquire(1)
             if self.flagon:
@@ -2596,6 +2596,11 @@ class tgraphcanvas(FigureCanvas):
             aw.stack.setCurrentIndex(1)
             aw.sendmessage(QApplication.translate("Message","HUD ON", None))
 
+    def refreshHUD(self):
+        aw.stack.setCurrentIndex(0)
+        img = self.grab()
+        aw.HUD.setPixmap(img)
+        aw.stack.setCurrentIndex(1)            
 
     # redraws at least the canvas if redraw=True and force=True
     def timealign(self,redraw=True,recompute=False,force=False):
@@ -14594,7 +14599,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.serialsemaphore.release(1)
 
     def resizeEvent(self, event):
-        if aw.qmc.statssummary and len(aw.qmc.timex) > 3:
+        if not aw.qmc.flagon and aw.qmc.statssummary and len(aw.qmc.timex) > 3:
             self.redrawTimer.start(500) # (re-) start the redraw time to be fired in half a second
         #if HUD is ON when resizing application. No drawing should be done inside this handler
         if self.qmc.HUDflag:
@@ -24971,12 +24976,9 @@ class ApplicationWindow(QMainWindow):
 
     def showHUDmetrics(self):
         if self.qmc.hudresizeflag:
-            #turn off
-            self.qmc.toggleHUD()
-            #turn back ON to adquire new size
-            self.qmc.toggleHUD()
+            self.qmc.refreshHUD()
             self.qmc.hudresizeflag = False
-        if len(self.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
+        elif len(self.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
             ETreachTime,BTreachTime,ET2reachTime,BT2reachTime = self.qmc.getTargetTime()
             if ETreachTime > 0 and ETreachTime < 2000:
                 text1 = u(QApplication.translate("Label","{0} to reach ET {1}", None).format(self.qmc.stringfromseconds(int(ETreachTime)),str(self.qmc.ETtarget) + self.qmc.mode))
