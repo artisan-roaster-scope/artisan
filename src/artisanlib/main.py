@@ -421,7 +421,7 @@ if platf == 'Windows':
 app = Artisan(args)
 if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
     print("MainProcess is running")
-#    sys.exit(0)
+    sys.exit(0)
 
 
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
@@ -50670,11 +50670,11 @@ def main():
                     aw.qmc.background = False
     except Exception:
         pass
-    if platf == 'Windows' and appFrozen():
-        try:
-            sys.stderr = sys.stdout
-        except:
-            pass
+#    if platf == 'Windows' and appFrozen():
+#        try:
+#            sys.stderr = sys.stdout
+#        except:
+#            pass
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):
