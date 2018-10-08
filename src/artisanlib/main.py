@@ -419,11 +419,6 @@ if platf == 'Windows':
     except Exception as e:
         pass
 app = Artisan(args)
-if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
-    print("MainProcess is running")
-    sys.exit(0)
-
-
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
@@ -5573,7 +5568,7 @@ class tgraphcanvas(FigureCanvas):
                                                 label=aw.arabicReshape(QApplication.translate("Label", "AUCguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
-                if aw.qmc.showtimeguide or aw.qmc.device == 18:
+                if aw.qmc.flagstart and aw.qmc.showtimeguide or aw.qmc.device == 18:
                     self.l_timeline, = self.ax.plot([], [],color = self.palette["timeguide"],
                                                 label=aw.arabicReshape(QApplication.translate("Label", "TIMEguide", None)),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
@@ -50601,11 +50596,15 @@ if sys.platform.startswith("darwin"):
             pass
 
 def main():
+    global aw
+    global app
+    
     # suppress all warnings
     warnings.filterwarnings('ignore')
     
-    global aw
-    global app
+    if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
+        sys.exit(0)
+    
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
     aw = ApplicationWindow()
@@ -50670,11 +50669,11 @@ def main():
                     aw.qmc.background = False
     except Exception:
         pass
-#    if platf == 'Windows' and appFrozen():
-#        try:
-#            sys.stderr = sys.stdout
-#        except:
-#            pass
+    if platf == 'Windows' and appFrozen():
+        try:
+            sys.stderr = sys.stdout
+        except:
+            pass
 
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore',divide='ignore',over='ignore',under='ignore'):

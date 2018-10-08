@@ -85,13 +85,6 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
     
     libtime.sleep(4)
     
-    
-    import multiprocessing
-    print(str(type(process)))
-    print(process.name)
-    print(str(type(multiprocessing.current_process())))
-    print(multiprocessing.current_process().name)
-    
     if process.is_alive():    
         # check successful start
         url = "http://127.0.0.1:" + str(port) + "/status"
