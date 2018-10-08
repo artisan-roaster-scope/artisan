@@ -34,6 +34,7 @@ from artisanlib import __build__
 
 
 import os
+import sys
 import ast
 import platform
 import math
@@ -49,6 +50,7 @@ import binascii
 import codecs
 import uuid
 import threading
+import multiprocessing
 
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
@@ -417,7 +419,8 @@ if platf == 'Windows':
     except Exception as e:
         pass
 app = Artisan(args)
-if app.isRunning(): sys.exit(0)
+if multiprocessing.current_process().name != "WebLCDs" and app.isRunning():
+    sys.exit(0)
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
@@ -38398,8 +38401,12 @@ class serialport(object):
             if not digital:
                 if aw.qmc.phidget1018_async[channel]:
                     try:
-                        ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltage()),self.PhidgetIO[idx].getMinVoltage())
-                        self.PhidgetIO[idx].setVoltageChangeTrigger(ct)
+                        if aw.qmc.phidget1018_ratio[channel]:
+                            ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltageRatio()),self.PhidgetIO[idx].getMinVoltageRatio())
+                            self.PhidgetIO[idx].setVoltageRatioChangeTrigger(ct)
+                        else:
+                            ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltage()),self.PhidgetIO[idx].getMinVoltage())
+                            self.PhidgetIO[idx].setVoltageChangeTrigger(ct)
                     except PhidgetException:
                         #print("Phidget Exception %i: %s" % (e.code, e.details))
                         pass
@@ -38408,7 +38415,10 @@ class serialport(object):
                     else:
                         self.PhidgetIO[idx].setOnVoltageChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx))
                 else:
-                    self.PhidgetIO[idx].setVoltageChangeTrigger(0.0)
+                    if aw.qmc.phidget1018_ratio[channel]:
+                        self.PhidgetIO[idx].setVoltageRatioChangeTrigger(0.0)
+                    else:
+                        self.PhidgetIO[idx].setVoltageChangeTrigger(0.0)
                     if aw.qmc.phidget1018_ratio[channel]:
                         self.PhidgetIO[idx].setOnVoltageRatioChangeHandler(lambda *_:None) 
                     else:

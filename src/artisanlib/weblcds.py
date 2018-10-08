@@ -18,6 +18,7 @@ from requests import get as rget
 
 import time as libtime
 
+
 wsocks = [] # list of open web sockets
 process = None
 port = None
@@ -67,8 +68,8 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
         gsignal(SIGQUIT, kill)
     
     # start the server in a separate process
-# usmultiprocessing
-    process = mProcess(target=work,args=(
+    # using multiprocessing
+    process = mProcess(name='WebLCDs',target=work,args=(
         port,
         resourcePath,
         nonesym,
