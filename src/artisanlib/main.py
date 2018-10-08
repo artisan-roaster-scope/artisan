@@ -419,16 +419,10 @@ if platf == 'Windows':
     except Exception as e:
         pass
 app = Artisan(args)
-#if multiprocessing.current_process().name != "WebLCDs" and multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
+if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
+    print("MainProcess is running")
 #    sys.exit(0)
-try:
-    print("p",p)
-except:
-    pass
 
-
-mp_type = str(type(multiprocessing.current_process()))
-mp_name = multiprocessing.current_process().name
 
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
@@ -713,8 +707,6 @@ class tgraphcanvas(FigureCanvas):
         self.mode_tempsliders = self.mode # the temperature mode of event slider to convert min/max limits
         
         self.errorlog = []
-        self.errorlog.append(mp_type)
-        self.errorlog.append(mp_name)
 
         # default delay between readings in miliseconds
         self.default_delay = 3000 # default 3s

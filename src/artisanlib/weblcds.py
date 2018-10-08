@@ -85,12 +85,22 @@ def startWeb(p,resourcePath,nonesym,timec,timebg,btc,btbg,etc,etbg,showetflag,sh
     
     libtime.sleep(4)
     
-    # check successful start
-    url = "http://127.0.0.1:" + str(port) + "/status"
-    r = rget(url,timeout=2)
     
-    if r.status_code == 200:
-        return True
+    import multiprocessing
+    print(str(type(process)))
+    print(process.name)
+    print(str(type(multiprocessing.current_process())))
+    print(multiprocessing.current_process().name)
+    
+    if process.is_alive():    
+        # check successful start
+        url = "http://127.0.0.1:" + str(port) + "/status"
+        r = rget(url,timeout=2)
+        
+        if r.status_code == 200:
+            return True
+        else:
+            return False
     else:
         return False
     
