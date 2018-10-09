@@ -81,7 +81,8 @@ from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox
                          QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
                          QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox,QButtonGroup) # @Reimport
 from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
-                            QKeySequence,QStandardItem,QImage,QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
+                            QKeySequence,QStandardItem, #QImage,
+                            QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
                             QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor,QTextDocument)  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,  # @Reimport
@@ -1858,11 +1859,10 @@ class tgraphcanvas(FigureCanvas):
             self.resetlines() # get rid of HUD, projection, cross lines and AUC line
             self.resetdeltalines() # just in case
             
-            # ask the canvas to kindly draw it self some time in the future
-            # when Qt thinks it is convenient
+            
             try:
                 self.fig.canvas.draw() # the triggered _draw_event(self,evt) function resets the self.in_draw_event if done
-                #self.fig.canvas.draw_idle()
+                #self.fig.canvas.draw_idle() # ask the canvas to kindly draw it self some time in the future when Qt thinks it is convenient
                 # make sure that the GUI framework has a chance to run its event loop
                 # and clear any GUI events.  This needs to be in a try/except block
                 # because the default implemenation of this method is to raise
@@ -2428,7 +2428,6 @@ class tgraphcanvas(FigureCanvas):
                         self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
                         self.autoChargeIdx = 0
 
-        
                     ##### updated canvas
                     try:
                         if not self.block_update:
@@ -2496,8 +2495,9 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.playbackevent()
                             if aw.qmc.backgroundPlaybackDROP:
                                 aw.qmc.playbackdrop()
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " updategraphics() {0}").format(str(e)),exc_tb.tb_lineno)  
                         
                     #####
                     if aw.qmc.patheffects:
@@ -2593,10 +2593,10 @@ class tgraphcanvas(FigureCanvas):
             
         #ON
         else:
+            self.redraw(False,False)
             #load
             img = self.grab()
             aw.HUD.setPixmap(img)
-            
             self.HUDflag = True
             aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
             aw.stack.setCurrentIndex(1)
@@ -2604,6 +2604,7 @@ class tgraphcanvas(FigureCanvas):
 
     def refreshHUD(self):
         aw.stack.setCurrentIndex(0)
+        self.redraw(False,False)
         img = self.grab()
         aw.HUD.setPixmap(img)
         aw.stack.setCurrentIndex(1)            
@@ -10437,12 +10438,12 @@ class SampleThread(QThread):
                             if aw.qmc.smooth_curves_on_recording:
                                 aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.stemp1)
                             else:
-                                aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.temp1)
+                                aw.qmc.l_temp1.set_data(aw.qmc.ctimex1, aw.qmc.ctemp1)
                         if aw.qmc.BTcurve:
                             if aw.qmc.smooth_curves_on_recording:
                                 aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.stemp2)
                             else:             
-                                aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.temp2)
+                                aw.qmc.l_temp2.set_data(aw.qmc.ctimex2, aw.qmc.ctemp2)
 
                             
                     
@@ -24988,7 +24989,7 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.hudresizeflag:
             self.qmc.refreshHUD()
             self.qmc.hudresizeflag = False
-        elif len(self.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
+        if len(self.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
             ETreachTime,BTreachTime,ET2reachTime,BT2reachTime = self.qmc.getTargetTime()
             if ETreachTime > 0 and ETreachTime < 2000:
                 text1 = u(QApplication.translate("Label","{0} to reach ET {1}", None).format(self.qmc.stringfromseconds(int(ETreachTime)),str(self.qmc.ETtarget) + self.qmc.mode))
@@ -25049,23 +25050,16 @@ class ApplicationWindow(QMainWindow):
             MVV = int(round(MV))
             pidstring = "ET pid = %i "%MVV
             ##### end of ET pid
-            # QImage.Format_RGB32, QImage.Format_ARGB32
+#            # QImage.Format_RGB32, QImage.Format_ARGB32
 #            w = self.qmc.size().width()*self.devicePixelRatio()
 #            h = self.qmc.size().height()*self.devicePixelRatio()            
 #            qImage = QImage(self.qmc.fig.canvas.buffer_rgba(), w, h, QImage.Format_ARGB32_Premultiplied).rgbSwapped()                     
 #            if hasattr(qImage, 'setDevicePixelRatio'):
-#                qImage.setDevicePixelRatio(self.qmc.fig.canvas._dpi_ratio) 
-
-            buf = self.qmc.fig.canvas.buffer_rgba()
-            buf = bytearray(buf).copy()
-            w = self.qmc.fig.canvas.size().width()*self.qmc.fig.canvas._dpi_ratio
-            h = self.qmc.fig.canvas.size().height()*self.qmc.fig.canvas._dpi_ratio
-            qImage = QImage(buf,w, h, QImage.Format_ARGB32_Premultiplied)
-            if hasattr(qImage, 'setDevicePixelRatio'):
-                qImage.setDevicePixelRatio(self.qmc.fig.canvas._dpi_ratio)
-            qImage = qImage.rgbSwapped()
+#                qImage.setDevicePixelRatio(self.qmc.fig.canvas._dpi_ratio)
+#            img = QPixmap.fromImage(qImage)
             
-            img = QPixmap.fromImage(qImage)
+            img = self.qmc.grab()
+            
             Wwidth = self.qmc.size().width()
             Wheight = self.qmc.size().height()
             #Draw begins
@@ -25090,51 +25084,49 @@ class ApplicationWindow(QMainWindow):
 
     def showHUDthermal(self):
         if self.qmc.hudresizeflag:
-            #turn off
-            self.qmc.toggleHUD()
-            #turn back ON to adquire new size
-            self.qmc.toggleHUD()
+            self.qmc.refreshHUD()
             self.qmc.hudresizeflag = False
-        img = self.qmc.grab()
-        p = QPainter(img)
-        Wwidth= self.qmc.size().width()
-        Wheight = self.qmc.size().height()
-        p.setOpacity(1)
-        p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
-        p.drawRect(10,10, Wwidth - 20, Wheight - 20)
-        if self.qmc.mode == "F" and self.qmc.temp1:
-            ETradius = int(self.qmc.temp1[-1]/3)
-            BTradius = int(self.qmc.temp2[-1]/3)
-        elif self.qmc.mode == "C" and self.qmc.temp1:
-            ETradius = int(self.qmc.fromCtoF(self.qmc.temp1[-1]/3))
-            BTradius = int(self.qmc.fromCtoF(self.qmc.temp2[-1]/3))
-        else:
-            ETradius = 50
-            BTradius = 50
-        Tradius = 300
-        p.setOpacity(0.5)
-        g = QRadialGradient(Wwidth/2, Wheight/2, ETradius)
-        beanbright =  100 - ETradius
-        if beanbright < 0: beanbright = 0
-        g.setColorAt(0.0, QColor(240,255,beanbright))  #bean center
-        g.setColorAt(.5, Qt.yellow)
-        g.setColorAt(.8, Qt.red)
-        g.setColorAt(1.,QColor("lightgrey"))
-        p.setBrush(QBrush(g))
-        #draw thermal circle
-        p.setPen(0)
-        p.drawEllipse(Wwidth/2 -Tradius/2 , Wheight/2 - Tradius/2 , Tradius,Tradius)
-        #draw ET circle
-        p.setBrush(0)
-        p.setPen(QColor("black"))
-        p.drawEllipse(Wwidth/2 -ETradius/2 , Wheight/2 - ETradius/2 , ETradius,ETradius)
-        #draw BT circle
-        p.drawEllipse(Wwidth/2 -BTradius/2 , Wheight/2 - BTradius/2 , BTradius,BTradius)
-        delta = QApplication.translate("Label","ET - BT = {0}{1}", None).format("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]),self.qmc.mode)
-        p.setFont(QFont('Utopia', 14, -1))
-        p.drawText(QPoint(Wwidth/2,Wheight/2),u(delta))
-        p.end()
-        self.HUD.setPixmap(img)
+        if len(self.qmc.temp2) > 0:
+            img = self.qmc.grab()
+            p = QPainter(img)
+            Wwidth= self.qmc.size().width()
+            Wheight = self.qmc.size().height()
+            p.setOpacity(1)
+            p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
+            p.drawRect(10,10, Wwidth - 20, Wheight - 20)
+            if self.qmc.mode == "F" and self.qmc.temp1:
+                ETradius = int(self.qmc.temp1[-1]/3)
+                BTradius = int(self.qmc.temp2[-1]/3)
+            elif self.qmc.mode == "C" and self.qmc.temp1:
+                ETradius = int(self.qmc.fromCtoF(self.qmc.temp1[-1]/3))
+                BTradius = int(self.qmc.fromCtoF(self.qmc.temp2[-1]/3))
+            else:
+                ETradius = 50
+                BTradius = 50
+            Tradius = 300
+            p.setOpacity(0.5)
+            g = QRadialGradient(Wwidth/2, Wheight/2, ETradius)
+            beanbright =  100 - ETradius
+            if beanbright < 0: beanbright = 0
+            g.setColorAt(0.0, QColor(240,255,beanbright))  #bean center
+            g.setColorAt(.5, Qt.yellow)
+            g.setColorAt(.8, Qt.red)
+            g.setColorAt(1.,QColor("lightgrey"))
+            p.setBrush(QBrush(g))
+            #draw thermal circle
+            p.setPen(0)
+            p.drawEllipse(Wwidth/2 -Tradius/2 , Wheight/2 - Tradius/2 , Tradius,Tradius)
+            #draw ET circle
+            p.setBrush(0)
+            p.setPen(QColor("black"))
+            p.drawEllipse(Wwidth/2 -ETradius/2 , Wheight/2 - ETradius/2 , ETradius,ETradius)
+            #draw BT circle
+            p.drawEllipse(Wwidth/2 -BTradius/2 , Wheight/2 - BTradius/2 , BTradius,BTradius)
+            delta = QApplication.translate("Label","ET - BT = {0}{1}", None).format("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]),self.qmc.mode)
+            p.setFont(QFont('Utopia', 14, -1))
+            p.drawText(QPoint(Wwidth/2,Wheight/2),u(delta))
+            p.end()
+            self.HUD.setPixmap(img)
 
     #used by WheelGraphDlg()
     #wrap values in unicode(.) if and only if those are of type string
