@@ -5753,9 +5753,9 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     start = 0
                     
-                # position the stats summary relative to the right hand edge of the graph
-#                droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
-                _,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
+                # position the stats summary relative to the right hand edge of the graph                
+                drop_label = QApplication.translate("Scope Annotation","DROP {0}", None).replace("{0}","[0-9:]*")
+                _,_,droptext_end = self.droptextBounds(drop_label,start,statsheight,ls,prop,fc)
                 stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                 stats_textbox_width = stats_textbox_bounds[2]
                 stats_textbox_height = stats_textbox_bounds[3]
@@ -5769,8 +5769,7 @@ class tgraphcanvas(FigureCanvas):
                     prev_stats_textbox_width = 0
                     #set the maximum number of iterations
                     for _ in range(2, 20):
-#                        droptext_width,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
-                        _,_,droptext_end = self.droptextBounds(start,statsheight,ls,prop,fc)
+                        _,_,droptext_end = self.droptextBounds(drop_label,start,statsheight,ls,prop,fc)
                         stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                         stats_textbox_width = stats_textbox_bounds[2]
                         stats_textbox_height = stats_textbox_bounds[3]
@@ -5810,11 +5809,14 @@ class tgraphcanvas(FigureCanvas):
         return bbox.bounds
 
 
-    def droptextBounds(self,x_pos,y_pos,ls,prop,fc):
-        import re        
+    def droptextBounds(self,drop_label,x_pos,y_pos,ls,prop,fc):
+        import re
+        droptext_width = 0
+        droptextstart = 0
+        droptext_end = 0
         for child in self.ax.get_children():
             if isinstance(child, mpl.text.Annotation):
-                droptext = re.search(r'.*\((.*?),.*(DROP [0-9:]*)',str(child))
+                droptext = re.search(r'.*\((.*?),.*({0})'.format(drop_label),str(child))
                 if droptext:
                     droptextstart = int(float(droptext.group(1))) - x_pos
                     droptext_width = self.statstextboxBounds(x_pos,y_pos,droptext.group(2),ls,prop,fc)[2]
