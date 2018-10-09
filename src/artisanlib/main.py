@@ -2001,7 +2001,7 @@ class tgraphcanvas(FigureCanvas):
         elif value < 0:
             return ""
         else:
-            if aw.qmc.LCDdecimalplaces:
+            if True: #aw.qmc.LCDdecimalplaces:
                 return u(int(round(value)))
             else:
                 return u(int(round(value / 10.)))
@@ -2272,7 +2272,7 @@ class tgraphcanvas(FigureCanvas):
                     try: # if self.temp1 is None, which should never be the case, this fails
                         if len(self.temp1) and -100 < self.temp1[-1] < 1000:
                             aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
-                        elif len(self.temp1) and -1000 < self.temp1[-1] < 10000:
+                        elif self.LCDdecimalplaces and len(self.temp1) and -10000 < self.temp1[-1] < 100000:
                             aw.lcd2.display("%.0f"%float(self.temp1[-1]))
                         else:
                             aw.lcd2.display("--")
@@ -2281,7 +2281,7 @@ class tgraphcanvas(FigureCanvas):
                     try:
                         if len(self.temp2) and -100 < self.temp2[-1] < 1000:
                             aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
-                        elif len(self.temp2) and -1000 < self.temp2[-1] < 10000:
+                        elif self.LCDdecimalplaces and len(self.temp2) and -10000 < self.temp2[-1] < 100000:
                             aw.lcd3.display("%.0f"%float(self.temp2[-1]))
                         else:
                             aw.lcd3.display("--")
@@ -2310,11 +2310,14 @@ class tgraphcanvas(FigureCanvas):
                         if i < aw.nLCDS:
                             try:
                                 if self.extratemp1[i]:
-                                    fmt = lcdformat
+                                    fmt = lcdformat                                      
                                     v = float(self.extratemp1[i][-1])
-                                    if -1000 < v < 10000:
-                                        if (v.is_integer() and self.intChannel(i,0)) or not (-100 < v < 1000):
-                                            fmt = "%.0f" # we display this value without decimals
+                                    if (v.is_integer() and self.intChannel(i,0)):
+                                        fmt = "%.0f"  
+                                    if -100 < v < 1000:
+                                        aw.extraLCD1[i].display(fmt%v) # everything fits
+                                    elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                        fmt = "%.0f"
                                         aw.extraLCD1[i].display(fmt%v)
                                     else:
                                         aw.extraLCD1[i].display("--")
@@ -2324,9 +2327,12 @@ class tgraphcanvas(FigureCanvas):
                                 if self.extratemp2[i]:
                                     fmt = lcdformat
                                     v = float(self.extratemp2[i][-1])
-                                    if -1000 < v < 10000:
-                                        if (v.is_integer() and self.intChannel(i,1)) or not (-100 < v < 1000):
-                                            fmt = "%.0f" # we display this value without decimals
+                                    if (v.is_integer() and self.intChannel(i,1)):
+                                        fmt = "%.0f"  
+                                    if -100 < v < 1000:
+                                        aw.extraLCD2[i].display(fmt%v) # everything fits
+                                    elif self.LCDdecimalplaces and -10000 < v < 100000:
+                                        fmt = "%.0f"
                                         aw.extraLCD2[i].display(fmt%v)
                                     else:
                                         aw.extraLCD2[i].display("--")
@@ -5947,8 +5953,9 @@ class tgraphcanvas(FigureCanvas):
             self.BTtarget = int(round(self.fromCtoF(self.BTtarget)))
             self.BT2target = int(round(self.fromCtoF(self.BT2target)))
             self.AUCbase = int(round(self.fromCtoF(self.AUCbase)))
-            self.RoRlimit = int(round(self.fromCtoF(self.RoRlimit)))
-            self.RoRlimitm = int(round(self.fromCtoF(self.RoRlimitm)))
+# this is wrong            
+#            self.RoRlimit = int(round(self.fromCtoF(self.RoRlimit)))
+#            self.RoRlimitm = int(round(self.fromCtoF(self.RoRlimitm)))
             self.alarmtemperature = [(self.fromCtoF(t) if t != 500 else t) for t in self.alarmtemperature]
             # conv Arduino mode
             if aw:
@@ -5983,8 +5990,9 @@ class tgraphcanvas(FigureCanvas):
             self.BTtarget = int(round(self.fromFtoC(self.BTtarget)))
             self.BT2target = int(round(self.fromFtoC(self.BT2target)))
             self.AUCbase = int(round(self.fromFtoC(self.AUCbase)))
-            self.RoRlimit = int(round(self.fromFtoC(self.RoRlimit)))
-            self.RoRlimitm = int(round(self.fromFtoC(self.RoRlimitm)))
+# This translates a limit (0F/min,30F/min) to (-18C/min, -1C/min) which is wrong
+#            self.RoRlimit = int(round(self.fromFtoC(self.RoRlimit)))
+#            self.RoRlimitm = int(round(self.fromFtoC(self.RoRlimitm)))
             self.alarmtemperature = [(self.fromFtoC(t) if t != 500 else t) for t in self.alarmtemperature]
             # conv Arduino mode
             if aw:
@@ -25040,11 +25048,21 @@ class ApplicationWindow(QMainWindow):
             pidstring = "ET pid = %i "%MVV
             ##### end of ET pid
             # QImage.Format_RGB32, QImage.Format_ARGB32
-            w = self.qmc.size().width()*self.devicePixelRatio()
-            h = self.qmc.size().height()*self.devicePixelRatio()
-            qImage = QImage(self.qmc.fig.canvas.buffer_rgba(), w, h, QImage.Format_ARGB32_Premultiplied).rgbSwapped()
+#            w = self.qmc.size().width()*self.devicePixelRatio()
+#            h = self.qmc.size().height()*self.devicePixelRatio()            
+#            qImage = QImage(self.qmc.fig.canvas.buffer_rgba(), w, h, QImage.Format_ARGB32_Premultiplied).rgbSwapped()                     
+#            if hasattr(qImage, 'setDevicePixelRatio'):
+#                qImage.setDevicePixelRatio(self.qmc.fig.canvas._dpi_ratio) 
+
+            buf = self.qmc.fig.canvas.buffer_rgba()
+            buf = bytearray(buf).copy()
+            w = self.qmc.fig.canvas.size().width()*self.qmc.fig.canvas._dpi_ratio
+            h = self.qmc.fig.canvas.size().height()*self.qmc.fig.canvas._dpi_ratio
+            qImage = QImage(buf,w, h, QImage.Format_ARGB32_Premultiplied)
             if hasattr(qImage, 'setDevicePixelRatio'):
                 qImage.setDevicePixelRatio(self.qmc.fig.canvas._dpi_ratio)
+            qImage = qImage.rgbSwapped()
+            
             img = QPixmap.fromImage(qImage)
             Wwidth = self.qmc.size().width()
             Wheight = self.qmc.size().height()
@@ -25764,12 +25782,12 @@ class HUDDlg(ArtisanDialog):
         self.maxLimit.setAlignment(Qt.AlignRight)
         self.maxLimit.setMinimumWidth(80)
         self.maxLimit.setValue(aw.qmc.filterDropOut_tmax)
-        if aw.qmc.mode == "F":
-            self.minLimit.setSuffix(" F")
-            self.maxLimit.setSuffix(" F")
-        elif aw.qmc.mode == "C":
-            self.minLimit.setSuffix(" C")
-            self.maxLimit.setSuffix(" C")
+#        if aw.qmc.mode == "F":
+#            self.minLimit.setSuffix(" F")
+#            self.maxLimit.setSuffix(" F")
+#        elif aw.qmc.mode == "C":
+#            self.minLimit.setSuffix(" C")
+#            self.maxLimit.setSuffix(" C")
         #show projection
         self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection",None))
         self.projectionmodeComboBox = QComboBox()
