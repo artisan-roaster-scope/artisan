@@ -9334,6 +9334,9 @@ class tgraphcanvas(FigureCanvas):
                 self.extratemp1[i] = [-1.]*num
                 self.extratemp2[i] = [-1.]*num
                 self.extratimex[i] = self.timex[:]
+                
+            if self.profile_sampling_interval is None:
+                self.profile_sampling_interval = self.delay / 1000.
 
             self.disconnect_designer()
 
