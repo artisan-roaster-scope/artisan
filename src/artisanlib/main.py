@@ -4274,91 +4274,6 @@ class tgraphcanvas(FigureCanvas):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " place_annotations() {0}").format(str(e)),exc_tb.tb_lineno)
-
-        
-#    # computes the RoR deltas and returns the smoothed versions for both temperature channels
-#    # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
-#    # timex_lin: a linear spaced version of timex
-#    def recomputeDeltas(self,timex,CHARGEidx,DROPidx,t1,t2,optimalSmoothing=True,timex_lin=None,deltasamples=None):
-#        try:
-#            tx = numpy.array(timex)
-#            if CHARGEidx > -1:
-#                roast_start_idx = CHARGEidx
-#            else:
-#                roast_start_idx = 0
-#            if DROPidx > 0:
-#                roast_end_idx = DROPidx
-#            else:
-#                roast_end_idx = len(tx)
-#            tx_roast = numpy.array(timex[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
-#            lt = len(tx_roast)
-#            if deltasamples is None:
-#                ds = aw.qmc.deltasamples
-#            else:
-#                ds = deltasamples
-#            if timex_lin is not None:
-#                if len(timex_lin) == len(timex):
-#                    timex_lin = numpy.array(timex_lin[roast_start_idx:roast_end_idx]) # just the part from CHARGE TO DROP
-#                else:
-#                    timex_lin = None
-#            if t1 is not None:
-#                with numpy.errstate(divide='ignore'):
-#                    nt1 = numpy.array([0 if x is None else x for x in t1[roast_start_idx:roast_end_idx]]) # ERROR None Type object not scriptable! t==None on ON
-#                    z1 = (nt1[ds:] - nt1[:-ds]) / ((tx_roast[ds:] - tx_roast[:-ds])/60.)
-#                    ld1 = len(z1)
-#                    
-#                # make lists equal in length
-#                if lt > ld1:
-#                    z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1)
-##                    z1 = numpy.append([None]*(lt - ld1),z1)
-#                if optimalSmoothing:
-#                    user_filter = self.deltafilter
-#                else:
-#                    user_filter = int(round(self.deltafilter/2.))
-#                delta1 = self.smooth_list(tx_roast,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
-#                # add None for parts before and after CHARGE/DROP
-#                delta1 = numpy.concatenate(([None]*(roast_start_idx),delta1,[None]*(len(tx)-roast_end_idx))) # ERROR: all input arrays must have the same number of dimensions
-#                # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
-#                if aw.qmc.RoRlimitFlag:
-#                    # remove values beyond the RoRlimit
-#                    delta1 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta1]
-#                if isinstance(delta1, (numpy.ndarray, numpy.generic)):
-#                    delta1 = delta1.tolist()
-#            else:
-#                delta1 = None
-#
-#            if t2 is not None:
-#                with numpy.errstate(divide='ignore'):
-#                    nt2 = numpy.array([0 if x is None else x for x in t2[roast_start_idx:roast_end_idx]])
-#                    z2 = (nt2[ds:] - nt2[:-ds]) / ((tx_roast[ds:] - tx_roast[:-ds])/60.)
-#                    ld2 = len(z2)
-#                # make lists equal in length
-#                if lt > ld2:
-#                    z2 = numpy.append([z2[0] if ld2 else 0.]*(lt - ld2),z2)
-##                    z2 = numpy.append([None]*(lt - ld2),z2)
-#                if optimalSmoothing:
-#                    user_filter = self.deltafilter
-#                else:
-#                    user_filter = int(round(self.deltafilter/2.))
-#                delta2 = self.smooth_list(tx_roast,z2,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin)
-#                # add None for parts before and after CHARGE/DROP
-#                delta2 = numpy.concatenate(([None]*(roast_start_idx),delta2,[None]*(len(tx)-roast_end_idx)))                
-#                # filter out values beyond the delta limits to cut out the part after DROP and before CHARGE
-#                if aw.qmc.RoRlimitFlag:
-#                    # remove values beyond the RoRlimit
-#                    delta2 = [d if d is not None and (max(-aw.qmc.maxRoRlimit,aw.qmc.RoRlimitm) < d < min(aw.qmc.maxRoRlimit,aw.qmc.RoRlimit)) else None for d in delta2]
-#                if isinstance(delta2, (numpy.ndarray, numpy.generic)):
-#                    delta2 = delta2.tolist()
-#            else:
-#                delta2 = None
-#                    
-#            return delta1, delta2
-#        except Exception as e:
-##            import traceback
-##            traceback.print_exc(file=sys.stdout)
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " recomputeDeltas() {0}").format(str(e)),exc_tb.tb_lineno)
-#            return [0]*len(timex),[0]*len(timex)
             
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
@@ -4919,7 +4834,10 @@ class tgraphcanvas(FigureCanvas):
                                 RoRstart = min(aw.qmc.timeindexB[0]+10, len(self.timeB)-1)
                             else:
                                 RoRstart = -1
-                            ds = int(max(1,aw.qmc.deltaspan / aw.qmc.background_profile_sampling_interval))
+                            if aw.qmc.background_profile_sampling_interval is None:
+                                ds = None
+                            else:
+                                ds = int(max(1,aw.qmc.deltaspan / aw.qmc.background_profile_sampling_interval))
                             self.delta1B, self.delta2B = self.recomputeDeltas(self.timeB,RoRstart,aw.qmc.timeindexB[6],st1,st2,optimalSmoothing=not decay_smoothing_p,timex_lin=timeB_lin,deltasamples=ds)
                         
                         ##### DeltaETB,DeltaBTB curves
@@ -16207,7 +16125,7 @@ class ApplicationWindow(QMainWindow):
             self.loadFile(toString(action.data()))
 
     def getDefaultPath(self):
-        #compare profilepath with userprofilepath (modulo the last two segments which are month/year respectively)
+        #compare profilepath with userprofilepath (modulo the last two segments which are month/year respectively)        
         return self.userprofilepath
 
     def setDefaultPath(self,f):
@@ -16220,8 +16138,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFilesDialog(self,msg=QApplication.translate("Message","Select",None),ext="*",path=None):
         if path is None:   
             path = self.getDefaultPath()
-            fname = path.absolutePath()
-        res = QFileDialog.getOpenFileNames(self,msg,fname,ext)[0]
+        res = QFileDialog.getOpenFileNames(self,msg,path,ext)[0]
         for f in res:
             self.setDefaultPath(u(f))
         return res
@@ -16229,10 +16146,11 @@ class ApplicationWindow(QMainWindow):
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
+        aw.sendmessage("ArtisanOpenFileDialog " + str(path))
         if path is None:   
             path = self.getDefaultPath()
-            fname = path.absolutePath()
-        res = u(QFileDialog.getOpenFileName(self,msg,fname,ext)[0])
+        aw.sendmessage("path " + str(path))
+#        res = u(QFileDialog.getOpenFileName(self,msg,path,ext)[0])
         f = u(res)
         self.setDefaultPath(f)
         return f
@@ -16242,7 +16160,6 @@ class ApplicationWindow(QMainWindow):
     def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
         if path is None:
             path = self.getDefaultPath()
-            path = path.absoluteFilePath("name")
         f = u(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
         self.setDefaultPath(f)
         return f
@@ -16252,7 +16169,6 @@ class ApplicationWindow(QMainWindow):
     def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None),path=None):
         if path is None:
             path = self.getDefaultPath()
-            path = path.absoluteFilePath("name")
         f = u(QFileDialog.getExistingDirectory(self,msg,path))
         self.setDefaultPath(f)
         return f
@@ -25056,16 +24972,7 @@ class ApplicationWindow(QMainWindow):
             MVV = int(round(MV))
             pidstring = "ET pid = %i "%MVV
             ##### end of ET pid
-#            # QImage.Format_RGB32, QImage.Format_ARGB32
-#            w = self.qmc.size().width()*self.devicePixelRatio()
-#            h = self.qmc.size().height()*self.devicePixelRatio()            
-#            qImage = QImage(self.qmc.fig.canvas.buffer_rgba(), w, h, QImage.Format_ARGB32_Premultiplied).rgbSwapped()                     
-#            if hasattr(qImage, 'setDevicePixelRatio'):
-#                qImage.setDevicePixelRatio(self.qmc.fig.canvas._dpi_ratio)
-#            img = QPixmap.fromImage(qImage)
-            
-            img = self.qmc.grab()
-            
+            img = self.qmc.grab()            
             Wwidth = self.qmc.size().width()
             Wheight = self.qmc.size().height()
             #Draw begins
