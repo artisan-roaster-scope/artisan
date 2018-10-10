@@ -17358,7 +17358,7 @@ class ApplicationWindow(QMainWindow):
                     u("DROP:" + self.eventtime2string(DROP)),
                     u("COOL:" + self.eventtime2string(COOL)),
                     u("Time:" + self.qmc.roastdate.time().toString()[:-3])])
-                row = ([u('Time1'),u('Time2'),u('BT'),u('ET'),u('Event')] + freduce(lambda x,y: x + [u(y[0]),u(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))                
+                row = ([u('Time1'),u('Time2'),u('ET'),u('BT'),u('Event')] + freduce(lambda x,y: x + [u(y[0]),u(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))                
                 writer.writerow(row)
                 last_time = None
                 for i in range(len(self.qmc.timex)):
@@ -17384,7 +17384,7 @@ class ApplicationWindow(QMainWindow):
                                 extratemps.append(u(self.qmc.extratemp2[j][i]))
                             else:
                                 extratemps.append(u("-1"))
-                        writer.writerow([u(time1),u(time2),u(self.qmc.temp2[i]),u(self.qmc.temp1[i]),u(event)] + extratemps)
+                        writer.writerow([u(time1),u(time2),u(self.qmc.temp1[i]),u(self.qmc.temp2[i]),u(event)] + extratemps)
                     last_time = time1
                 outfile.close()
                 return True
@@ -17487,8 +17487,8 @@ class ApplicationWindow(QMainWindow):
                 fieldlist = [
                     ["Time1",  "time1"             ],
                     ["Time2",  "time2"             ],
+                    ["ET",     "self.qmc.temp1[i]" ],
                     ["BT",     "self.qmc.temp2[i]" ],
-                    ["ET",     "self.qmc.temp2[i]" ],
                     ["Event",  "event"             ],
                     ]
                 extraslist = list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)]))
@@ -29603,8 +29603,8 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.setRowCount(nevents)
         self.eventtable.setColumnCount(6)
         self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table", "Time", None),
-                                                   QApplication.translate("Table", "BT", None),
                                                    QApplication.translate("Table", "ET", None),
+                                                   QApplication.translate("Table", "BT", None),
                                                    QApplication.translate("Table", "Description", None),
                                                    QApplication.translate("Table", "Type", None),
                                                    QApplication.translate("Table", "Value", None)])
@@ -29631,18 +29631,18 @@ class editGraphDlg(ArtisanDialog):
                 fmtstr = "%.1f"
             else:
                 fmtstr = "%.0f"
-                
-            btline = QLineEdit()
-            btline.setReadOnly(True)
-            btline.setAlignment(Qt.AlignRight)
-            bttemp = fmtstr%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
-            btline.setText(bttemp)
 
             etline = QLineEdit()
             etline.setReadOnly(True)
             etline.setAlignment(Qt.AlignRight)
             ettemp = fmtstr%(aw.qmc.temp1[aw.qmc.specialevents[i]]) + aw.qmc.mode
             etline.setText(ettemp)
+                
+            btline = QLineEdit()
+            btline.setReadOnly(True)
+            btline.setAlignment(Qt.AlignRight)
+            bttemp = fmtstr%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
+            btline.setText(bttemp)
             
             valueEdit = QLineEdit()
             valueEdit.setAlignment(Qt.AlignRight)
@@ -29661,8 +29661,8 @@ class editGraphDlg(ArtisanDialog):
             stringline = QLineEdit(aw.qmc.specialeventsStrings[i])
             #add widgets to the table
             self.eventtable.setCellWidget(i,0,timeline)
-            self.eventtable.setCellWidget(i,1,btline)
-            self.eventtable.setCellWidget(i,2,etline)
+            self.eventtable.setCellWidget(i,1,etline)
+            self.eventtable.setCellWidget(i,2,btline)
             self.eventtable.setCellWidget(i,3,stringline)
             self.eventtable.setCellWidget(i,4,typeComboBox)
             self.eventtable.setCellWidget(i,5,valueEdit)
@@ -34716,8 +34716,8 @@ class backgroundDlg(ArtisanDialog):
         self.eventtable.setRowCount(ndata)
         self.eventtable.setColumnCount(6)
         self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None),
-                                                   QApplication.translate("Table", "BT", None),
                                                    QApplication.translate("Table", "ET", None),
+                                                   QApplication.translate("Table", "BT", None),
                                                    QApplication.translate("Table","Description",None),
                                                    QApplication.translate("Table","Type",None),
                                                    QApplication.translate("Table","Value",None)])
@@ -34740,12 +34740,11 @@ class backgroundDlg(ArtisanDialog):
             else:
                 fmtstr = "%.0f"
             
-            btline = QTableWidgetItem(fmtstr%(aw.qmc.temp2B[aw.qmc.backgroundEvents[i]]) + aw.qmc.mode)
-            btline.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
-            
             etline = QTableWidgetItem(fmtstr%(aw.qmc.temp1B[aw.qmc.backgroundEvents[i]]) + aw.qmc.mode)
             etline.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
-                        
+            
+            btline = QTableWidgetItem(fmtstr%(aw.qmc.temp2B[aw.qmc.backgroundEvents[i]]) + aw.qmc.mode)
+            btline.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
             
             description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
             etype = QTableWidgetItem(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[i]))
@@ -34753,8 +34752,8 @@ class backgroundDlg(ArtisanDialog):
             evalue.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
             #add widgets to the table
             self.eventtable.setItem(i,0,timez)
-            self.eventtable.setItem(i,1,btline)
-            self.eventtable.setItem(i,2,etline)
+            self.eventtable.setItem(i,1,etline)
+            self.eventtable.setItem(i,2,btline)
             self.eventtable.setItem(i,3,description)
             self.eventtable.setItem(i,4,etype)
             self.eventtable.setItem(i,5,evalue)
