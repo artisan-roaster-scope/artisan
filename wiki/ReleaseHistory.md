@@ -2,6 +2,33 @@ Detailed Release History
 ========================
 
 ----
+v1.5.0 (xx.10.2018)
+------------------
+
+ * New Features
+   - adds support for VoltageRatio for Phidgets IO enhancement ([Issue #252](../../../issues/252))
+   - extends LCD rendering from [-999,9999] to render [-9999,99999] if "Decimal Places" are turned on  
+ * Changes 
+   - order of columns in roast/background properties events table, CSV import/export and Excel export swapped (ET always before BT)
+   -  event values on the graph are not abbreviated anymore if "Decimal Places" is not ticked
+ * Bug Fixes 
+   - fixes udev rule installation on Redhat/CentOS rpm builds
+   - fixes broken Linux builds crashing on opening the file selector ([Issue #259](../../../issues/259))
+   - fixes Windows gevent build error by upgrading to PyInstaller 3.4
+   - fixes broken Hottop communication on Windows ([Issue #258](../../../issues/258))
+   - fixes WebLCDs not starting on Windows ([Issue #253](../../../issues/253))
+   - fixes HUD crashing ([Issue #255](../../../issues/255))
+   - LCDs do not truncate readings to last 3 digits anymore if "Decimal Places" are ticked, but indicate an overflow by rendering two dashes ([Issue #256](../../../issues/256))
+   - fix issue preventing Stats Summary from showing if language is not set to English ([Issue #257](../../../issues/257))
+   - adds sampling interval to profiles generate using the designer
+   - ensures that profiles lacking an indication of the sampling interval used on recording are rendered when loaded into the background
+   - fixes typo in drop-out handling resulting in disappearing curves during recording ([Issue #254](../../../issues/254))
+   - ensures that "Snap Events" settings are persisted ([Issue #251](../../../issues/251))
+   - fixes Excel export listing BT twice instead of BT and ET
+
+
+
+----
 v1.4.0 (03.10.2018)
 ------------------
 
