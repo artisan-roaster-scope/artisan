@@ -112,6 +112,8 @@ cp ../LICENSE dist/LICENSE.txt
 rm -f dist/libdrm.so.2
 rm -f dist/libX11.so.6
 rm -f dist/libstdc++.so.6
+rm -f dist/libgio-2.0.so.0
+rm -f dist/libz.so.1
 
 rm -f libusb-1.0.so.0
 
