@@ -16146,11 +16146,9 @@ class ApplicationWindow(QMainWindow):
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
-        aw.sendmessage("ArtisanOpenFileDialog " + str(path))
         if path is None:   
             path = self.getDefaultPath()
-        aw.sendmessage("path " + str(path))
-#        res = u(QFileDialog.getOpenFileName(self,msg,path,ext)[0])
+        res = u(QFileDialog.getOpenFileName(self,msg,path,ext)[0])
         f = u(res)
         self.setDefaultPath(f)
         return f
