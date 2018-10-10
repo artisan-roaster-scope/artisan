@@ -12,7 +12,6 @@ urllib3==1.23
 requests==2.19.1
 yoctopuce==1.10.32391
 pefile==2018.8.8
-pyinstaller==3.4
 openpyxl==2.5.8
 altgraph==0.16.1
 macholib==1.11

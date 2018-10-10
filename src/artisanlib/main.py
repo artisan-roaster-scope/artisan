@@ -16148,9 +16148,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
         if path is None:   
             path = self.getDefaultPath()
-#        res = u(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext)[0])
-        res = u(QFileDialog.getOpenFileName(caption=msg,directory=path,filter=ext)[0])
-#        res = u(QFileDialog.getOpenFileName(caption=msg,directory=path,filter=ext,options=QFileDialog.DontUseNativeDialog)[0])
+        res = u(QFileDialog.getOpenFileName(self,caption=msg,directory=path,filter=ext)[0])
         f = u(res)
         self.setDefaultPath(f)
         return f
