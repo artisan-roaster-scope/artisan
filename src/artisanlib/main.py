@@ -16217,21 +16217,22 @@ class ApplicationWindow(QMainWindow):
             filepath_elements = filepath_dir.absolutePath().split("/")[:-1] # directories as QStrings (without the filename)
             self.userprofilepath = u(freduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
 
-    def ArtisanOpenFilesDialog(self,msg="Select",ext="*",path=None):
+    def ArtisanOpenFilesDialog(self,msg=QApplication.translate("Message","Select",None),ext="*",path=None):
         if path is None:   
             path = self.getDefaultPath()
-        res = QFileDialog.getOpenFileNames(self,msg,path,ext)[0]
+            fname = path.absolutePath()
+        res = QFileDialog.getOpenFileNames(self,msg,fname,ext)[0]
         for f in res:
             self.setDefaultPath(u(f))
         return res
-        
-        
+                
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanOpenFileDialog(self,msg=QApplication.translate("Message","Open",None),ext="*",path=None):
         if path is None:   
             path = self.getDefaultPath()
-        res = u(QFileDialog.getOpenFileName(self,msg,path,ext)[0])
+            fname = path.absolutePath()
+        res = u(QFileDialog.getOpenFileName(self,msg,fname,ext)[0])
         f = u(res)
         self.setDefaultPath(f)
         return f
@@ -16241,6 +16242,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None),ext="*.alog",path=None):
         if path is None:
             path = self.getDefaultPath()
+            path = path.absoluteFilePath("name")
         f = u(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
         self.setDefaultPath(f)
         return f
@@ -16250,6 +16252,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None),path=None):
         if path is None:
             path = self.getDefaultPath()
+            path = path.absoluteFilePath("name")
         f = u(QFileDialog.getExistingDirectory(self,msg,path))
         self.setDefaultPath(f)
         return f
