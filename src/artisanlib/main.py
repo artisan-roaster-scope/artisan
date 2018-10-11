@@ -9819,7 +9819,7 @@ class VMToolbar(NavigationToolbar):
         self.toolitems = (
 
 #PLUS-COMMENT
-            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
+#            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
             
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
             ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -9868,8 +9868,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-            if aw is not None:
-                aw.updatePlusStatus(self)
+#            if aw is not None:
+#                aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -18810,15 +18810,15 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-            if settings.contains("plus_account"):
-                self.plus_account = settings.value("plus_account",self.plus_account)
-                self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
-                if self.plus_account is not None:
-                    try:
-                        import plus.controller
-                        plus.controller.start(aw)
-                    except:
-                        pass
+#            if settings.contains("plus_account"):
+#                self.plus_account = settings.value("plus_account",self.plus_account)
+#                self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+#                if self.plus_account is not None:
+#                    try:
+#                        import plus.controller
+#                        plus.controller.start(aw)
+#                    except:
+#                        pass
                       
             #restore mode
             old_mode = self.qmc.mode
