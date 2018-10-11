@@ -1110,6 +1110,7 @@ class tgraphcanvas(FigureCanvas):
 
         #background profile
         self.background = False
+        self.backgroundprofile = None
         self.backgroundDetails = True
         self.backgroundeventsflag = True
         self.backgroundpath = ""
@@ -5537,7 +5538,7 @@ class tgraphcanvas(FigureCanvas):
     def statsSummary(self):
         try:
             # build roast of the day string
-            if aw.qmc.roastbatchpos != None and aw.qmc.roastbatchpos != 0:
+            if aw.qmc.roastbatchnr != None and aw.qmc.roastbatchnr != 0 and aw.qmc.roastbatchpos != None and aw.qmc.roastbatchpos != 0:
                 roastoftheday = '\n' + str(aw.qmc.roastbatchpos)
                 if locale == "en":
                     if aw.qmc.roastbatchpos > 3:
@@ -10666,7 +10667,7 @@ class SampleThread(QThread):
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
                 #add to plot a vertical time line
-                if aw.qmc.showtimeguide or aw.qmc.device == 18 and aw.qmc.l_timeline is not None:
+                if (aw.qmc.showtimeguide or aw.qmc.device == 18) and aw.qmc.l_timeline is not None:
                     aw.qmc.l_timeline.set_data([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit])
         except Exception as e:
             #import traceback
@@ -16353,6 +16354,7 @@ class ApplicationWindow(QMainWindow):
             if firstChar == "{":
                 f.close()
                 profile = self.deserialize(filename)
+                self.qmc.backgroundprofile = profile
                 tb = profile["timex"]
                 t1 = profile["temp1"]
                 t2 = profile["temp2"]
@@ -24092,6 +24094,7 @@ class ApplicationWindow(QMainWindow):
         
     def deleteBackground(self):
         self.qmc.background = False
+        self.qmc.backgroundprofile = None
         self.qmc.backgroundpath = ""
         self.qmc.backgroundUUID = None
         self.qmc.titleB = ""
@@ -34623,6 +34626,7 @@ class backgroundDlg(ArtisanDialog):
 # but we have to deactivate the show flag
         self.backgroundCheck.setChecked(False)
         aw.qmc.background = False
+        aw.qmc.backgroundprofile = None
         self.xtcurveComboBox.blockSignals(True)
         self.xtcurveComboBox.clear()
         aw.deleteBackground()
@@ -50591,6 +50595,7 @@ def main():
                     aw.qmc.timealign(redraw=True,recompute=True)
                 except:
                     aw.qmc.background = False
+                    aw.qmc.backgroundprofile = None
     except Exception:
         pass
     if platf == 'Windows' and appFrozen():
