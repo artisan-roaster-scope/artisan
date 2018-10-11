@@ -53,6 +53,7 @@ ssh_control()
     sudo apt install -y python3-pip python3-pyqt5 libusb-1.0 \
 	    libblas-dev liblapack-dev libatlas-base-dev gfortran
     set +e
+    sudo pip3 install --upgrade setuptools # prevents urlib3 error "TypeError: unsupported operand type(s) for -=: 'Retry' and 'int'" on pip3 retries
     while :; do
         pip3 install -r artisan/src/requirements.txt
 	if [ \$? -eq 0 ]; then
