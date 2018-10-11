@@ -25,6 +25,7 @@ v1.5.0 (xx.10.2018)
    - fixes typo in drop-out handling resulting in disappearing curves during recording ([Issue #254](../../../issues/254))
    - ensures that "Snap Events" settings are persisted ([Issue #251](../../../issues/251))
    - fixes Excel export listing BT twice instead of BT and ET
+   - fixes regression that deactivated curve smoothing completely
 
 
 
@@ -1142,3 +1143,4 @@ v0.2.0 (31.12.2010)
 v0.1.0 (20.12.2010)
 -------------------
  * Initial release
+====

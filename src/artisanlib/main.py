@@ -4984,12 +4984,12 @@ class tgraphcanvas(FigureCanvas):
                 temp2_nogaps = self.fill_gaps(self.temp2)
                         
                 if smooth or len(self.stemp1) != len(self.timex):
-                    if not aw.qmc.smooth_curves_on_recording or aw.qmc.flagon: # we don't smooth, but remove the dropouts
+                    if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon: # we don't smooth, but remove the dropouts
                         self.stemp1 = temp1_nogaps
                     else:
                         self.stemp1 = self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
                 if smooth or len(self.stemp2) != len(self.timex):
-                    if not aw.qmc.smooth_curves_on_recording or aw.qmc.flagon:  # we don't smooth, but remove the dropouts
+                    if not aw.qmc.smooth_curves_on_recording and aw.qmc.flagon:  # we don't smooth, but remove the dropouts
                         self.stemp2 = self.fill_gaps(self.temp2)
                     else:
                         self.stemp2 = self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
@@ -5318,7 +5318,7 @@ class tgraphcanvas(FigureCanvas):
                         timexi_lin = None
                     try:
                         if aw.extraCurveVisibility1[i]:
-                            if not aw.qmc.flagon and (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
+                            if (not aw.qmc.flagon or aw.qmc.smooth_curves_on_recording) and (smooth or len(self.extrastemp1[i]) != len(self.extratimex[i])):
                                 self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp1[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                             else: # we don't smooth, but remove the dropouts
                                 self.extrastemp1[i] = self.fill_gaps(self.extratemp1[i])
@@ -5330,7 +5330,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " redraw() {0}").format(str(ex)),exc_tb.tb_lineno)                        
                     try:
                         if aw.extraCurveVisibility2[i]:
-                            if not aw.qmc.flagon and (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
+                            if (not aw.qmc.flagon or aw.qmc.smooth_curves_on_recording) and (smooth or len(self.extrastemp2[i]) != len(self.extratimex[i])):
                                 self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.fill_gaps(self.extratemp2[i]),window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timexi_lin)
                             else:
                                 self.extrastemp2[i] = self.fill_gaps(self.extratemp2[i])
@@ -9819,7 +9819,7 @@ class VMToolbar(NavigationToolbar):
         self.toolitems = (
 
 #PLUS-COMMENT
-#            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
+            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
             
             ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
             ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -9868,8 +9868,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-#            if aw is not None:
-#                aw.updatePlusStatus(self)
+            if aw is not None:
+                aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -18810,15 +18810,15 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-#            if settings.contains("plus_account"):
-#                self.plus_account = settings.value("plus_account",self.plus_account)
-#                self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
-#                if self.plus_account is not None:
-#                    try:
-#                        import plus.controller
-#                        plus.controller.start(aw)
-#                    except:
-#                        pass
+            if settings.contains("plus_account"):
+                self.plus_account = settings.value("plus_account",self.plus_account)
+                self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+                if self.plus_account is not None:
+                    try:
+                        import plus.controller
+                        plus.controller.start(aw)
+                    except:
+                        pass
                       
             #restore mode
             old_mode = self.qmc.mode

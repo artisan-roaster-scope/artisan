@@ -59,6 +59,12 @@ ssh_control()
 	   break
 	fi
     done
+    while :; do
+        pip3 install -r artisan/src/requirements-rpi.txt
+	if [ \$? -eq 0 ]; then
+	   break
+	fi
+    done
     (cd Phidget22Python && sudo python3 setup.py install)
     cd artisan
     cd src

@@ -19,4 +19,3 @@ python-snap7==0.10
 colorspacious==1.1.2
 pyusb==1.0.2
 setuptools==40.4.3
-pyinstaller==3.4
