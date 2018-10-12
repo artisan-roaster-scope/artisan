@@ -1758,11 +1758,15 @@ class tgraphcanvas(FigureCanvas):
         self.extraArduinoT5 = 0. # SV
         self.extraArduinoT6 = 0. # TC4 internal ambient temperature
         
-        #used by extra device +Program_34 and +Program_56 to pass values
+        #used by extra device +Program_34, +Program_56, +Program_78 and +Program_910 to pass values
         self.program_t3 = -1
         self.program_t4 = -1
         self.program_t5 = -1
         self.program_t6 = -1
+        self.program_t7 = -1
+        self.program_t8 = -1
+        self.program_t9 = -1
+        self.program_t10 = -1
 
         #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs and ET-BT
         self.dutycycle = -1
@@ -12395,9 +12399,9 @@ class ApplicationWindow(QMainWindow):
         self.level1layout.addWidget(self.button_2)
         self.level1layout.addSpacing(15)
         self.level1layout.addWidget(self.button_10)
-        self.level1layout.addSpacing(10)
+        self.level1layout.addSpacing(15)
         self.level1layout.addWidget(self.button_18)
-        self.level1layout.addSpacing(10)
+        self.level1layout.addSpacing(15)
         self.level1layout.addWidget(self.lcd1)
         self.level1layout.setContentsMargins(0,0,0,0)
         self.level1layout.setSpacing(0)
@@ -35647,6 +35651,8 @@ class serialport(object):
                                    self.R1_DRUM_BTROR,        #85
                                    self.R1_EXIT_TEMP_VOLT,    #86
                                    self.R1_RPM_STATE,         #87
+                                   self.callprogram_78,       #88
+                                   self.callprogram_910,      #89
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -35898,7 +35904,15 @@ class serialport(object):
                         if len(parts) > 4:
                             aw.qmc.program_t5 = float(parts[4].strip())
                             if len(parts) > 5:
-                                aw.qmc.program_t6 = float(parts[5].strip())
+                                aw.qmc.program_t6 = float(parts[5].strip())                                
+                                if len(parts) > 6:
+                                    aw.qmc.program_t7 = float(parts[6].strip())                                
+                                    if len(parts) > 7:
+                                        aw.qmc.program_t8 = float(parts[7].strip())                                
+                                        if len(parts) > 8:
+                                            aw.qmc.program_t9 = float(parts[8].strip())                                
+                                            if len(parts) > 9:
+                                                aw.qmc.program_t10 = float(parts[9].strip())                                
                 return tx,float(parts[0].strip()),float(parts[1].strip())
             else:
                 return tx,0.,float(output)
@@ -35919,6 +35933,18 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t1 = aw.qmc.program_t5
         t2 = aw.qmc.program_t6
+        return tx,t2,t1
+
+    def callprogram_78(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.qmc.program_t7
+        t2 = aw.qmc.program_t8
+        return tx,t2,t1
+
+    def callprogram_910(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.qmc.program_t9
+        t2 = aw.qmc.program_t10
         return tx,t2,t1
 
     def virtual(self):
@@ -40493,7 +40519,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -41021,7 +41047,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -41113,7 +41139,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -43195,6 +43221,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 elif meter == "Aillio Bullet R1 BT/DT":
                     aw.qmc.device = 83
                     message = QApplication.translate("Message","Device set to {0}", None).format(meter)
+                ##########################
+                ####  DEVICE 48 is an external program 34
+                ##########################
+                ##########################
+                ####  DEVICE 49 is an external program 56
+                ##########################
                 
                 # ADD DEVICE:
 
@@ -43301,6 +43333,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 84
                 1, # 85
                 1, # 86
+                1, # 87
+                1, # 88
+                1, # 89
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -43417,7 +43452,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.accept()
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]):
                 aw.setcommport()
             #self.close()
         except Exception as e:
