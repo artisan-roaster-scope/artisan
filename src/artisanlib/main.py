@@ -9821,18 +9821,28 @@ def my_get_icon(name):
         
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
-        self.toolitems = (
+        if displayonlyMode:
+            self.toolitems = (
+                ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
+                ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
+                ('Forward', QApplication.translate("Tooltip", 'Forward to next view', None), 'forward', 'forward'),
+                (None, None, None, None),
+                ('Pan', QApplication.translate("Tooltip", 'Pan axes with left mouse, zoom with right', None), 'move', 'pan'),
+                ('Zoom', QApplication.translate("Tooltip", 'Zoom to rectangle', None), 'zoom_to_rect', 'zoom'),
+            )
+        else:       
+            self.toolitems = (
 
 #PLUS-COMMENT
-#            ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
-            
-            ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
-            ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
-            ('Forward', QApplication.translate("Tooltip", 'Forward to next view', None), 'forward', 'forward'),
-            (None, None, None, None),
-            ('Pan', QApplication.translate("Tooltip", 'Pan axes with left mouse, zoom with right', None), 'move', 'pan'),
-            ('Zoom', QApplication.translate("Tooltip", 'Zoom to rectangle', None), 'zoom_to_rect', 'zoom'),
-        )
+#                ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
+                
+                ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
+                ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
+                ('Forward', QApplication.translate("Tooltip", 'Forward to next view', None), 'forward', 'forward'),
+                (None, None, None, None),
+                ('Pan', QApplication.translate("Tooltip", 'Pan axes with left mouse, zoom with right', None), 'move', 'pan'),
+                ('Zoom', QApplication.translate("Tooltip", 'Zoom to rectangle', None), 'zoom_to_rect', 'zoom'),
+            )
         
         # if true, we render Artisan-specific white versions of the icons
         self.white_icons = white_icons
@@ -9873,7 +9883,7 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-#            if aw is not None:
+#            if aw is not None and not displayonlyMode:
 #                aw.updatePlusStatus(self)
 
 
@@ -18861,7 +18871,7 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-#            if settings.contains("plus_account"):
+#            if not displayonlyMode and settings.contains("plus_account"):
 #                self.plus_account = settings.value("plus_account",self.plus_account)
 #                self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
 #                if self.plus_account is not None:

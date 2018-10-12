@@ -6,7 +6,7 @@ v1.5.0 (xx.10.2018)
 ------------------
 
  * New Features
-   - adds back possibility to run a second (restricted) instance of Artisan
+   - adds back possibility to run a second (restricted) instance of Artisan ([Issue #260](../../../issues/260))
    - adds support for VoltageRatio for Phidgets IO enhancement ([Issue #252](../../../issues/252))
    - extends LCD rendering from [-999,9999] to render [-9999,99999] if "Decimal Places" are turned on
    - adds "Program 78" and "Program 910" device types
