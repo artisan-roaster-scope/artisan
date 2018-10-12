@@ -9830,7 +9830,7 @@ def my_get_icon(name):
         
 class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent,white_icons=False):
-        if displayonlyMode:
+        if artisanviewerMode:
             self.toolitems = (
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -9892,7 +9892,7 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-#            if aw is not None and not displayonlyMode:
+#            if aw is not None and not artisanviewerMode:
 #                aw.updatePlusStatus(self)
 
 
@@ -11817,7 +11817,7 @@ class ApplicationWindow(QMainWindow):
             self.button_1.setMinimumWidth(100)
         self.button_1.setMinimumHeight(50)
         self.button_1.clicked.connect(lambda _:self.qmc.ToggleMonitor())
-        if displayonlyMode:
+        if artisanviewerMode:
             self.button_1.setVisible(False)
 
         #create START/STOP buttons
@@ -11831,7 +11831,7 @@ class ApplicationWindow(QMainWindow):
             self.button_2.setMinimumWidth(100)
         self.button_2.setMinimumHeight(50)            
         self.button_2.clicked.connect(lambda _:self.qmc.ToggleRecorder())
-        if displayonlyMode:
+        if artisanviewerMode:
             self.button_2.setVisible(False)
         
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
@@ -11881,7 +11881,7 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setMinimumHeight(50)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
         self.button_7.clicked.connect(lambda _: self.qmc.reset())
-        if displayonlyMode:
+        if artisanviewerMode:
             self.button_7.setVisible(False)
 
         #create CHARGE button
@@ -11906,7 +11906,7 @@ class ApplicationWindow(QMainWindow):
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
         self.button_10.setMinimumSize(90, 50)
         self.button_10.clicked.connect(lambda _:self.PIDcontrol())
-        if displayonlyMode:
+        if artisanviewerMode:
             self.button_10.setVisible(False)
 
         #create EVENT record button
@@ -11980,7 +11980,7 @@ class ApplicationWindow(QMainWindow):
         self.button_18.setEnabled(False)
         if not self.qmc.HUDbuttonflag:
             self.button_18.setVisible(False)
-        if displayonlyMode:
+        if artisanviewerMode:
             self.button_18.setVisible(False)
             
         #create DRY button
@@ -12022,7 +12022,7 @@ class ApplicationWindow(QMainWindow):
         # switch superusermode action:
         self.lcd1.setContextMenuPolicy(Qt.CustomContextMenu)
         self.lcd1.customContextMenuRequested.connect(self.superusermodeClicked)
-        if displayonlyMode:
+        if artisanviewerMode:
             self.lcd1.setVisible(False)
 
 
@@ -15252,7 +15252,7 @@ class ApplicationWindow(QMainWindow):
             self.showExtraButtons(False)
         else:
             self.hideExtraButtons(False)
-        if displayonlyMode:
+        if artisanviewerMode:
             self.hideExtraButtons(True)
             
     def hideExtraButtons(self,changeDefault=True):
@@ -15304,7 +15304,7 @@ class ApplicationWindow(QMainWindow):
             self.showSliders(False)
         else:
             self.hideSliders(False)
-        if displayonlyMode:
+        if artisanviewerMode:
             self.hideSliders(True)
 
     def hideSliders(self,changeDefault=True):
@@ -15557,7 +15557,7 @@ class ApplicationWindow(QMainWindow):
         self.displayonlymenus()
 
     def displayonlymenus(self):
-        if displayonlyMode:
+        if artisanviewerMode:
             self.newRoastMenu.setEnabled(False)
             self.deviceAction.setEnabled(False)
             self.commportAction.setEnabled(False)
@@ -15725,17 +15725,17 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.movebackground("down",aw.qmc.backgroundmovespeed)
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
                 elif key == 65:                     #letter A (automatic save)
-                    if not displayonlyMode:
+                    if not artisanviewerMode:
                         self.automaticsave()
                 elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
                     self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
                 elif key == 67:                     #letter C (controls)
                     self.toggleControls()
                 elif key == 88:                     #letter X (readings)
-                    if not displayonlyMode:
+                    if not artisanviewerMode:
                         self.toggleReadings()
                 elif key == 83:                     #letter S (sliders)
-                    if not displayonlyMode:
+                    if not artisanviewerMode:
                         self.toggleSliders()
                 elif key == 84 and not self.qmc.flagon:  #letter T (mouse cross)
                     self.qmc.togglecrosslines()
@@ -15755,14 +15755,14 @@ class ApplicationWindow(QMainWindow):
                     self.quickEventShortCut = (4,"")
                     aw.sendmessage("SV")
                 elif key == 66:  #letter b hides/shows extra rows of event buttons
-                    if not displayonlyMode:
+                    if not artisanviewerMode:
                         self.toggleextraeventrows()
                 elif key == 77:  #letter m hides/shows standard buttons row
                     if aw.qmc.flagstart:
                         self.standardButtonsVisibility()
                 #Extra event buttons palette. Numerical keys [0,1,2,3,4,5,6,7,8,9]
                 elif key > 47 and key < 58:
-                    if not displayonlyMode:
+                    if not artisanviewerMode:
                         button = [48,49,50,51,52,53,54,55,56,57] 
                         if self.quickEventShortCut:
                             # quick custom event entry
@@ -18880,7 +18880,7 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-#            if not displayonlyMode and settings.contains("plus_account"):
+#            if not artisanviewerMode and settings.contains("plus_account"):
 #                self.plus_account = settings.value("plus_account",self.plus_account)
 #                self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
 #                if self.plus_account is not None:
@@ -19552,7 +19552,7 @@ class ApplicationWindow(QMainWindow):
                     aw.button_18.setVisible(True)
                 else:
                     aw.button_18.setVisible(False)
-            if displayonlyMode:
+            if artisanviewerMode:
                 aw.button_18.setVisible(False)
             settings.endGroup()
             settings.beginGroup("Style")
@@ -19859,7 +19859,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             self.qmc.adjustTempSliders() # adjust min/max slider limits of temperature sliders to correspond to the current temp mode
             aw.slidersAction.setEnabled(any(aw.eventslidervisibilities) or aw.pidcontrol.svSlider)
-            if displayonlyMode:
+            if artisanviewerMode:
                 aw.slidersAction.setEnabled(False)
             #restore quantifier
             settings.beginGroup("Quantifiers")
@@ -25262,7 +25262,7 @@ class ApplicationWindow(QMainWindow):
                 self.e4buttondialog.setVisible(True)
         self.settooltip()
         aw.buttonsAction.setEnabled(bool(len(aw.extraeventslabels) > 0))
-        if displayonlyMode:
+        if artisanviewerMode:
             aw.buttonsAction.setEnabled(False)
         self.update_extraeventbuttons_visibility()
 
@@ -25895,7 +25895,7 @@ class HUDDlg(ArtisanDialog):
         hudHBox.addStretch()
         hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","Head Up Display",None))
         hudGroupLayout.setLayout(hudHBox)  
-        if displayonlyMode:
+        if artisanviewerMode:
             hudGroupLayout.setEnabled(False)
         rorRoRAlgo = QHBoxLayout()
         rorRoRAlgo.addWidget(self.OptimalSmoothingFlag) 
@@ -32432,7 +32432,7 @@ class EventsDlg(ArtisanDialog):
         defaultButtonsLayout.setColumnMinimumWidth(3,20)
         ButtonGroupLayout = QGroupBox(QApplication.translate("GroupBox","Default Buttons",None))
         ButtonGroupLayout.setLayout(defaultButtonsLayout)
-        if displayonlyMode:
+        if artisanviewerMode:
             ButtonGroupLayout.setEnabled(False)
         
         samplingLayout = QHBoxLayout()
@@ -32646,12 +32646,12 @@ class EventsDlg(ArtisanDialog):
         self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        if displayonlyMode:
+        if artisanviewerMode:
             C2Widget.setEnabled(False)
         self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Buttons",None))
         C5Widget = QWidget()
         C5Widget.setLayout(C5VBox)
-        if displayonlyMode:
+        if artisanviewerMode:
             C5Widget.setEnabled(False)
         self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Sliders",None))
         C6Widget = QWidget()
@@ -50640,19 +50640,19 @@ if sys.platform.startswith("darwin"):
 def main():
     global aw
     global app
-    global displayonlyMode
+    global artisanviewerMode
     
     # suppress all warnings
     warnings.filterwarnings('ignore')
     
     if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
-        displayonlyMode = True
+        artisanviewerMode = True
         app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
         app.setOrganizationName("YourQuestViewer")                                    #needed by QSettings() to store windows geometry in operating system
         app.setOrganizationDomain("viewer.p.code.google.com")                         #needed by QSettings() to store windows geometry in operating system
 #        sys.exit(0)
     else:
-        displayonlyMode = False
+        artisanviewerMode = False
     
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
