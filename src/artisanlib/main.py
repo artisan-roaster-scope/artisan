@@ -11883,6 +11883,8 @@ class ApplicationWindow(QMainWindow):
         self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])
         self.button_10.setMinimumSize(90, 50)
         self.button_10.clicked.connect(lambda _:self.PIDcontrol())
+        if displayonlyMode:
+            self.button_10.setVisible(False)
 
         #create EVENT record button
         self.button_11 = QPushButton(QApplication.translate("Button", "EVENT", None))
@@ -15698,15 +15700,18 @@ class ApplicationWindow(QMainWindow):
                         aw.qmc.movebackground("down",aw.qmc.backgroundmovespeed)
                         aw.qmc.redraw(recomputeAllDeltas=True,sampling=aw.qmc.flagon)
                 elif key == 65:                     #letter A (automatic save)
-                    self.automaticsave()
+                    if not displayonlyMode:
+                        self.automaticsave()
                 elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
                     self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
                 elif key == 67:                     #letter C (controls)
                     self.toggleControls()
                 elif key == 88:                     #letter X (readings)
-                    self.toggleReadings()
+                    if not displayonlyMode:
+                        self.toggleReadings()
                 elif key == 83:                     #letter S (sliders)
-                    self.toggleSliders()
+                    if not displayonlyMode:
+                        self.toggleSliders()
                 elif key == 84 and not self.qmc.flagon:  #letter T (mouse cross)
                     self.qmc.togglecrosslines()
                 elif key == 81:  #letter q (quick entry of custom event 1)
@@ -15725,45 +15730,47 @@ class ApplicationWindow(QMainWindow):
                     self.quickEventShortCut = (4,"")
                     aw.sendmessage("SV")
                 elif key == 66:  #letter b hides/shows extra rows of event buttons
-                    self.toggleextraeventrows()
+                    if not displayonlyMode:
+                        self.toggleextraeventrows()
                 elif key == 77:  #letter m hides/shows standard buttons row
                     if aw.qmc.flagstart:
                         self.standardButtonsVisibility()
                 #Extra event buttons palette. Numerical keys [0,1,2,3,4,5,6,7,8,9]
                 elif key > 47 and key < 58:
-                    button = [48,49,50,51,52,53,54,55,56,57] 
-                    if self.quickEventShortCut:
-                        # quick custom event entry
-                        eventNr = self.quickEventShortCut[0]
-                        eventValueStr = self.quickEventShortCut[1] + str(button.index(key))
-                        if eventNr == 4:
-                            aw.sendmessage("SV %s"%(eventValueStr))
-                        else:
-                            aw.sendmessage("%s %s"%(aw.qmc.etypes[eventNr],eventValueStr))
-                        if eventNr == 4: # SV
-                            if len(eventValueStr) == 3:
-                                # three digits entered, set the SV
-                                self.quickEventShortCut = None
-                                value = int(eventValueStr)
-                                aw.sendmessage("")
-                                aw.pidcontrol.setSV(value)
+                    if not displayonlyMode:
+                        button = [48,49,50,51,52,53,54,55,56,57] 
+                        if self.quickEventShortCut:
+                            # quick custom event entry
+                            eventNr = self.quickEventShortCut[0]
+                            eventValueStr = self.quickEventShortCut[1] + str(button.index(key))
+                            if eventNr == 4:
+                                aw.sendmessage("SV %s"%(eventValueStr))
                             else:
-                                # keep on looking for digits
-                                self.quickEventShortCut = (eventNr,eventValueStr)
-                        else:
-                            if len(eventValueStr) == 2:
-                                # both digits entered, create the event
-                                self.quickEventShortCut = None
-                                value = max(aw.eventslidermin[eventNr],min(aw.eventslidermax[eventNr],int(eventValueStr)))
-                                aw.moveslider(eventNr,value)
-                                aw.recordsliderevent(eventNr)
+                                aw.sendmessage("%s %s"%(aw.qmc.etypes[eventNr],eventValueStr))
+                            if eventNr == 4: # SV
+                                if len(eventValueStr) == 3:
+                                    # three digits entered, set the SV
+                                    self.quickEventShortCut = None
+                                    value = int(eventValueStr)
+                                    aw.sendmessage("")
+                                    aw.pidcontrol.setSV(value)
+                                else:
+                                    # keep on looking for digits
+                                    self.quickEventShortCut = (eventNr,eventValueStr)
                             else:
-                                # keep on looking for digits
-                                self.quickEventShortCut = (eventNr,eventValueStr)
+                                if len(eventValueStr) == 2:
+                                    # both digits entered, create the event
+                                    self.quickEventShortCut = None
+                                    value = max(aw.eventslidermin[eventNr],min(aw.eventslidermax[eventNr],int(eventValueStr)))
+                                    aw.moveslider(eventNr,value)
+                                    aw.recordsliderevent(eventNr)
+                                else:
+                                    # keep on looking for digits
+                                    self.quickEventShortCut = (eventNr,eventValueStr)
 # now shift modifier is required to switch palettes via number keys
-#                    else:
-#                        if aw.buttonpalette_shortcuts:
-#                            self.setbuttonsfrom(button.index(key))
+#                       else:
+#                            if aw.buttonpalette_shortcuts:
+#                               self.setbuttonsfrom(button.index(key))
                 elif key == 58 and not aw.qmc.flagon: # screenshots only if not sampling!
                     self.desktopscreenshot()
                 elif key == 59 and not aw.qmc.flagon: # screenshots only if not sampling!
@@ -20320,9 +20327,6 @@ class ApplicationWindow(QMainWindow):
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
         #many applications (including the KDE applications) use INI text files
-        
-        if displayonlyMode:
-            return
 
         try:
             if filename:
@@ -50587,6 +50591,9 @@ def main():
     
     if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
         displayonlyMode = True
+        app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
+        app.setOrganizationName("YourQuestViewer")                                    #needed by QSettings() to store windows geometry in operating system
+        app.setOrganizationDomain("viewer.p.code.google.com")                         #needed by QSettings() to store windows geometry in operating system
 #        sys.exit(0)
     else:
         displayonlyMode = False
