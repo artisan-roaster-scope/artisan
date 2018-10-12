@@ -11362,9 +11362,9 @@ class ApplicationWindow(QMainWindow):
         self.ConfMenu.addAction(self.eventsAction)
         self.eventsAction.setShortcut("Ctrl+E")
 
-        alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
-        alarmAction.triggered.connect(self.alarmconfig)
-        self.ConfMenu.addAction(alarmAction)
+        self.alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
+        self.alarmAction.triggered.connect(self.alarmconfig)
+        self.ConfMenu.addAction(self.alarmAction)
         
         self.ConfMenu.addSeparator()
 
@@ -11393,13 +11393,13 @@ class ApplicationWindow(QMainWindow):
         
         self.ConfMenu.addSeparator()
 
-        autosaveAction = QAction(UIconst.CONF_MENU_AUTOSAVE,self)
-        autosaveAction.triggered.connect(self.autosaveconf)
-        self.ConfMenu.addAction(autosaveAction)
+        self.autosaveAction = QAction(UIconst.CONF_MENU_AUTOSAVE,self)
+        self.autosaveAction.triggered.connect(self.autosaveconf)
+        self.ConfMenu.addAction(self.autosaveAction)
 
-        batchAction = QAction(UIconst.CONF_MENU_BATCH,self)
-        batchAction.triggered.connect(self.batchconf)
-        self.ConfMenu.addAction(batchAction)
+        self.batchAction = QAction(UIconst.CONF_MENU_BATCH,self)
+        self.batchAction.triggered.connect(self.batchconf)
+        self.ConfMenu.addAction(self.batchAction)
 
         self.ConfMenu.addSeparator()
         
@@ -11725,6 +11725,8 @@ class ApplicationWindow(QMainWindow):
         self.resetAction = QAction(UIconst.HELP_MENU_RESET,self)
         self.resetAction.triggered.connect(self.resetApplication)
         self.helpMenu.addAction(self.resetAction)
+        
+        self.displayonlymenus()
 
         ############################## WIDGETS SECTION ########################################
 
@@ -11792,6 +11794,8 @@ class ApplicationWindow(QMainWindow):
             self.button_1.setMinimumWidth(100)
         self.button_1.setMinimumHeight(50)
         self.button_1.clicked.connect(lambda _:self.qmc.ToggleMonitor())
+        if displayonlyMode:
+            self.button_1.setVisible(False)
 
         #create START/STOP buttons
         self.button_2 = QPushButton(QApplication.translate("Button", "START", None))
@@ -11804,6 +11808,8 @@ class ApplicationWindow(QMainWindow):
             self.button_2.setMinimumWidth(100)
         self.button_2.setMinimumHeight(50)            
         self.button_2.clicked.connect(lambda _:self.qmc.ToggleRecorder())
+        if displayonlyMode:
+            self.button_2.setVisible(False)
         
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
         if platf == 'Windows':
@@ -11852,6 +11858,8 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setMinimumHeight(50)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None))
         self.button_7.clicked.connect(lambda _: self.qmc.reset())
+        if displayonlyMode:
+            self.button_7.setVisible(False)
 
         #create CHARGE button
         self.button_8 = QPushButton(QApplication.translate("Button", "CHARGE", None))
@@ -11946,6 +11954,8 @@ class ApplicationWindow(QMainWindow):
         self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None))
         self.button_18.setEnabled(False)
         if not self.qmc.HUDbuttonflag:
+            self.button_18.setVisible(False)
+        if displayonlyMode:
             self.button_18.setVisible(False)
             
         #create DRY button
@@ -15215,6 +15225,8 @@ class ApplicationWindow(QMainWindow):
             self.showExtraButtons(False)
         else:
             self.hideExtraButtons(False)
+        if displayonlyMode:
+            self.hideExtraButtons(True)
             
     def hideExtraButtons(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
@@ -15265,6 +15277,8 @@ class ApplicationWindow(QMainWindow):
             self.showSliders(False)
         else:
             self.hideSliders(False)
+        if displayonlyMode:
+            self.hideSliders(True)
 
     def hideSliders(self,changeDefault=True):
         focused_widget = QApplication.focusWidget()
@@ -15459,6 +15473,7 @@ class ApplicationWindow(QMainWindow):
         self.WindowconfigAction.setEnabled(True)
         self.colorsAction.setEnabled(True)
         self.themeMenu.setEnabled(True)
+        self.displayonlymenus()
         
 
     def disableEditMenus(self,designer=False,wheel=False):
@@ -15512,7 +15527,28 @@ class ApplicationWindow(QMainWindow):
         self.switchAction.setEnabled(False)
         self.machineMenu.setEnabled(False)
         self.themeMenu.setEnabled(False)
+        self.displayonlymenus()
 
+    def displayonlymenus(self):
+        if displayonlyMode:
+            self.newRoastMenu.setEnabled(False)
+            self.deviceAction.setEnabled(False)
+            self.commportAction.setEnabled(False)
+            self.saveAsSettingsAction.setEnabled(False)
+            self.resetAction.setEnabled(False)
+            self.machineMenu.setEnabled(False)
+            self.alarmAction.setEnabled(False)
+            self.autosaveAction.setEnabled(False)
+            self.batchAction.setEnabled(False)
+            self.readingsAction.setEnabled(False)
+            self.buttonsAction.setChecked(False)        
+            self.buttonsAction.setEnabled(False)
+            self.slidersAction.setChecked(False)
+            self.slidersAction.setEnabled(False)
+            self.lcdsAction.setEnabled(False)
+
+        else:
+            return
 
     def update_minieventline_visibility(self):
         if self.minieventsflag:
@@ -19484,6 +19520,8 @@ class ApplicationWindow(QMainWindow):
                     aw.button_18.setVisible(True)
                 else:
                     aw.button_18.setVisible(False)
+            if displayonlyMode:
+                aw.button_18.setVisible(False)
             settings.endGroup()
             settings.beginGroup("Style")
             if settings.contains("patheffects"):
@@ -19789,6 +19827,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             self.qmc.adjustTempSliders() # adjust min/max slider limits of temperature sliders to correspond to the current temp mode
             aw.slidersAction.setEnabled(any(aw.eventslidervisibilities) or aw.pidcontrol.svSlider)
+            if displayonlyMode:
+                aw.slidersAction.setEnabled(False)
             #restore quantifier
             settings.beginGroup("Quantifiers")
             if settings.contains("quantifieractive"):
@@ -20281,6 +20321,9 @@ class ApplicationWindow(QMainWindow):
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
         #many applications (including the KDE applications) use INI text files
         
+        if displayonlyMode:
+            return
+
         try:
             if filename:
                 settings = QSettings(filename,QSettings.IniFormat)
@@ -25190,6 +25233,8 @@ class ApplicationWindow(QMainWindow):
                 self.e4buttondialog.setVisible(True)
         self.settooltip()
         aw.buttonsAction.setEnabled(bool(len(aw.extraeventslabels) > 0))
+        if displayonlyMode:
+            aw.buttonsAction.setEnabled(False)
         self.update_extraeventbuttons_visibility()
 
     #assigns tooltips to extra event buttons
@@ -25821,6 +25866,8 @@ class HUDDlg(ArtisanDialog):
         hudHBox.addStretch()
         hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","Head Up Display",None))
         hudGroupLayout.setLayout(hudHBox)  
+        if displayonlyMode:
+            hudGroupLayout.setEnabled(False)
         rorRoRAlgo = QHBoxLayout()
         rorRoRAlgo.addWidget(self.OptimalSmoothingFlag) 
         rorRoRAlgo.addStretch()     
@@ -32356,6 +32403,9 @@ class EventsDlg(ArtisanDialog):
         defaultButtonsLayout.setColumnMinimumWidth(3,20)
         ButtonGroupLayout = QGroupBox(QApplication.translate("GroupBox","Default Buttons",None))
         ButtonGroupLayout.setLayout(defaultButtonsLayout)
+        if displayonlyMode:
+            ButtonGroupLayout.setEnabled(False)
+        
         samplingLayout = QHBoxLayout()
         samplingLayout.addStretch()
         samplingLayout.addWidget(self.SAMPLINGbuttonActionType)
@@ -32567,9 +32617,13 @@ class EventsDlg(ArtisanDialog):
         self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
+        if displayonlyMode:
+            C2Widget.setEnabled(False)
         self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Buttons",None))
         C5Widget = QWidget()
         C5Widget.setLayout(C5VBox)
+        if displayonlyMode:
+            C5Widget.setEnabled(False)
         self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Sliders",None))
         C6Widget = QWidget()
         C6Widget.setLayout(C6VBox)
@@ -50526,12 +50580,16 @@ if sys.platform.startswith("darwin"):
 def main():
     global aw
     global app
+    global displayonlyMode
     
     # suppress all warnings
     warnings.filterwarnings('ignore')
     
     if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
-        sys.exit(0)
+        displayonlyMode = True
+#        sys.exit(0)
+    else:
+        displayonlyMode = False
     
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
