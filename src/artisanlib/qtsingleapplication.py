@@ -81,8 +81,8 @@ class QtSingleApplication(QApplication):
         self._inStream = QTextStream(self._inSocket)
         self._inStream.setCodec('UTF-8')
         self._inSocket.readyRead.connect(self._onReadyRead)
-        if self._activateOnMessage:
-            self.activateWindow()
+#        if self._activateOnMessage:
+#            self.activateWindow()
 
     def _onReadyRead(self):
         while True:

@@ -11999,6 +11999,8 @@ class ApplicationWindow(QMainWindow):
         # switch superusermode action:
         self.lcd1.setContextMenuPolicy(Qt.CustomContextMenu)
         self.lcd1.customContextMenuRequested.connect(self.superusermodeClicked)
+        if displayonlyMode:
+            self.lcd1.setVisible(False)
 
 
         self.lcd2 = self.ArtisanLCD() # Temperature MET
