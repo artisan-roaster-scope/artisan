@@ -7589,22 +7589,10 @@ class tgraphcanvas(FigureCanvas):
                                 secondletter = ""
                             #if Event Type-Bars flag
                             if self.eventsGraphflag == 1 and etype < 4:
-                                char1 = self.etypesf(0)[0]
-                                char2 = self.etypesf(1)[0]
-                                char3 = self.etypesf(2)[0]
-                                char4 = self.etypesf(3)[0]
                                 if self.mode == "F":
-                                    row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                                    row = {0:self.phases[0]-20,1:self.phases[0]-40,2:self.phases[0]-60,3:self.phases[0]-80}
                                 else:
-                                    row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-                                if etype == 0:
-                                    rowpos = char1
-                                elif etype == 1:
-                                    rowpos = char2
-                                elif etype == 2:
-                                    rowpos = char3
-                                elif etype == 3:
-                                    rowpos = char4
+                                    row = {0:self.phases[0]-10,1:self.phases[0]-20,2:self.phases[0]-30,3:self.phases[0]-40}
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 fontprop_small = aw.mpl_fontproperties.copy()
                                 fontprop_small.set_size("xx-small")
@@ -7612,7 +7600,8 @@ class tgraphcanvas(FigureCanvas):
                                 if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
                                     self.ax.annotate(firstletter + secondletter, 
                                         xy=(self.timex[index], 
-                                        self.temp1[index]),xytext=(self.timex[index],row[rowpos]),
+                                        self.temp1[index]),
+                                        xytext=(self.timex[index],row[etype]),
                                         alpha=1.,
                                         bbox=dict(boxstyle='square,pad=0.1', fc=self.EvalueColor[etype], ec='none'),
                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
@@ -7624,7 +7613,7 @@ class tgraphcanvas(FigureCanvas):
                                     self.ax.annotate(firstletter + secondletter, 
                                             xy=(self.timex[index], 
                                             self.temp2[index]),
-                                            xytext=(self.timex[index],row[rowpos]),
+                                            xytext=(self.timex[index],row[etype]),
                                             alpha=1.,
                                             bbox=dict(boxstyle='square,pad=0.1', fc=self.EvalueColor[etype], ec='none'),
                                             path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
@@ -7791,21 +7780,17 @@ class tgraphcanvas(FigureCanvas):
                                              color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
                         #if Event Type-Bars flag
                         if self.eventsGraphflag == 1:
-                            char1 = self.etypesf(0)[0]
-                            char2 = self.etypesf(1)[0]
-                            char3 = self.etypesf(2)[0]
-                            char4 = self.etypesf(3)[0]
                             if self.mode == "F":
-                                row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                                row = {0:self.phases[0]-20,1:self.phases[0]-40,2:self.phases[0]-60,3:self.phases[0]-80}
                             else:
-                                row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                                row = {0:self.phases[0]-10,1:self.phases[0]-20,2:self.phases[0]-30,3:self.phases[0]-40}
                             #some times ET is not drawn (ET = 0) when using device NONE
                             # plot events on BT when showeventsonbt is true
                             if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
                             else:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette["specialeventtext"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor=aw.qmc.palette["specialeventbox"])
                         if self.eventsGraphflag in [2,3,4]:
                             # update lines data using the lists with new data
