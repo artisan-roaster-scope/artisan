@@ -886,9 +886,9 @@ class tgraphcanvas(FigureCanvas):
                        "+MODBUS 56",            #55
                        "Apollo DT301",          #56
                        "EXTECH 755",            #57
-                       "Phidget TMP1101 4xTC 01",#58
-                       "+Phidget TMP1101 4xTC 23",#59
-                       "+Phidget TMP1101 4xTC AT",#60
+                       "Phidget TMP1101 4xTC 01",  #58
+                       "+Phidget TMP1101 4xTC 23", #59
+                       "+Phidget TMP1101 4xTC AT", #60
                        "Phidget TMP1100 1xTC",  #61
                        "Phidget 1011 IO 01",    #62
                        "Phidget HUB0000 IO 01", #63
@@ -916,6 +916,8 @@ class tgraphcanvas(FigureCanvas):
                        "+Aillio Bullet R1 BT RoR/Drum",      #85
                        "+Aillio Bullet R1 Voltage/Exhaust",  #86
                        "+Aillio Bullet R1 State/Fan RPM",    #87
+                       "+Program 78",               #88
+                       "+Program 910",              #89
                        ]
                        
     
