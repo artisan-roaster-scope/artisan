@@ -7581,7 +7581,7 @@ class tgraphcanvas(FigureCanvas):
                             index = self.specialevents[-1]
                             if etype < 4  and (not aw.qmc.renderEventsDescr or len(self.specialeventsStrings[-1].strip()) == 0):
                                 firstletter = self.etypesf(self.specialeventstype[-1])[0]
-                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1]) 
+                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
                             else:
                                 firstletter = self.specialeventsStrings[-1].strip()[:aw.qmc.eventslabelschars]
                                 if firstletter == "":
@@ -7597,6 +7597,14 @@ class tgraphcanvas(FigureCanvas):
                                     row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
                                 else:
                                     row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                                if etype == 0:
+                                    rowpos = char1
+                                elif etype == 1:
+                                    rowpos = char2
+                                elif etype == 2:
+                                    rowpos = char3
+                                elif etype == 3:
+                                    rowpos = char4
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 fontprop_small = aw.mpl_fontproperties.copy()
                                 fontprop_small.set_size("xx-small")
@@ -7604,7 +7612,7 @@ class tgraphcanvas(FigureCanvas):
                                 if not aw.qmc.showeventsonbt and self.temp1[index] >= self.temp2[index]:
                                     self.ax.annotate(firstletter + secondletter, 
                                         xy=(self.timex[index], 
-                                        self.temp1[index]),xytext=(self.timex[index],row[firstletter]),
+                                        self.temp1[index]),xytext=(self.timex[index],row[rowpos]),
                                         alpha=1.,
                                         bbox=dict(boxstyle='square,pad=0.1', fc=self.EvalueColor[etype], ec='none'),
                                         path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
@@ -7615,7 +7623,8 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     self.ax.annotate(firstletter + secondletter, 
                                             xy=(self.timex[index], 
-                                            self.temp2[index]),xytext=(self.timex[index],row[firstletter]),
+                                            self.temp2[index]),
+                                            xytext=(self.timex[index],row[rowpos]),
                                             alpha=1.,
                                             bbox=dict(boxstyle='square,pad=0.1', fc=self.EvalueColor[etype], ec='none'),
                                             path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
@@ -17631,7 +17640,7 @@ class ApplicationWindow(QMainWindow):
                 import plus.config
                 if plus.config.uuid_tag in obj:
                     import plus.register
-                    plus.register.add_path(obj[plus.config.uuid_tag],fn)
+                    plus.register.addPath(obj[plus.config.uuid_tag],fn)
         except:
             pass
 
@@ -17653,7 +17662,7 @@ class ApplicationWindow(QMainWindow):
                     import plus.config
                     if plus.config.uuid_tag in obj:
                         import plus.register
-                        plus.register.add_path(obj[plus.config.uuid_tag],fn)
+                        plus.register.addPath(obj[plus.config.uuid_tag],fn)
             except:
                 pass
                 
@@ -36909,7 +36918,7 @@ class serialport(object):
             elif aw.modbus.input1bcd:
                 res1 = aw.modbus.readBCD(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
             else:
-                res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)            
+                res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
             res1 = self.processChannelData(res1,aw.modbus.input1div,aw.modbus.input1mode)
             just_send = True
         else:
