@@ -11020,7 +11020,10 @@ class ApplicationWindow(QMainWindow):
         self.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
         
         # set window title
-        self.windowTitle = "Artisan %s"%str(__version__)
+        if artisanviewerMode:
+            self.windowTitle = "ArtisanViewer %s"%str(__version__)
+        else:
+            self.windowTitle = "Artisan %s"%str(__version__)
         self.setWindowTitle(self.windowTitle)
         # populate recent file menu
         for i in range(self.MaxRecentFiles):
@@ -11670,7 +11673,10 @@ class ApplicationWindow(QMainWindow):
             self.viewMenu.addAction(self.fullscreenAction)        
 
         # HELP menu
-        helpAboutAction = QAction(UIconst.HELP_MENU_ABOUT,self)
+        if artisanviewerMode:
+            helpAboutAction = QAction(UIconst.HELP_MENU_ABOUT_ARTISANVIEWER,self)
+        else:
+            helpAboutAction = QAction(UIconst.HELP_MENU_ABOUT,self)
         helpAboutAction.setMenuRole(QAction.AboutRole)
         helpAboutAction.triggered.connect(self.helpAbout)
         self.helpMenu.addAction(helpAboutAction)

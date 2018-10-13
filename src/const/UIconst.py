@@ -184,6 +184,7 @@ if platf != 'Darwin':
     HELP_MENU = "&" + HELP_MENU
 ##note that the "About" menu item is recognized only if it is named "About" on the Mac, but automatically translated by the Qt standard tranlators
 HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None).format("Artisan") 
+HELP_MENU_ABOUT_ARTISANVIEWER = QApplication.translate("MAC_APPLICATION_MENU", "About {0}", None).format("ArtisanViewer") 
 HELP_MENU_ABOUTQT = QApplication.translate("Menu", "About Qt", None)
 HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None)
 #HELP_MENU_BLOG = QApplication.translate("Menu", "Blog", None)
