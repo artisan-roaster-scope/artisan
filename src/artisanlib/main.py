@@ -15549,7 +15549,7 @@ class ApplicationWindow(QMainWindow):
             self.deviceAction.setEnabled(False)
             self.commportAction.setEnabled(False)
             self.saveAsSettingsAction.setEnabled(False)
-            self.resetAction.setEnabled(False)
+#            self.resetAction.setEnabled(False)
             self.machineMenu.setEnabled(False)
             self.alarmAction.setEnabled(False)
             self.autosaveAction.setEnabled(False)
@@ -23482,6 +23482,10 @@ class ApplicationWindow(QMainWindow):
         build = ""
         if __build__ != "0":
             build = " build " + __build__
+        if artisanviewerMode:
+            name = "ArtisanViewer"
+        else:
+            name = "Artisan"
         box.about(self,
                 QApplication.translate("About", "About",None),
                 u("""<h2>{0} {1}{16} ({2})</h2>
@@ -23492,7 +23496,7 @@ class ApplicationWindow(QMainWindow):
                 <p><b>{11}</b><small>{12}</small></p>
                 <p><b>{14}</b><br><small>{15}</small></p>
                 """).format(
-                "Artisan",
+                name,
                 str(__version__),
                 str(__revision__),
                 platform.python_version(),
