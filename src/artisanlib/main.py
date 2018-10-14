@@ -12751,17 +12751,28 @@ class ApplicationWindow(QMainWindow):
         return d
     
     def setRecentRoast(self,rr):
-        self.qmc.title = rr["title"]
-        self.qmc.weight = [rr["weightIn"],rr["weightOut"],rr["weightUnit"]]
-        self.qmc.volume = [rr["volumeIn"],rr["volumeOut"],rr["volumeUnit"]]
-        self.qmc.density = [rr["densityWeight"],rr["densityWeightUnit"],rr["densityVolume"],rr["densityVolumeUnit"]]
-        self.qmc.beansize_min = rr["beanSize_min"]
-        self.qmc.beansize_max = rr["beanSize_max"]
-        self.qmc.moisture_green = rr["moistureGreen"]
-        self.qmc.moisture_roasted = rr["moistureRoasted"]
-        self.qmc.whole_color = rr["wholeColor"]
-        self.qmc.ground_color = rr["groundColor"]
-        self.qmc.color_system_idx = rr["colorSystem"]
+        if "title" in rr:
+            self.qmc.title = rr["title"]
+        if "weightweightIn" in rr and "weightOut" in rr and "weightUnit" in rr:
+            self.qmc.weight = [rr["weightIn"],rr["weightOut"],rr["weightUnit"]]
+        if "volumeIn" in rr and "volumeOut" in rr and "volumeUnit" in rr:
+            self.qmc.volume = [rr["volumeIn"],rr["volumeOut"],rr["volumeUnit"]]
+        if "densityWeight" in rr and "densityWeightUnit" in rr and "densityVolume" in rr and "densityVolumeUnit" in rr:
+            self.qmc.density = [rr["densityWeight"],rr["densityWeightUnit"],rr["densityVolume"],rr["densityVolumeUnit"]]
+        if "beanSize_min" in rr:
+            self.qmc.beansize_min = rr["beanSize_min"]
+        if "beanSize_max" in rr:
+            self.qmc.beansize_max = rr["beanSize_max"]
+        if "moistureGreen" in rr:
+             self.qmc.moisture_green = rr["moistureGreen"]
+        if "moistureRoasted" in rr:
+            self.qmc.moisture_roasted = rr["moistureRoasted"]
+        if "wholeColor" in rr:
+            self.qmc.whole_color = rr["wholeColor"]
+        if "groundColor" in rr:
+            self.qmc.ground_color = rr["groundColor"]
+        if "colorSystem" in rr:
+            self.qmc.color_system_idx = rr["colorSystem"]
 #PLUS
         if self.plus_account is not None and "plus_account" in rr and self.plus_account == rr["plus_account"]:
             if "plus_store" in rr:
@@ -50648,8 +50659,6 @@ def main():
     if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
         artisanviewerMode = True
         app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationName("YourQuestViewer")                                    #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationDomain("viewer.p.code.google.com")                         #needed by QSettings() to store windows geometry in operating system
 #        sys.exit(0)
     else:
         artisanviewerMode = False
