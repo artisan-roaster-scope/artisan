@@ -114,7 +114,7 @@ type=3
 wordorderLittle=true
 
 [RoastProperties]
-roastertype=Besca BSC
+roastertype=Besca BSC auto
 
 [Sliders]
 ModeTempSliders=C
