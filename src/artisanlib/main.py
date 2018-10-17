@@ -3899,12 +3899,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.dutycycleTX = 0.
                 aw.qmc.currentpidsv = 0.
                 
-                # if there is already some data recorded, we remove the filename to force writing a new file
+                # we remove the filename to force writing a new file
                 # and avoid accidential overwriting of existing data
-                if len(self.timex) > 2:
-                    #current file name
-                    aw.curFile = None
-                    aw.setWindowTitle(aw.windowTitle)
+                #current file name
+                aw.curFile = None
+                aw.setWindowTitle(aw.windowTitle)
                 
                 # if on turn mouse crosslines off
                 if aw.qmc.crossmarker:
@@ -17989,7 +17988,8 @@ class ApplicationWindow(QMainWindow):
             if "roastUUID" in profile:
                 self.qmc.roastUUID = d(profile["roastUUID"])
             else:
-                self.qmc.roastUUID = None
+                self.qmc.roastUUID = uuid.uuid4().hex # generate UUID
+                self.qmc.safesaveflag = True
             if "roastbatchnr" in profile:
                 try:
                     self.qmc.roastbatchnr = int(profile["roastbatchnr"])
@@ -18197,6 +18197,7 @@ class ApplicationWindow(QMainWindow):
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(aw,QApplication.translate("Error Message", "Exception:",None) + " setProfile()",str(ex) + "@line " + str(exc_tb.tb_lineno))
+            return False
 
     # the int n specifies the number of digits
     def float2float(self,f,n=1):
@@ -30289,7 +30290,8 @@ class editGraphDlg(ArtisanDialog):
         if aw.plus_account is None and aw.qmc.plus_blend is not None and self.org_beans != aw.qmc.beans:
             aw.qmc.plus_blend = None
             
-        aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None))
+        if not aw.qmc.flagon:
+            aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None))
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.close()
 
