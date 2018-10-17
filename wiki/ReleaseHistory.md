@@ -2,14 +2,15 @@ Detailed Release History
 ========================
 
 ----
-v1.5.0 (xx.10.2018)
+v1.5.0 (17.10.2018)
 ------------------
 
  * New Features
-   - adds back possibility to run a second (restricted) instance of Artisan ([Issue #260](../../../issues/260))
+   - adds ArtisanViewer mode allowing again to run a second (restricted) instance of Artisan ([Issue #260](../../../issues/260))
    - adds support for VoltageRatio for Phidgets IO enhancement ([Issue #252](../../../issues/252))
    - extends LCD rendering from [-999,9999] to render [-9999,99999] if "Decimal Places" are turned on
    - adds "Program 78" and "Program 910" device types
+   - adds support for manual [Besca roasting machines](https://www.bescaroasters.com/)
  * Changes 
    - order of columns in roast/background properties events table, CSV import/export and Excel export swapped (ET always before BT)
    -  event values on the graph are not abbreviated anymore if "Decimal Places" is not ticked
