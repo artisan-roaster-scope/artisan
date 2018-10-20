@@ -23,7 +23,7 @@ v1.5.0 (17.10.2018)
    - fixes HUD crashing ([Issue #255](../../../issues/255))
    - LCDs do not truncate readings to last 3 digits anymore if "Decimal Places" are ticked, but indicate an overflow by rendering two dashes ([Issue #256](../../../issues/256))
    - fix issue preventing Stats Summary from showing if language is not set to English ([Issue #257](../../../issues/257))
-   - adds sampling interval to profiles generate using the designer
+   - adds sampling interval to profiles generated using the designer
    - ensures that profiles lacking an indication of the sampling interval used on recording are rendered when loaded into the background
    - fixes typo in drop-out handling resulting in disappearing curves during recording ([Issue #254](../../../issues/254))
    - ensures that "Snap Events" settings are persisted ([Issue #251](../../../issues/251))

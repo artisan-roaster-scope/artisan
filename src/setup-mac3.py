@@ -16,6 +16,7 @@ def my_parse_makefile(filename, g):
 sysconfig.parse_makefile = my_parse_makefile
 
 import sys, os
+import subprocess
 from setuptools import setup
 
 import string
@@ -194,15 +195,15 @@ setup(
 )
 
             
-os.system(r'cp README.txt dist')
-os.system(r'cp ../LICENSE dist/LICENSE.txt')
-os.system(r'mkdir dist/Wheels')
-os.system(r'mkdir dist/Wheels/Cupping')
-os.system(r'mkdir dist/Wheels/Other')
-os.system(r'mkdir dist/Wheels/Roasting')
-os.system(r'cp Wheels/Cupping/* dist/Wheels/Cupping')
-os.system(r'cp Wheels/Other/* dist/Wheels/Other')
-os.system(r'cp Wheels/Roasting/* dist/Wheels/Roasting')
+subprocess.check_call(r'cp README.txt dist',shell = True)
+subprocess.check_call(r'cp ../LICENSE dist/LICENSE.txt',shell = True)
+subprocess.check_call(r'mkdir dist/Wheels',shell = True)
+subprocess.check_call(r'mkdir dist/Wheels/Cupping',shell = True)
+subprocess.check_call(r'mkdir dist/Wheels/Other',shell = True)
+subprocess.check_call(r'mkdir dist/Wheels/Roasting',shell = True)
+subprocess.check_call(r'cp Wheels/Cupping/* dist/Wheels/Cupping',shell = True)
+subprocess.check_call(r'cp Wheels/Other/* dist/Wheels/Other',shell = True)
+subprocess.check_call(r'cp Wheels/Roasting/* dist/Wheels/Roasting',shell = True)
 os.chdir('./dist')
 
 try:
@@ -216,17 +217,20 @@ except:
     PYTHON_V = '3.6'
     
 # (independent) matplotlib (installed via pip) shared libs are not copied by py2app (both cp are needed!)
-os.system(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs')
-os.system(r'cp -R ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs')
-os.system(r'cp ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks')
+subprocess.check_call(r'mkdir Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs',shell = True)
+subprocess.check_call(r'cp -R ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Resources/lib/python' + PYTHON_V + '/lib-dynload/matplotlib/.dylibs',shell = True)
+subprocess.check_call(r'cp ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/* Artisan.app/Contents/Frameworks',shell = True)
 
-# copy snap7 dylib
-os.system(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
-os.system(r'cp -f /usr/local/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib')
+# copy snap7 dylib (we try both directories)
+try:
+    subprocess.check_call(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
+except:
+    subprocess.check_call(r'cp -f /usr/local/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
+
 
 
 # copy brew installed libusb (note the slight name change of the dylib!)
-os.system(r'cp /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib')
+subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
 
             
 # for Qt5
@@ -246,11 +250,11 @@ for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
     for d in dirs:
         if d.startswith("Qt") and d.endswith(".framework") and d not in Qt_frameworks:
 #            print("dir",os.path.join(root,d))
-            os.system("rm -rf " + os.path.join(root,d))
+            subprocess.check_call("rm -rf " + os.path.join(root,d),shell = True)
 
 # remove doublicate Qt installation
 
-os.system("rm -rf ./Artisan.app/Contents/Resources/lib/python3.6/PyQt5/Qt")
+subprocess.check_call("rm -rf ./Artisan.app/Contents/Resources/lib/python3.6/PyQt5/Qt",shell = True)
                         
 
 print('*** Removing unused files ***')
@@ -295,10 +299,10 @@ for root, dirs, files in os.walk('.'):
             
 os.chdir('..')
 if os.environ['ARTISAN_LEGACY_BUILD'] == "true":
-    os.system(r"rm artisan-mac-" + VERSION + r"-legacy.dmg")
-    os.system(r'hdiutil create artisan-mac-' + VERSION + r'-legacy.dmg -volname "Artisan legacy" -fs HFS+ -srcfolder "dist"')
+    subprocess.check_call(r"rm artisan-mac-" + VERSION + r"-legacy.dmg",shell = True)
+    subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'-legacy.dmg -volname "Artisan legacy" -fs HFS+ -srcfolder "dist"',shell = True)
 else:
-    os.system(r"rm artisan-mac-" + VERSION + r".dmg")
-    os.system(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"')
+    subprocess.check_call(r"rm artisan-mac-" + VERSION + r".dmg",shell = True)
+    subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"',shell = True)
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
 
