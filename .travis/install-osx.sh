@@ -11,7 +11,7 @@ brew remove --ignore-dependencies python 1>/dev/null 2>&1
 brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb 1>/dev/null 2>&1
 
 brew install p7zip
-brew install libusb
+brew list libusb
 
 pip3 install -r src/requirements.txt
 pip3 install -r src/requirements-${TRAVIS_OS_NAME}.txt
