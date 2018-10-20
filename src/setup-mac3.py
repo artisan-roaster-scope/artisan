@@ -223,15 +223,15 @@ subprocess.check_call(r'cp ' + PYTHONPATH + r'site-packages/matplotlib/.dylibs/*
 
 # copy snap7 dylib (we try both directories)
 try:
-    subprocess.check_call(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
-except:
     subprocess.check_call(r'cp -f /usr/local/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
+except:
+    subprocess.check_call(r'cp -f /usr/lib/libsnap7.dylib Artisan.app/Contents/Frameworks/libsnap7.dylib',shell = True)
 
 
 
 # copy brew installed libusb (note the slight name change of the dylib!)
-    # cannot be run as root
-    #subprocess.check_call(r'cp $(brew list libusb | grep libusb-1.0.0.dylib) Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
+    # cannot be run brew as root thus the folllowing does not work
+    # subprocess.check_call(r'cp $(brew list libusb | grep libusb-1.0.0.dylib) Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
 try:
     subprocess.check_call(r'cp /usr/local/Cellar/libusb/1.0.22/lib/libusb-1.0.0.dylib Artisan.app/Contents/Frameworks/libusb-1.0.dylib',shell = True)
 except Exception as e:
@@ -305,10 +305,10 @@ for root, dirs, files in os.walk('.'):
             
 os.chdir('..')
 if os.environ['ARTISAN_LEGACY_BUILD'] == "true":
-    subprocess.check_call(r"rm artisan-mac-" + VERSION + r"-legacy.dmg",shell = True)
+    subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r"-legacy.dmg",shell = True)
     subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'-legacy.dmg -volname "Artisan legacy" -fs HFS+ -srcfolder "dist"',shell = True)
 else:
-    subprocess.check_call(r"rm artisan-mac-" + VERSION + r".dmg",shell = True)
+    subprocess.check_call(r"rm -f artisan-mac-" + VERSION + r".dmg",shell = True)
     subprocess.check_call(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"',shell = True)
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
 

@@ -42,7 +42,10 @@ export DYLD_FRAMEWORK_PATH=$QT_PATH/lib
 
 # translations
 $PYTHON/bin/pylupdate5 artisan.pro
-$QT_SRC_PATH/bin/lrelease -verbose artisan.pro || true
+# there is no full Qt installation on Travis, thus don't run  lrelease
+if [ -z $TRAVIS ]; then
+  $QT_SRC_PATH/bin/lrelease -verbose artisan.pro || true
+fi
 
 # distribution
 rm -rf build dist
