@@ -19,6 +19,8 @@ from artisanlib import __build__
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 # the GNU General Public License for more details.
 #
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #########################   POLICIES  ###########################################################################
 # 1  STRINGS
@@ -170,6 +172,19 @@ from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
 
 artisan_slider_style = """
+            QSlider::groove:vertical:focus {{
+                background: #888;
+                border: 0.5px solid #666;
+                width: 3px;
+                border-radius: 5px;
+            }}
+            QSlider::sub-page:vertical:focus {{
+                background: 888;
+                border: 0.5px solid #666;
+                width: 85px;
+                border-radius: 5px;
+            }}
+            
             QSlider::groove:vertical {{
                 background: #ddd;
                 border: 0.5px solid #aaa;
@@ -381,6 +396,15 @@ appGuid = '9068bd2fa8e54945a6be1f1a0a589e92'
 class Artisan(QtSingleApplication):
     def __init__(self, args):
         super(Artisan, self).__init__(appGuid,args)
+        
+#        self.focusChanged.connect(self.appRaised)
+#        
+#    def appRaised(self,oldFocusWidget,newFocusWidget):
+#        if oldFocusWidget is None and newFocusWidget is not None:
+#            print("focus gained")
+#        elif oldFocusWidget is not None and newFocusWidget is None:
+#            print("focus released")
+        
 
     def event(self, event):
         if event.type() == QEvent.FileOpen:
@@ -710,7 +734,7 @@ class tgraphcanvas(FigureCanvas):
         self.min_delay = 500 # 1000
         
         # oversampling flag
-        self.oversampling = True
+        self.oversampling = False
         self.oversampling_min_delay = 1000 # in contrast to what the user dialog says (3000) we enable oversampling already with 1s
         
         # extra event sampling interval in miliseconds. If 0, then extra sampling commands are sent "in sync" with the standard sampling commands
@@ -1199,12 +1223,12 @@ class tgraphcanvas(FigureCanvas):
         
 #PLUS
         # the default store selected by the user (save in the  app settings)
-        self.plus_default_store = None
-        
+        self.plus_default_store = None        
         # the current profiles coffee or blend and associated store ids (saved in the *.alog profile)
         self.plus_store = None
         self.plus_coffee = None
         self.plus_blend = None
+        self.plus_sync_record_hash = None
                 
         self.beans = ""
 
@@ -1713,6 +1737,7 @@ class tgraphcanvas(FigureCanvas):
         self.messagesemaphore = QSemaphore(1)
         self.errorsemaphore = QSemaphore(1)
         self.serialsemaphore = QSemaphore(1)
+        self.eventactionsemaphore = QSemaphore(1)
 
         #flag to plot cross lines from mouse
         self.crossmarker = False
@@ -3934,6 +3959,11 @@ class tgraphcanvas(FigureCanvas):
                 #check and turn off mouse cross marker
                 if self.crossmarker:
                     self.togglecrosslines()
+                    
+#PLUS-COMMENT
+#                if aw is not None and not artisanviewerMode:
+#                    aw.updatePlusStatus()                                  
+                    
             except Exception as ex:
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
@@ -4019,7 +4049,7 @@ class tgraphcanvas(FigureCanvas):
     # back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
     # a_lin: pre-computed linear spaced timestamps of equal length than a
     def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):  # default 'hanning'
-        if len(a) > 1 and len(a) == len(b) and window_len>2:
+        if len(a) > 1 and len(a) == len(b) and (aw.qmc.filterDropOuts or window_len>2):
             #pylint: disable=E1103
             # 1. truncate
             if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
@@ -4043,38 +4073,40 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.filterDropOuts:
                 try:
                     b = self.medfilt(numpy.array(b),5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
+                    res = b
                 except:
                     pass
             # 4. smooth data
-            if decay_smoothing:
-                # decay smoothing
-                if decay_weights is None:
-                    decay_weights = numpy.arange(1,window_len+1)
+            if window_len>2:
+                if decay_smoothing:
+                    # decay smoothing
+                    if decay_weights is None:
+                        decay_weights = numpy.arange(1,window_len+1)
+                    else:
+                        window_len = len(decay_weights)
+                    # invariant: window_len = len(decay_weights)
+                    if decay_weights.sum() != 0:
+                        res = b
+                    else:
+                        res = []
+                        # ignore -1 readings in averaging and ensure a good ramp
+                        for i in range(len(b)):
+                            seq = b[max(0,i-window_len + 1):i+1] 
+                            # we need to surpress -1 drop out values from this
+                            seq = list(filter(lambda item: item != -1,seq))
+                            w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
+                            if len(w) == 0:
+                                res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
+                            else:
+                                res.append(numpy.average(seq,weights=w)) # works only if len(seq) = len(w) 
+                        # postCond: len(res) = len(b)        
                 else:
-                    window_len = len(decay_weights)
-                # invariant: window_len = len(decay_weights)
-                if decay_weights.sum() == 0:
-                    res = b
-                else:
-                    res = []
-                    # ignore -1 readings in averaging and ensure a good ramp
-                    for i in range(len(b)):
-                        seq = b[max(0,i-window_len + 1):i+1] 
-                        # we need to surpress -1 drop out values from this
-                        seq = list(filter(lambda item: item != -1,seq))
-                        w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
-                        if len(w) == 0:
-                            res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
-                        else:
-                            res.append(numpy.average(seq,weights=w)) # works only if len(seq) = len(w) 
-                    # postCond: len(res) = len(b)        
-            else:
-                # optimal smoothing (the default)
-                win_len = max(0,window_len)
-                if win_len != 1: # at the lowest level we turn smoothing completely off
-                    res = self.smooth(a_mod,b,win_len,window)
-                else:
-                    res = b
+                    # optimal smoothing (the default)
+                    win_len = max(0,window_len)
+                    if win_len != 1: # at the lowest level we turn smoothing completely off
+                        res = self.smooth(a_mod,b,win_len,window)
+                    else:
+                        res = b
             # 4. sample back
             if re_sample and back_sample:
                 res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps
@@ -4458,6 +4490,28 @@ class tgraphcanvas(FigureCanvas):
         poly = Polygon(verts, facecolor=self.palette["aucarea"], edgecolor='0.5', alpha=0.3)
         self.ax.add_patch(poly)
 
+    def setProfileTitle(self,title,updatebackground=False):
+        if self.roastbatchnr == 0:
+            title = title
+        else:
+            title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + title
+
+        if self.background and self.titleB and len(self.titleB) > 10:
+            stl = 33
+        else:
+            stl = 38
+        if aw.qmc.graphfont != 1: # Humor font runs very long!!
+            stl = int(stl*1.5)
+        if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
+            title = toASCII(title)
+        title = aw.qmc.abbrevString(title,stl)
+        fontprop_xlarge = aw.mpl_fontproperties.copy()
+        fontprop_xlarge.set_size("x-large")
+        self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
+                    fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
+        if updatebackground:
+            self.updateBackground()    
+
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed (incl. those of the background curves)
     def redraw(self, recomputeAllDeltas=True, smooth=True,sampling=False):
@@ -4502,31 +4556,12 @@ class tgraphcanvas(FigureCanvas):
                 fontprop_medium.set_size("medium")
                 fontprop_large = aw.mpl_fontproperties.copy()
                 fontprop_large.set_size("large")
-                fontprop_xlarge = aw.mpl_fontproperties.copy()
-                fontprop_xlarge.set_size("x-large")
                 self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
                 if aw.qmc.flagstart and not aw.qmc.title_show_always:
-                    self.ax.set_title("")
+                    self.setProfileTitle("")
                     self.fig.suptitle("")
-                else:
-                    if self.roastbatchnr == 0:
-                        title = self.title
-                    else:
-                        title = self.roastbatchprefix + u(self.roastbatchnr) + u(" ") + self.title
-
-                    if self.background and self.titleB and len(self.titleB) > 10:
-                        stl = 33
-                    else:
-                        stl = 38
-                    if aw.qmc.graphfont != 1: # Humor font runs very long!!
-                        stl = int(stl*1.5)
-                        
-                        
-                    if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
-                        title = toASCII(title)
-                    title = aw.qmc.abbrevString(title,stl)
-                    self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
-                        fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
+                else:                        
+                    self.setProfileTitle(self.title)
                 
                 # extra event names with substitution of event names applied
                 extraname1_subst = aw.qmc.extraname1[:]
@@ -5006,8 +5041,6 @@ class tgraphcanvas(FigureCanvas):
                     # the first mode just places annotations. They are text annotations.
                     # The second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
                     # the third mode plots the events by value. They are not annotations but actual lines.
-        
-
     
                     if self.eventsGraphflag == 1 and Nevents:
                         
@@ -6572,7 +6605,7 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.ax.set_xlabel("")
             aw.qmc.ax.set_ylabel("")
             if not aw.qmc.title_show_always:
-                aw.qmc.ax.set_title("")
+                aw.qmc.setProfileTitle("")
             if aw.qmc.delta_ax:
                 aw.qmc.delta_ax.set_ylabel("")
                     
@@ -7499,7 +7532,7 @@ class tgraphcanvas(FigureCanvas):
                 #set message at bottom
                 aw.sendmessage(message)
 
-    def EventRecord(self,extraevent=None):
+    def EventRecord(self,extraevent=None,takeLock=True):
         try:
             if extraevent!=None:
                 if aw.extraeventstypes[extraevent] <= 4:
@@ -7507,21 +7540,21 @@ class tgraphcanvas(FigureCanvas):
                         extraevent=extraevent,
                         eventtype=aw.extraeventstypes[extraevent],
                         eventvalue=aw.extraeventsvalues[extraevent],
-                        eventdescription=aw.extraeventsdescriptions[extraevent])
+                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock)
                 elif aw.extraeventstypes[extraevent] == 9:
                     self.EventRecordAction(
                         extraevent=extraevent,
                         eventtype=4,  # we map back to the untyped event type
                         eventvalue=aw.extraeventsvalues[extraevent],
-                        eventdescription=aw.extraeventsdescriptions[extraevent])                
+                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock)                
                 else: # on "relative" event values, we take the last value set per event via the recordextraevent call before
                     self.EventRecordAction(
                         extraevent=extraevent,
                         eventtype=aw.extraeventstypes[extraevent]-5,
                         eventvalue=aw.qmc.eventsExternal2InternalValue(aw.extraeventsactionslastvalue[aw.extraeventstypes[extraevent]-5]),
-                        eventdescription=aw.extraeventsdescriptions[extraevent])
+                        eventdescription=aw.extraeventsdescriptions[extraevent],takeLock=takeLock)
             else:
-                self.EventRecordAction(extraevent=extraevent)
+                self.EventRecordAction(extraevent=extraevent,takeLock=takeLock)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " EventRecord() {0}").format(str(e)),exc_tb.tb_lineno)
@@ -9878,8 +9911,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-#            if aw is not None and not artisanviewerMode:
-#                aw.updatePlusStatus(self)
+#        if aw is not None and not artisanviewerMode:
+#            aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -10790,6 +10823,10 @@ class EventActionThread(QThread):
 class ApplicationWindow(QMainWindow):
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
+#PLUS:
+    updatePlusStatusSignal = pyqtSignal() # can be called from another thread or a QTimer to trigger to update the plus icon status
+    setTitleSignal = pyqtSignal(str,bool) # can be called from another thread or a QTimer to set the profile title in the main GUI thread
+    sendmessageSignal = pyqtSignal(str)
 
     def __init__(self, parent = None):
     
@@ -12470,9 +12507,9 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox1x.addWidget(self.sliderGrpBox1)
         self.slider1.setTracking(False)
         self.slider1.sliderMoved.connect(lambda v=0:self.updateSliderLCD(0,v))
+        self.slider1.sliderMoved.connect(lambda : self.sliderMoved(0))
         self.slider1.valueChanged.connect(lambda _:self.sliderReleased(0,updateLCD=True))
         self.slider1.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
-        self.slider1.sliderMoved.connect(lambda : self.sliderMoved(0))
         
 
         self.slider2 = self.slider()
@@ -12496,9 +12533,9 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox2x.addWidget(self.sliderGrpBox2)
         self.slider2.setTracking(False)
         self.slider2.sliderMoved.connect(lambda v=0:self.updateSliderLCD(1,v))
+        self.slider2.sliderMoved.connect(lambda : self.sliderMoved(1))
         self.slider2.valueChanged.connect(lambda _:self.sliderReleased(1,updateLCD=True))
         self.slider2.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
-        self.slider2.sliderMoved.connect(lambda : self.sliderMoved(1))
 
         self.slider3 = self.slider()
         self.sliderLCD3 = self.sliderLCD()
@@ -12521,9 +12558,9 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox3x.addWidget(self.sliderGrpBox3)
         self.slider3.setTracking(False)
         self.slider3.sliderMoved.connect(lambda v=0:self.updateSliderLCD(2,v))
+        self.slider3.sliderMoved.connect(lambda : self.sliderMoved(2))
         self.slider3.valueChanged.connect(lambda _:self.sliderReleased(2,updateLCD=True))
         self.slider3.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
-        self.slider3.sliderMoved.connect(lambda : self.sliderMoved(2))
 
         self.slider4 = self.slider()
         self.sliderLCD4 = self.sliderLCD()
@@ -12546,9 +12583,9 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox4x.addWidget(self.sliderGrpBox4)
         self.slider4.setTracking(False)
         self.slider4.sliderMoved.connect(lambda v=0:self.updateSliderLCD(3,v))
+        self.slider4.sliderMoved.connect(lambda : self.sliderMoved(3))
         self.slider4.valueChanged.connect(lambda _:self.sliderReleased(3,updateLCD=True))
         self.slider4.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
-        self.slider4.sliderMoved.connect(lambda : self.sliderMoved(3))
 
         self.sliderSV = self.slider()
         self.sliderLCDSV = self.sliderLCD()
@@ -12624,8 +12661,15 @@ class ApplicationWindow(QMainWindow):
         self.qmc.toolbar.hide() # we need to hide the default navigation toolbar that we don't use
         self.qmc.toolbar.destroy()
         
+        # this variable is bound to the Roast Properties dialog if it is open, set to False to block opening the dialog or None otherwise
+        self.editgraphdialog = None 
+        
         # we connect the signals
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
+        self.setTitleSignal.connect(self.qmc.setProfileTitle)
+        self.sendmessageSignal.connect(self.sendmessage)
+#PLUS:
+        self.updatePlusStatusSignal.connect(self.updatePlusStatus)
 
     
     # set the tare values per channel (0: ET, 1:BT, 2:E1c0, 3:E1c1, 4:E1c0, 5:E1c1,...)
@@ -12644,6 +12688,7 @@ class ApplicationWindow(QMainWindow):
         else: # we reset the tare value
             self.channel_tare_values[n] = 0
     
+#PLUS:    
     def updatePlusStatus(self,ntb=None):
         if ntb is None:
             ntb = self.ntb
@@ -12651,10 +12696,20 @@ class ApplicationWindow(QMainWindow):
             if aw.plus_account:
                 import plus.controller
                 if plus.controller.is_connected():
-                    plus_icon = "plus-connected"
+                    if aw.editgraphdialog == False:
+                        # syncing from server in progress
+                        plus_icon = "plus-dirty"
+                        tooltip = QApplication.translate("Tooltip", 'Syncing with artisan.plus', None)                        
+                    else:
+                        if plus.controller.is_synced():
+                            plus_icon = "plus-connected"
+                            tooltip = QApplication.translate("Tooltip", 'Disconnect artisan.plus', None)
+                        else:
+                            plus_icon = "plus-unsynced"   
+                            tooltip = QApplication.translate("Tooltip", 'Upload to artisan.plus', None)
                 else:
                     plus_icon = "plus-on"
-                tooltip = QApplication.translate("Tooltip", 'Disconnect artisan.plus', None)
+                    tooltip = QApplication.translate("Tooltip", 'Disconnect artisan.plus', None)
             else:
                 plus_icon = "plus-off"
                 tooltip = QApplication.translate("Tooltip", 'Connect artisan.plus', None)
@@ -12662,11 +12717,16 @@ class ApplicationWindow(QMainWindow):
                 plus_icon += ".svg"
             else:
                 plus_icon += ".png"
-            a = ntb.actions()[0] # the plus action is the first one
-            a.setIcon(ntb._icon(plus_icon))
-            a.setToolTip(tooltip)
-        except:
-            pass
+            if len(ntb.actions()) > 0:
+                a = ntb.actions()[0] # the plus action is the first one
+                a.setIcon(ntb._icon(plus_icon))
+                a.setToolTip(tooltip)
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " updatePlusStatus(): {0}").format(str(e)),exc_tb.tb_lineno)
+
 
     
     # turns channel off after millis
@@ -12752,18 +12812,20 @@ class ApplicationWindow(QMainWindow):
     def setRecentRoast(self,rr):
         if "title" in rr:
             self.qmc.title = rr["title"]
-        if "weightweightIn" in rr and "weightOut" in rr and "weightUnit" in rr:
+        if "weightIn" in rr and "weightOut" in rr and "weightUnit" in rr:
             self.qmc.weight = [rr["weightIn"],rr["weightOut"],rr["weightUnit"]]
         if "volumeIn" in rr and "volumeOut" in rr and "volumeUnit" in rr:
             self.qmc.volume = [rr["volumeIn"],rr["volumeOut"],rr["volumeUnit"]]
         if "densityWeight" in rr and "densityWeightUnit" in rr and "densityVolume" in rr and "densityVolumeUnit" in rr:
             self.qmc.density = [rr["densityWeight"],rr["densityWeightUnit"],rr["densityVolume"],rr["densityVolumeUnit"]]
+        if "beans" in rr:
+            aw.qmc.beans = rr["beans"]
         if "beanSize_min" in rr:
             self.qmc.beansize_min = rr["beanSize_min"]
         if "beanSize_max" in rr:
             self.qmc.beansize_max = rr["beanSize_max"]
         if "moistureGreen" in rr:
-             self.qmc.moisture_green = rr["moistureGreen"]
+            self.qmc.moisture_green = rr["moistureGreen"]
         if "moistureRoasted" in rr:
             self.qmc.moisture_roasted = rr["moistureRoasted"]
         if "wholeColor" in rr:
@@ -12778,7 +12840,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.plus_store = rr["plus_store"]
             if "plus_coffee" in rr:
                 self.qmc.plus_coffee = rr["plus_coffee"]
-            if "plus_store" in rr:
+            if "plus_blend" in rr:
                 self.qmc.plus_blend = rr["plus_blend"]
             if self.qmc.plus_default_store is not None and self.qmc.plus_default_store != self.qmc.plus_store:
                 self.qmc.plus_default_store = None # we reset the defaultstore
@@ -14420,7 +14482,7 @@ class ApplicationWindow(QMainWindow):
     # if updateLCD=True, call moveslider() which in turn updates the LCD
     def sliderReleased(self,n,force=False, updateLCD=False):
         if n == 0:
-            if force or (self.eventslidermoved[0] and self.slider1.value() != self.eventslidervalues[0]) or abs(self.slider1.value() - self.eventslidervalues[0]) > 3:
+            if force or (self.eventslidermoved[0] and self.slider1.value() != self.eventslidervalues[0]) or abs(self.slider1.value() - self.eventslidervalues[0]) > 0:
                 self.eventslidermoved[0] = 0
                 if aw.eventslidercoarse[0]:
                     v = int(round(self.slider1.value() / 10.))*10
@@ -14431,7 +14493,7 @@ class ApplicationWindow(QMainWindow):
                     self.moveslider(0,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 1:
-            if force or (self.eventslidermoved[1] and self.slider2.value() != self.eventslidervalues[1]) or abs(self.slider2.value() - self.eventslidervalues[1]) > 3:
+            if force or (self.eventslidermoved[1] and self.slider2.value() != self.eventslidervalues[1]) or abs(self.slider2.value() - self.eventslidervalues[1]) > 0:
                 if aw.eventslidercoarse[1]:
                     v = int(round(self.slider2.value() / 10.))*10
                 else:
@@ -14441,7 +14503,7 @@ class ApplicationWindow(QMainWindow):
                     self.moveslider(1,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 2:
-            if force or (self.eventslidermoved[2] and self.slider3.value() != self.eventslidervalues[2]) or abs(self.slider3.value() - self.eventslidervalues[2]) > 3:
+            if force or (self.eventslidermoved[2] and self.slider3.value() != self.eventslidervalues[2]) or abs(self.slider3.value() - self.eventslidervalues[2]) > 0:
                 if aw.eventslidercoarse[2]:
                     v = int(round(self.slider3.value() / 10.))*10
                 else:
@@ -14451,7 +14513,7 @@ class ApplicationWindow(QMainWindow):
                     self.moveslider(2,v,forceLCDupdate=True) # move slider if need and update slider LCD
                 self.recordsliderevent(n)
         elif n == 3:
-            if force or (self.eventslidermoved[3] and self.slider4.value() != self.eventslidervalues[3]) or abs(self.slider4.value() - self.eventslidervalues[3]) > 3:
+            if force or (self.eventslidermoved[3] and self.slider4.value() != self.eventslidervalues[3]) or abs(self.slider4.value() - self.eventslidervalues[3]) > 0:
                 if aw.eventslidercoarse[3]:
                     v = int(round(self.slider4.value() / 10.))*10
                 else:
@@ -14621,16 +14683,28 @@ class ApplicationWindow(QMainWindow):
     #         7= Call Program with argument (slider action); 8= HOTTOP Heater; 9= HOTTOP Main Fan; 10= HOTTOP Cooling Fan; 11= p-i-d; 12= Fuji Command;
     #         13= PWM Command; 14= VOUT Command; 15= S7 Command; 16= Aillio R1 Heater; 17= Aillio R1 Fan; 18= Aillio R1 Drum; 19= Aillio R1 Command
     def eventaction(self,action,cmd):
-#        self.eventaction_internal(action,cmd)
         if action:
-            eventActionThread = EventActionThread(action,cmd)                
-            eventActionThread.finished.connect(lambda x=eventActionThread : self.eventactionThreadDone(x))
-            self.eventaction_running_threads.append(eventActionThread)
-            eventActionThread.start()
+            if action == 3: # multiple event actions, we cannot run in parallel as it crashs!
+                self.eventaction_internal(action,cmd)
+            else:
+                eventActionThread = EventActionThread(action,cmd)                
+                eventActionThread.finished.connect(lambda x=eventActionThread : self.eventactionThreadDone(x))
+                try:
+                    aw.qmc.eventactionsemaphore.acquire(1)
+                    self.eventaction_running_threads.append(eventActionThread)
+                finally:
+                    if aw.qmc.eventactionsemaphore.available() < 1:
+                        aw.qmc.eventactionsemaphore.release(1)
+                eventActionThread.start()
                 
     def eventactionThreadDone(self,actionthread):
-        if actionthread in self.eventaction_running_threads:
-            self.eventaction_running_threads.remove(actionthread)
+        try:
+            aw.qmc.eventactionsemaphore.acquire(1)
+            if actionthread in self.eventaction_running_threads:
+                self.eventaction_running_threads.remove(actionthread)
+        finally:
+            if aw.qmc.eventactionsemaphore.available() < 1:
+                aw.qmc.eventactionsemaphore.release(1)
     
     def eventaction_internal(self,action,cmd):
         if action:
@@ -15124,6 +15198,7 @@ class ApplicationWindow(QMainWindow):
     def recordextraevent(self,ee):
         eventtype = self.extraeventstypes[ee]
         try:
+            aw.qmc.eventactionsemaphore.acquire(1)
             # reset color of last pressed button
             if self.lastbuttonpressed != -1 and len(self.buttonlist)>self.lastbuttonpressed:
                 normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttontextcolor[self.lastbuttonpressed],self.extraeventbuttoncolor[self.lastbuttonpressed])
@@ -15135,6 +15210,9 @@ class ApplicationWindow(QMainWindow):
             self.lastbuttonpressed = ee
         except Exception:
             pass
+        finally:
+            if aw.qmc.eventactionsemaphore.available() < 1:
+                aw.qmc.eventactionsemaphore.release(1)
         cmdvalue = self.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee])
         if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type " " that does not add an event; if eventtype == 9 ("-") we have an untyped event
             if eventtype == 9: # an untyped event
@@ -16270,6 +16348,11 @@ class ApplicationWindow(QMainWindow):
         #       reset (reset offers three options: Save,Continue,Cancell)
         #       START
         #########################################
+        
+        # turn keepOn temporary off
+        tmpKeepON = self.qmc.flagKeepON
+        self.qmc.flagKeepON = False
+        
         if self.qmc.flagstart:
             if self.qmc.timeindex[0] == -1:
                 self.sendmessage(QApplication.translate("Message","NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found", None))
@@ -16294,9 +16377,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ToggleRecorder()
             else:
                 if self.qmc.flagon:
-                    self.qmc.OffMonitor()
+                    self.qmc.OffMonitor()                 
                 if self.qmc.reset():
                     self.qmc.ToggleRecorder()
+        self.qmc.flagKeepON = tmpKeepON   
         
     def fileLoad(self):
         try:
@@ -16321,28 +16405,39 @@ class ApplicationWindow(QMainWindow):
             if firstChar == "{":
                 f.close()
                 res = aw.qmc.reset(redraw=False,soundOn=False)
+                obj = self.deserialize(filename)
                 if res:
-                    res = self.setProfile(filename,self.deserialize(filename))
+                    res = self.setProfile(filename,obj)
             else:
                 self.sendmessage(QApplication.translate("Message","Invalid artisan format", None))
                 res = False
             if res:
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading                               
                 #update etypes combo box
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
+                self.setCurrentFile(filename)
                 #Plot everything
                 self.qmc.redraw()
                 message = u(QApplication.translate("Message","{0}  loaded ", None).format(u(filename)))
                 self.sendmessage(message)
-                self.setCurrentFile(filename)
+
+#PLUS-COMMENT          
+#                if aw is not None and not artisanviewerMode:
+#                    aw.updatePlusStatus()
+#                    if aw.plus_account:
+#                        import plus.config
+#                        if plus.config.uuid_tag in obj:
+#                            import plus.sync                            
+#                            QTimer.singleShot(100,lambda : plus.sync.sync())
+                                    
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
         except IOError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " {0}: {1}").format(str(ex),str(filename)))
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None) + " {0}: {1}").format(str(ex),str(filename))),exc_tb.tb_lineno
             # remove file from the recent file list
             settings = QSettings()
             files = toStringList(settings.value('recentFileList'))
@@ -17869,11 +17964,11 @@ class ApplicationWindow(QMainWindow):
             else:            
                 self.qmc.title = QApplication.translate("Scope Title", "Roaster Scope",None)
                 
-##PLUS
+#PLUS
             if "plus_store" in profile:
                 self.qmc.plus_store = d(profile["plus_store"])
             else:
-                self.qmc.plus_store = None  
+                self.qmc.plus_store = None
             if "plus_coffee" in profile:
                 self.qmc.plus_coffee = d(profile["plus_coffee"])
             else:
@@ -17882,6 +17977,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.plus_blend = d(profile["plus_blend"])
             else:
                 self.qmc.plus_blend = None
+            if "plus_sync_record_hash" in profile:
+                self.qmc.plus_sync_record_hash = d(profile["plus_sync_record_hash"])
+            else:
+                self.qmc.plus_sync_record_hash = None
                 
                 
             if "beans" in profile:
@@ -18144,7 +18243,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.startofx = self.qmc.timex[aw.qmc.timeindex[0]] + self.qmc.locktimex_start
                     else:
                         self.qmc.startofx = self.qmc.locktimex_start
-            else:
+            elif len(profile) > 0:
                 ###########      OLD PROFILE FORMAT
                 if "startend" in profile:
                     startend = [float(fl) for fl in profile["startend"]]
@@ -18472,11 +18571,11 @@ class ApplicationWindow(QMainWindow):
             
 #PLUS
             if self.qmc.plus_store is not None:
-                profile["plus_store"] = self.qmc.plus_store
+                profile["plus_store"] = encodeLocal(self.qmc.plus_store)
             if self.qmc.plus_coffee is not None:
-                profile["plus_coffee"] = self.qmc.plus_coffee
+                profile["plus_coffee"] = encodeLocal(self.qmc.plus_coffee)
             if self.qmc.plus_blend is not None:
-                profile["plus_blend"] = self.qmc.plus_blend
+                profile["plus_blend"] = encodeLocal(self.qmc.plus_blend)
                         
             profile["beans"] = encodeLocal(self.qmc.beans)
             profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocal(self.qmc.weight[2])]
@@ -18627,6 +18726,15 @@ class ApplicationWindow(QMainWindow):
                 #write
                 pf = self.getProfile()
                 if pf:
+
+#PLUS-COMMENT  
+#                    if not artisanviewerMode and aw.plus_account:
+#                        import plus.controller
+#                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+#                        if sync_record_hash is not None:
+#                            # we add the hash over the sync record to be able to detect offline changes
+#                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
                     self.sendmessage(QApplication.translate("Message","Profile saved", None))
@@ -22158,7 +22266,7 @@ class ApplicationWindow(QMainWindow):
 
                     aw.qmc.ax.set_xlim(min_start_time-15,max_end_time+15) # we adjust the min, max time scale to ensure all data is visible
                     graph_image = "roastlog-graph"
-                    self.qmc.ax.set_title("")
+                    self.qmc.setProfileTitle("")
                     self.qmc.fig.suptitle("")           
                     rcParams['path.effects'] = []
                     if len(handles) > 7:
@@ -24254,9 +24362,11 @@ class ApplicationWindow(QMainWindow):
         self.qmc.convert_designer()
 
     def editgraph(self):
-        editgraphdialog = editGraphDlg(self)
-        editgraphdialog.show()
-        #editgraphdialog.setFixedSize(editgraphdialog.size())
+        if self.editgraphdialog != False: # Roast Properties dialog is not blocked!
+            self.editgraphdialog = editGraphDlg(self)
+            self.editgraphdialog.show()
+            #editgraphdialog.setFixedSize(editgraphdialog.size())
+            self.editgraphdialog = None
 
     def editphases(self):
         dialog = phasesGraphDlg(self)
@@ -27271,19 +27381,6 @@ class HUDDlg(ArtisanDialog):
         
     def changeSwapETBT(self):
         aw.qmc.swapETBT = not aw.qmc.swapETBT
-
-#    def changeWindow(self):
-#        try:
-#            v = self.Window.value()
-#            if v != aw.qmc.smoothingwindowsize:
-#                self.Window.setDisabled(True)
-#                aw.qmc.smoothingwindowsize = v
-#                aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
-#                self.Window.setDisabled(False)
-#                self.Window.setFocus()
-#        except Exception as e:
-#            _, _, exc_tb = sys.exc_info()
-#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " changeWindow(): {0}").format(str(e)),exc_tb.tb_lineno)
         
     def changeFilter(self):
         try:
@@ -28074,20 +28171,67 @@ class RoastsComboBox(QComboBox):
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
 ########################################################################################
 
+# this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
+class ClickableTextEdit(QTextEdit):
+    clicked = pyqtSignal()
+    editingFinished = pyqtSignal()
+    receivedFocus = pyqtSignal()
+    
+    def __init__(self, *args, **kwargs):
+        super(ClickableTextEdit, self).__init__(*args, **kwargs)
+        self._changed = False
+        self.setTabChangesFocus(True)
+        self.textChanged.connect(self._handle_text_changed)
+        
+    def mousePressEvent(self, event):
+        super(ClickableTextEdit, self).mousePressEvent(event)
+        if event.modifiers() == Qt.ControlModifier:
+            self.clicked.emit()
+
+    def focusInEvent(self, event):
+        super(ClickableTextEdit, self).focusInEvent(event)
+        self.receivedFocus.emit()
+
+    def focusOutEvent(self, event):
+        if self._changed:
+            self.editingFinished.emit()
+        super(ClickableTextEdit, self).focusOutEvent(event)
+
+    def _handle_text_changed(self):
+        self._changed = True
+
+    def setTextChanged(self, state=True):
+        self._changed = state
+
+    def setNewPlainText(self, text):
+        QTextEdit.setPlainText(self, text)
+        self._changed = False            
+            
+
 class editGraphDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None))        
 
-        # remember parameters related to plus_coffee/plus_blend
-        # if any of those changed manually while in non-plus mode, plus_coffee, plus_blend an plus_stock needs to be reset
+        # we remember user modifications to revert to them on deselecting a plus element
+        self.modified_beans = aw.qmc.beans
+        self.modified_density_weight_text = str(aw.qmc.density[0])
+        self.modified_density_weight_unit_idx = aw.qmc.weight_units.index(aw.qmc.density[1])
+        self.modified_density_volume_text = str(aw.qmc.density[2])
+        self.modified_density_volume_unit_idx = aw.qmc.volume_units.index(aw.qmc.density[3])
+        self.modified_beansize_min_text = str(aw.qmc.beansize_min)
+        self.modified_beansize_max_text = str(aw.qmc.beansize_max)
+        self.modified_moisture_greens_text = str(aw.qmc.moisture_greens)
+        
+        # remember parameters set by plus_coffee/plus_blend on entering the dialog to enable a Cancel action
         self.org_beans = aw.qmc.beans
         self.org_density = aw.qmc.density
         self.org_beansize_min = aw.qmc.beansize_min
         self.org_beansize_max = aw.qmc.beansize_max
         self.org_moisture_greens = aw.qmc.moisture_greens
         
+        # other parameters remembered for Cancel operation        
         self.org_specialevents = aw.qmc.specialevents
         self.org_specialeventstype = aw.qmc.specialeventstype
         self.org_specialeventsStrings = aw.qmc.specialeventsStrings
@@ -28330,10 +28474,13 @@ class editGraphDlg(ArtisanDialog):
             
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None)) + "</b>")
-        self.beansedit = QTextEdit()
+        self.beansedit = ClickableTextEdit()
+        self.beansedit.clicked.connect(self.openCoffeeBlend)
+        self.beansedit.editingFinished.connect(self.beansEdited)
+        
         self.beansedit.setMaximumHeight(60)
         if aw.qmc.beans is not None:
-            self.beansedit.setPlainText(u(aw.qmc.beans))
+            self.beansedit.setNewPlainText(u(aw.qmc.beans))
                     
         #roaster
         self.roaster = QLineEdit(aw.qmc.roastertype)
@@ -28428,8 +28575,8 @@ class editGraphDlg(ArtisanDialog):
         self.standarddensitylabel = QLabel("")
         self.standarddensitylabel.setMinimumWidth(50)
         self.standard_density()
-        self.bean_density_volume_edit.editingFinished.connect(self.standard_density)
-        self.bean_density_weight_edit.editingFinished.connect(self.standard_density)
+        self.bean_density_volume_edit.editingFinished.connect(self.density_volume_editing_finished)
+        self.bean_density_weight_edit.editingFinished.connect(self.density_weight_editing_finished)
         self.bean_density_weightUnitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeDensityWeightUnit(i))
         self.bean_density_volumeUnitsComboBox.currentIndexChanged.connect(lambda i=self.unitsComboBox.currentIndex() :self.changeDensityVolumeUnit(i))
         
@@ -28448,12 +28595,14 @@ class editGraphDlg(ArtisanDialog):
         #bean size
         bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Screen",None)) + "</b>")
         self.bean_size_min_edit = QLineEdit(str(int(round(aw.qmc.beansize_min))))
+        self.bean_size_min_edit.editingFinished.connect(self.beanSizeMinEdited)
         self.bean_size_min_edit.setValidator(QIntValidator(0,25,self.bean_size_min_edit))
         self.bean_size_min_edit.setMinimumWidth(25)
         self.bean_size_min_edit.setMaximumWidth(25)
         self.bean_size_min_edit.setAlignment(Qt.AlignRight)
         bean_size_sep_label = QLabel("/")
         self.bean_size_max_edit = QLineEdit(str(int(round(aw.qmc.beansize_max))))
+        self.bean_size_max_edit.editingFinished.connect(self.beanSizeMaxEdited)
         self.bean_size_max_edit.setValidator(QIntValidator(0,25,self.bean_size_max_edit))
         self.bean_size_max_edit.setMinimumWidth(25)
         self.bean_size_max_edit.setMaximumWidth(25)
@@ -28493,6 +28642,7 @@ class editGraphDlg(ArtisanDialog):
         moisture_greens_label = QLabel("<b>" + u(QApplication.translate("Label", "Moisture Greens",None)) + "</b>")
         moisture_greens_unit_label = QLabel(QApplication.translate("Label", "%",None))
         self.moisture_greens_edit = QLineEdit()
+        self.moisture_greens_edit.editingFinished.connect(self.moistureGreensEdited)
         self.moisture_greens_edit.setText(str(aw.qmc.moisture_greens))
         self.moisture_greens_edit.setMaximumWidth(50)
         self.moisture_greens_edit.setValidator(QDoubleValidator(0., 100., 2, self.moisture_greens_edit))
@@ -28690,17 +28840,20 @@ class editGraphDlg(ArtisanDialog):
 #PLUS
         self.plus_store_selected = None
         self.plus_coffee_selected = None
-        self.plus_blend_selected = None        
+        self.plus_blend_selected = None             
         if aw.plus_account is not None:
             # variables populated by stock data as rendered in the corresponding popups
             self.plus_stores = None
             self.plus_coffees = None
             self.plus_blends = None
-            self.plus_default_store = aw.qmc.plus_default_store            
+            self.plus_default_store = aw.qmc.plus_default_store
             # current selected stock/coffee/blend id
-            self.plus_store_selected = aw.qmc.plus_store # holds the store corresponding to the plus_coffee_selected/plus_blend_selected
-            self.plus_coffee_selected = aw.qmc.plus_coffee
-            self.plus_blend_selected = aw.qmc.plus_blend
+            if aw.qmc.plus_store is not None:
+                self.plus_store_selected = aw.qmc.plus_store # holds the store corresponding to the plus_coffee_selected/plus_blend_selected
+            if aw.qmc.plus_coffee is not None:
+                self.plus_coffee_selected = aw.qmc.plus_coffee
+            elif aw.qmc.plus_blend is not None:
+                self.plus_blend_selected = aw.qmc.plus_blend
             self.plus_amount_selected = None # holds the amount of the selected coffee/blend if known            
             textLayoutPlusOffset = 1 # to insert the plus widget row, we move the remaining ones one step lower
             plusCoffeeslabel = QLabel("<b>" + u(QApplication.translate("Label", "Coffee",None)) + "</b>")
@@ -28982,103 +29135,161 @@ class editGraphDlg(ArtisanDialog):
                 QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
         except:
             pass
+            
+    def openCoffeeBlend(self):
+        if aw.plus_account is not None:
+            import plus.util
+            if self.plus_coffee_selected is not None:
+                QDesktopServices.openUrl(QUrl(plus.util.coffeeLink(self.plus_coffee_selected)))
+            elif self.plus_blend_selected is not None:
+                QDesktopServices.openUrl(QUrl(plus.util.coffeeLink(self.plus_blend_selected)))
+                
+    def beansEdited(self):
+        self.modified_beans = u(self.beansedit.toPlainText())
         
+    def beanSizeMinEdited(self):
+        self.modified_beansize_min_text = self.bean_size_min_edit.text()
+        
+    def beanSizeMaxEdited(self):
+        self.modified_beansize_max_text = self.bean_size_max_edit.text()
+        
+    def moistureGreensEdited(self):
+        self.modified_moisture_greens_text = self.moisture_greens_edit.text()
+        
+    def plus_popups_set_enabled(self,b):
+        self.plus_stores_combo.setEnabled(b)
+        self.plus_coffees_combo.setEnabled(b)
+        self.plus_blends_combo.setEnabled(b)        
+
+    # storeIndex is the index of the selected entry in the popup
     def populatePlusCoffeeBlendCombos(self,storeIndex=None):
-        import plus.stock
-        
-        #---- Stores
-        
-        if storeIndex is None:
-            self.plus_stores = plus.stock.getStores() 
-            self.plus_stores_combo.blockSignals(True)       
-            self.plus_stores_combo.clear()
-            self.plus_stores_combo.addItems([""] + plus.stock.getStoreLabels(self.plus_stores))
-            p = plus.stock.getStorePosition(self.plus_default_store,self.plus_stores)
+        try: # this can crash if dialog got closed while this is processed in a different thread!
+            self.plus_popups_set_enabled(False)
+            import plus.stock
+            
+            #---- Stores
+            
+            if storeIndex is None or storeIndex == -1:
+                self.plus_stores = plus.stock.getStores() 
+                self.plus_stores_combo.blockSignals(True)       
+                self.plus_stores_combo.clear()
+                self.plus_stores_combo.addItems([""] + plus.stock.getStoreLabels(self.plus_stores))
+                p = plus.stock.getStorePosition(self.plus_default_store,self.plus_stores)
+                if p is None:
+                    self.plus_stores_combo.setCurrentIndex(0)
+                else:
+                    # we set to the default_store if available
+                    self.plus_stores_combo.setCurrentIndex(p+1)
+                self.plus_stores_combo.blockSignals(False)
+            
+            storeIdx = self.plus_stores_combo.currentIndex()
+            
+            # we reset the store if a coffee or blend is selected and the selected store is not equal to the default store
+            # we clean the coffee/blend selection as it does not fit
+            if storeIdx > 0 and (self.plus_coffee_selected or self.plus_blend_selected) and self.plus_store_selected != plus.stock.getStoreId(self.plus_stores[storeIdx-1]):
+                self.defaultCoffeeData()
+                self.plus_amount_selected = None
+                if self.plus_coffee_selected:
+                    self.plus_coffee_selected = None
+                if self.plus_blend_selected:
+                    self.plus_blend_selected = None
+            
+            if storeIdx:
+                self.plus_default_store = plus.stock.getStoreId(self.plus_stores[storeIdx-1])
+            else:
+                self.plus_default_store = None
+                     
+            # mark plus coffee fields
+            self.markPlusCoffeeFields(False)
+            
+            #---- Coffees
+            
+            self.plus_coffees = plus.stock.getCoffees(self.unitsComboBox.currentIndex(),self.plus_default_store)
+            self.plus_coffees_combo.blockSignals(True)  
+            self.plus_coffees_combo.clear()
+            self.plus_coffees_combo.addItems([""] + plus.stock.getCoffeesLabels(self.plus_coffees))        
+            
+            p = None
+            if self.plus_coffee_selected:
+                p = plus.stock.getCoffeeStockPosition(self.plus_coffee_selected,self.plus_store_selected,self.plus_coffees)
             if p is None:
-                self.plus_stores_combo.setCurrentIndex(0)
-            else:
-                self.plus_stores_combo.setCurrentIndex(p+1)
-            self.plus_stores_combo.blockSignals(False)
-        
-        storeIdx = self.plus_stores_combo.currentIndex()
-        
-        # we reset the store if a coffee or blend is selected and the selected store is not equal to the default store
-        if (self.plus_coffee_selected or self.plus_blend_selected) and self.plus_store_selected != plus.stock.getStoreId(self.plus_stores[storeIdx-1]):
-            storeIdx = None
-        
-        if storeIdx:
-            self.plus_default_store = plus.stock.getStoreId(self.plus_stores[storeIdx-1])
-        else:
-            self.plus_default_store = None
-                 
-        #---- Coffees
-        
-        self.plus_coffees = plus.stock.getCoffees(self.unitsComboBox.currentIndex(),self.plus_default_store)
-        self.plus_coffees_combo.blockSignals(True)  
-        self.plus_coffees_combo.clear()
-        self.plus_coffees_combo.addItems([""] + plus.stock.getCoffeesLabels(self.plus_coffees))        
-        
-        p = None
-        if self.plus_coffee_selected:
-            p = plus.stock.getCoffeeStockPosition(self.plus_coffee_selected,self.plus_store_selected,self.plus_coffees)            
-        if p is None:
-            self.plus_coffees_combo.setCurrentIndex(0)
-            if self.plus_blend_selected is None:
-                self.setReadOnlyPlusBlendFields(False)
-            self.plus_coffee_selected = None
-            self.plus_coffees_combo.blockSignals(False)
-        else:
-            # if roast is complete (charge and drop are set) 
-            if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6] > 0:
-                # we first change the index and then unblock signals to avoid properties being overwritten from the selected coffee
-                self.plus_coffees_combo.setCurrentIndex(p+1)
+                # not in the current stock
+                self.plus_coffees_combo.setCurrentIndex(0)
+                self.plus_coffee_selected = None
                 self.plus_coffees_combo.blockSignals(False)
             else:
-                # if roast is not yet complete we unblock the signals before changing the index to get the coffee data be filled in
-                self.plus_coffees_combo.blockSignals(False)
-                self.plus_coffees_combo.setCurrentIndex(p+1)
-        
-        
-        #---- Blends  
-
-        self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store)
-        self.plus_blends_combo.blockSignals(True)  
-        self.plus_blends_combo.clear()
-        self.plus_blends_combo.addItems([""] + plus.stock.getBlendLabels(self.plus_blends))  
- 
-        p = None
-        if self.plus_blend_selected:
-            p = plus.stock.getBlendStockPosition(self.plus_blend_selected,self.plus_store_selected,self.plus_blends)            
-        if p is None:
-            self.plus_blends_combo.setCurrentIndex(0)
-            if self.plus_coffee_selected is None:
-                self.setReadOnlyPlusCoffeeFields(False)
-            self.plus_blend_selected = None
-            self.plus_blends_combo.blockSignals(False)
-        else:
-            # if roast is complete (charge and drop are set) 
-            if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6] > 0:
-                # we first change the index and then unblock signals to avoid properties being overwritten from the selected blend
-                self.plus_blends_combo.setCurrentIndex(p+1)
+                # if roast is complete (charge and drop are set) 
+                if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6] > 0:
+                    # we first change the index and then unblock signals to avoid properties being overwritten from the selected coffee
+                    self.plus_coffees_combo.setCurrentIndex(p+1)
+                    self.plus_coffees_combo.blockSignals(False)
+                else:
+                    # if roast is not yet complete we unblock the signals before changing the index to get the coffee data be filled in
+                    self.plus_coffees_combo.blockSignals(False)
+                    self.plus_coffees_combo.setCurrentIndex(p+1)
+                self.markPlusCoffeeFields(True)
+            
+            
+            #---- Blends  
+    
+            self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store)
+            self.plus_blends_combo.blockSignals(True)  
+            self.plus_blends_combo.clear()
+            self.plus_blends_combo.addItems([""] + plus.stock.getBlendLabels(self.plus_blends))  
+            
+            p = None
+            if self.plus_blend_selected:
+                p = plus.stock.getBlendStockPosition(self.plus_blend_selected,self.plus_store_selected,self.plus_blends)            
+            if p is None:
+                self.plus_blends_combo.setCurrentIndex(0)
+                self.plus_blend_selected = None
                 self.plus_blends_combo.blockSignals(False)
             else:
-                # if roast is not yet complete we unblock the signals before changing the index to get the blend data be filled in
-                self.plus_blends_combo.blockSignals(False)
-                self.plus_blends_combo.setCurrentIndex(p+1)                
+                # if roast is complete (charge and drop are set) 
+                if aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[6] > 0:
+                    # we first change the index and then unblock signals to avoid properties being overwritten from the selected blend
+                    self.plus_blends_combo.setCurrentIndex(p+1)
+                    self.plus_blends_combo.blockSignals(False)
+                else:
+                    # if roast is not yet complete we unblock the signals before changing the index to get the blend data be filled in
+                    self.plus_blends_combo.blockSignals(False)
+                    self.plus_blends_combo.setCurrentIndex(p+1)  
+                self.markPlusBlendFields(True) 
+        except:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            pass     
+        finally:
+            self.plus_popups_set_enabled(True)
 
-    def setReadOnlyPlusCoffeeFields(self,b):
-        self.beansedit.setReadOnly(b)
-        self.bean_density_weightUnitsComboBox.setDisabled(b)
-        self.bean_density_volumeUnitsComboBox.setDisabled(b)
-        self.bean_density_weight_edit.setReadOnly(b)
-        self.bean_density_volume_edit.setReadOnly(b)
-        self.bean_density_weight_edit.setReadOnly(b)
-        self.bean_size_min_edit.setReadOnly(b)
-        self.bean_size_max_edit.setReadOnly(b)
-        self.moisture_greens_edit.setReadOnly(b)
         
-    def setReadOnlyPlusBlendFields(self,b):
-        self.beansedit.setReadOnly(b)   
+
+    def markPlusCoffeeFields(self,b):
+        qlineedit_marked_style = "QLineEdit { border: 0px solid gray; background: #e4f3f8; selection-background-color: darkgray; }"
+        background_white_style = "QTextEdit { background-color: white; }" 
+        if b:
+            self.beansedit.setStyleSheet("QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray; border: 0px solid gray; }")
+        else:
+            self.beansedit.setStyleSheet(background_white_style)
+        if b:
+            self.bean_density_weight_edit.setStyleSheet(qlineedit_marked_style)
+            self.bean_density_volume_edit.setStyleSheet(qlineedit_marked_style)
+            self.bean_size_min_edit.setStyleSheet(qlineedit_marked_style)
+            self.bean_size_max_edit.setStyleSheet(qlineedit_marked_style)
+            self.moisture_greens_edit.setStyleSheet(qlineedit_marked_style)
+        else:
+            self.bean_density_weight_edit.setStyleSheet(background_white_style)
+            self.bean_density_volume_edit.setStyleSheet(background_white_style)
+            self.bean_size_min_edit.setStyleSheet(background_white_style)
+            self.bean_size_max_edit.setStyleSheet(background_white_style)
+            self.moisture_greens_edit.setStyleSheet(background_white_style)
+            
+        
+    def markPlusBlendFields(self,b):
+        if b:
+            self.beansedit.setStyleSheet("QTextEdit { background-color : #e4f3f8; }");
+        else:
+            self.beansedit.setStyleSheet("QTextEdit { background-color : white; }"); 
         
     def fillBlendData(self,blend):
         import plus.stock
@@ -29091,7 +29302,7 @@ class editGraphDlg(ArtisanDialog):
             self.beansedit.clear()
             for l in blend_lines:
                 self.beansedit.append(l)
-            self.setReadOnlyPlusBlendFields(True)
+            self.markPlusBlendFields(True)
         except:
             pass
         
@@ -29104,8 +29315,14 @@ class editGraphDlg(ArtisanDialog):
         else:
             self.moisture_greens_edit.setText(str(0))
         if "density" in cd:
-            self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index("g"))
-            self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index("ml"))
+            keep_modified_weight_unit = self.modified_density_weight_unit_idx
+            self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index("g"))            
+            self.modified_density_weight_unit_idx = keep_modified_weight_unit
+                        
+            keep_modified_volume_unit = self.modified_density_volume_unit_idx
+            self.bean_density_volumeUnitsComboBox.setCurrentIndex(aw.qmc.volume_units.index("l"))          
+            self.modified_density_volume_unit_idx = keep_modified_volume_unit
+            
             self.bean_density_weight_edit.setText(str(cd["density"]))
             self.bean_density_volume_edit.setText(str(1.0)) 
         else:
@@ -29124,16 +29341,22 @@ class editGraphDlg(ArtisanDialog):
             self.bean_size_min_edit.setText("0")
             self.bean_size_max_edit.setText("0")
         self.standard_density()
-        self.setReadOnlyPlusCoffeeFields(True)
+        self.markPlusCoffeeFields(True)
         
     def defaultCoffeeData(self):
-        self.beansedit.setPlainText("")
-        self.moisture_greens_edit.setText(str(0))
-        self.bean_density_weight_edit.setText(str(0))
+        if self.modified_beans is None:
+            self.beansedit.clear()
+        else:
+            self.beansedit.setPlainText(u(self.modified_beans))
+        self.bean_density_weight_edit.setText(self.modified_density_weight_text)
+        self.bean_density_volume_edit.setText(self.modified_density_volume_text)
+        self.bean_density_weightUnitsComboBox.setCurrentIndex(self.modified_density_weight_unit_idx)
+        self.bean_density_volumeUnitsComboBox.setCurrentIndex(self.modified_density_volume_unit_idx)                    
         self.standard_density()
-        self.bean_size_min_edit.setText("0")
-        self.bean_size_max_edit.setText("0")
-        self.setReadOnlyPlusCoffeeFields(False)
+        self.bean_size_min_edit.setText(self.modified_beansize_min_text)
+        self.bean_size_max_edit.setText(self.modified_beansize_max_text)
+        self.moisture_greens_edit.setText(self.modified_moisture_greens_text)
+        self.markPlusCoffeeFields(False)
                     
     def storeSelectionChanged(self,n):
         if n != -1:
@@ -29319,7 +29542,7 @@ class editGraphDlg(ArtisanDialog):
                     aw.plus_account,
                     self.plus_store_selected,
                     self.plus_coffee_selected, 
-                    self.plus_blend_selected
+                    self.plus_blend_selected,
                     )
                 aw.addRecentRoast(rr)
         except Exception as e:
@@ -29415,6 +29638,7 @@ class editGraphDlg(ArtisanDialog):
         self.calculated_density()
         
     def changeDensityWeightUnit(self,i):
+        self.modified_density_weight_unit_idx = i
         o = aw.qmc.weight_units.index(aw.qmc.density[1]) # previous unit index        
         aw.qmc.density[1] = u(self.bean_density_weightUnitsComboBox.currentText())
         if self.bean_density_weight_edit.text() and self.bean_density_weight_edit.text() != "":
@@ -29423,6 +29647,7 @@ class editGraphDlg(ArtisanDialog):
                 self.bean_density_weight_edit.setText(str(aw.float2float(aw.convertWeight(wi,o,i),4)))
 
     def changeDensityVolumeUnit(self,i):
+        self.modified_density_volume_unit_idx = i
         o = aw.qmc.volume_units.index(aw.qmc.density[3]) # previous unit index        
         aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
         if self.bean_density_volume_edit.text() and self.bean_density_volume_edit.text() != "":
@@ -30051,6 +30276,14 @@ class editGraphDlg(ArtisanDialog):
             self.calculateorganiclosslabel.setText("")
             self.tab1bLayout.removeWidget(self.calculateorganiclosslabel)
 
+    def density_volume_editing_finished(self):
+        self.modified_density_volume_text = str(self.bean_density_volume_edit.text())
+        self.standard_density()
+            
+    def density_weight_editing_finished(self):
+        self.modified_density_weight_text = str(self.bean_density_weight_edit.text())
+        self.standard_density()
+    
     def standard_density(self):
         if self.bean_density_volume_edit.text() != "" and \
             float(str(self.bean_density_volume_edit.text())) != 0.0 and  \
@@ -30281,14 +30514,6 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.roastbatchprefix = u(self.batchprefixedit.text())
             aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
             aw.qmc.roastbatchpos = self.batchposSpinBox.value()
-            
-        # Reset Plus if any of the plus_coffee related values changed
-        if aw.plus_account is None and aw.qmc.plus_coffee is not None and (self.org_beans != aw.qmc.beans or self.org_density != aw.qmc.density or \
-                self.org_beansize_min != aw.qmc.beansize_min or self.org_beansize_max != aw.qmc.beansize_max or \
-                self.org_moisture_greens != aw.qmc.moisture_greens):
-            aw.qmc.plus_coffee = None
-        if aw.plus_account is None and aw.qmc.plus_blend is not None and self.org_beans != aw.qmc.beans:
-            aw.qmc.plus_blend = None
             
         if not aw.qmc.flagon:
             aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None))
@@ -38452,7 +38677,6 @@ class serialport(object):
                             ct = max(min(float(aw.qmc.phidget1018_changeTriggers[channel]/100.0),self.PhidgetIO[idx].getMaxVoltage()),self.PhidgetIO[idx].getMinVoltage())
                             self.PhidgetIO[idx].setVoltageChangeTrigger(ct)
                     except PhidgetException:
-                        #print("Phidget Exception %i: %s" % (e.code, e.details))
                         pass
                     if aw.qmc.phidget1018_ratio[channel]:                    
                         self.PhidgetIO[idx].setOnVoltageRatioChangeHandler(lambda _,t: self.phidget1018SensorChanged(t,channel,idx))
@@ -41291,48 +41515,51 @@ class scanModbusDlg(ArtisanDialog):
             self.stop = True               
 
     def start_pressed(self):
-        # set MODBUS serial, type, host, port settings from dialog
-        aw.modbus.comport = self.port
-        aw.modbus.baudrate = self.baudrate
-        aw.modbus.bytesize = self.bytesize
-        aw.modbus.stopbits = self.stopbits
-        aw.modbus.parity = self.parity
-        aw.modbus.timeout = self.timeout
-        aw.modbus.type = self.mtype
-        aw.modbus.host = self.mhost
-        aw.modbus.port = self.mport
-        self.stop = False
-        
-        # update slave and register limits
-        self.slave = int(self.slaveEdit.text())
-        self.min_register = int(self.minRegisterEdit.text())
-        self.max_register = int(self.maxRegisterEdit.text())
-        
-        # scan and report
-        result = "Register,Value<br>"
-        result += "--------------<br>"
-        for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1):
-            QApplication.processEvents()
-            if self.stop:
-                result += "<br>stopped<br>"
-                self.modbusEdit.setHtml(result)
-                break
-            if self.code4:
-                aw.modbus.sleepBetween()
-                aw.modbus.sleepBetween()
-                aw.modbus.connect()
-                res = aw.modbus.peekSingleRegister(self.slave,int(register),code=4)
-                if res is not None:
-                    result += str(register) + "(4)," + str(res) + "<br>"
+        try:
+            # set MODBUS serial, type, host, port settings from dialog
+            aw.modbus.comport = self.port
+            aw.modbus.baudrate = self.baudrate
+            aw.modbus.bytesize = self.bytesize
+            aw.modbus.stopbits = self.stopbits
+            aw.modbus.parity = self.parity
+            aw.modbus.timeout = self.timeout
+            aw.modbus.type = self.mtype
+            aw.modbus.host = self.mhost
+            aw.modbus.port = self.mport
+            self.stop = False
+            
+            # update slave and register limits
+            self.slave = int(self.slaveEdit.text())
+            self.min_register = int(self.minRegisterEdit.text())
+            self.max_register = int(self.maxRegisterEdit.text())
+            
+            # scan and report
+            result = "Register,Value<br>"
+            result += "--------------<br>"
+            for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1):
+                QApplication.processEvents()
+                if self.stop:
+                    result += "<br>stopped<br>"
                     self.modbusEdit.setHtml(result)
-            if self.code3:
-                aw.modbus.sleepBetween()
-                aw.modbus.sleepBetween()
-                aw.modbus.connect()
-                res = aw.modbus.peekSingleRegister(self.slave,int(register),code=3)   
-                if res is not None:
-                    result += str(register) + "(3)," + str(res) + "<br>"
-                    self.modbusEdit.setHtml(result)
+                    break
+                if self.code4:
+                    aw.modbus.sleepBetween()
+                    aw.modbus.sleepBetween()
+                    aw.modbus.connect()
+                    res = aw.modbus.peekSingleRegister(self.slave,int(register),code=4)
+                    if res is not None:
+                        result += str(register) + "(4)," + str(res) + "<br>"
+                        self.modbusEdit.setHtml(result)
+                if self.code3:
+                    aw.modbus.sleepBetween()
+                    aw.modbus.sleepBetween()
+                    aw.modbus.connect()
+                    res = aw.modbus.peekSingleRegister(self.slave,int(register),code=3)   
+                    if res is not None:
+                        result += str(register) + "(3)," + str(res) + "<br>"
+                        self.modbusEdit.setHtml(result)
+        except:
+            pass
         # reconstruct MODBUS setup
         aw.modbus.comport = self.port_aw
         aw.modbus.baudrate = self.baudrate_aw
@@ -41342,7 +41569,7 @@ class scanModbusDlg(ArtisanDialog):
         aw.modbus.timeout = self.timeout_aw
         aw.modbus.type = self.mtype_aw
         aw.modbus.host = self.mhost_aw
-        aw.modbus.port = self.mport_aw           
+        aw.modbus.port = self.mport_aw  
             
     def update(self):
         if aw.seriallogflag:
@@ -41580,11 +41807,14 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
             
-            changeTriggersCombo.setMinimumContentsLength(3)
-            width = changeTriggersCombo.minimumSizeHint().width()
-            changeTriggersCombo.setMinimumWidth(width)
-            if platf == 'Darwin':
-                changeTriggersCombo.setMaximumWidth(width)
+            changeTriggersCombo.setMinimumContentsLength(1)
+            changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength) 
+             
+#            changeTriggersCombo.setMinimumContentsLength(3)
+#            width = changeTriggersCombo.minimumSizeHint().width()
+#            changeTriggersCombo.setMinimumWidth(width)
+#            if platf == 'Darwin':
+#                changeTriggersCombo.setMaximumWidth(width)
             
             self.changeTriggerCombos1048.append(changeTriggersCombo)
             phidgetBox1048.addWidget(changeTriggersCombo,3,i)
@@ -41606,11 +41836,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
                 
-            probeTypeCombo.setMinimumContentsLength(1)
-            width = probeTypeCombo.minimumSizeHint().width()
-            probeTypeCombo.setMinimumWidth(width)
-            if platf == 'Darwin':
-                probeTypeCombo.setMaximumWidth(width)
+            probeTypeCombo.setMinimumContentsLength(0)
+            probeTypeCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)            
+#            width = probeTypeCombo.minimumSizeHint().width()
+#            probeTypeCombo.setMinimumWidth(width)
+#            if platf == 'Darwin':
+#                probeTypeCombo.setMaximumWidth(width)
             
             self.probeTypeCombos.append(probeTypeCombo)
             phidgetBox1048.addWidget(probeTypeCombo,1,i)            
@@ -41627,7 +41858,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombo1048.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1048_dataRate))
         except Exception:
             pass
-        self.dataRateCombo1048.setMinimumContentsLength(5)
+        self.dataRateCombo1048.setMinimumContentsLength(4)
+        self.dataRateCombo1048.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         width = self.dataRateCombo1048.minimumSizeHint().width()
         self.dataRateCombo1048.setMinimumWidth(width)
         if platf == 'Darwin':
@@ -41651,7 +41883,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1048VBox = QVBoxLayout()
         phidget1048VBox.addLayout(phidget1048HBox)
         phidget1048VBox.addStretch()
-        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048/1051/TMP1100/TMP1101 TC",None))
+        phidget1048GroupBox = QGroupBox(QApplication.translate("GroupBox","1048/1051/TMP1100/TMP1101 TC",None))
         phidget1048GroupBox.setLayout(phidget1048VBox)
         phidget1048GroupBox.setContentsMargins(0,10,0,0)
         phidget1048HBox.setContentsMargins(0,0,0,0)
@@ -41693,7 +41925,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1045VBox.addLayout(phidgetBox1045)
         phidget1045VBox.addStretch()
         phidget1045VBox.addStretch()
-        phidget1045GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1045 IR",None))
+        phidget1045GroupBox = QGroupBox(QApplication.translate("GroupBox","1045 IR",None))
         phidget1045GroupBox.setLayout(phidget1045VBox)
         phidget1045VBox.setContentsMargins(0,0,0,0)           
 
@@ -41715,7 +41947,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
           
-            gainCombo.setMinimumContentsLength(1)
+            gainCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            gainCombo.setMinimumContentsLength(2)
             width = gainCombo.minimumSizeHint().width()
             gainCombo.setMinimumWidth(width)
 #            gainCombo.setMaximumWidth(width)
@@ -41734,6 +41967,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
                                    
+            formulaCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
             formulaCombo.setMinimumContentsLength(3)
             width = formulaCombo.minimumSizeHint().width()
             formulaCombo.setMinimumWidth(width)
@@ -41763,7 +41997,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.dataRateCombo1046.setCurrentIndex(aw.qmc.phidget_dataRatesValues.index(aw.qmc.phidget1046_dataRate))
         except Exception:
             pass                
-        self.dataRateCombo1046.setMinimumContentsLength(5)
+        self.dataRateCombo1046.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        self.dataRateCombo1046.setMinimumContentsLength(4)
         width = self.dataRateCombo1046.minimumSizeHint().width()
         self.dataRateCombo1046.setMinimumWidth(width)
         if platf == 'Darwin':
@@ -41787,7 +42022,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1046VBox = QVBoxLayout()
         phidget1046VBox.addLayout(phidget1046HBox)
         phidget1046VBox.addStretch()
-        phidget1046GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1046 RTD",None))
+        phidget1046GroupBox = QGroupBox(QApplication.translate("GroupBox","1046 RTD",None))
         phidget1046GroupBox.setLayout(phidget1046VBox)
         phidget1046GroupBox.setContentsMargins(0,10,0,0)
         phidget1046HBox.setContentsMargins(0,0,0,0)
@@ -41887,7 +42122,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidget1200VBox.addLayout(phidget1200HBox)
         phidget1200VBox.addStretch()
         
-        phidget1200GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets TMP1200 RTD",None))
+        phidget1200GroupBox = QGroupBox(QApplication.translate("GroupBox","TMP1200 RTD",None))
         phidget1200HBox.setContentsMargins(0,0,0,0)
         phidget1200GroupBox.setLayout(phidget1200VBox)
         phidget1200GroupBox.setContentsMargins(0,10,0,0)
@@ -41919,14 +42154,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
             except Exception:
                 pass
 
-            dataRatesCombo.setMinimumContentsLength(5)
+            dataRatesCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            dataRatesCombo.setMinimumContentsLength(4)
             width = dataRatesCombo.minimumSizeHint().width()
             dataRatesCombo.setMinimumWidth(width)
             if platf == 'Darwin':
                 dataRatesCombo.setMaximumWidth(width)
             
             self.dataRateCombos.append(dataRatesCombo)
+            
             phidgetBox1018.addWidget(dataRatesCombo,4,i)
+            
             changeTriggersCombo = QComboBox()
             changeTriggersCombo.setFocusPolicy(Qt.NoFocus)
             model = changeTriggersCombo.model()
@@ -41938,13 +42176,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 changeTriggersCombo.setCurrentIndex((aw.qmc.phidget1018_changeTriggersValues.index(aw.qmc.phidget1018_changeTriggers[i-1])))
             except Exception:
                 pass
-#            changeTriggersCombo.setMaximumSize(20,50)
-#            changeTriggersCombo.setMaximumHeight(50)
 
-            changeTriggersCombo.setMinimumContentsLength(3)
+            changeTriggersCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+            changeTriggersCombo.setMinimumContentsLength(4)
             width = changeTriggersCombo.minimumSizeHint().width()
             changeTriggersCombo.setMinimumWidth(width)
-#            changeTriggersCombo.setMaximumWidth(width)
+            if platf == 'Darwin':
+                changeTriggersCombo.setMaximumWidth(width)
             
             self.changeTriggerCombos.append(changeTriggersCombo)
             phidgetBox1018.addWidget(changeTriggersCombo,3,i)
@@ -41977,7 +42215,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         phidgetBox1018.addWidget(ratioLabel,5,0,Qt.AlignRight)
         phidget1018HBox = QVBoxLayout()
         phidget1018HBox.addLayout(phidgetBox1018)
-        phidget1018GroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1010/1011/1013/1018/1019/HUB0000/SBC IO",None))
+        phidget1018GroupBox = QGroupBox(QApplication.translate("GroupBox","1010/1011/1013/1018/1019/HUB0000/SBC IO",None))
         phidget1018GroupBox.setLayout(phidget1018HBox)
         phidget1018HBox.setContentsMargins(0,0,0,0)
         self.phidgetBoxRemoteFlag = QCheckBox()

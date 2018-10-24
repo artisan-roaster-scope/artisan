@@ -202,7 +202,7 @@ class modbusport(object):
             try:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 if self.type == 1: # Serial ASCII
-                    from pymodbus.client.sync import ModbusSerialClient
+                    from pymodbus.client.sync import ModbusSerialClient 
                     self.master = ModbusSerialClient(
                         method='ascii',
                         port=self.comport,
@@ -213,7 +213,7 @@ class modbusport(object):
                         retry_on_empty=True,
                         timeout=self.timeout)
                 elif self.type == 2: # Serial Binary
-                    from pymodbus.client.sync import ModbusSerialClient
+                    from pymodbus.client.sync import ModbusSerialClient # @Reimport
                     self.master = ModbusSerialClient(
                         method='binary',
                         port=self.comport,
@@ -255,7 +255,7 @@ class modbusport(object):
                             port=self.port,
                             )
                 else: # Serial RTU
-                    from pymodbus.client.sync import ModbusSerialClient
+                    from pymodbus.client.sync import ModbusSerialClient # @Reimport
                     self.master = ModbusSerialClient(
                         method='rtu',
                         port=self.comport,

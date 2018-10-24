@@ -94,11 +94,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.5.0</string>
+	<string>1.6.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>Artisan 1.5.0</string>
+	<string>Artisan 1.6.0</string>
 	<key>LSArchitecturePriority</key>
 	<array>
 		<string>x86_64</string>

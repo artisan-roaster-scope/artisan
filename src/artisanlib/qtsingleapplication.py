@@ -32,7 +32,7 @@ class QtSingleApplication(QApplication):
             self._outStream.setCodec('UTF-8')
         else:
             # No, there isn't.
-            # First we remoe existing servers of that name that might not have been properly closed as the server died
+            # First we remove existing servers of that name that might not have been properly closed as the server died
             QLocalServer.removeServer(self._id) 
             self._outSocket = None
             self._outStream = None
