@@ -454,10 +454,12 @@ app.setOrganizationDomain("artisan-scope.com")                          #needed 
 try:
     legacysettings = QSettings("YourQuest", "Artisan")
     newsettings = QSettings("Artisan-Scope", "Artisan")
-    if not newsettings.contains('Mode') and legacysettings.contains('Mode'): 
+    # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied 
+    if not newsettings.contains("Mode") and legacysettings.contains("Mode") and not legacysettings.contains("_settingsCopied"): 
         # copy Artisan settings
         for key in legacysettings.allKeys():
             newsettings.setValue(key,legacysettings.value(key))
+        legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
         # copy ArtisanViewer settings    
         newsettings = QSettings("Artisan-Scope", "ArtisanViewer")
         legacysettings = QSettings("Artisan-Scope", "ArtisanViewer")
