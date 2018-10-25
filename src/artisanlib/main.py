@@ -461,8 +461,8 @@ try:
             newsettings.setValue(key,legacysettings.value(key))
         legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
         # copy ArtisanViewer settings    
+        legacysettings = QSettings("YourQuest", "ArtisanViewer")
         newsettings = QSettings("Artisan-Scope", "ArtisanViewer")
-        legacysettings = QSettings("Artisan-Scope", "ArtisanViewer")
         for key in legacysettings.allKeys():
             newsettings.setValue(key,legacysettings.value(key))
     del legacysettings   #free up memmory?
