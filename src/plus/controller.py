@@ -129,7 +129,7 @@ def connect(clear_on_failure = False):
                 success = connection.authentify()
                 if success:
                     config.connected = success
-                    config.app_window.sendmessage(config.app_window.plus_account + " " + QApplication.translate("Plus","Authentified",None)) # @UndefinedVariable
+                    config.app_window.sendmessage(config.app_window.plus_account + " " + QApplication.translate("Plus","authentified",None)) # @UndefinedVariable
                     config.app_window.sendmessage(QApplication.translate("Plus","Connected to artisan.plus",None))  # @UndefinedVariable
                     try:
                         queue.start() # start the outbox queue
