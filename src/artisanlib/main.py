@@ -397,13 +397,24 @@ class Artisan(QtSingleApplication):
     def __init__(self, args):
         super(Artisan, self).__init__(appGuid,args)
         
-#        self.focusChanged.connect(self.appRaised)
-#        
-#    def appRaised(self,oldFocusWidget,newFocusWidget):
-#        if oldFocusWidget is None and newFocusWidget is not None:
-#            print("focus gained")
-#        elif oldFocusWidget is not None and newFocusWidget is None:
-#            print("focus released")
+        self.focusChanged.connect(self.appRaised)
+        self.background = False # True if app was send to background
+        
+    def appRaised(self,oldFocusWidget,newFocusWidget):
+        if oldFocusWidget is None and newFocusWidget is not None and aw is not None and aw.centralWidget() == newFocusWidget and self.background:
+            #focus gained
+            self.background = False
+#PLUS
+            try:
+                if aw is not None and not artisanviewerMode and aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None:
+                    import plus.sync
+                    plus.sync.getUpdate(aw.qmc.roastUUID,aw.curFile)
+            except:
+                pass
+                
+        elif oldFocusWidget is not None and newFocusWidget is None and aw is not None and aw.centralWidget() == oldFocusWidget:
+            # focus released
+            self.background = True
         
 
     def event(self, event):
@@ -6039,8 +6050,8 @@ class tgraphcanvas(FigureCanvas):
                                             aw.qmc.extratemp2[e][i] = self.fromCtoF(aw.qmc.extratemp2[e][i])
                                     except Exception:
                                         pass
-
-                        self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
+                        if self.ambientTemp is not None and self.ambientTemp != 0:
+                            self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
 
                         #prevents accidentally deleting a modified profile. 
                         self.safesaveflag = True
@@ -6095,7 +6106,8 @@ class tgraphcanvas(FigureCanvas):
                                     except Exception:
                                         pass
 
-                        self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
+                        if self.ambientTemp is not None and self.ambientTemp != 0:
+                            self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
 
                         for i in range(len(self.timeB)):
                             self.temp1B[i] = self.fromFtoC(self.temp1B[i]) #ET B
@@ -8022,12 +8034,12 @@ class tgraphcanvas(FigureCanvas):
                     return
 
                 self.statisticstimes[0] = totaltime
-                dryphasetime = int(dryEndTime - self.timex[self.timeindex[0]])
-                midphasetime = int(self.timex[self.timeindex[2]] - dryEndTime)
-                finishphasetime = int(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
+                dryphasetime = aw.float2float(dryEndTime - self.timex[self.timeindex[0]])
+                midphasetime = aw.float2float(self.timex[self.timeindex[2]] - dryEndTime)
+                finishphasetime = aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
 
                 if self.timeindex[7]:
-                    coolphasetime = int(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]])
+                    coolphasetime = int(round(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]]))
                 else:
                     coolphasetime = 0
 
@@ -9038,10 +9050,10 @@ class tgraphcanvas(FigureCanvas):
                             aw.sendmessage(timez,style="background-color:'lightblue';")
                             break
                     else:
-                        totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
-                        dryphasetime = self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]
-                        midphasetime = self.timex[self.timeindex[2]] - self.timex[self.timeindex[1]]
-                        finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]]
+                        totaltime = aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
+                        dryphasetime = aw.float2float(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
+                        midphasetime = aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.timeindex[1]])
+                        finishphasetime = aw.float2float(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
 
                         if totaltime:
                             dryphaseP = int(round(dryphasetime*100./totaltime))
@@ -12716,7 +12728,7 @@ class ApplicationWindow(QMainWindow):
         if ntb is None:
             ntb = self.ntb
         try:
-            if aw.plus_account:
+            if aw.plus_account is not None:
                 import plus.controller
                 if plus.controller.is_connected():
                     if aw.editgraphdialog == False:
@@ -16448,7 +16460,7 @@ class ApplicationWindow(QMainWindow):
 #PLUS-COMMENT          
 #                if aw is not None and not artisanviewerMode:
 #                    aw.updatePlusStatus()
-#                    if aw.plus_account:
+#                    if aw.plus_account is not None:
 #                        import plus.config
 #                        if plus.config.uuid_tag in obj:
 #                            import plus.sync                            
@@ -18751,7 +18763,7 @@ class ApplicationWindow(QMainWindow):
                 if pf:
 
 #PLUS-COMMENT  
-#                    if not artisanviewerMode and aw.plus_account:
+#                    if not artisanviewerMode and aw.plus_account is not None:
 #                        import plus.controller
 #                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
 #                        if sync_record_hash is not None:
@@ -43262,7 +43274,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1.0
-                    message = QApplication.translate("Message","Device set to {0}. Now, chose Modbus serial port", None).format(meter)
+                    message = QApplication.translate("Message","Device set to {0}. Now, chose Modbus serial port or IP address", None).format(meter)
                 elif meter == "VOLTCRAFT K201":
                     aw.qmc.device = 30
                     #aw.ser.comport = "COM4"

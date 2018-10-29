@@ -2,12 +2,35 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key> NSHumanReadableCopyright </key>
+	<string>Artisan Scope, Roast Logger</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
 	<string>Artisan</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>pdf</string>
+				<string>PDF</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/pdf</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>PDF document</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>PDF</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>BrowserDocument</string>
+		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
@@ -19,6 +42,10 @@
 			<string>Artisan Profile</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
 			<key>NSDocumentClass</key>
 			<string>Document</string>
 		</dict>
@@ -33,6 +60,10 @@
 			<string>Artisan Alarms</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
 			<key>NSDocumentClass</key>
 			<string>AlarmConfigurations</string>
 		</dict>
@@ -47,6 +78,10 @@
 			<string>Artisan Palettes</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
 			<key>NSDocumentClass</key>
 			<string>PaletteConfigurations</string>
 		</dict>
@@ -61,6 +96,10 @@
 			<string>Artisan Settings</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
 			<key>NSDocumentClass</key>
 			<string>PaletteConfigurations</string>
 		</dict>
@@ -75,6 +114,10 @@
 			<string>Artisan Wheel</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+			</array>
 			<key>NSDocumentClass</key>
 			<string>PaletteConfigurations</string>
 		</dict>
@@ -99,6 +142,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>Artisan 1.6.0</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.developer-tools</string>
 	<key>LSArchitecturePriority</key>
 	<array>
 		<string>x86_64</string>
@@ -113,8 +158,6 @@
 	<array>
 		<false/>
 	</array>
-	<key>NSAppleScriptEnabled</key>
-	<false/>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
