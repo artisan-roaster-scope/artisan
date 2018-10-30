@@ -1,4 +1,3 @@
 PyQt5==5.11.3
 pyinstaller==3.4
-# plus:
 pywin32==224

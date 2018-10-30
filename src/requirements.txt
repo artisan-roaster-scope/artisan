@@ -9,7 +9,7 @@ gevent==1.3.6
 gevent-websocket==0.10.1
 qrcode==6.0
 urllib3==1.23
-requests==2.19.1
+requests==2.20.0
 yoctopuce==1.10.32391
 pefile==2018.8.8
 openpyxl==2.5.8
@@ -19,6 +19,5 @@ python-snap7==0.10
 colorspacious==1.1.2
 pyusb==1.0.2
 setuptools==40.4.3
-# plus:
 keyring==13.2.1
 persist-queue==0.4.0
