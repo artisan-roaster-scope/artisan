@@ -455,32 +455,48 @@ if platf == 'Windows':
     except Exception as e:
         pass
 app = Artisan(args)
-app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system
 
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "Artisan-Scope" then the legacy settings 
 # will be copied to the new settings location. Once settings exist under "Artisan-Scope" the legacy settings under "YourQuest" will
 # no longer be read or saved.  At start-up, versions of Artisan before to v1.6.0 will no longer share settings with versions v1.6.0 and after. 
 # Settings can be shared among all versions of Artisan by explicitly saving and loading them using Help>Save/Load Settings.
 try:
-    legacysettings = QSettings("YourQuest", "Artisan")
-    newsettings = QSettings("Artisan-Scope", "Artisan")
+    app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
+
+    app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
+    app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
+    legacysettings = QSettings()
+    app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
+    app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system        
+    newsettings = QSettings()
+    
+
     # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied 
     if not newsettings.contains("Mode") and legacysettings.contains("Mode") and not legacysettings.contains("_settingsCopied"): 
         # copy Artisan settings
         for key in legacysettings.allKeys():
             newsettings.setValue(key,legacysettings.value(key))
         legacysettings.setValue("_settingsCopied", 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
-        # copy ArtisanViewer settings    
-        legacysettings = QSettings("YourQuest", "ArtisanViewer")
-        newsettings = QSettings("Artisan-Scope", "ArtisanViewer")
+
+        # copy ArtisanViewer settings
+        app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
+
+        app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
+        app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system
+        legacysettings = QSettings()
+        app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
+        app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system        
+        newsettings = QSettings()
         for key in legacysettings.allKeys():
             newsettings.setValue(key,legacysettings.value(key))
     del legacysettings   #free up memmory?
     del newsettings      #free up memmory?
-except Exception as e:
+except:
     pass
+    
+app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system
     
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
@@ -26753,7 +26769,8 @@ class HUDDlg(ArtisanDialog):
     def showHUDbuttonToggle(self,i):
         if i:
             aw.qmc.HUDbuttonflag = True
-            aw.button_18.setVisible(True)
+            if not artisanviewerMode:
+                aw.button_18.setVisible(True)
         else:
             aw.qmc.HUDbuttonflag = False
             aw.button_18.setVisible(False)
