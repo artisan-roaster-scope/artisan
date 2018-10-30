@@ -114,10 +114,14 @@ def connect(clear_on_failure = False):
                 if config.app_window.plus_account is None or config.passwd is None: # @UndefinedVariable
                     # ask user for credentials
                     import plus.login
-                    login,passwd,remember = plus.login.plus_login(config.app_window,config.app_window.plus_account,config.app_window.plus_remember_credentials) # @UndefinedVariable
+                    login,passwd,remember = plus.login.plus_login(config.app_window,config.app_window.plus_email,config.app_window.plus_remember_credentials) # @UndefinedVariable
                     config.app_window.plus_remember_credentials = remember
                     # store credentials
                     config.app_window.plus_account = login
+                    if remember:
+                        config.app_window.plus_email = login
+                    else:
+                        config.app_window.plus_email = None                    
                     # store the passwd in the keychain
                     if login is not None and passwd is not None and remember:
                         try:

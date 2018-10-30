@@ -160,6 +160,7 @@ def addRoast(roast_record = None):
            (roast_record is not None or ("date" in r and r["date"] and "amount" in r)): # amount can be 0 but has to be present
             # put in upload queue
             config.logger.debug("queue: -> put in queue")
+            config.app_window.sendmessage(QApplication.translate("Plus","Queuing roast for upload to artisan.plus",None))                                
             queue.put({
                 "url": config.roast_url,
                 "data": r,

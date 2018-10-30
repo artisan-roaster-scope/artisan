@@ -458,6 +458,7 @@ app = Artisan(args)
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("Artisan-Scope")                                #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system
+
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "Artisan-Scope" then the legacy settings 
 # will be copied to the new settings location. Once settings exist under "Artisan-Scope" the legacy settings under "YourQuest" will
 # no longer be read or saved.  At start-up, versions of Artisan before to v1.6.0 will no longer share settings with versions v1.6.0 and after. 
@@ -4119,7 +4120,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         window_len = len(decay_weights)
                     # invariant: window_len = len(decay_weights)
-                    if decay_weights.sum() != 0:
+                    if decay_weights.sum() == 0:
                         res = b
                     else:
                         res = []
@@ -4147,6 +4148,71 @@ class tgraphcanvas(FigureCanvas):
             return numpy.concatenate(([None]*(fromIndex),res.tolist(),[None]*(len(a)-toIndex))).tolist()
         else:
             return b
+
+
+#    def smooth_list(self, a, b, window_len=7, window='hanning',decay_weights=None,decay_smoothing=False,fromIndex=-1,toIndex=0,re_sample=True,back_sample=True,a_lin=None):  # default 'hanning'
+#        if len(a) > 1 and len(a) == len(b) and window_len>2:
+#            #pylint: disable=E1103
+#            # 1. truncate
+#            if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
+#                if toIndex==0: # no limit
+#                    toIndex=len(a)
+#            else: # smooth list on full length
+#                fromIndex = 0
+#                toIndex = len(a)
+#            a = numpy.array(a,dtype='float64')[fromIndex:toIndex]
+#            b = numpy.array(b,dtype='float64')[fromIndex:toIndex] 
+#            # 2. re-sample           
+#            if re_sample:
+#                if a_lin is None or len(a_lin) != len(a):
+#                    a_mod = numpy.linspace(a[0],a[-1],len(a))
+#                else:
+#                    a_mod = a_lin                   
+#                b = numpy.interp(a_mod, a, b) # resample data in a to linear spaced time                               
+#            else:
+#                a_mod = a
+#            # 3. filter spikes
+#            if aw.qmc.filterDropOuts:
+#                try:
+#                    b = self.medfilt(numpy.array(b),5)  # k=3 seems not to catch all spikes in all cases; k must be odd!
+#                except:
+#                    pass
+#            # 4. smooth data
+#            if decay_smoothing:
+#                # decay smoothing
+#                if decay_weights is None:
+#                    decay_weights = numpy.arange(1,window_len+1)
+#                else:
+#                    window_len = len(decay_weights)
+#                # invariant: window_len = len(decay_weights)
+#                if decay_weights.sum() == 0:
+#                    res = b
+#                else:
+#                    res = []
+#                    # ignore -1 readings in averaging and ensure a good ramp
+#                    for i in range(len(b)):
+#                        seq = b[max(0,i-window_len + 1):i+1] 
+#                        # we need to surpress -1 drop out values from this
+#                        seq = list(filter(lambda item: item != -1,seq))
+#                        w = decay_weights[max(0,window_len-len(seq)):]  # preCond: len(decay_weights)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
+#                        if len(w) == 0:
+#                            res.append(b[i]) # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
+#                        else:
+#                            res.append(numpy.average(seq,weights=w)) # works only if len(seq) = len(w) 
+#                    # postCond: len(res) = len(b)        
+#            else:
+#                # optimal smoothing (the default)
+#                win_len = max(0,window_len)
+#                if win_len != 1: # at the lowest level we turn smoothing completely off
+#                    res = self.smooth(a_mod,b,win_len,window)
+#                else:
+#                    res = b
+#            # 4. sample back
+#            if re_sample and back_sample:
+#                res = numpy.interp(a, a_mod, res) # re-sampled back to orginal timestamps
+#            return numpy.concatenate(([None]*(fromIndex),res.tolist(),[None]*(len(a)-toIndex))).tolist()
+#        else:
+#            return b            
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):                
         if aw.qmc.patheffects:
@@ -5356,12 +5422,12 @@ class tgraphcanvas(FigureCanvas):
                                                      )                            
                             
                 #populate delta ET (self.delta1) and delta BT (self.delta2)
-                if self.DeltaETflag or self.DeltaBTflag:
+                if self.DeltaETflag or self.DeltaBTflag:            
                     if recomputeAllDeltas and not self.flagstart: # during recording we don't recompute the deltas
                         cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                         decay_smoothing_p = not aw.qmc.optimalSmoothing or sampling or aw.qmc.flagon
                         t1 = self.smooth_list(self.timex,temp1_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-                        t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)                        
+                        t2 = self.smooth_list(self.timex,temp2_nogaps,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)  
                         # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                         if aw.qmc.timeindex[0]>-1:
                             RoR_start = min(aw.qmc.timeindex[0]+10, len(self.timex)-1)
@@ -5594,8 +5660,8 @@ class tgraphcanvas(FigureCanvas):
                         aw.qmc.repaint()
                         QApplication.processEvents()
                 except:
-                    pass                 
-                        
+                    pass
+                    
             except Exception as ex:
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
@@ -10867,8 +10933,10 @@ class ApplicationWindow(QMainWindow):
     
         self.superusermode = False
         
+#PLUS:        
         self.plus_account = None # if set to a login string, Artisan plus features are enabled
         self.plus_remember_credentials = True # store plus account credentials in systems keychain
+        self.plus_email = None # if self.plus_remember_credentials is ticked, we remember here the login to be pre-set as plus_account in the dialog
         
         self.appearance = ""
         
@@ -19033,7 +19101,10 @@ class ApplicationWindow(QMainWindow):
 #PLUS-COMMENT
 #            if not artisanviewerMode and settings.contains("plus_account"):
 #                self.plus_account = settings.value("plus_account",self.plus_account)
-#                self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+#                if settings.contains("plus_remember_credentials"):
+#                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+#                if settings.contains("plus_email"):
+#                    self.plus_email = settings.value("plus_email",self.plus_email)
 #                if self.plus_account is not None:
 #                    try:
 #                        import plus.controller
@@ -20515,6 +20586,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("fullscreen", (self.full_screen_mode_active or self.isFullScreen()))
             settings.setValue("plus_account",self.plus_account)
             settings.setValue("plus_remember_credentials",self.plus_remember_credentials)
+            settings.setValue("plus_email",self.plus_email)
                 
             #on OS X we prevent the reopening of windows
             # as done by defaults write com.google.code.p.Artisan NSQuitAlwaysKeepsWindows -bool false
