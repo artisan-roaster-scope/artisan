@@ -107,7 +107,7 @@ def authentify():
                 try:
 #                    config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())  
                     if platform.system().startswith("Windows"):
-                        keyring.set_keyring(keyring.backends.Windows.Keyring())   # @UndefinedVariable                  
+                        keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())   # @UndefinedVariable                  
                     elif platform.system() == 'Darwin':
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
                     else: # Linux
@@ -170,7 +170,7 @@ def putData(url,data):
 
 def postData(url,data,authorized=True,compress=config.compress_posts):
     config.logger.info("connection:postData(%s,_data_,%s)",url,authorized)
-    config.logger.debug("connection: -> data: %s)",data)
+#    config.logger.debug("connection: -> data: %s)",data) # don't log POST data as it might contain credentials!
     jsondata = json.dumps(data).encode("utf8")
     config.logger.debug("connection: -> size %s",len(jsondata))
     headers = getHeaders(authorized,decompress=False)

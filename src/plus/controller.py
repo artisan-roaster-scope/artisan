@@ -94,7 +94,7 @@ def connect(clear_on_failure = False):
 #                    config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())       
                     #HACK set keyring backend explicitly
                     if platform.system().startswith("Windows"):
-                        keyring.set_keyring(keyring.backends.Windows.Keyring())   # @UndefinedVariable                  
+                        keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())   # @UndefinedVariable                  
                     elif platform.system() == 'Darwin':
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
                     else: # Linux
@@ -105,8 +105,12 @@ def connect(clear_on_failure = False):
                     try:
                         # try-catch as the keyring might not work
                         config.passwd = keyring.get_password(config.app_name, config.app_window.plus_account) # @UndefinedVariable
-                    except:
-                        pass
+                        if config.passwd is None:
+                            config.logger.debug("controller: -> keyring.get_password returned None")
+                        else:
+                            config.logger.debug("controller: -> keyring passwd received")
+                    except Exception as e:
+                        config.logger.error("controller: keyring Exception %s",e)
                 if config.app_window.plus_account is None or config.passwd is None: # @UndefinedVariable
                     # ask user for credentials
                     import plus.login
@@ -120,8 +124,8 @@ def connect(clear_on_failure = False):
                             # try-catch as the keyring might not work
                             keyring.set_password(config.app_name, login, passwd)
                             config.logger.debug("controller: -> keyring set (%s)",passwd)
-                        except:
-                            pass
+                        except Exception as e:
+                            config.logger.error("controller: keyring Exception %s",e)
                     config.passwd = passwd # remember password in memory for this session
             if config.app_window.plus_account is None: # @UndefinedVariable
                 config.app_window.sendmessage(QApplication.translate("Plus","Login aborted",None)) # @UndefinedVariable
