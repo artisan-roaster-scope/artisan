@@ -117,7 +117,7 @@ def load():
         with open(stock_cache_path) as f:
             stock = json.load(f)
     except Exception as e:
-        config.logger.error("stock: Exception in load() %s",e)
+        config.logger.debug("stock: Exception in load() %s",e) # the stock_cache is created on first save()
     finally:
         if stock_semaphore.available() < 1:
             stock_semaphore.release(1)

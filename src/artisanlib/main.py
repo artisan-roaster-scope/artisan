@@ -5615,7 +5615,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.graphfont == 1:
                         labels = [toASCII(l) for l in labels]
                     leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
-                    leg.draggable(state=True)
+                    leg.set_draggable(state=True)
                     frame = leg.get_frame()
                     frame.set_facecolor(self.palette["legendbg"])
 #                    frame.set_alpha(self.legendbgalpha)
@@ -28620,12 +28620,12 @@ class editGraphDlg(ArtisanDialog):
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
-        self.weightinedit.setValidator(QDoubleValidator(0., 99999.9, 5, self.weightinedit))
+        self.weightinedit.setValidator(QDoubleValidator(0., 999999., 5, self.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightinedit.setMinimumWidth(70)
         self.weightinedit.setMaximumWidth(70)
         self.weightinedit.setAlignment(Qt.AlignRight)
         self.weightoutedit = QLineEdit(outw)
-        self.weightoutedit.setValidator(QDoubleValidator(0., 99999., 5, self.weightoutedit))
+        self.weightoutedit.setValidator(QDoubleValidator(0., 999999., 5, self.weightoutedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightoutedit.setMinimumWidth(70)
         self.weightoutedit.setMaximumWidth(70)
         self.weightoutedit.setAlignment(Qt.AlignRight)
@@ -28651,12 +28651,12 @@ class editGraphDlg(ArtisanDialog):
         inv = str(aw.qmc.volume[0])
         outv = str(aw.qmc.volume[1])
         self.volumeinedit = QLineEdit(inv)
-        self.volumeinedit.setValidator(QDoubleValidator(0., 9999., 5, self.volumeinedit))
+        self.volumeinedit.setValidator(QDoubleValidator(0., 99999., 5, self.volumeinedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeinedit.setMinimumWidth(70)
         self.volumeinedit.setMaximumWidth(70)
         self.volumeinedit.setAlignment(Qt.AlignRight)
         self.volumeoutedit = QLineEdit(outv)
-        self.volumeoutedit.setValidator(QDoubleValidator(0., 9999., 5, self.volumeoutedit))
+        self.volumeoutedit.setValidator(QDoubleValidator(0., 99999., 5, self.volumeoutedit)) # the max limit has to be high enough otherwise the connected signals are not send!
         self.volumeoutedit.setMinimumWidth(70)
         self.volumeoutedit.setMaximumWidth(70)
         self.volumeoutedit.setAlignment(Qt.AlignRight)
@@ -28676,7 +28676,7 @@ class editGraphDlg(ArtisanDialog):
         #density
         bean_density_label = QLabel("<b>" + u(QApplication.translate("Label", "Density",None)) + "</b>")
         self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
-        self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 5,self.bean_density_weight_edit))
+        self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 99999., 5,self.bean_density_weight_edit))
         self.bean_density_weight_edit.setMinimumWidth(60)
         self.bean_density_weight_edit.setMaximumWidth(60)
         self.bean_density_weight_edit.setAlignment(Qt.AlignRight)
@@ -28687,7 +28687,7 @@ class editGraphDlg(ArtisanDialog):
         self.bean_density_weightUnitsComboBox.setCurrentIndex(aw.qmc.weight_units.index(aw.qmc.density[1]))
         bean_density_per_label = QLabel(QApplication.translate("Label", "per",None))
         self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
-        self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 5,self.bean_density_volume_edit))
+        self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 99999., 5,self.bean_density_volume_edit))
         self.bean_density_volume_edit.setMinimumWidth(60)
         self.bean_density_volume_edit.setMaximumWidth(60)
         self.bean_density_volume_edit.setAlignment(Qt.AlignRight)
@@ -29758,7 +29758,7 @@ class editGraphDlg(ArtisanDialog):
             if le.text() and le.text() != "":
                 wi = float(le.text())
                 if wi != 0.0:
-                    le.setText("%g" % aw.float2float(aw.convertVolume(wi,o,i),4))
+                    le.setText(str(aw.float2float(aw.convertVolume(wi,o,i),4)))
         self.calculated_density()
         
     def changeDensityWeightUnit(self,i):
