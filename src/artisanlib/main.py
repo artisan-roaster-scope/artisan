@@ -4422,6 +4422,11 @@ class tgraphcanvas(FigureCanvas):
                     endidx = self.ax.get_xlim()[1] # or timex[-1]
                     if timex[tidx] < endidx and self.watermarksflag:
                         self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None)#,lod=False)                        
+                try:
+                    for a in anno_artists:
+                        a.set_in_layout(False) # remove text annotations from tight_layout calculation
+                except: # mpl before v3.0 do not have this set_in_layout() function
+                    pass
                 aw.qmc.l_annotations = anno_artists
         except Exception as e:
 #            import traceback
@@ -4623,8 +4628,12 @@ class tgraphcanvas(FigureCanvas):
         title = aw.qmc.abbrevString(title,stl)
         fontprop_xlarge = aw.mpl_fontproperties.copy()
         fontprop_xlarge.set_size("x-large")
-        self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
+        t_artist = self.ax.set_title(aw.arabicReshape(title), color=self.palette["title"],
                     fontproperties=fontprop_xlarge,horizontalalignment="left",x=0)
+        try:
+            t_artist.set_in_layout(False) # remove title from tight_layout calculation
+        except: # set_in_layout not available in mpl<3.x
+            pass
         if updatebackground:
             self.updateBackground()    
 
@@ -4675,7 +4684,11 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
                 if aw.qmc.flagstart and not aw.qmc.title_show_always:
                     self.setProfileTitle("")
-                    self.fig.suptitle("")
+                    st_artist = self.fig.suptitle("")
+                    try:
+                        st_artist.set_in_layout(False) # remove suptitle from tight_layout calculation
+                    except: # set_in_layout not available in mpl<3.x
+                        pass
                 else:                        
                     self.setProfileTitle(self.title)
                 
@@ -4713,7 +4726,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         suptitleX = 1
                     if aw.qmc.flagstart and not aw.qmc.title_show_always:
-                        self.fig.suptitle("")
+                        st_artist = self.fig.suptitle("")
                     else:
                         if self.roastbatchnrB == 0:
                             titleB = self.titleB
@@ -4722,11 +4735,16 @@ class tgraphcanvas(FigureCanvas):
                         if aw.qmc.graphfont == 1: # if selected font is Humor we translate the unicode title into pure ascii
                             titleB = toASCII(titleB)
                         if self.title is None or u(self.title).strip() == "":
-                            self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
+                            st_artist = self.fig.suptitle(aw.arabicReshape(aw.qmc.abbrevString(titleB,stl)),
                                 horizontalalignment="right",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
                         else:
-                            self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
+                            st_artist = self.fig.suptitle("\n" + aw.qmc.abbrevString(titleB,stl),
                                 horizontalalignment="right",fontsize="xx-small",fontproperties=fontprop_small,x=suptitleX,y=1,color=self.palette["title"])
+                    try:
+                        st_artist.set_in_layout(False)  # remove title from tight_layout calculation
+                    except:  # set_in_layout not available in mpl<3.x
+                        pass
+                        
                 
     #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
     #            self.ax.spines['top'].set_color('none')
@@ -5615,7 +5633,10 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.graphfont == 1:
                         labels = [toASCII(l) for l in labels]
                     leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
-                    leg.set_draggable(state=True)
+                    try:
+                        leg.set_draggable(state=True)
+                    except: # not available in mpl<3.x
+                        leg.draggable(state=True) # for mpl 2.x
                     frame = leg.get_frame()
                     frame.set_facecolor(self.palette["legendbg"])
 #                    frame.set_alpha(self.legendbgalpha)
@@ -5628,7 +5649,7 @@ class tgraphcanvas(FigureCanvas):
                         rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette["background"])]                    
     
                 # we create here the project line plots to have the accurate time axis after CHARGE               
-                dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0
+                dashes_setup = [0.4,0.8,0.1,0.8] # simulating matplotlib 1.5 default on 2.0                
                     
                 ############  ready to plot ############
                 #self.fig.canvas.draw() # done by updateBackground()
@@ -10128,7 +10149,7 @@ class VMToolbar(NavigationToolbar):
     #                traceback.print_exc(file=sys.stdout)
                     pass
                 aw.fetchCurveStyles()
-                aw.fetchAxisLimits()
+#                aw.fetchAxisLimits() # DON'T
                 # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
                 aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
@@ -20357,22 +20378,22 @@ class ApplicationWindow(QMainWindow):
             c = mpl.colors.rgb2hex(c)
         return c
         
-    def fetchAxisLimits(self):
-        try:
-# don't fetch the axis as one might be zoomed in and then those values overwrite the standard Artisan axis setting on leaving the
-# figure options dialog without editing the axis limits. Not very intuitive!
-#            # x-axis min/max (in standard units)
-#            xmin, xmax = map(float, aw.qmc.ax.get_xlim())
-#            aw.qmc.startofx = xmin
-#            aw.qmc.endofx = xmax
-#            # y-axis min/max
-#            ymin, ymax = map(float, aw.qmc.ax.get_ylim())
-#            aw.qmc.ylimit_min = ymin
-#            aw.qmc.ylimit = ymax
-            # title            
-            aw.qmc.title = aw.qmc.ax.get_title()
-        except:
-            pass
+#    def fetchAxisLimits(self):
+#        try:
+## don't fetch the axis as one might be zoomed in and then those values overwrite the standard Artisan axis setting on leaving the
+## figure options dialog without editing the axis limits. Not very intuitive!
+##            # x-axis min/max (in standard units)
+##            xmin, xmax = map(float, aw.qmc.ax.get_xlim())
+##            aw.qmc.startofx = xmin
+##            aw.qmc.endofx = xmax
+##            # y-axis min/max
+##            ymin, ymax = map(float, aw.qmc.ax.get_ylim())
+##            aw.qmc.ylimit_min = ymin
+##            aw.qmc.ylimit = ymax
+#            # title            
+#            aw.qmc.title = aw.qmc.ax.get_title() # this would include the batch number in the title leading to duplications!
+#        except:
+#            pass
 
     def fetchCurveStyles(self):
         try:
