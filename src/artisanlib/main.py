@@ -1052,7 +1052,8 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=[""]*9
         self.plotcurvecolor = ["black"]*9
 
-        self.fig = Figure(tight_layout={"pad":.2},frameon=True,dpi=dpi) # ,"h_pad":0.0,"w_pad":0.0
+        self.tight_layout_params = {"pad":.3,"h_pad":0.0,"w_pad":0.0}
+        self.fig = Figure(tight_layout=self.tight_layout_params,frameon=True,dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
 
         self.fig.patch.set_facecolor(str(self.palette["canvas"]))
@@ -22324,7 +22325,9 @@ class ApplicationWindow(QMainWindow):
                             cf = aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calcuation as for normal curve smoothing
                             t1 = self.qmc.smooth_list(timex,self.qmc.fill_gaps(temp),window_len=cf,decay_smoothing=not aw.qmc.optimalSmoothing)
                             t1 = numpy.concatenate(([None]*charge,t1[charge:drop],[None]*(len(timex)-drop)))                            
-                            delta,_ = self.qmc.recomputeDeltas(tx,rd["charge_idx"],drop,t1,None,optimalSmoothing=aw.qmc.optimalSmoothing)
+                            # we start RoR computation 10 readings after CHARGE to avoid this initial peak
+                            RoR_start = min(rd["charge_idx"]+10,len(tx)-1)
+                            delta,_ = self.qmc.recomputeDeltas(tx,RoR_start,drop,t1,None,optimalSmoothing=aw.qmc.optimalSmoothing)
                             if self.qmc.BTlinewidth > 1 and self.qmc.BTlinewidth == self.qmc.BTdeltalinewidth:
                                 dlinewidth = self.qmc.BTlinewidth-1 # we render the delta lines a bit thinner
                                 dlinestyle = self.qmc.BTdeltalinestyle
@@ -22370,7 +22373,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 try:
                     
-                    # remove annotations, lines and artists from background profile
+                    # remove annotations, lines and other artists from background profile
                     try:
                         for l in aw.qmc.l_annotations + aw.qmc.l_background_annotations:
                             if l:
@@ -22401,11 +22404,10 @@ class ApplicationWindow(QMainWindow):
                                 aw.qmc.l_backgroundeventtype4dots]:
                             if a:
                                 try:
-                                    a.remove()
-                                    #aw.qmc.ax.lines.remove(a) # corresponds to a.remove()
-                                except Exception as e:
+                                    aw.qmc.ax.lines.remove(a)
+                                except:
                                     pass
-                    except Exception:
+                    except:
                         pass
 
                     aw.qmc.ax.set_xlim(min_start_time-15,max_end_time+15) # we adjust the min, max time scale to ensure all data is visible
@@ -22422,14 +22424,15 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False)
                             
                     # generate graph
+                    self.qmc.fig.set_tight_layout(False)
                     self.qmc.fig.canvas.draw()
-                    
                     # save graph                
                     graph_image = u(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + ".svg")))
                     try:
                         os.remove(graph_image)
                     except OSError:
                         pass
+                    self.qmc.fig.set_tight_layout(self.qmc.tight_layout_params)
                     self.qmc.fig.savefig(graph_image)
                         
                     #add some random number to force HTML reloading
