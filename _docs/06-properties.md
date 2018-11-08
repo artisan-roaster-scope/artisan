@@ -13,13 +13,14 @@ Under the Roast Properties, you can input many parameters for your current batch
 
 ![roasting menus](/assets/images/gsg/roast menu.png)
 
+![roast properties](/assets/images/gsg/roast properties dialog.png)
+
+
 When you enter the coffee bean name under Title, it shows up on the graph.  The idea is that "Title" is actual the product title which some people use for other things. That product title gets combined with the batch number to be rendered as title on the profile. The beans you use can be specified in the beans field.  So for example you have a product called Holiday Roast and in the bean field you enter the three types of beans you used.  
 
 If you press +, your current roast properties (together with the background profile) gets saved (up to 20 entries). Here it is assumed, that you re-roast your "product" several times. Thus the product name together with the charge size is added to the Recent Roasts menu. That menu is available as dropdown in the Roast Properties dialog next to the + and also as menu item under Files >> New. If you select one of those Recent Roasts from the File >> New menu, the saved Roast Properties are re-entered and the roast is started. Additionally, the background profile associated is loaded. This is a quick way to start a re-roast of a product. You can also select one of the Recent Roast items in the Roast Properties dropdown to have the saved roast properties being re-entered.
 
 Other useful information you might add includes which roaster was used and the drum speed.  With weight and volume entered, density can be calculated.  You can note moisture as well if you know it and ambient data.  On the second tab Notes, you can add roasting and cupping notes.  Events and Data are entered by Artisan throughout the roast.  
-
-![roast properties](/assets/images/gsg/roast properties dialog.png)
 
 To reset the Properties you have to select the box “Delete roast properties on RESET” and then reset. You can also have the Properties box open on charge to remind you, mostly to at least, name your coffee.
 
