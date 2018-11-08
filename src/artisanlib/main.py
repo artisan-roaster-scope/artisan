@@ -8675,7 +8675,7 @@ class tgraphcanvas(FigureCanvas):
         if len(timearray):                           #check that timearray is not empty just in case
             #if input seconds longer than available time return last index
             if  seconds > timearray[-1]:
-                return len(timearray)-1
+                return int(len(timearray)-1)
             #if given input seconds smaller than first time return first index
             if seconds < timearray[0]:
                 return 0
@@ -8687,7 +8687,7 @@ class tgraphcanvas(FigureCanvas):
                 #return closest (smallest) index
                 if choice2 < choice1:
                     i = i - 1
-            return i
+            return int(i)
         else:
             return -1
 
@@ -13826,7 +13826,10 @@ class ApplicationWindow(QMainWindow):
         else:
             aw.pidcontrol.activateONOFFeasySV(False)
             aw.pidcontrol.activateSVSlider(False)
-        aw.button_10.setVisible(res)
+        if artisanviewerMode:
+            aw.button_10.setVisible(False)
+        else:
+            aw.button_10.setVisible(res)
         self.LCD6frame.setVisible(lcds)
         self.LCD7frame.setVisible(lcds)
             
@@ -23284,9 +23287,9 @@ class ApplicationWindow(QMainWindow):
         for i in range(len(self.qmc.timex)):
             if self.qmc.timex[i] >= time:
                 if i > 0 and abs(time - self.qmc.timex[i]) > abs(time - self.qmc.timex[i-1]):
-                    return i-1
+                    return int(i-1)
                 else:
-                    return i
+                    return int(i)
         return -1
 
     #returns the index of the lowest point in BT; return -1 if no such value found
@@ -24143,6 +24146,7 @@ class ApplicationWindow(QMainWindow):
                     aw.stopActivities()
                     res = aw.settingsLoad(filename)
                     if reset:
+                        aw.qmc.roastpropertiesflag = 1 # ensure that all roast properties are reset!
                         aw.qmc.reset(soundOn=False)
                     if res and remember:
                         # update recentSettings menu
