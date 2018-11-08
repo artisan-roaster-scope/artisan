@@ -84,6 +84,10 @@ The dual temperature meters are perfect for the standard use of Artisan to log t
   - Dual K/J-Type
   - Built in USB to serial converter (19200-8E1)
   - 4 x 1.5V AAA Batteries or external power
+* [VOLTCRAFT PL-125-T2](https://www.conrad.de/de/temperatur-messgeraet-voltcraft-pl-125-t2-200-bis-1372-c-fuehler-typ-k-j-kalibriert-nach-werksstandard-ohne-zertifi-1012836.html)
+  - Dual K/J-Type
+  - Built in USB to serial converter (9600-8N1)
+  - 3 x 1.5V AAA Batteries
 
  
 ### Four Channel
@@ -101,7 +105,11 @@ Those 4 channel meters in the list below are all basically identical. Just that 
   - Internal memory
   - Software included
   - 9V Battery or external power
-
+* [VOLTCRAFT PL-125-T4](https://www.conrad.de/de/temperatur-messgeraet-voltcraft-pl-125-t4-200-bis-1372-c-fuehler-typ-k-j-kalibriert-nach-werksstandard-ohne-zertifi-1013036.html)
+  - Four K/J-Type
+  - Built in USB to serial converter (9600-8N1)
+  - 3 x 1.5V AAA Batteries
+ 
 ## Multi Meters
 
 Multi-meters allow to read different types of sensors by measuring a voltage or current input. Artisan supports two devices that feature a communication interface. The TE VA18B also supports one temperature channel connecting to a K-Type probe.
