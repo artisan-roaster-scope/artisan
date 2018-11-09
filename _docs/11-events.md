@@ -2,7 +2,7 @@
 title: "Events"
 permalink: /docs/events/
 excerpt: ""
-last_modified_at: 2018-05-15T15:59:00-04:00
+last_modified_at:
 toc: false
 ---
 
@@ -43,7 +43,7 @@ During a roast it is now possible to have Artisan draw a line at the current poi
 
 ### Rendering Events on Your Curves
 
-Under Config>Events on the right side of the dialog box you will see to the right of Events you now have a drop down with options:
+To see the values of the TP, DE, FCs etc, check the box for Annotations.  For Events that you have defined, you will see to the right of Events a dialog box with drop down options:
 
 ![combo setting](/assets/images/gsg/combo example.png)
 
