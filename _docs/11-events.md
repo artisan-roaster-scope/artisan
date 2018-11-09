@@ -2,7 +2,7 @@
 title: "Events"
 permalink: /docs/events/
 excerpt: ""
-last_modified_at:
+last_modified_at: 2018-11-9T15:59:00-04:00
 toc: false
 ---
 
