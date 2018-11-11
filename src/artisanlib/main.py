@@ -5478,7 +5478,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_delta1, = self.ax.plot(self.timex, self.delta1,transform=trans,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "ET", None)))                    
-                            if self.DeltaBTflag:           
+                            if self.DeltaBTflag:
                                 self.l_delta2, = self.ax.plot(self.timex, self.delta2,transform=trans,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                                 sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground=self.palette["background"])],
                                 linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(deltaLabelUTF8 + QApplication.translate("Label", "BT", None)))    
@@ -38066,6 +38066,8 @@ class serialport(object):
                 try:
                     if self.PhidgetIRSensorIC and self.PhidgetIRSensorIC.getAttached():
                         ambient = self.PhidgetIRSensorIC.getTemperature()
+                        if aw.qmc.mode == "F":
+                            ambient = aw.qmc.fromCtoF(ambient)
                 except Exception:
                     pass
                 if deviceType == DeviceID.PHIDID_TMP1200:
