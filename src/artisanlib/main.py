@@ -635,6 +635,7 @@ class AmbientThread(QThread):
         super(AmbientThread,self).__init__()
 
     def run(self):
+        libtime.sleep(1.5) # wait a moment after ON until all other devices are attached
         aw.qmc.getAmbientData()
         
         
@@ -6606,7 +6607,12 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
 
-    def getAmbientData(self):
+    def getAmbientData(self):        
+        if self.ambient_humidity_device == 1: # Phidget HUM1000
+            humidity = aw.ser.PhidgetHUM1000humidity()
+            if humidity is not None:
+                self.ambient_humidity = aw.float2float(humidity,1)
+                aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
         if self.ambient_temperature_device == 1: # Phidget HUM1000
             temp = aw.ser.PhidgetHUM1000temperature()
             if temp is not None:
@@ -6614,11 +6620,6 @@ class tgraphcanvas(FigureCanvas):
                     temp = self.fromCtoF(temp)
                 self.ambientTemp = aw.float2float(temp,1)
                 aw.sendmessage(QApplication.translate("Message","Temperature: {}{}", None).format(self.ambientTemp,self.mode))
-        if self.ambient_humidity_device == 1: # Phidget HUM1000
-            humidity = aw.ser.PhidgetHUM1000humidity()
-            if humidity is not None:
-                self.ambient_humidity = aw.float2float(humidity,1)
-                aw.sendmessage(QApplication.translate("Message","Humidity: {}%", None).format(self.ambient_humidity))
         if self.ambient_pressure_device == 1: # Phidget PRE1000
             pressure = aw.ser.PhidgetPRE1000pressure()
             if pressure is not None:
@@ -36878,9 +36879,9 @@ class serialport(object):
             if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                 tempSensor.setIsRemote(True)
                 tempSensor.setIsLocal(False)                   
-            tempSensor.openWaitForAttachment(1000)
+            tempSensor.openWaitForAttachment(2000)
             if tempSensor.getAttached():
-                libtime.sleep(0.3)
+                libtime.sleep(0.5)
                 res = tempSensor.getTemperature()
                 tempSensor.close()
                 return res
@@ -36899,9 +36900,9 @@ class serialport(object):
             if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                 humSensor.setIsRemote(True)
                 humSensor.setIsLocal(False)                   
-            humSensor.openWaitForAttachment(1000)
+            humSensor.openWaitForAttachment(2000)
             if humSensor.getAttached():
-                libtime.sleep(0.3)
+                libtime.sleep(0.5)
                 res = humSensor.getHumidity()
                 humSensor.close()
                 return res
@@ -36916,7 +36917,7 @@ class serialport(object):
             pressSensor = PhidgetPressureSensor()
             pressSensor.openWaitForAttachment(2000)
             if pressSensor.getAttached():
-                libtime.sleep(0.3)
+                libtime.sleep(0.5)
                 res = pressSensor.getPressure()
                 pressSensor.close()
                 return res
