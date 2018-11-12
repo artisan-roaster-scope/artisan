@@ -7986,13 +7986,13 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.release(1)
 
     def writecharacteristics(self,TP_index=None,LP=None):
-        try:
-            if self.statisticsflags[3] and self.timeindex[0]>-1 and self.temp1 and self.temp2 and self.temp1[self.timeindex[0]:self.timeindex[6]+1] and self.temp2[self.timeindex[0]:self.timeindex[6]+1]:
-                # MET temp and time relative to FCs
-                min_et = min(self.temp1[self.timeindex[0]:self.timeindex[6]])
-                idx_min_et = self.temp1.index(min_et)
-                met_temp = max(self.temp1[idx_min_et:self.timeindex[6]])
-                self.idx_met = idx_min_et + self.temp1[idx_min_et:self.timeindex[6]].index(met_temp)
+        try:            
+            # Display MET marker
+            if self.showmet and aw.qmc.ETcurve and self.timeindex[0] > -1 and self.timeindex[6] > 0:    
+                if TP_index is None:
+                    TP_index = aw.findTP()
+                met_temp = max(self.temp1[TP_index:self.timeindex[6]])
+                self.idx_met = TP_index + self.temp1[TP_index:self.timeindex[6]].index(met_temp)
                 if self.idx_met and self.timeindex[2]:
                     # time between MET and FCs
                     met_delta = aw.float2float(self.timex[self.timeindex[2]] - self.timex[self.idx_met],0)
@@ -8015,14 +8015,14 @@ class tgraphcanvas(FigureCanvas):
                                  ha = "center",
                                  alpha=0.9,
                                  color=textcolor,
-                                 #arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),
                                  bbox=dict(boxstyle=boxstyle, fc=boxcolor, ec='none'),
                                  fontproperties=fontprop_small,
-#                                 path_effects=[PathEffects.withStroke(linewidth=0.5,foreground="w")],
                                  path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                  picker=True,
                                  )
+                    self.met_annotate.set_in_layout(False)
 
+            if self.statisticsflags[3] and self.timeindex[0]>-1:
                 statsprop = aw.mpl_fontproperties.copy()
                 statsprop.set_size("small")
                 if aw.qmc.statisticsmode == 0:
