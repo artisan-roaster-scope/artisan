@@ -38738,6 +38738,7 @@ class serialport(object):
                     if port is not None:
                         aw.ser.PhidgetAnalogOut[i].setHubPort(port)
                     aw.ser.PhidgetAnalogOut[i].setDeviceSerialNumber(ser)
+                    aw.ser.PhidgetAnalogOut[i].setChannel(i)
                     if aw.qmc.phidgetRemoteOnlyFlag and aw.qmc.phidgetRemoteFlag:
                         aw.ser.PhidgetAnalogOut[i].setIsRemote(True)
                         aw.ser.PhidgetAnalogOut[i].setIsLocal(False)
