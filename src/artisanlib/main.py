@@ -118,6 +118,8 @@ import matplotlib.transforms as transforms
 import matplotlib.ticker as ticker
 import matplotlib.patheffects as PathEffects
 
+import matplotlib.backends.backend_pdf
+import matplotlib.backends.backend_svg
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
 
