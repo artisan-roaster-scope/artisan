@@ -118,8 +118,8 @@ import matplotlib.transforms as transforms
 import matplotlib.ticker as ticker
 import matplotlib.patheffects as PathEffects
 
-import matplotlib.backends.backend_pdf
-import matplotlib.backends.backend_svg
+import matplotlib.backends.backend_pdf # @UnusedImport
+import matplotlib.backends.backend_svg # @UnusedImport
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar # @Reimport
 
@@ -17992,7 +17992,7 @@ class ApplicationWindow(QMainWindow):
                 self.extrastopbits = self.extrastopbits[:len(self.qmc.extradevices)]
                 self.extratimeout = self.extratimeout[:len(self.qmc.extradevices)]
                 # b) add missing extra serial settings
-                for i in range(len(self.qmc.extradevices) - len(self.extraser)):
+                for _ in range(len(self.qmc.extradevices) - len(self.extraser)):
                     self.addSerialPort()
                 # c) set extra temp curves and prepare empty extra smoothed temp curves
                 if "extratimex" in profile:
@@ -18089,17 +18089,15 @@ class ApplicationWindow(QMainWindow):
 #            if "phases" in profile:
 #                self.qmc.phases = profile["phases"]
             if "flavors" in profile:
-                self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
-            #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
-            if self.qmc.flavors[0] < 1. and self.qmc.flavors[-1] < 1.:
-                l = len(self.qmc.flavors)
-                for i in range(l):
-                    self.qmc.flavors[i] *= 10.
-                self.qmc.flavors = self.qmc.flavors[:(l-1)]
+                self.qmc.flavors = [max(0,min(10,float(fl))) for fl in profile["flavors"]]
             if "flavorlabels" in profile:
                 self.qmc.flavorlabels = toStringList([d(x) for x in profile["flavorlabels"]])
-            for i in range(len(self.qmc.flavorlabels)):
-                self.qmc.flavorlabels[i] = self.qmc.flavorlabels[i]
+            if len(self.qmc.flavorlabels) > len(self.qmc.flavors):
+                # fill with default 5. values
+                self.qmc.flavors = self.qmc.flavors + [5.]*(len(self.qmc.flavorlabels)-len(self.qmc.flavors))
+            elif len(self.qmc.flavorlabels) < len(self.qmc.flavors):
+                # remove superfluous values
+                self.qmc.flavors = self.qmc.flavors[:len(self.qmc.flavorlabels)]
             if "flavorstartangle" in profile:
                 self.qmc.flavorstartangle = int(profile["flavorstartangle"])
             if "flavoraspect" in profile:
@@ -18423,7 +18421,7 @@ class ApplicationWindow(QMainWindow):
                 if aw.qmc.timeindex[2]:
                     aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
             # ensure that timeindex has the proper length
-            self.qmc.timeindex = self.qmc.timeindex + [0 for i in range(8-len(self.qmc.timeindex))]
+            self.qmc.timeindex = self.qmc.timeindex + [0 for _ in range(8-len(self.qmc.timeindex))]
             # reset linecount caches
             aw.qmc.resetlinecountcaches()
             # try to reload background profile
@@ -45315,7 +45313,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox):
 
     def wheelEvent(self, *args, **kwargs):
         if self.hasFocus():
-            return MyQDoubleSpinBox.wheelEvent(self, *args, **kwargs)
+            return QDoubleSpinBox.wheelEvent(self, *args, **kwargs)
             
 class MyTableWidgetItemQLineEdit(QTableWidgetItem):
     def __init__(self, sortKey):
