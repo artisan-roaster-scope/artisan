@@ -19082,9 +19082,9 @@ class ApplicationWindow(QMainWindow):
             progress.cancel()
             progress = None
 
-    def fileImport(self,msg,loader,reset=False):
+    def fileImport(self,msg,loader,reset=False,ext="*"):
         try:
-            filename = self.ArtisanOpenFileDialog(msg=msg)
+            filename = self.ArtisanOpenFileDialog(msg=msg,ext=ext)
             if filename:
                 if reset:
                     aw.qmc.reset(True,False)
@@ -45700,44 +45700,51 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setSortingEnabled(True)
 
     def importalarms(self):
-        aw.fileImport(QApplication.translate("Message", "Load Alarms",None),self.importalarmsJSON)
+        aw.fileImport(QApplication.translate("Message", "Load Alarms",None),self.importalarmsJSON,ext="*.alrm *.alog")
 
     def importalarmsJSON(self,filename):
         try:
-            import io
-            infile = io.open(filename, 'r', encoding='utf-8')
-            from json import load as json_load
-            alarms = json_load(infile)
-            infile.close()
-            aw.qmc.alarmsfile = filename            
-            self.alarmsfile.setText(aw.qmc.alarmsfile)
-            aw.qmc.alarmflag = alarms["alarmflags"]
-            aw.qmc.alarmguard = alarms["alarmguards"]
-            if "alarmnegguards" in alarms:
-                aw.qmc.alarmnegguard = alarms["alarmnegguards"]
-            else:
-                aw.qmc.alarmnegguard = [0]*len(aw.qmc.alarmflag)
-            aw.qmc.alarmtime = alarms["alarmtimes"]
-            aw.qmc.alarmoffset = alarms["alarmoffsets"]
-            aw.qmc.alarmcond = alarms["alarmconds"]
-            aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)
-            aw.qmc.alarmsource = alarms["alarmsources"]  
+            _,ext = os.path.splitext(filename)
+            if ext == ".alrm":
+                import io
+                infile = io.open(filename, 'r', encoding='utf-8')
+                from json import load as json_load
+                alarms = json_load(infile)
+                infile.close()
+                aw.qmc.alarmsfile = filename            
+                self.alarmsfile.setText(aw.qmc.alarmsfile)
+                aw.qmc.alarmflag = alarms["alarmflags"]
+                aw.qmc.alarmguard = alarms["alarmguards"]
+                if "alarmnegguards" in alarms:
+                    aw.qmc.alarmnegguard = alarms["alarmnegguards"]
+                else:
+                    aw.qmc.alarmnegguard = [0]*len(aw.qmc.alarmflag)
+                aw.qmc.alarmtime = alarms["alarmtimes"]
+                aw.qmc.alarmoffset = alarms["alarmoffsets"]
+                aw.qmc.alarmcond = alarms["alarmconds"]
+                aw.qmc.alarmsource = alarms["alarmsources"]
+                aw.qmc.alarmtemperature = alarms["alarmtemperatures"]
+                aw.qmc.alarmaction = alarms["alarmactions"]
+                if "alarmbeep" in alarms:
+                    aw.qmc.alarmbeep = alarms["alarmbeep"]
+                else:
+                    aw.qmc.alarmbeep = [0]*len(aw.qmc.alarmflag)
+                aw.qmc.alarmstrings = alarms["alarmstrings"]
+            elif ext == ".alog":
+                obj = aw.deserialize(filename)
+                aw.loadAlarmsFromProfile(filename,obj)
+                self.alarmsfile.setText(aw.qmc.alarmsfile) 
+            aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag) 
             aitems = self.buildAlarmSourceList()
             for i in range(len(aw.qmc.alarmsource)):
                 if aw.qmc.alarmsource[i] + 3 >= len(aitems):
                     aw.qmc.alarmsource[i] = 1 # BT
-            aw.qmc.alarmtemperature = alarms["alarmtemperatures"]
-            aw.qmc.alarmaction = alarms["alarmactions"]
-            if "alarmbeep" in alarms:
-                aw.qmc.alarmbeep = alarms["alarmbeep"]
-            else:
-                aw.qmc.alarmbeep = [0]*len(aw.qmc.alarmflag)
-            aw.qmc.alarmstrings = alarms["alarmstrings"]
             self.createalarmtable()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
+            aw.sendmessage(QApplication.translate("Message","Error loading alarm file", None))
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " importalarmsJSON() {0}").format(str(ex)),exc_tb.tb_lineno)
 
     def exportalarms(self):
