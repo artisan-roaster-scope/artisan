@@ -181,12 +181,12 @@ def applyServerUpdates(data):
         config.logger.debug("sync: -> apply: %s",data)
         aw = config.app_window
         
-        if "amount" in data:
+        if "amount" in data and data["amount"] is not None:
             w = aw.convertWeight(data["amount"],aw.qmc.weight_units.index("Kg"),aw.qmc.weight_units.index(aw.qmc.weight[2]))
             if w != aw.qmc.weight[0]:
                 aw.qmc.weight[0] = w
                 dirty = True
-        if "end_weight" in data:
+        if "end_weight" in data and data["end_weight"] is not None:
             w = aw.convertWeight(data["end_weight"],aw.qmc.weight_units.index("Kg"),aw.qmc.weight_units.index(aw.qmc.weight[2]))
             if w != aw.qmc.weight[1]:
                 aw.qmc.weight[1] = w
@@ -208,19 +208,33 @@ def applyServerUpdates(data):
             dirty = True
             title_changed = True
         
-        if "location" in data:
+        if "location" in data and data["location"] is not None:
             if "hr_id" in data["location"] and data["location"]["hr_id"] != aw.qmc.plus_store:
                 aw.qmc.plus_store = data["location"]["hr_id"]
                 dirty = True
-        if "coffee" in data:
+            if "label" in data["location"] and data["location"]["label"] != aw.qmc.plus_store_label:
+                aw.qmc.plus_store_label = data["location"]["label"]
+                dirty = True
+        if "coffee" in data and data["coffee"] is not None:
             if "hr_id" in data["coffee"] and data["coffee"]["hr_id"] != aw.qmc.plus_coffee:
                 aw.qmc.plus_coffee = data["coffee"]["hr_id"]
-                dirty = True          
-        if "blend" in data:
-            if "hr_id" in data["blend"] and data["blend"]["hr_id"] != aw.qmc.plus_blend:
-                aw.qmc.plus_blend = data["blend"]["hr_id"]
+                dirty = True  
+            if "label" in data["coffee"] and data["coffee"]["label"] != aw.qmc.plus_coffee_label:
+                aw.qmc.plus_coffee_label = data["coffee"]["label"]
+                dirty = True       
+        if "blend" in data and data["blend"] is not None and "label" in data["blend"] and "ingredients" in data["blend"] \
+               and data["blend"]["ingredients"]:
+            try:
+                ingredients = data["blend"]["ingredients"]
+                blend_spec = {
+                    "label": data["blend"]["label"], 
+                    "ingredients": [{"coffee": i["coffee"]["hr_id"], "ratio": i["ratio"]} for i in ingredients]}
+                blend_spec_labels = [i["coffee"]["label"] for i in ingredients]
+                aw.qmc.plus_blend_spec = blend_spec
+                aw.qmc.plus_blend_spec_labels = blend_spec_labels
                 dirty = True
-                                    
+            except:
+                pass
         if "color_system" in data and data["color_system"] != aw.qmc.color_systems[aw.qmc.color_system_idx]: 
             try:                   
                 aw.qmc.color_system_idx = aw.qmc.color_systems.index(data["color_system"])
@@ -239,12 +253,12 @@ def applyServerUpdates(data):
         if "notes" in data and data["notes"] != aw.qmc.roastingnotes:
             aw.qmc.roastingnotes = data["notes"]
             dirty = True
-        if "volume_in" in data:
+        if "volume_in" in data and data["volume_in"] is not None:
             v = aw.convertVolume(data["volume_in"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
             if w != aw.qmc.volume[0]:
                 aw.qmc.volume[0] = v
                 dirty = True
-        if "volume_out" in data:
+        if "volume_out" in data and data["volume_out"] is not None:
             v = aw.convertVolume(data["volume_out"],aw.qmc.volume_units.index("l"),aw.qmc.volume_units.index(aw.qmc.volume[2]))
             if w != aw.qmc.volume[1]:
                 aw.qmc.volume[1] = v

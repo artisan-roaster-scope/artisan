@@ -27,6 +27,7 @@ import hashlib
 
 from plus import config, util
 
+
 # given a profile dictionary extract key parameters to populate a Roast element
 def getTemplate(bp):
     config.logger.debug("roast:getTemplate()")
@@ -147,8 +148,12 @@ def getRoast():
             d["location"] = aw.qmc.plus_store
         if aw.qmc.plus_coffee:
             d["coffee"] = aw.qmc.plus_coffee
-        if aw.qmc.plus_blend:
-            d["blend"] = aw.qmc.plus_blend
+        else:
+            d["coffee"] = None
+        if aw.qmc.plus_blend_spec:
+            d["blend"] = aw.qmc.plus_blend_spec
+        else:
+            d["blend"] = None
         
         util.addTemp2dict(p,"ambientTemp",d,"temperature")        
         util.addNum2dict(p,"ambient_pressure",d,"pressure",800,1200,1)

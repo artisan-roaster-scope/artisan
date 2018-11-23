@@ -30,6 +30,9 @@ import time
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QSemaphore, QTimer
 
+
+from artisanlib.util import d as decode, encodeLocal
+
 from plus import config, connection, util, controller
 
 stock_semaphore = QSemaphore(1) # protects access to the stock_cache file and the stock dict
@@ -124,9 +127,32 @@ def load():
 
 
 ################### 
-# coffee and blend stock access and rendering
-# 
+# convert between blend dict and list representation
 
+def blend2list(blend_dict):
+    try:
+        if blend_dict and "label" in blend_dict and "ingredients" in blend_dict and len(blend_dict["ingredients"]) > 1:
+            return [encodeLocal(blend_dict["label"]), [ [encodeLocal(i["coffee"]), i["ratio"]] for i in blend_dict["ingredients"]] ]
+        else:
+            return None
+    except:
+        return None
+    
+def list2blend(blend_list):
+    try:
+        if blend_list and len(blend_list) == 2 and len(blend_list[1])>1:
+            d = {}
+            d["label"] = decode(blend_list[0])
+            d["ingredients"] = [{"coffee": decode(i[0]), "ratio": i[1]} for i in blend_list[1]]
+            return d
+        else:
+            return None
+    except:
+        return None
+
+
+################### 
+# coffee and blend stock access and rendering
 
 unit_translations_singular  = {
     "bag": QApplication.translate("Plus", "bag",None),
@@ -151,7 +177,7 @@ def renderAmount(amount,default_unit = None,target_unit_idx = 0):
                 u = unit_translations_plural[default_unit["name"]]
             else:
                 u = unit_translations_singular[default_unit["name"]]
-            res = "{}{}".format(a,u)
+            res = "{}{}".format(int(round(a)),u)
     except:
         pass
     # if we could not convert to default_unit type, we convert to the weightunit
@@ -169,7 +195,7 @@ def renderAmount(amount,default_unit = None,target_unit_idx = 0):
         else:
             target_unit = config.app_window.qmc.weight_units[target_unit_idx] # @UndefinedVariable
         if w > 9:
-            w = int(w) # we truncate all decimals
+            w = int(round(w)) # we truncate all decimals
         else:
             w = config.app_window.float2float(w,1) # @UndefinedVariable # we keep one decimal 
         res = "{0:g}{1}".format(w,target_unit)
@@ -314,7 +340,7 @@ def getCoffees(weight_unit_idx,store=None):
     else:
         return []    
 
-# returns the position of coffee hrid in coffees or None if coffee not in the coffees
+# returns the position of coffee hr_id in coffees or None if coffee not in the coffees
 def getCoffeePosition(coffeeId,coffees):
     try:
         return [getCoffeeId(c) for c in coffees].index(coffeeId)
@@ -401,6 +427,7 @@ def getBlends(weight_unit_idx,store=None):
                             coffee = i["coffee"]
                             ratio = i["ratio"]
                             cd, sd = getCoffeeStore(coffee,s) # if no stock of this coffee is available this returns None
+                            i["label"] = cd["label"] # add label of coffee to ingredient
                             stock_amount = sd["amount"]   # if sd is None, this fails
                             if location_label == "":
                                 location_label = sd["location_label"]
@@ -433,10 +460,43 @@ def getBlends(weight_unit_idx,store=None):
 #        return None
 #        # returns the position of blend id in blends or None if store not in the stores
      
+# not used currently: 
+## returns the position in blends which matches the given blendId and stockId and None if no match is found
+#def getBlendStockPosition(blendId,stockId,blends):
+#    res = [i for i, b in enumerate(blends) if getBlendBlendDict(b)["hr_id"] == blendId and getBlendStockDict(b)["location_hr_id"] == stockId]
+#    if len(res)>0:
+#        return res[0]
+#    else:
+#        return None
+
+# returns True if blendSpec of the form
+#   {"label": <blend-name>, "ingredients": [{"coffee": <hr_id>, "ratio": <n>}, .. ,{"coffee":<hr_id>, "ratio": <n>}]}
+# matches the blendDict in the coffee hr_ids and ratios and the blend label
+def matchBlendDict(blendSpec, blendDict, sameLabel=True):
+    if blendSpec is None or blendDict is None:
+        return False
+    else:
+        if (not sameLabel or blendSpec["label"] == blendDict["label"]) and len(blendSpec["ingredients"]) == len(blendDict["ingredients"]) and len(blendSpec["ingredients"]) > 0:
+            return all([i1["coffee"]==i2["coffee"] and i1["ratio"]==i2["ratio"] for (i1,i2) in (zip(blendSpec["ingredients"],blendDict["ingredients"]))])
+        else:
+            return False
+    
+        
 # returns the position in blends which matches the given blendId and stockId and None if no match is found
-def getBlendStockPosition(blendId,stockId,blends):
-    res = [i for i, b in enumerate(blends) if getBlendBlendDict(b)["hr_id"] == blendId and getBlendStockDict(b)["location_hr_id"] == stockId]
+def getBlendSpecStockPosition(blendSpec,stockId,blends):
+    res = [i for i, b in enumerate(blends) if \
+       matchBlendDict(blendSpec,getBlendBlendDict(b)) and \
+       getBlendStockDict(b)["location_hr_id"] == stockId]
     if len(res)>0:
         return res[0]
     else:
-        return None
+        # check again, but now ignore label (thus allow renaming of blend names)
+        res2 = [i for i, b in enumerate(blends) if \
+           matchBlendDict(blendSpec,getBlendBlendDict(b),sameLabel=False) and \
+           getBlendStockDict(b)["location_hr_id"] == stockId]
+        if len(res)>0:
+            return res[0]
+        else:
+            return None 
+        
+       
