@@ -81,11 +81,11 @@ from PyQt5.QtWidgets import (QLayout,QAction, QApplication, QWidget, QMessageBox
                          QLCDNumber, QSpinBox, QComboBox, QHeaderView, # @Reimport 
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QRadioButton, # @Reimport
                          QColorDialog, QFrame, QCheckBox,QStatusBar, QProgressDialog, # @Reimport
-                         QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox,QButtonGroup) # @Reimport
+                         QListView, QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QDoubleSpinBox,QButtonGroup) # @Reimport
 from PyQt5.QtGui import (QImageReader, QWindow,  # @Reimport
                             QKeySequence,QStandardItem, #QImage,
                             QPixmap,QColor,QPalette,QDesktopServices,QIcon,  # @Reimport
-                            QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor,QTextDocument)  # @Reimport
+                            QRegExpValidator,QDoubleValidator, QIntValidator,QPainter, QFont,QBrush, QRadialGradient,QCursor)  # @Reimport
 from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog)  # @Reimport
 from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal,  # @Reimport
                           QT_VERSION_STR,QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,   # @Reimport
@@ -1905,7 +1905,11 @@ class tgraphcanvas(FigureCanvas):
         self.base_messagevisible = False  
         
         #threshold for deltaE color difference comparisons
-        self.colorDifferenceThreshold = 20              
+        self.colorDifferenceThreshold = 20   
+        
+        #references to legend objects
+        self.handles = []   
+        self.labels = []    
         
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -2109,9 +2113,41 @@ class tgraphcanvas(FigureCanvas):
     def _draw_event(self, _):
         #self.fig.canvas.flush_events() # THIS prevents the black border on >Qt5.5, but slows down things (especially resizings) on redraw otherwise!!!
         self.ax_background = None
-        
 
     def onpick(self,event):
+        if event.artist != self.ax.legend and (isinstance(event.artist, matplotlib.lines.Line2D) or isinstance(event.artist, matplotlib.text.Text)):
+            idx = None
+            # deltaLabelMathPrefix (legend label)
+            # deltaLabelUTF8 (artist)
+            if isinstance(event.artist, matplotlib.text.Text):
+                try:
+                    label = event.artist.get_text()
+                    idx = self.labels.index(label)
+                except Exception as e:
+                    pass
+                try:
+                    # toggle also the visibility of the legend handle
+                    clean_label = label.replace(deltaLabelMathPrefix,deltaLabelUTF8)
+                    artist = next((x for x in self.legend_lines if x.get_label() == clean_label), None)
+                    if artist:
+                        artist.set_visible(not artist.get_visible())
+                except:
+                    pass
+            elif isinstance(event.artist, matplotlib.lines.Line2D):
+                try:
+                    label = event.artist.get_label().replace(deltaLabelUTF8,deltaLabelMathPrefix)
+                    idx = self.labels.index(label)
+                except:
+                    pass
+                # toggle also the visibility of the legend handle
+                event.artist.set_visible(not event.artist.get_visible())
+            # toggle the visibility of the corresponding line
+            if idx is not None:
+                artist = self.handles[idx]
+                artist.set_visible(not artist.get_visible())
+            QApplication.processEvents() # this is needed to avoid redraw problems if legend uses "use_blit" option!
+            self.fig.canvas.draw()
+            
         try:            
             if self.showmet and event.artist in [self.met_annotate]:
                 message = u("")
@@ -5160,9 +5196,10 @@ class tgraphcanvas(FigureCanvas):
                     
                 if aw.qmc.patheffects:
                     rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground=self.palette["background"])]
-                    
-                handles = []
-                labels = []
+                
+                self.handles = []
+                self.labels = []
+                self.legend_lines = []
                     
 
                 # we resample the temperatures to regular interval timestamps
@@ -5549,18 +5586,18 @@ class tgraphcanvas(FigureCanvas):
                         linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None)))
     
                 if aw.qmc.ETcurve:
-                    handles.append(self.l_temp1)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None)))
+                    self.handles.append(self.l_temp1)
+                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None)))
                 if aw.qmc.BTcurve:
-                    handles.append(self.l_temp2)
-                    labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None)))
+                    self.handles.append(self.l_temp2)
+                    self.labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None)))
     
                 if self.DeltaETflag: 
-                    handles.append(self.l_delta1)
-                    labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "ET", None)))
+                    self.handles.append(self.l_delta1)
+                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "ET", None)))
                 if self.DeltaBTflag:
-                    handles.append(self.l_delta2)
-                    labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "BT", None)))
+                    self.handles.append(self.l_delta2)
+                    self.labels.append(aw.arabicReshape(deltaLabelMathPrefix + QApplication.translate("Label", "BT", None)))
     
                 nrdevices = len(self.extradevices)
                 
@@ -5569,31 +5606,31 @@ class tgraphcanvas(FigureCanvas):
                     xtmpl2idx = 0
                     for i in range(nrdevices):
                         if aw.extraCurveVisibility1[i]:
-                            handles.append(self.extratemp1lines[xtmpl1idx])
                             xtmpl1idx = xtmpl1idx + 1
                             l1 = extraname1_subst[i]
                             if not l1.startswith("_"):
-                                labels.append(aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                                self.handles.append(self.extratemp1lines[xtmpl1idx])
+                                self.labels.append(aw.arabicReshape(l1.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
                         if aw.extraCurveVisibility2[i]:
-                            handles.append(self.extratemp2lines[xtmpl2idx])
                             xtmpl2idx = xtmpl2idx + 1
                             l2 = extraname2_subst[i]
                             if not l2.startswith("_"):
-                                labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
+                                self.handles.append(self.extratemp2lines[xtmpl2idx])
+                                self.labels.append(aw.arabicReshape(l2.format(self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3])))
     
                 if self.eventsshowflag and self.eventsGraphflag in [2,3,4] and Nevents:
                     if E1_nonempty and aw.qmc.showEtypes[0]:
-                        handles.append(self.l_eventtype1dots)
-                        labels.append(aw.arabicReshape(self.etypesf(0)))
+                        self.handles.append(self.l_eventtype1dots)
+                        self.labels.append(aw.arabicReshape(self.etypesf(0)))
                     if E2_nonempty and aw.qmc.showEtypes[1]:
-                        handles.append(self.l_eventtype2dots)
-                        labels.append(aw.arabicReshape(self.etypesf(1)))
+                        self.handles.append(self.l_eventtype2dots)
+                        self.labels.append(aw.arabicReshape(self.etypesf(1)))
                     if E3_nonempty and aw.qmc.showEtypes[2]:
-                        handles.append(self.l_eventtype3dots)
-                        labels.append(aw.arabicReshape(self.etypesf(2)))
+                        self.handles.append(self.l_eventtype3dots)
+                        self.labels.append(aw.arabicReshape(self.etypesf(2)))
                     if E4_nonempty and aw.qmc.showEtypes[3]:
-                        handles.append(self.l_eventtype4dots)
-                        labels.append(aw.arabicReshape(self.etypesf(3)))                        
+                        self.handles.append(self.l_eventtype4dots)
+                        self.labels.append(aw.arabicReshape(self.etypesf(3)))                        
                             
                 if not self.designerflag and aw.qmc.BTcurve:
                     if self.flagon: # no smoothed lines in this case, pass normal BT
@@ -5639,23 +5676,27 @@ class tgraphcanvas(FigureCanvas):
                     rcParams['path.effects'] = []
                     prop = aw.mpl_fontproperties.copy()
                     prop.set_size("x-small")
-                    if len(handles) > 7:
-                        ncol = int(math.ceil(len(handles)/4.))
-                    elif len(handles) > 3:
-                        ncol = int(math.ceil(len(handles)/2.))
+                    if len(self.handles) > 7:
+                        ncol = int(math.ceil(len(self.handles)/4.))
+                    elif len(self.handles) > 3:
+                        ncol = int(math.ceil(len(self.handles)/2.))
                     else:
-                        ncol = int(math.ceil(len(handles)))
+                        ncol = int(math.ceil(len(self.handles)))
                     if aw.qmc.graphfont == 1:
-                        labels = [toASCII(l) for l in labels]
-                    leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                        self.labels = [toASCII(l) for l in self.labels]
+                    leg = self.ax.legend(self.handles,self.labels,loc=self.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
+                    self.legend_lines = leg.get_lines()
+                    for h in leg.legendHandles:
+                        h.set_picker(5)
+                    for l in leg.texts:
+                        l.set_picker(5)                        
                     try:
-                        leg.set_draggable(state=True)
+                        leg.set_draggable(state=True,use_blit=True)#,update='bbox')
                     except: # not available in mpl<3.x
                         leg.draggable(state=True) # for mpl 2.x
                     frame = leg.get_frame()
                     frame.set_facecolor(self.palette["legendbg"])
 #                    frame.set_alpha(self.legendbgalpha)
-                    #frame.set_linewidth(0)
                     frame.set_edgecolor(self.palette["legendborder"])
                     frame.set_linewidth(0.5)
                     for line,text in zip(leg.get_lines(), leg.get_texts()):
@@ -11900,9 +11941,9 @@ class ApplicationWindow(QMainWindow):
         serialAction.triggered.connect(self.viewSerialLog)
         self.helpMenu.addAction(serialAction)
 
-        settingsAction = QAction(UIconst.HELP_MENU_SETTINGS,self)
-        settingsAction.triggered.connect(self.viewartisansettings)
-        self.helpMenu.addAction(settingsAction)
+#        settingsAction = QAction(UIconst.HELP_MENU_SETTINGS,self)
+#        settingsAction.triggered.connect(self.viewartisansettings)
+#        self.helpMenu.addAction(settingsAction)
 
         platformAction = QAction(UIconst.HELP_MENU_PLATFORM,self)
         platformAction.triggered.connect(self.viewplatform)
@@ -12932,8 +12973,9 @@ class ApplicationWindow(QMainWindow):
             
     def createRecentRoast(self,title,beans,weightIn,weightOut,weightUnit,volumeIn,volumeOut,volumeUnit,
             densityWeight,densityWeightUnit,densityVolume,densityVolumeUnit, beanSize_min, beanSize_max,
-            moistureGreen,moistureRoasted,wholeColor,groundColor,colorSystem,background,backgroundUUID,
-            plus_account,plus_store,plus_store_label,plus_coffee,plus_coffee_label,plus_blend_label,plus_blend_spec,plus_blend_spec_labels):
+            moistureGreen,moistureRoasted,wholeColor,groundColor,colorSystem,file,roastUUID,
+            batchnr,batchprefix,plus_account,plus_store,plus_store_label,plus_coffee,
+            plus_coffee_label,plus_blend_label,plus_blend_spec,plus_blend_spec_labels):
         d = {
             "title": title,
             "weightIn": weightIn,
@@ -12955,9 +12997,10 @@ class ApplicationWindow(QMainWindow):
         d["wholeColor"] = wholeColor
         d["groundColor"] = groundColor
         d["colorSystem"] = colorSystem
-        d["background"] = background
-        # added in v1.4
-        d["backgroundUUID"] = backgroundUUID
+        d["background"] = file
+        d["roastUUID"] = roastUUID
+        d["batchnr"] = batchnr
+        d["batchprefix"] = batchprefix
         d["plus_account"] = plus_account
         d["plus_store"] = plus_store
         d["plus_store_label"] = plus_store_label
@@ -23768,9 +23811,9 @@ class ApplicationWindow(QMainWindow):
             self.serial_dlg.show()
         QApplication.processEvents()
         
-    def viewartisansettings(self):
-        settingsDLG = artisansettingsDlg(self)
-        settingsDLG.show()
+#    def viewartisansettings(self):
+#        settingsDLG = artisansettingsDlg(self)
+#        settingsDLG.show()
 
     def viewplatform(self):
         platformDLG = platformDlg(self)
@@ -28447,6 +28490,13 @@ class editGraphDlg(ArtisanDialog):
         self.org_ambient_humidity = aw.qmc.ambient_humidity
         self.org_ambient_pressure = aw.qmc.ambient_pressure
         
+        # propulated by selecting a recent roast from the popup via recentRoastActivated()
+        self.template_file = None
+        self.template_name = None
+        self.template_uuid = None
+        self.template_batchnr = None
+        self.template_batchprefix = None
+        
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #MARKERS
         chargelabel = QLabel("<b>" + u(QApplication.translate("Label", "CHARGE",None)) + "</b>")
@@ -28630,12 +28680,13 @@ class editGraphDlg(ArtisanDialog):
         #self.createDataTable()        
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
-        #self.titleedit = QLineEdit(aw.qmc.title)
         self.titleedit = RoastsComboBox(selection = aw.qmc.title)
         self.titleedit.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed)
         self.titleedit.activated.connect(self.recentRoastActivated)
         self.titleedit.editTextChanged.connect(self.recentRoastEnabled)
-
+        self.titleedit.setStyleSheet(
+            "QComboBox {font-weight: bold;} QComboBox QAbstractItemView {font-weight: normal;}")
+        self.titleedit.setView(QListView())
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate("CheckBox","Show Always", None))
         self.titleShowAlwaysFlag.setChecked(aw.qmc.title_show_always)
         
@@ -29025,6 +29076,8 @@ class editGraphDlg(ArtisanDialog):
             calc_dropstr = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
             aw.sendmessage(QApplication.translate("Message","The recorded DROP time ({0}) does not match the post roast calculated DROP time ({1})", None).format(drop_str, calc_dropstr))
         textLayout = QGridLayout()
+        textLayout.setSpacing(1)
+        textLayout.setContentsMargins(0,0,0,0)
         textLayout.addWidget(datelabel1,0,0)
         datebatch = QHBoxLayout()
         datebatch.addWidget(dateedit)
@@ -29040,8 +29093,13 @@ class editGraphDlg(ArtisanDialog):
         titleLine = QHBoxLayout()
         titleLine.addWidget(self.titleedit)
         titleLine.addWidget(self.addRecentButton)
-        titleLine.addSpacing(5)
+        titleLine.addSpacing(2)
         titleLine.addWidget(self.titleShowAlwaysFlag) 
+        
+        self.template_line = QLabel("P249 Guatemala")
+        template_font = self.template_line.font()
+        template_font.setPointSize(template_font.pointSize() -2)
+        self.template_line.setFont(template_font)
         
 #PLUS
         self.plus_store_selected = None # holds the hr_id of the store of the selected coffee or blend
@@ -29073,7 +29131,7 @@ class editGraphDlg(ArtisanDialog):
             plusCoffeeslabel = QLabel("<b>" + u(QApplication.translate("Label", "Stock",None)) + "</b>")
             plusStoreslabel = QLabel("<b>" + u(QApplication.translate("Label", "Store",None)) + "</b>")
             plusBlendslabel = QLabel("<b>" + u(QApplication.translate("Label", "Blend",None)) + "</b>")            
-            self.plus_stores_combo = QComboBox()            
+            self.plus_stores_combo = QComboBox() 
             self.plus_coffees_combo = QComboBox()
             self.plus_blends_combo = QComboBox()
             self.plus_stores_combo.currentIndexChanged.connect(self.storeSelectionChanged)
@@ -29107,17 +29165,18 @@ class editGraphDlg(ArtisanDialog):
             plusLine.addWidget(plusStoreslabel)
             plusLine.addSpacing(5)
             plusLine.addWidget(self.plus_stores_combo)
-            textLayout.addWidget(self.plus_selected_line,3,1)
-            textLayout.addWidget(plusCoffeeslabel,4,0)
-            textLayout.addLayout(plusLine,4,1)
+            textLayout.addWidget(self.plus_selected_line,4,1)
+            textLayout.addWidget(plusCoffeeslabel,5,0)
+            textLayout.addLayout(plusLine,5,1)
             textLayoutPlusOffset = 2 # to insert the plus widget row, we move the remaining ones one step lower          
         else:
-            textLayoutPlusOffset = 0        
-        textLayout.addWidget(titlelabel,2,0)
-        textLayout.addLayout(titleLine,2,1)
-        textLayout.addWidget(beanslabel,3+textLayoutPlusOffset,0)
-        textLayout.addWidget(self.beansedit,3+textLayoutPlusOffset,1)        
-        textLayout.addWidget(operatorlabel,4+textLayoutPlusOffset,0)
+            textLayoutPlusOffset = 0
+        textLayout.addWidget(self.template_line,2,1)
+        textLayout.addWidget(titlelabel,3,0)
+        textLayout.addLayout(titleLine,3,1)
+        textLayout.addWidget(beanslabel,4+textLayoutPlusOffset,0)
+        textLayout.addWidget(self.beansedit,4+textLayoutPlusOffset,1)        
+        textLayout.addWidget(operatorlabel,5+textLayoutPlusOffset,0)
             
         roasteroperator = QHBoxLayout()
         roasteroperator.addWidget(self.operator, stretch=3)
@@ -29129,7 +29188,7 @@ class editGraphDlg(ArtisanDialog):
         roasteroperator.addWidget(drumspeedlabel)
         roasteroperator.addSpacing(5)
         roasteroperator.addWidget(self.drumspeed,stretch=1)
-        textLayout.addLayout(roasteroperator,4+textLayoutPlusOffset,1)        
+        textLayout.addLayout(roasteroperator,5+textLayoutPlusOffset,1)        
         weightLayout = QHBoxLayout()
         weightLayout.setSpacing(0)
         weightLayout.addWidget(weightlabel)
@@ -29186,8 +29245,7 @@ class editGraphDlg(ArtisanDialog):
         densityLayout.addWidget(self.bean_density_volume_edit)
         densityLayout.addSpacing(20)
         densityLayout.addWidget(self.standarddensitylabel)
-        densityLayout.addStretch()
-        
+        densityLayout.addStretch()        
         densityLayout.addSpacing(15)
         densityLayout.addWidget(bean_size_label)
         densityLayout.addSpacing(10)
@@ -29196,6 +29254,10 @@ class editGraphDlg(ArtisanDialog):
         densityLayout.addWidget(self.bean_size_max_edit)
         densityLayout.addSpacing(5)
         densityLayout.addWidget(bean_size_unit_label)
+
+        weightLayout.setContentsMargins(0,0,0,0)
+        volumeLayout.setContentsMargins(0,0,0,0)
+        densityLayout.setContentsMargins(0,0,0,0)
         
         colorLayout = QHBoxLayout()
         colorLayout.setSpacing(0)
@@ -29281,26 +29343,21 @@ class editGraphDlg(ArtisanDialog):
         eventbuttonLayout.addWidget(self.neweventTableButton)
         #tab 1
         self.tab1aLayout = QVBoxLayout()
-        self.tab1aLayout.setContentsMargins(0,0,0,0)
-        self.tab1aLayout.setSpacing(2)
-        #self.tab1aLayout.addWidget(timeGroupLayout)
+        self.tab1aLayout.setContentsMargins(0,5,0,0)
+        self.tab1aLayout.setSpacing(0)
         self.tab1aLayout.addLayout(mainLayout)
         self.tab1aLayout.addStretch()
         self.tab1aLayout.addLayout(textLayout)
         self.tab1aLayout.addStretch()
         self.tab1aLayout.addLayout(weightLayout)
         self.tab1aLayout.addLayout(volumeLayout)
-        self.tab1bLayout = QVBoxLayout()
-        self.tab1bLayout.setContentsMargins(0,0,0,0)
-        self.tab1bLayout.setSpacing(2)
-        self.tab1bLayout.addLayout(densityLayout)
-        self.tab1bLayout.addLayout(colorLayout)
-        self.tab1bLayout.addLayout(humidityGrid)
+        self.tab1aLayout.addLayout(densityLayout)
+        self.tab1aLayout.addLayout(colorLayout)
+        self.tab1aLayout.addLayout(humidityGrid)
         tab1Layout = QVBoxLayout()
         tab1Layout.addStretch()
         tab1Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         tab1Layout.addLayout(self.tab1aLayout)
-        tab1Layout.addLayout(self.tab1bLayout)
         tab1Layout.addStretch()
         self.calculated_density()
         #tab 2
@@ -29342,6 +29399,8 @@ class editGraphDlg(ArtisanDialog):
         self.setLayout(totallayout)
         self.titleedit.setFocus()
         
+        self.updateTemplateLine()
+        
         settings = QSettings()
         if settings.contains("RoastGeometry"):
             toByteArray(self.restoreGeometry(settings.value("RoastGeometry")))
@@ -29356,6 +29415,21 @@ class editGraphDlg(ArtisanDialog):
                 QTimer.singleShot(1500,lambda : self.populatePlusCoffeeBlendCombos())
         except:
             pass
+            
+    def updateTemplateLine(self):
+        line = ""
+        if self.template_file:
+            if self.template_batchprefix:
+                line = self.template_batchprefix
+            if self.template_batchnr:
+                line = line + str(self.template_batchnr)
+            if self.template_name:
+                if len(line) != 0:
+                    line = line + " "
+                line = line + self.template_name
+        if len(line) > 0:
+            line = u(QApplication.translate("Label", "Template",None)) + ": " + line
+        self.template_line.setText(line)
             
     def updatePlusSelectedLine(self):
         import plus.util
@@ -29724,6 +29798,24 @@ class editGraphDlg(ArtisanDialog):
             if "beanSize_max" in rr:
                 self.bean_size_max_edit.setText(str(rr["beanSize_max"]))
             # Note: the background profile will not be changed if recent roast is activated from Roast Properties
+            if "background" in rr:
+                self.template_file = rr["background"]
+                if "title" in rr:
+                    self.template_name = rr["title"]
+                if "roastUUID" in rr:
+                    self.template_uuid = rr["roastUUID"]
+                if "batchnr" in rr:
+                    self.template_batchnr = rr["batchnr"]
+                if "batchprefix" in rr:
+                    self.template_batchprefix = rr["batchprefix"]                
+            else:
+                self.template_file = None
+                self.template_name = None
+                self.template_uuid = None
+                self.template_batchnr = None
+                self.template_batchprefix = None
+            self.updateTemplateLine()
+                
             
 #PLUS            
             if aw.plus_account is not None and "plus_account" in rr and aw.plus_account == rr["plus_account"]:
@@ -29836,9 +29928,11 @@ class editGraphDlg(ArtisanDialog):
                     moistureRoasted,
                     wholeColor,
                     groundColor,
-                    colorSystem,
-                    aw.qmc.backgroundpath,
-                    aw.qmc.backgroundUUID,
+                    colorSystem,                    
+                    aw.curFile, # could be empty
+                    aw.qmc.roastUUID, # could be empty                    
+                    aw.qmc.roastbatchnr, #self.batchcounterSpinBox # aw.superusermode and aw.qmc.batchcounter > -1
+                    aw.qmc.roastbatchprefix,  #self.batchprefixedit                    
                     aw.plus_account,
                     self.plus_store_selected,
                     self.plus_store_selected_label,
@@ -30530,7 +30624,7 @@ class editGraphDlg(ArtisanDialog):
         din, dout = self.calc_density()
         if din > 0. and dout > 0.:
             self.calculateddensitylabel.setText(QApplication.translate("Label","Density in: {0} g/l   =>   Density out: {1} g/l", None).format("%.1f"%din,"%.1f"%dout))
-            self.tab1aLayout.addWidget(self.calculateddensitylabel)
+            self.tab1aLayout.insertWidget(6,self.calculateddensitylabel)
             # set also the green density if not yet set
             if (str(self.bean_density_weight_edit.text()) == "" or float(str(self.bean_density_weight_edit.text())) == 0.) and \
                 (str(self.bean_density_volume_edit.text()) == "" or float(str(self.bean_density_volume_edit.text())) in [0.,1.]):
@@ -30575,10 +30669,12 @@ class editGraphDlg(ArtisanDialog):
         mloss, oloss = self.calc_organic_loss()
         if oloss > 0. and mloss > 0.:
             self.calculateorganiclosslabel.setText(QApplication.translate("Label","Moisture loss: {0}%    Organic loss: {1}%", None).format("%.1f"%mloss,"%.1f"%oloss))
-            self.tab1bLayout.addWidget(self.calculateorganiclosslabel)
+#            self.tab1bLayout.addWidget(self.calculateorganiclosslabel)
+            self.tab1aLayout.addWidget(self.calculateorganiclosslabel)
         else:
             self.calculateorganiclosslabel.setText("")
-            self.tab1bLayout.removeWidget(self.calculateorganiclosslabel)
+#            self.tab1bLayout.removeWidget(self.calculateorganiclosslabel)
+            self.tab1aLayout.removeWidget(self.calculateorganiclosslabel)
 
     def density_volume_editing_finished(self):
         self.modified_density_volume_text = str(self.bean_density_volume_edit.text())
@@ -30823,9 +30919,20 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
             aw.qmc.roastbatchpos = self.batchposSpinBox.value()
             
+        # load selected recent roast template in the background
+        if self.template_file:
+            try:
+                aw.qmc.resetlinecountcaches()
+                aw.loadbackground(self.template_file)
+                aw.qmc.background = True
+                aw.qmc.timealign(redraw=False)
+                aw.qmc.redraw()
+            except:
+                pass
+        else:
+            aw.qmc.redraw(recomputeAllDeltas=False)
         if not aw.qmc.flagon:
             aw.sendmessage(QApplication.translate("Message","Roast properties updated but profile not saved to disk", None))
-        aw.qmc.redraw(recomputeAllDeltas=False)
         self.close()
 
 
@@ -31009,58 +31116,13 @@ class platformDlg(ArtisanDialog):
 #####################  VIEW ATISAN SETTINGS ##############################
 ##########################################################################
 
-class artisansettingsDlg(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(artisansettingsDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Settings Viewer", None))
-        self.htmlsettings = ""
-        self.ncategoriesComboBox = QComboBox()
-        self.settingsEdit = QTextEdit()
-        self.settingsEdit.setReadOnly(True)
-        names = self.getstring()
-        self.ncategoriesComboBox.addItems(names)
-        self.ncategoriesComboBox.currentIndexChanged.connect(self.searchstringfromcombobox)
-        searchButton = QPushButton(QApplication.translate("Button","Search", None))
-        searchButton.setMaximumWidth(150)
-        searchButton.clicked.connect(lambda _:self.findtext())
-        self.searchbox = QLineEdit(aw.searchtextartisansettings)
-        updateButton = QPushButton(QApplication.translate("Button","Update", None))
-        updateButton.setMaximumWidth(150)
-        updateButton.clicked.connect(lambda _:self.getstring())
-        searchlayout = QHBoxLayout()
-        searchlayout.addWidget(self.ncategoriesComboBox)
-        searchlayout.addWidget(self.searchbox)
-        searchlayout.addWidget(searchButton)
-        layout = QVBoxLayout()
-        layout.addLayout(searchlayout)
-        layout.addWidget(self.settingsEdit)
-        layout.addWidget(updateButton)
-        self.setLayout(layout)
-
-    def findtext(self):
-        aw.searchtextartisansettings = str(self.searchbox.text())
-        if not self.settingsEdit.find(self.searchbox.text()):
-            self.settingsEdit.find(self.searchbox.text(),QTextDocument.FindBackward)
-
-    def searchstringfromcombobox(self):
-        if not self.settingsEdit.find(self.ncategoriesComboBox.currentText()):
-            self.settingsEdit.find(self.ncategoriesComboBox.currentText(),QTextDocument.FindBackward)
-
-    def getstring(self):
-        self.htmlsettings = "<body bgcolor=\"black\">"
-        self.htmlsettings += "<font color=\"white\">"
-        self.htmlsettings += "version = " +__version__ +"<br><br>"
-        settingsdictlist,settingsnameslist = aw.readartisansettings()
-        pcolors = ["grey","blue"]
-        for n in range(len(settingsnameslist)):
-            self.htmlsettings += "<p><b><font color=\"orange\">%s </font></b></p>"%settingsnameslist[n].upper()
-            self.htmlsettings += "<p style=\"background-color: %s\">"%pcolors[n%2]
-            for keys in sorted(settingsdictlist[n]):
-                self.htmlsettings += "<b>&nbsp;&nbsp;" + keys + " = </b> <i>" + u(settingsdictlist[n][keys]) + "</i><br><br>"
-            self.htmlsettings += "</p>"
-        self.htmlsettings += "</body></font>"
-        self.settingsEdit.setHtml(self.htmlsettings)
-        return settingsnameslist
+#class artisansettingsDlg(ArtisanDialog):
+#    def __init__(self, parent = None):
+#        super(artisansettingsDlg,self).__init__(parent)
+#        self.setWindowTitle(QApplication.translate("Form Caption","Preferences", None))
+#        # Layout
+#        layout = QVBoxLayout()
+#        self.setLayout(layout)
 
 ##########################################################################
 #####################  VIEW SERIAL LOG DLG  ##############################
