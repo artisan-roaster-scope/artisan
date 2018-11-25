@@ -28642,7 +28642,7 @@ class editGraphDlg(ArtisanDialog):
         #table for showing events
         self.eventtable = QTableWidget()
         self.eventtable.setTabKeyNavigation(True)
-        self.createEventTable()
+#        self.createEventTable() # now called on tab switch
         self.clusterEventsButton = QPushButton(QApplication.translate("Button", "Cluster",None))
         self.clusterEventsButton.setFocusPolicy(Qt.NoFocus)
         self.clusterEventsButton.setMaximumSize(self.clusterEventsButton.sizeHint())
@@ -28677,7 +28677,7 @@ class editGraphDlg(ArtisanDialog):
         #DATA Table
         self.datatable = QTableWidget()
         self.datatable.setTabKeyNavigation(True)
-        #self.createDataTable()        
+        #self.createDataTable()  # called on tab switch       
         #TITLE
         titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None)) + "</b>")
         self.titleedit = RoastsComboBox(selection = aw.qmc.title)
@@ -30056,6 +30056,12 @@ class editGraphDlg(ArtisanDialog):
     def tabSwitched(self,i):
         if i == 3:
             self.createDataTable()
+        elif i == 2:
+            self.createEventTable()
+# to clear the selection on entering the event table tab one first has to clear the focus
+# if the event table is freshly created by the call above this is not needed            
+#            QApplication.focusWidget().clearFocus()
+#            self.eventtable.clearSelection()
             
     def roastflagChanged(self,flagname,x):
         if x == Qt.Checked:
@@ -30326,6 +30332,7 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventtable.setSelectionMode(QTableWidget.ExtendedSelection)
+
         self.eventtable.setShowGrid(True)
         
         self.eventtable.verticalHeader().setSectionResizeMode(2)
@@ -30394,7 +30401,8 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.setColumnWidth(1,65)
         self.eventtable.setColumnWidth(2,65)
         self.eventtable.setColumnWidth(5,55)
-        # header.setSectionResizeMode(QHeaderView.Stretch)
+        # header.setSectionResizeMode(QHeaderView.Stretch)        
+
 
     def saveEventTable(self):
         nevents = self.eventtable.rowCount() 
