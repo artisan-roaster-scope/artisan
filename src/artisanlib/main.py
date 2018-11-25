@@ -472,9 +472,10 @@ try:
     app.setOrganizationDomain("artisan-scope.com")                          #needed by QSettings() to store windows geometry in operating system        
     newsettings = QSettings()
     
-
+    settingsRelocated = False
     # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied 
     if not newsettings.contains("Mode") and legacysettings.contains("Mode") and not legacysettings.contains("_settingsCopied"): 
+        settingsRelocated = True
         # copy Artisan settings
         for key in legacysettings.allKeys():
             newsettings.setValue(key,legacysettings.value(key))
@@ -12862,6 +12863,35 @@ class ApplicationWindow(QMainWindow):
         # this variable is bound to the Roast Properties dialog if it is open, set to False to block opening the dialog or None otherwise
         self.editgraphdialog = None 
         
+        # provide information message to user about sharing settings at start-up
+        if settingsRelocated:
+            string =  QApplication.translate("Message","Welcome to version {0} of Artisan!", None).format(__version__) + "\n\n"
+            string += QApplication.translate("Message","This is a one time message to inform you about a change in Artisan.", None) + "\n\n"
+            string += QApplication.translate("Message","If you never run older versions of Artisan you can skip this message, the change does not affect you.", None) + "  "
+            string += QApplication.translate("Message","If you sometimes run older versions of Artisan this change may affect you.", None) + "\n\n"
+            string += QApplication.translate("Message","Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.", None) + "  "
+            string += QApplication.translate("Message","Beginning with release version v2.0, settings will not be automatically shared at start-up with versions before v2.0.", None) + "\n\n"  
+            string += QApplication.translate("Message","Do not worry, Artisan has already loaded your last used settings for you since this is the first time you opened this new version.", None) + "\n\n"
+            string += QApplication.translate("Message","Artisan settings files (.aset) continue to be compatible between versions.", None) + "  "
+            string += QApplication.translate("Message","To share settings between this version and Artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
+            string += QApplication.translate("Message","Enjoy using Artisan,", None) +"\n"
+            string += QApplication.translate("Message","The Artisan Team", None)
+            QMessageBox.information(aw,QApplication.translate("Message","One time message about loading settings at start-up", None),string)
+
+        # provide information message to user about Artisan Viewer the first time it is started
+        if artisanviewerFirstStart:
+            string =  QApplication.translate("Message","Welcome to the Artisan Viewer!", None).format(__version__) + "\n\n"
+            string += QApplication.translate("Message","This is a one time message to introduce you to the Artisan Viewer.", None) + "\n\n"
+            string += QApplication.translate("Message","The Artisan Viewer opens whenever a copy of Artisan is already running.", None) + "  "
+            string += QApplication.translate("Message","Only one instance of Artisan able to record profiles may be open.", None) + "  "
+            string += QApplication.translate("Message","Multiple instances of Artisan Viewer can be open at the same time.", None) + "\n\n"  
+            string += QApplication.translate("Message","Artisan Viewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start Artisan Viewer.", None) + "\n\n"
+            string += QApplication.translate("Message","Caution, the only way to share settings between Artisan and Artisan Viewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
+            string += QApplication.translate("Message","Enjoy using Artisan Viewer,", None) +"\n"
+            string += QApplication.translate("Message","The Artisan Team", None)
+            QMessageBox.information(aw,QApplication.translate("Message","One time message about Artisan Viewer", None),string)
+            settings.setValue("Mode",self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
+
         # we connect the signals
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
         self.setTitleSignal.connect(self.qmc.setProfileTitle)
@@ -51127,16 +51157,20 @@ def main():
     global aw
     global app
     global artisanviewerMode
+    global artisanviewerFirstStart
     
     # suppress all warnings
     warnings.filterwarnings('ignore')
     
+    artisanviewerMode = False
+    artisanviewerFirstStart = False
     if multiprocessing.current_process().name == 'MainProcess' and app.isRunning():
         artisanviewerMode = True
         app.setApplicationName("ArtisanViewer")                                       #needed by QSettings() to store windows geometry in operating system
-#        sys.exit(0)
-    else:
-        artisanviewerMode = False
+        viewersettings = QSettings()
+        if not viewersettings.contains("Mode"):
+            artisanviewerFirstStart = True
+        del viewersettings
     
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
