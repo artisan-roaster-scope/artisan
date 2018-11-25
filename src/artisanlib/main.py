@@ -2146,7 +2146,9 @@ class tgraphcanvas(FigureCanvas):
                 artist = self.handles[idx]
                 artist.set_visible(not artist.get_visible())
             QApplication.processEvents() # this is needed to avoid redraw problems if legend uses "use_blit" option!
-            self.fig.canvas.draw()
+#            self.fig.canvas.draw()
+            self.updateBackground()
+            QApplication.processEvents() # this is needed to avoid redraw problems if legend uses "use_blit" option!
             
         try:            
             if self.showmet and event.artist in [self.met_annotate]:
@@ -5691,7 +5693,7 @@ class tgraphcanvas(FigureCanvas):
                     for l in leg.texts:
                         l.set_picker(5)                        
                     try:
-                        leg.set_draggable(state=True,use_blit=True)#,update='bbox')
+                        leg.set_draggable(state=True,use_blit=sys.platform.startswith("darwin"))  #,update='bbox')
                     except: # not available in mpl<3.x
                         leg.draggable(state=True) # for mpl 2.x
                     frame = leg.get_frame()
@@ -21399,161 +21401,6 @@ class ApplicationWindow(QMainWindow):
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info() 
             QMessageBox.information(aw,QApplication.translate("Error Message", "Error",None),QApplication.translate("Error Message", "Exception:",None) + " closeEvent()  @line " + str(exc_tb.tb_lineno))
-
-    #used for trouble shooting.
-    def readartisansettings(self):
-        general,device,phases,statistics,events,delay,colors,cupping,extras,serial,axes,roast,alarms = {},{},{},{},{},{},{},{},{},{},{},{},{}
-        #read window geometry
-        rect = self.geometry()
-        height = str(rect.height())
-        width = str(rect.width())
-        general["geometry"] = height + "x" + width                #custom made string
-        general["mode"] = str(self.qmc.mode)
-        device["id"] = str(self.qmc.device)
-        device["controlETpid"] = str(self.ser.controlETpid)
-        device["readBTpid"] = str(self.ser.readBTpid)
-        device["arduinoETChannel"] = str(self.ser.arduinoETChannel)
-        device["arduinoBTChannel"] = str(self.ser.arduinoBTChannel)
-        device["arduinoATChannel"] = str(self.ser.arduinoATChannel)
-        phases["Phases"] = str(self.qmc.phases)
-        phases["phasesbuttonflag"] = str(self.qmc.phasesbuttonflag)
-        phases["watermarks"] = str(self.qmc.watermarksflag)
-        phases["phasesLCDs"] = str(self.qmc.phasesLCDflag)
-        phases["autoDry"] = str(self.qmc.autoDRYflag)
-        phases["autoFCs"] = str(self.qmc.autoFCsFlag)
-        statistics["Statistics"] = str(self.qmc.statisticsflags)
-        statistics["StatisticsConds"] = str(self.qmc.statisticsconditions)
-        statistics["AUCshowFlag"] = str(self.qmc.AUCshowFlag)
-        events["eventsbuttonflag"] = str(self.eventsbuttonflag)
-        events["minieventsflag"] = str(self.minieventsflag)
-        events["eventsGraphflag"] = str(self.qmc.eventsGraphflag)
-        events["etypes"] = u(list(map(u,self.qmc.etypes)))
-        events["eventsshowflag"] = str(self.qmc.eventsshowflag)
-        events["annotationsflag"] = str(self.qmc.annotationsflag)
-        events["showeventsonbt"] = str(self.qmc.showeventsonbt)
-        events["showEtypes"] = str(aw.qmc.showEtypes)
-        events["autoCharge"] = str(self.qmc.autoChargeFlag)
-        events["autoDrop"] = str(self.qmc.autoDropFlag)
-        events["markTP"] = str(self.qmc.markTPflag)
-        events["EvalueColor"] = str(self.qmc.EvalueColor)
-        events["EvalueTextColor"] = str(self.qmc.EvalueTextColor)
-        events["EvalueMarker"] = str(self.qmc.EvalueMarker)
-        events["Evaluelinethickness"] = str(self.qmc.Evaluelinethickness)
-        events["Evaluealpha"] = str(self.qmc.Evaluealpha)
-        delay["Delay"] = str(self.qmc.delay)
-        colors["Colors"] = str(self.qmc.palette)
-        colors["LCDColors"] = str(self.lcdpaletteB)
-        colors["LEDColors"] = str(self.lcdpaletteF)
-        cupping["Flavors"] = u(list(map(u,self.qmc.flavorlabels)))
-        cupping["flavorstartangle"] = str(self.qmc.flavorstartangle)
-        serial["comport"] = str(self.ser.comport)
-        serial["baudrate"] = str(self.ser.baudrate)
-        serial["bytesize"]= str(self.ser.bytesize)
-        serial["stopbits"]= str(self.ser.stopbits)
-        serial["parity"]= str(self.ser.parity)
-        serial["timeout"]= str(self.ser.timeout)
-        for key in list(self.fujipid.PXR.keys()):
-            device["PXR:" + key] = str(self.fujipid.PXR[key][0])   # key modified
-        for key in list(self.fujipid.PXG4.keys()):            
-            device["PXG:" + key] = str(self.fujipid.PXG4[key][0])  # key modified
-        for key in list(self.dtapid.dtamem.keys()):            
-            device["DTA:" + key] = str(self.dtapid.dtamem[key][0]) # key modified
-        general["sound"]= str(self.soundflag)
-        extras["DeltaET"]= str(self.qmc.DeltaETflag)
-        extras["DeltaBT"]= str(self.qmc.DeltaBTflag)
-        extras["DeltaETlcd"]= str(self.qmc.DeltaETlcdflag)
-        extras["DeltaBTlcd"]= str(self.qmc.DeltaBTlcdflag)
-        extras["deltafilter"]= str(self.qmc.deltafilter)
-        extras["curvefilter"]= str(self.qmc.curvefilter)
-#        extras["smoothingwindowsize"]= str(self.qmc.smoothingwindowsize)
-        extras["Projection"]= str(self.qmc.projectFlag)
-        extras["ProjectionMode"]= str(self.qmc.projectionmode)
-        extras["ETtarget"]= str(self.qmc.ETtarget)
-        extras["BTtarget"]= str(self.qmc.BTtarget)
-        extras["ET2target"]= str(self.qmc.ET2target)
-        extras["BT2target"]= str(self.qmc.BT2target)
-        extras["HUDMode"]= str(self.HUDfunction)                      # key modified
-        extras["hudETpid"]= str(self.qmc.hudETpid)
-        extras["Beep"]= str(self.soundflag)
-        extras["showmet"]= str(self.qmc.showmet)
-        extras["statssummary"]= str(self.qmc.statssummary)
-        extras["showtimeguide"]= str(self.qmc.showtimeguide)
-        axes["xmin"]= str(self.qmc.startofx)
-        axes["xmax"]= str(self.qmc.endofx)
-        axes["ymax"]= str(self.qmc.ylimit)
-        axes["ymin"]= str(self.qmc.ylimit_min)
-        axes["zmax"]= str(self.qmc.zlimit)
-        axes["zmin"]= str(self.qmc.zlimit_min)
-        axes["resetmaxtime"] = str(self.qmc.stringfromseconds(self.qmc.resetmaxtime))
-        axes["legendloc"] = str(self.qmc.legendloc)
-        roast["drumspeed"]= u(self.qmc.drumspeed)
-        roast["operator"]= u(self.qmc.operator)
-        roast["roastertype"] = u(self.qmc.roastertype)
-        roast["densitySampleVolume"] = str(self.qmc.density[2])
-        roast["densitySampleVolumeUnit"]= u(self.qmc.density[3])
-        roast["beansize"]= str(self.qmc.beansize)
-        alarms["alarmflag"]= str(self.qmc.alarmflag) 
-        alarms["alarmguard"]= str(self.qmc.alarmguard)
-        alarms["alarmnegguard"]= str(self.qmc.alarmnegguard)
-        alarms["alarmtime"]= str(self.qmc.alarmtime)
-        alarms["alarmoffset"]= str(self.qmc.alarmoffset)
-        alarms["alarmcond"]= str(self.qmc.alarmcond)
-        alarms["alarmsource"]= u(self.qmc.alarmsource)
-        alarms["alarmaction"]= u(self.qmc.alarmaction)
-        alarms["alarmbeep"]= str(self.qmc.alarmbeep)
-        alarms["alarmstrings"]= list(map(u,list(self.qmc.alarmstrings)))
-        general["profilepath"]= u(self.userprofilepath)
-        #save extra devices
-        device["extradevices"]= str(self.qmc.extradevices)
-        device["extradevicecolor1"]= str(self.qmc.extradevicecolor1)
-        device["extradevicecolor2"]= str(self.qmc.extradevicecolor2)
-        device["extraname1"]= u(self.qmc.extraname1)
-        device["extraname2"]= u(self.qmc.extraname2)
-        device["extramathexpression1"]= str(self.qmc.extramathexpression1)
-        device["extramathexpression2"]= str(self.qmc.extramathexpression2)
-        #save extra serial comm ports settings
-        serial["extracomport"]= str(self.extracomport)
-        serial["extrabaudrate"]= str(self.extrabaudrate)
-        serial["extrabytesize"]= str(self.extrabytesize)
-        serial["extraparity"]= str(self.extraparity)
-        serial["extrastopbits"]= str(self.extrastopbits)
-        serial["extratimeout"]= str(self.extratimeout)
-        device["BTfunction"]= str(self.qmc.BTfunction)
-        device["ETfunction"]= str(self.qmc.ETfunction)
-        serial["extraserlength"]= str(len(self.extraser))
-        general["resetqsettings"]= str(self.resetqsettings)
-        extras["plotcurves"]= str(self.qmc.plotcurves)
-        extras["plotcurvecolor"]= str(self.qmc.plotcurvecolor)
-        #custom event buttons
-        events["buttonlistmaxlen"]= str(self.buttonlistmaxlen)
-        events["extraeventstypes"]= u(self.extraeventstypes)
-        events["extraeventsvalues"]= str(self.extraeventsvalues)
-        events["extraeventsactionstrings"]= str(self.extraeventsactionstrings)
-        events["extraeventsactions"]= str(self.extraeventsactions)
-        events["extraeventsdescriptions"]= u(self.extraeventsdescriptions)
-        events["extraeventsvisibility"]= str(self.extraeventsvisibility)
-        events["extraeventslabels"]= u(self.extraeventslabels)
-        events["extraeventbuttoncolor"]= str(self.extraeventbuttoncolor)
-        events["extraeventbuttontextcolor"]= str(self.extraeventbuttontextcolor)
-        events["extraeventsbuttonsflags"]= str(self.extraeventsbuttonsflags)
-        events["buttonpalettemaxlen"]= str(self.buttonpalettemaxlen)
-        events["buttonpalette"]= str(self.buttonpalette)
-        axes["xgrid"]= str(self.qmc.xgrid)
-        axes["ygrid"]= str(self.qmc.ygrid)
-        axes["zgrid"]= str(self.qmc.zgrid)
-        axes["gridlinestyle"]= str(self.qmc.gridlinestyle)
-        axes["gridthickness"]= str(self.qmc.gridthickness)
-        axes["gridalpha"]= str(self.qmc.gridalpha)
-        axes["xrotation"]= str(self.qmc.xrotation)
-        general["extraLCDvisibility1"] = str(self.extraLCDvisibility1)
-        general["extraLCDvisibility2"] = str(self.extraLCDvisibility2)
-        general["extraCurveVisibility1"] = str(self.extraCurveVisibility1)
-        general["extraCurveVisibility2"] = str(self.extraCurveVisibility2)
-        settingsx = [general,device,phases,statistics,events,delay,colors,cupping,extras,serial,axes,roast,alarms]
-        #keep same order
-        settingsnames = ["general","device config","phases config","statistics config","events config","sampling interval","colors config",
-                         "cupping config","extras config","serial config","axes config","roast properties","alarms config"]
-        return settingsx,settingsnames
 
     def updateExtraLCDvisibility(self):
         n = len(self.qmc.extradevices)
