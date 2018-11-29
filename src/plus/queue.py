@@ -86,15 +86,15 @@ class Concur(threading.Thread):
                             sync.addSync(item["data"]["roast_id"],util.ISO86012epoch(item["data"]["modified_at"]))
                 except Exception as e:
                     config.logger.debug("queue: -> task failed: %s",e)
-                    if r:
+                    if r is not None:
                         config.logger.debug("queue: -> status code %s",r.status_code)
-                    if r and r.status_code == 401: # authentication failed
+                    if r is not None and r.status_code == 401: # authentication failed
                         controller.disconnect(remove_credentials = False)
                         iters = 0 # we don't retry and keep the task item
                         keepTask = True
-                    elif r and r.status_code == 409: # conflict
+                    elif r is not None and r.status_code == 409: # conflict
                         iters = 0 # we don't retry, but remove the task as it is faulty
-                    else: # 500 internal server error or others
+                    else: # 500 internal server error, 429 Client Error: Too Many Requests or others
                         # something went wrong we don't mark this task as done and retry
                         iters = iters - 1
                         time.sleep(config.queue_retry_delay)                        

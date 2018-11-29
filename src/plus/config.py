@@ -59,7 +59,7 @@ read_timeout     = 5 # in seconds
 min_passwd_len   = 4
 min_login_len    = 6
 compress_posts   = True
-post_compression_threshold = 500 # in bytes (data samller than this are always send uncompressed via POST)
+post_compression_threshold = 500 # in bytes (data smaller than this are always send uncompressed via POST)
 
 # Cache and queue parameters
 

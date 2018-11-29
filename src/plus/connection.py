@@ -98,6 +98,7 @@ def clearCredentials():
         if token_semaphore.available() < 1:
             token_semaphore.release(1)         
     
+# returns True on successful authentification
 def authentify():
     config.logger.info("authentify()")        
     try:
@@ -191,15 +192,15 @@ def postData(url,data,authorized=True,compress=config.compress_posts):
     if authorized and r.status_code == 401: # authorisation failed
         config.logger.debug("connection: -> session token outdated (404)")
         # we re-authentify by renewing the session token and try again
-        authentify()
-        headers = getHeaders(authorized,compress=compress) # recreate header with new token
-        r = requests.post(url,
-                headers = headers,
-                data    = postdata, 
-                verify  = config.verify_ssl,
-                timeout = (config.connect_timeout,config.read_timeout))
-        config.logger.debug("connection: -> status %s",r.status_code)
-        config.logger.debug("connection: -> time %s",r.elapsed.total_seconds())
+        if authentify():
+            headers = getHeaders(authorized,compress=compress) # recreate header with new token
+            r = requests.post(url,
+                    headers = headers,
+                    data    = postdata, 
+                    verify  = config.verify_ssl,
+                    timeout = (config.connect_timeout,config.read_timeout))
+            config.logger.debug("connection: -> status %s",r.status_code)
+            config.logger.debug("connection: -> time %s",r.elapsed.total_seconds())
     return r
 
 def getData(url,authorized=True):
