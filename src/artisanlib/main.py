@@ -53,6 +53,7 @@ import codecs
 import uuid
 import threading
 import multiprocessing
+import re
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -15068,19 +15069,57 @@ class ApplicationWindow(QMainWindow):
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
-                            cs = c.strip()
-                            try:
-                                if cs.startswith('set(') and len(cs)>7:
-                                    c,v = cs[4:-1].split(',')
-                                    aw.ser.phidgetBinaryOUTset(int(c),bool(int(v)))
-                                elif cs.startswith('toggle(') and len(cs)>8:
-                                    c = int(cs[7:-1])
-                                    aw.ser.phidgetBinaryOUTtoggle(c)
-                                elif cs.startswith('pulse(') and len(cs)>9 and len(cs)<14:
-                                    c,t = cs[6:-1].split(',')
-                                    aw.ser.phidgetBinaryOUTpulse(int(c),int(t))
-                            except Exception:
-                                pass
+                            cs_a = re.findall("[0-9a-zA-Z-\.]+", c)
+                            cs_len = len(cs_a)
+
+                            if cs_a[0] == "set" and cs_len == 3:
+                                aw.ser.phidgetBinaryOUTset(toInt(cs_a[1]), bool(toInt(cs_a[2])))
+
+                            elif cs_a[0] == "toggle" and cs_len == 2:
+                                c = toInt(cs_a[1])
+                                #keep state of this gpio, rather than rely on phidget and use non-zero value to set button color
+                                self.buttonStates[self.lastbuttonpressed] = (self.buttonStates[self.lastbuttonpressed] + 1) & 0x1
+                                aw.ser.phidgetBinaryOUTset(c, (self.buttonStates[self.lastbuttonpressed]))
+                                #block resetting style of last button
+                                self.lastbuttonpressed = -1
+                                #aw.sendmessage(QApplication.translate("Message", "toggle(%d)" % (toInt(cs_a[1])), None))
+
+                            elif cs_a[0] == "pulse" and cs_len == 3: #len(cs)>9 and len(cs)<14:
+                                c = toInt(cs_a[1])
+                                t = toInt(cs_a[2])
+                                #print("pulse(%d, %d)" % (c, t))
+                                if t>= 0.0 and t <= 1000:
+                                    aw.ser.phidgetBinaryOUTpulse(c, t)
+                                else:
+                                    aw.sendmessage(QApplication.translate("Message", "Pulse out of range (%d)" % (t), None))
+
+                            elif cs_a[0] == "out" and cs_len == 3:
+                                aw.ser.phidgetVOUTsetVOUT(toInt(cs_a[1]), toFloat(cs_a[2]))
+
+                            elif cs_a[0] == "slider" and cs_len == 3:
+                                v = toFloat(cs_a[2])
+                                if v >= 0.0 and v <= 100.0:
+                                    aw.moveslider(toInt(cs_a[1]), v)
+                                else:
+                                    aw.sendmessage(QApplication.translate("Message", "Slider out of range (%f)" % (f), None))
+
+                            elif cs_a[0] == "button" and cs_len == 4:
+                                b = toInt(cs_a[1]) - 1 # gui button list is indexed from 1
+                                c = toInt(cs_a[2])
+                                v = toInt(cs_a[3])
+                                self.buttonStates[b] = v & 0x1
+                                aw.ser.phidgetBinaryOUTset(c, bool(self.buttonStates[b]))
+                                #print("button(%d, %d, %d) self.buttonStates: %s" % (b, c, v, self.buttonStates))
+
+                                if self.buttonStates[b] != 0:
+                                    self.setExtraEventButtonStyle(b, style="pressed")
+                                else:
+                                    self.setExtraEventButtonStyle(b, style="normal")
+
+                            else:
+                                #print("no match for command [%s], continue" % (cs_a[0]))
+                                aw.sendmessage(QApplication.translate("Message","No match for command [%s], continuing" % (cs_a[0]), None))
+
                 elif action == 7: # slider call-program action
                     try:
                         self.call_prog_with_args(cmd_str)
@@ -15385,6 +15424,19 @@ class ApplicationWindow(QMainWindow):
             elif n == 3 and self.slider4.value() != v:
                 self.slider4.setValue(v)
 
+    def setExtraEventButtonStyle(self, tee, style="normal"):
+        if style=="normal":
+            # set color of this button to "normal"
+            normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
+                    self.extraeventbuttontextcolor[tee],self.extraeventbuttoncolor[tee])
+            self.buttonlist[tee].setStyleSheet(normalstyle)
+
+        if style=="pressed":
+            # set color of this button to "pressed"
+            pressedstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
+                    self.extraeventbuttoncolor[tee],self.extraeventbuttontextcolor[tee])
+            self.buttonlist[tee].setStyleSheet(pressedstyle)
+
     #called from user configured event buttons
     def recordextraevent(self,ee):
         eventtype = self.extraeventstypes[ee]
@@ -15392,13 +15444,17 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.eventactionsemaphore.acquire(1)
             # reset color of last pressed button
             if self.lastbuttonpressed != -1 and len(self.buttonlist)>self.lastbuttonpressed:
-                normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttontextcolor[self.lastbuttonpressed],self.extraeventbuttoncolor[self.lastbuttonpressed])
-                self.buttonlist[self.lastbuttonpressed].setStyleSheet(normalstyle)
-            # set color of this button to "pressed"
-            pressedstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttoncolor[ee],self.extraeventbuttontextcolor[ee])
-            self.buttonlist[ee].setStyleSheet(pressedstyle)
+                self.setExtraEventButtonStyle(self.lastbuttonpressed, style="normal")
+
+            #toggle button if it has nonzero state prior to toggling
+            if self.buttonStates[ee] != 0:
+                self.setExtraEventButtonStyle(ee, style="normal")
+            else:
+                self.setExtraEventButtonStyle(ee, style="pressed")
+
             # reset lastbuttonpressed
             self.lastbuttonpressed = ee
+
         except Exception:
             pass
         finally:
@@ -25417,6 +25473,7 @@ class ApplicationWindow(QMainWindow):
         self.e3buttondialog.clear()
         self.e4buttondialog.clear()
         self.buttonlist = []
+        self.buttonStates = []
         #hide all extra button rows
         self.e1buttondialog.setVisible(False)
         self.e2buttondialog.setVisible(False)
@@ -25438,6 +25495,7 @@ class ApplicationWindow(QMainWindow):
             p.setFocusPolicy(Qt.NoFocus)
             p.clicked.connect(lambda _,x=i:self.recordextraevent(x))
             self.buttonlist.append(p)
+            self.buttonStates.append(0)
             #add button to row (CHANGED: now never add extra buttons to default button set)
             if False: #lowerbuttonvisiblebuttons < self.buttonlistmaxlen:
                 self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
