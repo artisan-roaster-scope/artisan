@@ -53,6 +53,8 @@ import codecs
 import uuid
 import threading
 import multiprocessing
+import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
@@ -173,69 +175,7 @@ from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
 
-artisan_slider_style = """
-            QSlider::groove:vertical:focus {{
-                background: #888;
-                border: 0.5px solid #666;
-                width: 3px;
-                border-radius: 5px;
-            }}
-            QSlider::sub-page:vertical:focus {{
-                background: 888;
-                border: 0.5px solid #666;
-                width: 85px;
-                border-radius: 5px;
-            }}
-            
-            QSlider::groove:vertical {{
-                background: #ddd;
-                border: 0.5px solid #aaa;
-                width: 3px;
-                border-radius: 5px;
-            }}
-            QSlider::sub-page:vertical {{
-                background: #ddd;
-                border: 0.5px solid #aaa;
-                width: 85px;
-                border-radius: 5px;
-            }}
-            QSlider::add-page:vertical {{
-                background: {color};
-                border: 1px solid {color};
-                width: 5px;
-                border-radius: 2px;
-            }}
-            QSlider::handle:vertical {{
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #eee);
-                border: 0.5px solid #ddd;
-                height: 8px;
-                margin-top: -1px;
-                margin-bottom: -1px;
-                margin-left: -10px;
-                margin-right: -10px;
-                border-radius: 5px;
-            }}
-            QSlider::handle:vertical:hover {{
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #eee, stop:1 #ccc);
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }}
-            QSlider::sub-page:vertical:disabled {{
-                background: #bbb;
-                border-color: #999;
-            }}
-            QSlider::add-page:vertical:disabled {{
-                background: #eee;
-                border-color: #999;
-            }}
-            QSlider::handle:vertical:disabled {{
-                background: #eee;
-                border: 1px solid #aaa;
-                border-radius: 5px;
-            }}       
-"""
-
-
+from artisanlib.sliderStyle import *
 
 
 # maps Artisan thermocouple types (order as listed in the menu; see phidget1048_types) to Phdiget thermocouple types
@@ -997,6 +937,8 @@ class tgraphcanvas(FigureCanvas):
                        "+Aillio Bullet R1 State/Fan RPM",    #87
                        "+Program 78",               #88
                        "+Program 910",              #89
+                       "+Slider 01",                #90
+                       "+Slider 23",                #91
                        ]
                        
     
@@ -1025,6 +967,8 @@ class tgraphcanvas(FigureCanvas):
             76, # +Phidget HUB0000 IO Digital 45
             84, # +Aillio Bullet R1 Heater/Fan
             87, # +Aillio Bullet R1 State
+            90, # +Slider 01
+            91, # +Slider 23
         ]
 
         #extra devices
@@ -36167,6 +36111,8 @@ class serialport(object):
                                    self.R1_RPM_STATE,         #87
                                    self.callprogram_78,       #88
                                    self.callprogram_910,      #89
+                                   self.slider_01,            #90
+                                   self.slider_23,            #91
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -36459,6 +36405,18 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t1 = aw.qmc.program_t9
         t2 = aw.qmc.program_t10
+        return tx,t2,t1
+
+    def slider_01(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.slider1.value()
+        t2 = aw.slider2.value()
+        return tx,t2,t1
+
+    def slider_23(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.slider3.value()
+        t2 = aw.slider4.value()
         return tx,t2,t1
 
     def virtual(self):
@@ -41035,7 +40993,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -41563,7 +41521,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -41655,7 +41613,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -43866,6 +43824,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 87
                 1, # 88
                 1, # 89
+                1, # 90
+                1, # 91
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -43982,7 +43942,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.accept()
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]):
                 aw.setcommport()
             #self.close()
         except Exception as e:
