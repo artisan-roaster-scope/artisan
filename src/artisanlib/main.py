@@ -10267,7 +10267,7 @@ class SampleThread(QThread):
             d = aw.qmc.delay / 1000.
             tx_org = tx[-l:] # as len(tx)=len(temp) here, it is guranteed that len(tx_org)=l
             # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
-            tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d)) # by contruction, len(tx_lin)=len(tx_org)=l
+            tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by contruction, len(tx_lin)=len(tx_org)=l
             temp_trail = temp[-l:] # by construction, len(temp_trail)=len(tx_lin)=len(tx_org)=l
             temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
             return numpy.average(temp_trail_re[-len(decay_weights):],weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
