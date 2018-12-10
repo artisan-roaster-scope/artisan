@@ -5910,13 +5910,12 @@ class tgraphcanvas(FigureCanvas):
                     start = 0
                     
                 # position the stats summary relative to the right hand edge of the graph                
-                drop_label = QApplication.translate("Scope Annotation","DROP {0}", None).replace("{0}","[0-9:]*")
+                drop_label = QApplication.translate("Scope Annotation","DROP {0}", None).replace(" {0}","")
                 _,_,droptext_end = self.droptextBounds(drop_label,start,statsheight,ls,prop,fc)
                 stats_textbox_bounds = self.statstextboxBounds(self.ax.get_xlim()[1]+border,statsheight,statstr,ls,prop,fc)
                 stats_textbox_width = stats_textbox_bounds[2]
                 stats_textbox_height = stats_textbox_bounds[3]
                 pos_x = self.ax.get_xlim()[1]-stats_textbox_width-border
-#                print("\n1 stats_textbox_width",stats_textbox_width)
 
                 if (aw.qmc.autotimex):
                     aw.qmc.endofx = droptext_end + stats_textbox_width + 2*border # provide room for the stats
@@ -5969,10 +5968,10 @@ class tgraphcanvas(FigureCanvas):
         import re
         droptext_width = 0
         droptextstart = 0
-        droptext_end = 0
+        droptext_end = aw.qmc.timex[-1] - x_pos #default for when Events Annotations is unchecked 
         for child in self.ax.get_children():
             if isinstance(child, mpl.text.Annotation):
-                droptext = re.search(r'.*\((.*?),.*({0})'.format(drop_label),str(child))
+                droptext = re.search(r'.*\((.*?),.*({0} [0-9:]*)'.format(drop_label),str(child))
                 if droptext:
                     droptextstart = int(float(droptext.group(1))) - x_pos
                     droptext_width = self.statstextboxBounds(x_pos,y_pos,droptext.group(2),ls,prop,fc)[2]
