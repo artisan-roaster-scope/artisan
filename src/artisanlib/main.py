@@ -10271,7 +10271,7 @@ class SampleThread(QThread):
             temp_trail = temp[-l:] # by construction, len(temp_trail)=len(tx_lin)=len(tx_org)=l
             temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
             return numpy.average(temp_trail_re[-len(decay_weights):],weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
-        
+
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
@@ -15073,16 +15073,24 @@ class ApplicationWindow(QMainWindow):
                             cs_len = len(cs_a)
 
                             if cs_a[0] == "set" and cs_len == 3:
-                                aw.ser.phidgetBinaryOUTset(toInt(cs_a[1]), bool(toInt(cs_a[2])))
+                                if not aw.ser.phidgetBinaryOUTset(toInt(cs_a[1]), bool(toInt(cs_a[2]))):
+                                    aw.sendmessage(QApplication.translate("Message", "Failed to set(%s, %s)" % (cs_a[1], cs_a[2] ), None))
 
                             elif cs_a[0] == "toggle" and cs_len == 2:
                                 c = toInt(cs_a[1])
                                 #keep state of this gpio, rather than rely on phidget and use non-zero value to set button color
-                                self.buttonStates[self.lastbuttonpressed] = (self.buttonStates[self.lastbuttonpressed] + 1) & 0x1
-                                aw.ser.phidgetBinaryOUTset(c, (self.buttonStates[self.lastbuttonpressed]))
+                                newValue = (self.buttonStates[self.lastbuttonpressed] + 1) & 0x1
+                                if aw.ser.phidgetBinaryOUTset(c, bool(newValue)):
+                                    self.buttonStates[self.lastbuttonpressed] = newValue
+                                else:
+                                    aw.sendmessage(QApplication.translate("Message", "Failed to toggle(%s)" % (cs_a[1]), None))
+                                    #clear style that got set in button press event handler
+                                    if 0 != self.buttonStates[self.lastbuttonpressed]:
+                                        self.setExtraEventButtonStyle(self.lastbuttonpressed, style="pressed")
+                                    else:
+                                        self.setExtraEventButtonStyle(self.lastbuttonpressed, style="normal")
                                 #block resetting style of last button
                                 self.lastbuttonpressed = -1
-                                #aw.sendmessage(QApplication.translate("Message", "toggle(%d)" % (toInt(cs_a[1])), None))
 
                             elif cs_a[0] == "pulse" and cs_len == 3: #len(cs)>9 and len(cs)<14:
                                 c = toInt(cs_a[1])
@@ -15094,7 +15102,8 @@ class ApplicationWindow(QMainWindow):
                                     aw.sendmessage(QApplication.translate("Message", "Pulse out of range (%d)" % (t), None))
 
                             elif cs_a[0] == "out" and cs_len == 3:
-                                aw.ser.phidgetVOUTsetVOUT(toInt(cs_a[1]), toFloat(cs_a[2]))
+                                if not aw.ser.phidgetVOUTsetVOUT(toInt(cs_a[1]), toFloat(cs_a[2])):
+                                    aw.sendmessage(QApplication.translate("Message", "Failed to set VOUT(%s, %s)" % (cs_a[1], cs_a[2] ), None))
 
                             elif cs_a[0] == "slider" and cs_len == 3:
                                 v = toFloat(cs_a[2])
@@ -15107,9 +15116,10 @@ class ApplicationWindow(QMainWindow):
                                 b = toInt(cs_a[1]) - 1 # gui button list is indexed from 1
                                 c = toInt(cs_a[2])
                                 v = toInt(cs_a[3])
-                                self.buttonStates[b] = v & 0x1
-                                aw.ser.phidgetBinaryOUTset(c, bool(self.buttonStates[b]))
-                                #print("button(%d, %d, %d) self.buttonStates: %s" % (b, c, v, self.buttonStates))
+                                if aw.ser.phidgetBinaryOUTset(c, bool(v & 0x1)):
+                                    self.buttonStates[b] = v & 0x1
+                                else:
+                                    aw.sendmessage(QApplication.translate("Message", "Failed to set button(%s, %s, %s)" % (cs_a[1], cs_a[2], cs_a[3] ), None))
 
                                 if self.buttonStates[b] != 0:
                                     self.setExtraEventButtonStyle(b, style="pressed")
@@ -38634,29 +38644,32 @@ class serialport(object):
                 aw.ser.PhidgetBinaryOut[channel].openWaitForAttachment(1000)
         except:
             pass
-            
+
     def phidgetBinaryOUTpulse(self,channel,millis):
         self.phidgetBinaryOUTset(channel,1)
-#        QTimer.singleShot(millis,lambda : self.phidgetBinaryOUTset(channel,0))            
+#        QTimer.singleShot(millis,lambda : self.phidgetBinaryOUTset(channel,0))
         # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
         # the following solution has the drawback to block the eventaction thread
 #        libtime.sleep(millis/1000.)
 #        self.phidgetBinaryOUTset(channel,0)
         # so we use a QTimer.singleShot running in the main thread
         aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"BinaryOUTset")
-               
+
     # channel: 0-8
     # value: True or False
     def phidgetBinaryOUTset(self,channel,value):
+        res = False
         self.phidgetBinaryOUTattach(channel)
         if aw.ser.PhidgetBinaryOut:
             # set state of the given channel
             try:
                 if len(aw.ser.PhidgetBinaryOut) > channel and aw.ser.PhidgetBinaryOut[channel] and aw.ser.PhidgetBinaryOut[channel].getAttached():
                     aw.ser.PhidgetBinaryOut[channel].setState(value)
+                    res = True
             except Exception:
-                pass
-                
+                res = False
+        return res
+
     # channel: 0-8
     # returns: True or False (default)
     def phidgetBinaryOUTget(self,channel):
@@ -38866,11 +38879,12 @@ class serialport(object):
             if not aw.ser.PhidgetAnalogOut[channel].getAttached():
                 aw.ser.PhidgetAnalogOut[channel].openWaitForAttachment(1000)
         except:
-            pass                    
-                        
+            pass
 
     # value: float
+    # returns True or False indicating set status
     def phidgetVOUTsetVOUT(self,channel,value): 
+        res = False
         self.phidgetVOUTattach(channel)
         if aw.ser.PhidgetAnalogOut:
             # set voltage output
@@ -38882,9 +38896,11 @@ class serialport(object):
                     else:
                         aw.ser.PhidgetAnalogOut[channel].setVoltage(value)
                         aw.ser.PhidgetAnalogOut[channel].setEnabled(True)
+                    res = True
             except Exception:
-                pass
-    
+                res = False
+        return res
+
     def phidgetVOUTclose(self):
         if aw.ser.PhidgetAnalogOut:
             for i in range(4):
