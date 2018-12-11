@@ -53,6 +53,9 @@ import codecs
 import uuid
 import threading
 import multiprocessing
+import re
+import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import urllib.parse as urlparse  # @Reimport
 import urllib.request as urllib  # @Reimport
@@ -173,69 +176,7 @@ from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
 
-artisan_slider_style = """
-            QSlider::groove:vertical:focus {{
-                background: #888;
-                border: 0.5px solid #666;
-                width: 3px;
-                border-radius: 5px;
-            }}
-            QSlider::sub-page:vertical:focus {{
-                background: 888;
-                border: 0.5px solid #666;
-                width: 85px;
-                border-radius: 5px;
-            }}
-            
-            QSlider::groove:vertical {{
-                background: #ddd;
-                border: 0.5px solid #aaa;
-                width: 3px;
-                border-radius: 5px;
-            }}
-            QSlider::sub-page:vertical {{
-                background: #ddd;
-                border: 0.5px solid #aaa;
-                width: 85px;
-                border-radius: 5px;
-            }}
-            QSlider::add-page:vertical {{
-                background: {color};
-                border: 1px solid {color};
-                width: 5px;
-                border-radius: 2px;
-            }}
-            QSlider::handle:vertical {{
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #fff, stop:1 #eee);
-                border: 0.5px solid #ddd;
-                height: 8px;
-                margin-top: -1px;
-                margin-bottom: -1px;
-                margin-left: -10px;
-                margin-right: -10px;
-                border-radius: 5px;
-            }}
-            QSlider::handle:vertical:hover {{
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #eee, stop:1 #ccc);
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }}
-            QSlider::sub-page:vertical:disabled {{
-                background: #bbb;
-                border-color: #999;
-            }}
-            QSlider::add-page:vertical:disabled {{
-                background: #eee;
-                border-color: #999;
-            }}
-            QSlider::handle:vertical:disabled {{
-                background: #eee;
-                border: 1px solid #aaa;
-                border-radius: 5px;
-            }}       
-"""
-
-
+from artisanlib.sliderStyle import *
 
 
 # maps Artisan thermocouple types (order as listed in the menu; see phidget1048_types) to Phdiget thermocouple types
@@ -997,6 +938,8 @@ class tgraphcanvas(FigureCanvas):
                        "+Aillio Bullet R1 State/Fan RPM",    #87
                        "+Program 78",               #88
                        "+Program 910",              #89
+                       "+Slider 01",                #90
+                       "+Slider 23",                #91
                        ]
                        
     
@@ -1025,6 +968,8 @@ class tgraphcanvas(FigureCanvas):
             76, # +Phidget HUB0000 IO Digital 45
             84, # +Aillio Bullet R1 Heater/Fan
             87, # +Aillio Bullet R1 State
+            90, # +Slider 01
+            91, # +Slider 23
         ]
 
         #extra devices
@@ -10321,11 +10266,11 @@ class SampleThread(QThread):
             d = aw.qmc.delay / 1000.
             tx_org = tx[-l:] # as len(tx)=len(temp) here, it is guranteed that len(tx_org)=l
             # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
-            tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d)) # by contruction, len(tx_lin)=len(tx_org)=l
+            tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by contruction, len(tx_lin)=len(tx_org)=l
             temp_trail = temp[-l:] # by construction, len(temp_trail)=len(tx_lin)=len(tx_org)=l
             temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
             return numpy.average(temp_trail_re[-len(decay_weights):],weights=decay_weights[-l:])  # len(decay_weights)>len(temp_trail_re)=l is possible
-        
+
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
@@ -15123,19 +15068,67 @@ class ApplicationWindow(QMainWindow):
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(";")) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
                         for c in cmds:
-                            cs = c.strip()
-                            try:
-                                if cs.startswith('set(') and len(cs)>7:
-                                    c,v = cs[4:-1].split(',')
-                                    aw.ser.phidgetBinaryOUTset(int(c),bool(int(v)))
-                                elif cs.startswith('toggle(') and len(cs)>8:
-                                    c = int(cs[7:-1])
-                                    aw.ser.phidgetBinaryOUTtoggle(c)
-                                elif cs.startswith('pulse(') and len(cs)>9 and len(cs)<14:
-                                    c,t = cs[6:-1].split(',')
-                                    aw.ser.phidgetBinaryOUTpulse(int(c),int(t))
-                            except Exception:
-                                pass
+                            cs_a = re.findall("[0-9a-zA-Z-\.]+", c)
+                            cs_len = len(cs_a)
+
+                            if cs_a[0] == "set" and cs_len == 3:
+                                if not aw.ser.phidgetBinaryOUTset(toInt(cs_a[1]), bool(toInt(cs_a[2]))):
+                                    aw.sendmessage(QApplication.translate("Message", "Failed to set(%s, %s)" % (cs_a[1], cs_a[2] ), None))
+
+                            elif cs_a[0] == "toggle" and cs_len == 2:
+                                c = toInt(cs_a[1])
+                                #keep state of this gpio, rather than rely on phidget and use non-zero value to set button color
+                                newValue = (self.buttonStates[self.lastbuttonpressed] + 1) & 0x1
+                                if aw.ser.phidgetBinaryOUTset(c, bool(newValue)):
+                                    self.buttonStates[self.lastbuttonpressed] = newValue
+                                else:
+                                    aw.sendmessage(QApplication.translate("Message", "Failed to toggle(%s)" % (cs_a[1]), None))
+                                    #clear style that got set in button press event handler
+                                    if 0 != self.buttonStates[self.lastbuttonpressed]:
+                                        self.setExtraEventButtonStyle(self.lastbuttonpressed, style="pressed")
+                                    else:
+                                        self.setExtraEventButtonStyle(self.lastbuttonpressed, style="normal")
+                                #block resetting style of last button
+                                self.lastbuttonpressed = -1
+
+                            elif cs_a[0] == "pulse" and cs_len == 3: #len(cs)>9 and len(cs)<14:
+                                c = toInt(cs_a[1])
+                                t = toInt(cs_a[2])
+                                #print("pulse(%d, %d)" % (c, t))
+                                if t>= 0.0 and t <= 1000:
+                                    aw.ser.phidgetBinaryOUTpulse(c, t)
+                                else:
+                                    aw.sendmessage(QApplication.translate("Message", "Pulse out of range (%d)" % (t), None))
+
+                            elif cs_a[0] == "out" and cs_len == 3:
+                                if not aw.ser.phidgetVOUTsetVOUT(toInt(cs_a[1]), toFloat(cs_a[2])):
+                                    aw.sendmessage(QApplication.translate("Message", "Failed to set VOUT(%s, %s)" % (cs_a[1], cs_a[2] ), None))
+
+                            elif cs_a[0] == "slider" and cs_len == 3:
+                                v = toFloat(cs_a[2])
+                                if v >= 0.0 and v <= 100.0:
+                                    aw.moveslider(toInt(cs_a[1]), v)
+                                else:
+                                    aw.sendmessage(QApplication.translate("Message", "Slider out of range (%f)" % (f), None))
+
+                            elif cs_a[0] == "button" and cs_len == 4:
+                                b = toInt(cs_a[1]) - 1 # gui button list is indexed from 1
+                                c = toInt(cs_a[2])
+                                v = toInt(cs_a[3])
+                                if aw.ser.phidgetBinaryOUTset(c, bool(v & 0x1)):
+                                    self.buttonStates[b] = v & 0x1
+                                else:
+                                    aw.sendmessage(QApplication.translate("Message", "Failed to set button(%s, %s, %s)" % (cs_a[1], cs_a[2], cs_a[3] ), None))
+
+                                if self.buttonStates[b] != 0:
+                                    self.setExtraEventButtonStyle(b, style="pressed")
+                                else:
+                                    self.setExtraEventButtonStyle(b, style="normal")
+
+                            else:
+                                #print("no match for command [%s], continue" % (cs_a[0]))
+                                aw.sendmessage(QApplication.translate("Message","No match for command [%s], continuing" % (cs_a[0]), None))
+
                 elif action == 7: # slider call-program action
                     try:
                         self.call_prog_with_args(cmd_str)
@@ -15440,6 +15433,19 @@ class ApplicationWindow(QMainWindow):
             elif n == 3 and self.slider4.value() != v:
                 self.slider4.setValue(v)
 
+    def setExtraEventButtonStyle(self, tee, style="normal"):
+        if style=="normal":
+            # set color of this button to "normal"
+            normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
+                    self.extraeventbuttontextcolor[tee],self.extraeventbuttoncolor[tee])
+            self.buttonlist[tee].setStyleSheet(normalstyle)
+
+        if style=="pressed":
+            # set color of this button to "pressed"
+            pressedstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}" % (
+                    self.extraeventbuttoncolor[tee],self.extraeventbuttontextcolor[tee])
+            self.buttonlist[tee].setStyleSheet(pressedstyle)
+
     #called from user configured event buttons
     def recordextraevent(self,ee):
         eventtype = self.extraeventstypes[ee]
@@ -15447,13 +15453,17 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.eventactionsemaphore.acquire(1)
             # reset color of last pressed button
             if self.lastbuttonpressed != -1 and len(self.buttonlist)>self.lastbuttonpressed:
-                normalstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttontextcolor[self.lastbuttonpressed],self.extraeventbuttoncolor[self.lastbuttonpressed])
-                self.buttonlist[self.lastbuttonpressed].setStyleSheet(normalstyle)
-            # set color of this button to "pressed"
-            pressedstyle = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttoncolor[ee],self.extraeventbuttontextcolor[ee])
-            self.buttonlist[ee].setStyleSheet(pressedstyle)
+                self.setExtraEventButtonStyle(self.lastbuttonpressed, style="normal")
+
+            #toggle button if it has nonzero state prior to toggling
+            if self.buttonStates[ee] != 0:
+                self.setExtraEventButtonStyle(ee, style="normal")
+            else:
+                self.setExtraEventButtonStyle(ee, style="pressed")
+
             # reset lastbuttonpressed
             self.lastbuttonpressed = ee
+
         except Exception:
             pass
         finally:
@@ -25472,6 +25482,7 @@ class ApplicationWindow(QMainWindow):
         self.e3buttondialog.clear()
         self.e4buttondialog.clear()
         self.buttonlist = []
+        self.buttonStates = []
         #hide all extra button rows
         self.e1buttondialog.setVisible(False)
         self.e2buttondialog.setVisible(False)
@@ -25493,6 +25504,7 @@ class ApplicationWindow(QMainWindow):
             p.setFocusPolicy(Qt.NoFocus)
             p.clicked.connect(lambda _,x=i:self.recordextraevent(x))
             self.buttonlist.append(p)
+            self.buttonStates.append(0)
             #add button to row (CHANGED: now never add extra buttons to default button set)
             if False: #lowerbuttonvisiblebuttons < self.buttonlistmaxlen:
                 self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
@@ -36166,6 +36178,8 @@ class serialport(object):
                                    self.R1_RPM_STATE,         #87
                                    self.callprogram_78,       #88
                                    self.callprogram_910,      #89
+                                   self.slider_01,            #90
+                                   self.slider_23,            #91
                                    ]
         #string with the name of the program for device #27
         self.externalprogram = "test.py"
@@ -36458,6 +36472,18 @@ class serialport(object):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t1 = aw.qmc.program_t9
         t2 = aw.qmc.program_t10
+        return tx,t2,t1
+
+    def slider_01(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.slider1.value()
+        t2 = aw.slider2.value()
+        return tx,t2,t1
+
+    def slider_23(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t1 = aw.slider3.value()
+        t2 = aw.slider4.value()
         return tx,t2,t1
 
     def virtual(self):
@@ -38617,29 +38643,32 @@ class serialport(object):
                 aw.ser.PhidgetBinaryOut[channel].openWaitForAttachment(1000)
         except:
             pass
-            
+
     def phidgetBinaryOUTpulse(self,channel,millis):
         self.phidgetBinaryOUTset(channel,1)
-#        QTimer.singleShot(millis,lambda : self.phidgetBinaryOUTset(channel,0))            
+#        QTimer.singleShot(millis,lambda : self.phidgetBinaryOUTset(channel,0))
         # QTimer (which does not work being called from a QThread) call replaced by the next 2 lines (event actions are now started in an extra thread)
         # the following solution has the drawback to block the eventaction thread
 #        libtime.sleep(millis/1000.)
 #        self.phidgetBinaryOUTset(channel,0)
         # so we use a QTimer.singleShot running in the main thread
         aw.singleShotPhidgetsPulseOFF.emit(channel,millis,"BinaryOUTset")
-               
+
     # channel: 0-8
     # value: True or False
     def phidgetBinaryOUTset(self,channel,value):
+        res = False
         self.phidgetBinaryOUTattach(channel)
         if aw.ser.PhidgetBinaryOut:
             # set state of the given channel
             try:
                 if len(aw.ser.PhidgetBinaryOut) > channel and aw.ser.PhidgetBinaryOut[channel] and aw.ser.PhidgetBinaryOut[channel].getAttached():
                     aw.ser.PhidgetBinaryOut[channel].setState(value)
+                    res = True
             except Exception:
-                pass
-                
+                res = False
+        return res
+
     # channel: 0-8
     # returns: True or False (default)
     def phidgetBinaryOUTget(self,channel):
@@ -38849,11 +38878,12 @@ class serialport(object):
             if not aw.ser.PhidgetAnalogOut[channel].getAttached():
                 aw.ser.PhidgetAnalogOut[channel].openWaitForAttachment(1000)
         except:
-            pass                    
-                        
+            pass
 
     # value: float
+    # returns True or False indicating set status
     def phidgetVOUTsetVOUT(self,channel,value): 
+        res = False
         self.phidgetVOUTattach(channel)
         if aw.ser.PhidgetAnalogOut:
             # set voltage output
@@ -38865,9 +38895,11 @@ class serialport(object):
                     else:
                         aw.ser.PhidgetAnalogOut[channel].setVoltage(value)
                         aw.ser.PhidgetAnalogOut[channel].setEnabled(True)
+                    res = True
             except Exception:
-                pass
-    
+                res = False
+        return res
+
     def phidgetVOUTclose(self):
         if aw.ser.PhidgetAnalogOut:
             for i in range(4):
@@ -41034,7 +41066,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
         # "ADD DEVICE:"
-        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
+        if not(devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS, Phidget and Yocto devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -41562,7 +41594,7 @@ class comportDlg(ArtisanDialog):
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
                         # "ADD DEVICE:"
-                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not (devid in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = aw.extracomport[i])
                             comportComboBox.activated.connect(lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                             comportComboBox.setFixedWidth(200)
@@ -41654,7 +41686,7 @@ class comportDlg(ArtisanDialog):
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         # "ADD DEVICE:"
-        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not(aw.qmc.device in [27,29,33,34,37,40,41,45,46,47,48,49,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]) and not(aw.qmc.device == 0 and aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:
@@ -43865,6 +43897,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 1, # 87
                 1, # 88
                 1, # 89
+                1, # 90
+                1, # 91
                 ] 
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
@@ -43981,7 +44015,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.accept()
             #if device is not None or not external-program (don't need serial settings config)
             # "ADD DEVICE:"
-            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89]):
+            if not(aw.qmc.device in [18,27,34,37,40,41,45,46,47,48,49,50,51,52,55,58,59,60,61,62,63,64,65,68,69,70,71,72,73,74,75,76,79,80,81,82,83,84,85,86,87,88,89,90,91]):
                 aw.setcommport()
             #self.close()
         except Exception as e:
