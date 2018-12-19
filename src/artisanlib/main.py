@@ -8024,7 +8024,10 @@ class tgraphcanvas(FigureCanvas):
                                  path_effects=[PathEffects.withStroke(linewidth=0.5,foreground=self.palette["background"])],
                                  picker=True,
                                  )
-                    self.met_annotate.set_in_layout(False)
+                    try:
+                        self.met_annotate.set_in_layout(False) # remove suptitle from tight_layout calculation
+                    except: # set_in_layout not available in mpl<3.x
+                        pass
 
             if self.statisticsflags[3] and self.timeindex[0]>-1:
                 statsprop = aw.mpl_fontproperties.copy()
