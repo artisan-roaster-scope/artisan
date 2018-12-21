@@ -112,7 +112,7 @@ def authentify():
                     elif platform.system() == 'Darwin':
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
                     else: # Linux
-                        keyring.set_keyring(keyring.backends.SecretService())
+                        keyring.set_keyring(keyring.backends.SecretService.Keyring())
                     config.passwd = keyring.get_password(config.app_name, config.app_window.plus_account) # @UndefinedVariable
                 except Exception as e:
                     config.logger.error("controller: keyring Exception %s",e)     

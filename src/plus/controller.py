@@ -98,7 +98,7 @@ def connect(clear_on_failure = False):
                     elif platform.system() == 'Darwin':
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
                     else: # Linux
-                        keyring.set_keyring(keyring.backends.SecretService()) 
+                        keyring.set_keyring(keyring.backends.SecretService.Keyring()) 
                 except Exception as e:
                     config.logger.error("controller: keyring Exception %s",e)
                 if config.app_window.plus_account is not None: # @UndefinedVariable
