@@ -100,8 +100,14 @@ def connect(clear_on_failure = False):
                         keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())   # @UndefinedVariable                  
                     elif platform.system() == 'Darwin':
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
-#                    else: # Linux
-#                        keyring.set_keyring(keyring.backends.SecretService.Keyring())
+                    else: # Linux
+                        try:
+                            import keyring.backends.SecretService
+                            ss_keyring = keyring.backends.SecretService.Keyring()
+                            if ss_keyring.priority():
+                                keyring.set_keyring(ss_keyring)
+                        except Exception as e:
+                            config.logger.error("controller: Linux keyring Exception %s",e) 
                     config.logger.debug("keyring: %s",str(keyring.get_keyring()))
                 except Exception as e:
                     config.logger.error("controller: keyring Exception %s",e)
