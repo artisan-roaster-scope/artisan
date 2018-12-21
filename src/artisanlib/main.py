@@ -4013,8 +4013,8 @@ class tgraphcanvas(FigureCanvas):
                     self.togglecrosslines()
                     
 #PLUS-COMMENT
-#                if aw is not None and not artisanviewerMode:
-#                    aw.updatePlusStatus()                                  
+                if aw is not None and not artisanviewerMode:
+                    aw.updatePlusStatus()                                  
                     
             except Exception as ex:
 #                import traceback
@@ -7468,11 +7468,12 @@ class tgraphcanvas(FigureCanvas):
                         self.l_annotations += self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
                         #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                         self.updateBackground() # but we need
-                        try:
-                            # update ambient temperature if a ambient temperature source is configured and no value yet established
-                            aw.qmc.updateAmbientTemp()
-                        except Exception:
-                            pass
+                        # this might block:
+#                        try:
+#                            # update ambient temperature if a ambient temperature source is configured and no value yet established
+#                            aw.qmc.updateAmbientTemp()
+#                        except Exception:
+#                            pass
 #PLUS
                         if aw.plus_account is not None:
                             try:
@@ -10024,7 +10025,7 @@ class VMToolbar(NavigationToolbar):
             self.toolitems = (
 
 #PLUS-COMMENT
-#                ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
+                ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
                 
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -10073,8 +10074,8 @@ class VMToolbar(NavigationToolbar):
                         QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}")
 
 #PLUS-COMMENT            
-#        if aw is not None and not artisanviewerMode:
-#            aw.updatePlusStatus(self)
+        if aw is not None and not artisanviewerMode:
+            aw.updatePlusStatus(self)
 
 
         self.update_view_org = self._update_view
@@ -16706,13 +16707,13 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(message)
 
 #PLUS-COMMENT          
-#                if aw is not None and not artisanviewerMode:
-#                    aw.updatePlusStatus()
-#                    if aw.plus_account is not None:
-#                        import plus.config
-#                        if plus.config.uuid_tag in obj:
-#                            import plus.sync                            
-#                            QTimer.singleShot(100,lambda : plus.sync.sync())
+                if aw is not None and not artisanviewerMode:
+                    aw.updatePlusStatus()
+                    if aw.plus_account is not None:
+                        import plus.config
+                        if plus.config.uuid_tag in obj:
+                            import plus.sync                            
+                            QTimer.singleShot(100,lambda : plus.sync.sync())
                                     
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -19039,12 +19040,12 @@ class ApplicationWindow(QMainWindow):
                 if pf:
 
 #PLUS-COMMENT  
-#                    if not artisanviewerMode and aw.plus_account is not None:
-#                        import plus.controller
-#                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-#                        if sync_record_hash is not None:
-#                            # we add the hash over the sync record to be able to detect offline changes
-#                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
+                    if not artisanviewerMode and aw.plus_account is not None:
+                        import plus.controller
+                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                        if sync_record_hash is not None:
+                            # we add the hash over the sync record to be able to detect offline changes
+                            pf["plus_sync_record_hash"] = encodeLocal(sync_record_hash)
 
                     self.serialize(filename,pf)
                     self.setCurrentFile(filename)
@@ -19307,18 +19308,18 @@ class ApplicationWindow(QMainWindow):
                 self.full_screen_mode_active = bool(toBool(settings.value("fullscreen",self.full_screen_mode_active)))
 
 #PLUS-COMMENT
-#            if not artisanviewerMode and settings.contains("plus_account"):
-#                self.plus_account = settings.value("plus_account",self.plus_account)
-#                if settings.contains("plus_remember_credentials"):
-#                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
-#                if settings.contains("plus_email"):
-#                    self.plus_email = settings.value("plus_email",self.plus_email)
-#                if self.plus_account is not None:
-#                    try:
-#                        import plus.controller
-#                        plus.controller.start(aw)
-#                    except:
-#                        pass
+            if not artisanviewerMode and settings.contains("plus_account"):
+                self.plus_account = settings.value("plus_account",self.plus_account)
+                if settings.contains("plus_remember_credentials"):
+                    self.plus_remember_credentials = bool(toBool(settings.value("plus_remember_credentials",self.plus_remember_credentials)))
+                if settings.contains("plus_email"):
+                    self.plus_email = settings.value("plus_email",self.plus_email)
+                if self.plus_account is not None:
+                    try:
+                        import plus.controller
+                        plus.controller.start(aw)
+                    except:
+                        pass
                       
             #restore mode
             old_mode = self.qmc.mode
