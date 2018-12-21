@@ -116,16 +116,15 @@ def authentify():
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
                     else: # Linux
                         try:
+                            # test if secretstorage dbus is working
                             import secretstorage
                             bus = secretstorage.dbus_init()
                             res = list(secretstorage.get_all_collections(bus))
-                            config.logger.error("controller: Linux keyring res %s",str(res))
-            
+                            # if yes, import it
                             import keyring.backends.SecretService
                             ss_keyring = keyring.backends.SecretService.Keyring()
-                            config.logger.error("controller: Linux keyring ss_keyring %s",str(ss_keyring))
-                            config.logger.error("controller: Linux keyring ss_keyring %s",str(ss_keyring.priority))
                             if ss_keyring.priority:
+                                # if priority is not 0, we set it as keyring system
                                 keyring.set_keyring(ss_keyring)
                         except Exception as e:
                             config.logger.error("controller: Linux keyring Exception %s",e)
