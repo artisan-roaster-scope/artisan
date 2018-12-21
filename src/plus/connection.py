@@ -116,12 +116,19 @@ def authentify():
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
                     else: # Linux
                         try:
+                            import secretstorage
+                            bus = secretstorage.dbus_init()
+                            res = list(secretstorage.get_all_collections(bus))
+                            config.logger.error("controller: Linux keyring res %s",str(res))
+            
                             import keyring.backends.SecretService
                             ss_keyring = keyring.backends.SecretService.Keyring()
-                            if ss_keyring.priority():
+                            config.logger.error("controller: Linux keyring ss_keyring %s",str(ss_keyring))
+                            config.logger.error("controller: Linux keyring ss_keyring %s",str(ss_keyring.priority))
+                            if ss_keyring.priority:
                                 keyring.set_keyring(ss_keyring)
                         except Exception as e:
-                            config.logger.error("controller: Linux keyring Exception %s",e) 
+                            config.logger.error("controller: Linux keyring Exception %s",e)
                     config.logger.debug("keyring: %s",str(keyring.get_keyring()))
                     config.passwd = keyring.get_password(config.app_name, config.app_window.plus_account) # @UndefinedVariable
                 except Exception as e:
