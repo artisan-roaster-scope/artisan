@@ -29,12 +29,15 @@
 #import keyring.backends.pyfs
 #import keyring.backends.kwallet
 #import keyring.backends.multi
-#import keyring.backends.fail
-import keyring.backends.OS_X
-import keyring.backends.SecretService
-import keyring.backends.Windows
-import keyring # @Reimport # imported last to make py2app work
+
+
 import platform
+if platform.system().startswith("Windows") or platform.system() == 'Darwin':
+    import keyring.backends.fail
+    import keyring.backends.OS_X
+    import keyring.backends.SecretService
+    import keyring.backends.Windows
+import keyring # @Reimport # imported last to make py2app work
 
 
 from PyQt5.QtWidgets import QApplication
@@ -97,8 +100,9 @@ def connect(clear_on_failure = False):
                         keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())   # @UndefinedVariable                  
                     elif platform.system() == 'Darwin':
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
-                    else: # Linux
-                        keyring.set_keyring(keyring.backends.SecretService.Keyring()) 
+#                    else: # Linux
+#                        keyring.set_keyring(keyring.backends.SecretService.Keyring())
+                    config.logger.debug("keyring: %s",str(keyring.get_keyring()))
                 except Exception as e:
                     config.logger.error("controller: keyring Exception %s",e)
                 if config.app_window.plus_account is not None: # @UndefinedVariable
@@ -127,7 +131,7 @@ def connect(clear_on_failure = False):
                         try:
                             # try-catch as the keyring might not work
                             keyring.set_password(config.app_name, login, passwd)
-                            config.logger.debug("controller: -> keyring set (%s)",passwd)
+                            config.logger.debug("controller: -> keyring set password (%s)",login)
                         except Exception as e:
                             config.logger.error("controller: keyring Exception %s",e)
                     config.passwd = passwd # remember password in memory for this session

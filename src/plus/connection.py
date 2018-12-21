@@ -33,13 +33,16 @@ import json
 #import keyring.backends.pyfs
 #import keyring.backends.kwallet
 #import keyring.backends.multi
-#import keyring.backends.fail
-import keyring.backends.OS_X
-import keyring.backends.SecretService
-import keyring.backends.Windows
-import keyring # @Reimport # imported last to make py2app work
 
 import platform
+
+if platform.system().startswith("Windows") or platform.system() == 'Darwin':
+    import keyring.backends.fail
+    import keyring.backends.OS_X
+    import keyring.backends.SecretService
+    import keyring.backends.Windows
+import keyring # @Reimport # imported last to make py2app work
+
 
 from plus import config
 from artisanlib import __version__
@@ -48,7 +51,7 @@ from PyQt5.QtCore import QSemaphore
 
 token_semaphore = QSemaphore(1) # protects access to the session token which is manipluated only here
 
-    
+
 def getToken():
     try:
         token_semaphore.acquire(1)
@@ -111,8 +114,9 @@ def authentify():
                         keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())   # @UndefinedVariable                  
                     elif platform.system() == 'Darwin':
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
-                    else: # Linux
-                        keyring.set_keyring(keyring.backends.SecretService.Keyring())
+#                    else: # Linux
+#                        keyring.set_keyring(keyring.backends.SecretService.Keyring())
+                    config.logger.debug("keyring: %s",str(keyring.get_keyring()))
                     config.passwd = keyring.get_password(config.app_name, config.app_window.plus_account) # @UndefinedVariable
                 except Exception as e:
                     config.logger.error("controller: keyring Exception %s",e)     
