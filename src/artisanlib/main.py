@@ -832,7 +832,7 @@ class tgraphcanvas(FigureCanvas):
         self.YOCTOchan1Unit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
         self.YOCTOchan2Unit = "C" # indicates the unit ("C" or "F") of the readings as received from the device
         
-        self.phidget1018valueFactor = 1000 # we map the 0-5V voltage returned by the Phidgets22 API to mV
+        self.phidget1018valueFactor = 1000 # we map the 0-5V voltage returned by the Phidgets22 API to mV (0-5000)
         self.phidget1018_async = [False]*8
         self.phidget1018_ratio = [False]*8 # if True VoltageRatio instead of VoltageInput is returned
         self.phidget1018_dataRates = [256]*8 # in ms; (Phidgets default 256ms, min is 8ms, 16ms if wireless is active), max 1000ms

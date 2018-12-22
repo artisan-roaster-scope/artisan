@@ -1,3 +1,4 @@
+gevent==1.3.6
 numpy==1.15.4
 scipy==1.1.0 # older scipy to speed up installation
 matplotlib==3.0.2
