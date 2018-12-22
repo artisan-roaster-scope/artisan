@@ -3,4 +3,4 @@ numpy==1.15.4
 scipy==1.1.0 # older scipy to speed up installation
 matplotlib==3.0.2
 #PyQt 5.7 is preinstalled
-pyinstaller==3.4
+pyinstaller==3.3.1
