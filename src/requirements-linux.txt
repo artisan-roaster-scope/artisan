@@ -1,3 +1,6 @@
+numpy==1.15.4
+scipy==1.2.0
+matplotlib==3.0.2
 PyQt5==5.11.3
 pyinstaller==3.4
 SecretStorage==3.1.0

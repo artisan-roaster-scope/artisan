@@ -3,6 +3,9 @@ pyobjc-core==5.1.2
 pyobjc-framework-Cocoa==5.1.2
 py2app==0.18
 #sip==4.19.8
+numpy==1.15.4
+scipy==1.2.0
+matplotlib==3.0.2
 PyQt5-sip==4.19.13
 PyQt5==5.11.3
 
