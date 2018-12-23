@@ -52,7 +52,7 @@ def getDataDirectory():
 def getDirectory(filename,ext=None):
     fp = Path(getDataDirectory(),filename)
     if ext is not None:
-        fp.with_suffix(ext)
+        fp = fp.with_suffix(ext)
     try:
         fp = fp.resolve() # older pathlib raise an exception if a path does not exist
     except:
