@@ -109,6 +109,7 @@ class Login(QDialog):
 
 def plus_login(window,email=None,remember_credentials=True):
     l = Login(window,email,remember_credentials)
+    l.setWindowTitle("+")
     l.setWindowFlags(Qt.Sheet)
     l.setAttribute(Qt.WA_DeleteOnClose, True)
     l.exec_()

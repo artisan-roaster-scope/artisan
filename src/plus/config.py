@@ -91,7 +91,13 @@ log_file = "artisan_plus"
 
 # Logging
 
-log_file_path = str((Path(util.getDataDirectory()) / log_file).resolve()) + ".log"
+#log_file_path = str((Path(util.getDataDirectory()) / log_file).resolve()) + ".log"
+log_fp = Path(util.getDataDirectory(),log_file).with_suffix(".log")
+try:
+    log_fp = log_fp.resolve()
+except:
+    pass
+log_file_path = str(log_fp)
 
 logger = logging.getLogger("plus")
 logger.setLevel(logging.DEBUG)

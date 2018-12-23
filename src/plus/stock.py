@@ -491,7 +491,7 @@ def getBlendSpecStockPosition(blendSpec,stockId,blends):
         return res[0]
     else:
         # check again, but now ignore label (thus allow renaming of blend names)
-        res2 = [i for i, b in enumerate(blends) if \
+        res = [i for i, b in enumerate(blends) if \
            matchBlendDict(blendSpec,getBlendBlendDict(b),sameLabel=False) and \
            getBlendStockDict(b)["location_hr_id"] == stockId]
         if len(res)>0:
@@ -499,4 +499,3 @@ def getBlendSpecStockPosition(blendSpec,stockId,blends):
         else:
             return None 
         
-       

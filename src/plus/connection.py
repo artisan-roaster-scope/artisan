@@ -111,19 +111,22 @@ def authentify():
                 try:
 #                    config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())  
                     if platform.system().startswith("Windows"):
+                        import keyring # @Reimport
                         keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())   # @UndefinedVariable                  
                     elif platform.system() == 'Darwin':
+                        import keyring # @Reimport
                         keyring.set_keyring(keyring.backends.OS_X.Keyring())
                     else: # Linux
                         try:
                             # test if secretstorage dbus is working
-                            import secretstorage
+                            import secretstorage  # @Reimport
                             bus = secretstorage.dbus_init()
                             res = list(secretstorage.get_all_collections(bus))
                             # if yes, import it
-                            import keyring.backends.SecretService
+                            import keyring.backends.SecretService # @Reimport
                             ss_keyring = keyring.backends.SecretService.Keyring()
                             if ss_keyring.priority:
+                                import keyring # @Reimport
                                 # if priority is not 0, we set it as keyring system
                                 keyring.set_keyring(ss_keyring)
                         except Exception as e:
