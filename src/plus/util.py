@@ -38,7 +38,7 @@ from plus import config
 
 # we store data in the user- and app-specific local default data directory for the platform
 # note that the path is based on the ApplicationName and OrganizationName setting of the app
-# eg. /Users/<username>/Library/Application Support/YourQuest/Artisan on MacOS X
+# eg. /Users/<username>/Library/Application Support/Artisan-Scope/Artisan on MacOS X
 def getDataDirectory():
     try:
         data_dir = QStandardPaths.standardLocations(QStandardPaths.AppLocalDataLocation)[0]
@@ -48,6 +48,16 @@ def getDataDirectory():
     except Exception as e:
         config.logger.error("util: Exception in getDataDirectory() %s",e)
         return None
+
+def getDirectory(filename,ext=None):
+    fp = Path(getDataDirectory(),filename)
+    if ext is not None:
+        fp.with_suffix(ext)
+    try:
+        fp = fp.resolve() # older pathlib raise an exception if a path does not exist
+    except:
+        pass
+    return str(fp)
 
 # returns the last modification date as EPOCH (float incl. milliseconds) of the given file if it exists, or None
 def getModificationDate(path):

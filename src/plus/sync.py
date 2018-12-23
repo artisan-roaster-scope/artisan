@@ -38,7 +38,7 @@ from plus import config, util, connection, controller, roast
 
 sync_cache_semaphore = QSemaphore(1)
 
-sync_cache_path = str((Path(util.getDataDirectory()) / config.sync_cache).resolve())
+sync_cache_path = util.getDirectory(config.sync_cache)
 
 # register the modified_at timestamp (EPOC as float with milliseoncds) for the given uuid, assuming it holds the last timepoint modifications were last synced with the server
 def addSync(uuid,modified_at):

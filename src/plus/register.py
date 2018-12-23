@@ -32,7 +32,8 @@ from plus import config, util
 
 register_semaphore = QSemaphore(1)
 
-uuid_cache_path = str((Path(util.getDataDirectory()) / config.uuid_cache).resolve())
+uuid_cache_path = util.getDirectory(config.uuid_cache)
+
 
 
 # register the path for the given uuid, assuming it points to the .alog profile containing that uuid

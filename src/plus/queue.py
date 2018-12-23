@@ -32,7 +32,8 @@ from PyQt5.QtWidgets import QApplication
 
 from plus import config, util, roast, connection, sync, controller
 
-queue_path = str((Path(util.getDataDirectory()) / config.outbox_cache).resolve())
+queue_path = util.getDirectory(config.outbox_cache)
+
 
 queue = Queue(queue_path)
 

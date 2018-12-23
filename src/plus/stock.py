@@ -37,7 +37,7 @@ from plus import config, connection, util, controller
 
 stock_semaphore = QSemaphore(1) # protects access to the stock_cache file and the stock dict
 
-stock_cache_path = str((Path(util.getDataDirectory()) / config.stock_cache).resolve())
+stock_cache_path = util.getDirectory(config.stock_cache)
 
 stock = None # holds the dict with the current stock data (coffees, blends,..)
 
