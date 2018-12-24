@@ -26961,6 +26961,7 @@ class HUDDlg(ArtisanDialog):
                         for x in range(len(aw.qmc.extradevices)):
                             aw.qmc.extratemp1[x] = [-1]*len(x_range)
                             aw.qmc.extratemp2[x] = [-1]*len(x_range)
+                            aw.qmc.extratimex[x] = x_range[:]
                         aw.sendmessage(QApplication.translate("Message","Y1 = [%s] ; Y2 = [%s]"%(EQU[0],EQU[1]), None))
 
                     else:
