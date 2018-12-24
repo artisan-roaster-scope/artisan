@@ -123,6 +123,9 @@ def connect(clear_on_failure = False):
                             config.logger.debug("controller: -> keyring set password (%s)",login)
                         except Exception as e:
                             config.logger.error("controller: keyring Exception %s",e)
+                            if not platform.system().startswith("Windows") and platform.system() != 'Darwin':
+                                # on Linux remind to install the gnome-keyring
+                                config.app_window.sendmessage(QApplication.translate("Plus","Keyring error: Ensure that gnome-keyring is installed.",None)) # @UndefinedVariable 
                     config.passwd = passwd # remember password in memory for this session
             if config.app_window.plus_account is None: # @UndefinedVariable
                 config.app_window.sendmessage(QApplication.translate("Plus","Login aborted",None)) # @UndefinedVariable

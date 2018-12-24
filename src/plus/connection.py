@@ -126,10 +126,9 @@ def setKeyring():
                     # if priority is not 0, we set it as keyring system
                     keyring.set_keyring(ss_keyring)
             except Exception as e:
-                config.logger.error("controller: Linux keyring Exception %s",e)                
-                config.app_window.sendmessage(QApplication.translate("Plus","Keyring error: {0}. Ensure that gnome-keyring is installed.",None).format(e)) # @UndefinedVariable 
-        config.logger.debug("keyring: %s",str(keyring.get_keyring()))
-        config.passwd = keyring.get_password(config.app_name, config.app_window.plus_account) # @UndefinedVariable
+                pass
+                #config.logger.error("controller: Linux keyring Exception %s",e)                
+        #config.logger.debug("keyring: %s",str(keyring.get_keyring()))
     except Exception as e:
         config.logger.error("controller: keyring Exception %s",e) 
     
@@ -141,6 +140,11 @@ def authentify():
             # fetch passwd
             if config.passwd is None:
                 setKeyring()
+                try:
+                    config.passwd = keyring.get_password(config.app_name, config.app_window.plus_account) # @UndefinedVariable
+                except:
+                    pass
+            if config.passwd is None:
                 config.logger.debug("connection: -> password not found")
                 clearCredentials()
                 return False
