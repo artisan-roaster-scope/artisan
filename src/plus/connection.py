@@ -99,7 +99,39 @@ def clearCredentials():
         config.nickname = None
     finally:
         if token_semaphore.available() < 1:
-            token_semaphore.release(1)         
+            token_semaphore.release(1)   
+
+def setKeyring():
+    try:
+        #HACK set keyring backend explicitly
+        if platform.system().startswith("Windows"):
+            import keyring # @Reimport
+            keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())   # @UndefinedVariable                  
+        elif platform.system() == 'Darwin':
+            import keyring # @Reimport
+            keyring.set_keyring(keyring.backends.OS_X.Keyring())
+        else: # Linux
+            try:
+                import keyring
+                config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
+                # test if secretstorage dbus is working
+                import secretstorage  # @Reimport
+                bus = secretstorage.dbus_init()
+                res = list(secretstorage.get_all_collections(bus))
+                # if yes, import it
+                import keyring.backends.SecretService # @Reimport
+                ss_keyring = keyring.backends.SecretService.Keyring()
+                if ss_keyring.priority:
+                    import keyring # @Reimport
+                    # if priority is not 0, we set it as keyring system
+                    keyring.set_keyring(ss_keyring)
+            except Exception as e:
+                config.logger.error("controller: Linux keyring Exception %s",e)                
+                config.app_window.sendmessage(QApplication.translate("Plus","Keyring error: {0}. Ensure that gnome-keyring is installed.",None).format(e)) # @UndefinedVariable 
+        config.logger.debug("keyring: %s",str(keyring.get_keyring()))
+        config.passwd = keyring.get_password(config.app_name, config.app_window.plus_account) # @UndefinedVariable
+    except Exception as e:
+        config.logger.error("controller: keyring Exception %s",e) 
     
 # returns True on successful authentification
 def authentify():
@@ -107,35 +139,8 @@ def authentify():
     try:
         if config.app_window is not None and config.app_window.plus_account is not None: # @UndefinedVariable
             # fetch passwd
-            if config.passwd is None:        
-                try:
-#                    config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())  
-                    if platform.system().startswith("Windows"):
-                        import keyring # @Reimport
-                        keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())   # @UndefinedVariable                  
-                    elif platform.system() == 'Darwin':
-                        import keyring # @Reimport
-                        keyring.set_keyring(keyring.backends.OS_X.Keyring())
-                    else: # Linux
-                        try:
-                            # test if secretstorage dbus is working
-                            import secretstorage  # @Reimport
-                            bus = secretstorage.dbus_init()
-                            res = list(secretstorage.get_all_collections(bus))
-                            # if yes, import it
-                            import keyring.backends.SecretService # @Reimport
-                            ss_keyring = keyring.backends.SecretService.Keyring()
-                            if ss_keyring.priority:
-                                import keyring # @Reimport
-                                # if priority is not 0, we set it as keyring system
-                                keyring.set_keyring(ss_keyring)
-                        except Exception as e:
-                            config.logger.error("controller: Linux keyring Exception %s",e)
-                    config.logger.debug("keyring: %s",str(keyring.get_keyring()))
-                    config.passwd = keyring.get_password(config.app_name, config.app_window.plus_account) # @UndefinedVariable
-                except Exception as e:
-                    config.logger.error("controller: keyring Exception %s",e)     
             if config.passwd is None:
+                setKeyring()
                 config.logger.debug("connection: -> password not found")
                 clearCredentials()
                 return False

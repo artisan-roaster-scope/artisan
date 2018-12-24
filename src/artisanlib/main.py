@@ -12834,14 +12834,14 @@ class ApplicationWindow(QMainWindow):
             string =  QApplication.translate("Message","Welcome to version {0} of Artisan!", None).format(__version__) + "\n\n"
             string += QApplication.translate("Message","This is a one time message to inform you about a change in Artisan.", None) + "\n\n"
             string += QApplication.translate("Message","If you never run older versions of Artisan you can skip this message, the change does not affect you.", None) + "  "
-            string += QApplication.translate("Message","If you sometimes run older versions of Artisan this change may affect you.", None) + "\n\n"
+# message to long to fit the RPi 7" display
+#            string += QApplication.translate("Message","If you sometimes run older versions of Artisan this change may affect you.", None) + "\n\n"
             string += QApplication.translate("Message","Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.", None) + "  "
             string += QApplication.translate("Message","Beginning with release version v2.0, settings will not be automatically shared at start-up with versions before v2.0.", None) + "\n\n"  
             string += QApplication.translate("Message","Do not worry, Artisan has already loaded your last used settings for you since this is the first time you opened this new version.", None) + "\n\n"
-            string += QApplication.translate("Message","Artisan settings files (.aset) continue to be compatible between versions.", None) + "  "
+#            string += QApplication.translate("Message","Artisan settings files (.aset) continue to be compatible between versions.", None) + "  "
             string += QApplication.translate("Message","To share settings between this version and Artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.", None) + "\n\n"
-            string += QApplication.translate("Message","Enjoy using Artisan,", None) +"\n"
-            string += QApplication.translate("Message","The Artisan Team", None)
+            string += QApplication.translate("Message","Enjoy using Artisan, The Artisan Team", None)
             QMessageBox.information(aw,QApplication.translate("Message","One time message about loading settings at start-up", None),string)
 
         # provide information message to user about Artisan Viewer the first time it is started
@@ -36054,7 +36054,6 @@ class serialport(object):
         #list of comm ports available after Scan
         self.commavailable = []
         ##### SPECIAL METER FLAGS ########
-        self.PhidgetManager = None
         #stores the Phidget 1048 TemperatureSensor object (None if not initialized)
         self.PhidgetTemperatureSensor = None # either None or a list containing one PhidgetTemperatureSensor() object per channel
         self.Phidget1048values = [-1]*4 # the values gathered by registered change triggers
