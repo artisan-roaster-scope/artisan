@@ -79,7 +79,13 @@ stock_cache = "cache"
 # the uuid register that associates UUIDs with local filepaths where to locate the corresponding Artisan profiles
 uuid_cache = "uuids"
 
-# the sync registers that associates UUIDs with last known modification dates modified_at for profiles uploaded/synced automatially
+# the account register that associates account ids with a local running account number
+account_cache = "account"
+
+# the account nr locally assocated to the current account, or None
+account_nr = None
+
+# the sync register that associates UUIDs with last known modification dates modified_at for profiles uploaded/synced automatially
 sync_cache = "sync"
 
 # the outbox queues the outgoing PUSH/PUT data requests

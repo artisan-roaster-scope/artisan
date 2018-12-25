@@ -38,14 +38,18 @@ from plus import config, util, connection, controller, roast
 
 sync_cache_semaphore = QSemaphore(1)
 
-sync_cache_path = util.getDirectory(config.sync_cache)
+def getSyncPath():
+    if config.account_nr is None or config.account_nr == 0:
+        return util.getDirectory(config.sync_cache)
+    else:
+        return util.getDirectory(config.sync_cache + str(config.account_nr))
 
 # register the modified_at timestamp (EPOC as float with milliseoncds) for the given uuid, assuming it holds the last timepoint modifications were last synced with the server
 def addSync(uuid,modified_at):
     try:
         config.logger.debug("sync:addSync(" + str(uuid) + "," + str(modified_at) + ")")
         sync_cache_semaphore.acquire(1)
-        with shelve.open(sync_cache_path) as db:
+        with shelve.open(getSyncPath()) as db:
             db[uuid] = modified_at
     except Exception as e:
         config.logger.error("sync: Exception in addSync() %s",e)
@@ -58,7 +62,7 @@ def getSync(uuid):
     try:
         config.logger.debug("sync:getSync(" + str(uuid) + ")")
         sync_cache_semaphore.acquire(1)
-        with shelve.open(sync_cache_path) as db:
+        with shelve.open(getSyncPath()) as db:
             try:
                 ts = db[uuid]
                 config.logger.debug(" -> sync:getSync = " + str(ts))
@@ -68,6 +72,7 @@ def getSync(uuid):
                 return None
     except Exception as e:
         config.logger.error("sync: Exception in getSync() %s",e)
+        return None
     finally:
         if sync_cache_semaphore.available() < 1:
             sync_cache_semaphore.release(1)
@@ -76,7 +81,7 @@ def delSync(uuid):
     try:
         config.logger.debug("sync:delSync(" + str(uuid) + ")")
         sync_cache_semaphore.acquire(1)
-        with shelve.open(sync_cache_path) as db:
+        with shelve.open(getSyncPath()) as db:
             del db[uuid]
     except Exception as e:
         config.logger.error("sync: Exception in delSync() %s",e)

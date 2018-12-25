@@ -95,7 +95,7 @@ class Concur(threading.Thread):
                         keepTask = True
                     elif r is not None and r.status_code == 409: # conflict
                         iters = 0 # we don't retry, but remove the task as it is faulty
-                    else: # 500 internal server error, 429 Client Error: Too Many Requests or others
+                    else: # 500 internal server error, 429 Client Error: Too Many Requests, 404 Client Error: Not Found or others
                         # something went wrong we don't mark this task as done and retry
                         iters = iters - 1
                         time.sleep(config.queue_retry_delay)                        

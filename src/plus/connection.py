@@ -44,7 +44,7 @@ if platform.system().startswith("Windows") or platform.system() == 'Darwin':
 import keyring # @Reimport # imported last to make py2app work
 
 
-from plus import config
+from plus import config, account
 from artisanlib import __version__
 
 from PyQt5.QtCore import QSemaphore
@@ -97,6 +97,7 @@ def clearCredentials():
         config.app_window.plus_account = None
         config.passwd = None
         config.nickname = None
+        config.account_nr = None
     finally:
         if token_semaphore.available() < 1:
             token_semaphore.release(1)   
@@ -154,13 +155,17 @@ def authentify():
                 r = postData(config.auth_url,data,False)
                 # returns 404: login wrong and 401: passwd wrong
                 res = r.json()
-                if "success" in res and res["success"]:
+                if "success" in res and res["success"] and "result" in res and "user" in res["result"] and "token" in res["result"]["user"]:
                     config.logger.debug("connection: -> authentified, token received")
-                    if "result" in res and "user" in res["result"] and "nickname" in res["result"]["user"]:
+                    if "nickname" in res["result"]["user"]:
                         nickname = res["result"]["user"]["nickname"]
                     else:
                         nickname = None
                     setToken(res["result"]["user"]["token"],nickname)
+                    if "account_id" in res["result"]["user"] and "_id" in res["result"]["user"]["account_id"]:
+                        account_nr = account.setAccount(res["result"]["user"]["account_id"]["_id"])
+                        config.account_nr = account_nr
+                        config.logger.debug("connection: -> account: %s",account_nr)
                     return True
                 else:
                     config.logger.debug("connection: -> authentification failed")
