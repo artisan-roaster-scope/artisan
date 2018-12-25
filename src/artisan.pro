@@ -15,10 +15,11 @@
 SOURCES = \
     artisanlib/main.py \
     const/UIconst.py \
-#    plus/login.py \
-#    plus/controller.py \
-#    plus/stock.py \
-#    plus/sync.py \
+    plus/controller.py \
+    plus/login.py \
+    plus/queue.py \
+    plus/stock.py \
+    plus/sync.py
     
 TRANSLATIONS = \
 	translations/artisan_de.ts \
