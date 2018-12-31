@@ -129,7 +129,6 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 import matplotlib.backends.qt_editor.figureoptions as figureoptions
 
 
-from Phidget22.DeviceClass import DeviceClass
 from Phidget22.DeviceID import DeviceID
 from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor
 from Phidget22.Devices.HumiditySensor import HumiditySensor as PhidgetHumiditySensor
@@ -171,10 +170,11 @@ from unidecode import unidecode
 
 import artisanlib.arabic_reshaper
 from artisanlib.util import appFrozen, decs2string, stringp, uchr, o, u, d, encodeLocal, hex2int, s2a, cmd2str, str2cmd
-from artisanlib.suppress_errors import suppress_stdout_stderr
+#from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.s7port import s7port
 from artisanlib.modbusport import modbusport
 from artisanlib.qtsingleapplication import QtSingleApplication
+from artisanlib.phidgets import PhidgetManager
 
 from artisanlib.sliderStyle import *
 
@@ -825,6 +825,7 @@ class tgraphcanvas(FigureCanvas):
         self.phidgetPassword = ""
         self.phidgetPort = 5661
         self.phidgetServerAdded = False # this should be set on PhidgetNetwork.addServer and cleared on PhidgetNetwork.removeServer
+        self.phidgetManager = None
                 
         self.yoctoRemoteFlag = False
         self.yoctoServerID = "127.0.0.1"
@@ -1748,6 +1749,7 @@ class tgraphcanvas(FigureCanvas):
         #flag to plot cross lines from mouse
         self.crossmarker = False
         self.crossmouseid = 0
+        
 
         #########  temporary serial variables
         #temporary storage to pass values. Holds extra T3 and T4 values for center 309
@@ -6488,9 +6490,35 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.extraNoneTempHint1.append(False)
                 self.extraNoneTempHint2.append(False)          
-        
+
+    def addPhidgetServer(self):
+        if not self.phidgetServerAdded:
+            from Phidget22.Net import Net as PhidgetNetwork
+            PhidgetNetwork.addServer("PhidgetServer",self.phidgetServerID,self.phidgetPort,self.phidgetPassword,0)
+            self.phidgetServerAdded = True
+
+    def removePhidgetServer(self):
+        if self.phidgetServerAdded:
+            from Phidget22.Net import Net as PhidgetNetwork
+            PhidgetNetwork.removeServer("PhidgetServer")
+            self.phidgetServerAdded = False
+            
+    def startPhidgetManager(self):
+        if self.phidgetRemoteFlag:
+            self.addPhidgetServer()
+        if self.phidgetManager is None:
+            self.phidgetManager = PhidgetManager()
+            libtime.sleep(0.3)
+    
+    def stopPhidgetManager(self):
+        if self.phidgetManager is not None:
+            self.phidgetManager.close()
+            self.phidgetManager = None
+        self.removePhidgetServer()
+            
     def OnMonitor(self):
-        try: 
+        try:
+            self.startPhidgetManager()
             # collect ambient data if any
             if self.ambient_pressure_device or self.ambient_humidity_device or self.ambient_temperature_device:
                 self.ambiThread = AmbientThread()
@@ -6610,6 +6638,7 @@ class tgraphcanvas(FigureCanvas):
             QApplication.processEvents()
             if recording and self.flagKeepON:
                 self.OnMonitor()
+            self.stopPhidgetManager()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None) + " OffMonitor() {0}").format(str(ex)),exc_tb.tb_lineno)
@@ -6705,7 +6734,6 @@ class tgraphcanvas(FigureCanvas):
             ser.PhidgetIOvalues = [-1]*8
             ser.PhidgetIOasynctimes = [None]*8
             ser.PhidgetIOasynctimesAveraged = [None]*8
-        ser.removePhidgetServer()
         if ser.YOCTOsensor:
             try:
                 from yoctopuce.yocto_api import YAPI
@@ -10905,23 +10933,20 @@ class SampleThread(QThread):
             # initialize digitizer
             aw.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
+            max_delay = aw.qmc.delay / 1000.
             while True:
                 if aw.qmc.flagon:
                     start = libtime.perf_counter()
-                    #tx = aw.qmc.timeclock.elapsed()
                     
                     #collect information
                     aw.qmc.flagsampling = True # we signal that we are sampling
                     self.sample()
                     aw.qmc.flagsampling = False # we signal that we are done with sampling
                     
-                    # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    
-                    min_delay = aw.qmc.delay # was aw.qmc.min_delay, but for now rela
-                    now = libtime.perf_counter()
-                    dt = max(0.05,min(min_delay,aw.qmc.delay)/1000. - now + start) # min of 1sec to allow for refresh the display
-                    
-                    #dt = aw.qmc.delay/1000. # use this for fixed intervals
+                    # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)                    
+                    now = libtime.perf_counter()                
+                    dt = max(0.1,min(max_delay,aw.qmc.delay) / 1000. - now + start) # min of 0.1sec to allow for refresh the display  
+                    #dt = aw.qmc.delay/1000. # use this for fixed intervals                    
                     #apply sampling interval here
                     if aw.qmc.flagon:
                         libtime.sleep(dt)
@@ -36585,7 +36610,7 @@ class serialport(object):
 
     def PHIDGET1048_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,2)
+        t2,t1,_ = self.PHIDGET1048temperature(DeviceID.PHIDID_1048,2)
         return tx,t1,t2
 
     def PHIDGET1046(self):
@@ -36716,7 +36741,7 @@ class serialport(object):
             
     def PHIDGET_TMP1101_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        t2,t1 = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,2)
+        t2,t1,_ = self.PHIDGET1048temperature(DeviceID.PHIDID_TMP1101,2)
         return tx,t1,t2
 
     def PHIDGET_TMP1100(self):
@@ -36735,17 +36760,23 @@ class serialport(object):
         
     def PHIDGET_HUB0000(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,0)
+        if tx_async is not None:
+            tx = tx_async
         return tx,v1,v2
 
     def PHIDGET_HUB0000_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,1)
+        if tx_async is not None:
+            tx = tx_async
         return tx,v1,v2
 
     def PHIDGET_HUB0000_56(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
-        v2,v1 = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2)
+        v2,v1,tx_async = self.PHIDGET1018values(DeviceID.PHIDID_HUB0000,2)
+        if tx_async is not None:
+            tx = tx_async
         return tx,v1,v2        
 
     def HOTTOP_BTET(self):
@@ -37087,7 +37118,7 @@ class serialport(object):
         try:
             # Temperature
             tempSensor = PhidgetTemperatureSensor()
-            ser,port = self.getFirstMatchingPhidget('PhidgetTemperatureSensor',DeviceID.PHIDID_HUM1000)
+            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',DeviceID.PHIDID_HUM1000,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             if ser:
                 tempSensor.setDeviceSerialNumber(ser)
                 tempSensor.setHubPort(port)   #explicitly set the port to where the HUM is attached            
@@ -37114,7 +37145,7 @@ class serialport(object):
         try:
             # Humidity
             humSensor = PhidgetHumiditySensor()
-            ser,port = self.getFirstMatchingPhidget('PhidgetHumiditySensor',DeviceID.PHIDID_HUM1000)
+            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetHumiditySensor',DeviceID.PHIDID_HUM1000,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             if ser:
                 humSensor.setDeviceSerialNumber(ser)
                 humSensor.setHubPort(port)   #explicitly set the port to where the HUM is attached   
@@ -37140,7 +37171,7 @@ class serialport(object):
     def PhidgetPRE1000pressure(self):
         try:
             pressSensor = PhidgetPressureSensor()
-            ser,port = self.getFirstMatchingPhidget('PhidgetPressureSensor',DeviceID.PHIDID_PRE1000)
+            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetPressureSensor',DeviceID.PHIDID_PRE1000,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             if ser:
                 pressSensor.setDeviceSerialNumber(ser)
                 pressSensor.setHubPort(port)   #explicitly set the port to where the PRE is attached  
@@ -38072,84 +38103,7 @@ class serialport(object):
             from Phidget22.Net import Net as PhidgetNetwork
             PhidgetNetwork.removeServer("PhidgetServer")
             aw.qmc.phidgetServerAdded = False
-            
-# returns the serial and port of the attached device with lowest serial/port numbers of the given class and deviceID
-#   as well as a flag indicating if this is a remote channel
-# returned port is None for non VINT devices and serial is None if no matching device is attached
-    def getFirstMatchingPhidget(self,phidget_class_name,device_id,channel=None):
-        try:
-            phidgets = []
-            def attachHandler(e):
-                phidgets.append(e)
-            def detachHandler(e):
-                phidgets.remove(e)
-            if aw.qmc.phidgetRemoteFlag:
-                timeout = 2000
-                self.addPhidgetServer()
-            else:
-                timeout = 1000 # NOTE: 500ms timeout is tight, for remote access choose a larger timeout
-            while True:
-                with suppress_stdout_stderr():
-                    try:
-                        constructor = globals()[phidget_class_name]
-                        p = constructor()            
-                    except OSError as ex:
-                        aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None) + " Phidget v22 driver not installed")
-                        return None,None 
-                    
-                hub = 0 # we don't search for a hub port
-                
-                if device_id in [DeviceID.PHIDID_HUB0000]:
-                    # we are looking for HUB ports
-                    hub = 1
-                    p.setIsHubPortDevice(1)                    
-                if channel is not None:
-                    if hub:
-                        p.setChannel(0)
-                        p.setHubPort(channel)
-                        p.setIsHubPortDevice(True)
-                    else:
-                        p.setChannel(channel)
-                        
-                ## setIsRemote and setIsLocal have both to be set with inverse argument or both not to be set
-                ## all channels from one physical device have either be accessed via remote or from local
-                if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
-                    p.setIsRemote(True)
-                    p.setIsLocal(False)
-                elif not aw.qmc.phidgetRemoteFlag:
-                    p.setIsRemote(False)
-                    p.setIsLocal(True)
-                
-                p.setOnAttachHandler(attachHandler)
-                p.setOnDetachHandler(detachHandler)
-                try:
-                    p.openWaitForAttachment(timeout) 
-                except:
-                    break
-            serial = None
-            port = None
-            for p in phidgets:
-                try:
-                    if (p.getIsHubPortDevice() and hub) or p.getDeviceID() == device_id: # may throw a Phidgets error 52: not attached
-                        if p.getIsHubPortDevice() or p.getDeviceClass() == DeviceClass.PHIDCLASS_VINT:
-                            if serial is None or serial > p.getDeviceSerialNumber() or (serial == p.getDeviceSerialNumber() and port > p.getHubPort()):
-                                serial = p.getDeviceSerialNumber()
-                                port = p.getHubPort()
-                        else:
-                            if serial is None or serial > p.getDeviceSerialNumber():
-                                serial = p.getDeviceSerialNumber()
-                                port = None
-                    p.close()
-                except:
-                    pass
-            return serial,port        
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)            
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None) + " getFirstMatchingPhidget() {0}").format(str(ex)),exc_tb.tb_lineno)
-            return None,None
-        
+
 #---
 
     def phidget1045TemperatureChanged(self,_,t):
@@ -38231,35 +38185,48 @@ class serialport(object):
         except Exception:
             pass
 
-    def phidget1045attached(self,deviceType):
-        if deviceType == DeviceID.PHIDID_1045:
-            self.configure1045()
-            aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None))
-        elif deviceType == DeviceID.PHIDID_1051:
-            self.configureOneTC()
-            aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 1-input attached",None))
-        elif deviceType == DeviceID.PHIDID_TMP1100:
-            self.configureOneTC()
-            aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input attached",None))
-        elif deviceType == DeviceID.PHIDID_TMP1200:
-            self.configureOneRTD()
-            aw.sendmessage(QApplication.translate("Message","Phidget VINT RTD 1-input attached",None))
+    def phidget1045attached(self,serial,port,deviceType):
+        try:
+            aw.qmc.phidgetManager.reserveSerialPort(serial,port,0,"PhidgetTemperatureSensor",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+            if deviceType != DeviceID.PHIDID_TMP1200:
+                aw.qmc.phidgetManager.reserveSerialPort(serial,port,1,"PhidgetTemperatureSensor",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+            if deviceType == DeviceID.PHIDID_1045:
+                self.configure1045()
+                aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR attached",None))
+            elif deviceType == DeviceID.PHIDID_1051:
+                self.configureOneTC()
+                aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 1-input attached",None))
+            elif deviceType == DeviceID.PHIDID_TMP1100:
+                self.configureOneTC()
+                aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input attached",None))
+            elif deviceType == DeviceID.PHIDID_TMP1200:
+                self.configureOneRTD()
+                aw.sendmessage(QApplication.translate("Message","Phidget VINT RTD 1-input attached",None))
+        except:
+            pass
 
-    def phidget1045detached(self,deviceType):
-        if deviceType == DeviceID.PHIDID_1045:
-            aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR detached",None))
-        elif deviceType == DeviceID.PHIDID_1051:
-            aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 1-input detached",None))
-        elif deviceType == DeviceID.PHIDID_TMP1100:
-            aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input detached",None))
-        elif deviceType == DeviceID.PHIDID_TMP1200:
-            aw.sendmessage(QApplication.translate("Message","Phidget VINT RTD 1-input detached",None))
+    def phidget1045detached(self,serial,port,deviceType):
+        try:
+            aw.qmc.phidgetManager.releaseSerialPort(serial,port,0,"PhidgetTemperatureSensor",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+            if deviceType != DeviceID.PHIDID_TMP1200:
+                aw.qmc.phidgetManager.releaseSerialPort(serial,port,1,"PhidgetTemperatureSensor",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+            if deviceType == DeviceID.PHIDID_1045:
+                aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor IR detached",None))
+            elif deviceType == DeviceID.PHIDID_1051:
+                aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 1-input detached",None))
+            elif deviceType == DeviceID.PHIDID_TMP1100:
+                aw.sendmessage(QApplication.translate("Message","Phidget Isolated Thermocouple 1-input detached",None))
+            elif deviceType == DeviceID.PHIDID_TMP1200:
+                aw.sendmessage(QApplication.translate("Message","Phidget VINT RTD 1-input detached",None))
+        except:
+            pass
 
     # this one is reused for the 1045 (IR), the 1051 (1xTC), TMP1100 (1xTC), and TMP1200 (1xRTD)
     def PHIDGET1045temperature(self,deviceType=DeviceID.PHIDID_1045,retry=True):
         try:
             if not self.PhidgetIRSensor:
-                ser,port = self.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType)
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType,
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
                     self.PhidgetIRSensor = PhidgetTemperatureSensor()
                     if deviceType == DeviceID.PHIDID_TMP1200:
@@ -38267,8 +38234,8 @@ class serialport(object):
                     else:
                         self.PhidgetIRSensorIC = PhidgetTemperatureSensor()
                     try:
-                        self.PhidgetIRSensor.setOnAttachHandler(lambda _:self.phidget1045attached(deviceType))
-                        self.PhidgetIRSensor.setOnDetachHandler(lambda _:self.phidget1045detached(deviceType))
+                        self.PhidgetIRSensor.setOnAttachHandler(lambda _:self.phidget1045attached(ser,port,deviceType))
+                        self.PhidgetIRSensor.setOnDetachHandler(lambda _:self.phidget1045detached(ser,port,deviceType))
                         if aw.qmc.phidgetRemoteFlag:
                             self.addPhidgetServer()
                         if port is not None:
@@ -38428,14 +38395,26 @@ class serialport(object):
                 self.Phidget1048asynctimes[idx] = None
                 self.Phidget1048asynctimesAveraged[idx] = None
 
-    def phidget1048attached(self,idx):
-        self.configure1048(idx)
-        if self.PhidgetTemperatureSensor and self.PhidgetTemperatureSensor[idx].getChannel() == 0:
-            aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None))
+    def phidget1048attached(self,serial,port,deviceType,idx):
+        try:
+            self.configure1048(idx)
+            if self.PhidgetTemperatureSensor is not None and len(self.PhidgetTemperatureSensor) > idx:            
+                channel = self.PhidgetTemperatureSensor[idx].getChannel()
+                aw.qmc.phidgetManager.reserveSerialPort(serial,port,channel,"PhidgetTemperatureSensor",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                if channel == 0:
+                    aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None))
+        except:
+            pass
         
-    def phidget1048detached(self,idx):
-        if self.PhidgetTemperatureSensor and self.PhidgetTemperatureSensor[idx].getChannel() == 0:
-            aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input detached",None))
+    def phidget1048detached(self,serial,port,deviceType,idx):
+        try:
+            if self.PhidgetTemperatureSensor is not None and len(self.PhidgetTemperatureSensor) > idx:
+                channel = self.PhidgetTemperatureSensor[idx].getChannel()
+                aw.qmc.phidgetManager.releaseSerialPort(serial,port,channel,"PhidgetTemperatureSensor",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                if channel == 0:
+                    aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input detached",None))
+        except:
+            pass
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
     # works for the 4xTC USB_Phidget 1048 and the 4xTC VINT Phidget TMP1101
@@ -38445,22 +38424,25 @@ class serialport(object):
                 ser = None
                 port = None 
                 if mode == 0:
-                    ser,port = self.getFirstMatchingPhidget("PhidgetTemperatureSensor",deviceType,0)
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType,0,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
-                elif mode == 1:
-                    ser,port = self.getFirstMatchingPhidget("PhidgetTemperatureSensor",deviceType,2)                      
+                elif mode == 1: 
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType,2,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)                     
                 elif mode == 2:
-                    ser,port = self.getFirstMatchingPhidget("PhidgetTemperatureSensor",deviceType,4)
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetTemperatureSensor',deviceType,4,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
                     self.PhidgetTemperatureSensor = [PhidgetTemperatureSensor()]
                     if mode != 2:
                         self.PhidgetTemperatureSensor.append(PhidgetTemperatureSensor())
                     try:
-                        self.PhidgetTemperatureSensor[0].setOnAttachHandler(lambda _:self.phidget1048attached(0))
-                        self.PhidgetTemperatureSensor[0].setOnDetachHandler(lambda _:self.phidget1048detached(0))
+                        self.PhidgetTemperatureSensor[0].setOnAttachHandler(lambda _:self.phidget1048attached(ser,port,deviceType,0))
+                        self.PhidgetTemperatureSensor[0].setOnDetachHandler(lambda _:self.phidget1048detached(ser,port,deviceType,0))
                         if mode != 2:                            
-                            self.PhidgetTemperatureSensor[1].setOnAttachHandler(lambda _:self.phidget1048attached(1))                        
-                            self.PhidgetTemperatureSensor[1].setOnDetachHandler(lambda _:self.phidget1048detached(1))
+                            self.PhidgetTemperatureSensor[1].setOnAttachHandler(lambda _:self.phidget1048attached(ser,port,deviceType,1))
+                            self.PhidgetTemperatureSensor[1].setOnDetachHandler(lambda _:self.phidget1048detached(ser,port,deviceType,1))
                         if aw.qmc.phidgetRemoteFlag:
                             self.addPhidgetServer()
                         if port is not None:
@@ -38702,14 +38684,26 @@ class serialport(object):
                 self.Phidget1046asynctimes[idx] = None
                 self.Phidget1046asynctimesAveraged[idx] = None
 
-    def phidget1046attached(self,idx):
-        self.configure1046(idx)
-        if self.PhidgetBridgeSensor and self.PhidgetBridgeSensor[idx].getChannel() == 0:
-            aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None))
+    def phidget1046attached(self,serial,port,deviceType,idx):
+        try:
+            self.configure1046(idx)
+            if self.PhidgetBridgeSensor is not None:
+                channel = self.PhidgetBridgeSensor[idx].getChannel()
+                aw.qmc.phidgetManager.reserveSerialPort(serial,port,channel,"VoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                if channel == 0:
+                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None))
+        except:
+            pass
         
-    def phidget1046detached(self,idx):
-        if self.PhidgetBridgeSensor and self.PhidgetBridgeSensor[idx].getChannel() == 0:
-            aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input detached",None))
+    def phidget1046detached(self,serial,port,deviceType,idx):
+        try:
+            if self.PhidgetBridgeSensor is not None:
+                channel = self.PhidgetBridgeSensor[idx].getChannel()
+                aw.qmc.phidgetManager.releaseSerialPort(serial,port,channel,"VoltageRatioInput",deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                if channel == 0:
+                    aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input detached",None))
+        except:
+            pass
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4
     def PHIDGET1046temperature(self,mode=0,retry=True):
@@ -38719,10 +38713,12 @@ class serialport(object):
                 port = None 
                 if mode == 0:
                     # we scan for available main device
-                    ser,port = self.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,0)
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,0,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 # in all other cases, we check for existing serial/port pairs from attaching the main channels 1+2 of the device
                 elif mode == 1:
-                    ser,port = self.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,2)
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('VoltageRatioInput',DeviceID.PHIDID_1046,2,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
                     self.PhidgetBridgeSensor = [VoltageRatioInput(),VoltageRatioInput()]
                 
@@ -38737,8 +38733,8 @@ class serialport(object):
                             if aw.qmc.phidgetRemoteFlag and aw.qmc.phidgetRemoteOnlyFlag:
                                 self.PhidgetBridgeSensor[i].setIsRemote(True)
                                 self.PhidgetBridgeSensor[i].setIsLocal(False)
-                            self.PhidgetBridgeSensor[i].setOnAttachHandler(lambda _,x=i:self.phidget1046attached(x))
-                            self.PhidgetBridgeSensor[i].setOnDetachHandler(lambda _,x=i:self.phidget1046detached(x))
+                            self.PhidgetBridgeSensor[i].setOnAttachHandler(lambda _,x=i:self.phidget1046attached(ser,port,DeviceID.PHIDID_1046,x))
+                            self.PhidgetBridgeSensor[i].setOnDetachHandler(lambda _,x=i:self.phidget1046detached(ser,port,DeviceID.PHIDID_1046,x))
                             libtime.sleep(.1)
                             try:
                                 self.PhidgetBridgeSensor[i].open() #.openWaitForAttachment(timeout)
@@ -38828,14 +38824,18 @@ class serialport(object):
 
     def phidgetBinaryOUTattach(self,channel):
         if not aw.ser.PhidgetBinaryOut:
-            ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1014,channel)
+            aw.qmc.startPhidgetManager()
+            ser,_ = aw.qmc.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1014,channel,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             ports = 4
             if ser is None:
-                ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1017)
+                ser,_ = aw.qmc.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1017,
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 8
             # try to attach up to 8 IO channels of the first Phidget 1010, 1013, 1018, 1019 module
             if ser is None:
-                ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019)
+                ser,_ = aw.qmc.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019,
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 8
             if ser is not None:
                 aw.ser.PhidgetBinaryOut = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]                
@@ -38911,12 +38911,15 @@ class serialport(object):
 
     def phidgetOUTattach(self,channel):
         if not aw.ser.PhidgetDigitalOut:
+            aw.qmc.startPhidgetManager()
             # try to attach the 4 channels of the Phidget OUT1100 module
             ser = None
             port = None
             for phidget_id in [DeviceID.PHIDID_OUT1100,DeviceID.PHIDID_REL1000,DeviceID.PHIDID_REL1100,DeviceID.PHIDID_REL1101]:
                 if ser is None:
-                    ser,port = self.getFirstMatchingPhidget('DigitalOutput',phidget_id)
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',phidget_id,
+                            remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                    print(ser,port)
             if ser is not None:
                 aw.ser.PhidgetDigitalOut = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
                 for i in range(4):
@@ -38990,8 +38993,10 @@ class serialport(object):
 
     def phidgetOUTattachHub(self,channel):
         if not aw.ser.PhidgetDigitalOutHub:
+            aw.qmc.startPhidgetManager()
             # try to attach the 6 channels of the Phidget HUB0000 module
-            ser,_ = self.getFirstMatchingPhidget('DigitalOutput',DeviceID.PHIDID_HUB0000,channel)
+            ser,_ = aw.qmc.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_DIGITALOUTPUT_PORT,channel,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             if ser is not None:
                 aw.ser.PhidgetDigitalOutHub = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
                 for i in range(6):
@@ -39063,17 +39068,22 @@ class serialport(object):
 
     def phidgetVOUTattach(self,channel):
         if not aw.ser.PhidgetAnalogOut:
+            aw.qmc.startPhidgetManager()
             # try to attach the Phidget OUT100x module
-            ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1000)
+            ser,port = aw.qmc.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1000,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             ports = 1
             if ser is None:
-                ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1001)
+                ser,port = aw.qmc.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1001,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 1
             if ser is None:
-                ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_OUT1002)
+                ser,port = aw.qmc.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1002,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 1
             if ser is None:
-                ser,port = self.getFirstMatchingPhidget('VoltageOutput',DeviceID.PHIDID_1002)
+                ser,port = aw.qmc.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_1002,
+                                remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 4
             if ser is not None:
                 aw.ser.PhidgetAnalogOut = [VoltageOutput(),VoltageOutput(),VoltageOutput(),VoltageOutput()]
@@ -39205,31 +39215,43 @@ class serialport(object):
             self.PhidgetIOasynctimes[channel] = None
             self.PhidgetIOasynctimesAveraged[channel] = None
 
-    def phidget1018attached(self,deviceType,idx,digital=False):
-        self.configure1018(deviceType,idx,digital)
-        if self.PhidgetIO and self.PhidgetIO[idx].getChannel() == 0:
-            if deviceType == DeviceID.PHIDID_1011:
-                aw.sendmessage(QApplication.translate("Message","Phidget IO 2/2/2 attached",None))
-            elif deviceType == DeviceID.PHIDID_HUB0000:
-                aw.sendmessage(QApplication.translate("Message","Phidget IO 6/6/6 attached",None))
-            elif deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
-                aw.sendmessage(QApplication.translate("Message","Phidget IO 8/8/8 attached",None))
-            else:
-                aw.sendmessage(QApplication.translate("Message","Phidget IO attached",None))
+    def phidget1018attached(self,serial,port,className,deviceType,idx,digital=False):
+        try:
+            self.configure1018(deviceType,idx,digital)
+            if self.PhidgetIO is not None:
+                channel = self.PhidgetIO[idx].getChannel()
+                aw.qmc.phidgetManager.reserveSerialPort(serial,port,channel,className,deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                if channel == 0:
+                    if deviceType == DeviceID.PHIDID_1011:
+                        aw.sendmessage(QApplication.translate("Message","Phidget IO 2/2/2 attached",None))
+                    elif deviceType == DeviceID.PHIDID_HUB0000:
+                        aw.sendmessage(QApplication.translate("Message","Phidget IO 6/6/6 attached",None))
+                    elif deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
+                        aw.sendmessage(QApplication.translate("Message","Phidget IO 8/8/8 attached",None))
+                    else:
+                        aw.sendmessage(QApplication.translate("Message","Phidget IO attached",None))
+        except:
+            pass
 
-    def phidget1018detached(self,deviceType,idx):
-        if self.PhidgetIO and self.PhidgetIO[idx].getChannel() == 0:
-            if deviceType == DeviceID.PHIDID_1011:
-                aw.sendmessage(QApplication.translate("Message","Phidget IO 2/2/2 detached",None))
-            elif deviceType == DeviceID.PHIDID_HUB0000:
-                aw.sendmessage(QApplication.translate("Message","Phidget IO 6/6/6 detached",None))
-            elif deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
-                aw.sendmessage(QApplication.translate("Message","Phidget IO 8/8/8 detached",None))
-            else:
-                aw.sendmessage(QApplication.translate("Message","Phidget IO detached",None))
+    def phidget1018detached(self,serial,port,className,deviceType,idx):
+        try:
+            if self.PhidgetIO is not None:
+                channel = self.PhidgetIO[idx].getChannel()
+                aw.qmc.phidgetManager.releaseSerialPort(serial,port,channel,className,deviceType,remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
+                if channel == 0:
+                    if deviceType == DeviceID.PHIDID_1011:
+                        aw.sendmessage(QApplication.translate("Message","Phidget IO 2/2/2 detached",None))
+                    elif deviceType == DeviceID.PHIDID_HUB0000:
+                        aw.sendmessage(QApplication.translate("Message","Phidget IO 6/6/6 detached",None))
+                    elif deviceType == DeviceID.PHIDID_1010_1013_1018_1019:
+                        aw.sendmessage(QApplication.translate("Message","Phidget IO 8/8/8 detached",None))
+                    else:
+                        aw.sendmessage(QApplication.translate("Message","Phidget IO detached",None))
+        except:
+            pass
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for probe 5 and 6; mode 3 for probe 7 and 8
-    # access of the VoltageInput for the following IO Phidgets (DigitalIN/DigitalOUT/AnalogIN)
+    # access of the VoltageInput, DigitalInput or VoltageRatioInput for the following IO Phidgets
     #  - Phidget IO 8/8/8 (1010,1013,1018,1019,SBC): DeviceID.PHIDID_1010_1013_1018_1019
     #  - Phidget IO 6/6/6 (HUB0000): DeviceID.PHIDID_HUB0000
     #  - Phidget IO 2/2/2 (1011): DeviceID.PHIDID_1011
@@ -39240,18 +39262,25 @@ class serialport(object):
                 ser = None
                 port = None 
                 if digital:
-                    tp = "DigitalInput"
+                    tp = "PhidgetDigitalInput"
                 else:
-                    tp = "VoltageInput"
+                    if aw.qmc.phidget1018_ratio[mode*2]:
+                        tp = "PhidgetVoltageRatioInput"
+                    else:
+                        tp = "PhidgetVoltageInput"
                 if mode == 0:
                     # we scan for available main device
-                    ser,port = self.getFirstMatchingPhidget(tp,deviceType,0)
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget(tp,deviceType,0,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 elif mode == 1:
-                    ser,port = self.getFirstMatchingPhidget(tp,deviceType,2)
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget(tp,deviceType,2,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 elif mode == 2:
-                    ser,port = self.getFirstMatchingPhidget(tp,deviceType,4)
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget(tp,deviceType,4,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 elif mode == 3:
-                    ser,port = self.getFirstMatchingPhidget(tp,deviceType,6)
+                    ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget(tp,deviceType,6,
+                        remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
                     if digital:
                         self.PhidgetIO = [DigitalInput(),DigitalInput()]
@@ -39266,10 +39295,10 @@ class serialport(object):
                             ch2 = VoltageInput()
                         self.PhidgetIO = [ch1,ch2]
                     try: 
-                        self.PhidgetIO[0].setOnAttachHandler(lambda _:self.phidget1018attached(deviceType,0,digital))
-                        self.PhidgetIO[0].setOnDetachHandler(lambda _:self.phidget1018detached(deviceType,0))
-                        self.PhidgetIO[1].setOnAttachHandler(lambda _:self.phidget1018attached(deviceType,1,digital))
-                        self.PhidgetIO[1].setOnDetachHandler(lambda _:self.phidget1018detached(deviceType,1))
+                        self.PhidgetIO[0].setOnAttachHandler(lambda _:self.phidget1018attached(ser,port,tp,deviceType,0,digital))
+                        self.PhidgetIO[0].setOnDetachHandler(lambda _:self.phidget1018detached(ser,port,tp,deviceType,0))
+                        self.PhidgetIO[1].setOnAttachHandler(lambda _:self.phidget1018attached(ser,port,tp,deviceType,1,digital))
+                        self.PhidgetIO[1].setOnDetachHandler(lambda _:self.phidget1018detached(ser,port,tp,deviceType,1))
                         if deviceType in [DeviceID.PHIDID_HUB0000]:
                             # we are looking to attach a HUB port
                             self.PhidgetIO[0].setIsHubPortDevice(1)
