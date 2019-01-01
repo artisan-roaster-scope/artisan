@@ -10933,7 +10933,7 @@ class SampleThread(QThread):
             # initialize digitizer
             aw.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
             aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
-            max_delay = aw.qmc.delay / 1000.
+            max_delay = aw.qmc.delay
             while True:
                 if aw.qmc.flagon:
                     start = libtime.perf_counter()
@@ -10946,7 +10946,7 @@ class SampleThread(QThread):
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)                    
                     now = libtime.perf_counter()                
                     dt = max(0.1,min(max_delay,aw.qmc.delay) / 1000. - now + start) # min of 0.1sec to allow for refresh the display  
-                    #dt = aw.qmc.delay/1000. # use this for fixed intervals                    
+                    #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     if aw.qmc.flagon:
                         libtime.sleep(dt)
