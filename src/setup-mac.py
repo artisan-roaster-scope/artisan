@@ -67,6 +67,7 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_ja.qm"]),
     ("../translations", [r'translations/artisan_ko.qm']),
     ("../translations", [r'translations/artisan_pt.qm']),
+    ("../translations", [r'translations/artisan_pt_BR.qm']),
     ("../translations", [r'translations/artisan_pl.qm']),
     ("../translations", [r'translations/artisan_ru.qm']),
     ("../translations", [r"translations/artisan_sv.qm"]),

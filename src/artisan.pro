@@ -34,6 +34,7 @@ TRANSLATIONS = \
 	translations/artisan_nl.ts \
 	translations/artisan_ko.ts \
 	translations/artisan_pt.ts \
+	translations/artisan_pt_BR.ts \
 	translations/artisan_ru.ts \
 	translations/artisan_ar.ts \
 	translations/artisan_fi.ts \

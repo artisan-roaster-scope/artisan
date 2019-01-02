@@ -525,6 +525,7 @@ supported_languages = [
     "nl",
     "no",
     "pt",
+    "pt_BR",
     "pl",
     "ru",
     "sv",
@@ -11765,6 +11766,13 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.addAction(self.PortugueseLanguage)
         if locale == "pt":
             self.PortugueseLanguage.setChecked(True)
+
+        self.PortugueseBrasilLanguage = QAction(UIconst.CONF_MENU_BRASIL,self)
+        self.PortugueseBrasilLanguage.setCheckable(True)
+        self.PortugueseBrasilLanguage.triggered.connect(lambda _:self.changelocale("pt_BR"))
+        self.languageMenu.addAction(self.PortugueseBrasilLanguage)
+        if locale == "pt_BR":
+            self.PortugueseBrasilLanguage.setChecked(True)
 
         self.PolishLanguage = QAction(UIconst.CONF_MENU_POLISH,self)
         self.PolishLanguage.setCheckable(True)
@@ -23792,7 +23800,7 @@ class ApplicationWindow(QMainWindow):
         contributors += u(", Nick Watson, Azis Nawawi, Rit Multi, Joongbae Dave Cho (the Chambers), Probat, Andreas Bader, Dario Ernst")
         contributors += u(", Nicolas (Marvell Street Coffee Roasters), Randy (Buckeye Coffee), Moshe Spinell")
         contributors += u(", Morris Beume (Morris.Coffee), Michael Herbert, Bill (San Franciscan Roaster), Chistopher Feran")
-        contributors += u(", Coffed, Bono Gargolov<br>")
+        contributors += u(", Coffed, Bono Gargolov, Rodrigo Ramos, Nico Bigler<br>")
         box = QMessageBox(self)
         
         #create a html QString
