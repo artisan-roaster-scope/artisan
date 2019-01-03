@@ -45,7 +45,7 @@ Smooth Curves and Smooth Deltas are the two critical values you should adjust to
 
 The best settings depend on the noise produced by your meter, probes and overall system as well as the sampling interval. In general apply only as much smoothing as strictly necessary. If you want the most accurate readings, your hardware should be chosen to fight noise before the roasting software, by selecting/configuring a meter to produce minimal noise, selecting probes that produce minimal noise (note that probes with small diameter produce a lot more noise and that different probes of the same diameter can produce a different amount of noise), and protecting the system against ground-loop noise and electrical inferences.
 
-**Smooth Spikes** will activate a further low-pass filter that eliminates tiny spikes that occur on some systems randomly due to some electronic noise. This filter is only applied offline if optimal smoothing is active.
+**Smooth Spikes** will activate a further low-pass filter that eliminates tiny spikes that occur on some systems randomly due to some electronic noise. This filter is only applied offline if Optimal Smoothing is active.
 
 *Filtering After the Roast - An Alternative*
 
