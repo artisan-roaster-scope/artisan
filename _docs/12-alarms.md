@@ -2,7 +2,7 @@
 title: "Alarms"
 permalink: /docs/alarms/
 excerpt: ""
-last_modified_at: 2018-05-15T15:59:00-04:00
+last_modified_at: 2019-01-03T15:59:00-04:00
 
 ---
 
@@ -18,9 +18,16 @@ Alarms are unordered by definition. All alarm conditions of not-yet activated al
 
 ### Alarms from Profiles and Background Roasts
 
-If you want to load Alarms from a profile (.alog file) you can do so.  As of 1.4, if you have alarms from a background roast that you want to use you can check the box for Load from Background.  Alarms are also saved when you save your settings.  
+If you want to load Alarms from a profile (.alog file) check Load from Profile, or if you want alarms from a background roast, check the box for Load from Background. Alarms are also saved when you save your settings.  
 
 ![alarm trigger](/assets/images/gsg/alarms in 14.png)
+
+### Create Alarms from a Profile
+
+If you have a previous roast loaded that contains some (custom) events, you open its event table (menu Roast >> Properties; 3rd tab Events) you can turn the list of events listed there into alarms by clicking "Create Alarms".
+
+The "Create Alarms" action takes all SELECTED events listed in the table.  If NO events are  selected it takes all of them and turns each of them into an alarm rule. Make sure you check what is selected on on your screen.  Note that you can use the standard modifier keys on your operating system to achieve multi-selections (e.g. the command/apple key on Mac OS X) and further note that other tables within Artisan behave in a similar way.
+
 
 ### Alarms To Trigger PopUPs
 
