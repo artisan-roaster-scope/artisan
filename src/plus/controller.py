@@ -144,7 +144,7 @@ def connect(clear_on_failure = False):
                         connection.clearCredentials()
                         config.app_window.sendmessage(QApplication.translate("Plus","artisan.plus turned off",None))  # @UndefinedVariable
                     else:
-                        message = QApplication.translate("Plus","Authentification failed",None)
+                        message = QApplication.translate("Plus","Authentication failed",None)
                         if not config.app_window.plus_account is None: # @UndefinedVariable
                             message = config.app_window.plus_account + " " + message # @UndefinedVariable
                         config.app_window.sendmessage(message) # @UndefinedVariable

@@ -168,7 +168,7 @@ def authentify():
                         config.logger.debug("connection: -> account: %s",account_nr)
                     return True
                 else:
-                    config.logger.debug("connection: -> authentification failed")
+                    config.logger.debug("connection: -> authentication failed")
                     if "error" in res:
                         config.app_window.sendmessage(res["error"]) # @UndefinedVariable
                     clearCredentials()

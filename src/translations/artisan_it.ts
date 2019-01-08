@@ -8416,107 +8416,112 @@ Modify your setup?</source>
     <message>
         <location filename="../plus/login.py" line="39"/>
         <source>Register</source>
-        <translation type="unfinished">Registro</translation>
+        <translation>Registro</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="128"/>
         <source>Keyring error: Ensure that gnome-keyring is installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Errore portachiavi: assicurarsi che gnome-keyring sia installato.</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="131"/>
         <source>Login aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Login interrotto</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="136"/>
         <source>authentified</source>
-        <translation type="unfinished"></translation>
+        <translation>autenticato</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="137"/>
         <source>Connected to artisan.plus</source>
-        <translation type="unfinished"></translation>
+        <translation>Collegato ad artisan.plus</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="175"/>
         <source>artisan.plus turned off</source>
-        <translation type="unfinished"></translation>
+        <translation>artisan.plus spento</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="147"/>
         <source>Authentification failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Autenticazione fallita</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="157"/>
         <source>Couldn&apos;t connect to artisan.plus</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile connettersi a artisan.plus</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="177"/>
         <source>artisan.plus disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>artisan.plus disconnesso</translation>
     </message>
     <message>
         <location filename="../plus/login.py" line="41"/>
         <source>Reset Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Resetta la password</translation>
     </message>
     <message>
         <location filename="../plus/login.py" line="45"/>
         <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation>E-mail</translation>
     </message>
     <message>
         <location filename="../plus/login.py" line="51"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../plus/login.py" line="54"/>
         <source>Remember</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricorda</translation>
     </message>
     <message>
         <location filename="../plus/queue.py" line="166"/>
         <source>Queuing roast for upload to artisan.plus</source>
-        <translation type="unfinished"></translation>
+        <translation>Arresto in coda per il caricamento su artisan.plus</translation>
     </message>
     <message>
         <location filename="../plus/stock.py" line="158"/>
         <source>bag</source>
-        <translation type="unfinished"></translation>
+        <translation>sacco</translation>
     </message>
     <message>
         <location filename="../plus/stock.py" line="159"/>
         <source>box</source>
-        <translation type="unfinished"></translation>
+        <translation>scatola</translation>
     </message>
     <message>
         <location filename="../plus/stock.py" line="160"/>
         <source>barrel</source>
-        <translation type="unfinished"></translation>
+        <translation>barile</translation>
     </message>
     <message>
         <location filename="../plus/stock.py" line="163"/>
         <source>bags</source>
-        <translation type="unfinished"></translation>
+        <translation>sacchi</translation>
     </message>
     <message>
         <location filename="../plus/stock.py" line="164"/>
         <source>boxes</source>
-        <translation type="unfinished"></translation>
+        <translation>scatole</translation>
     </message>
     <message>
         <location filename="../plus/stock.py" line="165"/>
         <source>barrels</source>
-        <translation type="unfinished"></translation>
+        <translation>barili</translation>
     </message>
     <message>
         <location filename="../plus/sync.py" line="278"/>
         <source>Updated data received from artisan.plus</source>
-        <translation type="unfinished"></translation>
+        <translation>Dati aggiornati ricevuti da artisan.plus</translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="147"/>
+        <source>Authentication failed</source>
+        <translation>Autenticazione fallita</translation>
     </message>
 </context>
 <context>
@@ -10236,17 +10241,22 @@ Currently in ALL FINISHING MODE</source>
     <message>
         <location filename="../artisanlib/main.py" line="12977"/>
         <source>Syncing with artisan.plus</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronizzazione con artisan.plus</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="12984"/>
         <source>Upload to artisan.plus</source>
-        <translation type="unfinished"></translation>
+        <translation>Carica su artisan.plus</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10097"/>
         <source>Connect plus service</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Connetti a più servizi</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="10097"/>
+        <source>Connect to plus service</source>
+        <translation>Connetti a più servizi</translation>
     </message>
 </context>
 </TS>

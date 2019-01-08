@@ -8174,7 +8174,7 @@ Modify your setup?</source>
     <message>
         <location filename="../plus/controller.py" line="147"/>
         <source>Authentification failed</source>
-        <translation>Anmeldung fehlgeschlagen</translation>
+        <translation type="obsolete">Anmeldung fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="157"/>
@@ -8235,6 +8235,11 @@ Modify your setup?</source>
         <location filename="../plus/queue.py" line="166"/>
         <source>Queuing roast for upload to artisan.plus</source>
         <translation>Röstung wird zu artisan.plus übertragen</translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="147"/>
+        <source>Authentication failed</source>
+        <translation>Anmeldung fehlgeschlagen</translation>
     </message>
 </context>
 <context>
@@ -10046,6 +10051,11 @@ Momentan in ALLE in ENDPHASE MODUS</translation>
     <message>
         <location filename="../artisanlib/main.py" line="10097"/>
         <source>Connect plus service</source>
+        <translation type="obsolete">Mit artisan.plus verbinden</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="10097"/>
+        <source>Connect to plus service</source>
         <translation>Mit artisan.plus verbinden</translation>
     </message>
 </context>

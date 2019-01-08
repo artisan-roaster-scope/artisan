@@ -10054,7 +10054,7 @@ class VMToolbar(NavigationToolbar):
             self.toolitems = (
 
 #PLUS-COMMENT
-                ('Plus', QApplication.translate("Tooltip", 'Connect plus service', None), 'plus', 'plus'),
+                ('Plus', QApplication.translate("Tooltip", 'Connect to plus service', None), 'plus', 'plus'),
                 
                 ('Home', QApplication.translate("Tooltip", 'Reset original view', None), 'home', 'home'),
                 ('Back', QApplication.translate("Tooltip", 'Back to  previous view', None), 'back', 'back'),
@@ -20470,6 +20470,7 @@ class ApplicationWindow(QMainWindow):
 
 #--------------------------------
         try:
+            
             if "canvas" in aw.qmc.palette:
                 aw.updateCanvasColors()
             
@@ -20493,6 +20494,7 @@ class ApplicationWindow(QMainWindow):
                         aw.setdpi(aw.dpi,moveWindow=True) # with moveWindow=True, Mac builds fail on startup!
                 except Exception as e:
                     pass
+            
             #restore geometry
             if settings.contains("Geometry"):
                 self.restoreGeometry(settings.value("Geometry"))
@@ -20513,6 +20515,8 @@ class ApplicationWindow(QMainWindow):
                 self.showFullScreen()
                 if platf != 'Darwin':
                     aw.fullscreenAction.setChecked(True)
+            
+            QApplication.processEvents() # this one seems to be necessary in some cases to prevent a crash!?
                             
         except Exception as e:
             res = False
@@ -38833,16 +38837,16 @@ class serialport(object):
     def phidgetBinaryOUTattach(self,channel):
         if not aw.ser.PhidgetBinaryOut:
             aw.qmc.startPhidgetManager()
-            ser,_ = aw.qmc.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1014,channel,
+            ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1014,channel,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             ports = 4
             if ser is None:
-                ser,_ = aw.qmc.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1017,
+                ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1017,
                             remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 8
             # try to attach up to 8 IO channels of the first Phidget 1010, 1013, 1018, 1019 module
             if ser is None:
-                ser,_ = aw.qmc.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019,
+                ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_1010_1013_1018_1019,
                             remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 8
             if ser is not None:
@@ -39003,7 +39007,7 @@ class serialport(object):
         if not aw.ser.PhidgetDigitalOutHub:
             aw.qmc.startPhidgetManager()
             # try to attach the 6 channels of the Phidget HUB0000 module
-            ser,_ = aw.qmc.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_DIGITALOUTPUT_PORT,channel,
+            ser,_ = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetDigitalOutput',DeviceID.PHIDID_DIGITALOUTPUT_PORT,channel,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             if ser is not None:
                 aw.ser.PhidgetDigitalOutHub = [DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput(),DigitalOutput()]
@@ -39078,19 +39082,19 @@ class serialport(object):
         if not aw.ser.PhidgetAnalogOut:
             aw.qmc.startPhidgetManager()
             # try to attach the Phidget OUT100x module
-            ser,port = aw.qmc.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1000,
+            ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1000,
                         remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
             ports = 1
             if ser is None:
-                ser,port = aw.qmc.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1001,
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1001,
                                 remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 1
             if ser is None:
-                ser,port = aw.qmc.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1002,
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_OUT1002,
                                 remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 1
             if ser is None:
-                ser,port = aw.qmc.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_1002,
+                ser,port = aw.qmc.phidgetManager.getFirstMatchingPhidget('PhidgetVoltageOutput',DeviceID.PHIDID_1002,
                                 remote=aw.qmc.phidgetRemoteFlag,remoteOnly=aw.qmc.phidgetRemoteOnlyFlag)
                 ports = 4
             if ser is not None:

@@ -8166,7 +8166,7 @@ Modify your setup?</source>
     <message>
         <location filename="../plus/controller.py" line="147"/>
         <source>Authentification failed</source>
-        <translation>Authtification échouée</translation>
+        <translation type="obsolete">Authtification échouée</translation>
     </message>
     <message>
         <location filename="../plus/controller.py" line="157"/>
@@ -8237,6 +8237,11 @@ Modify your setup?</source>
         <location filename="../plus/sync.py" line="278"/>
         <source>Updated data received from artisan.plus</source>
         <translation>Données mises à jour depuis artisan plus</translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="147"/>
+        <source>Authentication failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10085,7 +10090,12 @@ Actuellement en MODE TOUS DEVELOPEMENT</translation>
     <message>
         <location filename="../artisanlib/main.py" line="10097"/>
         <source>Connect plus service</source>
-        <translation>Connecter le service plus</translation>
+        <translation type="obsolete">Connecter le service plus</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="10097"/>
+        <source>Connect to plus service</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

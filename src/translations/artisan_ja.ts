@@ -8560,11 +8560,6 @@ Modify your setup?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../plus/controller.py" line="147"/>
-        <source>Authentification failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../plus/controller.py" line="157"/>
         <source>Couldn&apos;t connect to artisan.plus</source>
         <translation type="unfinished"></translation>
@@ -8632,6 +8627,11 @@ Modify your setup?</source>
     <message>
         <location filename="../plus/sync.py" line="278"/>
         <source>Updated data received from artisan.plus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../plus/controller.py" line="147"/>
+        <source>Authentication failed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -10573,7 +10573,7 @@ Currently in ALL FINISHING MODE</source>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="10097"/>
-        <source>Connect plus service</source>
+        <source>Connect to plus service</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
