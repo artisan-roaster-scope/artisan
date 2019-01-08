@@ -118,7 +118,7 @@ DATA_FILES = [
     ("../Resources", [r"includes/Themes"]),
     ("../Resources", [r"includes/Icons"]),
   ]
-  
+
 if os.environ['ARTISAN_LEGACY_BUILD'] == "true":
     # we remove Qt components that are not available on legacy Qt installations
     DATA_FILES = [e for e in DATA_FILES if not "qt_plugins/styles" in e[0] and not "qt_plugins/platformthemes" in e[0]]
@@ -156,7 +156,7 @@ OPTIONS = {
     'semi_standalone': False,
     'site_packages': True,
     'dylib_excludes': ['phonon','QtDeclarative','QtDesigner',
-                    'QtHelp','QtMultimedia','QtNetwork',
+                    'QtHelp','QtMultimedia',
                     'QtOpenGL','QtScript','QtScriptTools',
                     'QtSql','QtTest','QtXmlPatterns','QtWebKit'],
     'packages': ['yoctopuce','gevent','openpyxl','certifi'],
@@ -250,8 +250,6 @@ Qt_frameworks = [
     'QtPrintSupport.framework',
     'QtNetwork.framework',
     'QtDBus.framework',
-#    'QtXml.framework',
-#    'QtMacExtras.framework',
 ]
 for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/'):
     for d in dirs:
