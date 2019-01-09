@@ -1,9 +1,9 @@
 #!/bin/sh
 
-set -ex
-#set -e
+#set -ex
+set -e
 
-brew update
+brew update # this seems to help to work around some homebrew issues
 
 #brew upgrade python
 
