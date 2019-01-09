@@ -16,19 +16,14 @@ if system() == 'Darwin':
             from PyQt5.QtWidgets import QApplication
             QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
     except Exception:
-        try:
-            if str(sys.frozen) == "macosx_app":
-                from PyQt4.QtGui import QApplication
-                QApplication.addLibraryPath(os.path.dirname(os.path.abspath(__file__)) + "/qt_plugins/")
-        except Exception:
-            pass
+        pass
 elif system().startswith("Windows"):
     try:
         ib = (hasattr(sys, "frozen") or # new py2exe
             hasattr(sys, "importers") # old py2exe
 #            or imp.is_frozen("__main__")) # tools/freeze
              or getattr(sys, 'frozen', False)) # tools/freeze           
-        from PyQt5.QtWidgets import QApplication
+        from PyQt5.QtWidgets import QApplication # @Reimport
         if ib:
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))            
         else:
@@ -37,37 +32,21 @@ elif system().startswith("Windows"):
             QApplication.addLibraryPath(site.getsitepackages()[1] + "\\PyQt5\\plugins")
 
     except Exception:
-        try:
-            from PyQt4.QtGui import QApplication
-            if ib:
-                QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.realpath(sys.executable)), "plugins"))
-            else:
-                import site
-                QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "\\PyQt4\\plugins")
-        except:
-            pass
+        pass
 else: # Linux
     try:
         ib = getattr(sys, 'frozen', False)
-        from PyQt5.QtWidgets import QApplication
+        from PyQt5.QtWidgets import QApplication # @Reimport
         if ib:
             QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "Resources/qt_plugins"))            
         else:
-            import site
+            import site # @Reimport# @Reimport
             QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "/PyQt5/qt_plugins")
     except Exception:
-        try:
-            from PyQt4.QtGui import QApplication
-            if ib:
-                QApplication.addLibraryPath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "Resources/qt_plugins"))
-            else:
-                import site
-                QApplication.addLibraryPath(os.path.dirname(site.getsitepackages()[0]) + "/PyQt4/qt_plugins")
-        except:
-            pass
+        pass
         
 from artisanlib import main
-import numpy
+import numpy # @UnusedImport
 from multiprocessing import freeze_support
 
 if system() == "Windows" and (hasattr(sys, "frozen") # new py2exe

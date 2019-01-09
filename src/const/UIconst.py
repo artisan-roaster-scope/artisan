@@ -13,18 +13,7 @@
 #
 # This file is part of Artisan.
 
-try:
-    from PyQt5.QtCore import QLibraryInfo
-    pyqtversion = 5
-except:
-    pyqtversion = 4
-
-if pyqtversion < 5:
-    from PyQt4.QtGui import QApplication
-    from PyQt4.QtCore import QT_VERSION_STR
-else:
-    from PyQt5.QtWidgets import QApplication
-    from PyQt5.QtCore import QT_VERSION_STR
+from PyQt5.QtWidgets import QApplication # @Reimport
 
 import platform
 

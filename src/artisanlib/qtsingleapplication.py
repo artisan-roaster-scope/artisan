@@ -14,10 +14,10 @@ from PyQt5.QtNetwork import QLocalSocket, QLocalServer
 class QtSingleApplication(QApplication):
     messageReceived = pyqtSignal(str)
 
-    def __init__(self, id, *argv):
+    def __init__(self, _id, *argv):
 
         super(QtSingleApplication, self).__init__(*argv)
-        self._id = id
+        self._id = _id
         self._activationWindow = None
         self._activateOnMessage = False
 

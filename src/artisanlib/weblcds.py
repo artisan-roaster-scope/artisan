@@ -131,7 +131,7 @@ def send():
 # route that establishes the websocket between the Artisan app and the clients
 @route('/websocket')
 def handle_websocket():
-    wsock = request.environ.get('wsgi.websocket')
+    wsock = request.environ.get('wsgi.websocket')  # @UndefinedVariable
     if not wsock:
         abort(400, 'Expected WebSocket request.')
     wsocks.append(wsock)

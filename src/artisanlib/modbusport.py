@@ -3,7 +3,7 @@ import time
 from PyQt5.QtCore import QSemaphore
 from PyQt5.QtWidgets import QApplication
 
-from artisanlib.util import *
+from artisanlib.util import * #@UnusedWildImport
 
 def convert_to_bcd(decimal):
     ''' Converts a decimal value to a bcd value

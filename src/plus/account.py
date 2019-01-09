@@ -24,7 +24,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import shelve
-from pathlib import Path
 
 from PyQt5.QtCore import QSemaphore
 

@@ -11726,9 +11726,9 @@ class ApplicationWindow(QMainWindow):
 
         self.IndonesianLanguage = QAction(UIconst.CONF_MENU_INDONESIAN,self)
         self.IndonesianLanguage.setCheckable(True)
-        self.IndonesianLanguage.triggered.connect(lambda _:self.changelocale("id"))
+        self.IndonesianLanguage.triggered.connect(lambda _:self.changelocale("_id"))
         self.languageMenu.addAction(self.IndonesianLanguage)
-        if locale == "id":
+        if locale == "_id":
             self.IndonesianLanguage.setChecked(True)
 
         self.ItalianLanguage = QAction(UIconst.CONF_MENU_ITALIAN,self)
@@ -29079,7 +29079,7 @@ class editGraphDlg(ArtisanDialog):
             self.plus_coffees = None
             self.plus_blends = None
             self.plus_default_store = aw.qmc.plus_default_store
-            # current selected stock/coffee/blend id
+            # current selected stock/coffee/blend _id
             if aw.qmc.plus_store is not None:
                 self.plus_store_selected = aw.qmc.plus_store # holds the store corresponding to the plus_coffee_selected/plus_blend_selected
                 self.plus_store_selected_label = aw.qmc.plus_store_label
@@ -36135,7 +36135,7 @@ class serialport(object):
         self.YOCTOsensor = None
         self.YOCTOchan1 = None
         self.YOCTOchan2 = None
-        #stores the id of the meter HH506RA as a string
+        #stores the _id of the meter HH506RA as a string
         self.HH506RAid = "X"
         #MS6514 variables
         self.MS6514PrevTemp1 = -1
@@ -49490,7 +49490,7 @@ class FujiPID(object):
                   "rampslopeunit":[1,41432], #0=hour,1=min
                   "controlmethod":[0,41002],  #0=pid,2=fuzzy,2=self,3=pid2
                   #################  CH8     Sets the defect conditions for each type of alarm
-                  #################  CH9     Sets the station number id and communication parameters of the PID controller
+                  #################  CH9     Sets the station number _id and communication parameters of the PID controller
                   #################  CH10    Changes settings for valve control 
                   #################  CH11    Sets passwords
                   #################  CH12    Sets the parameters mask functions to hide parameters from the user

@@ -25,7 +25,6 @@
 
 import logging
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 
 from plus import util
 

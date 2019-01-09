@@ -24,7 +24,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import shelve
-from pathlib import Path
 
 from PyQt5.QtCore import QSemaphore, QTimer
 from PyQt5.QtWidgets import QApplication
@@ -336,7 +335,7 @@ def fetchServerUpdate(uuid,file=None):
         config.logger.error("sync: Exception in fetchServerUpdate() in line %s: %s",exc_tb.tb_lineno,e)
     finally:
         aw.editgraphdialog = None # stop block opening the Roast Properties dialog while syncing from the server
-        config.app_window.updatePlusStatusSignal.emit()
+        config.app_window.updatePlusStatusSignal.emit() # @UndefinedVariable
 
 
 # updates from server are only requested if connected and the uuid is in the sync cache

@@ -37,10 +37,10 @@ import json
 import platform
 
 if platform.system().startswith("Windows") or platform.system() == 'Darwin':
-    import keyring.backends.fail
-    import keyring.backends.OS_X
-    import keyring.backends.SecretService
-    import keyring.backends.Windows
+    import keyring.backends.fail # @UnusedImport
+    import keyring.backends.OS_X # @UnusedImport
+    import keyring.backends.SecretService # @UnusedImport
+    import keyring.backends.Windows # @UnusedImport
 import keyring # @Reimport # imported last to make py2app work
 
 
@@ -113,12 +113,12 @@ def setKeyring():
             keyring.set_keyring(keyring.backends.OS_X.Keyring())
         else: # Linux
             try:
-                import keyring
+                import keyring # @Reimport
                 config.logger.debug("controller: keyring.get_keyring() %s",keyring.get_keyring())
                 # test if secretstorage dbus is working
-                import secretstorage  # @Reimport
+                import secretstorage  # @Reimport @UnresolvedImport
                 bus = secretstorage.dbus_init()
-                res = list(secretstorage.get_all_collections(bus))
+                _ = list(secretstorage.get_all_collections(bus))
                 # if yes, import it
                 import keyring.backends.SecretService # @Reimport
                 ss_keyring = keyring.backends.SecretService.Keyring()
